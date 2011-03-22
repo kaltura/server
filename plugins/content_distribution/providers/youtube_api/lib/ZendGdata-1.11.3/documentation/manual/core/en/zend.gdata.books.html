@@ -1,0 +1,601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Using the Book Search Data API - Zend Framework Manual</title>
+
+</head>
+<body>
+<table width="100%">
+    <tr valign="top">
+        <td width="85%">
+            <table width="100%">
+                <tr>
+                    <td width="25%" style="text-align: left;">
+                    <a href="zend.gdata.authsub.html">Authenticating with AuthSub</a>
+                    </td>
+
+                    <td width="50%" style="text-align: center;">
+                        <div class="up"><span class="up"><a href="zend.gdata.html">Zend_Gdata</a></span><br />
+                        <span class="home"><a href="manual.html">Programmer's Reference Guide</a></span></div>
+                    </td>
+
+                    <td width="25%" style="text-align: right;">
+                        <div class="next" style="text-align: right; float: right;"><a href="zend.gdata.clientlogin.html">Authenticating with ClientLogin</a></div>
+                    </td>
+                </tr>
+            </table>
+<hr />
+<div id="zend.gdata.books" class="section"><div class="info"><h1 class="title">Using the Book Search Data API</h1></div>
+    
+
+    <p class="para">
+        The Google Book Search Data <acronym class="acronym">API</acronym> allows client applications to view
+        and update Book Search content in the form of Google Data <acronym class="acronym">API</acronym> feeds.
+    </p>
+
+    <p class="para">
+        Your client application can use the Book Search Data <acronym class="acronym">API</acronym> to issue
+        full-text searches for books and to retrieve standard book information,
+        ratings, and reviews. You can also access individual users&#039;
+        <a href="http://books.google.com/googlebooks/mylibrary/" class="link external">&raquo; library collections and
+            public reviews</a>. Finally, your application can submit authenticated requests
+        to enable users to create and modify library collections, ratings, labels,
+        reviews, and other account-specific entities.
+    </p>
+
+    <p class="para">
+        For more information on the Book Search Data <acronym class="acronym">API</acronym>, please refer to the
+        official <a href="http://code.google.com/apis/books/gdata/developers_guide_php.html" class="link external">&raquo; PHP
+            Developer&#039;s Guide</a> on code.google.com.
+    </p>
+
+    <div class="section" id="zend.gdata.books.authentication" name="zend.gdata.books.authentication"><div class="info"><h1 class="title">Authenticating to the Book Search service</h1></div>
+        
+
+        <p class="para">
+            You can access both public and private feeds using the Book Search
+            Data <acronym class="acronym">API</acronym>. Public feeds don&#039;t require any authentication, but they are
+            read-only. If you want to modify user libraries, submit reviews or
+            ratings, or add labels, then your client needs to authenticate before
+            requesting private feeds. It can authenticate using either of two
+            approaches: AuthSub proxy authentication or ClientLogin username/password
+            authentication. Please refer to the <a href="http://code.google.com/apis/books/gdata/developers_guide_php.html#Authentication" class="link external">&raquo; Authentication
+                section in the <acronym class="acronym">PHP</acronym> Developer&#039;s Guide</a> for more detail.
+        </p>
+    </div>
+
+    <div class="section" id="zend.gdata.books.searching_for_books" name="zend.gdata.books.searching_for_books"><div class="info"><h1 class="title">Searching for books</h1></div>
+        
+
+        <p class="para">
+            The Book Search Data <acronym class="acronym">API</acronym> provides a number of feeds that list
+            collections of books.
+        </p>
+
+        <p class="para">
+            The most common action is to retrieve a list of books that match a
+            search query. To do so you create a <span class="classname">VolumeQuery</span> object
+            and pass it to the  <span class="methodname">Books::getVolumeFeed()</span> method.
+        </p>
+
+        <p class="para">
+            For example, to perform a keyword query, with a filter on
+            viewability to restrict the results to partial or full view books, use
+            the  <span class="methodname">setMinViewability()</span> and  <span class="methodname">setQuery()</span>
+            methods of the <span class="classname">VolumeQuery</span> object. The following code snippet
+            prints the title and viewability of all volumes whose metadata or text matches
+            the query term &quot;domino&quot;:
+        </p>
+
+        <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Books<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">newVolumeQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'domino'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setMinViewability</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'partial_view'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">getVolumeFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$feed</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$entry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getVolumeId</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getTitle</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getViewability</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+
+        <p class="para">
+            The <span class="classname">Query</span> class, and subclasses like
+            <span class="classname">VolumeQuery</span>, are responsible for constructing feed
+            <acronym class="acronym">URL</acronym>s. The VolumeQuery shown above constructs a <acronym class="acronym">URL</acronym>
+            equivalent to the following:
+        </p>
+
+        <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">http:<span style="color: #808080; font-style: italic;">//www.google.com/books/feeds/volumes?q=keyword&amp;amp;min-viewability=partial</span></div></li></ol></div></div></div>
+
+
+        <p class="para">
+            Note: Since Book Search results are
+            public, you can issue a Book Search query without authentication.
+        </p>
+
+        <p class="para">
+            Here are some of the most common <span class="classname">VolumeQuery</span>
+            methods for setting search parameters:
+        </p>
+
+        <p class="para">
+             <span class="methodname">setQuery()</span>: Specifies a search
+            query term. Book Search searches all book metadata and full text for
+            books matching the term. Book metadata includes titles, keywords,
+            descriptions, author names, and subjects.
+            Note that any spaces, quotes or other punctuation in the parameter
+            value must be <acronym class="acronym">URL</acronym>-escaped (Use a plus (<em class="emphasis">+</em>) for a
+            space). To search for an exact phrase, enclose the phrase in quotation marks.
+            For example, to search for books matching the phrase &quot;spy plane&quot;, set
+            the <span class="property">q</span> parameter to <strong class="command">%22spy+plane%22</strong>.
+            You can also use any of the <a href="http://books.google.com/advanced_book_search" class="link external">&raquo; 
+            advanced search operators</a> supported by Book Search. For example,
+            <strong class="command">jane+austen+-inauthor:austen</strong> returns matches that mention
+            (but are not authored by) Jane Austen.
+        </p>
+
+        <p class="para">
+             <span class="methodname">setStartIndex()</span>: Specifies
+            the index of the first matching result that should be included in the
+            result set. This parameter uses a one-based index, meaning the first
+            result is 1, the second result is 2 and so forth. This parameter works
+            in conjunction with the max-results
+            parameter to determine which results to return. For example, to
+            request the third set of 10 results—results 21-30—set
+            the <span class="property">start-index</span> parameter to <em class="emphasis">21</em> and the
+            max-results parameter to <em class="emphasis">10</em>.
+            Note: This isn&#039;t a general cursoring
+            mechanism. If you first send a query with
+            <strong class="command">?start-index=1&amp;max-results=10</strong> and then send another
+            query with <strong class="command">?start-index=11&amp;max-results=10</strong>, the
+            service cannot guarantee that the results are equivalent to
+            <strong class="command">?start-index=1&amp;max-results=20</strong>, because insertions and
+            deletions could have taken place in between the two queries.
+        </p>
+
+        <p class="para">
+             <span class="methodname">setMaxResults()</span>:
+            Specifies the maximum number of results that should be included
+            in the result set. This parameter works in conjunction with the
+            start-index parameter to determine which
+            results to return. The default value of this parameter is
+            <em class="emphasis">10</em> and the maximum value is <em class="emphasis">20</em>.
+        </p>
+
+        <p class="para">
+             <span class="methodname">setMinViewability()</span>: Allows you to filter the results according
+            to the books&#039; <a href="http://code.google.com/apis/books/docs/dynamic-links.html#terminology" class="link external">&raquo; viewability
+                status</a>. This parameter accepts one of three values:
+            <em class="emphasis">&#039;none&#039;</em> (the default, returning all matching books regardless of
+            viewability), <em class="emphasis">&#039;partial_view&#039;</em> (returning only books
+            that the user can preview or view in their entirety), or
+            <em class="emphasis">&#039;full_view&#039;</em> (returning only books that the user can
+            view in their entirety).
+        </p>
+
+        <div class="section" id="zend.gdata.books.partner_restrict" name="zend.gdata.books.partner_restrict"><div class="info"><h1 class="title">Partner Co-Branded Search</h1></div>
+            
+
+            <p class="para">
+                Google Book Search provides <a href="http://books.google.com/support/partner/bin/answer.py?hl=en&answer=65113" class="link external">&raquo; Co-Branded
+                    Search</a>, which lets content partners provide full-text search of
+                their books from their own websites.
+            </p>
+
+            <p class="para">
+                If you are a partner who wants to do Co-Branded Search using the
+                Book Search Data <acronym class="acronym">API</acronym>, you may do so by modifying the feed
+                <acronym class="acronym">URL</acronym> above to point to your Co-Branded Search implementation. if,
+                for example, a Co-Branded Search is available at the following
+                <acronym class="acronym">URL</acronym>:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">http:<span style="color: #808080; font-style: italic;">//www.google.com/books/p/PARTNER_COBRAND_ID?q=ball</span></div></li></ol></div></div></div>
+
+
+            <p class="para">
+                then you can obtain the same results using the Book Search Data
+                <acronym class="acronym">API</acronym> at the following <acronym class="acronym">URL</acronym>:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">http:<span style="color: #808080; font-style: italic;">//www.google.com/books/feeds/p/PARTNER_COBRAND_ID/volumes?q=ball+-soccer</span></div></li></ol></div></div></div>
+
+
+            <p class="para">
+                To specify an alternate <acronym class="acronym">URL</acronym> when querying a volume feed, you can
+                provide an extra parameter to  <span class="methodname">newVolumeQuery()</span>
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> =</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">newVolumeQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'http://www.google.com/books/p/PARTNER_COBRAND_ID'</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                For additional information or support, visit our
+                <a href="http://books.google.com/support/partner/" class="link external">&raquo; Partner help center</a>.
+            </p>
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.books.community_features" name="zend.gdata.books.community_features"><div class="info"><h1 class="title">Using community features</h1></div>
+        
+
+        <div class="section" id="zend.gdata.books.adding_ratings" name="zend.gdata.books.adding_ratings"><div class="info"><h1 class="title">Adding a rating</h1></div>
+            
+
+            <p class="para">
+                A user can add a rating to a book. Book Search uses a 1-5
+                rating system in which 1 is the lowest rating. Users cannot
+                update or delete ratings.
+            </p>
+
+            <p class="para">
+                To add a rating, add a <span class="classname">Rating</span> object to a
+                <span class="classname">VolumeEntry</span> and post it to the annotation feed. In the
+                example below, we start from an empty <span class="classname">VolumeEntry</span> object.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Books_VolumeEntry<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">setId</span><span style="color: #66cc66;">&#40;</span><span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_App_Extension_Id<span style="color: #66cc66;">&#40;</span>VOLUME_ID<span style="color: #66cc66;">&#41;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">setRating</span><span style="color: #66cc66;">&#40;</span><span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Extension_Rating<span style="color: #66cc66;">&#40;</span><span style="color: #cc66cc;">3</span>, <span style="color: #cc66cc;">1</span>, <span style="color: #cc66cc;">5</span>, <span style="color: #cc66cc;">1</span><span style="color: #66cc66;">&#41;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">insertVolume</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$entry</span>, Zend_Gdata_Books::<span style="color: #006600;">MY_ANNOTATION_FEED_URI</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+        </div>
+
+        <div class="section" id="zend.gdata.books.reviews" name="zend.gdata.books.reviews"><div class="info"><h1 class="title">Reviews</h1></div>
+            
+
+            <p class="para">
+                In addition to ratings, authenticated users can submit reviews or
+                edit their reviews. For information on how to request previously
+                submitted reviews, see <a href="#zend.gdata.books.retrieving_annotations" class="link external">&raquo; Retrieving annotations</a>.
+            </p>
+
+            <div class="section" id="zend.gdata.books.adding_review" name="zend.gdata.books.adding_review"><div class="info"><h1 class="title">Adding a review</h1></div>
+                
+
+                <p class="para">
+                    To add a review, add a <span class="classname">Review</span> object to a
+                    <span class="classname">VolumeEntry</span> and post it to the annotation
+                    feed. In the example below, we start from an existing
+                    <span class="classname">VolumeEntry</span> object.
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$annotationUrl</span> = <span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getAnnotationLink</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>-&gt;<span style="color: #006600;">href</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$review</span>&nbsp; &nbsp; &nbsp; &nbsp; = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Books_Extension_Review<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$review</span>-&gt;<span style="color: #006600;">setText</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">&quot;This book is amazing!&quot;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">setReview</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$review</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">insertVolume</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$entry</span>, <span style="color: #0000ff;">$annotationUrl</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+
+            <div class="section" id="zend.gdata.books.editing_review" name="zend.gdata.books.editing_review"><div class="info"><h1 class="title">Editing a review</h1></div>
+                
+
+                <p class="para">
+                    To update an existing review, first you retrieve the
+                    review you want to update, then you modify it, and
+                    then you submit it to the annotation feed.
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entryUrl</span> = <span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getId</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>-&gt;<span style="color: #006600;">getText</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$review</span>&nbsp; &nbsp;= <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Books_Extension_Review<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$review</span>-&gt;<span style="color: #006600;">setText</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">&quot;This book is actually not that good!&quot;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">setReview</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$review</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">updateVolume</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$entry</span>, <span style="color: #0000ff;">$entryUrl</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.books.labels" name="zend.gdata.books.labels"><div class="info"><h1 class="title">Labels</h1></div>
+            
+
+            <p class="para">
+                You can use the Book Search Data <acronym class="acronym">API</acronym> to label volumes with
+                keywords. A user can submit, retrieve and modify labels. See
+                <a href="#zend.gdata.books.retrieving_annotations" class="link external">&raquo; Retrieving
+                    annotations</a> for how to read previously submitted labels.
+            </p>
+
+            <div class="section" id="zend.gdata.books.submitting_labels" name="zend.gdata.books.submitting_labels"><div class="info"><h1 class="title">Submitting a set of labels</h1></div>
+                
+
+                <p class="para">
+                    To submit labels, add a <span class="classname">Category</span> object
+                    with the scheme <b><tt>LABELS_SCHEME</tt></b> to a
+                    <span class="classname">VolumeEntry</span> and post it to the annotation feed.
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$annotationUrl</span> = <span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getAnnotationLink</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>-&gt;<span style="color: #006600;">href</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$category</span>&nbsp; &nbsp; &nbsp; = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_App_Extension_Category<span style="color: #66cc66;">&#40;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #ff0000;">'rated'</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #ff0000;">'http://schemas.google.com/books/2008/labels'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">setCategory</span><span style="color: #66cc66;">&#40;</span><a href="http://www.php.net/array"><span style="color: #000066;">array</span></a><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$category</span><span style="color: #66cc66;">&#41;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">insertVolume</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$entry</span>, Zend_Gdata_Books::<span style="color: #006600;">MY_ANNOTATION_FEED_URI</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.books.retrieving_annotations" name="zend.gdata.books.retrieving_annotations"><div class="info"><h1 class="title">Retrieving annotations: reviews, ratings, and labels</h1></div>
+            
+
+            <p class="para">
+                You can use the Book Search Data <acronym class="acronym">API</acronym> to retrieve annotations
+                submitted by a given user. Annotations include reviews, ratings, and
+                labels. To retrieve any user&#039;s annotations, you can send an
+                unauthenticated request that includes the user&#039;s user ID. To retrieve the
+                authenticated user&#039;s annotations, use the value <em class="emphasis">me</em> as the user
+                ID.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">getVolumeFeed</span><span style="color: #66cc66;">&#40;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">'http://www.google.com/books/feeds/users/USER_ID/volumes'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&lt;i&gt;<span style="color: #66cc66;">&#40;</span>or<span style="color: #66cc66;">&#41;</span>&lt;/i&gt;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">getUserAnnotationFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// print title(s) and rating value</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$feed</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$entry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #b1b100;">foreach</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$feed</span>-&gt;<span style="color: #006600;">getTitles</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$title</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$title</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #66cc66;">&#125;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #b1b100;">if</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getRating</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">'Rating: '</span> . <span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">getRating</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>-&gt;<span style="color: #006600;">getAverage</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #66cc66;">&#125;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+
+            <p class="para">
+                For a list of the supported query parameters, see the
+                <a href="#zend.gdata.books.query_parameters" class="link external">&raquo; query parameters</a>
+                section.
+            </p>
+        </div>
+
+        <div class="section" id="zend.gdata.books.deleting_annotations" name="zend.gdata.books.deleting_annotations"><div class="info"><h1 class="title">Deleting Annotations</h1></div>
+            
+
+            <p class="para">
+                If you retrieved an annotation entry containing ratings,
+                reviews, and/or labels, you can remove all annotations
+                by calling  <span class="methodname">deleteVolume()</span> on that entry.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">deleteVolume</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$entry</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.books.sharing_with_my_library" name="zend.gdata.books.sharing_with_my_library"><div class="info"><h1 class="title">Book collections and My Library</h1></div>
+        
+
+        <p class="para">
+            Google Book Search provides a number of user-specific
+            book collections, each of which has its own feed.
+        </p>
+
+        <p class="para">
+            The most important collection is the user&#039;s My Library, which
+            represents the books the user would like to remember, organize, and
+            share with others. This is the collection the user sees when accessing
+            his or her <a href="http://books.google.com/books?op=library" class="link external">&raquo; My Library
+                page</a>.
+        </p>
+
+        <div class="section" id="zend.gdata.books.retrieving_books_in_library" name="zend.gdata.books.retrieving_books_in_library"><div class="info"><h1 class="title">Retrieving books in a user&#039;s library</h1></div>
+            
+
+            <p class="para">
+                The following sections describe how to retrieve a list
+                of books from a user&#039;s library, with or without query
+                parameters.
+            </p>
+
+            <p class="para">
+                You can query a Book Search public feed without authentication.
+            </p>
+
+            <div class="section" id="zend.gdata.books.retrieving_all_books_in_library" name="zend.gdata.books.retrieving_all_books_in_library"><div class="info"><h1 class="title">Retrieving all books in a user&#039;s library</h1></div>
+                
+
+                <p class="para">
+                    To retrieve the user&#039;s books, send a query to the
+                    My Library feed. To get the library of the authenticated
+                    user, use <em class="emphasis">me</em> in place of <b><tt>USER_ID</tt></b>.
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">getUserLibraryFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+                <p class="para">
+                    Note: The feed may not contain all of the user&#039;s books, because
+                    there&#039;s a default limit on the number of results returned. For
+                    more information, see the <span class="property">max-results</span> query parameter in
+                    <a href="#zend.gdata.books.searching_for_books" class="link external">&raquo; Searching for books</a>.
+                </p>
+            </div>
+
+            <div class="section" id="zend.gdata.books.retrieving_books_in_library_with_query" name="zend.gdata.books.retrieving_books_in_library_with_query"><div class="info"><h1 class="title">Searching for books in a user&#039;s library</h1></div>
+                
+
+                <p class="para">
+                    Just as you can <a href="#zend.gdata.books.searching_for_books" class="link external">&raquo; search across all books</a>,
+                    you can do a full-text search over just the books in a
+                    user&#039;s library. To do this, just set the appropriate
+                    paramters on the <span class="classname">VolumeQuery</span> object.
+                </p>
+
+                <p class="para">
+                    For example, the following query returns all the books in
+                    your library that contain the word &quot;bear&quot;:
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">newVolumeQuery</span><span style="color: #66cc66;">&#40;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #ff0000;">'http://www.google.com/books/feeds/users'</span> .</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #ff0000;">'/USER_ID/collections/library/volumes'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'bear'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">getVolumeFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+                <p class="para">
+                    For a list of the supported query parameters, see the
+                    <a href="#zend.gdata.books.query_pParameters" class="link external">&raquo; query parameters</a>
+                    section. In addition, you can search for books that have been
+                    <a href="#zend.gdata.books.labels" class="link external">&raquo; labeled by the user</a>:
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">newVolumeQuery</span><span style="color: #66cc66;">&#40;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #ff0000;">'http://www.google.com/books/feeds/users/'</span> .</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #ff0000;">'USER_ID/collections/library/volumes'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setCategory</span><span style="color: #66cc66;">&#40;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setCategory</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'favorites'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">getVolumeFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.books.updating_library" name="zend.gdata.books.updating_library"><div class="info"><h1 class="title">Updating books in a user&#039;s library</h1></div>
+            
+
+            <p class="para">
+                You can use the Book Search Data <acronym class="acronym">API</acronym> to add a book to, or remove
+                a book from, a user&#039;s library. Ratings, reviews, and labels are valid
+                across all the collections of a user, and are thus edited using the
+                annotation feed (see <a href="#zend.gdata.books.community_features" class="link external">&raquo; Using community features</a>).
+            </p>
+
+            <div class="section" id="zend.gdata.books.library_book_add" name="zend.gdata.books.library_book_add"><div class="info"><h1 class="title">Adding a book to a library</h1></div>
+                
+
+                <p class="para">
+                    After authenticating, you can add books to the current user&#039;s library.
+                </p>
+
+                <p class="para">
+                    You can either create an entry from scratch if you
+                    know the volume ID, or insert an entry read from any feed.
+                </p>
+
+                <p class="para">
+                    The following example creates a new entry and adds it to the library:
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Books_VolumeEntry<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$entry</span>-&gt;<span style="color: #006600;">setId</span><span style="color: #66cc66;">&#40;</span><span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_App_Extension_Id<span style="color: #66cc66;">&#40;</span>VOLUME_ID<span style="color: #66cc66;">&#41;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">insertVolume</span><span style="color: #66cc66;">&#40;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #0000ff;">$entry</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; Zend_Gdata_Books::<span style="color: #006600;">MY_LIBRARY_FEED_URI</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+                <p class="para">
+                    The following example adds an existing
+                    <span class="classname">VolumeEntry</span> object to the library:
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">insertVolume</span><span style="color: #66cc66;">&#40;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #0000ff;">$entry</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; Zend_Gdata_Books::<span style="color: #006600;">MY_LIBRARY_FEED_URI</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+
+            <div class="section" id="zend.gdata.books.library_book_remove" name="zend.gdata.books.library_book_remove"><div class="info"><h1 class="title">Removing a book from a library</h1></div>
+                
+
+                <p class="para">
+                    To remove a book from a user&#039;s library, call
+                     <span class="methodname">deleteVolume()</span> on the
+                    <span class="classname">VolumeEntry</span> object.
+                </p>
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$books</span>-&gt;<span style="color: #006600;">deleteVolume</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$entry</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+        <hr />
+
+            <table width="100%">
+                <tr>
+                    <td width="25%" style="text-align: left;">
+                    <a href="zend.gdata.authsub.html">Authenticating with AuthSub</a>
+                    </td>
+
+                    <td width="50%" style="text-align: center;">
+                        <div class="up"><span class="up"><a href="zend.gdata.html">Zend_Gdata</a></span><br />
+                        <span class="home"><a href="manual.html">Programmer's Reference Guide</a></span></div>
+                    </td>
+
+                    <td width="25%" style="text-align: right;">
+                        <div class="next" style="text-align: right; float: right;"><a href="zend.gdata.clientlogin.html">Authenticating with ClientLogin</a></div>
+                    </td>
+                </tr>
+            </table>
+</td>
+        <td style="font-size: smaller;" width="15%"> <style type="text/css">
+#leftbar {
+	float: left;
+	width: 186px;
+	padding: 5px;
+	font-size: smaller;
+}
+ul.toc {
+	margin: 0px 5px 5px 5px;
+	padding: 0px;
+}
+ul.toc li {
+	font-size: 85%;
+	margin: 1px 0 1px 1px;
+	padding: 1px 0 1px 11px;
+	list-style-type: none;
+	background-repeat: no-repeat;
+	background-position: center left;
+}
+ul.toc li.header {
+	font-size: 115%;
+	padding: 5px 0px 5px 11px;
+	border-bottom: 1px solid #cccccc;
+	margin-bottom: 5px;
+}
+ul.toc li.active {
+	font-weight: bold;
+}
+ul.toc li a {
+	text-decoration: none;
+}
+ul.toc li a:hover {
+	text-decoration: underline;
+}
+</style>
+ <ul class="toc">
+  <li class="header home"><a href="manual.html">Programmer's Reference Guide</a></li>
+  <li class="header up"><a href="manual.html">Programmer's Reference Guide</a></li>
+  <li class="header up"><a href="zend.gdata.html">Zend_Gdata</a></li>
+  <li><a href="zend.gdata.introduction.html">Introduction</a></li>
+  <li><a href="zend.gdata.authsub.html">Authenticating with AuthSub</a></li>
+  <li class="active"><a href="zend.gdata.books.html">Using the Book Search Data API</a></li>
+  <li><a href="zend.gdata.clientlogin.html">Authenticating with ClientLogin</a></li>
+  <li><a href="zend.gdata.calendar.html">Using Google Calendar</a></li>
+  <li><a href="zend.gdata.docs.html">Using Google Documents List Data API</a></li>
+  <li><a href="zend.gdata.health.html">Using Google Health</a></li>
+  <li><a href="zend.gdata.spreadsheets.html">Using Google Spreadsheets</a></li>
+  <li><a href="zend.gdata.gapps.html">Using Google Apps Provisioning</a></li>
+  <li><a href="zend.gdata.gbase.html">Using Google Base</a></li>
+  <li><a href="zend.gdata.photos.html">Using Picasa Web Albums</a></li>
+  <li><a href="zend.gdata.youtube.html">Using the YouTube Data API</a></li>
+  <li><a href="zend.gdata.exception.html">Catching Gdata Exceptions</a></li>
+ </ul>
+ </td>
+    </tr>
+</table>
+</body>
+</html>

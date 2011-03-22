@@ -1,0 +1,1209 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Zend_Gdata_Spreadsheets</title>
+			<link rel="stylesheet" href="../../media/stylesheet.css" />
+						<script src="../../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../../media/images/plus.png";
+				imgMinus.src = "../../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> Zend_Gdata_Spreadsheets</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+											<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+						
+			</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gdata Spreadsheets</p>
+	<ul class="tags">
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">link:</span> <a href="http://code.google.com/apis/gdata/spreadsheets.html">http://code.google.com/apis/gdata/spreadsheets.html</a></li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_Gdata---Spreadsheets.php.html">/Gdata/Spreadsheets.php</a> (line <span class="field">95</span>)
+		</p>
+		
+				
+		<pre><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a>
+   |
+   --<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a>
+      |
+      --Zend_Gdata_Spreadsheets</pre>
+	
+			</div>
+</div>
+
+
+	<a name="sec-const-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constant Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Constants</span> (<a href="#sec-consts">details</a>)
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="const-summary">
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#AUTH_SERVICE_NAME" title="details" class="const-name">AUTH_SERVICE_NAME</a> = 					<span class="var-type"> 'wise'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#CELL_FEED_LINK_URI" title="details" class="const-name">CELL_FEED_LINK_URI</a> = 					<span class="var-type"> 'http://schemas.google.com/spreadsheets/2006#cellsfeed'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#LIST_FEED_LINK_URI" title="details" class="const-name">LIST_FEED_LINK_URI</a> = 					<span class="var-type"> 'http://schemas.google.com/spreadsheets/2006#listfeed'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#SPREADSHEETS_FEED_URI" title="details" class="const-name">SPREADSHEETS_FEED_URI</a> = 					<span class="var-type"> 'http://spreadsheets.google.com/feeds/spreadsheets'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#SPREADSHEETS_POST_URI" title="details" class="const-name">SPREADSHEETS_POST_URI</a> = 					<span class="var-type"> 'http://spreadsheets.google.com/feeds/spreadsheets/private/full'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#WORKSHEETS_FEED_LINK_URI" title="details" class="const-name">WORKSHEETS_FEED_LINK_URI</a> = 					<span class="var-type"> 'http://schemas.google.com/spreadsheets/2006#worksheetsfeed'</span>
+
+				</div>
+							</div>
+		</div>
+	</div>
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+												<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type">array</span>
+					<a href="#$namespaces" title="details" class="var-name">$namespaces</a>
+				</div>
+																							</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																															
+				<div class="method-definition">
+					<img src="../../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">Zend_Gdata_Spreadsheets</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#deleteRow" title="details" class="method-name">deleteRow</a>
+											(<span class="var-type">ListEntry</span>&nbsp;<span class="var-name">$entry</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">CellEntry</span>
+										<a href="#getCellEntry" title="details" class="method-name">getCellEntry</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">CellFeed</span>
+										<a href="#getCellFeed" title="details" class="method-name">getCellFeed</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">ListEntry</span>
+										<a href="#getListEntry" title="details" class="method-name">getListEntry</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">ListFeed</span>
+										<a href="#getListFeed" title="details" class="method-name">getListFeed</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">array</span>
+										<a href="#getSpreadsheetCellFeedContents" title="details" class="method-name">getSpreadsheetCellFeedContents</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$range</span> = <span class="var-default">null</span>], [<span class="var-type">boolean</span>&nbsp;<span class="var-name">$empty</span> = <span class="var-default">false</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">SpreadsheetEntry</span>
+										<a href="#getSpreadsheetEntry" title="details" class="method-name">getSpreadsheetEntry</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_SpreadsheetFeed.html">Zend_Gdata_Spreadsheets_SpreadsheetFeed</a></span>
+										<a href="#getSpreadsheetFeed" title="details" class="method-name">getSpreadsheetFeed</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">array</span>
+										<a href="#getSpreadsheetListFeedContents" title="details" class="method-name">getSpreadsheetListFeedContents</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_SpreadsheetFeed.html">Zend_Gdata_Spreadsheets_SpreadsheetFeed</a></span>
+										<a href="#getSpreadsheets" title="details" class="method-name">getSpreadsheets</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">WorksheetEntry</span>
+										<a href="#GetWorksheetEntry" title="details" class="method-name">GetWorksheetEntry</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_WorksheetFeed.html">Zend_Gdata_Spreadsheets_WorksheetFeed</a></span>
+										<a href="#getWorksheetFeed" title="details" class="method-name">getWorksheetFeed</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">ListEntry</span>
+										<a href="#insertRow" title="details" class="method-name">insertRow</a>
+											(<span class="var-type">array</span>&nbsp;<span class="var-name">$rowData</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$wkshtId</span> = <span class="var-default">'default'</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">CellEntry</span>
+										<a href="#updateCell" title="details" class="method-name">updateCell</a>
+											(<span class="var-type">int</span>&nbsp;<span class="var-name">$row</span>, <span class="var-type">int</span>&nbsp;<span class="var-name">$col</span>, <span class="var-type">int</span>&nbsp;<span class="var-name">$inputValue</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$wkshtId</span> = <span class="var-default">'default'</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#updateRow" title="details" class="method-name">updateRow</a>
+											(<span class="var-type">ListEntry</span>&nbsp;<span class="var-name">$entry</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$newRowData</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$namespaces" id="$namespaces"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type">array</span>
+			<span class="var-name">$namespaces</span>
+			 = <span class="var-default">array(<br />        array('gs', 'http://schemas.google.com/spreadsheets/2006', 1, 0),array('gsx','http://schemas.google.com/spreadsheets/2006/extended',1,0))</span>			(line <span class="line-number">109</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Namespaces used for Zend_Gdata_Photos</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$namespaces">Zend_Gdata::$namespaces</a></dt>
+						<dd>Namespaces used for Gdata data</dd>
+					</dl>
+		
+		
+
+</div>
+
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_defaultPostUri">Zend_Gdata::$_defaultPostUri</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_httpClient">Zend_Gdata::$_httpClient</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_registeredPackages">Zend_Gdata::$_registeredPackages</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_staticHttpClient">Zend_Gdata::$_staticHttpClient</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_gzipEnabled">Zend_Gdata_App::$_gzipEnabled</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_httpMethodOverride">Zend_Gdata_App::$_httpMethodOverride</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_majorProtocolVersion">Zend_Gdata_App::$_majorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_maxRedirects">Zend_Gdata_App::$_maxRedirects</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_minorProtocolVersion">Zend_Gdata_App::$_minorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_useObjectMapping">Zend_Gdata_App::$_useObjectMapping</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_verboseExceptionMessages">Zend_Gdata_App::$_verboseExceptionMessages</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																			<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">122</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Create Gdata_Spreadsheets object</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Gdata_Spreadsheets</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+				<span class="var-name">$client</span><span class="var-description">: (optional) The HTTP client to use when           when communicating with the Google servers.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$applicationId</span><span class="var-description">: The identity of the app in the form of Company-AppName-Version</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#method__construct">Zend_Gdata::__construct()</a></dt>
+						<dd>Create Gdata object</dd>
+					</dl>
+			
+	</div>
+<a name="methoddeleteRow" id="deleteRow"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">deleteRow</span> (line <span class="line-number">363</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Deletes an existing row .</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			deleteRow
+		</span>
+					(<span class="var-type">ListEntry</span>&nbsp;<span class="var-name">$entry</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">ListEntry</span>
+				<span class="var-name">$entry</span><span class="var-description">: The row to delete</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetCellEntry" id="getCellEntry"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getCellEntry</span> (line <span class="line-number">239</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a cell entry.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">CellEntry</span>
+		<span class="method-name">
+			getCellEntry
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$location</span><span class="var-description">: A CellQuery or a URI specifying the entry location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetCellFeed" id="getCellFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getCellFeed</span> (line <span class="line-number">221</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a cell feed.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">CellFeed</span>
+		<span class="method-name">
+			getCellFeed
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$location</span><span class="var-description">: A CellQuery, WorksheetEntry or a URI specifying the feed location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetListEntry" id="getListEntry"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getListEntry</span> (line <span class="line-number">275</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a list entry.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">ListEntry</span>
+		<span class="method-name">
+			getListEntry
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$location</span><span class="var-description">: A ListQuery or a URI specifying the entry location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetListFeed" id="getListFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getListFeed</span> (line <span class="line-number">256</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a list feed.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">ListFeed</span>
+		<span class="method-name">
+			getListFeed
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: A ListQuery, WorksheetEntry or string URI specifying the feed location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetSpreadsheetCellFeedContents" id="getSpreadsheetCellFeedContents"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getSpreadsheetCellFeedContents</span> (line <span class="line-number">403</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the content of all cells as an associative array, indexed  off the cell location  (ie 'A1', 'D4', etc).  Each element of  the array is an associative array with a 'value' and a 'function'.</p>
+<p class="description"><p>Only non-empty cells are returned by default.  'range' is the  value of the 'range' query parameter specified at:  http://code.google.com/apis/spreadsheets/reference.html#cells_Parameters</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> An associative array of cells</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			getSpreadsheetCellFeedContents
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$range</span> = <span class="var-default">null</span>], [<span class="var-type">boolean</span>&nbsp;<span class="var-name">$empty</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: A CellQuery, WorksheetEntry or a URL (w/o query string) specifying the feed location.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$range</span><span class="var-description">: The range of cells to retrieve</span>			</li>
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$empty</span><span class="var-description">: Whether to retrieve empty cells</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetSpreadsheetEntry" id="getSpreadsheetEntry"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getSpreadsheetEntry</span> (line <span class="line-number">159</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a spreadsheet entry.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">SpreadsheetEntry</span>
+		<span class="method-name">
+			getSpreadsheetEntry
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$location</span><span class="var-description">: A DocumentQuery or a URI specifying the entry location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetSpreadsheetFeed" id="getSpreadsheetFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getSpreadsheetFeed</span> (line <span class="line-number">137</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a spreadsheet feed.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_SpreadsheetFeed.html">Zend_Gdata_Spreadsheets_SpreadsheetFeed</a></span>
+		<span class="method-name">
+			getSpreadsheetFeed
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: A DocumentQuery or a string URI specifying the feed location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetSpreadsheetListFeedContents" id="getSpreadsheetListFeedContents"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getSpreadsheetListFeedContents</span> (line <span class="line-number">374</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the content of all rows as an associative array</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> An array of rows.  Each element of the array is an associative array of data</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			getSpreadsheetListFeedContents
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: A ListQuery or string URI specifying the feed location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetSpreadsheets" id="getSpreadsheets"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getSpreadsheets</span> (line <span class="line-number">440</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Alias for getSpreadsheetFeed</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_SpreadsheetFeed.html">Zend_Gdata_Spreadsheets_SpreadsheetFeed</a></span>
+		<span class="method-name">
+			getSpreadsheets
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: A DocumentQuery or a string URI specifying the feed location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodGetWorksheetEntry" id="GetWorksheetEntry"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">GetWorksheetEntry</span> (line <span class="line-number">201</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a worksheet entry.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">WorksheetEntry</span>
+		<span class="method-name">
+			GetWorksheetEntry
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$location</span><span class="var-description">: A DocumentQuery or a URI specifying the entry location.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetWorksheetFeed" id="getWorksheetFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getWorksheetFeed</span> (line <span class="line-number">179</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets a worksheet feed.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of worksheets</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_WorksheetFeed.html">Zend_Gdata_Spreadsheets_WorksheetFeed</a></span>
+		<span class="method-name">
+			getWorksheetFeed
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: A DocumentQuery, SpreadsheetEntry, or a string URI</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodinsertRow" id="insertRow"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">insertRow</span> (line <span class="line-number">319</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Inserts a new row with provided data.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The inserted row</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">ListEntry</span>
+		<span class="method-name">
+			insertRow
+		</span>
+					(<span class="var-type">array</span>&nbsp;<span class="var-name">$rowData</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$wkshtId</span> = <span class="var-default">'default'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$rowData</span><span class="var-description">: An array of column header to row data</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$key</span><span class="var-description">: The key of the spreadsheet to modify</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$wkshtId</span><span class="var-description">: (optional) The worksheet to modify</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodupdateCell" id="updateCell"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">updateCell</span> (line <span class="line-number">296</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Updates an existing cell.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The updated cell entry.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">CellEntry</span>
+		<span class="method-name">
+			updateCell
+		</span>
+					(<span class="var-type">int</span>&nbsp;<span class="var-name">$row</span>, <span class="var-type">int</span>&nbsp;<span class="var-name">$col</span>, <span class="var-type">int</span>&nbsp;<span class="var-name">$inputValue</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$wkshtId</span> = <span class="var-default">'default'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$row</span><span class="var-description">: The row containing the cell to update</span>			</li>
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$col</span><span class="var-description">: The column containing the cell to update</span>			</li>
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$inputValue</span><span class="var-description">: The new value for the cell</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$key</span><span class="var-description">: The key for the spreadsheet to be updated</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$wkshtId</span><span class="var-description">: (optional) The worksheet to be updated</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodupdateRow" id="updateRow"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">updateRow</span> (line <span class="line-number">345</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Updates an existing row with provided data.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			updateRow
+		</span>
+					(<span class="var-type">ListEntry</span>&nbsp;<span class="var-name">$entry</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$newRowData</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">ListEntry</span>
+				<span class="var-name">$entry</span><span class="var-description">: The row entry to update</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$newRowData</span><span class="var-description">: An array of column header to row data</span>			</li>
+				</ul>
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#method__construct">Zend_Gdata::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodgetEntry">Zend_Gdata::getEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodgetFeed">Zend_Gdata::getFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodimport">Zend_Gdata::import()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodisAuthenticated">Zend_Gdata::isAuthenticated()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodperformHttpRequest">Zend_Gdata::performHttpRequest()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#method__construct">Zend_Gdata_App::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methoddelete">Zend_Gdata_App::delete()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodenableRequestDebugLogging">Zend_Gdata_App::enableRequestDebugLogging()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgenerateIfMatchHeaderData">Zend_Gdata_App::generateIfMatchHeaderData()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodget">Zend_Gdata_App::get()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetEntry">Zend_Gdata_App::getEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetFeed">Zend_Gdata_App::getFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetGzipEnabled">Zend_Gdata_App::getGzipEnabled()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetHttpClient">Zend_Gdata_App::getHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetHttpMethodOverride">Zend_Gdata_App::getHttpMethodOverride()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMajorProtocolVersion">Zend_Gdata_App::getMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMaxRedirects">Zend_Gdata_App::getMaxRedirects()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMinorProtocolVersion">Zend_Gdata_App::getMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetNextFeed">Zend_Gdata_App::getNextFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetPreviousFeed">Zend_Gdata_App::getPreviousFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetStaticHttpClient">Zend_Gdata_App::getStaticHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetVerboseExceptionMessages">Zend_Gdata_App::getVerboseExceptionMessages()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimport">Zend_Gdata_App::import()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimportFile">Zend_Gdata_App::importFile()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimportString">Zend_Gdata_App::importString()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimportUrl">Zend_Gdata_App::importUrl()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodinsertEntry">Zend_Gdata_App::insertEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodperformHttpRequest">Zend_Gdata_App::performHttpRequest()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodpost">Zend_Gdata_App::post()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodprepareRequest">Zend_Gdata_App::prepareRequest()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodput">Zend_Gdata_App::put()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodregisterPackage">Zend_Gdata_App::registerPackage()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodretrieveAllEntriesForFeed">Zend_Gdata_App::retrieveAllEntriesForFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetGzipEnabled">Zend_Gdata_App::setGzipEnabled()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetHttpClient">Zend_Gdata_App::setHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetHttpMethodOverride">Zend_Gdata_App::setHttpMethodOverride()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMajorProtocolVersion">Zend_Gdata_App::setMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMaxRedirects">Zend_Gdata_App::setMaxRedirects()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMinorProtocolVersion">Zend_Gdata_App::setMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetStaticHttpClient">Zend_Gdata_App::setStaticHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetVerboseExceptionMessages">Zend_Gdata_App::setVerboseExceptionMessages()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodupdateEntry">Zend_Gdata_App::updateEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methoduseObjectMapping">Zend_Gdata_App::useObjectMapping()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodusingObjectMapping">Zend_Gdata_App::usingObjectMapping()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#method__call">Zend_Gdata_App::__call()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+	<a name="sec-consts"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Constants</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+														| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="constAUTH_SERVICE_NAME" id="AUTH_SERVICE_NAME"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">AUTH_SERVICE_NAME</span>
+			 = <span class="const-default"> 'wise'</span>
+			(line <span class="line-number">102</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constCELL_FEED_LINK_URI" id="CELL_FEED_LINK_URI"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">CELL_FEED_LINK_URI</span>
+			 = <span class="const-default"> 'http://schemas.google.com/spreadsheets/2006#cellsfeed'</span>
+			(line <span class="line-number">101</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constLIST_FEED_LINK_URI" id="LIST_FEED_LINK_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">LIST_FEED_LINK_URI</span>
+			 = <span class="const-default"> 'http://schemas.google.com/spreadsheets/2006#listfeed'</span>
+			(line <span class="line-number">100</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSPREADSHEETS_FEED_URI" id="SPREADSHEETS_FEED_URI"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">SPREADSHEETS_FEED_URI</span>
+			 = <span class="const-default"> 'http://spreadsheets.google.com/feeds/spreadsheets'</span>
+			(line <span class="line-number">97</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSPREADSHEETS_POST_URI" id="SPREADSHEETS_POST_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">SPREADSHEETS_POST_URI</span>
+			 = <span class="const-default"> 'http://spreadsheets.google.com/feeds/spreadsheets/private/full'</span>
+			(line <span class="line-number">98</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constWORKSHEETS_FEED_LINK_URI" id="WORKSHEETS_FEED_LINK_URI"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">WORKSHEETS_FEED_LINK_URI</span>
+			 = <span class="const-default"> 'http://schemas.google.com/spreadsheets/2006#worksheetsfeed'</span>
+			(line <span class="line-number">99</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+							<h4>Inherited Constants</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="const-title">
+								<span class="const-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#constAUTH_SERVICE_NAME">Zend_Gdata::AUTH_SERVICE_NAME</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="const-title">
+								<span class="const-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#constDEFAULT_MAJOR_PROTOCOL_VERSION">Zend_Gdata_App::DEFAULT_MAJOR_PROTOCOL_VERSION</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="const-title">
+								<span class="const-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#constDEFAULT_MINOR_PROTOCOL_VERSION">Zend_Gdata_App::DEFAULT_MINOR_PROTOCOL_VERSION</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:03:24 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

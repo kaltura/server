@@ -1,0 +1,2422 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Zend_Http_Client</title>
+			<link rel="stylesheet" href="../../media/stylesheet.css" />
+						<script src="../../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../../media/images/plus.png";
+				imgMinus.src = "../../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> Zend_Http_Client</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+											<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+						
+			</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Zend_Http_Client is an implementation of an HTTP client in PHP. The client</p>
+<p class="description"><p>supports basic features like sending different HTTP requests and handling  redirections, as well as more advanced features like proxy settings, HTTP  authentication and cookie persistence (using a Zend_Http_CookieJar object)</p></p>
+	<ul class="tags">
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">todo:</span> Implement proxy settings</li>
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_Http---Client.php.html">/Http/Client.php</a> (line <span class="field">66</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gdata/Zend_Gdata_HttpClient.html">Zend_Gdata_HttpClient</a>
+					</td>
+					<td>
+											Gdata Http Client object.
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+	<a name="sec-const-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constant Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+						<span class="disabled">Constants</span> (<a href="#sec-consts">details</a>)
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="const-summary">
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#AUTH_BASIC" title="details" class="const-name">AUTH_BASIC</a> = 					<span class="var-type"> 'basic'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#CONNECT" title="details" class="const-name">CONNECT</a> = 					<span class="var-type"> 'CONNECT'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#CONTENT_LENGTH" title="details" class="const-name">CONTENT_LENGTH</a> = 					<span class="var-type"> 'Content-Length'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#CONTENT_TYPE" title="details" class="const-name">CONTENT_TYPE</a> = 					<span class="var-type"> 'Content-Type'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#DELETE" title="details" class="const-name">DELETE</a> = 					<span class="var-type"> 'DELETE'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#ENC_FORMDATA" title="details" class="const-name">ENC_FORMDATA</a> = 					<span class="var-type"> 'multipart/form-data'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#ENC_URLENCODED" title="details" class="const-name">ENC_URLENCODED</a> = 					<span class="var-type"> 'application/x-www-form-urlencoded'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#GET" title="details" class="const-name">GET</a> = 					<span class="var-type"> 'GET'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#HEAD" title="details" class="const-name">HEAD</a> = 					<span class="var-type"> 'HEAD'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#HTTP_0" title="details" class="const-name">HTTP_0</a> = 					<span class="var-type"> '1.0'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#HTTP_1" title="details" class="const-name">HTTP_1</a> = 					<span class="var-type"> '1.1'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#MERGE" title="details" class="const-name">MERGE</a> = 					<span class="var-type"> 'MERGE'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#OPTIONS" title="details" class="const-name">OPTIONS</a> = 					<span class="var-type"> 'OPTIONS'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#POST" title="details" class="const-name">POST</a> = 					<span class="var-type"> 'POST'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#PUT" title="details" class="const-name">PUT</a> = 					<span class="var-type"> 'PUT'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#TRACE" title="details" class="const-name">TRACE</a> = 					<span class="var-type"> 'TRACE'</span>
+
+				</div>
+							</div>
+		</div>
+	</div>
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																																																																																				<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type">resource</span>
+					<a href="#$_fileInfoDb" title="details" class="var-name">$_fileInfoDb</a>
+				</div>
+																				<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Http/Client_Adapter/Zend_Http_Client_Adapter_Interface.html">Zend_Http_Client_Adapter_Interface</a></span>
+					<a href="#$adapter" title="details" class="var-name">$adapter</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">array|null</span>
+					<a href="#$auth" title="details" class="var-name">$auth</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$config" title="details" class="var-name">$config</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">Zend_Http_CookieJar</span>
+					<a href="#$cookiejar" title="details" class="var-name">$cookiejar</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">string</span>
+					<a href="#$enctype" title="details" class="var-name">$enctype</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$files" title="details" class="var-name">$files</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$headers" title="details" class="var-name">$headers</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">string</span>
+					<a href="#$last_request" title="details" class="var-name">$last_request</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+					<a href="#$last_response" title="details" class="var-name">$last_response</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">string</span>
+					<a href="#$method" title="details" class="var-name">$method</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$paramsGet" title="details" class="var-name">$paramsGet</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$paramsPost" title="details" class="var-name">$paramsPost</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">string</span>
+					<a href="#$raw_post_data" title="details" class="var-name">$raw_post_data</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">int</span>
+					<a href="#$redirectCounter" title="details" class="var-name">$redirectCounter</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a></span>
+					<a href="#$uri" title="details" class="var-name">$uri</a>
+				</div>
+																			</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																			
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">string</span>
+										<a href="#encodeAuthHeader" title="details" class="method-name">encodeAuthHeader</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$password</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">self::AUTH_BASIC</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">string</span>
+										<a href="#encodeFormData" title="details" class="method-name">encodeFormData</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$boundary</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$value</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$filename</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span> = <span class="var-default">array()</span>])
+									</div>
+																																																																																																																																																																																																																							
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">array</span>
+										<a href="#_flattenParametersArray" title="details" class="method-name">_flattenParametersArray</a>
+											(<span class="var-type">array</span>&nbsp;<span class="var-name">$parray</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$prefix</span> = <span class="var-default">null</span>])
+									</div>
+																																																											
+				<div class="method-definition">
+					<img src="../../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">Zend_Http_Client</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$config</span> = <span class="var-default">null</span>])
+									</div>
+																															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client_Adapter/Zend_Http_Client_Adapter_Interface.html">Zend_Http_Client_Adapter_Interface</a></span>
+										<a href="#getAdapter" title="details" class="method-name">getAdapter</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">Zend_Http_CookieJar|null</span>
+										<a href="#getCookieJar" title="details" class="method-name">getCookieJar</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|array|null</span>
+										<a href="#getHeader" title="details" class="method-name">getHeader</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getLastRequest" title="details" class="method-name">getLastRequest</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+										<a href="#getLastResponse" title="details" class="method-name">getLastResponse</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">int</span>
+										<a href="#getRedirectionsCount" title="details" class="method-name">getRedirectionsCount</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">boolean|string</span>
+										<a href="#getStream" title="details" class="method-name">getStream</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>
+										<a href="#getUri" title="details" class="method-name">getUri</a>
+											([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$as_string</span> = <span class="var-default">false</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+										<a href="#request" title="details" class="method-name">request</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#resetParameters" title="details" class="method-name">resetParameters</a>
+											([<span class="var-type">bool</span>&nbsp;<span class="var-name">$clearAll</span> = <span class="var-default">false</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">null</span>
+										<a href="#setAdapter" title="details" class="method-name">setAdapter</a>
+											(<span class="var-type"><a href="../../Zend_Http/Client_Adapter/Zend_Http_Client_Adapter_Interface.html">Zend_Http_Client_Adapter_Interface</a>|string</span>&nbsp;<span class="var-name">$adapter</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setAuth" title="details" class="method-name">setAuth</a>
+											(<span class="var-type">string|false</span>&nbsp;<span class="var-name">$user</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$password</span> = <span class="var-default">''</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">self::AUTH_BASIC</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setConfig" title="details" class="method-name">setConfig</a>
+											([<span class="var-type">Zend_Config</span>&nbsp;<span class="var-name">$config</span> = <span class="var-default">array()</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setCookie" title="details" class="method-name">setCookie</a>
+											(<span class="var-type">Zend_Http_Cookie|string</span>&nbsp;<span class="var-name">$cookie</span>, [<span class="var-type">string|null</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setCookieJar" title="details" class="method-name">setCookieJar</a>
+											([<span class="var-type">Zend_Http_CookieJar|boolean</span>&nbsp;<span class="var-name">$cookiejar</span> = <span class="var-default">true</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setEncType" title="details" class="method-name">setEncType</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$enctype</span> = <span class="var-default">self::ENC_URLENCODED</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setFileUpload" title="details" class="method-name">setFileUpload</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$filename</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$formname</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$ctype</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setHeaders" title="details" class="method-name">setHeaders</a>
+											(<span class="var-type">string|array</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setMethod" title="details" class="method-name">setMethod</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span> = <span class="var-default">self::GET</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setParameterGet" title="details" class="method-name">setParameterGet</a>
+											(<span class="var-type">string|array</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setParameterPost" title="details" class="method-name">setParameterPost</a>
+											(<span class="var-type">string|array</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setRawData" title="details" class="method-name">setRawData</a>
+											(<span class="var-type">string|resource</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$enctype</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setStream" title="details" class="method-name">setStream</a>
+											([<span class="var-type">string|boolean</span>&nbsp;<span class="var-name">$streamfile</span> = <span class="var-default">true</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#setUri" title="details" class="method-name">setUri</a>
+											(<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>&nbsp;<span class="var-name">$uri</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#_detectFileMimeType" title="details" class="method-name">_detectFileMimeType</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$file</span>)
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">array</span>
+										<a href="#_getParametersRecursive" title="details" class="method-name">_getParametersRecursive</a>
+											(<span class="var-type">array</span>&nbsp;<span class="var-name">$parray</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$urlencode</span> = <span class="var-default">false</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">resource</span>
+										<a href="#_openTempStream" title="details" class="method-name">_openTempStream</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#_prepareBody" title="details" class="method-name">_prepareBody</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">array</span>
+										<a href="#_prepareHeaders" title="details" class="method-name">_prepareHeaders</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">null</span>
+										<a href="#_setParameter" title="details" class="method-name">_setParameter</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$type</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$_fileInfoDb" id="$_fileInfoDb"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type">resource</span>
+			<span class="var-name">$_fileInfoDb</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">241</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Fileinfo magic database resource</p>
+<p class="description"><p>This variable is populated the first time _detectFileMimeType is called  and is then reused on every call to this method</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+
+<a name="var$adapter" id="$adapter"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Http/Client_Adapter/Zend_Http_Client_Adapter_Interface.html">Zend_Http_Client_Adapter_Interface</a></span>
+			<span class="var-name">$adapter</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">130</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The adapter used to perform the actual connection to the server</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$auth" id="$auth"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array|null</span>
+			<span class="var-name">$auth</span>
+						(line <span class="line-number">193</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">HTTP Authentication settings</p>
+<p class="description"><p>Expected to be an associative array with this structure:  $this-&gt;auth = array('user' =&gt; 'username', 'password' =&gt; 'password', 'type' =&gt; 'basic')  Where 'type' should be one of the supported authentication types (see the AUTH_*  constants), for example 'basic' or 'digest'.</p><p>If null, no authentication will be used.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$config" id="$config"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$config</span>
+			 = <span class="var-default">array(<br />        'maxredirects'    =&gt; 5,<br />        'strictredirects' =&gt; false,<br />        'useragent'       =&gt; 'Zend_Http_Client',<br />        'timeout'         =&gt; 10,<br />        'adapter'         =&gt; 'Zend_Http_Client_Adapter_Socket',<br />        'httpversion'     =&gt; self::HTTP_1,<br />        'keepalive'       =&gt; false,<br />        'storeresponse'   =&gt; true,<br />        'strict'          =&gt; true,<br />        'output_stream'   =&gt; false,<br />        'encodecookies'   =&gt; true,<br />        'rfc3986_strict'  =&gt; false<br />    )</span>			(line <span class="line-number">110</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Configuration array, set using the constructor or using ::setConfig()</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$cookiejar" id="$cookiejar"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">Zend_Http_CookieJar</span>
+			<span class="var-name">$cookiejar</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">210</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The client's cookie jar</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$enctype" id="$enctype"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">string</span>
+			<span class="var-name">$enctype</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">172</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Request body content type (for POST requests)</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$files" id="$files"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$files</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">203</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">File upload arrays (used in POST requests)</p>
+<p class="description"><p>An associative array, where each element is of the format:    'name' =&gt; array('filename.txt', 'text/plain', 'This is the actual file contents')</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$headers" id="$headers"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$headers</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">144</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Associative array of request headers</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$last_request" id="$last_request"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">string</span>
+			<span class="var-name">$last_request</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">217</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The last HTTP request sent by the client, as string</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$last_response" id="$last_response"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+			<span class="var-name">$last_response</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">224</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The last HTTP response received by the client</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$method" id="$method"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">string</span>
+			<span class="var-name">$method</span>
+			 = <span class="var-default"> self::GET</span>			(line <span class="line-number">151</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">HTTP request method</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$paramsGet" id="$paramsGet"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$paramsGet</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">158</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Associative array of GET parameters</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$paramsPost" id="$paramsPost"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$paramsPost</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">165</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Associative array of POST parameters</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$raw_post_data" id="$raw_post_data"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">string</span>
+			<span class="var-name">$raw_post_data</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">179</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The raw post data to send. Could be set by setRawData($data, $enctype).</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$redirectCounter" id="$redirectCounter"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">int</span>
+			<span class="var-name">$redirectCounter</span>
+			 = <span class="var-default"> 0</span>			(line <span class="line-number">231</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Redirection counter</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$uri" id="$uri"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a></span>
+			<span class="var-name">$uri</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">137</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Request URI</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																			<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodencodeAuthHeader" id="encodeAuthHeader"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static encodeAuthHeader</span> (line <span class="line-number">1380</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Create a HTTP authentication &quot;Authorization:&quot; header according to the  specified user, password and authentication method.</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="http://www.faqs.org/rfcs/rfc2617.html">http://www.faqs.org/rfcs/rfc2617.html</a></li>
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">string</span>
+		<span class="method-name">
+			encodeAuthHeader
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$password</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">self::AUTH_BASIC</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$user</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$password</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$type</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodencodeFormData" id="encodeFormData"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static encodeFormData</span> (line <span class="line-number">1350</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Encode data to a multipart/form-data part suitable for a POST request.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">string</span>
+		<span class="method-name">
+			encodeFormData
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$boundary</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$value</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$filename</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$boundary</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$name</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$value</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$filename</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$headers</span><span class="var-description">: Associative array of optional headers @example (&quot;Content-Transfer-Encoding&quot; =&gt; &quot;binary&quot;)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_flattenParametersArray" id="_flattenParametersArray"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static _flattenParametersArray</span> (line <span class="line-number">1425</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Convert an array of parameters into a flat array of (key, value) pairs</p>
+<p class="description"><p>Will flatten a potentially multi-dimentional array of parameters (such  as POST parameters) into a flat array of (key, value) paris. In case  of multi-dimentional arrays, square brackets ([]) will be added to the  key to indicate an array.</p></p>
+	<ul class="tags">
+				<li><span class="field">since:</span> 1.9</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">array</span>
+		<span class="method-name">
+			_flattenParametersArray
+		</span>
+					(<span class="var-type">array</span>&nbsp;<span class="var-name">$parray</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$prefix</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$parray</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$prefix</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">250</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Constructor method. Will create a new HTTP client. Accepts the target  URL and optionally configuration array.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Http_Client</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$config</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>
+				<span class="var-name">$uri</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$config</span><span class="var-description">: Configuration key-value pairs.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetAdapter" id="getAdapter"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getAdapter</span> (line <span class="line-number">867</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Load the connection adapter</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client_Adapter/Zend_Http_Client_Adapter_Interface.html">Zend_Http_Client_Adapter_Interface</a></span>
+		<span class="method-name">
+			getAdapter
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata_HttpClient.html#methodgetAdapter">Zend_Gdata_HttpClient::getAdapter()</a>
+								: Return the current connection adapter
+							</li>
+				</ul>
+	</div>
+<a name="methodgetCookieJar" id="getCookieJar"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getCookieJar</span> (line <span class="line-number">611</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Return the current cookie jar or null if none.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Http_CookieJar|null</span>
+		<span class="method-name">
+			getCookieJar
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetHeader" id="getHeader"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getHeader</span> (line <span class="line-number">438</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value of a specific header</p>
+<p class="description"><p>Note that if the header has more than one value, an array  will be returned.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The header value or null if it is not set</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|array|null</span>
+		<span class="method-name">
+			getHeader
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$key</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$key</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetLastRequest" id="getLastRequest"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getLastRequest</span> (line <span class="line-number">808</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the last HTTP request as string</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getLastRequest
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetLastResponse" id="getLastResponse"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getLastResponse</span> (line <span class="line-number">821</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the last HTTP response received by this client</p>
+<p class="description"><p>If $config['storeresponse'] is set to false, or no response was  stored yet, will return null</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> or null if none</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+		<span class="method-name">
+			getLastResponse
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetRedirectionsCount" id="getRedirectionsCount"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getRedirectionsCount</span> (line <span class="line-number">519</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the number of redirections done on the last request</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int</span>
+		<span class="method-name">
+			getRedirectionsCount
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetStream" id="getStream"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getStream</span> (line <span class="line-number">888</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get status of streaming for received data</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">boolean|string</span>
+		<span class="method-name">
+			getStream
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetUri" id="getUri"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getUri</span> (line <span class="line-number">300</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the URI for the next request</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>
+		<span class="method-name">
+			getUri
+		</span>
+					([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$as_string</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$as_string</span><span class="var-description">: If true, will return the URI as a string</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodrequest" id="request"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">request</span> (line <span class="line-number">925</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Send the HTTP request and return an HTTP response object</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+		<span class="method-name">
+			request
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$method</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodresetParameters" id="resetParameters"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">resetParameters</span> (line <span class="line-number">778</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Clear all GET and POST parameters</p>
+<p class="description"><p>Should be used to reset the request parameters if the client is  used for several concurrent requests.</p><p>clearAll parameter controls if we clean just parameters or also  headers and last_*</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			resetParameters
+		</span>
+					([<span class="var-type">bool</span>&nbsp;<span class="var-name">$clearAll</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$clearAll</span><span class="var-description">: Should all data be cleared?</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata_HttpClient.html#methodresetParameters">Zend_Gdata_HttpClient::resetParameters()</a>
+								: Clear all custom parameters we set.
+							</li>
+				</ul>
+	</div>
+<a name="methodsetAdapter" id="setAdapter"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setAdapter</span> (line <span class="line-number">836</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Load the connection adapter</p>
+<p class="description"><p>While this method is not called more than one for a client, it is  seperated from -&gt;request() to preserve logic and readability</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">null</span>
+		<span class="method-name">
+			setAdapter
+		</span>
+					(<span class="var-type"><a href="../../Zend_Http/Client_Adapter/Zend_Http_Client_Adapter_Interface.html">Zend_Http_Client_Adapter_Interface</a>|string</span>&nbsp;<span class="var-name">$adapter</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client_Adapter/Zend_Http_Client_Adapter_Interface.html">Zend_Http_Client_Adapter_Interface</a>|string</span>
+				<span class="var-name">$adapter</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata_HttpClient.html#methodsetAdapter">Zend_Gdata_HttpClient::setAdapter()</a>
+								: Load the connection adapter
+							</li>
+				</ul>
+	</div>
+<a name="methodsetAuth" id="setAuth"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setAuth</span> (line <span class="line-number">547</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set HTTP authentication parameters</p>
+<p class="description"><p>$type should be one of the supported types - see the self::AUTH_*  constants.</p><p>To enable authentication:  <div class="src-code"><ol><li><div class="src-line">&nbsp;<span class="src-var">$this</span><span class="src-sym">-&gt;</span><a href="../../Zend_Http/Client/Zend_Http_Client.html#methodsetAuth">setAuth</a><span class="src-sym">(</span><span class="src-str">'shahar'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'secret'</span><span class="src-sym">,&nbsp;</span><span class="src-id"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span><span class="src-sym">::</span><span class="src-id">AUTH_BASIC</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+</ol></div></p><p>To disable authentication:  <div class="src-code"><ol><li><div class="src-line">&nbsp;<span class="src-var">$this</span><span class="src-sym">-&gt;</span><a href="../../Zend_Http/Client/Zend_Http_Client.html#methodsetAuth">setAuth</a><span class="src-sym">(</span><span class="src-id">false</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+</ol></div></p></p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="http://www.faqs.org/rfcs/rfc2617.html">http://www.faqs.org/rfcs/rfc2617.html</a></li>
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setAuth
+		</span>
+					(<span class="var-type">string|false</span>&nbsp;<span class="var-name">$user</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$password</span> = <span class="var-default">''</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">self::AUTH_BASIC</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string|false</span>
+				<span class="var-name">$user</span><span class="var-description">: User name or false disable authentication</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$password</span><span class="var-description">: Password</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$type</span><span class="var-description">: Authentication type</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetConfig" id="setConfig"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setConfig</span> (line <span class="line-number">316</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set configuration parameters for this HTTP client</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setConfig
+		</span>
+					([<span class="var-type">Zend_Config</span>&nbsp;<span class="var-name">$config</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">Zend_Config</span>
+				<span class="var-name">$config</span><span class="var-description">: | array $config</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetCookie" id="setCookie"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setCookie</span> (line <span class="line-number">625</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Add a cookie to the request. If the client has no Cookie Jar, the cookies  will be added directly to the headers array as &quot;Cookie&quot; headers.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setCookie
+		</span>
+					(<span class="var-type">Zend_Http_Cookie|string</span>&nbsp;<span class="var-name">$cookie</span>, [<span class="var-type">string|null</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">Zend_Http_Cookie|string</span>
+				<span class="var-name">$cookie</span>			</li>
+					<li>
+				<span class="var-type">string|null</span>
+				<span class="var-name">$value</span><span class="var-description">: If &quot;cookie&quot; is a string, this is the cookie value.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetCookieJar" id="setCookieJar"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setCookieJar</span> (line <span class="line-number">587</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the HTTP client's cookie jar.</p>
+<p class="description"><p>A cookie jar is an object that holds and maintains cookies across HTTP requests  and responses.</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setCookieJar
+		</span>
+					([<span class="var-type">Zend_Http_CookieJar|boolean</span>&nbsp;<span class="var-name">$cookiejar</span> = <span class="var-default">true</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">Zend_Http_CookieJar|boolean</span>
+				<span class="var-name">$cookiejar</span><span class="var-description">: Existing cookiejar object, true to create a new one, false to disable</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetEncType" id="setEncType"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setEncType</span> (line <span class="line-number">731</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the encoding type for POST data</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setEncType
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$enctype</span> = <span class="var-default">self::ENC_URLENCODED</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$enctype</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetFileUpload" id="setFileUpload"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setFileUpload</span> (line <span class="line-number">698</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set a file to upload (using a POST request)</p>
+<p class="description"><p>Can be used in two ways:</p><p><ol><li>$data is null (default): $filename is treated as the name if a local file which
+    will be read and sent. Will try to guess the content type using mime_content_type().</li><li>$data is set - $filename is sent as the file name, but $data is sent as the file
+    contents and no file is read from the file system. In this case, you need to
+    manually set the Content-Type ($ctype) or it will default to
+    application/octet-stream.</li></ol></p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setFileUpload
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$filename</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$formname</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$ctype</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$filename</span><span class="var-description">: Name of file to upload, or name to save as</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$formname</span><span class="var-description">: Name of form element to send as</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$data</span><span class="var-description">: Data to send (if null, $filename is read and sent)</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$ctype</span><span class="var-description">: Content type to use (if $data is set and $ctype is      null, will be application/octet-stream)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetHeaders" id="setHeaders"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setHeaders</span> (line <span class="line-number">386</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set one or more request headers</p>
+<p class="description"><p>This function can be used in several ways to set the client's request  headers: <ol><li>By providing two parameters: $name as the header to set (e.g. 'Host')
+    and $value as it's value (e.g. 'www.example.com').</li><li>By providing a single header string as the only parameter
+    e.g. 'Host: www.example.com'</li><li>By providing an array of headers as the first parameter
+    e.g. array('host' =&gt; 'www.example.com', 'x-foo: bar'). In This case
+    the function will call itself recursively for each array item.</li></ol></p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setHeaders
+		</span>
+					(<span class="var-type">string|array</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string|array</span>
+				<span class="var-name">$name</span><span class="var-description">: Header name, full header string ('Header: value')      or an array of headers</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$value</span><span class="var-description">: Header value or null</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetMethod" id="setMethod"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setMethod</span> (line <span class="line-number">350</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the next request's method</p>
+<p class="description"><p>Validated the passed method and sets it. If we have files set for  POST requests, and the new method is not POST, the files are silently  dropped.</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setMethod
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span> = <span class="var-default">self::GET</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$method</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetParameterGet" id="setParameterGet"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setParameterGet</span> (line <span class="line-number">455</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set a GET parameter for the request. Wrapper around _setParameter</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setParameterGet
+		</span>
+					(<span class="var-type">string|array</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string|array</span>
+				<span class="var-name">$name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetParameterPost" id="setParameterPost"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setParameterPost</span> (line <span class="line-number">474</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set a POST parameter for the request. Wrapper around _setParameter</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setParameterPost
+		</span>
+					(<span class="var-type">string|array</span>&nbsp;<span class="var-name">$name</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string|array</span>
+				<span class="var-name">$name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetRawData" id="setRawData"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setRawData</span> (line <span class="line-number">752</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the raw (already encoded) POST data.</p>
+<p class="description"><p>This function is here for two reasons: <ol><li>For advanced user who would like to set their own data, already encoded</li><li>For backwards compatibilty: If someone uses the old post($data) method.
+    this method will be used to set the encoded data.</li></ol>  $data can also be stream (such as file) from which the data will be read.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setRawData
+		</span>
+					(<span class="var-type">string|resource</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$enctype</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string|resource</span>
+				<span class="var-name">$data</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$enctype</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetStream" id="setStream"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setStream</span> (line <span class="line-number">878</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set streaming for received data</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setStream
+		</span>
+					([<span class="var-type">string|boolean</span>&nbsp;<span class="var-name">$streamfile</span> = <span class="var-default">true</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string|boolean</span>
+				<span class="var-name">$streamfile</span><span class="var-description">: Stream file, true for temp file, false/null for no streaming</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetUri" id="setUri"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setUri</span> (line <span class="line-number">267</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the URI for the next request</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			setUri
+		</span>
+					(<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>&nbsp;<span class="var-name">$uri</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Uri/Zend_Uri_Http.html">Zend_Uri_Http</a>|string</span>
+				<span class="var-name">$uri</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_detectFileMimeType" id="_detectFileMimeType"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">_detectFileMimeType</span> (line <span class="line-number">1314</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Attempt to detect the MIME type of a file using available extensions</p>
+<p class="description"><p>This method will try to detect the MIME type of a file. If the fileinfo  extension is available, it will be used. If not, the mime_magic  extension which is deprected but is still available in many PHP setups  will be tried.</p><p>If neither extension is available, the default application/octet-stream  MIME type will be returned</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> MIME type</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_detectFileMimeType
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$file</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$file</span><span class="var-description">: File path</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_getParametersRecursive" id="_getParametersRecursive"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">_getParametersRecursive</span> (line <span class="line-number">1264</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Helper method that gets a possibly multi-level parameters array (get or  post) and flattens it.</p>
+<p class="description"><p>The method returns an array of (key, value) pairs (because keys are not  necessarily unique. If one of the parameters in as array, it will also  add a [] suffix to the key.</p><p>This method is deprecated since Zend Framework 1.9 in favour of  self::_flattenParametersArray() and will be dropped in 2.0</p></p>
+	<ul class="tags">
+				<li><span class="field">deprecated:</span> since 1.9</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			_getParametersRecursive
+		</span>
+					(<span class="var-type">array</span>&nbsp;<span class="var-name">$parray</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$urlencode</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$parray</span><span class="var-description">: The parameters array</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$urlencode</span><span class="var-description">: Whether to urlencode the name and value</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_openTempStream" id="_openTempStream"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">_openTempStream</span> (line <span class="line-number">898</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Create temporary stream</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">resource</span>
+		<span class="method-name">
+			_openTempStream
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method_prepareBody" id="_prepareBody"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">_prepareBody</span> (line <span class="line-number">1157</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare the request body (for POST and PUT requests)</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Http_Client_Exception</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_prepareBody
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata_HttpClient.html#method_prepareBody">Zend_Gdata_HttpClient::_prepareBody()</a>
+								: Prepare the request body (for POST and PUT requests)
+							</li>
+				</ul>
+	</div>
+<a name="method_prepareHeaders" id="_prepareHeaders"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">_prepareHeaders</span> (line <span class="line-number">1076</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare the request headers</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			_prepareHeaders
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method_setParameter" id="_setParameter"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">_setParameter</span> (line <span class="line-number">494</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set a GET or POST parameter - used by SetParameterGet and SetParameterPost</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">null</span>
+		<span class="method-name">
+			_setParameter
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$type</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$type</span><span class="var-description">: GET or POST</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span>			</li>
+				</ul>
+		
+			
+	</div>
+						
+		</div>
+	</div>
+
+	<a name="sec-consts"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+										<a href="#sec-var-summary">Constants</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+														| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="constAUTH_BASIC" id="AUTH_BASIC"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">AUTH_BASIC</span>
+			 = <span class="const-default"> 'basic'</span>
+			(line <span class="line-number">84</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Supported HTTP Authentication methods</p>
+	
+	
+</div>
+<a name="constCONNECT" id="CONNECT"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">CONNECT</span>
+			 = <span class="const-default"> 'CONNECT'</span>
+			(line <span class="line-number">78</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constCONTENT_LENGTH" id="CONTENT_LENGTH"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">CONTENT_LENGTH</span>
+			 = <span class="const-default"> 'Content-Length'</span>
+			(line <span class="line-number">97</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constCONTENT_TYPE" id="CONTENT_TYPE"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">CONTENT_TYPE</span>
+			 = <span class="const-default"> 'Content-Type'</span>
+			(line <span class="line-number">96</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Content attributes</p>
+	
+	
+</div>
+<a name="constDELETE" id="DELETE"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">DELETE</span>
+			 = <span class="const-default"> 'DELETE'</span>
+			(line <span class="line-number">75</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constENC_FORMDATA" id="ENC_FORMDATA"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ENC_FORMDATA</span>
+			 = <span class="const-default"> 'multipart/form-data'</span>
+			(line <span class="line-number">103</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constENC_URLENCODED" id="ENC_URLENCODED"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ENC_URLENCODED</span>
+			 = <span class="const-default"> 'application/x-www-form-urlencoded'</span>
+			(line <span class="line-number">102</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">POST data encoding methods</p>
+	
+	
+</div>
+<a name="constGET" id="GET"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">GET</span>
+			 = <span class="const-default"> 'GET'</span>
+			(line <span class="line-number">71</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">HTTP request methods</p>
+	
+	
+</div>
+<a name="constHEAD" id="HEAD"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">HEAD</span>
+			 = <span class="const-default"> 'HEAD'</span>
+			(line <span class="line-number">74</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constHTTP_0" id="HTTP_0"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">HTTP_0</span>
+			 = <span class="const-default"> '1.0'</span>
+			(line <span class="line-number">91</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constHTTP_1" id="HTTP_1"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">HTTP_1</span>
+			 = <span class="const-default"> '1.1'</span>
+			(line <span class="line-number">90</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">HTTP protocol versions</p>
+	
+	
+</div>
+<a name="constMERGE" id="MERGE"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">MERGE</span>
+			 = <span class="const-default"> 'MERGE'</span>
+			(line <span class="line-number">79</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constOPTIONS" id="OPTIONS"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">OPTIONS</span>
+			 = <span class="const-default"> 'OPTIONS'</span>
+			(line <span class="line-number">77</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constPOST" id="POST"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">POST</span>
+			 = <span class="const-default"> 'POST'</span>
+			(line <span class="line-number">72</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constPUT" id="PUT"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">PUT</span>
+			 = <span class="const-default"> 'PUT'</span>
+			(line <span class="line-number">73</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constTRACE" id="TRACE"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">TRACE</span>
+			 = <span class="const-default"> 'TRACE'</span>
+			(line <span class="line-number">76</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+						
+		</div>
+	</div>
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:00:24 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

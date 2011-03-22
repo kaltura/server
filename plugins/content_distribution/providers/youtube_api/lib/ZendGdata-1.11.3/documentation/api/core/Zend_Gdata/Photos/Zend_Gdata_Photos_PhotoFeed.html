@@ -1,0 +1,1982 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Zend_Gdata_Photos_PhotoFeed</title>
+			<link rel="stylesheet" href="../../media/stylesheet.css" />
+						<script src="../../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../../media/images/plus.png";
+				imgMinus.src = "../../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> Zend_Gdata_Photos_PhotoFeed</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Data model for a collection of photo entries, usually  provided by the Picasa servers.</p>
+<p class="description"><p>For information on requesting this feed from a server, see the  service class, Zend_Gdata_Photos.</p></p>
+	<ul class="tags">
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_Gdata---Photos---PhotoFeed.php.html">/Gdata/Photos/PhotoFeed.php</a> (line <span class="field">52</span>)
+		</p>
+		
+				
+		<pre><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html">Zend_Gdata_App_Base</a>
+   |
+   --<a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html">Zend_Gdata_App_FeedEntryParent</a>
+      |
+      --<a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html">Zend_Gdata_App_FeedSourceParent</a>
+         |
+         --<a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a>
+            |
+            --<a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html">Zend_Gdata_Feed</a>
+               |
+               --Zend_Gdata_Photos_PhotoFeed</pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																																																																																								<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_entryClassName" title="details" class="var-name">$_entryClassName</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_entryKindClassMapping" title="details" class="var-name">$_entryKindClassMapping</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_feedClassName" title="details" class="var-name">$_feedClassName</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_AlbumId.html">Zend_Gdata_Photos_Extension_AlbumId</a></span>
+					<a href="#$_gphotoAlbumId" title="details" class="var-name">$_gphotoAlbumId</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Checksum.html">Zend_Gdata_Photos_Extension_Checksum</a></span>
+					<a href="#$_gphotoChecksum" title="details" class="var-name">$_gphotoChecksum</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Client.html">Zend_Gdata_Photos_Extension_Client</a></span>
+					<a href="#$_gphotoClient" title="details" class="var-name">$_gphotoClient</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentCount.html">Zend_Gdata_Photos_Extension_CommentCount</a></span>
+					<a href="#$_gphotoCommentCount" title="details" class="var-name">$_gphotoCommentCount</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentingEnabled.html">Zend_Gdata_Photos_Extension_CommentingEnabled</a></span>
+					<a href="#$_gphotoCommentingEnabled" title="details" class="var-name">$_gphotoCommentingEnabled</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Height.html">Zend_Gdata_Photos_Extension_Height</a></span>
+					<a href="#$_gphotoHeight" title="details" class="var-name">$_gphotoHeight</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Id.html">Zend_Gdata_Photos_Extension_Id</a></span>
+					<a href="#$_gphotoId" title="details" class="var-name">$_gphotoId</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Size.html">Zend_Gdata_Photos_Extension_Size</a></span>
+					<a href="#$_gphotoSize" title="details" class="var-name">$_gphotoSize</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Timestamp.html">Zend_Gdata_Photos_Extension_Timestamp</a></span>
+					<a href="#$_gphotoTimestamp" title="details" class="var-name">$_gphotoTimestamp</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Version.html">Zend_Gdata_Photos_Extension_Version</a></span>
+					<a href="#$_gphotoVersion" title="details" class="var-name">$_gphotoVersion</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Width.html">Zend_Gdata_Photos_Extension_Width</a></span>
+					<a href="#$_gphotoWidth" title="details" class="var-name">$_gphotoWidth</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaGroup.html">Zend_Gdata_Media_Extension_MediaGroup</a></span>
+					<a href="#$_mediaGroup" title="details" class="var-name">$_mediaGroup</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																																																																																																																							
+				<div class="method-definition">
+					<img src="../../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">Zend_Gdata_Photos_PhotoFeed</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$element</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#getDOM" title="details" class="method-name">getDOM</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$doc</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$majorVersion</span> = <span class="var-default">1</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$minorVersion</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoAlbumId" title="details" class="method-name">getGphotoAlbumId</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoChecksum" title="details" class="method-name">getGphotoChecksum</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoClient" title="details" class="method-name">getGphotoClient</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoCommentCount" title="details" class="method-name">getGphotoCommentCount</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoCommentingEnabled" title="details" class="method-name">getGphotoCommentingEnabled</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoHeight" title="details" class="method-name">getGphotoHeight</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoId" title="details" class="method-name">getGphotoId</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoSize" title="details" class="method-name">getGphotoSize</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoTimestamp" title="details" class="method-name">getGphotoTimestamp</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoVersion" title="details" class="method-name">getGphotoVersion</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getGphotoWidth" title="details" class="method-name">getGphotoWidth</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#getMediaGroup" title="details" class="method-name">getMediaGroup</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_AlbumId.html">Zend_Gdata_Photos_Extension_AlbumId</a></span>
+										<a href="#setGphotoAlbumId" title="details" class="method-name">setGphotoAlbumId</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Checksum.html">Zend_Gdata_Photos_Extension_Checksum</a></span>
+										<a href="#setGphotoChecksum" title="details" class="method-name">setGphotoChecksum</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Client.html">Zend_Gdata_Photos_Extension_Client</a></span>
+										<a href="#setGphotoClient" title="details" class="method-name">setGphotoClient</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentCount.html">Zend_Gdata_Photos_Extension_CommentCount</a></span>
+										<a href="#setGphotoCommentCount" title="details" class="method-name">setGphotoCommentCount</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentingEnabled.html">Zend_Gdata_Photos_Extension_CommentingEnabled</a></span>
+										<a href="#setGphotoCommentingEnabled" title="details" class="method-name">setGphotoCommentingEnabled</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Height.html">Zend_Gdata_Photos_Extension_Height</a></span>
+										<a href="#setGphotoHeight" title="details" class="method-name">setGphotoHeight</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Id.html">Zend_Gdata_Photos_Extension_Id</a></span>
+										<a href="#setGphotoId" title="details" class="method-name">setGphotoId</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Size.html">Zend_Gdata_Photos_Extension_Size</a></span>
+										<a href="#setGphotoSize" title="details" class="method-name">setGphotoSize</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Timestamp.html">Zend_Gdata_Photos_Extension_Timestamp</a></span>
+										<a href="#setGphotoTimestamp" title="details" class="method-name">setGphotoTimestamp</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Version.html">Zend_Gdata_Photos_Extension_Version</a></span>
+										<a href="#setGphotoVersion" title="details" class="method-name">setGphotoVersion</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Width.html">Zend_Gdata_Photos_Extension_Width</a></span>
+										<a href="#setGphotoWidth" title="details" class="method-name">setGphotoWidth</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaGroup.html">Zend_Gdata_Media_Extension_MediaGroup</a></span>
+										<a href="#setMediaGroup" title="details" class="method-name">setMediaGroup</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#takeChildFromDOM" title="details" class="method-name">takeChildFromDOM</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$child</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			
+<a name="var$_entryClassName" id="$_entryClassName"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_entryClassName</span>
+			 = <span class="var-default"> 'Zend_Gdata_Photos_PhotoEntry'</span>			(line <span class="line-number">139</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#var$_entryClassName">Zend_Gdata_Feed::$_entryClassName</a></dt>
+						<dd>The classname for individual feed elements.</dd>
+					</dl>
+		
+		
+
+</div>
+<a name="var$_entryKindClassMapping" id="$_entryKindClassMapping"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_entryKindClassMapping</span>
+			 = <span class="var-default">array(<br />        'http://schemas.google.com/photos/2007#comment' =&gt; 'Zend_Gdata_Photos_CommentEntry',<br />        'http://schemas.google.com/photos/2007#tag' =&gt; 'Zend_Gdata_Photos_TagEntry'<br />    )</span>			(line <span class="line-number">142</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_feedClassName" id="$_feedClassName"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_feedClassName</span>
+			 = <span class="var-default"> 'Zend_Gdata_Photos_PhotoFeed'</span>			(line <span class="line-number">140</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoAlbumId" id="$_gphotoAlbumId"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_AlbumId.html">Zend_Gdata_Photos_Extension_AlbumId</a></span>
+			<span class="var-name">$_gphotoAlbumId</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">67</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:albumid element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoChecksum" id="$_gphotoChecksum"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Checksum.html">Zend_Gdata_Photos_Extension_Checksum</a></span>
+			<span class="var-name">$_gphotoChecksum</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">109</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:checksum element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoClient" id="$_gphotoClient"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Client.html">Zend_Gdata_Photos_Extension_Client</a></span>
+			<span class="var-name">$_gphotoClient</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">102</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:client element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoCommentCount" id="$_gphotoCommentCount"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentCount.html">Zend_Gdata_Photos_Extension_CommentCount</a></span>
+			<span class="var-name">$_gphotoCommentCount</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">123</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:commentCount element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoCommentingEnabled" id="$_gphotoCommentingEnabled"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentingEnabled.html">Zend_Gdata_Photos_Extension_CommentingEnabled</a></span>
+			<span class="var-name">$_gphotoCommentingEnabled</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">130</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:commentingEnabled element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoHeight" id="$_gphotoHeight"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Height.html">Zend_Gdata_Photos_Extension_Height</a></span>
+			<span class="var-name">$_gphotoHeight</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">88</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:height element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoId" id="$_gphotoId"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Id.html">Zend_Gdata_Photos_Extension_Id</a></span>
+			<span class="var-name">$_gphotoId</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">60</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:id element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoSize" id="$_gphotoSize"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Size.html">Zend_Gdata_Photos_Extension_Size</a></span>
+			<span class="var-name">$_gphotoSize</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">95</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:size element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoTimestamp" id="$_gphotoTimestamp"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Timestamp.html">Zend_Gdata_Photos_Extension_Timestamp</a></span>
+			<span class="var-name">$_gphotoTimestamp</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">116</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:timestamp element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoVersion" id="$_gphotoVersion"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Version.html">Zend_Gdata_Photos_Extension_Version</a></span>
+			<span class="var-name">$_gphotoVersion</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">74</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:version element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_gphotoWidth" id="$_gphotoWidth"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Width.html">Zend_Gdata_Photos_Extension_Width</a></span>
+			<span class="var-name">$_gphotoWidth</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">81</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">gphoto:width element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_mediaGroup" id="$_mediaGroup"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaGroup.html">Zend_Gdata_Media_Extension_MediaGroup</a></span>
+			<span class="var-name">$_mediaGroup</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">137</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">media:group element</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html">Zend_Gdata_Feed</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#var$_itemsPerPage">Zend_Gdata_Feed::$_itemsPerPage</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#var$_startIndex">Zend_Gdata_Feed::$_startIndex</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#var$_totalResults">Zend_Gdata_Feed::$_totalResults</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#var$_entry">Zend_Gdata_App_Feed::$_entry</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#var$_entryIndex">Zend_Gdata_App_Feed::$_entryIndex</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#var$_rootElement">Zend_Gdata_App_Feed::$_rootElement</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html">Zend_Gdata_App_FeedSourceParent</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#var$_generator">Zend_Gdata_App_FeedSourceParent::$_generator</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#var$_icon">Zend_Gdata_App_FeedSourceParent::$_icon</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#var$_logo">Zend_Gdata_App_FeedSourceParent::$_logo</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#var$_subtitle">Zend_Gdata_App_FeedSourceParent::$_subtitle</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html">Zend_Gdata_App_FeedEntryParent</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_author">Zend_Gdata_App_FeedEntryParent::$_author</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_category">Zend_Gdata_App_FeedEntryParent::$_category</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_contributor">Zend_Gdata_App_FeedEntryParent::$_contributor</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_etag">Zend_Gdata_App_FeedEntryParent::$_etag</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_id">Zend_Gdata_App_FeedEntryParent::$_id</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_link">Zend_Gdata_App_FeedEntryParent::$_link</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_majorProtocolVersion">Zend_Gdata_App_FeedEntryParent::$_majorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_minorProtocolVersion">Zend_Gdata_App_FeedEntryParent::$_minorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_rights">Zend_Gdata_App_FeedEntryParent::$_rights</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_service">Zend_Gdata_App_FeedEntryParent::$_service</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_title">Zend_Gdata_App_FeedEntryParent::$_title</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_updated">Zend_Gdata_App_FeedEntryParent::$_updated</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html">Zend_Gdata_App_Base</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_extensionAttributes">Zend_Gdata_App_Base::$_extensionAttributes</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_extensionElements">Zend_Gdata_App_Base::$_extensionElements</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_namespaceLookupCache">Zend_Gdata_App_Base::$_namespaceLookupCache</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_namespaces">Zend_Gdata_App_Base::$_namespaces</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_rootNamespace">Zend_Gdata_App_Base::$_rootNamespace</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_rootNamespaceURI">Zend_Gdata_App_Base::$_rootNamespaceURI</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_text">Zend_Gdata_App_Base::$_text</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">147</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Gdata_Photos_PhotoFeed</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$element</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$element</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#method__construct">Zend_Gdata_Feed::__construct()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodgetDOM" id="getDOM"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getDOM</span> (line <span class="line-number">153</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getDOM
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$doc</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$majorVersion</span> = <span class="var-default">1</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$minorVersion</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$doc</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$majorVersion</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$minorVersion</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodgetDOM">Zend_Gdata_Feed::getDOM()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodgetGphotoAlbumId" id="getGphotoAlbumId"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoAlbumId</span> (line <span class="line-number">335</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:albumid attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoAlbumId">Zend_Gdata_Photos_PhotoFeed::setGphotoAlbumId()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoAlbumId
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoChecksum" id="getGphotoChecksum"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoChecksum</span> (line <span class="line-number">450</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:checksum attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoChecksum">Zend_Gdata_Photos_PhotoFeed::setGphotoChecksum()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoChecksum
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoClient" id="getGphotoClient"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoClient</span> (line <span class="line-number">427</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:client attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoClient">Zend_Gdata_Photos_PhotoFeed::setGphotoClient()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoClient
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoCommentCount" id="getGphotoCommentCount"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoCommentCount</span> (line <span class="line-number">496</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:commentCount attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoCommentCount">Zend_Gdata_Photos_PhotoFeed::setGphotoCommentCount()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoCommentCount
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoCommentingEnabled" id="getGphotoCommentingEnabled"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoCommentingEnabled</span> (line <span class="line-number">519</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:commentingEnabled attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoCommentingEnabled">Zend_Gdata_Photos_PhotoFeed::setGphotoCommentingEnabled()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoCommentingEnabled
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoHeight" id="getGphotoHeight"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoHeight</span> (line <span class="line-number">381</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:height attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoHeight">Zend_Gdata_Photos_PhotoFeed::setGphotoHeight()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoHeight
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoId" id="getGphotoId"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoId</span> (line <span class="line-number">289</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:id attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoId">Zend_Gdata_Photos_PhotoFeed::setGphotoId()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoId
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoSize" id="getGphotoSize"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoSize</span> (line <span class="line-number">404</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:size attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoSize">Zend_Gdata_Photos_PhotoFeed::setGphotoSize()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoSize
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoTimestamp" id="getGphotoTimestamp"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoTimestamp</span> (line <span class="line-number">473</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:timestamp attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoTimestamp">Zend_Gdata_Photos_PhotoFeed::setGphotoTimestamp()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoTimestamp
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoVersion" id="getGphotoVersion"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoVersion</span> (line <span class="line-number">312</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:version attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoVersion">Zend_Gdata_Photos_PhotoFeed::setGphotoVersion()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoVersion
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetGphotoWidth" id="getGphotoWidth"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getGphotoWidth</span> (line <span class="line-number">358</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's gphoto:width attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetGphotoWidth">Zend_Gdata_Photos_PhotoFeed::setGphotoWidth()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getGphotoWidth
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetMediaGroup" id="getMediaGroup"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getMediaGroup</span> (line <span class="line-number">542</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value for this element's media:group attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The requested attribute.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoFeed.html#methodsetMediaGroup">Zend_Gdata_Photos_PhotoFeed::setMediaGroup()</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getMediaGroup
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodsetGphotoAlbumId" id="setGphotoAlbumId"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoAlbumId</span> (line <span class="line-number">346</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:albumid attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_AlbumId.html">Zend_Gdata_Photos_Extension_AlbumId</a></span>
+		<span class="method-name">
+			setGphotoAlbumId
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoChecksum" id="setGphotoChecksum"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoChecksum</span> (line <span class="line-number">461</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:checksum attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Checksum.html">Zend_Gdata_Photos_Extension_Checksum</a></span>
+		<span class="method-name">
+			setGphotoChecksum
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoClient" id="setGphotoClient"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoClient</span> (line <span class="line-number">438</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:client attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Client.html">Zend_Gdata_Photos_Extension_Client</a></span>
+		<span class="method-name">
+			setGphotoClient
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoCommentCount" id="setGphotoCommentCount"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoCommentCount</span> (line <span class="line-number">507</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:commentCount attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentCount.html">Zend_Gdata_Photos_Extension_CommentCount</a></span>
+		<span class="method-name">
+			setGphotoCommentCount
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoCommentingEnabled" id="setGphotoCommentingEnabled"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoCommentingEnabled</span> (line <span class="line-number">530</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:commentingEnabled attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_CommentingEnabled.html">Zend_Gdata_Photos_Extension_CommentingEnabled</a></span>
+		<span class="method-name">
+			setGphotoCommentingEnabled
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoHeight" id="setGphotoHeight"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoHeight</span> (line <span class="line-number">392</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:height attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Height.html">Zend_Gdata_Photos_Extension_Height</a></span>
+		<span class="method-name">
+			setGphotoHeight
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoId" id="setGphotoId"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoId</span> (line <span class="line-number">300</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:id attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Id.html">Zend_Gdata_Photos_Extension_Id</a></span>
+		<span class="method-name">
+			setGphotoId
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoSize" id="setGphotoSize"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoSize</span> (line <span class="line-number">415</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:size attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Size.html">Zend_Gdata_Photos_Extension_Size</a></span>
+		<span class="method-name">
+			setGphotoSize
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoTimestamp" id="setGphotoTimestamp"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoTimestamp</span> (line <span class="line-number">484</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:timestamp attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Timestamp.html">Zend_Gdata_Photos_Extension_Timestamp</a></span>
+		<span class="method-name">
+			setGphotoTimestamp
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoVersion" id="setGphotoVersion"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoVersion</span> (line <span class="line-number">323</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:version attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Version.html">Zend_Gdata_Photos_Extension_Version</a></span>
+		<span class="method-name">
+			setGphotoVersion
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGphotoWidth" id="setGphotoWidth"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setGphotoWidth</span> (line <span class="line-number">369</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's gphoto:width attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_Extension_Width.html">Zend_Gdata_Photos_Extension_Width</a></span>
+		<span class="method-name">
+			setGphotoWidth
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetMediaGroup" id="setMediaGroup"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setMediaGroup</span> (line <span class="line-number">553</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the value for this element's media:group attribute.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The element being modified.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaGroup.html">Zend_Gdata_Media_Extension_MediaGroup</a></span>
+		<span class="method-name">
+			setMediaGroup
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: The desired value for this attribute.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodtakeChildFromDOM" id="takeChildFromDOM"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">takeChildFromDOM</span> (line <span class="line-number">193</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			takeChildFromDOM
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$child</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$child</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodtakeChildFromDOM">Zend_Gdata_Feed::takeChildFromDOM()</a></dt>
+						<dd>Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.</dd>
+					</dl>
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html">Zend_Gdata_Feed</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#method__construct">Zend_Gdata_Feed::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodgetDOM">Zend_Gdata_Feed::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodgetItemsPerPage">Zend_Gdata_Feed::getItemsPerPage()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodgetStartIndex">Zend_Gdata_Feed::getStartIndex()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodgetTotalResults">Zend_Gdata_Feed::getTotalResults()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodsetItemsPerPage">Zend_Gdata_Feed::setItemsPerPage()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodsetStartIndex">Zend_Gdata_Feed::setStartIndex()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodsetTotalResults">Zend_Gdata_Feed::setTotalResults()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodtakeAttributeFromDOM">Zend_Gdata_Feed::takeAttributeFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata_Feed.html#methodtakeChildFromDOM">Zend_Gdata_Feed::takeChildFromDOM()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodaddEntry">Zend_Gdata_App_Feed::addEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodcount">Zend_Gdata_App_Feed::count()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodcurrent">Zend_Gdata_App_Feed::current()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodgetDOM">Zend_Gdata_App_Feed::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodgetEntry">Zend_Gdata_App_Feed::getEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodgetNextFeed">Zend_Gdata_App_Feed::getNextFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodgetPreviousFeed">Zend_Gdata_App_Feed::getPreviousFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodkey">Zend_Gdata_App_Feed::key()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodnext">Zend_Gdata_App_Feed::next()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodoffsetExists">Zend_Gdata_App_Feed::offsetExists()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodoffsetGet">Zend_Gdata_App_Feed::offsetGet()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodoffsetSet">Zend_Gdata_App_Feed::offsetSet()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodoffsetUnset">Zend_Gdata_App_Feed::offsetUnset()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodrewind">Zend_Gdata_App_Feed::rewind()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodsetEntry">Zend_Gdata_App_Feed::setEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodsetMajorProtocolVersion">Zend_Gdata_App_Feed::setMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodsetMinorProtocolVersion">Zend_Gdata_App_Feed::setMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodtakeChildFromDOM">Zend_Gdata_App_Feed::takeChildFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#methodvalid">Zend_Gdata_App_Feed::valid()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html#method__get">Zend_Gdata_App_Feed::__get()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html">Zend_Gdata_App_FeedSourceParent</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodgetDOM">Zend_Gdata_App_FeedSourceParent::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodgetGenerator">Zend_Gdata_App_FeedSourceParent::getGenerator()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodgetIcon">Zend_Gdata_App_FeedSourceParent::getIcon()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodgetlogo">Zend_Gdata_App_FeedSourceParent::getlogo()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodgetSubtitle">Zend_Gdata_App_FeedSourceParent::getSubtitle()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodsetGenerator">Zend_Gdata_App_FeedSourceParent::setGenerator()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodsetHttpClient">Zend_Gdata_App_FeedSourceParent::setHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodsetIcon">Zend_Gdata_App_FeedSourceParent::setIcon()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodsetlogo">Zend_Gdata_App_FeedSourceParent::setlogo()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodsetService">Zend_Gdata_App_FeedSourceParent::setService()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodsetSubtitle">Zend_Gdata_App_FeedSourceParent::setSubtitle()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#methodtakeChildFromDOM">Zend_Gdata_App_FeedSourceParent::takeChildFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedSourceParent.html#method__get">Zend_Gdata_App_FeedSourceParent::__get()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html">Zend_Gdata_App_FeedEntryParent</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#method__construct">Zend_Gdata_App_FeedEntryParent::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetAlternateLink">Zend_Gdata_App_FeedEntryParent::getAlternateLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetAuthor">Zend_Gdata_App_FeedEntryParent::getAuthor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetCategory">Zend_Gdata_App_FeedEntryParent::getCategory()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetContributor">Zend_Gdata_App_FeedEntryParent::getContributor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetDOM">Zend_Gdata_App_FeedEntryParent::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetEditLink">Zend_Gdata_App_FeedEntryParent::getEditLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetEtag">Zend_Gdata_App_FeedEntryParent::getEtag()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetHttpClient">Zend_Gdata_App_FeedEntryParent::getHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetId">Zend_Gdata_App_FeedEntryParent::getId()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetLicenseLink">Zend_Gdata_App_FeedEntryParent::getLicenseLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetLink">Zend_Gdata_App_FeedEntryParent::getLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetMajorProtocolVersion">Zend_Gdata_App_FeedEntryParent::getMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetMinorProtocolVersion">Zend_Gdata_App_FeedEntryParent::getMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetNextLink">Zend_Gdata_App_FeedEntryParent::getNextLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetPreviousLink">Zend_Gdata_App_FeedEntryParent::getPreviousLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetRights">Zend_Gdata_App_FeedEntryParent::getRights()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetSelfLink">Zend_Gdata_App_FeedEntryParent::getSelfLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetService">Zend_Gdata_App_FeedEntryParent::getService()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetTitle">Zend_Gdata_App_FeedEntryParent::getTitle()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetTitleValue">Zend_Gdata_App_FeedEntryParent::getTitleValue()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetUpdated">Zend_Gdata_App_FeedEntryParent::getUpdated()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodlookupNamespace">Zend_Gdata_App_FeedEntryParent::lookupNamespace()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetAuthor">Zend_Gdata_App_FeedEntryParent::setAuthor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetCategory">Zend_Gdata_App_FeedEntryParent::setCategory()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetContributor">Zend_Gdata_App_FeedEntryParent::setContributor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetEtag">Zend_Gdata_App_FeedEntryParent::setEtag()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetHttpClient">Zend_Gdata_App_FeedEntryParent::setHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetId">Zend_Gdata_App_FeedEntryParent::setId()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetLink">Zend_Gdata_App_FeedEntryParent::setLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetMajorProtocolVersion">Zend_Gdata_App_FeedEntryParent::setMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetMinorProtocolVersion">Zend_Gdata_App_FeedEntryParent::setMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetRights">Zend_Gdata_App_FeedEntryParent::setRights()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetService">Zend_Gdata_App_FeedEntryParent::setService()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetTitle">Zend_Gdata_App_FeedEntryParent::setTitle()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetUpdated">Zend_Gdata_App_FeedEntryParent::setUpdated()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodtakeChildFromDOM">Zend_Gdata_App_FeedEntryParent::takeChildFromDOM()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html">Zend_Gdata_App_Base</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__construct">Zend_Gdata_App_Base::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodencode">Zend_Gdata_App_Base::encode()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodflushNamespaceLookupCache">Zend_Gdata_App_Base::flushNamespaceLookupCache()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetDOM">Zend_Gdata_App_Base::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetExtensionAttributes">Zend_Gdata_App_Base::getExtensionAttributes()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetExtensionElements">Zend_Gdata_App_Base::getExtensionElements()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetText">Zend_Gdata_App_Base::getText()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetXML">Zend_Gdata_App_Base::getXML()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodlookupNamespace">Zend_Gdata_App_Base::lookupNamespace()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodregisterAllNamespaces">Zend_Gdata_App_Base::registerAllNamespaces()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodregisterNamespace">Zend_Gdata_App_Base::registerNamespace()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsaveXML">Zend_Gdata_App_Base::saveXML()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsetExtensionAttributes">Zend_Gdata_App_Base::setExtensionAttributes()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsetExtensionElements">Zend_Gdata_App_Base::setExtensionElements()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsetText">Zend_Gdata_App_Base::setText()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtakeAttributeFromDOM">Zend_Gdata_App_Base::takeAttributeFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtakeChildFromDOM">Zend_Gdata_App_Base::takeChildFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtransferFromDOM">Zend_Gdata_App_Base::transferFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtransferFromXML">Zend_Gdata_App_Base::transferFromXML()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__get">Zend_Gdata_App_Base::__get()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__isset">Zend_Gdata_App_Base::__isset()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__set">Zend_Gdata_App_Base::__set()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__toString">Zend_Gdata_App_Base::__toString()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__unset">Zend_Gdata_App_Base::__unset()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:02:42 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

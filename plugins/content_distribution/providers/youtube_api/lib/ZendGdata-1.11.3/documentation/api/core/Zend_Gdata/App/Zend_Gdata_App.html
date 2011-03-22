@@ -1,0 +1,2453 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Zend_Gdata_App</title>
+			<link rel="stylesheet" href="../../media/stylesheet.css" />
+						<script src="../../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../../media/images/plus.png";
+				imgMinus.src = "../../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> Zend_Gdata_App</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+											<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+						
+			</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Provides Atom Publishing Protocol (APP) functionality.  This class and all  other components of Zend_Gdata_App are designed to work independently from  other Zend_Gdata components in order to interact with generic APP services.</p>
+	<ul class="tags">
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_Gdata---App.php.html">/Gdata/App.php</a> (line <span class="field">55</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a>
+					</td>
+					<td>
+											Provides functionality to interact with Google data APIs  Subclasses exist to implement service-specific features
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+	<a name="sec-const-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constant Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+						<span class="disabled">Constants</span> (<a href="#sec-consts">details</a>)
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="const-summary">
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#DEFAULT_MAJOR_PROTOCOL_VERSION" title="details" class="const-name">DEFAULT_MAJOR_PROTOCOL_VERSION</a> = 					<span class="var-type"> 1</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#DEFAULT_MINOR_PROTOCOL_VERSION" title="details" class="const-name">DEFAULT_MINOR_PROTOCOL_VERSION</a> = 					<span class="var-type"> null</span>
+
+				</div>
+							</div>
+		</div>
+	</div>
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																				<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type">boolean</span>
+					<a href="#$_gzipEnabled" title="details" class="var-name">$_gzipEnabled</a>
+				</div>
+																								<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type">boolean</span>
+					<a href="#$_httpMethodOverride" title="details" class="var-name">$_httpMethodOverride</a>
+				</div>
+																								<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type">int</span>
+					<a href="#$_maxRedirects" title="details" class="var-name">$_maxRedirects</a>
+				</div>
+																																<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+					<a href="#$_staticHttpClient" title="details" class="var-name">$_staticHttpClient</a>
+				</div>
+																								<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type">boolean</span>
+					<a href="#$_verboseExceptionMessages" title="details" class="var-name">$_verboseExceptionMessages</a>
+				</div>
+																				<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">string</span>
+					<a href="#$_defaultPostUri" title="details" class="var-name">$_defaultPostUri</a>
+				</div>
+																								<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+					<a href="#$_httpClient" title="details" class="var-name">$_httpClient</a>
+				</div>
+																								<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_majorProtocolVersion" title="details" class="var-name">$_majorProtocolVersion</a>
+				</div>
+																								<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_minorProtocolVersion" title="details" class="var-name">$_minorProtocolVersion</a>
+				</div>
+																<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$_registeredPackages" title="details" class="var-name">$_registeredPackages</a>
+				</div>
+																								<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">boolean</span>
+					<a href="#$_useObjectMapping" title="details" class="var-name">$_useObjectMapping</a>
+				</div>
+																			</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																			
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">boolean</span>
+										<a href="#getGzipEnabled" title="details" class="method-name">getGzipEnabled</a>
+										()
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">boolean</span>
+										<a href="#getHttpMethodOverride" title="details" class="method-name">getHttpMethodOverride</a>
+										()
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">int</span>
+										<a href="#getMaxRedirects" title="details" class="method-name">getMaxRedirects</a>
+										()
+									</div>
+																																							
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#getStaticHttpClient" title="details" class="method-name">getStaticHttpClient</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">boolean</span>
+										<a href="#getVerboseExceptionMessages" title="details" class="method-name">getVerboseExceptionMessages</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+										<a href="#import" title="details" class="method-name">import</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+										<a href="#importFile" title="details" class="method-name">importFile</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$filename</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$useIncludePath</span> = <span class="var-default">false</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+										<a href="#importString" title="details" class="method-name">importString</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$string</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$majorProtocolVersion</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$minorProtocolVersion</span> = <span class="var-default">null</span>], <span class="var-type">integer</span>&nbsp;<span class="var-name">$majorProcolVersion</span>, <span class="var-type">integer</span>&nbsp;<span class="var-name">$minorProcolVersion</span>)
+									</div>
+																																																																															
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">void</span>
+										<a href="#setGzipEnabled" title="details" class="method-name">setGzipEnabled</a>
+											([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$enabled</span> = <span class="var-default">false</span>])
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">void</span>
+										<a href="#setHttpMethodOverride" title="details" class="method-name">setHttpMethodOverride</a>
+											([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$override</span> = <span class="var-default">true</span>])
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">void</span>
+										<a href="#setMaxRedirects" title="details" class="method-name">setMaxRedirects</a>
+											(<span class="var-type">int</span>&nbsp;<span class="var-name">$maxRedirects</span>)
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">void</span>
+										<a href="#setStaticHttpClient" title="details" class="method-name">setStaticHttpClient</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$httpClient</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">void</span>
+										<a href="#setVerboseExceptionMessages" title="details" class="method-name">setVerboseExceptionMessages</a>
+											(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$verbose</span>)
+									</div>
+																																																			
+				<div class="method-definition">
+					<img src="../../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">Zend_Gdata_App</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#delete" title="details" class="method-name">delete</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#enableRequestDebugLogging" title="details" class="method-name">enableRequestDebugLogging</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$logfile</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|null</span>
+										<a href="#generateIfMatchHeaderData" title="details" class="method-name">generateIfMatchHeaderData</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$data</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$allowWeek</span>, <span class="var-type">boolean</span>&nbsp;<span class="var-name">$allowWeak</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+										<a href="#get" title="details" class="method-name">get</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span>
+										<a href="#getEntry" title="details" class="method-name">getEntry</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Entry'</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+										<a href="#getFeed" title="details" class="method-name">getFeed</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>])
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+										<a href="#getHttpClient" title="details" class="method-name">getHttpClient</a>
+										()
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">int</span>
+										<a href="#getMajorProtocolVersion" title="details" class="method-name">getMajorProtocolVersion</a>
+										()
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">(int|NULL)</span>
+										<a href="#getMinorProtocolVersion" title="details" class="method-name">getMinorProtocolVersion</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a>|null</span>
+										<a href="#getNextFeed" title="details" class="method-name">getNextFeed</a>
+											(<span class="var-type"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>&nbsp;<span class="var-name">$feed</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a>|null</span>
+										<a href="#getPreviousFeed" title="details" class="method-name">getPreviousFeed</a>
+											(<span class="var-type"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>&nbsp;<span class="var-name">$feed</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">null</span>])
+									</div>
+																																																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+										<a href="#importUrl" title="details" class="method-name">importUrl</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$url</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span>
+										<a href="#insertEntry" title="details" class="method-name">insertEntry</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Entry'</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+										<a href="#performHttpRequest" title="details" class="method-name">performHttpRequest</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$url</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$body</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentType</span> = <span class="var-default">null</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+										<a href="#post" title="details" class="method-name">post</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentType</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">null</span>], <span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">array</span>
+										<a href="#prepareRequest" title="details" class="method-name">prepareRequest</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$url</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span> = <span class="var-default">array()</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentTypeOverride</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+										<a href="#put" title="details" class="method-name">put</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentType</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">null</span>], <span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#registerPackage" title="details" class="method-name">registerPackage</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">mixed</span>
+										<a href="#retrieveAllEntriesForFeed" title="details" class="method-name">retrieveAllEntriesForFeed</a>
+											(<span class="var-type">object</span>&nbsp;<span class="var-name">$feed</span>)
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span>
+										<a href="#setHttpClient" title="details" class="method-name">setHttpClient</a>
+											(<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>])
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#setMajorProtocolVersion" title="details" class="method-name">setMajorProtocolVersion</a>
+											(<span class="var-type">int</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#setMinorProtocolVersion" title="details" class="method-name">setMinorProtocolVersion</a>
+											(<span class="var-type">(int|NULL)</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+																															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span>
+										<a href="#updateEntry" title="details" class="method-name">updateEntry</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string|null</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type">string|null</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#useObjectMapping" title="details" class="method-name">useObjectMapping</a>
+											(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">boolean</span>
+										<a href="#usingObjectMapping" title="details" class="method-name">usingObjectMapping</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#__call" title="details" class="method-name">__call</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$args</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$_gzipEnabled" id="$_gzipEnabled"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type">boolean</span>
+			<span class="var-name">$_gzipEnabled</span>
+			 = <span class="var-default"> false</span>			(line <span class="line-number">96</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Enable gzipped responses?</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_httpMethodOverride" id="$_httpMethodOverride"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type">boolean</span>
+			<span class="var-name">$_httpMethodOverride</span>
+			 = <span class="var-default"> false</span>			(line <span class="line-number">89</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Override HTTP PUT and DELETE request methods?</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_maxRedirects" id="$_maxRedirects"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type">int</span>
+			<span class="var-name">$_maxRedirects</span>
+			 = <span class="var-default"> 5</span>			(line <span class="line-number">127</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Maximum number of redirects to follow during HTTP operations</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_staticHttpClient" id="$_staticHttpClient"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+			<span class="var-name">$_staticHttpClient</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">82</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Client object used to communicate in static context</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_staticHttpClient">Zend_Gdata::$_staticHttpClient</a>
+								: Client object used to communicate in static context
+							</li>
+				</ul>
+		
+
+</div>
+<a name="var$_verboseExceptionMessages" id="$_verboseExceptionMessages"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type">boolean</span>
+			<span class="var-name">$_verboseExceptionMessages</span>
+			 = <span class="var-default"> true</span>			(line <span class="line-number">104</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Use verbose exception messages.  In the case of HTTP errors,  use the body of the HTTP response in the exception message.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+
+<a name="var$_defaultPostUri" id="$_defaultPostUri"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">string</span>
+			<span class="var-name">$_defaultPostUri</span>
+			 = <span class="var-default"> null</span>			(line <span class="line-number">111</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Default URI to which to POST.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_defaultPostUri">Zend_Gdata::$_defaultPostUri</a>
+								: Default URI to which to POST.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Docs/Zend_Gdata_Docs.html#var$_defaultPostUri">Zend_Gdata_Docs::$_defaultPostUri</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase.html#var$_defaultPostUri">Zend_Gdata_Gbase::$_defaultPostUri</a>
+								: The default URI for POST methods
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar.html#var$_defaultPostUri">Zend_Gdata_Calendar::$_defaultPostUri</a>
+							</li>
+				</ul>
+		
+
+</div>
+<a name="var$_httpClient" id="$_httpClient"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+			<span class="var-name">$_httpClient</span>
+						(line <span class="line-number">75</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Client object used to communicate</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_httpClient">Zend_Gdata::$_httpClient</a>
+								: Client object used to communicate
+							</li>
+				</ul>
+		
+
+</div>
+<a name="var$_majorProtocolVersion" id="$_majorProtocolVersion"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_majorProtocolVersion</span>
+						(line <span class="line-number">140</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Indicates the major protocol version that should be used.</p>
+<p class="description"><p>At present, recognized values are either 1 or 2. However, any integer  value &gt;= 1 is considered valid.</p><p>Under most circumtances, this will be automatically set by  Zend_Gdata_App subclasses.</p></p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMajorProtocolVersion">Zend_Gdata_App::setMajorProtocolVersion()</a></li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMajorProtocolVersion">Zend_Gdata_App::getMajorProtocolVersion()</a></li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_minorProtocolVersion" id="$_minorProtocolVersion"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_minorProtocolVersion</span>
+						(line <span class="line-number">156</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Indicates the minor protocol version that should be used. Can be set  to either an integer &gt;= 0, or NULL if no minor version should be sent  to the server.</p>
+<p class="description"><p>At present, this field is not used by any Google services, but may be  used in the future.</p><p>Under most circumtances, this will be automatically set by  Zend_Gdata_App subclasses.</p></p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMinorProtocolVersion">Zend_Gdata_App::setMinorProtocolVersion()</a></li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMinorProtocolVersion">Zend_Gdata_App::getMinorProtocolVersion()</a></li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_registeredPackages" id="$_registeredPackages"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_registeredPackages</span>
+			 = <span class="var-default">array(<br />            'Zend_Gdata_App_Extension',<br />            'Zend_Gdata_App')</span>			(line <span class="line-number">118</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Packages to search for classes when using magic __call method, in order.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_registeredPackages">Zend_Gdata::$_registeredPackages</a>
+								: Packages to search for classes when using magic __call method, in order.
+							</li>
+				</ul>
+		
+
+</div>
+<a name="var$_useObjectMapping" id="$_useObjectMapping"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">boolean</span>
+			<span class="var-name">$_useObjectMapping</span>
+			 = <span class="var-default"> true</span>			(line <span class="line-number">163</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Whether we want to use XML to object mapping when fetching data.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																			<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodgetGzipEnabled" id="getGzipEnabled"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static getGzipEnabled</span> (line <span class="line-number">348</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the HTTP override state</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">boolean</span>
+		<span class="method-name">
+			getGzipEnabled
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetHttpMethodOverride" id="getHttpMethodOverride"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static getHttpMethodOverride</span> (line <span class="line-number">320</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the HTTP override state</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">boolean</span>
+		<span class="method-name">
+			getHttpMethodOverride
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetMaxRedirects" id="getMaxRedirects"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static getMaxRedirects</span> (line <span class="line-number">395</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the maximum number of redirects to follow during HTTP operations</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Maximum number of redirects to follow</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">int</span>
+		<span class="method-name">
+			getMaxRedirects
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetStaticHttpClient" id="getStaticHttpClient"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static getStaticHttpClient</span> (line <span class="line-number">282</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the HTTP client object. If none is set, a new Zend_Http_Client will be used.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			getStaticHttpClient
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetVerboseExceptionMessages" id="getVerboseExceptionMessages"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static getVerboseExceptionMessages</span> (line <span class="line-number">361</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get whether to use verbose exception messages</p>
+<p class="description"><p>In the case of HTTP errors,  use the body of the HTTP response  in the exception message.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">boolean</span>
+		<span class="method-name">
+			getVerboseExceptionMessages
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodimport" id="import"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static import</span> (line <span class="line-number">728</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Imports a feed located at $uri.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Returns string only if the object                                     mapping has been disabled explicitly                                     by passing false to the                                     useObjectMapping() function.</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+		<span class="method-name">
+			import
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$uri</span>			</li>
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+				<span class="var-name">$client</span><span class="var-description">: The client used for communication</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: The class which is used as the return type</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodimport">Zend_Gdata::import()</a>
+								: Imports a feed located at $uri.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps.html#methodimport">Zend_Gdata_Gapps::import()</a>
+								: Imports a feed located at $uri.
+							</li>
+				</ul>
+	</div>
+<a name="methodimportFile" id="importFile"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static importFile</span> (line <span class="line-number">847</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Imports a feed from a file located at $filename.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+		<span class="method-name">
+			importFile
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$filename</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$useIncludePath</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$filename</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: The class which is used as the return type</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$useIncludePath</span><span class="var-description">: Whether the include_path should be searched</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodimportString" id="importString"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static importString</span> (line <span class="line-number">808</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Imports a feed represented by $string.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+		<span class="method-name">
+			importString
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$string</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$majorProtocolVersion</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$minorProtocolVersion</span> = <span class="var-default">null</span>], <span class="var-type">integer</span>&nbsp;<span class="var-name">$majorProcolVersion</span>, <span class="var-type">integer</span>&nbsp;<span class="var-name">$minorProcolVersion</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$string</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: The class which is used as the return type</span>			</li>
+					<li>
+				<span class="var-type">integer</span>
+				<span class="var-name">$majorProcolVersion</span><span class="var-description">: (optional) The major protocol version         of the data model object that is to be created.</span>			</li>
+					<li>
+				<span class="var-type">integer</span>
+				<span class="var-name">$minorProcolVersion</span><span class="var-description">: (optional) The minor protocol version         of the data model object that is to be created.</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$majorProtocolVersion</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$minorProtocolVersion</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetGzipEnabled" id="setGzipEnabled"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static setGzipEnabled</span> (line <span class="line-number">331</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Toggle requesting gzip encoded responses</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			setGzipEnabled
+		</span>
+					([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$enabled</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$enabled</span><span class="var-description">: Whether or not to enable gzipped responses</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetHttpMethodOverride" id="setHttpMethodOverride"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static setHttpMethodOverride</span> (line <span class="line-number">310</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Toggle using POST instead of PUT and DELETE HTTP methods</p>
+<p class="description"><p>Some feed implementations do not accept PUT and DELETE HTTP  methods, or they can't be used because of proxies or other  measures. This allows turning on using POST where PUT and  DELETE would normally be used; in addition, an  X-Method-Override header will be sent with a value of PUT or  DELETE as appropriate.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			setHttpMethodOverride
+		</span>
+					([<span class="var-type">boolean</span>&nbsp;<span class="var-name">$override</span> = <span class="var-default">true</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$override</span><span class="var-description">: Whether to override PUT and DELETE with POST.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetMaxRedirects" id="setMaxRedirects"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static setMaxRedirects</span> (line <span class="line-number">385</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the maximum number of redirects to follow during HTTP operations</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			setMaxRedirects
+		</span>
+					(<span class="var-type">int</span>&nbsp;<span class="var-name">$maxRedirects</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$maxRedirects</span><span class="var-description">: Maximum number of redirects to follow</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetStaticHttpClient" id="setStaticHttpClient"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static setStaticHttpClient</span> (line <span class="line-number">271</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the static HTTP client instance</p>
+<p class="description"><p>Sets the static HTTP client object to use for retrieving the feed.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			setStaticHttpClient
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$httpClient</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+				<span class="var-name">$httpClient</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetVerboseExceptionMessages" id="setVerboseExceptionMessages"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static setVerboseExceptionMessages</span> (line <span class="line-number">374</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set whether to use verbose exception messages</p>
+<p class="description"><p>In the case of HTTP errors, use the body of the HTTP response  in the exception message.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">void</span>
+		<span class="method-name">
+			setVerboseExceptionMessages
+		</span>
+					(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$verbose</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$verbose</span><span class="var-description">: Whether to use verbose exception messages</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">171</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Create Gdata object</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Gdata_App</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+				<span class="var-name">$client</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$applicationId</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#method__construct">Zend_Gdata::__construct()</a>
+								: Create Gdata object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Books/Zend_Gdata_Books.html#method__construct">Zend_Gdata_Books::__construct()</a>
+								: Create Zend_Gdata_Books object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health.html#method__construct">Zend_Gdata_Health::__construct()</a>
+								: Create Zend_Gdata_Health object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Exif/Zend_Gdata_Exif.html#method__construct">Zend_Gdata_Exif::__construct()</a>
+								: Create Zend_Gdata_Exif object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets.html#method__construct">Zend_Gdata_Spreadsheets::__construct()</a>
+								: Create Gdata_Spreadsheets object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Geo/Zend_Gdata_Geo.html#method__construct">Zend_Gdata_Geo::__construct()</a>
+								: Create Zend_Gdata_Geo object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/DublinCore/Zend_Gdata_DublinCore.html#method__construct">Zend_Gdata_DublinCore::__construct()</a>
+								: Create Zend_Gdata_DublinCore object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Media/Zend_Gdata_Media.html#method__construct">Zend_Gdata_Media::__construct()</a>
+								: Create Gdata_Media object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube.html#method__construct">Zend_Gdata_YouTube::__construct()</a>
+								: Create Zend_Gdata_YouTube object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Docs/Zend_Gdata_Docs.html#method__construct">Zend_Gdata_Docs::__construct()</a>
+								: Create Gdata_Docs object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase.html#method__construct">Zend_Gdata_Gbase::__construct()</a>
+								: Create Zend_Gdata_Gbase object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar.html#method__construct">Zend_Gdata_Calendar::__construct()</a>
+								: Create Gdata_Calendar object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps.html#method__construct">Zend_Gdata_Gapps::__construct()</a>
+								: Create Gdata_Gapps object
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos.html#method__construct">Zend_Gdata_Photos::__construct()</a>
+								: Create Zend_Gdata_Photos object
+							</li>
+				</ul>
+	</div>
+<a name="methoddelete" id="delete"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">delete</span> (line <span class="line-number">937</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">DELETE entry with client object</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_InvalidArgumentException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			delete
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$data</span><span class="var-description">: The Zend_Gdata_App_Entry or URL to delete</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$remainingRedirects</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps.html#methoddelete">Zend_Gdata_Gapps::delete()</a>
+								: DELETE entry with client object  This method overrides the default behavior of Zend_Gdata_App,  providing support for Zend_Gdata_Gapps_ServiceException.
+							</li>
+				</ul>
+	</div>
+<a name="methodenableRequestDebugLogging" id="enableRequestDebugLogging"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">enableRequestDebugLogging</span> (line <span class="line-number">1122</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">This method enables logging of requests by changing the  Zend_Http_Client_Adapter used for performing the requests.</p>
+<p class="description"><p>NOTE: This will not work if you have customized the adapter  already to use a proxy server or other interface.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			enableRequestDebugLogging
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$logfile</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$logfile</span><span class="var-description">: The logfile to use when logging the requests</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgenerateIfMatchHeaderData" id="generateIfMatchHeaderData"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">generateIfMatchHeaderData</span> (line <span class="line-number">1193</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the data for an If-Match header based on the current Etag  property. If Etags are not supported by the server or cannot be  extracted from the data, then null will be returned.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|null</span>
+		<span class="method-name">
+			generateIfMatchHeaderData
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$data</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$allowWeek</span>, <span class="var-type">boolean</span>&nbsp;<span class="var-name">$allowWeak</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$allowWeak</span><span class="var-description">: If false, then if a weak Etag is detected,         then return null rather than the Etag.</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$data</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$allowWeek</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodget" id="get"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">get</span> (line <span class="line-number">870</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">GET a URI using client object.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+		<span class="method-name">
+			get
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$uri</span><span class="var-description">: GET URI</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$extraHeaders</span><span class="var-description">: Extra headers to add to the request, as an         array of string-based key/value pairs.</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps.html#methodget">Zend_Gdata_Gapps::get()</a>
+								: GET a URI using client object.
+							</li>
+				</ul>
+	</div>
+<a name="methodgetEntry" id="getEntry"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getEntry</span> (line <span class="line-number">218</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve entry as string or object</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Returns string only if the object                                      mapping has been disabled explicitly                                      by passing false to the                                      useObjectMapping() function.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span>
+		<span class="method-name">
+			getEntry
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Entry'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$uri</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: The class which is used as the return type</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodgetEntry">Zend_Gdata::getEntry()</a>
+								: Retrieve entry as string or object
+							</li>
+				</ul>
+	</div>
+<a name="methodgetFeed" id="getFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getFeed</span> (line <span class="line-number">203</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve feed as string or object</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Returns string only if the object                                     mapping has been disabled explicitly                                     by passing false to the                                     useObjectMapping() function.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+		<span class="method-name">
+			getFeed
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$uri</span><span class="var-description">: The uri from which to retrieve the feed</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: The class which is used as the return type</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodgetFeed">Zend_Gdata::getFeed()</a>
+								: Retrieve feed as string or object
+							</li>
+				</ul>
+	</div>
+<a name="methodgetHttpClient" id="getHttpClient"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getHttpClient</span> (line <span class="line-number">228</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the Zend_Http_Client object used for communication</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+		<span class="method-name">
+			getHttpClient
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetMajorProtocolVersion" id="getMajorProtocolVersion"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getMajorProtocolVersion</span> (line <span class="line-number">424</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the major protocol version that is in use.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The major protocol version in use.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_majorProtocolVersion">Zend_Gdata_App::$_majorProtocolVersion</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">int</span>
+		<span class="method-name">
+			getMajorProtocolVersion
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetMinorProtocolVersion" id="getMinorProtocolVersion"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getMinorProtocolVersion</span> (line <span class="line-number">455</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the minor protocol version that is in use.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The major protocol version in use, or NULL if no          minor version is specified.</li>
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_minorProtocolVersion">Zend_Gdata_App::$_minorProtocolVersion</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">(int|NULL)</span>
+		<span class="method-name">
+			getMinorProtocolVersion
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetNextFeed" id="getNextFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getNextFeed</span> (line <span class="line-number">1142</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve next set of results based on a given feed.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Returns a           Zend_Gdata_App_Feed or null if no next set of results           exists.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a>|null</span>
+		<span class="method-name">
+			getNextFeed
+		</span>
+					(<span class="var-type"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>&nbsp;<span class="var-name">$feed</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+				<span class="var-name">$feed</span><span class="var-description">: The feed from which to           retreive the next set of results.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: (optional) The class of feed to be returned.           If null, the next feed (if found) will be the same class as           the feed that was given as the first argument.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetPreviousFeed" id="getPreviousFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getPreviousFeed</span> (line <span class="line-number">1169</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve previous set of results based on a given feed.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Returns a           Zend_Gdata_App_Feed or null if no previous set of results           exists.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a>|null</span>
+		<span class="method-name">
+			getPreviousFeed
+		</span>
+					(<span class="var-type"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>&nbsp;<span class="var-name">$feed</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+				<span class="var-name">$feed</span><span class="var-description">: The feed from which to           retreive the previous set of results.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: (optional) The class of feed to be returned.           If null, the previous feed (if found) will be the same class as           the feed that was given as the first argument.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodimportUrl" id="importUrl"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">importUrl</span> (line <span class="line-number">760</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Imports the specified URL (non-statically).</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Returns string only if the object                                     mapping has been disabled explicitly                                     by passing false to the                                     useObjectMapping() function.</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string|<a href="../../Zend_Gdata/App/Zend_Gdata_App_Feed.html">Zend_Gdata_App_Feed</a></span>
+		<span class="method-name">
+			importUrl
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$url</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Feed'</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$url</span><span class="var-description">: The URL to import</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: The class which is used as the return type</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$extraHeaders</span><span class="var-description">: Extra headers to add to the request, as an         array of string-based key/value pairs.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodinsertEntry" id="insertEntry"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">insertEntry</span> (line <span class="line-number">967</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Inserts an entry to a given URI and returns the response as a  fully formed Entry.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The entry returned by the service after          insertion.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span>
+		<span class="method-name">
+			insertEntry
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">'Zend_Gdata_App_Entry'</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$data</span><span class="var-description">: The Zend_Gdata_App_Entry or XML to post</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$uri</span><span class="var-description">: POST URI</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$className</span><span class="var-description">: The class of entry to be returned.</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$extraHeaders</span><span class="var-description">: Extra headers to add to the request, as an         array of string-based key/value pairs.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodperformHttpRequest" id="performHttpRequest"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">performHttpRequest</span> (line <span class="line-number">589</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Performs a HTTP request using the specified method</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The response object</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+		<span class="method-name">
+			performHttpRequest
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$url</span>, [<span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$body</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentType</span> = <span class="var-default">null</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$method</span><span class="var-description">: The HTTP method for the request - 'GET', 'POST',                        'PUT', 'DELETE'</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$url</span><span class="var-description">: The URL to which this request is being performed</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$headers</span><span class="var-description">: An associative array of HTTP headers                        for this request</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$body</span><span class="var-description">: The body of the HTTP request</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$contentType</span><span class="var-description">: The value for the content type                                 of the request body</span>			</li>
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$remainingRedirects</span><span class="var-description">: Number of redirects to follow if request                               s results in one</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodperformHttpRequest">Zend_Gdata::performHttpRequest()</a>
+								: Performs a HTTP request using the specified method.
+							</li>
+				</ul>
+	</div>
+<a name="methodpost" id="post"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">post</span> (line <span class="line-number">892</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">POST data with client object</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_InvalidArgumentException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+		<span class="method-name">
+			post
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentType</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">null</span>], <span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$data</span><span class="var-description">: The Zend_Gdata_App_Entry or XML to post</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$uri</span><span class="var-description">: POST URI</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$headers</span><span class="var-description">: Additional HTTP headers to insert.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$contentType</span><span class="var-description">: Content-type of the data</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$extraHeaders</span><span class="var-description">: Extra headers to add to the request, as an         array of string-based key/value pairs.</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$remainingRedirects</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps.html#methodpost">Zend_Gdata_Gapps::post()</a>
+								: POST data with client object.
+							</li>
+				</ul>
+	</div>
+<a name="methodprepareRequest" id="prepareRequest"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">prepareRequest</span> (line <span class="line-number">483</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Provides pre-processing for HTTP requests to APP services.</p>
+<p class="description"><p><ol><li>Checks the $data element and, if it's an entry, extracts the XML,
+    multipart data, edit link (PUT,DELETE), etc.</li><li>If $data is a string, sets the default content-type  header as
+    'application/atom+xml' if it's not already been set.</li><li>Adds a x-http-method override header and changes the HTTP method
+    to 'POST' if necessary as per getHttpMethodOverride()</li></ol></p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> An associative array containing the determined                'method', 'url', 'data', 'headers', 'contentType'</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			prepareRequest
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$url</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span> = <span class="var-default">array()</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentTypeOverride</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$method</span><span class="var-description">: The HTTP method for the request - 'GET', 'POST',                        'PUT', 'DELETE'</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$url</span><span class="var-description">: The URL to which this request is being performed,                     or null if found in $data</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$headers</span><span class="var-description">: An associative array of HTTP headers for this                        request</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$data</span><span class="var-description">: The Zend_Gdata_App_Entry or XML for the                     body of the request</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$contentTypeOverride</span><span class="var-description">: The override value for the                                     content type of the request body</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodput" id="put"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">put</span> (line <span class="line-number">917</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">PUT data with client object</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_InvalidArgumentException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Http/Response/Zend_Http_Response.html">Zend_Http_Response</a></span>
+		<span class="method-name">
+			put
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$remainingRedirects</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$contentType</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">null</span>], <span class="var-type">array</span>&nbsp;<span class="var-name">$headers</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$data</span><span class="var-description">: The Zend_Gdata_App_Entry or XML to post</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$uri</span><span class="var-description">: PUT URI</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$headers</span><span class="var-description">: Additional HTTP headers to insert.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$contentType</span><span class="var-description">: Content-type of the data</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$extraHeaders</span><span class="var-description">: Extra headers to add to the request, as an         array of string-based key/value pairs.</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$remainingRedirects</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps.html#methodput">Zend_Gdata_Gapps::put()</a>
+								: PUT data with client object  This method overrides the default behavior of Zend_Gdata_App,  providing support for Zend_Gdata_Gapps_ServiceException.
+							</li>
+				</ul>
+	</div>
+<a name="methodregisterPackage" id="registerPackage"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">registerPackage</span> (line <span class="line-number">188</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Adds a Zend Framework package to the $_registeredPackages array.</p>
+<p class="description"><p>This array is searched when using the magic __call method below  to instantiante new objects.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			registerPackage
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$name</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$name</span><span class="var-description">: The name of the package (eg Zend_Gdata_App)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodretrieveAllEntriesForFeed" id="retrieveAllEntriesForFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">retrieveAllEntriesForFeed</span> (line <span class="line-number">1094</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve all entries for a feed, iterating through pages as necessary.</p>
+<p class="description"><p>Be aware that calling this function on a large dataset will take a  significant amount of time to complete. In some cases this may cause  execution to timeout without proper precautions in place.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> A new feed of the same type as the one originally           passed in, containing all relevent entries.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">mixed</span>
+		<span class="method-name">
+			retrieveAllEntriesForFeed
+		</span>
+					(<span class="var-type">object</span>&nbsp;<span class="var-name">$feed</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">object</span>
+				<span class="var-name">$feed</span><span class="var-description">: The feed to iterate through.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetHttpClient" id="setHttpClient"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setHttpClient</span> (line <span class="line-number">240</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the Zend_Http_Client object used for communication</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Provides a fluent interface</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span>
+		<span class="method-name">
+			setHttpClient
+		</span>
+					(<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+				<span class="var-name">$client</span><span class="var-description">: The client to use for communication</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$applicationId</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube.html#methodsetHttpClient">Zend_Gdata_YouTube::setHttpClient()</a>
+								: Set the Zend_Http_Client object used for communication
+							</li>
+				</ul>
+	</div>
+<a name="methodsetMajorProtocolVersion" id="setMajorProtocolVersion"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setMajorProtocolVersion</span> (line <span class="line-number">408</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the major protocol version that should be used. Values &lt; 1 will  cause a Zend_Gdata_App_InvalidArgumentException to be thrown.</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_majorProtocolVersion">Zend_Gdata_App::$_majorProtocolVersion</a></li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_InvalidArgumentException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setMajorProtocolVersion
+		</span>
+					(<span class="var-type">int</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$value</span><span class="var-description">: The major protocol version to use.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetMinorProtocolVersion" id="setMinorProtocolVersion"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setMinorProtocolVersion</span> (line <span class="line-number">438</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the minor protocol version that should be used. If set to NULL, no  minor protocol version will be sent to the server. Values &lt; 0 will  cause a Zend_Gdata_App_InvalidArgumentException to be thrown.</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_minorProtocolVersion">Zend_Gdata_App::$_minorProtocolVersion</a></li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_InvalidArgumentException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setMinorProtocolVersion
+		</span>
+					(<span class="var-type">(int|NULL)</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">(int|NULL)</span>
+				<span class="var-name">$value</span><span class="var-description">: The minor protocol version to use.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodupdateEntry" id="updateEntry"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">updateEntry</span> (line <span class="line-number">1002</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Update an entry</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The entry returned from the server</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span>
+		<span class="method-name">
+			updateEntry
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$data</span>, [<span class="var-type">string|null</span>&nbsp;<span class="var-name">$uri</span> = <span class="var-default">null</span>], [<span class="var-type">string|null</span>&nbsp;<span class="var-name">$className</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$extraHeaders</span> = <span class="var-default">array()</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$data</span><span class="var-description">: Zend_Gdata_App_Entry or XML (w/ID and link rel='edit')</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$extraHeaders</span><span class="var-description">: Extra headers to add to the request, as an         array of string-based key/value pairs.</span>			</li>
+					<li>
+				<span class="var-type">string|null</span>
+				<span class="var-name">$uri</span><span class="var-description">: The URI to send requests to, or null if $data         contains the URI.</span>			</li>
+					<li>
+				<span class="var-type">string|null</span>
+				<span class="var-name">$className</span><span class="var-description">: The name of the class that should be deserialized         from the server response. If null, then 'Zend_Gdata_App_Entry'         will be used.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methoduseObjectMapping" id="useObjectMapping"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">useObjectMapping</span> (line <span class="line-number">1226</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Enable/disable the use of XML to object mapping.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			useObjectMapping
+		</span>
+					(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$value</span><span class="var-description">: Pass in true to use the XML to object mapping.                        Pass in false or null to disable it.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodusingObjectMapping" id="usingObjectMapping"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">usingObjectMapping</span> (line <span class="line-number">1214</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Determine whether service object is using XML to object mapping.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> True if service object is using XML to object mapping,                  false otherwise.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">boolean</span>
+		<span class="method-name">
+			usingObjectMapping
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method__call" id="__call"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">__call</span> (line <span class="line-number">1041</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Provides a magic factory method to instantiate new objects with</p>
+<p class="description"><p>shorter syntax than would otherwise be required by the Zend Framework  naming conventions.  For instance, to construct a new  Zend_Gdata_Calendar_Extension_Color, a developer simply needs to do  $gCal-&gt;newColor().  For this magic constructor, packages are searched  in the same order as which they appear in the $_registeredPackages  array</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			__call
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$method</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$args</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$method</span><span class="var-description">: The method name being called</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$args</span><span class="var-description">: The arguments passed to the call</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps.html#method__call">Zend_Gdata_Gapps::__call()</a>
+								: Provides a magic factory method to instantiate new objects with  shorter syntax than would otherwise be required by the Zend Framework  naming conventions. For more information, see Zend_Gdata_App::__call().
+							</li>
+				</ul>
+	</div>
+						
+		</div>
+	</div>
+
+	<a name="sec-consts"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+										<a href="#sec-var-summary">Constants</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+														| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="constDEFAULT_MAJOR_PROTOCOL_VERSION" id="DEFAULT_MAJOR_PROTOCOL_VERSION"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">DEFAULT_MAJOR_PROTOCOL_VERSION</span>
+			 = <span class="const-default"> 1</span>
+			(line <span class="line-number">62</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Default major protocol version.</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_majorProtocolVersion">Zend_Gdata_App::$_majorProtocolVersion</a></li>
+			</ul>
+	
+	
+</div>
+<a name="constDEFAULT_MINOR_PROTOCOL_VERSION" id="DEFAULT_MINOR_PROTOCOL_VERSION"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">DEFAULT_MINOR_PROTOCOL_VERSION</span>
+			 = <span class="const-default"> null</span>
+			(line <span class="line-number">68</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Default minor protocol version.</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_minorProtocolVersion">Zend_Gdata_App::$_minorProtocolVersion</a></li>
+			</ul>
+	
+	
+</div>
+						
+		</div>
+	</div>
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:00:08 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

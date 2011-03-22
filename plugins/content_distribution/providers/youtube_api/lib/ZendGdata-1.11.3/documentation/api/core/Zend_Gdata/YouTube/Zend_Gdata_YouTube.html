@@ -1,0 +1,2192 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Zend_Gdata_YouTube</title>
+			<link rel="stylesheet" href="../../media/stylesheet.css" />
+						<script src="../../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../../media/images/plus.png";
+				imgMinus.src = "../../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> Zend_Gdata_YouTube</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+											<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+						
+			</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Service class for interacting with the YouTube Data API.</p>
+	<ul class="tags">
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">link:</span> <a href="http://code.google.com/apis/youtube/">http://code.google.com/apis/youtube/</a></li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_Gdata---YouTube.php.html">/Gdata/YouTube.php</a> (line <span class="field">85</span>)
+		</p>
+		
+				
+		<pre><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a>
+   |
+   --<a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a>
+      |
+      --<a href="../../Zend_Gdata/Media/Zend_Gdata_Media.html">Zend_Gdata_Media</a>
+         |
+         --Zend_Gdata_YouTube</pre>
+	
+			</div>
+</div>
+
+
+	<a name="sec-const-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constant Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Constants</span> (<a href="#sec-consts">details</a>)
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="const-summary">
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#ACTIVITY_FEED_MAX_USERS" title="details" class="const-name">ACTIVITY_FEED_MAX_USERS</a> = 					<span class="var-type"> 20</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#ACTIVITY_FEED_URI" title="details" class="const-name">ACTIVITY_FEED_URI</a> = 					<span class="var-type"> 'http://gdata.youtube.com/feeds/api/events'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#AUTH_SERVICE_NAME" title="details" class="const-name">AUTH_SERVICE_NAME</a> = 					<span class="var-type"> 'youtube'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#CLIENTLOGIN_URL" title="details" class="const-name">CLIENTLOGIN_URL</a> = 					<span class="var-type"> 'https://www.google.com/youtube/accounts/ClientLogin'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#FAVORITES_URI_SUFFIX" title="details" class="const-name">FAVORITES_URI_SUFFIX</a> = 					<span class="var-type"> 'favorites'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#FRIEND_ACTIVITY_FEED_URI" title="details" class="const-name">FRIEND_ACTIVITY_FEED_URI</a> = 					<span class="var-type">
+        'http://gdata.youtube.com/feeds/api/users/default/friendsactivity'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#INBOX_FEED_URI" title="details" class="const-name">INBOX_FEED_URI</a> = 					<span class="var-type">
+        'http://gdata.youtube.com/feeds/api/users/default/inbox'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#INBOX_URI_SUFFIX" title="details" class="const-name">INBOX_URI_SUFFIX</a> = 					<span class="var-type"> 'inbox'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#IN_REPLY_TO_SCHEME" title="details" class="const-name">IN_REPLY_TO_SCHEME</a> = 					<span class="var-type">
+         'http://gdata.youtube.com/schemas/2007#in-reply-to'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#PLAYLIST_REL" title="details" class="const-name">PLAYLIST_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#playlist'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#RELATED_URI_SUFFIX" title="details" class="const-name">RELATED_URI_SUFFIX</a> = 					<span class="var-type"> 'related'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#RESPONSES_URI_SUFFIX" title="details" class="const-name">RESPONSES_URI_SUFFIX</a> = 					<span class="var-type"> 'responses'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_MOST_VIEWED_URI" title="details" class="const-name">STANDARD_MOST_VIEWED_URI</a> = 					<span class="var-type"> 'http://gdata.youtube.com/feeds/api/standardfeeds/most_viewed'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_MOST_VIEWED_URI_V2" title="details" class="const-name">STANDARD_MOST_VIEWED_URI_V2</a> = 					<span class="var-type">
+        'http://gdata.youtube.com/feeds/api/standardfeeds/most_viewed'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_RECENTLY_FEATURED_URI" title="details" class="const-name">STANDARD_RECENTLY_FEATURED_URI</a> = 					<span class="var-type"> 'http://gdata.youtube.com/feeds/api/standardfeeds/recently_featured'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_RECENTLY_FEATURED_URI_V2" title="details" class="const-name">STANDARD_RECENTLY_FEATURED_URI_V2</a> = 					<span class="var-type">
+        'http://gdata.youtube.com/feeds/api/standardfeeds/recently_featured'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_TOP_RATED_URI" title="details" class="const-name">STANDARD_TOP_RATED_URI</a> = 					<span class="var-type"> 'http://gdata.youtube.com/feeds/api/standardfeeds/top_rated'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_TOP_RATED_URI_V2" title="details" class="const-name">STANDARD_TOP_RATED_URI_V2</a> = 					<span class="var-type">
+        'http://gdata.youtube.com/feeds/api/standardfeeds/top_rated'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_WATCH_ON_MOBILE_URI" title="details" class="const-name">STANDARD_WATCH_ON_MOBILE_URI</a> = 					<span class="var-type"> 'http://gdata.youtube.com/feeds/api/standardfeeds/watch_on_mobile'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#STANDARD_WATCH_ON_MOBILE_URI_V2" title="details" class="const-name">STANDARD_WATCH_ON_MOBILE_URI_V2</a> = 					<span class="var-type">
+        'http://gdata.youtube.com/feeds/api/standardfeeds/watch_on_mobile'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#UPLOADS_URI_SUFFIX" title="details" class="const-name">UPLOADS_URI_SUFFIX</a> = 					<span class="var-type"> 'uploads'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#USER_CONTACTS_REL" title="details" class="const-name">USER_CONTACTS_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#user.contacts'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#USER_FAVORITES_REL" title="details" class="const-name">USER_FAVORITES_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#user.favorites'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#USER_PLAYLISTS_REL" title="details" class="const-name">USER_PLAYLISTS_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#user.playlists'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#USER_SUBSCRIPTIONS_REL" title="details" class="const-name">USER_SUBSCRIPTIONS_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#user.subscriptions'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#USER_UPLOADS_REL" title="details" class="const-name">USER_UPLOADS_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#user.uploads'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#USER_URI" title="details" class="const-name">USER_URI</a> = 					<span class="var-type"> 'http://gdata.youtube.com/feeds/api/users'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#VIDEO_COMPLAINTS_REL" title="details" class="const-name">VIDEO_COMPLAINTS_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#video.complaints'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#VIDEO_RATINGS_REL" title="details" class="const-name">VIDEO_RATINGS_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#video.ratings'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#VIDEO_RESPONSES_REL" title="details" class="const-name">VIDEO_RESPONSES_REL</a> = 					<span class="var-type"> 'http://gdata.youtube.com/schemas/2007#video.responses'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../../media/images/Constant.png" alt=" " />
+					<a href="#VIDEO_URI" title="details" class="const-name">VIDEO_URI</a> = 					<span class="var-type"> 'http://gdata.youtube.com/feeds/api/videos'</span>
+
+				</div>
+							</div>
+		</div>
+	</div>
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+												<div class="var-title">
+					<img src="../../media/images/StaticVariable.png" alt=" " />
+					static <span class="var-type">array</span>
+					<a href="#$namespaces" title="details" class="var-name">$namespaces</a>
+				</div>
+																							</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																																																																			
+				<div class="method-definition">
+					<img src="../../media/images/StaticMethod.png" alt=" "/>
+					static 						<span class="method-result">array</span>
+										<a href="#parseFormUploadTokenResponse" title="details" class="method-name">parseFormUploadTokenResponse</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$response</span>)
+									</div>
+																																																			
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityFeed.html">Zend_Gdata_YouTube_ActivityFeed</a></span>
+										<a href="#getActivityForUser" title="details" class="method-name">getActivityForUser</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$username</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$usernames</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ContactFeed.html">Zend_Gdata_YouTube_ContactFeed</a></span>
+										<a href="#getContactFeed" title="details" class="method-name">getContactFeed</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">array</span>
+										<a href="#getFormUploadToken" title="details" class="method-name">getFormUploadToken</a>
+											(<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>&nbsp;<span class="var-name">$videoEntry</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$url</span> = <span class="var-default">'http://gdata.youtube.com/action/GetUploadToken'</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityFeed.html">Zend_Gdata_YouTube_ActivityFeed</a></span>
+										<a href="#getFriendActivityForCurrentUser" title="details" class="method-name">getFriendActivityForCurrentUser</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a>|null</span>
+										<a href="#getFullVideoEntry" title="details" class="method-name">getFullVideoEntry</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$videoId</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$videoID</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxFeed.html">Zend_Gdata_YouTube_InboxFeed</a>|null</span>
+										<a href="#getInboxFeedForCurrentUser" title="details" class="method-name">getInboxFeedForCurrentUser</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getMostViewedVideoFeed" title="details" class="method-name">getMostViewedVideoFeed</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistListFeed.html">Zend_Gdata_YouTube_PlaylistListFeed</a></span>
+										<a href="#getPlaylistListFeed" title="details" class="method-name">getPlaylistListFeed</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistVideoFeed.html">Zend_Gdata_YouTube_PlaylistVideoFeed</a></span>
+										<a href="#getPlaylistVideoFeed" title="details" class="method-name">getPlaylistVideoFeed</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getRecentlyFeaturedVideoFeed" title="details" class="method-name">getRecentlyFeaturedVideoFeed</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getRelatedVideoFeed" title="details" class="method-name">getRelatedVideoFeed</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">Zend_Gdata_YouTube_SubscriptionListFeed</span>
+										<a href="#getSubscriptionFeed" title="details" class="method-name">getSubscriptionFeed</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentFeed.html">Zend_Gdata_YouTube_CommentFeed</a></span>
+										<a href="#getTopRatedVideoFeed" title="details" class="method-name">getTopRatedVideoFeed</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getUserFavorites" title="details" class="method-name">getUserFavorites</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_UserProfileEntry.html">Zend_Gdata_YouTube_UserProfileEntry</a></span>
+										<a href="#getUserProfile" title="details" class="method-name">getUserProfile</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getUserUploads" title="details" class="method-name">getUserUploads</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentFeed.html">Zend_Gdata_YouTube_CommentFeed</a></span>
+										<a href="#getVideoCommentFeed" title="details" class="method-name">getVideoCommentFeed</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>
+										<a href="#getVideoEntry" title="details" class="method-name">getVideoEntry</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>], [<span class="var-type">boolean</span>&nbsp;<span class="var-name">$fullEntry</span> = <span class="var-default">false</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getVideoFeed" title="details" class="method-name">getVideoFeed</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getVideoResponseFeed" title="details" class="method-name">getVideoResponseFeed</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+										<a href="#getWatchOnMobileVideoFeed" title="details" class="method-name">getWatchOnMobileVideoFeed</a>
+											([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+									</div>
+																							
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html">Zend_Gdata_YouTube_CommentEntry</a></span>
+										<a href="#replyToCommentEntry" title="details" class="method-name">replyToCommentEntry</a>
+											(<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html">Zend_Gdata_YouTube_CommentEntry</a></span>&nbsp;<span class="var-name">$commentEntry</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$commentText</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxEntry.html">Zend_Gdata_YouTube_InboxEntry</a>|null</span>
+										<a href="#sendVideoMessage" title="details" class="method-name">sendVideoMessage</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$body</span>, [<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>&nbsp;<span class="var-name">$videoEntry</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$recipientUserName</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span>
+										<a href="#setHttpClient" title="details" class="method-name">setHttpClient</a>
+											(<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$clientId</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$developerKey</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">Zend_Gdata_YouTube</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$clientId</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$developerKey</span> = <span class="var-default">null</span>])
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$namespaces" id="$namespaces"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../../media/images/StaticVariable.png" />
+		<span class="var-title">
+			static <span class="var-type">array</span>
+			<span class="var-name">$namespaces</span>
+			 = <span class="var-default">array(<br />        array('yt', 'http://gdata.youtube.com/schemas/2007', 1, 0),array('georss','http://www.georss.org/georss',1,0),array('gml','http://www.opengis.net/gml',1,0),array('media','http://search.yahoo.com/mrss/',1,0))</span>			(line <span class="line-number">185</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Namespaces used for Zend_Gdata_YouTube</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Media/Zend_Gdata_Media.html#var$namespaces">Zend_Gdata_Media::$namespaces</a></dt>
+						<dd>Namespaces used for Zend_Gdata_Photos</dd>
+					</dl>
+		
+		
+
+</div>
+
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_defaultPostUri">Zend_Gdata::$_defaultPostUri</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_httpClient">Zend_Gdata::$_httpClient</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_registeredPackages">Zend_Gdata::$_registeredPackages</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#var$_staticHttpClient">Zend_Gdata::$_staticHttpClient</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_gzipEnabled">Zend_Gdata_App::$_gzipEnabled</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_httpMethodOverride">Zend_Gdata_App::$_httpMethodOverride</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_majorProtocolVersion">Zend_Gdata_App::$_majorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_maxRedirects">Zend_Gdata_App::$_maxRedirects</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_minorProtocolVersion">Zend_Gdata_App::$_minorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_useObjectMapping">Zend_Gdata_App::$_useObjectMapping</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#var$_verboseExceptionMessages">Zend_Gdata_App::$_verboseExceptionMessages</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																			<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodparseFormUploadTokenResponse" id="parseFormUploadTokenResponse"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/StaticMethod.png" />
+		<span class="method-title">static parseFormUploadTokenResponse</span> (line <span class="line-number">650</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Helper function for parsing a YouTube token response</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> An array containing the token and URL</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		static <span class="method-result">array</span>
+		<span class="method-name">
+			parseFormUploadTokenResponse
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$response</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$response</span><span class="var-description">: The service response</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetActivityForUser" id="getActivityForUser"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getActivityForUser</span> (line <span class="line-number">722</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves the activity feed for users</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_VersionException if using version less than 2.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityFeed.html">Zend_Gdata_YouTube_ActivityFeed</a></span>
+		<span class="method-name">
+			getActivityForUser
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$username</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$usernames</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$usernames</span><span class="var-description">: A string identifying the usernames for which to               retrieve activity for. This can also be a Zend_Gdata_Query               object from which a URL can be determined.</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$username</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetContactFeed" id="getContactFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getContactFeed</span> (line <span class="line-number">569</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of a user's contacts</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of contacts</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ContactFeed.html">Zend_Gdata_YouTube_ContactFeed</a></span>
+		<span class="method-name">
+			getContactFeed
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$user</span><span class="var-description">: (optional) The username of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetFormUploadToken" id="getFormUploadToken"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getFormUploadToken</span> (line <span class="line-number">699</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a YouTube token</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> An array containing a token and URL</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			getFormUploadToken
+		</span>
+					(<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>&nbsp;<span class="var-name">$videoEntry</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$url</span> = <span class="var-default">'http://gdata.youtube.com/action/GetUploadToken'</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>
+				<span class="var-name">$videoEntry</span><span class="var-description">: The video entry</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$url</span><span class="var-description">: The location as a string URL</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetFriendActivityForCurrentUser" id="getFriendActivityForCurrentUser"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getFriendActivityForCurrentUser</span> (line <span class="line-number">753</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve the activity of the currently authenticated users friend.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception if not logged in.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityFeed.html">Zend_Gdata_YouTube_ActivityFeed</a></span>
+		<span class="method-name">
+			getFriendActivityForCurrentUser
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetFullVideoEntry" id="getFullVideoEntry"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getFullVideoEntry</span> (line <span class="line-number">305</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a video entry from the user's upload feed.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The video entry to be           retrieved, or null if it was not found or the user requesting it           did not have the appropriate permissions.</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a>|null</span>
+		<span class="method-name">
+			getFullVideoEntry
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$videoId</span>, <span class="var-type">mixed</span>&nbsp;<span class="var-name">$videoID</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$videoID</span><span class="var-description">: The ID of the video to retrieve.</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$videoId</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetInboxFeedForCurrentUser" id="getInboxFeedForCurrentUser"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getInboxFeedForCurrentUser</span> (line <span class="line-number">771</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve a feed of messages in the currently authenticated user's inbox.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Gdata_App_Exception if not logged in.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxFeed.html">Zend_Gdata_YouTube_InboxFeed</a>|null</span>
+		<span class="method-name">
+			getInboxFeedForCurrentUser
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetMostViewedVideoFeed" id="getMostViewedVideoFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getMostViewedVideoFeed</span> (line <span class="line-number">417</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of the most viewed videos.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getMostViewedVideoFeed
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetPlaylistListFeed" id="getPlaylistListFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getPlaylistListFeed</span> (line <span class="line-number">511</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed which lists a user's playlist</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of playlists</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistListFeed.html">Zend_Gdata_YouTube_PlaylistListFeed</a></span>
+		<span class="method-name">
+			getPlaylistListFeed
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$user</span><span class="var-description">: (optional) The username of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetPlaylistVideoFeed" id="getPlaylistVideoFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getPlaylistVideoFeed</span> (line <span class="line-number">531</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of videos in a particular playlist</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at          the specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistVideoFeed.html">Zend_Gdata_YouTube_PlaylistVideoFeed</a></span>
+		<span class="method-name">
+			getPlaylistVideoFeed
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetRecentlyFeaturedVideoFeed" id="getRecentlyFeaturedVideoFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getRecentlyFeaturedVideoFeed</span> (line <span class="line-number">448</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of recently featured videos.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getRecentlyFeaturedVideoFeed
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetRelatedVideoFeed" id="getRelatedVideoFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getRelatedVideoFeed</span> (line <span class="line-number">321</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of videos related to the specified video ID.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getRelatedVideoFeed
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$videoId</span><span class="var-description">: The videoId of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetSubscriptionFeed" id="getSubscriptionFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getSubscriptionFeed</span> (line <span class="line-number">549</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of a user's subscriptions</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of subscriptions</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Gdata_YouTube_SubscriptionListFeed</span>
+		<span class="method-name">
+			getSubscriptionFeed
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$user</span><span class="var-description">: (optional) The username of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetTopRatedVideoFeed" id="getTopRatedVideoFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getTopRatedVideoFeed</span> (line <span class="line-number">385</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of comments related to the specified video ID.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentFeed.html">Zend_Gdata_YouTube_CommentFeed</a></span>
+		<span class="method-name">
+			getTopRatedVideoFeed
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetUserFavorites" id="getUserFavorites"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getUserFavorites</span> (line <span class="line-number">610</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a user's favorites</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The videos favorited by the user</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getUserFavorites
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$user</span><span class="var-description">: (optional) The username of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetUserProfile" id="getUserProfile"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getUserProfile</span> (line <span class="line-number">631</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a user's profile as an entry</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The user profile entry</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_UserProfileEntry.html">Zend_Gdata_YouTube_UserProfileEntry</a></span>
+		<span class="method-name">
+			getUserProfile
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$user</span><span class="var-description">: (optional) The username of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetUserUploads" id="getUserUploads"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getUserUploads</span> (line <span class="line-number">589</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a user's uploads</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The videos uploaded by the user</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getUserUploads
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$user</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$user</span><span class="var-description">: (optional) The username of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetVideoCommentFeed" id="getVideoCommentFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getVideoCommentFeed</span> (line <span class="line-number">365</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of comments related to the specified video ID.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentFeed.html">Zend_Gdata_YouTube_CommentFeed</a></span>
+		<span class="method-name">
+			getVideoCommentFeed
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$videoId</span><span class="var-description">: The videoId of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetVideoEntry" id="getVideoEntry"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getVideoEntry</span> (line <span class="line-number">279</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a specific video entry.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The video entry found at the          specified URL.</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>
+		<span class="method-name">
+			getVideoEntry
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>], [<span class="var-type">boolean</span>&nbsp;<span class="var-name">$fullEntry</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$videoId</span><span class="var-description">: The ID of the video to retrieve.</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined.</span>			</li>
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$fullEntry</span><span class="var-description">: (optional) Retrieve the full metadata for the          entry. Only possible if entry belongs to currently authenticated          user. An exception will be thrown otherwise.</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetVideoFeed" id="getVideoFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getVideoFeed</span> (line <span class="line-number">254</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of videos.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getVideoFeed
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetVideoResponseFeed" id="getVideoResponseFeed"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getVideoResponseFeed</span> (line <span class="line-number">343</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of video responses related to the specified video ID.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getVideoResponseFeed
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$videoId</span><span class="var-description">: The videoId of interest</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetWatchOnMobileVideoFeed" id="getWatchOnMobileVideoFeed"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getWatchOnMobileVideoFeed</span> (line <span class="line-number">480</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves a feed of videos recently featured for mobile devices.</p>
+<p class="description"><p>These videos will have RTSP links in the $entry-&gt;mediaGroup-&gt;content</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The feed of videos found at the          specified URL.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a></span>
+		<span class="method-name">
+			getWatchOnMobileVideoFeed
+		</span>
+					([<span class="var-type">mixed</span>&nbsp;<span class="var-name">$location</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$location</span><span class="var-description">: (optional) The URL to query or a          Zend_Gdata_Query object from which a URL can be determined</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodreplyToCommentEntry" id="replyToCommentEntry"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">replyToCommentEntry</span> (line <span class="line-number">853</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Post a comment in reply to an existing comment</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> the posted comment</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html">Zend_Gdata_YouTube_CommentEntry</a></span>
+		<span class="method-name">
+			replyToCommentEntry
+		</span>
+					(<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html">Zend_Gdata_YouTube_CommentEntry</a></span>&nbsp;<span class="var-name">$commentEntry</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$commentText</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html">Zend_Gdata_YouTube_CommentEntry</a></span>
+				<span class="var-name">$commentEntry</span><span class="var-description">: The comment entry          to reply to</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$commentText</span><span class="var-description">: The text of the          comment to post</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsendVideoMessage" id="sendVideoMessage"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">sendVideoMessage</span> (line <span class="line-number">800</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Send a video message.</p>
+<p class="description"><p>Note: Either a Zend_Gdata_YouTube_VideoEntry or a valid video ID must  be provided.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> The          Zend_Gdata_YouTube_Inbox_Entry representing the sent message.</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_InvalidArgumentException if no valid          Zend_Gdata_YouTube_VideoEntry or videoId were provided</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxEntry.html">Zend_Gdata_YouTube_InboxEntry</a>|null</span>
+		<span class="method-name">
+			sendVideoMessage
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$body</span>, [<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>&nbsp;<span class="var-name">$videoEntry</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$videoId</span> = <span class="var-default">null</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$recipientUserName</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$body</span><span class="var-description">: The body of the message</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$videoId</span><span class="var-description">: The id of the video to send</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$recipientUserName</span><span class="var-description">: The username of the recipient</span>			</li>
+					<li>
+				<span class="var-type"><a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a></span>
+				<span class="var-name">$videoEntry</span><span class="var-description">: (optional) The video entry to send</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetHttpClient" id="setHttpClient"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">setHttpClient</span> (line <span class="line-number">222</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set the Zend_Http_Client object used for communication</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Provides a fluent interface</li>
+				<li><span class="field">throws:</span> Zend_Gdata_App_HttpException</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span>
+		<span class="method-name">
+			setHttpClient
+		</span>
+					(<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$clientId</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$developerKey</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+				<span class="var-name">$client</span><span class="var-description">: The client to use for communication</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$applicationId</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$clientId</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$developerKey</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetHttpClient">Zend_Gdata_App::setHttpClient()</a></dt>
+						<dd>Set the Zend_Http_Client object used for communication</dd>
+					</dl>
+			
+	</div>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">202</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Create Zend_Gdata_YouTube object</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Gdata_YouTube</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>&nbsp;<span class="var-name">$client</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$applicationId</span> = <span class="var-default">'MyCompany-MyApp-1.0'</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$clientId</span> = <span class="var-default">null</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$developerKey</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../../Zend_Http/Client/Zend_Http_Client.html">Zend_Http_Client</a></span>
+				<span class="var-name">$client</span><span class="var-description">: (optional) The HTTP client to use when           when communicating with the Google servers.</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$applicationId</span><span class="var-description">: The identity of the app in the form of         Company-AppName-Version</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$clientId</span><span class="var-description">: The clientId issued by the YouTube dashboard</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$developerKey</span><span class="var-description">: The developerKey issued by the YouTube dashboard</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/Media/Zend_Gdata_Media.html#method__construct">Zend_Gdata_Media::__construct()</a></dt>
+						<dd>Create Gdata_Media object</dd>
+					</dl>
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/Media/Zend_Gdata_Media.html">Zend_Gdata_Media</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Media/Zend_Gdata_Media.html#method__construct">Zend_Gdata_Media::__construct()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#method__construct">Zend_Gdata::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodgetEntry">Zend_Gdata::getEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodgetFeed">Zend_Gdata::getFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodimport">Zend_Gdata::import()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodisAuthenticated">Zend_Gdata::isAuthenticated()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#methodperformHttpRequest">Zend_Gdata::performHttpRequest()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#method__construct">Zend_Gdata_App::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methoddelete">Zend_Gdata_App::delete()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodenableRequestDebugLogging">Zend_Gdata_App::enableRequestDebugLogging()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgenerateIfMatchHeaderData">Zend_Gdata_App::generateIfMatchHeaderData()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodget">Zend_Gdata_App::get()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetEntry">Zend_Gdata_App::getEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetFeed">Zend_Gdata_App::getFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetGzipEnabled">Zend_Gdata_App::getGzipEnabled()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetHttpClient">Zend_Gdata_App::getHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetHttpMethodOverride">Zend_Gdata_App::getHttpMethodOverride()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMajorProtocolVersion">Zend_Gdata_App::getMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMaxRedirects">Zend_Gdata_App::getMaxRedirects()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetMinorProtocolVersion">Zend_Gdata_App::getMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetNextFeed">Zend_Gdata_App::getNextFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetPreviousFeed">Zend_Gdata_App::getPreviousFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetStaticHttpClient">Zend_Gdata_App::getStaticHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodgetVerboseExceptionMessages">Zend_Gdata_App::getVerboseExceptionMessages()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimport">Zend_Gdata_App::import()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimportFile">Zend_Gdata_App::importFile()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimportString">Zend_Gdata_App::importString()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodimportUrl">Zend_Gdata_App::importUrl()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodinsertEntry">Zend_Gdata_App::insertEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodperformHttpRequest">Zend_Gdata_App::performHttpRequest()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodpost">Zend_Gdata_App::post()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodprepareRequest">Zend_Gdata_App::prepareRequest()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodput">Zend_Gdata_App::put()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodregisterPackage">Zend_Gdata_App::registerPackage()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodretrieveAllEntriesForFeed">Zend_Gdata_App::retrieveAllEntriesForFeed()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetGzipEnabled">Zend_Gdata_App::setGzipEnabled()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetHttpClient">Zend_Gdata_App::setHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetHttpMethodOverride">Zend_Gdata_App::setHttpMethodOverride()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMajorProtocolVersion">Zend_Gdata_App::setMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMaxRedirects">Zend_Gdata_App::setMaxRedirects()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetMinorProtocolVersion">Zend_Gdata_App::setMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetStaticHttpClient">Zend_Gdata_App::setStaticHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodsetVerboseExceptionMessages">Zend_Gdata_App::setVerboseExceptionMessages()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodupdateEntry">Zend_Gdata_App::updateEntry()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methoduseObjectMapping">Zend_Gdata_App::useObjectMapping()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#methodusingObjectMapping">Zend_Gdata_App::usingObjectMapping()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#method__call">Zend_Gdata_App::__call()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+	<a name="sec-consts"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Constants</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+														| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="constACTIVITY_FEED_MAX_USERS" id="ACTIVITY_FEED_MAX_USERS"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ACTIVITY_FEED_MAX_USERS</span>
+			 = <span class="const-default"> 20</span>
+			(line <span class="line-number">143</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The maximum number of users for which activity can be requested for,  as enforced by the API.</p>
+	
+	
+</div>
+<a name="constACTIVITY_FEED_URI" id="ACTIVITY_FEED_URI"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ACTIVITY_FEED_URI</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/feeds/api/events'</span>
+			(line <span class="line-number">116</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constAUTH_SERVICE_NAME" id="AUTH_SERVICE_NAME"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">AUTH_SERVICE_NAME</span>
+			 = <span class="const-default"> 'youtube'</span>
+			(line <span class="line-number">88</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constCLIENTLOGIN_URL" id="CLIENTLOGIN_URL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">CLIENTLOGIN_URL</span>
+			 = <span class="const-default"> 'https://www.google.com/youtube/accounts/ClientLogin'</span>
+			(line <span class="line-number">89</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constFAVORITES_URI_SUFFIX" id="FAVORITES_URI_SUFFIX"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">FAVORITES_URI_SUFFIX</span>
+			 = <span class="const-default"> 'favorites'</span>
+			(line <span class="line-number">150</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The suffix for a feed of favorites.</p>
+	
+	
+</div>
+<a name="constFRIEND_ACTIVITY_FEED_URI" id="FRIEND_ACTIVITY_FEED_URI"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">FRIEND_ACTIVITY_FEED_URI</span>
+			 = <span class="const-default"><br />        'http://gdata.youtube.com/feeds/api/users/default/friendsactivity'</span>
+			(line <span class="line-number">117</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constINBOX_FEED_URI" id="INBOX_FEED_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INBOX_FEED_URI</span>
+			 = <span class="const-default"><br />        'http://gdata.youtube.com/feeds/api/users/default/inbox'</span>
+			(line <span class="line-number">134</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The URI of the inbox feed for the currently authenticated user.</p>
+	
+	
+</div>
+<a name="constINBOX_URI_SUFFIX" id="INBOX_URI_SUFFIX"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INBOX_URI_SUFFIX</span>
+			 = <span class="const-default"> 'inbox'</span>
+			(line <span class="line-number">178</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The suffix for a feed of messages (inbox entries).</p>
+	
+	
+</div>
+<a name="constIN_REPLY_TO_SCHEME" id="IN_REPLY_TO_SCHEME"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">IN_REPLY_TO_SCHEME</span>
+			 = <span class="const-default"><br />         'http://gdata.youtube.com/schemas/2007#in-reply-to'</span>
+			(line <span class="line-number">126</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The URI of the in-reply-to schema for comments in reply to  other comments.</p>
+	
+	
+</div>
+<a name="constPLAYLIST_REL" id="PLAYLIST_REL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">PLAYLIST_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#playlist'</span>
+			(line <span class="line-number">107</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constRELATED_URI_SUFFIX" id="RELATED_URI_SUFFIX"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">RELATED_URI_SUFFIX</span>
+			 = <span class="const-default"> 'related'</span>
+			(line <span class="line-number">171</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The suffix for a feed of related videos.</p>
+	
+	
+</div>
+<a name="constRESPONSES_URI_SUFFIX" id="RESPONSES_URI_SUFFIX"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">RESPONSES_URI_SUFFIX</span>
+			 = <span class="const-default"> 'responses'</span>
+			(line <span class="line-number">164</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The suffix for a feed of video responses.</p>
+	
+	
+</div>
+<a name="constSTANDARD_MOST_VIEWED_URI" id="STANDARD_MOST_VIEWED_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_MOST_VIEWED_URI</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/feeds/api/standardfeeds/most_viewed'</span>
+			(line <span class="line-number">92</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSTANDARD_MOST_VIEWED_URI_V2" id="STANDARD_MOST_VIEWED_URI_V2"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_MOST_VIEWED_URI_V2</span>
+			 = <span class="const-default"><br />        'http://gdata.youtube.com/feeds/api/standardfeeds/most_viewed'</span>
+			(line <span class="line-number">98</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSTANDARD_RECENTLY_FEATURED_URI" id="STANDARD_RECENTLY_FEATURED_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_RECENTLY_FEATURED_URI</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/feeds/api/standardfeeds/recently_featured'</span>
+			(line <span class="line-number">93</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSTANDARD_RECENTLY_FEATURED_URI_V2" id="STANDARD_RECENTLY_FEATURED_URI_V2"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_RECENTLY_FEATURED_URI_V2</span>
+			 = <span class="const-default"><br />        'http://gdata.youtube.com/feeds/api/standardfeeds/recently_featured'</span>
+			(line <span class="line-number">100</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSTANDARD_TOP_RATED_URI" id="STANDARD_TOP_RATED_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_TOP_RATED_URI</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/feeds/api/standardfeeds/top_rated'</span>
+			(line <span class="line-number">91</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSTANDARD_TOP_RATED_URI_V2" id="STANDARD_TOP_RATED_URI_V2"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_TOP_RATED_URI_V2</span>
+			 = <span class="const-default"><br />        'http://gdata.youtube.com/feeds/api/standardfeeds/top_rated'</span>
+			(line <span class="line-number">96</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSTANDARD_WATCH_ON_MOBILE_URI" id="STANDARD_WATCH_ON_MOBILE_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_WATCH_ON_MOBILE_URI</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/feeds/api/standardfeeds/watch_on_mobile'</span>
+			(line <span class="line-number">94</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constSTANDARD_WATCH_ON_MOBILE_URI_V2" id="STANDARD_WATCH_ON_MOBILE_URI_V2"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">STANDARD_WATCH_ON_MOBILE_URI_V2</span>
+			 = <span class="const-default"><br />        'http://gdata.youtube.com/feeds/api/standardfeeds/watch_on_mobile'</span>
+			(line <span class="line-number">102</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUPLOADS_URI_SUFFIX" id="UPLOADS_URI_SUFFIX"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">UPLOADS_URI_SUFFIX</span>
+			 = <span class="const-default"> 'uploads'</span>
+			(line <span class="line-number">157</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The suffix for the user's upload feed.</p>
+	
+	
+</div>
+<a name="constUSER_CONTACTS_REL" id="USER_CONTACTS_REL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">USER_CONTACTS_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#user.contacts'</span>
+			(line <span class="line-number">111</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUSER_FAVORITES_REL" id="USER_FAVORITES_REL"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">USER_FAVORITES_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#user.favorites'</span>
+			(line <span class="line-number">112</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUSER_PLAYLISTS_REL" id="USER_PLAYLISTS_REL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">USER_PLAYLISTS_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#user.playlists'</span>
+			(line <span class="line-number">109</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUSER_SUBSCRIPTIONS_REL" id="USER_SUBSCRIPTIONS_REL"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">USER_SUBSCRIPTIONS_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#user.subscriptions'</span>
+			(line <span class="line-number">110</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUSER_UPLOADS_REL" id="USER_UPLOADS_REL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">USER_UPLOADS_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#user.uploads'</span>
+			(line <span class="line-number">108</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUSER_URI" id="USER_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">USER_URI</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/feeds/api/users'</span>
+			(line <span class="line-number">105</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constVIDEO_COMPLAINTS_REL" id="VIDEO_COMPLAINTS_REL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">VIDEO_COMPLAINTS_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#video.complaints'</span>
+			(line <span class="line-number">115</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constVIDEO_RATINGS_REL" id="VIDEO_RATINGS_REL"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">VIDEO_RATINGS_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#video.ratings'</span>
+			(line <span class="line-number">114</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constVIDEO_RESPONSES_REL" id="VIDEO_RESPONSES_REL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">VIDEO_RESPONSES_REL</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/schemas/2007#video.responses'</span>
+			(line <span class="line-number">113</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constVIDEO_URI" id="VIDEO_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">VIDEO_URI</span>
+			 = <span class="const-default"> 'http://gdata.youtube.com/feeds/api/videos'</span>
+			(line <span class="line-number">106</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+							<h4>Inherited Constants</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html">Zend_Gdata</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="const-title">
+								<span class="const-name"><a href="../../Zend_Gdata/Gdata/Zend_Gdata.html#constAUTH_SERVICE_NAME">Zend_Gdata::AUTH_SERVICE_NAME</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html">Zend_Gdata_App</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="const-title">
+								<span class="const-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#constDEFAULT_MAJOR_PROTOCOL_VERSION">Zend_Gdata_App::DEFAULT_MAJOR_PROTOCOL_VERSION</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="const-title">
+								<span class="const-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App.html#constDEFAULT_MINOR_PROTOCOL_VERSION">Zend_Gdata_App::DEFAULT_MINOR_PROTOCOL_VERSION</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:04:05 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

@@ -1,0 +1,1628 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Zend_Gdata_Entry</title>
+			<link rel="stylesheet" href="../../media/stylesheet.css" />
+						<script src="../../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../../media/images/plus.png";
+				imgMinus.src = "../../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> Zend_Gdata_Entry</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Represents the Gdata flavor of an Atom entry</p>
+	<ul class="tags">
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_Gdata---Entry.php.html">/Gdata/Entry.php</a> (line <span class="field">43</span>)
+		</p>
+		
+				
+		<pre><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html">Zend_Gdata_App_Base</a>
+   |
+   --<a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html">Zend_Gdata_App_FeedEntryParent</a>
+      |
+      --<a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a>
+         |
+         --<a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html">Zend_Gdata_App_MediaEntry</a>
+            |
+            --Zend_Gdata_Entry</pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileListEntry.html">Zend_Gdata_Health_ProfileListEntry</a>
+					</td>
+					<td>
+											Concrete class for working with Health profile list entries.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileEntry.html">Zend_Gdata_Health_ProfileEntry</a>
+					</td>
+					<td>
+											Concrete class for working with Health profile entries.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_ListEntry.html">Zend_Gdata_Spreadsheets_ListEntry</a>
+					</td>
+					<td>
+											Concrete class for working with List entries.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_CellEntry.html">Zend_Gdata_Spreadsheets_CellEntry</a>
+					</td>
+					<td>
+											Concrete class for working with Cell entries.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_WorksheetEntry.html">Zend_Gdata_Spreadsheets_WorksheetEntry</a>
+					</td>
+					<td>
+											Concrete class for working with Worksheet entries.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_SpreadsheetEntry.html">Zend_Gdata_Spreadsheets_SpreadsheetEntry</a>
+					</td>
+					<td>
+											Concrete class for working with Atom entries.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_OwnerEntry.html">Zend_Gdata_Gapps_OwnerEntry</a>
+					</td>
+					<td>
+											Data model class for a Google Apps Owner Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_MemberEntry.html">Zend_Gdata_Gapps_MemberEntry</a>
+					</td>
+					<td>
+											Data model class for a Google Apps Member Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListRecipientEntry.html">Zend_Gdata_Gapps_EmailListRecipientEntry</a>
+					</td>
+					<td>
+											Data model class for a Google Apps Email List Recipient Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListEntry.html">Zend_Gdata_Gapps_EmailListEntry</a>
+					</td>
+					<td>
+											Data model class for a Google Apps Email List Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_NicknameEntry.html">Zend_Gdata_Gapps_NicknameEntry</a>
+					</td>
+					<td>
+											Data model class for a Google Apps Nickname Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_UserEntry.html">Zend_Gdata_Gapps_UserEntry</a>
+					</td>
+					<td>
+											Data model class for a Google Apps User Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_GroupEntry.html">Zend_Gdata_Gapps_GroupEntry</a>
+					</td>
+					<td>
+											Data model class for a Google Apps Group Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Geo/Zend_Gdata_Geo_Entry.html">Zend_Gdata_Geo_Entry</a>
+					</td>
+					<td>
+											An Atom entry containing Geograpic data.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Docs/Zend_Gdata_Docs_DocumentListEntry.html">Zend_Gdata_Docs_DocumentListEntry</a>
+					</td>
+					<td>
+											Represents a Documents List entry in the Documents List data API meta feed  of a user's documents.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Entry.html">Zend_Gdata_Media_Entry</a>
+					</td>
+					<td>
+											Represents the Gdata flavor of an Atom entry
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase_Entry.html">Zend_Gdata_Gbase_Entry</a>
+					</td>
+					<td>
+											Base class for working with Google Base entries.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_AlbumEntry.html">Zend_Gdata_Photos_AlbumEntry</a>
+					</td>
+					<td>
+											Data model class for a Photo Album Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_CommentEntry.html">Zend_Gdata_Photos_CommentEntry</a>
+					</td>
+					<td>
+											Data model class for a Comment Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_TagEntry.html">Zend_Gdata_Photos_TagEntry</a>
+					</td>
+					<td>
+											Data model class for a Tag Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_UserEntry.html">Zend_Gdata_Photos_UserEntry</a>
+					</td>
+					<td>
+											Data model class for a User Entry.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Books/Zend_Gdata_Books_VolumeEntry.html">Zend_Gdata_Books_VolumeEntry</a>
+					</td>
+					<td>
+											Describes an entry in a feed of Book Search volumes
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Books/Zend_Gdata_Books_CollectionEntry.html">Zend_Gdata_Books_CollectionEntry</a>
+					</td>
+					<td>
+											Describes an entry in a feed of collections
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Gdata/Zend_Gdata_Kind_EventEntry.html">Zend_Gdata_Kind_EventEntry</a>
+					</td>
+					<td>
+											Data model for the Gdata Event &quot;Kind&quot;.  Google Calendar has a separate  EventEntry class which extends this.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Exif/Zend_Gdata_Exif_Entry.html">Zend_Gdata_Exif_Entry</a>
+					</td>
+					<td>
+											An Atom entry containing EXIF metadata.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_ListEntry.html">Zend_Gdata_Calendar_ListEntry</a>
+					</td>
+					<td>
+											Represents a Calendar entry in the Calendar data API meta feed of a user's  calendars.
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_UserProfileEntry.html">Zend_Gdata_YouTube_UserProfileEntry</a>
+					</td>
+					<td>
+											Represents the YouTube video playlist flavor of an Atom entry
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_SubscriptionEntry.html">Zend_Gdata_YouTube_SubscriptionEntry</a>
+					</td>
+					<td>
+											Represents the YouTube video subscription flavor of an Atom entry
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html">Zend_Gdata_YouTube_CommentEntry</a>
+					</td>
+					<td>
+											The YouTube comments flavor of an Atom Entry
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistListEntry.html">Zend_Gdata_YouTube_PlaylistListEntry</a>
+					</td>
+					<td>
+											Represents the YouTube video playlist flavor of an Atom entry
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"
+								 style="vertical-align: center"/>
+						<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityEntry.html">Zend_Gdata_YouTube_ActivityEntry</a>
+					</td>
+					<td>
+											A concrete class for working with YouTube user activity entries.
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																								<div class="var-title">
+					<img src="../../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_entryClassName" title="details" class="var-name">$_entryClassName</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendants</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																															
+				<div class="method-definition">
+					<img src="../../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">Zend_Gdata_Entry</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$element</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#getDOM" title="details" class="method-name">getDOM</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$doc</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$majorVersion</span> = <span class="var-default">1</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$minorVersion</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#takeAttributeFromDOM" title="details" class="method-name">takeAttributeFromDOM</a>
+											(<span class="var-type">DOMNode</span>&nbsp;<span class="var-name">$attribute</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#takeChildFromDOM" title="details" class="method-name">takeChildFromDOM</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$child</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			
+<a name="var$_entryClassName" id="$_entryClassName"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_entryClassName</span>
+			 = <span class="var-default"> 'Zend_Gdata_Entry'</span>			(line <span class="line-number">46</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_entryClassName">Zend_Gdata_App_Entry::$_entryClassName</a></dt>
+						<dd>Class name for each entry in this feed*</dd>
+					</dl>
+		
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileListEntry.html#var$_entryClassName">Zend_Gdata_Health_ProfileListEntry::$_entryClassName</a>
+								: The classname for individual profile list entry elements.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileEntry.html#var$_entryClassName">Zend_Gdata_Health_ProfileEntry::$_entryClassName</a>
+								: The classname for individual profile entry elements.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_ListEntry.html#var$_entryClassName">Zend_Gdata_Spreadsheets_ListEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_CellEntry.html#var$_entryClassName">Zend_Gdata_Spreadsheets_CellEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_WorksheetEntry.html#var$_entryClassName">Zend_Gdata_Spreadsheets_WorksheetEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_SpreadsheetEntry.html#var$_entryClassName">Zend_Gdata_Spreadsheets_SpreadsheetEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_OwnerEntry.html#var$_entryClassName">Zend_Gdata_Gapps_OwnerEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_MemberEntry.html#var$_entryClassName">Zend_Gdata_Gapps_MemberEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListRecipientEntry.html#var$_entryClassName">Zend_Gdata_Gapps_EmailListRecipientEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListEntry.html#var$_entryClassName">Zend_Gdata_Gapps_EmailListEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_NicknameEntry.html#var$_entryClassName">Zend_Gdata_Gapps_NicknameEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_UserEntry.html#var$_entryClassName">Zend_Gdata_Gapps_UserEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_GroupEntry.html#var$_entryClassName">Zend_Gdata_Gapps_GroupEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Geo/Zend_Gdata_Geo_Entry.html#var$_entryClassName">Zend_Gdata_Geo_Entry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Entry.html#var$_entryClassName">Zend_Gdata_Media_Entry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoEntry.html#var$_entryClassName">Zend_Gdata_Photos_PhotoEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxEntry.html#var$_entryClassName">Zend_Gdata_YouTube_InboxEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_MediaEntry.html#var$_entryClassName">Zend_Gdata_YouTube_MediaEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html#var$_entryClassName">Zend_Gdata_YouTube_VideoEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistVideoEntry.html#var$_entryClassName">Zend_Gdata_YouTube_PlaylistVideoEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase_Entry.html#var$_entryClassName">Zend_Gdata_Gbase_Entry::$_entryClassName</a>
+								: Name of the base class for Google Base entries
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase_SnippetEntry.html#var$_entryClassName">Zend_Gdata_Gbase_SnippetEntry::$_entryClassName</a>
+								: The classname for individual snippet entry elements.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase_ItemEntry.html#var$_entryClassName">Zend_Gdata_Gbase_ItemEntry::$_entryClassName</a>
+								: The classname for individual item entry elements.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_AlbumEntry.html#var$_entryClassName">Zend_Gdata_Photos_AlbumEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_CommentEntry.html#var$_entryClassName">Zend_Gdata_Photos_CommentEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_TagEntry.html#var$_entryClassName">Zend_Gdata_Photos_TagEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_UserEntry.html#var$_entryClassName">Zend_Gdata_Photos_UserEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_EventEntry.html#var$_entryClassName">Zend_Gdata_Calendar_EventEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Exif/Zend_Gdata_Exif_Entry.html#var$_entryClassName">Zend_Gdata_Exif_Entry::$_entryClassName</a>
+								: The classname for individual feed elements.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_UserProfileEntry.html#var$_entryClassName">Zend_Gdata_YouTube_UserProfileEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ContactEntry.html#var$_entryClassName">Zend_Gdata_YouTube_ContactEntry::$_entryClassName</a>
+								: The classname for individual feed elements.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_SubscriptionEntry.html#var$_entryClassName">Zend_Gdata_YouTube_SubscriptionEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html#var$_entryClassName">Zend_Gdata_YouTube_CommentEntry::$_entryClassName</a>
+								: The classname for individual feed elements.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistListEntry.html#var$_entryClassName">Zend_Gdata_YouTube_PlaylistListEntry::$_entryClassName</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityEntry.html#var$_entryClassName">Zend_Gdata_YouTube_ActivityEntry::$_entryClassName</a>
+								: The classname for individual user activity entry elements.
+							</li>
+				</ul>
+		
+
+</div>
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html">Zend_Gdata_App_MediaEntry</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html#var$_mediaSource">Zend_Gdata_App_MediaEntry::$_mediaSource</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_content">Zend_Gdata_App_Entry::$_content</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_control">Zend_Gdata_App_Entry::$_control</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_edited">Zend_Gdata_App_Entry::$_edited</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_published">Zend_Gdata_App_Entry::$_published</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_rootElement">Zend_Gdata_App_Entry::$_rootElement</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_source">Zend_Gdata_App_Entry::$_source</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#var$_summary">Zend_Gdata_App_Entry::$_summary</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html">Zend_Gdata_App_FeedEntryParent</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_author">Zend_Gdata_App_FeedEntryParent::$_author</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_category">Zend_Gdata_App_FeedEntryParent::$_category</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_contributor">Zend_Gdata_App_FeedEntryParent::$_contributor</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_etag">Zend_Gdata_App_FeedEntryParent::$_etag</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_id">Zend_Gdata_App_FeedEntryParent::$_id</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_link">Zend_Gdata_App_FeedEntryParent::$_link</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_majorProtocolVersion">Zend_Gdata_App_FeedEntryParent::$_majorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_minorProtocolVersion">Zend_Gdata_App_FeedEntryParent::$_minorProtocolVersion</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_rights">Zend_Gdata_App_FeedEntryParent::$_rights</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_service">Zend_Gdata_App_FeedEntryParent::$_service</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_title">Zend_Gdata_App_FeedEntryParent::$_title</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#var$_updated">Zend_Gdata_App_FeedEntryParent::$_updated</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html">Zend_Gdata_App_Base</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_extensionAttributes">Zend_Gdata_App_Base::$_extensionAttributes</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_extensionElements">Zend_Gdata_App_Base::$_extensionElements</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_namespaceLookupCache">Zend_Gdata_App_Base::$_namespaceLookupCache</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_namespaces">Zend_Gdata_App_Base::$_namespaces</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_rootNamespace">Zend_Gdata_App_Base::$_rootNamespace</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_rootNamespaceURI">Zend_Gdata_App_Base::$_rootNamespaceURI</a></span><br>
+							</span>
+													<img src="../../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#var$_text">Zend_Gdata_App_Base::$_text</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">48</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">Zend_Gdata_Entry</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$element</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$element</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html#method__construct">Zend_Gdata_App_MediaEntry::__construct()</a></dt>
+						<dd>Constructs a new MediaEntry, representing XML data and optional  file to upload</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileListEntry.html#method__construct">Zend_Gdata_Health_ProfileListEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_Health_ProfileListEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileEntry.html#method__construct">Zend_Gdata_Health_ProfileEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_Health_ProfileEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_ListEntry.html#method__construct">Zend_Gdata_Spreadsheets_ListEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_Spreadsheets_ListEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_CellEntry.html#method__construct">Zend_Gdata_Spreadsheets_CellEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_Spreadsheets_CellEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_WorksheetEntry.html#method__construct">Zend_Gdata_Spreadsheets_WorksheetEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_Spreadsheets_WorksheetEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_SpreadsheetEntry.html#method__construct">Zend_Gdata_Spreadsheets_SpreadsheetEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_Spreadsheets_SpreadsheetEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_OwnerEntry.html#method__construct">Zend_Gdata_Gapps_OwnerEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_MemberEntry.html#method__construct">Zend_Gdata_Gapps_MemberEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListRecipientEntry.html#method__construct">Zend_Gdata_Gapps_EmailListRecipientEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListEntry.html#method__construct">Zend_Gdata_Gapps_EmailListEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_NicknameEntry.html#method__construct">Zend_Gdata_Gapps_NicknameEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_UserEntry.html#method__construct">Zend_Gdata_Gapps_UserEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_GroupEntry.html#method__construct">Zend_Gdata_Gapps_GroupEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Geo/Zend_Gdata_Geo_Entry.html#method__construct">Zend_Gdata_Geo_Entry::__construct()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Docs/Zend_Gdata_Docs_DocumentListEntry.html#method__construct">Zend_Gdata_Docs_DocumentListEntry::__construct()</a>
+								: Create a new instance of an entry representing a document.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Entry.html#method__construct">Zend_Gdata_Media_Entry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoEntry.html#method__construct">Zend_Gdata_Photos_PhotoEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxEntry.html#method__construct">Zend_Gdata_YouTube_InboxEntry::__construct()</a>
+								: Creates a subscription entry, representing an individual subscription  in a list of subscriptions, usually associated with an individual user.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html#method__construct">Zend_Gdata_YouTube_VideoEntry::__construct()</a>
+								: Creates a Video entry, representing an individual video
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistVideoEntry.html#method__construct">Zend_Gdata_YouTube_PlaylistVideoEntry::__construct()</a>
+								: Creates a Playlist video entry, representing an individual video  in a list of videos contained within a specific playlist
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase_Entry.html#method__construct">Zend_Gdata_Gbase_Entry::__construct()</a>
+								: Constructs a new Zend_Gdata_Gbase_ItemEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_AlbumEntry.html#method__construct">Zend_Gdata_Photos_AlbumEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_CommentEntry.html#method__construct">Zend_Gdata_Photos_CommentEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_TagEntry.html#method__construct">Zend_Gdata_Photos_TagEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_UserEntry.html#method__construct">Zend_Gdata_Photos_UserEntry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Books/Zend_Gdata_Books_VolumeEntry.html#method__construct">Zend_Gdata_Books_VolumeEntry::__construct()</a>
+								: Constructor for Zend_Gdata_Books_VolumeEntry which  Describes an entry in a feed of Book Search volumes
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Books/Zend_Gdata_Books_CollectionEntry.html#method__construct">Zend_Gdata_Books_CollectionEntry::__construct()</a>
+								: Constructor for Zend_Gdata_Books_CollectionEntry which  Describes an entry in a feed of collections
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_EventEntry.html#method__construct">Zend_Gdata_Calendar_EventEntry::__construct()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Exif/Zend_Gdata_Exif_Entry.html#method__construct">Zend_Gdata_Exif_Entry::__construct()</a>
+								: Create a new instance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_ListEntry.html#method__construct">Zend_Gdata_Calendar_ListEntry::__construct()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_UserProfileEntry.html#method__construct">Zend_Gdata_YouTube_UserProfileEntry::__construct()</a>
+								: Creates a User Profile entry, representing an individual user  and their attributes.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ContactEntry.html#method__construct">Zend_Gdata_YouTube_ContactEntry::__construct()</a>
+								: Constructs a new Contact Entry object, to represent  an individual contact for a user
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_SubscriptionEntry.html#method__construct">Zend_Gdata_YouTube_SubscriptionEntry::__construct()</a>
+								: Creates a subscription entry, representing an individual subscription  in a list of subscriptions, usually associated with an individual user.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_CommentEntry.html#method__construct">Zend_Gdata_YouTube_CommentEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_YouTube_CommentEntry object.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistListEntry.html#method__construct">Zend_Gdata_YouTube_PlaylistListEntry::__construct()</a>
+								: Creates a Playlist list entry, representing an individual playlist  in a list of playlists, usually associated with an individual user.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityEntry.html#method__construct">Zend_Gdata_YouTube_ActivityEntry::__construct()</a>
+								: Constructs a new Zend_Gdata_YouTube_ActivityEntry object.
+							</li>
+				</ul>
+	</div>
+<a name="methodgetDOM" id="getDOM"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">getDOM</span> (line <span class="line-number">54</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getDOM
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$doc</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$majorVersion</span> = <span class="var-default">1</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$minorVersion</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$doc</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$majorVersion</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$minorVersion</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodgetDOM">Zend_Gdata_App_Entry::getDOM()</a></dt>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileListEntry.html#methodgetDOM">Zend_Gdata_Health_ProfileListEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileEntry.html#methodgetDOM">Zend_Gdata_Health_ProfileEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_ListEntry.html#methodgetDOM">Zend_Gdata_Spreadsheets_ListEntry::getDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_CellEntry.html#methodgetDOM">Zend_Gdata_Spreadsheets_CellEntry::getDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_WorksheetEntry.html#methodgetDOM">Zend_Gdata_Spreadsheets_WorksheetEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_OwnerEntry.html#methodgetDOM">Zend_Gdata_Gapps_OwnerEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_MemberEntry.html#methodgetDOM">Zend_Gdata_Gapps_MemberEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListRecipientEntry.html#methodgetDOM">Zend_Gdata_Gapps_EmailListRecipientEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListEntry.html#methodgetDOM">Zend_Gdata_Gapps_EmailListEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_NicknameEntry.html#methodgetDOM">Zend_Gdata_Gapps_NicknameEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_UserEntry.html#methodgetDOM">Zend_Gdata_Gapps_UserEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_GroupEntry.html#methodgetDOM">Zend_Gdata_Gapps_GroupEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Geo/Zend_Gdata_Geo_Entry.html#methodgetDOM">Zend_Gdata_Geo_Entry::getDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Entry.html#methodgetDOM">Zend_Gdata_Media_Entry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoEntry.html#methodgetDOM">Zend_Gdata_Photos_PhotoEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxEntry.html#methodgetDOM">Zend_Gdata_YouTube_InboxEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html#methodgetDOM">Zend_Gdata_YouTube_VideoEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistVideoEntry.html#methodgetDOM">Zend_Gdata_YouTube_PlaylistVideoEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase_Entry.html#methodgetDOM">Zend_Gdata_Gbase_Entry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_AlbumEntry.html#methodgetDOM">Zend_Gdata_Photos_AlbumEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_CommentEntry.html#methodgetDOM">Zend_Gdata_Photos_CommentEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_TagEntry.html#methodgetDOM">Zend_Gdata_Photos_TagEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_UserEntry.html#methodgetDOM">Zend_Gdata_Photos_UserEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Books/Zend_Gdata_Books_VolumeEntry.html#methodgetDOM">Zend_Gdata_Books_VolumeEntry::getDOM()</a>
+								: Retrieves DOMElement which corresponds to this element and all  child properties. This is used to build this object back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistance.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata_Kind_EventEntry.html#methodgetDOM">Zend_Gdata_Kind_EventEntry::getDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_EventEntry.html#methodgetDOM">Zend_Gdata_Calendar_EventEntry::getDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Exif/Zend_Gdata_Exif_Entry.html#methodgetDOM">Zend_Gdata_Exif_Entry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_ListEntry.html#methodgetDOM">Zend_Gdata_Calendar_ListEntry::getDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_UserProfileEntry.html#methodgetDOM">Zend_Gdata_YouTube_UserProfileEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ContactEntry.html#methodgetDOM">Zend_Gdata_YouTube_ContactEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_SubscriptionEntry.html#methodgetDOM">Zend_Gdata_YouTube_SubscriptionEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistListEntry.html#methodgetDOM">Zend_Gdata_YouTube_PlaylistListEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for sending to the server upon updates, or  for application storage/persistence.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityEntry.html#methodgetDOM">Zend_Gdata_YouTube_ActivityEntry::getDOM()</a>
+								: Retrieves a DOMElement which corresponds to this element and all  child properties.  This is used to build an entry back into a DOM  and eventually XML text for application storage/persistence.
+							</li>
+				</ul>
+	</div>
+<a name="methodtakeAttributeFromDOM" id="takeAttributeFromDOM"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">takeAttributeFromDOM</span> (line <span class="line-number">111</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Given a DOMNode representing an attribute, tries to map the data into  instance members.  If no mapping is defined, the name and value are  stored in an array.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			takeAttributeFromDOM
+		</span>
+					(<span class="var-type">DOMNode</span>&nbsp;<span class="var-name">$attribute</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">DOMNode</span>
+				<span class="var-name">$attribute</span><span class="var-description">: The DOMNode attribute needed to be handled</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtakeAttributeFromDOM">Zend_Gdata_App_Base::takeAttributeFromDOM()</a></dt>
+						<dd>Given a DOMNode representing an attribute, tries to map the data into  instance members.  If no mapping is defined, the name and value are  stored in an array.</dd>
+					</dl>
+			
+	</div>
+<a name="methodtakeChildFromDOM" id="takeChildFromDOM"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">takeChildFromDOM</span> (line <span class="line-number">69</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			takeChildFromDOM
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$child</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$child</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodtakeChildFromDOM">Zend_Gdata_App_Entry::takeChildFromDOM()</a></dt>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileListEntry.html#methodtakeChildFromDOM">Zend_Gdata_Health_ProfileListEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Health/Zend_Gdata_Health_ProfileEntry.html#methodtakeChildFromDOM">Zend_Gdata_Health_ProfileEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_ListEntry.html#methodtakeChildFromDOM">Zend_Gdata_Spreadsheets_ListEntry::takeChildFromDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_CellEntry.html#methodtakeChildFromDOM">Zend_Gdata_Spreadsheets_CellEntry::takeChildFromDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Spreadsheets/Zend_Gdata_Spreadsheets_WorksheetEntry.html#methodtakeChildFromDOM">Zend_Gdata_Spreadsheets_WorksheetEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_OwnerEntry.html#methodtakeChildFromDOM">Zend_Gdata_Gapps_OwnerEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as owners of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_MemberEntry.html#methodtakeChildFromDOM">Zend_Gdata_Gapps_MemberEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListRecipientEntry.html#methodtakeChildFromDOM">Zend_Gdata_Gapps_EmailListRecipientEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_EmailListEntry.html#methodtakeChildFromDOM">Zend_Gdata_Gapps_EmailListEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_NicknameEntry.html#methodtakeChildFromDOM">Zend_Gdata_Gapps_NicknameEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_UserEntry.html#methodtakeChildFromDOM">Zend_Gdata_Gapps_UserEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gapps/Zend_Gdata_Gapps_GroupEntry.html#methodtakeChildFromDOM">Zend_Gdata_Gapps_GroupEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Geo/Zend_Gdata_Geo_Entry.html#methodtakeChildFromDOM">Zend_Gdata_Geo_Entry::takeChildFromDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Entry.html#methodtakeChildFromDOM">Zend_Gdata_Media_Entry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_PhotoEntry.html#methodtakeChildFromDOM">Zend_Gdata_Photos_PhotoEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_InboxEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_InboxEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_MediaEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_MediaEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_VideoEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_VideoEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistVideoEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_PlaylistVideoEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gbase/Zend_Gdata_Gbase_Entry.html#methodtakeChildFromDOM">Zend_Gdata_Gbase_Entry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_AlbumEntry.html#methodtakeChildFromDOM">Zend_Gdata_Photos_AlbumEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_CommentEntry.html#methodtakeChildFromDOM">Zend_Gdata_Photos_CommentEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_TagEntry.html#methodtakeChildFromDOM">Zend_Gdata_Photos_TagEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Photos/Zend_Gdata_Photos_UserEntry.html#methodtakeChildFromDOM">Zend_Gdata_Photos_UserEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Books/Zend_Gdata_Books_VolumeEntry.html#methodtakeChildFromDOM">Zend_Gdata_Books_VolumeEntry::takeChildFromDOM()</a>
+								: Creates individual objects of the appropriate type and stores  them in this object based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Gdata/Zend_Gdata_Kind_EventEntry.html#methodtakeChildFromDOM">Zend_Gdata_Kind_EventEntry::takeChildFromDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_EventEntry.html#methodtakeChildFromDOM">Zend_Gdata_Calendar_EventEntry::takeChildFromDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Exif/Zend_Gdata_Exif_Entry.html#methodtakeChildFromDOM">Zend_Gdata_Exif_Entry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/Calendar/Zend_Gdata_Calendar_ListEntry.html#methodtakeChildFromDOM">Zend_Gdata_Calendar_ListEntry::takeChildFromDOM()</a>
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_UserProfileEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_UserProfileEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ContactEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_ContactEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_SubscriptionEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_SubscriptionEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_PlaylistListEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_PlaylistListEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them in the $_entry array based upon DOM data.
+							</li>
+					<li>
+				<a href="../../Zend_Gdata/YouTube/Zend_Gdata_YouTube_ActivityEntry.html#methodtakeChildFromDOM">Zend_Gdata_YouTube_ActivityEntry::takeChildFromDOM()</a>
+								: Creates individual Entry objects of the appropriate type and  stores them as members of this entry based upon DOM data.
+							</li>
+				</ul>
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html">Zend_Gdata_App_MediaEntry</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html#method__construct">Zend_Gdata_App_MediaEntry::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html#methodencode">Zend_Gdata_App_MediaEntry::encode()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html#methodgetMediaSource">Zend_Gdata_App_MediaEntry::getMediaSource()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_MediaEntry.html#methodsetMediaSource">Zend_Gdata_App_MediaEntry::setMediaSource()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html">Zend_Gdata_App_Entry</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methoddelete">Zend_Gdata_App_Entry::delete()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodgetContent">Zend_Gdata_App_Entry::getContent()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodgetControl">Zend_Gdata_App_Entry::getControl()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodgetDOM">Zend_Gdata_App_Entry::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodgetPublished">Zend_Gdata_App_Entry::getPublished()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodgetSource">Zend_Gdata_App_Entry::getSource()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodgetSummary">Zend_Gdata_App_Entry::getSummary()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodreload">Zend_Gdata_App_Entry::reload()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodsave">Zend_Gdata_App_Entry::save()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodsetContent">Zend_Gdata_App_Entry::setContent()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodsetControl">Zend_Gdata_App_Entry::setControl()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodsetPublished">Zend_Gdata_App_Entry::setPublished()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodsetSource">Zend_Gdata_App_Entry::setSource()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodsetSummary">Zend_Gdata_App_Entry::setSummary()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Entry.html#methodtakeChildFromDOM">Zend_Gdata_App_Entry::takeChildFromDOM()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html">Zend_Gdata_App_FeedEntryParent</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#method__construct">Zend_Gdata_App_FeedEntryParent::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetAlternateLink">Zend_Gdata_App_FeedEntryParent::getAlternateLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetAuthor">Zend_Gdata_App_FeedEntryParent::getAuthor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetCategory">Zend_Gdata_App_FeedEntryParent::getCategory()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetContributor">Zend_Gdata_App_FeedEntryParent::getContributor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetDOM">Zend_Gdata_App_FeedEntryParent::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetEditLink">Zend_Gdata_App_FeedEntryParent::getEditLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetEtag">Zend_Gdata_App_FeedEntryParent::getEtag()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetHttpClient">Zend_Gdata_App_FeedEntryParent::getHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetId">Zend_Gdata_App_FeedEntryParent::getId()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetLicenseLink">Zend_Gdata_App_FeedEntryParent::getLicenseLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetLink">Zend_Gdata_App_FeedEntryParent::getLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetMajorProtocolVersion">Zend_Gdata_App_FeedEntryParent::getMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetMinorProtocolVersion">Zend_Gdata_App_FeedEntryParent::getMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetNextLink">Zend_Gdata_App_FeedEntryParent::getNextLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetPreviousLink">Zend_Gdata_App_FeedEntryParent::getPreviousLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetRights">Zend_Gdata_App_FeedEntryParent::getRights()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetSelfLink">Zend_Gdata_App_FeedEntryParent::getSelfLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetService">Zend_Gdata_App_FeedEntryParent::getService()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetTitle">Zend_Gdata_App_FeedEntryParent::getTitle()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetTitleValue">Zend_Gdata_App_FeedEntryParent::getTitleValue()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodgetUpdated">Zend_Gdata_App_FeedEntryParent::getUpdated()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodlookupNamespace">Zend_Gdata_App_FeedEntryParent::lookupNamespace()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetAuthor">Zend_Gdata_App_FeedEntryParent::setAuthor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetCategory">Zend_Gdata_App_FeedEntryParent::setCategory()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetContributor">Zend_Gdata_App_FeedEntryParent::setContributor()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetEtag">Zend_Gdata_App_FeedEntryParent::setEtag()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetHttpClient">Zend_Gdata_App_FeedEntryParent::setHttpClient()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetId">Zend_Gdata_App_FeedEntryParent::setId()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetLink">Zend_Gdata_App_FeedEntryParent::setLink()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetMajorProtocolVersion">Zend_Gdata_App_FeedEntryParent::setMajorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetMinorProtocolVersion">Zend_Gdata_App_FeedEntryParent::setMinorProtocolVersion()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetRights">Zend_Gdata_App_FeedEntryParent::setRights()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetService">Zend_Gdata_App_FeedEntryParent::setService()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetTitle">Zend_Gdata_App_FeedEntryParent::setTitle()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodsetUpdated">Zend_Gdata_App_FeedEntryParent::setUpdated()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_FeedEntryParent.html#methodtakeChildFromDOM">Zend_Gdata_App_FeedEntryParent::takeChildFromDOM()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html">Zend_Gdata_App_Base</a></span></p>
+					<blockquote>
+													<img src="../../media/images/Constructor.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__construct">Zend_Gdata_App_Base::__construct()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodencode">Zend_Gdata_App_Base::encode()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodflushNamespaceLookupCache">Zend_Gdata_App_Base::flushNamespaceLookupCache()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetDOM">Zend_Gdata_App_Base::getDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetExtensionAttributes">Zend_Gdata_App_Base::getExtensionAttributes()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetExtensionElements">Zend_Gdata_App_Base::getExtensionElements()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetText">Zend_Gdata_App_Base::getText()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodgetXML">Zend_Gdata_App_Base::getXML()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodlookupNamespace">Zend_Gdata_App_Base::lookupNamespace()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodregisterAllNamespaces">Zend_Gdata_App_Base::registerAllNamespaces()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodregisterNamespace">Zend_Gdata_App_Base::registerNamespace()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsaveXML">Zend_Gdata_App_Base::saveXML()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsetExtensionAttributes">Zend_Gdata_App_Base::setExtensionAttributes()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsetExtensionElements">Zend_Gdata_App_Base::setExtensionElements()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodsetText">Zend_Gdata_App_Base::setText()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtakeAttributeFromDOM">Zend_Gdata_App_Base::takeAttributeFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtakeChildFromDOM">Zend_Gdata_App_Base::takeChildFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtransferFromDOM">Zend_Gdata_App_Base::transferFromDOM()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#methodtransferFromXML">Zend_Gdata_App_Base::transferFromXML()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__get">Zend_Gdata_App_Base::__get()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__isset">Zend_Gdata_App_Base::__isset()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__set">Zend_Gdata_App_Base::__set()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__toString">Zend_Gdata_App_Base::__toString()</a></span><br>
+													<img src="../../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../../Zend_Gdata/App/Zend_Gdata_App_Base.html#method__unset">Zend_Gdata_App_Base::__unset()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:00:59 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

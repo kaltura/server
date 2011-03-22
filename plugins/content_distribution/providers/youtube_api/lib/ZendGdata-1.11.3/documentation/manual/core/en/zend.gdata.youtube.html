@@ -1,0 +1,759 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Using the YouTube Data API - Zend Framework Manual</title>
+
+</head>
+<body>
+<table width="100%">
+    <tr valign="top">
+        <td width="85%">
+            <table width="100%">
+                <tr>
+                    <td width="25%" style="text-align: left;">
+                    <a href="zend.gdata.photos.html">Using Picasa Web Albums</a>
+                    </td>
+
+                    <td width="50%" style="text-align: center;">
+                        <div class="up"><span class="up"><a href="zend.gdata.html">Zend_Gdata</a></span><br />
+                        <span class="home"><a href="manual.html">Programmer's Reference Guide</a></span></div>
+                    </td>
+
+                    <td width="25%" style="text-align: right;">
+                        <div class="next" style="text-align: right; float: right;"><a href="zend.gdata.exception.html">Catching Gdata Exceptions</a></div>
+                    </td>
+                </tr>
+            </table>
+<hr />
+<div id="zend.gdata.youtube" class="section"><div class="info"><h1 class="title">Using the YouTube Data API</h1></div>
+    
+
+    <p class="para">
+        The YouTube Data <acronym class="acronym">API</acronym> offers read and write access to YouTube&#039;s content.
+        Users can perform unauthenticated requests to Google Data feeds to
+        retrieve feeds of popular videos, comments, public information about
+        YouTube user profiles, user playlists, favorites, subscriptions and so on.
+    </p>
+
+    <p class="para">
+        For more information on the YouTube Data <acronym class="acronym">API</acronym>, please refer
+        to the official <a href="http://code.google.com/apis/youtube/developers_guide_php.html" class="link external">&raquo; <acronym class="acronym">PHP</acronym>
+            Developer&#039;s Guide</a> on code.google.com.
+    </p>
+
+    <div class="section" id="zend.gdata.youtube.authentication" name="zend.gdata.youtube.authentication"><div class="info"><h1 class="title">Authentication</h1></div>
+        
+
+        <p class="para">
+            The YouTube Data <acronym class="acronym">API</acronym> allows read-only access to public data, which
+            does not require authentication. For any write requests, a user
+            needs to authenticate either using ClientLogin or AuthSub authentication. Please refer
+            to the <a href="http://code.google.com/apis/youtube/developers_guide_php.html#Authentication" class="link external">&raquo; Authentication
+                section in the <acronym class="acronym">PHP</acronym> Developer&#039;s Guide</a> for more detail.
+        </p>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.developer_key" name="zend.gdata.youtube.developer_key"><div class="info"><h1 class="title">Developer Keys and Client ID</h1></div>
+        
+
+        <p class="para">
+            A developer key identifies the YouTube developer that is submitting
+            an <acronym class="acronym">API</acronym> request. A client ID identifies your application for logging
+            and debugging purposes. Please visit <a href="http://code.google.com/apis/youtube/dashboard/" class="link external">&raquo; http://code.google.com/apis/youtube/dashboard/</a>
+            to obtain a developer key and client ID. The example below demonstrates how to pass the
+            developer key and client ID to the <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube.html" class="link external">&raquo; Zend_Gdata_YouTube</a>
+            service object.
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #1 Passing a Developer Key and ClientID to Zend_Gdata_YouTube</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$httpClient</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$applicationId</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$clientId</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$developerKey</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.videos" name="zend.gdata.youtube.videos"><div class="info"><h1 class="title">Retrieving public video feeds</h1></div>
+        
+
+        <p class="para">
+            The YouTube Data <acronym class="acronym">API</acronym> provides numerous feeds that return a list of
+            videos, such as standard feeds, related videos, video responses,
+            user&#039;s uploads, and user&#039;s favorites. For example, the
+            user&#039;s uploads feed returns all videos uploaded by a specific user. See the <a href="http://code.google.com/apis/youtube/reference.html#Video_Feeds" class="link external">&raquo; YouTube
+                <acronym class="acronym">API</acronym> reference guide</a> for a detailed list of available
+            feeds.
+        </p>
+
+        <div class="section" id="zend.gdata.youtube.videos.searching" name="zend.gdata.youtube.videos.searching"><div class="info"><h1 class="title">Searching for videos by metadata</h1></div>
+            
+
+            <p class="para">
+                You can retrieve a list of videos that match specified
+                search criteria, using the YouTubeQuery class. The following query
+                looks for videos which contain the word &quot;cat&quot; in their
+                metadata, starting with the 10th video and displaying 20
+                videos per page, ordered by the view count.
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #2 Searching for videos</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">newVideoQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">videoQuery</span> = <span style="color: #ff0000;">'cat'</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">startIndex</span> = <span style="color: #cc66cc;">10</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">maxResults</span> = <span style="color: #cc66cc;">20</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">orderBy</span> = <span style="color: #ff0000;">'viewCount'</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">queryUrl</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getVideoFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$videoFeed</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$videoEntry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;---------VIDEO----------<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;Title: &quot;</span> . <span style="color: #0000ff;">$videoEntry</span>-&gt;<span style="color: #006600;">getVideoTitle</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>Description:<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$videoEntry</span>-&gt;<span style="color: #006600;">getVideoDescription</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span><span style="color: #000099; font-weight: bold;">\n</span><span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+            </div>
+
+            <p class="para">
+                For more details on the different query parameters, please refer to the <a href="http://code.google.com/apis/youtube/reference.html#Searching_for_videos" class="link external">&raquo; 
+                    Reference Guide</a>. The available helper functions in <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoQuery.html" class="link external">&raquo; <span class="classname">Zend_Gdata_YouTube_VideoQuery</span></a>
+                for each of these parameters are described in more detail in the <a href="http://code.google.com/apis/youtube/developers_guide_php.html#SearchingVideos" class="link external">&raquo; PHP
+                    Developer&#039;s Guide</a>.
+            </p>
+        </div>
+
+        <div class="section" id="zend.gdata.youtube.videos.searchingcategories" name="zend.gdata.youtube.videos.searchingcategories"><div class="info"><h1 class="title">Searching for videos by categories and tags/keywords</h1></div>
+            
+
+            <p class="para">
+                Searching for videos in specific categories is done by generating a <a href="http://code.google.com/apis/youtube/reference.html#Category_search" class="link external">&raquo; specially
+                    formatted <acronym class="acronym">URL</acronym></a>. For example, to search for
+                comedy videos which contain the keyword dog:
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #3 Searching for videos in specific categories</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">newVideoQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">category</span> = <span style="color: #ff0000;">'Comedy/dog'</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">queryUrl</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getVideoFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.youtube.videos.standard" name="zend.gdata.youtube.videos.standard"><div class="info"><h1 class="title">Retrieving standard feeds</h1></div>
+            
+
+            <p class="para">
+                The YouTube Data <acronym class="acronym">API</acronym> has a number of <a href="http://code.google.com/apis/youtube/reference.html#Standard_feeds" class="link external">&raquo; standard
+                    feeds</a>. These standard feeds can be retrieved as <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoFeed.html" class="link external">&raquo; Zend_Gdata_YouTube_VideoFeed</a>
+                objects using the specified <acronym class="acronym">URL</acronym>s, using the predefined constants
+                within the <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube.html" class="link external">&raquo; Zend_Gdata_YouTube</a>
+                class (Zend_Gdata_YouTube::STANDARD_TOP_RATED_URI for example) or
+                using the predefined helper methods (see code listing below).
+            </p>
+
+            <p class="para">
+                To retrieve the top rated videos using the helper method:
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #4 Retrieving a standard video feed</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getTopRatedVideoFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+
+            <p class="para">
+                There are also query parameters to specify the time period
+                over which the standard feed is computed.
+            </p>
+
+            <p class="para">
+                For example, to retrieve the top rated videos for today:
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #5 Using a Zend_Gdata_YouTube_VideoQuery to Retrieve Videos</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">newVideoQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setTime</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'today'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getTopRatedVideoFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+
+            <p class="para">
+                Alternatively, you could just retrieve the feed using the
+                <acronym class="acronym">URL</acronym>:
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #6 Retrieving a video feed by URL</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$url</span> = <span style="color: #ff0000;">'http://gdata.youtube.com/feeds/standardfeeds/top_rated?time=today'</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getVideoFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$url</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.youtube.videos.user" name="zend.gdata.youtube.videos.user"><div class="info"><h1 class="title">Retrieving videos uploaded by a user</h1></div>
+            
+
+            <p class="para">
+                You can retrieve a list of videos uploaded by a particular user
+                using a simple helper method. This example retrieves videos
+                uploaded by the user &#039;liz&#039;.
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #7 Retrieving videos uploaded by a specific user</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getUserUploads</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'liz'</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.youtube.videos.favorites" name="zend.gdata.youtube.videos.favorites"><div class="info"><h1 class="title">Retrieving videos favorited by a user</h1></div>
+            
+
+            <p class="para">
+                You can retrieve a list of a user&#039;s favorite videos
+                using a simple helper method. This example retrieves videos
+                favorited by the user &#039;liz&#039;.
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #8 Retrieving a user&#039;s favorite videos</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getUserFavorites</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'liz'</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.youtube.videos.responses" name="zend.gdata.youtube.videos.responses"><div class="info"><h1 class="title">Retrieving video responses for a video</h1></div>
+            
+
+            <p class="para">
+                You can retrieve a list of a video&#039;s video responses
+                using a simple helper method. This example retrieves video
+                response for a video with the ID &#039;abc123813abc&#039;.
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #9 Retrieving a feed of video responses</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getVideoResponseFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'abc123813abc'</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.comments" name="zend.gdata.youtube.comments"><div class="info"><h1 class="title">Retrieving video comments</h1></div>
+        
+
+        <p class="para">
+            The comments for each YouTube video can be retrieved in
+            several ways. To retrieve the comments for the video with
+            the ID &#039;abc123813abc&#039;, use the following code:
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #10 Retrieving a feed of video comments from a video ID</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$commentFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getVideoCommentFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'abc123813abc'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$commentFeed</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$commentEntry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$commentEntry</span>-&gt;<span style="color: #006600;">title</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$commentEntry</span>-&gt;<span style="color: #006600;">content</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span><span style="color: #000099; font-weight: bold;">\n</span><span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+        </div>
+
+        <p class="para">
+            Comments can also be retrieved for a video if you have a copy of the <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html" class="link external">&raquo; Zend_Gdata_YouTube_VideoEntry</a>
+            object:
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #11 Retrieving a Feed of Video Comments from a Zend_Gdata_YouTube_VideoEntry</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$videoEntry</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getVideoEntry</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'abc123813abc'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// we don't know the video ID in this example, but we do have the URL</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$commentFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getVideoCommentFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #000000; font-weight: bold;">null</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #0000ff;">$videoEntry</span>-&gt;<span style="color: #006600;">comments</span>-&gt;<span style="color: #006600;">href</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.playlists" name="zend.gdata.youtube.playlists"><div class="info"><h1 class="title">Retrieving playlist feeds</h1></div>
+        
+
+        <p class="para">
+          The YouTube Data <acronym class="acronym">API</acronym> provides information about users, including
+            profiles, playlists, subscriptions, and more.
+        </p>
+
+        <div class="section" id="zend.gdata.youtube.playlists.user" name="zend.gdata.youtube.playlists.user"><div class="info"><h1 class="title">Retrieving the playlists of a user</h1></div>
+            
+
+            <p class="para">
+                The library provides a helper method to retrieve
+                the playlists associated with a given user. To retrieve the
+                playlists for the user &#039;liz&#039;:
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #12 Retrieving the playlists of a user</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$playlistListFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getPlaylistListFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'liz'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$playlistListFeed</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$playlistEntry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$playlistEntry</span>-&gt;<span style="color: #006600;">title</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$playlistEntry</span>-&gt;<span style="color: #006600;">description</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$playlistEntry</span>-&gt;<span style="color: #006600;">getPlaylistVideoFeedUrl</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span><span style="color: #000099; font-weight: bold;">\n</span><span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+            </div>
+        </div>
+
+        <div class="section" id="zend.gdata.youtube.playlists.special" name="zend.gdata.youtube.playlists.special"><div class="info"><h1 class="title">Retrieving a specific playlist</h1></div>
+            
+
+            <p class="para">
+                The library provides a helper method to retrieve
+                the videos associated with a given playlist. To retrieve the
+                playlists for a specific playlist entry:
+            </p>
+
+            <div class="example"><div class="info"><p><b>Example #13 Retrieving a specific playlist</b></p></div>
+                
+
+                <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feedUrl</span> = <span style="color: #0000ff;">$playlistEntry</span>-&gt;<span style="color: #006600;">getPlaylistVideoFeedUrl</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$playlistVideoFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getPlaylistVideoFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$feedUrl</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.subscriptions" name="zend.gdata.youtube.subscriptions"><div class="info"><h1 class="title">Retrieving a list of a user&#039;s subscriptions</h1></div>
+        
+
+        <p class="para">
+            A user can have several types of subscriptions: channel
+            subscription, tag subscription, or favorites subscription. A <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_SubscriptionEntry.html" class="link external">&raquo; Zend_Gdata_YouTube_SubscriptionEntry</a>
+            is used to represent individual subscriptions.
+        </p>
+
+        <p class="para">
+            To retrieve all subscriptions for the user &#039;liz&#039;:
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #14 Retrieving all subscriptions for a user</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$subscriptionFeed</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getSubscriptionFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'liz'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$subscriptionFeed</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$subscriptionEntry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$subscriptionEntry</span>-&gt;<span style="color: #006600;">title</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.profile" name="zend.gdata.youtube.profile"><div class="info"><h1 class="title">Retrieving a user&#039;s profile</h1></div>
+        
+
+        <p class="para">
+            You can retrieve the public profile information
+            for any YouTube user. To retrieve the profile
+            for the user &#039;liz&#039;:
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #15 Retrieving a user&#039;s profile</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$userProfile</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getUserProfile</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'liz'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;username: &quot;</span> . <span style="color: #0000ff;">$userProfile</span>-&gt;<span style="color: #006600;">username</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;age: &quot;</span> . <span style="color: #0000ff;">$userProfile</span>-&gt;<span style="color: #006600;">age</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;hometown: &quot;</span> . <span style="color: #0000ff;">$userProfile</span>-&gt;<span style="color: #006600;">hometown</span>-&gt;<span style="color: #006600;">text</span> . <span style="color: #ff0000;">&quot;<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.uploads" name="zend.gdata.youtube.uploads"><div class="info"><h1 class="title">Uploading Videos to YouTube</h1></div>
+        
+
+        <p class="para">
+            Please make sure to review the diagrams in the <a href="http://code.google.com/apis/youtube/developers_guide_protocol.html#Process_Flows_for_Uploading_Videos" class="link external">&raquo; protocol
+                guide</a> on code.google.com for a high-level
+            overview of the upload process. Uploading videos can be done in one of
+            two ways: either by uploading the video directly or by sending just the video
+            meta-data and having a user upload the video through an <acronym class="acronym">HTML</acronym> form.
+        </p>
+
+        <p class="para">
+            In order to upload a video directly, you must first construct a new <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html" class="link external">&raquo; Zend_Gdata_YouTube_VideoEntry</a>
+            object and specify some required meta-data. The following example shows uploading the
+            Quicktime video &quot;mytestmovie.mov&quot; to YouTube with the following properties:
+        </p>
+
+        <table class="doctable table"><div class="info"><caption><b>Metadata used in the code-sample below</b></caption></div>
+            
+
+            
+                <thead valign="middle">
+                    <tr valign="middle">
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody valign="middle" class="tbody">
+                    <tr valign="middle">
+                        <td align="left">Title</td>
+                        <td align="left">My Test Movie</td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">Category</td>
+                        <td align="left">Autos</td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">Keywords</td>
+                        <td align="left">cars, funny</td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">Description</td>
+                        <td align="left">My description</td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">Filename</td>
+                        <td align="left">mytestmovie.mov</td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">File <acronym class="acronym">MIME</acronym> type</td>
+                        <td align="left">video/quicktime</td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">Video private?</td>
+                        <td align="left"><b><tt>FALSE</tt></b></td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">Video location</td>
+                        <td align="left">37, -122 (lat, long)</td>
+                    </tr>
+
+
+                    <tr valign="middle">
+                        <td align="left">Developer Tags</td>
+                        <td align="left">mydevelopertag, anotherdevelopertag</td>
+                    </tr>
+
+                </tbody>
+            
+        </table>
+
+
+        <p class="para">
+            The code below creates a blank <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html" class="link external">&raquo; Zend_Gdata_YouTube_VideoEntry</a>
+            to be uploaded. A <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_App_MediaFileSource.html" class="link external">&raquo; Zend_Gdata_App_MediaFileSource</a>
+            object is then used to hold the actual video file. Under the hood, the <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_Extension_MediaGroup.html" class="link external">&raquo; Zend_Gdata_YouTube_Extension_MediaGroup</a>
+            object is used to hold all of the video&#039;s meta-data. Our helper methods detailed below
+            allow you to just set the video meta-data without having to worry about the media group
+            object. The $uploadUrl is the location where the new entry gets posted to.
+            This can be specified either with the $userName of the
+            currently authenticated user, or, alternatively, you can simply use the
+            string &#039;default&#039; to refer to the currently authenticated user.
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #16 Uploading a video</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$httpClient</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube_VideoEntry<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$filesource</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">newMediaFileSource</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'mytestmovie.mov'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$filesource</span>-&gt;<span style="color: #006600;">setContentType</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'video/quicktime'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$filesource</span>-&gt;<span style="color: #006600;">setSlug</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'mytestmovie.mov'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setMediaSource</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$filesource</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setVideoTitle</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'My Test Movie'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setVideoDescription</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'My Test Movie'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// Note that category must be a valid YouTube category !</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setVideoCategory</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'Comedy'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// Set keywords, note that this must be a comma separated string</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// and that each keyword cannot contain whitespace</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">SetVideoTags</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'cars, funny'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// Optionally set some developer tags</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setVideoDeveloperTags</span><span style="color: #66cc66;">&#40;</span><a href="http://www.php.net/array"><span style="color: #000066;">array</span></a><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'mydevelopertag'</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #ff0000;">'anotherdevelopertag'</span><span style="color: #66cc66;">&#41;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// Optionally set the video's location</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">registerPackage</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'Zend_Gdata_Geo'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">registerPackage</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'Zend_Gdata_Geo_Extension'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$where</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">newGeoRssWhere</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$position</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">newGmlPos</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'37.0 -122.0'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$where</span>-&gt;<span style="color: #006600;">point</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">newGmlPoint</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$position</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setWhere</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$where</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// Upload URI for the currently authenticated user</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$uploadUrl</span> =</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #ff0000;">'http://uploads.gdata.youtube.com/feeds/users/default/uploads'</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// Try to upload the video, catching a Zend_Gdata_App_HttpException</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// if availableor just a regular Zend_Gdata_App_Exception</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">try <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #0000ff;">$newEntry</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">insertEntry</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$myVideoEntry</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$uploadUrl</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #ff0000;">'Zend_Gdata_YouTube_VideoEntry'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span> catch <span style="color: #66cc66;">&#40;</span>Zend_Gdata_App_HttpException <span style="color: #0000ff;">$httpException</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$httpException</span>-&gt;<span style="color: #006600;">getRawResponseBody</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span> catch <span style="color: #66cc66;">&#40;</span>Zend_Gdata_App_Exception <span style="color: #0000ff;">$e</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$e</span>-&gt;<span style="color: #006600;">getMessage</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+        </div>
+
+        <p class="para">
+            To upload a video as private, simply use: $myVideoEntry-&gt;setVideoPrivate(); prior to
+            performing the upload. $videoEntry-&gt;isVideoPrivate() can be used to check whether a
+            video entry is private or not.
+        </p>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.uploads.browser" name="zend.gdata.youtube.uploads.browser"><div class="info"><h1 class="title">Browser-based upload</h1></div>
+        
+
+        <p class="para">
+            Browser-based uploading is performed almost identically to direct uploading,
+            except that you do not attach a <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_App_MediaFileSource.html" class="link external">&raquo; Zend_Gdata_App_MediaFileSource</a>
+            object to the <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html" class="link external">&raquo; Zend_Gdata_YouTube_VideoEntry</a>
+            you are constructing. Instead you simply submit all of your video&#039;s meta-data to receive
+            back a token element which can be used to construct an <acronym class="acronym">HTML</acronym> upload
+            form.
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #17 Browser-based upload</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$yt</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube<span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$httpClient</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>= <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_YouTube_VideoEntry<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setVideoTitle</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'My Test Movie'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setVideoDescription</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'My Test Movie'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// Note that category must be a valid YouTube category</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">setVideoCategory</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'Comedy'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$myVideoEntry</span>-&gt;<span style="color: #006600;">SetVideoTags</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'cars, funny'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$tokenHandlerUrl</span> = <span style="color: #ff0000;">'http://gdata.youtube.com/action/GetUploadToken'</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$tokenArray</span> = <span style="color: #0000ff;">$yt</span>-&gt;<span style="color: #006600;">getFormUploadToken</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$myVideoEntry</span>, <span style="color: #0000ff;">$tokenHandlerUrl</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$tokenValue</span> = <span style="color: #0000ff;">$tokenArray</span><span style="color: #66cc66;">&#91;</span><span style="color: #ff0000;">'token'</span><span style="color: #66cc66;">&#93;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$postUrl</span> = <span style="color: #0000ff;">$tokenArray</span><span style="color: #66cc66;">&#91;</span><span style="color: #ff0000;">'url'</span><span style="color: #66cc66;">&#93;</span>;</div></li></ol></div></div></div>
+
+        </div>
+
+        <p class="para">
+            The above code prints out a link and a token that is used to construct an
+            <acronym class="acronym">HTML</acronym> form to display in the user&#039;s browser. A simple example form is
+            shown below with $tokenValue representing the content of the returned token element,
+            as shown being retrieved from $myVideoEntry above. In order for the user
+            to be redirected to your website after submitting the form, make sure to
+            append a $nextUrl parameter to the $postUrl above, which functions in the
+            same way as the $next parameter of an AuthSub link. The only difference is
+            that here, instead of a single-use token, a status and an id variable are
+            returned in the <acronym class="acronym">URL</acronym>.
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #18 Browser-based upload: Creating the HTML form</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #808080; font-style: italic;">// place to redirect user after upload</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$nextUrl</span> = <span style="color: #ff0000;">'http://mysite.com/youtube_uploads'</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$form</span> = <span style="color: #ff0000;">'&lt;form action=&quot;'</span>. <span style="color: #0000ff;">$postUrl</span> .<span style="color: #ff0000;">'?nexturl='</span>. <span style="color: #0000ff;">$nextUrl</span> .</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">'&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;'</span>.</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">'&lt;input name=&quot;file&quot; type=&quot;file&quot;/&gt;'</span>.</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">'&lt;input name=&quot;token&quot; type=&quot;hidden&quot; value=&quot;'</span>. <span style="color: #0000ff;">$tokenValue</span> .<span style="color: #ff0000;">'&quot;/&gt;'</span>.</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">'&lt;input value=&quot;Upload Video File&quot; type=&quot;submit&quot; /&gt;'</span>.</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #ff0000;">'&lt;/form&gt;'</span>;</div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.uploads.status" name="zend.gdata.youtube.uploads.status"><div class="info"><h1 class="title">Checking upload status</h1></div>
+        
+
+        <p class="para">
+            After uploading a video, it will immediately be visible in an
+            authenticated user&#039;s uploads feed. However, it will not be public on
+            the site until it has been processed. Videos that have been rejected or
+            failed to upload successfully will also only be in the authenticated
+            user&#039;s uploads feed. The following code checks the status of a <a href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html" class="link external">&raquo; Zend_Gdata_YouTube_VideoEntry</a>
+            to see if it is not live yet or if it has been rejected.
+        </p>
+
+        <div class="example"><div class="info"><p><b>Example #19 Checking video upload status</b></p></div>
+            
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">try <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #0000ff;">$control</span> = <span style="color: #0000ff;">$videoEntry</span>-&gt;<span style="color: #006600;">getControl</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span> catch <span style="color: #66cc66;">&#40;</span>Zend_Gdata_App_Exception <span style="color: #0000ff;">$e</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$e</span>-&gt;<span style="color: #006600;">getMessage</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">if</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$control</span> instanceof Zend_Gdata_App_Extension_Control<span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #b1b100;">if</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$control</span>-&gt;<span style="color: #006600;">getDraft</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span> != <span style="color: #000000; font-weight: bold;">null</span> &amp;&amp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #0000ff;">$control</span>-&gt;<span style="color: #006600;">getDraft</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>-&gt;<span style="color: #006600;">getText</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span> == <span style="color: #ff0000;">'yes'</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #0000ff;">$state</span> = <span style="color: #0000ff;">$videoEntry</span>-&gt;<span style="color: #006600;">getVideoState</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #b1b100;">if</span> <span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$state</span> instanceof Zend_Gdata_YouTube_Extension_State<span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/print"><span style="color: #000066;">print</span></a> <span style="color: #ff0000;">'Upload status: '</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; . <span style="color: #0000ff;">$state</span>-&gt;<span style="color: #006600;">getName</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span style="color: #ff0000;">' '</span>. <span style="color: #0000ff;">$state</span>-&gt;<span style="color: #006600;">getText</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #66cc66;">&#125;</span> <span style="color: #b1b100;">else</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/print"><span style="color: #000066;">print</span></a> <span style="color: #ff0000;">'Not able to retrieve the video status information'</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span style="color: #ff0000;">' yet. '</span> . <span style="color: #ff0000;">&quot;Please try again shortly.<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #66cc66;">&#125;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; <span style="color: #66cc66;">&#125;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.youtube.other" name="zend.gdata.youtube.other"><div class="info"><h1 class="title">Other Functions</h1></div>
+        
+
+        <p class="para">
+            In addition to the functionality described above, the YouTube <acronym class="acronym">API</acronym>
+            contains many other functions that allow you to modify video meta-data,
+            delete video entries and use the full range of community features on the site. Some of
+            the community features that can be modified through the <acronym class="acronym">API</acronym> include:
+            ratings, comments, playlists, subscriptions, user profiles, contacts and messages.
+        </p>
+        <p class="para">
+            Please refer to the full documentation available in the <a href="http://code.google.com/apis/youtube/developers_guide_php.html" class="link external">&raquo; PHP Developer&#039;s
+                Guide</a> on code.google.com.
+        </p>
+    </div>
+</div>
+        <hr />
+
+            <table width="100%">
+                <tr>
+                    <td width="25%" style="text-align: left;">
+                    <a href="zend.gdata.photos.html">Using Picasa Web Albums</a>
+                    </td>
+
+                    <td width="50%" style="text-align: center;">
+                        <div class="up"><span class="up"><a href="zend.gdata.html">Zend_Gdata</a></span><br />
+                        <span class="home"><a href="manual.html">Programmer's Reference Guide</a></span></div>
+                    </td>
+
+                    <td width="25%" style="text-align: right;">
+                        <div class="next" style="text-align: right; float: right;"><a href="zend.gdata.exception.html">Catching Gdata Exceptions</a></div>
+                    </td>
+                </tr>
+            </table>
+</td>
+        <td style="font-size: smaller;" width="15%"> <style type="text/css">
+#leftbar {
+	float: left;
+	width: 186px;
+	padding: 5px;
+	font-size: smaller;
+}
+ul.toc {
+	margin: 0px 5px 5px 5px;
+	padding: 0px;
+}
+ul.toc li {
+	font-size: 85%;
+	margin: 1px 0 1px 1px;
+	padding: 1px 0 1px 11px;
+	list-style-type: none;
+	background-repeat: no-repeat;
+	background-position: center left;
+}
+ul.toc li.header {
+	font-size: 115%;
+	padding: 5px 0px 5px 11px;
+	border-bottom: 1px solid #cccccc;
+	margin-bottom: 5px;
+}
+ul.toc li.active {
+	font-weight: bold;
+}
+ul.toc li a {
+	text-decoration: none;
+}
+ul.toc li a:hover {
+	text-decoration: underline;
+}
+</style>
+ <ul class="toc">
+  <li class="header home"><a href="manual.html">Programmer's Reference Guide</a></li>
+  <li class="header up"><a href="manual.html">Programmer's Reference Guide</a></li>
+  <li class="header up"><a href="zend.gdata.html">Zend_Gdata</a></li>
+  <li><a href="zend.gdata.introduction.html">Introduction</a></li>
+  <li><a href="zend.gdata.authsub.html">Authenticating with AuthSub</a></li>
+  <li><a href="zend.gdata.books.html">Using the Book Search Data API</a></li>
+  <li><a href="zend.gdata.clientlogin.html">Authenticating with ClientLogin</a></li>
+  <li><a href="zend.gdata.calendar.html">Using Google Calendar</a></li>
+  <li><a href="zend.gdata.docs.html">Using Google Documents List Data API</a></li>
+  <li><a href="zend.gdata.health.html">Using Google Health</a></li>
+  <li><a href="zend.gdata.spreadsheets.html">Using Google Spreadsheets</a></li>
+  <li><a href="zend.gdata.gapps.html">Using Google Apps Provisioning</a></li>
+  <li><a href="zend.gdata.gbase.html">Using Google Base</a></li>
+  <li><a href="zend.gdata.photos.html">Using Picasa Web Albums</a></li>
+  <li class="active"><a href="zend.gdata.youtube.html">Using the YouTube Data API</a></li>
+  <li><a href="zend.gdata.exception.html">Catching Gdata Exceptions</a></li>
+ </ul>
+ </td>
+    </tr>
+</table>
+</body>
+</html>

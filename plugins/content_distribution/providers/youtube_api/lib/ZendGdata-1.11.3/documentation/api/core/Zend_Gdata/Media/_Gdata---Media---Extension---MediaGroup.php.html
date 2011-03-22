@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs for page MediaGroup.php</title>
+			<link rel="stylesheet" href="../../media/stylesheet.css" />
+						<script src="../../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../../media/images/plus.png";
+				imgMinus.src = "../../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="file-name"><img src="../../media/images/Page_logo.png" alt="File" style="vertical-align: middle">/Gdata/Media/Extension/MediaGroup.php</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-classes">Classes</a>
+			|							<a href="#sec-includes">Includes</a>
+												</div>
+	<div class="info-box-body">	
+		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Zend Framework</p>
+<p class="description"><p>LICENSE</p><p>This source file is subject to the new BSD license that is bundled  with this package in the file LICENSE.txt.  It is also available through the world-wide-web at this URL:  http://framework.zend.com/license/new-bsd  If you did not receive a copy of the license and are unable to  obtain it through the world-wide-web, please send an email  to license@zend.com so we can send you a copy immediately.</p></p>
+	<ul class="tags">
+				<li><span class="field">version:</span> $Id: MediaGroup.php 20096 2010-01-06 02:05:09Z bkarwin $</li>
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		
+			</div>
+</div>
+		
+	<a name="sec-classes"></a>	
+	<div class="info-box">
+		<div class="info-box-title">Classes</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Classes</span>
+			|							<a href="#sec-includes">Includes</a>
+																		</div>
+		<div class="info-box-body">	
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em; vertical-align: top; white-space: nowrap">
+						<img src="../../media/images/Class.png"
+								 alt=" class"
+								 title=" class"/>
+						<a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaGroup.html">Zend_Gdata_Media_Extension_MediaGroup</a>
+					</td>
+					<td>
+											This class represents the media:group element of Media RSS.
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+	<a name="sec-includes"></a>	
+	<div class="info-box">
+		<div class="info-box-title">Includes</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-classes">Classes</a>
+				|						<span class="disabled">Includes</span>
+														</div>
+		<div class="info-box-body">	
+			<a name="_Zend/Gdata/Media/Extension/MediaCategory_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaCategory.php'</span>)
+			(line <span class="line-number">42</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaCategory.html">Zend_Gdata_Media_Extension_MediaCategory</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Entry_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Entry.php'</span>)
+			(line <span class="line-number">32</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Gdata/Zend_Gdata_Entry.html">Zend_Gdata_Entry</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaCopyright_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaCopyright.php'</span>)
+			(line <span class="line-number">47</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaCopyright.html">Zend_Gdata_Media_Extension_MediaCopyright</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaDescription_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaDescription.php'</span>)
+			(line <span class="line-number">57</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaDescription.html">Zend_Gdata_Media_Extension_MediaDescription</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Extension_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Extension.php'</span>)
+			(line <span class="line-number">27</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Gdata/Zend_Gdata_Extension.html">Zend_Gdata_Extension</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaCredit_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaCredit.php'</span>)
+			(line <span class="line-number">52</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaCredit.html">Zend_Gdata_Media_Extension_MediaCredit</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaContent_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaContent.php'</span>)
+			(line <span class="line-number">37</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaContent.html">Zend_Gdata_Media_Extension_MediaContent</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaHash_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaHash.php'</span>)
+			(line <span class="line-number">62</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaHash.html">Zend_Gdata_Media_Extension_MediaHash</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaRestriction_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaRestriction.php'</span>)
+			(line <span class="line-number">82</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaRestriction.html">Zend_Gdata_Media_Extension_MediaRestriction</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaPlayer_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaPlayer.php'</span>)
+			(line <span class="line-number">72</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaPlayer.html">Zend_Gdata_Media_Extension_MediaPlayer</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaText_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaText.php'</span>)
+			(line <span class="line-number">87</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaText.html">Zend_Gdata_Media_Extension_MediaText</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaTitle_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaTitle.php'</span>)
+			(line <span class="line-number">97</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaTitle.html">Zend_Gdata_Media_Extension_MediaTitle</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaKeywords_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaKeywords.php'</span>)
+			(line <span class="line-number">67</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaKeywords.html">Zend_Gdata_Media_Extension_MediaKeywords</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaThumbnail_php"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaThumbnail.php'</span>)
+			(line <span class="line-number">92</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaThumbnail.html">Zend_Gdata_Media_Extension_MediaThumbnail</a></li>
+			</ul>
+	
+</div>
+<a name="_Zend/Gdata/Media/Extension/MediaRating_php"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<img src="../../media/images/Page.png" alt=" " />
+		<span class="include-title">
+			<span class="include-type">require_once</span>
+			(<span class="include-name">'Zend/Gdata/Media/Extension/MediaRating.php'</span>)
+			(line <span class="line-number">77</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="../../Zend_Gdata/Media/Zend_Gdata_Media_Extension_MediaRating.html">Zend_Gdata_Media_Extension_MediaRating</a></li>
+			</ul>
+	
+</div>
+		</div>
+	</div>
+	
+	
+	
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:02:18 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

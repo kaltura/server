@@ -1,0 +1,481 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Using Google Spreadsheets - Zend Framework Manual</title>
+
+</head>
+<body>
+<table width="100%">
+    <tr valign="top">
+        <td width="85%">
+            <table width="100%">
+                <tr>
+                    <td width="25%" style="text-align: left;">
+                    <a href="zend.gdata.health.html">Using Google Health</a>
+                    </td>
+
+                    <td width="50%" style="text-align: center;">
+                        <div class="up"><span class="up"><a href="zend.gdata.html">Zend_Gdata</a></span><br />
+                        <span class="home"><a href="manual.html">Programmer's Reference Guide</a></span></div>
+                    </td>
+
+                    <td width="25%" style="text-align: right;">
+                        <div class="next" style="text-align: right; float: right;"><a href="zend.gdata.gapps.html">Using Google Apps Provisioning</a></div>
+                    </td>
+                </tr>
+            </table>
+<hr />
+<div id="zend.gdata.spreadsheets" class="section"><div class="info"><h1 class="title">Using Google Spreadsheets</h1></div>
+    
+
+    <p class="para">
+        The Google Spreadsheets data <acronym class="acronym">API</acronym> allows client applications to view
+        and update Spreadsheets content in the form of Google data <acronym class="acronym">API</acronym> feeds.
+        Your client application can request a list of a user&#039;s spreadsheets,
+        edit or delete content in an existing Spreadsheets worksheet, and
+        query the content in an existing Spreadsheets worksheet.
+    </p>
+
+    <p class="para">
+        See <a href="http://code.google.com/apis/spreadsheets/overview.html" class="link external">&raquo; http://code.google.com/apis/spreadsheets/overview.html</a>
+        for more information about the Google Spreadsheets <acronym class="acronym">API</acronym>.
+    </p>
+
+    <div class="section" id="zend.gdata.spreadsheets.creating" name="zend.gdata.spreadsheets.creating"><div class="info"><h1 class="title">Create a Spreadsheet</h1></div>
+        
+
+        <p class="para">
+            The Spreadsheets data <acronym class="acronym">API</acronym> does not currently provide a way to
+            programmatically create or delete a spreadsheet.
+        </p>
+    </div>
+
+    <div class="section" id="zend.gdata.spreadsheets.listspreadsheets" name="zend.gdata.spreadsheets.listspreadsheets"><div class="info"><h1 class="title">Get a List of Spreadsheets</h1></div>
+        
+
+        <p class="para">
+            You can get a list of spreadsheets for a particular user by using
+            the  <span class="methodname">getSpreadsheetFeed()</span> method of the Spreadsheets
+            service. The service will return a
+            <span class="classname">Zend_Gdata_Spreadsheets_SpreadsheetFeed</span> object
+            containing a list of spreadsheets associated with the authenticated
+            user.
+        </p>
+
+        <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$service</span> = Zend_Gdata_Spreadsheets::<span style="color: #006600;">AUTH_SERVICE_NAME</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$client</span> = Zend_Gdata_ClientLogin::<span style="color: #006600;">getHttpClient</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$user</span>, <span style="color: #0000ff;">$pass</span>, <span style="color: #0000ff;">$service</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$spreadsheetService</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Spreadsheets<span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$client</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">getSpreadsheetFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+    </div>
+
+     <div class="section" id="zend.gdata.spreadsheets.listworksheets" name="zend.gdata.spreadsheets.listworksheets"><div class="info"><h1 class="title">Get a List of Worksheets</h1></div>
+        
+
+        <p class="para">
+            A given spreadsheet may contain multiple worksheets. For each
+            spreadsheet, there&#039;s a worksheets metafeed listing all the
+            worksheets in that spreadsheet.
+        </p>
+
+        <p class="para">
+            Given the spreadsheet key from the &lt;id&gt; of a
+            <span class="classname">Zend_Gdata_Spreadsheets_SpreadsheetEntry</span>
+            object you&#039;ve already retrieved, you can fetch a feed
+            containing a list of worksheets associated with that spreadsheet.
+        </p>
+
+        <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Spreadsheets_DocumentQuery<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setSpreadsheetKey</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$spreadsheetKey</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">getWorksheetFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+        <p class="para">
+            The resulting <span class="classname">Zend_Gdata_Spreadsheets_WorksheetFeed</span>
+            object feed represents the response from the server. Among other
+            things, this feed contains a list of
+            <span class="classname">Zend_Gdata_Spreadsheets_WorksheetEntry </span>
+            objects (<strong class="command">$feed-&gt;entries</strong>), each of which represents a
+            single worksheet.
+        </p>
+    </div>
+
+    <div class="section" id="zend.gdata.spreadsheets.listfeeds" name="zend.gdata.spreadsheets.listfeeds"><div class="info"><h1 class="title">Interacting With List-based Feeds</h1></div>
+        
+
+        <p class="para">
+            A given worksheet generally contains multiple rows, each
+            containing multiple cells. You can request data from the
+            worksheet either as a list-based feed, in which each entry
+            represents a row, or as a cell-based feed, in which each
+            entry represents a single cell. For information on cell-based feeds, see <a href="zend.gdata.spreadsheets.html#zend.gdata.spreadsheets.cellfeeds" class="link">Interacting with cell-based
+                feeds</a>.
+        </p>
+
+        <p class="para">
+            The following sections describe how to get a list-based feed,
+            add a row to a worksheet, and send queries with various query
+            parameters.
+        </p>
+
+        <p class="para">
+            The list feed makes some assumptions about how the data is laid
+            out in the spreadsheet.
+        </p>
+
+        <p class="para">
+            In particular, the list feed treats the first row of the
+            worksheet as a header row; Spreadsheets dynamically creates
+            <acronym class="acronym">XML</acronym> elements named after the contents of header-row cells.
+            Users who want to provide Gdata feeds should not put any data
+            other than column headers in the first row of a worksheet.
+        </p>
+
+        <p class="para">
+            The list feed contains all rows after the first row up to the
+            first blank row. The first blank row terminates the data set.
+            If expected data isn&#039;t appearing in a feed, check the worksheet
+            manually to see whether there&#039;s an unexpected blank row in the
+            middle of the data. In particular, if the second row of the
+            spreadsheet is blank, then the list feed will contain no data.
+        </p>
+
+        <p class="para">
+            A row in a list feed is as many columns wide as the worksheet itself.
+        </p>
+
+        <div class="section" id="zend.gdata.spreadsheets.listfeeds.get" name="zend.gdata.spreadsheets.listfeeds.get"><div class="info"><h1 class="title">Get a List-based Feed</h1></div>
+            
+
+            <p class="para">
+                To retrieve a worksheet&#039;s list feed, use the
+                 <span class="methodname">getListFeed()</span> method of the Spreadsheets service.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Spreadsheets_ListQuery<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setSpreadsheetKey</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$spreadsheetKey</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setWorksheetId</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$worksheetId</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$listFeed</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">getListFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                The resulting <span class="classname">Zend_Gdata_Spreadsheets_ListFeed</span>
+                object <var class="varname">$listfeed</var> represents a response from the
+                server. Among other things, this feed contains an array of
+                <span class="classname">Zend_Gdata_Spreadsheets_ListEntry</span> objects
+                (<strong class="command">$listFeed-&gt;entries</strong>), each of which represents
+                a single row in a worksheet.
+            </p>
+
+            <p class="para">
+                Each <span class="classname">Zend_Gdata_Spreadsheets_ListEntry</span> contains an
+                array, <span class="property">custom</span>, which contains the data for that
+                row. You can extract and display this array:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$rowData</span> = <span style="color: #0000ff;">$listFeed</span>-&gt;<span style="color: #006600;">entries</span><span style="color: #66cc66;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #66cc66;">&#93;</span>-&gt;<span style="color: #006600;">getCustom</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$rowData</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$customEntry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$customEntry</span>-&gt;<span style="color: #006600;">getColumnName</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span> . <span style="color: #ff0000;">&quot; = &quot;</span> . <span style="color: #0000ff;">$customEntry</span>-&gt;<span style="color: #006600;">getText</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+
+            <p class="para">
+                An alternate version of this array, <span class="property">customByName</span>,
+                allows direct access to an entry&#039;s cells by name. This is
+                convenient when trying to access a specific header:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$customEntry</span> = <span style="color: #0000ff;">$listFeed</span>-&gt;<span style="color: #006600;">entries</span><span style="color: #66cc66;">&#91;</span><span style="color: #cc66cc;">1</span><span style="color: #66cc66;">&#93;</span>-&gt;<span style="color: #006600;">getCustomByName</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'my_heading'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #0000ff;">$customEntry</span>-&gt;<span style="color: #006600;">getColumnName</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span> . <span style="color: #ff0000;">&quot; = &quot;</span> . <span style="color: #0000ff;">$customEntry</span>-&gt;<span style="color: #006600;">getText</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+        </div>
+
+        <div class="section" id="zend.gdata.spreadsheets.listfeeds.reverse" name="zend.gdata.spreadsheets.listfeeds.reverse"><div class="info"><h1 class="title">Reverse-sort Rows</h1></div>
+            
+
+            <p class="para">
+                By default, rows in the feed appear in the same order as the
+                corresponding rows in the GUI; that is, they&#039;re in order by
+                row number. To get rows in reverse order, set the reverse
+                properties of the <span class="classname">Zend_Gdata_Spreadsheets_ListQuery</span>
+                object to <b><tt>TRUE</tt></b>:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Spreadsheets_ListQuery<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setSpreadsheetKey</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$spreadsheetKey</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setWorksheetId</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$worksheetId</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setReverse</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'true'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$listFeed</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">getListFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                Note that if you want to order (or reverse sort) by a
+                particular column, rather than by position in the worksheet,
+                you can set the <span class="property">orderby</span> value of the
+                <span class="classname">Zend_Gdata_Spreadsheets_ListQuery</span> object to
+                <em class="emphasis">column:&lt;the header of that column&gt;</em>.
+            </p>
+        </div>
+
+        <div class="section" id="zend.gdata.spreadsheets.listfeeds.sq" name="zend.gdata.spreadsheets.listfeeds.sq"><div class="info"><h1 class="title">Send a Structured Query</h1></div>
+            
+
+            <p class="para">
+                You can set a <span class="classname">Zend_Gdata_Spreadsheets_ListQuery</span>&#039;s
+                <span class="property">sq</span> value to produce a feed with entries that meet
+                the specified criteria. For example, suppose you have a worksheet
+                containing personnel data, in which each row represents
+                information about a single person. You wish to retrieve all rows
+                in which the person&#039;s name is &quot;John&quot; and the person&#039;s age is over
+                25. To do so, you would set <span class="property">sq</span> as follows:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Spreadsheets_ListQuery<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setSpreadsheetKey</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$spreadsheetKey</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setWorksheetId</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$worksheetId</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setSpreadsheetQuery</span><span style="color: #66cc66;">&#40;</span><span style="color: #ff0000;">'name=John and age&gt;25'</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$listFeed</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">getListFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+        </div>
+
+        <div class="section" id="zend.gdata.spreadsheets.listfeeds.addrow" name="zend.gdata.spreadsheets.listfeeds.addrow"><div class="info"><h1 class="title">Add a Row</h1></div>
+            
+
+            <p class="para">
+                Rows can be added to a spreadsheet by using the
+                 <span class="methodname">insertRow()</span> method of the Spreadsheet service.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$insertedListEntry</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">insertRow</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$rowData</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #0000ff;">$spreadsheetKey</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style="color: #0000ff;">$worksheetId</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                The <var class="varname">$rowData</var> parameter contains an array of column
+                keys to data values. The method returns a
+                <span class="classname">Zend_Gdata_Spreadsheets_SpreadsheetsEntry</span> object
+                which represents the inserted row.
+            </p>
+
+            <p class="para">
+                Spreadsheets inserts the new row immediately after the last row
+                that appears in the list-based feed, which is to say
+                immediately before the first entirely blank row.
+            </p>
+        </div>
+
+        <div class="section" id="zend.gdata.spreadsheets.listfeeds.editrow" name="zend.gdata.spreadsheets.listfeeds.editrow"><div class="info"><h1 class="title">Edit a Row</h1></div>
+            
+
+            <p class="para">
+                Once a <span class="classname">Zend_Gdata_Spreadsheets_ListEntry</span> object
+                is fetched, its rows can be updated by using the
+                 <span class="methodname">updateRow()</span> method of the Spreadsheet service.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$updatedListEntry</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">updateRow</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$oldListEntry</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$newRowData</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                The <var class="varname">$oldListEntry</var> parameter contains the list entry
+                to be updated. <var class="varname">$newRowData</var> contains an array of
+                column keys to data values, to be used as the new row data.
+                The method returns a
+                <span class="classname">Zend_Gdata_Spreadsheets_SpreadsheetsEntry</span> object
+                which represents the updated row.
+            </p>
+        </div>
+
+        <div class="section" id="zend.gdata.spreadsheets.listfeeds.deleterow" name="zend.gdata.spreadsheets.listfeeds.deleterow"><div class="info"><h1 class="title">Delete a Row</h1></div>
+            
+
+            <p class="para">
+                To delete a row, simply invoke  <span class="methodname">deleteRow()</span> on the
+                <span class="classname">Zend_Gdata_Spreadsheets</span> object with the existing
+                entry to be deleted:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">deleteRow</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$listEntry</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                Alternatively, you can call the  <span class="methodname">delete()</span> method of
+                the entry itself:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$listEntry</span>-&gt;<span style="color: #006600;">delete</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+        </div>
+    </div>
+
+    <div class="section" id="zend.gdata.spreadsheets.cellfeeds" name="zend.gdata.spreadsheets.cellfeeds"><div class="info"><h1 class="title">Interacting With Cell-based Feeds</h1></div>
+        
+
+        <p class="para">
+            In a cell-based feed, each entry represents a single cell.
+        </p>
+
+        <p class="para">
+            Note that we don&#039;t recommend interacting with both a cell-based
+            feed and a list-based feed for the same worksheet at the same time.
+        </p>
+
+        <div class="section" id="zend.gdata.spreadsheets.cellfeeds.get" name="zend.gdata.spreadsheets.cellfeeds.get"><div class="info"><h1 class="title">Get a Cell-based Feed</h1></div>
+            
+
+            <p class="para">
+                To retrieve a worksheet&#039;s cell feed, use the
+                 <span class="methodname">getCellFeed()</span> method of the Spreadsheets service.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Spreadsheets_CellQuery<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setSpreadsheetKey</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$spreadsheetKey</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setWorksheetId</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$worksheetId</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$cellFeed</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">getCellFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                The resulting <span class="classname">Zend_Gdata_Spreadsheets_CellFeed</span>
+                object <var class="varname">$cellFeed</var> represents a response from the
+                server. Among other things, this feed contains an array of
+                <span class="classname">Zend_Gdata_Spreadsheets_CellEntry</span> objects
+                (<strong class="command">$cellFeed&gt;entries</strong>), each of which represents
+                a single cell in a worksheet. You can display this information:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #b1b100;">foreach</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$cellFeed</span> <span style="color: #b1b100;">as</span> <span style="color: #0000ff;">$cellEntry</span><span style="color: #66cc66;">&#41;</span> <span style="color: #66cc66;">&#123;</span></div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; <span style="color: #0000ff;">$row</span> = <span style="color: #0000ff;">$cellEntry</span>-&gt;<span style="color: #006600;">cell</span>-&gt;<span style="color: #006600;">getRow</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; <span style="color: #0000ff;">$col</span> = <span style="color: #0000ff;">$cellEntry</span>-&gt;<span style="color: #006600;">cell</span>-&gt;<span style="color: #006600;">getColumn</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; <span style="color: #0000ff;">$val</span> = <span style="color: #0000ff;">$cellEntry</span>-&gt;<span style="color: #006600;">cell</span>-&gt;<span style="color: #006600;">getText</span><span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; <a href="http://www.php.net/echo"><span style="color: #000066;">echo</span></a> <span style="color: #ff0000;">&quot;$row, $col = $val<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #66cc66;">&#125;</span></div></li></ol></div></div></div>
+
+        </div>
+
+        <div class="section" id="zend.gdata.spreadsheets.cellfeeds.cellrangequery" name="zend.gdata.spreadsheets.cellfeeds.cellrangequery"><div class="info"><h1 class="title">Send a Cell Range Query</h1></div>
+            
+
+            <p class="para">
+                Suppose you wanted to retrieve the cells in the first column
+                of a worksheet. You can request a cell feed containing only
+                this column as follows:
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span> = <span style="color: #000000; font-weight: bold;">new</span> Zend_Gdata_Spreadsheets_CellQuery<span style="color: #66cc66;">&#40;</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setMinCol</span><span style="color: #66cc66;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setMaxCol</span><span style="color: #66cc66;">&#40;</span><span style="color: #cc66cc;">1</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$query</span>-&gt;<span style="color: #006600;">setMinRow</span><span style="color: #66cc66;">&#40;</span><span style="color: #cc66cc;">2</span><span style="color: #66cc66;">&#41;</span>;</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$feed</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">getCellsFeed</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$query</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                This requests all the data in column 1, starting with row 2.
+            </p>
+        </div>
+
+        <div class="section" id="zend.gdata.spreadsheets.cellfeeds.updatecell" name="zend.gdata.spreadsheets.cellfeeds.updatecell"><div class="info"><h1 class="title">Change Contents of a Cell</h1></div>
+            
+
+            <p class="para">
+                To modify the contents of a cell, call
+                 <span class="methodname">updateCell()</span> with the row, column,
+                and new value of the cell.
+            </p>
+
+            <div class="programlisting php"><div class="phpcode"><div class="php" style="font-family: monospace;"><ol><li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;"><span style="color: #0000ff;">$updatedCell</span> = <span style="color: #0000ff;">$spreadsheetService</span>-&gt;<span style="color: #006600;">updateCell</span><span style="color: #66cc66;">&#40;</span><span style="color: #0000ff;">$row</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$col</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$inputValue</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$spreadsheetKey</span>,</div></li>
+<li style="font-family: 'Courier New', Courier, monospace; color: black; font-weight: normal; font-style: normal;"><div style="font-family: 'Courier New', Courier, monospace; font-weight: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color: #0000ff;">$worksheetId</span><span style="color: #66cc66;">&#41;</span>;</div></li></ol></div></div></div>
+
+
+            <p class="para">
+                The new data is placed in the specified cell in the worksheet.
+                If the specified cell contains data already, it will be
+                overwritten. Note: Use  <span class="methodname">updateCell()</span> to change
+                the data in a cell, even if the cell is empty.
+            </p>
+        </div>
+    </div>
+</div>
+        <hr />
+
+            <table width="100%">
+                <tr>
+                    <td width="25%" style="text-align: left;">
+                    <a href="zend.gdata.health.html">Using Google Health</a>
+                    </td>
+
+                    <td width="50%" style="text-align: center;">
+                        <div class="up"><span class="up"><a href="zend.gdata.html">Zend_Gdata</a></span><br />
+                        <span class="home"><a href="manual.html">Programmer's Reference Guide</a></span></div>
+                    </td>
+
+                    <td width="25%" style="text-align: right;">
+                        <div class="next" style="text-align: right; float: right;"><a href="zend.gdata.gapps.html">Using Google Apps Provisioning</a></div>
+                    </td>
+                </tr>
+            </table>
+</td>
+        <td style="font-size: smaller;" width="15%"> <style type="text/css">
+#leftbar {
+	float: left;
+	width: 186px;
+	padding: 5px;
+	font-size: smaller;
+}
+ul.toc {
+	margin: 0px 5px 5px 5px;
+	padding: 0px;
+}
+ul.toc li {
+	font-size: 85%;
+	margin: 1px 0 1px 1px;
+	padding: 1px 0 1px 11px;
+	list-style-type: none;
+	background-repeat: no-repeat;
+	background-position: center left;
+}
+ul.toc li.header {
+	font-size: 115%;
+	padding: 5px 0px 5px 11px;
+	border-bottom: 1px solid #cccccc;
+	margin-bottom: 5px;
+}
+ul.toc li.active {
+	font-weight: bold;
+}
+ul.toc li a {
+	text-decoration: none;
+}
+ul.toc li a:hover {
+	text-decoration: underline;
+}
+</style>
+ <ul class="toc">
+  <li class="header home"><a href="manual.html">Programmer's Reference Guide</a></li>
+  <li class="header up"><a href="manual.html">Programmer's Reference Guide</a></li>
+  <li class="header up"><a href="zend.gdata.html">Zend_Gdata</a></li>
+  <li><a href="zend.gdata.introduction.html">Introduction</a></li>
+  <li><a href="zend.gdata.authsub.html">Authenticating with AuthSub</a></li>
+  <li><a href="zend.gdata.books.html">Using the Book Search Data API</a></li>
+  <li><a href="zend.gdata.clientlogin.html">Authenticating with ClientLogin</a></li>
+  <li><a href="zend.gdata.calendar.html">Using Google Calendar</a></li>
+  <li><a href="zend.gdata.docs.html">Using Google Documents List Data API</a></li>
+  <li><a href="zend.gdata.health.html">Using Google Health</a></li>
+  <li class="active"><a href="zend.gdata.spreadsheets.html">Using Google Spreadsheets</a></li>
+  <li><a href="zend.gdata.gapps.html">Using Google Apps Provisioning</a></li>
+  <li><a href="zend.gdata.gbase.html">Using Google Base</a></li>
+  <li><a href="zend.gdata.photos.html">Using Picasa Web Albums</a></li>
+  <li><a href="zend.gdata.youtube.html">Using the YouTube Data API</a></li>
+  <li><a href="zend.gdata.exception.html">Catching Gdata Exceptions</a></li>
+ </ul>
+ </td>
+    </tr>
+</table>
+</body>
+</html>

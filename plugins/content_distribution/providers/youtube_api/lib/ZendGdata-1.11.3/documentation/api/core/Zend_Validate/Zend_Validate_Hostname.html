@@ -1,0 +1,1434 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title>Docs For Class Zend_Validate_Hostname</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+						<script src="../media/lib/classTree.js"></script>
+												<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "../media/images/plus.png";
+				imgMinus.src = "../media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name"><img src="../media/images/Class_logo.png"
+														alt=" Class"
+														title=" Class"
+														style="vertical-align: middle"> Zend_Validate_Hostname</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+											<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+						
+			</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Please note there are two standalone test scripts for testing IDN characters due to problems  with file encoding.</p>
+<p class="description"><p>The first is tests/Zend/Validate/HostnameTestStandalone.php which is designed to be run on  the command line.</p><p>The second is tests/Zend/Validate/HostnameTestForm.php which is designed to be run via HTML  to allow users to test entering UTF-8 characters in a form.</p></p>
+	<ul class="tags">
+				<li><span class="field">copyright:</span> Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)</li>
+				<li><span class="field">license:</span> <a href="http://framework.zend.com/license/new-bsd">New BSD License</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_Validate---Hostname.php.html">/Validate/Hostname.php</a> (line <span class="field">47</span>)
+		</p>
+		
+				
+		<pre><a href="../Zend_Validate/Zend_Validate_Abstract.html">Zend_Validate_Abstract</a>
+   |
+   --Zend_Validate_Hostname</pre>
+	
+			</div>
+</div>
+
+
+	<a name="sec-const-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constant Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Constants</span> (<a href="#sec-consts">details</a>)
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="const-summary">
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#ALLOW_ALL" title="details" class="const-name">ALLOW_ALL</a> = 					<span class="var-type"> 7</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#ALLOW_DNS" title="details" class="const-name">ALLOW_DNS</a> = 					<span class="var-type"> 1</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#ALLOW_IP" title="details" class="const-name">ALLOW_IP</a> = 					<span class="var-type"> 2</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#ALLOW_LOCAL" title="details" class="const-name">ALLOW_LOCAL</a> = 					<span class="var-type"> 4</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#ALLOW_URI" title="details" class="const-name">ALLOW_URI</a> = 					<span class="var-type"> 8</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#CANNOT_DECODE_PUNYCODE" title="details" class="const-name">CANNOT_DECODE_PUNYCODE</a> = 					<span class="var-type"> 'hostnameCannotDecodePunycode'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#INVALID" title="details" class="const-name">INVALID</a> = 					<span class="var-type"> 'hostnameInvalid'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#INVALID_DASH" title="details" class="const-name">INVALID_DASH</a> = 					<span class="var-type"> 'hostnameDashCharacter'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#INVALID_HOSTNAME" title="details" class="const-name">INVALID_HOSTNAME</a> = 					<span class="var-type"> 'hostnameInvalidHostname'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#INVALID_HOSTNAME_SCHEMA" title="details" class="const-name">INVALID_HOSTNAME_SCHEMA</a> = 					<span class="var-type"> 'hostnameInvalidHostnameSchema'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#INVALID_LOCAL_NAME" title="details" class="const-name">INVALID_LOCAL_NAME</a> = 					<span class="var-type"> 'hostnameInvalidLocalName'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#INVALID_URI" title="details" class="const-name">INVALID_URI</a> = 					<span class="var-type"> 'hostnameInvalidUri'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#IP_ADDRESS_NOT_ALLOWED" title="details" class="const-name">IP_ADDRESS_NOT_ALLOWED</a> = 					<span class="var-type"> 'hostnameIpAddressNotAllowed'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#LOCAL_NAME_NOT_ALLOWED" title="details" class="const-name">LOCAL_NAME_NOT_ALLOWED</a> = 					<span class="var-type"> 'hostnameLocalNameNotAllowed'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#UNDECIPHERABLE_TLD" title="details" class="const-name">UNDECIPHERABLE_TLD</a> = 					<span class="var-type"> 'hostnameUndecipherableTld'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#UNKNOWN_TLD" title="details" class="const-name">UNKNOWN_TLD</a> = 					<span class="var-type"> 'hostnameUnknownTld'</span>
+
+				</div>
+							</div>
+		</div>
+	</div>
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																								<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_idnLength" title="details" class="var-name">$_idnLength</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$_messageTemplates" title="details" class="var-name">$_messageTemplates</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$_messageVariables" title="details" class="var-name">$_messageVariables</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">mixed</span>
+					<a href="#$_options" title="details" class="var-name">$_options</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">string</span>
+					<a href="#$_tld" title="details" class="var-name">$_tld</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$_validIdns" title="details" class="var-name">$_validIdns</a>
+				</div>
+																<div class="var-title">
+					<img src="../media/images/Variable.png" alt=" " />
+					<span class="var-type">array</span>
+					<a href="#$_validTlds" title="details" class="var-name">$_validTlds</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																							
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">string</span>
+										<a href="#decodePunycode" title="details" class="method-name">decodePunycode</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$encoded</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">integer</span>
+										<a href="#getAllow" title="details" class="method-name">getAllow</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>
+										<a href="#getIpValidator" title="details" class="method-name">getIpValidator</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">array</span>
+										<a href="#getOptions" title="details" class="method-name">getOptions</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">boolean</span>
+										<a href="#getValidateIdn" title="details" class="method-name">getValidateIdn</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">boolean</span>
+										<a href="#getValidateTld" title="details" class="method-name">getValidateTld</a>
+										()
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">boolean</span>
+										<a href="#isValid" title="details" class="method-name">isValid</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Constructor.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">array()</span>], <span class="var-type">integer</span>&nbsp;<span class="var-name">$allow</span>, <span class="var-type">boolean</span>&nbsp;<span class="var-name">$validateIdn</span>, <span class="var-type">boolean</span>&nbsp;<span class="var-name">$validateTld</span>, <span class="var-type"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>&nbsp;<span class="var-name">$ipValidator</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../Zend_Validate/Zend_Validate_Hostname.html">Zend_Validate_Hostname</a></span>
+										<a href="#setAllow" title="details" class="method-name">setAllow</a>
+											(<span class="var-type">integer</span>&nbsp;<span class="var-name">$allow</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void;</span>
+										<a href="#setIpValidator" title="details" class="method-name">setIpValidator</a>
+											([<span class="var-type"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>&nbsp;<span class="var-name">$ipValidator</span> = <span class="var-default">null</span>])
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result"><a href="../Zend_Validate/Zend_Validate_Hostname.html">Zend_Validate_Hostname</a></span>
+										<a href="#setOptions" title="details" class="method-name">setOptions</a>
+											(<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#setValidateIdn" title="details" class="method-name">setValidateIdn</a>
+											(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$allowed</span>)
+									</div>
+															
+				<div class="method-definition">
+					<img src="../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#setValidateTld" title="details" class="method-name">setValidateTld</a>
+											(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$allowed</span>)
+									</div>
+											</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			
+<a name="var$_idnLength" id="$_idnLength"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_idnLength</span>
+			 = <span class="var-default">array(<br />        'BIZ' =&gt; array(5 =&gt; 17, 11 =&gt; 15, 12 =&gt; 20),'CN'=&gt;array(1=&gt;20),'COM'=&gt;array(3=&gt;17,5=&gt;20),'HK'=&gt;array(1=&gt;15),'INFO'=&gt;array(4=&gt;17),'KR'=&gt;array(1=&gt;17),'NET'=&gt;array(3=&gt;17,5=&gt;20),'ORG'=&gt;array(6=&gt;17),'TW'=&gt;array(1=&gt;20),'ایران'=&gt;array(1=&gt;30),'中国'=&gt;array(1=&gt;20),'公司'=&gt;array(1=&gt;20),'网络'=&gt;array(1=&gt;20),)</span>			(line <span class="line-number">299</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_messageTemplates" id="$_messageTemplates"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_messageTemplates</span>
+			 = <span class="var-default">array(<br />        self::CANNOT_DECODE_PUNYCODE  =&gt; &quot;'%value%' appears to be a DNS hostname but the given punycode notation cannot be decoded&quot;,<br />        self::INVALID                 =&gt; &quot;Invalid type given. String expected&quot;,<br />        self::INVALID_DASH            =&gt; &quot;'%value%' appears to be a DNS hostname but contains a dash in an invalid position&quot;,<br />        self::INVALID_HOSTNAME        =&gt; &quot;'%value%' does not match the expected structure for a DNS hostname&quot;,<br />        self::INVALID_HOSTNAME_SCHEMA =&gt; &quot;'%value%' appears to be a DNS hostname but cannot match against hostname schema for TLD '%tld%'&quot;,<br />        self::INVALID_LOCAL_NAME      =&gt; &quot;'%value%' does not appear to be a valid local network name&quot;,<br />        self::INVALID_URI             =&gt; &quot;'%value%' does not appear to be a valid URI hostname&quot;,<br />        self::IP_ADDRESS_NOT_ALLOWED  =&gt; &quot;'%value%' appears to be an IP address, but IP addresses are not allowed&quot;,<br />        self::LOCAL_NAME_NOT_ALLOWED  =&gt; &quot;'%value%' appears to be a local network name but local network names are not allowed&quot;,<br />        self::UNDECIPHERABLE_TLD      =&gt; &quot;'%value%' appears to be a DNS hostname but cannot extract TLD part&quot;,<br />        self::UNKNOWN_TLD             =&gt; &quot;'%value%' appears to be a DNS hostname but cannot match TLD against known list&quot;,<br />    )</span>			(line <span class="line-number">64</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_messageTemplates">Zend_Validate_Abstract::$_messageTemplates</a></dt>
+						<dd>Validation failure message template definitions</dd>
+					</dl>
+		
+		
+
+</div>
+<a name="var$_messageVariables" id="$_messageVariables"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_messageVariables</span>
+			 = <span class="var-default">array(<br />        'tld' =&gt; '_tld'<br />    )</span>			(line <span class="line-number">81</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_messageVariables">Zend_Validate_Abstract::$_messageVariables</a></dt>
+						<dd>Additional variables available for validation failure messages</dd>
+					</dl>
+		
+		
+
+</div>
+<a name="var$_options" id="$_options"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_options</span>
+			 = <span class="var-default">array(<br />        'allow' =&gt; self::ALLOW_DNS,<br />        'idn'   =&gt; true,<br />        'tld'   =&gt; true,<br />        'ip'    =&gt; null<br />    )</span>			(line <span class="line-number">315</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_tld" id="$_tld"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">string</span>
+			<span class="var-name">$_tld</span>
+						(line <span class="line-number">142</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_validIdns" id="$_validIdns"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_validIdns</span>
+			 = <span class="var-default">array(<br />        'AC'  =&gt; array(1 =&gt; '/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'),'AR'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-ãç-êìíñ-õü]{1,63}$/iu'),'AS'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĸĺļľłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷźż]{1,63}$/iu'),'AT'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿœšž]{1,63}$/iu'),'BIZ'=&gt;'Hostname/Biz.php','BR'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-ãçéíó-õúü]{1,63}$/iu'),'BV'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),'CAT'=&gt;array(1=&gt;'/^[\x{002d}0-9a-z·àç-éíïòóúü]{1,63}$/iu'),'CH'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'),'CL'=&gt;array(1=&gt;'/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'),'CN'=&gt;'Hostname/Cn.php','COM'=&gt;'Zend/Validate/Hostname/Com.php','DE'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),'DK'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zäéöü]{1,63}$/iu'),'ES'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zàáçèéíïñòóúü·]{1,63}$/iu'),'EU'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿ]{1,63}$/iu',2=&gt;'/^[\x{002d}0-9a-zāăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĵķĺļľŀłńņňŉŋōŏőœŕŗřśŝšťŧũūŭůűųŵŷźżž]{1,63}$/iu',3=&gt;'/^[\x{002d}0-9a-zșț]{1,63}$/iu',4=&gt;'/^[\x{002d}0-9a-zΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώ]{1,63}$/iu',5=&gt;'/^[\x{002d}0-9a-zабвгдежзийклмнопрстуфхцчшщъыьэюя]{1,63}$/iu',6=&gt;'/^[\x{002d}0-9a-zἀ-ἇἐ-ἕἠ-ἧἰ-ἷὀ-ὅὐ-ὗὠ-ὧὰ-ώᾀ-ᾇᾐ-ᾗᾠ-ᾧᾰ-ᾴᾶᾷῂῃῄῆῇῐ-ΐῖῗῠ-ῧῲῳῴῶῷ]{1,63}$/iu'),'FI'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zäåö]{1,63}$/iu'),'GR'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zΆΈΉΊΌΎ-ΡΣ-ώἀ-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼῂῃῄῆ-ῌῐ-ΐῖ-Ίῠ-Ῥῲῳῴῶ-ῼ]{1,63}$/iu'),'HK'=&gt;'Zend/Validate/Hostname/Cn.php','HU'=&gt;array(1=&gt;'/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu'),'INFO'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zäåæéöøü]{1,63}$/iu',2=&gt;'/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu',3=&gt;'/^[\x{002d}0-9a-záæéíðóöúýþ]{1,63}$/iu',4=&gt;'/^[\x{AC00}-\x{D7A3}]{1,17}$/iu',5=&gt;'/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu',6=&gt;'/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',7=&gt;'/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',8=&gt;'/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu'),'IO'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),'IS'=&gt;array(1=&gt;'/^[\x{002d}0-9a-záéýúíóþæöð]{1,63}$/iu'),'JP'=&gt;'Zend/Validate/Hostname/Jp.php','KR'=&gt;array(1=&gt;'/^[\x{AC00}-\x{D7A3}]{1,17}$/iu'),'LI'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿœ]{1,63}$/iu'),'LT'=&gt;array(1=&gt;'/^[\x{002d}0-9ąčęėįšųūž]{1,63}$/iu'),'MD'=&gt;array(1=&gt;'/^[\x{002d}0-9ăâîşţ]{1,63}$/iu'),'MUSEUM'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿāăąćċčďđēėęěğġģħīįıķĺļľłńņňŋōőœŕŗřśşšţťŧūůűųŵŷźżžǎǐǒǔ\x{01E5}\x{01E7}\x{01E9}\x{01EF}ə\x{0292}ẁẃẅỳ]{1,63}$/iu'),'NET'=&gt;'Zend/Validate/Hostname/Com.php','NO'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),'NU'=&gt;'Zend/Validate/Hostname/Com.php','ORG'=&gt;array(1=&gt;'/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu',2=&gt;'/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',3=&gt;'/^[\x{002d}0-9a-záäåæéëíðóöøúüýþ]{1,63}$/iu',4=&gt;'/^[\x{002d}0-9a-záéíóöúüőű]{1,63}$/iu',5=&gt;'/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',6=&gt;'/^[\x{AC00}-\x{D7A3}]{1,17}$/iu',7=&gt;'/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu'),'PE'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zñáéíóúü]{1,63}$/iu'),'PL'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zāčēģīķļņōŗšūž]{1,63}$/iu',2=&gt;'/^[\x{002d}а-ик-ш\x{0450}ѓѕјљњќџ]{1,63}$/iu',3=&gt;'/^[\x{002d}0-9a-zâîăşţ]{1,63}$/iu',4=&gt;'/^[\x{002d}0-9а-яё\x{04C2}]{1,63}$/iu',5=&gt;'/^[\x{002d}0-9a-zàáâèéêìíîòóôùúûċġħż]{1,63}$/iu',6=&gt;'/^[\x{002d}0-9a-zàäåæéêòóôöøü]{1,63}$/iu',7=&gt;'/^[\x{002d}0-9a-zóąćęłńśźż]{1,63}$/iu',8=&gt;'/^[\x{002d}0-9a-zàáâãçéêíòóôõúü]{1,63}$/iu',9=&gt;'/^[\x{002d}0-9a-zâîăşţ]{1,63}$/iu',10=&gt;'/^[\x{002d}0-9a-záäéíóôúýčďĺľňŕšťž]{1,63}$/iu',11=&gt;'/^[\x{002d}0-9a-zçë]{1,63}$/iu',12=&gt;'/^[\x{002d}0-9а-ик-шђјљњћџ]{1,63}$/iu',13=&gt;'/^[\x{002d}0-9a-zćčđšž]{1,63}$/iu',14=&gt;'/^[\x{002d}0-9a-zâçöûüğış]{1,63}$/iu',15=&gt;'/^[\x{002d}0-9a-záéíñóúü]{1,63}$/iu',16=&gt;'/^[\x{002d}0-9a-zäõöüšž]{1,63}$/iu',17=&gt;'/^[\x{002d}0-9a-zĉĝĥĵŝŭ]{1,63}$/iu',18=&gt;'/^[\x{002d}0-9a-zâäéëîô]{1,63}$/iu',19=&gt;'/^[\x{002d}0-9a-zàáâäåæçèéêëìíîïðñòôöøùúûüýćčłńřśš]{1,63}$/iu',20=&gt;'/^[\x{002d}0-9a-zäåæõöøüšž]{1,63}$/iu',21=&gt;'/^[\x{002d}0-9a-zàáçèéìíòóùú]{1,63}$/iu',22=&gt;'/^[\x{002d}0-9a-zàáéíóöúüőű]{1,63}$/iu',23=&gt;'/^[\x{002d}0-9ΐά-ώ]{1,63}$/iu',24=&gt;'/^[\x{002d}0-9a-zàáâåæçèéêëðóôöøüþœ]{1,63}$/iu',25=&gt;'/^[\x{002d}0-9a-záäéíóöúüýčďěňřšťůž]{1,63}$/iu',26=&gt;'/^[\x{002d}0-9a-z·àçèéíïòóúü]{1,63}$/iu',27=&gt;'/^[\x{002d}0-9а-ъьюя\x{0450}\x{045D}]{1,63}$/iu',28=&gt;'/^[\x{002d}0-9а-яёіў]{1,63}$/iu',29=&gt;'/^[\x{002d}0-9a-ząčėęįšūųž]{1,63}$/iu',30=&gt;'/^[\x{002d}0-9a-záäåæéëíðóöøúüýþ]{1,63}$/iu',31=&gt;'/^[\x{002d}0-9a-zàâæçèéêëîïñôùûüÿœ]{1,63}$/iu',32=&gt;'/^[\x{002d}0-9а-щъыьэюяёєіїґ]{1,63}$/iu',33=&gt;'/^[\x{002d}0-9א-ת]{1,63}$/iu'),'PR'=&gt;array(1=&gt;'/^[\x{002d}0-9a-záéíóúñäëïüöâêîôûàèùæçœãõ]{1,63}$/iu'),'PT'=&gt;array(1=&gt;'/^[\x{002d}0-9a-záàâãçéêíóôõú]{1,63}$/iu'),'RU'=&gt;array(1=&gt;'/^[\x{002d}0-9а-яё]{1,63}$/iu'),'SA'=&gt;array(1=&gt;'/^[\x{002d}.0-9\x{0621}-\x{063A}\x{0641}-\x{064A}\x{0660}-\x{0669}]{1,63}$/iu'),'SE'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zäåéöü]{1,63}$/iu'),'SH'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿăąāćĉčċďđĕěėęēğĝġģĥħĭĩįīıĵķĺľļłńňņŋŏőōœĸŕřŗśŝšşťţŧŭůűũųūŵŷźžż]{1,63}$/iu'),'SJ'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zàáä-éêñ-ôöøüčđńŋšŧž]{1,63}$/iu'),'TH'=&gt;array(1=&gt;'/^[\x{002d}0-9a-z\x{0E01}-\x{0E3A}\x{0E40}-\x{0E4D}\x{0E50}-\x{0E59}]{1,63}$/iu'),'TM'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zà-öø-ÿāăąćĉċčďđēėęěĝġģĥħīįĵķĺļľŀłńņňŋőœŕŗřśŝşšţťŧūŭůűųŵŷźżž]{1,63}$/iu'),'TW'=&gt;'Zend/Validate/Hostname/Cn.php','TR'=&gt;array(1=&gt;'/^[\x{002d}0-9a-zğıüşöç]{1,63}$/iu'),'VE'=&gt;array(1=&gt;'/^[\x{002d}0-9a-záéíóúüñ]{1,63}$/iu'),'VN'=&gt;array(1=&gt;'/^[ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯư\x{1EA0}-\x{1EF9}]{1,63}$/iu'),'ایران'=&gt;array(1=&gt;'/^[\x{0621}-\x{0624}\x{0626}-\x{063A}\x{0641}\x{0642}\x{0644}-\x{0648}\x{067E}\x{0686}\x{0698}\x{06A9}\x{06AF}\x{06CC}\x{06F0}-\x{06F9}]{1,30}$/iu'),'中国'=&gt;'Zend/Validate/Hostname/Cn.php','公司'=&gt;'Zend/Validate/Hostname/Cn.php','网络'=&gt;'Zend/Validate/Hostname/Cn.php')</span>			(line <span class="line-number">194</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Array for valid Idns</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="http://www.iana.org/domains/idn-tables/ Official list of supported IDN Chars
+ (.AC) Ascension Island http://www.nic.ac/pdf/AC-IDN-Policy.pdf
+ (.AR) Argentinia http://www.nic.ar/faqidn.html
+ (.AS) American Samoa http://www.nic.as/idn/chars.cfm
+ (.AT) Austria http://www.nic.at/en/service/technical_information/idn/charset_converter/
+ (.BIZ) International http://www.iana.org/domains/idn-tables/
+ (.BR) Brazil http://registro.br/faq/faq6.html
+ (.BV) Bouvett Island http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+ (.CAT) Catalan http://www.iana.org/domains/idn-tables/tables/cat_ca_1.0.html
+ (.CH) Switzerland https://nic.switch.ch/reg/ocView.action?res=EF6GW2JBPVTG67DLNIQXU234MN6SC33JNQQGI7L6#anhang1
+ (.CL) Chile http://www.iana.org/domains/idn-tables/tables/cl_latn_1.0.html
+ (.COM) International http://www.verisign.com/information-services/naming-services/internationalized-domain-names/index.html
+ (.DE) Germany http://www.denic.de/en/domains/idns/liste.html
+ (.DK) Danmark http://www.dk-hostmaster.dk/index.php?id=151
+ (.ES) Spain https://www.nic.es/media/2008-05/1210147705287.pdf
+ (.FI) Finland http://www.ficora.fi/en/index/palvelut/fiverkkotunnukset/aakkostenkaytto.html
+ (.GR) Greece https://grweb.ics.forth.gr/CharacterTable1_en.jsp
+ (.HU) Hungary http://www.domain.hu/domain/English/szabalyzat/szabalyzat.html
+ (.INFO) International http://www.nic.info/info/idn
+ (.IO) British Indian Ocean Territory http://www.nic.io/IO-IDN-Policy.pdf
+ (.IR) Iran http://www.nic.ir/Allowable_Characters_dot-iran
+ (.IS) Iceland http://www.isnic.is/domain/rules.php
+ (.KR) Korea http://www.iana.org/domains/idn-tables/tables/kr_ko-kr_1.0.html
+ (.LI) Liechtenstein https://nic.switch.ch/reg/ocView.action?res=EF6GW2JBPVTG67DLNIQXU234MN6SC33JNQQGI7L6#anhang1
+ (.LT) Lithuania http://www.domreg.lt/static/doc/public/idn_symbols-en.pdf
+ (.MD) Moldova http://www.register.md/
+ (.MUSEUM) International http://www.iana.org/domains/idn-tables/tables/museum_latn_1.0.html
+ (.NET) International http://www.verisign.com/information-services/naming-services/internationalized-domain-names/index.html
+ (.NO) Norway http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+ (.NU) Niue http://www.worldnames.net/
+ (.ORG) International http://www.pir.org/index.php?db=content/FAQs&amp;tbl=FAQs_Registrant&amp;id=2
+ (.PE) Peru https://www.nic.pe/nuevas_politicas_faq_2.php
+ (.PL) Poland http://www.dns.pl/IDN/allowed_character_sets.pdf
+ (.PR) Puerto Rico http://www.nic.pr/idn_rules.asp
+ (.PT) Portugal https://online.dns.pt/dns_2008/do?com=DS;8216320233;111;+PAGE(4000058)+K-CAT-CODIGO(C.125)+RCNT(100);
+ (.RU) Russia http://www.iana.org/domains/idn-tables/tables/ru_ru-ru_1.0.html
+ (.SA) Saudi Arabia http://www.iana.org/domains/idn-tables/tables/sa_ar_1.0.html
+ (.SE) Sweden http://www.iis.se/english/IDN_campaignsite.shtml?lang=en
+ (.SH) Saint Helena http://www.nic.sh/SH-IDN-Policy.pdf
+ (.SJ) Svalbard and Jan Mayen http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+ (.TH) Thailand http://www.iana.org/domains/idn-tables/tables/th_th-th_1.0.html
+ (.TM) Turkmenistan http://www.nic.tm/TM-IDN-Policy.pdf
+ (.TR) Turkey https://www.nic.tr/index.php
+ (.VE) Venice http://www.iana.org/domains/idn-tables/tables/ve_es_1.0.html
+ (.VN) Vietnam http://www.vnnic.vn/english/5-6-300-2-2-04-20071115.htm#1.%20Introduction">http://www.iana.org/domains/idn-tables/ Official list of supported IDN Chars
+ (.AC) Ascension Island http://www.nic.ac/pdf/AC-IDN-Policy.pdf
+ (.AR) Argentinia http://www.nic.ar/faqidn.html
+ (.AS) American Samoa http://www.nic.as/idn/chars.cfm
+ (.AT) Austria http://www.nic.at/en/service/technical_information/idn/charset_converter/
+ (.BIZ) International http://www.iana.org/domains/idn-tables/
+ (.BR) Brazil http://registro.br/faq/faq6.html
+ (.BV) Bouvett Island http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+ (.CAT) Catalan http://www.iana.org/domains/idn-tables/tables/cat_ca_1.0.html
+ (.CH) Switzerland https://nic.switch.ch/reg/ocView.action?res=EF6GW2JBPVTG67DLNIQXU234MN6SC33JNQQGI7L6#anhang1
+ (.CL) Chile http://www.iana.org/domains/idn-tables/tables/cl_latn_1.0.html
+ (.COM) International http://www.verisign.com/information-services/naming-services/internationalized-domain-names/index.html
+ (.DE) Germany http://www.denic.de/en/domains/idns/liste.html
+ (.DK) Danmark http://www.dk-hostmaster.dk/index.php?id=151
+ (.ES) Spain https://www.nic.es/media/2008-05/1210147705287.pdf
+ (.FI) Finland http://www.ficora.fi/en/index/palvelut/fiverkkotunnukset/aakkostenkaytto.html
+ (.GR) Greece https://grweb.ics.forth.gr/CharacterTable1_en.jsp
+ (.HU) Hungary http://www.domain.hu/domain/English/szabalyzat/szabalyzat.html
+ (.INFO) International http://www.nic.info/info/idn
+ (.IO) British Indian Ocean Territory http://www.nic.io/IO-IDN-Policy.pdf
+ (.IR) Iran http://www.nic.ir/Allowable_Characters_dot-iran
+ (.IS) Iceland http://www.isnic.is/domain/rules.php
+ (.KR) Korea http://www.iana.org/domains/idn-tables/tables/kr_ko-kr_1.0.html
+ (.LI) Liechtenstein https://nic.switch.ch/reg/ocView.action?res=EF6GW2JBPVTG67DLNIQXU234MN6SC33JNQQGI7L6#anhang1
+ (.LT) Lithuania http://www.domreg.lt/static/doc/public/idn_symbols-en.pdf
+ (.MD) Moldova http://www.register.md/
+ (.MUSEUM) International http://www.iana.org/domains/idn-tables/tables/museum_latn_1.0.html
+ (.NET) International http://www.verisign.com/information-services/naming-services/internationalized-domain-names/index.html
+ (.NO) Norway http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+ (.NU) Niue http://www.worldnames.net/
+ (.ORG) International http://www.pir.org/index.php?db=content/FAQs&amp;tbl=FAQs_Registrant&amp;id=2
+ (.PE) Peru https://www.nic.pe/nuevas_politicas_faq_2.php
+ (.PL) Poland http://www.dns.pl/IDN/allowed_character_sets.pdf
+ (.PR) Puerto Rico http://www.nic.pr/idn_rules.asp
+ (.PT) Portugal https://online.dns.pt/dns_2008/do?com=DS;8216320233;111;+PAGE(4000058)+K-CAT-CODIGO(C.125)+RCNT(100);
+ (.RU) Russia http://www.iana.org/domains/idn-tables/tables/ru_ru-ru_1.0.html
+ (.SA) Saudi Arabia http://www.iana.org/domains/idn-tables/tables/sa_ar_1.0.html
+ (.SE) Sweden http://www.iis.se/english/IDN_campaignsite.shtml?lang=en
+ (.SH) Saint Helena http://www.nic.sh/SH-IDN-Policy.pdf
+ (.SJ) Svalbard and Jan Mayen http://www.norid.no/domeneregistrering/idn/idn_nyetegn.en.html
+ (.TH) Thailand http://www.iana.org/domains/idn-tables/tables/th_th-th_1.0.html
+ (.TM) Turkmenistan http://www.nic.tm/TM-IDN-Policy.pdf
+ (.TR) Turkey https://www.nic.tr/index.php
+ (.VE) Venice http://www.iana.org/domains/idn-tables/tables/ve_es_1.0.html
+ (.VN) Vietnam http://www.vnnic.vn/english/5-6-300-2-2-04-20071115.htm#1.%20Introduction</a></li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_validTlds" id="$_validTlds"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<img src="../media/images/Variable.png" />
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_validTlds</span>
+			 = <span class="var-default">array(<br />        'ac', 'ad', 'ae', 'aero', 'af', 'ag', 'ai', 'al', 'am', 'an', 'ao', 'aq', 'ar', 'arpa',<br />        'as', 'asia', 'at', 'au', 'aw', 'ax', 'az', 'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi',<br />        'biz', 'bj', 'bm', 'bn', 'bo', 'br', 'bs', 'bt', 'bv', 'bw', 'by', 'bz', 'ca', 'cat', 'cc',<br />        'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'com', 'coop', 'cr', 'cu',<br />        'cv', 'cx', 'cy', 'cz', 'de', 'dj', 'dk', 'dm', 'do', 'dz', 'ec', 'edu', 'ee', 'eg', 'er',<br />        'es', 'et', 'eu', 'fi', 'fj', 'fk', 'fm', 'fo', 'fr', 'ga', 'gb', 'gd', 'ge', 'gf', 'gg',<br />        'gh', 'gi', 'gl', 'gm', 'gn', 'gov', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gw', 'gy', 'hk',<br />        'hm', 'hn', 'hr', 'ht', 'hu', 'id', 'ie', 'il', 'im', 'in', 'info', 'int', 'io', 'iq',<br />        'ir', 'is', 'it', 'je', 'jm', 'jo', 'jobs', 'jp', 'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp',<br />        'kr', 'kw', 'ky', 'kz', 'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly',<br />        'ma', 'mc', 'md', 'me', 'mg', 'mh', 'mil', 'mk', 'ml', 'mm', 'mn', 'mo', 'mobi', 'mp',<br />        'mq', 'mr', 'ms', 'mt', 'mu', 'museum', 'mv', 'mw', 'mx', 'my', 'mz', 'na', 'name', 'nc',<br />        'ne', 'net', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz', 'om', 'org', 'pa', 'pe',<br />        'pf', 'pg', 'ph', 'pk', 'pl', 'pm', 'pn', 'pr', 'pro', 'ps', 'pt', 'pw', 'py', 'qa', 're',<br />        'ro', 'rs', 'ru', 'rw', 'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh', 'si', 'sj', 'sk', 'sl',<br />        'sm', 'sn', 'so', 'sr', 'st', 'su', 'sv', 'sy', 'sz', 'tc', 'td', 'tel', 'tf', 'tg', 'th',<br />        'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tp', 'tr', 'travel', 'tt', 'tv', 'tw', 'tz', 'ua',<br />        'ug', 'uk', 'um', 'us', 'uy', 'uz', 'va', 'vc', 've', 'vg', 'vi', 'vn', 'vu', 'wf', 'ws',<br />        'ye', 'yt', 'yu', 'za', 'zm', 'zw'<br />    )</span>			(line <span class="line-number">117</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Array of valid top-level-domains</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="ftp://data.iana.org/TLD/tlds-alpha-by-domain.txt  List of all TLDs by domain">ftp://data.iana.org/TLD/tlds-alpha-by-domain.txt  List of all TLDs by domain</a></li>
+				<li><span class="field">see:</span> <a href="http://www.iana.org/domains/root/db/ Official list of supported TLDs">http://www.iana.org/domains/root/db/ Official list of supported TLDs</a></li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../Zend_Validate/Zend_Validate_Abstract.html">Zend_Validate_Abstract</a></span></p>
+					<blockquote>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_defaultTranslator">Zend_Validate_Abstract::$_defaultTranslator</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_errors">Zend_Validate_Abstract::$_errors</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_messageLength">Zend_Validate_Abstract::$_messageLength</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_messages">Zend_Validate_Abstract::$_messages</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_obscureValue">Zend_Validate_Abstract::$_obscureValue</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_translator">Zend_Validate_Abstract::$_translator</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_translatorDisabled">Zend_Validate_Abstract::$_translatorDisabled</a></span><br>
+							</span>
+													<img src="../media/images/Variable.png" />
+							<span class="var-title">
+								<span class="var-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#var$_value">Zend_Validate_Abstract::$_value</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																			<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methoddecodePunycode" id="decodePunycode"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">decodePunycode</span> (line <span class="line-number">682</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Decodes a punycode encoded string to it's original utf8 string  In case of a decoding failure the original string is returned</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			decodePunycode
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$encoded</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$encoded</span><span class="var-description">: Punycode encoded string to decode</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetAllow" id="getAllow"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">getAllow</span> (line <span class="line-number">424</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the allow option</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">integer</span>
+		<span class="method-name">
+			getAllow
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetIpValidator" id="getIpValidator"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">getIpValidator</span> (line <span class="line-number">400</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the set ip validator</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>
+		<span class="method-name">
+			getIpValidator
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetOptions" id="getOptions"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">getOptions</span> (line <span class="line-number">363</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns all set options</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			getOptions
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetValidateIdn" id="getValidateIdn"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">getValidateIdn</span> (line <span class="line-number">446</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the set idn option</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">boolean</span>
+		<span class="method-name">
+			getValidateIdn
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetValidateTld" id="getValidateTld"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">getValidateTld</span> (line <span class="line-number">469</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the set tld option</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">boolean</span>
+		<span class="method-name">
+			getValidateTld
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodisValid" id="isValid"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">isValid</span> (line <span class="line-number">496</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defined by Zend_Validate_Interface</p>
+<p class="description"><p>Returns true if and only if the $value is a valid hostname with respect to the current allow option</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> Zend_Validate_Exception if a fatal error occurs for validation process</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">boolean</span>
+		<span class="method-name">
+			isValid
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Constructor.png" />
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">332</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets validator options</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> <a href="http://www.iana.org/cctld/specifications-policies-cctlds-01apr02.htm  Technical Specifications for ccTLDs">http://www.iana.org/cctld/specifications-policies-cctlds-01apr02.htm  Technical Specifications for ccTLDs</a></li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">array()</span>], <span class="var-type">integer</span>&nbsp;<span class="var-name">$allow</span>, <span class="var-type">boolean</span>&nbsp;<span class="var-name">$validateIdn</span>, <span class="var-type">boolean</span>&nbsp;<span class="var-name">$validateTld</span>, <span class="var-type"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>&nbsp;<span class="var-name">$ipValidator</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">integer</span>
+				<span class="var-name">$allow</span><span class="var-description">: OPTIONAL Set what types of hostname to allow (default ALLOW_DNS)</span>			</li>
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$validateIdn</span><span class="var-description">: OPTIONAL Set whether IDN domains are validated (default true)</span>			</li>
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$validateTld</span><span class="var-description">: OPTIONAL Set whether the TLD element of a hostname is validated (default true)</span>			</li>
+					<li>
+				<span class="var-type"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>
+				<span class="var-name">$ipValidator</span><span class="var-description">: OPTIONAL</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$options</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetAllow" id="setAllow"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">setAllow</span> (line <span class="line-number">435</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets the allow option</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Provides a fluent interface</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../Zend_Validate/Zend_Validate_Hostname.html">Zend_Validate_Hostname</a></span>
+		<span class="method-name">
+			setAllow
+		</span>
+					(<span class="var-type">integer</span>&nbsp;<span class="var-name">$allow</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">integer</span>
+				<span class="var-name">$allow</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetIpValidator" id="setIpValidator"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">setIpValidator</span> (line <span class="line-number">409</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void;</span>
+		<span class="method-name">
+			setIpValidator
+		</span>
+					([<span class="var-type"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>&nbsp;<span class="var-name">$ipValidator</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../Zend_Validate/Zend_Validate_Ip.html">Zend_Validate_Ip</a></span>
+				<span class="var-name">$ipValidator</span><span class="var-description">: OPTIONAL</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetOptions" id="setOptions"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">setOptions</span> (line <span class="line-number">374</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets the options for this validator</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../Zend_Validate/Zend_Validate_Hostname.html">Zend_Validate_Hostname</a></span>
+		<span class="method-name">
+			setOptions
+		</span>
+					(<span class="var-type">array</span>&nbsp;<span class="var-name">$options</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetValidateIdn" id="setValidateIdn"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">setValidateIdn</span> (line <span class="line-number">458</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set whether IDN domains are validated</p>
+<p class="description"><p>This only applies when DNS hostnames are validated</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setValidateIdn
+		</span>
+					(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$allowed</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$allowed</span><span class="var-description">: Set allowed to true to validate IDNs, and false to not validate them</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodsetValidateTld" id="setValidateTld"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../media/images/Method.png" />
+		<span class="method-title">setValidateTld</span> (line <span class="line-number">481</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Set whether the TLD element of a hostname is validated</p>
+<p class="description"><p>This only applies when DNS hostnames are validated</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setValidateTld
+		</span>
+					(<span class="var-type">boolean</span>&nbsp;<span class="var-name">$allowed</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">boolean</span>
+				<span class="var-name">$allowed</span><span class="var-description">: Set allowed to true to validate TLDs, and false to not validate them</span>			</li>
+				</ul>
+		
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../Zend_Validate/Zend_Validate_Abstract.html">Zend_Validate_Abstract</a></span></p>
+					<blockquote>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetDefaultTranslator">Zend_Validate_Abstract::getDefaultTranslator()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetErrors">Zend_Validate_Abstract::getErrors()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetMessageLength">Zend_Validate_Abstract::getMessageLength()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetMessages">Zend_Validate_Abstract::getMessages()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetMessageTemplates">Zend_Validate_Abstract::getMessageTemplates()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetMessageVariables">Zend_Validate_Abstract::getMessageVariables()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetObscureValue">Zend_Validate_Abstract::getObscureValue()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodgetTranslator">Zend_Validate_Abstract::getTranslator()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodhasDefaultTranslator">Zend_Validate_Abstract::hasDefaultTranslator()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodhasTranslator">Zend_Validate_Abstract::hasTranslator()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodsetDefaultTranslator">Zend_Validate_Abstract::setDefaultTranslator()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodsetDisableTranslator">Zend_Validate_Abstract::setDisableTranslator()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodsetMessage">Zend_Validate_Abstract::setMessage()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodsetMessageLength">Zend_Validate_Abstract::setMessageLength()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodsetMessages">Zend_Validate_Abstract::setMessages()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodsetObscureValue">Zend_Validate_Abstract::setObscureValue()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodsetTranslator">Zend_Validate_Abstract::setTranslator()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#methodtranslatorIsDisabled">Zend_Validate_Abstract::translatorIsDisabled()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#method_createMessage">Zend_Validate_Abstract::_createMessage()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#method_error">Zend_Validate_Abstract::_error()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#method_setValue">Zend_Validate_Abstract::_setValue()</a></span><br>
+													<img src="../media/images/Method.png" alt=" "/>
+							<span class="method-name"><a href="../Zend_Validate/Zend_Validate_Abstract.html#method__get">Zend_Validate_Abstract::__get()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+	<a name="sec-consts"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Constants</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+														| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="constALLOW_ALL" id="ALLOW_ALL"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ALLOW_ALL</span>
+			 = <span class="const-default"> 7</span>
+			(line <span class="line-number">103</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Allows all types of hostnames</p>
+	
+	
+</div>
+<a name="constALLOW_DNS" id="ALLOW_DNS"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ALLOW_DNS</span>
+			 = <span class="const-default"> 1</span>
+			(line <span class="line-number">88</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Allows Internet domain names (e.g., example.com)</p>
+	
+	
+</div>
+<a name="constALLOW_IP" id="ALLOW_IP"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ALLOW_IP</span>
+			 = <span class="const-default"> 2</span>
+			(line <span class="line-number">93</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Allows IP addresses</p>
+	
+	
+</div>
+<a name="constALLOW_LOCAL" id="ALLOW_LOCAL"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ALLOW_LOCAL</span>
+			 = <span class="const-default"> 4</span>
+			(line <span class="line-number">98</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Allows local network names (e.g., localhost, www.localdomain)</p>
+	
+	
+</div>
+<a name="constALLOW_URI" id="ALLOW_URI"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">ALLOW_URI</span>
+			 = <span class="const-default"> 8</span>
+			(line <span class="line-number">108</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Allows all types of hostnames</p>
+	
+	
+</div>
+<a name="constCANNOT_DECODE_PUNYCODE" id="CANNOT_DECODE_PUNYCODE"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">CANNOT_DECODE_PUNYCODE</span>
+			 = <span class="const-default"> 'hostnameCannotDecodePunycode'</span>
+			(line <span class="line-number">49</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constINVALID" id="INVALID"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INVALID</span>
+			 = <span class="const-default"> 'hostnameInvalid'</span>
+			(line <span class="line-number">50</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constINVALID_DASH" id="INVALID_DASH"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INVALID_DASH</span>
+			 = <span class="const-default"> 'hostnameDashCharacter'</span>
+			(line <span class="line-number">51</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constINVALID_HOSTNAME" id="INVALID_HOSTNAME"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INVALID_HOSTNAME</span>
+			 = <span class="const-default"> 'hostnameInvalidHostname'</span>
+			(line <span class="line-number">52</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constINVALID_HOSTNAME_SCHEMA" id="INVALID_HOSTNAME_SCHEMA"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INVALID_HOSTNAME_SCHEMA</span>
+			 = <span class="const-default"> 'hostnameInvalidHostnameSchema'</span>
+			(line <span class="line-number">53</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constINVALID_LOCAL_NAME" id="INVALID_LOCAL_NAME"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INVALID_LOCAL_NAME</span>
+			 = <span class="const-default"> 'hostnameInvalidLocalName'</span>
+			(line <span class="line-number">54</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constINVALID_URI" id="INVALID_URI"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">INVALID_URI</span>
+			 = <span class="const-default"> 'hostnameInvalidUri'</span>
+			(line <span class="line-number">55</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constIP_ADDRESS_NOT_ALLOWED" id="IP_ADDRESS_NOT_ALLOWED"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">IP_ADDRESS_NOT_ALLOWED</span>
+			 = <span class="const-default"> 'hostnameIpAddressNotAllowed'</span>
+			(line <span class="line-number">56</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constLOCAL_NAME_NOT_ALLOWED" id="LOCAL_NAME_NOT_ALLOWED"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">LOCAL_NAME_NOT_ALLOWED</span>
+			 = <span class="const-default"> 'hostnameLocalNameNotAllowed'</span>
+			(line <span class="line-number">57</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUNDECIPHERABLE_TLD" id="UNDECIPHERABLE_TLD"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">UNDECIPHERABLE_TLD</span>
+			 = <span class="const-default"> 'hostnameUndecipherableTld'</span>
+			(line <span class="line-number">58</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constUNKNOWN_TLD" id="UNKNOWN_TLD"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">UNKNOWN_TLD</span>
+			 = <span class="const-default"> 'hostnameUnknownTld'</span>
+			(line <span class="line-number">59</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+						
+		</div>
+	</div>
+	
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 31 Jan 2011 14:01:44 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>
