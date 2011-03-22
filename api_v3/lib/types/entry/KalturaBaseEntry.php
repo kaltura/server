@@ -238,6 +238,50 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public $endDate;
 	
+	/**
+	 * Entry external reference id
+	 * 
+	 * @var string
+	 * @filter eq,in
+	 * @requiresPermission insert,update
+	 */
+	public $referenceId;
+	
+	/**
+	 * ID of temporary entry that will replace this entry when it’s approved and ready for replacement
+	 * 
+	 * @var string
+	 * @filter eq,in
+	 * @readonly
+	 */
+	public $replacingEntryId;
+	
+	/**
+	 * ID of the entry that will be replaced when the replacement approved and this entry is ready
+	 * 
+	 * @var string
+	 * @filter eq,in
+	 * @readonly
+	 */
+	public $replacedEntryId;
+	
+	/**
+	 * Status of the replacement readiness and approval
+	 * 
+	 * @var KalturaEntryReplacementStatus
+	 * @filter eq,in
+	 * @readonly
+	 */
+	public $replacementStatus;
+	
+	/**
+	 * Can be used to store various partner related data as a numeric value
+	 * 
+	 * @var int
+	 * @filter gte,lte,order
+	 */
+	public $partnerSortValue;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */

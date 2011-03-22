@@ -1564,6 +1564,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function setIsmVersion ( $v )	{	$this->putInCustomData ( "ismVersion" , $v );	}
 	public function getIsmVersion (  )		{	return (int) $this->getFromCustomData( "ismVersion" );	}
 	
+	public function setReferenceID  ( $v )	{	$this->putInCustomData ( "referenceID" , $v );	}
+	public function getReferenceID (  )		{	return (int) $this->getFromCustomData( "referenceID" );	}
+	
+	public function setPartnerSortValue ( $v )	{	$this->putInCustomData ( "partnerSortValue" , $v );	}
+	public function getPartnerSortValue (  )	{	return (int) $this->getFromCustomData( "partnerSortValue" );	}
+	
+	public function setReplacementStatus ( $v )	{	$this->putInCustomData ( "replacementStatus" , $v );	}
+	public function getReplacementStatus (  )	{	return (int) $this->getFromCustomData( "replacementStatus" );	}
+	
+	public function setReplacingEntryId ( $v )	{	$this->putInCustomData ( "replacingEntryId" , $v );	}
+	public function getReplacingEntryId (  )	{	return (int) $this->getFromCustomData( "replacingEntryId" );	}
+	
+	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
+	public function getReplacedEntryId (  )		{	return (int) $this->getFromCustomData( "replacedEntryId" );	}
+	
 	public function setDynamicFlavorAttributes(array $v)
 	{
 		$this->putInCustomData("dynamicFlavorAttributes", serialize($v));
@@ -2272,6 +2287,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			'description' => 'description',
 			'admin_tags' => 'adminTags',
 			'duration_type' => 'durationType',
+			'reference_id' => 'referenceId',
+			'replacing_entry_id' => 'replacingEntryId',
+			'replaced_entry_id' => 'replacedEntryId',
 		
 			'kuser_id' => 'kuserId',
 			'entry_status' => 'status',
@@ -2286,6 +2304,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			'moderation_count' => 'moderationCount',
 			'rank' => 'rank',
 			'plays' => 'plays',
+			'partner_sort_value' => 'partnerSortValue',
+			'replacement_status' => 'replacementStatus',
 		
 			'created_at' => 'createdAt',
 			'updated_at' => 'updatedAt',
@@ -2310,6 +2330,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			'description' => IIndexable::FIELD_TYPE_STRING,
 			'admin_tags' => IIndexable::FIELD_TYPE_STRING,
 			'duration_type' => IIndexable::FIELD_TYPE_STRING,
+			'reference_id' => IIndexable::FIELD_TYPE_STRING,
+			'replacing_entry_id' => IIndexable::FIELD_TYPE_STRING,
+			'replaced_entry_id' => IIndexable::FIELD_TYPE_STRING,
 			
 			'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
 			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -2326,6 +2349,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			'moderation_count' => IIndexable::FIELD_TYPE_INTEGER,
 			'rank' => IIndexable::FIELD_TYPE_INTEGER,
 			'plays' => IIndexable::FIELD_TYPE_INTEGER,
+			'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
+			'replacement_status' => IIndexable::FIELD_TYPE_INTEGER,
 		
 			'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 			'updated_at' => IIndexable::FIELD_TYPE_DATETIME,

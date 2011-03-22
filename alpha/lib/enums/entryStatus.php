@@ -22,4 +22,6 @@ interface entryStatus extends BaseEnum
 	 * @deprecated This status is deprecated and will be removed in the future, entry {@link ?object=kalturaEntryModerationStatus moderationStatus} should be used instead
 	 */
 	const BLOCKED = 6;
+	
+	const NO_CONTENT = 7;
 }
