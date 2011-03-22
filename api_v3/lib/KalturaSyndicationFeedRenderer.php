@@ -398,7 +398,7 @@ class KalturaSyndicationFeedRenderer
 			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
 				continue;
 					
-			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB);				
+			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage);				
 		}
 		echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
 	}
