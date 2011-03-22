@@ -51,6 +51,11 @@ class playManifestAction extends kalturaAction
 	 */
 	private $maxBitrate = null;
 	
+	/**
+	 * @var array
+	 */
+	private $flavorIds = null;
+	
 	const PLAY_STREAM_TYPE_LIVE = 'live';
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
 	const PLAY_STREAM_TYPE_ANY = 'any';
@@ -135,38 +140,52 @@ class playManifestAction extends kalturaAction
 		}
 		else 
 		{
-			$tag = flavorParams::TAG_MBR;
-			if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
-				$tag = flavorParams::TAG_SLWEB;
-			elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-				$tag = flavorParams::TAG_APPLEMBR;
-			$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, $tag);
-
-			// if format is APPLE HTTP and there aren't any segmented flavors use ipad and iphone with
-			// akamai hd on the fly segmenter
-			if(!count($flavorAssets) && $this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+			if ($this->flavorIds)
 			{
-				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, "ipad");
-				$flavorAssets2 = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, "iphone");
-				foreach($flavorAssets2 as $flavorAsset2)
+				$tmpFlavorAssets = flavorAssetPeer::retreiveReadyByEntryId($this->entryId);
+				$flavorAssets = array();
+				foreach($tmpFlavorAssets as $flavorAsset)
 				{
-					$found = false;
-					foreach($flavorAssets as $flavorAsset)
-					{
-						if ($flavorAsset->getId() == $flavorAsset2->getId())
-						{
-							$found = true;
-							break;
-						}
-					}
-					
-					if (!$found)
-						$flavorAssets[] = $flavorAsset2;
+					if (in_array($flavorAsset->getId(), $this->flavorIds))
+						$flavorAssets[] = $flavorAsset;
 				}
 			}
+			else 
+			{
+				$tag = flavorParams::TAG_MBR;
+				if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
+					$tag = flavorParams::TAG_SLWEB;
+				elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+					$tag = flavorParams::TAG_APPLEMBR;
+				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, $tag);
+
+				if(!count($flavorAssets) && $tag == flavorParams::TAG_MBR)
+					$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
 				
-			if(!count($flavorAssets) && $tag == flavorParams::TAG_MBR)
-				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
+				// if format is APPLE HTTP and there aren't any segmented flavors use ipad and iphone with
+				// akamai hd on the fly segmenter
+				if(!count($flavorAssets) && $this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
+				{
+					$tmpFlavorAssets = flavorAssetPeer::retreiveReadyByEntryId($this->entryId);
+					$flavorAssets = array();
+					
+					$tagVersions = array("new", "");
+
+					// try first the ipadnew and iphonenew, optimized for segmenting (with fixed GOP and IDR frames)
+					// if no such flavors were found, use the ipad,iphone and pray
+					foreach($tagVersions as $tagVersion)
+					{
+						foreach($tmpFlavorAssets as $flavorAsset)
+						{
+							if ($flavorAsset->hasTag("ipad$tagVersion") || $flavorAsset->hasTag("iphone$tagVersion"))
+								$flavorAssets[] = $flavorAsset;
+						}
+						
+						if (count($flavorAssets))
+							break;
+					}
+				}
+			}
 		}
 		
 		$flavors = array();
@@ -674,7 +693,11 @@ class playManifestAction extends kalturaAction
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
-	
+		
+		$flavorIdsStr = $this->getRequestParameter ( "flavorIds", null );
+		if ($flavorIdsStr)
+			$this->flavorIds = explode(",", $flavorIdsStr);
+		
 		
 		$this->entry = entryPeer::retrieveByPKNoFilter( $this->entryId );
 		if ( ! $this->entry )
