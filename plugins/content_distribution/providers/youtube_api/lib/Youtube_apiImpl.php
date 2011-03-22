@@ -107,8 +107,26 @@ function getEntry($yt, $remoteId)
 	printVideoEntry($videoEntry);
 }
 
-function updateEntry($yt, $fileDisk, $fileUrl, $title, $description, $category, $keywords)
+function updateEntry($yt, $remoteId, $title, $description, $category, $keywords)
 {
+	$videoEntry = $yt->getVideoEntry($remoteId,null, true); 
+	$putUrl = $videoEntry->getEditLink()->getHref();
+
+	$videoEntry->setVideoTitle($title); 
+	$videoEntry->setVideoDescription($description); 
+	// The category must be a valid YouTube category! 
+	$videoEntry->setVideoCategory($category);  
+	// Set keywords. Please note that this must be a comma-separated string 
+	// and that individual keywords cannot contain whitespace 
+	$videoEntry->SetVideoTags($keywords);  	
+
+	$yt->updateEntry($videoEntry, $putUrl);
+}
+
+function deleteEntry($yt, $remoteId)
+{
+	$videoEntry = $yt->getVideoEntry($remoteId,'http://gdata.youtube.com/feeds/users/default/uploads', true); 
+	$yt->delete($videoEntry);
 }
 
 $authenticationURL= 'https://www.google.com/accounts/ClientLogin'; 
@@ -124,8 +142,15 @@ $httpClient = Zend_Gdata_ClientLogin::getHttpClient($username = 'kalturasb',
 $yt = new Zend_Gdata_YouTube($httpClient, $applicationId, $clientId, $developerKey);
 $yt->setMajorProtocolVersion(2);
 
-getEntry($yt, 'J9JY0k8nLiE');
 //$newEntry = uploadVideo($yt, 'snake.wmv','snake.wmv', 'My Test Movie', 'My Test Movie', 'Autos', 'cars, funny');
+//$newEntry -> setMajorProtocolVersion(2);
+//getEntry($yt, 'J9JY0k8nLiE');
+//updateEntry($yt, $newEntry->getVideoId(), 'nwe title', 'new desc', 'Autos', 'cars, flickr');
+
+//echo  $newEntry->getVideoId();
+
+deleteEntry($yt, '1rzHS0G9B-Q');
+
 //if (!empty($newEntry))
 {
 //	$newEntry -> setMajorProtocolVersion(2);
