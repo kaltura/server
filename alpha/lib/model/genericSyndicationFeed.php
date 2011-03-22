@@ -9,7 +9,7 @@
  */ 
 class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 {
-	const FILE_SYNC_MRSS_XSL = 1;
+	const FILE_SYNC_SYNDICATION_FEED_XSLT = 1;
 	
 	private $xslt;
 		
