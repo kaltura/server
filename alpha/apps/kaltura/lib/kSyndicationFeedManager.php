@@ -66,7 +66,7 @@ class kSyndicationFeedManager
 	 * @param $syndicationFeed
 	 * @return string
 	 */
-	private static function getMrssEntryXml(entry $entry,  syndicationFeed $syndicationFeed = null, $link = null)
+	private static function getMrssEntryXml(entry $entry, syndicationFeed $syndicationFeed = null, $link = null)
 	{
 		$mrss = kMrssManager::getEntryMrssXml($entry, null, $link);
 		
