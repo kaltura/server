@@ -200,7 +200,8 @@ class kMrssManager
 		$mrss->addChild('userId', $entry->getPuserId(true));
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
 		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
-		$mrss->addChild('thumbnailUrl', $entry->getThumbnailUrl());
+		$thumbnailUrl = $mrss->addChild('thumbnailUrl');
+		$thumbnailUrl->addAttribute('url', $entry->getThumbnailUrl());
 		$tags = $mrss->addChild('tags');
 		foreach(explode(',', $entry->getTags()) as $tag)
 			$tags->addChild('tag', self::stringToSafeXml($tag));
