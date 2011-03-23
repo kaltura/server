@@ -207,11 +207,15 @@ class investigateAction extends kalturaSystemAction
 				 $more_interesting_track_entries[] = $track_entry->getParam3Str() ; 
 		}
 
+		$track_entry_list2 = array();
+		//very heavy query, skip this
+		/*
 		// add all the track_entry objects that are related (joined on PARAM_3_STR)
 		$track_entry_c2 = new Criteria();
 		$track_entry_c2->add ( TrackEntryPeer::TRACK_EVENT_TYPE_ID , TrackEntry::TRACK_ENTRY_EVENT_TYPE_UPLOADED_FILE );
 		$track_entry_c2->add ( TrackEntryPeer::PARAM_3_STR , $more_interesting_track_entries , Criteria::IN );
 		$track_entry_list2 = TrackEntryPeer::doSelect ( $track_entry_c2 );
+		*/
 		
 		// first add the TRACK_ENTRY_EVENT_TYPE_UPLOADED_FILE - they most probably happend before the rest
 		$this->track_entry_list = array_merge ( $track_entry_list2 , $track_entry_list   );
