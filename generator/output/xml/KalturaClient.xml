@@ -3765,6 +3765,7 @@
     </class>
     <class name="KalturaGenericSyndicationFeed" base="KalturaBaseSyndicationFeed">
       <property name="feedDescription" type="string" readOnly="0" insertOnly="0" description="feed description&#10;"/>
+      <property name="feedLandingPage" type="string" readOnly="0" insertOnly="0" description="feed landing page (i.e publisher website)&#10;"/>
     </class>
     <class name="KalturaGenericXsltSyndicationFeed" base="KalturaGenericSyndicationFeed">
       <property name="xslt" type="string" readOnly="0" insertOnly="0" description=""/>
