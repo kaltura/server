@@ -68,10 +68,16 @@ class kIpAddressUtils
 
 			case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
 				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
-		        $fromIp = (ip2long($rangeIp) &ip2long($rangeMask)) + 1; 
-		        $toIp = (ip2long($rangeIp) | (~ip2long($rangeMask))) + 1; 
-		        $ip = ip2long($ip); 
-		        return ($ip >= $fromIp && $ip <= $toIp);
+				// convert mask address to CIDR
+				$long = ip2long($rangeMask);
+  				$base = ip2long('255.255.255.255');
+  				$rangeMask = 32-log(($long ^ $base)+1,2);
+  				if ($rangeMask <= 0){
+    				return false;
+    			} 
+       			$ipBinaryStr = sprintf("%032b",ip2long($ip)); 
+       			$netBinaryStr = sprintf("%032b",ip2long($rangeIp)); 
+        		return (substr_compare($ipBinaryStr,$netBinaryStr,0,$rangeMask) === 0);
 				
 			case self::IP_ADDRESS_TYPE_MASK_CIDR:
 				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));

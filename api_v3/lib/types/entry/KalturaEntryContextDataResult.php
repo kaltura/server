@@ -21,6 +21,11 @@ class KalturaEntryContextDataResult extends KalturaObject
 	public $isSessionRestricted;
 	
 	/**
+	 * @var bool
+	 */
+	public $isIpAddressRestricted;
+	
+	/**
 	 * @var int
 	 */
 	public $previewLength;

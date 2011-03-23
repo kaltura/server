@@ -395,6 +395,7 @@ class BaseEntryService extends KalturaEntryService
 		$result->isSiteRestricted = false;
 		$result->isCountryRestricted = false;
 		$result->isSessionRestricted = false;
+		$result->isIpAddressRestricted = false;
 		$result->previewLength = -1;
 				
 		if ($accessControl && $accessControl->hasRestrictions())
@@ -422,6 +423,10 @@ class BaseEntryService extends KalturaEntryService
 				$result->isSessionRestricted = !$accessControl->getPreviewRestriction()->isValid();
 				$result->previewLength = $accessControl->getPreviewRestriction()->getPreviewLength();
 			}
+			
+			if ($accessControl->hasIpAddressRestriction())
+				$result->isIpAddressRestricted = !$accessControl->getIpAddressRestriction()->isValid();
+				
 		}
 		
 		return $result;
