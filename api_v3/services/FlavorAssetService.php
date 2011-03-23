@@ -32,6 +32,18 @@ class FlavorAssetService extends KalturaBaseService
 			
 		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance(), $partnerGroup);
 	}
+
+	// maybe a solution to bug #9798
+//	/* (non-PHPdoc)
+//	 * @see KalturaBaseService::kalturaNetworkAllowed()
+//	 */
+//	protected function kalturaNetworkAllowed($actionName)
+//	{
+//		if( $actionName == 'getWebPlayableByEntryId')
+//			return true;
+//		else
+//			return false;
+//	}
 	
 	protected function globalPartnerAllowed($actionName)
 	{
