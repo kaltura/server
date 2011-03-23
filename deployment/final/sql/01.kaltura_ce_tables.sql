@@ -17,6 +17,7 @@ CREATE TABLE `access_control` (
   `prv_restrict_privilege` varchar(20) DEFAULT NULL,
   `prv_restrict_length` int(11) DEFAULT NULL,
   `kdir_restrict_type` tinyint(4) DEFAULT NULL,
+  `custom_data` TEXT,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
