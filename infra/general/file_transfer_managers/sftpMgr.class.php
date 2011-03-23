@@ -88,19 +88,15 @@ class sftpMgr extends kFileTransferMgr
         if (!$stream) {
         	return false;
         }
-        $data_to_send = @file_get_contents($local_file);
-        if ($data_to_send === false) {
-        	@fclose($stream);
-        	return false;
-        }
-        if (@fwrite($stream, $data_to_send) === false) {
-            @fclose($stream);
-        	return false;
-		}
+        
+        //Writes the file in chunks (for large files bug)
+        $fileToReadHandle = fopen($local_file, "r");
+        $this->writeFileInChunks($fileToReadHandle, $stream);
+        fclose($fileToReadHandle);
+
         return @fclose($stream);		
 	}
-	
-	
+		
 	// download a file from the server (ftp_mode is irrelevant)
 	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
 	{	
@@ -109,8 +105,12 @@ class sftpMgr extends kFileTransferMgr
         if (!$stream) {
         	return false;
         }
-        $contents = fread($stream, filesize("ssh2.sftp://$sftp$remote_file"));           
-        file_put_contents($local_file, $contents);
+        
+        //Writes the file in chunks (for large files bug)
+        $fileToWriteHandle = fopen($local_file, "w+");
+        $this->writeFileInChunks($stream, $fileToWriteHandle);
+        fclose($fileToWriteHandle);
+
         return @fclose($stream);
 	}
 	

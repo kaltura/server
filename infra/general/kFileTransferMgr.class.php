@@ -667,5 +667,36 @@ abstract class kFileTransferMgr
 		return $new_path;
 	}
 
+	/**
+	 * 
+	 * Reads the file in chunks (in order to avoid large files exception)
+	 * @param FileHandle $fileHandle - use fopen to open the file
+	 * @return - the file content (using fread)
+	 */
+	private function writeFileInChunks($fileToReadHandle, $fileToWriteHandle)
+	{
+		$content = null;
+		$chunkSize = 1*(1024*1024); // how many bytes per chunk 
+		if ($fileToReadHandle == null || $fileToWriteHandle == null) 
+		{ 
+			return false;
+		} 
+		
+		while (!feof($fileToReadHandle)) 
+		{ 
+			$content = fread($fileToReadHandle, $chunkSize);
+			if($content === false)
+			{
+				return false;
+			}
+			
+			if(fwrite($fileToWriteHandle, $content) === false)
+			{
+				return false;
+			}
+		} 
+		
+		return true;		
+	}
 }
 
