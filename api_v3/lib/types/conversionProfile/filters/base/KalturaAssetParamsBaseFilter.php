@@ -13,6 +13,8 @@ class KalturaAssetParamsBaseFilter extends KalturaFilter
 		"isSystemDefaultEqual" => "_eq_is_system_default",
 		"tagsEqual" => "_eq_tags",
 		"formatEqual" => "_eq_format",
+		"originEqual" => "_eq_origin",
+		"originIn" => "_in_origin",
 	);
 
 	private $order_by_map = array
@@ -63,4 +65,18 @@ class KalturaAssetParamsBaseFilter extends KalturaFilter
 	 * @var KalturaContainerFormat
 	 */
 	public $formatEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaAssetParamsOrigin
+	 */
+	public $originEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $originIn;
 }

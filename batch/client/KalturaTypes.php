@@ -176,6 +176,14 @@ class KalturaAssetParams extends KalturaObjectBase
 	 */
 	public $format = null;
 
+	/**
+	 * The ingestion origin of the Flavor Params
+	 * 
+	 *
+	 * @var KalturaAssetParamsOrigin
+	 */
+	public $origin = null;
+
 
 }
 
@@ -1609,6 +1617,49 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 * @var int
 	 */
 	public $endDate = null;
+
+	/**
+	 * Entry external reference id
+	 * 
+	 *
+	 * @var string
+	 */
+	public $referenceId = null;
+
+	/**
+	 * ID of temporary entry that will replace this entry when it’s approved and ready for replacement
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $replacingEntryId = null;
+
+	/**
+	 * ID of the entry that will be replaced when the replacement approved and this entry is ready
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $replacedEntryId = null;
+
+	/**
+	 * Status of the replacement readiness and approval
+	 * 
+	 *
+	 * @var KalturaEntryReplacementStatus
+	 * @readonly
+	 */
+	public $replacementStatus = null;
+
+	/**
+	 * Can be used to store various partner related data as a numeric value
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerSortValue = null;
 
 
 }

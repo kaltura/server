@@ -502,6 +502,49 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 */
 	public $endDate = null;
 
+	/**
+	 * Entry external reference id
+	 * 
+	 *
+	 * @var string
+	 */
+	public $referenceId = null;
+
+	/**
+	 * ID of temporary entry that will replace this entry when it’s approved and ready for replacement
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $replacingEntryId = null;
+
+	/**
+	 * ID of the entry that will be replaced when the replacement approved and this entry is ready
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $replacedEntryId = null;
+
+	/**
+	 * Status of the replacement readiness and approval
+	 * 
+	 *
+	 * @var KalturaEntryReplacementStatus
+	 * @readonly
+	 */
+	public $replacementStatus = null;
+
+	/**
+	 * Can be used to store various partner related data as a numeric value
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerSortValue = null;
+
 
 }
 
@@ -1364,6 +1407,14 @@ class KalturaAssetParams extends KalturaObjectBase
 	 * @var KalturaContainerFormat
 	 */
 	public $format = null;
+
+	/**
+	 * The ingestion origin of the Flavor Params
+	 * 
+	 *
+	 * @var KalturaAssetParamsOrigin
+	 */
+	public $origin = null;
 
 
 }
@@ -2837,6 +2888,43 @@ abstract class KalturaPartnerBaseFilter extends KalturaFilter
  */
 class KalturaPartnerFilter extends KalturaPartnerBaseFilter
 {
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaProfesionalServicesPartnerFilter extends KalturaPartnerFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaCommercialUseType
+	 */
+	public $commercialUseEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual = null;
+
 
 }
 

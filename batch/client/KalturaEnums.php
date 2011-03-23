@@ -83,6 +83,17 @@ class KalturaAssetParamsOrderBy
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaAssetParamsOrigin
+{
+	const CONVERT = 0;
+	const INGEST = 1;
+	const CONVERT_WHEN_MISSING = 2;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaAssetParamsOutputOrderBy
 {
 }
@@ -528,6 +539,17 @@ class KalturaEntryModerationStatus
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaEntryReplacementStatus
+{
+	const APPROVED_BUT_NOT_READY = "1";
+	const READY_BUT_NOT_APPROVED = "2";
+	const NOT_READY_AND_NOT_APPROVED = "3";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaEntryStatus
 {
 	const ERROR_IMPORTING = "-2";
@@ -539,6 +561,7 @@ class KalturaEntryStatus
 	const PENDING = "4";
 	const MODERATE = "5";
 	const BLOCKED = "6";
+	const NO_CONTENT = "7";
 	const INFECTED = "virusScan.Infected";
 }
 
@@ -582,6 +605,7 @@ class KalturaFileSyncObjectType
 	const METADATA = "5";
 	const METADATA_PROFILE = "6";
 	const SYNDICATION_FEED = "7";
+	const CONVERSION_PROFILE = "8";
 	const GENERIC_DISTRIBUTION_ACTION = "contentDistribution.GenericDistributionAction";
 	const ENTRY_DISTRIBUTION = "contentDistribution.EntryDistribution";
 	const DISTRIBUTION_PROFILE = "contentDistribution.DistributionProfile";

@@ -55,6 +55,16 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"endDateLessThanOrEqual" => "_lte_end_date",
 		"endDateGreaterThanOrEqualOrNull" => "_gteornull_end_date",
 		"endDateLessThanOrEqualOrNull" => "_lteornull_end_date",
+		"referenceIdEqual" => "_eq_reference_id",
+		"referenceIdIn" => "_in_reference_id",
+		"replacingEntryIdEqual" => "_eq_replacing_entry_id",
+		"replacingEntryIdIn" => "_in_replacing_entry_id",
+		"replacedEntryIdEqual" => "_eq_replaced_entry_id",
+		"replacedEntryIdIn" => "_in_replaced_entry_id",
+		"replacementStatusEqual" => "_eq_replacement_status",
+		"replacementStatusIn" => "_in_replacement_status",
+		"partnerSortValueGreaterThanOrEqual" => "_gte_partner_sort_value",
+		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
 		"tagsAdminTagsMultiLikeOr" => "_mlikeor_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeOr" => "_mlikeor_tags-admin_tags-name",
@@ -75,6 +85,8 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"-updatedAt" => "-updated_at",
 		"+rank" => "+rank",
 		"-rank" => "-rank",
+		"+partnerSortValue" => "+partner_sort_value",
+		"-partnerSortValue" => "-partner_sort_value",
 		"recent" => "recent",
 	);
 
@@ -419,6 +431,77 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $endDateLessThanOrEqualOrNull;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $referenceIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $referenceIdIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $replacingEntryIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $replacingEntryIdIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $replacedEntryIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $replacedEntryIdIn;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaEntryReplacementStatus
+	 */
+	public $replacementStatusEqual;
+
+	/**
+	 * 
+	 * 
+	 * @dynamicType KalturaEntryReplacementStatus
+	 * @var string
+	 */
+	public $replacementStatusIn;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerSortValueGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerSortValueLessThanOrEqual;
 
 	/**
 	 * @var string
