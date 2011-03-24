@@ -39,11 +39,11 @@ class MediaService extends KalturaEntryService
      * Generic add entry, should be used when the uploaded entry type is not known
      *
      * @action add
-     * @param KalturaBaseEntry $entry
+     * @param KalturaMediaEntry $entry
      * @param KalturaResource $resource
-     * @return KalturaBaseEntry
+     * @return KalturaMediaEntry
      */
-    function addAction(KalturaBaseEntry $entry, KalturaResource $resource = null)
+    function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
     	$dbEntry = parent::add($entry);
     	
@@ -215,7 +215,7 @@ class MediaService extends KalturaEntryService
 				
 		$entryNewFullPath = $entryFullPath . '.clipped.flv';
  		KalturaLog::debug("Clip webcam full path from [$entryFixedFullPath] to [$entryNewFullPath]");
-		myFlvStaticHandler::clipToNewFile($entryFixedFullPath, $entryNewFullPath);
+		myFlvStaticHandler::clipToNewFile($entryFixedFullPath, $entryNewFullPath, 0, 0);
 		$entryFullPath = $entryNewFullPath ;
 				
 		if(!file_exists($entryFullPath))
