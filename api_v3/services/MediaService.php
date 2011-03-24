@@ -191,6 +191,8 @@ class MediaService extends KalturaEntryService
 			$dbAsset->save();												
 			throw $e;
 		}
+		$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbAsset->save();
 		
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
@@ -254,9 +256,6 @@ class MediaService extends KalturaEntryService
 		{
 			KalturaLog::err("Getting media info: " . $e->getMessage());
 		}
-		
-		$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$dbAsset->save();
 		
 		$dbEntry->setStatus(entryStatus::READY);
 		$dbEntry->save();
