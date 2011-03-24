@@ -34,7 +34,7 @@
 						(<?php echo implode($titles, ', '); ?>)
 					<?php endif; ?>
 				</td>
-				<td><?php echo $user->roleNames.' ('.$user->roleIds.')'; ?></td>
+				<td><?php echo $user->roleNames; // .' ('.$user->roleIds.')' ?></td>
 				<td>
 					<?php $disabled = (($user->email == $this->myEmail) || ($user->isAccountOwner)) ? ' disabled="disabled"' : ''; ?>
 					<select class="options" onchange="doAction(this.value, '<?php echo $user->id; ?>') "<?php echo $disabled; ?>>

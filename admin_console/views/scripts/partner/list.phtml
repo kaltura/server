@@ -42,13 +42,15 @@
 						<?php if (Kaltura_AclHelper::isAllowed('partner','kmc-users')): ?>
 							<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
 						<?php endif; ?>
+						<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
+							<?php if (Kaltura_AclHelper::isAllowed('partner','configure')): ?>
+								<option value="configure"><?php echo $this->translate('Configure'); ?></option>
+							<?php endif; ?>
+						<?php endif; ?>
 						<?php if (Kaltura_AclHelper::isAllowed('widget','list')): ?>
 							<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
 						<?php endif; ?>	
 						<?php if ($partner->id != Kaltura_Consts::TEMPLATE_PARTNER_ID): ?>
-							<?php if (Kaltura_AclHelper::isAllowed('partner','configure')): ?>
-								<option value="configure"><?php echo $this->translate('Configure'); ?></option>
-							<?php endif; ?>								
 							<?php if (Kaltura_AclHelper::isAllowed('partner','configure-storage')): ?>	
 								<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
 							<?php endif; ?>	
@@ -63,6 +65,11 @@
 								<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 							<?php endif; ?>
 						<?php endif; ?>
+						<?php /* for next time, move the Distribution tab to here.
+						 if (Kaltura_AclHelper::isAllowed('partner','configure-distribution')): ?>
+							<option value="distributionProfiles"><?php echo $this->translate('Distribution Profiles'); ?></option>
+							<option value="distributionProviders"><?php echo $this->translate('Distribution Providers'); ?></option>
+						<?php endif; */ ?>
 					</select>
 				</td>
 			</tr>
@@ -140,8 +147,8 @@ function kmcUsers(partnerId) {
 		bgiframe: true,
 		modal: true,
 		resizable: true,
-		width: 1133,
-		height: 600,
+		width: (jQuery(window).width()-40),
+		height: (jQuery(window).height()-40),
 		title: "<?php echo $this->translate('Publisher\'s Users list'); ?>",
 		buttons: {
 			'<?php echo $this->translate('Close'); ?>': function() {
@@ -275,6 +282,18 @@ function changeStatus(partnerId, status, callback)
 			alert('<?php echo $this->translate('an error occured'); ?>');
 		}
 	});
+}
+
+function distributionProfiles(partnerId)
+{
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileListAction'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
+	document.location = url;
+}
+
+function distributionProviders(partnerId)
+{
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'GenericDistributionProvidersListAction'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
+	document.location = url;
 }
 
 jQuery(function() {

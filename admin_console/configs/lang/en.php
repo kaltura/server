@@ -57,6 +57,7 @@ return array(
 	'KalturaConversionEngineType::AVIDEMUX' => 'Convert - AVIDEMUX',
 	'KalturaConversionEngineType::PDF2SWF' => 'Convert - PDF to SWF',
 	'KalturaConversionEngineType::PDF_CREATOR' => 'Convert - PDF Creator',
+	'KalturaConversionEngineType::SEGMENTER' => 'Convert – Stream Segmenter',
 
 	'KalturaBatchJobStatus::PENDING' => 'Pending',
 	'KalturaBatchJobStatus::QUEUED' => 'Started',
@@ -907,6 +908,10 @@ return array(
 	'entry-investigate track entry createdAt th' => 'Create Time',
 	'entry-investigate track entry updatedAt th' => 'Update Time',
 	'entry-investigate track entry userIp th' => 'User IP',
+
+	// Distibution
+	'provider-list intro text'	=>	'From here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
+	'distribution-profiles intro text' =>	'From here you can define and manage specific distribution profiles for each publisher account.',
 );
 
 

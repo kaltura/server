@@ -59,7 +59,7 @@ class Form_PartnerConfiguration extends Kaltura_Form
 		));
 		
 		$this->addElement('text', 'admin_login_users_quota', array(
-			'label'			=> 'Quota of loginable admin users:',
+			'label'			=> 'Number of KMC admin users:',
 			'filters'		=> array('StringTrim'),
 		));
 		

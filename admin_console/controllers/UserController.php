@@ -119,12 +119,7 @@ class UserController extends Zend_Controller_Action
 	{
 		Zend_Session::forgetMe();
 		$client = Kaltura_ClientHelper::getClient();
-		try {
-			$client->session->end();
-		}
-		catch (Exception $e) {
-			// do nothing - continue logout
-		}
+		$client->session->end();
 		Zend_Auth::getInstance()->clearIdentity();
 		$this->_helper->redirector('index', 'index');
 	}
@@ -172,7 +167,7 @@ class UserController extends Zend_Controller_Action
 		$form = new Form_ChangeUserRole();
 		$form->getElement('name')->setValue($user->fullName);
 		$form->getElement('email')->setValue($user->email);
-		$form->getElement('currentRole')->setValue($user->roleNames);
+		$form->getElement('role')->setValue($user->roleIds);
 				
 		if ($request->isPost())
 		{

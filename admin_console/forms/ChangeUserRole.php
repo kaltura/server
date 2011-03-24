@@ -28,17 +28,9 @@ class Form_ChangeUserRole extends Zend_Form
 			'ignore' 		=> true,
 		));
 		
-		// Add a current role element
-		$this->addElement('text', 'currentRole', array(
-			'label'			=> 'Current role:',
-			'filters'		=> array('StringTrim'),
-			'readonly'		=> true,
-			'ignore' 		=> true,
-		));
-		
 		// Add a new role element
 		$this->addElement('select', 'role', array(
-			'label'			=> 'New role:',
+			'label'			=> 'Role:',
 			'filters'		=> array('StringTrim'),
 			'required'		=> true,
 		));

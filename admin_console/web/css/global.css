@@ -42,7 +42,7 @@ html, body { margin:0; padding:0; height: 100%; }
 #sub-header { padding:5px 20px 19px; min-height: 25px; background: transparent url(../images/sub-bg.png) repeat-x 0 -2px; }
 
 /* wrapper */
-#wrapper { padding: 10px; clear: both; }
+#wrapper { padding: 10px; clear: both; width: 95%; }
 
 /* main navigation 
 .navigation { height:28px; margin: -4px 0 0 36px; float:left; }
@@ -144,7 +144,7 @@ div#my_info, div#new_admin { clear: both;}
 	   p#clear_dates { text-align:center; margin-top:3px;}
 	  #filters img { vertical-align:middle; #vertical-align:2px; padding-right:5px;}
 
-	#results { float:left;}
+	#results { float:left; width: 100%; }
 	*:first-child+html #results { margin-top: 18px; } /* ie7 only */
 	body#batch-in-progress-tasks #results, body#batch-failed-tasks #results { margin-left:20px;}
 
@@ -187,7 +187,7 @@ div#my_info, div#new_admin { clear: both;}
 		  ul.errors { color:red;}
 
 		  #list_admins_panel { }
-		   #list_admins_panel table { width:708px; clear:both;}
+		   #list_admins_panel table { width:100%; clear:both;}
 		   div.panel button { position:absolute; bottom:17px; right:10px; }
 			@-moz-document url-prefix() { div.panel button { bottom:45px; right:20px;} }
 
@@ -362,7 +362,7 @@ body#monitoring-xymon {}
 	 #index-apc #wrapper { padding:0; overflow: hidden; }	
 	
 	#index-testme { }
-	 #index-testme #wrapper { padding:0; overflow: hidden; }
+	 #index-testme #wrapper { padding:0; overflow: hidden; width: 100%; }
 
 	#index-testme-doc { }
 	 #index-testme-doc #wrapper { padding:0; overflow: hidden; }
@@ -460,17 +460,30 @@ body#index-apc #wrapper { display:block;}
 body#index-testme #wrapper { display:block;} 
 body#index-testme-doc #wrapper { display:block;}
 
-table table td.commandLines { width }
-
-
+#change-user-role-dialog form { width: auto; }
 #change-user-role-dialog input, 
-#change-user-role-dialog select { width: 160px}
+#change-user-role-dialog select { width: 200px}
 
 #change-user-role-dialog input { border:none; background:#fff; }
 
 #list_kmc_users_panel button { position: static; }
-#list_kmc_users_panel table { width: auto; min-width: 0px; }
+#list_kmc_users_panel table { width: 100%; min-width: 0px; }
 
 /* kaltura_inernal_tools plugin */
 dt#Algorithm-label { margin-bottom: 10px; font-size: 16px; font-weight: bold; }
 dd#Algorithm-element { clear: both; }
+#Algorithm-element label { display: block; margin: 7px 0; }
+#Algorithm-element input[type=text] { height: 14px; }
+
+.truncated { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+#results table { width: 100%; }
+
+.flavor_param { clear: both; }
+.flavor_param label { float: left; margin: 2px 20px 2px 0; }
+.flavor_param .flavor_name { width: 200px; margin-right: 10px; }
+
+#frmGenericProviderConfig .zend_form dt { float: left; width: 120px; margin: 5px 10px 0 0px; clear: both; }
+#frmGenericProviderConfig .zend_form dd { margin: 5px 0 5px; }
+#frmGenericProviderConfig .zend_form .set_default { float: right; margin: -23px 40px 0 0; width: 125px; }
+.crossLine { clear: both; }
