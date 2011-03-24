@@ -2,14 +2,9 @@
 /**
  * Applicative event that raised implicitly by the developer
  */
-class kObjectDataChangedEvent extends KalturaEvent implements IKalturaContinualEvent
+class kObjectDataChangedEvent extends kApplicativeEvent
 {
 	const EVENT_CONSUMER = 'kObjectDataChangedEventConsumer';
-	
-	/**
-	 * @var BaseObject
-	 */
-	private $object;
 	
 	/**
 	 * @var string
@@ -20,9 +15,10 @@ class kObjectDataChangedEvent extends KalturaEvent implements IKalturaContinualE
 	 * @param BaseObject $object
 	 * @param string $previousVersion
 	 */
-	public function __construct(BaseObject $object, $previousVersion = null)
+	public function __construct(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		$this->object = $object;
+		parent::__construct($object, $raisedJob);
+		
 		$this->previousVersion = $previousVersion;
 	}
 	
@@ -37,7 +33,7 @@ class kObjectDataChangedEvent extends KalturaEvent implements IKalturaContinualE
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		return $consumer->objectDataChanged($this->object, $this->previousVersion);
+		return $consumer->objectDataChanged($this->object, $this->previousVersion, $this->raisedJob);
 	}
 
 }

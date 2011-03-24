@@ -2,22 +2,9 @@
 /**
  * Applicative event that raised implicitly by the developer
  */
-class kObjectDeletedEvent extends KalturaEvent implements IKalturaContinualEvent
+class kObjectDeletedEvent extends kApplicativeEvent
 {
 	const EVENT_CONSUMER = 'kObjectDeletedEventConsumer';
-	
-	/**
-	 * @var BaseObject
-	 */
-	private $object;
-	
-	/**
-	 * @param BaseObject $object
-	 */
-	public function __construct(BaseObject $object)
-	{
-		$this->object = $object;
-	}
 	
 	public function getConsumerInterface()
 	{
@@ -30,7 +17,7 @@ class kObjectDeletedEvent extends KalturaEvent implements IKalturaContinualEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		return $consumer->objectDeleted($this->object);
+		return $consumer->objectDeleted($this->object, $this->raisedJob);
 	}
 
 }

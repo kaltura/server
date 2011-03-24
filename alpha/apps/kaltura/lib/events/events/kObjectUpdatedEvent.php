@@ -2,22 +2,9 @@
 /**
  * Applicative event that raised implicitly by the developer
  */
-class kObjectUpdatedEvent extends KalturaEvent implements IKalturaContinualEvent
+class kObjectUpdatedEvent extends kApplicativeEvent
 {
 	const EVENT_CONSUMER = 'kObjectUpdatedEventConsumer';
-	
-	/**
-	 * @var BaseObject
-	 */
-	private $object;
-	
-	/**
-	 * @param BaseObject $object
-	 */
-	public function __construct(BaseObject $object)
-	{
-		$this->object = $object;
-	}
 	
 	public function getConsumerInterface()
 	{
@@ -30,7 +17,7 @@ class kObjectUpdatedEvent extends KalturaEvent implements IKalturaContinualEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
-		return $consumer->objectUpdated($this->object);
+		return $consumer->objectUpdated($this->object, $this->raisedJob);
 	}
 
 }
