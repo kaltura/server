@@ -1118,6 +1118,8 @@
 			
 <script type="text/javascript">
 
+	var jobNodes = {};
+	
 	function generateFlow(){
 
 		var $paintarea = jQuery("#paintarea");
@@ -1129,9 +1131,8 @@
 		var y = offset.top + 5;
 
 		var workflow  = new draw2d.Workflow("paintarea");
-		var jobNodes = {};
 
-		<?php if($investigateData->jobs && $investigateData->jobs->totalCount): ?>
+		<?php if($investigateData && $investigateData->jobs && $investigateData->jobs->totalCount): ?>
 			<?php foreach($investigateData->jobs->objects as $job): ?>
 
 				<?php 
@@ -1193,8 +1194,9 @@
 				
 				var jobW = (jobNode.getChildrenWidth() / 2);
 				
-				var jobY = y + (jobNode.getNodeLevel() * 110);
-				workflow.addFigure(jobNode, jobX, jobY);
+				var jobY = (jobNode.getNodeLevel() * 110);
+				jobNode.setJobY(jobY);
+				workflow.addFigure(jobNode, jobX, y + jobY);
 
 				if(jobNode.getNodeLevel())
 					jobNode.setJobParentX(jobX + jobW);
@@ -1221,33 +1223,6 @@
 		<?php else: ?>
 			$paintarea.remove();
 		<?php endif; ?>
-		
-//		var object = new draw2d.shape.uml.Class("Convert");
-//		object.addAttribute("id", 3453453);
-//		object.setDimension(20, 10);
-//		workflow.addFigure(object, x + 10, y + 10);
-//		
-//		var rectangle = new draw2d.shape.uml.Class("Rectangle");
-//		rectangle.setDimension(20, 10);
-//		rectangle.addAttribute("width","Integer","0");
-//		rectangle.addAttribute("height","Integer","0");
-//		workflow.addFigure(rectangle, x + 100, y + 300);
-//		
-//		var circle = new draw2d.shape.uml.Class("Circle");
-//		circle.setDimension(20, 10);
-//		circle.addAttribute("diameter","Integer","0");
-//		workflow.addFigure(circle, x + 500, y + 300);
-//		
-//		var con = new draw2d.shape.uml.InheritanceConnection();
-//		con.setSource(rectangle.portTop);
-//		con.setTarget(object.portTop);
-//		workflow.addFigure(con);
-//		
-//		var con = new draw2d.shape.uml.InheritanceConnection();
-//		con.setSource(circle.portTop);
-//		con.setTarget(object.portTop);
-//		workflow.addFigure(con);
-			
 	}
 	
 	function doThumbs() {
@@ -1261,6 +1236,18 @@
 
 	function toggleView(entityId) {
 		jQuery("#" + entityId).toggle();
+
+		var $paintarea = jQuery("#paintarea");
+		if(!$paintarea)
+			return;
+		
+		var offset = $paintarea.offset();
+		var y = offset.top + 5;
+		
+		for(var i in jobNodes){
+			jobNode = jobNodes[i];
+			jobNode.updatePosition(y);
+		}
 	}
 
 	jQuery(function() {

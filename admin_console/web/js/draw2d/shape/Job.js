@@ -5,6 +5,7 @@ draw2d.shape.Job=function(_4ef2){
 	this.nodeLevel=0;
 	this.parentJobNode=null;
 	this.jobX=0;
+	this.jobY=0;
 	this.portTop=null;
 	this.portRight=null;
 	this.portBottom=null;
@@ -20,7 +21,7 @@ draw2d.shape.Job.prototype.type="shape.job";
 draw2d.shape.Job.prototype.setWorkflow=function(_4ef3){
 	draw2d.Node.prototype.setWorkflow.call(this,_4ef3);
 	if(_4ef3!==null&&this.portTop===null){
-	this.recalculateSize();
+		this.recalculateSize();
 	}
 };
 draw2d.shape.Job.prototype.setClassName=function(name){
@@ -156,6 +157,12 @@ draw2d.shape.Job.prototype.getJobX=function(_4ef3){
 draw2d.shape.Job.prototype.setJobX=function(theX){
 	this.jobX = theX;
 }
+draw2d.shape.Job.prototype.setJobY=function(theY){
+	this.jobY = theY;
+}
+draw2d.shape.Job.prototype.updatePosition=function(baseY){
+	this.setPosition(this.x, baseY + this.jobY);
+};
 draw2d.shape.Job.prototype.getJobParentX=function(_4ef3){
 	return this.parentJobNode.getJobX();
 }
