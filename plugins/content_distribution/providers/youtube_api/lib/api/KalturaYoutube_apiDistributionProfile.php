@@ -9,7 +9,12 @@ class KalturaYoutube_apiDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $username;
-	
+
+	/**
+	 * @var string
+	 */
+	public $password;
+		
 	/**
 	 * @var string
 	 */
@@ -102,11 +107,8 @@ class KalturaYoutube_apiDistributionProfile extends KalturaDistributionProfile
 	private static $map_between_objects = array 
 	(
 		'username',
+		'password'
 		'notificationEmail',
-		'sftpHost',
-		'sftpLogin',
-		'sftpPublicKey',
-		'sftpPrivateKey',
 		'ownerName',
 		'defaultCategory',
 		'allowComments',

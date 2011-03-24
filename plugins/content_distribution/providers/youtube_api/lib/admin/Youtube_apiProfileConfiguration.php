@@ -62,7 +62,13 @@ class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfigura
 			'label'			=> 'YouTube Account:',
 			'filters'		=> array('StringTrim'),
 		));
-	
+
+		// General
+		$this->addElement('text', 'password', array(
+			'label'			=> 'YouTube Password:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('text', 'notification_email', array(
 			'label'			=> 'Notification Email:',
 			'filters'		=> array('StringTrim'),
@@ -84,36 +90,11 @@ class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfigura
 //		$this->addMetadataProfile();
 		
 		$this->addDisplayGroup(
-			array('username', 'notification_email', 'owner_name', 'target', 'metadata_profile_id'), 
+			array('username', 'password', 'notification_email', 'owner_name', 'target', 'metadata_profile_id'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
-		
-		// SFTP Configuration
-		$this->addElement('text', 'sftp_host', array(
-			'label'			=> 'SFTP Host:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'sftp_login', array(
-			'label'			=> 'SFTP Login:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('file', 'sftp_public_key', array(
-			'label' => 'SFTP Public Key:'
-		));
-		
-		$this->addElement('file', 'sftp_private_key', array(
-			'label' => 'SFTP Private Key:'
-		));
-		
-		$this->addDisplayGroup(
-			array('sftp_host', 'sftp_login', 'sftp_public_key', 'sftp_private_key'), 
-			'sftp', 
-			array('legend' => 'SFTP Configuration', 'decorators' => array('FormElements', 'Fieldset'))
-		);
-		
+				
 		//  Metadata
 		$this->addElement('text', 'default_category', array(
 			'label' => 'Default Category:',

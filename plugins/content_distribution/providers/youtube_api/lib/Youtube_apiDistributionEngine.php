@@ -87,8 +87,8 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		$props = $this->getYoutube_apiProps($entry, $data, $distributionProfile);
 		if($data->entryDistribution->remoteId)
 		{
-			$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
-			$dailyMotionImpl->update($data->remoteId, $props);
+			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+			$youTubeApiImpl->update($data->remoteId, $props);
 		
 			$data->remoteId = $data->entryDistribution->remoteId;
 			return true;
@@ -123,9 +123,9 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 			$videoFilePath = $videoFilePathNew;
 		}
 		
-		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
-		$remoteId = $dailyMotionImpl->upload($videoFilePath);
-		$dailyMotionImpl->update($remoteId, $props);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+		$remoteId = $youTubeApiImpl->upload($videoFilePath);
+		$youTubeApiImpl->update($remoteId, $props);
 	
 		if ($needDel == true)
 		{
@@ -141,9 +141,9 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
 		$distributionProfile = $data->distributionProfile;
-		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
 		
-		$status = $dailyMotionImpl->getStatus($data->remoteId);
+		$status = $youTubeApiImpl->getStatus($data->remoteId);
 				
 		switch($status)
 		{
@@ -178,8 +178,8 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = $this->getYoutube_apiProps($entry, $data, $distributionProfile);
 	
-		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
-		$dailyMotionImpl->update($data->remoteId, $props);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+		$youTubeApiImpl->update($data->remoteId, $props);
 		
 //		$data->sentData = $youtube_apiMediaService->request;
 //		$data->results = $youtube_apiMediaService->response;
@@ -193,9 +193,9 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
 		$distributionProfile = $data->distributionProfile;
-		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
 		
-		$dailyMotionImpl->delete($data->remoteId);
+		$youTubeApiImpl->delete($data->remoteId);
 		
 		return true;
 	}
