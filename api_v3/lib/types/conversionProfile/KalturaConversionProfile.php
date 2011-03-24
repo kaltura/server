@@ -92,6 +92,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 * Cropping dimensions
 	 * 
 	 * @var KalturaCropDimensions
+	 * @deprecated
 	 */
 	public $cropDimensions;
 	
@@ -99,6 +100,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 * Clipping start position (in miliseconds)
 	 * 
 	 * @var int
+	 * @deprecated
 	 */
 	public $clipStart;
 	
@@ -106,6 +108,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 * Clipping duration (in miliseconds)
 	 * 
 	 * @var int
+	 * @deprecated
 	 */
 	public $clipDuration;
 	
@@ -115,6 +118,13 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $xslTransformation;
+	
+	/**
+	 * ID of default storage profile to be used for linked net-storage file syncs
+	 * 
+	 * @var int
+	 */
+	public $storageProfileId;
 	
 	private static $map_between_objects = array
 	(
@@ -130,6 +140,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		"isDefault",
 		"clipStart",
 		"clipDuration",
+		"storageProfileId",
 	);
 	
 	public function getMapBetweenObjects ( )

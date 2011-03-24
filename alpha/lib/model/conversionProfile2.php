@@ -225,5 +225,14 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		return $this->getflavorParamsConversionProfilesJoinassetParams($criteria, $con, $join_behavior);
 	}
+
+	public function getStorageProfileId()
+	{
+		return $this->getFromCustomData('storageProfileId');
+	}
 	
+	public function setStorageProfileId($v)
+	{
+		$this->putInCustomData('storageProfileId', $v);
+	}
 }
