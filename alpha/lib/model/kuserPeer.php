@@ -14,6 +14,7 @@ class kuserPeer extends BasekuserPeer
 	const KALTURA_NEW_USER_EMAIL_TO_ADMINS = 122;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL = 123;
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
+	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL_TO_ADMINS = 125;
 	
 	private static $s_default_count_limit = 301;
 
@@ -431,9 +432,17 @@ class kuserPeer extends BasekuserPeer
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
 		
-		$mailType = self::KALTURA_NEW_USER_EMAIL_TO_ADMINS;
 		$bodyParams = null;
+
+
+		$mailType = self::KALTURA_NEW_USER_EMAIL_TO_ADMINS;
 		
+		//If the new user partner is -2 (admin console) then it is a admin console user		
+		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			$mailType = self::KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL_TO_ADMINS;
+		}
+				
 		// get all partner administrators
 		$c = new Criteria();
 		$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
@@ -455,8 +464,16 @@ class kuserPeer extends BasekuserPeer
 				if (!$adminName) { $adminName = $admin->getPuserId(); }
 				$unsubscribeLink .= $admin->getEmail();
 				$bodyParams = null;
-				$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId);
-			
+				
+				if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // Mail for admin console user
+				{
+					$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $roleName);
+				}
+				else
+				{
+					$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $publisherName, $roleName, $publisherName, $puserId);
+				}
+				
 				// add mail job
 				kJobsManager::addMailJob(
 					null, 
@@ -510,7 +527,7 @@ class kuserPeer extends BasekuserPeer
 			if ($existingUser)
 			{
 				$mailType = self::KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL;
-				$bodyParams = array($userName, $creatorUserName, $loginEmail, $resetPasswordLink, $roleName, $adminConsoleLink);
+				$bodyParams = array($userName, $creatorUserName, $loginEmail, $roleName);
 			}
 			else
 			{
