@@ -103,7 +103,7 @@ class MediaService extends KalturaEntryService
 		$dbEntry->setSource(KalturaSourceType::FILE);
 		$dbEntry->save();
 		
-		return $this->attachFile($resource->localFilePath, $dbEntry, $dbAsset);
+		return $this->attachFile($resource->localFilePath, $dbEntry, $dbAsset, true);
     }
     
     /**
@@ -158,7 +158,7 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
      * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
      */
-    protected function attachFile($entryFullPath, entry $dbEntry, asset $dbAsset = null)
+    protected function attachFile($entryFullPath, entry $dbEntry, asset $dbAsset = null, $copyOnly = false)
     {
 		$isNewAsset = false;
 		if(!$dbAsset)
@@ -181,7 +181,7 @@ class MediaService extends KalturaEntryService
 		$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
 		try {
-			kFileSyncUtils::moveFromFile($entryFullPath, $syncKey);
+			kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
 		}
 		catch (Exception $e) {
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
