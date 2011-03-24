@@ -1261,7 +1261,7 @@
 <script type="text/javascript">
 
 	function openRequestDialog(){
-		$('#dvRequestDialog').show();
+		jQuery('#dvRequestDialog').show();
 	}
 	
 	function doRequestSupport(){
@@ -1273,8 +1273,8 @@
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
 
-		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
-		$('#submitAction').val('reconvertEntry');
+		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
+		jQuery('#submitAction').val('reconvertEntry');
 	
 		frm.submit();
 	}
@@ -1283,9 +1283,9 @@
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
 
-		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
-		$('#actionFlavorAssetId').val(thumbAssetId);
-		$('#submitAction').val('regenerate');
+		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
+		jQuery('#actionFlavorAssetId').val(thumbAssetId);
+		jQuery('#submitAction').val('regenerate');
 	
 		frm.submit();
 	}
@@ -1294,9 +1294,9 @@
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
 
-		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
-		$('#actionFlavorAssetId').val(flavorAssetId);
-		$('#submitAction').val('reconvert');
+		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
+		jQuery('#actionFlavorAssetId').val(flavorAssetId);
+		jQuery('#submitAction').val('reconvert');
 
 		frm.submit();
 	}
@@ -1306,10 +1306,10 @@
 		var frm = document.getElementById("frmSearch");
 		frm.reset();
 
-		$('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
-		$('#actionJobId').val(jobId);
-		$('#actionJobType').val(jobType);
-		$('#submitAction').val('retry');
+		jQuery('#partnerId').val(<?php echo ($entry ? $entry->partnerId : 0); ?>);
+		jQuery('#actionJobId').val(jobId);
+		jQuery('#actionJobType').val(jobType);
+		jQuery('#submitAction').val('retry');
 
 		frm.submit();
 	}
