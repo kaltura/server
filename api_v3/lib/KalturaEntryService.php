@@ -2,18 +2,32 @@
 
 class KalturaEntryService extends KalturaBaseService 
 {
+    /**
+     * @param KalturaResource $resource
+     * @param entry $dbEntry
+     * @param asset $asset
+     */
+    protected function attachResource(KalturaResource $resource, entry $dbEntry, asset $asset = null)
+    {
+    	
+    }
+    
 	/**
 	 * @param KalturaBaseEntry $entry
+	 * @param entry $dbEntry
 	 * @return entry
 	 */
-	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
+	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
 		// create a default name if none was given
 		if (!$entry->name)
 			$entry->name = $this->getPartnerId().'_'.time();
 		
 		// first copy all the properties to the db entry, then we'll check for security stuff
-		$dbEntry = $entry->toInsertableObject(new entry());
+		if(!$dbEntry)
+			$dbEntry = new entry();
+			
+		$dbEntry = $entry->toInsertableObject($dbEntry);
 
 		$this->checkAndSetValidUser($entry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($entry);
@@ -25,6 +39,25 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry->setDefaultModerationStatus();
 				
 		return $dbEntry;
+	}
+	
+	/**
+	 * Adds entry
+	 * 
+	 * @param KalturaBaseEntry $entry
+	 * @return entry
+	 */
+	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
+	{
+		$dbEntry = null;
+		$conversionProfile = myPartnerUtils::getConversionProfile2ForPartner($this->getPartnerId(), $conversionProfileId);
+		if($conversionProfile && $conversionProfile->getDefaultEntryId())
+		{
+			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
+			$dbEntry = $templateEntry->copy();
+		}
+		
+		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
 	/**

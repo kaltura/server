@@ -29,7 +29,176 @@ class BaseEntryService extends KalturaEntryService
 		return parent::partnerRequired($actionName);
 	}
 	
-	
+    /**
+     * Generic add entry, should be used when the uploaded entry type is not known
+     *
+     * @action add
+     * @param KalturaBaseEntry $entry
+     * @param KalturaResource $resource
+     * @param KalturaEntryType $type
+     * @return KalturaBaseEntry
+     */
+    function addAction(KalturaBaseEntry $entry, KalturaResource $resource, $type = -1)
+    {
+    	$dbEntry = parent::add($entry);
+    	if($type == KalturaEntryType::AUTOMATIC)
+    		$this->setEntryTypeByResource($dbEntry, $resource);
+    	$dbEntry->save();
+    	
+    	$this->attachResource($dbEntry, $resource);
+    	
+	    $entry->fromObject($dbEntry);
+	    return $entry;
+    }
+
+    /**
+     * @param KalturaResource $resource
+     * @param entry $dbEntry
+     * @param asset $asset
+     */
+    protected function attachResource(KalturaResource $resource, entry $dbEntry, asset $asset = null)
+    {
+    	$service = null;
+    	switch($dbEntry->getType())
+    	{
+			case entryType::MEDIA_CLIP:
+				$service = new MediaService();
+    			$service->initService('media', 'media', $this->actionName);
+    			break;
+				
+			case entryType::MIX:
+				$service = new MixingService();
+    			$service->initService('mixing', 'mixing', $this->actionName);
+    			break;
+				
+			case entryType::PLAYLIST:
+				$service = new PlaylistService();
+    			$service->initService('playlist', 'playlist', $this->actionName);
+    			break;
+				
+			case entryType::DATA:
+				$service = new DataService();
+    			$service->initService('data', 'data', $this->actionName);
+    			break;
+				
+			case entryType::LIVE_STREAM:
+				$service = new LiveStreamService();
+    			$service->initService('liveStream', 'liveStream', $this->actionName);
+    			break;
+    	}
+
+    	if($service)
+    		$service->attachResource($resource, $dbEntry, $asset);
+    }
+    
+    /**
+     * @param KalturaResource $resource
+     */
+    protected function setEntryTypeByResource(entry $dbEntry, KalturaResource $resource)
+    {
+    	$fullPath = null;
+    	switch(get_class($resource))
+    	{
+    		case 'KalturaAssetParamsResourceContainer':
+    			return $this->setEntryTypeByResource($dbEntry, $resource->resource);
+    			
+			case 'KalturaAssetsParamsResourceContainers':
+    			return $this->setEntryTypeByResource(reset($dbEntry, $resource->resources));
+				
+			case 'KalturaAssetResource':
+				assetPeer::resetInstanceCriteriaFilter();
+				$asset = assetPeer::retrieveById($resource->assetId);
+				if($asset)
+				{
+					$sourceEntry = $asset->getentry();
+					if($sourceEntry)
+					{
+						$dbEntry->setType($sourceEntry->getType());
+						$dbEntry->setMediaType($sourceEntry->getMediaType());
+					}
+				}
+				return;
+				
+			case 'KalturaEntryResource':
+				$sourceEntry = entryPeer::retrieveByPK($resource->entryId);
+				if($sourceEntry)
+				{
+					$dbEntry->setType($sourceEntry->getType());
+					$dbEntry->setMediaType($sourceEntry->getMediaType());
+				}
+				
+				return;
+				
+			case 'KalturaDropFolderFileResource':
+				// TODO - get the file name from the drop folder file object
+				return;
+				
+			case 'KalturaFileSyncResource':
+				$key = new FileSyncKey();
+				$key->object_type = $resource->fileSyncObjectType;
+				$key->object_sub_type = $resource->objectSubType;
+				$key->object_id = $resource->objectId;
+				$key->version = $resource->version;
+				$key->partner_id = $this->getPartnerId();
+				$fullPath = kFileSyncUtils::getLocalFilePathForKey($key);
+				break;
+				
+			case 'KalturaLocalFileResource':
+				$fullPath = $resource->localFilePath;
+				break;
+				
+			case 'KalturaSearchResultsResource':
+				$source = $resource->result->searchSource;
+				if ($source == KalturaSearchProviderType::KALTURA ||
+					$source == KalturaSearchProviderType::KALTURA_PARTNER ||
+					$source == KalturaSearchProviderType::KALTURA_USER_CLIPS)
+				{
+					$sourceEntry = entryPeer::retrieveByPK($searchResult->id);
+					if($sourceEntry)
+					{
+						$dbEntry->setType($sourceEntry->getType());
+						$dbEntry->setMediaType($sourceEntry->getMediaType());
+					}
+					return;
+				}
+				
+				$fullPath = $resource->result->url;
+				break;
+				
+			case 'KalturaUploadedFileResource':
+				$fullPath = $resource->fileData['name'];
+				break;
+				
+			case 'KalturaUploadedFileTokenResource':
+			case 'KalturaWebcamTokenResource':
+				$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($resource->token);
+				break;
+				
+			case 'KalturaUrlResource':
+				$fullPath = $resource->url;
+				break;
+				
+			default:
+				return;
+    	}
+    	if($fullPath)
+    		$this->setEntryTypeByExtension($dbEntry, $fullPath);
+    }
+    
+    protected function setEntryTypeByExtension(entry $dbEntry, $fullPath)
+    {
+    	$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+    	if(!$ext)
+   			return;
+    	
+    	$mediaType = myFileUploadService::getMediaTypeFromFileExt($ext);
+    	if($mediaType != entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
+    	{
+			$dbEntry->setType(entryType::MEDIA_CLIP);
+			$dbEntry->setMediaType($mediaType);
+    	}
+    }
+    
     /**
      * Generic add entry using an uploaded file, should be used when the uploaded entry type is not known
      *
