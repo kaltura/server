@@ -43,18 +43,6 @@ class kFlowHelper
 		$flavorAsset->setIsOriginal(true);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-		
-//		// 2010-11-08 - Solved by Tan-Tan in DocumentCreatedHandler::objectAdded 
-//		// 2010-10-17 - Hotfix by Dor - source document asset with no conversion profile should be in status READY
-//		if ($entry->getType() == entryType::DOCUMENT)
-//		{
-//			if (is_null($entry->conversionProfileId))
-//			{
-//				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
-//			}
-//		}
-//		// ----- hotfix end
-		
 		$flavorAsset->save();
 		
 		return $flavorAsset;
@@ -87,15 +75,32 @@ class kFlowHelper
 				throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 		}
 		
-		$msg = null;
-		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId(), $msg);
+		$flavorAsset = null;
+		if($data->getFlavorAssetId())
+		{
+			assetPeer::resetInstanceCriteriaFilter();
+			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			if($flavorAsset)
+			{
+				$flavorAsset->incrementVersion();
+				$flavorAsset->save();
+			}
+		}
+		
+		$isNewFlavor = false;
 		if(!$flavorAsset)
 		{
-			KalturaLog::err("Flavor asset not created for entry [" . $dbBatchJob->getEntryId() . "]");
-			kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
-			$dbBatchJob->setMessage($msg);
-			$dbBatchJob->setDescription($dbBatchJob->getDescription() . "\n" . $msg);
-			return $dbBatchJob;
+			$msg = null;
+			$flavorAsset = kFlowHelper::createOriginalFlavorAsset($dbBatchJob->getPartnerId(), $dbBatchJob->getEntryId(), $msg);
+			if(!$flavorAsset)
+			{
+				KalturaLog::err("Flavor asset not created for entry [" . $dbBatchJob->getEntryId() . "]");
+				kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+				$dbBatchJob->setMessage($msg);
+				$dbBatchJob->setDescription($dbBatchJob->getDescription() . "\n" . $msg);
+				return $dbBatchJob;
+			}
+			$isNewFlavor = true;
 		}
 		
 		$syncKey = null;
@@ -134,7 +139,10 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 		
-		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
+		if($isNewFlavor)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
+		else
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($flavorAsset, $dbBatchJob));
 		
 		return $dbBatchJob;
 	}
