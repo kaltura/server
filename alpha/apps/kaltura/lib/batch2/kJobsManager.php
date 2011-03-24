@@ -652,11 +652,14 @@ class kJobsManager
 		return kJobsManager::addJob($parentJob->createChild(), $postConvertData, BatchJobType::POSTCONVERT, $jobSubType);
 	}
 	
-	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl)
+	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null)
 	{
  		$jobData = new kImportJobData();
  		$jobData->setSrcFileUrl($entryUrl);
  		
+ 		if($asset)
+ 			$jobData->setFlavorAssetId($asset->getId());
+ 			
 		$batchJob = null;
 		if($parentJob)
 		{
