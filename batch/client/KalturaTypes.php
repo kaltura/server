@@ -5755,6 +5755,76 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 *
 	 * @var string
 	 */
+	public $referenceIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $referenceIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $replacingEntryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $replacingEntryIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $replacedEntryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $replacedEntryIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryReplacementStatus
+	 */
+	public $replacementStatusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $replacementStatusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerSortValueGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerSortValueLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
 	public $tagsNameMultiLikeOr = null;
 
 	/**
@@ -6337,6 +6407,20 @@ abstract class KalturaAssetParamsBaseFilter extends KalturaFilter
 	 * @var KalturaContainerFormat
 	 */
 	public $formatEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAssetParamsOrigin
+	 */
+	public $originEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $originIn = null;
 
 
 }

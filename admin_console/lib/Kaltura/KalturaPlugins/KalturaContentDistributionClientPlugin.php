@@ -95,10 +95,9 @@ class KalturaDistributionProviderType
 	const GENERIC = "1";
 	const SYNDICATION = "2";
 	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
-	const VERIZON = "verizonDistribution.VERIZON";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
+	const VERIZON = "verizonDistribution.VERIZON";
 }
 
 /**

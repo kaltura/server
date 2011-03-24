@@ -152,6 +152,8 @@ class KalturaBaseEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
@@ -499,6 +501,8 @@ class KalturaDataEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
@@ -773,6 +777,8 @@ class KalturaLiveStreamAdminEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
@@ -801,6 +807,8 @@ class KalturaLiveStreamEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
@@ -903,6 +911,8 @@ class KalturaMediaEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
@@ -968,6 +978,8 @@ class KalturaMixEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
@@ -1308,6 +1320,8 @@ class KalturaPlayableEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
@@ -1326,6 +1340,8 @@ class KalturaPlaylistOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
 /**
