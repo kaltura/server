@@ -1124,6 +1124,7 @@ class myPartnerUtils
  		kEventsManager::raiseEvent(new kObjectCopiedEvent($fromPartner, $toPartner));
  		
  		self::copyAccessControls($fromPartner, $toPartner);
+ 		self::copyFlavorParams($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
 		
  		self::copyEntriesByType($fromPartner, $toPartner, entryType::MEDIA_CLIP, $dontCopyUsers);
@@ -1204,6 +1205,25 @@ class myPartnerUtils
  			$newUiConf = $uiConf->cloneToNew($newUiConf);
  			$newUiConf->save();
  			KalturaLog::log("copyUiConfsByType - UIConf [".$newUiConf->getId()."] was created");
+ 		}
+ 	}
+ 	
+ 	public static function copyFlavorParams(Partner $fromPartner, Partner $toPartner)
+ 	{
+ 		KalturaLog::log("Copying flavor params from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
+ 		
+ 		$c = new Criteria();
+ 		$c->add(assetParamsPeer::PARTNER_ID, $fromPartner->getId());
+ 		
+ 		assetParamsPeer::resetInstanceCriteriaFilter();
+ 		$flavorParamsObjects = assetParamsPeer::doSelect($c);
+ 		foreach($flavorParamsObjects as $flavorParams)
+ 		{
+ 			$newFlavorParams = $flavorParams->copy();
+ 			$newFlavorParams->setPartnerId($toPartner->getId());
+ 			$newFlavorParams->save();
+ 			
+ 			KalturaLog::log("Copied [".$flavorParams->getId()."], new id is [".$newFlavorParams->getId()."]");
  		}
  	}
  	
