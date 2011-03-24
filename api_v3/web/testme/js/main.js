@@ -173,7 +173,6 @@ KTestMe.prototype = {
 					return;
 				
 				var value = jQuery(item).find("input:text,select").val();
-				alert(name + ": " + value);
 				if(value)
 					params[name] = value;
 				
