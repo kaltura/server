@@ -792,6 +792,13 @@ class myEntryUtils
 				}
 			}
 
+			// resizing (and editing)) an image file that failes results in a long server waiting time
+			// prevent this waiting time (of future requests) in case the resizeing failes
+			$cache = new myCache("thumb-processing-resize", 5 * 60); // 5 minutes
+			$processing = $cache->get($orig_image_path);
+			if ($processing)
+				KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+			
 			kFile::fullMkdir($tempThumbPath);
 			if ($crop_provider)
 			{
@@ -802,10 +809,15 @@ class myEntryUtils
 				$convertedImagePath = myFileConverter::convertImage($orig_image_path, $tempThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
 			}
 			
-			// die if resize operation failed
-			if ($convertedImagePath === null)
-					KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
-			
+			// die if resize operation failed and add failed resizing to cache
+			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
+				$cache->put($orig_image_path, true);
+				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
+			}
+			// if resizing secceded remove from cache of failed resizing 
+			if ($cache->get($orig_image_path))
+				$cache->remove($orig_image_path, true);
+						
 			if ($multi)
 			{
 				list($w, $h, $type, $attr, $srcIm) = myFileConverter::createImageByFile($tempThumbPath);
