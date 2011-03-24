@@ -21,8 +21,6 @@ class KalturaDispatcher
 	
 	public function dispatch($service, $action, $params = array()) 
 	{
-		KalturaLog::debug("Dispatching service [".$service."], action [".$action."] with params " . print_r($params, true));
-		
 		$start = microtime( true );
 	
 		// prevent impersonate to partner zero
@@ -62,6 +60,7 @@ class KalturaDispatcher
 		// validate it's ok to access this service
 		$deserializer = new KalturaRequestDeserializer($params);
 		$arguments = $deserializer->buildActionArguments($actionParams);
+		KalturaLog::debug("Dispatching service [".$service."], action [".$action."] with params " . print_r($arguments, true));
 
 		$serviceInstance = $reflector->getServiceInstance();
 		
