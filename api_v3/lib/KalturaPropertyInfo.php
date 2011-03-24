@@ -255,6 +255,7 @@ class KalturaPropertyInfo
 		$array["defaultValue"] 	= $this->getDefaultValue();
 		$array["isSimpleType"] 	= $this->isSimpleType();
 		$array["isComplexType"]	= $this->isComplexType();
+		$array["isFile"]		= $this->isFile();
 		$array["isEnum"] 		= $this->isEnum();
 		$array["isStringEnum"] 	= $this->isStringEnum();
 		$array["isArray"] 		= $this->isArray();

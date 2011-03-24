@@ -258,15 +258,16 @@ KTestMe.prototype = {
 				return;
 
 			property.name = param.name + ":" + property.name;
-			
 			if (property.isEnum || property.isStringEnum)
 				scope.addEnumField(jqObjectProperties, property);
 			else if (property.isArray)
 				scope.addArrayField(jqObjectProperties, property);
-			else if (!property.isComplexType)
-				scope.addSimpleField(jqObjectProperties, property);
-			else
+			else if (property.isComplexType)
 				scope.addObjectField(jqObjectProperties, property);
+			else if (property.isFile)
+				scope.addFileField(jqObjectProperties, property);
+			else
+				scope.addSimpleField(jqObjectProperties, property);
 		}));
 		
 		var jqObject = jQuery("<div class=\"object\">");
@@ -369,10 +370,12 @@ KTestMe.prototype = {
 							scope.addEnumField(jqObjectProperties, property);
 						else if (property.isArray)
 							scope.addArrayField(jqObjectProperties, property);
-						else if (!property.isComplexType)
-							scope.addSimpleField(jqObjectProperties, property);
-						else
+						else if (property.isComplexType)
 							scope.addObjectField(jqObjectProperties, property);
+						else if (property.isFile)
+							scope.addFileField(jqObjectProperties, property);
+						else
+							scope.addSimpleField(jqObjectProperties, property);
 					}));
 				}
 			})
