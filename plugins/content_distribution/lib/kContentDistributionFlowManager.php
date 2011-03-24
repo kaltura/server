@@ -46,11 +46,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectUpdatedEventConsumer::objectUpdated()
 	 */
-	public function objectUpdated(BaseObject $object)
+	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof EntryDistribution)
 		{
@@ -65,25 +64,23 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
-	public function objectAdded(BaseObject $object)
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof EntryDistribution)
 		{
 			$entry = entryPeer::retrieveByPK($object->getEntryId());
 			if($entry) // updated in the indexing server (sphinx)
-				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
+				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry, $raisedJob));
 		}
 		
 		return true;
 	}
 	
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param BatchJob $twinJob
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
@@ -102,11 +99,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
-	public function objectDeleted(BaseObject $object)
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof entry)
 			return self::onEntryDeleted($object);
@@ -127,18 +123,16 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		{
 			$entry = entryPeer::retrieveByPK($object->getEntryId());
 			if($entry) // updated in the indexing server (sphinx)
-				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry));
+				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry, $raisedJob));
 		}
 		
 		return true;
 	}
 
-	/**
-	 * @param BaseObject $object
-	 * @param string $previousVersion
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectDataChangedEventConsumer::objectDataChanged()
 	 */
-	public function objectDataChanged(BaseObject $object, $previousVersion = null)
+	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
 		if(!class_exists('Metadata') || !($object instanceof Metadata))
 			return true;

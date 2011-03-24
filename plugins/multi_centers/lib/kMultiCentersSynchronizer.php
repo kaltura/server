@@ -23,11 +23,10 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 		return null;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
-	public function objectAdded(BaseObject $object)
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if(
 			!($object instanceof FileSync) 
@@ -57,7 +56,7 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 			return true;
 		}				
 		
-		$job = kMultiCentersManager::addFileSyncImportJob($this->getEntryId($object), $object->getPartnerId(), $object->getId(), $sourceFileUrl);
+		$job = kMultiCentersManager::addFileSyncImportJob($this->getEntryId($object), $object->getPartnerId(), $object->getId(), $sourceFileUrl, $raisedJob);
 		
 		$job->setDc($object->getDc());
 		$job->save();

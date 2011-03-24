@@ -5,7 +5,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	private static $flavorAssetIdsToScan = array();
 	
 	
-	private function resumeEvents($flavorAsset)
+	private function resumeEvents($flavorAsset, BatchJob $raisedJob = null)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
@@ -15,11 +15,11 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		foreach ($fileSyncList as $fileSync)
 		{
 			// resume file sync added event
-			kEventsManager::continueEvent(new kObjectAddedEvent($fileSync), 'kVirusScanFlowManager');
+			kEventsManager::continueEvent(new kObjectAddedEvent($fileSync, $raisedJob), 'kVirusScanFlowManager');
 		}
 
 		// resume flavor asset added event consumption
-		kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
+		kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset, $raisedJob), 'kVirusScanFlowManager');
 	}
 	
 	
@@ -73,7 +73,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	 * @param flavorAsset $object
 	 * @return bool true if should continue to the next consumer
 	 */
-	private function addedFlavorAsset(flavorAsset $object)
+	private function addedFlavorAsset(flavorAsset $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof flavorAsset && $object->getIsOriginal())
 		{
@@ -84,7 +84,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 				// suitable virus scan profile found - create scan job
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				kVirusScanJobsManager::addVirusScanJob(null, $object->getPartnerId(), $object->getEntryId(), $object->getId(), $srcFilePath, $profile->getEngineType(), $profile->getActionIfInfected());
+				kVirusScanJobsManager::addVirusScanJob($raisedJob, $object->getPartnerId(), $object->getEntryId(), $object->getId(), $srcFilePath, $profile->getEngineType(), $profile->getActionIfInfected());
 				return false; // pause other event consumers until virus scan job is finished
 			}
 		}
@@ -93,11 +93,10 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	}
 	
 
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
-	public function objectAdded(BaseObject $object)
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		// virus scan only works in api_v3 context because it uses dynamic enums
 		if (!class_exists('kCurrentContext') || !kCurrentContext::isApiV3Context()) {
@@ -107,7 +106,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		$response = true;
 		if($object instanceof flavorAsset)
 		{
-			$response = $this->addedFlavorAsset($object);
+			$response = $this->addedFlavorAsset($object, $raisedJob);
 		}
 		
 		if($object instanceof FileSync)
@@ -167,7 +166,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		{
 			case KalturaVirusScanJobResult::FILE_WAS_CLEANED:									
 			case KalturaVirusScanJobResult::FILE_IS_CLEAN:
-				$this->resumeEvents($flavorAsset);
+				$this->resumeEvents($flavorAsset, $dbBatchJob);
 				break;
 				
 			case KalturaVirusScanJobResult::FILE_INFECTED:

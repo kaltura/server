@@ -4,7 +4,7 @@ class kShortLinkFlowManager implements kObjectDeletedEventConsumer
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
-	public function objectDeleted(BaseObject $object)
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof kuser)
 		{

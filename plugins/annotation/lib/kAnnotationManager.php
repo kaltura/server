@@ -1,10 +1,10 @@
 <?php
 class kAnnotationManager implements kObjectDeletedEventConsumer
 {
-	/**
-	 * @param BaseObject $object
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
-	public function objectDeleted(BaseObject $object) 
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
 	{
 		KalturaLog::debug("annotation objectDeleted");
 		if($object instanceof entry)

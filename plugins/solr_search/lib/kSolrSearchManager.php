@@ -18,11 +18,10 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 		return true;
 	}
 
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
-	public function objectDeleted(BaseObject $object) 
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
 	{
 		if(!($object instanceof entry))
 			return true;

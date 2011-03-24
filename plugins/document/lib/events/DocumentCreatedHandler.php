@@ -90,11 +90,10 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 		return true;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
-	public function objectAdded(BaseObject $object)
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof flavorAsset && $object->getIsOriginal())
 		{
@@ -106,7 +105,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 				
-					kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
+					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 				}
 				else
 				{

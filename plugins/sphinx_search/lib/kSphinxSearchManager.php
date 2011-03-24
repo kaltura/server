@@ -14,11 +14,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		return self::SPHINX_INDEX_NAME . '_' . $baseName;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectUpdatedEventConsumer::objectUpdated()
 	 */
-	public function objectUpdated(BaseObject $object)
+	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if(!($object instanceof IIndexable))
 			return true;
@@ -27,11 +26,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		return true;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
-	public function objectAdded(BaseObject $object)
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if(!($object instanceof IIndexable))
 			return true;

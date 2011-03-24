@@ -101,12 +101,10 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		return $dbBatchJob;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @param string $previousVersion
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectDataChangedEventConsumer::objectDataChanged()
 	 */
-	public function objectDataChanged(BaseObject $object, $previousVersion = null)
+	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
 		if(!class_exists('Metadata') || !($object instanceof Metadata))
 			return true;
