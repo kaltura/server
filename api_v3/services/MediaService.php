@@ -1214,11 +1214,10 @@ class MediaService extends KalturaEntryService
 		return parent::anonymousRankEntry($entryId, KalturaEntryType::MEDIA_CLIP, $rank);
 	}
 	
-	/**
-	 * @param KalturaBaseEntry $entry
-	 * @return entry
+	/* (non-PHPdoc)
+	 * @see KalturaEntryService::prepareEntryForInsert()
 	 */
-	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
+	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
 		// first validate the input object
 		//$entry->validatePropertyMinLength("name", 1);

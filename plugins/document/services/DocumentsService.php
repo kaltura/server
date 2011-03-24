@@ -497,7 +497,10 @@ class DocumentsService extends KalturaEntryService
 		}	
 	}
 	
-	protected function prepareEntryForInsert(KalturaBaseEntry $entry)
+	/* (non-PHPdoc)
+	 * @see KalturaEntryService::prepareEntryForInsert()
+	 */
+	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
 		// first validate the input object
 		//$entry->validatePropertyMinLength("name", 1);
