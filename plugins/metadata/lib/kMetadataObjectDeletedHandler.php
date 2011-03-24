@@ -1,10 +1,10 @@
 <?php
 class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 {
-	/**
-	 * @param BaseObject $object
+	/* (non-PHPdoc)
+	 * @see kObjectDeleteHandler::objectDeleted()
 	 */
-	public function objectDeleted(BaseObject $object) 
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
 	{
 		if($object instanceof entry)
 			$this->deleteMetadataObjects(Metadata::TYPE_ENTRY, $object->getId());
