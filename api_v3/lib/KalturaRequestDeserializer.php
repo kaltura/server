@@ -123,7 +123,7 @@ class KalturaRequestDeserializer
 					{
 						foreach($this->paramsGrouped[$name] as $arrayItemParams)
 						{
-							$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams);
+							$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
 						}
 					}
 					$serviceArguments[] = $arrayObj;
@@ -131,7 +131,7 @@ class KalturaRequestDeserializer
 				}
 				else if (isset($this->paramsGrouped[$name])) // object 
 				{
-					$serviceArguments[] = $this->buildObject($actionParam->getTypeReflector(), $this->paramsGrouped[$name]);
+					$serviceArguments[] = $this->buildObject($actionParam->getTypeReflector(), $this->paramsGrouped[$name], $name);
 					$found = true;
 				}
 				else if ($actionParam->isOptional()) // object that is optional
@@ -149,7 +149,7 @@ class KalturaRequestDeserializer
 		return $serviceArguments;
 	}
 
-	private function buildObject(KalturaTypeReflector $typeReflector, array &$params)
+	private function buildObject(KalturaTypeReflector $typeReflector, array &$params, $objectName)
 	{
 		// if objectType was specified, we will use it only if the anotation type is it's base type
 		if (array_key_exists("objectType", $params))
@@ -205,7 +205,7 @@ class KalturaRequestDeserializer
 					$arrayObj = new $type();
 					foreach($params[$name] as $arrayItemParams)
 					{
-						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams);
+						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
 					}
 					$obj->$name = $arrayObj;
 				}
@@ -214,14 +214,14 @@ class KalturaRequestDeserializer
 			{
 				if (isset($params[$name]) && is_array($params[$name]))
 				{
-					$obj->$name = $this->buildObject($property->getTypeReflector(), $params[$name]);
+					$obj->$name = $this->buildObject($property->getTypeReflector(), $params[$name], "{$objectName}:$name");
 				}
 			}
 			else if ($property->isFile())
 			{
-				if (isset($_FILES[$name])) 
+				if (isset($_FILES["{$objectName}:$name"])) 
 				{
-					$obj->$name = $_FILES[$name];
+					$obj->$name = $_FILES["{$objectName}:$name"];
 				}
 			}
 		}
