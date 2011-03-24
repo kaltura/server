@@ -56,7 +56,7 @@ class kFile
 			clearstatcache($specificClean, $filePath);
 		else
 			clearstatcache();
-		return filesize($filePath);	
+		return @filesize($filePath);	
 	}
 	
 	// TODO - implement recursion
