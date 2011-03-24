@@ -61,7 +61,7 @@ class MediaService extends KalturaEntryService
 		if(!$dbEntry || !$dbEntry->getId())
 			return null;
 			
-    	$this->convert($dbEntry->getId());
+//    	$this->convert($dbEntry->getId());
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 		
 		$entry = new KalturaMediaEntry();
@@ -73,6 +73,7 @@ class MediaService extends KalturaEntryService
      * @param KalturaUploadedFileResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      * @throws KalturaErrors::UPLOAD_ERROR
      */
     protected function attachUploadedFileResource(KalturaUploadedFileResource $resource, entry $dbEntry, asset $dbAsset = null)
@@ -88,26 +89,28 @@ class MediaService extends KalturaEntryService
 		if(!$moved)
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
 			 
-		$this->attachFile($tempPath, $dbEntry, $dbAsset);
+		return $this->attachFile($tempPath, $dbEntry, $dbAsset);
     }
     
     /**
      * @param KalturaLocalFileResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      */
     protected function attachLocalFileResource(KalturaLocalFileResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
 		$dbEntry->setSource(KalturaSourceType::FILE);
 		$dbEntry->save();
 		
-		$this->attachFile($resource->localFilePath, $dbEntry, $dbAsset);
+		return $this->attachFile($resource->localFilePath, $dbEntry, $dbAsset);
     }
     
     /**
      * @param KalturaUploadedFileTokenResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
      * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
      */
@@ -141,8 +144,10 @@ class MediaService extends KalturaEntryService
 		$dbEntry->setSource(KalturaSourceType::FILE);
 		$dbEntry->save();
 		
-		$this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+		$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
 		kUploadTokenMgr::closeUploadTokenById($resource->token);
+		
+		return $dbAsset;
     }
     
     /**
@@ -199,6 +204,7 @@ class MediaService extends KalturaEntryService
      * @param KalturaWebcamTokenResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
      */
     protected function attachWebcamTokenResource(KalturaWebcamTokenResource $resource, entry $dbEntry, asset $dbAsset = null)
@@ -254,12 +260,15 @@ class MediaService extends KalturaEntryService
 		
 		$dbEntry->setStatus(entryStatus::READY);
 		$dbEntry->save();
+		
+		return $dbAsset;
     }
     
     /**
      * @param KalturaAssetResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
@@ -270,13 +279,14 @@ class MediaService extends KalturaEntryService
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $resource->assetId);
 		
-		$this->attachAsset($srcFlavorAsset, $dbEntry, $dbAsset);
+		return $this->attachAsset($srcFlavorAsset, $dbEntry, $dbAsset);
     }
     
     /**
      * @param asset $srcFlavorAsset
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
@@ -318,12 +328,15 @@ class MediaService extends KalturaEntryService
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		else
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($dbAsset));
+			
+		return $dbAsset;
     }
     
     /**
      * @param KalturaEntryResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
@@ -340,13 +353,14 @@ class MediaService extends KalturaEntryService
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $resource->assetId);
 		
-		$this->attachAsset($srcFlavorAsset, $dbEntry, $dbAsset);
+		return $this->attachAsset($srcFlavorAsset, $dbEntry, $dbAsset);
     }
 
     /**
      * @param KalturaUrlResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      */
     protected function attachUrlResource(KalturaUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
@@ -354,24 +368,28 @@ class MediaService extends KalturaEntryService
 		$dbEntry->save();
 
 		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $resource->url, $dbAsset);
+		
+		return $dbAsset;
     }
     
     /**
      * @param KalturaBulkResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      */
     protected function attachBulkResource(KalturaBulkResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
 		$dbEntry->setBulkUploadId($resource->bulkUploadId);
 
-		$this->attachUrlResource($resource, $dbEntry, $dbAsset);
+		return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
     }
     
     /**
      * @param KalturaSearchResultsResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      */
     protected function attachSearchResultsResource(KalturaSearchResultsResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
@@ -419,23 +437,32 @@ class MediaService extends KalturaEntryService
 		{
 			kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $resource->result->url, $dbAsset);
 		}
+		return $dbAsset;
     }
     
     /**
      * @param KalturaAssetsParamsResourceContainers $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      */
     protected function attachAssetsParamsResourceContainers(KalturaAssetsParamsResourceContainers $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$ret = null;
     	foreach($resource->resources as $assetParamsResourceContainer)
-    		$this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry, $dbAsset);
+    	{
+    		$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry, $dbAsset);
+    		if($dbAsset->getIsOriginal())
+    			$ret = $dbAsset;
+    	}
+    	return $ret;
     }
     
     /**
      * @param KalturaAssetParamsResourceContainer $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      */
     protected function attachAssetParamsResourceContainer(KalturaAssetParamsResourceContainer $resource, entry $dbEntry, asset $dbAsset = null)
     {
@@ -462,13 +489,14 @@ class MediaService extends KalturaEntryService
 		$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbAsset->save();
 		
-		$this->attachResource($resource->resource, $dbEntry, $dbAsset);
+		return $this->attachResource($resource->resource, $dbEntry, $dbAsset);
     }
     
     /**
      * @param KalturaResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
+     * @return asset
      * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
      * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
      * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
@@ -518,12 +546,8 @@ class MediaService extends KalturaEntryService
 			case 'KalturaDropFolderFileResource':
 			case 'KalturaFileSyncResource':
 				// TODO
-				break;
+				return null;
     	}
-    	
-		$entry = new KalturaMediaEntry();
-		$entry->fromObject($dbEntry);
-		return $entry;
     }
     
 	/**
