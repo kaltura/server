@@ -217,6 +217,13 @@ class KalturaRequestDeserializer
 					$obj->$name = $this->buildObject($property->getTypeReflector(), $params[$name]);
 				}
 			}
+			else if ($property->isFile())
+			{
+				if (isset($_FILES[$name])) 
+				{
+					$obj->$name = $_FILES[$name];
+				}
+			}
 		}
 		return $obj;
 	}
