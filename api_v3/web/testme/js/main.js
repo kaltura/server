@@ -168,7 +168,7 @@ KTestMe.prototype = {
 		jQuery(".param").each(function(i, item) {
 			if (jQuery(item).find("input:checkbox:checked").size() > 0)
 			{
-				var name = jQuery(item).find("input").attr("name");
+				var name = jQuery(item).find("input:text,input:file,select").attr("name");
 				if(!name)
 					return;
 				
