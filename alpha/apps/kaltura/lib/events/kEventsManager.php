@@ -56,7 +56,7 @@ class kEventsManager
 	
 		$cacheDir = dirname($cachePath);
 		if(!file_exists($cacheDir))
-			@mkdir($cacheDir, 777, true);
+			@mkdir($cacheDir, 0777, true);
 			
 		@file_put_contents($cachePath, serialize(self::$consumers));
 	}

@@ -22,7 +22,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		{
 			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
 			if(!is_dir($this->tempXmlPath))
-				mkdir($this->tempXmlPath, 777, true);
+				mkdir($this->tempXmlPath, 0777, true);
 		}
 		else
 		{

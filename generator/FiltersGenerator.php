@@ -416,7 +416,7 @@ class FiltersGenerator extends ClientGeneratorFromPhp
 	{
 		$dirname = dirname($fileName);
 		if(!file_exists($dirname))
-			mkdir($dirname, 777, true);
+			mkdir($dirname, 0777, true);
 			
 		$handle = fopen($fileName, "w");
 		fwrite($handle, $contents);

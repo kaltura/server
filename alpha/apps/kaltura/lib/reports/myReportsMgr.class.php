@@ -345,7 +345,7 @@ class myReportsMgr
 		$folderPath = "/content/reports/$partner_id";
 		$fullPath = myContentStorage::getFSContentRootPath() .  $folderPath;
 		if(!file_exists($fullPath))
-			mkdir($fullPath, 777, true);
+			mkdir($fullPath, 0777, true);
 			
 		$fileName = "{$file_name}_{$time_suffix}";
 		$url = requestUtils::getHost() . "$folderPath/$fileName";
