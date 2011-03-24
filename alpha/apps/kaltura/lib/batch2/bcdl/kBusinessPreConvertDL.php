@@ -330,6 +330,8 @@ class kBusinessPreConvertDL
 			return null;
 		}
 		
+		// TODO - if source flavor is remote storage, create import job and mark the flavor as FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT
+		
 		$mediaInfoId = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
 		if($mediaInfo)
