@@ -43,7 +43,7 @@ FROM
 		SUM(count_video + count_audio + count_image) count_media_all_time,
 		SUM(count_bandwidth ) count_bandwidth_all_time,
 		SUM(count_storage ) count_storage_all_time
-	FROM kalturadw.dwh_aggr_partner aggr_partner inner join kalturadw.dwh_dim_partners dim_partner on (aggr_partner.partner_id = dim_partner.partner_id)
+	FROM kalturadw.dwh_hourly_partner aggr_partner inner join kalturadw.dwh_dim_partners dim_partner on (aggr_partner.partner_id = dim_partner.partner_id)
 	WHERE {OBJ_ID_CLAUSE} AND
 	aggr_partner.date_id <= {TO_DATE_ID}
 	GROUP BY aggr_partner.partner_id
