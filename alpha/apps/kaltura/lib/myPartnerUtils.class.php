@@ -548,6 +548,37 @@ class myPartnerUtils
 		return $new_conversion_profile;		
 	}	
 	
+	/**
+	 * @param int $partner_id
+	 * @return conversionProfile2
+	 */
+	public static function getConversionProfile2ForPartner($partner_id, $conversionProfile2Id = null)
+	{
+		if($conversionProfile2Id == conversionProfile2::CONVERSION_PROFILE_NONE)
+			return null;
+			
+		if(!$conversionProfile2Id)
+		{
+			// try to extract the conversion profile from the partner
+			$partner = PartnerPeer::retrieveByPK($partner_id);
+			if(!$partner) 
+				throw new Exception("Cannot find partner for id [$partner_id]");
+			
+			$partner_kmc_version = $partner->getKmcVersion();
+			if(is_null($partner_kmc_version) || version_compare($partner_kmc_version, "2", "<")) 
+			{
+				$old_conversion_profile = self::getCurrentConversionProfile($partner->getId());
+				if(!$old_conversion_profile)
+					throw new Exception("Cannot find conversion profile for partner id [$partner_id]");
+				
+				return myConversionProfileUtils::createConversionProfile2FromConversionProfile($old_conversion_profile);  
+			}
+			
+			$conversionProfile2Id = $partner->getDefaultConversionProfileId();
+		}
+		
+		return conversionProfile2Peer::retrieveByPk($conversionProfile2Id);
+	}	
 	
 /*@Partner $partner*/
 	public static function getDefaultKshow ( $partner_id, $subp_id , $puser_kuser, $group_id = null , $create_anyway = false, $default_name = null )
