@@ -673,11 +673,11 @@ abstract class kFileTransferMgr
 	 * @param FileHandle $fileHandle - use fopen to open the file
 	 * @return - the file content (using fread)
 	 */
-	private function writeFileInChunks($fileToReadHandle, $fileToWriteHandle)
+	protected function writeFileInChunks($fileToReadHandle, $fileToWriteHandle)
 	{
 		$content = null;
-		$chunkSize = 1*(1024*1024); // how many bytes per chunk 
-		if ($fileToReadHandle == null || $fileToWriteHandle == null) 
+		$chunkSize = 4096; // how many bytes per chunk 
+		if (is_null($fileToReadHandle) || is_null($fileToWriteHandle)) 
 		{ 
 			return false;
 		} 

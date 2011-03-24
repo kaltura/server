@@ -91,10 +91,11 @@ class sftpMgr extends kFileTransferMgr
         
         //Writes the file in chunks (for large files bug)
         $fileToReadHandle = fopen($local_file, "r");
-        $this->writeFileInChunks($fileToReadHandle, $stream);
-        fclose($fileToReadHandle);
-
-        return @fclose($stream);		
+        $ret = $this->writeFileInChunks($fileToReadHandle, $stream);
+        @fclose($fileToReadHandle);
+		@fclose($stream);
+	
+        return $ret;		
 	}
 		
 	// download a file from the server (ftp_mode is irrelevant)
@@ -108,10 +109,11 @@ class sftpMgr extends kFileTransferMgr
         
         //Writes the file in chunks (for large files bug)
         $fileToWriteHandle = fopen($local_file, "w+");
-        $this->writeFileInChunks($stream, $fileToWriteHandle);
-        fclose($fileToWriteHandle);
+        $ret = $this->writeFileInChunks($stream, $fileToWriteHandle);
+        @fclose($fileToWriteHandle);
+        @fclose($stream);
 
-        return @fclose($stream);
+        return $ret;
 	}
 	
 	// create a new directory
