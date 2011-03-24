@@ -14,6 +14,11 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 	 * @var string
 	 */
 	public $thumbAssetFilePath;
+
+	/**
+	 * @var string
+	 */
+	public $currentPlaylists;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -41,6 +46,14 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
 		}
+		
+		$this->loadPlaylistsFromMetadata($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile);
+		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
+		if ($entryDistributionDb)
+			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
+		else
+			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
+		
 	}
 
 
@@ -48,7 +61,8 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 	private static $map_between_objects = array
 	(
 		"videoAssetFilePath",
-		"thumbAssetFilePath"	
+		"thumbAssetFilePath",
+		"currentPlaylists",	
 	);
 
 	public function getMapBetweenObjects ( )
@@ -87,4 +101,35 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 	{
 		$this->thumbAssetFilePath = $thumbAssetFilePath;
 	}	
+	
+	protected function loadPlaylistsFromMetadata($entryId, KalturaYouTubeDistributionProfile $distributionProfile)
+	{
+		$playlists = array();
+		$metadataProfileId = $distributionProfile->metadataProfileId; 
+		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryId);
+		if ($metadata)
+		{
+			$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			$xmlContent = kFileSyncUtils::file_get_contents($key, true, false);
+			$xml = new DOMDocument();
+			$xml->loadXML($xmlContent);
+			
+			// first metada field
+			$nodes = $xml->getElementsByTagName(YouTubeDistributionProfile::METADATA_FIELD_PLAYLIST);
+			foreach($nodes as $node)
+			{
+				$playlists[] = $node->textContent;
+			}
+			
+			// second metadata field
+			$nodes = $xml->getElementsByTagName(YouTubeDistributionProfile::METADATA_FIELD_PLAYLISTS);
+			foreach($nodes as $node)
+			{
+				$playlists[] = $node->textContent;
+			}
+		}
+		
+		$this->newPlaylists = implode(',', $playlists);
+	}
+	
 }

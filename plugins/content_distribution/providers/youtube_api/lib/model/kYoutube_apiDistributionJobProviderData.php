@@ -47,4 +47,8 @@ class kYoutube_apiDistributionJobProviderData extends kDistributionJobProviderDa
 		$this->thumbAssetFilePath = $thumbAssetFilePath;
 	}	
 
+	public function __construct(kDistributionJobData $distributionJobData = null)
+	{
+		parent::__construct($distributionJobData);
+	}
 }

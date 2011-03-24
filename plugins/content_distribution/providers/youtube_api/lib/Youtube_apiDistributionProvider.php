@@ -79,7 +79,7 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -105,16 +105,13 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	{
 		return 0;
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		if(kConf::hasParam('youtube_api_update_required_entry_fields'))
-			return kConf::get('youtube_api_update_required_entry_fields');
-			
-		return array();
+		return array(entryPeer::NAME, entryPeer::DESCRIPTION, entryPeer::TAGS);
 	}
 
 	/* (non-PHPdoc)
@@ -122,9 +119,11 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		if(kConf::hasParam('youtube_api_update_required_metadata_xpaths'))
-			return kConf::get('youtube_api_update_required_metadata_xpaths');
-			
-		return array();
+		return array(
+			"/*[local-name()='metadata']/*[local-name()='".YouTubeDistributionProfile::METADATA_FIELD_PLAYLIST."']",
+			"/*[local-name()='metadata']/*[local-name()='".YouTubeDistributionProfile::METADATA_FIELD_PLAYLISTS."']",
+		);
+		
 	}
+	
 }
