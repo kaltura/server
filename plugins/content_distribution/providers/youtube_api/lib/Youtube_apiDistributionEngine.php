@@ -66,15 +66,18 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	 */
 	public function getYoutube_apiProps(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaYoutube_apiDistributionProfile $distributionProfile)
 	{	
-		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$entryId = $data->entryDistribution->entryId;
+		$entry = $this->kalturaClient->media->get($entryId);
+	
+//		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = array();
-		$props['tags'] = explode(",",$this->findMetadataValue($metadataObjects, 'Keywords'));
-		$props['title'] = $this->findMetadataValue($metadataObjects, 'LongTitle');
-		$props['channel'] = $this->findMetadataValue($metadataObjects, 'Youtube_apiCategory');
-		$props['description'] = $this->findMetadataValue($metadataObjects, 'ShortDescription');
-		$props['date'] = time();
-		$props['language'] = 'en';
-		$props['published']= true;
+		$props['keywords'] = $entry->tags);
+		$props['title'] = $entry->name;
+		$props['category'] = $distributionProfile->defaultCategory;
+		$props['description'] = $entry->description;
+		$props['start_date'] = time();
+		$props['end_date'] = time();
+		$props['playlists']= '';
 		
 
 		return $props;
@@ -124,15 +127,14 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		}
 		
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
-		$remoteId = $youTubeApiImpl->upload($videoFilePath);
-		$youTubeApiImpl->update($remoteId, $props);
+		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath,$videoFilePath,$props);
 	
 		if ($needDel == true)
 		{
 			unlink($videoFilePath);
 		}
 		$data->remoteId = $remoteId;
-		return false;
+		return true;
 	}
 	
 	/* (non-PHPdoc)
@@ -179,7 +181,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		$props = $this->getYoutube_apiProps($entry, $data, $distributionProfile);
 	
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
-		$youTubeApiImpl->update($data->remoteId, $props);
+		$youTubeApiImpl->updateEntry($data->remoteId, $props);
 		
 //		$data->sentData = $youtube_apiMediaService->request;
 //		$data->results = $youtube_apiMediaService->response;
@@ -195,7 +197,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		$distributionProfile = $data->distributionProfile;
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
 		
-		$youTubeApiImpl->delete($data->remoteId);
+		$youTubeApiImpl->deleteEntry($data->remoteId);
 		
 		return true;
 	}

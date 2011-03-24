@@ -28,32 +28,33 @@ class YouTubeApiImpl
 													$loginCaptcha = null,
 													$this->authenticationURL);
 													
-		$this->yt = new Zend_Gdata_YouTube($httpClient, $this->applicationId, $this->clientId, $this->developerKey);
+		$this->yt = new Zend_Gdata_YouTube($this->httpClient, $this->applicationId, $this->clientId, $this->developerKey);
 		$this->yt->setMajorProtocolVersion(2);
 	}
 	
-	public function uploadVideo($fileDisk, $fileUrl, $title, $description, $category, $keywords)
+	public function uploadVideo($fileDisk, $fileUrl,$props)
 	{
 		// create a new VideoEntry object 
 		$myVideoEntry = new Zend_Gdata_YouTube_VideoEntry();  
 		// create a new Zend_Gdata_App_MediaFileSource object 
-		$filesource = $yt->newMediaFileSource($fileDisk); 
+		$filesource = $this->yt->newMediaFileSource($fileDisk); 
 		$filesource->setContentType('video/quicktime'); 
 	//	print_r($filesource);
 		// set slug header 
 		$filesource->setSlug($fileUrl);  
 		// add the filesource to the video entry 
 		$myVideoEntry->setMediaSource($filesource);  
-		$myVideoEntry->setVideoTitle($title); 
-		$myVideoEntry->setVideoDescription($description); 
+		$myVideoEntry->setVideoTitle($props['title']); 
+		$myVideoEntry->setVideoDescription($props['description']); 
 		// The category must be a valid YouTube category! 
-		$myVideoEntry->setVideoCategory($category);  
+		$myVideoEntry->setVideoCategory($props['category']);  
 		// Set keywords. Please note that this must be a comma-separated string 
 		// and that individual keywords cannot contain whitespace 
-		$myVideoEntry->SetVideoTags($keywords);  
+		$myVideoEntry->SetVideoTags($props['keywords']);  
+		$myVideoEntry->setVideoPublic();
 		// set some developer tags -- this is optional 
 		// (see Searching by Developer Tags for more details) 
-		$myVideoEntry->setVideoDeveloperTags(array('mydevtag', 'anotherdevtag'));  
+//		$myVideoEntry->setVideoDeveloperTags(array('mydevtag', 'anotherdevtag'));  
 		// set the video's location -- this is also optional 
 	//	$yt->registerPackage('Zend_Gdata_Geo'); 
 	//	$yt->registerPackage('Zend_Gdata_Geo_Extension'); 
@@ -68,7 +69,9 @@ class YouTubeApiImpl
 		try 
 		{   
 			$newEntry = $this->yt->insertEntry($myVideoEntry, $uploadUrl, 'Zend_Gdata_YouTube_VideoEntry'); 
-			return $newEntry;
+			$newEntry -> setMajorProtocolVersion(2);
+			
+			return $newEntry->getVideoId();
 		}
 		catch (Zend_Gdata_App_HttpException $httpException) 
 		{   
@@ -121,36 +124,43 @@ class YouTubeApiImpl
 		} 
 	}
 
-	public function getEntry($yt, $remoteId)
+	public function getEntry($remoteId)
 	{
 		$videoEntry = $this->yt->getVideoEntry($remoteId); 
 		$this->printVideoEntry($videoEntry);
 	}
 
-	function updateEntry($yt, $remoteId, $title, $description, $category, $keywords)
+	function updateEntry($remoteId, $props)
 	{
 		$videoEntry = $this->yt->getVideoEntry($remoteId,null, true); 
 		$putUrl = $videoEntry->getEditLink()->getHref();
 
-		$videoEntry->setVideoTitle($title); 
-		$videoEntry->setVideoDescription($description); 
+		$videoEntry->setVideoTitle($props['title']); 
+		$videoEntry->setVideoDescription($props['description']); 
 		// The category must be a valid YouTube category! 
-		$videoEntry->setVideoCategory($category);  
+		$videoEntry->setVideoCategory($props['category']);  
 		// Set keywords. Please note that this must be a comma-separated string 
 		// and that individual keywords cannot contain whitespace 
-		$videoEntry->SetVideoTags($keywords);  	
+		$videoEntry->SetVideoTags($props['keyword']);  	
 
 		$this->yt->updateEntry($videoEntry, $putUrl);
 	}
 
-	function deleteEntry($yt, $remoteId)
+	function deleteEntry($remoteId)
 	{
 		$videoEntry = $this->yt->getVideoEntry($remoteId,'http://gdata.youtube.com/feeds/users/default/uploads', true); 
 		$this->yt->delete($videoEntry);
 	}
 }
 
+$impl = new YouTubeApiImpl('kalturasb', '250vanil');
+$props = Array();
+$props['title'] = 'My Test Movie';
+$props['description'] = 'My Test Movie';
+$props['category'] = 'Autos';
+$props['keywords'] = 'cars, funny';
 
+print $impl -> uploadVideo('snake.wmv','snake.wmv', $props);
 //$newEntry = uploadVideo($yt, 'snake.wmv','snake.wmv', 'My Test Movie', 'My Test Movie', 'Autos', 'cars, funny');
 //$newEntry -> setMajorProtocolVersion(2);
 //getEntry($yt, 'J9JY0k8nLiE');
