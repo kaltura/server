@@ -12,7 +12,6 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	
 	protected function __construct()
 	{
-		
 	}
 	
 	/**
@@ -122,8 +121,7 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 		return array(
 			"/*[local-name()='metadata']/*[local-name()='".YouTubeDistributionProfile::METADATA_FIELD_PLAYLIST."']",
 			"/*[local-name()='metadata']/*[local-name()='".YouTubeDistributionProfile::METADATA_FIELD_PLAYLISTS."']",
-		);
-		
+		);	
 	}
 	
 }

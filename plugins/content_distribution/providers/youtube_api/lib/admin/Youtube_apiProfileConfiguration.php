@@ -81,7 +81,7 @@ class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfigura
 			)
 		));
 		
-		$this->addMetadataProfile();
+//		$this->addMetadataProfile();
 		
 		$this->addDisplayGroup(
 			array('username', 'notification_email', 'owner_name', 'target', 'metadata_profile_id'), 
