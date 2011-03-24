@@ -8,7 +8,7 @@
  * @subpackage Batch
  *
  */
-class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer
+class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectUpdatedEventConsumer
 {
 	public final function __construct()
 	{ 
@@ -339,13 +339,18 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		kJobsManager::addJob($dbBatchJob->createChild(), $jobData, BatchJobType::MAIL, $jobData->getMailType());	
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
-	public function objectAdded(BaseObject $object)
+	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof flavorAsset && $object->getIsOriginal())
+		if(
+				$object instanceof flavorAsset 
+			&&	$object->getIsOriginal()
+			&&	(
+						$object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY
+					||	$object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP
+				))
 		{
 			$entry = $object->getentry();
 			if($entry->getType() == entryType::MEDIA_CLIP)
@@ -353,10 +358,25 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			
-				kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
+				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+				
+				$entryFlavors = flavorAssetPeer::retrieveByEntryId($entry->getId());
+				foreach($entryFlavors as $entryFlavor)
+				{
+					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
+						kBusinessPreConvertDL::decideAddEntryFlavor($raisedJob, $entry->getId(), $entryFlavor->getFlavorParamsId());
+				}
 			}
 		}
 		
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectUpdatedEventConsumer::objectUpdated()
+	 */
+	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		$this->objectAdded($object, $raisedJob);
 	}
 }
