@@ -544,7 +544,10 @@ class MediaService extends KalturaEntryService
 			case 'KalturaRemoteStorageResource':
 			case 'KalturaDropFolderFileResource':
 			case 'KalturaFileSyncResource':
-				// TODO
+			default:
+				KalturaLog::err("Resource of type [" . get_class($resource) . "] is not supported");
+				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+				$dbEntry->save();
 				return null;
     	}
     }
