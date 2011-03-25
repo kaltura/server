@@ -176,10 +176,11 @@ KTestMe.prototype = {
 				if(value)
 					params[name] = value;
 				
-				var lastIndex = name.lastIndexOf(":");
-				if(lastIndex > 0)
-				{
-					var objectName = name.substr(0, lastIndex);
+				var objectsNames = name.split(":");
+				while(objectsNames.length > 1){
+					objectsNames.pop();
+					objectName = objectsNames.join(":");
+
 					if(objectTypes[objectName])
 						params[objectName + ":objectType"] = objectTypes[objectName];
 				}
