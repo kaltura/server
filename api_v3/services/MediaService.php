@@ -200,8 +200,6 @@ class MediaService extends KalturaEntryService
 		
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
-		else
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($dbAsset));
 			
 		return $dbAsset;
     }
@@ -335,8 +333,6 @@ class MediaService extends KalturaEntryService
 
         if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
-		else
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($dbAsset));
 			
 		return $dbAsset;
     }
@@ -491,8 +487,10 @@ class MediaService extends KalturaEntryService
     	if(!$dbAsset)
     		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbEntry->getId(), $resource->assetParamsId);
     		
+    	$isNewAsset = false;
     	if(!$dbAsset)
     	{
+    		$isNewAsset = true;
 			$dbAsset = new flavorAsset();
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
@@ -511,6 +509,11 @@ class MediaService extends KalturaEntryService
 		$dbAsset->save();
 		
 		$dbAsset = $this->attachResource($resource->resource, $dbEntry, $dbAsset);
+		
+        if($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		
+		return $dbAsset;
     }
     
     /**
