@@ -655,7 +655,7 @@ class kJobsManager
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null)
 	{
 		$entryUrl = str_replace('//', '/', $entryUrl);
-		$entryUrl = preg_replace('/^((https?)|(ftp)):\//', '$1//', $entryUrl);
+		$entryUrl = preg_replace('/^((https?)|(ftp)):\//', '$1://', $entryUrl);
 		
  		$jobData = new kImportJobData();
  		$jobData->setSrcFileUrl($entryUrl);
