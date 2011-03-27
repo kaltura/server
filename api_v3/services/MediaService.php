@@ -461,11 +461,14 @@ class MediaService extends KalturaEntryService
     protected function attachAssetsParamsResourceContainers(KalturaAssetsParamsResourceContainers $resource, entry $dbEntry, asset $dbAsset = null)
     {
     	$resource->validatePropertyNotNull('resources');
+    	KalturaLog::debug("Resources [" . count($resource->resources) . "]");
     	
     	$ret = null;
     	foreach($resource->resources as $assetParamsResourceContainer)
     	{
+    		KalturaLog::debug("Resource asset params id [{$assetParamsResourceContainer->assetParamsId}]");
     		$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry, $dbAsset);
+    		KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
     		if($dbAsset->getIsOriginal())
     			$ret = $dbAsset;
     	}
