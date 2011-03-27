@@ -51,7 +51,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		{
 			if(!isset($this->_includeList[strtolower($serviceReflector->getServiceId())]))
 			{
-				KalturaLog::debug("Service [" . $serviceReflector->getServiceName() . "] exluded");
+				KalturaLog::debug("Service [" . $serviceReflector->getServiceName() . "] excluded");
 				continue;
 			}
 				
@@ -78,7 +78,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			{
 				if(!isset($serviceIncludeList[strtolower($action)]))
 				{
-					KalturaLog::debug("Action [" . $serviceReflector->getServiceName() . ".$action] exluded");
+					KalturaLog::debug("Action [" . $serviceReflector->getServiceName() . ".$action] excluded");
 					continue;
 				}
 					
@@ -130,7 +130,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
     	{
 			if(!isset($this->_includeList[strtolower("{$pluginName}_{$service}")]))
 			{
-				KalturaLog::debug("Service [$service] exluded");
+				KalturaLog::debug("Service [$service] excluded");
 				continue;
 			}
 			
