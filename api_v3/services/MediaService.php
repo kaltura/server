@@ -78,6 +78,25 @@ class MediaService extends KalturaEntryService
     }
     
     /**
+     * @param KalturaFileSyncResource $resource
+     * @param entry $dbEntry
+     * @param asset $dbAsset
+     * @return asset
+     * @throws KalturaErrors::UPLOAD_ERROR
+     */
+    protected function attachFileSyncResource(KalturaFileSyncResource $resource, entry $dbEntry, asset $dbAsset = null)
+    {
+    	$resource->validatePropertyNotNull('fileSyncObjectType');
+    	$resource->validatePropertyNotNull('objectSubType');
+    	$resource->validatePropertyNotNull('objectId');
+    	
+    	$syncable = kFileSyncObjectManager::retrieveObject($resource->fileSyncObjectType, $resource->objectId);
+    	$srcSyncKey = $syncable->getSyncKey($resource->objectSubType, $resource->version);
+    	
+        return $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+    }
+    
+    /**
      * @param KalturaUploadedFileResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
@@ -302,7 +321,6 @@ class MediaService extends KalturaEntryService
      * @param entry $dbEntry
      * @param asset $dbAsset
      * @return asset
-     * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
      */
@@ -316,14 +334,26 @@ class MediaService extends KalturaEntryService
     	$dbEntry->setSource(KalturaSearchProviderType::KALTURA);
       	$dbEntry->setSourceId($srcEntry->getId());
       	
+        $srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+      	
+        return $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+    }
+    
+    /**
+     * @param FileSyncKey $srcSyncKey
+     * @param entry $dbEntry
+     * @param asset $dbAsset
+     * @return asset
+     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+     */
+    protected function attachFileSync(FileSyncKey $srcSyncKey, entry $dbEntry, asset $dbAsset = null)
+    {
       	$isNewAsset = false;
       	if(!$dbAsset)
       	{
       		$isNewAsset = true;
         	$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
-      		$dbEntry->setMediaType($srcEntry->getMediaType());
       	}
-      	$dbEntry->save();
       	
         if(!$dbAsset)
         {
@@ -335,7 +365,6 @@ class MediaService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
         }
                 
-        $srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         $newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
 
@@ -371,6 +400,49 @@ class MediaService extends KalturaEntryService
 		return $this->attachAsset($srcFlavorAsset, $dbEntry, $dbAsset);
     }
 
+    /**
+     * @param KalturaRemoteStorageResource $resource
+     * @param entry $dbEntry
+     * @param asset $dbAsset
+     * @return asset
+     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+     */
+    protected function attachRemoteStorageResource(KalturaRemoteStorageResource $resource, entry $dbEntry, asset $dbAsset = null)
+    {
+    	$resource->validatePropertyNotNull('url');
+    	$resource->validatePropertyNotNull('storageProfileId');
+    
+		$dbEntry->setSource(KalturaSourceType::URL);
+		$dbEntry->save();
+
+      	$isNewAsset = false;
+      	if(!$dbAsset)
+      	{
+      		$isNewAsset = true;
+        	$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+      	}
+      	
+        if(!$dbAsset)
+        {
+			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
+			
+			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+			$dbEntry->save();
+			
+			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
+        }
+                
+        $key = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($key, $resource->url, $resource->storageProfileId);
+
+        if($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+			
+		return $dbAsset;
+		
+		return $dbAsset;
+    }
+    
     /**
      * @param KalturaUrlResource $resource
      * @param entry $dbEntry
@@ -581,9 +653,14 @@ class MediaService extends KalturaEntryService
 			case 'KalturaUploadedFileResource':
 				return $this->attachUploadedFileResource($resource, $dbEntry, $dbAsset);
 				
-			case 'KalturaRemoteStorageResource':
-			case 'KalturaDropFolderFileResource':
 			case 'KalturaFileSyncResource':
+				return $this->attachFileSyncResource($resource, $dbEntry, $dbAsset);
+				
+			case 'KalturaRemoteStorageResource':
+				return $this->attachRemoteStorageResource($resource, $dbEntry, $dbAsset);
+				
+			case 'KalturaDropFolderFileResource':
+				// TODO after DropFolderFile object creation
 			default:
 				KalturaLog::err("Resource of type [" . get_class($resource) . "] is not supported");
 				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
