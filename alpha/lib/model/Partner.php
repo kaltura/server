@@ -464,6 +464,9 @@ class Partner extends BasePartner
 	/** added disableAkamaiHDNetwork param for having per-partner ability to disable Akamai HD Network feature (GUI in KMC preview & embed) **/
 	public function getDisableAkamaiHDNetwork() { return $this->getFromCustomData("disableAkamaiHDNetwork", null); }
 	public function setDisableAkamaiHDNetwork( $v ) { $this->putInCustomData("disableAkamaiHDNetwork", $v); }
+
+	public function getImportRemoteSourceForConvert() { return $this->getFromCustomData("importRemoteSourceForConvert", null, false); }
+	public function setImportRemoteSourceForConvert( $v ) { $this->putInCustomData("importRemoteSourceForConvert", $v); }
 	
 	public function lockCategories()
 	{
