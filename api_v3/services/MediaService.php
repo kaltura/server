@@ -78,6 +78,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachUploadedFileResource(KalturaUploadedFileResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('fileData');
+    	
 		$dbEntry->setSource(KalturaSourceType::FILE);
 		$dbEntry->save();
 		
@@ -100,6 +102,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachLocalFileResource(KalturaLocalFileResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('localFilePath');
+    	
 		$dbEntry->setSource(KalturaSourceType::FILE);
 		$dbEntry->save();
 		
@@ -116,6 +120,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachUploadedFileTokenResource(KalturaUploadedFileTokenResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('token');
+    	
 		try
 		{
 		    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($resource->token);
@@ -209,6 +215,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachWebcamTokenResource(KalturaWebcamTokenResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('token');
+    	
 	    $content = myContentStorage::getFSContentRootPath();
 	    $entryFullPath = "{$content}/content/webcam/{$resource->token}.flv";
 	    
@@ -274,6 +282,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachAssetResource(KalturaAssetResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('assetId');
+    	
 		$srcFlavorAsset = flavorAssetPeer::retrieveById($resource->assetId);
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $resource->assetId);
@@ -342,6 +352,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachEntryResource(KalturaEntryResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('entryId');
+    	
     	$srcFlavorAsset = null;
     	assetPeer::resetInstanceCriteriaFilter();
     	if(is_null($resource->flavorParamsId))
@@ -363,6 +375,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachUrlResource(KalturaUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('url');
+    
 		$dbEntry->setSource(KalturaSourceType::URL);
 		$dbEntry->save();
 
@@ -379,6 +393,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachBulkResource(KalturaBulkResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('bulkUploadId');
+    	
 		$dbEntry->setBulkUploadId($resource->bulkUploadId);
 
 		return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
@@ -392,6 +408,7 @@ class MediaService extends KalturaEntryService
      */
     protected function attachSearchResultsResource(KalturaSearchResultsResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('result');
      	$resource->result->validatePropertyNotNull("searchSource");
      	
 		if (!$dbEntry->getName())
@@ -447,6 +464,8 @@ class MediaService extends KalturaEntryService
      */
     protected function attachAssetsParamsResourceContainers(KalturaAssetsParamsResourceContainers $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('resources');
+    	
     	$ret = null;
     	foreach($resource->resources as $assetParamsResourceContainer)
     	{
@@ -465,6 +484,9 @@ class MediaService extends KalturaEntryService
      */
     protected function attachAssetParamsResourceContainer(KalturaAssetParamsResourceContainer $resource, entry $dbEntry, asset $dbAsset = null)
     {
+    	$resource->validatePropertyNotNull('resource');
+    	$resource->validatePropertyNotNull('assetParamsId');
+    	
     	assetPeer::resetInstanceCriteriaFilter();
     	if(!$dbAsset)
     		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbEntry->getId(), $resource->assetParamsId);
