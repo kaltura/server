@@ -120,6 +120,9 @@ return array(
 	'KalturaFlavorAssetStatus::DELETED' => 'Deleted',
 	'KalturaFlavorAssetStatus::NOT_APPLICABLE' => 'Not Applicable',
 	'KalturaFlavorAssetStatus::TEMP' => 'Temporary',
+	'KalturaFlavorAssetStatus::WAIT_FOR_CONVERT' => 'Wait for convert',
+	'KalturaFlavorAssetStatus::IMPORTING' => 'Importing',
+	'KalturaFlavorAssetStatus::VALIDATING' => 'Validating',
 
 	'KalturaFileSyncStatus::ERROR' => 'Error',
 	'KalturaFileSyncStatus::PENDING' => 'Pending',
