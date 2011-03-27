@@ -21,13 +21,13 @@ class KalturaFileSyncResource extends KalturaContentResource
 	
 	/**
 	 * The object id of the file sync object 
-	 * @var int
+	 * @var string
 	 */
 	public $objectId;
 	
 	/**
 	 * The version of the file sync object 
-	 * @var int
+	 * @var string
 	 */
 	public $version;
 }
