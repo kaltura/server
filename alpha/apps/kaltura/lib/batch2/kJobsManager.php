@@ -712,6 +712,20 @@ class kJobsManager
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (filesize($inputFileSyncLocalPath) == 0)
 		{
+			$partner = $entry->getPartner();
+			if($partner && $partner->getImportRemoteSourceForConvert())
+			{
+				$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+				$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+				if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+				{
+					$url = $syncFile->getExternalUrl();
+					kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
+				}
+				return null;
+			}
+			
 			$entry->setStatus(entryStatus::ERROR_CONVERTING);
 			$entry->save();
 			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
