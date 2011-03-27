@@ -588,7 +588,7 @@ class MediaService extends KalturaEntryService
 			$dbAsset = new flavorAsset();
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
-			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
 			
 			$dbAsset->setFlavorParamsId($resource->assetParamsId);
 			if($assetParams->hasTag(assetParams::TAG_SOURCE))

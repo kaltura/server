@@ -158,7 +158,11 @@ class kBusinessPostConvertDL
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 				continue;
 			
-			if($siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED || $siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING)
+			if(
+					$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED 
+				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING 
+				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING 
+				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
 				$hasInComplte = true;
 			
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
@@ -240,7 +244,11 @@ class kBusinessPostConvertDL
 			if($flavorAsset->getIsOriginal())
 				continue;
 				
-			if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED || $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING)
+			if(
+					$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED
+				||	$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING
+				||	$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING
+				||	$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
 				$hasIncomplete = true;
 		}
 		

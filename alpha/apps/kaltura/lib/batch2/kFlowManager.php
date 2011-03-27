@@ -358,7 +358,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 			}
 		}
-		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
 		{
 			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
 			$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
@@ -376,25 +376,24 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if(!($object instanceof flavorAsset) || !in_array(flavorAssetPeer::STATUS, $modifiedColumns))
+		if(
+				!($object instanceof flavorAsset) 
+			||	!in_array(flavorAssetPeer::STATUS, $modifiedColumns))
 			return true;
 		
 		$entry = $object->getentry();
 		
 		if($object->getIsOriginal())
 		{
-			if($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED)
+			if($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED && $entry->getType() == entryType::MEDIA_CLIP)
 			{
-				if($entry->getType() == entryType::MEDIA_CLIP)
-				{
-					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				
-					kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
-				}
+				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			
+				kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
 			}
 		}
-		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
 		{
 			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
 			$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration

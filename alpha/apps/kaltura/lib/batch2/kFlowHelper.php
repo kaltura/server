@@ -149,7 +149,7 @@ class kFlowHelper
 			if($flavorAsset->getIsOriginal() && $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 			else
-				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
 				
 			$flavorAsset->save();
 			
