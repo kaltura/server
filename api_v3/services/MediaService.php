@@ -455,10 +455,9 @@ class MediaService extends KalturaEntryService
     /**
      * @param KalturaAssetsParamsResourceContainers $resource
      * @param entry $dbEntry
-     * @param asset $dbAsset
      * @return asset
      */
-    protected function attachAssetsParamsResourceContainers(KalturaAssetsParamsResourceContainers $resource, entry $dbEntry, asset $dbAsset = null)
+    protected function attachAssetsParamsResourceContainers(KalturaAssetsParamsResourceContainers $resource, entry $dbEntry)
     {
     	$resource->validatePropertyNotNull('resources');
     	KalturaLog::debug("Resources [" . count($resource->resources) . "]");
@@ -467,7 +466,7 @@ class MediaService extends KalturaEntryService
     	foreach($resource->resources as $assetParamsResourceContainer)
     	{
     		KalturaLog::debug("Resource asset params id [{$assetParamsResourceContainer->assetParamsId}]");
-    		$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry, $dbAsset);
+    		$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry);
     		KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
     		if($dbAsset->getIsOriginal())
     			$ret = $dbAsset;
@@ -537,7 +536,7 @@ class MediaService extends KalturaEntryService
     	switch(get_class($resource))
     	{
 			case 'KalturaAssetsParamsResourceContainers':
-				return $this->attachAssetsParamsResourceContainers($resource, $dbEntry, $dbAsset);
+				return $this->attachAssetsParamsResourceContainers($resource, $dbEntry);
 				
 			case 'KalturaAssetParamsResourceContainer':
 				return $this->attachAssetParamsResourceContainer($resource, $dbEntry, $dbAsset);
