@@ -270,4 +270,6 @@ class KalturaErrors extends APIErrors
 	 * file sync
 	 */
 	const FILE_DOESNT_EXIST = "FILE_DOESNT_EXIST,File doesnt exist";
+	
+	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND,Storage profile id %s not found";
 }

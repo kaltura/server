@@ -50,6 +50,7 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
      * @throws KalturaErrors::UPLOAD_ERROR
      * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
+     * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
      */
     function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
@@ -406,6 +407,7 @@ class MediaService extends KalturaEntryService
      * @param asset $dbAsset
      * @return asset
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+     * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
      */
     protected function attachRemoteStorageResource(KalturaRemoteStorageResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
@@ -433,7 +435,11 @@ class MediaService extends KalturaEntryService
         }
                 
         $key = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($key, $resource->url, $resource->storageProfileId);
+        $storageProfile = StorageProfilePeer::retrieveByPK($resource->storageProfileId);
+        if(!$storageProfile)
+        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $resource->storageProfileId);
+        	
+		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($key, $resource->url, $storageProfile);
 
         if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
@@ -615,6 +621,7 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
      * @throws KalturaErrors::UPLOAD_ERROR
      * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
+     * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
      */
     protected function attachResource(KalturaResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
