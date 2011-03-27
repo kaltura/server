@@ -42,6 +42,14 @@ class MediaService extends KalturaEntryService
      * @param KalturaMediaEntry $entry
      * @param KalturaResource $resource
      * @return KalturaMediaEntry
+     * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+     * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+     * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+     * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+     * @throws KalturaErrors::UPLOAD_ERROR
+     * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
      */
     function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
@@ -479,12 +487,18 @@ class MediaService extends KalturaEntryService
      * @param entry $dbEntry
      * @param asset $dbAsset
      * @return asset
+     * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
      */
     protected function attachAssetParamsResourceContainer(KalturaAssetParamsResourceContainer $resource, entry $dbEntry, asset $dbAsset = null)
     {
     	$resource->validatePropertyNotNull('resource');
     	$resource->validatePropertyNotNull('assetParamsId');
     	
+		assetParamsPeer::resetInstanceCriteriaFilter();
+		$assetParams = assetParamsPeer::retrieveByPK($resource->assetParamsId);
+		if(!$assetParams)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $resource->assetParamsId);
+			
     	assetPeer::resetInstanceCriteriaFilter();
     	if(!$dbAsset)
     		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbEntry->getId(), $resource->assetParamsId);
@@ -496,18 +510,16 @@ class MediaService extends KalturaEntryService
 			$dbAsset = new flavorAsset();
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
+			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 			
-			assetParamsPeer::resetInstanceCriteriaFilter();
-			$assetParams = assetParamsPeer::retrieveByPK($resource->assetParamsId);
-			if($assetParams)
+			$dbAsset->setFlavorParamsId($resource->assetParamsId);
+			if($assetParams->hasTag(assetParams::TAG_SOURCE))
 			{
-				$dbAsset->setFlavorParamsId($resource->assetParamsId);
-				if($assetParams->hasTag(assetParams::TAG_SOURCE))
-					$dbAsset->setIsOriginal(true);
+				$dbAsset->setIsOriginal(true);
+				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 			}
     	}
 		$dbAsset->incrementVersion();
-		$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbAsset->save();
 		
 		$dbAsset = $this->attachResource($resource->resource, $dbEntry, $dbAsset);
@@ -530,6 +542,7 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
      * @throws KalturaErrors::UPLOAD_ERROR
+     * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
      */
     protected function attachResource(KalturaResource $resource, entry $dbEntry, asset $dbAsset = null)
     {

@@ -658,7 +658,12 @@ class kJobsManager
  		$jobData->setSrcFileUrl($entryUrl);
  		
  		if($asset)
+ 		{
+ 			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+ 			$asset->save();
+ 			
  			$jobData->setFlavorAssetId($asset->getId());
+ 		}
  			
 		$batchJob = null;
 		if($parentJob)

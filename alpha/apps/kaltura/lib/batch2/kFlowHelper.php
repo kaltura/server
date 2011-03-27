@@ -140,9 +140,29 @@ class kFlowHelper
 		$dbBatchJob->save();
 		
 		if($isNewFlavor)
+		{
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
+		}
 		else
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($flavorAsset, $dbBatchJob));
+		{
+			// if the flavor is the source, its readiness should be decided during the profile conversion 
+			if($flavorAsset->getIsOriginal() && $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+			else
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+				
+			$flavorAsset->save();
+			
+			if($flavorAsset->getIsOriginal())
+			{
+				$entryFlavors = flavorAssetPeer::retrieveByEntryId($flavorAsset->getEntryId());
+				foreach($entryFlavors as $entryFlavor)
+				{
+					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
+						kBusinessPreConvertDL::decideAddEntryFlavor($dbBatchJob, $flavorAsset->getEntryId(), $entryFlavor->getFlavorParamsId());
+				}
+			}
+		}
 		
 		return $dbBatchJob;
 	}

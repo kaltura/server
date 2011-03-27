@@ -18,6 +18,7 @@ class asset extends Baseasset implements ISyncableFile
 	const FLAVOR_ASSET_STATUS_NOT_APPLICABLE = 4;
 	const FLAVOR_ASSET_STATUS_TEMP = 5; // used during conversion and should be deleted
 	const FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT = 6; // can't convert since the source is not ready yet, will be converted when the source is ready
+	const FLAVOR_ASSET_STATUS_IMPORTING = 7;
 	
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET = 1;
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG = 2;

@@ -8,7 +8,7 @@
  * @subpackage Batch
  *
  */
-class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectUpdatedEventConsumer
+class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer
 {
 	public final function __construct()
 	{ 
@@ -353,13 +353,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			
 				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
-				
-				$entryFlavors = flavorAssetPeer::retrieveByEntryId($entry->getId());
-				foreach($entryFlavors as $entryFlavor)
-				{
-					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
-						kBusinessPreConvertDL::decideAddEntryFlavor($raisedJob, $entry->getId(), $entryFlavor->getFlavorParamsId());
-				}
 			}
 		}
 		
@@ -367,38 +360,18 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	}
 	
 	/* (non-PHPdoc)
-	 * @see kObjectUpdatedEventConsumer::objectUpdated()
+	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
-	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
 		if(
-				$object instanceof flavorAsset 
-			&&	$object->getIsOriginal()
-		)
-		{
-			$entry = $object->getentry();
-			if($entry->getType() == entryType::MEDIA_CLIP)
-			{
-				if($entry->getStatus() == entryStatus::PENDING)
-				{
-					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				
-					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
-				}
-				
-				if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
-				{
-					$entryFlavors = flavorAssetPeer::retrieveByEntryId($entry->getId());
-					foreach($entryFlavors as $entryFlavor)
-					{
-						if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
-							kBusinessPreConvertDL::decideAddEntryFlavor($raisedJob, $entry->getId(), $entryFlavor->getFlavorParamsId());
-					}
-				}
-			}
-		}
-		
-		return true;
+				!($object instanceof flavorAsset) 
+			||	!$object->getIsOriginal() 
+			||	!in_array(flavorAssetPeer::STATUS, $modifiedColumns)
+			||	$object->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_QUEUED
+			)
+			return true;
+			 
+		return $this->objectAdded($object);
 	}
 }
