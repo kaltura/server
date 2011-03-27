@@ -794,9 +794,15 @@ class kBusinessPreConvertDL
 		
 		$sourceFlavor = null;
 		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
+		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
 
 		foreach($flavors as $index => $flavor)
 		{
+			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
+				continue;
+				
+			$conversionProfileFlavorParamsItem = $conversionProfileFlavorParams[$flavor->getId()];
+			
 			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
 			{
 				foreach($dynamicFlavorAttributes[$flavor->getId()] as $attributeName => $attributeValue)
@@ -807,7 +813,20 @@ class kBusinessPreConvertDL
 			{
 				$sourceFlavor = $flavor;
 				unset($flavors[$index]);
+				continue;
 			}
+			
+			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT)
+				continue;
+			
+			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+			{
+				unset($flavors[$index]);
+				continue;
+			}
+				
+			if(in_array($flavor->getId(), $entryIngestedFlavors))
+				unset($flavors[$index]);
 		}
 		
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
@@ -973,14 +992,34 @@ class kBusinessPreConvertDL
 		
 		// gets the flavor params by the id
 		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
+		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
+		
 		foreach($flavors as $index => $flavor)
 		{
+			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
+				continue;
+				
+			$conversionProfileFlavorParamsItem = $conversionProfileFlavorParams[$flavor->getId()];
+		
 			if($flavor->hasTag(flavorParams::TAG_SOURCE))
 			{
 				unset($flavors[$index]);
 				continue;
 			}
 			
+			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
+			{
+				unset($flavors[$index]);
+				continue;
+			}
+			
+			if(	in_array($flavor->getId(), $entryIngestedFlavors) && 
+				$conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
+			{
+				unset($flavors[$index]);
+				continue;
+			}
+				
 			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
 			{
 				foreach($dynamicFlavorAttributes[$flavor->getId()] as $attributeName => $attributeValue)
