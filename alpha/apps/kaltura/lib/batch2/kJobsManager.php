@@ -572,7 +572,7 @@ class kJobsManager
 	 * @param int $thumbOffset
 	 * @return BatchJob
 	 */
-	public static function addPostConvertJob(BatchJob $parentJob, $jobSubType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
+	public static function addPostConvertJob(BatchJob $parentJob = null, $jobSubType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
@@ -581,19 +581,22 @@ class kJobsManager
 		$postConvertData->setThumbOffset($thumbOffset);
 		$postConvertData->setCreateThumb($createThumb);
 		
-		$parentData = $parentJob->getData();
-		if($parentData instanceof kConvartableJobData)
+		if($parentJob)
 		{
-			$postConvertData->setCurrentOperationSet($parentData->getCurrentOperationSet());
-			$postConvertData->setCurrentOperationIndex($parentData->getCurrentOperationIndex());
+			$parentData = $parentJob->getData();
+			if($parentData instanceof kConvartableJobData)
+			{
+				$postConvertData->setCurrentOperationSet($parentData->getCurrentOperationSet());
+				$postConvertData->setCurrentOperationIndex($parentData->getCurrentOperationIndex());
+			}
 		}
 		
+		$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
 		if($createThumb)
 		{
 			$flavorParamsOutput = flavorParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 			if(!$flavorParamsOutput)
 			{
-				$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
 				if($flavorAsset)
 				{
 					$postConvertData->setThumbHeight($flavorAsset->getHeight());
@@ -608,13 +611,14 @@ class kJobsManager
 			{
 				$postConvertData->setCreateThumb(false);
 			}
-			else 
+			elseif($flavorAsset)
 			{
-				$entry = $parentJob->getEntry();
-				$rootBatchJob = $parentJob->getRootJob();
+				$entry = $flavorAsset->getentry();
 				
-				if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+				if($parentJob && $parentJob->getRootJob() && $parentJob->getRootJob()->getJobType() == BatchJobType::CONVERT_PROFILE)
 				{
+					$rootBatchJob = $parentJob->getRootJob();
+					
 					$thisFlavorHeight = $flavorParamsOutput->getHeight();
 					$thisFlavorBitrate = $flavorParamsOutput->getVideoBitrate();
 					
@@ -647,9 +651,21 @@ class kJobsManager
 				}
 			}
 		}
-			
+	
+		$batchJob = null;
+		if($parentJob)
+		{
+			$batchJob = $parentJob->createChild();
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setEntryId($flavorAsset->getEntryId());
+			$batchJob->setPartnerId($flavorAsset->getPartnerId());
+		}
+		
 		KalturaLog::log("Post Convert created with file: " . $postConvertData->getSrcFileSyncLocalPath());
-		return kJobsManager::addJob($parentJob->createChild(), $postConvertData, BatchJobType::POSTCONVERT, $jobSubType);
+		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $jobSubType);
 	}
 	
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null)
