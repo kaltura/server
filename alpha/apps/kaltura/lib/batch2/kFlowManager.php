@@ -374,22 +374,27 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		if(
 				$object instanceof flavorAsset 
 			&&	$object->getIsOriginal()
-			&&	$object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY
 		)
 		{
 			$entry = $object->getentry();
 			if($entry->getType() == entryType::MEDIA_CLIP)
 			{
-				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			
-				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
-				
-				$entryFlavors = flavorAssetPeer::retrieveByEntryId($entry->getId());
-				foreach($entryFlavors as $entryFlavor)
+				if($entry->getStatus() == entryStatus::PENDING)
 				{
-					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
-						kBusinessPreConvertDL::decideAddEntryFlavor($raisedJob, $entry->getId(), $entryFlavor->getFlavorParamsId());
+					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				
+					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+				}
+				
+				if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+				{
+					$entryFlavors = flavorAssetPeer::retrieveByEntryId($entry->getId());
+					foreach($entryFlavors as $entryFlavor)
+					{
+						if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
+							kBusinessPreConvertDL::decideAddEntryFlavor($raisedJob, $entry->getId(), $entryFlavor->getFlavorParamsId());
+					}
 				}
 			}
 		}
