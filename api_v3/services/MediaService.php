@@ -469,8 +469,11 @@ class MediaService extends KalturaEntryService
     	if(!$dbAsset)
     		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbEntry->getId(), $resource->assetParamsId);
     		
+    	$isNewAsset = false;
     	if(!$dbAsset)
     	{
+    		$isNewAsset = true;
+    		
 			$dbAsset = new flavorAsset();
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
@@ -488,7 +491,12 @@ class MediaService extends KalturaEntryService
 		$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbAsset->save();
 		
-		return $this->attachResource($resource->resource, $dbEntry, $dbAsset);
+		$dbAsset = $this->attachResource($resource->resource, $dbEntry, $dbAsset);
+		
+		if($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		else
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($dbAsset));
     }
     
     /**
@@ -1222,8 +1230,6 @@ class MediaService extends KalturaEntryService
 	 */
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
-		// first validate the input object
-		//$entry->validatePropertyMinLength("name", 1);
 		$entry->validatePropertyNotNull("mediaType");
 		
 		$dbEntry = parent::prepareEntryForInsert($entry);
