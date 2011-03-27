@@ -78,7 +78,6 @@ class KalturaResponseCacher
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		ksort($this->_params);
 
-//		$protocol = (@$_SERVER['HTTPS'] == 'on') ? "https|" : "";
 		$this->_cacheKey = md5( http_build_query($this->_params) );
 
 		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
