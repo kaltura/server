@@ -401,6 +401,27 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 */
 	public $alwaysAllowedPermissionNames = null;
 
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $importRemoteSourceForConvert = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableEntryReplacement = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableEntryReplacementApproval = null;
+
 
 }
 
