@@ -150,6 +150,11 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'storage_delete_from_kaltura')))
 		));
 		
+		$this->addElement('checkbox', 'import_remote_source_for_convert', array(
+			'label'	  => 'Import remote source for convert',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'import_remote_source_for_convert')))
+		));
+		
 		$this->addElement('checkbox', 'enable_entry_replacement', array(
 			'label'	  => 'Enable entry replacement',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_entry_replacement')))
