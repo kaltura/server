@@ -150,6 +150,21 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $alwaysAllowedPermissionNames;
 	
+	/**
+	 * @var bool
+	 */
+	public $importRemoteSourceForConvert;
+	
+	/**
+	 * @var bool
+	 */
+	public $enableEntryReplacement;
+	
+	/**
+	 * @var bool
+	 */
+	public $enableEntryReplacementApproval;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -177,6 +192,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"userSessionRoleId",
 		"adminSessionRoleId",
 		"alwaysAllowedPermissionNames",
+		"importRemoteSourceForConvert",
 	);
 
 	public function getMapBetweenObjects()
@@ -201,6 +217,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->enableAnnotation = $source_object->getPluginEnabled(AnnotationPlugin::getPluginName());
 			
 		$this->enablePs2PermissionValidation = $source_object->getEnabledService(PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
+		$this->enableEntryReplacement = $source_object->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT);
+		$this->enableEntryReplacementApproval = $source_object->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -220,7 +238,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$object_to_fill->setPluginEnabled(AnnotationPlugin::getPluginName(), $this->enableAnnotation);
 				
 		$object_to_fill->setEnabledService($this->enablePs2PermissionValidation, PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
-
+		$object_to_fill->setEnabledService($this->enableEntryReplacement, PermissionName::FEATURE_ENTRY_REPLACEMENT);
+		$object_to_fill->setEnabledService($this->enableEntryReplacementApproval, PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL);
+		
 		return $object_to_fill;
 	}
 }

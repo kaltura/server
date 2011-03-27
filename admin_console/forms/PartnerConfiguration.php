@@ -149,6 +149,16 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'label'	  => 'Delete exported storage from Kaltura',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'storage_delete_from_kaltura')))
 		));
+		
+		$this->addElement('checkbox', 'enable_entry_replacement', array(
+			'label'	  => 'Enable entry replacement',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_entry_replacement')))
+		));
+		
+		$this->addElement('checkbox', 'enable_entry_replacement_approval', array(
+			'label'	  => 'Enable entry replacement approval',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_entry_replacement_approval')))
+		));
 				
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'KalturaStorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');

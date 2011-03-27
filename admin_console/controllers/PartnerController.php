@@ -259,7 +259,7 @@ class PartnerController extends Zend_Controller_Action
 				$form->getElement('enable_audit_trail')->setAttrib('disabled',true);
 			
 			if (!$moduls->annotation)
-				$form->getElement('enable_annotation')->setAttrib('disabled',false);
+				$form->getElement('enable_annotation')->setAttrib('disabled',true);
 		}
 		
 		$request = $this->getRequest();
