@@ -744,10 +744,9 @@ class kFileSyncUtils
 	 * @param FileSyncKey $key
 	 * @param string $url
 	 * @param StorageProfile $externalStorage
-	 * @param bool $isOriginal
 	 * @return SyncFile
 	 */
-	public static function createReadyExternalSyncFileForKey(FileSyncKey $key, $url, StorageProfile $externalStorage, $isOriginal = true)
+	public static function createReadyExternalSyncFileForKey(FileSyncKey $key, $url, StorageProfile $externalStorage)
 	{
 		$externalStorageId = $externalStorage->getId();
 		KalturaLog::log(__METHOD__." - key [$key], externalStorage [$externalStorageId]");
@@ -767,7 +766,7 @@ class kFileSyncUtils
 		$fileSync->setFilePath	( $filePath );
 		$fileSync->setFileSize	( -1 );
 		$fileSync->setStatus	( FileSync::FILE_SYNC_STATUS_READY );
-		$fileSync->setOriginal	( $isOriginal );
+		$fileSync->setOriginal	( false );
 		$fileSync->setReadyAt	( time() );
 		$fileSync->setFileType	( FileSync::FILE_SYNC_FILE_TYPE_URL );
 		$fileSync->save();
