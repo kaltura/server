@@ -429,7 +429,7 @@ class kFlowHelper
 				if($flavorAsset->getIsOriginal())
 					$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE;
 					
-					kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
+				kJobsManager::addPostConvertJob($dbBatchJob, $jobSubType, $data->getDestFileSyncLocalPath(), $data->getFlavorAssetId(), $flavorParamsOutput->getId(), $createThumb, $offset);
 			}
 			else // no need to run post convert
 			{
