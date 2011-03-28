@@ -97,7 +97,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 * @param array $data
 	 * @param string $dataName
 	 */
-	public function __construct($name = NULL, array $data = array(), $dataName = '')
+	public function __construct($name = null, array $data = array(), $dataName = '')
 	{
 		parent::__construct($name, $data, $dataName);
 				
@@ -169,13 +169,16 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		switch($argConfig->objectType)
 		{
 			case 'dependency':
-				throw new KalturaUnitTestException("Argument [$argName] taken from dependency");
+				throw new KalturaTestException("Argument [$argName] taken from dependency");
 				
 			case 'array':
 				return array();
 				
 			case 'native':
 				return $argConfig->value;
+				
+			case 'file':
+				return $argConfig->path;
 				
 			default:
 				return $this->populateObject($argConfig);
@@ -278,7 +281,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 					$value = $this->getArgConfig($testConfig, $arg);
 					$test[] = $value;
 				}
-				catch (KalturaUnitTestException $e)
+				catch (KalturaTestException $e)
 				{
 					KalturaLog::log($e->getMessage());
 				}
@@ -299,7 +302,17 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		$debugTrace = debug_backtrace();
 		list($className, $methodName) = $debugTrace[2]['args'];
 		if(class_exists($className) && method_exists($className, $methodName))
-			return $this->provideTestData($className, $methodName);
+		{
+			try
+			{
+				return $this->provideTestData($className, $methodName);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err($e->getMessage());
+				throw $e;
+			}
+		}
 			
 		throw new Exception('Calling method not found');
 	}
@@ -312,6 +325,10 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		print("In RunTest\n");
 
+		foreach ($this->dependencyInput as $index => $value)
+			$this->data[$index] = $value;
+		$this->dependencyInput = array();
+		
 		$this->currentFailure = null;
 		
 		//if the fraemwork wasn't initiated we need to init here (caused becasue only here we add our listener )
@@ -338,7 +355,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			}
 		}
 		
-		parent::runTest();
+		$testResult = parent::runTest();
+		return $testResult;
 	}
 
 	/**
