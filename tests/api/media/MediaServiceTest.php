@@ -1,7 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../base/bootstrap.php');
-require_once(dirname(__FILE__) . '/MediaServiceBaseTest.php');
+require_once(dirname(__FILE__) . '/../../bootstrap.php');
 
 /**
  * media service test case.
@@ -9,101 +8,107 @@ require_once(dirname(__FILE__) . '/MediaServiceBaseTest.php');
 class MediaServiceTest extends MediaServiceBaseTest
 {
 	/**
-	 * Tests media->addFromBulk action
-	 * @param KalturaMediaEntry $mediaEntry
-	 * @param string $url
-	 * @param int $bulkUploadId
-	 * @param KalturaMediaEntry $reference
-	 * @dataProvider provideData
+	 * Validates testAdd results
 	 */
-	public function testAddFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId, KalturaMediaEntry $reference)
+	protected function validateAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->addFromBulk($mediaEntry, $url, $bulkUploadId, $reference);
-		$this->assertType('KalturaMediaEntry', $resultObject);
-		// TODO - add here your own validations
+		parent::validateAdd($entry, $resource, $reference);
+		// TODO - add your own validations here
 	}
 
 	/**
-	 * Tests media->addFromUrl action
+	 * Tests media->addfromurl action
 	 * @param KalturaMediaEntry $mediaEntry
 	 * @param string $url
 	 * @param KalturaMediaEntry $reference
 	 * @dataProvider provideData
 	 */
-	public function testAddFromUrl(KalturaMediaEntry $mediaEntry, $url, KalturaMediaEntry $reference)
+	public function testAddfromurl(KalturaMediaEntry $mediaEntry, $url, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->addFromUrl($mediaEntry, $url, $reference);
+		$resultObject = $this->client->media->addfromurl($mediaEntry, $url, $reference);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		// TODO - add here your own validations
 	}
 
 	/**
-	 * Tests media->addFromSearchResult action
+	 * Tests media->addfromsearchresult action
 	 * @param KalturaMediaEntry $mediaEntry
 	 * @param KalturaSearchResult $searchResult
 	 * @param KalturaMediaEntry $reference
 	 * @dataProvider provideData
 	 */
-	public function testAddFromSearchResult(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null, KalturaMediaEntry $reference)
+	public function testAddfromsearchresult(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->addFromSearchResult($mediaEntry, $searchResult, $reference);
+		$resultObject = $this->client->media->addfromsearchresult($mediaEntry, $searchResult, $reference);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		// TODO - add here your own validations
 	}
 
 	/**
-	 * Tests media->addFromUploadedFile action
-	 * @param KalturaMediaEntry $mediaEntry
+	 * Tests media->addfromuploadedfile action
 	 * @param string $uploadTokenId
+	 * @param KalturaMediaEntry $mediaEntry
 	 * @param KalturaMediaEntry $reference
+	 * @depends testUpload with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testAddFromUploadedFile(KalturaMediaEntry $mediaEntry, $uploadTokenId, KalturaMediaEntry $reference)
+	public function testAddfromuploadedfile($uploadTokenId, KalturaMediaEntry $mediaEntry, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->addFromUploadedFile($mediaEntry, $uploadTokenId, $reference);
+		KalturaLog::debug("Upload token [$uploadTokenId]");
+		$resultObject = $this->client->media->addfromuploadedfile($mediaEntry, $uploadTokenId, $reference);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		// TODO - add here your own validations
 	}
 
 	/**
-	 * Tests media->addFromRecordedWebcam action
+	 * Tests media->addfromrecordedwebcam action
 	 * @param KalturaMediaEntry $mediaEntry
 	 * @param string $webcamTokenId
 	 * @param KalturaMediaEntry $reference
 	 * @dataProvider provideData
 	 */
-	public function testAddFromRecordedWebcam(KalturaMediaEntry $mediaEntry, $webcamTokenId, KalturaMediaEntry $reference)
+	public function testAddfromrecordedwebcam(KalturaMediaEntry $mediaEntry, $webcamTokenId, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->addFromRecordedWebcam($mediaEntry, $webcamTokenId, $reference);
+		$resultObject = $this->client->media->addfromrecordedwebcam($mediaEntry, $webcamTokenId, $reference);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		// TODO - add here your own validations
 	}
 
 	/**
-	 * Tests media->addFromEntry action
+	 * Tests media->addfromentry action
 	 * @param string $sourceEntryId
 	 * @param KalturaMediaEntry $mediaEntry
 	 * @param int $sourceFlavorParamsId
 	 * @param KalturaMediaEntry $reference
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testAddFromEntry($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = null, KalturaMediaEntry $reference)
+	public function testAddfromentry($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = null, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->addFromEntry($sourceEntryId, $mediaEntry, $sourceFlavorParamsId, $reference);
+		$resultObject = $this->client->media->addfromentry($sourceEntryId, $mediaEntry, $sourceFlavorParamsId, $reference);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		// TODO - add here your own validations
 	}
 
 	/**
-	 * Tests media->addFromFlavorAsset action
+	 * Tests media->addfromflavorasset action
+	 * @param string $entryId
 	 * @param string $sourceFlavorAssetId
 	 * @param KalturaMediaEntry $mediaEntry
 	 * @param KalturaMediaEntry $reference
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testAddFromFlavorAsset($sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null, KalturaMediaEntry $reference)
+	public function testAddfromflavorasset($entryId, $sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->addFromFlavorAsset($sourceFlavorAssetId, $mediaEntry, $reference);
+		if(is_null($sourceFlavorAssetId))
+		{
+			$flavorAssets = $this->client->flavorAsset->getByEntryId($entryId);
+			$flavorAsset = reset($flavorAssets);
+			$sourceFlavorAssetId = $flavorAsset->id;
+		}
+		
+		$resultObject = $this->client->media->addfromflavorasset($sourceFlavorAssetId, $mediaEntry, $reference);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		// TODO - add here your own validations
 	}
@@ -114,6 +119,7 @@ class MediaServiceTest extends MediaServiceBaseTest
 	 * @param int $conversionProfileId
 	 * @param KalturaConversionAttributeArray $dynamicConversionAttributes
 	 * @param int $reference
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testConvert($entryId, $conversionProfileId = null, KalturaConversionAttributeArray $dynamicConversionAttributes = null, $reference)
@@ -178,34 +184,41 @@ class MediaServiceTest extends MediaServiceBaseTest
 	 * @param string $reference
 	 * @dataProvider provideData
 	 */
-	public function testUpload(file $fileData, $reference)
+	public function testUpload($fileData, $reference)
 	{
 		$resultObject = $this->client->media->upload($fileData, $reference);
 		$this->assertType('string', $resultObject);
 		// TODO - add here your own validations
+		
+		KalturaLog::debug("Returned token [$resultObject]");
+		return $resultObject;
 	}
 
 	/**
-	 * Tests media->requestConversion action
+	 * Tests media->requestconversion action
 	 * @param string $entryId
 	 * @param string $fileFormat
 	 * @param int $reference
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testRequestConversion($entryId, $fileFormat, $reference)
+	public function testRequestconversion($entryId, $fileFormat, $reference)
 	{
-		$resultObject = $this->client->media->requestConversion($entryId, $fileFormat, $reference);
+		$resultObject = $this->client->media->requestconversion($entryId, $fileFormat, $reference);
 		$this->assertType('int', $resultObject);
 		// TODO - add here your own validations
 	}
 
 	/**
 	 * Tests media->flag action
+	 * @param string $entryId
 	 * @param KalturaModerationFlag $moderationFlag
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testFlag(KalturaModerationFlag $moderationFlag)
+	public function testFlag($entryId, KalturaModerationFlag $moderationFlag)
 	{
+		$moderationFlag->flaggedEntryId = $entryId;
 		$resultObject = $this->client->media->flag($moderationFlag);
 		// TODO - add here your own validations
 	}
@@ -213,6 +226,7 @@ class MediaServiceTest extends MediaServiceBaseTest
 	/**
 	 * Tests media->reject action
 	 * @param string $entryId
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testReject($entryId)
@@ -224,6 +238,7 @@ class MediaServiceTest extends MediaServiceBaseTest
 	/**
 	 * Tests media->approve action
 	 * @param string $entryId
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testApprove($entryId)
@@ -233,28 +248,30 @@ class MediaServiceTest extends MediaServiceBaseTest
 	}
 
 	/**
-	 * Tests media->listFlags action
+	 * Tests media->listflags action
 	 * @param string $entryId
 	 * @param KalturaFilterPager $pager
 	 * @param KalturaModerationFlagListResponse $reference
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testListFlags($entryId, KalturaFilterPager $pager = null, KalturaModerationFlagListResponse $reference)
+	public function testListflags($entryId, KalturaFilterPager $pager = null, KalturaModerationFlagListResponse $reference)
 	{
-		$resultObject = $this->client->media->listFlags($entryId, $pager, $reference);
+		$resultObject = $this->client->media->listflags($entryId, $pager, $reference);
 		$this->assertType('KalturaModerationFlagListResponse', $resultObject);
 		// TODO - add here your own validations
 	}
 
 	/**
-	 * Tests media->anonymousRank action
+	 * Tests media->anonymousrank action
 	 * @param string $entryId
 	 * @param int $rank
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
-	public function testAnonymousRank($entryId, $rank)
+	public function testAnonymousrank($entryId, $rank)
 	{
-		$resultObject = $this->client->media->anonymousRank($entryId, $rank);
+		$resultObject = $this->client->media->anonymousrank($entryId, $rank);
 		// TODO - add here your own validations
 	}
 
