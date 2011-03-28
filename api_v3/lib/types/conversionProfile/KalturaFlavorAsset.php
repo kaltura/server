@@ -48,6 +48,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * True if this Flavor Asset is the original source
 	 * 
 	 * @var bool
+	 * @readonly
 	 */
 	public $isOriginal;
 	
