@@ -154,7 +154,6 @@ class MediaServiceTest extends MediaServiceBaseTest
 	public function testConvert($entryId, $conversionProfileId = null, KalturaConversionAttributeArray $dynamicConversionAttributes = null, $reference)
 	{
 		$resultObject = $this->client->media->convert($entryId, $conversionProfileId, $dynamicConversionAttributes, $reference);
-		$this->assertType('int', $resultObject);
 		// TODO - add here your own validations
 	}
 
@@ -218,21 +217,6 @@ class MediaServiceTest extends MediaServiceBaseTest
 	public function testRequestconversion($entryId, $fileFormat, $reference)
 	{
 		$resultObject = $this->client->media->requestconversion($entryId, $fileFormat, $reference);
-		$this->assertType('int', $resultObject);
-		// TODO - add here your own validations
-	}
-
-	/**
-	 * Tests media->flag action
-	 * @param string $entryId
-	 * @param KalturaModerationFlag $moderationFlag
-	 * @depends testAdd with data set #0
-	 * @dataProvider provideData
-	 */
-	public function testFlag($entryId, KalturaModerationFlag $moderationFlag)
-	{
-		$moderationFlag->flaggedEntryId = $entryId;
-		$resultObject = $this->client->media->flag($moderationFlag);
 		// TODO - add here your own validations
 	}
 
