@@ -34,6 +34,9 @@ $partner99->setPluginEnabled('contentDistribution', true);
 //Disable plugin Live Streaming
 $partner99->setLiveStreamEnabled(false);
 
+//Disables Akamai Hd network
+$partner99->setDisableAkamaiHDNetwork(true);
+
 if($dryRun)
 {
 	KalturaLog::log('DRY RUN - Adding new permissions [Vast, CustomMetadata, Thumbnails managment] to partner [99]\n');
