@@ -3,10 +3,7 @@
  * @package api
  * @subpackage enum
  */
-class KalturaSyndicationFeedType extends KalturaDynamicEnum implements syndicationFeedType
+class KalturaSyndicationFeedType extends KalturaEnum implements syndicationFeedType
 {
-	public static function getEnumClass()
-	{
-		return 'syndicationFeedType';
-	}
+
 }
