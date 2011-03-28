@@ -1,7 +1,5 @@
 <?php
 
-require_once (dirname(__FILE__). '/../bootstrap/bootstrapServer.php');
-
 /**
  * Represents a base test case for a general test
  * @author Roni
