@@ -8,6 +8,19 @@ require_once(dirname(__FILE__) . '/../../bootstrap.php');
 class MediaServiceTest extends MediaServiceBaseTest
 {
 	/**
+	 * Tests media->add action
+	 * @param KalturaMediaEntry $entry 
+	 * @param KalturaResource $resource 
+	 * @param KalturaMediaEntry $reference 
+	 * @return int
+	 * @dataProvider provideData
+	 */
+	public function testAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	{
+		return parent::testAdd($entry, $resource, $reference);
+	}
+	
+	/**
 	 * Validates testAdd results
 	 */
 	protected function validateAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
@@ -44,6 +57,22 @@ class MediaServiceTest extends MediaServiceBaseTest
 		// TODO - add here your own validations
 	}
 
+	/**
+	 * Tests media->upload action
+	 * @param file $fileData
+	 * @param string $reference
+	 * @dataProvider provideData
+	 */
+	public function testUpload($fileData, $reference)
+	{
+		$resultObject = $this->client->media->upload($fileData, $reference);
+		$this->assertType('string', $resultObject);
+		// TODO - add here your own validations
+		
+		KalturaLog::debug("Returned token [$resultObject]");
+		return $resultObject;
+	}
+	
 	/**
 	 * Tests media->addfromuploadedfile action
 	 * @param string $uploadTokenId
@@ -176,22 +205,6 @@ class MediaServiceTest extends MediaServiceBaseTest
 		$resultObject = $this->client->media->count($filter, $reference);
 		$this->assertType('int', $resultObject);
 		// TODO - add here your own validations
-	}
-
-	/**
-	 * Tests media->upload action
-	 * @param file $fileData
-	 * @param string $reference
-	 * @dataProvider provideData
-	 */
-	public function testUpload($fileData, $reference)
-	{
-		$resultObject = $this->client->media->upload($fileData, $reference);
-		$this->assertType('string', $resultObject);
-		// TODO - add here your own validations
-		
-		KalturaLog::debug("Returned token [$resultObject]");
-		return $resultObject;
 	}
 
 	/**

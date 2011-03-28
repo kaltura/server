@@ -3,7 +3,7 @@
 /**
  * media service base test case.
  */
-abstract class MediaServiceBaseTest extends KalturaApiUnitTestCase
+abstract class MediaServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests media->add action
@@ -19,6 +19,7 @@ abstract class MediaServiceBaseTest extends KalturaApiUnitTestCase
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		$this->assertNotNull($resultObject->id);
 		$this->validateAdd($entry, $resource, $reference);
+		KalturaLog::debug("Created entry [$resultObject->id]");
 		return $resultObject->id;
 	}
 
@@ -82,7 +83,7 @@ abstract class MediaServiceBaseTest extends KalturaApiUnitTestCase
 	/**
 	 * Tests media->delete action
 	 * @param string $entryId Media entry id to delete
-	 * @depends testAdd with data set #0
+	 * @depends testGet with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testDelete($entryId)
