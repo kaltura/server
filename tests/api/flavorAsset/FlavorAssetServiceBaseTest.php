@@ -29,23 +29,23 @@ abstract class FlavorAssetServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests flavorAsset->list action
+	 * Tests flavorAsset->listAction action
 	 * @param KalturaAssetFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaFlavorAssetListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorAssetListResponse $reference)
+	public function testListAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorAssetListResponse $reference)
 	{
-		$resultObject = $this->client->flavorAsset->list($filter, $pager);
+		$resultObject = $this->client->flavorAsset->listAction($filter, $pager);
 		$this->assertType('KalturaFlavorAssetListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorAssetListResponse $reference)
+	protected function validateListAction(KalturaAssetFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorAssetListResponse $reference)
 	{
 	}
 

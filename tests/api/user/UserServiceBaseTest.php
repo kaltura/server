@@ -94,23 +94,23 @@ abstract class UserServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests user->list action
+	 * Tests user->listAction action
 	 * @param KalturaUserFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaUserListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserListResponse $reference)
+	public function testListAction(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserListResponse $reference)
 	{
-		$resultObject = $this->client->user->list($filter, $pager);
+		$resultObject = $this->client->user->listAction($filter, $pager);
 		$this->assertType('KalturaUserListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserListResponse $reference)
+	protected function validateListAction(KalturaUserFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserListResponse $reference)
 	{
 	}
 

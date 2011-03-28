@@ -97,23 +97,23 @@ abstract class UiConfServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests uiConf->list action
+	 * Tests uiConf->listAction action
 	 * @param KalturaUiConfFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaUiConfListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaUiConfFilter $filter = null, KalturaFilterPager $pager = null, KalturaUiConfListResponse $reference)
+	public function testListAction(KalturaUiConfFilter $filter = null, KalturaFilterPager $pager = null, KalturaUiConfListResponse $reference)
 	{
-		$resultObject = $this->client->uiConf->list($filter, $pager);
+		$resultObject = $this->client->uiConf->listAction($filter, $pager);
 		$this->assertType('KalturaUiConfListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaUiConfFilter $filter = null, KalturaFilterPager $pager = null, KalturaUiConfListResponse $reference)
+	protected function validateListAction(KalturaUiConfFilter $filter = null, KalturaFilterPager $pager = null, KalturaUiConfListResponse $reference)
 	{
 	}
 

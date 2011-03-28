@@ -97,22 +97,22 @@ abstract class CategoryServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests category->list action
+	 * Tests category->listAction action
 	 * @param KalturaCategoryFilter $filter 
 	 * @param KalturaCategoryListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaCategoryFilter $filter = null, KalturaCategoryListResponse $reference)
+	public function testListAction(KalturaCategoryFilter $filter = null, KalturaCategoryListResponse $reference)
 	{
-		$resultObject = $this->client->category->list($filter);
+		$resultObject = $this->client->category->listAction($filter);
 		$this->assertType('KalturaCategoryListResponse', $resultObject);
-		$this->validateList($filter, $reference);
+		$this->validateListAction($filter, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaCategoryFilter $filter = null, KalturaCategoryListResponse $reference)
+	protected function validateListAction(KalturaCategoryFilter $filter = null, KalturaCategoryListResponse $reference)
 	{
 	}
 

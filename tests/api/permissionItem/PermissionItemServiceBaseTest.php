@@ -94,23 +94,23 @@ abstract class PermissionItemServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests permissionItem->list action
+	 * Tests permissionItem->listAction action
 	 * @param KalturaPermissionItemFilter $filter 
 	 * @param KalturaFilterPager $pager 
-	 * @param KalturaPremissionItemListResponse $reference 
+	 * @param KalturaPermissionItemListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaPermissionItemFilter $filter = null, KalturaFilterPager $pager = null, KalturaPremissionItemListResponse $reference)
+	public function testListAction(KalturaPermissionItemFilter $filter = null, KalturaFilterPager $pager = null, KalturaPermissionItemListResponse $reference)
 	{
-		$resultObject = $this->client->permissionItem->list($filter, $pager);
-		$this->assertType('KalturaPremissionItemListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$resultObject = $this->client->permissionItem->listAction($filter, $pager);
+		$this->assertType('KalturaPermissionItemListResponse', $resultObject);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaPermissionItemFilter $filter = null, KalturaFilterPager $pager = null, KalturaPremissionItemListResponse $reference)
+	protected function validateListAction(KalturaPermissionItemFilter $filter = null, KalturaFilterPager $pager = null, KalturaPermissionItemListResponse $reference)
 	{
 	}
 

@@ -97,23 +97,23 @@ abstract class ConversionProfileServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests conversionProfile->list action
+	 * Tests conversionProfile->listAction action
 	 * @param KalturaConversionProfileFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaConversionProfileListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaConversionProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaConversionProfileListResponse $reference)
+	public function testListAction(KalturaConversionProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaConversionProfileListResponse $reference)
 	{
-		$resultObject = $this->client->conversionProfile->list($filter, $pager);
+		$resultObject = $this->client->conversionProfile->listAction($filter, $pager);
 		$this->assertType('KalturaConversionProfileListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaConversionProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaConversionProfileListResponse $reference)
+	protected function validateListAction(KalturaConversionProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaConversionProfileListResponse $reference)
 	{
 	}
 

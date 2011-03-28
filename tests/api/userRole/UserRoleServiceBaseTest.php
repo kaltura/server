@@ -94,23 +94,23 @@ abstract class UserRoleServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests userRole->list action
+	 * Tests userRole->listAction action
 	 * @param KalturaUserRoleFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaUserRoleListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaUserRoleFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserRoleListResponse $reference)
+	public function testListAction(KalturaUserRoleFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserRoleListResponse $reference)
 	{
-		$resultObject = $this->client->userRole->list($filter, $pager);
+		$resultObject = $this->client->userRole->listAction($filter, $pager);
 		$this->assertType('KalturaUserRoleListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaUserRoleFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserRoleListResponse $reference)
+	protected function validateListAction(KalturaUserRoleFilter $filter = null, KalturaFilterPager $pager = null, KalturaUserRoleListResponse $reference)
 	{
 	}
 

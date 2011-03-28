@@ -70,23 +70,23 @@ abstract class UploadTokenServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests uploadToken->list action
+	 * Tests uploadToken->listAction action
 	 * @param KalturaUploadTokenFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaUploadTokenListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaUploadTokenFilter $filter = null, KalturaFilterPager $pager = null, KalturaUploadTokenListResponse $reference)
+	public function testListAction(KalturaUploadTokenFilter $filter = null, KalturaFilterPager $pager = null, KalturaUploadTokenListResponse $reference)
 	{
-		$resultObject = $this->client->uploadToken->list($filter, $pager);
+		$resultObject = $this->client->uploadToken->listAction($filter, $pager);
 		$this->assertType('KalturaUploadTokenListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaUploadTokenFilter $filter = null, KalturaFilterPager $pager = null, KalturaUploadTokenListResponse $reference)
+	protected function validateListAction(KalturaUploadTokenFilter $filter = null, KalturaFilterPager $pager = null, KalturaUploadTokenListResponse $reference)
 	{
 	}
 

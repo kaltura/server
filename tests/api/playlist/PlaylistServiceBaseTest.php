@@ -97,23 +97,23 @@ abstract class PlaylistServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests playlist->list action
+	 * Tests playlist->listAction action
 	 * @param KalturaPlaylistFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaPlaylistListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaPlaylistFilter $filter = null, KalturaFilterPager $pager = null, KalturaPlaylistListResponse $reference)
+	public function testListAction(KalturaPlaylistFilter $filter = null, KalturaFilterPager $pager = null, KalturaPlaylistListResponse $reference)
 	{
-		$resultObject = $this->client->playlist->list($filter, $pager);
+		$resultObject = $this->client->playlist->listAction($filter, $pager);
 		$this->assertType('KalturaPlaylistListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaPlaylistFilter $filter = null, KalturaFilterPager $pager = null, KalturaPlaylistListResponse $reference)
+	protected function validateListAction(KalturaPlaylistFilter $filter = null, KalturaFilterPager $pager = null, KalturaPlaylistListResponse $reference)
 	{
 	}
 

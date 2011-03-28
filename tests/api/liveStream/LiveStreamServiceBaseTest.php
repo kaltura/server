@@ -13,7 +13,7 @@ abstract class LiveStreamServiceBaseTest extends KalturaApiUnitTestCase
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaLiveStreamAdminEntry $liveStreamEntry, $sourceType = null, KalturaLiveStreamAdminEntry $reference)
+	public function testAdd(KalturaLiveStreamAdminEntry $liveStreamEntry, KalturaSourceType $sourceType = null, KalturaLiveStreamAdminEntry $reference)
 	{
 		$resultObject = $this->client->liveStream->add($liveStreamEntry, $sourceType);
 		$this->assertType('KalturaLiveStreamAdminEntry', $resultObject);
@@ -25,7 +25,7 @@ abstract class LiveStreamServiceBaseTest extends KalturaApiUnitTestCase
 	/**
 	 * Validates testAdd results
 	 */
-	protected function validateAdd(KalturaLiveStreamAdminEntry $liveStreamEntry, $sourceType = null, KalturaLiveStreamAdminEntry $reference)
+	protected function validateAdd(KalturaLiveStreamAdminEntry $liveStreamEntry, KalturaSourceType $sourceType = null, KalturaLiveStreamAdminEntry $reference)
 	{
 	}
 
@@ -96,23 +96,23 @@ abstract class LiveStreamServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests liveStream->list action
+	 * Tests liveStream->listAction action
 	 * @param KalturaLiveStreamEntryFilter $filter live stream entry filter
 	 * @param KalturaFilterPager $pager Pager
 	 * @param KalturaLiveStreamListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaLiveStreamEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaLiveStreamListResponse $reference)
+	public function testListAction(KalturaLiveStreamEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaLiveStreamListResponse $reference)
 	{
-		$resultObject = $this->client->liveStream->list($filter, $pager);
+		$resultObject = $this->client->liveStream->listAction($filter, $pager);
 		$this->assertType('KalturaLiveStreamListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaLiveStreamEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaLiveStreamListResponse $reference)
+	protected function validateListAction(KalturaLiveStreamEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaLiveStreamListResponse $reference)
 	{
 	}
 

@@ -6,11 +6,36 @@
 abstract class MediaServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
+	 * Tests media->add action
+	 * @param KalturaMediaEntry $entry 
+	 * @param KalturaResource $resource 
+	 * @param KalturaMediaEntry $reference 
+	 * @return int
+	 * @dataProvider provideData
+	 */
+	public function testAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	{
+		$resultObject = $this->client->media->add($entry, $resource);
+		$this->assertType('KalturaMediaEntry', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($entry, $resource, $reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	{
+	}
+
+	/**
 	 * Tests media->get action
 	 * @param string $entryId Media entry id
 	 * @param int $version Desired version of the data
 	 * @param KalturaMediaEntry $reference 
 	 * @return int
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testGet($entryId, $version = -1, KalturaMediaEntry $reference)
@@ -35,6 +60,7 @@ abstract class MediaServiceBaseTest extends KalturaApiUnitTestCase
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata to update
 	 * @param KalturaMediaEntry $reference 
 	 * @return int
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testUpdate($entryId, KalturaMediaEntry $mediaEntry, KalturaMediaEntry $reference)
@@ -56,6 +82,7 @@ abstract class MediaServiceBaseTest extends KalturaApiUnitTestCase
 	/**
 	 * Tests media->delete action
 	 * @param string $entryId Media entry id to delete
+	 * @depends testAdd with data set #0
 	 * @dataProvider provideData
 	 */
 	public function testDelete($entryId)
@@ -72,23 +99,23 @@ abstract class MediaServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests media->list action
+	 * Tests media->listAction action
 	 * @param KalturaMediaEntryFilter $filter Media entry filter
 	 * @param KalturaFilterPager $pager Pager
 	 * @param KalturaMediaListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaMediaEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaListResponse $reference)
+	public function testListAction(KalturaMediaEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaListResponse $reference)
 	{
-		$resultObject = $this->client->media->list($filter, $pager);
+		$resultObject = $this->client->media->listAction($filter, $pager);
 		$this->assertType('KalturaMediaListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaMediaEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaListResponse $reference)
+	protected function validateListAction(KalturaMediaEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaListResponse $reference)
 	{
 	}
 

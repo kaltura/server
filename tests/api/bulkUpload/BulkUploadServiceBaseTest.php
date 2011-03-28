@@ -13,7 +13,7 @@ abstract class BulkUploadServiceBaseTest extends KalturaApiUnitTestCase
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd($conversionProfileId, file $csvFileData, KalturaBulkUpload $reference)
+	public function testAdd($conversionProfileId, $csvFileData, KalturaBulkUpload $reference)
 	{
 		$resultObject = $this->client->bulkUpload->add($conversionProfileId, $csvFileData);
 		$this->assertType('KalturaBulkUpload', $resultObject);
@@ -25,7 +25,7 @@ abstract class BulkUploadServiceBaseTest extends KalturaApiUnitTestCase
 	/**
 	 * Validates testAdd results
 	 */
-	protected function validateAdd($conversionProfileId, file $csvFileData, KalturaBulkUpload $reference)
+	protected function validateAdd($conversionProfileId, $csvFileData, KalturaBulkUpload $reference)
 	{
 	}
 
@@ -54,22 +54,22 @@ abstract class BulkUploadServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests bulkUpload->list action
+	 * Tests bulkUpload->listAction action
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaBulkUploadListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaFilterPager $pager = null, KalturaBulkUploadListResponse $reference)
+	public function testListAction(KalturaFilterPager $pager = null, KalturaBulkUploadListResponse $reference)
 	{
-		$resultObject = $this->client->bulkUpload->list($pager);
+		$resultObject = $this->client->bulkUpload->listAction($pager);
 		$this->assertType('KalturaBulkUploadListResponse', $resultObject);
-		$this->validateList($pager, $reference);
+		$this->validateListAction($pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaFilterPager $pager = null, KalturaBulkUploadListResponse $reference)
+	protected function validateListAction(KalturaFilterPager $pager = null, KalturaBulkUploadListResponse $reference)
 	{
 	}
 

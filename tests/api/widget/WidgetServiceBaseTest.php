@@ -76,23 +76,23 @@ abstract class WidgetServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests widget->list action
+	 * Tests widget->listAction action
 	 * @param KalturaWidgetFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaWidgetListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaWidgetFilter $filter = null, KalturaFilterPager $pager = null, KalturaWidgetListResponse $reference)
+	public function testListAction(KalturaWidgetFilter $filter = null, KalturaFilterPager $pager = null, KalturaWidgetListResponse $reference)
 	{
-		$resultObject = $this->client->widget->list($filter, $pager);
+		$resultObject = $this->client->widget->listAction($filter, $pager);
 		$this->assertType('KalturaWidgetListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaWidgetFilter $filter = null, KalturaFilterPager $pager = null, KalturaWidgetListResponse $reference)
+	protected function validateListAction(KalturaWidgetFilter $filter = null, KalturaFilterPager $pager = null, KalturaWidgetListResponse $reference)
 	{
 	}
 

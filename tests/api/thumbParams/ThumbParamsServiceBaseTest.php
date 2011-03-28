@@ -97,23 +97,23 @@ abstract class ThumbParamsServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests thumbParams->list action
+	 * Tests thumbParams->listAction action
 	 * @param KalturaThumbParamsFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaThumbParamsListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaThumbParamsFilter $filter = null, KalturaFilterPager $pager = null, KalturaThumbParamsListResponse $reference)
+	public function testListAction(KalturaThumbParamsFilter $filter = null, KalturaFilterPager $pager = null, KalturaThumbParamsListResponse $reference)
 	{
-		$resultObject = $this->client->thumbParams->list($filter, $pager);
+		$resultObject = $this->client->thumbParams->listAction($filter, $pager);
 		$this->assertType('KalturaThumbParamsListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaThumbParamsFilter $filter = null, KalturaFilterPager $pager = null, KalturaThumbParamsListResponse $reference)
+	protected function validateListAction(KalturaThumbParamsFilter $filter = null, KalturaFilterPager $pager = null, KalturaThumbParamsListResponse $reference)
 	{
 	}
 

@@ -97,23 +97,23 @@ abstract class AccessControlServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests accessControl->list action
+	 * Tests accessControl->listAction action
 	 * @param KalturaAccessControlFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaAccessControlListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaAccessControlFilter $filter = null, KalturaFilterPager $pager = null, KalturaAccessControlListResponse $reference)
+	public function testListAction(KalturaAccessControlFilter $filter = null, KalturaFilterPager $pager = null, KalturaAccessControlListResponse $reference)
 	{
-		$resultObject = $this->client->accessControl->list($filter, $pager);
+		$resultObject = $this->client->accessControl->listAction($filter, $pager);
 		$this->assertType('KalturaAccessControlListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaAccessControlFilter $filter = null, KalturaFilterPager $pager = null, KalturaAccessControlListResponse $reference)
+	protected function validateListAction(KalturaAccessControlFilter $filter = null, KalturaFilterPager $pager = null, KalturaAccessControlListResponse $reference)
 	{
 	}
 

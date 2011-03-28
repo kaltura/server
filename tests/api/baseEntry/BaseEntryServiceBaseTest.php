@@ -6,6 +6,31 @@
 abstract class BaseEntryServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
+	 * Tests baseEntry->add action
+	 * @param KalturaBaseEntry $entry 
+	 * @param KalturaResource $resource 
+	 * @param KalturaEntryType $type 
+	 * @param KalturaBaseEntry $reference 
+	 * @return int
+	 * @dataProvider provideData
+	 */
+	public function testAdd(KalturaBaseEntry $entry, KalturaResource $resource, KalturaEntryType $type = -1, KalturaBaseEntry $reference)
+	{
+		$resultObject = $this->client->baseEntry->add($entry, $resource, $type);
+		$this->assertType('KalturaBaseEntry', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($entry, $resource, $type, $reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaBaseEntry $entry, KalturaResource $resource, KalturaEntryType $type = -1, KalturaBaseEntry $reference)
+	{
+	}
+
+	/**
 	 * Tests baseEntry->get action
 	 * @param string $entryId Entry id
 	 * @param int $version Desired version of the data
@@ -72,23 +97,23 @@ abstract class BaseEntryServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests baseEntry->list action
+	 * Tests baseEntry->listAction action
 	 * @param KalturaBaseEntryFilter $filter Entry filter
 	 * @param KalturaFilterPager $pager Pager
 	 * @param KalturaBaseEntryListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseEntryListResponse $reference)
+	public function testListAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseEntryListResponse $reference)
 	{
-		$resultObject = $this->client->baseEntry->list($filter, $pager);
+		$resultObject = $this->client->baseEntry->listAction($filter, $pager);
 		$this->assertType('KalturaBaseEntryListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseEntryListResponse $reference)
+	protected function validateListAction(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseEntryListResponse $reference)
 	{
 	}
 

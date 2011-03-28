@@ -94,23 +94,23 @@ abstract class SyndicationFeedServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests syndicationFeed->list action
+	 * Tests syndicationFeed->listAction action
 	 * @param KalturaBaseSyndicationFeedFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaBaseSyndicationFeedListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaBaseSyndicationFeedFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseSyndicationFeedListResponse $reference)
+	public function testListAction(KalturaBaseSyndicationFeedFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseSyndicationFeedListResponse $reference)
 	{
-		$resultObject = $this->client->syndicationFeed->list($filter, $pager);
+		$resultObject = $this->client->syndicationFeed->listAction($filter, $pager);
 		$this->assertType('KalturaBaseSyndicationFeedListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaBaseSyndicationFeedFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseSyndicationFeedListResponse $reference)
+	protected function validateListAction(KalturaBaseSyndicationFeedFilter $filter = null, KalturaFilterPager $pager = null, KalturaBaseSyndicationFeedListResponse $reference)
 	{
 	}
 

@@ -95,23 +95,23 @@ abstract class DataServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests data->list action
+	 * Tests data->listAction action
 	 * @param KalturaDataEntryFilter $filter Document entry filter
 	 * @param KalturaFilterPager $pager Pager
 	 * @param KalturaDataListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaDataEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDataListResponse $reference)
+	public function testListAction(KalturaDataEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDataListResponse $reference)
 	{
-		$resultObject = $this->client->data->list($filter, $pager);
+		$resultObject = $this->client->data->listAction($filter, $pager);
 		$this->assertType('KalturaDataListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaDataEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDataListResponse $reference)
+	protected function validateListAction(KalturaDataEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDataListResponse $reference)
 	{
 	}
 

@@ -95,23 +95,23 @@ abstract class MixingServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests mixing->list action
+	 * Tests mixing->listAction action
 	 * @param KalturaMixEntryFilter $filter Mix entry filter
 	 * @param KalturaFilterPager $pager Pager
 	 * @param KalturaMixListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaMixEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMixListResponse $reference)
+	public function testListAction(KalturaMixEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMixListResponse $reference)
 	{
-		$resultObject = $this->client->mixing->list($filter, $pager);
+		$resultObject = $this->client->mixing->listAction($filter, $pager);
 		$this->assertType('KalturaMixListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaMixEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMixListResponse $reference)
+	protected function validateListAction(KalturaMixEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaMixListResponse $reference)
 	{
 	}
 
