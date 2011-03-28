@@ -161,7 +161,7 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		
 		// method signature
 		$signature = "";
-		if (in_array($action, array("list", "clone"))) // because list & clone are preserved in PHP
+		if (in_array($action, array("list", "clone", "goto"))) // because list & clone are preserved in PHP
 			$signature .= "function ".$action."Action(";
 		else
 			$signature .= "function ".$action."(";
