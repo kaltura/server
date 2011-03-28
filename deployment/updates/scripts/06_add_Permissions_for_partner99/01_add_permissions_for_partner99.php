@@ -28,7 +28,7 @@ $partner99->setEnableVast(true);
 //Enable plugin metadata
 $partner99->setPluginEnabled('metadata', true);
 
-//Enable plugin metadata
+//Enable plugin contentDistribution
 $partner99->setPluginEnabled('contentDistribution', true);
 
 //Disable plugin Live Streaming
