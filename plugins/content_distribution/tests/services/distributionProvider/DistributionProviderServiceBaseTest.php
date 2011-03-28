@@ -6,23 +6,23 @@
 abstract class DistributionProviderServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests distributionProvider->list action
+	 * Tests distributionProvider->listAction action
 	 * @param KalturaDistributionProviderFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaDistributionProviderListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaDistributionProviderFilter $filter = null, KalturaFilterPager $pager = null, KalturaDistributionProviderListResponse $reference)
+	public function testListAction(KalturaDistributionProviderFilter $filter = null, KalturaFilterPager $pager = null, KalturaDistributionProviderListResponse $reference)
 	{
-		$resultObject = $this->client->distributionProvider->list($filter, $pager);
+		$resultObject = $this->client->distributionProvider->listAction($filter, $pager);
 		$this->assertType('KalturaDistributionProviderListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaDistributionProviderFilter $filter = null, KalturaFilterPager $pager = null, KalturaDistributionProviderListResponse $reference)
+	protected function validateListAction(KalturaDistributionProviderFilter $filter = null, KalturaFilterPager $pager = null, KalturaDistributionProviderListResponse $reference)
 	{
 	}
 

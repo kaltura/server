@@ -6,23 +6,23 @@
 abstract class VirusScanProfileServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests virusScanProfile->list action
+	 * Tests virusScanProfile->listAction action
 	 * @param KalturaVirusScanProfileFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaVirusScanProfileListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaVirusScanProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaVirusScanProfileListResponse $reference)
+	public function testListAction(KalturaVirusScanProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaVirusScanProfileListResponse $reference)
 	{
-		$resultObject = $this->client->virusScanProfile->list($filter, $pager);
+		$resultObject = $this->client->virusScanProfile->listAction($filter, $pager);
 		$this->assertType('KalturaVirusScanProfileListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaVirusScanProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaVirusScanProfileListResponse $reference)
+	protected function validateListAction(KalturaVirusScanProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaVirusScanProfileListResponse $reference)
 	{
 	}
 

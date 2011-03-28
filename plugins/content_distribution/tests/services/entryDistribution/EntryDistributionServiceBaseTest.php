@@ -97,23 +97,23 @@ abstract class EntryDistributionServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests entryDistribution->list action
+	 * Tests entryDistribution->listAction action
 	 * @param KalturaEntryDistributionFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaEntryDistributionListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaEntryDistributionFilter $filter = null, KalturaFilterPager $pager = null, KalturaEntryDistributionListResponse $reference)
+	public function testListAction(KalturaEntryDistributionFilter $filter = null, KalturaFilterPager $pager = null, KalturaEntryDistributionListResponse $reference)
 	{
-		$resultObject = $this->client->entryDistribution->list($filter, $pager);
+		$resultObject = $this->client->entryDistribution->listAction($filter, $pager);
 		$this->assertType('KalturaEntryDistributionListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaEntryDistributionFilter $filter = null, KalturaFilterPager $pager = null, KalturaEntryDistributionListResponse $reference)
+	protected function validateListAction(KalturaEntryDistributionFilter $filter = null, KalturaFilterPager $pager = null, KalturaEntryDistributionListResponse $reference)
 	{
 	}
 

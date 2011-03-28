@@ -6,23 +6,23 @@
 abstract class MediaInfoServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests mediaInfo->list action
+	 * Tests mediaInfo->listAction action
 	 * @param KalturaMediaInfoFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaMediaInfoListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaInfoListResponse $reference)
+	public function testListAction(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaInfoListResponse $reference)
 	{
-		$resultObject = $this->client->mediaInfo->list($filter, $pager);
+		$resultObject = $this->client->mediaInfo->listAction($filter, $pager);
 		$this->assertType('KalturaMediaInfoListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaInfoListResponse $reference)
+	protected function validateListAction(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null, KalturaMediaInfoListResponse $reference)
 	{
 	}
 

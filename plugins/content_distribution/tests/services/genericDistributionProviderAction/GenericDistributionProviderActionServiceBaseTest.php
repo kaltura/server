@@ -97,23 +97,23 @@ abstract class GenericDistributionProviderActionServiceBaseTest extends KalturaA
 	}
 
 	/**
-	 * Tests genericDistributionProviderAction->list action
+	 * Tests genericDistributionProviderAction->listAction action
 	 * @param KalturaGenericDistributionProviderActionFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaGenericDistributionProviderActionListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null, KalturaGenericDistributionProviderActionListResponse $reference)
+	public function testListAction(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null, KalturaGenericDistributionProviderActionListResponse $reference)
 	{
-		$resultObject = $this->client->genericDistributionProviderAction->list($filter, $pager);
+		$resultObject = $this->client->genericDistributionProviderAction->listAction($filter, $pager);
 		$this->assertType('KalturaGenericDistributionProviderActionListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null, KalturaGenericDistributionProviderActionListResponse $reference)
+	protected function validateListAction(KalturaGenericDistributionProviderActionFilter $filter = null, KalturaFilterPager $pager = null, KalturaGenericDistributionProviderActionListResponse $reference)
 	{
 	}
 

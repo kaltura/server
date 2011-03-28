@@ -6,23 +6,23 @@
 abstract class MetadataServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests metadata->list action
+	 * Tests metadata->listAction action
 	 * @param KalturaMetadataFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaMetadataListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataListResponse $reference)
+	public function testListAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataListResponse $reference)
 	{
-		$resultObject = $this->client->metadata->list($filter, $pager);
+		$resultObject = $this->client->metadata->listAction($filter, $pager);
 		$this->assertType('KalturaMetadataListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataListResponse $reference)
+	protected function validateListAction(KalturaMetadataFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataListResponse $reference)
 	{
 	}
 
@@ -36,7 +36,7 @@ abstract class MetadataServiceBaseTest extends KalturaApiUnitTestCase
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd($metadataProfileId, $objectType, $objectId, $xmlData, KalturaMetadata $reference)
+	public function testAdd($metadataProfileId, KalturaMetadataObjectType $objectType, $objectId, $xmlData, KalturaMetadata $reference)
 	{
 		$resultObject = $this->client->metadata->add($metadataProfileId, $objectType, $objectId, $xmlData);
 		$this->assertType('KalturaMetadata', $resultObject);
@@ -48,7 +48,7 @@ abstract class MetadataServiceBaseTest extends KalturaApiUnitTestCase
 	/**
 	 * Validates testAdd results
 	 */
-	protected function validateAdd($metadataProfileId, $objectType, $objectId, $xmlData, KalturaMetadata $reference)
+	protected function validateAdd($metadataProfileId, KalturaMetadataObjectType $objectType, $objectId, $xmlData, KalturaMetadata $reference)
 	{
 	}
 

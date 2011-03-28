@@ -6,23 +6,23 @@
 abstract class MetadataProfileServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests metadataProfile->list action
+	 * Tests metadataProfile->listAction action
 	 * @param KalturaMetadataProfileFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaMetadataProfileListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaMetadataProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataProfileListResponse $reference)
+	public function testListAction(KalturaMetadataProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataProfileListResponse $reference)
 	{
-		$resultObject = $this->client->metadataProfile->list($filter, $pager);
+		$resultObject = $this->client->metadataProfile->listAction($filter, $pager);
 		$this->assertType('KalturaMetadataProfileListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaMetadataProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataProfileListResponse $reference)
+	protected function validateListAction(KalturaMetadataProfileFilter $filter = null, KalturaFilterPager $pager = null, KalturaMetadataProfileListResponse $reference)
 	{
 	}
 

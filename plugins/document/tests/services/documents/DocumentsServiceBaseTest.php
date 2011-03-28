@@ -72,23 +72,23 @@ abstract class DocumentsServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests documents->list action
+	 * Tests documents->listAction action
 	 * @param KalturaDocumentEntryFilter $filter Document entry filter
 	 * @param KalturaFilterPager $pager Pager
 	 * @param KalturaDocumentListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDocumentListResponse $reference)
+	public function testListAction(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDocumentListResponse $reference)
 	{
-		$resultObject = $this->client->documents->list($filter, $pager);
+		$resultObject = $this->client->documents->listAction($filter, $pager);
 		$this->assertType('KalturaDocumentListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDocumentListResponse $reference)
+	protected function validateListAction(KalturaDocumentEntryFilter $filter = null, KalturaFilterPager $pager = null, KalturaDocumentListResponse $reference)
 	{
 	}
 

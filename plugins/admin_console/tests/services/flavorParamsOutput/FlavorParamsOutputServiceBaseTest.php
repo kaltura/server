@@ -6,23 +6,23 @@
 abstract class FlavorParamsOutputServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests flavorParamsOutput->list action
+	 * Tests flavorParamsOutput->listAction action
 	 * @param KalturaFlavorParamsOutputFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaFlavorParamsOutputListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaFlavorParamsOutputFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorParamsOutputListResponse $reference)
+	public function testListAction(KalturaFlavorParamsOutputFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorParamsOutputListResponse $reference)
 	{
-		$resultObject = $this->client->flavorParamsOutput->list($filter, $pager);
+		$resultObject = $this->client->flavorParamsOutput->listAction($filter, $pager);
 		$this->assertType('KalturaFlavorParamsOutputListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaFlavorParamsOutputFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorParamsOutputListResponse $reference)
+	protected function validateListAction(KalturaFlavorParamsOutputFilter $filter = null, KalturaFilterPager $pager = null, KalturaFlavorParamsOutputListResponse $reference)
 	{
 	}
 

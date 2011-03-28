@@ -6,23 +6,23 @@
 abstract class AnnotationServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests annotation->list action
+	 * Tests annotation->listAction action
 	 * @param KalturaAnnotationFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaAnnotationListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null, KalturaAnnotationListResponse $reference)
+	public function testListAction(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null, KalturaAnnotationListResponse $reference)
 	{
-		$resultObject = $this->client->annotation->list($filter, $pager);
+		$resultObject = $this->client->annotation->listAction($filter, $pager);
 		$this->assertType('KalturaAnnotationListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null, KalturaAnnotationListResponse $reference)
+	protected function validateListAction(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null, KalturaAnnotationListResponse $reference)
 	{
 	}
 

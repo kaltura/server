@@ -6,23 +6,23 @@
 abstract class ShortLinkServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests shortLink->list action
+	 * Tests shortLink->listAction action
 	 * @param KalturaShortLinkFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaShortLinkListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null, KalturaShortLinkListResponse $reference)
+	public function testListAction(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null, KalturaShortLinkListResponse $reference)
 	{
-		$resultObject = $this->client->shortLink->list($filter, $pager);
+		$resultObject = $this->client->shortLink->listAction($filter, $pager);
 		$this->assertType('KalturaShortLinkListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null, KalturaShortLinkListResponse $reference)
+	protected function validateListAction(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null, KalturaShortLinkListResponse $reference)
 	{
 	}
 

@@ -6,23 +6,23 @@
 abstract class AuditTrailServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests auditTrail->list action
+	 * Tests auditTrail->listAction action
 	 * @param KalturaAuditTrailFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaAuditTrailListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaAuditTrailFilter $filter = null, KalturaFilterPager $pager = null, KalturaAuditTrailListResponse $reference)
+	public function testListAction(KalturaAuditTrailFilter $filter = null, KalturaFilterPager $pager = null, KalturaAuditTrailListResponse $reference)
 	{
-		$resultObject = $this->client->auditTrail->list($filter, $pager);
+		$resultObject = $this->client->auditTrail->listAction($filter, $pager);
 		$this->assertType('KalturaAuditTrailListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaAuditTrailFilter $filter = null, KalturaFilterPager $pager = null, KalturaAuditTrailListResponse $reference)
+	protected function validateListAction(KalturaAuditTrailFilter $filter = null, KalturaFilterPager $pager = null, KalturaAuditTrailListResponse $reference)
 	{
 	}
 

@@ -29,23 +29,23 @@ abstract class SystemPartnerServiceBaseTest extends KalturaApiUnitTestCase
 	}
 
 	/**
-	 * Tests systemPartner->list action
+	 * Tests systemPartner->listAction action
 	 * @param KalturaPartnerFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaPartnerListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null, KalturaPartnerListResponse $reference)
+	public function testListAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null, KalturaPartnerListResponse $reference)
 	{
-		$resultObject = $this->client->systemPartner->list($filter, $pager);
+		$resultObject = $this->client->systemPartner->listAction($filter, $pager);
 		$this->assertType('KalturaPartnerListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null, KalturaPartnerListResponse $reference)
+	protected function validateListAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null, KalturaPartnerListResponse $reference)
 	{
 	}
 

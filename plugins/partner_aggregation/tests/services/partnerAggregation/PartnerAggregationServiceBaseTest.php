@@ -6,23 +6,23 @@
 abstract class PartnerAggregationServiceBaseTest extends KalturaApiUnitTestCase
 {
 	/**
-	 * Tests partnerAggregation->list action
+	 * Tests partnerAggregation->listAction action
 	 * @param KalturaDwhHourlyPartnerFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaDwhHourlyPartnerListResponse $reference 
 	 * @dataProvider provideData
 	 */
-	public function testList(KalturaDwhHourlyPartnerFilter $filter, KalturaFilterPager $pager = null, KalturaDwhHourlyPartnerListResponse $reference)
+	public function testListAction(KalturaDwhHourlyPartnerFilter $filter, KalturaFilterPager $pager = null, KalturaDwhHourlyPartnerListResponse $reference)
 	{
-		$resultObject = $this->client->partnerAggregation->list($filter, $pager);
+		$resultObject = $this->client->partnerAggregation->listAction($filter, $pager);
 		$this->assertType('KalturaDwhHourlyPartnerListResponse', $resultObject);
-		$this->validateList($filter, $pager, $reference);
+		$this->validateListAction($filter, $pager, $reference);
 	}
 
 	/**
-	 * Validates testList results
+	 * Validates testListAction results
 	 */
-	protected function validateList(KalturaDwhHourlyPartnerFilter $filter, KalturaFilterPager $pager = null, KalturaDwhHourlyPartnerListResponse $reference)
+	protected function validateListAction(KalturaDwhHourlyPartnerFilter $filter, KalturaFilterPager $pager = null, KalturaDwhHourlyPartnerListResponse $reference)
 	{
 	}
 
