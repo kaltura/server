@@ -327,30 +327,7 @@ class KAsyncConvert extends KBatchBase
 	 */
 	protected function getSupportedEngines()
 	{
-/*
- * 	params->useOn2			= true
-	params->useFFMpeg		= true
-	params->MEncoder			= true
-	params->EncodingCom		= true
-	params->KalturaCom		= true
- */		 
-		$supported_engines_arr = array();
-		if  ( $this->taskConfig->params->useOn2 ) $supported_engines_arr[] = KalturaConversionEngineType::ON2;
-		if  ( $this->taskConfig->params->useFFMpeg ) $supported_engines_arr[] = KalturaConversionEngineType::FFMPEG;
-		if  ( $this->taskConfig->params->MEncoder ) $supported_engines_arr[] = KalturaConversionEngineType::MENCODER;
-		if  ( $this->taskConfig->params->EncodingCom ) $supported_engines_arr[] = KalturaConversionEngineType::ENCODING_COM;
-		if  ( $this->taskConfig->params->KalturaCom ) $supported_engines_arr[] = KalturaConversionEngineType::KALTURA_COM;
-		if  ( $this->taskConfig->params->useFFMpegAux ) $supported_engines_arr[] = KalturaConversionEngineType::FFMPEG_AUX;
-		if  ( $this->taskConfig->params->useFFMpegVp8 ) $supported_engines_arr[] = KalturaConversionEngineType::FFMPEG_VP8;
-		if  ( $this->taskConfig->params->useExpressionEncoder ) $supported_engines_arr[] = KalturaConversionEngineType::EXPRESSION_ENCODER;
-		if  ( $this->taskConfig->params->useQtTools ) $supported_engines_arr[] = KalturaConversionEngineType::QUICK_TIME_PLAYER_TOOLS;
-		if  ( $this->taskConfig->params->useFastStart ) $supported_engines_arr[] = KalturaConversionEngineType::FAST_START;
-		if  ( $this->taskConfig->params->useAvidemux ) $supported_engines_arr[] = KalturaConversionEngineType::AVIDEMUX;
-		if  ( $this->taskConfig->params->usePdfCreator ) $supported_engines_arr[] = KalturaConversionEngineType::PDF_CREATOR;
-		if  ( $this->taskConfig->params->usePdf2Swf ) $supported_engines_arr[] = KalturaConversionEngineType::PDF2SWF;
-		if  ( $this->taskConfig->params->useSegmenter ) $supported_engines_arr[] = KalturaConversionEngineType::SEGMENTER;
-		
-		return join(',', $supported_engines_arr);
+		return $this->taskConfig->filter->jobSubTypeIn;
 	}
 }
 ?>
