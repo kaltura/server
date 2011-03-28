@@ -28,6 +28,12 @@ $partner99->setEnableVast(true);
 //Enable plugin metadata
 $partner99->setPluginEnabled('metadata', true);
 
+//Enable plugin metadata
+$partner99->setPluginEnabled('contentDistribution', true);
+
+//Disable plugin Live Streaming
+$partner99->setLiveStreamEnabled(false);
+
 if($dryRun)
 {
 	KalturaLog::log('DRY RUN - Adding new permissions [Vast, CustomMetadata, Thumbnails managment] to partner [99]\n');
