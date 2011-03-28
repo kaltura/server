@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaTrackEntryEventType
 {
 	const UPLOADED_FILE = 1;
@@ -21,10 +13,6 @@ class KalturaTrackEntryEventType
 	const DELETED_ENTRY = 6;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 {
 	/**
@@ -46,10 +34,6 @@ class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
 {
 	/**
@@ -71,10 +55,6 @@ class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaMediaInfoListResponse extends KalturaObjectBase
 {
 	/**
@@ -96,10 +76,6 @@ class KalturaMediaInfoListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaTrackEntry extends KalturaObjectBase
 {
 	/**
@@ -224,10 +200,6 @@ class KalturaTrackEntry extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaTrackEntryListResponse extends KalturaObjectBase
 {
 	/**
@@ -250,10 +222,6 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFlavorParamsOutputService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -278,10 +246,6 @@ class KalturaFlavorParamsOutputService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaThumbParamsOutputService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -306,10 +270,6 @@ class KalturaThumbParamsOutputService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaMediaInfoService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -334,10 +294,6 @@ class KalturaMediaInfoService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryAdminService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -359,6 +315,20 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function getByFlavorId($flavorId, $version = -1)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "flavorId", $flavorId);
+		$this->client->addParam($kparams, "version", $version);
+		$this->client->queueServiceActionCall("adminconsole_entryadmin", "getByFlavorId", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
+		return $resultObject;
+	}
+
 	function getTracks($entryId)
 	{
 		$kparams = array();
@@ -372,14 +342,71 @@ class KalturaEntryAdminService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
+
+class KalturaUiConfAdminService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client = null)
+	{
+		parent::__construct($client);
+	}
+
+	function add(KalturaUiConf $uiConf)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function update($id, KalturaUiConf $uiConf)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function get($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "get", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		return $resultObject;
+	}
+
+	function delete($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "delete", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+}
 class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaAdminConsoleClientPlugin
 	 */
 	protected static $instance;
 
@@ -403,6 +430,11 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 	 */
 	public $entryAdmin = null;
 
+	/**
+	 * @var KalturaUiConfAdminService
+	 */
+	public $uiConfAdmin = null;
+
 	protected function __construct(KalturaClient $client)
 	{
 		parent::__construct($client);
@@ -410,10 +442,11 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 		$this->thumbParamsOutput = new KalturaThumbParamsOutputService($client);
 		$this->mediaInfo = new KalturaMediaInfoService($client);
 		$this->entryAdmin = new KalturaEntryAdminService($client);
+		$this->uiConfAdmin = new KalturaUiConfAdminService($client);
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaAdminConsoleClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{
@@ -432,6 +465,7 @@ class KalturaAdminConsoleClientPlugin extends KalturaClientPlugin
 			'thumbParamsOutput' => $this->thumbParamsOutput,
 			'mediaInfo' => $this->mediaInfo,
 			'entryAdmin' => $this->entryAdmin,
+			'uiConfAdmin' => $this->uiConfAdmin,
 		);
 		return $services;
 	}

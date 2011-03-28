@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStorageProfileProtocol
 {
 	const KALTURA_DC = 0;
@@ -19,10 +11,6 @@ class KalturaStorageProfileProtocol
 	const SFTP = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStorageProfileStatus
 {
 	const DISABLED = 1;
@@ -30,10 +18,6 @@ class KalturaStorageProfileStatus
 	const MANUAL = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStorageServePriority
 {
 	const KALTURA_ONLY = 1;
@@ -42,10 +26,6 @@ class KalturaStorageServePriority
 	const EXTERNAL_ONLY = 4;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStorageProfile extends KalturaObjectBase
 {
 	/**
@@ -86,6 +66,13 @@ class KalturaStorageProfile extends KalturaObjectBase
 	 * @var string
 	 */
 	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $systemName = null;
 
 	/**
 	 * 
@@ -218,10 +205,6 @@ class KalturaStorageProfile extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStorageProfileListResponse extends KalturaObjectBase
 {
 	/**
@@ -244,10 +227,6 @@ class KalturaStorageProfileListResponse extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStorageProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -325,14 +304,10 @@ class KalturaStorageProfileService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStorageProfileClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaStorageProfileClientPlugin
 	 */
 	protected static $instance;
 
@@ -348,7 +323,7 @@ class KalturaStorageProfileClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaStorageProfileClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

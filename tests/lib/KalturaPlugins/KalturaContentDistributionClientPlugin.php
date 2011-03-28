@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionAction
 {
 	const SUBMIT = 1;
@@ -19,10 +11,6 @@ class KalturaDistributionAction
 	const FETCH_REPORT = 4;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionErrorType
 {
 	const MISSING_FLAVOR = 1;
@@ -31,10 +19,6 @@ class KalturaDistributionErrorType
 	const INVALID_DATA = 4;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProfileActionStatus
 {
 	const DISABLED = 1;
@@ -42,10 +26,6 @@ class KalturaDistributionProfileActionStatus
 	const MANUAL = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProfileOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -54,10 +34,6 @@ class KalturaDistributionProfileOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProfileStatus
 {
 	const DISABLED = 1;
@@ -65,10 +41,6 @@ class KalturaDistributionProfileStatus
 	const DELETED = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProtocol
 {
 	const FTP = 1;
@@ -78,29 +50,19 @@ class KalturaDistributionProtocol
 	const HTTPS = 5;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProviderOrderBy
 {
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
+	const SYNDICATION = "2";
 	const MSN = "msnDistribution.MSN";
-	const HULU = "huluDistribution.HULU";
+	const COMCAST = "comcastDistribution.COMCAST";
+	const YOUTUBE = "youTubeDistribution.YOUTUBE";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryDistributionFlag
 {
 	const NONE = 0;
@@ -109,10 +71,6 @@ class KalturaEntryDistributionFlag
 	const UPDATE_REQUIRED = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryDistributionOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -127,10 +85,6 @@ class KalturaEntryDistributionOrderBy
 	const SUNSET_DESC = "-sunset";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryDistributionStatus
 {
 	const PENDING = 0;
@@ -146,21 +100,6 @@ class KalturaEntryDistributionStatus
 	const REMOVED = 10;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
-class KalturaEntryDistributionSunStatus
-{
-	const BEFORE_SUNRISE = 1;
-	const AFTER_SUNRISE = 2;
-	const AFTER_SUNSET = 3;
-}
-
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderActionOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -169,10 +108,6 @@ class KalturaGenericDistributionProviderActionOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -181,10 +116,6 @@ class KalturaGenericDistributionProviderOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderParser
 {
 	const XSL = 1;
@@ -192,78 +123,12 @@ class KalturaGenericDistributionProviderParser
 	const REGEX = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderStatus
 {
 	const ACTIVE = 2;
 	const DELETED = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
-class KalturaContentDistributionSearchItem extends KalturaSearchItem
-{
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $noDistributionProfiles = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $distributionProfileId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaEntryDistributionSunStatus
-	 */
-	public $distributionSunStatus = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaEntryDistributionFlag
-	 */
-	public $entryDistributionFlag = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaEntryDistributionStatus
-	 */
-	public $entryDistributionStatus = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $hasEntryDistributionValidationErrors = null;
-
-	/**
-	 * Comma seperated validation error types
-	 *
-	 * @var string
-	 */
-	public $entryDistributionValidationErrors = null;
-
-
-}
-
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionThumbDimensions extends KalturaObjectBase
 {
 	/**
@@ -283,10 +148,6 @@ class KalturaDistributionThumbDimensions extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaDistributionProfile extends KalturaObjectBase
 {
 	/**
@@ -433,10 +294,6 @@ abstract class KalturaDistributionProfile extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaDistributionValidationError extends KalturaObjectBase
 {
 	/**
@@ -463,10 +320,6 @@ abstract class KalturaDistributionValidationError extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryDistribution extends KalturaObjectBase
 {
 	/**
@@ -682,19 +535,37 @@ class KalturaEntryDistribution extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
+class KalturaDistributionRemoteMediaFile extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $remoteId = null;
+
+
+}
+
 class KalturaDistributionJobData extends KalturaJobData
 {
 	/**
@@ -760,13 +631,17 @@ class KalturaDistributionJobData extends KalturaJobData
 	 */
 	public $sentData = null;
 
+	/**
+	 * Stores array of media files that submitted to the destination site
+	 * Could be used later for media update 
+	 *
+	 * @var array of KalturaDistributionRemoteMediaFile
+	 */
+	public $mediaFiles;
+
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
 {
 	/**
@@ -786,37 +661,21 @@ class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProfileAction extends KalturaObjectBase
 {
 	/**
@@ -878,10 +737,6 @@ class KalturaGenericDistributionProfileAction extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 {
 	/**
@@ -937,10 +792,26 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
+class KalturaSyndicationDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xsl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $feedId = null;
+
+
+}
+
 abstract class KalturaDistributionProvider extends KalturaObjectBase
 {
 	/**
@@ -1003,10 +874,11 @@ abstract class KalturaDistributionProvider extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
+class KalturaSyndicationDistributionProvider extends KalturaDistributionProvider
+{
+
+}
+
 class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**
@@ -1033,10 +905,6 @@ class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobPr
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
 {
 	/**
@@ -1084,19 +952,11 @@ abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProfileFilter extends KalturaDistributionProfileBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProfileListResponse extends KalturaObjectBase
 {
 	/**
@@ -1118,10 +978,6 @@ class KalturaDistributionProfileListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 {
 	/**
@@ -1267,19 +1123,11 @@ abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryDistributionListResponse extends KalturaObjectBase
 {
 	/**
@@ -1301,10 +1149,6 @@ class KalturaEntryDistributionListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
 {
 	/**
@@ -1324,19 +1168,11 @@ abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProviderFilter extends KalturaDistributionProviderBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProviderListResponse extends KalturaObjectBase
 {
 	/**
@@ -1358,10 +1194,6 @@ class KalturaDistributionProviderListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 {
 	/**
@@ -1459,10 +1291,6 @@ class KalturaGenericDistributionProvider extends KalturaDistributionProvider
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
 {
 	/**
@@ -1552,19 +1380,11 @@ abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistr
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderFilter extends KalturaGenericDistributionProviderBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderListResponse extends KalturaObjectBase
 {
 	/**
@@ -1586,10 +1406,6 @@ class KalturaGenericDistributionProviderListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderAction extends KalturaObjectBase
 {
 	/**
@@ -1726,10 +1542,6 @@ class KalturaGenericDistributionProviderAction extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
 {
 	/**
@@ -1805,19 +1617,11 @@ abstract class KalturaGenericDistributionProviderActionBaseFilter extends Kaltur
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderActionFilter extends KalturaGenericDistributionProviderActionBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderActionListResponse extends KalturaObjectBase
 {
 	/**
@@ -1840,10 +1644,6 @@ class KalturaGenericDistributionProviderActionListResponse extends KalturaObject
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1951,10 +1751,6 @@ class KalturaDistributionProfileService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEntryDistributionService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2109,12 +1905,28 @@ class KalturaEntryDistributionService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaEntryDistribution");
 		return $resultObject;
 	}
+
+	function serveSentData($id, $actionType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "actionType", $actionType);
+		$this->client->queueServiceActionCall('contentdistribution_entrydistribution', 'serveSentData', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
+
+	function serveReturnedData($id, $actionType)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "actionType", $actionType);
+		$this->client->queueServiceActionCall('contentdistribution_entrydistribution', 'serveReturnedData', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDistributionProviderService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2139,10 +1951,6 @@ class KalturaDistributionProviderService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2220,10 +2028,6 @@ class KalturaGenericDistributionProviderService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaGenericDistributionProviderActionService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2431,10 +2235,6 @@ class KalturaGenericDistributionProviderActionService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaContentDistributionBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2719,6 +2519,19 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function getAssetUrl($assetId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "assetId", $assetId);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getAssetUrl", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 
@@ -3741,14 +3554,10 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaContentDistributionClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaContentDistributionClientPlugin
 	 */
 	protected static $instance;
 
@@ -3794,7 +3603,7 @@ class KalturaContentDistributionClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaContentDistributionClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

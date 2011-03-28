@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -25,10 +17,6 @@ class KalturaFileSyncOrderBy
 	const FILE_SIZE_DESC = "-fileSize";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncStatus
 {
 	const ERROR = -1;
@@ -38,10 +26,6 @@ class KalturaFileSyncStatus
 	const PURGED = 4;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncType
 {
 	const FILE = 1;
@@ -49,10 +33,6 @@ class KalturaFileSyncType
 	const URL = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 {
 	/**
@@ -261,19 +241,11 @@ abstract class KalturaFileSyncBaseFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSync extends KalturaObjectBase
 {
 	/**
@@ -463,10 +435,6 @@ class KalturaFileSync extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncListResponse extends KalturaObjectBase
 {
 	/**
@@ -489,10 +457,6 @@ class KalturaFileSyncListResponse extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -531,14 +495,10 @@ class KalturaFileSyncService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaFileSyncClientPlugin
 	 */
 	protected static $instance;
 
@@ -554,7 +514,7 @@ class KalturaFileSyncClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaFileSyncClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

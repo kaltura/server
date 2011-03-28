@@ -1,17 +1,9 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once("KalturaClientBase.php");
 require_once("KalturaEnums.php");
 require_once("KalturaTypes.php");
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAccessControlService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -89,31 +81,11 @@ class KalturaAccessControlService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAdminUserService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
-	}
-
-	function updatePassword($email, $password, $newEmail = "", $newPassword = "")
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "email", $email);
-		$this->client->addParam($kparams, "password", $password);
-		$this->client->addParam($kparams, "newEmail", $newEmail);
-		$this->client->addParam($kparams, "newPassword", $newPassword);
-		$this->client->queueServiceActionCall("adminuser", "updatePassword", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaAdminUser");
-		return $resultObject;
 	}
 
 	function resetPassword($email)
@@ -159,15 +131,26 @@ class KalturaAdminUserService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaBaseEntryService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
+	}
+
+	function add(KalturaBaseEntry $entry, KalturaResource $resource, $type = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entry", $entry->toParams());
+		$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->addParam($kparams, "type", $type);
+		$this->client->queueServiceActionCall("baseentry", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
+		return $resultObject;
 	}
 
 	function addFromUploadedFile(KalturaBaseEntry $entry, $uploadTokenId, $type = null)
@@ -410,10 +393,6 @@ class KalturaBaseEntryService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaBatchcontrolService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -638,10 +617,6 @@ class KalturaBatchcontrolService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1669,10 +1644,6 @@ class KalturaBatchService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaBulkUploadService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1723,10 +1694,6 @@ class KalturaBulkUploadService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaCategoryService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1802,10 +1769,6 @@ class KalturaCategoryService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaConversionProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1883,10 +1846,6 @@ class KalturaConversionProfileService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDataService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1963,12 +1922,19 @@ class KalturaDataService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "KalturaDataListResponse");
 		return $resultObject;
 	}
+
+	function serve($entryId, $version = -1, $forceProxy = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "version", $version);
+		$this->client->addParam($kparams, "forceProxy", $forceProxy);
+		$this->client->queueServiceActionCall('data', 'serve', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaEmailIngestionProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2060,10 +2026,6 @@ class KalturaEmailIngestionProfileService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFlavorAssetService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2194,10 +2156,6 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFlavorParamsService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -2288,10 +2246,6 @@ class KalturaFlavorParamsService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaJobsService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -3243,10 +3197,6 @@ class KalturaJobsService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaLiveStreamService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -3355,15 +3305,26 @@ class KalturaLiveStreamService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaMediaService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
+	}
+
+	function add(KalturaMediaEntry $entry, KalturaResource $resource = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entry", $entry->toParams());
+		if ($resource !== null)
+			$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->queueServiceActionCall("media", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
+		return $resultObject;
 	}
 
 	function addFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId)
@@ -3657,10 +3618,6 @@ class KalturaMediaService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaMixingService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -3836,10 +3793,6 @@ class KalturaMixingService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaNotificationService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -3862,10 +3815,6 @@ class KalturaNotificationService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaPartnerService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -3944,10 +3893,6 @@ class KalturaPartnerService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaPermissionItemService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4020,15 +3965,11 @@ class KalturaPermissionItemService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaPremissionItemListResponse");
+		$this->client->validateObjectType($resultObject, "KalturaPermissionItemListResponse");
 		return $resultObject;
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaPermissionService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4118,10 +4059,6 @@ class KalturaPermissionService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaPlaylistService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4278,10 +4215,6 @@ class KalturaPlaylistService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaReportService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4360,10 +4293,6 @@ class KalturaReportService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSearchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4429,10 +4358,6 @@ class KalturaSearchService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSessionService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4504,10 +4429,6 @@ class KalturaSessionService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaStatsService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4555,10 +4476,6 @@ class KalturaStatsService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSyndicationFeedService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4662,10 +4579,6 @@ class KalturaSyndicationFeedService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4686,15 +4599,30 @@ class KalturaSystemService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaThumbAssetService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
+	}
+
+	function serveByEntryId($entryId, $thumbParamId = "")
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "thumbParamId", $thumbParamId);
+		$this->client->queueServiceActionCall('thumbasset', 'serveByEntryId', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
+
+	function serve($thumbAssetId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "thumbAssetId", $thumbAssetId);
+		$this->client->queueServiceActionCall('thumbasset', 'serve', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
 	}
 
 	function setAsDefault($thumbAssetId)
@@ -4837,10 +4765,6 @@ class KalturaThumbAssetService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaThumbParamsService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -4931,10 +4855,6 @@ class KalturaThumbParamsService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaUiConfService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -5053,10 +4973,6 @@ class KalturaUiConfService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaUploadService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -5092,10 +5008,6 @@ class KalturaUploadService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaUploadTokenService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -5178,10 +5090,6 @@ class KalturaUploadTokenService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaUserRoleService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -5272,10 +5180,6 @@ class KalturaUserRoleService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaUserService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -5487,10 +5391,6 @@ class KalturaUserService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaWidgetService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -5568,10 +5468,6 @@ class KalturaWidgetService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaXInternalService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -5594,10 +5490,6 @@ class KalturaXInternalService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaClient extends KalturaClientBase
 {
 	/**
@@ -5820,7 +5712,7 @@ class KalturaClient extends KalturaClientBase
 	public $uploadToken = null;
 
 	/**
-	 * UserRole service lets you create and manage user permissions
+	 * UserRole service lets you create and manage user roles
 	 * @var KalturaUserRoleService
 	 */
 	public $userRole = null;

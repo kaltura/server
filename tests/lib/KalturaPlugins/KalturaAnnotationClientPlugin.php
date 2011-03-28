@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAnnotationOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -19,10 +11,6 @@ class KalturaAnnotationOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaAnnotationBaseFilter extends KalturaFilter
 {
 	/**
@@ -98,19 +86,11 @@ abstract class KalturaAnnotationBaseFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAnnotation extends KalturaObjectBase
 {
 	/**
@@ -205,10 +185,6 @@ class KalturaAnnotation extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAnnotationListResponse extends KalturaObjectBase
 {
 	/**
@@ -231,10 +207,6 @@ class KalturaAnnotationListResponse extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAnnotationService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -311,14 +283,10 @@ class KalturaAnnotationService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAnnotationClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaAnnotationClientPlugin
 	 */
 	protected static $instance;
 
@@ -334,7 +302,7 @@ class KalturaAnnotationClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaAnnotationClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

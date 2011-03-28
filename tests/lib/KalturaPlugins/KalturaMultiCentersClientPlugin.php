@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFileSyncImportJobData extends KalturaJobData
 {
 	/**
@@ -45,10 +37,6 @@ class KalturaFileSyncImportJobData extends KalturaJobData
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaFilesyncImportBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1139,14 +1127,10 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaMultiCentersClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaMultiCentersClientPlugin
 	 */
 	protected static $instance;
 
@@ -1162,7 +1146,7 @@ class KalturaMultiCentersClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaMultiCentersClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

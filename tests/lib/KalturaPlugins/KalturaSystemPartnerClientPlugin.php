@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemPartnerUsageFilter extends KalturaFilter
 {
 	/**
@@ -32,10 +24,6 @@ class KalturaSystemPartnerUsageFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemPartnerUsageItem extends KalturaObjectBase
 {
 	/**
@@ -169,10 +157,6 @@ class KalturaSystemPartnerUsageItem extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemPartnerUsageListResponse extends KalturaObjectBase
 {
 	/**
@@ -192,10 +176,6 @@ class KalturaSystemPartnerUsageListResponse extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 {
 	/**
@@ -401,13 +381,30 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 */
 	public $alwaysAllowedPermissionNames = null;
 
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $importRemoteSourceForConvert = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableEntryReplacement = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $enableEntryReplacementApproval = null;
+
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemPartnerPackage extends KalturaObjectBase
 {
 	/**
@@ -428,10 +425,6 @@ class KalturaSystemPartnerPackage extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemPartnerService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -553,14 +546,10 @@ class KalturaSystemPartnerService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaSystemPartnerClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaSystemPartnerClientPlugin
 	 */
 	protected static $instance;
 
@@ -576,7 +565,7 @@ class KalturaSystemPartnerClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaSystemPartnerClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

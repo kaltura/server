@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusFoundAction
 {
 	const NONE = 0;
@@ -19,19 +11,11 @@ class KalturaVirusFoundAction
 	const CLEAN_DELETE = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanEngineType
 {
 	const SYMANTEC_SCAN_ENGINE = "symantecScanEngine.SymantecScanEngine";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanJobResult
 {
 	const SCAN_ERROR = 1;
@@ -40,10 +24,6 @@ class KalturaVirusScanJobResult
 	const FILE_INFECTED = 4;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanProfileOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -52,20 +32,12 @@ class KalturaVirusScanProfileOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanProfileStatus
 {
 	const DISABLED = 1;
 	const ENABLED = 2;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanJobData extends KalturaJobData
 {
 	/**
@@ -99,10 +71,6 @@ class KalturaVirusScanJobData extends KalturaJobData
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 {
 	/**
@@ -192,19 +160,11 @@ abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanProfileFilter extends KalturaVirusScanProfileBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanProfile extends KalturaObjectBase
 {
 	/**
@@ -277,10 +237,6 @@ class KalturaVirusScanProfile extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 {
 	/**
@@ -303,10 +259,6 @@ class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanProfileService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -398,10 +350,6 @@ class KalturaVirusScanProfileService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanBatchService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -1475,14 +1423,10 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaVirusScanClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaVirusScanClientPlugin
 	 */
 	protected static $instance;
 
@@ -1504,7 +1448,7 @@ class KalturaVirusScanClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaVirusScanClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

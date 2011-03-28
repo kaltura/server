@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaInternalToolsSession extends KalturaObjectBase
 {
 	/**
@@ -73,10 +65,6 @@ class KalturaInternalToolsSession extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaKalturaInternalToolsService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -85,10 +73,6 @@ class KalturaKalturaInternalToolsService extends KalturaServiceBase
 	}
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -134,14 +118,10 @@ class KalturaKalturaInternalToolsSystemHelperService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaKalturaInternalToolsClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaKalturaInternalToolsClientPlugin
 	 */
 	protected static $instance;
 
@@ -163,7 +143,7 @@ class KalturaKalturaInternalToolsClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaKalturaInternalToolsClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

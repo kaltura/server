@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDocumentEntryOrderBy
 {
 	const NAME_ASC = "+name";
@@ -23,12 +15,10 @@ class KalturaDocumentEntryOrderBy
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
+	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDocumentType
 {
 	const DOCUMENT = 11;
@@ -36,10 +26,6 @@ class KalturaDocumentType
 	const PDF = 13;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDocumentEntry extends KalturaBaseEntry
 {
 	/**
@@ -62,10 +48,6 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
 {
 	/**
@@ -85,19 +67,11 @@ abstract class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDocumentListResponse extends KalturaObjectBase
 {
 	/**
@@ -120,10 +94,6 @@ class KalturaDocumentListResponse extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDocumentsService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -278,15 +248,33 @@ class KalturaDocumentsService extends KalturaServiceBase
 		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
+
+	function serve($entryId, $flavorAssetId = "", $forceProxy = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "flavorAssetId", $flavorAssetId);
+		$this->client->addParam($kparams, "forceProxy", $forceProxy);
+		$this->client->queueServiceActionCall('document_documents', 'serve', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
+
+	function serveByFlavorParamsId($entryId, $flavorParamsId = "", $forceProxy = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "flavorParamsId", $flavorParamsId);
+		$this->client->addParam($kparams, "forceProxy", $forceProxy);
+		$this->client->queueServiceActionCall('document_documents', 'serveByFlavorParamsId', $kparams);
+		$resultObject = $this->client->getServeUrl();
+		return $resultObject;
+	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaDocumentClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaDocumentClientPlugin
 	 */
 	protected static $instance;
 
@@ -302,7 +290,7 @@ class KalturaDocumentClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaDocumentClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{

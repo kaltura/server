@@ -1,16 +1,8 @@
 <?php
-/**
- * @package External
- * @subpackage Kaltura
- */
 require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailAction
 {
 	const CREATED = "CREATED";
@@ -24,10 +16,6 @@ class KalturaAuditTrailAction
 	const RELATION_REMOVED = "RELATION_REMOVED";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailContext
 {
 	const CLIENT = -1;
@@ -36,10 +24,6 @@ class KalturaAuditTrailContext
 	const API_V3 = 2;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailObjectType
 {
 	const ACCESS_CONTROL = "accessControl";
@@ -72,10 +56,6 @@ class KalturaAuditTrailObjectType
 	const PERMISSION = "Permission";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -84,10 +64,6 @@ class KalturaAuditTrailOrderBy
 	const PARSED_AT_DESC = "-parsedAt";
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailStatus
 {
 	const PENDING = 1;
@@ -95,10 +71,6 @@ class KalturaAuditTrailStatus
 	const FAILED = 3;
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaAuditTrailBaseFilter extends KalturaFilter
 {
 	/**
@@ -363,28 +335,16 @@ abstract class KalturaAuditTrailBaseFilter extends KalturaFilter
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailFilter extends KalturaAuditTrailBaseFilter
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 abstract class KalturaAuditTrailInfo extends KalturaObjectBase
 {
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrail extends KalturaObjectBase
 {
 	/**
@@ -572,10 +532,6 @@ class KalturaAuditTrail extends KalturaObjectBase
 
 }
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailListResponse extends KalturaObjectBase
 {
 	/**
@@ -598,10 +554,6 @@ class KalturaAuditTrailListResponse extends KalturaObjectBase
 }
 
 
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditTrailService extends KalturaServiceBase
 {
 	function __construct(KalturaClient $client = null)
@@ -651,14 +603,10 @@ class KalturaAuditTrailService extends KalturaServiceBase
 		return $resultObject;
 	}
 }
-/**
- * @package External
- * @subpackage Kaltura
- */
 class KalturaAuditClientPlugin extends KalturaClientPlugin
 {
 	/**
-	 * @var KalturaClientPlugin
+	 * @var KalturaAuditClientPlugin
 	 */
 	protected static $instance;
 
@@ -674,7 +622,7 @@ class KalturaAuditClientPlugin extends KalturaClientPlugin
 	}
 
 	/**
-	 * @return KalturaClientPlugin
+	 * @return KalturaAuditClientPlugin
 	 */
 	public static function get(KalturaClient $client)
 	{
