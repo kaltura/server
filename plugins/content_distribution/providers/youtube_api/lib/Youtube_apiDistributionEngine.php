@@ -71,13 +71,17 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	
 //		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = array();
-		$props['keywords'] = $entry->tags);
+		$props['keywords'] = $entry->tags;
 		$props['title'] = $entry->name;
 		$props['category'] = $distributionProfile->defaultCategory;
 		$props['description'] = $entry->description;
 		$props['start_date'] = time();
 		$props['end_date'] = time();
-		$props['playlists']= '';
+		$props['playlists']= $distributionProfile->playlists;
+		$props['comment']= $distributionProfile->allowComments;
+		$props['rate']= $distributionProfile->allowEmbedding;
+		$props['commentVote']= $distributionProfile->allowRatings;
+		$props['videoRespond']= $distributionProfile->allowResponses;
 		
 
 		return $props;
@@ -90,7 +94,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		$props = $this->getYoutube_apiProps($entry, $data, $distributionProfile);
 		if($data->entryDistribution->remoteId)
 		{
-			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
 			$youTubeApiImpl->update($data->remoteId, $props);
 		
 			$data->remoteId = $data->entryDistribution->remoteId;
@@ -126,7 +130,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 			$videoFilePath = $videoFilePathNew;
 		}
 		
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
 		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath,$videoFilePath,$props);
 	
 		if ($needDel == true)
@@ -143,7 +147,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
 		$distributionProfile = $data->distributionProfile;
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
 		
 		$status = $youTubeApiImpl->getStatus($data->remoteId);
 				
@@ -180,7 +184,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = $this->getYoutube_apiProps($entry, $data, $distributionProfile);
 	
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
 		$youTubeApiImpl->updateEntry($data->remoteId, $props);
 		
 //		$data->sentData = $youtube_apiMediaService->request;
@@ -195,7 +199,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
 		$distributionProfile = $data->distributionProfile;
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->user, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
 		
 		$youTubeApiImpl->deleteEntry($data->remoteId);
 		

@@ -1,11 +1,27 @@
 <?php
 
-$path = 'C:/kaltura/opt/kaltura/app/plugins/content_distribution/providers/youtube_api/ZendGdata-1.11.3/library';
-set_include_path($path . PATH_SEPARATOR . get_include_path() );
+//$path = dirname(__FILE__) . '/ZendGdata-1.11.3/library';
+//set_include_path('C:/kaltura/opt/kaltura/app/vendor/ZendFramework/library/' . PATH_SEPARATOR . get_include_path() );
+if(!class_exists("Zend_Loader"))
+{
+	require_once 'Zend/Loader.php'; // the Zend dir must be in your include_path 
+}
 
-require_once 'Zend/Loader.php'; // the Zend dir must be in your include_path 
-Zend_Loader::loadClass('Zend_Gdata_YouTube'); 
-Zend_Loader::loadClass('Zend_Gdata_ClientLogin');
+
+if(!class_exists("Zend_Gdata_YouTube"))
+{
+	Zend_Loader::loadClass('Zend_Gdata_YouTube'); 
+}
+
+if(!class_exists("Zend_Gdata_ClientLogin"))
+{
+	Zend_Loader::loadClass('Zend_Gdata_ClientLogin');
+}
+
+if(!class_exists("Zend_Gdata_YouTube_Extension_Access"))
+{
+	Zend_Loader::loadClass('Zend_Gdata_YouTube_Extension_Access');
+}
 
 class YouTubeApiImpl
 {
@@ -52,6 +68,15 @@ class YouTubeApiImpl
 		// and that individual keywords cannot contain whitespace 
 		$myVideoEntry->SetVideoTags($props['keywords']);  
 		$myVideoEntry->setVideoPublic();
+		
+		$access = array();
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('comment',$props['comment']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('rate',$props['rate']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('commentVote',$props['commentVote']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('videoRespond',$props['videoRespond']);
+		
+		$myVideoEntry->setAccess($access);
+		
 		// set some developer tags -- this is optional 
 		// (see Searching by Developer Tags for more details) 
 //		$myVideoEntry->setVideoDeveloperTags(array('mydevtag', 'anotherdevtag'));  
@@ -70,7 +95,7 @@ class YouTubeApiImpl
 		{   
 			$newEntry = $this->yt->insertEntry($myVideoEntry, $uploadUrl, 'Zend_Gdata_YouTube_VideoEntry'); 
 			$newEntry -> setMajorProtocolVersion(2);
-			
+			$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
 			return $newEntry->getVideoId();
 		}
 		catch (Zend_Gdata_App_HttpException $httpException) 
@@ -87,6 +112,109 @@ class YouTubeApiImpl
 		}
 	}
 
+	private function addPlaylist($playlistName, $videoEntry)
+	{
+		$newPlaylist = $this->yt->newPlaylistListEntry();
+		$newPlaylist->description = $this->yt->newDescription()->setText($playlistName);
+		$newPlaylist->title = $this->yt->newTitle()->setText($playlistName);
+		// post the new playlist
+		$postLocation = 'http://gdata.youtube.com/feeds/api/users/default/playlists';
+		try 
+		{
+		  $newPlaylistEntry = $this->yt->insertEntry($newPlaylist, $postLocation, 'Zend_Gdata_YouTube_PlaylistListEntry');
+		  $newPlaylistEntry->setMajorProtocolVersion(2);
+		} catch (Zend_Gdata_App_Exception $e) {
+		  echo $e->getMessage();
+		  return;
+		}	
+		
+		$postUrl = $newPlaylistEntry->getPlaylistVideoFeedUrl();
+
+		// create a new Zend_Gdata_PlaylistListEntry, passing in the underling DOMElement of the VideoEntry
+		$newPlaylistListEntry = $this->yt->newPlaylistListEntry($videoEntry->getDOM());
+
+		// post
+		try {
+		  $this->yt->insertEntry($newPlaylistListEntry, $postUrl);
+		} catch (Zend_App_Exception $e) {
+		  echo $e->getMessage();
+		}		
+	}
+	
+	private function updatePlaylist($playlist, $videoEntry)
+	{
+		$postUrl = $playlist->getPlaylistVideoFeedUrl();
+
+		// create a new Zend_Gdata_PlaylistListEntry, passing in the underling DOMElement of the VideoEntry
+		$newPlaylistListEntry = $this->yt->newPlaylistListEntry($videoEntry->getDOM());
+
+		// post
+		try {
+		  $this->yt->insertEntry($newPlaylistListEntry, $postUrl);
+		} catch (Zend_App_Exception $e) {
+		  echo $e->getMessage();
+		}	
+	}
+
+	private function removeFromPlaylist($playlistVideoEntry)
+	{
+		$playlistVideoEntry->delete();
+	}
+	
+	private function handlePlaylists($videoEntry, $playlistNames)
+	{
+		$updatedPlaylists = array();
+		$playlistListFeed = $this->yt->getPlaylistListFeed("default");
+		for ($i=0; $i < $playlistListFeed->count(); $i++)
+		{
+			$playlistListEntry = $playlistListFeed->entries[$i];
+			$key = array_search($playlistListEntry->title->text, $playlistNames);
+			if ($key === FALSE) // not found
+			{ 
+				$playlistVideoFeed = $this->yt->getPlaylistVideoFeed($playlistListEntry->getPlaylistVideoFeedUrl());
+
+				foreach ($playlistVideoFeed as $playlistVideoEntry) 
+				{
+					if ($playlistVideoEntry->getVideoId() == $videoEntry->getVideoId())
+					{
+						$this->removeFromPlaylist($playlistVideoEntry);
+						break;
+					}
+				}
+			}
+			else
+			{
+				$playlistVideoFeed = $this->yt->getPlaylistVideoFeed($playlistListEntry->getPlaylistVideoFeedUrl());
+				$found = false;
+				foreach ($playlistVideoFeed as $playlistVideoEntry) 
+				{
+					$playlistVideoEntry->setMajorProtocolVersion(2);
+					if ($playlistVideoEntry->getVideoId() == $videoEntry->getVideoId())
+					{
+						$found = true;
+						break;
+					}
+				}
+
+				$updatedPlaylists[] = $playlistListEntry->title->text;
+				if ($found == false)
+				{
+					$this->updatePlaylist($playlistListEntry, $videoEntry);
+				}
+			}
+		}
+		
+		foreach($playlistNames as $plName)
+		{
+			if (strlen($plName) == 0) continue;
+
+			if (array_search($plName, $updatedPlaylists) === FALSE)
+			{
+				$this->addPlaylist($plName, $videoEntry);
+			}
+		}
+	}
+	
 	private function printVideoEntry($videoEntry)  
 	{   
 		// the videoEntry object contains many helper functions   
@@ -126,7 +254,7 @@ class YouTubeApiImpl
 
 	public function getEntry($remoteId)
 	{
-		$videoEntry = $this->yt->getVideoEntry($remoteId); 
+		$videoEntry = $this->yt->getVideoEntry($remoteId, null, true); 
 		$this->printVideoEntry($videoEntry);
 	}
 
@@ -141,9 +269,18 @@ class YouTubeApiImpl
 		$videoEntry->setVideoCategory($props['category']);  
 		// Set keywords. Please note that this must be a comma-separated string 
 		// and that individual keywords cannot contain whitespace 
-		$videoEntry->SetVideoTags($props['keyword']);  	
-
-		$this->yt->updateEntry($videoEntry, $putUrl);
+		$videoEntry->SetVideoTags($props['keywords']);  	
+		$access = array();
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('comment',$props['comment']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('rate',$props['rate']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('commentVote',$props['commentVote']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('videoRespond',$props['videoRespond']);
+		
+		$videoEntry->setAccess($access);
+		
+		$newEntry = $this->yt->updateEntry($videoEntry, $putUrl);
+		$newEntry->setMajorProtocolVersion(2);
+		$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
 	}
 
 	function deleteEntry($remoteId)
@@ -152,19 +289,25 @@ class YouTubeApiImpl
 		$this->yt->delete($videoEntry);
 	}
 }
+/*$impl = new YouTubeApiImpl('kalturasb', '250vanil');
 
-$impl = new YouTubeApiImpl('kalturasb', '250vanil');
 $props = Array();
 $props['title'] = 'My Test Movie';
 $props['description'] = 'My Test Movie';
-$props['category'] = 'Autos';
+$props['category'] = 'Education';
 $props['keywords'] = 'cars, funny';
+$props['playlists'] ='';
+$props['comment']= 'denied';
+$props['rate']= 'denied';
+$props['commentVote']= 'denied';
+$props['videoRespond']= 'allowed';*/
+//print $impl -> uploadVideo('sizeme.flv','sizeme.flv', $props);
 
-print $impl -> uploadVideo('snake.wmv','snake.wmv', $props);
+
 //$newEntry = uploadVideo($yt, 'snake.wmv','snake.wmv', 'My Test Movie', 'My Test Movie', 'Autos', 'cars, funny');
 //$newEntry -> setMajorProtocolVersion(2);
-//getEntry($yt, 'J9JY0k8nLiE');
-//updateEntry($yt, $newEntry->getVideoId(), 'nwe title', 'new desc', 'Autos', 'cars, flickr');
+//$impl->getEntry('bYuqjJWRi1w');
+//$impl->updateEntry('GYgYuLRf8Dc', $props);
 
 //echo  $newEntry->getVideoId();
 

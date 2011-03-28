@@ -68,29 +68,11 @@ class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfigura
 			'label'			=> 'YouTube Password:',
 			'filters'		=> array('StringTrim'),
 		));
-		
-		$this->addElement('text', 'notification_email', array(
-			'label'			=> 'Notification Email:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'owner_name', array(
-			'label' => 'Owner Name:',
-		));
-		
-		$this->addElement('select', 'target', array(
-			'label' => 'Target:',
-			'multioptions' => array(
-				'upload,claim,fingerprint' => 'upload,claim,fingerprint', 
-				'upload,claim' => 'upload,claim', 
-				'claim,fingerprint' => 'claim,fingerprint',
-			)
-		));
-		
+								
 //		$this->addMetadataProfile();
 		
 		$this->addDisplayGroup(
-			array('username', 'password', 'notification_email', 'owner_name', 'target', 'metadata_profile_id'), 
+			array('username', 'password',  'metadata_profile_id'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
@@ -110,38 +92,34 @@ class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfigura
 		$this->addElement('select', 'allow_comments', array(
 			'label' => 'Allow Comments:',
 			'multioptions' => array(
-				'' => 'Default', 
-				'Always' => 'Always', 
-				'Approve' => 'Approve',
-				'Never' => 'Never',
+				'allowed' => 'allowed', 
+				'denied' => 'denied',
+				'moderated' => 'moderated',
 			)
 		));
 		
 		$this->addElement('select', 'allow_embedding', array(
 			'label' => 'Allow Embedding:',
 			'multioptions' => array(
-				'' => 'Default', 
-				'true' => 'True', 
-				'false' => 'False',
+				'allowed' => 'allowed', 
+				'denied' => 'denied',
 			)
 		));
 		
 		$this->addElement('select', 'allow_ratings', array(
 			'label' => 'Allow Ratings:',
 			'multioptions' => array(
-				'' => 'Default', 
-				'true' => 'True', 
-				'false' => 'False',
+				'allowed' => 'allowed', 
+				'denied' => 'denied',
 			)
 		));
 		
 		$this->addElement('select', 'allow_responses', array(
 			'label' => 'Allow Responses:',
 			'multioptions' => array(
-				'' => 'Default', 
-				'Always' => 'Always', 
-				'Approve' => 'Approve',
-				'Never' => 'Never',
+				'allowed' => 'allowed', 
+				'denied' => 'denied',
+				'moderated' => 'moderated',
 			)
 		));
 		
@@ -149,20 +127,6 @@ class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfigura
 			array('allow_comments', 'allow_embedding', 'allow_ratings', 'allow_responses'), 
 			'community', 
 			array('legend' => 'Community', 'decorators' => array('FormElements', 'Fieldset'))
-		);
-		
-		$this->addElement('text', 'commercial_policy', array(
-			'label' => 'Commercial Policy:'
-		));
-		
-		$this->addElement('text', 'ugc_policy', array(
-			'label' => 'UGC Policy:'
-		));
-		
-		$this->addDisplayGroup(
-			array('commercial_policy', 'ugc_policy'), 
-			'policies', 
-			array('legend' => 'Saved Policies', 'decorators' => array('FormElements', 'Fieldset'))
 		);
 	}
 }

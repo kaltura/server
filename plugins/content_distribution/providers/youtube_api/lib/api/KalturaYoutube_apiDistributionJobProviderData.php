@@ -18,7 +18,7 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 	/**
 	 * @var string
 	 */
-	public $currentPlaylists;
+	public $playlists;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -49,10 +49,10 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 		
 		$this->loadPlaylistsFromMetadata($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile);
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
-		if ($entryDistributionDb)
-			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
-		else
-			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
+//		if ($entryDistributionDb)
+//			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
+//		else
+//			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
 		
 	}
 
@@ -62,7 +62,7 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 	(
 		"videoAssetFilePath",
 		"thumbAssetFilePath",
-		"currentPlaylists",	
+		"playlists",	
 	);
 
 	public function getMapBetweenObjects ( )
@@ -102,7 +102,7 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 		$this->thumbAssetFilePath = $thumbAssetFilePath;
 	}	
 	
-	protected function loadPlaylistsFromMetadata($entryId, KalturaYouTubeDistributionProfile $distributionProfile)
+	protected function loadPlaylistsFromMetadata($entryId, KalturaYoutube_apiDistributionProfile $distributionProfile)
 	{
 		$playlists = array();
 		$metadataProfileId = $distributionProfile->metadataProfileId; 
@@ -129,7 +129,7 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 			}
 		}
 		
-		$this->newPlaylists = implode(',', $playlists);
+		$this->playlists = implode(',', $playlists);
 	}
 	
 }

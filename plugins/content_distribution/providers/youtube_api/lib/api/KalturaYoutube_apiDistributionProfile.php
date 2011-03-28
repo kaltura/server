@@ -16,40 +16,6 @@ class KalturaYoutube_apiDistributionProfile extends KalturaDistributionProfile
 	public $password;
 		
 	/**
-	 * @var string
-	 */
-	public $notificationEmail;
-	
-	/**
-	 * @var string
-	 */
-	public $sftpHost;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $sftpLogin;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $sftpPublicKey;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $sftpPrivateKey;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $ownerName;
-	
-	/**
 	 * 
 	 * @var string
 	 */
@@ -78,24 +44,7 @@ class KalturaYoutube_apiDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $allowResponses;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $commercialPolicy;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $ugcPolicy;
 		
-	/**
-	 * @var string
-	 */
-	public $target;
-
 	/**
 	 * @var int
 	 */
@@ -107,17 +56,12 @@ class KalturaYoutube_apiDistributionProfile extends KalturaDistributionProfile
 	private static $map_between_objects = array 
 	(
 		'username',
-		'password'
-		'notificationEmail',
-		'ownerName',
+		'password',
 		'defaultCategory',
 		'allowComments',
 		'allowEmbedding',
 		'allowRatings',
 		'allowResponses',
-		'commercialPolicy',
-		'ugcPolicy',
-		'target',
 		'metadataProfileId',
 	 );
 		 
