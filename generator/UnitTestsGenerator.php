@@ -37,7 +37,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$serviceName = $serviceReflector->getServiceName();
 		$serviceClass = $serviceReflector->getServiceClass();
 		
-		$bootstrapPath = '/../../base/bootstrap.php';
+		$bootstrapPath = '/../../bootstrap.php';
 		
 		if($serviceReflector->isFromPlugin())
 		{
@@ -63,14 +63,13 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("/**");
 		$this->writeBase(" * $serviceName service base test case.");
 		$this->writeBase(" */");
-		$this->writeBase("abstract class {$serviceClass}BaseTest extends KalturaApiUnitTestCase");
+		$this->writeBase("abstract class {$serviceClass}BaseTest extends KalturaApiTestCase");
 		$this->writeBase("{");
 		
 		
 		$this->writeTest("<?php");
 		$this->writeTest("");
 		$this->writeTest("require_once(dirname(__FILE__) . '$bootstrapPath');");
-		$this->writeTest("require_once(dirname(__FILE__) . '/{$serviceClass}BaseTest.php');");
 		$this->writeTest("");
 		$this->writeTest("/**");
 		$this->writeTest(" * $serviceName service test case.");
@@ -205,15 +204,24 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					$propertyName = $actionParamProperty->getName();
 					
 					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
+					{
 						$this->writeIni("test1.$paramName.$propertyName = " . $actionParamProperty->getDefaultValue());
+					}
+					elseif($actionParamProperty->isFile())
+					{
+						$this->writeIni("test1.$paramName.$propertyName.type = file");
+						$this->writeIni("test1.$paramName.$propertyName.path = ");
+					}
 					else
+					{
 						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
+					}
 				}
 			}
 			
 			$paramDesc = $actionParam->getDescription();
 			$this->writeBase("	 * @param $paramType \$$paramName $paramDesc");
-			if($actionParam->isSimpleType() || $actionParam->isEnum())
+			if(!$actionParam->isComplexType())
 				$testParam = "\$$paramName";
 			else
 				$testParam = "$paramType \$$paramName";
@@ -263,15 +271,24 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					$propertyName = $actionParamProperty->getName();
 					
 					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
+					{
 						$this->writeIni("test1.reference.$propertyName = " . $actionParamProperty->getDefaultValue());
+					}
+					elseif($actionParamProperty->isFile())
+					{
+						$this->writeIni("test1.reference.$propertyName.type = file");
+						$this->writeIni("test1.reference.$propertyName.path = ");
+					}
 					else
+					{
 						$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+					}
 				}
 			}
 			
 			$paramDesc = $outputTypeReflector->getDescription();
 			$this->writeBase("	 * @param $paramType \$reference $paramDesc");
-			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
+			if(!$outputTypeReflector->isComplexType())
 				$testParam = "\$reference";
 			else
 				$testParam = "$paramType \$reference";
@@ -362,12 +379,15 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if($outputTypeReflector && $outputTypeReflector->isFile())
 			return;
 			
+		if(in_array($action, array("list", "clone", "goto")))
+			$action = "{$action}Action";
+		
 		KalturaLog::info("Generates action [$serviceName.$action]");
 		if($action == 'add')
 			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
 		if($action == 'update')
 			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
-		if($action == 'list')
+		if($action == 'listAction')
 			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector, null);
 		if($action == 'get')
 			return $this->writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector);
@@ -397,7 +417,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			}
 			
 			$this->writeTest("	 * @param $paramType \$$paramName");
-			if($actionParam->isSimpleType() || $actionParam->isEnum())
+			if(!$actionParam->isComplexType())
 				$testParam = "\$$paramName";
 			else
 				$testParam = "$paramType \$$paramName";
@@ -446,13 +466,22 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					$propertyName = $actionParamProperty->getName();
 					
 					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
+					{
 						$this->writeIni("test1.reference.$propertyName = " . $actionParamProperty->getDefaultValue());
+					}
+					elseif($actionParamProperty->isFile())
+					{
+						$this->writeIni("test1.reference.$propertyName.type = file");
+						$this->writeIni("test1.reference.$propertyName.path = ");
+					}
 					else
+					{
 						$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+					}
 				}
 			}
 			$this->writeTest("	 * @param $paramType \$reference");
-			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
+			if(!$outputTypeReflector->isComplexType())
 				$testParam = "\$reference";
 			else
 				$testParam = "$paramType \$reference";
