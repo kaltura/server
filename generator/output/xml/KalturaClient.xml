@@ -1418,7 +1418,7 @@
       <const name="DELETED" value="-1"/>
       <const name="ACTIVE" value="1"/>
     </enum>
-    <enum name="KalturaSyndicationFeedType" enumType="string">
+    <enum name="KalturaSyndicationFeedType" enumType="int">
       <const name="GOOGLE_VIDEO" value="1"/>
       <const name="YAHOO" value="2"/>
       <const name="ITUNES" value="3"/>
@@ -2566,7 +2566,7 @@
       <property name="playlistId" type="string" readOnly="0" insertOnly="0" description="link a playlist that will set what content the feed will include&#10;if empty, all content will be included in feed&#10;"/>
       <property name="name" type="string" readOnly="0" insertOnly="0" description="feed name&#10;"/>
       <property name="status" type="int" enumType="KalturaSyndicationFeedStatus" readOnly="1" insertOnly="0" description="feed status&#10;"/>
-      <property name="type" type="string" enumType="KalturaSyndicationFeedType" readOnly="1" insertOnly="0" description="feed type&#10;"/>
+      <property name="type" type="int" enumType="KalturaSyndicationFeedType" readOnly="1" insertOnly="0" description="feed type&#10;"/>
       <property name="landingPage" type="string" readOnly="0" insertOnly="0" description="Base URL for each video, on the partners site&#10;This is required by all syndication types.&#13;"/>
       <property name="createdAt" type="int" readOnly="1" insertOnly="0" description="Creation date as Unix timestamp (In seconds)&#10;"/>
       <property name="allowEmbed" type="bool" readOnly="0" insertOnly="0" description="allow_embed tells google OR yahoo weather to allow embedding the video on google OR yahoo video results&#10;or just to provide a link to the landing page.&#10;it is applied on the video-player_loc property in the XML (google)&#10;and addes media-player tag (yahoo)&#13;"/>
