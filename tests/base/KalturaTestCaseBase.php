@@ -12,7 +12,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	/**
 	 * 
 	 * Indicates wheter the test framework was initialized 
-	 * @var unknown_type
+	 * @var bool
 	 */
 	private static $isFrameworkInit = false;
 	
@@ -58,7 +58,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @param unknown_type $isFrameworkInit
+	 * @param bool $isFrameworkInit
 	 */
 	public static function setIsFrameworkInit($isFrameworkInit) {
 		KalturaTestCaseBase::$isFrameworkInit = $isFrameworkInit;
@@ -95,9 +95,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	/**
 	 * 
 	 * Creates a new Kaltura test Object
-	 * @param unknown_type $name
+	 * @param string $name
 	 * @param array $data
-	 * @param unknown_type $dataName
+	 * @param string $dataName
 	 */
 	public function __construct($name = NULL, array $data = array(), $dataName = '')
 	{
@@ -116,8 +116,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		$testFilePath = KAutoloader::getClassFilePath($class);
 		$this->testFolder = dirname($testFilePath);
 			
-//		print ($testFilePath);
-		
+		KalturaLog::info("Loads config file [$testFilePath.ini]");
 		$this->config = new KalturaTestConfig("$testFilePath.ini");
 		$testConfig = $this->config->get('config');
 		if(!$testConfig)
@@ -169,7 +168,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		if(is_string($argConfig))
 			return $argConfig;
 			
-		switch($argConfig->type)
+		switch($argConfig->objectType)
 		{
 			case 'dependency':
 				throw new KalturaUnitTestException("Argument [$argName] taken from dependency");
@@ -192,17 +191,17 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	protected function populateObject(Zend_Config $config)
 	{
-		if(!$config->type)
+		if(!$config->objectType)
 			return null;
 			
-		$type = $config->type;
-		KalturaLog::debug("Creating object [$type]");
-		$reflectionClass = new ReflectionClass($type); 
-		$object = new $type();
+		$objectType = $config->objectType;
+		KalturaLog::debug("Creating object [$objectType]");
+		$reflectionClass = new ReflectionClass($objectType); 
+		$object = new $objectType();
 		
 		foreach($config as $field => $value)
 		{
-			if($field == 'type')
+			if($field == 'objectType')
 				continue;
 				
 			if($value instanceof Zend_Config)
@@ -245,22 +244,22 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				$argConfig = new Zend_Config(array(), true);
 				$argName = $arg->getName();
 				KalturaLog::info("Create default config for attribute [$argName] in method [$methodName]");
-				$type = $arg->getClass();
-				if($type)
+				$objectType = $arg->getClass();
+				if($objectType)
 				{
-					$type = $type->getName();
-					KalturaLog::info("Default config for attribute [$argName] of type [$type]");
-					$argConfig->type = $type;
+					$objectType = $objectType->getName();
+					KalturaLog::info("Default config for attribute [$argName] of objectType [$objectType]");
+					$argConfig->objectType = $objectType;
 				}
 				elseif($arg->isArray())
 				{
-					KalturaLog::info("Default config for attribute [$argName] of type [array]");
-					$argConfig->type = 'array';
+					KalturaLog::info("Default config for attribute [$argName] of objectType [array]");
+					$argConfig->objectType = 'array';
 				}
 				else
 				{
-					KalturaLog::info("Default config for attribute [$argName] of native type");
-					$argConfig->type = 'native';
+					KalturaLog::info("Default config for attribute [$argName] of native objectType");
+					$argConfig->objectType = 'native';
 				}
 				$default->$argName = $argConfig;
 			}
@@ -290,6 +289,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			$tests[] = $test;
 		}
 		
+		KalturaLog::info("Tests data provided [" . print_r($tests, true) . "]");
 		return $tests;
 	}
 	
@@ -408,8 +408,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 * 
 	 * Compares the $actualValue with the $expectedValue on the given field / property, no Exception is thrown
 	 * @param string $fieldName
-	 * @param unknown_type $actualValue
-	 * @param unknown_type $expectedResult
+	 * @param object $actualValue
+	 * @param object $expectedResult
 	 * @throws no exception can be thrown (for mass compares)
 	 */
 	public function compareOnField($fieldName, $actualValue, $expectedValue, $assertToPerform, $message = null)
