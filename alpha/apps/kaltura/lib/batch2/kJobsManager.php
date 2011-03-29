@@ -29,7 +29,9 @@ class kJobsManager
 	public static function updateBatchJob(BatchJob $batchJob, $status, BatchJob $twinJob = null)
 	{
 		$batchJob->setStatus($status);
-		$batchJob->save();
+		$changed = $batchJob->save();
+		if(!$changed)
+			return $batchJob;
 		
 		$event = new kBatchJobStatusEvent($batchJob, $twinJob);
 		kEventsManager::raiseEvent($event);
