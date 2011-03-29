@@ -172,7 +172,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				throw new KalturaTestException("Argument [$argName] taken from dependency");
 				
 			case 'array':
-				return array();
+				return $this->populateArray($argConfig);
 				
 			case 'native':
 				return $argConfig->value;
@@ -190,6 +190,38 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 * @param Object $object
 	 * @return Object
 	 */
+	protected function populateArray(Zend_Config $config)
+	{
+		KalturaLog::debug("Creating array");
+		$array = array();
+		
+		foreach($config as $index => $value)
+		{
+			if($index == 'objectType')
+				continue;
+				
+			if($value instanceof Zend_Config)
+			{
+				$value = $this->populateObject($value);
+			}
+			elseif(substr($value, 0, 1) == '@')
+			{
+				$fileName = substr($value, 1);
+				KalturaLog::debug("Load key [$index] content from file [$fileName]");
+				$value = file_get_contents($fileName);
+			}
+
+			KalturaLog::debug("Set array key [$index] to value [" . print_r($value, true) . "]");
+			$array[$index] = $value;
+		}
+		return $array;
+	}
+	
+	/**
+	 * @param Zend_Config $config
+	 * @param Object $object
+	 * @return Object
+	 */
 	protected function populateObject(Zend_Config $config)
 	{
 		if(!$config->objectType)
@@ -197,6 +229,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			
 		if($config->objectType == 'file')
 			return $config->path;
+		
+		if($config->objectType == 'array')
+			return $this->populateArray($config);
 		
 		$objectType = $config->objectType;
 		KalturaLog::debug("Creating object [$objectType]");
