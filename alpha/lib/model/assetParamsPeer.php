@@ -220,8 +220,8 @@ class assetParamsPeer extends BaseassetParamsPeer
 						{
 							if(!PermissionPeer::isValidForPartner($requiredPermission, self::$filterPartner))
 							{
-								$obj = null;
-								self::excludeId($obj->getId()); 
+								self::excludeId($obj->getId());
+								$obj = null; 
 							}
 						}
 					}
