@@ -100,7 +100,9 @@ class kMrssManager
 	 */
 	protected static function appendDataEntryMrss(entry $entry, SimpleXMLElement $mrss)
 	{
-		
+		$media = $mrss->addChild('livestream');
+		$media->addChild('mediaType', $entry->getMediaType());
+		$media->addChild('duration', $entry->getLengthInMsecs());
 	}
 	
 	
@@ -110,7 +112,14 @@ class kMrssManager
 	 */
 	protected static function appendLiveStreamEntryMrss(entry $entry, SimpleXMLElement $mrss)
 	{
-		
+		/*$bitrates = $entry->getStreamBitrates();
+		foreach ($bitrates as $bitrate)
+		{
+			$content = $mrss->addChild('content');			
+			$content->addAttribute('url', $entry->getPrimaryBroadcastingUrl);
+			$content->addAttribute('height', $entry->getHeight());
+			$content->addAttribute('width', $flavorParams->getWidth());
+		}*/
 	}
 
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key)
@@ -182,9 +191,10 @@ class kMrssManager
 	 * @param entry $entry
 	 * @param SimpleXMLElement $mrss
 	 * @param string $link
+	 * @param string $filterFlavors
 	 * @return SimpleXMLElement
 	 */
-	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, $link = null)
+	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, $link = null, $fitlerByFlovorParams = null)
 	{
 		if(!$mrss)
 		{
@@ -249,6 +259,9 @@ class kMrssManager
 		$flavorAssets = flavorAssetPeer::retreiveReadyByEntryId($entry->getId());
 		foreach($flavorAssets as $flavorAsset)
 		{
+			if (!is_null($fitlerByFlovorParams) && $flavorAsset->getFlavorParamsId() != $fitlerByFlovorParams)
+				continue;
+				 
 			$content = $mrss->addChild('content');
 			$content->addAttribute('url', self::getAssetUrl($flavorAsset));
 			$content->addAttribute('flavorAssetId', $flavorAsset->getId());
