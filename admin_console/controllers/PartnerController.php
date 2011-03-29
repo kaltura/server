@@ -260,6 +260,9 @@ class PartnerController extends Zend_Controller_Action
 			
 			if (!$moduls->annotation)
 				$form->getElement('enable_annotation')->setAttrib('disabled',true);
+			
+			if (!$moduls->mobileFlavors)
+				$form->getElement('enable_mobile_flavors')->setAttrib('disabled',true);
 		}
 		
 		$request = $this->getRequest();
