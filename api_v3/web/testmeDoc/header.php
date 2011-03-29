@@ -39,6 +39,7 @@ if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
 		<ul id="kmcSubMenu">
 			<li><a href="../testme/index.php">Test Console</a></li>
 			<li class="active"><a href="#">API Documentation</a></li>
+			<li><a href="../testme/client-libs.php">API Client Libraries</a></li>
 		</ul>
 	<?php
 }

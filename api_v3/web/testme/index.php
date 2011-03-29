@@ -49,6 +49,7 @@
 				<ul id="kmcSubMenu">
 					<li class="active"><a href="#">Test Console</a></li>
 					<li><a href="../testmeDoc/index.php">API Documentation</a></li>
+					<li><a href="client-libs.php">API Client Libraries</a></li>
 				</ul>	
 			<?php
 		}
