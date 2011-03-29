@@ -70,11 +70,11 @@ class secForm {
 	function getClient() {
 
 		// Get kaltura configuration file
-		require_once( realpath( '/opt/kaltura/app/alpha/config' ) . '/kConf.php' );
+		require_once( realpath( dirname(__FILE__) ) . '/../config/kConf.php' );
 		$kConf = new kConf();
 		
 		// Load kaltura client
-		require_once( realpath( '/opt/kaltura/app/clients/php5/' ) . '/KalturaClient.php' );
+		require_once( realpath( dirname(__FILE__) ) . '/../../clients/php5/KalturaClient.php' );
 				
 		try {		
 			$conf = new KalturaConfiguration( $this->partnerId );
