@@ -7,14 +7,17 @@
  */
 class KalturaStringArray extends KalturaTypedArray
 {
-	public static function fromStringArray(array $strings)
+	public static function fromStringArray(array $strings = null)
 	{
 		$stringArray = new KalturaStringArray();
-		foreach($strings as $string)
+		if($strings && is_array($strings))
 		{
-			$stringObject = new KalturaString();
-			$stringObject->value = $string;
-			$stringArray[] = $stringObject;
+			foreach($strings as $string)
+			{
+				$stringObject = new KalturaString();
+				$stringObject->value = $string;
+				$stringArray[] = $stringObject;
+			}
 		}
 		return $stringArray;
 	}
