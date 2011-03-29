@@ -96,8 +96,7 @@ class FlavorParamsService extends KalturaBaseService
 		if (!$flavorParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
-		$flavorParamsDb = new flavorParams();
-		$flavorParams->toObject($flavorParamsDb);
+		$flavorParams->toUpdatableObject($flavorParamsDb);
 		$flavorParamsDb->save();
 			
 		$flavorParams->fromObject($flavorParamsDb);
