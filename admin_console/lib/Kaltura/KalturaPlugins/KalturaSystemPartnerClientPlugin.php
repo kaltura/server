@@ -364,6 +364,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObjectBase
 	 *
 	 * @var bool
 	 */
+	public $enableMobileFlavors = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
 	public $enablePs2PermissionValidation = null;
 
 	/**

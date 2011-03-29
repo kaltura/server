@@ -1040,6 +1040,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var bool
+	 * @readonly
 	 */
 	public $isOriginal = null;
 
@@ -1331,6 +1332,22 @@ class KalturaMediaInfo extends KalturaObjectBase
  * @package Admin
  * @subpackage Client
  */
+class KalturaString extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $value = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaAssetParams extends KalturaObjectBase
 {
 	/**
@@ -1415,6 +1432,14 @@ class KalturaAssetParams extends KalturaObjectBase
 	 * @var KalturaAssetParamsOrigin
 	 */
 	public $origin = null;
+
+	/**
+	 * Array of partner permisison names that required for using this asset params
+	 * 
+	 *
+	 * @var array of KalturaString
+	 */
+	public $requiredPermissions;
 
 
 }
@@ -5832,22 +5857,6 @@ class KalturaUiConfListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
-
-
-}
-
-/**
- * @package Admin
- * @subpackage Client
- */
-class KalturaString extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $value = null;
 
 
 }

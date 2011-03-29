@@ -99,6 +99,22 @@ class KalturaBulkUploadJobData extends KalturaJobData
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaString extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $value = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaAssetParams extends KalturaObjectBase
 {
 	/**
@@ -183,6 +199,14 @@ class KalturaAssetParams extends KalturaObjectBase
 	 * @var KalturaAssetParamsOrigin
 	 */
 	public $origin = null;
+
+	/**
+	 * Array of partner permisison names that required for using this asset params
+	 * 
+	 *
+	 * @var array of KalturaString
+	 */
+	public $requiredPermissions;
 
 
 }
@@ -4929,6 +4953,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var bool
+	 * @readonly
 	 */
 	public $isOriginal = null;
 
