@@ -659,6 +659,7 @@ class playManifestAction extends kalturaAction
 		<meta name="title" content="" />
 		<meta name="httpBase" content="'.$domain.'" />
 		<meta name="rtmpAuthBase" content="" />
+		<meta name="vod" content="true"/>
 	</head>
 	<body>
 		<switch id="video">'.$flavorsXml.'</switch>
