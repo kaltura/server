@@ -18,6 +18,13 @@ class assetParamsPeer extends BaseassetParamsPeer
 		assetType::THUMBNAIL => thumbParamsPeer::OM_CLASS,
 	);
 
+	public static function excludeId($id)
+	{
+		$criteriaFilter = self::getCriteriaFilter();
+		$criteria = $criteriaFilter->getFilter();
+		$criteria->addAnd(self::ID, $id, Criteria::NOT_EQUAL);
+	}
+
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
 		self::$filterPartner = $partnerId;
@@ -212,7 +219,10 @@ class assetParamsPeer extends BaseassetParamsPeer
 						foreach($requiredPermissions as $requiredPermission)
 						{
 							if(!PermissionPeer::isValidForPartner($requiredPermission, self::$filterPartner))
+							{
 								$obj = null;
+								self::excludeId($obj->getId()); 
+							}
 						}
 					}
 				}
