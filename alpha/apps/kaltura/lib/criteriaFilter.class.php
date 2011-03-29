@@ -10,6 +10,11 @@ class criteriaFilter
 	 */
 	private $criteria;
 	private $enable = true;
+
+	public function isEnabled()
+	{
+		return $this->enable;
+	}
 	
 	public function enable()
 	{
