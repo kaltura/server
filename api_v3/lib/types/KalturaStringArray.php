@@ -7,7 +7,7 @@
  */
 class KalturaStringArray extends KalturaTypedArray
 {
-	public function fromArray(array $strings)
+	public static function fromStringArray(array $strings)
 	{
 		$stringArray = new KalturaStringArray();
 		foreach($strings as $string)
