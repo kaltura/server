@@ -89,4 +89,15 @@ class assetParamsOutput extends BaseassetParamsOutput
 		$tags = explode(',', $this->getTags());
 		return in_array($v, $tags);
 	}
+	
+	// dummy for to be compatible with assetParams
+	public function setRequiredPermissions($permissionNames)
+	{
+	}
+	
+	// dummy for to be compatible with assetParams
+	public function getRequiredPermissions()
+	{
+		return array();
+	}
 }
