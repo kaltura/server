@@ -195,6 +195,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		if(!$config->objectType)
 			return null;
 			
+		if($config->objectType == 'file')
+			return $config->path;
+		
 		$objectType = $config->objectType;
 		KalturaLog::debug("Creating object [$objectType]");
 		$reflectionClass = new ReflectionClass($objectType); 
