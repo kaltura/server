@@ -96,7 +96,7 @@ class ThumbParamsService extends KalturaBaseService
 		if (!$thumbParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
-		$thumbParams->toObject($thumbParamsDb);
+		$thumbParams->toUpdatableObject($thumbParamsDb);
 		$thumbParamsDb->save();
 			
 		$thumbParams->fromObject($thumbParamsDb);
@@ -141,10 +141,11 @@ class ThumbParamsService extends KalturaBaseService
 		
 		$c = new Criteria();
 		$thumbParamsFilter->attachToCriteria($c);
-		
-		$totalCount = thumbParamsPeer::doCount($c);
 		$pager->attachToCriteria($c);
 		$dbList = thumbParamsPeer::doSelect($c);
+		
+		$c->setLimit(null);
+		$totalCount = thumbParamsPeer::doCount($c);
 
 		$list = KalturaThumbParamsArray::fromDbArray($dbList);
 		$response = new KalturaThumbParamsListResponse();
