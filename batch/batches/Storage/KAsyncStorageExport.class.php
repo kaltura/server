@@ -111,11 +111,14 @@ class KAsyncStorageExport extends KBatchBase
 		
 		try{
 			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword, null, $data->ftpPassiveMode);
-			$engine->putFile($destFile, $srcFile, $data->force);
 		}
-		catch(kFileTransferMgrException $ke)
+		catch(Exception $e)
 		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ke->getCode(), $ke->getMessage(), KalturaBatchJobStatus::FAILED);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $e->getMessage(), KalturaBatchJobStatus::RETRY);
+		}
+	
+		try{
+			$engine->putFile($destFile, $srcFile, $data->force);
 		}
 		catch(Exception $e)
 		{
