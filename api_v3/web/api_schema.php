@@ -1,5 +1,5 @@
 <?php
-$fileLocation = "../../generator/output/xml/KalturaClient.xml";
+$fileLocation = "../../generator/output/KalturaClient.xml";
 if (!file_exists($fileLocation))
 	die("KalturaClient.xml was not found");
 	
