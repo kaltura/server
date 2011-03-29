@@ -3,7 +3,7 @@
 /**
  * KalturaInternalTools service base test case.
  */
-abstract class KalturaInternalToolsServiceBaseTest extends KalturaApiUnitTestCase
+abstract class KalturaInternalToolsServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Called when all tests are done

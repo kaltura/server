@@ -3,7 +3,7 @@
 /**
  * uiConfAdmin service base test case.
  */
-abstract class UiConfAdminServiceBaseTest extends KalturaApiUnitTestCase
+abstract class UiConfAdminServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests uiConfAdmin->add action

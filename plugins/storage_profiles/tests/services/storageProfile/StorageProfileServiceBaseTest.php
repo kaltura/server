@@ -3,7 +3,7 @@
 /**
  * storageProfile service base test case.
  */
-abstract class StorageProfileServiceBaseTest extends KalturaApiUnitTestCase
+abstract class StorageProfileServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests storageProfile->get action

@@ -3,7 +3,7 @@
 /**
  * systemPartner service base test case.
  */
-abstract class SystemPartnerServiceBaseTest extends KalturaApiUnitTestCase
+abstract class SystemPartnerServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests systemPartner->get action

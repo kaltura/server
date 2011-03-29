@@ -3,7 +3,7 @@
 /**
  * entryDistribution service base test case.
  */
-abstract class EntryDistributionServiceBaseTest extends KalturaApiUnitTestCase
+abstract class EntryDistributionServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests entryDistribution->add action

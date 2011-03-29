@@ -3,7 +3,7 @@
 /**
  * metadataProfile service base test case.
  */
-abstract class MetadataProfileServiceBaseTest extends KalturaApiUnitTestCase
+abstract class MetadataProfileServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests metadataProfile->listAction action

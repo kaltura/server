@@ -3,7 +3,7 @@
 /**
  * genericDistributionProviderAction service base test case.
  */
-abstract class GenericDistributionProviderActionServiceBaseTest extends KalturaApiUnitTestCase
+abstract class GenericDistributionProviderActionServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests genericDistributionProviderAction->add action

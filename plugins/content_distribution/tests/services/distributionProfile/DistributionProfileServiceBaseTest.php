@@ -3,7 +3,7 @@
 /**
  * distributionProfile service base test case.
  */
-abstract class DistributionProfileServiceBaseTest extends KalturaApiUnitTestCase
+abstract class DistributionProfileServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests distributionProfile->add action

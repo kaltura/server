@@ -3,7 +3,7 @@
 /**
  * auditTrail service base test case.
  */
-abstract class AuditTrailServiceBaseTest extends KalturaApiUnitTestCase
+abstract class AuditTrailServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests auditTrail->listAction action

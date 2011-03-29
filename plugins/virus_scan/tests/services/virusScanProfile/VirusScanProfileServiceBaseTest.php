@@ -3,7 +3,7 @@
 /**
  * virusScanProfile service base test case.
  */
-abstract class VirusScanProfileServiceBaseTest extends KalturaApiUnitTestCase
+abstract class VirusScanProfileServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests virusScanProfile->listAction action

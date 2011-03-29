@@ -3,7 +3,7 @@
 /**
  * mediaInfo service base test case.
  */
-abstract class MediaInfoServiceBaseTest extends KalturaApiUnitTestCase
+abstract class MediaInfoServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests mediaInfo->listAction action

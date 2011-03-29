@@ -3,7 +3,7 @@
 /**
  * shortLink service base test case.
  */
-abstract class ShortLinkServiceBaseTest extends KalturaApiUnitTestCase
+abstract class ShortLinkServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests shortLink->listAction action

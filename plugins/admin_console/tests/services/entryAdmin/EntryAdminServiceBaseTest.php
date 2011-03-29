@@ -3,7 +3,7 @@
 /**
  * entryAdmin service base test case.
  */
-abstract class EntryAdminServiceBaseTest extends KalturaApiUnitTestCase
+abstract class EntryAdminServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests entryAdmin->get action

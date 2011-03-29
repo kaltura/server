@@ -3,7 +3,7 @@
 /**
  * annotation service base test case.
  */
-abstract class AnnotationServiceBaseTest extends KalturaApiUnitTestCase
+abstract class AnnotationServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests annotation->listAction action

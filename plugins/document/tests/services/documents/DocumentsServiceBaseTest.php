@@ -3,7 +3,7 @@
 /**
  * documents service base test case.
  */
-abstract class DocumentsServiceBaseTest extends KalturaApiUnitTestCase
+abstract class DocumentsServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests documents->get action

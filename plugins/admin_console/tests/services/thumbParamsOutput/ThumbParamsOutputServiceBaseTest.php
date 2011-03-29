@@ -3,7 +3,7 @@
 /**
  * thumbParamsOutput service base test case.
  */
-abstract class ThumbParamsOutputServiceBaseTest extends KalturaApiUnitTestCase
+abstract class ThumbParamsOutputServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests thumbParamsOutput->listAction action

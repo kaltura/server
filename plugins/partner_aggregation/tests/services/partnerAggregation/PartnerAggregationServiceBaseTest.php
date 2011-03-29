@@ -3,7 +3,7 @@
 /**
  * partnerAggregation service base test case.
  */
-abstract class PartnerAggregationServiceBaseTest extends KalturaApiUnitTestCase
+abstract class PartnerAggregationServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests partnerAggregation->listAction action
