@@ -142,9 +142,11 @@ class FlavorParamsService extends KalturaBaseService
 		$c = new Criteria();
 		$flavorParamsFilter->attachToCriteria($c);
 		
-		$totalCount = flavorParamsPeer::doCount($c);
 		$pager->attachToCriteria($c);
 		$dbList = flavorParamsPeer::doSelect($c);
+		
+		$c->setLimit(null);
+		$totalCount = flavorParamsPeer::doCount($c);
 
 		$list = KalturaFlavorParamsArray::fromDbArray($dbList);
 		$response = new KalturaFlavorParamsListResponse();
