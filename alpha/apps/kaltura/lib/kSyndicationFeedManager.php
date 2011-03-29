@@ -76,16 +76,15 @@ class kSyndicationFeedManager
 			return null;
 		}
 		
-		if ((!is_null($syndicationFeed))  && !is_null($syndicationFeed->getPlayerUiconfId()))
-		{
-			$host = myPartnerUtils::getCdnHost($entry->getPartnerId());
-			
-			$playerUrl = 'http://'.$host.
-							'/kwidget/wid/_'.$entry->getPartnerId().
-							'/entry_id/'.$entry->getId().$syndicationFeed->getPlayerUiconfId();
-			$mrss->addChild('player',$playerUrl);
-		}
-		
+		$host = myPartnerUtils::getCdnHost($entry->getPartnerId());
+		$uiconfId = ($syndicationFeed->getPlayerUiconfId)? '/ui_conf_id/'.$syndicationFeed->getPlayerUiconfId: '';
+		$playerUrl = 'http://'.$host.
+						'/kwidget/wid/_'.$entry->getPartnerId().
+						'/entry_id/'.$entry->getId().$syndicationFeed->getPlayerUiconfId();
+
+		$player = $mrss->addChild('player');
+		$player->addAttribute('url', $playerUrl);
+				
 		return $mrss->asXML();
 	}
 	
