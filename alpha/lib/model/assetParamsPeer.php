@@ -10,6 +10,8 @@
  */ 
 class assetParamsPeer extends BaseassetParamsPeer
 {
+	static protected $filterPartner = null;
+	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		assetType::FLAVOR => flavorParamsPeer::OM_CLASS,
@@ -18,6 +20,8 @@ class assetParamsPeer extends BaseassetParamsPeer
 
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
+		self::$filterPartner = $partnerId;
+		
 		$criteriaFilter = self::getCriteriaFilter();
 		$criteria = $criteriaFilter->getFilter();
 		
@@ -171,6 +175,57 @@ class assetParamsPeer extends BaseassetParamsPeer
 		}
 			
 		return parent::OM_CLASS;
+	}
+
+	/**
+	 * Overrides parent populateObjects method
+	 * Force partner required permissions
+	 *
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function populateObjects(PDOStatement $stmt)
+	{
+		$criteria_filter = assetParamsPeer::getCriteriaFilter();
+		$results = array();
+	
+		// populate the object(s)
+		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+			$key = assetParamsPeer::getPrimaryKeyHashFromRow($row, 0);
+			if (null !== ($obj = assetParamsPeer::getInstanceFromPool($key))) {
+				// We no longer rehydrate the object, since this can cause data loss.
+				// See http://propel.phpdb.org/trac/ticket/509
+				// $obj->hydrate($row, 0, true); // rehydrate
+				$results[] = $obj;
+			} else {
+				// class must be set each time from the record row
+				$cls = assetParamsPeer::getOMClass($row, 0);
+				$cls = substr('.'.$cls, strrpos('.'.$cls, '.') + 1);
+				$obj = new $cls();
+				$obj->hydrate($row);
+				
+				if($criteria_filter->isEnabled() && self::$filterPartner)
+				{
+					$requiredPermissions = $obj->getRequiredPermissions();
+					if($requiredPermissions && count($requiredPermissions))
+					{
+						foreach($requiredPermissions as $requiredPermission)
+						{
+							if(!PermissionPeer::isValidForPartner($requiredPermission, self::$filterPartner))
+								$obj = null;
+						}
+					}
+				}
+				
+				if($obj)
+				{
+					$results[] = $obj;
+					assetParamsPeer::addInstanceToPool($obj, $key);
+				}
+			} // if key exists
+		}
+		$stmt->closeCursor();
+		return $results;
 	}
 	
 	public static function alternativeCon($con)

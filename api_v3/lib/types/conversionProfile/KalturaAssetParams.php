@@ -81,6 +81,13 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	 * @filter eq,in
 	 */
 	public $origin;
+
+	/**
+	 * Array of partner permisison names that required for using this asset params
+	 *  
+	 * @var KalturaStringArray
+	 */
+	public $requiredPermissions;
 	
 	private static $map_between_objects = array
 	(
@@ -94,6 +101,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"tags",
 		"format",
 		"origin",
+		"requiredPermissions",
 	);
 	
 	public function getMapBetweenObjects()

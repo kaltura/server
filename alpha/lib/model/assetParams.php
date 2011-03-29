@@ -122,4 +122,14 @@ class assetParams extends BaseassetParams
 	{
 		$this->putInCustomData($attributeName, $v);
 	}
+	
+	public function setRequiredPermissions($permissionNames)
+	{
+		$this->putInCustomData('requiredPermissions', $permissionNames);
+	}
+	
+	public function getRequiredPermissions()
+	{
+		return $this->getFromCustomData('requiredPermissions');
+	}
 }
