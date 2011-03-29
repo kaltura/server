@@ -1,0 +1,39 @@
+div#content { width:100%;font-size: small;font-family: arial,sans-serif;margin:40px 15px; }
+div#header { margin-bottom:30px; }
+div#header h1 { margin-bottom:10px; }
+div#boxs { margin-bottom: 30px; }
+div#downloads-box { float:left;margin-right:50px; }
+.graytextsmall { color:#8a8a8a;font-size:12px; }
+.graytext { color:#8a8a8a; }
+div#download-buttons { margin-top:30px; }
+.download-button { float:left;width:71px;height:81px;margin: 0 20px 40px 0;cursor:pointer;cursor:hand; }
+.download-btn { background:transparent;border:none;width:71px;height:80px; }
+.generator-btn { padding-left:8px;font-size:10px; }
+.php4-btn { background:transparent url('../images/buttons/php4.jpg') no-repeat right top; }
+.php4-btn:hover  { background:transparent url('../images/buttons/php4.jpg') no-repeat left top; }
+.php5-btn { background:transparent url('../images/buttons/php5.jpg') no-repeat right top; }
+.php5-btn:hover  { background:transparent url('../images/buttons/php5.jpg') no-repeat left top; }
+.php5Zend-btn { background:transparent url('../images/buttons/php5Zend.jpg') no-repeat right top; }
+.php5Zend-btn:hover { background:transparent url('../images/buttons/php5Zend.jpg') no-repeat left top; }
+.csharp-btn { background:transparent url('../images/buttons/csharp.jpg') no-repeat right top; }
+.csharp-btn:hover { background:transparent url('../images/buttons/csharp.jpg') no-repeat left top; }
+.java-btn { background:transparent url('../images/buttons/java.jpg') no-repeat right top; }
+.java-btn:hover { background:transparent url('../images/buttons/java.jpg') no-repeat left top; }
+.js-btn { background:transparent url('../images/buttons/js.jpg') no-repeat right top; }
+.js-btn:hover { background:transparent url('../images/buttons/js.jpg') no-repeat left top; }
+.actionscript3-btn { background:transparent url('../images/buttons/actionscript3.jpg') no-repeat right top; }
+.actionscript3-btn:hover { background:transparent url('../images/buttons/actionscript3.jpg') no-repeat left top; }
+.flex35-btn { background:transparent url('../images/buttons/flex35.jpg') no-repeat right top; }
+.flex35-btn:hover { background:transparent url('../images/buttons/flex35.jpg') no-repeat left top; }
+.ruby-btn { background:transparent url('../images/buttons/ruby.jpg') no-repeat right top; }
+.ruby-btn:hover { background:transparent url('../images/buttons/ruby.jpg') no-repeat left top; }
+.python-btn { background:transparent url('../images/buttons/python.jpg') no-repeat right top; }
+.python-btn:hover { background:transparent url('../images/buttons/python.jpg') no-repeat left top; }
+.clear { clear:both; }
+div#notifications-box { float:left;color:#ffffff; }
+div#notifications-header { width:272px;height:55px;background-color:#000000;padding:5px; }
+div#notifications-feed { width:272px;height:320px;overflow:auto;background:#000000;margin-top:12px;margin-bottom:10px;padding:5px; }
+.tweetsdiv { height:265px; }
+.twitter-icon { height:50px;border:none; }
+a.bluelink, a.bluelink:visited  { color:#009cff; }
+a.bluelink:hover { color:#6cc6ff; }
