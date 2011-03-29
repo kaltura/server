@@ -101,19 +101,55 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"tags",
 		"format",
 		"origin",
-		"requiredPermissions",
 	);
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::toObject()
+	 */
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if(is_null($object_to_fill))
+			$object_to_fill = new assetParams();
+			
+		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
+		
+		$requiredPermissions = array();
+		foreach($this->requiredPermissions as $requiredPermission)
+			$requiredPermissions[] = $requiredPermission->value;
+			
+		$object_to_fill->setRequiredPermissions($requiredPermissions);
+		
+		return $object_to_fill;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function fromObject ( $source_object  )
+	{
+		$this->requiredPermissions = KalturaStringArray::fromArray($source_object->getRequiredPermissions());
+		return parent::fromObject($source_object);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getExtraFilters()
+	 */
 	public function getExtraFilters()
 	{
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IFilterable::getFilterDocs()
+	 */
 	public function getFilterDocs()
 	{
 		return array();

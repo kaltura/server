@@ -7,9 +7,20 @@
  */
 class KalturaStringArray extends KalturaTypedArray
 {
+	public function fromArray(array $strings)
+	{
+		$stringArray = new KalturaStringArray();
+		foreach($strings as $string)
+		{
+			$stringObject = new KalturaString();
+			$stringObject->value = $string;
+			$stringArray[] = $stringObject;
+		}
+		return $stringArray;
+	}
+	
 	public function __construct()
 	{
 		return parent::__construct("KalturaString");
 	}
 }
-?>
