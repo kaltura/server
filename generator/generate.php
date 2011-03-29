@@ -76,7 +76,10 @@ $generatedDate = date('d-m-Y', time());
 // Clear the output folder -
 exec ("rm -rf $outputPathBase/*");
 
-$generatedClients = '';
+$generatedClients = array(
+	'generatedDate' => $generatedDate,
+	'apiVersion' => $apiVersion,
+);
 
 // Loop through the config.ini and generate the client libraries -
 foreach($config as $name => $item)
@@ -93,7 +96,7 @@ foreach($config as $name => $item)
 	//check if this client should be internal or public (on the UI)
 	$isInternal = $item->get("internal");
 	if ($isInternal === null)
-		$generatedClients .= PHP_EOL.$name;
+		$generatedClients[] = $name;
 	
 	// check if generator is valid (not null and there is a class by this name)
 	if ($generator === null)
@@ -186,20 +189,30 @@ foreach($config as $name => $item)
 	KalturaLog::info("Generate client library [$name]");
 	$instance->generate();
 	
-	if ($mainOutput !== null) 
+	if ($mainOutput) 
 		$outputPath = $outputPathBase;
 	else
 		$outputPath = $outputPathBase.DIRECTORY_SEPARATOR.$name;
 	KalturaLog::info("Saving client library to [$outputPath]");
 	if (realpath($outputPath) === false)
+	{
+		$oldMask = umask();
+		umask(0);
 		mkdir($outputPath, 0777, true);
+		umask($oldMask);
+	}
 	$files = $instance->getOutputFiles();
 	foreach($files as $file => $data)
 	{
 		$filePath = realpath($outputPath).DIRECTORY_SEPARATOR.$file;
 		$dirName = pathinfo($filePath, PATHINFO_DIRNAME);
 		if (!file_exists($dirName))
+		{
+			$oldMask = umask();
+			umask(0);
 			mkdir($dirName, 0777, true);
+			umask($oldMask);
+		}
 
 		file_put_contents($filePath, $data);
 	}
@@ -217,7 +230,7 @@ foreach($config as $name => $item)
 	else
 	{
 		//tar gzip the client library
-		if ($shouldNotPackage === null) 
+		if (!$shouldNotPackage) 
 			createPackage($outputPath, $name);
 	}
 		
@@ -225,10 +238,7 @@ foreach($config as $name => $item)
 }
 
 //write the summary file (will be used by the generator UI)
-$summaryFile = '$:'.$generatedDate.PHP_EOL;
-$summaryFile .= '#:'.$apiVersion;
-$summaryFile .= $generatedClients;
-file_put_contents($outputPathBase.DIRECTORY_SEPARATOR.$summaryFileName, $summaryFile);
+file_put_contents($outputPathBase.DIRECTORY_SEPARATOR.$summaryFileName, serialize($generatedClients));
 
 /**
  * Build a packaged tarball for the client library.
@@ -266,31 +276,5 @@ function createPackage($outputPath, $generatorName)
 			
 		KalturaLog::debug("Restoring dir to [$oldDir]");
 		chdir($oldDir);
-	}
-}
-
-function getApiRevision()
-{
-	return null;
-	$output = shell_exec("svn info \"".KALTURA_API_PATH."\"");
-	if ($output === null)
-	{
-		KalturaLog::warning("Can't find the api subversion revision. SVN command is probably not installed, or not available in path");
-		return null;
-	}
-	else
-	{
-		$match = array();
-		if (preg_match("/Revision: ([0-9]*)/", $output, $match))
-		{
-			$r = $match[1];
-			KalturaLog::info("API revision is [$r]");
-			return $r;
-		}
-		else
-		{
-			KalturaLog::err("Failed to parse the api subversion revision.");
-			return null;
-		}
 	}
 }
