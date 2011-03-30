@@ -34,6 +34,14 @@ class KalturaTestProcedureData
 	 * @var array<KalturaTestCaseInstanceData>
 	 */
 	private $testCasesData = array();
+	
+	//TODO: add support for configuration in the tests (currently is passed through the test case additional data)
+	/**
+	 * 
+	 * Defines the test procedure configuration (for all test case instances) 
+	 * @var KalturaTestDataConfiguration
+	 */
+	private $testProcedureConfiguration = null; 
 
 	/**
 	 * 
