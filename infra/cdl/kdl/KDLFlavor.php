@@ -509,6 +509,8 @@ $target->_video = null;
 
 		$widSrc = $source->_width;
 		$hgtSrc = $source->_height;
+		if($widSrc==0 || $hgtSrc)
+			return;
 		$darSrcFrame = $widSrc/$hgtSrc;
 		/*
 		 * DAR adjustment
