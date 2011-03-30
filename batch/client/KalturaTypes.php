@@ -6509,6 +6509,80 @@ class KalturaAssetParamsOutputFilter extends KalturaAssetParamsOutputBaseFilter
  * @package Scheduler
  * @subpackage Client
  */
+abstract class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $conversionProfileIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $conversionProfileIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $assetParamsIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetParamsIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFlavorReadyBehaviorType
+	 */
+	public $readyBehaviorEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $readyBehaviorIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAssetParamsOrigin
+	 */
+	public $originEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $originIn = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfileAssetParamsBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 abstract class KalturaConversionProfileBaseFilter extends KalturaFilter
 {
 	/**

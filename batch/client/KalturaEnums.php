@@ -457,6 +457,14 @@ class KalturaConversionEngineType
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaConversionProfileAssetParamsOrderBy
+{
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaConversionProfileOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -663,6 +671,17 @@ class KalturaFlavorParamsOrderBy
  */
 class KalturaFlavorParamsOutputOrderBy
 {
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaFlavorReadyBehaviorType
+{
+	const INHERIT_FLAVOR_PARAMS = 0;
+	const REQUIRED = 1;
+	const OPTIONAL = 2;
 }
 
 /**
