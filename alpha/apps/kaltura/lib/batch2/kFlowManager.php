@@ -347,9 +347,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		if(!($object instanceof flavorAsset))
 			return true;
 		
+		$entry = $object->getentry();
+		
 		if($object->getIsOriginal())
 		{
-			$entry = $object->getentry();
 			if($entry->getType() == entryType::MEDIA_CLIP)
 			{
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
