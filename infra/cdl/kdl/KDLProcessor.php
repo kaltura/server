@@ -48,17 +48,35 @@ include_once("KDLTranscoderCommand.php");
 		{
 			if($mediaSet!=null && $mediaSet->IsDataSet()){
 				$rv=$this->Initialize($mediaSet);
+
 				if($rv==false) {
-					return false;
+					/*
+					 * fix #9599 - handles rm files that fails to extract media info, but still playable by real player -
+					 * simulate video and audio elements, although no source mediainfo is provided
+					 */
+					if($this->_srcDataSet->_container && $this->_srcDataSet->_container->IsFormatOf(array("realmedia"))){
+						$rmSrc = $this->_srcDataSet;
+						$rmSrc->_errors=array();
+						$rmSrc->_video = new KDLVideoData;
+						$rmSrc->_video->_id = $rmSrc->_video->_format = "realvideo";
+						$rmSrc->_audio = new KDLAudioData;
+						$rmSrc->_audio->_id = $rmSrc->_audio->_format = "realaudio";
+						$rmSrc->_warnings[KDLConstants::ContainerIndex][] = // "Product bitrate too low - ".$prdAud->_bitRate."kbps, required - ".$trgAud->_bitRate."kbps.";
+							KDLWarnings::ToString(KDLWarnings::RealMediaMissingContent);
+KalturaLog::log("An invalid source RealMedia file thatfails to provide valid mediaInfodata. Set up a flavor with 'default' params.");
+					}
+					else {
+						return false;
+					}
 				}
 			}
 			if($profile==null)
 				return true;
 
 			$this->GenerateTargetFlavors($profile, $targetList);
-			if(count($this->_srcDataSet->_errors)>0)
+			if(count($this->_srcDataSet->_errors)>0){
 				return false;
-
+			}
 			return true;
 		}
 
