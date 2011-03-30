@@ -16,10 +16,15 @@ KalturaLog::debug(">------------------------------------- syndicationFeedRendere
 KalturaLog::info("syndicationFeedRenderer-start ");
 
 $feedId = $_GET['feedId'];
+$entryId = @$_GET['entryId'];
 try
 {
 	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId);
 	$syndicationFeedRenderer->addFlavorParamsAttachedFilter();
+	
+	if (isset($entryId))
+		$syndicationFeedRenderer->addEntryAttachedFilter($entryId);
+		
 	$syndicationFeedRenderer->execute();
 }
 catch(Exception $ex)
