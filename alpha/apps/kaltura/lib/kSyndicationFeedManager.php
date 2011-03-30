@@ -76,9 +76,8 @@ class kSyndicationFeedManager
 			return null;
 		}
 		
-		$host = myPartnerUtils::getCdnHost($entry->getPartnerId());
 		$uiconfId = ($syndicationFeed->getPlayerUiconfId)? '/ui_conf_id/'.$syndicationFeed->getPlayerUiconfId: '';
-		$playerUrl = 'http://'.$host.
+		$playerUrl = 'http://'.kConf::get('www_host').
 						'/kwidget/wid/_'.$entry->getPartnerId().
 						'/entry_id/'.$entry->getId().$syndicationFeed->getPlayerUiconfId();
 
