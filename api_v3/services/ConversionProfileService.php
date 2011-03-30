@@ -87,6 +87,46 @@ class ConversionProfileService extends KalturaBaseService
 	}
 	
 	/**
+	 * Lists asset parmas of conversion profile by ID
+	 * 
+	 * @action listAssetParams
+	 * @param int $conversionProfileId
+	 * @return KalturaConversionProfileAssetParamsListResponse
+	 */
+	public function listAssetParamsAction($conversionProfileId)
+	{
+		$dbList = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
+		
+		$list = KalturaConversionProfileAssetParamsArray::fromDbArray($dbList);
+		$response = new KalturaConversionProfileAssetParamsListResponse();
+		$response->objects = $list;
+		$response->totalCount = count($list);
+		return $response; 
+	}
+	
+	/**
+	 * Update asset parmas of conversion profile by ID
+	 * 
+	 * @action updateAssetParams
+	 * @param int $conversionProfileId
+	 * @param int $assetParamsId
+	 * @param KalturaConversionProfileAssetParams $conversionProfileAssetParams
+	 * @return KalturaConversionProfileAssetParams
+	 */
+	public function updateAssetParamsAction($conversionProfileId, $assetParamsId, KalturaConversionProfileAssetParams $conversionProfileAssetParams)
+	{
+		$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($assetParamsId, $conversionProfileId);
+		if(!$flavorParamsConversionProfile)
+			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId, $assetParamsId);
+			
+		$conversionProfileAssetParams->toUpdatableObject($flavorParamsConversionProfile);
+		$flavorParamsConversionProfile->save();
+			
+		$conversionProfileAssetParams->fromObject($flavorParamsConversionProfile);
+		return $conversionProfileAssetParams;
+	}
+	
+	/**
 	 * Update Conversion Profile by ID
 	 * 
 	 * @action update
