@@ -416,6 +416,16 @@ class MediaService extends KalturaEntryService
     protected function attachEntryResource(KalturaEntryResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
     	$resource->validatePropertyNotNull('entryId');
+    
+    	$srcEntry = entryPeer::retrieveByPK($resource->entryId);
+		if (!$srcEntry || $srcEntry->getType() != entryType::MEDIA_CLIP || $srcEntry->getMediaType() != $dbEntry->getMediaType())
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $resource->entryId);
+    	
+    	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+    	{
+			$srcSyncKey = $srcEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			return $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+    	}
     	
     	$srcFlavorAsset = null;
     	assetPeer::resetInstanceCriteriaFilter();
