@@ -300,6 +300,7 @@
 		const ChangingFormt=2116;
 		const RemovingMultilineTranscoding=2117;
 		const MissingTranscoderEngine=2118;
+		const RealMediaMissingContent=2119;
 		const Other = 2500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
@@ -377,6 +378,9 @@
 					break;
 				case self::MissingTranscoderEngine:
 					$str = "$err,$param1#The transcoding engine ($param1) is missing.";
+					break;
+				case self::RealMediaMissingContent:
+					$str = $err."#The source file is an outdated RM file.No valid media info.";
 					break;
 				case self::Other:
 				default:
