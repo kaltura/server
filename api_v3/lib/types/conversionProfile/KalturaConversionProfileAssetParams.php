@@ -22,12 +22,6 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 	 * @filter eq,in
 	 */
 	public $assetParamsId;
-	
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $partnerId;
 
 	/**
 	 * The ingestion origin of the asset params
@@ -48,8 +42,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 	private static $map_between_objects = array
 	(
 		'conversionProfileId',
-		'assetParamsId',
-		'partnerId',
+		'assetParamsId' => 'flavorParamsId',
 		'readyBehavior',
 		'origin',
 	);
