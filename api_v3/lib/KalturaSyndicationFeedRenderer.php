@@ -131,6 +131,16 @@ class KalturaSyndicationFeedRenderer
 		$entryFilter->attachToCriteria($this->baseCriteria);
 	}
 	
+	public function addEntryAttachedFilter($entryId)
+	{
+		if($this->executed)
+			return;
+		
+		$entryFilter = new entryFilter();
+		$entryFilter->setIdEquel($entryId);		
+		$this->addFilter($entryFilter);
+	}
+	
 	public function addFilter(entryFilter $entryFilter)
 	{
 		if($this->executed)
