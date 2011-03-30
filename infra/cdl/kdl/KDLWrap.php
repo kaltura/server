@@ -101,11 +101,12 @@ class KDLWrap
 		KDLWrap::ConvertMediainfoCdl2Mediadataset($cdlProductMediaInfo, $kdlProduct);
 		$kdlTarget = KDLWrap::ConvertFlavorCdl2Kdl($cdlTarget);
 		$kdlSource = new KDLFlavor();
-		if($cdlSourceMediaInfo)
+		// Do not run product validation when the source is undefined
+		// in most cases - ForceCommand case
+		if($cdlSourceMediaInfo){
 			KDLWrap::ConvertMediainfoCdl2Mediadataset($cdlSourceMediaInfo, $kdlSource);
-		
-		$kdlTarget->ValidateProduct($kdlSource, $kdlProduct);
-
+			$kdlTarget->ValidateProduct($kdlSource, $kdlProduct);
+		}
 		$product = KDLWrap::ConvertFlavorKdl2Cdl($kdlProduct);
 		return $product;
 	}
