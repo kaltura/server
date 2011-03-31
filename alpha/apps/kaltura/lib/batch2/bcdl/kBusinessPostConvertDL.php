@@ -2,22 +2,26 @@
 
 class kBusinessPostConvertDL
 {
-	public static function getReadyBehavior(flavorAsset $flavorAsset)
+	public static function getReadyBehavior(flavorAsset $flavorAsset, conversionProfile2 $profile = null)
 	{
 		if($flavorAsset->getIsOriginal())
 		{
-			try{
-				$profile = myPartnerUtils::getConversionProfile2ForEntry($flavorAsset->getEntryId());
-				if($profile)
+			if(!$profile)
+			{
+				try{
+					$profile = myPartnerUtils::getConversionProfile2ForEntry($flavorAsset->getEntryId());
+				}
+				catch(Exception $e)
 				{
-					$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorAsset->getFlavorParamsId(), $profile->getId());
-					if($flavorParamsConversionProfile)
-						return $flavorParamsConversionProfile->getReadyBehavior();
+					KalturaLog::err($e->getMessage());
 				}
 			}
-			catch(Exception $e)
+		
+			if($profile)
 			{
-				KalturaLog::err('getConversionProfile2ForEntry Error: ' . $e->getMessage());
+				$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavorAsset->getFlavorParamsId(), $profile->getId());
+				if($flavorParamsConversionProfile)
+					return $flavorParamsConversionProfile->getReadyBehavior();
 			}
 		}
 		
@@ -104,7 +108,16 @@ class kBusinessPostConvertDL
 	 */
 	public static function handleConvertFinished(BatchJob $dbBatchJob, flavorAsset $currentFlavorAsset)
 	{
-		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset);
+		$profile = null;
+		try{
+			$profile = myPartnerUtils::getConversionProfile2ForEntry($currentFlavorAsset->getEntryId());
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+		}
+		
+		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		
@@ -140,12 +153,33 @@ class kBusinessPostConvertDL
 			return $dbBatchJob;
 		}
 		
-		// go over all the conversion jobs in the context
+		$inheritedFlavorParamsIds = array();
+		$requiredFlavorParamsIds = array();
+		$flavorParamsConversionProfileItems = flavorParamsConversionProfilePeer::retrieveByConversionProfile($profile->getId());
+		foreach($flavorParamsConversionProfileItems as $flavorParamsConversionProfile)
+		{
+			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
+				$requiredFlavorParamsIds[$flavorParamsConversionProfile->getFlavorParamsId()] = true;
+			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS)
+				$inheritedFlavorParamsIds[] = $flavorParamsConversionProfile->getFlavorParamsId();
+		}
+		$flavorParamsItems = flavorParamsPeer::retrieveByPKs($inheritedFlavorParamsIds);
+		foreach($flavorParamsItems as $flavorParams)
+		{
+			if($flavorParams->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
+				$requiredFlavorParamsIds[$flavorParamsConversionProfile->getFlavorParamsId()] = true;			
+		}
+		
+		
+		// go over all the flavor assets of the entry
 		$hasInComplte = false;
 		$hasInComplteRequired = false;
 		$siblingFlavorAssets = flavorAssetPeer::retrieveByEntryId($dbBatchJob->getEntryId());
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
 		{
+			if(isset($requiredFlavorParamsIds[$siblingFlavorAsset->getId()]))
+				unset($requiredFlavorParamsIds[$siblingFlavorAsset->getId()]);
+				
 			if($siblingFlavorAsset->getId() == $currentFlavorAsset->getId())
 				continue;
 			
@@ -153,7 +187,7 @@ class kBusinessPostConvertDL
 			if($siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				continue;
 				
-			$readyBehavior = self::getReadyBehavior($siblingFlavorAsset);
+			$readyBehavior = self::getReadyBehavior($siblingFlavorAsset, $profile);
 			
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
 				continue;
@@ -169,6 +203,9 @@ class kBusinessPostConvertDL
 				$hasInComplteRequired = true;
 		}
 				
+		if(count($requiredFlavorParamsIds))
+			$hasInComplteRequired = true;
+			
 		if($hasInComplteRequired)
 		{
 			KalturaLog::debug('Convert Finished - has In-Complte Required jobs');
