@@ -243,10 +243,17 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if(class_exists('AnnotationPlugin') && !is_null($this->enableAnnotation))
 			$object_to_fill->setPluginEnabled(AnnotationPlugin::getPluginName(), $this->enableAnnotation);
 						
-		$object_to_fill->setEnabledService($this->enableMobileFlavors, PermissionName::FEATURE_MOBILE_FLAVORS);
-		$object_to_fill->setEnabledService($this->enablePs2PermissionValidation, PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
-		$object_to_fill->setEnabledService($this->enableEntryReplacement, PermissionName::FEATURE_ENTRY_REPLACEMENT);
-		$object_to_fill->setEnabledService($this->enableEntryReplacementApproval, PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL);
+		if(!is_null($this->enableMobileFlavors))
+			$object_to_fill->setEnabledService($this->enableMobileFlavors, PermissionName::FEATURE_MOBILE_FLAVORS);
+			
+		if(!is_null($this->enablePs2PermissionValidation))
+			$object_to_fill->setEnabledService($this->enablePs2PermissionValidation, PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
+			
+		if(!is_null($this->enableEntryReplacement))
+			$object_to_fill->setEnabledService($this->enableEntryReplacement, PermissionName::FEATURE_ENTRY_REPLACEMENT);
+			
+		if(!is_null($this->enableEntryReplacementApproval))
+			$object_to_fill->setEnabledService($this->enableEntryReplacementApproval, PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL);
 		
 		return $object_to_fill;
 	}
