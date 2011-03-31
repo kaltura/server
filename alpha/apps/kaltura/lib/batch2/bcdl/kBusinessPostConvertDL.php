@@ -204,11 +204,14 @@ class kBusinessPostConvertDL
 		}
 				
 		if(count($requiredFlavorParamsIds))
+		{
 			$hasInComplteRequired = true;
+			$hasInComplte = true;
+		}
 			
 		if($hasInComplteRequired)
 		{
-			KalturaLog::debug('Convert Finished - has In-Complte Required jobs');
+			KalturaLog::debug('Convert Finished - has In-Compelte Required jobs');
 		} 
 		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
@@ -232,7 +235,7 @@ class kBusinessPostConvertDL
 		
 		if($hasInComplte)
 		{
-			KalturaLog::debug('Convert Finished - has In-Complte jobs');
+			KalturaLog::debug('Convert Finished - has In-Complete jobs');
 		}
 		else //if(!$currentFlavorAsset->getIsOriginal())
 		{
