@@ -313,6 +313,11 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"accessControlId",
 	 	"startDate",
 	 	"endDate",
+	 	"referenceId",
+		"replacingEntryId",
+		"replacedEntryId",
+		"replacementStatus",
+		"partnerSortValue",
 	 	"categories",
 	 	"categoriesIds",
 	 );
