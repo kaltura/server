@@ -50,6 +50,10 @@ class PermissionService extends KalturaBaseService
 	{
 		$permission->validateForInsert();
 		$permission->validatePropertyNotNull('name');
+		
+		if (strpos($permission->name, ',') !== false) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'name');
+		}
 
 		if (!$permission->friendlyName) {
 			$permission->friendlyName = $permission->name;
@@ -133,6 +137,10 @@ class PermissionService extends KalturaBaseService
 		
 		if ($permission->name && $permission->name != $permissionName)
 		{
+			if (strpos($permission->name, ',') !== false) {
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'name');
+			}
+			
 			$existingPermission = PermissionPeer::getByNameAndPartner($permission->name, array($dbPermission->getPartnerId(), PartnerPeer::GLOBAL_PARTNER));
 			if ($existingPermission)
 			{
