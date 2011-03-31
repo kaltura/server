@@ -205,6 +205,8 @@ class UiConfService extends KalturaBaseService
 	 */		
 	function listAction( KalturaUiConfFilter $filter = null , KalturaFilterPager $pager = null)
 	{
+	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
+	    
 		if (!$filter)
 			$filter = new KalturaUiConfFilter;
 		$uiConfFilter = new uiConfFilter ();
