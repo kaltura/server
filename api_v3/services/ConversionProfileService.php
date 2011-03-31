@@ -27,6 +27,31 @@ class ConversionProfileService extends KalturaBaseService
 	}
 	
 	/**
+	 * Set Conversion Profile to be the partner default
+	 * 
+	 * @action setAsDefault
+	 * @param int $id
+	 * @return KalturaConversionProfile
+	 */
+	public function setAsDefaultAction($id)
+	{
+		$conversionProfileDb = conversionProfile2Peer::retrieveByPK($id);
+		if (!$conversionProfileDb || $conversionProfileDb->getPartnerId() != $this->getPartnerId())
+			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $id);
+			
+		$partner = $this->getPartner();
+		$partner->setDefaultConversionProfileId($id);
+		$partner->save();
+		PartnerPeer::removePartnerFromCache($partner->getId());
+		
+		$conversionProfile = new KalturaConversionProfile();
+		$conversionProfile->fromObject($conversionProfileDb);
+		$conversionProfile->loadFlavorParamsIds($conversionProfileDb);
+		
+		return $conversionProfile;
+	}
+	
+	/**
 	 * Add new Conversion Profile
 	 * 
 	 * @action add

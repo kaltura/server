@@ -82,11 +82,19 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	public $flavorParamsIds;
 	
 	/**
-	 * True if this Conversion Profile is the default
+	 * Indicates that this conversion profile is system default
 	 *  
 	 * @var KalturaNullableBoolean
 	 */
 	public $isDefault;
+	
+	/**
+	 * Indicates that this conversion profile is partner default
+	 * 
+	 * @var bool
+	 * @readonly
+	 */
+	public $isPartnerDefault;
 	
 	/**
 	 * Cropping dimensions
@@ -156,6 +164,14 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		
 		$this->cropDimensions = new KalturaCropDimensions();
 		$this->cropDimensions->fromObject($sourceObject);
+		
+		$this->isPartnerDefault = false;
+		if($this->partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($this->partnerId);
+			if($partner && $this->id == $partner->getDefaultConversionProfileId())
+				$this->isPartnerDefault = true;
+		}
 	}
 	
 	public function toObject($objectToFill = null , $propsToSkip = array())
