@@ -364,6 +364,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
 			$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 			$syncKey = $object->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			
+			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+			if($fileSync)
+				return true;
+				
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($srcFileSyncLocalPath)
 				kJobsManager::addPostConvertJob($raisedJob, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, true, $offset);
@@ -399,6 +404,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
 			$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 			$syncKey = $object->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			
+			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+			if($fileSync)
+				return true;
+				
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($srcFileSyncLocalPath)
 				kJobsManager::addPostConvertJob(null, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, true, $offset);
