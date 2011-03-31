@@ -262,14 +262,19 @@ class ConversionProfileService extends KalturaBaseService
 	 * Delete the relation of flavorParams <> conversionProfile2
 	 * 
 	 * @param conversionProfile2 $conversionProfileDb
-	 * @param string $notInFlavorIds comma sepeartaed id that should not be deleted
+	 * @param string|array $notInFlavorIds comma sepeartaed id that should not be deleted
 	 */
 	protected function deleteFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $notInFlavorIds = null)
 	{
 		$c = new Criteria();
 		$c->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfileDb->getId());
 		if($notInFlavorIds)
+		{
+			if(!is_array($notInFlavorIds))
+				$notInFlavorIds = explode(',', $notInFlavorIds);
+				
 			$c->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, $notInFlavorIds, Criteria::NOT_IN);
+		}
 			
 		flavorParamsConversionProfilePeer::doDelete($c);
 	}
