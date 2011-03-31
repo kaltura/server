@@ -366,7 +366,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$syncKey = $object->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			
 			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
-			if($fileSync)
+			if(!$fileSync)
 				return true;
 				
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
@@ -406,7 +406,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			$syncKey = $object->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			
 			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
-			if($fileSync)
+			if(!$fileSync)
 				return true;
 				
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
