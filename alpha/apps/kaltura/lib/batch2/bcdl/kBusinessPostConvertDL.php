@@ -172,13 +172,12 @@ class kBusinessPostConvertDL
 		
 		
 		// go over all the flavor assets of the entry
-		$hasInComplte = false;
-		$hasInComplteRequired = false;
+		$inCompleteFlavorIds = false;
 		$siblingFlavorAssets = flavorAssetPeer::retrieveByEntryId($dbBatchJob->getEntryId());
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
 		{
-			if(isset($requiredFlavorParamsIds[$siblingFlavorAsset->getId()]))
-				unset($requiredFlavorParamsIds[$siblingFlavorAsset->getId()]);
+			if(isset($requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()]))
+				unset($requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()]);
 				
 			if($siblingFlavorAsset->getId() == $currentFlavorAsset->getId())
 				continue;
@@ -197,21 +196,19 @@ class kBusinessPostConvertDL
 				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING 
 				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING 
 				||	$siblingFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
-				$hasInComplte = true;
+				$inCompleteFlavorIds[] = $siblingFlavorAsset->getFlavorParamsId();
 			
 			if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
-				$hasInComplteRequired = true;
+				$requiredFlavorParamsIds[$siblingFlavorAsset->getFlavorParamsId()] = true;
 		}
 				
 		if(count($requiredFlavorParamsIds))
 		{
-			$hasInComplteRequired = true;
-			$hasInComplte = true;
-		}
-			
-		if($hasInComplteRequired)
-		{
-			KalturaLog::debug('Convert Finished - has In-Compelte Required jobs');
+			$inCompleteRequiredFlavorParamsIds = array_keys($requiredFlavorParamsIds);
+			foreach($inCompleteRequiredFlavorParamsIds as $inCompleteFlavorId)
+				$inCompleteFlavorIds[] = $inCompleteFlavorId;
+				
+			KalturaLog::debug('Convert Finished - has In-Compelte Required flavors [[' . print_r($inCompleteRequiredFlavorParamsIds, true) . ']');
 		} 
 		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
@@ -233,9 +230,9 @@ class kBusinessPostConvertDL
 			return $dbBatchJob;
 		}
 		
-		if($hasInComplte)
+		if(count($inCompleteFlavorIds))
 		{
-			KalturaLog::debug('Convert Finished - has In-Complete jobs');
+			KalturaLog::debug('Convert Finished - has In-Complete flavors [' . print_r($inCompleteFlavorIds, true) . ']');
 		}
 		else //if(!$currentFlavorAsset->getIsOriginal())
 		{
