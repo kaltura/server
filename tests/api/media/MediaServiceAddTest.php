@@ -24,7 +24,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaMediaEntry $entry, KalturaResource $resource, KalturaMediaEntry $reference)
+	public function testAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference = null)
 	{
 		$entry->categories = self::getCategory();
 		
