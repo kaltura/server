@@ -199,7 +199,7 @@ class MediaService extends KalturaEntryService
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
 			{
-				kFileSyncUtils::moveFromFile($entryFullPath, $syncKey);
+				kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
 			}
 			catch (Exception $e) {
 				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
