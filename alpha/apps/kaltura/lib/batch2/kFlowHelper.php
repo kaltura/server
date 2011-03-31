@@ -975,6 +975,19 @@ class kFlowHelper
 	 */
 	public static function generateThumbnailsFromFlavor($entryId, BatchJob $parentJob = null, $srcParamsId = null)
 	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if(!$entry)
+		{
+			KalturaLog::notice("Entry id [$entryId] not found");
+			return;
+		}
+		
+		if($entry->getType() != entryType::MEDIA_CLIP || $entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
+		{
+			KalturaLog::notice("Cupture thumbnail is not supported for entry [$entryId] of type [" . $entry->getType() . "] and media type [" . $entry->getMediaType() . "]");
+			return;
+		}
+			
 		$profile = null;
 		try
 		{
@@ -988,13 +1001,6 @@ class kFlowHelper
 		if(!$profile)
 		{
 			KalturaLog::notice("Profile not found for entry id [$entryId]");
-			return;
-		}
-			
-		$entry = entryPeer::retrieveByPK($entryId);
-		if(!$entry)
-		{
-			KalturaLog::notice("Entry id [$entryId] not found");
 			return;
 		}
 			
