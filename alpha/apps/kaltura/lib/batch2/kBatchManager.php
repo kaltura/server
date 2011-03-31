@@ -272,7 +272,7 @@ class kBatchManager
 		$c->add(BatchJobPeer::FINISH_TIME, time()-600, Criteria::LESS_THAN); 
 		
 		// MUST be the master DB
-		$jobs = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		$jobs = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER));
 		foreach($jobs as $job)
 		{
 			KalturaLog::log("Cleaning job id[" . $job->getId() . "]");
