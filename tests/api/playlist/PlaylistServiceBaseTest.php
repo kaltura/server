@@ -3,7 +3,7 @@
 /**
  * playlist service base test case.
  */
-abstract class PlaylistServiceBaseTest extends KalturaApiUnitTestCase
+abstract class PlaylistServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests playlist->add action

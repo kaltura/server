@@ -3,7 +3,7 @@
 /**
  * user service base test case.
  */
-abstract class UserServiceBaseTest extends KalturaApiUnitTestCase
+abstract class UserServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests user->add action

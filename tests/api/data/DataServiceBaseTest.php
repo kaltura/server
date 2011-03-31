@@ -3,7 +3,7 @@
 /**
  * data service base test case.
  */
-abstract class DataServiceBaseTest extends KalturaApiUnitTestCase
+abstract class DataServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests data->add action

@@ -3,7 +3,7 @@
 /**
  * mixing service base test case.
  */
-abstract class MixingServiceBaseTest extends KalturaApiUnitTestCase
+abstract class MixingServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests mixing->add action

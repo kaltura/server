@@ -3,7 +3,7 @@
 /**
  * stats service base test case.
  */
-abstract class StatsServiceBaseTest extends KalturaApiUnitTestCase
+abstract class StatsServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Called when all tests are done

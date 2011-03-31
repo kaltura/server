@@ -3,7 +3,7 @@
 /**
  * notification service base test case.
  */
-abstract class NotificationServiceBaseTest extends KalturaApiUnitTestCase
+abstract class NotificationServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Called when all tests are done

@@ -3,7 +3,7 @@
 /**
  * search service base test case.
  */
-abstract class SearchServiceBaseTest extends KalturaApiUnitTestCase
+abstract class SearchServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Called when all tests are done

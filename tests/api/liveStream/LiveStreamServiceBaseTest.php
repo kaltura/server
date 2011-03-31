@@ -3,7 +3,7 @@
 /**
  * liveStream service base test case.
  */
-abstract class LiveStreamServiceBaseTest extends KalturaApiUnitTestCase
+abstract class LiveStreamServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests liveStream->add action

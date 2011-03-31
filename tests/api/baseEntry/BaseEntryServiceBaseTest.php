@@ -3,7 +3,7 @@
 /**
  * baseEntry service base test case.
  */
-abstract class BaseEntryServiceBaseTest extends KalturaApiUnitTestCase
+abstract class BaseEntryServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests baseEntry->add action

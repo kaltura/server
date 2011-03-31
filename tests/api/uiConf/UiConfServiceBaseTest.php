@@ -3,7 +3,7 @@
 /**
  * uiConf service base test case.
  */
-abstract class UiConfServiceBaseTest extends KalturaApiUnitTestCase
+abstract class UiConfServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests uiConf->add action

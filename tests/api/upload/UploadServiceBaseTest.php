@@ -3,7 +3,7 @@
 /**
  * upload service base test case.
  */
-abstract class UploadServiceBaseTest extends KalturaApiUnitTestCase
+abstract class UploadServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Called when all tests are done

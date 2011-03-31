@@ -3,7 +3,7 @@
 /**
  * flavorParams service base test case.
  */
-abstract class FlavorParamsServiceBaseTest extends KalturaApiUnitTestCase
+abstract class FlavorParamsServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests flavorParams->add action

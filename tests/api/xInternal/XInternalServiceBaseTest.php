@@ -3,7 +3,7 @@
 /**
  * xInternal service base test case.
  */
-abstract class XInternalServiceBaseTest extends KalturaApiUnitTestCase
+abstract class XInternalServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Called when all tests are done

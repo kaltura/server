@@ -3,7 +3,7 @@
 /**
  * thumbAsset service base test case.
  */
-abstract class ThumbAssetServiceBaseTest extends KalturaApiUnitTestCase
+abstract class ThumbAssetServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests thumbAsset->get action

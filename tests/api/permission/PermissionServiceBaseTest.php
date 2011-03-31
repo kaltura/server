@@ -3,7 +3,7 @@
 /**
  * permission service base test case.
  */
-abstract class PermissionServiceBaseTest extends KalturaApiUnitTestCase
+abstract class PermissionServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests permission->add action

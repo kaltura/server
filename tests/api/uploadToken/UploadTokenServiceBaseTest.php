@@ -3,7 +3,7 @@
 /**
  * uploadToken service base test case.
  */
-abstract class UploadTokenServiceBaseTest extends KalturaApiUnitTestCase
+abstract class UploadTokenServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests uploadToken->add action

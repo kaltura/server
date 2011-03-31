@@ -3,7 +3,7 @@
 /**
  * report service base test case.
  */
-abstract class ReportServiceBaseTest extends KalturaApiUnitTestCase
+abstract class ReportServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Called when all tests are done

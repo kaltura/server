@@ -3,7 +3,7 @@
 /**
  * accessControl service base test case.
  */
-abstract class AccessControlServiceBaseTest extends KalturaApiUnitTestCase
+abstract class AccessControlServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests accessControl->add action

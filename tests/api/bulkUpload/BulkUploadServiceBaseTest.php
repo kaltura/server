@@ -3,7 +3,7 @@
 /**
  * bulkUpload service base test case.
  */
-abstract class BulkUploadServiceBaseTest extends KalturaApiUnitTestCase
+abstract class BulkUploadServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests bulkUpload->add action

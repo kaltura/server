@@ -3,7 +3,7 @@
 /**
  * category service base test case.
  */
-abstract class CategoryServiceBaseTest extends KalturaApiUnitTestCase
+abstract class CategoryServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests category->add action

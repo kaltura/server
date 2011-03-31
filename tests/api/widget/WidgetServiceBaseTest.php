@@ -3,7 +3,7 @@
 /**
  * widget service base test case.
  */
-abstract class WidgetServiceBaseTest extends KalturaApiUnitTestCase
+abstract class WidgetServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests widget->add action

@@ -3,7 +3,7 @@
 /**
  * syndicationFeed service base test case.
  */
-abstract class SyndicationFeedServiceBaseTest extends KalturaApiUnitTestCase
+abstract class SyndicationFeedServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests syndicationFeed->add action

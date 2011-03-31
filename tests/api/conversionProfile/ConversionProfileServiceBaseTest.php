@@ -3,7 +3,7 @@
 /**
  * conversionProfile service base test case.
  */
-abstract class ConversionProfileServiceBaseTest extends KalturaApiUnitTestCase
+abstract class ConversionProfileServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests conversionProfile->add action

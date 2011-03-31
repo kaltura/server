@@ -3,7 +3,7 @@
 /**
  * EmailIngestionProfile service base test case.
  */
-abstract class EmailIngestionProfileServiceBaseTest extends KalturaApiUnitTestCase
+abstract class EmailIngestionProfileServiceBaseTest extends KalturaApiTestCase
 {
 	/**
 	 * Tests EmailIngestionProfile->add action
