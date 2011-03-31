@@ -240,7 +240,7 @@ class ConversionProfileService extends KalturaBaseService
 	 */
 	protected function addFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $flavorParamsIds)
 	{
-		$existingIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
+		$existingIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileDb->getId());
 		
 		assetParamsPeer::resetInstanceCriteriaFilter();
 		$assetParamsObjects = assetParamsPeer::retrieveByPKs($flavorParamsIds);
