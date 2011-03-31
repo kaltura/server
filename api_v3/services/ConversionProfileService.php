@@ -156,7 +156,7 @@ class ConversionProfileService extends KalturaBaseService
 		
 		if ($conversionProfile->flavorParamsIds !== null) 
 		{
-			$this->deleteFlavorParamsRelation($conversionProfileDb);
+			$this->deleteFlavorParamsRelation($conversionProfileDb, $conversionProfile->flavorParamsIds);
 			$this->addFlavorParamsRelation($conversionProfileDb, $conversionProfile->getFlavorParamsAsArray());
 		}
 		
@@ -240,10 +240,15 @@ class ConversionProfileService extends KalturaBaseService
 	 */
 	protected function addFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $flavorParamsIds)
 	{
+		$existingIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
+		
 		assetParamsPeer::resetInstanceCriteriaFilter();
 		$assetParamsObjects = assetParamsPeer::retrieveByPKs($flavorParamsIds);
 		foreach($assetParamsObjects as $assetParams)
 		{
+			if(in_array($assetParams->getId(), $existingIds))
+				continue;
+				
 			$fpc = new flavorParamsConversionProfile();
 			$fpc->setConversionProfileId($conversionProfileDb->getId());
 			$fpc->setFlavorParamsId($assetParams->getId());
@@ -257,11 +262,15 @@ class ConversionProfileService extends KalturaBaseService
 	 * Delete the relation of flavorParams <> conversionProfile2
 	 * 
 	 * @param conversionProfile2 $conversionProfileDb
+	 * @param string $notInFlavorIds comma sepeartaed id that should not be deleted
 	 */
-	protected function deleteFlavorParamsRelation(conversionProfile2 $conversionProfileDb)
+	protected function deleteFlavorParamsRelation(conversionProfile2 $conversionProfileDb, $notInFlavorIds = null)
 	{
 		$c = new Criteria();
 		$c->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfileDb->getId());
+		if($notInFlavorIds)
+			$c->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, $notInFlavorIds, Criteria::NOT_IN);
+			
 		flavorParamsConversionProfilePeer::doDelete($c);
 	}
 }
