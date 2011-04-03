@@ -45,6 +45,412 @@ class FlavorAssetService extends KalturaBaseService
 //			return false;
 //	}
 	
+
+    /**
+     * Add flavor asset
+     *
+     * @action add
+     * @param string $entryId
+     * @param KalturaFlavorAsset $flavorAsset
+     * @param KalturaContentResource $contentResource
+     * @return KalturaFlavorAsset
+     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @throws KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+     */
+    function addAction($entryId, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource)
+    {
+    	$dbEntry = entryPeer::retrieveByPK($entryId);
+    	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+    		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+    	
+    	if($flavorAsset->flavorParamsId)
+    	{
+    		$dbFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavorAsset->flavorParamsId);
+    		if($dbFlavorAsset)
+    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS, $dbFlavorAsset->getId(), $flavorAsset->flavorParamsId);
+    	}
+    	
+    	$dbFlavorAsset = new flavorAsset();
+    	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
+    	
+    	$this->attachContentResource($dbFlavorAsset, $contentResource);
+		
+		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbFlavorAsset->save();	
+    	
+		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset->fromObject($dbFlavorAsset);
+		return $flavorAsset;
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param string $fullPath
+	 * @param bool $copyOnly
+	 */
+	protected function attachFile(flavorAsset $flavorAsset, $fullPath, $copyOnly = false)
+	{
+		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+		$flavorAsset->setFileExt($ext);
+		$flavorAsset->save();
+		
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		
+		try {
+			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, $copyOnly);
+		}
+		catch (Exception $e) {
+			$flavorAsset->setDescription($e->getMessage());
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();												
+			throw $e;
+		}
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaUploadedFileTokenResource $contentResource
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 */
+	protected function attachUploadedFileTokenResource(flavorAsset $flavorAsset, KalturaUploadedFileTokenResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('token');
+    	
+		try
+		{
+		    $fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($contentResource->token);
+		}
+		catch(kCoreException $ex)
+		{
+			$flavorAsset->setDescription($ex->getMessage());
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+			
+		    if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
+			    throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
+			    
+		    throw $ex;
+		}
+				
+		if(!file_exists($fullPath))
+		{
+			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($contentResource->token, kDataCenterMgr::getCurrentDcId());
+			if($remoteDCHost)
+			{
+				kFile::dumpApiRequest($remoteDCHost);
+			}
+			else
+			{
+				$flavorAsset->setDescription("Uploaded file token [$contentResource->token] dc not found");
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$flavorAsset->save();
+				
+				throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
+			}
+		}
+		
+		$this->attachFile($flavorAsset, $fullPath);
+		kUploadTokenMgr::closeUploadTokenById($contentResource->token);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaWebcamTokenResource $contentResource
+	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 */
+	protected function attachWebcamTokenResource(flavorAsset $flavorAsset, KalturaWebcamTokenResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('token');
+    	
+	    $content = myContentStorage::getFSContentRootPath();
+	    $fullPath = "{$content}/content/webcam/{$contentResource->token}.flv";
+	    
+		if(!file_exists($fullPath))
+		{
+			$flavorAsset->setDescription("Webcam file token [$contentResource->token] original file [$fullPath] not found");
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+			
+			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
+		}
+					
+		$fixedFullPath = $fullPath . '.fixed.flv';
+ 		KalturaLog::debug("Fix webcam full path from [$fullPath] to [$fixedFullPath]");
+		myFlvStaticHandler::fixRed5WebcamFlv($fullPath, $fixedFullPath);
+				
+		$newFullPath = $fullPath . '.clipped.flv';
+ 		KalturaLog::debug("Clip webcam full path from [$fixedFullPath] to [$newFullPath]");
+		myFlvStaticHandler::clipToNewFile($fixedFullPath, $newFullPath, 0, 0);
+		$fullPath = $newFullPath ;
+			
+		if(!file_exists($fullPath))
+		{
+			$flavorAsset->setDescription("Webcam file token [$contentResource->token] fixed file [$fullPath] not found");
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+			
+			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
+		}
+		
+		$this->attachFile($flavorAsset, $fullPath);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param flavorAsset $srcFlavorAsset
+	 */
+	protected function attachAsset(flavorAsset $flavorAsset, flavorAsset $srcFlavorAsset)
+	{
+		$sourceEntryId = $srcFlavorAsset->getEntryId();
+		
+        $srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+      	
+        $this->attachFileSync($flavorAsset, $srcSyncKey);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaAssetResource $contentResource
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 */
+	protected function attachAssetResource(flavorAsset $flavorAsset, KalturaAssetResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('assetId');
+    	
+		$srcFlavorAsset = flavorAssetPeer::retrieveById($contentResource->assetId);
+		if (!$srcFlavorAsset)
+		{
+			$flavorAsset->setDescription("Source asset [$contentResource->assetId] not found");
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+			
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contentResource->assetId);
+		}
+		
+		$this->attachAsset($flavorAsset, $srcFlavorAsset);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaEntryResource $contentResource
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 */
+	protected function attachEntryResource(flavorAsset $flavorAsset, KalturaEntryResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('entryId');
+    
+    	$srcEntry = entryPeer::retrieveByPK($contentResource->entryId);
+    	if(!$srcEntry || $srcEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($srcEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $contentResource->entryId);
+    	
+    	$srcFlavorAsset = null;
+    	assetPeer::resetInstanceCriteriaFilter();
+    	if(is_null($contentResource->flavorParamsId))
+			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($contentResource->entryId);
+		else
+			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($contentResource->entryId, $contentResource->flavorParamsId);
+
+		if (!$srcFlavorAsset)
+		{
+			$flavorAsset->setDescription("Source asset for entry [$contentResource->entryId] not found");
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+			
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contentResource->assetId);
+		}
+		
+		$this->attachAsset($flavorAsset, $srcFlavorAsset);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param string $url
+	 */
+	protected function attachUrl(flavorAsset $flavorAsset, $url)
+	{
+		kJobsManager::addImportJob(null, $flavorAsset->getEntryId(), $this->getPartnerId(), $url, $flavorAsset);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaUrlResource $contentResource
+	 */
+	protected function attachUrlResource(flavorAsset $flavorAsset, KalturaUrlResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('url');
+    	$this->attachUrl($flavorAsset, $contentResource->url);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaSearchResultsResource $contentResource
+	 */
+	protected function KalturaSearchResultsResource(flavorAsset $flavorAsset, KalturaSearchResultsResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('result');
+     	$contentResource->result->validatePropertyNotNull("searchSource");
+     	
+		if ($contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER_KSHOW ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_KSHOW ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS)
+		{
+			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($contentResource->result->id); 
+			$this->attachAsset($flavorAsset, $srcFlavorAsset);
+		}
+		else
+		{
+			$this->attachUrl($flavorAsset, $contentResource->result->url);
+		}
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaLocalFileResource $contentResource
+	 */
+	protected function attachLocalFileResource(flavorAsset $flavorAsset, KalturaLocalFileResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('localFilePath');
+		$this->attachFile($flavorAsset, $contentResource->localFilePath);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaUploadedFileResource $contentResource
+	 */
+	protected function attachUploadedFileResource(flavorAsset $flavorAsset, KalturaUploadedFileResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('fileData');
+		$ext = pathinfo($contentResource->fileData['name'], PATHINFO_EXTENSION);
+		
+		$uploadPath = $contentResource->fileData['tmp_name'];
+		$tempPath = myContentStorage::getFSUploadsPath() . '/' . uniqid(time()) . '.' . $ext;
+		$moved = kFile::moveFile($uploadPath, $tempPath, true);
+		if(!$moved)
+		{
+			$flavorAsset->setDescription("Could not move file from [$uploadPath] to [$tempPath]");
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+			
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
+		}
+			 
+		return $this->attachFile($flavorAsset, $tempPath);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param FileSyncKey $srcSyncKey
+	 */
+	protected function attachFileSync(flavorAsset $flavorAsset, FileSyncKey $srcSyncKey)
+	{
+        $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaFileSyncResource $contentResource
+	 */
+	protected function attachFileSyncResource(flavorAsset $flavorAsset, KalturaFileSyncResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('fileSyncObjectType');
+    	$contentResource->validatePropertyNotNull('objectSubType');
+    	$contentResource->validatePropertyNotNull('objectId');
+    	
+    	$syncable = kFileSyncObjectManager::retrieveObject($contentResource->fileSyncObjectType, $contentResource->objectId);
+    	$srcSyncKey = $syncable->getSyncKey($contentResource->objectSubType, $contentResource->version);
+    	
+        return $this->attachFileSync($flavorAsset, $srcSyncKey);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaRemoteStorageResource $contentResource
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 */
+	protected function attachRemoteStorageResource(flavorAsset $flavorAsset, KalturaRemoteStorageResource $contentResource)
+	{
+    	$contentResource->validatePropertyNotNull('url');
+    	$contentResource->validatePropertyNotNull('storageProfileId');
+    
+        $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->storageProfileId);
+        if(!$storageProfile)
+        {
+			$flavorAsset->setDescription("Could not move file from [$uploadPath] to [$tempPath]");
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->save();
+			
+        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->storageProfileId);
+        }
+        	
+        $syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->url, $storageProfile);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaContentResource $contentResource
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 */
+	protected function attachContentResource(flavorAsset $flavorAsset, KalturaContentResource $contentResource)
+	{
+    	switch(get_class($contentResource))
+    	{
+			case 'KalturaUploadedFileTokenResource':
+				return $this->attachUploadedFileTokenResource($flavorAsset, $contentResource);
+				
+			case 'KalturaWebcamTokenResource':
+				return $this->attachWebcamTokenResource($flavorAsset, $contentResource);
+				
+			case 'KalturaAssetResource':
+				return $this->attachAssetResource($flavorAsset, $contentResource);
+				
+			case 'KalturaEntryResource':
+				return $this->attachEntryResource($flavorAsset, $contentResource);
+				
+			case 'KalturaUrlResource':
+				return $this->attachUrlResource($flavorAsset, $contentResource);
+				
+			case 'KalturaSearchResultsResource':
+				return $this->attachSearchResultsResource($flavorAsset, $contentResource);
+				
+			case 'KalturaLocalFileResource':
+				return $this->attachLocalFileResource($flavorAsset, $contentResource);
+				
+			case 'KalturaUploadedFileResource':
+				return $this->attachUploadedFileResource($flavorAsset, $contentResource);
+				
+			case 'KalturaFileSyncResource':
+				return $this->attachFileSyncResource($flavorAsset, $contentResource);
+				
+			case 'KalturaRemoteStorageResource':
+				return $this->attachRemoteStorageResource($flavorAsset, $contentResource);
+				
+			case 'KalturaDropFolderFileResource':
+				// TODO after DropFolderFile object creation
+			default:
+				$msg = "Resource of type [" . get_class($contentResource) . "] is not supported";
+				KalturaLog::err($msg);
+				
+				$flavorAsset->setDescription($msg);
+				$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+				$flavorAsset->save();
+				return null;
+    	}
+    }
+    
 	protected function globalPartnerAllowed($actionName)
 	{
 		if ($actionName === 'getFlavorAssetsWithParams') {
