@@ -330,7 +330,10 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
+		{
+			KalturaLog::debug("Creating new entry");
 			$dbObject = new entry();
+		}
 			
 		parent::toObject($dbObject, $skip);
 		

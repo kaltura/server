@@ -25,9 +25,13 @@ class KalturaEntryService extends KalturaBaseService
 		
 		// first copy all the properties to the db entry, then we'll check for security stuff
 		if(!$dbEntry)
+		{
+			KalturaLog::debug("Creating new entry");
 			$dbEntry = new entry();
+		}
 			
 		$dbEntry = $entry->toInsertableObject($dbEntry);
+		KalturaLog::debug("Inserted entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
 
 		$this->checkAndSetValidUser($entry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($entry);
