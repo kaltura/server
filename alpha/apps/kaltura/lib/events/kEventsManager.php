@@ -88,12 +88,10 @@ class kEventsManager
 	public static function raiseEvent(KalturaEvent $event)
 	{
 		$consumerInterface = $event->getConsumerInterface();
-		KalturaLog::debug("Event [" . get_class($event) . "] raised looking for consumers [$consumerInterface]");
 
 		$consumers = self::getConsumers($consumerInterface);
 		foreach($consumers as $consumerClass)
 		{
-//			KalturaLog::debug("Event consumer [$consumerClass] called");
 			$continue = $event->consume(new $consumerClass());
 			
 			if(!$continue)

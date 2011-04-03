@@ -23,6 +23,12 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	{
 		$this->object = $object;
 		$this->modifiedColumns = $modifiedColumns;
+		
+		$additionalLog = '';
+		if(method_exists($object, 'getId'))
+			$additionalLog .= 'id [' . $object->getId() . ']';
+			
+		KalturaLog::debug("Event [" . get_class($this) . "] object type [" . get_class($object) . "] $additionalLog modified columns [" . print_r($modifiedColumns, true) . "]");
 	}
 	
 	public function getConsumerInterface()
@@ -36,6 +42,11 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		$additionalLog = '';
+		if(method_exists($this->object, 'getId'))
+			$additionalLog .= 'id [' . $this->object->getId() . ']';
+			
+		KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer) . ' object type [' . get_class($this->object) . '] ' . $additionalLog);
 		return $consumer->objectChanged($this->object, $this->modifiedColumns);
 	}
 

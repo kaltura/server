@@ -17,6 +17,12 @@ class kObjectCreatedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	public function __construct(BaseObject $object)
 	{
 		$this->object = $object;
+		
+		$additionalLog = '';
+		if(method_exists($object, 'getId'))
+			$additionalLog .= ' id [' . $object->getId() . ']';
+			
+		KalturaLog::debug("Event [" . get_class($this) . "] object type [" . get_class($object) . "]" . $additionalLog);
 	}
 	
 	public function getConsumerInterface()
@@ -30,6 +36,11 @@ class kObjectCreatedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		$additionalLog = '';
+		if(method_exists($this->object, 'getId'))
+			$additionalLog .= 'id [' . $this->object->getId() . ']';
+			
+		KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer) . ' object type [' . get_class($this->object) . '] ' . $additionalLog);
 		return $consumer->objectCreated($this->object);
 	}
 
