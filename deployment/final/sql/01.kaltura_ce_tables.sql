@@ -96,6 +96,7 @@ CREATE TABLE `audit_trail` (
   `server_name` varchar(63) DEFAULT NULL,
   `ip_address` varchar(15) DEFAULT NULL,
   `user_agent` varchar(127) DEFAULT NULL,
+  `client_tag` VARCHAR(127),
   `description` varchar(1023) DEFAULT NULL,
   `error_description` varchar(1023) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1889,6 +1890,14 @@ CREATE TABLE `temp_entry_update` (
   `views` int(11) DEFAULT '0',
   `plays` int(11) DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `temp_updated_kusers_storage_usage`;
+
+CREATE TABLE `temp_updated_kusers_storage_usage` (
+  `kuser_id` INT(11) NOT NULL,
+  `storage_kb` INT(11)
+) ENGINE=MYISAM DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `tmp`;
