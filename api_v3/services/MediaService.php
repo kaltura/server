@@ -55,7 +55,7 @@ class MediaService extends KalturaEntryService
     function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
     	$dbEntry = parent::add($entry, $entry->conversionQuality);
-		KalturaLog::debug("Added entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
+//		KalturaLog::debug("Added entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
     	
     	if(!$resource)
     	{
@@ -67,7 +67,7 @@ class MediaService extends KalturaEntryService
     	}
     	
     	$this->attachResource($resource, $dbEntry);
-		KalturaLog::debug("Attached entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
+//		KalturaLog::debug("Attached entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
     	
 		if(!$dbEntry || !$dbEntry->getId())
 			return null;
@@ -1432,7 +1432,7 @@ class MediaService extends KalturaEntryService
 	{
 		$entry->validatePropertyNotNull("mediaType");
 		
-		$dbEntry = parent::prepareEntryForInsert($entry);
+		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 		
 		if ( $this->getConversionQualityFromRequest() )
 			$dbEntry->setConversionQuality( $this->getConversionQualityFromRequest() );
