@@ -14,7 +14,7 @@ class KalturaDailymotionDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $password;
-		
+
 	/**
 	 * @var int
 	 */

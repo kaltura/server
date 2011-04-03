@@ -37,7 +37,7 @@ class Youtube_apiDistributionPlugin extends KalturaPlugin implements IKalturaPer
 	/**
 	 * @return array<string> list of enum classes names that extend the base enum name
 	 */
-	public static function getEnums($baseEnumName)
+	public static function getEnums($baseEnumName = null)
 	{
 		if($baseEnumName == 'DistributionProviderType')
 			return array('Youtube_apiDistributionProviderType');
