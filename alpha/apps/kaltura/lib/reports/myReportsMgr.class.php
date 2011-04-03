@@ -320,7 +320,7 @@ class myReportsMgr
 		
 		// return URL
 		if ( ! file_exists (dirname ( $file_name ) ))
-			@mkdir( dirname ( $file_name ) , 0777 );
+			kFile::fullMkfileDir( dirname ( $file_name ) , 0777 );
 		file_put_contents( $file_name , $data );
 		
 		return $url;
@@ -345,7 +345,7 @@ class myReportsMgr
 		$folderPath = "/content/reports/$partner_id";
 		$fullPath = myContentStorage::getFSContentRootPath() .  $folderPath;
 		if(!file_exists($fullPath))
-			mkdir($fullPath, 0777, true);
+			kFile::fullMkfileDir($fullPath, 0777, true);
 			
 		$fileName = "{$file_name}_{$time_suffix}";
 		$url = requestUtils::getHost() . "$folderPath/$fileName";

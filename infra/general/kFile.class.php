@@ -292,43 +292,38 @@ class kFile
 		return $res;
 	}
 	
-	public static function fullMkdir($path, $rights = 0777)
+	/**
+	 * 
+	 * creates a dirctory using the specified path
+	 * @param unknown_type $path
+	 * @param unknown_type $rights
+	 * @param unknown_type $recursive
+	 */
+	public static function fullMkfileDir ($path, $rights = 0777, $recursive = true)
 	{
-		if(file_exists(dirname($path)))
-			return true;
+		KalturaLog::debug("attempt to create: " . $path);
 		
-		return @mkdir(dirname($path), $rights, true);
-	
-		//		Remarked by Tan-Tan Feb 2010
-	//
-	//		$folder_path = array(strstr($path, '.') ? dirname($path) : $path);
-	//		$folder_path = str_replace( "\\" , "/" , $folder_path);
-	//		while(!@is_dir(dirname(end($folder_path)))
-	//		&& dirname(end($folder_path)) != '/'
-	//		&& dirname(end($folder_path)) != '.'
-	//		&& dirname(end($folder_path)) != '')
-	//		array_push($folder_path, dirname(end($folder_path)));
-	//
-	//		while($parent_folder_path = array_pop($folder_path))
-	//		{
-	//			if ( ! file_exists( $parent_folder_path ))
-	//			{
-	//				if(!@mkdir($parent_folder_path, $rights))
-	//				{
-	//					//user_error("Can't create folder \"$parent_folder_path\".");
-	//				}
-	//				else
-	//				{
-	//					@chmod($parent_folder_path, $rights);
-	//				}
-	//			}
-	//			else
-	//			{
-	//				@chmod($parent_folder_path, $rights);
-	//			}
-	//		}
+		if(file_exists($path))
+			return true;
+			
+		$oldUmask = umask(00);
+		$result = @mkdir($path, $rights, $recursive);
+		umask($oldUmask);
+		return $result;
 	}
-
+	
+	/**
+	 * 
+	 * creates a dirctory using the dirname of the specified path
+	 * @param unknown_type $path
+	 * @param unknown_type $rights
+	 * @param unknown_type $recursive
+	 */
+	public static function fullMkdir($path, $rights = 0777, $recursive = true)
+	{
+		return self::fullMkfile(dirname($path), $rights, $recursive);
+	}
+	
 	private static function rename_wrap($src, $trg)
 	{
 //	KalturaLog::log("before rename");

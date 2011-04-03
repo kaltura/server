@@ -20,7 +20,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		{
 			$this->tempXmlPath = $taskConfig->params->tempXmlPath;
 			if(!is_dir($this->tempXmlPath))
-				mkdir($this->tempXmlPath, 0777, true);
+				kFile::fullMkfileDir($this->tempXmlPath, 0777, true);
 		}
 		else
 		{
