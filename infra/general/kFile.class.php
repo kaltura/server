@@ -321,7 +321,7 @@ class kFile
 	 */
 	public static function fullMkdir($path, $rights = 0777, $recursive = true)
 	{
-		return self::fullMkfile(dirname($path), $rights, $recursive);
+		return self::fullMkfileDir(dirname($path), $rights, $recursive);
 	}
 	
 	private static function rename_wrap($src, $trg)
