@@ -300,9 +300,7 @@ class kFile
 	 * @param unknown_type $recursive
 	 */
 	public static function fullMkfileDir ($path, $rights = 0777, $recursive = true)
-	{
-		KalturaLog::debug("attempt to create: " . $path);
-		
+	{		
 		if(file_exists($path))
 			return true;
 			
