@@ -36,7 +36,7 @@ class MediaService extends KalturaEntryService
 
 	
     /**
-     * Generic add entry, should be used when the uploaded entry type is not known
+     * Add entry
      *
      * @action add
      * @param KalturaMediaEntry $entry
@@ -54,7 +54,7 @@ class MediaService extends KalturaEntryService
      */
     function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
-    	$dbEntry = parent::add($entry);
+    	$dbEntry = parent::add($entry, $entry->conversionQuality);
     	
     	if(!$resource)
     	{
@@ -70,7 +70,6 @@ class MediaService extends KalturaEntryService
 		if(!$dbEntry || !$dbEntry->getId())
 			return null;
 			
-//    	$this->convert($dbEntry->getId());
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 		
 		$entry = new KalturaMediaEntry();
