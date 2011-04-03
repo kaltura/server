@@ -182,11 +182,11 @@ class kBusinessPostConvertDL
 		
 		
 		// go over all the flavor assets of the entry
-		$inCompleteFlavorIds = false;
+		$inCompleteFlavorIds = array();
 		$siblingFlavorAssets = flavorAssetPeer::retrieveByEntryId($dbBatchJob->getEntryId());
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
 		{
-			KalturaLog::debug("unset required sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] flavor params id [" . $siblingFlavorAsset->getFlavorParamsId() . "]");
+			KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] flavor params id [" . $siblingFlavorAsset->getFlavorParamsId() . "]");
 				
 			if($siblingFlavorAsset->getId() == $currentFlavorAsset->getId())
 			{
