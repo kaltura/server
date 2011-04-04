@@ -279,7 +279,7 @@ class kBusinessPostConvertDL
 			$allDone = true;
 			foreach($childJobs as $childJob)
 			{
-				if($childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+				if($childJob->getId() != $rootBatchJob->getId() && $childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 				{
 					KalturaLog::debug('Child job id [' . $childJob->getId() . '] status [' . $childJob->getStatus() . ']');
 					$allDone = false;
