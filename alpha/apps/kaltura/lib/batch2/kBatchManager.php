@@ -199,6 +199,9 @@ class kBatchManager
 			if(!is_null($tags))
 			{
 				$tagsArray = explode(',', $tags);
+				$assetTagsArray = $flavorAsset->getTagsArray();
+				foreach($assetTagsArray as $tag)
+					$tagsArray[] = $tag;
 				
 				if(!KDLWrap::CDLIsFLV($mediaInfoDb))
 				{
