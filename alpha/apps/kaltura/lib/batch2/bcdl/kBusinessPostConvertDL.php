@@ -256,21 +256,32 @@ class kBusinessPostConvertDL
 			return $dbBatchJob;
 		}
 			
-		// only bulk-download and convert-profile are pending on the conversions to close them, otherwise, return
-		if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
-		{
-			KalturaLog::debug('Convert Finished - root job type [' . $rootBatchJob->getJobType() . ']');
-			return $dbBatchJob;
-		}
-		
 		if(count($inCompleteFlavorIds))
 		{
 			KalturaLog::debug('Convert Finished - has In-Complete flavors [' . print_r($inCompleteFlavorIds, true) . ']');
+			
+			if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+			{
+				$childJobs = $rootBatchJob->getChildJobs();
+				if(count($childJobs) > 1)
+				{
+					$allDone = true;
+					foreach($childJobs as $childJob)
+						if($childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+							$allDone = false;
+							
+					if($allDone)
+						kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				}
+			}
 		}
 		else //if(!$currentFlavorAsset->getIsOriginal())
 		{
 			// mark the context root job as finished only if all conversion jobs are completed
-			kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+			kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
+			
+			if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 		}
 			
 		return $dbBatchJob;
