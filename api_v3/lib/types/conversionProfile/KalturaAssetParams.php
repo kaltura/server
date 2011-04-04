@@ -122,8 +122,11 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
 		
 		$requiredPermissions = array();
-		foreach($this->requiredPermissions as $requiredPermission)
-			$requiredPermissions[] = $requiredPermission->value;
+		if($this->requiredPermissions && count($this->requiredPermissions))
+		{
+			foreach($this->requiredPermissions as $requiredPermission)
+				$requiredPermissions[] = $requiredPermission->value;
+		}
 			
 		$object_to_fill->setRequiredPermissions($requiredPermissions);
 		
