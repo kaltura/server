@@ -33,6 +33,9 @@ class KalturaObject
 	public function fromObject ( $source_object  )
 	{
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		if(!$reflector)
+			return false;
+			
 		$properties = $reflector->getProperties();
 		
 		if ($reflector->requiresReadPermission() && !kPermissionManager::getReadPermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
