@@ -85,7 +85,7 @@ class FlavorAssetService extends KalturaBaseService
     	
     	$this->attachContentResource($dbFlavorAsset, $contentResource);
 		
-		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
 		$dbFlavorAsset->save();
 		
 		kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
