@@ -64,12 +64,11 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	 * @param KalturaDailymotionDistributionProfile $distributionProfile
 	 * @return array()
 	 */
-	public function getDailymotionProps(/*KalturaBaseEntry $entry, */KalturaDistributionJobData $data, KalturaDailymotionDistributionProfile $distributionProfile)
+	public function getDailymotionProps(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaDailymotionDistributionProfile $distributionProfile)
 	{	
 		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = array();
-//		$props['tags'] = explode(",",$this->findMetadataValue($metadataObjects, 'Keywords'));
-		$props['tags'] =''; /* temporary patch */
+		$props['tags'] = explode(",",$this->findMetadataValue($metadataObjects, 'Keywords'));
 		$props['title'] = $this->findMetadataValue($metadataObjects, 'LongTitle');
 		$props['channel'] = $this->findMetadataValue($metadataObjects, 'DailymotionCategory');
 		$props['description'] = $this->findMetadataValue($metadataObjects, 'ShortDescription');
@@ -84,8 +83,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaDailymotionDistributionProfile $distributionProfile)
 	{	
 		$needDel = false;
-//		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getDailymotionProps(/*$entry,*/ $data, $distributionProfile);
+		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$props = $this->getDailymotionProps($entry, $data, $distributionProfile);
 		if($data->entryDistribution->remoteId)
 		{
 			$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
@@ -176,8 +175,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	
 	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaDailymotionDistributionProfile $distributionProfile)
 	{
-//		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getDailymotionProps(/*$entry, */$data, $distributionProfile);
+		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$props = $this->getDailymotionProps($entry, $data, $distributionProfile);
 	
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
 		$dailyMotionImpl->update($data->remoteId, $props);
