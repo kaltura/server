@@ -267,11 +267,19 @@ class kBusinessPostConvertDL
 				{
 					$allDone = true;
 					foreach($childJobs as $childJob)
+					{
 						if($childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+						{
+							KalturaLog::debug('Child job id [' . $childJob->getId() . '] status [' . $childJob->getStatus() . ']');
 							$allDone = false;
+						}
+					}
 							
 					if($allDone)
+					{
+						KalturaLog::debug('All child jobs done, closing profile');
 						kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+					}
 				}
 			}
 		}
