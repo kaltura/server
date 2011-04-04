@@ -951,13 +951,13 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				case EntryDistributionStatus::DELETED:
 				case EntryDistributionStatus::DELETING:
 				case EntryDistributionStatus::REMOVED:
+				case EntryDistributionStatus::PENDING:
+				case EntryDistributionStatus::ERROR_SUBMITTING:	
 					
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
 					continue;
 				
-				case EntryDistributionStatus::PENDING:
 				case EntryDistributionStatus::QUEUED:
-				case EntryDistributionStatus::ERROR_SUBMITTING:
 					
 					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 					$entryDistribution->setValidationErrorsArray($validationErrors);
