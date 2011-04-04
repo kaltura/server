@@ -10,8 +10,4 @@ interface IKalturaServices extends IKalturaBase
 	 */
 	public static function getServicesMap();
 	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig();	
 }
