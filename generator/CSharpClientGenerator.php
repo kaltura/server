@@ -557,9 +557,15 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 				
 				$paramsStr .= ", ";
 			}
+			
 			if ($this->endsWith($paramsStr, ", "))
 				$paramsStr = substr($paramsStr, 0, strlen($paramsStr) - 2);
-			$this->appendLine("			return this.".$this->upperCaseFirstLetter($action)."($paramsStr);");
+				
+			if($resultType)
+				$this->appendLine("			return this.".$this->upperCaseFirstLetter($action)."($paramsStr);");
+			else
+				$this->appendLine("			this.".$this->upperCaseFirstLetter($action)."($paramsStr);");
+				
 			$this->appendLine("		}");
 		}
 		
