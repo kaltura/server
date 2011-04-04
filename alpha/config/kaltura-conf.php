@@ -203,11 +203,5 @@ return array (
     'KuserToUserRoleTableMap' => 'lib/model/map/KuserToUserRoleTableMap.php',
     'KuserToUserRolePeer' => 'lib/model/KuserToUserRolePeer.php',
     'KuserToUserRole' => 'lib/model/KuserToUserRole.php',
-    'DropFolderTableMap' => 'lib/model/map/DropFolderTableMap.php',
-    'DropFolderPeer' => 'lib/model/DropFolderPeer.php',
-    'DropFolder' => 'lib/model/DropFolder.php',
-    'DropFolderFileTableMap' => 'lib/model/map/DropFolderFileTableMap.php',
-    'DropFolderFilePeer' => 'lib/model/DropFolderFilePeer.php',
-    'DropFolderFile' => 'lib/model/DropFolderFile.php',
   ),
 );
