@@ -25,7 +25,8 @@
  * 			e. additional - whether to include any additional objects not directly defined through API services
  * 			f. internal - whether to show this client in the Client Libraries UI in the testme console, or not
  * 			g. nopackage - whether to generate a tar.gz package from the client library folder 
- * 			h. nofolder - there will not be client folder, the client files will be in output folder (if it's a single file like XML schema)
+ * 			h. nofolder - there will not be client folder, the client files will be in output folder (if it's a single file like XML schema) 
+ * 			i. ignore - whether to ignore any objects although defined through API services by inheritance
  * 
  * Notes:
  * 		* Kaltura API ignores only un-sent parameters. Thus, if you would like a parameter value to be left unchanged
@@ -120,6 +121,9 @@ foreach($config as $name => $item)
 
 	// get the list of Objects to include in this client generate	
 	$additional = $item->get("additional");
+
+	// get the list of Objects to ignore	
+	$ignore = $item->get("ignore");
 	
 	// get the list of Plugins to include in this client generate
 	$pluginList = explode(',', $item->get("plugins"));
@@ -143,6 +147,7 @@ foreach($config as $name => $item)
 		KalturaLog::info("Using XmlSchemaGenerator to generate the api schema");
 		$xmlGenerator = new XmlClientGenerator();
 		$xmlGenerator->setIncludeOrExcludeList($include, $exclude);
+		$xmlGenerator->setIgnoreList($ignore);
 		$xmlGenerator->setAdditionalList($additional);
 		$xmlGenerator->generate();
 		$files = $xmlGenerator->getOutputFiles();
@@ -173,6 +178,7 @@ foreach($config as $name => $item)
 	{
 		$instance = $reflectionClass->newInstance();
 		$instance->setIncludeOrExcludeList($include, $exclude);
+		$instance->setIgnoreList($ignore);
 		$instance->setAdditionalList($additional);
 		
 		if($item->get("package"))

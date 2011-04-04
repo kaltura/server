@@ -7,6 +7,7 @@ abstract class ClientGeneratorFromPhp
 	protected $_types = array();
 	protected $_includeList = array();
 	protected $_sourcePath = "";
+	protected $_typesToIgnore = array();
 	
 	protected $package = 'Kaltura';
 	protected $subpackage = 'Client';
@@ -290,6 +291,9 @@ abstract class ClientGeneratorFromPhp
 	
 	private function loadTypesRecursive(KalturaTypeReflector $typeReflector)
 	{
+		if(in_array($typeReflector->getType(), $this->_typesToIgnore))
+			return;
+			
 	    $parentTypeReflector = $typeReflector->getParentTypeReflector();
 	    if ($parentTypeReflector)
 	    {
@@ -448,6 +452,17 @@ abstract class ClientGeneratorFromPhp
 	public function setIncludeList($list)
 	{
 		$this->_includeList = $list;
+	}
+	
+	public function setIgnoreList($list)
+	{
+		if(!$list)
+			$list = array();
+			
+		if(is_string($list))
+			$list = explode(',', $list);
+			
+		$this->_typesToIgnore = $list;
 	}
 	
 	public function setAdditionalList($list)
