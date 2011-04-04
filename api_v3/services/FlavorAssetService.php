@@ -78,10 +78,17 @@ class FlavorAssetService extends KalturaBaseService
     	$dbFlavorAsset = new flavorAsset();
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
     	
+		$dbFlavorAsset->setEntryId($entryId);
+		$dbFlavorAsset->setPartnerId($dbEntry->getPartnerId());
+		$dbFlavorAsset->incrementVersion();
+		$dbFlavorAsset->save();
+    	
     	$this->attachContentResource($dbFlavorAsset, $contentResource);
 		
 		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$dbFlavorAsset->save();	
+		$dbFlavorAsset->save();
+		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
     	
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->fromObject($dbFlavorAsset);
