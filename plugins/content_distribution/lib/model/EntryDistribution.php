@@ -219,7 +219,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	
 		try{
 			$arr = unserialize($validationErrors);
-			if($arr)
+			if(is_array($arr))
 				return $arr;
 				
 			KalturaLog::err("Unable to unserialize [$validationErrors]");
