@@ -256,42 +256,43 @@ class kBusinessPostConvertDL
 			return $dbBatchJob;
 		}
 			
-		if(count($inCompleteFlavorIds))
-		{
-			KalturaLog::debug('Convert Finished - has In-Complete flavors [' . print_r($inCompleteFlavorIds, true) . ']');
-			
-			if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
-			{
-				$childJobs = $rootBatchJob->getChildJobs();
-				if(count($childJobs) > 1)
-				{
-					$allDone = true;
-					foreach($childJobs as $childJob)
-					{
-						if($childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-						{
-							KalturaLog::debug('Child job id [' . $childJob->getId() . '] status [' . $childJob->getStatus() . ']');
-							$allDone = false;
-						}
-					}
-							
-					if($allDone)
-					{
-						KalturaLog::debug('All child jobs done, closing profile');
-						kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-					}
-				}
-			}
-		}
-		else //if(!$currentFlavorAsset->getIsOriginal())
+		if(!count($inCompleteFlavorIds))
 		{
 			// mark the context root job as finished only if all conversion jobs are completed
 			kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
 			
 			if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+		
+			return $dbBatchJob;
 		}
+		
+		KalturaLog::debug('Convert Finished - has In-Complete flavors [' . print_r($inCompleteFlavorIds, true) . ']');
+	
+		if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
+			return $dbBatchJob;
 			
+		$childJobs = $rootBatchJob->getChildJobs();
+		KalturaLog::debug('Child jobs found [' . count($childJobs) . ']');
+		if(count($childJobs) > 1)
+		{
+			$allDone = true;
+			foreach($childJobs as $childJob)
+			{
+				if($childJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+				{
+					KalturaLog::debug('Child job id [' . $childJob->getId() . '] status [' . $childJob->getStatus() . ']');
+					$allDone = false;
+				}
+			}
+					
+			if($allDone)
+			{
+				KalturaLog::debug('All child jobs done, closing profile');
+				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+			}
+		}
+		
 		return $dbBatchJob;
 	}
 	
