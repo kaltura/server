@@ -42,8 +42,8 @@ function checkCache()
 					$processing_time = microtime(true) - $start_time;
 					header("X-Kaltura:cached-dispatcher,$key,$processing_time");
 					header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
-					header("Cache-Control" , "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-					header("Pragma" , "no-cache" );
+					header("Cache-Control, no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+					header("Pragma, no-cache" );
 					echo $response;
 					die;
 				}
