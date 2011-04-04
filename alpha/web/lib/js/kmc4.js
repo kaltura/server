@@ -306,7 +306,8 @@ kmc.utils = {
 		doc_height = (doc_height-offset);
 		doc_height = (doc_height < 590) ? 590 : doc_height; // Flash minimum height is 590 px
 		$("#flash_wrap").height(doc_height + "px");
-		$("#server_wrap iframe").height(doc_height);
+		$("#server_wrap iframe").height(doc_height + "px");
+		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
 	},
 	escapeQuotes : function(string) {
 		string = string.replace(/"/g,"&Prime;");
@@ -1561,7 +1562,8 @@ function playerAdded() { // called from appstudio
 /*** end old functions ***/
 
 $(function() {
-	kmc.utils.handleMenu();
+	//kmc.utils.handleMenu();
+	kmc.utils.activateHeader();
 	kmc.mediator.loadKmc();
 });
 
