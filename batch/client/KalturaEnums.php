@@ -451,6 +451,7 @@ class KalturaConversionEngineType
 	const EXPRESSION_ENCODER = "expressionEncoder.ExpressionEncoder";
 	const AVIDEMUX = "avidemux.Avidemux";
 	const SEGMENTER = "segmenter.Segmenter";
+	const INLET_ARMADA = "inletArmada.InletArmada";
 }
 
 /**
