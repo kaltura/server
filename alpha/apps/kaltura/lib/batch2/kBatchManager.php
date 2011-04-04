@@ -186,6 +186,32 @@ class kBatchManager
 				$flavorAsset->setTags($finalTags);
 			}
 		}
+		else 
+		{
+			KalturaLog::log("Media info is for the destination flavor asset");
+			$tags = null;
+			
+			$flavorParams = flavorParamsPeer::retrieveByPK($flavorAsset->getFlavorParamsId());
+			if($flavorParams)
+				$tags = $flavorParams->getTags();
+			KalturaLog::log("Flavor asset tags from flavor params [$tags]");
+			
+			if(!is_null($tags))
+			{
+				$tagsArray = explode(',', $tags);
+				
+				if(!KDLWrap::CDLIsFLV($mediaInfoDb))
+				{
+					$key = array_search(flavorParams::TAG_MBR, $tagsArray);
+					unset($tagsArray[$key]);
+				}
+				
+				$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfoDb, $tagsArray);
+				$finalTags = join(',', $finalTagsArray);
+				KalturaLog::log("Flavor asset tags from KDL [$finalTags]");
+				$flavorAsset->setTags($finalTags);
+			}
+		}
 				
 		KalturaLog::log("KDLWrap::ConvertMediainfoCdl2FlavorAsset(" . $mediaInfoDb->getId() . ", " . $flavorAsset->getId() . ");");
 		KDLWrap::ConvertMediainfoCdl2FlavorAsset($mediaInfoDb, $flavorAsset);
