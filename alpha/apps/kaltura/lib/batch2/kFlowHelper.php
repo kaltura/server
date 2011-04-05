@@ -1346,8 +1346,6 @@ class kFlowHelper
 			$originalflavorAsset->save();
 		}
 		
-		//kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
-		
 		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
 			
 		return $dbBatchJob; 	
