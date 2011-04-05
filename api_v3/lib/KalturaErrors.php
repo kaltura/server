@@ -134,6 +134,8 @@ class KalturaErrors extends APIErrors
 	 */
 	const CONVERSION_PROFILE_ID_NOT_FOUND = "CONVERSION_PROFILE_ID_NOT_FOUND,Conversion profile id \"%s\" not found";
 	
+	const INGESTION_PROFILE_ID_NOT_FOUND = "INGESTION_PROFILE_ID_NOT_FOUND,Ingestion profile id \"%s\" not found";
+	
 	const CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE = "CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE,Default conversion profile cannot be deleted";
 	
 	const CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND = "CONVERSION_PROFILE_ASSET_PARAMS_NOT_FOUND,Conversion profile id \"%s\" asset params id \"%s\" not found";
