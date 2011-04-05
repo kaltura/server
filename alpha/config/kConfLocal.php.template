@@ -134,6 +134,7 @@ class kConfLocal
 		// self::$map['default_plugins'][] = "SegmenterPlugin"; 
 		// self::$map['default_plugins'][] = "ShortLinkPlugin";
 		// self::$map['default_plugins'][] = "ProfesionalServicesPlugin";
+		// self::$map['default_plugins'][] = "InletArmadaPlugin";
 		
 }
 
