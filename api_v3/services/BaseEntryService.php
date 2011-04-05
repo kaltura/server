@@ -37,6 +37,7 @@ class BaseEntryService extends KalturaEntryService
      * @param KalturaResource $resource
      * @param KalturaEntryType $type
      * @return KalturaBaseEntry
+     * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
      */
     function addAction(KalturaBaseEntry $entry, KalturaResource $resource, $type = -1)
     {
@@ -85,10 +86,12 @@ class BaseEntryService extends KalturaEntryService
 				$service = new LiveStreamService();
     			$service->initService('liveStream', 'liveStream', $this->actionName);
     			break;
+    			
+    		default:
+    			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
     	}
-
-    	if($service)
-    		$service->attachResource($resource, $dbEntry, $asset);
+    		
+    	$service->attachResource($resource, $dbEntry, $asset);
     }
     
     /**
