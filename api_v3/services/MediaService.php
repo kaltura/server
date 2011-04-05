@@ -311,8 +311,11 @@ class MediaService extends KalturaEntryService
 		$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbAsset->save();
 		
-		$dbEntry->setStatus(entryStatus::READY);
-		$dbEntry->save();
+		if(!$dbEntry->getReplacedEntryId())
+		{
+			$dbEntry->setStatus(entryStatus::READY);
+			$dbEntry->save();
+		}
 		
 		return $dbAsset;
     }
@@ -605,8 +608,11 @@ class MediaService extends KalturaEntryService
 			if (!$copyDataResult) // will be false when the entry id was not found
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 				
-			$dbEntry->setStatusReady();
-			$dbEntry->save();
+			if(!$dbEntry->getReplacedEntryId())
+			{
+				$dbEntry->setStatusReady();
+				$dbEntry->save();
+			}
 		}
 		else
 		{
@@ -1163,13 +1169,57 @@ class MediaService extends KalturaEntryService
 	 * @action update
 	 * @param string $entryId Media entry id to update
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata to update
+	 * @param KalturaResource $resource Resource to be used to replace entry media content
 	 * @return KalturaMediaEntry The updated media entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function updateAction($entryId, KalturaMediaEntry $mediaEntry)
+	function updateAction($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null)
 	{
-		return $this->updateEntry($entryId, $mediaEntry, KalturaEntryType::MEDIA_CLIP);
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		$mediaEntry = new KalturaMediaEntry();
+		if(is_null($mediaEntry))
+		{
+			$mediaEntry->fromObject($dbEntry);
+		}
+		else
+		{
+			$mediaEntry = $this->updateEntry($entryId, $mediaEntry, KalturaEntryType::MEDIA_CLIP);
+		}
+		
+		$partner = $this->getPartner();
+		if(!is_null($resource) && $partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
+		{
+			if(!$dbEntry)
+				$dbEntry = entryPeer::retrieveByPK($entryId);
+				
+			$tempMediaEntry = new KalturaMediaEntry();
+		 	$tempMediaEntry->type = $mediaEntry->type;
+			$tempMediaEntry->mediaType = $mediaEntry->mediaType;
+			$tempMediaEntry->conversionQuality = $mediaEntry->conversionQuality;
+			
+			$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
+			$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
+			$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
+			$tempDbEntry->setReplacedEntryId($dbEntry->getId());
+			$tempDbEntry->save();
+			
+			$this->attachResource($resource, $tempDbEntry);
+			
+			$dbEntry->setReplacingEntryId($tempDbEntry->getId());
+			$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
+			if($partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
+				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+			$dbEntry->save();
+			
+			$mediaEntry->fromObject($dbEntry);
+		}
+		
+		return $mediaEntry;
 	}
 
 	/**
