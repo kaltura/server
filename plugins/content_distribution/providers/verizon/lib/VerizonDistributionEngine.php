@@ -65,7 +65,7 @@ class VerizonDistributionEngine extends DistributionEngine implements
 		
 		$data->remoteId = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
 		
-		return true;
+		return false;
 	}
 
 	/**
