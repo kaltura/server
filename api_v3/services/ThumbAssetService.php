@@ -369,11 +369,11 @@ class ThumbAssetService extends KalturaBaseService
 			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_KSHOW ||
 			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS)
 		{
-			$this->attachEntry($thumbAsset, $resource->result->id);
+			$this->attachEntry($thumbAsset, $contentResource->result->id);
 		}
 		else
 		{
-			$this->attachUrl($thumbAsset, $resource->result->url);
+			$this->attachUrl($thumbAsset, $contentResource->result->url);
 		}
     }
     

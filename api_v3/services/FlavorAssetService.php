@@ -430,11 +430,11 @@ class FlavorAssetService extends KalturaBaseService
 			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_KSHOW ||
 			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS)
 		{
-			$this->attachEntry($flavorAsset, $resource->result->id);
+			$this->attachEntry($flavorAsset, $contentResource->result->id);
 		}
 		else
 		{
-			$this->attachUrl($flavorAsset, $resource->result->url);
+			$this->attachUrl($flavorAsset, $contentResource->result->url);
 		}
     }
     
