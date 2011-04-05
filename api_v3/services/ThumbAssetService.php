@@ -73,6 +73,14 @@ class ThumbAssetService extends KalturaBaseService
     	
     	$this->attachContentResource($dbThumbAsset, $contentResource);
 				
+    	$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+    	$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+    	if($filePath && file_exists($filePath) && filesize($filePath))
+    	{
+    		list($width, $height, $type, $attr) = getimagesize($filePath);
+    		$dbThumbAsset->setWidth($width);
+    		$dbThumbAsset->setHeight($height);
+    	}
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
 		
