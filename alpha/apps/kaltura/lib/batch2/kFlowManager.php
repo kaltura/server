@@ -383,6 +383,17 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
 		if(
+				$object instanceof entry 
+			&&	in_array(entryPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == entryStatus::READY
+			&&	$object->getReplacedEntryId()
+		)
+		{
+			kFlowHelper::handleEntryReplacement($object);
+			return true;
+		}
+		
+		if(
 				!($object instanceof flavorAsset) 
 			||	!in_array(flavorAssetPeer::STATUS, $modifiedColumns))
 			return true;
