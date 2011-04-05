@@ -2545,7 +2545,7 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * @var string
 	 */
-	protected $apiVersion = '3.1.1';
+	protected $apiVersion = '3.1.2';
 
 	/**
 	 * Base Entry Service
