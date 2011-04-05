@@ -80,6 +80,7 @@ class ThumbAssetService extends KalturaBaseService
     		list($width, $height, $type, $attr) = getimagesize($filePath);
     		$dbThumbAsset->setWidth($width);
     		$dbThumbAsset->setHeight($height);
+    		$dbThumbAsset->setSize(filesize($filePath));
     	}
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
