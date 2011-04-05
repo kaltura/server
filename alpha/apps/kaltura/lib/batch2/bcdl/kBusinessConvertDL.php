@@ -2,6 +2,63 @@
 
 class kBusinessConvertDL
 {
+	/**
+	 * @param entry $entry
+	 * @param entry $tempEntry
+	 */
+	public static function replaceEntry(entry $entry, entry $tempEntry = null)
+	{
+		if(!$tempEntry)
+			$tempEntry = entryPeer::retrieveByPK($entry->getReplacedEntryId());
+			
+		if(!$tempEntry)
+		{
+			KalturaLog::err("Temp entry id [" . $entry->getReplacedEntryId() . "] not found");
+			return;
+		}
+		
+		assetPeer::resetInstanceCriteriaFilter();
+		$tempAssets = assetPeer::retrieveByEntryId($tempEntry->getId());
+		$oldAssets = assetPeer::retrieveByEntryId($entry->getId());
+		$newAssets = array();
+		foreach($tempAssets as $newAsset)
+		{
+			if($newAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+				$newAssets[$newAsset->getFlavorParamsId()] = $newAsset;
+		}
+		
+		$saveEntry = false;
+		foreach($oldAssets as $oldAsset)
+		{
+			if(isset($newAssets[$oldAsset->getFlavorParamsId()]))
+			{
+				$newAsset = $newAssets[$oldAsset->getFlavorParamsId()];
+				
+				$oldAsset->incrementVersion();
+				$oldAsset->save();
+				
+				$oldFileSync = $oldAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$newFileSync = $newAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				
+				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync, false);
+			}	
+			else
+			{
+				$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
+				$oldAsset->setDeletedAt(time());
+				$oldAsset->save();
+				
+				$entry->removeFlavorParamsId($oldAsset->getFlavorParamsId());
+				$saveEntry = true;
+			}		
+		}
+		
+		if($saveEntry)
+			$entry->save();
+			
+		myEntryUtils::deleteEntry($tempEntry);
+	}
+	
 	public static function parseFlavorDescription(flavorParamsOutputWrap $flavor)
 	{
 		$description = '';
