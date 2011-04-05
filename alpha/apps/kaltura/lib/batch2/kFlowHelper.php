@@ -1543,4 +1543,39 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 	
+	/**
+	 * @param entry $tempEntry
+	 */
+	public static function handleEntryReplacement(entry $tempEntry)
+	{
+		KalturaLog::debug("Handling temp entry id [" . $tempEntry->getId() . "] for real entry id [" . $tempEntry->getReplacedEntryId() . "]");
+		$entry = entryPeer::retrieveByPK($tempEntry->getReplacedEntryId());
+		if(!$entry)
+		{
+			KalturaLog::err("Real entry id [" . $tempEntry->getReplacedEntryId() . "] not found");
+			myEntryUtils::deleteEntry($tempEntry);
+			return;
+		}
+		
+		switch($entry->getReplacementStatus())
+		{
+			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
+				kBusinessConvertDL::replaceEntry($entry, $tempEntry);
+				break;
+				
+			case entryReplacementStatus::READY_BUT_NOT_APPROVED:
+				break;
+				
+			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
+				$entry->setReplacementStatus(entryReplacementStatus::READY_BUT_NOT_APPROVED);
+				$entry->save();
+				break;
+			
+			case entryReplacementStatus::NONE:
+			default:
+				KalturaLog::err("Real entry id [" . $tempEntry->getReplacedEntryId() . "] replacement canceled");
+				myEntryUtils::deleteEntry($tempEntry);
+				break;
+		}
+	}	
 }
