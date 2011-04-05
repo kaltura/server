@@ -38,6 +38,14 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 	 * @filter eq,in
 	 */
 	public $origin;
+
+	/**
+	 * Asset params system name
+	 *  
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $systemName;
 	
 	private static $map_between_objects = array
 	(
@@ -45,6 +53,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 		'assetParamsId' => 'flavorParamsId',
 		'readyBehavior',
 		'origin',
+		'systemName',
 	);
 	
 	public function getMapBetweenObjects ( )
