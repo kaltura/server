@@ -52,8 +52,11 @@ class InletArmadaPlugin extends KalturaPlugin implements IKalturaObjectLoader, I
 	/**
 	 * @return array<string> list of enum classes names that extend the base enum name
 	 */
-	public static function getEnums($baseEnumName)
+	public static function getEnums($baseEnumName = null)
 	{
+		if(is_null($baseEnumName))
+			return array('InletArmadaConversionEngineType');
+	
 		if($baseEnumName == 'conversionEngineType')
 			return array('InletArmadaConversionEngineType');
 			
