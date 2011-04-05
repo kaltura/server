@@ -51,6 +51,7 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::UPLOAD_ERROR
      * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
      * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
     function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
@@ -756,7 +757,8 @@ class MediaService extends KalturaEntryService
 				KalturaLog::err("Resource of type [" . get_class($resource) . "] is not supported");
 				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
 				$dbEntry->save();
-				return null;
+				
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($resource));
     	}
     }
     

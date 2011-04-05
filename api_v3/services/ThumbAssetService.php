@@ -49,6 +49,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
     function addAction($entryId, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource)
     {
@@ -395,6 +396,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
 	 */
 	protected function attachContentResource(thumbAsset $thumbAsset, KalturaContentResource $contentResource)
 	{
@@ -437,7 +439,8 @@ class ThumbAssetService extends KalturaBaseService
 				$thumbAsset->setDescription($msg);
 				$thumbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
 				$thumbAsset->save();
-				return null;
+				
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($contentResource));
     	}
     }
     

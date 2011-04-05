@@ -61,6 +61,7 @@ class FlavorAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
     function addAction($entryId, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource)
     {
@@ -446,6 +447,7 @@ class FlavorAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
 	 */
 	protected function attachContentResource(flavorAsset $flavorAsset, KalturaContentResource $contentResource)
 	{
@@ -490,7 +492,8 @@ class FlavorAssetService extends KalturaBaseService
 				$flavorAsset->setDescription($msg);
 				$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
 				$flavorAsset->save();
-				return null;
+				
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($contentResource));
     	}
     }
     
