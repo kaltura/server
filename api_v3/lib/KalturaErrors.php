@@ -170,6 +170,10 @@ class KalturaErrors extends APIErrors
 	
 	const THUMB_ASSET_IS_NOT_READY = "THUMB_ASSET_IS_NOT_READY,The thumbnail asset is not ready";
 	
+	const THUMB_ASSET_ALREADY_EXISTS = "THUMB_ASSET_ALREADY_EXISTS,Thumbnail asset id \"%s\" already use thumbnail params id \"%s\"";
+	
+	const THUMB_ASSET_DOWNLOAD_FAILED = "THUMB_ASSET_DOWNLOAD_FAILED,Fail to download thumbnain from URL \"%s\"";
+	
 	/**
 	 * Category Service
 	 */
