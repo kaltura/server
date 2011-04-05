@@ -269,7 +269,7 @@ class FlavorAssetService extends KalturaBaseService
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$flavorAsset->save();
 			
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contentResource->assetId);
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contentResource->flavorParamsId);
 		}
 		
 		$this->attachAsset($flavorAsset, $srcFlavorAsset);
@@ -391,7 +391,7 @@ class FlavorAssetService extends KalturaBaseService
         $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->storageProfileId);
         if(!$storageProfile)
         {
-			$flavorAsset->setDescription("Could not move file from [$uploadPath] to [$tempPath]");
+			$flavorAsset->setDescription("Could not find storage profile id [$contentResource->storageProfileId]");
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$flavorAsset->save();
 			
