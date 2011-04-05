@@ -43,11 +43,11 @@ class ThumbAssetService extends KalturaBaseService
      * @param KalturaContentResource $contentResource
      * @return KalturaThumbAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-     * @throws KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS
+     * @throws KalturaErrors::THUMB_ASSET_ALREADY_EXISTS
 	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
 	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
      */
     function addAction($entryId, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource)
@@ -158,6 +158,9 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	protected function attachAsset(thumbAsset $thumbAsset, thumbAsset $srcThumbAsset)
 	{
+		$thumbAsset->setFlavorParamsId($srcThumbAsset->getFlavorParamsId());
+		$thumbAsset->save();
+		
 		$sourceEntryId = $srcThumbAsset->getEntryId();
 		
         $srcSyncKey = $srcThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -168,7 +171,7 @@ class ThumbAssetService extends KalturaBaseService
 	/**
 	 * @param thumbAsset $thumbAsset
 	 * @param KalturaAssetResource $contentResource
-	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
 	protected function attachAssetResource(thumbAsset $thumbAsset, KalturaAssetResource $contentResource)
 	{
@@ -181,7 +184,7 @@ class ThumbAssetService extends KalturaBaseService
 			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$thumbAsset->save();
 			
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contentResource->assetId);
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $contentResource->assetId);
 		}
 		
 		$this->attachAsset($thumbAsset, $srcThumbAsset);
@@ -190,33 +193,29 @@ class ThumbAssetService extends KalturaBaseService
 	/**
 	 * @param thumbAsset $thumbAsset
 	 * @param KalturaEntryResource $contentResource
-	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
 	protected function attachEntryResource(thumbAsset $thumbAsset, KalturaEntryResource $contentResource)
 	{
     	$contentResource->validatePropertyNotNull('entryId');
+    	$contentResource->validatePropertyNotNull('flavorParamsId');
     
-    	$srcEntry = entryPeer::retrieveByPK($contentResource->entryId);
-    	if(!$srcEntry || $srcEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($srcEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $contentResource->entryId);
+    	$this->attachEntry($thumbAsset, $contentResource->entryId, $contentResource->flavorParamsId);
+    }
+    
+	/**
+	 * @param thumbAsset $thumbAsset
+	 * @param string $entryId
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 */
+	protected function attachEntry(thumbAsset $thumbAsset, $entryId)
+	{
+    	$srcEntry = entryPeer::retrieveByPK($entryId);
+    	if(!$srcEntry || $srcEntry->getType() != KalturaEntryType::MEDIA_CLIP || $srcEntry->getMediaType() != KalturaMediaType::IMAGE)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
-    	$srcThumbAsset = null;
-    	assetPeer::resetInstanceCriteriaFilter();
-    	if(is_null($contentResource->flavorParamsId))
-			$srcThumbAsset = assetPeer::retrieveOriginalByEntryId($contentResource->entryId);
-		else
-			$srcThumbAsset = assetPeer::retrieveByEntryIdAndParams($contentResource->entryId, $contentResource->flavorParamsId);
-
-		if (!$srcThumbAsset)
-		{
-			$thumbAsset->setDescription("Source asset for entry [$contentResource->entryId] not found");
-			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$thumbAsset->save();
-			
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contentResource->flavorParamsId);
-		}
-		
-		$this->attachAsset($thumbAsset, $srcThumbAsset);
+        $srcSyncKey = $srcEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+        $this->attachFileSync($thumbAsset, $srcSyncKey);
     }
     
 	/**
@@ -277,7 +276,7 @@ class ThumbAssetService extends KalturaBaseService
 	protected function attachLocalFileResource(thumbAsset $thumbAsset, KalturaLocalFileResource $contentResource)
 	{
     	$contentResource->validatePropertyNotNull('localFilePath');
-		$this->attachFile($thumbAsset, $contentResource->localFilePath);
+		$this->attachFile($thumbAsset, $contentResource->localFilePath, true);
     }
     
 	/**
@@ -356,11 +355,36 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
+	 * @param KalturaSearchResultsResource $contentResource
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 */
+	protected function attachSearchResultsResource(thumbAsset $thumbAsset, KalturaSearchResultsResource $contentResource)
+    {
+    	$contentResource->validatePropertyNotNull('result');
+     	$contentResource->result->validatePropertyNotNull("searchSource");
+     	
+		if ($contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER_KSHOW ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_KSHOW ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS)
+		{
+			$this->attachEntry($thumbAsset, $resource->result->id);
+		}
+		else
+		{
+			$this->attachUrl($thumbAsset, $resource->result->url);
+		}
+    }
+    
+    
+	/**
+	 * @param thumbAsset $thumbAsset
 	 * @param KalturaContentResource $contentResource
 	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
 	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
 	protected function attachContentResource(thumbAsset $thumbAsset, KalturaContentResource $contentResource)

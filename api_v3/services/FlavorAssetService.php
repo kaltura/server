@@ -214,6 +214,9 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	protected function attachAsset(flavorAsset $flavorAsset, flavorAsset $srcFlavorAsset)
 	{
+		$flavorAsset->setFlavorParamsId($srcFlavorAsset->getFlavorParamsId());
+		$flavorAsset->save();
+		
 		$sourceEntryId = $srcFlavorAsset->getEntryId();
 		
         $srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -251,25 +254,34 @@ class FlavorAssetService extends KalturaBaseService
 	protected function attachEntryResource(flavorAsset $flavorAsset, KalturaEntryResource $contentResource)
 	{
     	$contentResource->validatePropertyNotNull('entryId');
+    }
     
-    	$srcEntry = entryPeer::retrieveByPK($contentResource->entryId);
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param string $entryId
+	 * @param int $flavorParamsId
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 */
+	protected function attachEntry(flavorAsset $flavorAsset, $entryId, $flavorParamsId = null)
+	{
+    	$srcEntry = entryPeer::retrieveByPK($entryId);
     	if(!$srcEntry || $srcEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($srcEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $contentResource->entryId);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
     	$srcFlavorAsset = null;
     	assetPeer::resetInstanceCriteriaFilter();
-    	if(is_null($contentResource->flavorParamsId))
-			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($contentResource->entryId);
+    	if(is_null($flavorParamsId))
+			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		else
-			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($contentResource->entryId, $contentResource->flavorParamsId);
+			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);
 
 		if (!$srcFlavorAsset)
 		{
-			$flavorAsset->setDescription("Source asset for entry [$contentResource->entryId] not found");
+			$flavorAsset->setDescription("Source asset for entry [$entryId] not found");
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$flavorAsset->save();
 			
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contentResource->flavorParamsId);
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorParamsId);
 		}
 		
 		$this->attachAsset($flavorAsset, $srcFlavorAsset);
@@ -325,7 +337,7 @@ class FlavorAssetService extends KalturaBaseService
 	protected function attachLocalFileResource(flavorAsset $flavorAsset, KalturaLocalFileResource $contentResource)
 	{
     	$contentResource->validatePropertyNotNull('localFilePath');
-		$this->attachFile($flavorAsset, $contentResource->localFilePath);
+		$this->attachFile($flavorAsset, $contentResource->localFilePath, true);
     }
     
 	/**
@@ -400,6 +412,30 @@ class FlavorAssetService extends KalturaBaseService
         	
         $syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->url, $storageProfile);
+    }
+    
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param KalturaSearchResultsResource $contentResource
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 */
+	protected function attachSearchResultsResource(flavorAsset $flavorAsset, KalturaSearchResultsResource $contentResource)
+    {
+    	$contentResource->validatePropertyNotNull('result');
+     	$contentResource->result->validatePropertyNotNull("searchSource");
+     	
+		if ($contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER_KSHOW ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_KSHOW ||
+			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS)
+		{
+			$this->attachEntry($flavorAsset, $resource->result->id);
+		}
+		else
+		{
+			$this->attachUrl($flavorAsset, $resource->result->url);
+		}
     }
     
 	/**
