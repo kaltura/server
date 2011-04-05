@@ -1987,7 +1987,7 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * @var string
 	 */
-	protected $apiVersion = '3.1.1';
+	protected $apiVersion = '3.1.2';
 
 	/**
 	 * batch service lets you handle different batch process from remote machines.
