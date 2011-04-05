@@ -53,8 +53,8 @@ class kBusinessConvertDL
 			}		
 		}
 		
-		if($saveEntry)
-			$entry->save();
+		$entry->setReplacementStatus(entryReplacementStatus::NONE);		
+		$entry->save();
 			
 		myEntryUtils::deleteEntry($tempEntry);
 	}

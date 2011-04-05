@@ -1234,6 +1234,73 @@ class MediaService extends KalturaEntryService
 	{
 		$this->deleteEntry($entryId, KalturaEntryType::MEDIA_CLIP);
 	}
+
+	/**
+	 * Approves media replacement
+	 *
+	 * @action approveReplace
+	 * @param string $entryId Media entry id to replace
+	 * @return KalturaMediaEntry The replaced media entry
+	 * 
+ 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function approveReplaceAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		switch($dbEntry->getReplacementStatus())
+		{
+			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
+				break;
+				
+			case entryReplacementStatus::READY_BUT_NOT_APPROVED:
+				kBusinessConvertDL::replaceEntry($dbEntry);
+				break;
+				
+			case entryReplacementStatus::NOT_READY_AND_NOT_APPROVED:
+				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				$dbEntry->save();
+				break;
+			
+			case entryReplacementStatus::NONE:
+			default:
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_REPLACED, $entryId);
+				break;
+		}
+		
+		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
+	}
+
+	/**
+	 * Cancels media replacement
+	 *
+	 * @action cancelReplace
+	 * @param string $entryId Media entry id to cancel
+	 * @return KalturaMediaEntry The canceled media entry
+	 * 
+ 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function cancelReplaceAction($entryId)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			
+		if($dbEntry->getReplacingEntryId())
+		{
+			$dbTempEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
+			myEntryUtils::deleteEntry($dbTempEntry);
+		}
+		
+		$dbEntry->setReplacingEntryId(null);
+		$dbEntry->setReplacementStatus(entryReplacementStatus::NONE);
+		
+		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
+	}
 	
 	/**
 	 * List media entries by filter with paging support.

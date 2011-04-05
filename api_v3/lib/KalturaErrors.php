@@ -71,6 +71,8 @@ class KalturaErrors extends APIErrors
 	
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND,Entry id \"%s\" not found";
 	
+	const ENTRY_ID_NOT_REPLACED = "ENTRY_ID_NOT_REPLACED,Entry id \"%s\" not replaced";
+	
 	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED,Entry type \"%s\" not suppported";
 	
 	const RESOURCE_TYPE_NOT_SUPPORTED = "RESOURCE_TYPE_NOT_SUPPORTED,Resource type \"%s\" not suppported";
