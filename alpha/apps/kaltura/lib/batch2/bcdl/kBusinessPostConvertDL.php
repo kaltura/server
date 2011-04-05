@@ -246,7 +246,8 @@ class kBusinessPostConvertDL
 		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
-			kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
+			if(!$currentFlavorAsset->getentry()->getReplacedEntryId())
+				kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
 		}
 		
 		// no need to finished the root job
