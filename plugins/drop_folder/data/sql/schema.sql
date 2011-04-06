@@ -50,7 +50,7 @@ CREATE TABLE `drop_folder_file`
 	`last_file_size_check_at` DATETIME,
 	`error_description` TEXT,
 	`parsed_slug` VARCHAR(500),
-	`parsed_flavor_id` INTEGER,
+	`parsed_flavor` VARCHAR(500),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,

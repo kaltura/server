@@ -35,7 +35,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_file_size_check_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_description" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_slug" type="varchar" size="500" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_flavor_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_flavor" type="varchar" size="500" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />

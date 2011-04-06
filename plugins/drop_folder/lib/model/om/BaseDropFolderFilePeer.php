@@ -58,8 +58,8 @@ abstract class BaseDropFolderFilePeer {
 	/** the column name for the PARSED_SLUG field */
 	const PARSED_SLUG = 'drop_folder_file.PARSED_SLUG';
 
-	/** the column name for the PARSED_FLAVOR_ID field */
-	const PARSED_FLAVOR_ID = 'drop_folder_file.PARSED_FLAVOR_ID';
+	/** the column name for the PARSED_FLAVOR field */
+	const PARSED_FLAVOR = 'drop_folder_file.PARSED_FLAVOR';
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'drop_folder_file.CREATED_AT';
@@ -86,10 +86,10 @@ abstract class BaseDropFolderFilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'DropFolderId', 'FileName', 'Status', 'FileSize', 'LastFileSizeCheckAt', 'ErrorDescription', 'ParsedSlug', 'ParsedFlavorId', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'dropFolderId', 'fileName', 'status', 'fileSize', 'lastFileSizeCheckAt', 'errorDescription', 'parsedSlug', 'parsedFlavorId', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::DROP_FOLDER_ID, self::FILE_NAME, self::STATUS, self::FILE_SIZE, self::LAST_FILE_SIZE_CHECK_AT, self::ERROR_DESCRIPTION, self::PARSED_SLUG, self::PARSED_FLAVOR_ID, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'drop_folder_id', 'file_name', 'status', 'file_size', 'last_file_size_check_at', 'error_description', 'parsed_slug', 'parsed_flavor_id', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'DropFolderId', 'FileName', 'Status', 'FileSize', 'LastFileSizeCheckAt', 'ErrorDescription', 'ParsedSlug', 'ParsedFlavor', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'dropFolderId', 'fileName', 'status', 'fileSize', 'lastFileSizeCheckAt', 'errorDescription', 'parsedSlug', 'parsedFlavor', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::DROP_FOLDER_ID, self::FILE_NAME, self::STATUS, self::FILE_SIZE, self::LAST_FILE_SIZE_CHECK_AT, self::ERROR_DESCRIPTION, self::PARSED_SLUG, self::PARSED_FLAVOR, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'drop_folder_id', 'file_name', 'status', 'file_size', 'last_file_size_check_at', 'error_description', 'parsed_slug', 'parsed_flavor', 'created_at', 'updated_at', 'custom_data', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
@@ -100,10 +100,10 @@ abstract class BaseDropFolderFilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'DropFolderId' => 2, 'FileName' => 3, 'Status' => 4, 'FileSize' => 5, 'LastFileSizeCheckAt' => 6, 'ErrorDescription' => 7, 'ParsedSlug' => 8, 'ParsedFlavorId' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'CustomData' => 12, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'dropFolderId' => 2, 'fileName' => 3, 'status' => 4, 'fileSize' => 5, 'lastFileSizeCheckAt' => 6, 'errorDescription' => 7, 'parsedSlug' => 8, 'parsedFlavorId' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'customData' => 12, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::DROP_FOLDER_ID => 2, self::FILE_NAME => 3, self::STATUS => 4, self::FILE_SIZE => 5, self::LAST_FILE_SIZE_CHECK_AT => 6, self::ERROR_DESCRIPTION => 7, self::PARSED_SLUG => 8, self::PARSED_FLAVOR_ID => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::CUSTOM_DATA => 12, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'drop_folder_id' => 2, 'file_name' => 3, 'status' => 4, 'file_size' => 5, 'last_file_size_check_at' => 6, 'error_description' => 7, 'parsed_slug' => 8, 'parsed_flavor_id' => 9, 'created_at' => 10, 'updated_at' => 11, 'custom_data' => 12, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'DropFolderId' => 2, 'FileName' => 3, 'Status' => 4, 'FileSize' => 5, 'LastFileSizeCheckAt' => 6, 'ErrorDescription' => 7, 'ParsedSlug' => 8, 'ParsedFlavor' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'CustomData' => 12, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'dropFolderId' => 2, 'fileName' => 3, 'status' => 4, 'fileSize' => 5, 'lastFileSizeCheckAt' => 6, 'errorDescription' => 7, 'parsedSlug' => 8, 'parsedFlavor' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'customData' => 12, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::DROP_FOLDER_ID => 2, self::FILE_NAME => 3, self::STATUS => 4, self::FILE_SIZE => 5, self::LAST_FILE_SIZE_CHECK_AT => 6, self::ERROR_DESCRIPTION => 7, self::PARSED_SLUG => 8, self::PARSED_FLAVOR => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::CUSTOM_DATA => 12, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'drop_folder_id' => 2, 'file_name' => 3, 'status' => 4, 'file_size' => 5, 'last_file_size_check_at' => 6, 'error_description' => 7, 'parsed_slug' => 8, 'parsed_flavor' => 9, 'created_at' => 10, 'updated_at' => 11, 'custom_data' => 12, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
@@ -183,7 +183,7 @@ abstract class BaseDropFolderFilePeer {
 		$criteria->addSelectColumn(DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT);
 		$criteria->addSelectColumn(DropFolderFilePeer::ERROR_DESCRIPTION);
 		$criteria->addSelectColumn(DropFolderFilePeer::PARSED_SLUG);
-		$criteria->addSelectColumn(DropFolderFilePeer::PARSED_FLAVOR_ID);
+		$criteria->addSelectColumn(DropFolderFilePeer::PARSED_FLAVOR);
 		$criteria->addSelectColumn(DropFolderFilePeer::CREATED_AT);
 		$criteria->addSelectColumn(DropFolderFilePeer::UPDATED_AT);
 		$criteria->addSelectColumn(DropFolderFilePeer::CUSTOM_DATA);

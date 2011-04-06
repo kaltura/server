@@ -74,10 +74,10 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	protected $parsed_slug;
 
 	/**
-	 * The value for the parsed_flavor_id field.
-	 * @var        int
+	 * The value for the parsed_flavor field.
+	 * @var        string
 	 */
-	protected $parsed_flavor_id;
+	protected $parsed_flavor;
 
 	/**
 	 * The value for the created_at field.
@@ -246,13 +246,13 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [parsed_flavor_id] column value.
+	 * Get the [parsed_flavor] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
-	public function getParsedFlavorId()
+	public function getParsedFlavor()
 	{
-		return $this->parsed_flavor_id;
+		return $this->parsed_flavor;
 	}
 
 	/**
@@ -582,27 +582,27 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	} // setParsedSlug()
 
 	/**
-	 * Set the value of [parsed_flavor_id] column.
+	 * Set the value of [parsed_flavor] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     DropFolderFile The current object (for fluent API support)
 	 */
-	public function setParsedFlavorId($v)
+	public function setParsedFlavor($v)
 	{
-		if(!isset($this->oldColumnsValues[DropFolderFilePeer::PARSED_FLAVOR_ID]))
-			$this->oldColumnsValues[DropFolderFilePeer::PARSED_FLAVOR_ID] = $this->parsed_flavor_id;
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::PARSED_FLAVOR]))
+			$this->oldColumnsValues[DropFolderFilePeer::PARSED_FLAVOR] = $this->parsed_flavor;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
-		if ($this->parsed_flavor_id !== $v) {
-			$this->parsed_flavor_id = $v;
-			$this->modifiedColumns[] = DropFolderFilePeer::PARSED_FLAVOR_ID;
+		if ($this->parsed_flavor !== $v) {
+			$this->parsed_flavor = $v;
+			$this->modifiedColumns[] = DropFolderFilePeer::PARSED_FLAVOR;
 		}
 
 		return $this;
-	} // setParsedFlavorId()
+	} // setParsedFlavor()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -763,7 +763,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$this->last_file_size_check_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->error_description = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->parsed_slug = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->parsed_flavor_id = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->parsed_flavor = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
@@ -1211,7 +1211,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				return $this->getParsedSlug();
 				break;
 			case 9:
-				return $this->getParsedFlavorId();
+				return $this->getParsedFlavor();
 				break;
 			case 10:
 				return $this->getCreatedAt();
@@ -1252,7 +1252,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$keys[6] => $this->getLastFileSizeCheckAt(),
 			$keys[7] => $this->getErrorDescription(),
 			$keys[8] => $this->getParsedSlug(),
-			$keys[9] => $this->getParsedFlavorId(),
+			$keys[9] => $this->getParsedFlavor(),
 			$keys[10] => $this->getCreatedAt(),
 			$keys[11] => $this->getUpdatedAt(),
 			$keys[12] => $this->getCustomData(),
@@ -1315,7 +1315,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				$this->setParsedSlug($value);
 				break;
 			case 9:
-				$this->setParsedFlavorId($value);
+				$this->setParsedFlavor($value);
 				break;
 			case 10:
 				$this->setCreatedAt($value);
@@ -1359,7 +1359,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[6], $arr)) $this->setLastFileSizeCheckAt($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setErrorDescription($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setParsedSlug($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setParsedFlavorId($arr[$keys[9]]);
+		if (array_key_exists($keys[9], $arr)) $this->setParsedFlavor($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
@@ -1383,7 +1383,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT)) $criteria->add(DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT, $this->last_file_size_check_at);
 		if ($this->isColumnModified(DropFolderFilePeer::ERROR_DESCRIPTION)) $criteria->add(DropFolderFilePeer::ERROR_DESCRIPTION, $this->error_description);
 		if ($this->isColumnModified(DropFolderFilePeer::PARSED_SLUG)) $criteria->add(DropFolderFilePeer::PARSED_SLUG, $this->parsed_slug);
-		if ($this->isColumnModified(DropFolderFilePeer::PARSED_FLAVOR_ID)) $criteria->add(DropFolderFilePeer::PARSED_FLAVOR_ID, $this->parsed_flavor_id);
+		if ($this->isColumnModified(DropFolderFilePeer::PARSED_FLAVOR)) $criteria->add(DropFolderFilePeer::PARSED_FLAVOR, $this->parsed_flavor);
 		if ($this->isColumnModified(DropFolderFilePeer::CREATED_AT)) $criteria->add(DropFolderFilePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DropFolderFilePeer::UPDATED_AT)) $criteria->add(DropFolderFilePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(DropFolderFilePeer::CUSTOM_DATA)) $criteria->add(DropFolderFilePeer::CUSTOM_DATA, $this->custom_data);
@@ -1457,7 +1457,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 
 		$copyObj->setParsedSlug($this->parsed_slug);
 
-		$copyObj->setParsedFlavorId($this->parsed_flavor_id);
+		$copyObj->setParsedFlavor($this->parsed_flavor);
 
 		$copyObj->setCreatedAt($this->created_at);
 
