@@ -33,7 +33,6 @@ class ThumbAssetService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(thumbParamsPeer::getInstance(), $partnerGroup);
 	}
 	
-	
     /**
      * Add thumbnail asset
      *
@@ -65,7 +64,7 @@ class ThumbAssetService extends KalturaBaseService
     	}
     	
     	$dbThumbAsset = new thumbAsset();
-    	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
+    	$dbThumbAsset = $thumbAsset->toInsertableObject($dbThumbAsset);
     	
 		$dbThumbAsset->setEntryId($entryId);
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
@@ -85,6 +84,40 @@ class ThumbAssetService extends KalturaBaseService
     	}
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
+		
+		$thumbAsset = new KalturaThumbAsset();
+		$thumbAsset->fromObject($dbThumbAsset);
+		return $thumbAsset;
+    }
+	
+    /**
+     * Update thumbnail asset
+     *
+     * @action update
+     * @param string $id
+     * @param KalturaThumbAsset $thumbAsset
+     * @param KalturaContentResource $contentResource
+     * @return KalturaThumbAsset
+     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @throws KalturaErrors::THUMB_ASSET_ALREADY_EXISTS
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
+     */
+    function updateAction($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource)
+    {
+		$dbThumbAsset = thumbAssetPeer::retrieveById($id);
+		if($dbThumbAsset)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+    	
+    	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
+		$dbThumbAsset->incrementVersion();
+		$dbThumbAsset->save();
+    	
+    	$this->attachContentResource($dbThumbAsset, $contentResource);
 		
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->fromObject($dbThumbAsset);

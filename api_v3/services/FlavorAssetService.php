@@ -77,7 +77,7 @@ class FlavorAssetService extends KalturaBaseService
     	}
     	
     	$dbFlavorAsset = new flavorAsset();
-    	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
+    	$dbFlavorAsset = $flavorAsset->toInsertableObject($dbFlavorAsset);
     	
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
@@ -98,6 +98,41 @@ class FlavorAssetService extends KalturaBaseService
 		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
 		$dbFlavorAsset->save();
 		
+		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset->fromObject($dbFlavorAsset);
+		return $flavorAsset;
+    }
+
+    /**
+     * Update flavor asset
+     *
+     * @action update
+     * @param string $id
+     * @param KalturaFlavorAsset $flavorAsset
+     * @param KalturaContentResource $contentResource
+     * @return KalturaFlavorAsset
+     * @throws KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
+     */
+    function updateAction($id, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource)
+    {
+   		$dbFlavorAsset = flavorAssetPeer::retrieveById($id);
+   		if(!$dbFlavorAsset)
+   			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
+    	
+    	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
+		$dbFlavorAsset->incrementVersion();
+		$dbFlavorAsset->save();
+    	
+    	$this->attachContentResource($dbFlavorAsset, $contentResource);
+		
+    	// TODO - maybe we should raise object updated event to trigger post convert job?
+    	
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->fromObject($dbFlavorAsset);
 		return $flavorAsset;
