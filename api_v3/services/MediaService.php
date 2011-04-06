@@ -1294,7 +1294,8 @@ class MediaService extends KalturaEntryService
 		if($dbEntry->getReplacingEntryId())
 		{
 			$dbTempEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
-			myEntryUtils::deleteEntry($dbTempEntry);
+			if($dbTempEntry)
+				myEntryUtils::deleteEntry($dbTempEntry);
 		}
 		
 		$dbEntry->setReplacingEntryId(null);
