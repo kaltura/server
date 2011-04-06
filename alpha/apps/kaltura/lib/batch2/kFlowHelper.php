@@ -145,11 +145,14 @@ class kFlowHelper
 		}
 		else
 		{
-			// if the flavor is the source, its readiness should be decided during the profile conversion 
-			if($flavorAsset->getIsOriginal() && $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
-			else
-				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+			// if the flavor is the source, its readiness should be decided during the profile conversion
+			if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			{ 
+				if($flavorAsset->getIsOriginal())
+					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+				else
+					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+			}
 				
 			$flavorAsset->save();
 			
