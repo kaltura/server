@@ -1173,6 +1173,7 @@ class MediaService extends KalturaEntryService
 	 * @return KalturaMediaEntry The updated media entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS
 	 */
 	function updateAction($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null)
 	{
@@ -1194,9 +1195,9 @@ class MediaService extends KalturaEntryService
 		$partner = $this->getPartner();
 		if(!is_null($resource) && $partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
 		{
-			if(!$dbEntry)
-				$dbEntry = entryPeer::retrieveByPK($entryId);
-				
+			if($dbEntry->getReplacingEntryId())
+				throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+			
 			$tempMediaEntry = new KalturaMediaEntry();
 		 	$tempMediaEntry->type = $mediaEntry->type;
 			$tempMediaEntry->mediaType = $mediaEntry->mediaType;
