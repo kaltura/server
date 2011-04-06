@@ -1565,7 +1565,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function getIsmVersion (  )		{	return (int) $this->getFromCustomData( "ismVersion" );	}
 	
 	public function setReferenceID  ( $v )	{	$this->putInCustomData ( "referenceID" , $v );	}
-	public function getReferenceID (  )		{	return (int) $this->getFromCustomData( "referenceID" );	}
+	public function getReferenceID (  )		{	return $this->getFromCustomData( "referenceID" );	}
 	
 	public function setPartnerSortValue ( $v )	{	$this->putInCustomData ( "partnerSortValue" , $v );	}
 	public function getPartnerSortValue (  )	{	return (int) $this->getFromCustomData( "partnerSortValue" );	}
@@ -1574,10 +1574,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function getReplacementStatus (  )	{	return (int) $this->getFromCustomData( "replacementStatus" );	}
 	
 	public function setReplacingEntryId ( $v )	{	$this->putInCustomData ( "replacingEntryId" , $v );	}
-	public function getReplacingEntryId (  )	{	return (int) $this->getFromCustomData( "replacingEntryId" );	}
+	public function getReplacingEntryId (  )	{	return $this->getFromCustomData( "replacingEntryId" );	}
 	
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
-	public function getReplacedEntryId (  )		{	return (int) $this->getFromCustomData( "replacedEntryId" );	}
+	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 	
 	public function setDynamicFlavorAttributes(array $v)
 	{
