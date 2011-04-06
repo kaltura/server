@@ -1299,6 +1299,7 @@ class MediaService extends KalturaEntryService
 		
 		$dbEntry->setReplacingEntryId(null);
 		$dbEntry->setReplacementStatus(entryReplacementStatus::NONE);
+		$dbEntry->save();
 		
 		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
 	}
