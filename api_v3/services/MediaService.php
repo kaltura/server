@@ -1213,7 +1213,7 @@ class MediaService extends KalturaEntryService
 			
 			$dbEntry->setReplacingEntryId($tempDbEntry->getId());
 			$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
-			if($partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
+			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
 				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 			$dbEntry->save();
 			
