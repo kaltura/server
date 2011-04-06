@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Core
+ * @package plugins.dropFolder
  * @subpackage model.enum
  */ 
 interface DropFolderFileStatus extends BaseEnum

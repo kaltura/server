@@ -10,7 +10,7 @@
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package Core
+ * @package plugins.dropFolder
  * @subpackage model
  */
 class DropFolder extends BaseDropFolder
@@ -63,7 +63,7 @@ class DropFolder extends BaseDropFolder
 	// Unmatched file policy
 	
 	/**
-	 * @return IngestionUnmatchedFilesPolicy
+	 * @return DropFolderUnmatchedFilesPolicy
 	 */
 	public function getUnmatchedFilePolicy()
 	{
@@ -71,7 +71,7 @@ class DropFolder extends BaseDropFolder
 	}
 	
 	/**
-	 * @param IngestionUnmatchedFilesPolicy $policy
+	 * @param DropFolderUnmatchedFilesPolicy $policy
 	 */
 	public function setUnmatchedFilePolicy($policy)
 	{

@@ -10,9 +10,21 @@
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package Core
+ * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolderFilePeer extends BaseDropFolderFilePeer {
+class DropFolderFilePeer extends BaseDropFolderFilePeer
+{
 
+	
+	public static function getByDropFolderIdAndFileName($dropFolderId, $fileName)
+	{
+		$c = new Criteria();
+		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
+		$c->addAnd(DropFolderFilePeer::FILE_NAME, $fileName, Criteria::EQUAL);
+		$dropFolderFile = DropFolderFilePeer::doSelectOne($c);
+		return $dropFolderFile;		
+	}
+	
+	
 } // DropFolderFilePeer
