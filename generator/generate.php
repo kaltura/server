@@ -36,14 +36,17 @@
  * 			either create a Nullable Boolean type, or keep a map of changed parameters, then only send the variables in that map.
  */
 error_reporting(E_ALL);
+ini_set( "memory_limit","512M" );
 
 //the name of the output folder for the generators -
-$outputPathBase = 'output';
-//the name of the summary file that will be used by the UI -
-$summaryFileName = 'summary.kinf';
 
 //bootstrap connects the generator to the rest of Kaltura system
 require_once("bootstrap.php");
+
+$root = myContentStorage::getFSContentRootPath();
+$outputPathBase = "$root/content/generator/output";
+//the name of the summary file that will be used by the UI -
+$summaryFileName = 'summary.kinf';
 
 //pass the name of the generator as the first argument of the command line to
 //generate a single library. if this argument is empty, generator will create all libs.
