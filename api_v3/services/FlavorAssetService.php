@@ -79,6 +79,13 @@ class FlavorAssetService extends KalturaBaseService
     	$dbFlavorAsset = new flavorAsset();
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
     	
+    	if(!is_null($flavorAsset->flavorParamsId))
+    	{
+    		$flavorParams = flavorParamsPeer::retrieveByPK($flavorAsset->flavorParamsId);
+    		if($flavorParams && $flavorParams->hasTag(flavorParams::TAG_SOURCE))
+    			$dbFlavorAsset->setIsOriginal(true);
+    	}
+    	
 		$dbFlavorAsset->setEntryId($entryId);
 		$dbFlavorAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbFlavorAsset->incrementVersion();
