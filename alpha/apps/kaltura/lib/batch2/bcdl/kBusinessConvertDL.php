@@ -9,11 +9,11 @@ class kBusinessConvertDL
 	public static function replaceEntry(entry $entry, entry $tempEntry = null)
 	{
 		if(!$tempEntry)
-			$tempEntry = entryPeer::retrieveByPK($entry->getReplacedEntryId());
+			$tempEntry = entryPeer::retrieveByPK($entry->getReplacingEntryId());
 			
 		if(!$tempEntry)
 		{
-			KalturaLog::err("Temp entry id [" . $entry->getReplacedEntryId() . "] not found");
+			KalturaLog::err("Temp entry id [" . $entry->getReplacingEntryId() . "] not found");
 			return;
 		}
 		
