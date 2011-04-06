@@ -110,7 +110,7 @@ class ThumbAssetService extends KalturaBaseService
     function updateAction($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource)
     {
 		$dbThumbAsset = thumbAssetPeer::retrieveById($id);
-		if($dbThumbAsset)
+		if(!$dbThumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
     	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
