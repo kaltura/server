@@ -67,6 +67,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	 * The file extension
 	 * 
 	 * @var string
+	 * @insertonly
 	 */
 	public $fileExt;
 	

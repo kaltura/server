@@ -9,6 +9,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * The Flavor Params used to create this Flavor Asset
 	 * 
 	 * @var int
+	 * @insertonly
 	 */
 	public $flavorParamsId;
 	
