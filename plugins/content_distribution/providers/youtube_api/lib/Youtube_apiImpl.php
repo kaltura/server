@@ -50,6 +50,11 @@ class YouTubeApiImpl
 	
 	public function uploadVideo($fileDisk, $fileUrl,$props)
 	{
+//		foreach ($props as $key => $val)
+//		{
+//			error_log($key . " is " . $val);
+//		}
+		
 		// create a new VideoEntry object 
 		$myVideoEntry = new Zend_Gdata_YouTube_VideoEntry();  
 		// create a new Zend_Gdata_App_MediaFileSource object 
@@ -91,13 +96,13 @@ class YouTubeApiImpl
 		$uploadUrl = 'http://uploads.gdata.youtube.com/feeds/api/users/default/uploads';  
 		// try to upload the video, catching a Zend_Gdata_App_HttpException,  
 		// if available, or just a regular Zend_Gdata_App_Exception otherwise 
-		try 
-		{   
+/*		try 
+		{   */
 			$newEntry = $this->yt->insertEntry($myVideoEntry, $uploadUrl, 'Zend_Gdata_YouTube_VideoEntry'); 
 			$newEntry -> setMajorProtocolVersion(2);
 			$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
 			return $newEntry->getVideoId();
-		}
+/*		}
 		catch (Zend_Gdata_App_HttpException $httpException) 
 		{   
 	//		print_r($httpException);
@@ -109,7 +114,7 @@ class YouTubeApiImpl
 	//		print_r($e);
 			echo $e->getMessage(); 
 			return null;
-		}
+		}*/
 	}
 
 	private function addPlaylist($playlistName, $videoEntry)
@@ -119,14 +124,14 @@ class YouTubeApiImpl
 		$newPlaylist->title = $this->yt->newTitle()->setText($playlistName);
 		// post the new playlist
 		$postLocation = 'http://gdata.youtube.com/feeds/api/users/default/playlists';
-		try 
-		{
+/*		try 
+		{*/
 		  $newPlaylistEntry = $this->yt->insertEntry($newPlaylist, $postLocation, 'Zend_Gdata_YouTube_PlaylistListEntry');
 		  $newPlaylistEntry->setMajorProtocolVersion(2);
-		} catch (Zend_Gdata_App_Exception $e) {
+/*		} catch (Zend_Gdata_App_Exception $e) {
 		  echo $e->getMessage();
 		  return;
-		}	
+		}	*/
 		
 		$postUrl = $newPlaylistEntry->getPlaylistVideoFeedUrl();
 
@@ -134,11 +139,11 @@ class YouTubeApiImpl
 		$newPlaylistListEntry = $this->yt->newPlaylistListEntry($videoEntry->getDOM());
 
 		// post
-		try {
+/*		try {*/
 		  $this->yt->insertEntry($newPlaylistListEntry, $postUrl);
-		} catch (Zend_App_Exception $e) {
+/*		} catch (Zend_App_Exception $e) {
 		  echo $e->getMessage();
-		}		
+		}	*/	
 	}
 	
 	private function updatePlaylist($playlist, $videoEntry)
@@ -149,11 +154,11 @@ class YouTubeApiImpl
 		$newPlaylistListEntry = $this->yt->newPlaylistListEntry($videoEntry->getDOM());
 
 		// post
-		try {
+/*		try {*/
 		  $this->yt->insertEntry($newPlaylistListEntry, $postUrl);
-		} catch (Zend_App_Exception $e) {
+/*		} catch (Zend_App_Exception $e) {
 		  echo $e->getMessage();
-		}	
+		}	*/
 	}
 
 	private function removeFromPlaylist($playlistVideoEntry)
@@ -289,7 +294,8 @@ class YouTubeApiImpl
 		$this->yt->delete($videoEntry);
 	}
 }
-/*$impl = new YouTubeApiImpl('kalturasb', '250vanil');
+/*
+$impl = new YouTubeApiImpl('kalturasb', '250vanil');
 
 $props = Array();
 $props['title'] = 'My Test Movie';
@@ -300,11 +306,11 @@ $props['playlists'] ='';
 $props['comment']= 'denied';
 $props['rate']= 'denied';
 $props['commentVote']= 'denied';
-$props['videoRespond']= 'allowed';*/
+$props['videoRespond']= 'allowed';
 //print $impl -> uploadVideo('sizeme.flv','sizeme.flv', $props);
 
 
-//$newEntry = uploadVideo($yt, 'snake.wmv','snake.wmv', 'My Test Movie', 'My Test Movie', 'Autos', 'cars, funny');
+$newEntry = $impl -> uploadVideo('snake.wmv','snake.wmv', $props);*/
 //$newEntry -> setMajorProtocolVersion(2);
 //$impl->getEntry('bYuqjJWRi1w');
 //$impl->updateEntry('GYgYuLRf8Dc', $props);

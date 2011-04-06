@@ -77,7 +77,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		$props['description'] = $entry->description;
 		$props['start_date'] = time();
 		$props['end_date'] = time();
-		$props['playlists']= $distributionProfile->playlists;
+		$props['playlists']= $data->providerData->playlists;
 		$props['comment']= $distributionProfile->allowComments;
 		$props['rate']= $distributionProfile->allowEmbedding;
 		$props['commentVote']= $distributionProfile->allowRatings;

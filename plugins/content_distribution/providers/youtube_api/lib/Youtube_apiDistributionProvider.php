@@ -70,7 +70,7 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	 */
 	public function isReportsEnabled()
 	{
-		return true; // TODO - check if reports supported
+		return false; // TODO - check if reports supported
 	}
 
 	/* (non-PHPdoc)
@@ -78,7 +78,7 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		return true;
+		return false;
 	}
 
 	/* (non-PHPdoc)
