@@ -25,6 +25,31 @@ class KalturaTrackEntryEventType
  * @package Admin
  * @subpackage Client
  */
+class KalturaMediaInfoListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaMediaInfo
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 {
 	/**
@@ -42,6 +67,55 @@ class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaInvestigateFlavorAssetData extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaFlavorAsset
+	 * @readonly
+	 */
+	public $flavorAsset;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncListResponse
+	 * @readonly
+	 */
+	public $fileSyncs;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMediaInfoListResponse
+	 * @readonly
+	 */
+	public $mediaInfos;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFlavorParams
+	 * @readonly
+	 */
+	public $flavorParams;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFlavorParamsOutputListResponse
+	 * @readonly
+	 */
+	public $flavorParamsOutputs;
 
 
 }
@@ -75,23 +149,39 @@ class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
  * @package Admin
  * @subpackage Client
  */
-class KalturaMediaInfoListResponse extends KalturaObjectBase
+class KalturaInvestigateThumbAssetData extends KalturaObjectBase
 {
 	/**
 	 * 
 	 *
-	 * @var array of KalturaMediaInfo
+	 * @var KalturaThumbAsset
 	 * @readonly
 	 */
-	public $objects;
+	public $thumbAsset;
 
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var KalturaFileSyncListResponse
 	 * @readonly
 	 */
-	public $totalCount = null;
+	public $fileSyncs;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaThumbParams
+	 * @readonly
+	 */
+	public $thumbParams;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaThumbParamsOutputListResponse
+	 * @readonly
+	 */
+	public $thumbParamsOutputs;
 
 
 }
@@ -220,6 +310,63 @@ class KalturaTrackEntry extends KalturaObjectBase
 	 * @var string
 	 */
 	public $userIp = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaInvestigateEntryData extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaBaseEntry
+	 * @readonly
+	 */
+	public $entry;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaFileSyncListResponse
+	 * @readonly
+	 */
+	public $fileSyncs;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaBatchJobListResponse
+	 * @readonly
+	 */
+	public $jobs;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaInvestigateFlavorAssetData
+	 * @readonly
+	 */
+	public $flavorAssets;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaInvestigateThumbAssetData
+	 * @readonly
+	 */
+	public $thumbAssets;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaTrackEntry
+	 * @readonly
+	 */
+	public $tracks;
 
 
 }
