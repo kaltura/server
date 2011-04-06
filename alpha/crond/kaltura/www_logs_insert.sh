@@ -28,23 +28,23 @@ rm -f www_res
 rm -f www_res.sql
 
 
-cd /opt/kaltura/logs
+##cd /opt/kaltura/logs
 
 # extract unique ips
 
-zcat /data/logs/investigate/??-apache*-access_log-$WHEN.gz |awk '{print $1}'|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'|sort -u >uvip_$WHEN
+##zcat /data/logs/investigate/??-apache*-access_log-$WHEN.gz |awk '{print $1}'|grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'|sort -u >uvip_$WHEN
 
-php /opt/kaltura/app/alpha/scripts/uv_summary_insert.php ip $WHEN uvip_$WHEN > ip_res.sql
-mysql -h${DBSTATS} kaltura_stats -uroot -proot < ip_res.sql
+##php /opt/kaltura/app/alpha/scripts/uv_summary_insert.php ip $WHEN uvip_$WHEN > ip_res.sql
+##mysql -h${DBSTATS} kaltura_stats -uroot -proot < ip_res.sql
 
-rm -f ip_res.sql
+##rm -f ip_res.sql
 
 # extract unique cookies
 
-zcat /data/logs/investigate/??-apache*-access_log-$WHEN.gz |php /opt/kaltura/app/alpha/scripts/find_unique_visitors.php >uv_$WHEN
+##zcat /data/logs/investigate/??-apache*-access_log-$WHEN.gz |php /opt/kaltura/app/alpha/scripts/find_unique_visitors.php >uv_$WHEN
 
-php /opt/kaltura/app/alpha/scripts/uv_summary_insert.php cookie $WHEN uv_$WHEN > cookie_res.sql
-mysql -h${DBSTATS} kaltura_stats -uroot -proot < cookie_res.sql
+##php /opt/kaltura/app/alpha/scripts/uv_summary_insert.php cookie $WHEN uv_$WHEN > cookie_res.sql
+##mysql -h${DBSTATS} kaltura_stats -uroot -proot < cookie_res.sql
 
-rm -f cookie_res.sql
+##rm -f cookie_res.sql
 
