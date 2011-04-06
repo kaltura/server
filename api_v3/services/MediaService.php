@@ -1183,6 +1183,7 @@ class MediaService extends KalturaEntryService
 		
 		if(is_null($mediaEntry))
 		{
+			$mediaEntry = new KalturaMediaEntry();
 			$mediaEntry->fromObject($dbEntry);
 		}
 		else
