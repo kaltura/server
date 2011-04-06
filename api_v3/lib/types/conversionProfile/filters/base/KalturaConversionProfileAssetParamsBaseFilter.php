@@ -16,6 +16,8 @@ class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilter
 		"readyBehaviorIn" => "_in_ready_behavior",
 		"originEqual" => "_eq_origin",
 		"originIn" => "_in_origin",
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
 	);
 
 	private $order_by_map = array
@@ -87,4 +89,18 @@ class KalturaConversionProfileAssetParamsBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $originIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameIn;
 }
