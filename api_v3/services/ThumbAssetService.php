@@ -131,6 +131,7 @@ class ThumbAssetService extends KalturaBaseService
 		
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setFileExt($ext);
+		$thumbAsset->setSize(filesize($fullPath));
 		$thumbAsset->save();
 		
 		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -265,8 +266,6 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	protected function attachUrl(thumbAsset $thumbAsset, $url)
 	{
-        $thumbAsset->save();
-        
     	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $thumbAsset->getId() . '.jpg';
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($thumbAsset, $fullPath);
@@ -357,6 +356,12 @@ class ThumbAssetService extends KalturaBaseService
 		
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+                
+        $fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+        $fileSync = kFileSyncUtils::resolve($fileSync);
+        
+		$thumbAsset->setSize($fileSync->getFileSize());
+		$thumbAsset->save();
     }
     
 	/**

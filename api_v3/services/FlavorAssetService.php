@@ -143,6 +143,7 @@ class FlavorAssetService extends KalturaBaseService
 	{
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		$flavorAsset->setFileExt($ext);
+		$flavorAsset->setSize(filesize($fullPath));
 		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
 		
@@ -417,6 +418,12 @@ class FlavorAssetService extends KalturaBaseService
 		
         $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+                
+        $fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+        $fileSync = kFileSyncUtils::resolve($fileSync);
+        
+		$flavorAsset->setSize($fileSync->getFileSize());
+		$flavorAsset->save();
     }
     
 	/**
