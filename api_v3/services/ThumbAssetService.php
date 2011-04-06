@@ -68,8 +68,6 @@ class ThumbAssetService extends KalturaBaseService
     	
 		$dbThumbAsset->setEntryId($entryId);
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
-		$dbThumbAsset->incrementVersion();
-		$dbThumbAsset->save();
     	
     	$this->attachContentResource($dbThumbAsset, $contentResource);
 				
@@ -114,8 +112,6 @@ class ThumbAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
     	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
-		$dbThumbAsset->incrementVersion();
-		$dbThumbAsset->save();
     	
     	$this->attachContentResource($dbThumbAsset, $contentResource);
 		
@@ -132,6 +128,8 @@ class ThumbAssetService extends KalturaBaseService
 	protected function attachFile(thumbAsset $thumbAsset, $fullPath, $copyOnly = false)
 	{
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+		
+		$thumbAsset->incrementVersion();
 		$thumbAsset->setFileExt($ext);
 		$thumbAsset->save();
 		
@@ -267,6 +265,8 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	protected function attachUrl(thumbAsset $thumbAsset, $url)
 	{
+        $thumbAsset->save();
+        
     	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $thumbAsset->getId() . '.jpg';
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($thumbAsset, $fullPath);
@@ -352,6 +352,9 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	protected function attachFileSync(thumbAsset $thumbAsset, FileSyncKey $srcSyncKey)
 	{
+		$thumbAsset->incrementVersion();
+		$thumbAsset->save();
+		
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
     }
@@ -391,6 +394,8 @@ class ThumbAssetService extends KalturaBaseService
 			
         	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->storageProfileId);
         }
+        $thumbAsset->incrementVersion();
+        $thumbAsset->save();
         	
         $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->url, $storageProfile);

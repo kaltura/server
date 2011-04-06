@@ -88,8 +88,6 @@ class FlavorAssetService extends KalturaBaseService
     	
 		$dbFlavorAsset->setEntryId($entryId);
 		$dbFlavorAsset->setPartnerId($dbEntry->getPartnerId());
-		$dbFlavorAsset->incrementVersion();
-		$dbFlavorAsset->save();
     	
     	$this->attachContentResource($dbFlavorAsset, $contentResource);
 				
@@ -126,8 +124,6 @@ class FlavorAssetService extends KalturaBaseService
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
-		$dbFlavorAsset->incrementVersion();
-		$dbFlavorAsset->save();
     	
     	$this->attachContentResource($dbFlavorAsset, $contentResource);
 		
@@ -147,6 +143,7 @@ class FlavorAssetService extends KalturaBaseService
 	{
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		$flavorAsset->setFileExt($ext);
+		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -336,6 +333,8 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	protected function attachUrl(flavorAsset $flavorAsset, $url)
 	{
+		$flavorAsset->save();
+		
 		kJobsManager::addImportJob(null, $flavorAsset->getEntryId(), $this->getPartnerId(), $url, $flavorAsset);
     }
     
@@ -413,6 +412,9 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	protected function attachFileSync(flavorAsset $flavorAsset, FileSyncKey $srcSyncKey)
 	{
+		$flavorAsset->incrementVersion();
+		$flavorAsset->save();
+		
         $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
     }
@@ -453,6 +455,9 @@ class FlavorAssetService extends KalturaBaseService
         	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->storageProfileId);
         }
         	
+		$flavorAsset->incrementVersion();
+		$flavorAsset->save();
+		
         $syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->url, $storageProfile);
     }
