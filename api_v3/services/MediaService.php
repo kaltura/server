@@ -1181,7 +1181,6 @@ class MediaService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$mediaEntry = new KalturaMediaEntry();
 		if(is_null($mediaEntry))
 		{
 			$mediaEntry->fromObject($dbEntry);
