@@ -7,6 +7,23 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionProviderType
+{
+	const GENERIC = "1";
+	const SYNDICATION = "2";
+	const MSN = "msnDistribution.MSN";
+	const COMCAST = "comcastDistribution.COMCAST";
+	const YOUTUBE = "youTubeDistribution.YOUTUBE";
+	const EXAMPLE = "exampleDistribution.EXAMPLE";
+	const IDETIC = "ideticDistribution.IDETIC";
+	const MYSPACE = "myspaceDistribution.MYSPACE";
+	const VERIZON = "verizonDistribution.VERIZON";
+}
+
 
 /**
  * @package Scheduler
