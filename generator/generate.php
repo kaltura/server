@@ -45,6 +45,7 @@ require_once("bootstrap.php");
 
 $root = myContentStorage::getFSContentRootPath();
 $outputPathBase = "$root/content/generator/output";
+kFile::fullMkdir($outputPathBase);
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
 

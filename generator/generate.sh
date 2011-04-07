@@ -5,5 +5,5 @@ rm -fr ../cache/generatorv3/*
 
 php generate.php "$@"
 
-rsync -avC output/adminConsoleClient/ ../admin_console/lib/Kaltura
-rsync -avC output/batchClient/ ../batch/client
+rsync -avC /web/content/generator/output/adminConsoleClient/ ../admin_console/lib/Kaltura
+rsync -avC /web/content/generator/output/batchClient/ ../batch/client
