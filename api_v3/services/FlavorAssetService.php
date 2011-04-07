@@ -92,9 +92,6 @@ class FlavorAssetService extends KalturaBaseService
     	$this->attachContentResource($dbFlavorAsset, $contentResource);
 				
     	kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
-    	
-		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
-		$dbFlavorAsset->save();
 		
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->fromObject($dbFlavorAsset);
@@ -127,8 +124,6 @@ class FlavorAssetService extends KalturaBaseService
     	
     	$this->attachContentResource($dbFlavorAsset, $contentResource);
 		
-    	// TODO - maybe we should raise object updated event to trigger post convert job?
-    	
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->fromObject($dbFlavorAsset);
 		return $flavorAsset;
@@ -158,6 +153,11 @@ class FlavorAssetService extends KalturaBaseService
 			$flavorAsset->save();												
 			throw $e;
 		}
+		
+        if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+			
+		$flavorAsset->save();
     }
     
 	/**
@@ -422,6 +422,9 @@ class FlavorAssetService extends KalturaBaseService
         $fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
         $fileSync = kFileSyncUtils::resolve($fileSync);
         
+        if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+		
 		$flavorAsset->setSize($fileSync->getFileSize());
 		$flavorAsset->save();
     }
@@ -467,6 +470,9 @@ class FlavorAssetService extends KalturaBaseService
 		
         $syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->url, $storageProfile);
+		
+		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$flavorAsset->save();
     }
     
 	/**
