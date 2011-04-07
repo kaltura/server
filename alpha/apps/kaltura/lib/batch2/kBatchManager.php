@@ -392,11 +392,11 @@ class kBatchManager
 		return 1;
 	}
 	
-	public static function updateEntry(BatchJob $dbBatchJob, $status)
+	public static function updateEntry($entryId, $status)
 	{
-		$entry = $dbBatchJob->getEntry();
+		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry) {
-			KalturaLog::debug("Entry was not found for job id [$dbBatchJob->getId()]");
+			KalturaLog::err("Entry was not found for job id [$entryId]");
 			return null;
 		}
 		
@@ -417,7 +417,7 @@ class kBatchManager
 		$entry->setStatus($status);
 		$entry->save();
 		
-		kFlowHelper::createEntryUpdateNotification($dbBatchJob);
+		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry, null, null, null, null, $entry->getId());
 		
 		return $entry;
 	}

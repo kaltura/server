@@ -473,6 +473,8 @@ class FlavorAssetService extends KalturaBaseService
 		
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		$flavorAsset->save();
+		
+		kBusinessPostConvertDL::handleConvertFinished(null, $flavorAsset);
     }
     
 	/**

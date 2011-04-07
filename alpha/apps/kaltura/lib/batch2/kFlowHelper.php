@@ -50,14 +50,6 @@ class kFlowHelper
 	
 	/**
 	 * @param BatchJob $dbBatchJob
-	 */
-	public static function createEntryUpdateNotification(BatchJob $dbBatchJob)
-	{
-		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $dbBatchJob->getEntry(true, false), null, null, null, null, $dbBatchJob->getEntryId());
-	}
-	
-	/**
-	 * @param BatchJob $dbBatchJob
 	 * @param kImportJobData $data
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
@@ -95,7 +87,7 @@ class kFlowHelper
 			if(!$flavorAsset)
 			{
 				KalturaLog::err("Flavor asset not created for entry [" . $dbBatchJob->getEntryId() . "]");
-				kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 				$dbBatchJob->setMessage($msg);
 				$dbBatchJob->setDescription($dbBatchJob->getDescription() . "\n" . $msg);
 				return $dbBatchJob;
@@ -211,7 +203,7 @@ class kFlowHelper
 		{
 			$entry = $dbBatchJob->getEntry();
 			if($entry->getStatus() != entryStatus::READY && $entry->getStatus() != entryStatus::DELETED)
-				kBatchManager::updateEntry($dbBatchJob, entryStatus::PRECONVERT);
+				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::PRECONVERT);
 		}
 				
 		switch($dbBatchJob->getJobSubType())
@@ -1176,7 +1168,7 @@ class kFlowHelper
 			catch(Exception $e)
 			{
 				KalturaLog::err($e->getMessage());
-				kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 				return $dbBatchJob;
 			}
 		}
@@ -1324,7 +1316,7 @@ class kFlowHelper
 	{
 		KalturaLog::debug("Convert Profile failed");
 		
-		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 		
 		$originalflavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
 		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
@@ -1471,13 +1463,13 @@ class kFlowHelper
 		$entry->setSecondaryBroadcastingUrl($data->getSecondaryBroadcastingUrl());	
 		$entry->setStreamName($data->getStreamName());
 	
-		kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
+		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::READY);
 		return $dbBatchJob; 	
 	}
 	
 	public static function handleProvisionProvideFailed(BatchJob $dbBatchJob, kProvisionJobData $data, BatchJob $twinJob = null)
 	{
-		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 		return $dbBatchJob; 	
 	}
 	

@@ -106,9 +106,9 @@ class kBusinessPostConvertDL
 	 * @param flavorAsset $currentFlavorAsset
 	 * @return BatchJob
 	 */
-	public static function handleConvertFinished(BatchJob $dbBatchJob, flavorAsset $currentFlavorAsset)
+	public static function handleConvertFinished(BatchJob $dbBatchJob = null, flavorAsset $currentFlavorAsset)
 	{
-		KalturaLog::debug("entry id [" . $dbBatchJob->getEntryId() . "] flavor asset id [" . $currentFlavorAsset->getId() . "]");
+		KalturaLog::debug("entry id [" . $currentFlavorAsset->getEntryId() . "] flavor asset id [" . $currentFlavorAsset->getId() . "]");
 		$profile = null;
 		try{
 			$profile = myPartnerUtils::getConversionProfile2ForEntry($currentFlavorAsset->getEntryId());
@@ -121,7 +121,9 @@ class kBusinessPostConvertDL
 		
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		
-		$rootBatchJob = $dbBatchJob->getRootJob();
+		$rootBatchJob = null;
+		if($dbBatchJob)
+			$rootBatchJob = $dbBatchJob->getRootJob();
 		if($rootBatchJob)
 			KalturaLog::debug("root batch job id [" . $rootBatchJob->getId() . "] type [" . $rootBatchJob->getJobType() . "]");
 		
@@ -183,7 +185,7 @@ class kBusinessPostConvertDL
 		
 		// go over all the flavor assets of the entry
 		$inCompleteFlavorIds = array();
-		$siblingFlavorAssets = flavorAssetPeer::retrieveByEntryId($dbBatchJob->getEntryId());
+		$siblingFlavorAssets = flavorAssetPeer::retrieveByEntryId($currentFlavorAsset->getEntryId());
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
 		{
 			KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] flavor params id [" . $siblingFlavorAsset->getFlavorParamsId() . "]");
@@ -247,7 +249,7 @@ class kBusinessPostConvertDL
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
 			if(!$currentFlavorAsset->getentry()->getReplacedEntryId())
-				kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
+				kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 		}
 		
 		// no need to finished the root job
@@ -260,7 +262,7 @@ class kBusinessPostConvertDL
 		if(!count($inCompleteFlavorIds))
 		{
 			// mark the context root job as finished only if all conversion jobs are completed
-			kBatchManager::updateEntry($dbBatchJob, entryStatus::READY);
+			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 			
 			if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
@@ -408,7 +410,7 @@ class kBusinessPostConvertDL
 		if(is_null($flavorParamsOutputId))
 		{
 			kJobsManager::failBatchJob($rootBatchJob, "Job " . $dbBatchJob->getId() . " failed");
-			kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+			kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 			return false;
 		}
 		
@@ -416,7 +418,7 @@ class kBusinessPostConvertDL
 		if($readyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
 			kJobsManager::failBatchJob($rootBatchJob, "Job " . $dbBatchJob->getId() . " failed");
-			kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+			kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 			return false;
 		}
 		
@@ -444,7 +446,7 @@ class kBusinessPostConvertDL
 				
 		// all conversions failed, should fail the root job
 		kJobsManager::failBatchJob($rootBatchJob, "All conversions failed");
-		kBatchManager::updateEntry($dbBatchJob, entryStatus::ERROR_CONVERTING);
+		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 		return false;
 	}
 	
