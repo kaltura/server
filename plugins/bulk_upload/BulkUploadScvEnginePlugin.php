@@ -1,10 +1,10 @@
 <?php
 /**
- * @package plugins.bulkUpload
+ * @package plugins.bulkUploadCsvEngine
  */
-class BulkUploadPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaAdminConsoleEntryInvestigate, IKalturaPending, IKalturaMemoryCleaner
+class BulkUploadCsvEnginePlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaPending, IKalturaMemoryCleaner
 {
-	const PLUGIN_NAME = 'bulkUpload';
+	const PLUGIN_NAME = 'bulkUploadCsvEngine';
 	const PLUGIN_VERSION_MAJOR = 1;
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
@@ -16,15 +16,10 @@ class BulkUploadPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 	 */
 	public function getInstance($interface)
 	{
+		if($this instanceof $interface)
+			return $this;
+			
 		return null;
-		
-//		if($this instanceof $interface)
-//			return $this;
-//			
-//		if($interface == 'IKalturaMrssContributor')
-//			return kContentDistributionMrssManager::get();
-//			
-//		return null;
 	}
 	
 	/**
@@ -105,13 +100,15 @@ class BulkUploadPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		print("In My Get Enums!!!\n");
 		if(is_null($baseEnumName))
-			return array('BulkUploadBatchJobType');
+			return array('BulkUploadCsvType');
 	
-		if($baseEnumName == 'BatchJobType')
-			return array('BulkUploadBatchJobType');
+		if($baseEnumName == 'BulkUploadType')
+			return array('BulkUploadCsvType');
 		
+		if($baseEnumName == 'KalturaBulkUploadType')
+			return array('BulkUploadCsvType');
+			
 		return array();
 	}
 	
@@ -153,30 +150,40 @@ class BulkUploadPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 		// bulk upload does not work in partner services 2 context because it uses dynamic enums
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
-		
+			
+			
+		//Gets the right job type for the engine
 		if($baseClass == 'kJobData')
 		{
-			if($enumValue == self::getBatchJobTypeCoreValue(BulkUploadBatchJobType::CSV))
-				return new kDistributionSubmitJobData();
-				
-			if($enumValue == self::getBatchJobTypeCoreValue(BulkUploadBatchJobType::XML))
-				return new kDistributionUpdateJobData();
+			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadType::CSV))
+				return new kBulkUploadCsvJobData();	
+		}
+		
+		if($baseClass == 'KalturaBulkUploadJobData')
+		{
+			if($enumValue == self::getApiValue(BulkUploadType::CSV))
+				return new kBulkUploadCsvJobData();
+		}
+		
+		//Returns the rigth BulkUploadtType for the engine
+		if($baseClass == 'BulkUploadType')
+		{
+			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadType::CSV))
+				return new kBulkUploadCsvJobData();
+		}
+		
+		if($baseClass == 'KalturaBulkUploadType')
+		{
+			if($enumValue == self::getApiValue(BulkUploadType::CSV))
+				return new kBulkUploadCsvJobData();
 		}
 	
-		if($baseClass == 'KalturaJobData')
+		if($baseClass == 'KBulkUploadEngine')
 		{
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
-				return new KalturaDistributionSubmitJobData();
-				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
-				return new KalturaDistributionUpdateJobData();
-				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
-				return new KalturaDistributionDeleteJobData();
-				
-			if($enumValue == self::getApiValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT) || $enumValue == self::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
-				return new KalturaDistributionFetchReportJobData();
+			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadType::CSV))
+				return new BulkUploadEngineCsv($constructorArgs[0]);
 		}
+		
 		
 		return null;
 	}
@@ -226,35 +233,6 @@ class BulkUploadPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 	}
 	
 	/**
-	 * 
-	 * Returns the admin console pages needed for bulk upload
-	 */
-	public static function getAdminConsolePages()
-	{
-		$pages = array();
-		
-//		$pages[] = new DistributionProfileListAction();
-//		$pages[] = new DistributionProfileConfigureAction();
-//		$pages[] = new DistributionProfileUpdateStatusAction();
-//		
-//		$pages[] = new GenericDistributionProvidersListAction();
-//		$pages[] = new GenericDistributionProviderConfigureAction();
-//		$pages[] = new GenericDistributionProviderDeleteAction();
-//		
-		return $pages;
-	}
-	
-	/**
-	 * @return array<Kaltura_View_Helper_EntryInvestigatePlugin>
-	 */
-	public static function getEntryInvestigatePlugins()
-	{
-		return array(
-//			new Kaltura_View_Helper_EntryInvestigateDistribution(),
-		);
-	}
-	
-	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
 	public static function getContentDistributionFileSyncObjectTypeCoreValue($valueName)
@@ -266,10 +244,10 @@ class BulkUploadPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
-	public static function getBatchJobTypeCoreValue($valueName)
+	public static function getBulkUploadTypeCoreValue($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-		return kPluginableEnumsManager::apiToCore('BatchJobType', $value);
+		return kPluginableEnumsManager::apiToCore('BulkUploadType', $value);
 	}
 	
 	/**

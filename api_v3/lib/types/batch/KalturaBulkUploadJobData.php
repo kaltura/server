@@ -5,6 +5,8 @@
  */
 class KalturaBulkUploadJobData extends KalturaJobData
 {
+	//TODO: Roni - maybe add propertires to the blk upload job data.
+	
 	/**
 	 * @var string
 	 */
@@ -24,14 +26,12 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 */
 	public $conversionProfileId;
 	
-	
 	/**
 	 * Created by the API
 	 * 
 	 * @var string
 	 */
 	public $csvFilePath;
-	
 	
 	/**
 	 * Created by the API
@@ -86,5 +86,3 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		return parent::toObject($dbData);
 	}
 }
-
-?>

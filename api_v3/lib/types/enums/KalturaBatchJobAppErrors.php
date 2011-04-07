@@ -25,4 +25,6 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	const CONVERSION_FAILED = 81;
 	
 	const THUMBNAIL_NOT_CREATED = 91;
+	
+	const JOB_ABORTED = 101;
 }

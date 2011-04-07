@@ -3,7 +3,7 @@
  * @package plugins
  * @subpackage lib
  */
-class KalturaBulkUploadXmlJobData extends kBulkUploadBaseJobData
+class kBulkUploadXmlJobData extends kBulkUploadJobData
 {
 	/**
 	 * Created by the API

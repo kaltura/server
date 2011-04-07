@@ -3,10 +3,9 @@
  * @package plugins.bulkUpload
  * @subpackage lib
  */
-class KalturaBulkUploadType extends KalturaEnum implements BulkUploadType
+class BulkUploadXmlType implements IKalturaPluginEnum, BulkUploadType
 {
 	const XML = 'XML';
-	const CSV = 'CSV';
 	
 	/**
 	 * 
@@ -14,10 +13,8 @@ class KalturaBulkUploadType extends KalturaEnum implements BulkUploadType
 	 */
 	public static function getAdditionalValues()
 	{
-		//TODO: Roni - see if this is ok that the additional values are the same as the values
 		return array(
 			'XML' => self::XML,
-			'CSV' => self::CSV,
 		);
 	}
 }

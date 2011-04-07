@@ -12,7 +12,21 @@ abstract class KBulkUploadEngine
 	 * @var KSchedularTaskConfig
 	 */
 	protected $taskConfig = null;
-		
+
+	/**
+	 * 
+	 * The Engine client
+	 * @var KalturaClient
+	 */
+	protected $client; 
+	
+	/**
+	 * 
+	 * The multirequest counter
+	 * @var int
+	 */
+	protected $multiRequestCounter = 0;
+	
 	/**
 	 * Will return the proper engine depending on the type (KalturaBulkUploadTypeType)
 	 *
@@ -20,20 +34,14 @@ abstract class KBulkUploadEngine
 	 * @param KSchedularTaskConfig $taskConfig
 	 * @return KBulkUploadEngine
 	 */
-	public static function getInstance ( $provider , KSchedularTaskConfig $taskConfig )
+	public static function getEngine ( $batchJobSubype , KSchedularTaskConfig $taskConfig )
 	{
 		$engine =  null;
 		
-		switch ($provider )
+		switch ($batchJobSubype)
 		{
-			case KalturaBulkUploadType::CSV:
-				$engine = new KBulkUploadEngineCsv($taskConfig);
-				break;
-			case KalturaBulkUploadType::XML:
-				$engine = new KBulkUploadEngineXml($taskConfig);
-				break;
 			default:
-				$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $provider, array($taskConfig));
+				$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubype, array($taskConfig));
 		}
 				
 		return $engine;
@@ -103,40 +111,272 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBulkUploadJobData $data
 	 */
 	protected function close(KalturaBatchJob $job, KalturaBulkUploadJobData $data );
-}
-
-/**
- * @package Scheduler
- * @subpackage Conversion
- *
- */
-class KBulkUploadEngineResult
-{
+		
 	/**
-	 * @var int
+	 * @param string $item
 	 */
-	public $status;
-	
-	/**
-	 * @var string
-	 */
-	public $errMessage;
-	
-	/**
-	 * @var KalturaProvisionJobData
-	 */
-	public $data;
-	
-	/**
-	 * @param int $status
-	 * @param string $errMessage
-	 * @param KalturaProvisionJobData $data
-	 */
-	public function __construct( $status , $errMessage, KalturaBulkUploadJobData $data = null )
+	public static function trimArray(&$item)
 	{
-		$this->status = $status;
-		$this->errMessage = $errMessage;
-		$this->data = $data;
+		$item = trim($item);
+	}
+		
+	/**
+	 * 
+	 * Adds a bulk upload result
+	 * @param KalturaBulkUploadResult $bulkUploadResult
+	 */
+	public static function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult)
+	{
+		$pluginsData = $bulkUploadResult->pluginsData;
+		$bulkUploadResult->pluginsData = null;
+		$this->kClient->batch->addBulkUploadResult($bulkUploadResult, $pluginsData);
+	}
+	
+	/**
+	 * 
+	 * Gets the job and job data and returns the file to be opened
+	 * @param KalturaBatchJob $job
+	 * @param KalturaBulkUploadJobData $bulkUploadJobData
+	 */
+	public static function getFileHandle(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
+	{
+		// reporting start of work
+		$this->updateJob($job, 'Fetching file', KalturaBatchJobStatus::QUEUED, 1);
+				
+		$fileHandle = fopen($bulkUploadJobData->csvFilePath, "r");
+		
+		if(! $fileHandle) // fails and exit
+		{
+			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND, "File not found: $bulkUploadJobData->csvFilePath", KalturaBatchJobStatus::FAILED);
+			throw new KalturaException("Unable to open file: {$bulkUploadJobData->csvFilePath}");
+		}
+					
+		KalturaLog::info("Opened file: $bulkUploadJobData->csvFilePath");
+		
+		return $fileHandle;
+	}
+
+	/**
+	 * 
+	 * Gets the start line number for the given job id
+	 * @param int $jobId
+	 * @return int - the start line for the job id
+	 */
+	public static function getStartLineNumber($jobId)
+	{
+		//Get the last line number for the specific job id
+		$startLineNumber = 0;
+		$bulkUploadLastResult = null;
+		try{
+			$bulkUploadLastResult = $this->kClient->batch->getBulkUploadLastResult($job->id);
+		}
+		catch(Exception $e){
+			KalturaLog::err("getBulkUploadLastResult: " . $e->getMessage());
+		}
+		
+		if($bulkUploadLastResult)
+			$startLineNumber = $bulkUploadLastResult->lineIndex;
+		
+		return $startLineNumber;
+	}
+	
+	/**
+	 * 
+	 * Gets the number of current multy request counter and decides if to send the chunked data or not
+	 * @return bool - true if the chunked data was sent, false if the data is not sent and ERROR on error
+	 * 
+	 */
+	public static function sendChunkedData(KalturaBatchJob $job)
+	{
+		$multiRequestSize = $this->taskConfig->params->multiRequestSize;
+
+		// send chunk of requests
+		if($this->multiRequestCounter >= $multiRequestSize)
+		{
+			$this->kClient->doMultiRequest();
+			
+			KalturaLog::info("Sent $this->multiRequestCounter invalid lines results");
+			
+			// check if job aborted
+			if(KAsyncBulkUpload::isAborted($job))
+			{
+				ini_set('auto_detect_line_endings', false);
+				throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::ABORTED); //The job was aborted
+			}
+			
+			// start a new multi request
+			$this->kClient->startMultiRequest();
+			
+			$this->multiRequestCounter = 0;
+		}
+	}
+
+	/**
+	 * 
+	 * Gets the number of current multy request counter and decides if to send the chunked data or not
+	 * @param KalturaBatchJob $job
+	 * @param array $bulkUploadResultChunk
+	 */
+	public static function sendChunkedDataForPartner(KalturaBatchJob $job, array $bulkUploadResultChunk)
+	{
+		$multiRequestSize = $this->taskConfig->params->multiRequestSize;
+		
+		// send chunk of requests
+		if($this->multiRequestCounter > $multiRequestSize)
+		{
+			// commit the multi request entries
+			$requestResults = KAsyncBulkUpload::doMultiRequestForPartnerId();
+			
+			if(count($requestResults) != count($bulkUploadResultChunk))
+			{
+				ini_set('auto_detect_line_endings', false);
+				$err = __FILE__ . ', line: ' . __LINE__ . ' $requestResults and $$bulkUploadResultChunk must have the same size';
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, $err, KalturaBatchJobStatus::FAILED);
+				throw new KalturaException("Error On trySendChunkedDataForPartner");
+			}
+				
+			// saving the results with the created enrty ids
+			KAsyncBulkUpload::updateEntriesResults($requestResults, $bulkUploadResultChunk);
+					
+			// check if job aborted
+			if(KAsyncBulkUpload::isAborted($job))
+			{
+				ini_set('auto_detect_line_endings', false);
+				throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::ABORTED); //The job was aborted
+			}
+			
+			// start a new multi request
+			$this->startMultiRequest(true);
+			
+			$bulkUploadResultChunk = array();
+			$this->multiRequestCounter = 0;
+		}
+	}
+	
+	/**
+	 * 
+	 * Start a multirequest, if specified start the multi request for the job partner
+	 * @param bool $isSpecificForPartner
+	 */
+	public static function startMultiRequest($isSpecificForPartner)
+	{
+		if($isSpecificForPartner)
+		{
+			$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();;
+			$this->kClient->setConfig($this->kClientConfig);
+		}
+		$this->kClient->startMultiRequest();
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function doMultiRequestForPartnerId()
+	{
+		$requestResults = $this->kClient->doMultiRequest();
+		
+		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
+		$this->kClient->setConfig($this->kClientConfig);
+		
+		return $requestResults;
+	}
+	
+	/**
+	 * save the results for returned created entries
+	 * 
+	 * @param array $requestResults
+	 * @param array $bulkUploadResults
+	 */
+	public static function updateEntriesResults(array $requestResults, array $bulkUploadResults)
+	{
+		KalturaLog::debug("updateEntriesResults(" . count($requestResults) . ", " . count($bulkUploadResults) . ")");
+		
+		$this->kClient->startMultiRequest();
+		
+		KalturaLog::info("Updating " . count($requestResults) . " results");
+		
+		// checking the created entries
+		foreach($requestResults as $index => $requestResult)
+		{
+			$bulkUploadResult = $bulkUploadResults[$index];
+			
+			if($requestResult instanceof Exception)
+			{
+				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->errorDescription = $requestResult->getMessage();
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			if(! ($requestResult instanceof KalturaMediaEntry))
+			{
+				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
+			// update the results with the new entry id
+			$bulkUploadResult->entryId = $requestResult->id;
+			$this->addBulkUploadResult($bulkUploadResult);
+		}
+		$this->kClient->doMultiRequest();
+	}
+	
+	/**
+	 * @param KalturaBatchJob $job
+	 * @return boolean
+	 */
+	public static function isAborted(KalturaBatchJob $job)
+	{
+		$batchJobResponse = $this->kClient->jobs->getBulkUploadStatus($job->id);
+		$updatedJob = $batchJobResponse->batchJob;
+		if($updatedJob->abort)
+		{
+			KalturaLog::info("job[$job->id] aborted");
+			$this->closeJob($job, null, null, 'Aborted', KalturaBatchJobAppErrors::ABORTED);
+			
+			if($this->kClient->isMultiRequest())
+				$this->kClient->doMultiRequest();
+				
+			return true;
+		}
+		return false;
 	}
 }
 
+//TODO: Roni - see if this si needed (copied from another location)
+///**
+// * @package Scheduler
+// * @subpackage Conversion
+// *
+// */
+//class KBulkUploadEngineResult
+//{
+//	/**
+//	 * @var int
+//	 */
+//	public $status;
+//	
+//	/**
+//	 * @var string
+//	 */
+//	public $errMessage;
+//	
+//	/**
+//	 * @var KalturaProvisionJobData
+//	 */
+//	public $data;
+//	
+//	/**
+//	 * @param int $status
+//	 * @param string $errMessage
+//	 * @param KalturaProvisionJobData $data
+//	 */
+//	public function __construct( $status , $errMessage, KalturaBulkUploadJobData $data = null )
+//	{
+//		$this->status = $status;
+//		$this->errMessage = $errMessage;
+//		$this->data = $data;
+//	}
+//}
