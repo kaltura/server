@@ -55,7 +55,7 @@ class kSyndicationFeedManager
 		
 		foreach ($mrss->children() as $second_gen) {
 			if ($second_gen->getName() == 'channel')
-				$second_gen->addChild('items',ITEMS_PLACEHOLDER);
+				$second_gen->addChild('items', self::ITEMS_PLACEHOLDER);
 		}
 		
 		return $mrss->asXML();
@@ -104,7 +104,7 @@ class kSyndicationFeedManager
 			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
 		}
 		
-		$divideHeaderFromFooter = strpos($mrss,ITEMS_PLACEHOLDER);		
+		$divideHeaderFromFooter = strpos($mrss, self::ITEMS_PLACEHOLDER);		
 		$mrss = substr($mrss,0,$divideHeaderFromFooter);
 		$mrss = self::removeXmlHeader($mrss);
 		
@@ -128,7 +128,7 @@ class kSyndicationFeedManager
 			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
 		}
 		
-		$divideHeaderFromFooter = strpos($mrss,ITEMS_PLACEHOLDER) + strlen(ITEMS_PLACEHOLDER);
+		$divideHeaderFromFooter = strpos($mrss,self::ITEMS_PLACEHOLDER) + strlen(self::ITEMS_PLACEHOLDER);
 		$mrss = substr($mrss,$divideHeaderFromFooter);
 		
 		return $mrss;
@@ -227,7 +227,7 @@ class kSyndicationFeedManager
 		
 		//add place holder for items
 		$items = $xpath->query("//xsl:apply-templates[@name='item']"); 
-		$itemPlaceHolderNode = $xsl->createTextNode(ITEMS_PLACEHOLDER);
+		$itemPlaceHolderNode = $xsl->createTextNode(self::ITEMS_PLACEHOLDER);
 		$items->item(0)->parentNode->replaceChild($itemPlaceHolderNode,$items->item(0));
 	
 		return $xsl->saveXML();
