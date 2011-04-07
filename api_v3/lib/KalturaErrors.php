@@ -60,6 +60,8 @@ class KalturaErrors extends APIErrors
 	
 	const INVALID_USER_ID = "INVALID_USER_ID,Invalid user id";
 	
+	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND,There is no data center with id [%s]";
+	
 	/**
 	 * Service Oriented Errors
 	 *
