@@ -2,7 +2,7 @@
 class kSyndicationFeedManager
 {
 	
-	const ITEMS_PLACEHOLDER = '<ITEMS_PLACEHOLDER>';
+	const ITEMS_PLACEHOLDER = 'ITEMS_PLACEHOLDER';
 	
 	private static $xsl = null;
 	private static $xslItem = null;
@@ -104,7 +104,7 @@ class kSyndicationFeedManager
 			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
 		}
 		
-		$divideHeaderFromFooter = strpos($mrss, self::ITEMS_PLACEHOLDER);		
+		$divideHeaderFromFooter = strpos($mrss,self::ITEMS_PLACEHOLDER);		
 		$mrss = substr($mrss,0,$divideHeaderFromFooter);
 		$mrss = self::removeXmlHeader($mrss);
 		
@@ -128,7 +128,7 @@ class kSyndicationFeedManager
 			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
 		}
 		
-		$divideHeaderFromFooter = strpos($mrss,self::ITEMS_PLACEHOLDER) + strlen(self::ITEMS_PLACEHOLDER);
+		$divideHeaderFromFooter = strpos($mrss, self::ITEMS_PLACEHOLDER) + strlen(self::ITEMS_PLACEHOLDER);
 		$mrss = substr($mrss,$divideHeaderFromFooter);
 		
 		return $mrss;
