@@ -195,6 +195,7 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$password = $distributionProfile->password;
 		
 		$url = "https://{$domain}{$this->fetchReportPath}?uuid={$data->remoteId}";
+		KalturaLog::debug("url [$url]");
 		
 		$ch = curl_init();
 
@@ -222,6 +223,8 @@ class MsnDistributionEngine extends DistributionEngine implements
 			throw new Exception("Curl error [$errDescription] number [$errNumber]", $errNumber);
 		}
 		curl_close($ch);
+
+		KalturaLog::debug("results [$results]");
 		
 		$xml = new DOMDocument();
 		if($xml->loadXML($results))
