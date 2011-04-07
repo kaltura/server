@@ -252,19 +252,14 @@ class kBusinessPostConvertDL
 				kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 		}
 		
-		// no need to finished the root job
-		if(!$rootBatchJob)
-		{
-			KalturaLog::debug('Convert Finished - no root job to close');
-			return $dbBatchJob;
-		}
-			
 		if(!count($inCompleteFlavorIds))
 		{
+			KalturaLog::debug('Convert Finished');
+			
 			// mark the context root job as finished only if all conversion jobs are completed
 			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 			
-			if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 		
 			return $dbBatchJob;
