@@ -1,5 +1,5 @@
 <?php
-ini_set("memory_limit","256M");
+ini_set("memory_limit","512M");
 
 define('SF_ROOT_DIR',    realpath(dirname(__FILE__).'/../../alpha/'));
 define('SF_APP',         'kaltura');
