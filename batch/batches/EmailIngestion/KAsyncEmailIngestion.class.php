@@ -387,7 +387,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 			// upload file to the kaltura server
 			// ---------------------------------
 			try {
-				$tokenId = $this->getClient()->media->upload(realpath($filename));
+				$tokenId = $this->getClient()->upload->upload(realpath($filename)); 
 			}
 			catch (Exception $e) {
 				$tokenId = null;

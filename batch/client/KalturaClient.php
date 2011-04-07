@@ -2396,27 +2396,13 @@ class KalturaMediaService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function addFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId)
+	function add(KalturaMediaEntry $entry, KalturaResource $resource = null)
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->addParam($kparams, "url", $url);
-		$this->client->addParam($kparams, "bulkUploadId", $bulkUploadId);
-		$this->client->queueServiceActionCall("media", "addFromBulk", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function addFromUploadedFile(KalturaMediaEntry $mediaEntry, $uploadTokenId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->addParam($kparams, "uploadTokenId", $uploadTokenId);
-		$this->client->queueServiceActionCall("media", "addFromUploadedFile", $kparams);
+		$this->client->addParam($kparams, "entry", $entry->toParams());
+		if ($resource !== null)
+			$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->queueServiceActionCall("media", "add", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -2436,20 +2422,6 @@ class KalturaMediaService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function upload($fileData)
-	{
-		$kparams = array();
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("media", "upload", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 }
@@ -2532,6 +2504,32 @@ class KalturaThumbAssetService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaThumbAssetListResponse");
+		return $resultObject;
+	}
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaUploadService extends KalturaServiceBase
+{
+	function __construct(KalturaClient $client = null)
+	{
+		parent::__construct($client);
+	}
+
+	function upload($fileData)
+	{
+		$kparams = array();
+		$kfiles = array();
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->queueServiceActionCall("upload", "upload", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 }
@@ -2626,6 +2624,12 @@ class KalturaClient extends KalturaClientBase
 	public $thumbAsset = null;
 
 	/**
+	 * 
+	 * @var KalturaUploadService
+	 */
+	public $upload = null;
+
+	/**
 	 * Kaltura client constructor
 	 *
 	 * @param KalturaConfiguration $config
@@ -2644,6 +2648,7 @@ class KalturaClient extends KalturaClientBase
 		$this->session = new KalturaSessionService($this);
 		$this->system = new KalturaSystemService($this);
 		$this->thumbAsset = new KalturaThumbAssetService($this);
+		$this->upload = new KalturaUploadService($this);
 	}
 	
 }

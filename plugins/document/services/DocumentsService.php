@@ -275,6 +275,8 @@ class DocumentsService extends KalturaEntryService
 	 * @action upload
 	 * @param file $fileData The file data
 	 * @return string Upload token id
+	 * 
+	 * @deprecated use upload.upload or uploadToken.add instead
 	 */
 	function uploadAction($fileData)
 	{

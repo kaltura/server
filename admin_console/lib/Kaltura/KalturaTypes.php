@@ -696,6 +696,7 @@ class KalturaAsset extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $fileExt = null;
 
@@ -745,6 +746,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var int
+	 * @insertonly
 	 */
 	public $flavorParamsId = null;
 
@@ -1395,6 +1397,7 @@ class KalturaThumbAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var int
+	 * @insertonly
 	 */
 	public $thumbParamsId = null;
 

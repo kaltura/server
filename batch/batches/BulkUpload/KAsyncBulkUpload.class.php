@@ -609,7 +609,10 @@ class KAsyncBulkUpload extends KBatchBase
 			
 			$bulkUploadResultChunk[] = $bulkUploadResult;
 			
-			$this->kClient->media->addFromBulk($mediaEntry, $bulkUploadResult->url, $job->id);
+			$bulkResource = new KalturaBulkResource();
+			$bulkResource->url = $bulkUploadResult->url;
+			$bulkResource->bulkUploadId = $job->id;
+			$this->kClient->media->add($mediaEntry, $bulkResource);
 			$multiRequestCounter ++;
 		}
 		

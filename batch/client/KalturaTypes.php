@@ -3536,6 +3536,7 @@ class KalturaAsset extends KalturaObjectBase
 	 * 
 	 *
 	 * @var string
+	 * @insertonly
 	 */
 	public $fileExt = null;
 
@@ -3585,6 +3586,7 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var int
+	 * @insertonly
 	 */
 	public $flavorParamsId = null;
 
@@ -3872,6 +3874,15 @@ class KalturaBatchJobListResponse extends KalturaObjectBase
  * @package Scheduler
  * @subpackage Client
  */
+abstract class KalturaResource extends KalturaObjectBase
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaThumbAsset extends KalturaAsset
 {
 	/**
@@ -3879,6 +3890,7 @@ class KalturaThumbAsset extends KalturaAsset
 	 * 
 	 *
 	 * @var int
+	 * @insertonly
 	 */
 	public $thumbParamsId = null;
 
@@ -8050,6 +8062,384 @@ abstract class KalturaGenericXsltSyndicationFeedBaseFilter extends KalturaGeneri
  */
 class KalturaGenericXsltSyndicationFeedFilter extends KalturaGenericXsltSyndicationFeedBaseFilter
 {
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaContentResource extends KalturaResource
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaAssetParamsResourceContainer extends KalturaResource
+{
+	/**
+	 * The content resource to associate with asset params
+	 *
+	 * @var KalturaContentResource
+	 */
+	public $resource;
+
+	/**
+	 * The asset params to associate with the reaource
+	 *
+	 * @var string
+	 */
+	public $assetParamsId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaAssetResource extends KalturaContentResource
+{
+	/**
+	 * ID of the source asset 
+	 *
+	 * @var string
+	 */
+	public $assetId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaAssetsParamsResourceContainers extends KalturaResource
+{
+	/**
+	 * Array of resources associated with asset params ids
+	 *
+	 * @var array of KalturaAssetParamsResourceContainer
+	 */
+	public $resources;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaUrlResource extends KalturaContentResource
+{
+	/**
+	 * Remote URL, FTP, HTTP or HTTPS 
+	 *
+	 * @var string
+	 */
+	public $url = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaBulkResource extends KalturaUrlResource
+{
+	/**
+	 * ID of the bulk upload job to be associated with the entry 
+	 *
+	 * @var string
+	 */
+	public $bulkUploadId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDropFolderFileResource extends KalturaContentResource
+{
+	/**
+	 * ID of the drop folder file object 
+	 *
+	 * @var int
+	 */
+	public $dropFolderFileId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaEntryResource extends KalturaContentResource
+{
+	/**
+	 * ID of the source entry 
+	 *
+	 * @var string
+	 */
+	public $entryId = null;
+
+	/**
+	 * ID of the source flavor params, set to null to use the source flavor
+	 *
+	 * @var int
+	 */
+	public $flavorParamsId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaFileSyncResource extends KalturaContentResource
+{
+	/**
+	 * The object type of the file sync object 
+	 *
+	 * @var int
+	 */
+	public $fileSyncObjectType = null;
+
+	/**
+	 * The object sub-type of the file sync object 
+	 *
+	 * @var int
+	 */
+	public $objectSubType = null;
+
+	/**
+	 * The object id of the file sync object 
+	 *
+	 * @var string
+	 */
+	public $objectId = null;
+
+	/**
+	 * The version of the file sync object 
+	 *
+	 * @var string
+	 */
+	public $version = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaLocalFileResource extends KalturaContentResource
+{
+	/**
+	 * Full path to the local file 
+	 *
+	 * @var string
+	 */
+	public $localFilePath = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaRemoteStorageResource extends KalturaUrlResource
+{
+	/**
+	 * ID of storage profile to be associated with the created file sync, used for file serving URL composing, keep null to use the default. 
+	 *
+	 * @var string
+	 */
+	public $storageProfileId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSearch extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $keyWords = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaSearchProviderType
+	 */
+	public $searchSource = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaMediaType
+	 */
+	public $mediaType = null;
+
+	/**
+	 * Use this field to pass dynamic data for searching
+	 * For example - if you set this field to "mymovies_$partner_id"
+	 * The $partner_id will be automatically replcaed with your real partner Id
+	 * 
+	 *
+	 * @var string
+	 */
+	public $extraData = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $authData = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSearchResult extends KalturaSearch
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $title = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $thumbUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $url = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sourceLink = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $credit = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaLicenseType
+	 */
+	public $licenseType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flashPlaybackType = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSearchResultsResource extends KalturaContentResource
+{
+	/**
+	 * Search media provider search results 
+	 *
+	 * @var KalturaSearchResult
+	 */
+	public $result;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaUploadedFileTokenResource extends KalturaContentResource
+{
+	/**
+	 * Token that returned from upload.upload action or uploadToken.add action. 
+	 *
+	 * @var string
+	 */
+	public $token = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaWebcamTokenResource extends KalturaContentResource
+{
+	/**
+	 * Token that returned from media server such as FMS or red5. 
+	 *
+	 * @var string
+	 */
+	public $token = null;
+
 
 }
 

@@ -808,6 +808,8 @@ class ThumbAssetService extends KalturaBaseService
 	 * @param string $entryId
 	 * @param string $url
 	 * @return KalturaThumbAsset
+	 * 
+	 * @deprecated use thumbAsset.add instead
 	 */
 	public function addFromUrlAction($entryId, $url)
 	{

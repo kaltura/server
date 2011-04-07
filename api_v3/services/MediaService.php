@@ -781,6 +781,8 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
+	 * 
+	 * @deprecated use media.add instead
 	 */
 	function addFromBulkAction(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId)
 	{
@@ -798,6 +800,8 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
+	 * 
+	 * @deprecated use media.add instead
 	 */
 	function addFromUrlAction(KalturaMediaEntry $mediaEntry, $url)
 	{
@@ -847,6 +851,8 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
+	 * 
+	 * @deprecated use media.add instead
 	 */
 	function addFromSearchResultAction(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null)
 	{
@@ -941,6 +947,8 @@ class MediaService extends KalturaEntryService
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * 
+	 * @deprecated use media.add instead
 	 */
 	function addFromUploadedFileAction(KalturaMediaEntry $mediaEntry, $uploadTokenId)
 	{
@@ -1014,6 +1022,8 @@ class MediaService extends KalturaEntryService
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 * 
+	 * @deprecated use media.add instead
 	 */
 	function addFromRecordedWebcamAction(KalturaMediaEntry $mediaEntry, $webcamTokenId)
 	{
@@ -1063,6 +1073,8 @@ class MediaService extends KalturaEntryService
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING
 	 * @throws KalturaErrors::FLAVOR_PARAMS_NOT_FOUND
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+	 * 
+	 * @deprecated use media.add instead
 	 */
 	function addFromEntryAction($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = null)
 	{
@@ -1109,6 +1121,8 @@ class MediaService extends KalturaEntryService
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+	 * 
+	 * @deprecated use media.add instead
 	 */
 	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null)
 	{
@@ -1354,6 +1368,8 @@ class MediaService extends KalturaEntryService
 	 * @action upload
 	 * @param file $fileData The file data
 	 * @return string Upload token id
+	 * 
+	 * @deprecated use upload.upload or uploadToken.add instead
 	 */
 	function uploadAction($fileData)
 	{
