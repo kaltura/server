@@ -38,6 +38,10 @@ while(count($partners))
 		
 		// just refresh the account owner kuser id parameter, to set the missing admin name & email
 		$ownerKuserId = $partner->getAccountOwnerKuserId();
+		if (is_null($ownerKuserId)) {
+			KalturaLog::log('Skipping ['.$partner->getId().'] because owner kuser id = null');
+			continue;
+		}
 		$partner->setAccountOwnerKuserId($ownerKuserId);
 		
 		if (!$dryRun) {
