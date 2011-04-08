@@ -798,6 +798,7 @@ return array(
 	'partner was blocked' => 'Publisher was blocked successfully',
 	'partner was unblocked' => 'Publisher was unblocked successfully',
 	'partner was removed' => 'Publisher was successfully removed',
+	'partner-list commercial filtered' => 'Commercial partners filtered from results',
 
 	// partner-selector
 	'partner-selector intro text' => 'Select a partner from the list below',

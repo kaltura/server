@@ -98,6 +98,9 @@ div#my_info, div#new_admin { clear: both;}
 .batch-entry-lifecycle {}
  
 
+/* partner-list */
+#partner-list .hint { color: #FF3200; }
+
 /* partner-usage-index */ 
 #partner-usage-index input { vertical-align: top; }
 

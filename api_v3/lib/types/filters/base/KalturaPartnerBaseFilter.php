@@ -16,6 +16,9 @@ class KalturaPartnerBaseFilter extends KalturaFilter
 		"nameEqual" => "_eq_name",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"partnerPackageEqual" => "_eq_partner_package",
+		"partnerPackageGreaterThanOrEqual" => "_gte_partner_package",
+		"partnerPackageLessThanOrEqual" => "_lte_partner_package",
 		"partnerNameDescriptionWebsiteAdminNameAdminEmailLike" => "_like_partner_name-description-website-admin_name-admin_email",
 	);
 
@@ -102,6 +105,27 @@ class KalturaPartnerBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerPackageEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual;
 
 	/**
 	 * @var string

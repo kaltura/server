@@ -1,6 +1,8 @@
 <?php
 class PartnerController extends Zend_Controller_Action
 {
+	const PARTNER_PACKAGE_FREE = 1;
+	
 	public function indexAction()
 	{
 		$this->_helper->redirector('list');
@@ -79,6 +81,16 @@ class PartnerController extends Zend_Controller_Action
 		
 		// init filter
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
+		// if non-commercial partners are not allowed, add to filter
+		
+		if (Kaltura_AclHelper::isAllowed('partner','commercial')) {
+			$this->view->commercialFiltered = false;
+		}
+		else {
+			$this->view->commercialFiltered = true;
+			$partnerFilter->partnerPackageLessThanOrEqual = self::PARTNER_PACKAGE_FREE;
+		}
+							
 		
 		// get results and paginate
 		$paginatorAdapter = new Kaltura_FilterPaginator("systemPartner", "listAction", null, $partnerFilter);

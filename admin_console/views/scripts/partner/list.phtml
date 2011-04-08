@@ -3,6 +3,7 @@
 <div id="results" class="clear">
 	<?php $count = $this->paginator->getItemsCount(); ?>
 	<h2><?php echo $this->translate('Results'); ?><span> (<?php echo $count; ?> <?php echo $this->translate(array('publisher', 'publishers', $count)); ?>)</span></h2>
+	<span class="hint"><?php if ($this->commercialFiltered) { echo $this->translate('partner-list commercial filtered'); } ?></span>
 	<table class="clear">
 		<thead>
 			<tr>

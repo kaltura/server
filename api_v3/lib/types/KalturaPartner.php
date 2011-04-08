@@ -147,6 +147,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
+	 * @filter eq,gte,lte
 	 * @readonly
 	 */
 	public $partnerPackage;
