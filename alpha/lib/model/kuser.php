@@ -142,7 +142,13 @@ class kuser extends Basekuser
 		if ($this->isColumnModified(kuserPeer::EMAIL) && $this->getIsAccountOwner() && !is_null($this->oldColumnsValues[kuserPeer::EMAIL])) {
 			myPartnerUtils::emailChangedEmail($this->getPartnerId(), $this->oldColumnsValues[kuserPeer::EMAIL], $this->getEmail(), $this->getPartner()->getName() , PartnerPeer::KALTURAS_PARTNER_EMAIL_CHANGE );
 		}
-		
+
+		if ($this->getIsAccountOwner() && ( $this->isColumnModified(kuserPeer::EMAIL) || $this->isColumnModified(kuserPeer::FIRST_NAME) || $this->isColumnModified(kuserPeer::LAST_NAME) ))
+		{
+			$partner = $this->getPartner();
+			$partner->setAccountOwnerKuserId($this->getId(), false);
+			$partner->save();
+		}
 				
 		$ret = parent::postUpdate($con);
 		
