@@ -33,6 +33,8 @@ while(count($partners))
 		if (file_exists($stopFile)) {
 			die('STOP FILE CREATED');
 		}
+		
+		$lastPartner = $partner->getId();
 
 		KalturaLog::log('-- partner id ' . $partner->getId());
 		
