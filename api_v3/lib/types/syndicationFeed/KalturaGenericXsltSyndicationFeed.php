@@ -30,24 +30,16 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 		$xslStylesheet = $xpath->query("//xsl:stylesheet");
 		$rss = $xpath->query("//xsl:template[@name='rss']");
 		if ($rss->length == 0)
-		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_TEMPLATE_RSS, $this->xslt);
-		}
 		
 		$item = $xpath->query("//xsl:template[@name='item']");
 		if ($item->length == 0)
-		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_TEMPLATE_ITEM, $this->xslt);
-		}		
 		
 		$items = $xpath->query("//xsl:apply-templates[@name='item']"); 
 		if ($items->length == 0)
-		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM, $this->xslt);
-		}
-		
-			
-	
+
 		return true;
 	}
 	
@@ -67,14 +59,6 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 
 		$key = $source_object->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
 		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
-	}
-	
-	
-	public function toObject($object_to_fill = null , $props_to_skip = array())
-	{
-		$this->validateXslt();
-		
-		return parent::toObject();
 	}
 	
 }
