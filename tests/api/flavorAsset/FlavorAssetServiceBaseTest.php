@@ -6,6 +6,56 @@
 abstract class FlavorAssetServiceBaseTest extends KalturaApiTestCase
 {
 	/**
+	 * Tests flavorAsset->add action
+	 * @param string $entryId 
+	 * @param KalturaFlavorAsset $flavorAsset 
+	 * @param KalturaContentResource $contentResource 
+	 * @param KalturaFlavorAsset $reference 
+	 * @return int
+	 * @dataProvider provideData
+	 */
+	public function testAdd($entryId, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource, KalturaFlavorAsset $reference)
+	{
+		$resultObject = $this->client->flavorAsset->add($entryId, $flavorAsset, $contentResource);
+		$this->assertType('KalturaFlavorAsset', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($entryId, $flavorAsset, $contentResource, $reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd($entryId, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource, KalturaFlavorAsset $reference)
+	{
+	}
+
+	/**
+	 * Tests flavorAsset->update action
+	 * @param string $id 
+	 * @param KalturaFlavorAsset $flavorAsset 
+	 * @param KalturaContentResource $contentResource 
+	 * @param KalturaFlavorAsset $reference 
+	 * @return int
+	 * @dataProvider provideData
+	 */
+	public function testUpdate($id, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource, KalturaFlavorAsset $reference)
+	{
+		$resultObject = $this->client->flavorAsset->update($id, $flavorAsset, $contentResource);
+		$this->assertType('KalturaFlavorAsset', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateUpdate($id, $flavorAsset, $contentResource, $reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testUpdate results
+	 */
+	protected function validateUpdate($id, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource, KalturaFlavorAsset $reference)
+	{
+	}
+
+	/**
 	 * Tests flavorAsset->get action
 	 * @param string $id 
 	 * @param KalturaFlavorAsset $reference 

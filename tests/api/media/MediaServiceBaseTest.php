@@ -57,23 +57,24 @@ abstract class MediaServiceBaseTest extends KalturaApiTestCase
 	 * Tests media->update action
 	 * @param string $entryId Media entry id to update
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata to update
+	 * @param KalturaResource $resource Resource to be used to replace entry media content
 	 * @param KalturaMediaEntry $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testUpdate($entryId, KalturaMediaEntry $mediaEntry, KalturaMediaEntry $reference)
+	public function testUpdate($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->update($entryId, $mediaEntry);
+		$resultObject = $this->client->media->update($entryId, $mediaEntry, $resource);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateUpdate($entryId, $mediaEntry, $reference);
+		$this->validateUpdate($entryId, $mediaEntry, $resource, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testUpdate results
 	 */
-	protected function validateUpdate($entryId, KalturaMediaEntry $mediaEntry, KalturaMediaEntry $reference)
+	protected function validateUpdate($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null, KalturaMediaEntry $reference)
 	{
 	}
 
