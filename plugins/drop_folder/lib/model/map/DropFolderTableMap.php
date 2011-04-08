@@ -42,9 +42,11 @@ class DropFolderTableMap extends TableMap {
 		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 100, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', true, null, null);
-		$this->addColumn('CONVERSION_PROFILE_ID', 'ConversionProfileId', 'INTEGER', false, null, null);
-		$this->addColumn('PATH', 'Path', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('DC', 'Dc', 'INTEGER', true, null, null);
+		$this->addColumn('PATH', 'Path', 'LONGVARCHAR', true, null, null);
+		$this->addColumn('CONVERSION_PROFILE_ID', 'ConversionProfileId', 'INTEGER', false, null, null);
+		$this->addColumn('FILE_DELETE_POLICY', 'FileDeletePolicy', 'INTEGER', false, null, null);
+		$this->addColumn('UNMATCHED_FILE_POLICY', 'UnmatchedFilePolicy', 'INTEGER', false, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, null);
 		$this->addColumn('SLUG_FIELD', 'SlugField', 'VARCHAR', false, 500, null);
 		$this->addColumn('SLUG_REGEX', 'SlugRegex', 'VARCHAR', false, 100, null);

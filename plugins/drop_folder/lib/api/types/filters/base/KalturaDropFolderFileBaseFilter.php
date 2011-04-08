@@ -22,9 +22,9 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 		"parsedSlugEqual" => "_eq_parsed_slug",
 		"parsedSlugIn" => "_in_parsed_slug",
 		"parsedSlugLike" => "_like_parsed_slug",
-		"parsedFlavorIdEqual" => "_eq_parsed_flavor_id",
-		"parsedFlavorIdIn" => "_in_parsed_flavor_id",
-		"parsedFlavorIdLike" => "_like_parsed_flavor_id",
+		"parsedFlavorEqual" => "_eq_parsed_flavor",
+		"parsedFlavorIn" => "_in_parsed_flavor",
+		"parsedFlavorLike" => "_like_parsed_flavor",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -39,12 +39,12 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 		"-fileName" => "-file_name",
 		"+fileSize" => "+file_size",
 		"-fileSize" => "-file_size",
-		"+lastFileSizeCheckAt" => "+last_file_size_check_at",
-		"-lastFileSizeCheckAt" => "-last_file_size_check_at",
+		"+fileSizeLastSetAt" => "+file_size_last_set_at",
+		"-fileSizeLastSetAt" => "-file_size_last_set_at",
 		"+parsedSlug" => "+parsed_slug",
 		"-parsedSlug" => "-parsed_slug",
-		"+parsedFlavorId" => "+parsed_flavor_id",
-		"-parsedFlavorId" => "-parsed_flavor_id",
+		"+parsedFlavor" => "+parsed_flavor",
+		"-parsedFlavor" => "-parsed_flavor",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
@@ -164,21 +164,21 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	 * 
 	 * @var int
 	 */
-	public $parsedFlavorIdEqual;
+	public $parsedFlavorEqual;
 
 	/**
 	 * 
 	 * 
 	 * @var string
 	 */
-	public $parsedFlavorIdIn;
+	public $parsedFlavorIn;
 
 	/**
 	 * 
 	 * 
 	 * @var int
 	 */
-	public $parsedFlavorIdLike;
+	public $parsedFlavorLike;
 
 	/**
 	 * 

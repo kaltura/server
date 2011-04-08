@@ -56,10 +56,10 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	protected $file_size;
 
 	/**
-	 * The value for the last_file_size_check_at field.
+	 * The value for the file_size_last_set_at field.
 	 * @var        string
 	 */
-	protected $last_file_size_check_at;
+	protected $file_size_last_set_at;
 
 	/**
 	 * The value for the error_description field.
@@ -186,7 +186,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [optionally formatted] temporal [last_file_size_check_at] column value.
+	 * Get the [optionally formatted] temporal [file_size_last_set_at] column value.
 	 * 
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
 	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
@@ -196,22 +196,22 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
 	 * @throws     PropelException - if unable to parse/validate the date/time value.
 	 */
-	public function getLastFileSizeCheckAt($format = 'Y-m-d H:i:s')
+	public function getFileSizeLastSetAt($format = 'Y-m-d H:i:s')
 	{
-		if ($this->last_file_size_check_at === null) {
+		if ($this->file_size_last_set_at === null) {
 			return null;
 		}
 
 
-		if ($this->last_file_size_check_at === '0000-00-00 00:00:00') {
+		if ($this->file_size_last_set_at === '0000-00-00 00:00:00') {
 			// while technically this is not a default value of NULL,
 			// this seems to be closest in meaning.
 			return null;
 		} else {
 			try {
-				$dt = new DateTime($this->last_file_size_check_at);
+				$dt = new DateTime($this->file_size_last_set_at);
 			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->last_file_size_check_at, true), $x);
+				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->file_size_last_set_at, true), $x);
 			}
 		}
 
@@ -484,16 +484,16 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	} // setFileSize()
 
 	/**
-	 * Sets the value of [last_file_size_check_at] column to a normalized version of the date/time value specified.
+	 * Sets the value of [file_size_last_set_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
 	 * @return     DropFolderFile The current object (for fluent API support)
 	 */
-	public function setLastFileSizeCheckAt($v)
+	public function setFileSizeLastSetAt($v)
 	{
-		if(!isset($this->oldColumnsValues[DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT]))
-			$this->oldColumnsValues[DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT] = $this->last_file_size_check_at;
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::FILE_SIZE_LAST_SET_AT]))
+			$this->oldColumnsValues[DropFolderFilePeer::FILE_SIZE_LAST_SET_AT] = $this->file_size_last_set_at;
 
 		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
 		// -- which is unexpected, to say the least.
@@ -518,22 +518,22 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			}
 		}
 
-		if ( $this->last_file_size_check_at !== null || $dt !== null ) {
+		if ( $this->file_size_last_set_at !== null || $dt !== null ) {
 			// (nested ifs are a little easier to read in this case)
 
-			$currNorm = ($this->last_file_size_check_at !== null && $tmpDt = new DateTime($this->last_file_size_check_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+			$currNorm = ($this->file_size_last_set_at !== null && $tmpDt = new DateTime($this->file_size_last_set_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
 			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
 
 			if ( ($currNorm !== $newNorm) // normalized values don't match 
 					)
 			{
-				$this->last_file_size_check_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT;
+				$this->file_size_last_set_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
+				$this->modifiedColumns[] = DropFolderFilePeer::FILE_SIZE_LAST_SET_AT;
 			}
 		} // if either are not null
 
 		return $this;
-	} // setLastFileSizeCheckAt()
+	} // setFileSizeLastSetAt()
 
 	/**
 	 * Set the value of [error_description] column.
@@ -760,7 +760,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$this->file_name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->status = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->file_size = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->last_file_size_check_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->file_size_last_set_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->error_description = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->parsed_slug = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->parsed_flavor = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
@@ -1202,7 +1202,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				return $this->getFileSize();
 				break;
 			case 6:
-				return $this->getLastFileSizeCheckAt();
+				return $this->getFileSizeLastSetAt();
 				break;
 			case 7:
 				return $this->getErrorDescription();
@@ -1249,7 +1249,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$keys[3] => $this->getFileName(),
 			$keys[4] => $this->getStatus(),
 			$keys[5] => $this->getFileSize(),
-			$keys[6] => $this->getLastFileSizeCheckAt(),
+			$keys[6] => $this->getFileSizeLastSetAt(),
 			$keys[7] => $this->getErrorDescription(),
 			$keys[8] => $this->getParsedSlug(),
 			$keys[9] => $this->getParsedFlavor(),
@@ -1306,7 +1306,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				$this->setFileSize($value);
 				break;
 			case 6:
-				$this->setLastFileSizeCheckAt($value);
+				$this->setFileSizeLastSetAt($value);
 				break;
 			case 7:
 				$this->setErrorDescription($value);
@@ -1356,7 +1356,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setFileName($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setStatus($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setFileSize($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setLastFileSizeCheckAt($arr[$keys[6]]);
+		if (array_key_exists($keys[6], $arr)) $this->setFileSizeLastSetAt($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setErrorDescription($arr[$keys[7]]);
 		if (array_key_exists($keys[8], $arr)) $this->setParsedSlug($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setParsedFlavor($arr[$keys[9]]);
@@ -1380,7 +1380,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_NAME)) $criteria->add(DropFolderFilePeer::FILE_NAME, $this->file_name);
 		if ($this->isColumnModified(DropFolderFilePeer::STATUS)) $criteria->add(DropFolderFilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE)) $criteria->add(DropFolderFilePeer::FILE_SIZE, $this->file_size);
-		if ($this->isColumnModified(DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT)) $criteria->add(DropFolderFilePeer::LAST_FILE_SIZE_CHECK_AT, $this->last_file_size_check_at);
+		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT)) $criteria->add(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT, $this->file_size_last_set_at);
 		if ($this->isColumnModified(DropFolderFilePeer::ERROR_DESCRIPTION)) $criteria->add(DropFolderFilePeer::ERROR_DESCRIPTION, $this->error_description);
 		if ($this->isColumnModified(DropFolderFilePeer::PARSED_SLUG)) $criteria->add(DropFolderFilePeer::PARSED_SLUG, $this->parsed_slug);
 		if ($this->isColumnModified(DropFolderFilePeer::PARSED_FLAVOR)) $criteria->add(DropFolderFilePeer::PARSED_FLAVOR, $this->parsed_flavor);
@@ -1451,7 +1451,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 
 		$copyObj->setFileSize($this->file_size);
 
-		$copyObj->setLastFileSizeCheckAt($this->last_file_size_check_at);
+		$copyObj->setFileSizeLastSetAt($this->file_size_last_set_at);
 
 		$copyObj->setErrorDescription($this->error_description);
 

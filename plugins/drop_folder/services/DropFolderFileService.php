@@ -12,6 +12,9 @@ class DropFolderFileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
+		if (!DropFolderPlugin::isAllowedPartner($this->getPartnerId()))
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+		
 		myPartnerUtils::addPartnerToCriteria(new DropFolderPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		myPartnerUtils::addPartnerToCriteria(new DropFolderFilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 	}
@@ -30,9 +33,22 @@ class DropFolderFileService extends KalturaBaseService
 		// check for required parameters
 		$dropFolderFile->validatePropertyNotNull('dropFolderId');
 		$dropFolderFile->validatePropertyNotNull('fileName');
+		$dropFolderFile->validatePropertyMinValue('fileSize', 0);
 		
-		if (DropFolderFilePeer::getByDropFolderIdAndFileName($dropFolderFile->dropFolderId, $dropFolderFile->fileName)) {
-			throw new KalturaAPIException(DropFolderApiErrors::DROP_FOLDER_FILE_ALREADY_EXISTS, $dropFolderFile->dropFolderId, $dropFolderFile->fileName);
+		// check that drop folder id exists in the system
+		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->dropFolderId);
+		if (!$dropFolder) {
+			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND, $dropFolderFile->dropFolderId);
+		}
+		
+		// check that drop folder partner id = current partner id
+		if ($dropFolder->getPartnerId() !== $this->getPartnerId()){
+			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_PARTNER_ID_NO_MATCH, $dropFolder->getPartnerId(), $this->getPartnerId());
+		}
+		
+		// check that the file doesn't already exist in the drop folder
+		if (DropFolderFilePeer::retrieveByDropFolderIdAndFileName($dropFolderFile->dropFolderId, $dropFolderFile->fileName)) {
+			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_FILE_ALREADY_EXISTS, $dropFolderFile->dropFolderId, $dropFolderFile->fileName);
 		}
 		
 		// save in database
@@ -86,6 +102,10 @@ class DropFolderFileService extends KalturaBaseService
 		
 		if (!$dbDropFolderFile) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFileId);
+		}
+		
+		if (!is_null($dropFolderFile->fileSize)) {
+			$dropFolderFile->validatePropertyMinValue('fileSize', 0);
 		}
 					
 		$dbDropFolderFile = $dropFolderFile->toUpdatableObject($dbDropFolderFile);

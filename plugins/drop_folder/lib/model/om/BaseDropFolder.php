@@ -50,10 +50,10 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $status;
 
 	/**
-	 * The value for the conversion_profile_id field.
+	 * The value for the dc field.
 	 * @var        int
 	 */
-	protected $conversion_profile_id;
+	protected $dc;
 
 	/**
 	 * The value for the path field.
@@ -62,10 +62,22 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $path;
 
 	/**
-	 * The value for the dc field.
+	 * The value for the conversion_profile_id field.
 	 * @var        int
 	 */
-	protected $dc;
+	protected $conversion_profile_id;
+
+	/**
+	 * The value for the file_delete_policy field.
+	 * @var        int
+	 */
+	protected $file_delete_policy;
+
+	/**
+	 * The value for the unmatched_file_policy field.
+	 * @var        int
+	 */
+	protected $unmatched_file_policy;
 
 	/**
 	 * The value for the type field.
@@ -182,13 +194,13 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [conversion_profile_id] column value.
+	 * Get the [dc] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getConversionProfileId()
+	public function getDc()
 	{
-		return $this->conversion_profile_id;
+		return $this->dc;
 	}
 
 	/**
@@ -202,13 +214,33 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [dc] column value.
+	 * Get the [conversion_profile_id] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getDc()
+	public function getConversionProfileId()
 	{
-		return $this->dc;
+		return $this->conversion_profile_id;
+	}
+
+	/**
+	 * Get the [file_delete_policy] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getFileDeletePolicy()
+	{
+		return $this->file_delete_policy;
+	}
+
+	/**
+	 * Get the [unmatched_file_policy] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getUnmatchedFilePolicy()
+	{
+		return $this->unmatched_file_policy;
 	}
 
 	/**
@@ -447,27 +479,27 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	} // setStatus()
 
 	/**
-	 * Set the value of [conversion_profile_id] column.
+	 * Set the value of [dc] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     DropFolder The current object (for fluent API support)
 	 */
-	public function setConversionProfileId($v)
+	public function setDc($v)
 	{
-		if(!isset($this->oldColumnsValues[DropFolderPeer::CONVERSION_PROFILE_ID]))
-			$this->oldColumnsValues[DropFolderPeer::CONVERSION_PROFILE_ID] = $this->conversion_profile_id;
+		if(!isset($this->oldColumnsValues[DropFolderPeer::DC]))
+			$this->oldColumnsValues[DropFolderPeer::DC] = $this->dc;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->conversion_profile_id !== $v) {
-			$this->conversion_profile_id = $v;
-			$this->modifiedColumns[] = DropFolderPeer::CONVERSION_PROFILE_ID;
+		if ($this->dc !== $v) {
+			$this->dc = $v;
+			$this->modifiedColumns[] = DropFolderPeer::DC;
 		}
 
 		return $this;
-	} // setConversionProfileId()
+	} // setDc()
 
 	/**
 	 * Set the value of [path] column.
@@ -493,27 +525,73 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	} // setPath()
 
 	/**
-	 * Set the value of [dc] column.
+	 * Set the value of [conversion_profile_id] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     DropFolder The current object (for fluent API support)
 	 */
-	public function setDc($v)
+	public function setConversionProfileId($v)
 	{
-		if(!isset($this->oldColumnsValues[DropFolderPeer::DC]))
-			$this->oldColumnsValues[DropFolderPeer::DC] = $this->dc;
+		if(!isset($this->oldColumnsValues[DropFolderPeer::CONVERSION_PROFILE_ID]))
+			$this->oldColumnsValues[DropFolderPeer::CONVERSION_PROFILE_ID] = $this->conversion_profile_id;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->dc !== $v) {
-			$this->dc = $v;
-			$this->modifiedColumns[] = DropFolderPeer::DC;
+		if ($this->conversion_profile_id !== $v) {
+			$this->conversion_profile_id = $v;
+			$this->modifiedColumns[] = DropFolderPeer::CONVERSION_PROFILE_ID;
 		}
 
 		return $this;
-	} // setDc()
+	} // setConversionProfileId()
+
+	/**
+	 * Set the value of [file_delete_policy] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolder The current object (for fluent API support)
+	 */
+	public function setFileDeletePolicy($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderPeer::FILE_DELETE_POLICY]))
+			$this->oldColumnsValues[DropFolderPeer::FILE_DELETE_POLICY] = $this->file_delete_policy;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->file_delete_policy !== $v) {
+			$this->file_delete_policy = $v;
+			$this->modifiedColumns[] = DropFolderPeer::FILE_DELETE_POLICY;
+		}
+
+		return $this;
+	} // setFileDeletePolicy()
+
+	/**
+	 * Set the value of [unmatched_file_policy] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolder The current object (for fluent API support)
+	 */
+	public function setUnmatchedFilePolicy($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderPeer::UNMATCHED_FILE_POLICY]))
+			$this->oldColumnsValues[DropFolderPeer::UNMATCHED_FILE_POLICY] = $this->unmatched_file_policy;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->unmatched_file_policy !== $v) {
+			$this->unmatched_file_policy = $v;
+			$this->modifiedColumns[] = DropFolderPeer::UNMATCHED_FILE_POLICY;
+		}
+
+		return $this;
+	} // setUnmatchedFilePolicy()
 
 	/**
 	 * Set the value of [type] column.
@@ -739,15 +817,17 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$this->name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->description = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->status = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->conversion_profile_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->dc = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->path = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->dc = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->type = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->slug_field = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->slug_regex = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->conversion_profile_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->file_delete_policy = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->unmatched_file_policy = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->slug_field = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->slug_regex = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->created_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->updated_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -757,7 +837,7 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 14; // 14 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 16; // 16 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolder object", $e);
@@ -1180,30 +1260,36 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				return $this->getStatus();
 				break;
 			case 5:
-				return $this->getConversionProfileId();
+				return $this->getDc();
 				break;
 			case 6:
 				return $this->getPath();
 				break;
 			case 7:
-				return $this->getDc();
+				return $this->getConversionProfileId();
 				break;
 			case 8:
-				return $this->getType();
+				return $this->getFileDeletePolicy();
 				break;
 			case 9:
-				return $this->getSlugField();
+				return $this->getUnmatchedFilePolicy();
 				break;
 			case 10:
-				return $this->getSlugRegex();
+				return $this->getType();
 				break;
 			case 11:
-				return $this->getCreatedAt();
+				return $this->getSlugField();
 				break;
 			case 12:
-				return $this->getUpdatedAt();
+				return $this->getSlugRegex();
 				break;
 			case 13:
+				return $this->getCreatedAt();
+				break;
+			case 14:
+				return $this->getUpdatedAt();
+				break;
+			case 15:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1232,15 +1318,17 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$keys[2] => $this->getName(),
 			$keys[3] => $this->getDescription(),
 			$keys[4] => $this->getStatus(),
-			$keys[5] => $this->getConversionProfileId(),
+			$keys[5] => $this->getDc(),
 			$keys[6] => $this->getPath(),
-			$keys[7] => $this->getDc(),
-			$keys[8] => $this->getType(),
-			$keys[9] => $this->getSlugField(),
-			$keys[10] => $this->getSlugRegex(),
-			$keys[11] => $this->getCreatedAt(),
-			$keys[12] => $this->getUpdatedAt(),
-			$keys[13] => $this->getCustomData(),
+			$keys[7] => $this->getConversionProfileId(),
+			$keys[8] => $this->getFileDeletePolicy(),
+			$keys[9] => $this->getUnmatchedFilePolicy(),
+			$keys[10] => $this->getType(),
+			$keys[11] => $this->getSlugField(),
+			$keys[12] => $this->getSlugRegex(),
+			$keys[13] => $this->getCreatedAt(),
+			$keys[14] => $this->getUpdatedAt(),
+			$keys[15] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1288,30 +1376,36 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				$this->setStatus($value);
 				break;
 			case 5:
-				$this->setConversionProfileId($value);
+				$this->setDc($value);
 				break;
 			case 6:
 				$this->setPath($value);
 				break;
 			case 7:
-				$this->setDc($value);
+				$this->setConversionProfileId($value);
 				break;
 			case 8:
-				$this->setType($value);
+				$this->setFileDeletePolicy($value);
 				break;
 			case 9:
-				$this->setSlugField($value);
+				$this->setUnmatchedFilePolicy($value);
 				break;
 			case 10:
-				$this->setSlugRegex($value);
+				$this->setType($value);
 				break;
 			case 11:
-				$this->setCreatedAt($value);
+				$this->setSlugField($value);
 				break;
 			case 12:
-				$this->setUpdatedAt($value);
+				$this->setSlugRegex($value);
 				break;
 			case 13:
+				$this->setCreatedAt($value);
+				break;
+			case 14:
+				$this->setUpdatedAt($value);
+				break;
+			case 15:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1343,15 +1437,17 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setStatus($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setConversionProfileId($arr[$keys[5]]);
+		if (array_key_exists($keys[5], $arr)) $this->setDc($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setPath($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setDc($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setType($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setSlugField($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setSlugRegex($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
+		if (array_key_exists($keys[7], $arr)) $this->setConversionProfileId($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setFileDeletePolicy($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setUnmatchedFilePolicy($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setType($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setSlugField($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setSlugRegex($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
 	}
 
 	/**
@@ -1368,9 +1464,11 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderPeer::NAME)) $criteria->add(DropFolderPeer::NAME, $this->name);
 		if ($this->isColumnModified(DropFolderPeer::DESCRIPTION)) $criteria->add(DropFolderPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(DropFolderPeer::STATUS)) $criteria->add(DropFolderPeer::STATUS, $this->status);
-		if ($this->isColumnModified(DropFolderPeer::CONVERSION_PROFILE_ID)) $criteria->add(DropFolderPeer::CONVERSION_PROFILE_ID, $this->conversion_profile_id);
-		if ($this->isColumnModified(DropFolderPeer::PATH)) $criteria->add(DropFolderPeer::PATH, $this->path);
 		if ($this->isColumnModified(DropFolderPeer::DC)) $criteria->add(DropFolderPeer::DC, $this->dc);
+		if ($this->isColumnModified(DropFolderPeer::PATH)) $criteria->add(DropFolderPeer::PATH, $this->path);
+		if ($this->isColumnModified(DropFolderPeer::CONVERSION_PROFILE_ID)) $criteria->add(DropFolderPeer::CONVERSION_PROFILE_ID, $this->conversion_profile_id);
+		if ($this->isColumnModified(DropFolderPeer::FILE_DELETE_POLICY)) $criteria->add(DropFolderPeer::FILE_DELETE_POLICY, $this->file_delete_policy);
+		if ($this->isColumnModified(DropFolderPeer::UNMATCHED_FILE_POLICY)) $criteria->add(DropFolderPeer::UNMATCHED_FILE_POLICY, $this->unmatched_file_policy);
 		if ($this->isColumnModified(DropFolderPeer::TYPE)) $criteria->add(DropFolderPeer::TYPE, $this->type);
 		if ($this->isColumnModified(DropFolderPeer::SLUG_FIELD)) $criteria->add(DropFolderPeer::SLUG_FIELD, $this->slug_field);
 		if ($this->isColumnModified(DropFolderPeer::SLUG_REGEX)) $criteria->add(DropFolderPeer::SLUG_REGEX, $this->slug_regex);
@@ -1439,11 +1537,15 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 
 		$copyObj->setStatus($this->status);
 
-		$copyObj->setConversionProfileId($this->conversion_profile_id);
+		$copyObj->setDc($this->dc);
 
 		$copyObj->setPath($this->path);
 
-		$copyObj->setDc($this->dc);
+		$copyObj->setConversionProfileId($this->conversion_profile_id);
+
+		$copyObj->setFileDeletePolicy($this->file_delete_policy);
+
+		$copyObj->setUnmatchedFilePolicy($this->unmatched_file_policy);
 
 		$copyObj->setType($this->type);
 

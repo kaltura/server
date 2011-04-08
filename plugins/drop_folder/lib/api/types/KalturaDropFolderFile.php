@@ -42,8 +42,9 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @filter order
+	 * @readonly
 	 */
-	public $lastFileSizeCheckAt;
+	public $fileSizeLastSetAt;
 	
 	/**
 	 * @var KalturaDropFolderFileStatus
@@ -61,7 +62,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	 * @var int
 	 * @filter eq,in,like,order
 	 */
-	public $parsedFlavorId;
+	public $parsedFlavor;
 	
 	/**
 	 * @var string
@@ -95,9 +96,9 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		'fileName',
 		'fileSize',
 		'status',
-		'lastFileSizeCheckAt',
+		'fileSizeLastSetAt',
 		'parsedSlug',
-		'parsedFlavorId',
+		'parsedFlavor',
 		'errorDescription',
 		'createdAt',
 		'updatedAt',

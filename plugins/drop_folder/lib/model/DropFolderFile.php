@@ -13,6 +13,14 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolderFile extends BaseDropFolderFile {
+class DropFolderFile extends BaseDropFolderFile
+{
 
+	public function setFileSize($size)
+	{
+		parent::setFileSize($size);
+		self::setFileSizeLastSetAt(time());	
+	}
+	
+	
 } // DropFolderFile

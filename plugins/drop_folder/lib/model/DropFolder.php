@@ -17,29 +17,27 @@ class DropFolder extends BaseDropFolder
 {
 	
 	const AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE = 3;
-	const FILE_SIZE_CHECK_INTERNAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minues
+	const FILE_SIZE_CHECK_INTERNAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minutes
 	
 	// ------------------------------------------
 	// -- Custom data columns -------------------
 	// ------------------------------------------
 	
-	const FILE_SIZE_CHECK_INTERVAL_COLUMN = 'file_size_check_interval';
-	const FILE_HANDLERS_CONFIG_COLUMN     = 'file_handlers_config';
-	const UNMATCHED_FILE_POLICY_COLUMN    = 'unmatched_file_policy';
-	const FILE_DELETE_POLICY_COLUMN       = 'file_delete_policy';
-	const AUTO_FILE_DELETE_DAYS_COLUMN  = 'auto_file_delete_days';
+	const CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL = 'file_size_check_interval';
+	const CUSTOM_DATA_FILE_HANDLERS_CONFIG     = 'file_handlers_config';
+	const CUSTOM_DATA_AUTO_FILE_DELETE_DAYS  = 'auto_file_delete_days';
 	
 	
 	// File size check interval - value in seconds
 	
 	public function getFileSizeCheckInterval()
 	{
-		return $this->getFromCustomData(self::FILE_SIZE_CHECK_INTERVAL_COLUMN);
+		return $this->getFromCustomData(self::CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL);
 	}
 	
 	public function setFileSizeCheckInterval($interval)
 	{
-		$this->putInCustomData(self::FILE_SIZE_CHECK_INTERVAL_COLUMN, $interval);
+		$this->putInCustomData(self::CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL, $interval);
 	}
 	
 	
@@ -48,7 +46,7 @@ class DropFolder extends BaseDropFolder
 	
 	public function getFileHandlersConfig()
 	{
-		$serializedConfig = $this->getFromCustomData(self::FILE_HANDLERS_CONFIG_COLUMN);
+		$serializedConfig = $this->getFromCustomData(self::CUSTOM_DATA_FILE_HANDLERS_CONFIG);
 		$configArray = unserialize($serializedConfig);
 		return $configArray;
 	}
@@ -56,58 +54,20 @@ class DropFolder extends BaseDropFolder
 	public function setFileHandlersConfig($fileHandlersConfig)
 	{
 		$serializedConfig = serialize($fileHandlersConfig);
-		$this->putInCustomData(self::FILE_HANDLERS_CONFIG_COLUMN, $serializedConfig);
-	}
-	
-	
-	// Unmatched file policy
-	
-	/**
-	 * @return DropFolderUnmatchedFilesPolicy
-	 */
-	public function getUnmatchedFilePolicy()
-	{
-		return $this->getFromCustomData(self::UNMATCHED_FILE_POLICY_COLUMN);
-	}
-	
-	/**
-	 * @param DropFolderUnmatchedFilesPolicy $policy
-	 */
-	public function setUnmatchedFilePolicy($policy)
-	{
-		$this->putInCustomData(self::UNMATCHED_FILE_POLICY_COLUMN, $policy);
-	}
-	
-	
-	// File delete policy
-	
-	/**
-	 * @return DropFolderFileDeletePolicy
-	 */
-	public function getFileDeletePolicy()
-	{
-		return $this->getFromCustomData(self::FILE_DELETE_POLICY_COLUMN);
-	}
-	
-	/**
-	 * @param DropFolderFileDeletePolicy $policy
-	 */
-	public function setFileDeletePolicy($policy)
-	{
-		$this->putInCustomData(self::FILE_DELETE_POLICY_COLUMN, $policy);
-	}
+		$this->putInCustomData(self::CUSTOM_DATA_FILE_HANDLERS_CONFIG, $serializedConfig);
+	}	
 	
 	
 	// Automatic file delete days
 		
 	public function getAutoFileDeleteDays()
 	{
-		return $this->getFromCustomData(self::AUTO_FILE_DELETE_DAYS_COLUMN);
+		return $this->getFromCustomData(self::CUSTOM_DATA_AUTO_FILE_DELETE_DAYS);
 	}
 	
 	public function setAutoFileDeleteDays($days)
 	{
-		$this->putInCustomData(self::AUTO_FILE_DELETE_DAYS_COLUMN, $days);
+		$this->putInCustomData(self::CUSTOM_DATA_AUTO_FILE_DELETE_DAYS, $days);
 	}
 	
 	

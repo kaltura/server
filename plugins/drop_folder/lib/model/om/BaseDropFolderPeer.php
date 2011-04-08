@@ -26,7 +26,7 @@ abstract class BaseDropFolderPeer {
 	const TM_CLASS = 'DropFolderTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 14;
+	const NUM_COLUMNS = 16;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -46,14 +46,20 @@ abstract class BaseDropFolderPeer {
 	/** the column name for the STATUS field */
 	const STATUS = 'drop_folder.STATUS';
 
-	/** the column name for the CONVERSION_PROFILE_ID field */
-	const CONVERSION_PROFILE_ID = 'drop_folder.CONVERSION_PROFILE_ID';
+	/** the column name for the DC field */
+	const DC = 'drop_folder.DC';
 
 	/** the column name for the PATH field */
 	const PATH = 'drop_folder.PATH';
 
-	/** the column name for the DC field */
-	const DC = 'drop_folder.DC';
+	/** the column name for the CONVERSION_PROFILE_ID field */
+	const CONVERSION_PROFILE_ID = 'drop_folder.CONVERSION_PROFILE_ID';
+
+	/** the column name for the FILE_DELETE_POLICY field */
+	const FILE_DELETE_POLICY = 'drop_folder.FILE_DELETE_POLICY';
+
+	/** the column name for the UNMATCHED_FILE_POLICY field */
+	const UNMATCHED_FILE_POLICY = 'drop_folder.UNMATCHED_FILE_POLICY';
 
 	/** the column name for the TYPE field */
 	const TYPE = 'drop_folder.TYPE';
@@ -89,11 +95,11 @@ abstract class BaseDropFolderPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'Description', 'Status', 'ConversionProfileId', 'Path', 'Dc', 'Type', 'SlugField', 'SlugRegex', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'description', 'status', 'conversionProfileId', 'path', 'dc', 'type', 'slugField', 'slugRegex', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::DESCRIPTION, self::STATUS, self::CONVERSION_PROFILE_ID, self::PATH, self::DC, self::TYPE, self::SLUG_FIELD, self::SLUG_REGEX, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'description', 'status', 'conversion_profile_id', 'path', 'dc', 'type', 'slug_field', 'slug_regex', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PartnerId', 'Name', 'Description', 'Status', 'Dc', 'Path', 'ConversionProfileId', 'FileDeletePolicy', 'UnmatchedFilePolicy', 'Type', 'SlugField', 'SlugRegex', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'partnerId', 'name', 'description', 'status', 'dc', 'path', 'conversionProfileId', 'fileDeletePolicy', 'unmatchedFilePolicy', 'type', 'slugField', 'slugRegex', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARTNER_ID, self::NAME, self::DESCRIPTION, self::STATUS, self::DC, self::PATH, self::CONVERSION_PROFILE_ID, self::FILE_DELETE_POLICY, self::UNMATCHED_FILE_POLICY, self::TYPE, self::SLUG_FIELD, self::SLUG_REGEX, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'partner_id', 'name', 'description', 'status', 'dc', 'path', 'conversion_profile_id', 'file_delete_policy', 'unmatched_file_policy', 'type', 'slug_field', 'slug_regex', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
 	);
 
 	/**
@@ -103,11 +109,11 @@ abstract class BaseDropFolderPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'Description' => 3, 'Status' => 4, 'ConversionProfileId' => 5, 'Path' => 6, 'Dc' => 7, 'Type' => 8, 'SlugField' => 9, 'SlugRegex' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, 'CustomData' => 13, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'description' => 3, 'status' => 4, 'conversionProfileId' => 5, 'path' => 6, 'dc' => 7, 'type' => 8, 'slugField' => 9, 'slugRegex' => 10, 'createdAt' => 11, 'updatedAt' => 12, 'customData' => 13, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::DESCRIPTION => 3, self::STATUS => 4, self::CONVERSION_PROFILE_ID => 5, self::PATH => 6, self::DC => 7, self::TYPE => 8, self::SLUG_FIELD => 9, self::SLUG_REGEX => 10, self::CREATED_AT => 11, self::UPDATED_AT => 12, self::CUSTOM_DATA => 13, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'description' => 3, 'status' => 4, 'conversion_profile_id' => 5, 'path' => 6, 'dc' => 7, 'type' => 8, 'slug_field' => 9, 'slug_regex' => 10, 'created_at' => 11, 'updated_at' => 12, 'custom_data' => 13, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PartnerId' => 1, 'Name' => 2, 'Description' => 3, 'Status' => 4, 'Dc' => 5, 'Path' => 6, 'ConversionProfileId' => 7, 'FileDeletePolicy' => 8, 'UnmatchedFilePolicy' => 9, 'Type' => 10, 'SlugField' => 11, 'SlugRegex' => 12, 'CreatedAt' => 13, 'UpdatedAt' => 14, 'CustomData' => 15, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'partnerId' => 1, 'name' => 2, 'description' => 3, 'status' => 4, 'dc' => 5, 'path' => 6, 'conversionProfileId' => 7, 'fileDeletePolicy' => 8, 'unmatchedFilePolicy' => 9, 'type' => 10, 'slugField' => 11, 'slugRegex' => 12, 'createdAt' => 13, 'updatedAt' => 14, 'customData' => 15, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARTNER_ID => 1, self::NAME => 2, self::DESCRIPTION => 3, self::STATUS => 4, self::DC => 5, self::PATH => 6, self::CONVERSION_PROFILE_ID => 7, self::FILE_DELETE_POLICY => 8, self::UNMATCHED_FILE_POLICY => 9, self::TYPE => 10, self::SLUG_FIELD => 11, self::SLUG_REGEX => 12, self::CREATED_AT => 13, self::UPDATED_AT => 14, self::CUSTOM_DATA => 15, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'partner_id' => 1, 'name' => 2, 'description' => 3, 'status' => 4, 'dc' => 5, 'path' => 6, 'conversion_profile_id' => 7, 'file_delete_policy' => 8, 'unmatched_file_policy' => 9, 'type' => 10, 'slug_field' => 11, 'slug_regex' => 12, 'created_at' => 13, 'updated_at' => 14, 'custom_data' => 15, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
 	);
 
 	/**
@@ -182,9 +188,11 @@ abstract class BaseDropFolderPeer {
 		$criteria->addSelectColumn(DropFolderPeer::NAME);
 		$criteria->addSelectColumn(DropFolderPeer::DESCRIPTION);
 		$criteria->addSelectColumn(DropFolderPeer::STATUS);
-		$criteria->addSelectColumn(DropFolderPeer::CONVERSION_PROFILE_ID);
-		$criteria->addSelectColumn(DropFolderPeer::PATH);
 		$criteria->addSelectColumn(DropFolderPeer::DC);
+		$criteria->addSelectColumn(DropFolderPeer::PATH);
+		$criteria->addSelectColumn(DropFolderPeer::CONVERSION_PROFILE_ID);
+		$criteria->addSelectColumn(DropFolderPeer::FILE_DELETE_POLICY);
+		$criteria->addSelectColumn(DropFolderPeer::UNMATCHED_FILE_POLICY);
 		$criteria->addSelectColumn(DropFolderPeer::TYPE);
 		$criteria->addSelectColumn(DropFolderPeer::SLUG_FIELD);
 		$criteria->addSelectColumn(DropFolderPeer::SLUG_REGEX);

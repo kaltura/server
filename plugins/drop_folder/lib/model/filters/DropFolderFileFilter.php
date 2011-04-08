@@ -22,9 +22,9 @@ class DropFolderFileFilter extends baseObjectFilter
 			"_like_parsed_slug",
 			"_eq_parsed_slug",
 			"_in_parsed_slug",
-			"_like_parsed_flavor_id",
-			"_eq_parsed_flavor_id",
-			"_in_parsed_flavor_id",
+			"_like_parsed_flavor",
+			"_eq_parsed_flavor",
+			"_in_parsed_flavor",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_gte_updated_at",
@@ -37,9 +37,9 @@ class DropFolderFileFilter extends baseObjectFilter
 			"id",
 			"file_name",
 			"file_size",
-			"last_file_size_check_at",
+			"file_size_last_set_at",
 			"parsed_slug",
-			"parsed_flavor_id",
+			"parsed_flavor",
 		);
 	}
 

@@ -17,7 +17,7 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 {
 
 	
-	public static function getByDropFolderIdAndFileName($dropFolderId, $fileName)
+	public static function retrieveByDropFolderIdAndFileName($dropFolderId, $fileName)
 	{
 		$c = new Criteria();
 		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);

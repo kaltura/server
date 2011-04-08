@@ -13,6 +13,15 @@
  * @package plugins.dropFolder
  * @subpackage model
  */
-class DropFolderPeer extends BaseDropFolderPeer {
+class DropFolderPeer extends BaseDropFolderPeer
+{
+	
+	public static function getByDcAndPath($dcId, $path)
+	{
+		$c = new Criteria();
+		$c->addAnd(DropFolderPeer::DC, $dcId, Criteria::EQUAL);
+		$c->addAnd(DropFolderPeer::PATH, $path, Criteria::EQUAL);
+		return DropFolderPeer::doSelectOne($c);
+	}	
 
 } // DropFolderPeer
