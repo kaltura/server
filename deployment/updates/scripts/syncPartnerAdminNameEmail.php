@@ -40,6 +40,7 @@ while(count($partners))
 		$ownerKuserId = $partner->getAccountOwnerKuserId();
 		if (is_null($ownerKuserId)) {
 			KalturaLog::log('Skipping ['.$partner->getId().'] because owner kuser id = null');
+			file_put_contents($lastPartnerFile, $lastPartner);
 			continue;
 		}
 		$partner->setAccountOwnerKuserId($ownerKuserId);
