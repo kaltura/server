@@ -116,7 +116,7 @@ class UserService extends KalturaBaseUserService
 			if (!is_null($user->roleIds)) {
 				UserRolePeer::testValidRolesForUser($user->roleIds);
 			}
-			if ($user->id != $userId) {
+			if (!is_null($user->id) && $user->id != $userId) {
 				if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
 					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 				} 
