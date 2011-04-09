@@ -30,6 +30,8 @@ class DropFolderService extends KalturaBaseService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS
+	 * @throws KalturaErrors::DATA_CENTER_ID_NOT_FOUND
 	 */
 	public function addAction(KalturaDropFolder $dropFolder)
 	{
@@ -122,6 +124,7 @@ class DropFolderService extends KalturaBaseService
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::DATA_CENTER_ID_NOT_FOUND
 	 */	
 	public function updateAction($dropFolderId, KalturaDropFolder $dropFolder)
 	{

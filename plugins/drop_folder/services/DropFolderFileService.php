@@ -27,6 +27,9 @@ class DropFolderFileService extends KalturaBaseService
 	 * @return KalturaDropFolderFile
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
+	 * @throws KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND
+	 * @throws KalturaDropFolderErrors::DROP_FOLDER_PARTNER_ID_NO_MATCH
+	 * @throws KalturaDropFolderErrors::DROP_FOLDER_FILE_ALREADY_EXISTS
 	 */
 	public function addAction(KalturaDropFolderFile $dropFolderFile)
 	{
