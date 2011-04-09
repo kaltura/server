@@ -33,11 +33,11 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
+	 * @param KalturaClient $kClient - the client for the engine to use
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig )
+	protected function __construct( KSchedularTaskConfig $taskConfig, $kClient )
 	{
-		parent::__construct($taskConfig);
-				
+		parent::__construct($taskConfig, $kClient);
 		KalturaLog::debug("Created new KBulkUploadEngineCsv");
 	}
 	
@@ -325,6 +325,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
 		//Add logic here from old bulk upload
+		parent::handleBulkUpload($job, $data);
 	}
 
 	/**

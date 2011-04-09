@@ -18,7 +18,7 @@ abstract class KBulkUploadEngine
 	 * The Engine client
 	 * @var KalturaClient
 	 */
-	protected $client; 
+	protected $kClient; 
 	
 	/**
 	 * 
@@ -28,20 +28,21 @@ abstract class KBulkUploadEngine
 	protected $multiRequestCounter = 0;
 	
 	/**
-	 * Will return the proper engine depending on the type (KalturaBulkUploadTypeType)
+	 * Will return the proper engine depending on the type (KalturaBulkUploadType)
 	 *
 	 * @param int $provider
-	 * @param KSchedularTaskConfig $taskConfig
+	 * @param KSchedularTaskConfig $taskConfig - for the engine
+	 * @param KalturaClient kClient - the client for the engine to use
 	 * @return KBulkUploadEngine
 	 */
-	public static function getEngine ( $batchJobSubype , KSchedularTaskConfig $taskConfig )
+	public static function getEngine ( $batchJobSubType , KSchedularTaskConfig $taskConfig, $kClient )
 	{
 		$engine =  null;
 		
-		switch ($batchJobSubype)
+		switch ($batchJobSubType)
 		{
 			default:
-				$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubype, array($taskConfig));
+				$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient));
 		}
 				
 		return $engine;
@@ -50,9 +51,10 @@ abstract class KBulkUploadEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig )
+	protected function __construct( KSchedularTaskConfig $taskConfig, $kClient )
 	{
 		$this->taskConfig = $taskConfig;
+		$this->kClient = $kClient;
 	}
 	
 	/**
@@ -115,7 +117,7 @@ abstract class KBulkUploadEngine
 	/**
 	 * @param string $item
 	 */
-	public static function trimArray(&$item)
+	protected function trimArray(&$item)
 	{
 		$item = trim($item);
 	}
@@ -125,7 +127,7 @@ abstract class KBulkUploadEngine
 	 * Adds a bulk upload result
 	 * @param KalturaBulkUploadResult $bulkUploadResult
 	 */
-	public static function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult)
+	protected function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult)
 	{
 		$pluginsData = $bulkUploadResult->pluginsData;
 		$bulkUploadResult->pluginsData = null;
@@ -138,7 +140,7 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $bulkUploadJobData
 	 */
-	public static function getFileHandle(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
+	protected function getFileHandle(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
 	{
 		// reporting start of work
 		$this->updateJob($job, 'Fetching file', KalturaBatchJobStatus::QUEUED, 1);
@@ -162,7 +164,7 @@ abstract class KBulkUploadEngine
 	 * @param int $jobId
 	 * @return int - the start line for the job id
 	 */
-	public static function getStartLineNumber($jobId)
+	protected function getStartLineNumber($jobId)
 	{
 		//Get the last line number for the specific job id
 		$startLineNumber = 0;
@@ -186,7 +188,7 @@ abstract class KBulkUploadEngine
 	 * @return bool - true if the chunked data was sent, false if the data is not sent and ERROR on error
 	 * 
 	 */
-	public static function sendChunkedData(KalturaBatchJob $job)
+	protected function sendChunkedData(KalturaBatchJob $job)
 	{
 		$multiRequestSize = $this->taskConfig->params->multiRequestSize;
 
@@ -217,7 +219,7 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param array $bulkUploadResultChunk
 	 */
-	public static function sendChunkedDataForPartner(KalturaBatchJob $job, array $bulkUploadResultChunk)
+	protected function sendChunkedDataForPartner(KalturaBatchJob $job, array $bulkUploadResultChunk)
 	{
 		$multiRequestSize = $this->taskConfig->params->multiRequestSize;
 		
@@ -258,7 +260,7 @@ abstract class KBulkUploadEngine
 	 * Start a multirequest, if specified start the multi request for the job partner
 	 * @param bool $isSpecificForPartner
 	 */
-	public static function startMultiRequest($isSpecificForPartner)
+	protected function startMultiRequest($isSpecificForPartner)
 	{
 		if($isSpecificForPartner)
 		{
@@ -271,7 +273,7 @@ abstract class KBulkUploadEngine
 	/**
 	 * @return array
 	 */
-	public static function doMultiRequestForPartnerId()
+	protected function doMultiRequestForPartnerId()
 	{
 		$requestResults = $this->kClient->doMultiRequest();
 		
@@ -287,7 +289,7 @@ abstract class KBulkUploadEngine
 	 * @param array $requestResults
 	 * @param array $bulkUploadResults
 	 */
-	public static function updateEntriesResults(array $requestResults, array $bulkUploadResults)
+	protected function updateEntriesResults(array $requestResults, array $bulkUploadResults)
 	{
 		KalturaLog::debug("updateEntriesResults(" . count($requestResults) . ", " . count($bulkUploadResults) . ")");
 		
@@ -327,7 +329,7 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @return boolean
 	 */
-	public static function isAborted(KalturaBatchJob $job)
+	protected function isAborted(KalturaBatchJob $job)
 	{
 		$batchJobResponse = $this->kClient->jobs->getBulkUploadStatus($job->id);
 		$updatedJob = $batchJobResponse->batchJob;
@@ -345,7 +347,8 @@ abstract class KBulkUploadEngine
 	}
 }
 
-//TODO: Roni - see if this si needed (copied from another location)
+
+//TODO: Roni - see if this is needed (copied from another location)
 ///**
 // * @package Scheduler
 // * @subpackage Conversion

@@ -18,11 +18,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig )
+	protected function __construct( KSchedularTaskConfig $taskConfig, $kClient )
 	{
-		parent::__construct($taskConfig);
-				
-		KalturaLog::debug("Connecting to Akamai(username: $username, password: $password)");
+		parent::__construct($taskConfig, $kClient);
 	}
 	
 	/* (non-PHPdoc)
