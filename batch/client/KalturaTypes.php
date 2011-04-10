@@ -7280,6 +7280,27 @@ abstract class KalturaPartnerBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
+	 * @var int
+	 */
+	public $partnerPackageEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackageLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
 	 * @var string
 	 */
 	public $partnerNameDescriptionWebsiteAdminNameAdminEmailLike = null;
@@ -8090,7 +8111,7 @@ class KalturaAssetParamsResourceContainer extends KalturaResource
 	/**
 	 * The asset params to associate with the reaource
 	 *
-	 * @var string
+	 * @var int
 	 */
 	public $assetParamsId = null;
 
@@ -8154,25 +8175,9 @@ class KalturaBulkResource extends KalturaUrlResource
 	/**
 	 * ID of the bulk upload job to be associated with the entry 
 	 *
-	 * @var string
-	 */
-	public $bulkUploadId = null;
-
-
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaDropFolderFileResource extends KalturaContentResource
-{
-	/**
-	 * ID of the drop folder file object 
-	 *
 	 * @var int
 	 */
-	public $dropFolderFileId = null;
+	public $bulkUploadId = null;
 
 
 }
@@ -8262,151 +8267,9 @@ class KalturaRemoteStorageResource extends KalturaUrlResource
 	/**
 	 * ID of storage profile to be associated with the created file sync, used for file serving URL composing, keep null to use the default. 
 	 *
-	 * @var string
+	 * @var int
 	 */
 	public $storageProfileId = null;
-
-
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaSearch extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $keyWords = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaSearchProviderType
-	 */
-	public $searchSource = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaMediaType
-	 */
-	public $mediaType = null;
-
-	/**
-	 * Use this field to pass dynamic data for searching
-	 * For example - if you set this field to "mymovies_$partner_id"
-	 * The $partner_id will be automatically replcaed with your real partner Id
-	 * 
-	 *
-	 * @var string
-	 */
-	public $extraData = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $authData = null;
-
-
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaSearchResult extends KalturaSearch
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $id = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $title = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $thumbUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $description = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $tags = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $url = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $sourceLink = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $credit = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaLicenseType
-	 */
-	public $licenseType = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $flashPlaybackType = null;
-
-
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaSearchResultsResource extends KalturaContentResource
-{
-	/**
-	 * Search media provider search results 
-	 *
-	 * @var KalturaSearchResult
-	 */
-	public $result;
 
 
 }
