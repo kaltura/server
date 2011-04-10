@@ -350,7 +350,10 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 					
 			$bulkUploadResultChunk[] = $bulkUploadResult;
 			
-			$this->kClient->media->addFromBulk($mediaEntry, $bulkUploadResult->url, $job->id);
+			$resource = new KalturaBulkResource();
+			$resource->url = $bulkUploadResult->url;
+			$resource->bulkUploadId = $job->id;
+			$this->kClient->media->add($mediaEntry, $resource);
 			$this->multiRequestCounter ++;
 		}
 		

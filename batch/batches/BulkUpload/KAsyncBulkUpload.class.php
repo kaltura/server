@@ -85,15 +85,6 @@ class KAsyncBulkUpload extends KBatchBase {
 		}
 		
 		$engine->handleBulkUpload ( $job, $bulkUploadJobData );
-	
-		//TODO: Merge this changes of TanTan to the CSV plugin
-	//		$bulkUploadResultChunk[] = $bulkUploadResult;
-	//	
-	//		$bulkResource = new KalturaBulkResource();
-	//		$bulkResource->url = $bulkUploadResult->url;
-	//		$bulkResource->bulkUploadId = $job->id;
-	//		$this->kClient->media->add($mediaEntry, $bulkResource);
-	//		$multiRequestCounter ++;
 	}
 	
 	/**
