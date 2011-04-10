@@ -275,7 +275,7 @@ abstract class KBulkUploadEngine
 	 * Start a multirequest, if specified start the multi request for the job partner
 	 * @param bool $isSpecificForPartner
 	 */
-	protected function startMultiRequest($isSpecificForPartner)
+	protected function startMultiRequest($isSpecificForPartner = false)
 	{
 		if($isSpecificForPartner)
 		{
