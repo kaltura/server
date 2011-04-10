@@ -176,7 +176,7 @@ abstract class KBulkUploadEngine
 		$startLineNumber = 0;
 		$bulkUploadLastResult = null;
 		try{
-			$bulkUploadLastResult = $this->kClient->batch->getBulkUploadLastResult($job->id);
+			$bulkUploadLastResult = $this->kClient->batch->getBulkUploadLastResult($jobId);
 		}
 		catch(Exception $e){
 			KalturaLog::err("getBulkUploadLastResult: " . $e->getMessage());
