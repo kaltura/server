@@ -41,34 +41,22 @@ class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaEnumera
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		// bulk upload does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-			
-		//Returns the right job for the engine
-		if($baseClass == 'kJobData')
+		//The client side
+		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
 		{
-			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadType::XML))
-				return new kBulkUploadXmlJobData();
-		}
-		
-		if($baseClass == 'KalturaBulkUploadJobData')
-		{
+			//TODO: add support for different job types
 			if($enumValue == self::getApiValue(BulkUploadType::XML))
 				return new kBulkUploadXmlJobData();
 		}
-		
-		//Returns the right bulk upload type for the engine
-		if($baseClass == 'BulkUploadType')
+				
+		//If we are on the client side (like batch)
+		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadType')
 		{
-			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadType::XML))
-				return new kBulkUploadXmlJobData();
-		}
-		
-		if($baseClass == 'KalturaBulkUploadType')
-		{
-			if($enumValue == self::getApiValue(BulkUploadType::XML))
-				return new kBulkUploadXmlJobData();
+			if($enumValue == KalturaBulkUploadType::XML)
+			{
+				$reflection = new ReflectionClass('BulkUploadEngineXml');	
+				return $reflection->newInstance($constructorArgs);
+			}
 		}
 	
 		return null;

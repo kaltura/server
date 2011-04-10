@@ -50,10 +50,10 @@ class BulkUploadCsvEnginePlugin extends KalturaPlugin implements IKalturaEnumera
 				return new kBulkUploadCsvJobData();
 		}
 		
-		//Gets the engine =
-		if($baseClass == 'KBulkUploadEngine')
+		//Gets the engine
+		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
 		{
-			if($enumValue == self::getApiValue(KalturaBulkUploadType::CSV))
+			if($enumValue == KalturaBulkUploadType::CSV)
 			{
 				$reflection = new ReflectionClass('BulkUploadEngineCsv');
 				return $reflection->newInstance($constructorArgs);
