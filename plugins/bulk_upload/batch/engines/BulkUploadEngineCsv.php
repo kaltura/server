@@ -254,10 +254,9 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$msg = "CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($bulkUploadResults)) . ' invalid records';
 		$updateData = new KalturaBulkUploadJobData();
 		$updateData->csvVersion = $csvVersion;
-		$this->updateJob($job, $msg, KalturaBatchJobStatus::PROCESSING, 2, $updateData);
-		
+				
 		// check if job aborted
-		if(KAsyncBulkUpload::isAborted($job))
+		if($this->isAborted($job))
 		{
 			ini_set('auto_detect_line_endings', false);
 			throw new KalturaException("Job was aborted", KalturaBatchJobStatus::ABORTED); //The job swas aborted
@@ -286,8 +285,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		KalturaLog::debug("MultiRequestSize: $this->taskConfig->params->multiRequestSize");
 		
 		// opens the csv file
-		$fileHandle = KAsyncBulkUpload::getFileHandle($job, $data);
-		$this->startLineNumber = KAsyncBulkUpload::getStartLineNumber($job->id);
+		$fileHandle = $this->getFileHandle($job, $data);
+		$this->startLineNumber = $this->getStartLineNumber($job->id);
 		$this->lineNumber = 0;
 		$this->multiRequestCounter = 0;
 		$this->bulkUploadResults = array();
@@ -339,7 +338,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected function createEntries(array $bulkUploadResults, KalturaBatchJob $job, kBulkUploadJobData $bulkUploadJobData, $csvVersion)
 	{
 		// start a multi request for add entries
-		KAsyncBulkUpload::startMultiRequestForPartnerId();
+		$this->startMultiRequestForPartnerId();
 		$multiRequestCounter = 0;
 		
 		KalturaLog::info("job[$job->id] start creating entries");
@@ -348,7 +347,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
-			KAsyncBulkUpload::sendChunkedDataForPartner($job, &$bulkUploadResultChunk);
+			$this->sendChunkedDataForPartner($job, &$bulkUploadResultChunk);
 						
 			$mediaEntry = $this->createMediaEntryFromResultAndJobData($bulkUploadResult, $bulkUploadJobData);
 					
