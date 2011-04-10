@@ -333,7 +333,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * @param array $bulkUploadResultChunk
 	 * @param KalturaBatchJob $job
 	 */
-	protected function createEntries(array $bulkUploadResults, KalturaBatchJob $job, kBulkUploadJobData $bulkUploadJobData)
+	protected function createEntries(array $bulkUploadResults, KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
 	{
 		// start a multi request for add entries
 		$this->startMultiRequestForPartnerId();
