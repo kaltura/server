@@ -8,6 +8,8 @@
  */
 abstract class KBulkUploadEngine
 {
+	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
+	
 	/**
 	 * @var KSchedularTaskConfig
 	 */

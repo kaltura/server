@@ -17,7 +17,6 @@ setlocale ( LC_ALL, 'en_US.UTF-8' );
  * @subpackage Bulk-Upload
  */
 class KAsyncBulkUpload extends KBatchBase {
-	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 	
 	protected $currentPartnerId = null;
 	
