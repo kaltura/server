@@ -39,12 +39,9 @@ abstract class KBulkUploadEngine
 	{
 		$engine =  null;
 		
-		switch ($batchJobSubType)
-		{
-			default:
-				$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient));
-		}
-				
+		//Gets the engine from the plugin (as we moved all engines to the plugin)
+		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient));
+						
 		return $engine;
 	}
 
@@ -68,7 +65,7 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBulkUploadJobData $data
 	 * @return KBulkUploadEningeResult
 	 */
-	protected public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
 		//TODO: Roni create the flow:
 		//0. Init - maybe even give client :)
@@ -88,7 +85,10 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $data
 	 */
-	protected function validateFile(KalturaBatchJob $job, KalturaBulkUploadJobData $data );
+	protected function validateFile(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	{
+		return;
+	}
 	
 	/**
 	 * 
@@ -96,7 +96,10 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $data
 	 */
-	protected function parseRows(KalturaBatchJob $job, KalturaBulkUploadJobData $data );
+	protected function parseRows(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	{
+		return;
+	}
 	
 	/**
 	 * 
@@ -104,7 +107,10 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $data
 	 */
-	protected function init(KalturaBatchJob $job, KalturaBulkUploadJobData $data );
+	protected function init(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	{
+		return;
+	}
 		
 	/**
 	 * 
@@ -112,7 +118,10 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $data
 	 */
-	protected function close(KalturaBatchJob $job, KalturaBulkUploadJobData $data );
+	protected function close(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	{
+		return;
+	}
 		
 	/**
 	 * @param string $item

@@ -26,5 +26,6 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	
 	const THUMBNAIL_NOT_CREATED = 91;
 	
+	//TODO: move to other Enum (KalturaBatchJobAppStatus)
 	const JOB_ABORTED = 101;
 }

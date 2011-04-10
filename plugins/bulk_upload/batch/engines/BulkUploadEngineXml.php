@@ -26,7 +26,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
 	 */
-	protected public function handleBulkUpload(KalturaBatchJob $job, KalturaBulkUploadJobData $data) 
+	public function handleBulkUpload(KalturaBatchJob $job, KalturaBulkUploadJobData $data) 
 	{
 		//Add XML logic here
 		parent::handleBulkUpload($job, $data);

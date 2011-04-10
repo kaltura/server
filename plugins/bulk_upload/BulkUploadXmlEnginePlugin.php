@@ -2,30 +2,9 @@
 /**
  * @package plugins.bulkUploadXmlEngine
  */
-class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaPending, IKalturaMemoryCleaner
+class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'bulkUploadXmlEngine';
-	const PLUGIN_VERSION_MAJOR = 1;
-	const PLUGIN_VERSION_MINOR = 0;
-	const PLUGIN_VERSION_BUILD = 0;
-//	const CONTENT_DSTRIBUTION_MANAGER = 'kContentDistributionFlowManager';
-
-	/**
-	 * (non-PHPdoc)
-	 * @see KalturaPlugin::getInstance()
-	 */
-	public function getInstance($interface)
-	{
-		return $this;
-		
-//		if($this instanceof $interface)
-//			return $this;
-//			
-//		if($interface == 'IKalturaMrssContributor')
-//			return kContentDistributionMrssManager::get();
-//			
-//		return null;
-	}
 	
 	/**
 	 * 
@@ -36,69 +15,6 @@ class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPermiss
 		return self::PLUGIN_NAME;
 	}
 	
-	/**
-	 * 
-	 * Returns the plugin dependency
-	 */
-	public static function dependsOn()
-	{
-		return array();
-//		$dependency = new KalturaDependency(MetadataPlugin::getPluginName());
-//		return array($dependency);
-	}
-	
-	/**
-	 * 
-	 * Returns if the plugin is enable for the partner
-	 * @param int $partnerId
-	 */
-	public static function isAllowedPartner($partnerId)
-	{
-		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
-			return true;
-			
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner)
-			return false;
-			
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
-	}
-	
-	/**
-	 * @return array<string,string> in the form array[serviceName] = serviceClass
-	 */
-	public static function getServicesMap()
-	{
-		$map = array(
-//			'distributionProfile' => 'DistributionProfileService',
-//			'entryDistribution' => 'EntryDistributionService',
-//			'distributionProvider' => 'DistributionProviderService',
-//			'genericDistributionProvider' => 'GenericDistributionProviderService',
-//			'genericDistributionProviderAction' => 'GenericDistributionProviderActionService',
-//			'contentDistributionBatch' => 'ContentDistributionBatchService',
-		);
-		return $map;
-	}
-	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		//TOOD: Roni - ask TanTan if i need to create for permissions
-		return realpath(dirname(__FILE__).'/config/content_distribution.ct');
-	}
-
-	/**
-	 * @return array
-	 */
-	public static function getEventConsumers()
-	{
-		//TOOD: Roni - ask TanTan if i need to create for events
-		return array(
-//			self::CONTENT_DSTRIBUTION_MANAGER,
-		);
-	}
 	
 	/**
 	 * @return array<string> list of enum classes names that extend the base enum name
@@ -115,33 +31,6 @@ class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPermiss
 			return array('BulkUploadXmlType');
 			
 		return array();
-	}
-	
-	/**
-	 * 
-	 * Returns the plugin version
-	 */
-	public static function getVersion()
-	{
-		return new KalturaVersion(
-			self::PLUGIN_VERSION_MAJOR,
-			self::PLUGIN_VERSION_MINOR,
-			self::PLUGIN_VERSION_BUILD
-		);
-	}
-	
-	/**
-	 * Return textual search data to be associated with the object
-	 * 
-	 * @param BaseObject $object
-	 * @return string
-	 */
-	public static function getSearchData(BaseObject $object)
-	{
-//		if($object instanceof entry)
-//			return kContentDistributionManager::getEntrySearchValues($object);
-			
-		return null;
 	}
 	
 	/**
@@ -257,15 +146,6 @@ class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPermiss
 	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
-	public static function getContentDistributionFileSyncObjectTypeCoreValue($valueName)
-	{
-		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-		return kPluginableEnumsManager::apiToCore('FileSyncObjectType', $value);
-	}
-	
-	/**
-	 * @return int id of dynamic enum in the DB.
-	 */
 	public static function getBulkUploadTypeCoreValue($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
@@ -278,16 +158,5 @@ class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPermiss
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-
-	/**
-	 * 
-	 * Cleans used memory
-	 */
-	public static function cleanMemory()
-	{
-		//TODO: Roni - add clean memory
-	    DistributionProfilePeer::clearInstancePool();
-	    EntryDistributionPeer::clearInstancePool();
 	}
 }

@@ -322,7 +322,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
 	 */
-	protected public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
 		//Add logic here from old bulk upload
 		parent::handleBulkUpload($job, $data);
