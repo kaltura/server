@@ -250,7 +250,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 		switch(get_class($dbData))
 		{
 			case 'kBulkUploadJobData':
-				$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $this->jobSubType);
+				$this->data = new KalturaBulkUploadJobData();
 				break;
 				
 			case 'kConvartableJobData':
