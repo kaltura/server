@@ -336,7 +336,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected function createEntries(array $bulkUploadResults, KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
 	{
 		// start a multi request for add entries
-		$this->startMultiRequestForPartnerId();
+		$this->startMultiRequest(true);
 		$multiRequestCounter = 0;
 		
 		KalturaLog::info("job[$job->id] start creating entries");
