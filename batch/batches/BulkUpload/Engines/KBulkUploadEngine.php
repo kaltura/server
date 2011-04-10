@@ -151,9 +151,6 @@ abstract class KBulkUploadEngine
 	 */
 	protected function getFileHandle(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
 	{
-		// reporting start of work
-		$this->updateJob($job, 'Fetching file', KalturaBatchJobStatus::QUEUED, 1);
-				
 		$fileHandle = fopen($bulkUploadJobData->csvFilePath, "r");
 		
 		if(! $fileHandle) // fails and exit
