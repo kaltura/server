@@ -59,38 +59,42 @@ class KAsyncBulkUpload extends KBatchBase {
 			catch ( KalturaException $e ) 
 			{
 				ini_set ( 'auto_detect_line_endings', false );
-				KalturaLog::ERR ( "An exception was raised in startBulkUpload: " . $e );
-				switch ($e->getCode ()) 
-				{
-					//TODO : fix exception handling
-					case KalturaBatchJobAppErrors::ABORTED : // if the job was aborted
-							$errType = KalturaBatchJobErrorTypes::APP;
-							$status = KalturaBatchJobAppErrors::ABORTED;
-							$msg = $e->getMessage();
-							$errNumber = $e->getCode();
-						break;
-					case KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND:
-							$errType = KalturaBatchJobErrorTypes::APP;
-							$status = KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND;
-							$msg = $e->getMessage();
-							$errNumber = $e->getCode();
-						break;
-					case KalturaBatchJobStatus::FAILED :
-							$errType = KalturaBatchJobErrorTypes::APP;
-							$status = KalturaBatchJobStatus::FAILED;
-							$msg = $e->getMessage();
-							$errNumber = $e->getCode();
-					default :
-							$errType = KalturaBatchJobErrorTypes::APP;
-							$status = null;
-							$msg = $e->getMessage();
-							$errNumber = $e->getCode();
-						break;
-				}
-				$this->closeJob($job, $errType, $errNumber, $msg, $status);
+				$this->handleExceptions($e, $job);
 				return false;
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * Handles all exceptions raised in the bulk engines
+	 * @param Exception $e
+	 * @param KalturaBatchJob $job
+	 */
+	private function handleExceptions($e,KalturaBatchJob $job)
+	{
+		//TODO : fix exception handling
+		KalturaLog::ERR ( "An exception was raised in bulk upload: " . $e );
+		$errType = KalturaBatchJobErrorTypes::APP;
+		$msg = $e->getMessage();
+		$errNumber = $e->getCode();
+		
+		switch ($e->getCode ()) 
+		{
+			case KalturaBatchJobAppErrors::ABORTED : // if the job was aborted
+					$status = KalturaBatchJobStatus::ABORTED;
+				break;
+			case KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND:
+					$status = KalturaBatchJobStatus::FAILED;
+				break;
+			case KalturaBatchJobStatus::FAILED :
+					$status = KalturaBatchJobStatus::FAILED;
+				break;
+			default :
+				    $status = null;
+				break;
+		}
+		$this->closeJob($job, $errType, $errNumber, $msg, $status);
 	}
 	
 	/**
