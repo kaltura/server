@@ -64,7 +64,7 @@
 							{
 								?>
 									<div class="download-button <?php echo $clientName; ?>-btn">
-										<a href="http://<?php echo kConf::get('cdn_host'); ?>/api_v3/testme/serve-client-lib.php?lib=<?php echo $clientName.'_'.$schemaGenDate; ?>.tar.gz" target="_blank" >
+										<a href="http://<?php echo kConf::get('cdn_host'); ?>/content/clientlibs/<?php echo $clientName.'_'.$schemaGenDate; ?>.tar.gz" target="_blank" >
 											<button class="download-btn" title="Single class <?php echo $clientName; ?> client library"></button>
 										</a>
 									</div>
