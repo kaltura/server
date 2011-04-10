@@ -11,6 +11,11 @@ abstract class KBulkUploadEngine
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 	
 	/**
+	 * @var KalturaConfiguration
+	 */
+	protected $kClientConfig = null;
+		
+	/**
 	 * @var KSchedularTaskConfig
 	 */
 	protected $taskConfig = null;
@@ -37,12 +42,12 @@ abstract class KBulkUploadEngine
 	 * @param KalturaClient kClient - the client for the engine to use
 	 * @return KBulkUploadEngine
 	 */
-	public static function getEngine ( $batchJobSubType , KSchedularTaskConfig $taskConfig, $kClient )
+	public static function getEngine ( $batchJobSubType , KSchedularTaskConfig $taskConfig, $kClient, $kClientConfig )
 	{
 		$engine =  null;
 		
 		//Gets the engine from the plugin (as we moved all engines to the plugin)
-		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient));
+		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $kClientConfig));
 						
 		return $engine;
 	}
@@ -50,10 +55,12 @@ abstract class KBulkUploadEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig, $kClient )
+	protected function __construct( KSchedularTaskConfig $taskConfig, $kClient, $kClientConfig = null)
 	{
 		$this->taskConfig = $taskConfig;
 		$this->kClient = $kClient;
+		//TODO: is this neccessary for creating a multirequest for partner??
+		$this->kClientConfig = $kClientConfig;
 	}
 	
 	/**
@@ -273,8 +280,8 @@ abstract class KBulkUploadEngine
 		if($isSpecificForPartner)
 		{
 			$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();;
-			$this->kClient->setConfig($this->kClientConfig);
 		}
+			$this->kClient->setConfig($this->kClientConfig);
 		$this->kClient->startMultiRequest();
 	}
 	

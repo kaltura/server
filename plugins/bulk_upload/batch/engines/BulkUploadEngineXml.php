@@ -18,9 +18,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function __construct( KSchedularTaskConfig $taskConfig, $kClient )
+	public function __construct( KSchedularTaskConfig $taskConfig, $kClient, $kClientConfig = null )
 	{
-		parent::__construct($taskConfig, $kClient);
+		parent::__construct($taskConfig, $kClient, $kClientConfig);
 	}
 	
 	/* (non-PHPdoc)

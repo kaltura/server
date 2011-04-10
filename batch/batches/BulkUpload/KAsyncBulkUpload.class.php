@@ -77,7 +77,7 @@ class KAsyncBulkUpload extends KBatchBase {
 		//TODO: Roni - Get from the job the job subtype (the BulkUpload Type)
 		//Gets the right Engine instance 
 		//$engine = KBulkUploadEngine::getEngine($bulkUploadJobData->getBulkType(), $this->taskConfig);
-		$engine = KBulkUploadEngine::getEngine ( KalturaBulkUploadType::CSV, $this->taskConfig, $this->kClient );
+		$engine = KBulkUploadEngine::getEngine ( KalturaBulkUploadType::CSV, $this->taskConfig, $this->kClient, $this->kClientConfig );
 		if (is_null ( $engine )) {
 			//TODO: handle exceptions better
 			KalturaLog::err("Bulk upload engine is null" );
