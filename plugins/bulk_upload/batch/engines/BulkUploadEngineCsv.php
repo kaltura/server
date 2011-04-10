@@ -60,13 +60,12 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	
 		$fields = array();
 		$arr = null;
-//		if(!preg_match_all('/%([YmdTHis])/', self::BULK_UPLOAD_DATE_FORMAT, $arr))
-		if(!preg_match_all('/%([YmdHis])/', KAsyncBulkUpload::BULK_UPLOAD_DATE_FORMAT, $arr))
+		if(!preg_match_all('/%([YmdTHis])/', self::BULK_UPLOAD_DATE_FORMAT, $arr))
 			return false;
 	
 		$fields = $arr[1];
 		
-		return '/' . str_replace(array_keys($replace), $replace, KAsyncBulkUpload::BULK_UPLOAD_DATE_FORMAT) . '/';
+		return '/' . str_replace(array_keys($replace), $replace, self::BULK_UPLOAD_DATE_FORMAT) . '/';
 	}
 	
 	/**
@@ -90,7 +89,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 		if(function_exists('strptime'))
 		{
-			$ret = strptime($str, KAsyncBulkUpload::BULK_UPLOAD_DATE_FORMAT);
+			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT);
 			if($ret)
 			{
 				KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
@@ -356,7 +355,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		}
 		
 		// commit the multi request entries
-		$requestResults = KAsyncBulkUpload::doMultiRequestForPartnerId();
+		$requestResults = $this->doMultiRequestForPartnerId();
 		KalturaLog::info("job[$job->id] finish creating entries");
 	
 		if(count($requestResults) != count($bulkUploadResultChunk))
@@ -370,7 +369,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		// saving the results with the created enrty ids
 		if(count($requestResults))
 		{
-			KAsyncBulkUpload::updateEntriesResults($requestResults, $bulkUploadResultChunk);
+			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 		}
 		
 		return true;
@@ -466,13 +465,13 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 				// fail and continue with next line
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->errorDescription = "Wrong number of values on line $lineNumber";
-				KAsyncBulkUpload::addBulkUploadResult($bulkUploadResult);
+				$this->addBulkUploadResult($bulkUploadResult);
 				return null;
 			}
 		}
 			
 		// trim the values
-		array_walk($values, array('KAsyncBulkUpload', 'trimArray'));
+		array_walk($values, array('KBulkUploadEngine', 'trimArray'));
 		
 	    $scheduleStartDate = null;
 	    $scheduleEndDate = null;
