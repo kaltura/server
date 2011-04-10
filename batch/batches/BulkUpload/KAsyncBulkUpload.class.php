@@ -50,16 +50,44 @@ class KAsyncBulkUpload extends KBatchBase {
 		foreach ( $jobs as $job ) {
 			try {
 				$this->startBulkUpload ( $job, $job->data );
-			} catch ( KalturaException $e ) {
-				switch ($e->getCode ()) {
+				
+				ini_set ( 'auto_detect_line_endings', false );
+				// the closer will report finished after checking the imports and converts, reports almost done
+				$this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE);
+				
+			} 
+			catch ( KalturaException $e ) 
+			{
+				ini_set ( 'auto_detect_line_endings', false );
+				KalturaLog::ERR ( "An exception was raised in startBulkUpload: " . $e );
+				switch ($e->getCode ()) 
+				{
+					//TODO : fix exception handling
 					case KalturaBatchJobAppErrors::ABORTED : // if the job was aborted
-						KalturaLog::NOTICE ( "Job was aborted stoping batch" );
+							$errType = KalturaBatchJobErrorTypes::APP;
+							$status = KalturaBatchJobAppErrors::ABORTED;
+							$msg = $e->getMessage();
+							$errNumber = $e->getCode();
 						break;
+					case KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND:
+							$errType = KalturaBatchJobErrorTypes::APP;
+							$status = KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND;
+							$msg = $e->getMessage();
+							$errNumber = $e->getCode();
+						break;
+					case KalturaBatchJobStatus::FAILED :
+							$errType = KalturaBatchJobErrorTypes::APP;
+							$status = KalturaBatchJobStatus::FAILED;
+							$msg = $e->getMessage();
+							$errNumber = $e->getCode();
 					default :
-						KalturaLog::ERR ( "An exception was raised in startBulkUpload: " . $e );
+							$errType = KalturaBatchJobErrorTypes::APP;
+							$status = null;
+							$msg = $e->getMessage();
+							$errNumber = $e->getCode();
 						break;
 				}
-				ini_set ( 'auto_detect_line_endings', false );
+				$this->closeJob($job, $errType, $errNumber, $msg, $status);
 				return false;
 			}
 		}

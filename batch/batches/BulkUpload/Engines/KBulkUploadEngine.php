@@ -164,8 +164,8 @@ abstract class KBulkUploadEngine
 		
 		if(! $fileHandle) // fails and exit
 		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND, "File not found: $bulkUploadJobData->csvFilePath", KalturaBatchJobStatus::FAILED);
-			throw new KalturaException("Unable to open file: {$bulkUploadJobData->csvFilePath}");
+			throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND); //The job was aborted
+			throw new Exception("Unable to open file: {$bulkUploadJobData->csvFilePath}");
 		}
 					
 		KalturaLog::info("Opened file: $bulkUploadJobData->csvFilePath");
@@ -246,10 +246,8 @@ abstract class KBulkUploadEngine
 			
 			if(count($requestResults) != count($bulkUploadResultChunk))
 			{
-				ini_set('auto_detect_line_endings', false);
 				$err = __FILE__ . ', line: ' . __LINE__ . ' $requestResults and $$bulkUploadResultChunk must have the same size';
-				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, $err, KalturaBatchJobStatus::FAILED);
-				throw new KalturaException("Error On trySendChunkedDataForPartner");
+				throw new KalturaException($err, KalturaBatchJobStatus::FAILED);
 			}
 				
 			// saving the results with the created enrty ids
@@ -351,7 +349,9 @@ abstract class KBulkUploadEngine
 		if($updatedJob->abort)
 		{
 			KalturaLog::info("job[$job->id] aborted");
-			$this->closeJob($job, null, null, 'Aborted', KalturaBatchJobAppErrors::ABORTED);
+			
+			//Throw exception and close the job from the outside 
+			throw new Exception("Job was aborted", KalturaBatchJobAppErrors::ABORTED);
 			
 			if($this->kClient->isMultiRequest())
 				$this->kClient->doMultiRequest();

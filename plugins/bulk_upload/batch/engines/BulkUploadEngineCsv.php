@@ -301,10 +301,6 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	public function close(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
-		ini_set('auto_detect_line_endings', false);
-		
-		// the closer will report finished after checking the imports and converts, reports almost done
-		$this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE);
 		return true;
 	}
 	
@@ -363,10 +359,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	
 		if(count($requestResults) != count($bulkUploadResultChunk))
 		{
-			ini_set('auto_detect_line_endings', false);
 			$err = __FILE__ . ', line: ' . __LINE__ . ' $requestResults and $$bulkUploadResultChunk must have the same size';
-			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, null, $err, KalturaBatchJobStatus::FAILED);
-			return false;
+			throw new KalturaException($err, KalturaBatchJobStatus::FAILED);		
 		}
 		
 		// saving the results with the created enrty ids
