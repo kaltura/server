@@ -8,4 +8,8 @@
  */
 class KalturaResource extends KalturaObject 
 {
+	public function validateEntry(entry $dbEntry)
+	{
+		
+	}
 }

@@ -69,7 +69,9 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset->setEntryId($entryId);
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
     	
-    	$this->attachContentResource($dbThumbAsset, $contentResource);
+		$contentResource->validateEntry($dbEntry);
+		$kContentResource = $contentResource->toObject();
+    	$this->attachContentResource($dbThumbAsset, $kContentResource);
 				
     	$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
     	$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
@@ -113,7 +115,9 @@ class ThumbAssetService extends KalturaBaseService
     	
     	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
     	
-    	$this->attachContentResource($dbThumbAsset, $contentResource);
+		$contentResource->validateEntry($dbThumbAsset->getentry());
+		$kContentResource = $contentResource->toObject();
+    	$this->attachContentResource($dbThumbAsset, $kContentResource);
 		
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->fromObject($dbThumbAsset);
@@ -433,7 +437,7 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param KalturaContentResource $contentResource
+	 * @param kContentResource $contentResource
 	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
 	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
@@ -441,7 +445,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
 	 */
-	protected function attachContentResource(thumbAsset $thumbAsset, KalturaContentResource $contentResource)
+	protected function attachContentResource(thumbAsset $thumbAsset, kContentResource $contentResource)
 	{
     	switch(get_class($contentResource))
     	{

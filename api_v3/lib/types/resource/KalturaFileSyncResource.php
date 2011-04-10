@@ -30,4 +30,33 @@ class KalturaFileSyncResource extends KalturaContentResource
 	 * @var string
 	 */
 	public $version;
+
+	public function validateEntry(entry $dbEntry)
+	{
+		parent::validateEntry($dbEntry);
+    	$this->validatePropertyNotNull('fileSyncObjectType');
+    	$this->validatePropertyNotNull('objectSubType');
+    	$this->validatePropertyNotNull('objectId');
+	}
+
+	private static $map_between_objects = array
+	(
+		'fileSyncObjectType',
+		'objectSubType',
+		'objectId',
+		'version',
+	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if(!$object_to_fill)
+			$object_to_fill = new kFileSyncResource();
+			
+		return parent::toObject($object_to_fill, $props_to_skip);
+	}
 }

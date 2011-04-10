@@ -3,12 +3,12 @@
 class KalturaEntryService extends KalturaBaseService 
 {
     /**
-     * @param KalturaResource $resource
+     * @param kResource $resource
      * @param entry $dbEntry
      * @param asset $asset
      * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
      */
-    protected function attachResource(KalturaResource $resource, entry $dbEntry, asset $asset = null)
+    protected function attachResource(kResource $resource, entry $dbEntry, asset $asset = null)
     {
     	throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
     }

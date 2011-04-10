@@ -10,4 +10,23 @@ class KalturaAssetsParamsResourceContainers extends KalturaResource
 	 * @var KalturaAssetParamsResourceContainerArray
 	 */
 	public $resources;
+
+	public function validateEntry(entry $dbEntry)
+	{
+		parent::validateEntry($dbEntry);
+    	$this->validatePropertyNotNull('resources');
+	}
+
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if(!$object_to_fill)
+			$object_to_fill = new kAssetsParamsResourceContainers();
+			
+		$resources = array();
+		foreach($this->resources as $resource)
+			$resources[] = $resource->toObject();
+			
+		$object_to_fill->setResources($resources);
+		return $object_to_fill;
+	}
 }

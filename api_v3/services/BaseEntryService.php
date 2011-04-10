@@ -46,18 +46,22 @@ class BaseEntryService extends KalturaEntryService
     		$this->setEntryTypeByResource($dbEntry, $resource);
     	$dbEntry->save();
     	
-    	$this->attachResource($dbEntry, $resource);
+    	
+    	$resource->validateEntry($dbEntry);
+    	$kResource = $resource->toObject();
+    	
+    	$this->attachResource($kResource, $dbEntry);
     	
 	    $entry->fromObject($dbEntry);
 	    return $entry;
     }
 
     /**
-     * @param KalturaResource $resource
+     * @param kResource $resource
      * @param entry $dbEntry
      * @param asset $asset
      */
-    protected function attachResource(KalturaResource $resource, entry $dbEntry, asset $asset = null)
+    protected function attachResource(kResource $resource, entry $dbEntry, asset $asset = null)
     {
     	$service = null;
     	switch($dbEntry->getType())
