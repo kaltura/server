@@ -282,13 +282,13 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		//to support EOF of mac files
 		ini_set('auto_detect_line_endings', true);
 		$this->currentPartnerId = $job->partnerId;
-		KalturaLog::debug("MultiRequestSize: $this->taskConfig->params->multiRequestSize");
-		
+		$this->multiRequestCounter = 0;
+				
 		// opens the csv file
 		$fileHandle = $this->getFileHandle($job, $data);
 		$this->startLineNumber = $this->getStartLineNumber($job->id);
 		$this->lineNumber = 0;
-		$this->multiRequestCounter = 0;
+		
 		$this->bulkUploadResults = array();
 	 
 		return true;
@@ -343,8 +343,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 		KalturaLog::info("job[$job->id] start creating entries");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
-		$multiRequestSize = $this->taskConfig->params->multiRequestSize;
-		
+				
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
 			$this->sendChunkedDataForPartner($job, &$bulkUploadResultChunk);
