@@ -29,7 +29,8 @@
 	require_once("../../bootstrap.php");
 	
 	//Get the generated clients summary
-	$summaryData = file_get_contents(realpath(dirname(__FILE__)) . '/../../../generator/output/summary.kinf');
+	$root = myContentStorage::getFSContentRootPath();
+	$summaryData = file_get_contents("$root/content/clientlibs/summary.kinf");
 	$summary = unserialize($summaryData);
 	$schemaGenDate = $summary['generatedDate'];
 	$apiVersion = $summary['apiVersion'];
