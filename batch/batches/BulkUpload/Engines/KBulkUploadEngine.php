@@ -215,7 +215,7 @@ abstract class KBulkUploadEngine
 			KalturaLog::info("Sent $this->multiRequestCounter invalid lines results");
 			
 			// check if job aborted
-			if(KAsyncBulkUpload::isAborted($job))
+			if($this->isAborted($job))
 			{
 				ini_set('auto_detect_line_endings', false);
 				throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::ABORTED); //The job was aborted
@@ -242,7 +242,7 @@ abstract class KBulkUploadEngine
 		if($this->multiRequestCounter > $multiRequestSize)
 		{
 			// commit the multi request entries
-			$requestResults = KAsyncBulkUpload::doMultiRequestForPartnerId();
+			$requestResults = $this->doMultiRequestForPartnerId();
 			
 			if(count($requestResults) != count($bulkUploadResultChunk))
 			{
@@ -253,10 +253,10 @@ abstract class KBulkUploadEngine
 			}
 				
 			// saving the results with the created enrty ids
-			KAsyncBulkUpload::updateEntriesResults($requestResults, $bulkUploadResultChunk);
+			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 					
 			// check if job aborted
-			if(KAsyncBulkUpload::isAborted($job))
+			if($this->isAborted($job))
 			{
 				ini_set('auto_detect_line_endings', false);
 				throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::ABORTED); //The job was aborted
