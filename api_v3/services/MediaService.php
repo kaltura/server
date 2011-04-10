@@ -344,7 +344,7 @@ class MediaService extends KalturaEntryService
     	$ret = null;
     	foreach($resource->getResources() as $assetParamsResourceContainer)
     	{
-    		KalturaLog::debug("Resource asset params id [{$assetParamsResourceContainer->assetParamsId}]");
+    		KalturaLog::debug("Resource asset params id [" . $assetParamsResourceContainer->getAssetParamsId() . "]");
     		$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry);
     		KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
     		if($dbAsset->getIsOriginal())
