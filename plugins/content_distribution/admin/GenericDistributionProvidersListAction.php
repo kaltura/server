@@ -26,7 +26,7 @@ class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
 		$request = $action->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		
+
 		$newForm = new Form_NewGenericProvider();
 		
 		// init filter

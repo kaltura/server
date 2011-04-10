@@ -428,15 +428,12 @@ body#monitoring-xymon {}
 #partner-external-storages .rightcolumn { float: right; width:416px; }
 #partner-external-storages hr {margin:12px;}
 #partner-external-storages .checkBoxOption {display: block; width:300px; float:none; }
-//#desciption-label {width:auto;}
 
 #partner-external-storages div.newStorageDiv #description-label element.style{ width:auto;}
 #partner-external-storages ul.errors  {margin-left: 18px; line-height: 1; font-size: 10px;}
 
 #partner-external-storages #description {display: block;}
 #partner-external-storages div.commentFormObjects{ height: 240px; width: 400px; overflow: auto;}
-
-#frmDistributionProfileConfig fieldset { float: none; padding: 10px 20px 10px 10px; }
   
 form#addNewDistributionProfile { margin-left: 20px; }
 form#addNewDistributionProfile dd, 
@@ -490,3 +487,20 @@ dd#Algorithm-element { clear: both; }
 #frmGenericProviderConfig .zend_form dd { margin: 5px 0 5px; }
 #frmGenericProviderConfig .zend_form .set_default { float: right; margin: -23px 40px 0 0; width: 125px; }
 .crossLine { clear: both; }
+
+#frmDistributionProfileConfig fieldset { float: none; padding: 10px 20px 10px 10px; }
+#frmDistributionProfileConfig #fieldset-newThumbDimensions { width: 100%; padding: 10px 0; }
+#frmDistributionProfileConfig #fieldset-newThumbDimensionsButtonGroup { padding-right: 0; }
+#frmDistributionProfileConfig #frmGenericProviderConfig fieldset { width: 100%; padding-right: 0; }
+
+#fieldset-newThumbDimensionsButtonGroup { background: #fff; border: 0; padding: 0; width: 100%; }
+#fieldset-newThumbDimensions dt { clear: both; float: left; margin: 5px 10px 0 0; width: 120px; }
+#fieldset-newThumbDimensions dd { float: left; margin: 5px 0; }
+#fieldset-newThumbDimensions #thumbnailRequired { float: right; margin: -50px 95px 0 0; }
+#fieldset-newThumbDimensions { width: 100%; margin-right: 0; padding: 10px 0; }
+
+#frmGenericProviderConfig .actionGroup-submit dt, #frmGenericProviderConfig .actionGroup-update  dt, #frmGenericProviderConfig .actionGroup-delete  dt, #frmGenericProviderConfig .actionGroup-fetchReport  dt  { width: auto; }
+.actionGroup-submit label, .actionGroup-update label, .actionGroup-delete label, .actionGroup-fetchReport label { float: left; width: 200px; }
+.actionGroup-submit input, .actionGroup-update input, .actionGroup-delete input, .actionGroup-fetchReport input { float: left; }
+
+#frmGenericProviderConfig input[type=text] { width: 193px; }

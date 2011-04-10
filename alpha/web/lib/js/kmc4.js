@@ -1562,8 +1562,7 @@ function playerAdded() { // called from appstudio
 /*** end old functions ***/
 
 $(function() {
-	//kmc.utils.handleMenu();
-	kmc.utils.activateHeader();
+	kmc.utils.handleMenu();
 	kmc.mediator.loadKmc();
 });
 
@@ -1697,3 +1696,20 @@ var XD = function(){
 		}
 	};
 }();
+
+// If we have ongoing process, we show a warning message when the user try to leaves the page
+function checkForOngoingProcess() {
+	var warning_message;
+	try {
+		warning_message = $("#kcms")[0].hasOngoingProcess();
+	}
+	catch(e) {
+		warning_message = false;
+	}
+
+	if(warning_message != null) {
+		return warning_message;
+	}
+	return;
+}
+window.onbeforeunload = checkForOngoingProcess;

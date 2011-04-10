@@ -115,7 +115,7 @@ class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmGenericProviderConfig');
 
-		$this->setDescription('generic-provider-configure intro text');
+		//$this->setDescription('generic-provider-configure intro text');
 		$this->loadDefaultDecorators();
 		$this->addDecorator('Description', array('placement' => 'prepend'));
 
@@ -123,20 +123,15 @@ class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 			'label'			=> 'Name:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('checkbox', 'is_default', array(
+			'label'	  => 'Set as Default',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'div', 'class' => 'set_default')))
+		));
 		
 		$this->addElement('text', 'partner_id', array(
 			'label'			=> 'Publisher ID:',
 			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('hidden', 'crossLine1', array(
-			'lable'			=> 'line',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
-		));
-		
-		$this->addElement('checkbox', 'is_default', array(
-			'label'	  => 'Is Default',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
 		));
 	}
 	

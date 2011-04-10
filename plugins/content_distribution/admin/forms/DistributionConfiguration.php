@@ -79,8 +79,8 @@ class Form_DistributionConfiguration extends Kaltura_Form
 			$element->setDecorators(
 				array(
 					'ViewHelper', 
-					array('Label', array('placement' => 'prepend')),
-					array('HtmlTag',  array('tag' => 'div')),
+					array('Label', array('placement' => 'prepend', 'class' => 'flavor_name')),
+					array('HtmlTag',  array('tag' => 'div', 'class' => 'flavor_param')),
 				));
 			$element->setSeparator('');
 			
@@ -154,13 +154,17 @@ class Form_DistributionConfiguration extends Kaltura_Form
 	public function addThumbDimensionsForm()
 	{
 		$this->addElement('button', 'newThumbDimensionsButton', array(
-			'label'		=> 'New Dimensions',
+			'label'		=> 'Add Thumbnail',
 			'onclick'		=> "newThumbDimensions()",
+			'decorators'	=> array('ViewHelper'),
+		));
+		$this->addElement('hidden', 'thumbnailSettings', array(
+			'label'		=> 'Thumbnail Settings',
 			'decorators'	=> array('ViewHelper'),
 		));
 		
 		$this->addDisplayGroup(
-			array('newThumbDimensionsButton'), 
+			array('thumbnailSettings','newThumbDimensionsButton'),
 			'newThumbDimensionsButtonGroup',
 			array(
 				'decorators' => array('FormElements', 'Fieldset', array('HtmlTag',array('tag'=>'div'))),
@@ -179,7 +183,7 @@ class Form_DistributionConfiguration extends Kaltura_Form
 		
 		$this->addElement('checkbox', 'dimensionsRequired', array(
 			'label'	  => 'Is Required',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'id' => 'thumbnailRequired')))
 		));
 			
 		$this->addDisplayGroup(
