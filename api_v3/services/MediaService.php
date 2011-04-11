@@ -911,7 +911,7 @@ class MediaService extends KalturaEntryService
 			if($dbEntry->getReplacingEntryId())
 				throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 			
-			if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT)
+			if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 			{
 				$resource->validateEntry($dbEntry);
 				$kResource = $resource->toObject();
