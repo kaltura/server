@@ -138,17 +138,17 @@ class kFlowHelper
 		}
 		else
 		{
-			// if the flavor is the source, its readiness should be decided during the profile conversion
 			if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
 				$entry = $flavorAsset->getentry();
-				if($entry->getStatus() == entryStatus::PENDING)
+				if($flavorAsset->getIsOriginal() && $entry->getStatus() == entryStatus::PENDING)
 				{
 					kJobsManager::addConvertProfileJob($dbBatchJob, $entry, $flavorAsset->getId(), $localFilePath);
 				}
 			}
 			else
 			{ 
+				// 	if the flavor is the source, its readiness should be decided during the profile conversion
 				if($flavorAsset->getIsOriginal())
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 				else
