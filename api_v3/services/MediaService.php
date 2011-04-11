@@ -34,6 +34,42 @@ class MediaService extends KalturaEntryService
 		return parent::partnerRequired($actionName);
 	}
 
+	/**
+	 * @param entry $dbEntry
+	 */
+	private function makeWebcamEntryReady(entry $dbEntry)
+	{
+		$originalFlavorAsset = flavorAssetPeer::retreiveOriginalByEntryId($dbEntry->getId());
+		$syncKey = $originalFlavorAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+    	$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+    	
+		// call mediaInfo for file
+		$dbMediaInfo = new mediaInfo();
+		try
+		{
+			$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, kConf::get('bin_path_mediainfo'));
+			$mediaInfo = $mediaInfoParser->getMediaInfo();
+			$dbMediaInfo = $mediaInfo->toInsertableObject($dbMediaInfo);
+			$dbMediaInfo->setFlavorAssetId($originalFlavorAsset->getId());
+			$dbMediaInfo->save();
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Getting media info: " . $e->getMessage());
+			$dbMediaInfo = null;
+		}
+		
+		// fix flavor asset according to mediainfo
+		if($dbMediaInfo)
+		{
+			KDLWrap::ConvertMediainfoCdl2FlavorAsset($dbMediaInfo, $originalFlavorAsset);
+			$flavorTags = KDLWrap::CDLMediaInfo2Tags($dbMediaInfo, array(flavorParams::TAG_WEB, flavorParams::TAG_MBR));
+			$originalFlavorAsset->setTags(implode(',', array_unique($flavorTags)));
+		}
+		
+   		$dbEntry->setStatus(entryStatus::READY);
+   		$dbEntry->save();
+	} 
 	
     /**
      * Add entry
@@ -88,8 +124,7 @@ class MediaService extends KalturaEntryService
     
 		if($dbEntry->getSource() == entry::ENTRY_MEDIA_SOURCE_WEBCAM)
 		{
-    		$dbEntry->setStatus(entryStatus::READY);
-    		$dbEntry->save();
+			$this->makeWebcamEntryReady($dbEntry);
 		}
 			
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
