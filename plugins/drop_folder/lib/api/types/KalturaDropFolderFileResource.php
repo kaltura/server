@@ -22,13 +22,19 @@ class KalturaDropFolderFileResource extends KalturaContentResource
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if(!$object_to_fill)
-			$object_to_fill = new kFileSyncResource();
-					
-//		TODO
-//		$object_to_fill->setFileSyncObjectType(DropFolderPlugin::getDropFolderFileSyncObjectTypeCoreValue(DropFolderFileSyncObjectType::DROP_FOLDER_FILE));
-//		$object_to_fill->setObjectSubType(DropFolderFile::FILE_SYNC_DROP_FOLDER_FILE_SUB_TYPE_FILE);
-		$object_to_fill->setObjectId($this->dropFolderFileId);
+			$object_to_fill = new kLocalFileResource();
+
+		$dropFolderFile = DropFolderFilePeer::retrieveByPK($this->dropFolderFileId);
+		if(!$dropFolderFile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->dropFolderFileId);
 		
+		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
+		if(!$dropFolder)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFile->getDropFolderId());
+			
+		$localFilePath = $dropFolder->getPath() . '/' . $dropFolderFile->getFileName();
+		
+		$object_to_fill->setLocalFilePath($localFilePath);
 		return $object_to_fill;
 	}
 }
