@@ -74,6 +74,17 @@ class MediaService extends KalturaEntryService
 		if(!$dbEntry || !$dbEntry->getId())
 			return null;
 			
+		if($dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+	    	$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+	    	if($filePath && file_exists($filePath) && filesize($filePath))
+	    	{
+	    		list($width, $height, $type, $attr) = getimagesize($filePath);
+	    		$dbEntry->setDimensions($width, $height);
+	    	}
+		}
+			
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 		
 		$entry = new KalturaMediaEntry();
@@ -90,6 +101,9 @@ class MediaService extends KalturaEntryService
      */
     protected function attachFileSyncResource(kFileSyncResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+		$dbEntry->setSource(entry::ENTRY_MEDIA_SOURCE_KALTURA);
+		$dbEntry->save();
+		
     	$syncable = kFileSyncObjectManager::retrieveObject($resource->getFileSyncObjectType(), $resource->getObjectId());
     	$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
     	
@@ -104,7 +118,7 @@ class MediaService extends KalturaEntryService
      */
     protected function attachLocalFileResource(kLocalFileResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
-		$dbEntry->setSource(KalturaSourceType::FILE);
+		$dbEntry->setSource($resource->getSourceType());
 		$dbEntry->save();
 		
 		return $this->attachFile($resource->getLocalFilePath(), $dbEntry, $dbAsset, $resource->getKeepOriginalFile());
@@ -427,9 +441,6 @@ class MediaService extends KalturaEntryService
 				
 			case 'kBulkResource':
 				return $this->attachBulkResource($resource, $dbEntry, $dbAsset);
-				
-			case 'kSearchResultResource':
-				return $this->attachSearchResultsResource($resource, $dbEntry, $dbAsset);
 				
 			case 'kLocalFileResource':
 				return $this->attachLocalFileResource($resource, $dbEntry, $dbAsset);
