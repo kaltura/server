@@ -82,6 +82,7 @@ class MediaService extends KalturaEntryService
 	    	{
 	    		list($width, $height, $type, $attr) = getimagesize($filePath);
 	    		$dbEntry->setDimensions($width, $height);
+	    		$dbEntry->save();
 	    	}
 		}
 			
