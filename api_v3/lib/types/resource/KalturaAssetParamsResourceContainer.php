@@ -29,7 +29,9 @@ class KalturaAssetParamsResourceContainer extends KalturaResource
 		if(!$object_to_fill)
 			$object_to_fill = new kAssetParamsResourceContainer();
 			
-		$object_to_fill->setResource($this->resource->toObject());
+		if($this->resource)
+			$object_to_fill->setResource($this->resource->toObject());
+			
 		$object_to_fill->setAssetParamsId($this->assetParamsId);
 		return $object_to_fill;
 	}
