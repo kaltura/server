@@ -36,7 +36,7 @@ class KOperationEngineInletArmada  extends KSingleOutputOperationEngine
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 //$this->outFilePath = "k:".$this->outFilePath;
-		KalturaLog::debug("operator==>".print_r($operator,1));
+		KalturaLog::debug("operator===>".print_r($operator,1));
 /*		if(mkdir($this->outFilePath))
 			KalturaLog::debug("SUCCESS");
 		else 
@@ -48,10 +48,13 @@ $encodingTemplate;
 		$inlet = new InletAPIWrap($this->url);
 		KalturaLog::debug(print_r($inlet,1));
 		$rvObj=new XmlRpcData;
+		
 		$rv=$inlet->userLogon($this->login, $this->passw, $rvObj);
 		if(!$rv) {
 			throw new KOperationEngineException("Inlet failure: login, rv(".(print_r($rvObj,true)).")");
 		}
+		KalturaLog::debug("userLogon - ".print_r($rvObj,1));
+		
 		$rv=$inlet->jobAdd(			
 				$encodingTemplate,			// job template id
 				$inFilePath,		// String job_source_file, 
@@ -63,8 +66,10 @@ $encodingTemplate;
 		if(!$rv) {
 			throw new KOperationEngineException("Inlet failure: add job, rv(".print_r($rvObj,1).")");
 		}
+		KalturaLog::debug("jobAdd - ".print_r($rvObj,1));
 		
 		$jobId=$rvObj->job_id;
+		$attemptCnt=0;
 		while ($jobId) {
 			sleep(60);
 			$rv=$inlet->jobList(array($jobId),$rvObj);
@@ -80,6 +85,10 @@ $encodingTemplate;
 				throw new KOperationEngineException("Inlet failure: job, rv(".print_r($rvObj,1).")");
 				break;
 			}
+			if($attemptCnt%10==0) {
+				KalturaLog::debug("waiting for job completion - ".print_r($rvObj,1));
+			}
+			$attemptCnt++;
 		}
 		
 		copy($inFilePath, $this->outFilePath);
