@@ -85,6 +85,12 @@ class MediaService extends KalturaEntryService
 	    		$dbEntry->save();
 	    	}
 		}
+    
+		if($dbEntry->getSource() == entry::ENTRY_MEDIA_SOURCE_WEBCAM)
+		{
+    		$dbEntry->setStatus(entryStatus::READY);
+    		$dbEntry->save();
+		}
 			
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 		
@@ -905,26 +911,35 @@ class MediaService extends KalturaEntryService
 			if($dbEntry->getReplacingEntryId())
 				throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 			
-			$tempMediaEntry = new KalturaMediaEntry();
-		 	$tempMediaEntry->type = $mediaEntry->type;
-			$tempMediaEntry->mediaType = $mediaEntry->mediaType;
-			$tempMediaEntry->conversionQuality = $mediaEntry->conversionQuality;
-			
-			$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
-			$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
-			$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
-			$tempDbEntry->setReplacedEntryId($dbEntry->getId());
-			$tempDbEntry->save();
-			
-			$resource->validateEntry($dbEntry);
-			$kResource = $resource->toObject();
-			$this->attachResource($kResource, $tempDbEntry);
-			
-			$dbEntry->setReplacingEntryId($tempDbEntry->getId());
-			$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
-			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
-				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-			$dbEntry->save();
+			if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT)
+			{
+				$resource->validateEntry($dbEntry);
+				$kResource = $resource->toObject();
+				$this->attachResource($kResource, $dbEntry);
+			}
+			else 
+			{
+				$tempMediaEntry = new KalturaMediaEntry();
+			 	$tempMediaEntry->type = $mediaEntry->type;
+				$tempMediaEntry->mediaType = $mediaEntry->mediaType;
+				$tempMediaEntry->conversionQuality = $mediaEntry->conversionQuality;
+				
+				$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
+				$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
+				$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
+				$tempDbEntry->setReplacedEntryId($dbEntry->getId());
+				$tempDbEntry->save();
+				
+				$resource->validateEntry($dbEntry);
+				$kResource = $resource->toObject();
+				$this->attachResource($kResource, $tempDbEntry);
+				
+				$dbEntry->setReplacingEntryId($tempDbEntry->getId());
+				$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
+				if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
+					$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				$dbEntry->save();
+			}
 			
 			$mediaEntry->fromObject($dbEntry);
 		}
