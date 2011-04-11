@@ -21,12 +21,6 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	const VALUES_COUNT_V2 = 12;
 	
-	/**
-	 * 
-	 * The current partner if for the engine
-	 * @var unknown_type
-	 */
-	protected $currentPartnerId;
 	protected $lineNumber = 0;
 	protected $startLineNumber = 0;
 	protected $csvVersion = KalturaBulkUploadCsvVersion::V1;
