@@ -43,7 +43,8 @@ class SyndicationFeedService extends KalturaBaseService
 		$syndicationFeed->validatePlaylistId();
 		
 		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
-			$syndicationFeed->validateXslt();
+			$syndicationFeed->validatePropertyNotNull('xslt');				
+			kSyndicationFeedManager::validateXsl($syndicationFeed->xslt);
 			$syndicationFeedDB = new genericSyndicationFeed();
 			$syndicationFeedDB->setVersion(1);	
 		}else
@@ -124,7 +125,7 @@ class SyndicationFeedService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
 			
 		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed) && ($syndicationFeed->xslt != null)){
-			$syndicationFeed->validateXslt();
+			kSyndicationFeedManager::validateXsl($syndicationFeed->$xslt);
 			$syndicationFeedDB->incrementVersion();
 			$syndicationFeedDB->save();
 		}
