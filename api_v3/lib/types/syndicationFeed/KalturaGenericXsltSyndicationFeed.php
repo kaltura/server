@@ -13,35 +13,8 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 	
 	private static $mapBetweenObjects = array
 	(
-   
+   		
 	);
-	
-	public function validateXslt()
-	{
-		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($this->xslt))
-		{
-			KalturaLog::debug("Could not load xslt");
-			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT, $this->xslt);
-		}
-		
-		$xpath = new DOMXpath($xsl);
-		
-		$xslStylesheet = $xpath->query("//xsl:stylesheet");
-		$rss = $xpath->query("//xsl:template[@name='rss']");
-		if ($rss->length == 0)
-			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_TEMPLATE_RSS, $this->xslt);
-		
-		$item = $xpath->query("//xsl:template[@name='item']");
-		if ($item->length == 0)
-			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_TEMPLATE_ITEM, $this->xslt);
-		
-		$items = $xpath->query("//xsl:apply-templates[@name='item']"); 
-		if ($items->length == 0)
-			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM, $this->xslt);
-
-		return true;
-	}
 	
 	public function getMapBetweenObjects()
 	{
