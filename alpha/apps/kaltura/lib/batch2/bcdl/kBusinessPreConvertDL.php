@@ -83,6 +83,7 @@ class kBusinessPreConvertDL
 		{
 			$destThumbParamsOutput->setVideoOffset($entry->getThumbOffset());
 		}
+		$destThumbParamsOutput->setVideoOffset(min($destThumbParamsOutput->getVideoOffset(), $entry->getDuration()));
 		
 		$thumbAsset = thumbAssetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getId());
 		if($thumbAsset)
