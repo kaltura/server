@@ -336,6 +336,15 @@ class KalturaBulkUploadCsvVersion
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaBulkUploadType
+{
+	const CSV = "bulkUploadCsvEngine.CSV";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaCategoryOrderBy
 {
 	const DEPTH_ASC = "+depth";
