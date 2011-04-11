@@ -402,10 +402,17 @@ class MediaService extends KalturaEntryService
     	{
     		KalturaLog::debug("Resource asset params id [" . $assetParamsResourceContainer->getAssetParamsId() . "]");
     		$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry);
+    		if(!$dbAsset)
+    			continue;
+    			
     		KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
+    		$dbEntry->addFlavorParamsId($dbAsset->getFlavorParamsId());
+    		
     		if($dbAsset->getIsOriginal())
     			$ret = $dbAsset;
     	}
+    	$dbEntry->save();
+    	
     	return $ret;
     }
     
