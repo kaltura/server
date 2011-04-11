@@ -1868,6 +1868,8 @@ CREATE TABLE `syndication_feed` (
   `feed_image_url` varchar(512) DEFAULT NULL,
   `feed_author` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
+  `custom_data` TEXT,
+  `display_in_search` TINYINT default 1,
   PRIMARY KEY (`id`),
   KEY `int_id_index` (`int_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
