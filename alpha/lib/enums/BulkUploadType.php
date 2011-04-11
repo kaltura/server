@@ -6,5 +6,4 @@
  */
 interface BulkUploadType extends BaseEnum
 {
-	const NONE = 0;
 }
