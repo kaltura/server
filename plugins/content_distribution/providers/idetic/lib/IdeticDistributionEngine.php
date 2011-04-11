@@ -75,6 +75,45 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	 * @param KalturaIdeticDistributionJobProviderData $providerData
 	 * @throws Exception
 	 */
+	public function handleDelete($path, KalturaDistributionJobData $data, KalturaIdeticDistributionProfile $distributionProfile, KalturaIdeticDistributionJobProviderData $providerData)
+	{
+		$domain = $distributionProfile->domain;
+		$username = $distributionProfile->username;
+		$password = $distributionProfile->password;
+		
+		KalturaLog::debug("idetic: delete");
+//		if(!$providerData->xml)
+//			throw new Exception("XML data not supplied");
+
+		if (!isset($data->remoteId) || $data->remoteId == "")
+		{
+			return false;
+		}
+		else
+		{
+			$remoteId = $data->remoteId;
+		}
+		$fileName = $remoteId . '.xml';
+		$destFile = "{$path}/{$fileName}";
+			
+		
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		if(!$fileTransferMgr)
+			throw new Exception("FTP manager not loaded");
+			
+		$fileTransferMgr->login($this->domain, $username, $password);
+		$fileTransferMgr->delFile($destFile);
+
+		return $remoteId;
+	}
+	
+	/**
+	 * @param string $path
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaIdeticDistributionProfile $distributionProfile
+	 * @param KalturaIdeticDistributionJobProviderData $providerData
+	 * @throws Exception
+	 */
 	public function handleSend($path, KalturaDistributionJobData $data, KalturaIdeticDistributionProfile $distributionProfile, KalturaIdeticDistributionJobProviderData $providerData)
 	{
 		$domain = $distributionProfile->domain;
@@ -190,10 +229,10 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	
 		if(!$data->providerData || !($data->providerData instanceof KalturaIdeticDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaIdeticDistributionJobProviderData");
+			
+		$this->handleDelete($this->deletePath, $data, $data->distributionProfile, $data->providerData);
 		
-		$this->handleSend($this->deletePath, $data, $data->distributionProfile, $data->providerData);
-		
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)

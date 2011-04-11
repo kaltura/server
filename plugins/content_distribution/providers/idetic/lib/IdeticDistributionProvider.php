@@ -47,7 +47,7 @@ class IdeticDistributionProvider implements IDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return true;
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -111,10 +111,7 @@ class IdeticDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		if(kConf::hasParam('idetic_update_required_entry_fields'))
-			return kConf::get('idetic_update_required_entry_fields');
-			
-		return array();
+		return array(entryPeer::NAME, entryPeer::DESCRIPTION, entryPeer::TAGS);
 	}
 
 	/* (non-PHPdoc)
@@ -122,10 +119,12 @@ class IdeticDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		if(kConf::hasParam('idetic_update_required_metadata_xpaths'))
-			return kConf::get('idetic_update_required_metadata_xpaths');
-			
 		return array();
+		
+		return array(
+			"/*[local-name()='metadata']/*[local-name()='".IdeticDistributionProfile::METADATA_FIELD_SHORTTITLE."']",
+			"/*[local-name()='metadata']/*[local-name()='".IdeticDistributionProfile::METADATA_FIELD_MEDIUMDESCRIPTION."']",
+		);	
 	}
 	
 	/**

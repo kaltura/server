@@ -222,9 +222,10 @@ class IdeticDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 	 */
 	public static function getEventConsumers()
 	{
-		return array(
-			self::IDETIC_REPORT_HANDLER,
-		);
+		return array();
+//		return array(
+//			self::IDETIC_REPORT_HANDLER,
+//		);
 	}
 	
 	/**

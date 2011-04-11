@@ -26,7 +26,7 @@
 		<xsl:for-each select="/item/content">
 			<xsl:if test="@flavorAssetId = $flavorAssetId">
 				<IndirectUploadURL>
-					<xsl:value-of select="url" />
+					<xsl:value-of select="@url" />
 				</IndirectUploadURL>
 			</xsl:if>
 		</xsl:for-each>
@@ -44,25 +44,42 @@
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="title" />
-							<xsl:otherwise>
+							</xsl:otherwise>
 						</xsl:choose>					
 					</Title>				
 					<ShortTitle>
-						<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
-							<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
-						</xsl:if>
+            <xsl:choose>
+              <xsl:when test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
+							  <xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
+						  </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="title" />
+              </xsl:otherwise>
+            </xsl:choose>
 					</ShortTitle>
 					<Synopsis>
-						<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/MediumDescription) > 0">
-							<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/MediumDescription" />
-						</xsl:if>				
+            <xsl:choose>
+              <xsl:when test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/MediumDescription) > 0">
+							  <xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/MediumDescription" />
+						  </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="description" />
+              </xsl:otherwise>
+            </xsl:choose>
 					</Synopsis>
 					<Keyword>
-						<xsl:if test="count(customData/metadata/keywords/keyword) > 0">
-							<xsl:call-template name="implode">
-								<xsl:with-param name="items" select="customData/metadata/keywords/keyword" />
-							</xsl:call-template>
-						</xsl:if>
+            <xsl:choose>
+              <xsl:when test="count(customData/metadata/keywords/keyword) > 0">
+                <xsl:call-template name="implode">
+                  <xsl:with-param name="items" select="customData/metadata/keywords/keyword" />
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="implode">
+                  <xsl:with-param name="items" select="tags/tag" />
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
 					</Keyword>
 				</BasicDescription>
 			</ProgramInformation> 
@@ -75,15 +92,15 @@
 							<xsl:when test="$deleteOp = ''">
 								<xsl:choose>
 									<xsl:when test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise) > 0">
-										<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000', sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise))" />
+										<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise))" />
 									</xsl:when>
 									<xsl:otherwise>
-										<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000')" />
+										<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z')" />
 									</xsl:otherwise>
 								</xsl:choose>
 							</xsl:when>
 							<xsl:otherwise>
-									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000',1295449112-2*86400)" />
+									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z',1295449112-2*86400)" />
 							</xsl:otherwise>
 						</xsl:choose>
 					</StartOfAvailability>
@@ -97,7 +114,7 @@
 						</xsl:when>
 						<xsl:otherwise>						
 							<EndOfAvailability>
-									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000',1295449112-86400)" />
+									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z',1295449112-86400)" />
 							</EndOfAvailability>
 						</xsl:otherwise>
 					</xsl:choose>
@@ -106,11 +123,11 @@
 							<xsl:with-param name="flavorAssetId" select="." />
 						</xsl:call-template>
 					</xsl:for-each>
-				<OnDemandProgram>					
+				</OnDemandProgram>					
 			</ProgramLocation>
 		</ProgramLocationTable> 
 	</ProgramDescription>
-
+</xsl:template>
 
 
 </xsl:stylesheet>

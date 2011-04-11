@@ -32,9 +32,9 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-$entryId = '0_s0hymwue';
+$entryId = '0_kntco0ij';
 
-$matches = null;
+/*$matches = null;
 if (preg_match ( "/x0y.*.err/" , '/pub/in/x0y.title.err' , $matches))
 {
 	print_r($matches);
@@ -66,7 +66,7 @@ foreach($argv as $arg)
 		print_r($fileTransferMgr->listDir("/pub/in"));
 //		$fileTransferMgr->putFile($destFile, $srcFile, true);
 
-		return;
+		return;*/
 $entry = entryPeer::retrieveByPKNoFilter($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
 file_put_contents('mrss.xml', $mrss);
@@ -74,7 +74,7 @@ KalturaLog::debug("MRSS [$mrss]");
 
 $distributionJobData = new KalturaDistributionSubmitJobData();
 
-$dbDistributionProfile = DistributionProfilePeer::retrieveByPK(2);
+$dbDistributionProfile = DistributionProfilePeer::retrieveByPK(7);
 $distributionProfile = new KalturaIdeticDistributionProfile();
 $distributionProfile->fromObject($dbDistributionProfile);
 $distributionJobData->distributionProfileId = $distributionProfile->id;
@@ -82,7 +82,7 @@ $distributionJobData->distributionProfileId = $distributionProfile->id;
 
 $distributionJobData->distributionProfile = $distributionProfile;
 
-$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(2);
+$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(38);
 $entryDistribution = new KalturaEntryDistribution();
 $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
@@ -94,9 +94,12 @@ $distributionJobData->providerData = $providerData;
 file_put_contents('out.xml', $providerData->xml);
 KalturaLog::debug("XML [$providerData->xml]");
 
-return;
-$engine = new GenericDistributionEngine();
-$engine->submit($distributionJobData);
+
+$engine = new IdeticDistributionEngine();
+//$engine->submit($distributionJobData);
+$distributionJobData->remoteId = '4da2b9127f5a5';
+//$engine->update($distributionJobData);
+$engine->delete($distributionJobData);
 
 
 //$xml = new DOMDocument();
