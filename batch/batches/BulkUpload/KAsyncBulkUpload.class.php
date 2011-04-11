@@ -18,8 +18,6 @@ setlocale ( LC_ALL, 'en_US.UTF-8' );
  */
 class KAsyncBulkUpload extends KBatchBase {
 	
-	protected $currentPartnerId = null;
-	
 	/**
 	 * @return number
 	 */

@@ -9,6 +9,13 @@
 abstract class KBulkUploadEngine
 {
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
+
+	/**
+	 * 
+	 * The current partner if for the engine
+	 * @var unknown_type
+	 */
+	protected $currentPartnerId;	
 	
 	/**
 	 * @var KalturaConfiguration
@@ -277,7 +284,7 @@ abstract class KBulkUploadEngine
 	{
 		if($isSpecificForPartner)
 		{
-			$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();;
+			$this->kClientConfig->partnerId = $this->currentPartnerId;
 		}
 			$this->kClient->setConfig($this->kClientConfig);
 		$this->kClient->startMultiRequest();
@@ -290,7 +297,7 @@ abstract class KBulkUploadEngine
 	{
 		$requestResults = $this->kClient->doMultiRequest();
 		
-		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
+		$this->kClientConfig->partnerId = $this->currentPartnerId;
 		$this->kClient->setConfig($this->kClientConfig);
 		
 		return $requestResults;
