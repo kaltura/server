@@ -1,4 +1,4 @@
-<?php
+\<?php
 class kSyndicationFeedManager
 {
 	
@@ -282,5 +282,35 @@ class kSyndicationFeedManager
 		}
 				
 		return $xml->saveXML();
-	}	
+	}
+
+	/*
+	 * @param string $xsltStr
+	 */
+	public static function validateXsl($xsltStr)
+	{
+		$xsl = new DOMDocument();
+		if(!$xsl->loadXML($xsltStr))
+		{
+			KalturaLog::debug("Could not load xslt");
+			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT, $xsltStr);
+		}
+		
+		$xpath = new DOMXpath($xsl);
+		
+		$xslStylesheet = $xpath->query("//xsl:stylesheet");
+		$rss = $xpath->query("//xsl:template[@name='rss']");
+		if ($rss->length == 0)
+			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_TEMPLATE_RSS, $xsltStr);
+		
+		$item = $xpath->query("//xsl:template[@name='item']");
+		if ($item->length == 0)
+			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_TEMPLATE_ITEM, $xsltStr);
+		
+		$items = $xpath->query("//xsl:apply-templates[@name='item']"); 
+		if ($items->length == 0)
+			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM, $xsltStr);
+
+		return true;
+	}
 }
