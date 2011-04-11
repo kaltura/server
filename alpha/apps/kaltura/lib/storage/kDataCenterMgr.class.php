@@ -232,5 +232,21 @@ class kDataCenterMgr
 		}
 		
 	}
+	
+	/**
+	 * @param int $dcId
+	 * @return bool true/false
+	 */
+	public static function dcExists($dcId)
+	{
+		$tempDc = null;
+		try { 
+			$tempDc = kDataCenterMgr::getDcById($dcId);
+		}
+		catch (Exception $e) {
+			$tempDc = null;
+		}
+		return !is_null($tempDc);
+	}
 }
 ?>
