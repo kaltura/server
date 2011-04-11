@@ -83,11 +83,12 @@ else
 	var kmc = {
 		vars : {
 		  /* --- new vars KMC4 */
-			kmc_version		: "<?php echo $kmc_swf_version; ?>",
-			kmc_general_uiconf	: "<?php echo $kmc_general->getId(); ?>", 
+			kmc_version				: "<?php echo $kmc_swf_version; ?>",
+			kmc_general_uiconf		: "<?php echo $kmc_general->getId(); ?>",
 			kmc_permissions_uiconf	: "<?php echo $kmc_permissions->getId(); ?>", 
-			allowed_partners	: <?php echo json_encode($allowedPartners); ?>,
+			allowed_partners		: <?php echo json_encode($allowedPartners); ?>,
 			hide_akamai_hd_network	: "<?php echo $hideAkamaiHDNetwork; ?>",
+			kmc_secured				: <?php echo (kConf::get("kmc_secured_login"))? "true" : "false"; ?>,
 		  /* END new vars KMC4 */
 		
 			service_url		: "<?php echo $service_url; ?>",
