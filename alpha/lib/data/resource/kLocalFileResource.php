@@ -19,6 +19,11 @@ class kLocalFileResource extends kContentResource
 	private $keepOriginalFile = false;
 	
 	/**
+	 * @var int
+	 */
+	private $sourceType = entry::ENTRY_MEDIA_SOURCE_FILE;
+	
+	/**
 	 * @return string
 	 */
 	public function getLocalFilePath()
@@ -48,5 +53,21 @@ class kLocalFileResource extends kContentResource
 	public function setKeepOriginalFile($keepOriginalFile)
 	{
 		$this->keepOriginalFile = $keepOriginalFile;
+	}
+	
+	/**
+	 * @return the $sourceType
+	 */
+	public function getSourceType()
+	{
+		return $this->sourceType;
+	}
+
+	/**
+	 * @param int $sourceType
+	 */
+	public function setSourceType($sourceType)
+	{
+		$this->sourceType = $sourceType;
 	}
 }
