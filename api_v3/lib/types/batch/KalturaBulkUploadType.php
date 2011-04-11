@@ -8,7 +8,10 @@
  * @subpackage objects
  *
  */
-class KalturaBulkUploadType extends KalturaObject implements BulkUploadType
+class KalturaBulkUploadType extends KalturaDynamicEnum implements BulkUploadType
 {
-
+	public static function getEnumClass()
+	{
+		return 'BulkUploadType';
+	}
 }
