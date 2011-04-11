@@ -42,6 +42,7 @@ class KalturaWebcamTokenResource extends KalturaContentResource
 		if(!file_exists($entryFullPath))
 			throw new KalturaAPIException(KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND);
 					
+		$object_to_fill->setSourceType(KalturaSourceType::WEBCAM);
 		$object_to_fill->setLocalFilePath($entryFullPath);
 		return $object_to_fill;
 	}
