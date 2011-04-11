@@ -126,7 +126,8 @@ class kFlowHelper
 		}
 		
 		// set the path in the job data
-		$data->setDestFileLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
+		$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		$data->setDestFileLocalPath($localFilePath);
 		$data->setFlavorAssetId($flavorAsset->getId());
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
@@ -138,15 +139,23 @@ class kFlowHelper
 		else
 		{
 			// if the flavor is the source, its readiness should be decided during the profile conversion
-			if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			{
+				$entry = $flavorAsset->getentry();
+				if($entry->getStatus() == entryStatus::PENDING)
+				{
+					kJobsManager::addConvertProfileJob($dbBatchJob, $entry, $flavorAsset->getId(), $localFilePath);
+				}
+			}
+			else
 			{ 
 				if($flavorAsset->getIsOriginal())
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 				else
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+					
+				$flavorAsset->save();
 			}
-				
-			$flavorAsset->save();
 			
 			if($flavorAsset->getIsOriginal())
 			{
