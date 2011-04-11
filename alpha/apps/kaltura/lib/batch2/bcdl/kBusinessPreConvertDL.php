@@ -79,6 +79,11 @@ class kBusinessPreConvertDL
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
 		$destThumbParamsOutput = self::validateThumbAndMediaInfo($destThumbParams, $mediaInfo, $errDescription);
 		
+		if($srcAsset->getType() == assetType::FLAVOR && is_null($destThumbParamsOutput->getVideoOffset()))
+		{
+			$destThumbParamsOutput->setVideoOffset($entry->getThumbOffset());
+		}
+		
 		$thumbAsset = thumbAssetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getId());
 		if($thumbAsset)
 		{
@@ -112,6 +117,7 @@ class kBusinessPreConvertDL
 		$destThumbParamsOutput->setEntryId($entry->getId());
 		$destThumbParamsOutput->setFlavorAssetId($thumbAsset->getId());
 		$destThumbParamsOutput->setFlavorAssetVersion($thumbAsset->getVersion());
+		
 		$destThumbParamsOutput->save();
 		
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
