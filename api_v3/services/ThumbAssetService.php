@@ -153,119 +153,6 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param KalturaUploadedFileTokenResource $contentResource
-	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-	 */
-	protected function attachUploadedFileTokenResource(thumbAsset $thumbAsset, KalturaUploadedFileTokenResource $contentResource)
-	{
-    	$contentResource->validatePropertyNotNull('token');
-    	
-		try
-		{
-		    $fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($contentResource->token);
-		}
-		catch(kCoreException $ex)
-		{
-			$thumbAsset->setDescription($ex->getMessage());
-			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$thumbAsset->save();
-			
-		    if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
-			    throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
-			    
-		    throw $ex;
-		}
-				
-		if(!file_exists($fullPath))
-		{
-			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($contentResource->token, kDataCenterMgr::getCurrentDcId());
-			if($remoteDCHost)
-			{
-				kFile::dumpApiRequest($remoteDCHost);
-			}
-			else
-			{
-				$thumbAsset->setDescription("Uploaded file token [$contentResource->token] dc not found");
-				$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$thumbAsset->save();
-				
-				throw new KalturaAPIException(KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN);
-			}
-		}
-		
-		$this->attachFile($thumbAsset, $fullPath);
-		kUploadTokenMgr::closeUploadTokenById($contentResource->token);
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
-	 * @param thumbAsset $srcThumbAsset
-	 */
-	protected function attachAsset(thumbAsset $thumbAsset, thumbAsset $srcThumbAsset)
-	{
-		$thumbAsset->setFlavorParamsId($srcThumbAsset->getFlavorParamsId());
-		$thumbAsset->save();
-		
-		$sourceEntryId = $srcThumbAsset->getEntryId();
-		
-        $srcSyncKey = $srcThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-      	
-        $this->attachFileSync($thumbAsset, $srcSyncKey);
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
-	 * @param KalturaAssetResource $contentResource
-	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
-	 */
-	protected function attachAssetResource(thumbAsset $thumbAsset, KalturaAssetResource $contentResource)
-	{
-    	$contentResource->validatePropertyNotNull('assetId');
-    	
-		$srcThumbAsset = thumbAssetPeer::retrieveById($contentResource->assetId);
-		if (!$srcThumbAsset)
-		{
-			$thumbAsset->setDescription("Source asset [$contentResource->assetId] not found");
-			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$thumbAsset->save();
-			
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $contentResource->assetId);
-		}
-		
-		$this->attachAsset($thumbAsset, $srcThumbAsset);
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
-	 * @param KalturaEntryResource $contentResource
-	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
-	 */
-	protected function attachEntryResource(thumbAsset $thumbAsset, KalturaEntryResource $contentResource)
-	{
-    	$contentResource->validatePropertyNotNull('entryId');
-    	$contentResource->validatePropertyNotNull('flavorParamsId');
-    
-    	$this->attachEntry($thumbAsset, $contentResource->entryId, $contentResource->flavorParamsId);
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
-	 * @param string $entryId
-	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
-	 */
-	protected function attachEntry(thumbAsset $thumbAsset, $entryId)
-	{
-    	$srcEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$srcEntry || $srcEntry->getType() != KalturaEntryType::MEDIA_CLIP || $srcEntry->getMediaType() != KalturaMediaType::IMAGE)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-    	
-        $srcSyncKey = $srcEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-        $this->attachFileSync($thumbAsset, $srcSyncKey);
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
 	 * @param string $url
 	 */
 	protected function attachUrl(thumbAsset $thumbAsset, $url)
@@ -283,12 +170,11 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param KalturaUrlResource $contentResource
+	 * @param kUrlResource $contentResource
 	 */
-	protected function attachUrlResource(thumbAsset $thumbAsset, KalturaUrlResource $contentResource)
+	protected function attachUrlResource(thumbAsset $thumbAsset, kUrlResource $contentResource)
 	{
-    	$contentResource->validatePropertyNotNull('url');
-    	$this->attachUrl($thumbAsset, $contentResource->url);
+    	$this->attachUrl($thumbAsset, $contentResource->getUrl());
     }
     
 	/**
@@ -317,36 +203,11 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param KalturaLocalFileResource $contentResource
+	 * @param kLocalFileResource $contentResource
 	 */
-	protected function attachLocalFileResource(thumbAsset $thumbAsset, KalturaLocalFileResource $contentResource)
+	protected function attachLocalFileResource(thumbAsset $thumbAsset, kLocalFileResource $contentResource)
 	{
-    	$contentResource->validatePropertyNotNull('localFilePath');
-		$this->attachFile($thumbAsset, $contentResource->localFilePath, true);
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
-	 * @param KalturaUploadedFileResource $contentResource
-	 */
-	protected function attachUploadedFileResource(thumbAsset $thumbAsset, KalturaUploadedFileResource $contentResource)
-	{
-    	$contentResource->validatePropertyNotNull('fileData');
-		$ext = pathinfo($contentResource->fileData['name'], PATHINFO_EXTENSION);
-		
-		$uploadPath = $contentResource->fileData['tmp_name'];
-		$tempPath = myContentStorage::getFSUploadsPath() . '/' . uniqid(time()) . '.jpg';
-		$moved = kFile::moveFile($uploadPath, $tempPath, true);
-		if(!$moved)
-		{
-			$thumbAsset->setDescription("Could not move file from [$uploadPath] to [$tempPath]");
-			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$thumbAsset->save();
-			
-			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
-		}
-			 
-		return $this->attachFile($thumbAsset, $tempPath);
+		$this->attachFile($thumbAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
     }
     
 	/**
@@ -370,68 +231,37 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param KalturaFileSyncResource $contentResource
+	 * @param kFileSyncResource $contentResource
 	 */
-	protected function attachFileSyncResource(thumbAsset $thumbAsset, KalturaFileSyncResource $contentResource)
+	protected function attachFileSyncResource(thumbAsset $thumbAsset, kFileSyncResource $contentResource)
 	{
-    	$contentResource->validatePropertyNotNull('fileSyncObjectType');
-    	$contentResource->validatePropertyNotNull('objectSubType');
-    	$contentResource->validatePropertyNotNull('objectId');
-    	
-    	$syncable = kFileSyncObjectManager::retrieveObject($contentResource->fileSyncObjectType, $contentResource->objectId);
-    	$srcSyncKey = $syncable->getSyncKey($contentResource->objectSubType, $contentResource->version);
+    	$syncable = kFileSyncObjectManager::retrieveObject($contentResource->getFileSyncObjectType(), $contentResource->getObjectId());
+    	$srcSyncKey = $syncable->getSyncKey($contentResource->getObjectSubType(), $contentResource->getVersion());
     	
         return $this->attachFileSync($thumbAsset, $srcSyncKey);
     }
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param KalturaRemoteStorageResource $contentResource
+	 * @param kRemoteStorageResource $contentResource
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
-	protected function attachRemoteStorageResource(thumbAsset $thumbAsset, KalturaRemoteStorageResource $contentResource)
+	protected function attachRemoteStorageResource(thumbAsset $thumbAsset, kRemoteStorageResource $contentResource)
 	{
-    	$contentResource->validatePropertyNotNull('url');
-    	$contentResource->validatePropertyNotNull('storageProfileId');
-    
-        $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->storageProfileId);
+        $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->getStorageProfileId());
         if(!$storageProfile)
         {
-			$thumbAsset->setDescription("Could not find storage profile id [$contentResource->storageProfileId]");
+			$thumbAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
 			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$thumbAsset->save();
 			
-        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->storageProfileId);
+        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
         }
         $thumbAsset->incrementVersion();
         $thumbAsset->save();
         	
         $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->url, $storageProfile);
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
-	 * @param KalturaSearchResultsResource $contentResource
-	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 */
-	protected function attachSearchResultsResource(thumbAsset $thumbAsset, KalturaSearchResultsResource $contentResource)
-    {
-    	$contentResource->validatePropertyNotNull('result');
-     	$contentResource->result->validatePropertyNotNull("searchSource");
-     	
-		if ($contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER_KSHOW ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_KSHOW ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS)
-		{
-			$this->attachEntry($thumbAsset, $contentResource->result->id);
-		}
-		else
-		{
-			$this->attachUrl($thumbAsset, $contentResource->result->url);
-		}
+		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->getUrl(), $storageProfile);
     }
     
     
@@ -449,35 +279,17 @@ class ThumbAssetService extends KalturaBaseService
 	{
     	switch(get_class($contentResource))
     	{
-			case 'KalturaUploadedFileTokenResource':
-				return $this->attachUploadedFileTokenResource($thumbAsset, $contentResource);
-				
-			case 'KalturaAssetResource':
-				return $this->attachAssetResource($thumbAsset, $contentResource);
-				
-			case 'KalturaEntryResource':
-				return $this->attachEntryResource($thumbAsset, $contentResource);
-				
-			case 'KalturaUrlResource':
+			case 'kUrlResource':
 				return $this->attachUrlResource($thumbAsset, $contentResource);
 				
-			case 'KalturaSearchResultsResource':
-				return $this->attachSearchResultsResource($thumbAsset, $contentResource);
-				
-			case 'KalturaLocalFileResource':
+			case 'kLocalFileResource':
 				return $this->attachLocalFileResource($thumbAsset, $contentResource);
 				
-			case 'KalturaUploadedFileResource':
-				return $this->attachUploadedFileResource($thumbAsset, $contentResource);
-				
-			case 'KalturaFileSyncResource':
+			case 'kFileSyncResource':
 				return $this->attachFileSyncResource($thumbAsset, $contentResource);
 				
-			case 'KalturaRemoteStorageResource':
+			case 'kRemoteStorageResource':
 				return $this->attachRemoteStorageResource($thumbAsset, $contentResource);
-				
-			case 'KalturaDropFolderFileResource':
-				// TODO after DropFolderFile object creation
 				
 			default:
 				$msg = "Resource of type [" . get_class($contentResource) . "] is not supported";
