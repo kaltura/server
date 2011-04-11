@@ -36,7 +36,7 @@ class KalturaThumbParams extends KalturaAssetParams
 	public $cropHeight = 0;
 	
 	/**
-	 * @var int
+	 * @var float
 	 */
 	public $videoOffset = 3;
 	
