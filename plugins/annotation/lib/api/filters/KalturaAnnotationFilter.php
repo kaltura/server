@@ -18,6 +18,9 @@ class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 			
 		if(isset($this->userIdEqual)){
 			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->userIdEqual);
+			if (! $dbKuser) {
+				throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+			}
 			$this->userIdEqual = $dbKuser->getId();
 		}
 			
@@ -26,6 +29,9 @@ class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
 			$userIds = explode(",", $this->userIdIn);
 			foreach ($userIds as $userId){
 				$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $userId);
+				if (! $dbKuser) {
+				    throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+			}
 				$kuserIds = $dbKuser->getId().",";
 			}
 			
