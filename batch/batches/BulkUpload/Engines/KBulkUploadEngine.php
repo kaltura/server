@@ -12,10 +12,10 @@ abstract class KBulkUploadEngine
 
 	/**
 	 * 
-	 * The current partner if for the engine
-	 * @var unknown_type
+	 * The batch current partner id
+	 * @var int
 	 */
-	protected $currentPartnerId;	
+	protected $currentPartnerId;
 	
 	/**
 	 * @var KalturaConfiguration
@@ -49,12 +49,12 @@ abstract class KBulkUploadEngine
 	 * @param KalturaClient kClient - the client for the engine to use
 	 * @return KBulkUploadEngine
 	 */
-	public static function getEngine ( $batchJobSubType , KSchedularTaskConfig $taskConfig, $kClient, $kClientConfig )
+	public static function getEngine ( $batchJobSubType , KSchedularTaskConfig $taskConfig, $kClient)
 	{
 		$engine =  null;
 		
 		//Gets the engine from the plugin (as we moved all engines to the plugin)
-		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $kClientConfig));
+		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient));
 						
 		return $engine;
 	}
@@ -62,12 +62,12 @@ abstract class KBulkUploadEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig, $kClient, $kClientConfig = null)
+	protected function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient)
 	{
 		$this->taskConfig = $taskConfig;
 		$this->kClient = $kClient;
 		//TODO: is this neccessary for creating a multirequest for partner??
-		$this->kClientConfig = $kClientConfig;
+		$this->kClientConfig = $kClient->getConfig();
 	}
 	
 	/**
@@ -90,8 +90,19 @@ abstract class KBulkUploadEngine
 		//3. Close
 		
 		$this->init($job, $data);
-		$this->validateFile($job, $data);
-		$this->parseRows($job, $data);
+	
+		$isValid = $this->validate($job, $data);
+		if(!$isValid)
+		{
+			throw new KalturaException("Validation failed on job [$job->id]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+		}
+		
+		$isValid = $this->parse($job, $data);
+		if(!$isValid)
+		{
+			throw new KalturaException("Parse rows failed on job [$job->id]", KalturaBatchJobAppErrors::BULK_PARSE_ITEMS_FAILED);
+		}
+		
 		$this->close($job, $data);
 	}
 
@@ -101,9 +112,9 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $data
 	 */
-	protected function validateFile(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	protected function validate(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
-		return;
+		return true;
 	}
 	
 	/**
@@ -112,9 +123,9 @@ abstract class KBulkUploadEngine
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $data
 	 */
-	protected function parseRows(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	protected function parse(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
-		return;
+		return true;
 	}
 	
 	/**
@@ -125,7 +136,7 @@ abstract class KBulkUploadEngine
 	 */
 	protected function init(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
-		return;
+		return true;
 	}
 		
 	/**
@@ -136,7 +147,7 @@ abstract class KBulkUploadEngine
 	 */
 	protected function close(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
 	{
-		return;
+		return true;
 	}
 		
 	/**
@@ -171,8 +182,8 @@ abstract class KBulkUploadEngine
 		
 		if(! $fileHandle) // fails and exit
 		{
-			throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND); //The job was aborted
-			throw new Exception("Unable to open file: {$bulkUploadJobData->csvFilePath}");
+			//TODO: Roni - Add support for XML file
+			throw new KalturaException("Unable to open file: {$bulkUploadJobData->csvFilePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
 					
 		KalturaLog::info("Opened file: $bulkUploadJobData->csvFilePath");
@@ -224,8 +235,7 @@ abstract class KBulkUploadEngine
 			// check if job aborted
 			if($this->isAborted($job))
 			{
-				ini_set('auto_detect_line_endings', false);
-				throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::ABORTED); //The job was aborted
+				throw new KalturaBulkUploadAbortedException("Job was aborted", KalturaBulkUploadAbortedException::ABORTED); //The job was aborted
 			}
 			
 			// start a new multi request
@@ -254,7 +264,7 @@ abstract class KBulkUploadEngine
 			if(count($requestResults) != count($bulkUploadResultChunk))
 			{
 				$err = __FILE__ . ', line: ' . __LINE__ . ' $requestResults and $$bulkUploadResultChunk must have the same size';
-				throw new KalturaException($err, KalturaBatchJobStatus::FAILED);
+				throw new KalturaException($err, KalturaBatchJobAppErrors::BULK_INVLAID_BULK_REQUEST_COUNT);
 			}
 				
 			// saving the results with the created enrty ids
@@ -263,8 +273,7 @@ abstract class KBulkUploadEngine
 			// check if job aborted
 			if($this->isAborted($job))
 			{
-				ini_set('auto_detect_line_endings', false);
-				throw new KalturaException("Job was aborted", KalturaBatchJobAppErrors::ABORTED); //The job was aborted
+				throw new KalturaBulkUploadAbortedException("Job was aborted", KalturaBulkUploadAbortedException::ABORTED); //The job was aborted
 			}
 			
 			// start a new multi request
@@ -285,8 +294,9 @@ abstract class KBulkUploadEngine
 		if($isSpecificForPartner)
 		{
 			$this->kClientConfig->partnerId = $this->currentPartnerId;
-		}
 			$this->kClient->setConfig($this->kClientConfig);
+		}
+		
 		$this->kClient->startMultiRequest();
 	}
 	
@@ -368,40 +378,3 @@ abstract class KBulkUploadEngine
 		return false;
 	}
 }
-
-
-//TODO: Roni - see if this is needed (copied from another location)
-///**
-// * @package Scheduler
-// * @subpackage Conversion
-// *
-// */
-//class KBulkUploadEngineResult
-//{
-//	/**
-//	 * @var int
-//	 */
-//	public $status;
-//	
-//	/**
-//	 * @var string
-//	 */
-//	public $errMessage;
-//	
-//	/**
-//	 * @var KalturaProvisionJobData
-//	 */
-//	public $data;
-//	
-//	/**
-//	 * @param int $status
-//	 * @param string $errMessage
-//	 * @param KalturaProvisionJobData $data
-//	 */
-//	public function __construct( $status , $errMessage, KalturaBulkUploadJobData $data = null )
-//	{
-//		$this->status = $status;
-//		$this->errMessage = $errMessage;
-//		$this->data = $data;
-//	}
-//}

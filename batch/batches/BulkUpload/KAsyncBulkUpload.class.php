@@ -42,36 +42,50 @@ class KAsyncBulkUpload extends KBatchBase {
 		if (! count ( $jobs )) {
 			KalturaLog::info ( "Queue size: 0 sent to scheduler" );
 			$this->saveSchedulerQueue ( self::getType () );
-			return;
+			return false;
 		}
 		
-		foreach ( $jobs as $job ) {
+		$jobResults = array();
+		foreach ( $jobs as $job ) 
+		{
 			try {
-				$this->startBulkUpload ( $job, $job->data );
+				$job = $this->startBulkUpload ( $job, $job->data );
 				
-				ini_set ( 'auto_detect_line_endings', false );
 				// the closer will report finished after checking the imports and converts, reports almost done
-				$this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE);
-				
-			} 
-			catch ( KalturaException $e ) 
-			{
-				ini_set ( 'auto_detect_line_endings', false );
-				$this->handleExceptions($e, $job);
-				return false;
+				$jobResults[] = $this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE);
 			}
+			catch (KalturaBulkUploadAbortedException $abortedException)
+			{
+				$jobResults[] = $this->closeJob($job, null, null, $abortedException->getMessage(), KalturaBatchJobStatus::ABORTED);
+			}
+			catch(KalturaException $kex)
+			{
+				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
+			}
+			catch(KalturaClientException $kcex)
+			{
+				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
+			}
+			catch(Exception $ex)
+			{
+				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+			}
+			
+			ini_set('auto_detect_line_endings', false);
 		}
+		
+		return $jobResults;
 	}
 	
 	/**
 	 * 
 	 * Handles all exceptions raised in the bulk engines
-	 * @param Exception $e
+	 * @param KalturaBulkUploadJobException $e
 	 * @param KalturaBatchJob $job
 	 */
 	private function handleExceptions($e,KalturaBatchJob $job)
 	{
-		//TODO : fix exception handling
+		//TODO : Roni - Ask TanTan for defenitions 
 		KalturaLog::ERR ( "An exception was raised in bulk upload: " . $e );
 		$errType = KalturaBatchJobErrorTypes::APP;
 		$msg = $e->getMessage();
@@ -79,13 +93,19 @@ class KAsyncBulkUpload extends KBatchBase {
 		
 		switch ($e->getCode ()) 
 		{
-			case KalturaBatchJobAppErrors::ABORTED : // if the job was aborted
+			case KalturaBulkUploadJobErrors::ABORTED: // if the job was aborted
 					$status = KalturaBatchJobStatus::ABORTED;
 				break;
-			case KalturaBatchJobAppErrors::CSV_FILE_NOT_FOUND:
+			case KalturaBulkUploadJobErrors::FILE_NOT_FOUND:
 					$status = KalturaBatchJobStatus::FAILED;
 				break;
-			case KalturaBatchJobStatus::FAILED :
+			case KalturaBulkUploadJobErrors::VALIDATION_FAILED:
+					$status = KalturaBatchJobStatus::FAILED;
+				break;
+			case KalturaBulkUploadJobErrors::PARSE_ROWS_FAILED:
+					$status = KalturaBatchJobStatus::FAILED;
+				break;
+			case KalturaBulkUploadJobErrors::UNKNOWN_ERROR:
 					$status = KalturaBatchJobStatus::FAILED;
 				break;
 			default :
@@ -110,11 +130,13 @@ class KAsyncBulkUpload extends KBatchBase {
 		$engine = KBulkUploadEngine::getEngine ( KalturaBulkUploadType::CSV, $this->taskConfig, $this->kClient, $this->kClientConfig );
 		if (is_null ( $engine )) {
 			//TODO: handle exceptions better
-			KalturaLog::err("Bulk upload engine is null" );
-			throw new Exception ( "Unable to find bulk upload engine, action aborted" );
+			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::BULK_ENGINE_NOT_FOUND );
 		}
 		
 		$engine->handleBulkUpload ( $job, $bulkUploadJobData );
+
+		//TODO: Roni - ask TanTan Should we return the same job we get?
+		return $job;
 	}
 	
 	/**
