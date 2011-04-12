@@ -28,10 +28,21 @@
 		
 		$include = $indexConfig->get("include");
 		$exclude = $indexConfig->get("exclude");
+
+		$cacheFileName = kConf::get("general_cache_dir").'/testme';
 		
-		$clientGenerator = new DummyForDocsClientGenerator();
-		$clientGenerator->setIncludeOrExcludeList($include, $exclude);
-		$clientGenerator->load();
+		if (file_exists($cacheFileName))
+		{
+			$clientGenerator = unserialize(file_get_contents($cacheFileName));
+		}
+		else
+		{
+			$clientGenerator = new DummyForDocsClientGenerator();
+			$clientGenerator->setIncludeOrExcludeList($include, $exclude);
+			$clientGenerator->load();
+			
+			file_put_contents($cacheFileName, serialize($clientGenerator));
+		}
 		
 		$list = array();
 		$services = $clientGenerator->getServices();
