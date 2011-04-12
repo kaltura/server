@@ -111,10 +111,12 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		if(kConf::hasParam('msn_update_required_entry_fields'))
-			return kConf::get('msn_update_required_entry_fields');
-			
-		return array();
+		return array(
+			// entry columns
+			entryPeer::NAME, 
+			entryPeer::DESCRIPTION, 
+			entryPeer::TAGS, 
+		);
 	}
 
 	/* (non-PHPdoc)
@@ -122,10 +124,12 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		if(kConf::hasParam('msn_update_required_metadata_xpaths'))
-			return kConf::get('msn_update_required_metadata_xpaths');
-			
-		return array();
+		return array(
+			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_PUBLIC . "']",
+			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_VIDEO_CAT . "']",
+			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_VIDEO_TOP . "']",
+			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_VIDEO_TOP_CAT . "']",
+		);
 	}
 	
 	/**
