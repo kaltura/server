@@ -5,6 +5,7 @@
  */
 class KalturaBatchJobAppErrors extends KalturaEnum
 {
+	
 	const OUTPUT_FILE_DOESNT_EXIST = 11;
 	const OUTPUT_FILE_WRONG_SIZE = 12;
 	const CANNOT_CREATE_DIRECTORY = 13;
@@ -26,6 +27,11 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	
 	const THUMBNAIL_NOT_CREATED = 91;
 	
-	//TODO: move to other Enum (KalturaBatchJobAppStatus)
-	const JOB_ABORTED = 101;
+	//Bulk upload exceptions
+	const BULK_VALIDATION_FAILED = 101;
+	const BULK_PARSE_ITEMS_FAILED = 102;
+	const BULK_FILE_NOT_FOUND = 103;
+	const BULK_UNKNOWN_ERROR = 104;
+	const BULK_INVLAID_BULK_REQUEST_COUNT = 105;
+	const BULK_ENGINE_NOT_FOUND = 106;
 }

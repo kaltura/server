@@ -5,8 +5,6 @@
  */
 class KalturaBulkUploadJobData extends KalturaJobData
 {
-	//TODO: Roni - maybe add propertires to the blk upload job data.
-	
 	/**
 	 * @var string
 	 */
@@ -31,13 +29,6 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 * 
 	 * @var string
 	 */
-	public $csvFilePath;
-	
-	/**
-	 * Created by the API
-	 * 
-	 * @var string
-	 */
 	public $resultsFileLocalPath;
 	
 	/**
@@ -53,24 +44,15 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 * @var int
 	 */
 	public $numOfEntries;
-	
-	/**
-	 * The version of the csv file
-	 * 
-	 * @var KalturaBulkUploadCsvVersion
-	 */
-	public $csvVersion;
-    
+   
 	private static $map_between_objects = array
 	(
 		"userId",
 		"uploadedBy",
 		"conversionProfileId",
-		"csvFilePath",
 		"resultsFileLocalPath",
 		"resultsFileUrl",
 		"numOfEntries",
-		"csvVersion",
 	);
 
 	public function getMapBetweenObjects ( )
