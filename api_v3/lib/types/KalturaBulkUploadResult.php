@@ -164,9 +164,7 @@ class KalturaBulkUploadResult extends KalturaObject
      * @var KalturaBulkUploadPluginDataArray
      */
     public $pluginsData;
-    
-    
-    
+       
 	private static $mapBetweenObjects = array
 	(
 		"id",
