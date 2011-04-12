@@ -19,6 +19,8 @@ if($argc > 1 && $argv[1] == 'realrun')
 define("TEMPLATE_PARTNER_ID", 99 );
 
 //-- Script start
+//Get partner 99
+$partner99 = PartnerPeer::retrieveByPK(TEMPLATE_PARTNER_ID);
 
 //Enable the vast
 $partner99->setEnableVast(true);
