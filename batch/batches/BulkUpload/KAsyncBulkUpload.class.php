@@ -46,6 +46,7 @@ class KAsyncBulkUpload extends KBatchBase {
 		}
 		
 		$jobResults = array();
+		ini_set('auto_detect_line_endings', true);
 		foreach ( $jobs as $job ) 
 		{
 			try {
@@ -56,7 +57,7 @@ class KAsyncBulkUpload extends KBatchBase {
 			}
 			catch (KalturaBulkUploadAbortedException $abortedException)
 			{
-				$jobResults[] = $this->closeJob($job, null, null, $abortedException->getMessage(), KalturaBatchJobStatus::ABORTED);
+				$jobResults[] = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ABORTED);
 			}
 			catch(KalturaException $kex)
 			{
@@ -70,9 +71,8 @@ class KAsyncBulkUpload extends KBatchBase {
 			{
 				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
-			
-			ini_set('auto_detect_line_endings', false);
 		}
+		ini_set('auto_detect_line_endings', false);
 		
 		return $jobResults;
 	}
@@ -89,12 +89,11 @@ class KAsyncBulkUpload extends KBatchBase {
 		//Gets the right Engine instance 
 		$engine = KBulkUploadEngine::getEngine($job->jobSubType, $this->taskConfig, $this->kClient);
 		if (is_null ( $engine )) {
-			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::BULK_ENGINE_NOT_FOUND );
+			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND );
 		}
 
 		$engine->handleBulkUpload ( $job, $bulkUploadJobData );
 
-		//TODO: Roni - ask TanTan Should we return the same job we get?
 		return $job;
 	}
 	
