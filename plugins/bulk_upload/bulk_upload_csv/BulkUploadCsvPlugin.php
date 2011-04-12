@@ -2,7 +2,7 @@
 /**
  * @package plugins.bulkUploadCsv
  */
-class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaBulkUploadDefaultEngine
+class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'bulkUploadCsv';
 

@@ -7,15 +7,7 @@
  *
  */
 class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
-{
-	/**
-	 * Created by the API
-	 * 
-	 *
-	 * @var string
-	 */
-	public $csvFilePath = null;
-		
+{	
 	/**
 	 * The version of the csv file
 	 * 
@@ -31,7 +23,6 @@ class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 	 */
 	private static $map_between_objects = array
 	(
-		"csvFilePath",
 		"csvVersion"
 	);
 

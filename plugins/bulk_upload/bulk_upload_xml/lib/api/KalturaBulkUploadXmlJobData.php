@@ -9,21 +9,12 @@
 class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
 {
 	/**
-	 * Created by the API
-	 * 
-	 * @var string
-	 */
-	public $xmlFilePath;
-
-	/**
 	 * 
 	 * Maps between objects and the properties
 	 * @var array
 	 */
 	private static $map_between_objects = array
-	(
-		"xmlFilePath"
-	);
+	();
 
 	public function getMapBetweenObjects ( )
 	{
