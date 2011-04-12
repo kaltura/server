@@ -183,7 +183,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * (non-PHPdoc)
 	 * @see KBulkUploadEngine::validate()
 	 */
-	public function validate(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function validate(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
 	{
 		//TODO: add validation for CSV - take from the parse
 		return true;
@@ -193,7 +193,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * (non-PHPdoc)
 	 * @see KBulkUploadEngine::parse()
 	 */
-	public function parse(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function parse(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
 	{
 		$fileHandle = $this->getFileHandle($job, $data);
 		$values = fgetcsv($fileHandle);
@@ -246,7 +246,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 		// reports that the parsing done
 		$msg = "CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($bulkUploadResults)) . ' invalid records';
-		$updateData = new KalturaBulkUploadJobData();
+		$updateData = new KalturaBulkUploadCsvJobData();
 		$updateData->csvVersion = $this->csvVersion;
 				
 		// check if job aborted
@@ -266,7 +266,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * (non-PHPdoc)
 	 * @see KBulkUploadEngine::init()
 	 */
-	public function init(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function init(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
 	{
 		//to support EOF of mac files
 		ini_set('auto_detect_line_endings', true);
@@ -287,9 +287,9 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * 
 	 * Closes the engine with the needed params of the batch job 
 	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $data
+	 * @param KalturaBulkUploadCsvJobData $data
 	 */
-	public function close(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function close(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
 	{
 		return true;
 	}
@@ -306,7 +306,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
 	 */
-	public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
 	{
 		//Add logic here from old bulk upload
 		parent::handleBulkUpload($job, $data);
@@ -319,7 +319,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * @param array $bulkUploadResultChunk
 	 * @param KalturaBatchJob $job
 	 */
-	protected function createEntries(array $bulkUploadResults, KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
+	protected function createEntries(array $bulkUploadResults, KalturaBatchJob $job, KalturaBulkUploadCsvJobData $bulkUploadJobData)
 	{
 		// start a multi request for add entries
 		$this->startMultiRequest(true);
@@ -366,9 +366,9 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * 
 	 * Creates and returns a new media entry for the given job data and bulk upload result object
 	 * @param unknown_type $bulkUploadResult
-	 * @param unknown_type $bulkUploadJobData
+	 * @param KalturaBulkUploadCsvJobData $bulkUploadJobData
 	 */
-	protected function createMediaEntryFromResultAndJobData($bulkUploadResult, $bulkUploadJobData)
+	protected function createMediaEntryFromResultAndJobData($bulkUploadResult, KalturaBulkUploadCsvJobData $bulkUploadJobData)
 	{
 		//Create the new media entry and set basic values
 		$mediaEntry = new KalturaMediaEntry();
