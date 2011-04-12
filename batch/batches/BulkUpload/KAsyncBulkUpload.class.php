@@ -79,44 +79,6 @@ class KAsyncBulkUpload extends KBatchBase {
 	
 	/**
 	 * 
-	 * Handles all exceptions raised in the bulk engines
-	 * @param KalturaBulkUploadJobException $e
-	 * @param KalturaBatchJob $job
-	 */
-	private function handleExceptions($e,KalturaBatchJob $job)
-	{
-		//TODO : Roni - Ask TanTan for defenitions 
-		KalturaLog::ERR ( "An exception was raised in bulk upload: " . $e );
-		$errType = KalturaBatchJobErrorTypes::APP;
-		$msg = $e->getMessage();
-		$errNumber = $e->getCode();
-		
-		switch ($e->getCode ()) 
-		{
-			case KalturaBulkUploadJobErrors::ABORTED: // if the job was aborted
-					$status = KalturaBatchJobStatus::ABORTED;
-				break;
-			case KalturaBulkUploadJobErrors::FILE_NOT_FOUND:
-					$status = KalturaBatchJobStatus::FAILED;
-				break;
-			case KalturaBulkUploadJobErrors::VALIDATION_FAILED:
-					$status = KalturaBatchJobStatus::FAILED;
-				break;
-			case KalturaBulkUploadJobErrors::PARSE_ROWS_FAILED:
-					$status = KalturaBatchJobStatus::FAILED;
-				break;
-			case KalturaBulkUploadJobErrors::UNKNOWN_ERROR:
-					$status = KalturaBatchJobStatus::FAILED;
-				break;
-			default :
-				    $status = null;
-				break;
-		}
-		$this->closeJob($job, $errType, $errNumber, $msg, $status);
-	}
-	
-	/**
-	 * 
 	 * Starts the bulk upload
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $bulkUploadJobData
@@ -124,15 +86,12 @@ class KAsyncBulkUpload extends KBatchBase {
 	private function startBulkUpload(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData) {
 		KalturaLog::debug ( "startBulkUpload($job->id)" );
 		
-		//TODO: Roni - Get from the job the job subtype (the BulkUpload Type)
 		//Gets the right Engine instance 
-		//$engine = KBulkUploadEngine::getEngine($bulkUploadJobData->getBulkType(), $this->taskConfig);
-		$engine = KBulkUploadEngine::getEngine ( KalturaBulkUploadType::CSV, $this->taskConfig, $this->kClient, $this->kClientConfig );
+		$engine = KBulkUploadEngine::getEngine($job->jobSubType, $this->taskConfig, $this->kClient);
 		if (is_null ( $engine )) {
-			//TODO: handle exceptions better
 			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::BULK_ENGINE_NOT_FOUND );
 		}
-		
+
 		$engine->handleBulkUpload ( $job, $bulkUploadJobData );
 
 		//TODO: Roni - ask TanTan Should we return the same job we get?

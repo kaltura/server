@@ -178,15 +178,15 @@ abstract class KBulkUploadEngine
 	 */
 	protected function getFileHandle(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
 	{
-		$fileHandle = fopen($bulkUploadJobData->csvFilePath, "r");
+		$fileHandle = fopen($bulkUploadJobData->filePath, "r");
 		
 		if(! $fileHandle) // fails and exit
 		{
 			//TODO: Roni - Add support for XML file
-			throw new KalturaException("Unable to open file: {$bulkUploadJobData->csvFilePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
+			throw new KalturaException("Unable to open file: {$bulkUploadJobData->filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
 					
-		KalturaLog::info("Opened file: $bulkUploadJobData->csvFilePath");
+		KalturaLog::info("Opened file: $bulkUploadJobData->filePath");
 		
 		return $fileHandle;
 	}
