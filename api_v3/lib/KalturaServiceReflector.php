@@ -23,7 +23,7 @@ class KalturaServiceReflector
 	/**
 	 * @var array
 	 */
-	private $_actions = null;
+	private $_actions = array();
 	
 	/**
 	 * @var KalturaDocCommentParser
@@ -139,10 +139,24 @@ class KalturaServiceReflector
 		return array_key_exists($actionId, $actions);
 	}
 	
-	public function getActions()
+	public function getActionMethodName($actionId)
 	{
-		if ($this->_actions !== null)
-			return $this->_actions;
+		$actions = $this->getActions(false);
+		if(isset($actions[$actionId]))
+			return $actions[$actionId];
+			
+		return null;
+	}
+	
+	/**
+	 * @param bool $ignoreDeprecated
+	 * @return array
+	 */
+	public function getActions($ignoreDeprecated = true)
+	{
+		$actionsArrayType = intval($ignoreDeprecated);
+		if (isset($this->_actions[$actionsArrayType]) && is_array($this->_actions[$actionsArrayType]))
+			return $this->_actions[$actionsArrayType];
 		
 		$reflectionClass = new ReflectionClass($this->_serviceClass);
 		
@@ -155,15 +169,18 @@ class KalturaServiceReflector
 			$parsedDocComment = new KalturaDocCommentParser( $docComment );
 			if ($parsedDocComment->action)
 			{
+				if($ignoreDeprecated && $parsedDocComment->deprecated)
+					continue;
+					
 				$actionName = $parsedDocComment->action;
 				$actionId = strtolower($actionName);
 				$actions[$actionId] = $reflectionMethod->getName(); // key is the action id (action name lower cased), value is the method name
 			}
 		}
 		
-		$this->_actions = $actions;
+		$this->_actions[$actionsArrayType] = $actions;
 		
-		return $this->_actions;
+		return $this->_actions[$actionsArrayType];
 	}
 	
 	/**
@@ -176,7 +193,7 @@ class KalturaServiceReflector
 			throw new Exception("Action [$actionName] does not exists for service [$this->_serviceId]");
 		
 		$actionId = strtolower($actionName);
-		$methodName = $this->_actions[$actionId];
+		$methodName = $this->getActionMethodName($actionId);
 		// reflect the service 
 		$reflectionClass = new ReflectionClass($this->_serviceClass);
 		$reflectionMethod = $reflectionClass->getMethod($methodName);
@@ -192,7 +209,7 @@ class KalturaServiceReflector
 			throw new Exception("Action [$actionName] does not exists for service [$this->_serviceId]");
 			
 		$actionId = strtolower($actionName);
-		$methodName = $this->_actions[$actionId];
+		$methodName = $this->getActionMethodName($actionId);
 		
 		// reflect the service 
 		$reflectionClass = new ReflectionClass($this->_serviceClass);
@@ -254,7 +271,7 @@ class KalturaServiceReflector
 			throw new Exception("Action [$actionName] does not exists for service [$this->_serviceId]");
 
 		$actionId = strtolower($actionName);
-		$methodName = $this->_actions[$actionId];
+		$methodName = $this->getActionMethodName($actionId);
 		
 		// reflect the service
 		$reflectionClass = new ReflectionClass($this->_serviceClass);
@@ -271,7 +288,7 @@ class KalturaServiceReflector
 	public function invoke($actionName, $arguments)
 	{
 	    $actionId = strtolower($actionName);
-		$methodName = $this->_actions[$actionId];
+		$methodName = $this->getActionMethodName($actionId);
 		$instance = $this->getServiceInstance();
 		return call_user_func_array(array($instance, $methodName), $arguments);
 	}
@@ -294,6 +311,9 @@ class KalturaServiceReflector
 	public function removeAction($actionName)
 	{
 		$actionId = strtolower($actionName);
-		unset($this->_actions[$actionId]);
+		if(isset($this->_actions[0]) && isset($this->_actions[0][$actionId]))
+			unset($this->_actions[0][$actionId]);
+		if(isset($this->_actions[1]) && isset($this->_actions[1][$actionId]))
+			unset($this->_actions[1][$actionId]);
 	}
 }
