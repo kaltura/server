@@ -2,7 +2,7 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions
+class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'dropFolder';
 	
@@ -34,5 +34,59 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		);
 		return $map;
 	}
+	
+	/**
+	 * @param string $baseClass
+	 * @param string $enumValue
+	 * @param array $constructorArgs
+	 * @return object
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{			
+		if ($baseClass == 'DropFolderFileHandler')
+		{
+			if ($enumValue == DropFolderFileHandlerType::CONTENT)
+			{
+				return new ContentDropFolderFileHandler();
+			}
+			if ($enumValue == DropFolderFileHandlerType::CSV)
+			{
+				return new CsvDropFolderFileHandler();
+			}
+			if ($enumValue == DropFolderFileHandlerType::XML)
+			{
+				return new XmlDropFolderFileHandler();
+			}
+		}
+			
+		return null;
+	}
+	
+	/**
+	 * @param string $baseClass
+	 * @param string $enumValue
+	 * @return string
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{			
+		if ($baseClass == 'DropFolderFileHandler')
+		{
+			if ($enumValue == DropFolderFileHandlerType::CONTENT)
+			{
+				return 'ContentDropFolderFileHandler';
+			}
+			if ($enumValue == DropFolderFileHandlerType::CSV)
+			{
+				return 'CsvDropFolderFileHandler';
+			}
+			if ($enumValue == DropFolderFileHandlerType::XML)
+			{
+				return 'XmlDropFolderFileHandler';
+			}
+		}
+		
+		return null;
+	}
+	
 
 }

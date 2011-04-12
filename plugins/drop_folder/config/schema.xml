@@ -12,8 +12,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_delete_policy" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="unmatched_file_policy" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="type" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="slug_field" type="varchar" size="500" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="slug_regex" type="varchar" size="100" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />		

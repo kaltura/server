@@ -48,8 +48,6 @@ class DropFolderTableMap extends TableMap {
 		$this->addColumn('FILE_DELETE_POLICY', 'FileDeletePolicy', 'INTEGER', false, null, null);
 		$this->addColumn('UNMATCHED_FILE_POLICY', 'UnmatchedFilePolicy', 'INTEGER', false, null, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, null);
-		$this->addColumn('SLUG_FIELD', 'SlugField', 'VARCHAR', false, 500, null);
-		$this->addColumn('SLUG_REGEX', 'SlugRegex', 'VARCHAR', false, 100, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

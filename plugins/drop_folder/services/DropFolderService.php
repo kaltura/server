@@ -44,33 +44,18 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0);
 		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0);
 		
-		self::errorIfDcNotExists($dropFolder->dc);
-		
-		DropFolderPeer::setUseCriteriaFilter(false);
-		$existingDropFolder = DropFolderPeer::getByDcAndPath($dropFolder->dc, $dropFolder->path);
-		DropFolderPeer::setUseCriteriaFilter(true);
-		if ($existingDropFolder) {
-			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path, $dropFolder->dc);
-		}
-		
-		// set default values where null		
-		if (is_null($dropFolder->fileSizeCheckInterval)) {
-			$dropFolder->fileSizeCheckInterval = DropFolder::FILE_SIZE_CHECK_INTERNAL_DEFAULT_VALUE;
-		}
-		
-		if (is_null($dropFolder->unmatchedFilePolicy)) {
-			$dropFolder->unmatchedFilePolicy = DropFolderUnmatchedFilesPolicy::ADD_AS_ENTRY;
-		}
-		
-		if (is_null($dropFolder->fileDeletePolicy)) {
-			$dropFolder->fileDeletePolicy = DropFolderFileDeletePolicy::MANUAL_DELETE;
-		}
-		
-		if (is_null($dropFolder->autoFileDeleteDays)) {
-			$dropFolder->autoFileDeleteDays = DropFolder::AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE;
-		}
-		
 		// validate values
+		
+		if (!kDataCenterMgr::dcExists($dropFolder->dc)) {
+			throw new KalturaAPIException(KalturaErrors::DATA_CENTER_ID_NOT_FOUND, $dropFolder->dc);
+		}
+				
+		$existingDropFolder = DropFolderPeer::retrieveByPathNoFilters($dropFolder->path);
+		if ($existingDropFolder) {
+			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
+		}
+		
+		
 		if (!is_null($dropFolder->ingestionProfileId)) {
 			$conversionProfileDb = conversionProfile2Peer::retrieveByPK($dropFolder->ingestionProfileId);
 			if (!$conversionProfileDb) {
@@ -134,16 +119,20 @@ class DropFolderService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
 		}
 		
-		if (!is_null($dropFolder->dc)) {
-			self::errorIfDcNotExists($dropFolder->dc);
+		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0);
+		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0);
+		
+		if (!is_null($dropFolder->path)) {
+			$existingDropFolder = DropFolderPeer::retrieveByPathNoFilters($dropFolder->path);
+			if ($existingDropFolder) {
+				throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
+			}
 		}
 		
-		if (!is_null($dropFolder->fileSizeCheckInterval)) {
-			$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0);
-		}
-
-		if (!is_null($dropFolder->autoFileDeleteDays)) {
-			$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0);
+		if (!is_null($dropFolder->dc)) {
+			if (!kDataCenterMgr::dcExists($dropFolder->dc)) {
+				throw new KalturaAPIException(KalturaErrors::DATA_CENTER_ID_NOT_FOUND, $dropFolder->dc);
+			}
 		}
 		
 		if (!is_null($dropFolder->ingestionProfileId)) {
@@ -216,16 +205,6 @@ class DropFolderService extends KalturaBaseService
 		$response->totalCount = $count;
 		
 		return $response;
-	}
-	
-	
-	private static function errorIfDcNotExists($dcId)
-	{
-		try { $tempDc = kDataCenterMgr::getDcById($dcId); }
-		catch (Exception $e) { $tempDc = null; }
-		if (!$tempDc) {
-			throw new KalturaAPIException(KalturaErrors::DATA_CENTER_ID_NOT_FOUND, $dcId);
-		}
 	}
 	
 }

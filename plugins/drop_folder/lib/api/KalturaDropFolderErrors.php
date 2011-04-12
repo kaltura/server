@@ -13,5 +13,5 @@ class KalturaDropFolderErrors extends KalturaErrors
 	
 	const DROP_FOLDER_PARTNER_ID_NO_MATCH = "DROP_FOLDER_PARTNER_ID_NO_MATCH,Drop folder [%s] partner id does not match drop folder file partner id [%s]";
 	
-	const DROP_FOLDER_ALREADY_EXISTS = "DROP_FOLDER_ALREADY_EXISTS,Drop folder with path [%s] already exists on data center [%s]";
+	const DROP_FOLDER_ALREADY_EXISTS = "DROP_FOLDER_ALREADY_EXISTS,Drop folder with path [%s] already exists";
 }

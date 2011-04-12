@@ -23,8 +23,6 @@ CREATE TABLE `drop_folder`
 	`file_delete_policy` INTEGER,
 	`unmatched_file_policy` INTEGER,
 	`type` INTEGER  NOT NULL,
-	`slug_field` VARCHAR(500),
-	`slug_regex` VARCHAR(100),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,

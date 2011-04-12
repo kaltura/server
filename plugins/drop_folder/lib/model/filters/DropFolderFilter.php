@@ -22,8 +22,6 @@ class DropFolderFilter extends baseObjectFilter
 			"_eq_dc",
 			"_in_dc",
 			"_like_path",
-			"_like_slug_field",
-			"_like_slug_regex",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_gte_updated_at",

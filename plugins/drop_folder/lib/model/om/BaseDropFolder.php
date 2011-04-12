@@ -86,18 +86,6 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $type;
 
 	/**
-	 * The value for the slug_field field.
-	 * @var        string
-	 */
-	protected $slug_field;
-
-	/**
-	 * The value for the slug_regex field.
-	 * @var        string
-	 */
-	protected $slug_regex;
-
-	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -251,26 +239,6 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	public function getType()
 	{
 		return $this->type;
-	}
-
-	/**
-	 * Get the [slug_field] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSlugField()
-	{
-		return $this->slug_field;
-	}
-
-	/**
-	 * Get the [slug_regex] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSlugRegex()
-	{
-		return $this->slug_regex;
 	}
 
 	/**
@@ -617,52 +585,6 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	} // setType()
 
 	/**
-	 * Set the value of [slug_field] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     DropFolder The current object (for fluent API support)
-	 */
-	public function setSlugField($v)
-	{
-		if(!isset($this->oldColumnsValues[DropFolderPeer::SLUG_FIELD]))
-			$this->oldColumnsValues[DropFolderPeer::SLUG_FIELD] = $this->slug_field;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->slug_field !== $v) {
-			$this->slug_field = $v;
-			$this->modifiedColumns[] = DropFolderPeer::SLUG_FIELD;
-		}
-
-		return $this;
-	} // setSlugField()
-
-	/**
-	 * Set the value of [slug_regex] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     DropFolder The current object (for fluent API support)
-	 */
-	public function setSlugRegex($v)
-	{
-		if(!isset($this->oldColumnsValues[DropFolderPeer::SLUG_REGEX]))
-			$this->oldColumnsValues[DropFolderPeer::SLUG_REGEX] = $this->slug_regex;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->slug_regex !== $v) {
-			$this->slug_regex = $v;
-			$this->modifiedColumns[] = DropFolderPeer::SLUG_REGEX;
-		}
-
-		return $this;
-	} // setSlugRegex()
-
-	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -823,11 +745,9 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$this->file_delete_policy = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->unmatched_file_policy = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->slug_field = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->slug_regex = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->created_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->updated_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -837,7 +757,7 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 16; // 16 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 14; // 14 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolder object", $e);
@@ -1278,18 +1198,12 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				return $this->getType();
 				break;
 			case 11:
-				return $this->getSlugField();
-				break;
-			case 12:
-				return $this->getSlugRegex();
-				break;
-			case 13:
 				return $this->getCreatedAt();
 				break;
-			case 14:
+			case 12:
 				return $this->getUpdatedAt();
 				break;
-			case 15:
+			case 13:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1324,11 +1238,9 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$keys[8] => $this->getFileDeletePolicy(),
 			$keys[9] => $this->getUnmatchedFilePolicy(),
 			$keys[10] => $this->getType(),
-			$keys[11] => $this->getSlugField(),
-			$keys[12] => $this->getSlugRegex(),
-			$keys[13] => $this->getCreatedAt(),
-			$keys[14] => $this->getUpdatedAt(),
-			$keys[15] => $this->getCustomData(),
+			$keys[11] => $this->getCreatedAt(),
+			$keys[12] => $this->getUpdatedAt(),
+			$keys[13] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1394,18 +1306,12 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				$this->setType($value);
 				break;
 			case 11:
-				$this->setSlugField($value);
-				break;
-			case 12:
-				$this->setSlugRegex($value);
-				break;
-			case 13:
 				$this->setCreatedAt($value);
 				break;
-			case 14:
+			case 12:
 				$this->setUpdatedAt($value);
 				break;
-			case 15:
+			case 13:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1443,11 +1349,9 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setFileDeletePolicy($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setUnmatchedFilePolicy($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setType($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setSlugField($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setSlugRegex($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
 	}
 
 	/**
@@ -1470,8 +1374,6 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderPeer::FILE_DELETE_POLICY)) $criteria->add(DropFolderPeer::FILE_DELETE_POLICY, $this->file_delete_policy);
 		if ($this->isColumnModified(DropFolderPeer::UNMATCHED_FILE_POLICY)) $criteria->add(DropFolderPeer::UNMATCHED_FILE_POLICY, $this->unmatched_file_policy);
 		if ($this->isColumnModified(DropFolderPeer::TYPE)) $criteria->add(DropFolderPeer::TYPE, $this->type);
-		if ($this->isColumnModified(DropFolderPeer::SLUG_FIELD)) $criteria->add(DropFolderPeer::SLUG_FIELD, $this->slug_field);
-		if ($this->isColumnModified(DropFolderPeer::SLUG_REGEX)) $criteria->add(DropFolderPeer::SLUG_REGEX, $this->slug_regex);
 		if ($this->isColumnModified(DropFolderPeer::CREATED_AT)) $criteria->add(DropFolderPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DropFolderPeer::UPDATED_AT)) $criteria->add(DropFolderPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(DropFolderPeer::CUSTOM_DATA)) $criteria->add(DropFolderPeer::CUSTOM_DATA, $this->custom_data);
@@ -1548,10 +1450,6 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		$copyObj->setUnmatchedFilePolicy($this->unmatched_file_policy);
 
 		$copyObj->setType($this->type);
-
-		$copyObj->setSlugField($this->slug_field);
-
-		$copyObj->setSlugRegex($this->slug_regex);
 
 		$copyObj->setCreatedAt($this->created_at);
 

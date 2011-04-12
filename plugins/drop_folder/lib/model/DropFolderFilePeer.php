@@ -16,6 +16,19 @@
 class DropFolderFilePeer extends BaseDropFolderFilePeer
 {
 
+	public static function setDefaultCriteriaFilter ()
+	{
+		parent::setDefaultCriteriaFilter();
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( self::STATUS, DropFolderFileStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
 	
 	public static function retrieveByDropFolderIdAndFileName($dropFolderId, $fileName)
 	{

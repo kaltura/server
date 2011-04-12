@@ -16,12 +16,34 @@
 class DropFolderPeer extends BaseDropFolderPeer
 {
 	
-	public static function getByDcAndPath($dcId, $path)
+	public static function setDefaultCriteriaFilter ()
+	{
+		parent::setDefaultCriteriaFilter();
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( self::STATUS, DropFolderStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
+	
+	public static function retrieveByPath($path)
 	{
 		$c = new Criteria();
-		$c->addAnd(DropFolderPeer::DC, $dcId, Criteria::EQUAL);
 		$c->addAnd(DropFolderPeer::PATH, $path, Criteria::EQUAL);
 		return DropFolderPeer::doSelectOne($c);
-	}	
+	}
+	
+	public static function retrieveByPathNoFilters($path)
+	{
+		DropFolderPeer::setUseCriteriaFilter(false);
+		$dropFolder = self::retrieveByPath($path);
+		DropFolderPeer::setUseCriteriaFilter(true);
+		return $dropFolder;
+	}
+	
 
 } // DropFolderPeer

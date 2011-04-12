@@ -22,8 +22,6 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 		"dcEqual" => "_eq_dc",
 		"dcIn" => "_in_dc",
 		"pathLike" => "_like_path",
-		"slugFieldLike" => "_like_slug_field",
-		"slugRegexLike" => "_like_slug_regex",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -150,20 +148,6 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $pathLike;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $slugFieldLike;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $slugRegexLike;
 
 	/**
 	 * 

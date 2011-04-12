@@ -61,18 +61,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public $path;
 	
 	/**
-	 * @var string
-	 * @filter like
-	 */
-	public $slugField;
-	
-	/**
-	 * @var string
-	 * @filter like
-	 */
-	public $slugRegex;
-	
-	/**
 	 * @var int
 	 */
 	public $fileSizeCheckInterval;
@@ -93,6 +81,12 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public $autoFileDeleteDays;
 	
 	/**
+	 * KalturaDropFolderFileHandlerConfigArray
+	 * @requiresPermission read
+	 */
+	public $fileHandlersConfig;	
+	
+	/**
 	 * @var int
 	 * @readonly
 	 * @filter gte,lte,order
@@ -105,11 +99,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
-	
-	
-	
-	//TODO: fileHandlersConfig - should have a defined class ?
-	//$fileHandlersConfig	
 
 	
 	/*
@@ -125,12 +114,11 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'ingestionProfileId' => 'conversionProfileId',
 		'dc',
 		'path',
-		'slugField',
-		'slugRegex',
 		'fileSizeCheckInterval',
 		'unmatchedFilePolicy',
 		'fileDeletePolicy',
 		'autoFileDeleteDays',
+		'fileHandlersConfig',
 		'createdAt',
 		'updatedAt',
 	 );
