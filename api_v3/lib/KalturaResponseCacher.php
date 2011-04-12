@@ -19,12 +19,15 @@ class KalturaResponseCacher
 	public function __construct($params = null, $cacheDirectory = null, $expiry = 0)
 	{
 		self::$_useCache = kConf::get('enable_cache');
-		$this->_cacheDirectory = $cacheDirectory ? $cacheDirectory : 
-			rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		
+
 		if ($expiry)
 			$this->_expiry = $expiry;
 			
+		$this->_cacheDirectory = $cacheDirectory ? $cacheDirectory : 
+			rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		
+		$this->_cacheDirectory .= "cache_v3-$this->_expiry . DIRECTORY_SEPARATOR;
+		
 		if (!self::$_useCache)
 			return;
 			
