@@ -21,17 +21,15 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	const REMOTE_FILE_NOT_FOUND = 61;
 	const REMOTE_DOWNLOAD_FAILED = 62;
 	
-	const CSV_FILE_NOT_FOUND = 71;
+	//Bulk upload exceptions
+	const BULK_FILE_NOT_FOUND = 71;
+	const BULK_VALIDATION_FAILED = 72;
+	const BULK_PARSE_ITEMS_FAILED = 73;
+	const BULK_UNKNOWN_ERROR = 74;
+	const BULK_INVLAID_BULK_REQUEST_COUNT = 75;
 	
 	const CONVERSION_FAILED = 81;
 	
 	const THUMBNAIL_NOT_CREATED = 91;
 	
-	//Bulk upload exceptions
-	const BULK_VALIDATION_FAILED = 101;
-	const BULK_PARSE_ITEMS_FAILED = 102;
-	const BULK_FILE_NOT_FOUND = 103;
-	const BULK_UNKNOWN_ERROR = 104;
-	const BULK_INVLAID_BULK_REQUEST_COUNT = 105;
-	const BULK_ENGINE_NOT_FOUND = 106;
 }
