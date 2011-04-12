@@ -50,10 +50,7 @@ class KAsyncBulkUpload extends KBatchBase {
 		foreach ( $jobs as $job ) 
 		{
 			try {
-				$job = $this->startBulkUpload ( $job, $job->data );
-				
-				// the closer will report finished after checking the imports and converts, reports almost done
-				$jobResults[] = $this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE);
+				$jobResults[] = $this->startBulkUpload($job);
 			}
 			catch (KalturaBulkUploadAbortedException $abortedException)
 			{
@@ -83,18 +80,21 @@ class KAsyncBulkUpload extends KBatchBase {
 	 * @param KalturaBatchJob $job
 	 * @param KalturaBulkUploadJobData $bulkUploadJobData
 	 */
-	private function startBulkUpload(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData) {
+	private function startBulkUpload(KalturaBatchJob $job)
+	{
 		KalturaLog::debug ( "startBulkUpload($job->id)" );
 		
 		//Gets the right Engine instance 
-		$engine = KBulkUploadEngine::getEngine($job->jobSubType, $this->taskConfig, $this->kClient);
+		$engine = KBulkUploadEngine::getEngine($job->jobSubType, $this->taskConfig, $this->kClient, $job);
 		if (is_null ( $engine )) {
 			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND );
 		}
 
-		$engine->handleBulkUpload ( $job, $bulkUploadJobData );
+		$engine->handleBulkUpload();
+		$job = $engine->getJob();
+		$data = $engine->getData();
 
-		return $job;
+		return $this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE, $data);
 	}
 	
 	/**

@@ -21,20 +21,32 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	const VALUES_COUNT_V2 = 12;
 	
+	/**
+	 * @var int
+	 */
 	protected $lineNumber = 0;
-	protected $startLineNumber = 0;
+	
+	/**
+	 * @var KalturaBulkUploadCsvVersion
+	 */
 	protected $csvVersion = KalturaBulkUploadCsvVersion::V1;
 
-	/**
-	 * @param KSchedularTaskConfig $taskConfig
-	 * @param KalturaClient $kClient - the client for the engine to use
-	 */
-	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient )
+	public function handleBulkUpload()
 	{
-		parent::__construct($taskConfig, $kClient);
-		KalturaLog::debug("Created new KBulkUploadEngineCsv");
-	}
+		//TODO: Roni create the flow:
+		//0. Init - maybe even give client :)
+		//1. Validate - even if empty
+		//2. Parse rows
+		//3. Close
+		
+		$this->init();
 	
+		$isValid = $this->parse();
+		if(!$isValid)
+		{
+			throw new KalturaException("Parse rows failed on job [$this->job->id]", KalturaBatchJobAppErrors::BULK_PARSE_ITEMS_FAILED);
+		}
+	}
 	
 	/**
 	 * @param array $fields
@@ -179,28 +191,14 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		return preg_match("/$strRegex/i", $str);
 	}
 	
-	/**
-	 * (non-PHPdoc)
-	 * @see KBulkUploadEngine::validate()
-	 */
-	public function validate(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
+	public function parse()
 	{
-		//TODO: add validation for CSV - take from the parse
-		return true;
-	}
-	
-	/**
-	 * (non-PHPdoc)
-	 * @see KBulkUploadEngine::parse()
-	 */
-	public function parse(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
-	{
-		$fileHandle = $this->getFileHandle($job, $data);
+		$fileHandle = $this->getFileHandle();
 		$values = fgetcsv($fileHandle);
 		
 		while($values)
 		{
-			$this->sendChunkedData($job);
+			$this->sendChunkedData();
 					
 			// use version 3 (dynamic columns cassiopeia) identified by * in first char
 			if(substr(trim($values[0]), 0, 1) == '*') // is a remark
@@ -221,7 +219,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			$this->lineNumber ++;
 			
 			// creates a result object
-			$bulkUploadResult =  $this->createUploadResult($job, $this->lineNumber, $values, $columns);
+			$bulkUploadResult =  $this->createUploadResult($this->lineNumber, $values, $columns);
 				    		    
 		    if(is_null($bulkUploadResult))
 		    {
@@ -242,7 +240,6 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 		KalturaLog::info("Sent $this->multiRequestCounter invalid lines results");
 		KalturaLog::info("CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($bulkUploadResults)) . ' invalid records');
-		$bulkUploadJobData->csvVersion = $this->csvVersion;
 		
 		// reports that the parsing done
 		$msg = "CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($bulkUploadResults)) . ' invalid records';
@@ -250,47 +247,45 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$updateData->csvVersion = $this->csvVersion;
 				
 		// check if job aborted
-		if($this->isAborted($job))
-		{
-			ini_set('auto_detect_line_endings', false);
-			throw new KalturaBulkUploadAbortedException("Job was aborted", KalturaBulkUploadAbortedException::ABORTED); //The job swas aborted
-		}
+		$this->checkAborted();
 
 		//Create the entries from the bulk upload results
-		$isValid = $this->createEntries($bulkUploadResults, $job, $data, $this->multiRequestCounter);
+		$isValid = $this->createEntries($bulkUploadResults, $this->multiRequestCounter);
 		
 		return true;
+	}
+	
+	/**
+	 * 
+	 * Gets the job and job data and returns the file to be opened
+	 */
+	protected function getFileHandle()
+	{
+		$filePath = $this->data->filePath;
+		$fileHandle = fopen($filePath, "r");
+		if(! $fileHandle) // fails and exit
+			throw new KalturaException("Unable to open file: {$filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
+					
+		KalturaLog::info("Opened file: $filePath");
+		return $fileHandle;
 	}
 	
 	/**
 	 * (non-PHPdoc)
 	 * @see KBulkUploadEngine::init()
 	 */
-	public function init(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
+	public function init()
 	{
 		//to support EOF of mac files
 		ini_set('auto_detect_line_endings', true);
-		$this->currentPartnerId = $job->partnerId;
+		$this->currentPartnerId = $this->job->partnerId;
 		$this->multiRequestCounter = 0;
 				
 		// opens the csv file
-		$fileHandle = $this->getFileHandle($job, $data);
-		$this->startLineNumber = $this->getStartLineNumber($job->id);
-		$this->lineNumber = 0;
+		$this->lineNumber = $this->getStartLineNumber($this->job->id);
 		
 		$this->bulkUploadResults = array();
 	 
-		return true;
-	}
-	
-	/**
-	 * 
-	 * Closes the engine with the needed params of the batch job 
-	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadCsvJobData $data
-	 */
-	public function close(KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
-	{
 		return true;
 	}
 	
@@ -303,49 +298,38 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see KBulkUploadEngine::HandleBulkUpload()
-	 */
-	public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadCsvJobData $data )
-	{
-		//Add logic here from old bulk upload
-		parent::handleBulkUpload($job, $data);
-	}
-
-	/**
 	 * 
 	 * Create the entries from the given bulk upload results
 	 * @param array $bulkUploadResults
 	 * @param array $bulkUploadResultChunk
-	 * @param KalturaBatchJob $job
 	 */
-	protected function createEntries(array $bulkUploadResults, KalturaBatchJob $job, KalturaBulkUploadCsvJobData $bulkUploadJobData)
+	protected function createEntries(array $bulkUploadResults)
 	{
 		// start a multi request for add entries
 		$this->startMultiRequest(true);
 		$multiRequestCounter = 0;
 		
-		KalturaLog::info("job[$job->id] start creating entries");
+		KalturaLog::info("job[$this->job->id] start creating entries");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
 				
 		foreach($bulkUploadResults as $bulkUploadResult)
 		{
-			$this->sendChunkedDataForPartner($job, &$bulkUploadResultChunk);
+			$this->sendChunkedDataForPartner($this->job, &$bulkUploadResultChunk);
 						
-			$mediaEntry = $this->createMediaEntryFromResultAndJobData($bulkUploadResult, $bulkUploadJobData);
+			$mediaEntry = $this->createMediaEntryFromResultAndJobData($bulkUploadResult);
 					
 			$bulkUploadResultChunk[] = $bulkUploadResult;
 			
 			$resource = new KalturaBulkResource();
 			$resource->url = $bulkUploadResult->url;
-			$resource->bulkUploadId = $job->id;
+			$resource->bulkUploadId = $this->job->id;
 			$this->kClient->media->add($mediaEntry, $resource);
 			$this->multiRequestCounter ++;
 		}
 		
 		// commit the multi request entries
 		$requestResults = $this->doMultiRequestForPartnerId();
-		KalturaLog::info("job[$job->id] finish creating entries");
+		KalturaLog::info("job[$this->job->id] finish creating entries");
 	
 		if(count($requestResults) != count($bulkUploadResultChunk))
 		{
@@ -366,20 +350,19 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 * 
 	 * Creates and returns a new media entry for the given job data and bulk upload result object
 	 * @param unknown_type $bulkUploadResult
-	 * @param KalturaBulkUploadCsvJobData $bulkUploadJobData
 	 */
-	protected function createMediaEntryFromResultAndJobData($bulkUploadResult, KalturaBulkUploadCsvJobData $bulkUploadJobData)
+	protected function createMediaEntryFromResultAndJobData($bulkUploadResult)
 	{
 		//Create the new media entry and set basic values
 		$mediaEntry = new KalturaMediaEntry();
 		$mediaEntry->name = $bulkUploadResult->title;
 		$mediaEntry->description = $bulkUploadResult->description;
 		$mediaEntry->tags = $bulkUploadResult->tags;
-		$mediaEntry->userId = $bulkUploadJobData->userId;
-		$mediaEntry->conversionQuality = $bulkUploadJobData->conversionProfileId;
+		$mediaEntry->userId = $this->data->userId;
+		$mediaEntry->conversionQuality = $this->data->conversionProfileId;
 		
 		//Set values for V1 csv
-		if($bulkUploadJobData->csvVersion> KalturaBulkUploadCsvVersion::V1)
+		if($this->data->csvVersion> KalturaBulkUploadCsvVersion::V1)
 		{
 			if($bulkUploadResult->conversionProfileId)
 		    	$mediaEntry->conversionQuality = $bulkUploadResult->conversionProfileId;
@@ -425,17 +408,16 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	/**
 	 * 
 	 * Creates a new upload result object from the given parameters
-	 * @param KalturaBatchJob $job
 	 * @param int $lineNumber
 	 * @param array $values
 	 * @param array $columns
 	 */
-	protected function createUploadResult(KalturaBatchJob $job, $lineNumber, $values, $columns)
+	protected function createUploadResult($lineNumber, $values, $columns)
 	{
 		$bulkUploadResult = new KalturaBulkUploadResult();
-		$bulkUploadResult->bulkUploadJobId = $job->id;
+		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		$bulkUploadResult->lineIndex = $lineNumber;
-		$bulkUploadResult->partnerId = $job->partnerId;
+		$bulkUploadResult->partnerId = $this->job->partnerId;
 		$bulkUploadResult->rowData = join(',', $values);
 				
 		// check variables count
@@ -539,9 +521,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected function checkErrors($lineNumber, $bulkUploadResult, $scheduleStartDate, $scheduleEndDate)
 	{
 		$isValid = false;
-		$maxRecords = $this->taskConfig->params->maxRecords;
 		
-		if($lineNumber > $maxRecords) // check max records
+		if($lineNumber > $this->maxRecords) // check max records
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 			$bulkUploadResult->errorDescription = "Exeeded max records count per bulk";

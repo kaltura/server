@@ -194,10 +194,13 @@ class KalturaBatchJobAppErrors
 	const ENGINE_NOT_FOUND = 51;
 	const REMOTE_FILE_NOT_FOUND = 61;
 	const REMOTE_DOWNLOAD_FAILED = 62;
-	const CSV_FILE_NOT_FOUND = 71;
+	const BULK_FILE_NOT_FOUND = 71;
+	const BULK_VALIDATION_FAILED = 72;
+	const BULK_PARSE_ITEMS_FAILED = 73;
+	const BULK_UNKNOWN_ERROR = 74;
+	const BULK_INVLAID_BULK_REQUEST_COUNT = 75;
 	const CONVERSION_FAILED = 81;
 	const THUMBNAIL_NOT_CREATED = 91;
-	const JOB_ABORTED = 101;
 }
 
 /**
@@ -325,20 +328,8 @@ class KalturaBitRateMode
  * @package Scheduler
  * @subpackage Client
  */
-class KalturaBulkUploadCsvVersion
-{
-	const V1 = "1";
-	const V2 = "2";
-	const V3 = "3";
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
 class KalturaBulkUploadType
 {
-	const CSV = "bulkUploadCsvEngine.CSV";
 }
 
 /**

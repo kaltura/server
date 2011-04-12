@@ -5019,14 +5019,6 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 *
 	 * @var string
 	 */
-	public $csvFilePath = null;
-
-	/**
-	 * Created by the API
-	 * 
-	 *
-	 * @var string
-	 */
 	public $resultsFileLocalPath = null;
 
 	/**
@@ -5046,12 +5038,11 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	public $numOfEntries = null;
 
 	/**
-	 * The version of the csv file
-	 * 
+	 * The bulk upload file path
 	 *
-	 * @var KalturaBulkUploadCsvVersion
+	 * @var string
 	 */
-	public $csvVersion = null;
+	public $filePath = null;
 
 
 }
@@ -5223,7 +5214,7 @@ class KalturaThumbParams extends KalturaAssetParams
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var float
 	 */
 	public $videoOffset = null;
 

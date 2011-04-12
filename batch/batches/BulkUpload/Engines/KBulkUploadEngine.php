@@ -23,9 +23,14 @@ abstract class KBulkUploadEngine
 	protected $kClientConfig = null;
 		
 	/**
-	 * @var KSchedularTaskConfig
+	 * @var int
 	 */
-	protected $taskConfig = null;
+	protected $multiRequestSize = 5;
+	
+	/**
+	 * @var int
+	 */
+	protected $maxRecords = 1000;
 
 	/**
 	 * 
@@ -42,6 +47,18 @@ abstract class KBulkUploadEngine
 	protected $multiRequestCounter = 0;
 	
 	/**
+	 * 
+	 * @var KalturaBatchJob
+	 */
+	protected $job = null;
+	
+	/**
+	 * 
+	 * @var KalturaBulkUploadJobData
+	 */
+	protected $data = null;
+	
+	/**
 	 * Will return the proper engine depending on the type (KalturaBulkUploadType)
 	 *
 	 * @param int $provider
@@ -49,12 +66,12 @@ abstract class KBulkUploadEngine
 	 * @param KalturaClient kClient - the client for the engine to use
 	 * @return KBulkUploadEngine
 	 */
-	public static function getEngine ( $batchJobSubType , KSchedularTaskConfig $taskConfig, $kClient)
+	public static function getEngine($batchJobSubType, KSchedularTaskConfig $taskConfig, $kClient, KalturaBatchJob $job)
 	{
 		$engine =  null;
 		
 		//Gets the engine from the plugin (as we moved all engines to the plugin)
-		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient));
+		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $job));
 						
 		return $engine;
 	}
@@ -62,93 +79,35 @@ abstract class KBulkUploadEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient)
+	protected function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
 	{
-		$this->taskConfig = $taskConfig;
+		$this->multiRequestSize = $taskConfig->params->multiRequestSize;
+		$this->maxRecords = $taskConfig->params->maxRecords;
+		
 		$this->kClient = $kClient;
-		//TODO: is this neccessary for creating a multirequest for partner??
 		$this->kClientConfig = $kClient->getConfig();
+		
+		$this->job = $job;
+		$this->data = $job->data;
 	}
 	
 	/**
-	 * @return string
+	 * @return KalturaBatchJob
 	 */
-	abstract public function getName();
-	
-	/**
-	 * 
-	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $data
-	 * @return KBulkUploadEningeResult
-	 */
-	public function handleBulkUpload( KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function getJob()
 	{
-		//TODO: Roni create the flow:
-		//0. Init - maybe even give client :)
-		//1. Validate - even if empty
-		//2. Parse rows
-		//3. Close
-		
-		$this->init($job, $data);
-	
-		$isValid = $this->validate($job, $data);
-		if(!$isValid)
-		{
-			throw new KalturaException("Validation failed on job [$job->id]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
-		}
-		
-		$isValid = $this->parse($job, $data);
-		if(!$isValid)
-		{
-			throw new KalturaException("Parse rows failed on job [$job->id]", KalturaBatchJobAppErrors::BULK_PARSE_ITEMS_FAILED);
-		}
-		
-		$this->close($job, $data);
+		return $this->job;
 	}
 
 	/**
-	 * 
-	 * Validates the given file for the job
-	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $data
+	 * @return KalturaBulkUploadJobData
 	 */
-	protected function validate(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
+	public function getData()
 	{
-		return true;
+		return $this->data;
 	}
-	
-	/**
-	 * 
-	 * Parse the rows of the given bulk job file and perform the needed actions
-	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $data
-	 */
-	protected function parse(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
-	{
-		return true;
-	}
-	
-	/**
-	 * 
-	 * Inits the engine with the needed params of the batch job 
-	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $data
-	 */
-	protected function init(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
-	{
-		return true;
-	}
-		
-	/**
-	 * 
-	 * closes the engine with the needed params of the batch job 
-	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $data
-	 */
-	protected function close(KalturaBatchJob $job, KalturaBulkUploadJobData $data )
-	{
-		return true;
-	}
+
+	abstract public function handleBulkUpload();
 		
 	/**
 	 * @param string $item
@@ -169,50 +128,22 @@ abstract class KBulkUploadEngine
 		$bulkUploadResult->pluginsData = null;
 		$this->kClient->batch->addBulkUploadResult($bulkUploadResult, $pluginsData);
 	}
-	
-	/**
-	 * 
-	 * Gets the job and job data and returns the file to be opened
-	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $bulkUploadJobData
-	 */
-	protected function getFileHandle(KalturaBatchJob $job, KalturaBulkUploadJobData $bulkUploadJobData)
-	{
-		$fileHandle = fopen($bulkUploadJobData->filePath, "r");
-		
-		if(! $fileHandle) // fails and exit
-		{
-			//TODO: Roni - Add support for XML file
-			throw new KalturaException("Unable to open file: {$bulkUploadJobData->filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
-		}
-					
-		KalturaLog::info("Opened file: $bulkUploadJobData->filePath");
-		
-		return $fileHandle;
-	}
 
 	/**
 	 * 
 	 * Gets the start line number for the given job id
-	 * @param int $jobId
 	 * @return int - the start line for the job id
 	 */
-	protected function getStartLineNumber($jobId)
+	protected function getStartLineNumber()
 	{
-		//Get the last line number for the specific job id
-		$startLineNumber = 0;
-		$bulkUploadLastResult = null;
 		try{
-			$bulkUploadLastResult = $this->kClient->batch->getBulkUploadLastResult($jobId);
+			$bulkUploadLastResult = $this->kClient->batch->getBulkUploadLastResult($this->job->id);
+			return $bulkUploadLastResult->lineIndex;
 		}
 		catch(Exception $e){
 			KalturaLog::err("getBulkUploadLastResult: " . $e->getMessage());
+			return 0;
 		}
-		
-		if($bulkUploadLastResult)
-			$startLineNumber = $bulkUploadLastResult->lineIndex;
-		
-		return $startLineNumber;
 	}
 	
 	/**
@@ -221,22 +152,17 @@ abstract class KBulkUploadEngine
 	 * @return bool - true if the chunked data was sent, false if the data is not sent and ERROR on error
 	 * 
 	 */
-	protected function sendChunkedData(KalturaBatchJob $job)
+	protected function sendChunkedData()
 	{
-		$multiRequestSize = $this->taskConfig->params->multiRequestSize;
-
 		// send chunk of requests
-		if($this->multiRequestCounter >= $multiRequestSize)
+		if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 		{
 			$this->kClient->doMultiRequest();
 			
 			KalturaLog::info("Sent $this->multiRequestCounter invalid lines results");
 			
 			// check if job aborted
-			if($this->isAborted($job))
-			{
-				throw new KalturaBulkUploadAbortedException("Job was aborted", KalturaBulkUploadAbortedException::ABORTED); //The job was aborted
-			}
+			$this->isAborted();
 			
 			// start a new multi request
 			$this->kClient->startMultiRequest();
@@ -248,15 +174,12 @@ abstract class KBulkUploadEngine
 	/**
 	 * 
 	 * Gets the number of current multy request counter and decides if to send the chunked data or not
-	 * @param KalturaBatchJob $job
 	 * @param array $bulkUploadResultChunk
 	 */
-	protected function sendChunkedDataForPartner(KalturaBatchJob $job, array $bulkUploadResultChunk)
+	protected function sendChunkedDataForPartner(array $bulkUploadResultChunk)
 	{
-		$multiRequestSize = $this->taskConfig->params->multiRequestSize;
-		
 		// send chunk of requests
-		if($this->multiRequestCounter > $multiRequestSize)
+		if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 		{
 			// commit the multi request entries
 			$requestResults = $this->doMultiRequestForPartnerId();
@@ -271,10 +194,7 @@ abstract class KBulkUploadEngine
 			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 					
 			// check if job aborted
-			if($this->isAborted($job))
-			{
-				throw new KalturaBulkUploadAbortedException("Job was aborted", KalturaBulkUploadAbortedException::ABORTED); //The job was aborted
-			}
+			$this->checkAborted();
 			
 			// start a new multi request
 			$this->startMultiRequest(true);
@@ -355,25 +275,19 @@ abstract class KBulkUploadEngine
 		$this->kClient->doMultiRequest();
 	}
 	
-	/**
-	 * @param KalturaBatchJob $job
-	 * @return boolean
-	 */
-	protected function isAborted(KalturaBatchJob $job)
+	protected function checkAborted()
 	{
-		$batchJobResponse = $this->kClient->jobs->getBulkUploadStatus($job->id);
+		if($this->kClient->isMultiRequest())
+			$this->kClient->doMultiRequest();
+			
+		$batchJobResponse = $this->kClient->jobs->getBulkUploadStatus($this->job->id);
 		$updatedJob = $batchJobResponse->batchJob;
 		if($updatedJob->abort)
 		{
-			KalturaLog::info("job[$job->id] aborted");
-			
-			//Throw exception and close the job from the outside 
-			throw new Exception("Job was aborted", KalturaBatchJobAppErrors::ABORTED);
-			
-			if($this->kClient->isMultiRequest())
-				$this->kClient->doMultiRequest();
+			KalturaLog::info("job[{$this->job->id}] aborted");
 				
-			return true;
+			//Throw exception and close the job from the outside 
+			throw new KalturaBulkUploadAbortedException("Job was aborted", KalturaBulkUploadAbortedException::JOB_ABORTED);
 		}
 		return false;
 	}

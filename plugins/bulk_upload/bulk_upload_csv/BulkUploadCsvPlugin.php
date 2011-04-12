@@ -8,15 +8,6 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 
 	/**
 	 * 
-	 * Returns wheter this is the default plugin for the bulk upload (in case no bulk upload type was specified)
-	 */
-	public static function isDefaultEngine()
-	{
-		return true;
-	} 
-	
-	/**
-	 * 
 	 * Returns the plugin name
 	 */
 	public static function getPluginName()
@@ -47,25 +38,16 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		//Gets the right job for the engine	
-		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
-		{
-			if($enumValue == BulkUploadType::CSV)
-				return new kBulkUploadCsvJobData();
-		}
-		
-		if(class_exists('KalturaClient') && ($enumValue == null) && $baseClass == 'KalturaBulkUploadJobData')
-		{
-			return new kBulkUploadXmlJobData();
-		}
+		if($baseClass == 'kBulkUploadJobData' && (is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
+			return new kBulkUploadCsvJobData();
 		
 		//Gets the engine
 		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
 		{
-			if($enumValue == KalturaBulkUploadType::CSV)
+			if(is_null($enumValue) || $enumValue == KalturaBulkUploadType::CSV)
 			{
-				return new BulkUploadEngineCsv($constructorArgs[0], $constructorArgs[1], $constructorArgs[2]);
-//				$reflection = new ReflectionClass('BulkUploadEngineCsv');
-//				return $reflection->newInstance($constructorArgs);
+				list($taskConfig, $kClient, $job) = $constructorArgs;
+				return new BulkUploadEngineCsv($taskConfig, $kClient, $job);
 			}
 		}
 				
@@ -79,22 +61,6 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		//TODO: check if needed
-		//Gets the right job for the engine	
-		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
-		{
-			if($enumValue == BulkUploadType::CSV)
-				return 'kBulkUploadCsvJobData';
-		}
-		
-		//Gets the engine
-		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
-		{
-			if($enumValue == KalturaBulkUploadType::CSV)
-			{
-				return 'BulkUploadEngineCsv';
-			}
-		}
 		return null;
 	}
 	
