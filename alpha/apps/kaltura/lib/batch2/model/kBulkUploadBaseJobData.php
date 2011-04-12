@@ -30,27 +30,6 @@ class kBulkUploadBaseJobData extends kJobData
 	 * @var int
 	 */
 	private $numOfEntries;
-	
-	/**
-	 * 
-	 * The bulk type such as xml, csv
-	 * @var unknown_type
-	 */
-	private $bulkType;
-	
-	/**
-	 * @return the $bulkType
-	 */
-	public function getBulkType() {
-		return $this->bulkType;
-	}
-
-	/**
-	 * @param unknown_type $bulkType
-	 */
-	public function setBulkType($bulkType) {
-		$this->bulkType = $bulkType;
-	}
 
 	/**
 	 * @return the $userId

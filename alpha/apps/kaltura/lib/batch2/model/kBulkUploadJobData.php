@@ -20,6 +20,27 @@ class kBulkUploadJobData extends kBulkUploadBaseJobData
 	private $resultsFileUrl;
 
 	/**
+	 * 
+	 * The bulk upload job file path
+	 * @var string
+	 */
+	private $filePath;
+	
+	/**
+	 * @return the $filePath
+	 */
+	public function getFilePath() {
+		return $this->filePath;
+	}
+
+	/**
+	 * @param string $filePath
+	 */
+	public function setFilePath($filePath) {
+		$this->filePath = $filePath;
+	}
+
+	/**
 	 * @return the $resultsFileLocalPath
 	 */
 	public function getResultsFileLocalPath() {
