@@ -82,7 +82,8 @@ class addbulkuploadAction extends defPartnerservices2Action
 		}
 		catch(Exception $e)
 		{
-			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+			$this->addError(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+			return;
 		}
 		$csvPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
