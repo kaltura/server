@@ -45,6 +45,13 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 */
 	public $numOfEntries;
    
+	/**
+	 * 
+	 * The bulk upload file path
+	 * @var string
+	 */
+	public $filePath;
+	
 	private static $map_between_objects = array
 	(
 		"userId",
@@ -53,6 +60,7 @@ class KalturaBulkUploadJobData extends KalturaJobData
 		"resultsFileLocalPath",
 		"resultsFileUrl",
 		"numOfEntries",
+		"filePath"
 	);
 
 	public function getMapBetweenObjects ( )

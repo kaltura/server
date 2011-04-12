@@ -24,35 +24,33 @@ class BulkUploadService extends KalturaBaseService
 	 * @param file $csvFileData CSV File
 	 * @return KalturaBulkUpload
 	 */
-	function addAction($conversionProfileId, $csvFileData, $bulkUploadType = null)
+	function addAction($conversionProfileId, $fileData, $bulkUploadType = null)
 	{
 		// first we copy the file to "content/batchfiles/[partner_id]/"
-		$origFilename = $csvFileData["name"];
+		$origFilename = $fileData["name"];
 		$fileInfo = pathinfo($origFilename);
 		$extension = strtolower($fileInfo["extension"]);
-			
-		//TODO: Roni - Ask TanTan about the int type and the changes needed
+		
 		$job = new BatchJob();
 		$job->setPartnerId($this->getPartnerId());
 		$job->setJobSubType($bulkUploadType);
 		$job->save();
-		//TODO: Roni - add default BulkEngine plugin interface return CSV.
 		
 		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
 //		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 		try{
-			kFileSyncUtils::moveFromFile($csvFileData["tmp_name"], $syncKey, true);
+			kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey, true);
 		}
 		catch(Exception $e)
 		{
 			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
 		}
-		$csvPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		
+		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
 		$data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadType, array());
-		
-		$data = new KalturaBulkUploadJobData();
-		$data->csvFilePath = $csvPath;
+				
+		$data->filePath = $filePath;
 		$data->userId = $this->getKuser()->getPuserId();
 		$data->uploadedBy = $this->getKuser()->getScreenName();
 		if ($conversionProfileId === -1)
