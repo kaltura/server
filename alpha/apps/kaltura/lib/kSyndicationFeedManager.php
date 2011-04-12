@@ -49,7 +49,7 @@ class kSyndicationFeedManager
 		return self::$xsl;
 	}
 	
-		private static function getKalturaMrssXml($title, $link = null, $description = null)
+	private static function getKalturaMrssXml($title, $link = null, $description = null)
 	{
 		$mrss = kMrssManager::getMrssXml($title, $link, $description);
 		
@@ -97,7 +97,7 @@ class kSyndicationFeedManager
 	public static function getMrssHeader($title, $link = null, $description = null, syndicationFeed $syndicationFeed = null)
 	{
 		$mrss = self::getKalturaMrssXml($title, $link, $description);
-		
+	
 		if (!is_null($syndicationFeed) && ($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null(self::getXslt($syndicationFeed))))
 		{
 			$kalturaXslt = self::getKalturaMrssXslt(self::getXslt($syndicationFeed));
@@ -267,13 +267,15 @@ class kSyndicationFeedManager
 			KalturaLog::debug("Could not load xslt");
 			return null;
 		}
-
+		
+		error_reporting(0);
 		$proc = new XSLTProcessor;
 		$proc->registerPHPFunctions();
 		$proc->importStyleSheet($xsl);
 		
 		$xml = $proc->transformToDoc($xml);
 		$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
+		error_reporting(E_ALL);
 		
 		if(!$xml)
 		{
