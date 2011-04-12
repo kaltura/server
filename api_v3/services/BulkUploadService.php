@@ -22,56 +22,14 @@ class BulkUploadService extends KalturaBaseService
 	 * @action add
 	 * @param int $conversionProfileId Convertion profile id to use for converting the current bulk (-1 to use partner's default)
 	 * @param file $csvFileData CSV File
+	 * @param KalturaBulkUploadType $bulkUploadType
 	 * @return KalturaBulkUpload
 	 */
 	function addAction($conversionProfileId, $fileData, $bulkUploadType = null)
 	{
-		// first we copy the file to "content/batchfiles/[partner_id]/"
-		$origFilename = $fileData["name"];
-		$fileInfo = pathinfo($origFilename);
-		$extension = strtolower($fileInfo["extension"]);
+		$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', $bulkUploadType);
 		
-		$job = new BatchJob();
-		$job->setPartnerId($this->getPartnerId());
-		$job->setJobSubType($bulkUploadType);
-		$job->save();
-		
-		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
-//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
-		try{
-			kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey, true);
-		}
-		catch(Exception $e)
-		{
-			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
-		}
-		
-		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		
-		$data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $bulkUploadType, array());
-				
-		$data->filePath = $filePath;
-		$data->userId = $this->getKuser()->getPuserId();
-		$data->uploadedBy = $this->getKuser()->getScreenName();
-		if ($conversionProfileId === -1)
-			$conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
-			
-		$kmcVersion = $this->getPartner()->getKmcVersion();
-		$check = null;
-		if($kmcVersion < 2)
-		{
-			$check = ConversionProfilePeer::retrieveByPK($conversionProfileId);
-		}
-		else
-		{
-			$check = conversionProfile2Peer::retrieveByPK($conversionProfileId);
-		}
-		if(!$check)
-			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
-		
-		$data->conversionProfileId = $conversionProfileId;
-			
-		$dbJob = kJobsManager::addJob($job, $data->toObject(), KalturaBatchJobType::BULKUPLOAD);
+		$dbJob = kBulkUploadManager::add($fileData["tmp_name"], $fileData["name"], $conversionProfileId, $bulkUploadType);
 		
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJob);
