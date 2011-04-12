@@ -12,14 +12,19 @@ class KalturaResponseCacher
 	protected $_cacheHeadersFilePath = "";
 	protected $_cacheLogFilePath = "";
 	protected $_ks = "";
+	protected $_expiry = 600;
 	
 	protected static $_useCache = true;
 	
-	public function __construct($params = null)
+	public function __construct($params = null, $cacheDirectory = null, $expiry = 0)
 	{
 		self::$_useCache = kConf::get('enable_cache');
-		$this->_cacheDirectory = rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		$this->_cacheDirectory = $cacheDirectory ? $cacheDirectory : 
+			rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 		
+		if ($expiry)
+			$this->_expiry = $expiry;
+			
 		if (!self::$_useCache)
 			return;
 			
@@ -206,7 +211,7 @@ class KalturaResponseCacher
 	{
 		if (file_exists($this->_cacheDataFilePath))
 		{
-			if (filemtime($this->_cacheDataFilePath) + 600 < time())
+			if (filemtime($this->_cacheDataFilePath) + $this->_expiry < time())
 			{
 				@unlink($this->_cacheDataFilePath);
 				@unlink($this->_cacheHeadersFilePath);
