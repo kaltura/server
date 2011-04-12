@@ -6,7 +6,7 @@
 	
 	<xsl:variable name="alert-Scheduler-Status-Time" select="10 * $minute"/>
 	
-	<xsl:variable name="alert-Queue-Size-Convert" select="100"/>
+	<xsl:variable name="alert-Queue-Size-Convert" select="400"/>
 	<xsl:variable name="alert-Queue-Size-Import" select="200"/>
 	<xsl:variable name="alert-Queue-Size-Flatten" select="5"/>
 	<xsl:variable name="alert-Queue-Size-Bulk-Upload" select="5"/>
