@@ -30,12 +30,12 @@ class kFile
 			    	if (is_dir($fullPath))
 			    	{
 			    		$tmpPrefix = $tmpPrefix.'/';
-			    		$fileList[] = array($tmpPrefix, 'dir', filesize($fullPath));
+			    		$fileList[] = array($tmpPrefix, 'dir', self::kFileSize($fullPath));
 			    		$fileList = array_merge($fileList, kFile::listDir($fullPath, $tmpPrefix));
 			    	}	
 			    	else
 			    	{
-			    		$fileList[] = array($tmpPrefix, 'file', filesize($fullPath));
+			    		$fileList[] = array($tmpPrefix, 'file', self::kFileSize($fullPath));
 			    	}	    	
 		    	}
 		    }
