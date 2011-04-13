@@ -365,6 +365,10 @@ class requestUtils
 				$content_type ="image/jpeg";
 			elseif ($ext == "swf")
 				$content_type ="application/x-shockwave-flash";
+			elseif ($ext == "m3u8")
+				$content_type ="application/x-mpegURL";
+			elseif ($ext == "ts")
+				$content_type ="video/MP2T";
 			else
 				$content_type ="image/$ext";
 		}
@@ -375,6 +379,7 @@ class requestUtils
 		
 		if ($max_age)
 		{
+			// added max-stale=0 to fight evil proxies
 			$cache_scope = $private ? "private" : "public";
 			header("Cache-Control: $cache_scope, max-age=$max_age max-stale=0");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
