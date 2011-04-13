@@ -88,7 +88,9 @@ class KalturaResponseCacher
 
 		$this->_cacheKey = md5( http_build_query($this->_params) );
 
-		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
+		// split cache over 16 folders using the cachekey first character
+		// this will reduce the amount of files per cache folder
+		$pathWithFilePrefix = $this->_cacheDirectory . DIRECTORY_SEPARATOR . substr($this->_cacheKey, 0, 1) . DIRECTORY_SEPARATOR . $this->_cacheFilePrefix;
 		$this->_cacheDataFilePath 		= $pathWithFilePrefix . $this->_cacheKey;
 		$this->_cacheHeadersFilePath 	= $pathWithFilePrefix . $this->_cacheKey . ".headers";
 		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
@@ -205,7 +207,7 @@ class KalturaResponseCacher
 		$dirname = dirname($filePath);
 		if (!is_dir($dirname))
 		{
-			mkdir($dirname, 0777);
+			mkdir($dirname, 0777, true);
 		}
 	}
 	
