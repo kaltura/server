@@ -501,5 +501,3 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 		return array();
 	} 
 }
-
-?>
