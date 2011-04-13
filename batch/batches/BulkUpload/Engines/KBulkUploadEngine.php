@@ -57,6 +57,21 @@ abstract class KBulkUploadEngine
 	 * @var KalturaBulkUploadJobData
 	 */
 	protected $data = null;
+
+	/**
+	 * @param KSchedularTaskConfig $taskConfig
+	 */
+	protected function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
+	{
+		$this->multiRequestSize = $taskConfig->params->multiRequestSize;
+		$this->maxRecords = $taskConfig->params->maxRecords;
+		
+		$this->kClient = $kClient;
+		$this->kClientConfig = $kClient->getConfig();
+		
+		$this->job = $job;
+		$this->data = $job->data;
+	}
 	
 	/**
 	 * Will return the proper engine depending on the type (KalturaBulkUploadType)
@@ -75,21 +90,6 @@ abstract class KBulkUploadEngine
 						
 		return $engine;
 	}
-
-	/**
-	 * @param KSchedularTaskConfig $taskConfig
-	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
-	{
-		$this->multiRequestSize = $taskConfig->params->multiRequestSize;
-		$this->maxRecords = $taskConfig->params->maxRecords;
-		
-		$this->kClient = $kClient;
-		$this->kClientConfig = $kClient->getConfig();
-		
-		$this->job = $job;
-		$this->data = $job->data;
-	}
 	
 	/**
 	 * @return KalturaBatchJob
@@ -107,16 +107,12 @@ abstract class KBulkUploadEngine
 		return $this->data;
 	}
 
-	abstract public function handleBulkUpload();
-		
 	/**
-	 * @param string $item
+	 * 
+	 * Handles the bulk upload
 	 */
-	protected function trimArray(&$item)
-	{
-		$item = trim($item);
-	}
-		
+	abstract public function handleBulkUpload();
+			
 	/**
 	 * 
 	 * Adds a bulk upload result
@@ -223,7 +219,7 @@ abstract class KBulkUploadEngine
 	/**
 	 * @return array
 	 */
-	protected function doMultiRequestForPartnerId()
+	protected function doMultiRequestForPartner()
 	{
 		$requestResults = $this->kClient->doMultiRequest();
 		
@@ -275,6 +271,11 @@ abstract class KBulkUploadEngine
 		$this->kClient->doMultiRequest();
 	}
 	
+	/**
+	 * 
+	 * Checks if the job was aborted (throws exception if so)
+	 * @throws KalturaBulkUploadAbortedException
+	 */
 	protected function checkAborted()
 	{
 		if($this->kClient->isMultiRequest())
