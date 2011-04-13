@@ -35,6 +35,7 @@ class myBatchPartnerUsage extends myBatchBase
 				}
 			}
 			unset($partners);
+			PartnerPeer::clearInstancePool();
 			$start_pos += $bulk_size;
 		}
 	}
