@@ -55,7 +55,7 @@ package com.kaltura.delegates {
 					resInd+= nActions;
 				}
 				else {
-					xml += result.result.item[resInd].children().toString();
+					xml += result.result.item[resInd].children().toXMLString();
 					resInd++;
 				}
 				xml +="</result></result>";
