@@ -185,6 +185,29 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		return preg_match("/$strRegex/i", $str);
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see KBulkUploadEngine::init()
+	 */
+	public function init()
+	{
+		//to support EOF of mac files
+		ini_set('auto_detect_line_endings', true);
+		$this->currentPartnerId = $this->job->partnerId;
+		$this->multiRequestCounter = 0;
+				
+		// opens the csv file
+		$this->lineNumber = $this->getStartLineNumber($this->job->id);
+		
+		$this->bulkUploadResults = array();
+	 
+		return true;
+	}
+	
+	/**
+	 * 
+	 * Parses the CSV rows and creates the entries 
+	 */
 	public function parse()
 	{
 		$fileHandle = $this->getFileHandle();
