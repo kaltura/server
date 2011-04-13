@@ -2,7 +2,7 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader
+class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'dropFolder';
 	
@@ -47,15 +47,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		{
 			if ($enumValue == DropFolderFileHandlerType::CONTENT)
 			{
-				return new ContentDropFolderFileHandler();
-			}
-			if ($enumValue == DropFolderFileHandlerType::CSV)
-			{
-				return new CsvDropFolderFileHandler();
-			}
-			if ($enumValue == DropFolderFileHandlerType::XML)
-			{
-				return new XmlDropFolderFileHandler();
+				return new DropFolderContentFileHandler();
 			}
 		}
 			
@@ -73,19 +65,29 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		{
 			if ($enumValue == DropFolderFileHandlerType::CONTENT)
 			{
-				return 'ContentDropFolderFileHandler';
-			}
-			if ($enumValue == DropFolderFileHandlerType::CSV)
-			{
-				return 'CsvDropFolderFileHandler';
-			}
-			if ($enumValue == DropFolderFileHandlerType::XML)
-			{
-				return 'XmlDropFolderFileHandler';
+				return 'DropFolderContentFileHandler';
 			}
 		}
 		
 		return null;
+	}
+	
+	
+	/**
+	 * @return array<string> list of enum classes names that extend the base enum name
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('DropFolderWatcherBatchType','DropFolderPermissionName');
+			
+		if($baseEnumName == 'BatchJobType')
+			return array('DropFolderWatcherBatchType');
+			
+		if($baseEnumName == 'PermissionName')
+			return array('DropFolderPermissionName');
+			
+		return array();
 	}
 	
 

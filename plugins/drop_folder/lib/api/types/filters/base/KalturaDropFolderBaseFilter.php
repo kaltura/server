@@ -22,6 +22,11 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 		"dcEqual" => "_eq_dc",
 		"dcIn" => "_in_dc",
 		"pathLike" => "_like_path",
+		"fileHandlerTypeEqual" => "_eq_file_handler_type",
+		"fileHandlerTypeIn" => "_in_file_handler_type",
+		"fileNamePatternsLike" => "_like_file_name_patterns",
+		"fileNamePatternsMultiLikeOr" => "_mlikeor_file_name_patterns",
+		"fileNamePatternsMultiLikeAnd" => "_mlikeand_file_name_patterns",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -148,6 +153,42 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $pathLike;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaDropFolderFileHandlerType
+	 */
+	public $fileHandlerTypeEqual;
+
+	/**
+	 * 
+	 * 
+	 * @dynamicType KalturaDropFolderFileHandlerType
+	 * @var string
+	 */
+	public $fileHandlerTypeIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $fileNamePatternsLike;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $fileNamePatternsMultiLikeOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $fileNamePatternsMultiLikeAnd;
 
 	/**
 	 * 

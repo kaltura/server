@@ -42,17 +42,5 @@ class KalturaDropFolderFileHandlerConfig extends KalturaObject
 	public function fromObject ($source_object)
 	{
 		parent::fromObject($source_object);
-	}
-
-	
-	public function getExtraFilters()
-	{
-		return array();
-	}
-	
-	public function getFilterDocs()
-	{
-		return array();
-	}
-	
+	}	
 }

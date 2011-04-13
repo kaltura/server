@@ -1,6 +1,6 @@
 <?php
 
-class CsvDropFolderFileHandler extends DropFolderFileHandler
+class DropFolderContentFileHandler extends DropFolderFileHandler
 {
 	/* (non-PHPdoc)
 	 * @see DropFolderFileHandler::setConfig()

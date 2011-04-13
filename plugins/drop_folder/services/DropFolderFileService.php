@@ -56,7 +56,7 @@ class DropFolderFileService extends KalturaBaseService
 		
 		// save in database
 		$dbDropFolderFile = $dropFolderFile->toInsertableObject();
-		$dbDropFolderFile->setPartnerId($this->getPartnerId()); //TODO: ok ?
+		$dbDropFolderFile->setPartnerId($dropFolder->getPartnerId()); //TODO: ok ?
 		$dbDropFolderFile->save();
 		
 		// return the saved object
@@ -136,7 +136,7 @@ class DropFolderFileService extends KalturaBaseService
 		if (!$dbDropFolderFile) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFileId);
 		}
-
+		
 		$dbDropFolderFile->setStatus(DropFolderFileStatus::DELETED);
 		$dbDropFolderFile->save();
 			

@@ -44,6 +44,12 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $description;
 
 	/**
+	 * The value for the type field.
+	 * @var        int
+	 */
+	protected $type;
+
+	/**
 	 * The value for the status field.
 	 * @var        int
 	 */
@@ -74,16 +80,22 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $file_delete_policy;
 
 	/**
-	 * The value for the unmatched_file_policy field.
+	 * The value for the file_handler_type field.
 	 * @var        int
 	 */
-	protected $unmatched_file_policy;
+	protected $file_handler_type;
 
 	/**
-	 * The value for the type field.
-	 * @var        int
+	 * The value for the file_name_patterns field.
+	 * @var        string
 	 */
-	protected $type;
+	protected $file_name_patterns;
+
+	/**
+	 * The value for the file_handler_config field.
+	 * @var        string
+	 */
+	protected $file_handler_config;
 
 	/**
 	 * The value for the created_at field.
@@ -172,6 +184,16 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getType()
+	{
+		return $this->type;
+	}
+
+	/**
 	 * Get the [status] column value.
 	 * 
 	 * @return     int
@@ -222,23 +244,33 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [unmatched_file_policy] column value.
+	 * Get the [file_handler_type] column value.
 	 * 
 	 * @return     int
 	 */
-	public function getUnmatchedFilePolicy()
+	public function getFileHandlerType()
 	{
-		return $this->unmatched_file_policy;
+		return $this->file_handler_type;
 	}
 
 	/**
-	 * Get the [type] column value.
+	 * Get the [file_name_patterns] column value.
 	 * 
-	 * @return     int
+	 * @return     string
 	 */
-	public function getType()
+	public function getFileNamePatterns()
 	{
-		return $this->type;
+		return $this->file_name_patterns;
+	}
+
+	/**
+	 * Get the [file_handler_config] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getFileHandlerConfig()
+	{
+		return $this->file_handler_config;
 	}
 
 	/**
@@ -424,6 +456,29 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	} // setDescription()
 
 	/**
+	 * Set the value of [type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolder The current object (for fluent API support)
+	 */
+	public function setType($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderPeer::TYPE]))
+			$this->oldColumnsValues[DropFolderPeer::TYPE] = $this->type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->type !== $v) {
+			$this->type = $v;
+			$this->modifiedColumns[] = DropFolderPeer::TYPE;
+		}
+
+		return $this;
+	} // setType()
+
+	/**
 	 * Set the value of [status] column.
 	 * 
 	 * @param      int $v new value
@@ -539,50 +594,73 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	} // setFileDeletePolicy()
 
 	/**
-	 * Set the value of [unmatched_file_policy] column.
+	 * Set the value of [file_handler_type] column.
 	 * 
 	 * @param      int $v new value
 	 * @return     DropFolder The current object (for fluent API support)
 	 */
-	public function setUnmatchedFilePolicy($v)
+	public function setFileHandlerType($v)
 	{
-		if(!isset($this->oldColumnsValues[DropFolderPeer::UNMATCHED_FILE_POLICY]))
-			$this->oldColumnsValues[DropFolderPeer::UNMATCHED_FILE_POLICY] = $this->unmatched_file_policy;
+		if(!isset($this->oldColumnsValues[DropFolderPeer::FILE_HANDLER_TYPE]))
+			$this->oldColumnsValues[DropFolderPeer::FILE_HANDLER_TYPE] = $this->file_handler_type;
 
 		if ($v !== null) {
 			$v = (int) $v;
 		}
 
-		if ($this->unmatched_file_policy !== $v) {
-			$this->unmatched_file_policy = $v;
-			$this->modifiedColumns[] = DropFolderPeer::UNMATCHED_FILE_POLICY;
+		if ($this->file_handler_type !== $v) {
+			$this->file_handler_type = $v;
+			$this->modifiedColumns[] = DropFolderPeer::FILE_HANDLER_TYPE;
 		}
 
 		return $this;
-	} // setUnmatchedFilePolicy()
+	} // setFileHandlerType()
 
 	/**
-	 * Set the value of [type] column.
+	 * Set the value of [file_name_patterns] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      string $v new value
 	 * @return     DropFolder The current object (for fluent API support)
 	 */
-	public function setType($v)
+	public function setFileNamePatterns($v)
 	{
-		if(!isset($this->oldColumnsValues[DropFolderPeer::TYPE]))
-			$this->oldColumnsValues[DropFolderPeer::TYPE] = $this->type;
+		if(!isset($this->oldColumnsValues[DropFolderPeer::FILE_NAME_PATTERNS]))
+			$this->oldColumnsValues[DropFolderPeer::FILE_NAME_PATTERNS] = $this->file_name_patterns;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (string) $v;
 		}
 
-		if ($this->type !== $v) {
-			$this->type = $v;
-			$this->modifiedColumns[] = DropFolderPeer::TYPE;
+		if ($this->file_name_patterns !== $v) {
+			$this->file_name_patterns = $v;
+			$this->modifiedColumns[] = DropFolderPeer::FILE_NAME_PATTERNS;
 		}
 
 		return $this;
-	} // setType()
+	} // setFileNamePatterns()
+
+	/**
+	 * Set the value of [file_handler_config] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     DropFolder The current object (for fluent API support)
+	 */
+	public function setFileHandlerConfig($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderPeer::FILE_HANDLER_CONFIG]))
+			$this->oldColumnsValues[DropFolderPeer::FILE_HANDLER_CONFIG] = $this->file_handler_config;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->file_handler_config !== $v) {
+			$this->file_handler_config = $v;
+			$this->modifiedColumns[] = DropFolderPeer::FILE_HANDLER_CONFIG;
+		}
+
+		return $this;
+	} // setFileHandlerConfig()
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -738,16 +816,18 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
 			$this->name = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->description = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-			$this->status = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-			$this->dc = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->path = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->conversion_profile_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->file_delete_policy = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->unmatched_file_policy = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-			$this->type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->type = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+			$this->status = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+			$this->dc = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+			$this->path = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->conversion_profile_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->file_delete_policy = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->file_handler_type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->file_name_patterns = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->file_handler_config = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->created_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->updated_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -757,7 +837,7 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 14; // 14 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 16; // 16 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolder object", $e);
@@ -1177,33 +1257,39 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				return $this->getDescription();
 				break;
 			case 4:
-				return $this->getStatus();
-				break;
-			case 5:
-				return $this->getDc();
-				break;
-			case 6:
-				return $this->getPath();
-				break;
-			case 7:
-				return $this->getConversionProfileId();
-				break;
-			case 8:
-				return $this->getFileDeletePolicy();
-				break;
-			case 9:
-				return $this->getUnmatchedFilePolicy();
-				break;
-			case 10:
 				return $this->getType();
 				break;
+			case 5:
+				return $this->getStatus();
+				break;
+			case 6:
+				return $this->getDc();
+				break;
+			case 7:
+				return $this->getPath();
+				break;
+			case 8:
+				return $this->getConversionProfileId();
+				break;
+			case 9:
+				return $this->getFileDeletePolicy();
+				break;
+			case 10:
+				return $this->getFileHandlerType();
+				break;
 			case 11:
-				return $this->getCreatedAt();
+				return $this->getFileNamePatterns();
 				break;
 			case 12:
-				return $this->getUpdatedAt();
+				return $this->getFileHandlerConfig();
 				break;
 			case 13:
+				return $this->getCreatedAt();
+				break;
+			case 14:
+				return $this->getUpdatedAt();
+				break;
+			case 15:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1231,16 +1317,18 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$keys[1] => $this->getPartnerId(),
 			$keys[2] => $this->getName(),
 			$keys[3] => $this->getDescription(),
-			$keys[4] => $this->getStatus(),
-			$keys[5] => $this->getDc(),
-			$keys[6] => $this->getPath(),
-			$keys[7] => $this->getConversionProfileId(),
-			$keys[8] => $this->getFileDeletePolicy(),
-			$keys[9] => $this->getUnmatchedFilePolicy(),
-			$keys[10] => $this->getType(),
-			$keys[11] => $this->getCreatedAt(),
-			$keys[12] => $this->getUpdatedAt(),
-			$keys[13] => $this->getCustomData(),
+			$keys[4] => $this->getType(),
+			$keys[5] => $this->getStatus(),
+			$keys[6] => $this->getDc(),
+			$keys[7] => $this->getPath(),
+			$keys[8] => $this->getConversionProfileId(),
+			$keys[9] => $this->getFileDeletePolicy(),
+			$keys[10] => $this->getFileHandlerType(),
+			$keys[11] => $this->getFileNamePatterns(),
+			$keys[12] => $this->getFileHandlerConfig(),
+			$keys[13] => $this->getCreatedAt(),
+			$keys[14] => $this->getUpdatedAt(),
+			$keys[15] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1285,33 +1373,39 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				$this->setDescription($value);
 				break;
 			case 4:
-				$this->setStatus($value);
-				break;
-			case 5:
-				$this->setDc($value);
-				break;
-			case 6:
-				$this->setPath($value);
-				break;
-			case 7:
-				$this->setConversionProfileId($value);
-				break;
-			case 8:
-				$this->setFileDeletePolicy($value);
-				break;
-			case 9:
-				$this->setUnmatchedFilePolicy($value);
-				break;
-			case 10:
 				$this->setType($value);
 				break;
+			case 5:
+				$this->setStatus($value);
+				break;
+			case 6:
+				$this->setDc($value);
+				break;
+			case 7:
+				$this->setPath($value);
+				break;
+			case 8:
+				$this->setConversionProfileId($value);
+				break;
+			case 9:
+				$this->setFileDeletePolicy($value);
+				break;
+			case 10:
+				$this->setFileHandlerType($value);
+				break;
 			case 11:
-				$this->setCreatedAt($value);
+				$this->setFileNamePatterns($value);
 				break;
 			case 12:
-				$this->setUpdatedAt($value);
+				$this->setFileHandlerConfig($value);
 				break;
 			case 13:
+				$this->setCreatedAt($value);
+				break;
+			case 14:
+				$this->setUpdatedAt($value);
+				break;
+			case 15:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1342,16 +1436,18 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setPartnerId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setStatus($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setDc($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setPath($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setConversionProfileId($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setFileDeletePolicy($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setUnmatchedFilePolicy($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setType($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
+		if (array_key_exists($keys[4], $arr)) $this->setType($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setStatus($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setDc($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setPath($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setConversionProfileId($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setFileDeletePolicy($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setFileHandlerType($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setFileNamePatterns($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setFileHandlerConfig($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
 	}
 
 	/**
@@ -1367,13 +1463,15 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderPeer::PARTNER_ID)) $criteria->add(DropFolderPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(DropFolderPeer::NAME)) $criteria->add(DropFolderPeer::NAME, $this->name);
 		if ($this->isColumnModified(DropFolderPeer::DESCRIPTION)) $criteria->add(DropFolderPeer::DESCRIPTION, $this->description);
+		if ($this->isColumnModified(DropFolderPeer::TYPE)) $criteria->add(DropFolderPeer::TYPE, $this->type);
 		if ($this->isColumnModified(DropFolderPeer::STATUS)) $criteria->add(DropFolderPeer::STATUS, $this->status);
 		if ($this->isColumnModified(DropFolderPeer::DC)) $criteria->add(DropFolderPeer::DC, $this->dc);
 		if ($this->isColumnModified(DropFolderPeer::PATH)) $criteria->add(DropFolderPeer::PATH, $this->path);
 		if ($this->isColumnModified(DropFolderPeer::CONVERSION_PROFILE_ID)) $criteria->add(DropFolderPeer::CONVERSION_PROFILE_ID, $this->conversion_profile_id);
 		if ($this->isColumnModified(DropFolderPeer::FILE_DELETE_POLICY)) $criteria->add(DropFolderPeer::FILE_DELETE_POLICY, $this->file_delete_policy);
-		if ($this->isColumnModified(DropFolderPeer::UNMATCHED_FILE_POLICY)) $criteria->add(DropFolderPeer::UNMATCHED_FILE_POLICY, $this->unmatched_file_policy);
-		if ($this->isColumnModified(DropFolderPeer::TYPE)) $criteria->add(DropFolderPeer::TYPE, $this->type);
+		if ($this->isColumnModified(DropFolderPeer::FILE_HANDLER_TYPE)) $criteria->add(DropFolderPeer::FILE_HANDLER_TYPE, $this->file_handler_type);
+		if ($this->isColumnModified(DropFolderPeer::FILE_NAME_PATTERNS)) $criteria->add(DropFolderPeer::FILE_NAME_PATTERNS, $this->file_name_patterns);
+		if ($this->isColumnModified(DropFolderPeer::FILE_HANDLER_CONFIG)) $criteria->add(DropFolderPeer::FILE_HANDLER_CONFIG, $this->file_handler_config);
 		if ($this->isColumnModified(DropFolderPeer::CREATED_AT)) $criteria->add(DropFolderPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DropFolderPeer::UPDATED_AT)) $criteria->add(DropFolderPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(DropFolderPeer::CUSTOM_DATA)) $criteria->add(DropFolderPeer::CUSTOM_DATA, $this->custom_data);
@@ -1437,6 +1535,8 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 
 		$copyObj->setDescription($this->description);
 
+		$copyObj->setType($this->type);
+
 		$copyObj->setStatus($this->status);
 
 		$copyObj->setDc($this->dc);
@@ -1447,9 +1547,11 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 
 		$copyObj->setFileDeletePolicy($this->file_delete_policy);
 
-		$copyObj->setUnmatchedFilePolicy($this->unmatched_file_policy);
+		$copyObj->setFileHandlerType($this->file_handler_type);
 
-		$copyObj->setType($this->type);
+		$copyObj->setFileNamePatterns($this->file_name_patterns);
+
+		$copyObj->setFileHandlerConfig($this->file_handler_config);
 
 		$copyObj->setCreatedAt($this->created_at);
 

@@ -13,13 +13,7 @@ class DropFolderFileHandlerConfig
 	 * @var DropFolderFileHandlerType
 	 */
 	protected $handlerType;
-	
-	/**
-	 * File pattern 
-	 * @var string
-	 */
-	protected $filePattern;
-		
+			
 	
 	/**
 	 * @return the $handlerType
@@ -35,19 +29,6 @@ class DropFolderFileHandlerConfig
 		$this->handlerType = $handlerType;
 	}
 
-	/**
-	 * @return the $filePattern
-	 */
-	public function getFilePattern() {
-		return $this->filePattern;
-	}
-
-	/**
-	 * @param string $filePattern
-	 */
-	public function setFilePattern($filePattern) {
-		$this->filePattern = $filePattern;
-	}
 	
 	
 }

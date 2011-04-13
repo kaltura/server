@@ -50,7 +50,7 @@ class DropFolderService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::DATA_CENTER_ID_NOT_FOUND, $dropFolder->dc);
 		}
 				
-		$existingDropFolder = DropFolderPeer::retrieveByPathNoFilters($dropFolder->path);
+		$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);
 		if ($existingDropFolder) {
 			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
 		}
@@ -123,7 +123,7 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0);
 		
 		if (!is_null($dropFolder->path)) {
-			$existingDropFolder = DropFolderPeer::retrieveByPathNoFilters($dropFolder->path);
+			$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);
 			if ($existingDropFolder) {
 				throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
 			}

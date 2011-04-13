@@ -22,5 +22,4 @@ class DropFolderFile extends BaseDropFolderFile
 		self::setFileSizeLastSetAt(time());	
 	}
 	
-	
 } // DropFolderFile

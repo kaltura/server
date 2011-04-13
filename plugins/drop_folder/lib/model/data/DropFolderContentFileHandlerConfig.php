@@ -1,11 +1,16 @@
 <?php
 
-class ContentDropFolderFileHandlerConfig extends DropFolderFileHandlerConfig
+class DropFolderContentFileHandlerConfig extends DropFolderFileHandlerConfig
 {
-	
-	private $slugField;
+		
+	//TODO: to slug or not to slug ?!?
 	
 	private $slugRegex;
+	
+	/**
+	 * @var DropFolderUnmatchedContentFilePolicy
+	 */
+	private $unmatchedFilePolicy;
 	
 
 	// override type parameter - should always be DropFolderFileHandlerType::CONTENT
@@ -13,20 +18,6 @@ class ContentDropFolderFileHandlerConfig extends DropFolderFileHandlerConfig
 		return DropFolderFileHandlerType::CONTENT;
 	}
 	
-	
-	/**
-	 * @return string the $slugField
-	 */
-	public function getSlugField() {
-		return $this->slugField;
-	}
-
-	/**
-	 * @param string $slugField
-	 */
-	public function setSlugField($slugField) {
-		$this->slugField = $slugField;
-	}
 
 	/**
 	 * @return string the $slugRegex

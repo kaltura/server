@@ -10,9 +10,10 @@ interface DropFolderFileStatus extends BaseEnum
 	const WAITING           = 3; // waiting for more files to upload to the drop folder	
 	const HANDLED           = 4; // file handling finished
 	const IGNORE            = 5; // don't show in unmatched file list
-	const DELETED           = 6; // file is deleted
-	const NO_MATCH          = 7; // no match found for the file
-	const ERROR_HANDLING    = 8; // error - file handling cannot continue
+	const DELETED           = 6; // file is marked as deleted
+	const PURGED            = 7; // file is physicaly deleted
+	const NO_MATCH          = 8; // no match found for the file
+	const ERROR_HANDLING    = 9; // error - file handling cannot continue
 	
 	// future remote drop folder status that might be in use
 	

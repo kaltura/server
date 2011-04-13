@@ -7,12 +7,19 @@ abstract class DropFolderFileHandler
 	 * Return a new instance of a class extending DropFolderFileHandler, according to give $type
 	 * @param DropFolderFileHandlerType $type
 	 */
-	public static function generateHandler($type)
+	public static function getHandler($type, DropFolderFileHandlerConfig $config = null)
 	{
-		return KalturaPluginManager::loadObject('DropFolderFileHandler', $type);
+		$handler = KalturaPluginManager::loadObject('DropFolderFileHandler', $type);
+		if ($config) {
+			$handler->setConfig($config);
+		}
+		return $config;
 	}
+	
+	private function __construct();
+		// instantiation should be done using getHandler
 		
-	public abstract function setConfig(DropFolderFileHandlerConfig $config);
+	protected abstract function setConfig(DropFolderFileHandlerConfig $config);
 		// must be implemented by extending classes
 	
 	/**

@@ -41,13 +41,15 @@ class DropFolderTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', true, 100, null);
 		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', true, null, null);
 		$this->addColumn('DC', 'Dc', 'INTEGER', true, null, null);
 		$this->addColumn('PATH', 'Path', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('CONVERSION_PROFILE_ID', 'ConversionProfileId', 'INTEGER', false, null, null);
 		$this->addColumn('FILE_DELETE_POLICY', 'FileDeletePolicy', 'INTEGER', false, null, null);
-		$this->addColumn('UNMATCHED_FILE_POLICY', 'UnmatchedFilePolicy', 'INTEGER', false, null, null);
-		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, null);
+		$this->addColumn('FILE_HANDLER_TYPE', 'FileHandlerType', 'INTEGER', false, null, null);
+		$this->addColumn('FILE_NAME_PATTERNS', 'FileNamePatterns', 'LONGVARCHAR', true, null, null);
+		$this->addColumn('FILE_HANDLER_CONFIG', 'FileHandlerConfig', 'LONGVARCHAR', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

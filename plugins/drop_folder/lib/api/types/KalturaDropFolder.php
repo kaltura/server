@@ -66,11 +66,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public $fileSizeCheckInterval;
 	
 	/**
-	 * @var KalturaDropFolderUnmatchedFilesPolicy
-	 */
-	public $unmatchedFilePolicy;
-
-	/**
 	 * @var KalturaDropFolderFileDeletePolicy
 	 */
 	public $fileDeletePolicy;
@@ -80,11 +75,23 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	 */
 	public $autoFileDeleteDays;
 	
+	
 	/**
-	 * KalturaDropFolderFileHandlerConfigArray
-	 * @requiresPermission read
+	 * @var KalturaDropFolderFileHandlerType
+	 * @filter eq,in
 	 */
-	public $fileHandlersConfig;	
+	public $fileHandlerType;
+	
+	/**
+	 * @var string
+	 * @filter like,mlikeor,mlikeand
+	 */
+	public $fileNamePatterns;
+	
+	/**
+	 * KalturaDropFolderFileHandlerConfig
+	 */
+	public $fileHandlerConfig;	
 	
 	/**
 	 * @var int
@@ -115,10 +122,11 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'dc',
 		'path',
 		'fileSizeCheckInterval',
-		'unmatchedFilePolicy',
 		'fileDeletePolicy',
 		'autoFileDeleteDays',
-		'fileHandlersConfig',
+		'fileHandlerType',
+		'fileNamePatterns',
+		'fileHandlerConfig',
 		'createdAt',
 		'updatedAt',
 	 );

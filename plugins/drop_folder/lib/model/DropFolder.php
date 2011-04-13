@@ -37,11 +37,7 @@ class DropFolder extends BaseDropFolder
 		if (is_null($this->getFileSizeCheckInterval())) {
 			$this->setFileSizeCheckInterval(DropFolder::FILE_SIZE_CHECK_INTERNAL_DEFAULT_VALUE);
 		}
-		
-		if (is_null($this->getUnmatchedFilePolicy())) {
-			$this->setUnmatchedFilePolicy(DropFolderUnmatchedFilesPolicy::ADD_AS_ENTRY);
-		}
-		
+				
 		if (is_null($this->getFileDeletePolicy())) {
 			$this->setFileDeletePolicy(DropFolderFileDeletePolicy::MANUAL_DELETE);
 		}
@@ -52,12 +48,36 @@ class DropFolder extends BaseDropFolder
     	
 		return $ret;
 	}
+
 	
+	// -------------------------------------
+	// -- Override base methods ------------
+	// -------------------------------------
 	
+	/**
+	 * @return DropFolderFileHandlerConfig
+	 */
+	public function getFileHandlerConfig()
+	{
+		$serializedConfig = parent::getFileHandlerConfig();
+		try {
+			$config = unserialize($serializedConfig);
+		}
+		catch (Exception $e) {
+			KalturaLog::err('Error unserializing file handler config for drop folder id ['.$this->getId().']');
+			$config = null;
+		}
+		return $config;
+	}
 	
-	
-	
-	
+	/**
+	 * @param DropFolderFileHandlerConfig $fileHandlerConfig
+	 */
+	public function setFileHandlerConfig(DropFolderFileHandlerConfig $fileHandlerConfig)
+	{
+		$serializedConfig = serialize($fileHandlerConfig);
+		parent::setFileHandlerConfig($serializedConfig);
+	}	
 	
 	
 	// ------------------------------------------
@@ -65,7 +85,6 @@ class DropFolder extends BaseDropFolder
 	// ------------------------------------------
 	
 	const CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL = 'file_size_check_interval';
-	const CUSTOM_DATA_FILE_HANDLERS_CONFIG     = 'file_handlers_config';
 	const CUSTOM_DATA_AUTO_FILE_DELETE_DAYS  = 'auto_file_delete_days';
 	
 	
@@ -79,38 +98,13 @@ class DropFolder extends BaseDropFolder
 		return $this->getFromCustomData(self::CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL);
 	}
 	
-	public function setFileSizeCheckInterval(int $interval)
+	public function setFileSizeCheckInterval($interval)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL, $interval);
 	}
 	
 	
-	// File handlers configuration
-	
-	/**
-	 * @return array of FileHandlerConfig objects
-	 */
-	public function getFileHandlersConfig()
-	{
-		$serializedConfig = $this->getFromCustomData(self::CUSTOM_DATA_FILE_HANDLERS_CONFIG);
-		try {
-			$configArray = unserialize($serializedConfig);
-		}
-		catch (Exception $e) {
-			$configArray = array();
-		}
-		return $configArray;
-	}
-	
-	/**
-	 * @param array $fileHandlersConfig array of FileHandlersConfig objects
-	 */
-	public function setFileHandlersConfig(array $fileHandlersConfig)
-	{
-		$serializedConfig = serialize($fileHandlersConfig);
-		$this->putInCustomData(self::CUSTOM_DATA_FILE_HANDLERS_CONFIG, $serializedConfig);
-	}	
-	
+
 	
 	// Automatic file delete days
 		
@@ -122,7 +116,7 @@ class DropFolder extends BaseDropFolder
 		return $this->getFromCustomData(self::CUSTOM_DATA_AUTO_FILE_DELETE_DAYS);
 	}
 	
-	public function setAutoFileDeleteDays(int $days)
+	public function setAutoFileDeleteDays($days)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_AUTO_FILE_DELETE_DAYS, $days);
 	}
