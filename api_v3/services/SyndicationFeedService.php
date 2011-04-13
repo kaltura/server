@@ -44,18 +44,16 @@ class SyndicationFeedService extends KalturaBaseService
 		
 		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
 			$syndicationFeed->validatePropertyNotNull('xslt');				
-			kSyndicationFeedManager::validateXsl($syndicationFeed->xslt);
 			$syndicationFeedDB = new genericSyndicationFeed();
 			$syndicationFeedDB->setVersion(1);	
 		}else
 		{
 			$syndicationFeedDB = new syndicationFeed();
 		}
-		
-		$syndicationFeed->partnerId = $this->getPartnerId();
-		$syndicationFeed->status = KalturaSyndicationFeedStatus::ACTIVE;
-		$syndicationFeed->toObject($syndicationFeedDB);
-
+			
+		$syndicationFeed->toInsertableObject($syndicationFeedDB);
+		$syndicationFeedDB->setPartnerId($this->getPartnerId());
+		$syndicationFeedDB->setStatus(KalturaSyndicationFeedStatus::ACTIVE);
 		$syndicationFeedDB->save();
 		
 		if($syndicationFeed->addToDefaultConversionProfile)
@@ -123,23 +121,22 @@ class SyndicationFeedService extends KalturaBaseService
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($id);
 		if (!$syndicationFeedDB)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
-			
+		
+		$syndicationFeed->toUpdatableObject($syndicationFeedDB, array('type'));	
+		
 		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed) && ($syndicationFeed->xslt != null)){
-			kSyndicationFeedManager::validateXsl($syndicationFeed->$xslt);
 			$syndicationFeedDB->incrementVersion();
-			$syndicationFeedDB->save();
 		}
-				
-		$syndicationFeed->type = null;
+		$syndicationFeedDB->save();		
+		
 		
 		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed) && ($syndicationFeed->xslt != null)){			
 			$key = $syndicationFeedDB->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
 			kFileSyncUtils::file_put_contents($key, $syndicationFeed->xslt);
 		}
 		
-        $syndicationFeed = $syndicationFeed->toUpdatableObject($syndicationFeedDB, array('type'));
-        $syndicationFeedDB->save();
-				
+        $syndicationFeed->type = null;
+        
 		$syndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		$syndicationFeed->fromObject($syndicationFeedDB);
 		return $syndicationFeed;
