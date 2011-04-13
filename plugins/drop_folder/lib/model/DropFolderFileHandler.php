@@ -15,9 +15,6 @@ abstract class DropFolderFileHandler
 		}
 		return $config;
 	}
-	
-	private function __construct();
-		// instantiation should be done using getHandler
 		
 	protected abstract function setConfig(DropFolderFileHandlerConfig $config);
 		// must be implemented by extending classes
