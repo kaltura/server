@@ -9,6 +9,6 @@ class KalturaPermissionName extends KalturaDynamicEnum implements PermissionName
 	
 	public static function getEnumClass()
 	{
-		return 'permissionName';
+		return 'PermissionName';
 	}
 }
