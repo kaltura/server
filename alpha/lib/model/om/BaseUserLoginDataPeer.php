@@ -463,6 +463,10 @@ abstract class BaseUserLoginDataPeer {
 	 */
 	public static function clearInstancePool()
 	{
+		foreach (self::$instances as $instance)
+		{
+			$instance->clearAllReferences(false);
+		}
 		self::$instances = array();
 	}
 	
