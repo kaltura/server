@@ -29,11 +29,11 @@
 		$include = $indexConfig->get("include");
 		$exclude = $indexConfig->get("exclude");
 
-		$cacheFileName = kConf::get("cache_root_path").'/testme';
+		$cacheFileName = kConf::get("cache_root_path").'/testme/services';
 		
 		if (file_exists($cacheFileName))
 		{
-			$clientGenerator = unserialize(file_get_contents($cacheFileName));
+			$services = unserialize(file_get_contents($cacheFileName));
 		}
 		else
 		{
@@ -41,11 +41,11 @@
 			$clientGenerator->setIncludeOrExcludeList($include, $exclude);
 			$clientGenerator->load();
 			
-			file_put_contents($cacheFileName, serialize($clientGenerator));
+			$services = $clientGenerator->getServices();
+			kFile::setFileContent($cacheFileName, serialize($services));
 		}
 		
 		$list = array();
-		$services = $clientGenerator->getServices();
 		foreach($services as $serviceName => $serviceReflector)
 		{
 			if($serviceReflector->isDeprecated() || $serviceReflector->isServerOnly())
