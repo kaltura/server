@@ -61,7 +61,7 @@ abstract class KBulkUploadEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
+	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
 	{
 		$this->multiRequestSize = $taskConfig->params->multiRequestSize;
 		$this->maxRecords = $taskConfig->params->maxRecords;
