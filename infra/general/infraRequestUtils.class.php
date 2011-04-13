@@ -102,6 +102,8 @@ class infraRequestUtils
 				$content_type ="video/x-flv";
 			elseif ($ext == "mp4")
 				$content_type ="video/mp4";
+			elseif ($ext == "webm")
+				$content_type ="video/webm";
 			elseif ($ext == "ogg")
 				$content_type ="video/ogg";
 			elseif ($ext == "mp3")
@@ -110,6 +112,10 @@ class infraRequestUtils
 				$content_type ="image/jpeg";
 			elseif ($ext == "swf")
 				$content_type ="application/x-shockwave-flash";
+			elseif ($ext == "m3u8")
+				$content_type ="application/x-mpegURL";
+			elseif ($ext == "ts")
+				$content_type ="video/MP2T";
 			else
 				$content_type ="image/$ext";
 		}
