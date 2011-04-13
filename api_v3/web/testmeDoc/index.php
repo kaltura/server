@@ -1,14 +1,5 @@
 <?php 
 
-function saveToCache($cacheFileName, $buffer)
-{
-	$cacheFileDir = pathinfo($cacheFileName, PATHINFO_DIRNAME);
-	if (!file_exists($cacheFileDir) || !is_dir($cacheFileDir))
-		mkdir($cacheFileDir, 0755, true);
-	
-	file_put_contents($cacheFileName, $buffer);
-}
-
 require_once("../../bootstrap.php"); 
 require_once("helpers.php");
 
@@ -19,7 +10,7 @@ $inputAction = @$_GET["action"];
 $inputObject = @$_GET["object"];
 
 // get cache file name
-$cachePath = kConf::get("general_cache_dir").'/testmeDoc';
+$cachePath = kConf::get("cache_root_path").'/testmeDoc';
 
 if ($inputPage)
 {
@@ -63,7 +54,7 @@ else
 	ob_end_clean();
 	print $out;
 	
-	saveToCache($cacheLeftPaneFilePath, $out);
+	kFile::setFileContent($cacheLeftPaneFilePath, $out);
 }
 
 // right pane - try to return from cache
@@ -114,6 +105,6 @@ $out = ob_get_contents();
 ob_end_clean();
 print $out;
 
-saveToCache($cacheFilePath, $out);
+kFile::setFileContent($cacheFilePath, $out);
 
 require_once("footer.php");
