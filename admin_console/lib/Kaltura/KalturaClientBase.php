@@ -472,6 +472,11 @@ class KalturaClientBase
 		return $this->isMultiRequest;	
 	}
 	
+	public function getMultiRequestQueueSize()
+	{
+		return count($this->callsQueue);	
+	}
+	
 	/**
 	 * @param string $msg
 	 */

@@ -299,6 +299,7 @@ class KalturaBatchJobType
 	const DISTRIBUTION_DELETE = "contentDistribution.DistributionDelete";
 	const DISTRIBUTION_FETCH_REPORT = "contentDistribution.DistributionFetchReport";
 	const DISTRIBUTION_SYNC = "contentDistribution.DistributionSync";
+	const DROP_FOLDER_WATCHER = "dropFolder.DropFolderWatcher";
 }
 
 /**
@@ -315,11 +316,8 @@ class KalturaBitRateMode
  * @package Admin
  * @subpackage Client
  */
-class KalturaBulkUploadCsvVersion
+class KalturaBulkUploadType
 {
-	const V1 = "1";
-	const V2 = "2";
-	const V3 = "3";
 }
 
 /**
@@ -1263,6 +1261,10 @@ class KalturaPermissionName
 	const STUDIO_SELECT_CONTENT = "STUDIO_SELECT_CONTENT";
 	const CONTENT_MANAGE_EMBED_CODE = "CONTENT_MANAGE_EMBED_CODE";
 	const ADMIN_WHITE_BRANDING = "ADMIN_WHITE_BRANDING";
+	const SYSTEM_ADMIN_DROP_FOLDER_BASE = "dropFolder.SYSTEM_ADMIN_DROP_FOLDER_BASE";
+	const SYSTEM_ADMIN_DROP_FOLDER_MODIFY = "dropFolder.SYSTEM_ADMIN_DROP_FOLDER_MODIFY";
+	const CONTENT_INGEST_DROP_FOLDER_BASE = "dropFolder.CONTENT_INGEST_DROP_FOLDER_BASE";
+	const CONTENT_INGEST_DROP_FOLDER_MODIFY = "dropFolder.CONTENT_INGEST_DROP_FOLDER_MODIFY";
 }
 
 /**
