@@ -1,6 +1,53 @@
 <?php
+/**
+ * The bulk upload manager does all the bulk upload logic for adding via bulk upload 
+ * @author Roni
+ *
+ */
 class kBulkUploadManager
 {
+	/**
+	 * 
+	 * The partenr for the bulk upload job
+	 * @var partner
+	 */
+	private static $partner;
+	
+	/**
+	 * 
+	 * The kuser who performed the bulk operation
+	 * @var kuser
+	 */
+	private static $kuser;
+	
+	/**
+	 * @return the $partner
+	 */
+	public static function getPartner() {
+		return kBulkUploadManager::$partner;
+	}
+
+	/**
+	 * @return the $kuser
+	 */
+	public static function getKuser() {
+		return kBulkUploadManager::$kuser;
+	}
+
+	/**
+	 * @param partner $partner
+	 */
+	public static function setPartner($partner) {
+		kBulkUploadManager::$partner = $partner;
+	}
+
+	/**
+	 * @param kuser $kuser
+	 */
+	public static function setKuser($kuser) {
+		kBulkUploadManager::$kuser = $kuser;
+	}
+
 	/**
 	 * @param string $filePath the full path to the file 
 	 * @param string $fileName the file name, use to extract the extension
@@ -15,7 +62,7 @@ class kBulkUploadManager
 		$extension = strtolower($fileInfo["extension"]);
 		
 		$job = new BatchJob();
-		$job->setPartnerId($this->getPartnerId());
+		$job->setPartnerId($this->getPartner());
 		$job->setJobSubType($bulkUploadType);
 		$job->save();
 		
