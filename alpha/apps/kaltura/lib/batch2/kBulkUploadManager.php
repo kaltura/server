@@ -9,7 +9,7 @@ class kBulkUploadManager
 	/**
 	 * 
 	 * The partenr for the bulk upload job
-	 * @var partner
+	 * @var Partner
 	 */
 	private static $partner;
 	
@@ -62,10 +62,10 @@ class kBulkUploadManager
 		$extension = strtolower($fileInfo["extension"]);
 		
 		$job = new BatchJob();
-		$job->setPartnerId(kBulkUploadManager::getPartner());
+		$job->setPartnerId(kBulkUploadManager::getPartner()->getId());
 		$job->setJobSubType($bulkUploadType);
 		$job->save();
-		
+
 		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
 //		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 		try{
