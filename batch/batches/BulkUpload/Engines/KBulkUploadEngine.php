@@ -137,7 +137,7 @@ abstract class KBulkUploadEngine
 			return $bulkUploadLastResult->lineIndex;
 		}
 		catch(Exception $e){
-			KalturaLog::err("getBulkUploadLastResult: " . $e->getMessage());
+			KalturaLog::notice("getBulkUploadLastResult: " . $e->getMessage());
 			return 0;
 		}
 	}
