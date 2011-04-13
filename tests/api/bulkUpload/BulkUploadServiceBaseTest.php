@@ -8,24 +8,25 @@ abstract class BulkUploadServiceBaseTest extends KalturaApiTestCase
 	/**
 	 * Tests bulkUpload->add action
 	 * @param int $conversionProfileId Convertion profile id to use for converting the current bulk (-1 to use partner's default)
-	 * @param file $csvFileData CSV File
+	 * @param file $fileData CSV File
+	 * @param KalturaBulkUploadType $bulkUploadType 
 	 * @param KalturaBulkUpload $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd($conversionProfileId, $csvFileData, KalturaBulkUpload $reference)
+	public function testAdd($conversionProfileId, $fileData, KalturaBulkUploadType $bulkUploadType = null, KalturaBulkUpload $reference)
 	{
-		$resultObject = $this->client->bulkUpload->add($conversionProfileId, $csvFileData);
+		$resultObject = $this->client->bulkUpload->add($conversionProfileId, $fileData, $bulkUploadType);
 		$this->assertType('KalturaBulkUpload', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateAdd($conversionProfileId, $csvFileData, $reference);
+		$this->validateAdd($conversionProfileId, $fileData, $bulkUploadType, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testAdd results
 	 */
-	protected function validateAdd($conversionProfileId, $csvFileData, KalturaBulkUpload $reference)
+	protected function validateAdd($conversionProfileId, $fileData, KalturaBulkUploadType $bulkUploadType = null, KalturaBulkUpload $reference)
 	{
 	}
 
