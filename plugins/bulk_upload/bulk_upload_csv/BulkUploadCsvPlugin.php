@@ -37,13 +37,21 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		//Gets the right job for the engine	
+		//Gets the right job for the engine	(only for server)
 		if($baseClass == 'kBulkUploadJobData' && (is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
 			return new kBulkUploadCsvJobData();
 		
-		//Gets the engine
+		//Gets the right job for the engine (only for clients)	
+		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
+		{
+			if(is_null($enumValue) || $enumValue == KalturaBulkUploadType::CSV)
+				return new KalturaBulkUploadCsvJobData();
+		}	
+		
+		//Gets the engine (only for clients)
 		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
 		{
+			
 			if(is_null($enumValue) || $enumValue == KalturaBulkUploadType::CSV)
 			{
 				list($taskConfig, $kClient, $job) = $constructorArgs;
