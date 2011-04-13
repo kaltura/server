@@ -1,8 +1,8 @@
 <?php
 /**
- * @package plugins.bulkUploadXmlEngine
+ * @package plugins.bulkUploadXml
  */
-class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader
+class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'bulkUploadXml';
 	
@@ -38,22 +38,16 @@ class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaEnumera
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		//The client side
-		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
-		{
-			//TODO: add support for different job types
-			if($enumValue == KalturaBulkUploadType::XML)
-				return new kBulkUploadXmlJobData();
-		}
+		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
+			return new kBulkUploadXmlJobData();
 				
 		//If we are on the client side (like batch)
 		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
 		{
 			if($enumValue == KalturaBulkUploadType::XML)
 			{
-				return new BulkUploadEngineXml($constructorArgs[0], $constructorArgs[1]);
-//				$reflection = new ReflectionClass('BulkUploadEngineXml');	
-//				return $reflection->newInstance($constructorArgs);
+				list($taskConfig, $kClient, $job) = $constructorArgs;
+				return new BulkUploadEngineXml($taskConfig, $kClient, $job);
 			}
 		}
 	
@@ -67,19 +61,6 @@ class BulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaEnumera
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
-		{
-			if($enumValue == self::getApiValue(BulkUploadType::XML))
-				return 'kBulkUploadXmlJobData';
-		}
-		
-		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
-		{
-			if($enumValue == KalturaBulkUploadType::CSV)
-			{
-				return 'BulkUploadEngineXml';
-			}
-		
 		return null;
 	}
 		
