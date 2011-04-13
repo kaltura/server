@@ -29,6 +29,8 @@ class BulkUploadService extends KalturaBaseService
 	{
 		$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', $bulkUploadType);
 		
+		kBulkUploadManager::setKuser($this->getKuser());
+		kBulkUploadManager::setpartner($this->getpartner());
 		$dbJob = kBulkUploadManager::add($fileData["tmp_name"], $fileData["name"], $conversionProfileId, $bulkUploadType);
 		
 		$bulkUpload = new KalturaBulkUpload();
