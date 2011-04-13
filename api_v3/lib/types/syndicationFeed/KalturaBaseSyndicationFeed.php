@@ -55,7 +55,7 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	 * feed type
 	 * 
 	 * @var KalturaSyndicationFeedType
-	 * @readonly
+	 * @insertonly
 	 * @filter order
 	 */
 	public $type;
