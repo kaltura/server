@@ -22,6 +22,13 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	const VALUES_COUNT_V2 = 12;
 	
 	/**
+	 * 
+	 * The bulk upload results
+	 * @var array
+	 */
+	private $bulkUploadResults;
+		
+	/**
 	 * @var int
 	 */
 	protected $lineNumber = 0;
@@ -236,7 +243,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			$this->lineNumber ++;
 			
 			// creates a result object
-			$bulkUploadResult =  $this->createUploadResult($this->lineNumber, $values, $columns);
+			$bulkUploadResult =  $this->createUploadResult($values, $columns);
 				    		    
 		    if(is_null($bulkUploadResult))
 		    {
@@ -244,7 +251,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		    }
 			else // store the valid results in the $bulkUploadResults 
 			{
-				$bulkUploadResults[] = $bulkUploadResult;
+				$this->bulkUploadResults[] = $bulkUploadResult;
 			}
 			
 			$values = fgetcsv($fileHandle);
@@ -256,10 +263,10 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$this->kClient->doMultiRequest();
 		
 		KalturaLog::info("Sent $this->multiRequestCounter invalid lines results");
-		KalturaLog::info("CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($bulkUploadResults)) . ' invalid records');
+		KalturaLog::info("CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($this->bulkUploadResults)) . ' invalid records');
 		
 		// reports that the parsing done
-		$msg = "CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($bulkUploadResults)) . ' invalid records';
+		$msg = "CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($this->bulkUploadResults)) . ' invalid records';
 		$updateData = new KalturaBulkUploadCsvJobData();
 		$updateData->csvVersion = $this->csvVersion;
 				
@@ -267,7 +274,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$this->checkAborted();
 
 		//Create the entries from the bulk upload results
-		$isValid = $this->createEntries($bulkUploadResults, $this->multiRequestCounter);
+		$isValid = $this->createEntries();
 		
 		return true;
 	}
@@ -298,10 +305,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	/**
 	 * 
 	 * Create the entries from the given bulk upload results
-	 * @param array $bulkUploadResults
-	 * @param array $bulkUploadResultChunk
 	 */
-	protected function createEntries(array $bulkUploadResults)
+	protected function createEntries()
 	{
 		// start a multi request for add entries
 		$this->startMultiRequest(true);
@@ -310,7 +315,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		KalturaLog::info("job[$this->job->id] start creating entries");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
 				
-		foreach($bulkUploadResults as $bulkUploadResult)
+		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
 			$this->sendChunkedDataForPartner($this->job, &$bulkUploadResultChunk);
 						
