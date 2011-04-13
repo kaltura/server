@@ -6,7 +6,11 @@ class UserController extends Zend_Controller_Action
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		
+		$settings = Zend_Registry::get('config')->settings;
+		$adminConsolePartnerId = $settings->partnerId;
+		
 		$filter = new KalturaUserFilter();
+		$filter->partnerIdEqual = $adminConsolePartnerId;
 		$paginatorAdapter = new Kaltura_FilterPaginator("user", "listAction", null, $filter);
 		$paginator = new Kaltura_Paginator($paginatorAdapter);
 		$paginator->setCurrentPageNumber($page);
