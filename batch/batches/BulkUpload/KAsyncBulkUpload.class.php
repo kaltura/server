@@ -78,7 +78,6 @@ class KAsyncBulkUpload extends KBatchBase {
 	 * 
 	 * Starts the bulk upload
 	 * @param KalturaBatchJob $job
-	 * @param KalturaBulkUploadJobData $bulkUploadJobData
 	 */
 	private function startBulkUpload(KalturaBatchJob $job)
 	{
