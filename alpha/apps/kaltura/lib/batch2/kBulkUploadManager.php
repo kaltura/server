@@ -62,7 +62,7 @@ class kBulkUploadManager
 		$extension = strtolower($fileInfo["extension"]);
 		
 		$job = new BatchJob();
-		$job->setPartnerId($this->getPartner());
+		$job->setPartnerId(kBulkUploadManager::getPartner());
 		$job->setJobSubType($bulkUploadType);
 		$job->save();
 		
@@ -81,12 +81,12 @@ class kBulkUploadManager
 		$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $bulkUploadType, array());
 				
 		$data->setFilePath($filePath);
-		$data->setUserId($this->getKuser()->getPuserId());
-		$data->setUploadedBy($this->getKuser()->getScreenName());
+		$data->setUserId(kBulkUploadManager::getKuser()->getPuserId());
+		$data->setUploadedBy(kBulkUploadManager::getKuser()->getScreenName());
 		if (!$conversionProfileId)
-			$conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
+			$conversionProfileId = kBulkUploadManager::getPartner()->getDefaultConversionProfileId();
 			
-		$kmcVersion = $this->getPartner()->getKmcVersion();
+		$kmcVersion = kBulkUploadManager::getPartner()->getKmcVersion();
 		$check = null;
 		if($kmcVersion < 2)
 		{
