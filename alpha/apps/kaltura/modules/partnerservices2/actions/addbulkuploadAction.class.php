@@ -58,44 +58,46 @@ class addbulkuploadAction extends defPartnerservices2Action
 			$this->addError(APIErrors::INVALID_FILE_FIELD, $fileField);
 			return;
 		}
-		
+				
 		// first we copy the file to "content/batchfiles/[partner_id]/"
-		$origFilename = $_FILES[$fileField]['name'];
+		$fileName = $_FILES[$fileField]['name'];
+		$filePath = $_FILES[$fileField]['tmp_name'];
 
-		$fileInfo = pathinfo($origFilename);
-		$extension = strtolower($fileInfo['extension']);
+		kBulkUploadManager::add($filePath, $fileName, $profileId);
 		
-		if ($extension != "csv")
-		{
-			$this->addError(APIErrors::INVALID_FILE_EXTENSION);
-			return;
-		}
-		
-		$job = new BatchJob();
-		$job->setPartnerId($partner_id);
-		$job->save();
-		
-		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
-//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
-		try{
-			kFileSyncUtils::moveFromFile($_FILES[$fileField]['tmp_name'], $syncKey, true);
-		}
-		catch(Exception $e)
-		{
-			$this->addError(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
-			return;
-		}
-		$csvPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		
-		$data = new kBulkUploadJobData();
-		$data->setCsvFilePath($csvPath);
-		$data->setUserId($puser_kuser->getPuserId());
-		$data->setUploadedBy($puser_kuser->getPuserName());
-		$data->setConversionProfileId($profileId);
-			
-		kJobsManager::addJob($job, $data, BatchJobType::BULKUPLOAD);
-		
-		$this->addMsg("status", "ok");
+//		$fileInfo = pathinfo($fileName );
+//		$extension = strtolower($fileInfo['extension']);
+//		
+//		if ($extension != "csv")
+//		{
+//			$this->addError(APIErrors::INVALID_FILE_EXTENSION);
+//			return;
+//		}
+//		
+//		$job = new BatchJob();
+//		$job->setPartnerId($partner_id);
+//		$job->save();
+//		
+//		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
+////		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
+//		try{
+//			kFileSyncUtils::moveFromFile($_FILES[$fileField]['tmp_name'], $syncKey, true);
+//		}
+//		catch(Exception $e)
+//		{
+//			$this->addError(APIErrors::BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR);
+//			return;
+//		}
+//		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+//		
+//		$data = new kBulkUploadJobData();
+//		$data->setFilePath($filePath);
+//		$data->setUserId($puser_kuser->getPuserId());
+//		$data->setUploadedBy($puser_kuser->getPuserName());
+//		$data->setConversionProfileId($profileId);
+//			
+//		kJobsManager::addJob($job, $data, BatchJobType::BULKUPLOAD);
+//		
+//		$this->addMsg("status", "ok");
 	}
 }
-?>
