@@ -1058,4 +1058,22 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	}";
 	}
 	
+	protected function addClearInstancePool(&$script)
+	{
+		$script .= "
+	/**
+	 * Clear the instance pool.
+	 *
+	 * @return     void
+	 */
+	public static function clearInstancePool()
+	{
+		foreach (self::\$instances as \$instance)
+		{
+			\$instance->clearAllReferences(false);
+		}
+		self::\$instances = array();
+	}
+	";
+	}
 }
