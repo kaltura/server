@@ -224,7 +224,9 @@ class APIErrors
 	
 	const BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_CSV_FILE_SYNC_ERROR, Unable to create file sync object for bulk upload csv";
 	
-	
+	// %s - bulk upload type
+	const BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID = "BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID, bulk upload type [%s] not supported";
+		
 	const BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR = "BULK_UPLOAD_CREATE_RESULT_FILE_SYNC_ERROR, Unable to create file sync object for bulk upload result";
 	
 	
