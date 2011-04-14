@@ -995,7 +995,12 @@ class kJobsManager
 		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
 		$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $bulkUploadType, array());
-				
+
+		if(is_null($data))
+		{
+			throw new APIException(APIErrors::BULK_UPLOAD_BULK_UPLOAD_TYPE_NOT_VALID, $bulkUploadType);
+		}
+		
 		$data->setFilePath($filePath);
 		$data->setUserId($puserId);
 		$data->setUploadedBy($puserId);
