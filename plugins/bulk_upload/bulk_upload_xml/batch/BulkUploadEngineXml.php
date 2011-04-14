@@ -10,7 +10,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * The engine xsd file path
-	 * @var unknown_type
+	 * @var string
 	 */
 	private $xsdFilePath = "{dirname(__FILE__)}../lib/schema/ingestion.xsd";
 	 
@@ -25,7 +25,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
 	 */
-	public function handleBulkUpload(KalturaBatchJob $job, KalturaBulkUploadJobData $data) 
+	public function handleBulkUpload() 
 	{
 		$this->validate();
 	    $this->parse();
