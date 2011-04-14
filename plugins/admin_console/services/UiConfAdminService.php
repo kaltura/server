@@ -104,4 +104,38 @@ class UiConfAdminService extends KalturaBaseService
 		$dbUiConf->setStatus(uiConf::UI_CONF_STATUS_DELETED);
 		$dbUiConf->save();
 	}
+	
+	/**
+	 * Retrieve a list of available UIConfs  with no partner limitation
+	 * 
+	 * @action list
+	 * @param KalturaUiConfFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaUiConfListResponse
+	 */		
+	function listAction( KalturaUiConfFilter $filter = null , KalturaFilterPager $pager = null)
+	{
+		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
+		
+		if (!$filter)
+			$filter = new KalturaUiConfFilter();
+			
+		$uiConfFilter = new uiConfFilter();
+		$filter->toObject($uiConfFilter);
+		
+		$c = new Criteria();
+		$uiConfFilter->attachToCriteria($c);
+		$count = uiConfPeer::doCount($c);
+		if ($pager)
+			$pager->attachToCriteria($c);
+		$list = uiConfPeer::doSelect($c);
+		
+		$newList = KalturaUiConfArray::fromUiConfArray($list);
+		
+		$response = new KalturaUiConfListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $count;
+		
+		return $response;
+	}
 }

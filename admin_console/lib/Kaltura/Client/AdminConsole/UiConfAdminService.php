@@ -62,4 +62,20 @@ class Kaltura_Client_AdminConsole_UiConfAdminService extends Kaltura_Client_Serv
 		$this->client->throwExceptionIfError($resultObject);
 		return $resultObject;
 	}
+
+	function listAction(Kaltura_Client_Type_UiConfFilter $filter = null, Kaltura_Client_Type_FilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "Kaltura_Client_Type_UiConfListResponse");
+		return $resultObject;
+	}
 }
