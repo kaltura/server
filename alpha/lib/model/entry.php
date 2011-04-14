@@ -1692,6 +1692,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	 */
 	public function getPartner()	{		return PartnerPeer::retrieveByPK( $this->getPartnerId() );	}
 	
+	public function getSubpId()
+	{
+		return ($this->subp_id != null ? $this->subp_id : 0);
+	}
+		
 	public function getPartnerLandingPage ()
 	{
 		if ( ! $this->getPartner() ) return null;
