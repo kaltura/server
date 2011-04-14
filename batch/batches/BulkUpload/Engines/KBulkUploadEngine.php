@@ -178,7 +178,7 @@ abstract class KBulkUploadEngine
 		if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 		{
 			// commit the multi request entries
-			$requestResults = $this->doMultiRequestForPartnerId();
+			$requestResults = $this->doMultiRequestForPartner();
 			
 			if(count($requestResults) != count($bulkUploadResultChunk))
 			{
