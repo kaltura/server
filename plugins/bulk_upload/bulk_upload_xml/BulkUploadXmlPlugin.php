@@ -73,17 +73,8 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 				list($taskConfig, $kClient, $job) = $constructorArgs;
 				return new BulkUploadEngineXml($taskConfig, $kClient, $job);
 			}
-			
-			if($enumValue == self::getBulkUploadTypeCoreValue(KalturaBulkUploadType::XML))
-			{
-				list($taskConfig, $kClient, $job) = $constructorArgs;
-				return new BulkUploadEngineXml($taskConfig, $kClient, $job);
-			}
 		}
 				
-		return null;
-		
-	
 		return null;
 	}
 	
