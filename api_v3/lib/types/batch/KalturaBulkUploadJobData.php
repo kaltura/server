@@ -75,4 +75,22 @@ class KalturaBulkUploadJobData extends KalturaJobData
 			
 		return parent::toObject($dbData);
 	}
+
+	/**
+	 * @param string $subType is the bulk upload sub type
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		return kPluginableEnumsManager::apiToCore('BulkUploadType', $subType);
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		return kPluginableEnumsManager::coreToApi('BulkUploadType', $subType);
+	}
 }
