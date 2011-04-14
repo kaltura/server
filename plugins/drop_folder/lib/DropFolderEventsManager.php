@@ -45,6 +45,7 @@ class DropFolderEventsManager implements kObjectChangedEventConsumer
 		// get file patterns configured for the drop folder
 		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
 		$filePatterns = $dropFolder->getFileNamePatterns();
+		$filePatterns = array_map('trim', explode(',', $filePatterns));
 		
 		// get current file name
 		$fileName = $dropFolderFile->getFileName();

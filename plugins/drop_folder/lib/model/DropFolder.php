@@ -73,8 +73,9 @@ class DropFolder extends BaseDropFolder
 	/**
 	 * @param DropFolderFileHandlerConfig $fileHandlerConfig
 	 */
-	public function setFileHandlerConfig(DropFolderFileHandlerConfig $fileHandlerConfig)
+	public function setFileHandlerConfig($fileHandlerConfig)
 	{
+		//TODO: verify that $fileHandlerConfig instanceof DropFolderFileHandlerConfig
 		$serializedConfig = serialize($fileHandlerConfig);
 		parent::setFileHandlerConfig($serializedConfig);
 	}	

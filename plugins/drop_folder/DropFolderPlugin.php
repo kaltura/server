@@ -2,9 +2,10 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator
+class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'dropFolder';
+	const DROP_FOLDER_EVENTS_MANAGER_CLASS = 'DropFolderEventsManager';
 	
 	public static function getPluginName()
 	{
@@ -88,6 +89,16 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			return array('DropFolderPermissionName');
 			
 		return array();
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::DROP_FOLDER_EVENTS_MANAGER_CLASS
+		);
 	}
 	
 
