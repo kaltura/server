@@ -12,7 +12,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * The engine xsd file path
 	 * @var string
 	 */
-	private $xsdFilePath = "{dirname(__FILE__)}../lib/ingestion.xsd";
+	private $xsdFilePath = "/../lib/ingestion.xsd";
 	 
 	/**
 	 * @return string
@@ -38,7 +38,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function validate() 
 	{
 		$xdoc = new DomDocument;
-		$xdoc->Load($this->data->filePath);
+		$xdoc->Load(dirname(__FILE__) . $this->data->filePath);
 		//Validate the XML file against the schema
 		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
 		{
