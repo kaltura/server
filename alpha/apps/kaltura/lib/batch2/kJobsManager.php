@@ -1022,6 +1022,6 @@ class kJobsManager
 		
 		$data->setConversionProfileId($conversionProfileId);
 			
-		return kJobsManager::addJob($job, $data, BatchJobType::BULKUPLOAD, $bulkUploadType);
+		return kJobsManager::addJob($job, $data, BatchJobType::BULKUPLOAD, kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadType));
 	}
 }
