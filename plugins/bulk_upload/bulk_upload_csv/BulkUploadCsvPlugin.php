@@ -69,7 +69,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
 		{
 			
-			if(is_null($enumValue) || $enumValue == KalturaBulkUploadType::CSV)
+			if(is_null($enumValue) || $enumValue == KalturaBulkUploadCsvType::CSV)
 			{
 				list($taskConfig, $kClient, $job) = $constructorArgs;
 				return new BulkUploadEngineCsv($taskConfig, $kClient, $job);
