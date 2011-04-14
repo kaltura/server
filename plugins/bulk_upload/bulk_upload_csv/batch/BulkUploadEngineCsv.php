@@ -316,7 +316,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 				
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
-			$this->sendChunkedDataForPartner($this->job, &$bulkUploadResultChunk);
+			$this->sendChunkedDataForPartner(&$bulkUploadResultChunk);
 						
 			$mediaEntry = $this->createMediaEntryFromResultAndJobData($bulkUploadResult);
 					
