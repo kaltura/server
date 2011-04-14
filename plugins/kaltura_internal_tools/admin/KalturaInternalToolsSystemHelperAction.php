@@ -19,7 +19,7 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePl
 	
 	public function getRequiredPermissions()
 	{
-		return array(KalturaPermissionName::SYSTEM_INTERNAL);
+		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_INTERNAL);
 	}
 
 	
@@ -95,10 +95,19 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePl
 		elseif ( $algo == "ks" )
 		{			
 			//$ks = ks::fromSecureString ( $str ); // to do ->api Extension
-			$client = Kaltura_ClientHelper::getClient();
-			$ks = $client->KalturaInternalToolsSystemHelper->fromSecureString($str); 
-			$res = print_r ( $ks , true );
-			if ( $ks != null )
+			$client = Infra_ClientHelper::getClient();
+			$internalToolsPlugin = Kaltura_Client_KalturaInternalTools_Plugin::get($client);
+			$ks = null;
+			
+			try{
+				$ks = $internalToolsPlugin->kalturaInternalToolsSystemHelper->fromSecureString($str);
+				$res = print_r ( $ks , true );
+			}
+			catch(Kaltura_Client_Exception $e){
+				$res = $e->getMessage();
+			}
+			 
+			if (!is_null($ks))
 			{
 				$expired = $ks->valid_until;
 				$expired_str = self::formatThisData($expired); 
@@ -130,16 +139,17 @@ class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePl
 		elseif ( $algo == "ip" )
 		{
 			//$ip_geo = new myIPGeocoder();// to do ->api Extension
-			$client = Kaltura_ClientHelper::getClient();
+			$client = Infra_ClientHelper::getClient();
+			$internalToolsPlugin = Kaltura_Client_KalturaInternalTools_Plugin::get($client);
 			if ( $str )
 				$remote_addr = $str;
 			else
 			{
 				//$remote_addr = requestUtils::getRemoteAddress();// to do ->api Extension
-				$remote_addr = $client->KalturaInternalToolsSystemHelper->getRemoteAddress();
+				$remote_addr = $internalToolsPlugin->KalturaInternalToolsSystemHelper->getRemoteAddress();
 			} 
 			//$res = $ip_geo->iptocountry( $remote_addr );
-			$res = $client->KalturaInternalToolsSystemHelper->iptocountry($remote_addr);
+			$res = $internalToolsPlugin->KalturaInternalToolsSystemHelper->iptocountry($remote_addr);
 		}
 		
 				

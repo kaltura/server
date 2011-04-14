@@ -19,7 +19,7 @@ class MetadataProfilesAction extends KalturaAdminConsolePlugin
 	
 	public function getRequiredPermissions()
 	{
-		return array(KalturaPermissionName::SYSTEM_ADMIN_PUBLISHER_CONFIG);
+		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_PUBLISHER_CONFIG);
 	}
 	
 	public function doAction(Zend_Controller_Action $action)
