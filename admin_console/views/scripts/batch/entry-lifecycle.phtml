@@ -75,19 +75,19 @@
 								$color = 'black';
 								switch($job->status)
 								{
-									case KalturaBatchJobStatus::FINISHED:
-									case KalturaBatchJobStatus::DONT_PROCESS:
+									case Kaltura_Client_Enum_BatchJobStatus::FINISHED:
+									case Kaltura_Client_Enum_BatchJobStatus::DONT_PROCESS:
 										$color = 'green';
 										break;
 										
-									case KalturaBatchJobStatus::ABORTED:
-									case KalturaBatchJobStatus::FAILED:										
-									case KalturaBatchJobStatus::FATAL:
+									case Kaltura_Client_Enum_BatchJobStatus::ABORTED:
+									case Kaltura_Client_Enum_BatchJobStatus::FAILED:										
+									case Kaltura_Client_Enum_BatchJobStatus::FATAL:
 										$color = 'red';
 										break;
 								}
 								
-								$status = $this->enumTranslate('KalturaBatchJobStatus', $job->status);
+								$status = $this->enumTranslate('Kaltura_Client_Enum_BatchJobStatus', $job->status);
 								echo "<font color=\"$color\">$status</font>";
 								
 								if($job->deletedAt)

@@ -77,7 +77,7 @@
 								<td><?php echo date($this->translate('date format'), $job->createdAt); ?></td>
 								<td><?php echo $job->executionAttempts; ?></td>
 								<td>
-									<?php if (Kaltura_AclHelper::isAllowed('batch', 'in-progress-abort-tasks')): ?>
+									<?php if (Infra_AclHelper::isAllowed('batch', 'in-progress-abort-tasks')): ?>
 									<button onclick="cancelJob(<?php echo $job->id . ',' . $job->jobType; ?>)"><?php echo $this->translate('jobs in-progress action cancel'); ?></button>
 									<?php endif; ?>
 								</td>
@@ -149,7 +149,7 @@
 								<td><?php echo date($this->translate('date format'), $job->queueTime); ?></td>
 								<td><?php echo $job->executionAttempts; ?></td>
 								<td>
-									<?php if (Kaltura_AclHelper::isAllowed('batch', 'in-progress-abort-tasks')): ?>
+									<?php if (Infra_AclHelper::isAllowed('batch', 'in-progress-abort-tasks')): ?>
 									<button onclick="abortJob(<?php echo $job->id . ',' . $job->jobType; ?>)"><?php echo $this->translate('jobs in-progress action abort'); ?></button>
 									<?php endif; ?>
 								</td>

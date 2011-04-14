@@ -7,7 +7,7 @@ class IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-    	if (Kaltura_AclHelper::isAllowed('partner', 'list'))
+    	if (Infra_AclHelper::isAllowed('partner', 'list'))
         	$this->_helper->redirector('list', 'partner');
     }
     

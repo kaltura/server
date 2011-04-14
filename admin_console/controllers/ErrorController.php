@@ -9,7 +9,7 @@ class ErrorController extends Zend_Controller_Action
 		$errors = $this->_getParam('error_handler');
 		
 		// handle kaltura session expired
-		if (get_class($errors->exception) == 'KalturaException')
+		if (get_class($errors->exception) == 'Kaltura_Client_Exception')
 		{
 			if (strpos($errors->exception->getMessage(), 'EXPIRED'))
 			{

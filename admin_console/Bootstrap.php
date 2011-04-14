@@ -79,7 +79,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		{
 			if(!($pluginAdminConsolePage instanceof KalturaAdminConsolePlugin))
 				continue;
-			if(!($pluginAdminConsolePage->accessCheck(Kaltura_AclHelper::getCurrentPermissions())))
+			if(!($pluginAdminConsolePage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
 				continue;				
 				
 			$navigation->addPage(array(
@@ -122,10 +122,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			'namespace' => '',
 			'basePath'  => dirname(__FILE__),
 		));
-		$moduleAutoloader->addResourceType('kaltura', 'lib/Kaltura', 'Kaltura');
+		$moduleAutoloader->addResourceType('infra', '../ui_infra/Infra', 'Infra');
 		$autoloader->pushAutoloader($moduleAutoloader);
-		$autoloader->pushAutoloader(new Kaltura_ClientLoader());
-		$autoloader->pushAutoloader(new Kaltura_InfraLoader());
+		
+		$clientAutoloader = new Zend_Application_Module_Autoloader(array(
+			'namespace' => '',
+			'basePath'  => dirname(__FILE__),
+		));
+		$clientAutoloader->addResourceType('kaltura', 'lib/Kaltura', 'Kaltura');
+		$autoloader->pushAutoloader($clientAutoloader);
+		
+//		$autoloader->pushAutoloader(new Infra_ClientLoader());
+		$autoloader->pushAutoloader(new Infra_InfraLoader());
 	}
 	
 	protected function _initTimeZone()
@@ -148,21 +156,21 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		
 		$front = Zend_Controller_Front::getInstance();
 		
-		$front->registerPlugin(new Kaltura_AuthPlugin());
+		$front->registerPlugin(new Infra_AuthPlugin());
 		
 		$acl = Zend_Registry::get('acl');
 		$config = Zend_Registry::get('config');
-		$front->registerPlugin(new Kaltura_ControllerPluginAcl($acl, Kaltura_AclHelper::getCurrentRole()));
+		$front->registerPlugin(new Infra_ControllerPluginAcl($acl, Infra_AclHelper::getCurrentRole()));
 	}
 	
 	protected function _initAcl()
 	{
 		$acl = new Zend_Acl();
 		
-		$acl->addRole(Kaltura_AclHelper::ROLE_GUEST);
+		$acl->addRole(Infra_AclHelper::ROLE_GUEST);
 				
-		$currentRole = Kaltura_AclHelper::getCurrentRole();
-		$currentPermissions = Kaltura_AclHelper::getCurrentPermissions();
+		$currentRole = Infra_AclHelper::getCurrentRole();
+		$currentPermissions = Infra_AclHelper::getCurrentPermissions();
 		
 		if (!$acl->hasRole($currentRole)) {
 			$acl->addRole($currentRole);
@@ -262,7 +270,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		{
 			$controller = $page->get('controller');
 			$action = $page->get('action');
-			$allowed = Kaltura_AclHelper::isAllowed($controller, $action);
+			$allowed = Infra_AclHelper::isAllowed($controller, $action);
 
 			if(!$allowed)
 			{

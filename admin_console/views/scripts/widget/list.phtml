@@ -32,11 +32,11 @@
 			</tr>
 		</tfoot>
 		<tbody>
-			<?php foreach($this->paginator as /* KalturaUIConf */ $uiConf): ?>
+			<?php foreach($this->paginator as /* Kaltura_Client_Type_UIConf */ $uiConf): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
 				<td><?php echo $uiConf->id; ?></td>
 				<td><?php echo $uiConf->name; ?></td>
-				<td><?php echo $this->enumTranslate('KalturaUiConfObjType', $uiConf->objType); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_UiConfObjType', $uiConf->objType); ?></td>
 				<td><?php echo $uiConf->partnerId; ?></td>
 				<td><?php echo (isset($uiConf->partner)) ? $uiConf->partner->name : ''; ?></td>
 				<td><?php echo $uiConf->width; ?></td>
@@ -48,13 +48,13 @@
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $uiConf->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
-						<?php if (Kaltura_AclHelper::isAllowed('widget','edit')): ?>
+						<?php if (Infra_AclHelper::isAllowed('widget','edit')): ?>
 							<option value="editForm" ><?php echo $this->translate('Edit'); ?></option>
 						<?php endif; ?>
-						<?php if (Kaltura_AclHelper::isAllowed('widget','delete')): ?>
+						<?php if (Infra_AclHelper::isAllowed('widget','delete')): ?>
 							<option value="deleteWidget" ><?php echo $this->translate('Delete'); ?></option>
 						<?php endif; ?>
-						<?php if (Kaltura_AclHelper::isAllowed('widget','duplicate')): ?>
+						<?php if (Infra_AclHelper::isAllowed('widget','duplicate')): ?>
 							<option value="duplicateWidget" ><?php echo $this->translate('Duplicate'); ?></option>
 						<?php endif; ?>
 					</select>

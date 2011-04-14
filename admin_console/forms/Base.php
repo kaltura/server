@@ -1,5 +1,5 @@
 <?php
-class Form_Base extends Kaltura_Form
+class Form_Base extends Infra_Form
 {
 	protected $templatePath = null;
 	protected $viewParams = array();

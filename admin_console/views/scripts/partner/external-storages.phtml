@@ -50,12 +50,12 @@
 			</tr>
 		</tfoot>
 		<tbody>
-			<?php foreach($this->paginator as /* KalturaStorageProfile */ $storage): ?>
+			<?php foreach($this->paginator as /* Kaltura_Client_StorageProfile_Type_StorageProfile */ $storage): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-				<td><?php echo $this->enumTranslate('KalturaStorageProfileStatus', $storage->status); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_StorageProfile_Enum_StorageProfileStatus', $storage->status); ?></td>
 				<td><?php echo $storage->id; ?></td>
 				<td><?php echo $storage->name; ?></td>
-				<td><?php echo $this->enumTranslate('KalturaStorageProfileProtocol', $storage->protocol); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_StorageProfile_Enum_StorageProfileProtocol', $storage->protocol); ?></td>
 				<td><?php echo $storage->storageUrl; ?></td>
 				<td><?php echo $storage->partnerId; ?></td>
 				<td><?php echo (isset($pathManagersNames[$storage->pathManagerClass]) ? $pathManagersNames[$storage->pathManagerClass] : $pathManagersNames['default']); ?></td>
@@ -66,13 +66,13 @@
 					<select class="options" onchange="doAction(this.value, <?php echo $storage->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
-						<?php if ($storage->status == KalturaStorageProfileStatus::DISABLED): ?>
+						<?php if ($storage->status == Kaltura_Client_StorageProfile_Enum_StorageProfileStatus::DISABLED): ?>
 							<option value="setManual"><?php echo $this->translate('Enable'); ?></option>
 							<option value="setAutomatic"><?php echo $this->translate('Export Automatically'); ?></option>
-						<?php elseif ($storage->status == KalturaStorageProfileStatus::MANUAL): ?>
+						<?php elseif ($storage->status == Kaltura_Client_StorageProfile_Enum_StorageProfileStatus::MANUAL): ?>
 							<option value="disable"><?php echo $this->translate('Disable'); ?></option>
 							<option value="setAutomatic"><?php echo $this->translate('Export Automatically'); ?></option>
-						<?php elseif ($storage->status == KalturaStorageProfileStatus::AUTOMATIC): ?>
+						<?php elseif ($storage->status == Kaltura_Client_StorageProfile_Enum_StorageProfileStatus::AUTOMATIC): ?>
 							<option value="disable"><?php echo $this->translate('Disable'); ?></option>
 							<option value="setManual"><?php echo $this->translate('Manual only'); ?></option>
 						<?php endif; ?>
@@ -200,7 +200,7 @@ function setManual(storageId)
 	{
 		changeStatus(
 				storageId, 
-			<?php echo KalturaStorageProfileStatus::MANUAL; ?>, 
+			<?php echo Kaltura_Client_StorageProfile_Enum_StorageProfileStatus::MANUAL; ?>, 
 			function() {
 				alert('<?php echo $this->translate('storage was manualed');?>');
 			}
@@ -215,7 +215,7 @@ function setAutomatic(storageId)
 	{
 		changeStatus(
 				storageId, 
-			<?php echo KalturaStorageProfileStatus::AUTOMATIC; ?>, 
+			<?php echo Kaltura_Client_StorageProfile_Enum_StorageProfileStatus::AUTOMATIC; ?>, 
 			function() {
 				alert('<?php echo $this->translate('storage was autoed');?>');
 			}
@@ -230,7 +230,7 @@ function disable(storageId)
 	{
 		changeStatus(
 				storageId, 
-			<?php echo KalturaStorageProfileStatus::DISABLED; ?>, 
+			<?php echo Kaltura_Client_StorageProfile_Enum_StorageProfileStatus::DISABLED; ?>, 
 			function() {
 				alert('<?php echo $this->translate('storage was disabled');?>');
 			}

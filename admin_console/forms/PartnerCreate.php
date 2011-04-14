@@ -1,5 +1,5 @@
 <?php 
-class Form_PartnerCreate extends Kaltura_Form
+class Form_PartnerCreate extends Infra_Form
 {
 	public function init()
 	{

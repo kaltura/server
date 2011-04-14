@@ -64,12 +64,12 @@
 					<th><?php echo $this->translate('entry-investigate info entry status label'); ?></th>
 					<th><?php echo $this->translate('entry-investigate info entry type label'); ?></th>
 					<?php 
-						if($entry instanceof KalturaMediaEntry)
+						if($entry instanceof Kaltura_Client_Type_MediaEntry)
 						{
 							?>
 								<th><?php echo $this->translate('entry-investigate info entry pv label'); ?></th>
 								<?php 
-									if($entry instanceof KalturaLiveStreamAdminEntry)
+									if($entry instanceof Kaltura_Client_Type_LiveStreamAdminEntry)
 									{
 										?>
 											<th><?php echo $this->translate('entry-investigate info entry ip1 label'); ?></th>
@@ -83,7 +83,7 @@
 											<th><?php echo $this->translate('entry-investigate info entry encoder bk rtmp label'); ?></th>
 										<?php 
 									}
-									elseif($entry instanceof KalturaMediaEntry)
+									elseif($entry instanceof Kaltura_Client_Type_MediaEntry)
 									{
 										?>
 											<th><?php echo $this->translate('entry-investigate info entry media type label'); ?></th>
@@ -109,8 +109,8 @@
 				</tr>
 				<tr class="<?php echo $this->cycle(array('odd', 'even'), 'entry')->next(); ?>">
 					<?php
-						$status = $this->enumTranslate('KalturaEntryStatus', $entry->status);
-						if($entry->status == KalturaEntryStatus::READY)
+						$status = $this->enumTranslate('Kaltura_Client_Enum_EntryStatus', $entry->status);
+						if($entry->status == Kaltura_Client_Enum_EntryStatus::READY)
 							$status = "<font color=\"green\">$status</font>";
 						elseif($entry->status < 0)
 							$status = "<font color=\"red\">$status</font>";
@@ -122,14 +122,14 @@
 					<td><?php echo $entry->tags; ?></td>
 					<td><?php echo $entry->adminTags; ?></td>
 					<td><?php echo $status; ?></td>
-					<td><?php echo $this->enumTranslate('KalturaEntryType', $entry->type); ?></td>
+					<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_EntryType', $entry->type); ?></td>
 					<?php 
-						if($entry instanceof KalturaMediaEntry)
+						if($entry instanceof Kaltura_Client_Type_MediaEntry)
 						{
 							?>
 								<td><?php echo 'p: ' . $entry->plays . '<br>v: ' . $entry->views; ?></td>
 								<?php 
-									if($entry instanceof KalturaLiveStreamAdminEntry)
+									if($entry instanceof Kaltura_Client_Type_LiveStreamAdminEntry)
 									{
 										?>
 											<td><?php echo $entry->encodingIP1; ?></td>
@@ -143,11 +143,11 @@
 											<td>rtmp://b.ep<?php echo $entry->streamRemoteBackupId; ?>.i.akamaientrypoint.net/EntryPoint</td>
 										<?php 
 									}
-									elseif($entry instanceof KalturaMediaEntry)
+									elseif($entry instanceof Kaltura_Client_Type_MediaEntry)
 									{
 										?>
-											<td><?php echo $this->enumTranslate('KalturaMediaType', $entry->mediaType); ?></td>
-											<td><?php echo $this->enumTranslate('KalturaSourceType', $entry->sourceType); ?></td>
+											<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_MediaType', $entry->mediaType); ?></td>
+											<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_SourceType', $entry->sourceType); ?></td>
 											<td><?php echo $entry->conversionQuality; ?></td>
 											<td><?php echo date($this->translate('time format'), $entry->mediaDate); ?></td>
 										<?php 
@@ -171,7 +171,7 @@
 			<br />
 			<ul>
 				<?php 
-					if($entry instanceof KalturaLiveStreamAdminEntry)
+					if($entry instanceof Kaltura_Client_Type_LiveStreamAdminEntry)
 					{
 						$getBroadcast = http_build_query(array(
 							'entryId' => $entry->id,
@@ -199,7 +199,7 @@
 							<li><a target="_blank" href="/p/<?php echo $entry->partnerId; ?>/sp/<?php echo $entry->partnerId; ?>00/playManifest/entryId/<?php echo $entry->id; ?>/format/rtmp/a/a.f4m"><?php echo $this->translate('entry-investigate info entry manifest label'); ?></a>
 						<?php 
 					}
-					elseif($entry instanceof KalturaMediaEntry)
+					elseif($entry instanceof Kaltura_Client_Type_MediaEntry)
 					{
 						?>
 							<li><?php echo $this->translate('entry-investigate info entry www label'); ?> - <a target="_blank" href="<?php echo str_replace( "cdn" , "www" , $entry->dataUrl ); ?>"><?php echo str_replace( "cdn" , "www" , $entry->dataUrl ); ?></a></li>
@@ -213,7 +213,7 @@
 			<br/>
 			
 			<?php 
-				if($enableActions && Kaltura_Support::isEnabled())
+				if($enableActions && Infra_Support::isEnabled())
 				{
 					?>
 						<button onclick="openRequestDialog();"><?php echo $this->translate('entry-investigate entry request support'); ?></button>
@@ -267,7 +267,7 @@
 										<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
 										<?php
 									}
-									elseif($file->status == KalturaFileSyncStatus::READY)
+									elseif($file->status == Kaltura_Client_FileSync_Enum_FileSyncStatus::READY)
 									{
 										?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
 									}
@@ -283,8 +283,8 @@
 								<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
 								<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
 								<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
-								<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
-								<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
+								<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncStatus', $file->status); ?></td>
+								<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncType', $file->fileType); ?></td>
 								<td><?php echo $file->linkedId; ?></td>
 								<td><?php echo $file->linkCount; ?></td>
 								<td><?php echo $file->fileRoot; ?></td>
@@ -358,7 +358,7 @@
 									<td><?php echo date($this->translate('time format'), $flavorAsset->createdAt); ?></td>
 									<td><?php echo date($this->translate('time format'), $flavorAsset->updatedAt); ?></td>
 									<td><?php echo date($this->translate('time format'), $flavorAsset->deletedAt); ?></td>
-									<td><?php echo $this->enumTranslate('KalturaFlavorAssetStatus', $flavorAsset->status); ?></td>
+									<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_FlavorAssetStatus', $flavorAsset->status); ?></td>
 									<td><?php echo $flavorAsset->description; ?></td>
 									<td><?php echo $flavorAsset->width; ?></td>
 									<td><?php echo $flavorAsset->height; ?></td>
@@ -569,7 +569,7 @@
 															<td><?php echo $mediaInfo->videoCodecId; ?></td>
 															<td><?php echo $mediaInfo->videoDuration; ?></td>
 															<td><?php echo $mediaInfo->videoBitRate; ?></td>
-															<td><?php echo $this->enumTranslate('KalturaBitRateMode', $mediaInfo->videoBitRateMode); ?></td>
+															<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_BitRateMode', $mediaInfo->videoBitRateMode); ?></td>
 															<td><?php echo $mediaInfo->videoWidth; ?></td>
 															<td><?php echo $mediaInfo->videoHeight; ?></td>
 															<td><?php echo $mediaInfo->videoFrameRate; ?></td>
@@ -579,7 +579,7 @@
 															<td><?php echo $mediaInfo->audioCodecId; ?></td>
 															<td><?php echo $mediaInfo->audioDuration; ?></td>
 															<td><?php echo $mediaInfo->audioBitRate; ?></td>
-															<td><?php echo $this->enumTranslate('KalturaBitRateMode', $mediaInfo->audioBitRateMode); ?></td>
+															<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_BitRateMode', $mediaInfo->audioBitRateMode); ?></td>
 															<td><?php echo $mediaInfo->audioChannels; ?></td>
 															<td><?php echo $mediaInfo->audioSamplingRate; ?></td>
 															<td><?php echo $mediaInfo->audioResolution; ?></td>
@@ -630,7 +630,7 @@
 																	<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
 																	<?php
 																}
-																elseif($file->status == KalturaFileSyncStatus::READY)
+																elseif($file->status == Kaltura_Client_FileSync_Enum_FileSyncStatus::READY)
 																{
 																	?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
 																}
@@ -646,8 +646,8 @@
 															<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
 															<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
 															<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
-															<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
-															<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
+															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncStatus', $file->status); ?></td>
+															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncType', $file->fileType); ?></td>
 															<td><?php echo $file->linkedId; ?></td>
 															<td><?php echo $file->linkCount; ?></td>
 															<td><?php echo $file->fileRoot; ?></td>
@@ -728,7 +728,7 @@
 									<td><?php echo date($this->translate('time format'), $thumbAsset->createdAt); ?></td>
 									<td><?php echo date($this->translate('time format'), $thumbAsset->updatedAt); ?></td>
 									<td><?php echo date($this->translate('time format'), $thumbAsset->deletedAt); ?></td>
-									<td><?php echo $this->enumTranslate('KalturaFlavorAssetStatus', $thumbAsset->status); ?></td>
+									<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_FlavorAssetStatus', $thumbAsset->status); ?></td>
 									<td><?php echo $thumbAsset->description; ?></td>
 									<td><?php echo $thumbAsset->width; ?></td>
 									<td><?php echo $thumbAsset->height; ?></td>
@@ -869,7 +869,7 @@
 																	<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
 																	<?php
 																}
-																elseif($file->status == KalturaFileSyncStatus::READY)
+																elseif($file->status == Kaltura_Client_FileSync_Enum_FileSyncStatus::READY)
 																{
 																	?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
 																}
@@ -885,8 +885,8 @@
 															<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
 															<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
 															<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
-															<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
-															<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
+															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncStatus', $file->status); ?></td>
+															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncType', $file->fileType); ?></td>
 															<td><?php echo $file->linkedId; ?></td>
 															<td><?php echo $file->linkCount; ?></td>
 															<td><?php echo $file->fileRoot; ?></td>
@@ -981,19 +981,19 @@
 										$color = 'black';
 										switch($job->status)
 										{
-											case KalturaBatchJobStatus::FINISHED:
-											case KalturaBatchJobStatus::DONT_PROCESS:
+											case Kaltura_Client_Enum_BatchJobStatus::FINISHED:
+											case Kaltura_Client_Enum_BatchJobStatus::DONT_PROCESS:
 												$color = 'green';
 												break;
 												
-											case KalturaBatchJobStatus::ABORTED:
-											case KalturaBatchJobStatus::FAILED:										
-											case KalturaBatchJobStatus::FATAL:
+											case Kaltura_Client_Enum_BatchJobStatus::ABORTED:
+											case Kaltura_Client_Enum_BatchJobStatus::FAILED:										
+											case Kaltura_Client_Enum_BatchJobStatus::FATAL:
 												$color = 'red';
 												break;
 										}
 										
-										$status = $this->enumTranslate('KalturaBatchJobStatus', $job->status);
+										$status = $this->enumTranslate('Kaltura_Client_Enum_BatchJobStatus', $job->status);
 										echo "<font color=\"$color\">$status</font>";
 										
 										if($job->deletedAt)
@@ -1082,7 +1082,7 @@
 					<?php foreach($investigateData->tracks as $track): ?>
 					<tr class="<?php echo $this->cycle(array('odd', 'even'), 'tracks')->next(); ?>">
 						<td><?php echo $track->id; ?></td>
-						<td><?php echo $this->enumTranslate('KalturaTrackEntryEventType', $track->trackEventType); ?></td>
+						<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_TrackEntryEventType', $track->trackEventType); ?></td>
 						<td><?php echo $track->psVersion; ?></td>
 						<td><?php echo $track->context; ?></td>
 						<td><?php echo $track->hostName; ?></td>
@@ -1139,22 +1139,22 @@
 					$color = '255, 255, 255';
 					switch($job->status)
 					{
-						case KalturaBatchJobStatus::QUEUED:
-						case KalturaBatchJobStatus::PROCESSING:
-						case KalturaBatchJobStatus::PROCESSED:
-						case KalturaBatchJobStatus::MOVEFILE:
-						case KalturaBatchJobStatus::ALMOST_DONE:
+						case Kaltura_Client_Enum_BatchJobStatus::QUEUED:
+						case Kaltura_Client_Enum_BatchJobStatus::PROCESSING:
+						case Kaltura_Client_Enum_BatchJobStatus::PROCESSED:
+						case Kaltura_Client_Enum_BatchJobStatus::MOVEFILE:
+						case Kaltura_Client_Enum_BatchJobStatus::ALMOST_DONE:
 							$color = '200, 255, 200';
 							break;
 	
-						case KalturaBatchJobStatus::FINISHED:
-						case KalturaBatchJobStatus::DONT_PROCESS:
+						case Kaltura_Client_Enum_BatchJobStatus::FINISHED:
+						case Kaltura_Client_Enum_BatchJobStatus::DONT_PROCESS:
 							$color = '128, 255, 128';
 							break;
 							
-						case KalturaBatchJobStatus::ABORTED:
-						case KalturaBatchJobStatus::FAILED:										
-						case KalturaBatchJobStatus::FATAL:
+						case Kaltura_Client_Enum_BatchJobStatus::ABORTED:
+						case Kaltura_Client_Enum_BatchJobStatus::FAILED:										
+						case Kaltura_Client_Enum_BatchJobStatus::FATAL:
 							$color = '255, 0, 0';
 							break;
 					}
@@ -1167,7 +1167,7 @@
 				var jobNode = new draw2d.shape.Job("<?php echo $this->jobTypeTranslate($job->jobType, $job->jobSubType); ?>");
 				jobNode.setBackgroundColor(bgColor);
 				jobNode.addAttribute("id", <?php echo $job->id; ?>);
-				jobNode.addAttribute("status", "<?php echo $this->enumTranslate('KalturaBatchJobStatus', $job->status); ?>");
+				jobNode.addAttribute("status", "<?php echo $this->enumTranslate('Kaltura_Client_Enum_BatchJobStatus', $job->status); ?>");
 				jobNodes["job_<?php echo $job->id; ?>"] = jobNode;
 
 				<?php if($job->parentJobId && $job->parentJobId != $job->id): ?>

@@ -290,11 +290,11 @@ class Kaltura_View_Helper_FailReasonTranslate extends Zend_View_Helper_Abstract
 				$ret = "<span title=\"$message\">$errTypeDesc ($errNumber)</span>";
 				break;
 				
-			case KalturaBatchJobErrorTypes::KALTURA_API:
+			case KalturaBatchJobErrorTypes::Kaltura_API:
 				$ret = "<span title=\"$message\">$errTypeDesc ($errNumber)</span>";
 				break;
 				
-			case KalturaBatchJobErrorTypes::KALTURA_CLIENT:
+			case KalturaBatchJobErrorTypes::Kaltura_CLIENT:
 				$title = $message;
 				if(isset(self::$clientDescriptions[$errNumber]))
 					$title = self::$clientDescriptions[$errNumber];

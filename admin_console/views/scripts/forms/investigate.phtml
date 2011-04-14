@@ -2,7 +2,7 @@
 	<?php echo $this->searchType; ?>
 	<?php echo $this->entryId; ?>
 	<?php echo $this->search; ?> 
-	<?php if(Kaltura_Support::isAdminEnabled()): ?> 
+	<?php if(Infra_Support::isAdminEnabled()): ?> 
 	<dl>
 		<dt id="entryFile-label"><label for="entryFile" class="optional"><?php echo $this->translate('entry-investigate entry upload support'); ?>:</label></dt> 
 		<dd><?php echo $this->entryFile; ?></dd>

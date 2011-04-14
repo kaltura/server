@@ -4,9 +4,9 @@ class Form_Partner_StorageHelper
 	public static function addProtocolsToForm(Zend_Form $form)
 	{
 		$arr = array(
-			KalturaStorageProfileProtocol::FTP => 'FTP',
-			KalturaStorageProfileProtocol::SFTP => 'SFTP',
-			KalturaStorageProfileProtocol::SCP => 'SCP',
+			Kaltura_Client_StorageProfile_Enum_StorageProfileProtocol::FTP => 'FTP',
+			Kaltura_Client_StorageProfile_Enum_StorageProfileProtocol::SFTP => 'SFTP',
+			Kaltura_Client_StorageProfile_Enum_StorageProfileProtocol::SCP => 'SCP',
 		);
 		$form->getElement('protocol')->setMultiOptions($arr);
 	}

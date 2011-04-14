@@ -5,35 +5,35 @@ class Form_Batch_TasksFailed extends Form_Base
     {
 		$this->setTemplatePath('forms/failed-tasks.phtml');
 		
-		$oClass = new ReflectionClass('KalturaBatchJobErrorTypes');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_BatchJobErrorTypes');
 		$failureTypes = $oClass->getConstants();
 	
     	$statuses = array(
-    		KalturaBatchJobStatus::FAILED => $failureTypes,
-    		KalturaBatchJobStatus::ABORTED => true,
-    		KalturaBatchJobStatus::FATAL => true,
+    		Kaltura_Client_Enum_BatchJobStatus::FAILED => $failureTypes,
+    		Kaltura_Client_Enum_BatchJobStatus::ABORTED => true,
+    		Kaltura_Client_Enum_BatchJobStatus::FATAL => true,
     	);
     	
 		$this->addViewParam('failStatuses', $statuses);
     		
-		$oClass = new ReflectionClass('KalturaConversionEngineType');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_ConversionEngineType');
 		$convertSubTypes = $oClass->getConstants();
-		unset($convertSubTypes['KALTURA_COM']);
+		unset($convertSubTypes['Kaltura_COM']);
 		
-		$oClass = new ReflectionClass('KalturaBatchJobType');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_BatchJobType');
 		$jobTypes = array_fill_keys($oClass->getConstants(), false);
 		
-		$jobTypes[KalturaBatchJobType::CONVERT] = array_fill_keys($convertSubTypes, true);
-		$jobTypes[KalturaBatchJobType::IMPORT] = true;
-		$jobTypes[KalturaBatchJobType::BULKUPLOAD] = true;
+		$jobTypes[Kaltura_Client_Enum_BatchJobType::CONVERT] = array_fill_keys($convertSubTypes, true);
+		$jobTypes[Kaltura_Client_Enum_BatchJobType::IMPORT] = true;
+		$jobTypes[Kaltura_Client_Enum_BatchJobType::BULKUPLOAD] = true;
 		
-		unset($jobTypes[KalturaBatchJobType::DVDCREATOR]);
-		unset($jobTypes[KalturaBatchJobType::OOCONVERT]);
-		unset($jobTypes[KalturaBatchJobType::CLEANUP]);
-		unset($jobTypes[KalturaBatchJobType::SCHEDULER_HELPER]);
-		unset($jobTypes[KalturaBatchJobType::PULL]);
-		unset($jobTypes[KalturaBatchJobType::REMOTE_CONVERT]);
-		unset($jobTypes[KalturaBatchJobType::DELETE]);
+		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::DVDCREATOR]);
+		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::OOCONVERT]);
+		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::CLEANUP]);
+		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::SCHEDULER_HELPER]);
+		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::PULL]);
+		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::REMOTE_CONVERT]);
+		unset($jobTypes[Kaltura_Client_Enum_BatchJobType::DELETE]);
     	
 		$this->addViewParam('jobTypes', $jobTypes);
 		

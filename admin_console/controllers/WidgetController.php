@@ -16,11 +16,11 @@ class WidgetController extends Zend_Controller_Action
 		$form->populate($request->getParams());
 		
 		$uiConfFilter = $this->getUiConfFilterFromRequest($request);
-		$uiConfFilter->orderBy = KalturaUiConfOrderBy::CREATED_AT_DESC;
+		$uiConfFilter->orderBy = Kaltura_Client_Enum_UiConfOrderBy::CREATED_AT_DESC;
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginatorWithPartnerLoader(null, $uiConfFilter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
+		$paginatorAdapter = new Infra_FilterPaginatorWithPartnerLoader(null, $uiConfFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
@@ -38,15 +38,16 @@ class WidgetController extends Zend_Controller_Action
 		$form = new Form_Widget();
 		$form->setObjTypes($this->getSupportedUiConfTypes());
 		$form->setAction($action);
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 		
 		if ($request->isPost())
 		{
 			$form->loadVersions($request->getParam('obj_type'));
 			if ($form->isValid($request->getParams()))
 			{
-				$uiConf = $form->getObject('KalturaUiConf', $request->getPost());
-				$uiConf = $client->uiConfAdmin->add($uiConf);
+				$uiConf = $form->getObject('Kaltura_Client_Type_UiConf', $request->getPost());
+				$uiConf = $adminConsolePlugin->uiConfAdmin->add($uiConf);
 				$form->setAttrib('class', 'valid');
 			}
 		}
@@ -67,16 +68,18 @@ class WidgetController extends Zend_Controller_Action
 		$form->setObjTypes($this->getSupportedUiConfTypes());
 		$form->setAction($action);
 		
-		$client = Kaltura_ClientHelper::getClient();
-		$uiConf = $client->uiConfAdmin->get($id);
+		$client = Infra_ClientHelper::getClient();
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+		
+		$uiConf = $adminConsolePlugin->uiConfAdmin->get($id);
 
 		if ($request->isPost())
 		{
 			$form->loadVersions($request->getParam('obj_type'));
 			if ($form->isValid($request->getParams()))
 			{
-				$uiConfUpdate = $form->getObject('KalturaUiConf', $request->getPost());
-				$uiConf = $client->uiConfAdmin->update($id, $uiConfUpdate);
+				$uiConfUpdate = $form->getObject('Kaltura_Client_Type_UiConf', $request->getPost());
+				$uiConf = $adminConsolePlugin->uiConfAdmin->update($id, $uiConfUpdate);
 				$form->populateFromObject($uiConf);
 				$form->setAttrib('class', 'valid');
 			}
@@ -100,9 +103,10 @@ class WidgetController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$request = $this->getRequest();
 		$id = $request->getParam('id');
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 		
-		$uiConf = $client->uiConfAdmin->delete($id);
+		$uiConf = $adminConsolePlugin->uiConfAdmin->delete($id);
 		
 		echo $this->_helper->json('ok', false);
 	}
@@ -112,11 +116,12 @@ class WidgetController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$request = $this->getRequest();
 		$id = $request->getParam('id');
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 		
-		$uiConf = $client->uiConfAdmin->get($id);
+		$uiConf = $adminConsolePlugin->uiConfAdmin->get($id);
 		$uiConf->id = null;
-		$uiConf = $client->uiConfAdmin->add($uiConf);
+		$uiConf = $adminConsolePlugin->uiConfAdmin->add($uiConf);
 		
 		echo $this->_helper->json('ok', false);
 	}
@@ -125,13 +130,13 @@ class WidgetController extends Zend_Controller_Action
 	{
 		$request = $this->getRequest();
 		$this->view->kcwEditorVersion = "v1.2.0"; 
-		$this->view->kcwBaseUrl = Kaltura_ClientHelper::getServiceUrl() . '/flash/kcweditor/';
+		$this->view->kcwBaseUrl = Infra_ClientHelper::getServiceUrl() . '/flash/kcweditor/';
 		$this->_helper->layout->setLayout('layout_empty');
 	}
 	
 	protected function getUiConfFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
-		$uiConfFilter = new KalturaUiConfFilter();
+		$uiConfFilter = new Kaltura_Client_Type_UiConfFilter();
 		$uiConfFilter->objTypeIn = implode(',', array_keys($this->getSupportedUiConfTypes()));
 		$partnerFilter = null;
 		$filterType = $request->getParam('filter_type');
@@ -145,14 +150,14 @@ class WidgetController extends Zend_Controller_Action
 				$uiConfFilter->partnerIdIn = $filterInput;
 				break;
 			case 'by-partner-name':
-				$partnerFilter = new KalturaPartnerFilter();
+				$partnerFilter = new Kaltura_Client_Type_PartnerFilter();
 				$partnerFilter->nameLike = $filterInput;
 				$statuses = array();
-				$statuses[] = KalturaPartnerStatus::ACTIVE;
-				$statuses[] = KalturaPartnerStatus::BLOCKED;
+				$statuses[] = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
+				$statuses[] = Kaltura_Client_Enum_PartnerStatus::BLOCKED;
 				$partnerFilter->statusIn = implode(',', $statuses);
-				$partnerFilter->orderBy = KalturaPartnerOrderBy::ID_DESC;
-				$client = Kaltura_ClientHelper::getClient();
+				$partnerFilter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
+				$client = Infra_ClientHelper::getClient();
 				$partnersResponse = $client->systemPartner->listAction($partnerFilter);
 				if (count($partnersResponse->objects) == 0)
 				{

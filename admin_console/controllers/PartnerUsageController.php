@@ -9,7 +9,9 @@ class PartnerUsageController extends Zend_Controller_Action
 		$from = new Zend_Date($this->_getParam('from_date', $this->getDefaultFromDate()));
 		$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
 		
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		
 		$form = new Form_PartnerUsageFilter();
 		$form->populate($request->getParams());
 		
@@ -23,13 +25,13 @@ class PartnerUsageController extends Zend_Controller_Action
 		
 		// init filters
 		$partnerFilter = $this->getPartnerFilterFromForm($form);
-		$usageFilter = new KalturaSystemPartnerUsageFilter();
+		$usageFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerUsageFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("systemPartner", "getUsage", null, $partnerFilter, $usageFilter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
+		$paginatorAdapter = new Infra_FilterPaginator($systemPartnerPlugin->systemPartner, "getUsage", null, $partnerFilter, $usageFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
@@ -47,7 +49,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$from = new Zend_Date($this->_getParam('from_date', $this->getDefaultFromDate()));
 		$to = new Zend_Date($this->_getParam('to_date', $this->getDefaultToDate()));
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		if ($client->getKs() == null) {
 			$client->setKs(self::generateKs());
 		}
@@ -60,7 +62,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
 		
-		$pager = new KalturaFilterPager();
+		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
 		$items = array();
@@ -125,7 +127,7 @@ class PartnerUsageController extends Zend_Controller_Action
 	
 	private function getPartnerFilterFromForm(Zend_Form $form)
 	{
-		$filter = new KalturaPartnerFilter();
+		$filter = new Kaltura_Client_Type_PartnerFilter();
 		$filterType = $form->getValue('filter_type');
 		$filterInput = $form->getValue('filter_input');
 		$includeActive = $form->getValue('include_active');
@@ -144,14 +146,14 @@ class PartnerUsageController extends Zend_Controller_Action
 		}
 		$statuses = array();
 		if ($includeActive)
-			$statuses[] = KalturaPartnerStatus::ACTIVE;
+			$statuses[] = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
 		if ($includeBlocked)
-			$statuses[] = KalturaPartnerStatus::BLOCKED;
+			$statuses[] = Kaltura_Client_Enum_PartnerStatus::BLOCKED;
 		if ($includeRemoved)
-			$statuses[] = KalturaPartnerStatus::FULL_BLOCK;
+			$statuses[] = Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK;
 			
 		$filter->statusIn = implode(',', $statuses);
-		$filter->orderBy = KalturaPartnerOrderBy::ID_DESC;
+		$filter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
 		return $filter;
 	}
 	
@@ -170,10 +172,10 @@ class PartnerUsageController extends Zend_Controller_Action
 		$partnerId = $settings->partnerId;
 		$secret = $settings->secret;
 		$sessionExpiry = $settings->sessionExpiry;
-		return self::createKS($partnerId, $secret, KalturaSessionType::ADMIN, $sessionExpiry);
+		return self::createKS($partnerId, $secret, Kaltura_Client_Enum_SessionType::ADMIN, $sessionExpiry);
 	}
 	
-	private static function createKS($partnerId, $adminSecret, $sessionType = KalturaSessionType::ADMIN, $expiry = 7200)
+	private static function createKS($partnerId, $adminSecret, $sessionType = Kaltura_Client_Enum_SessionType::ADMIN, $expiry = 7200)
 	{
 		$puserId = '';
 		$privileges = '';

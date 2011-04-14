@@ -36,7 +36,7 @@
 		<tbody>
 			<?php foreach($this->paginator as $item): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-				<td><?php echo $this->enumTranslate('KalturaPartnerStatus', $item->partnerStatus); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_PartnerStatus', $item->partnerStatus); ?></td>
 				<td><?php echo $item->partnerName; ?></td>
 				<td><?php echo $item->partnerId; ?></td>
 				<td><?php $d = (new Zend_Date($item->partnerCreatedAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>

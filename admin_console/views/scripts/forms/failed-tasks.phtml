@@ -19,7 +19,7 @@
 		foreach($this->failStatuses as $status => $errorTypes)
 		{
 	        $fieldName = "status_$status";
-	        $label = $this->enumTranslate('KalturaBatchJobStatus', $status);
+	        $label = $this->enumTranslate('Kaltura_Client_Enum_BatchJobStatus', $status);
         	?>
 			<li><label><?php echo $this->$fieldName . ' ' . $label . ' (' . $status . ')'; ?></label>
 			
@@ -33,7 +33,7 @@
 	        	foreach($errorTypes as $errorType)
 	        	{
 			        $fieldName = "status_{$status}_{$errorType}";
-			        $label = $this->enumTranslate('KalturaBatchJobErrorTypes', $errorType);
+			        $label = $this->enumTranslate('Kaltura_Client_Enum_BatchJobErrorTypes', $errorType);
 		        	?>
 						<li><label><?php echo $this->$fieldName . ' ' . $label; ?></label></li>
 					

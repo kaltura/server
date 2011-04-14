@@ -41,8 +41,8 @@ class Form_NewUser extends Zend_Form
 		
 		$element = $this->getElement('role');
 		
-		$client = Kaltura_ClientHelper::getClient();
-		$filter = new KalturaUserRoleFilter();
+		$client = Infra_ClientHelper::getClient();
+		$filter = new Kaltura_Client_Type_UserRoleFilter();
 		$filter->tagsMultiLikeAnd = 'admin_console';
 		$userRoles = $client->userRole->listAction($filter);
 		if ($userRoles && isset($userRoles->objects)) {

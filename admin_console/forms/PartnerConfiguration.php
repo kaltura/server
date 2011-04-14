@@ -1,5 +1,5 @@
 <?php 
-class Form_PartnerConfiguration extends Kaltura_Form
+class Form_PartnerConfiguration extends Infra_Form
 {
 	public function init()
 	{
@@ -170,7 +170,7 @@ class Form_PartnerConfiguration extends Kaltura_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_entry_replacement_approval')))
 		));
 				
-		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'KalturaStorageServePriority'));
+		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_StorageProfile_Enum_StorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');
 		$this->addElements(array($storageServP));
 	}

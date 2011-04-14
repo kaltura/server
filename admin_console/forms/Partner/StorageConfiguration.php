@@ -1,5 +1,5 @@
 <?php 
-class Form_Partner_StorageConfiguration extends Kaltura_Form
+class Form_Partner_StorageConfiguration extends Infra_Form
 {
 	public function init()
 	{
@@ -118,7 +118,7 @@ class Form_Partner_StorageConfiguration extends Kaltura_Form
 		));
 	}
 	
-	public function addFlavorParamsFields(KalturaFlavorParamsListResponse $flavorParams, array $selectedFlavorParams = array())
+	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $selectedFlavorParams = array())
 	{
 		foreach($flavorParams->objects as $index => $flavorParamsItem)
 		{

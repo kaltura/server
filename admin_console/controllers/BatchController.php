@@ -25,7 +25,10 @@ class BatchController extends Zend_Controller_Action
 		if(!$entryId)
 			return;
 			
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		
 		if(!$client)
 		{
 			$this->view->errors[] = 'init client failed';
@@ -37,7 +40,7 @@ class BatchController extends Zend_Controller_Action
 			try
 			{
 				// $entryId is actually flavor id in this case
-				$entry = $client->entryAdmin->getByFlavorId($entryId);
+				$entry = $adminConsolePlugin->entryAdmin->getByFlavorId($entryId);
 			}
 			catch(Exception $e)
 			{
@@ -49,7 +52,7 @@ class BatchController extends Zend_Controller_Action
 		else
 		{
 			try{
-				$entry = $client->entryAdmin->get($entryId);
+				$entry = $adminConsolePlugin->entryAdmin->get($entryId);
 			}
 			catch(Exception $e){
 				$this->view->errors[] = 'Entry not found: ' . $e->getMessage();
@@ -59,17 +62,17 @@ class BatchController extends Zend_Controller_Action
 		$this->view->entry = $entry;
 		
 		try{
-			$this->view->partner = $client->systemPartner->get($entry->partnerId);
+			$this->view->partner = $systemPartnerPlugin->systemPartner->get($entry->partnerId);
 		}
 		catch(Exception $e){
 			$this->view->errors[] = 'Partner not found: ' . $e->getMessage();
 		}
 		
-		$filter = new Kaltura_BatchJobFilter();
-		$filter->jobTypeNotIn = KalturaBatchJobType::DELETE;
+		$filter = new Infra_BatchJobFilter();
+		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 		$filter->entryIdEqual = $entryId;
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $filter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
+		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $filter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage(20);
 		$paginator->setAction($action);
@@ -95,31 +98,31 @@ class BatchController extends Zend_Controller_Action
 	public function inProgressTasksAction()
 	{
 		$inProgressStatuses = array(
-			KalturaBatchJobStatus::ALMOST_DONE,
-			KalturaBatchJobStatus::MOVEFILE,
-			KalturaBatchJobStatus::PROCESSED,
-			KalturaBatchJobStatus::PROCESSING,
-			KalturaBatchJobStatus::QUEUED,
+			Kaltura_Client_Enum_BatchJobStatus::ALMOST_DONE,
+			Kaltura_Client_Enum_BatchJobStatus::MOVEFILE,
+			Kaltura_Client_Enum_BatchJobStatus::PROCESSED,
+			Kaltura_Client_Enum_BatchJobStatus::PROCESSING,
+			Kaltura_Client_Enum_BatchJobStatus::QUEUED,
 		);
 		$inQueueStatuses = array(
-			KalturaBatchJobStatus::PENDING,
-			KalturaBatchJobStatus::RETRY,
+			Kaltura_Client_Enum_BatchJobStatus::PENDING,
+			Kaltura_Client_Enum_BatchJobStatus::RETRY,
 		);
 		$defaultJobTypes = array(
-			KalturaBatchJobType::CONVERT,
-			KalturaBatchJobType::IMPORT,
-			KalturaBatchJobType::BULKUPLOAD,
-			KalturaBatchJobType::CONVERT_PROFILE,
-			KalturaBatchJobType::POSTCONVERT,
-			KalturaBatchJobType::EXTRACT_MEDIA,
+			Kaltura_Client_Enum_BatchJobType::CONVERT,
+			Kaltura_Client_Enum_BatchJobType::IMPORT,
+			Kaltura_Client_Enum_BatchJobType::BULKUPLOAD,
+			Kaltura_Client_Enum_BatchJobType::CONVERT_PROFILE,
+			Kaltura_Client_Enum_BatchJobType::POSTCONVERT,
+			Kaltura_Client_Enum_BatchJobType::EXTRACT_MEDIA,
 		);
 		
-		$oClass = new ReflectionClass('KalturaConversionEngineType');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_ConversionEngineType');
 		$convertSubTypes = $oClass->getConstants();
 		
-		$oClass = new ReflectionClass('KalturaBatchJobType');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_BatchJobType');
 		$jobTypes = array_flip($oClass->getConstants());
-		$jobTypes[KalturaBatchJobType::CONVERT] = $convertSubTypes;
+		$jobTypes[Kaltura_Client_Enum_BatchJobType::CONVERT] = $convertSubTypes;
 		
 		$request = $this->getRequest();
 		$action = $this->view->url(array('controller' => 'batch', 'action' => 'in-progress-tasks'), null, true);
@@ -130,7 +133,7 @@ class BatchController extends Zend_Controller_Action
 		$this->view->tasksInProgressForm->populate($request->getParams());
         $this->view->tasksInProgressForm->setAction($action);
 		
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		if(!$client)
 		{
 			$this->view->errors[] = 'init client failed';
@@ -140,7 +143,7 @@ class BatchController extends Zend_Controller_Action
 		$abortJob = $request->getParam('abort', false);
 		if ($abortJob)
 		{
-			Kaltura_AclHelper::validateAccess('batch', 'in-progress-abort-tasks');
+			Infra_AclHelper::validateAccess('batch', 'in-progress-abort-tasks');
 			$abortJobType = $request->getParam('abortType', false);
 			try{
 				$client->jobs->abortJob($abortJob, $abortJobType);
@@ -151,9 +154,9 @@ class BatchController extends Zend_Controller_Action
 		}
 		
 		
-		$filter = new Kaltura_BatchJobFilter();
-		$filter->orderBy = KalturaBaseJobOrderBy::CREATED_AT_DESC;
-		$filter->jobTypeNotIn = KalturaBatchJobType::DELETE;
+		$filter = new Infra_BatchJobFilter();
+		$filter->orderBy = Kaltura_Client_Enum_BaseJobOrderBy::CREATED_AT_DESC;
+		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 	
 		if($request->getParam('createdAtFrom', false))
 		{
@@ -226,8 +229,8 @@ class BatchController extends Zend_Controller_Action
 		
 		$inProgressFilter = clone $filter;
 		$inProgressFilter->statusIn = implode(',', $inProgressStatuses);
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $inProgressFilter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request, 'inProgressPage');
+		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $inProgressFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request, 'inProgressPage');
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
 		$paginator->setAction($action);
@@ -235,8 +238,8 @@ class BatchController extends Zend_Controller_Action
 		
 		$inQueueFilter = clone $filter;
 		$inQueueFilter->statusIn = implode(',', $inQueueStatuses);
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $inQueueFilter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request, 'inQueuePage');
+		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $inQueueFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request, 'inQueuePage');
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
 		$paginator->setAction($action);
@@ -246,30 +249,30 @@ class BatchController extends Zend_Controller_Action
 	public function failedTasksAction()
 	{
 		$defaultJobTypes = array(
-			KalturaBatchJobType::CONVERT,
-			KalturaBatchJobType::IMPORT,
-			KalturaBatchJobType::BULKUPLOAD,
+			Kaltura_Client_Enum_BatchJobType::CONVERT,
+			Kaltura_Client_Enum_BatchJobType::IMPORT,
+			Kaltura_Client_Enum_BatchJobType::BULKUPLOAD,
 		);
 		
-		$oClass = new ReflectionClass('KalturaConversionEngineType');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_ConversionEngineType');
 		$convertSubTypes = $oClass->getConstants();
 		
-		$oClass = new ReflectionClass('KalturaBatchJobType');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_BatchJobType');
 		$jobTypes = array_flip($oClass->getConstants());
-		$jobTypes[KalturaBatchJobType::CONVERT] = $convertSubTypes;
+		$jobTypes[Kaltura_Client_Enum_BatchJobType::CONVERT] = $convertSubTypes;
 		
-		$oClass = new ReflectionClass('KalturaBatchJobErrorTypes');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_BatchJobErrorTypes');
 		$errorTypes = $oClass->getConstants();
 		
-		$oClass = new ReflectionClass('KalturaBatchJobStatus');
+		$oClass = new ReflectionClass('Kaltura_Client_Enum_BatchJobStatus');
 		$statuses = array_flip($oClass->getConstants());
-		$statuses[KalturaBatchJobStatus::FAILED] = $errorTypes;
+		$statuses[Kaltura_Client_Enum_BatchJobStatus::FAILED] = $errorTypes;
 		
 		$request = $this->getRequest();
 		
 		$this->view->errors = array();
 		
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		if(!$client)
 		{
 			$this->view->errors[] = 'init client failed';
@@ -292,12 +295,12 @@ class BatchController extends Zend_Controller_Action
 			foreach($jobs as $jobId => $jobType)
 			{
 				if($submitAction == 'retry') {
-					Kaltura_AclHelper::validateAccess('batch', 'failed-retry-delete');
+					Infra_AclHelper::validateAccess('batch', 'failed-retry-delete');
 					$client->jobs->retryJob($jobId, $jobType);
 				}
 					
 				elseif($submitAction == 'delete') {
-					Kaltura_AclHelper::validateAccess('batch', 'failed-retry-delete');
+					Infra_AclHelper::validateAccess('batch', 'failed-retry-delete');
 					$client->jobs->deleteJob($jobId, $jobType);
 				}
 			}
@@ -315,9 +318,9 @@ class BatchController extends Zend_Controller_Action
         $submitAction = $this->view->tasksFailedForm->getElement('submitAction');
         $submitAction->setValue('');
 		
-		$filter = new Kaltura_BatchJobFilter();
-		$filter->orderBy = KalturaBaseJobOrderBy::CREATED_AT_DESC;
-//		$filter->jobTypeNotIn = KalturaBatchJobType::DELETE;
+		$filter = new Infra_BatchJobFilter();
+		$filter->orderBy = Kaltura_Client_Enum_BaseJobOrderBy::CREATED_AT_DESC;
+//		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 	
 		if($request->getParam('createdAtFrom', false))
 		{
@@ -386,9 +389,9 @@ class BatchController extends Zend_Controller_Action
 		if(!count($inFailedStatuses))
 		{
 			$inFailedStatuses = array(
-				KalturaBatchJobStatus::FAILED,
-				KalturaBatchJobStatus::ABORTED,
-				KalturaBatchJobStatus::FATAL,
+				Kaltura_Client_Enum_BatchJobStatus::FAILED,
+				Kaltura_Client_Enum_BatchJobStatus::ABORTED,
+				Kaltura_Client_Enum_BatchJobStatus::FATAL,
 			);
 		}
 		
@@ -427,8 +430,8 @@ class BatchController extends Zend_Controller_Action
 		if(!$filter->hasJobTypeFilter())
 			$filter->jobTypeIn = implode(',', $defaultJobTypes);
 		
-		$paginatorAdapter = new Kaltura_FilterPaginator("jobs", "listBatchJobs", null, $filter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
+		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $filter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
 		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
 		$paginator->setAction($action);
@@ -443,7 +446,7 @@ class BatchController extends Zend_Controller_Action
 		$this->view->schedulers = array();
 		$this->view->workers = array();
 		
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		if(!$client)
 		{
 			$this->view->errors[] = 'init client failed';
@@ -455,7 +458,7 @@ class BatchController extends Zend_Controller_Action
 		$action = $request->getParam('hdnAction', false);
 		if($action)
 		{
-			Kaltura_AclHelper::validateAccess('batch', 'setup-stop-start');
+			Infra_AclHelper::validateAccess('batch', 'setup-stop-start');
 			$workerId = $request->getParam('hdnWorkerId', false);
 			$cause = $request->getParam('hdnCause', false);
 
@@ -522,16 +525,16 @@ class BatchController extends Zend_Controller_Action
 			}
 		}
 	
-		$filter = new KalturaControlPanelCommandFilter();
+		$filter = new Kaltura_Client_Type_ControlPanelCommandFilter();
 		$filter->createdByIdEqual = $adminId;
-		$filter->statusIn = KalturaControlPanelCommandStatus::HANDLED . ',' . KalturaControlPanelCommandStatus::PENDING;
+		$filter->statusIn = Kaltura_Client_Enum_ControlPanelCommandStatus::HANDLED . ',' . Kaltura_Client_Enum_ControlPanelCommandStatus::PENDING;
 		
 		$this->view->disabledWorkers = array();
 		try{
 			$commandsList = $client->batchcontrol->listCommands($filter);
 			
 			foreach($commandsList->objects as $command)
-				if($command->type != KalturaControlPanelCommandType::CONFIG)
+				if($command->type != Kaltura_Client_Enum_ControlPanelCommandType::CONFIG)
 					$this->view->disabledWorkers[$command->workerId] = $command;
 		}
 		catch(Exception $e){
@@ -542,7 +545,7 @@ class BatchController extends Zend_Controller_Action
 		$settings = Zend_Registry::get('config')->settings;
 		$controlCommandsTimeFrame = $settings->controlCommandsTimeFrame * 60;
 		
-		$filter = new KalturaControlPanelCommandFilter();
+		$filter = new Kaltura_Client_Type_ControlPanelCommandFilter();
 		$filter->createdByIdEqual = $adminId;
 		$filter->createdAtGreaterThanOrEqual = (time() - $controlCommandsTimeFrame) ;
 		
@@ -598,7 +601,7 @@ class BatchController extends Zend_Controller_Action
 			$host = $_SERVER['HTTP_HOST'];
 			$summary = "Admin console supoport request from $host";
 			$description = $request->getParam('supportDescription', '');
-			$ticketId = Kaltura_Support::addIssue($summary, $description, $content);
+			$ticketId = Infra_Support::addIssue($summary, $description, $content);
 			if(!$ticketId)
 				$errors[] = "Support ticket could not be send";
 		}
@@ -607,13 +610,16 @@ class BatchController extends Zend_Controller_Action
 	/**
 	 * @param string $entryId
 	 * @param array $errors
-	 * @return KalturaInvestigateEntryData
+	 * @return Kaltura_Client_Enum_InvestigateEntryData
 	 */
 	public function getEntryInvestigationData($entryId, &$errors)
 	{
-		$investigateData = new KalturaInvestigateEntryData();
+		$investigateData = new Kaltura_Client_AdminConsole_Type_InvestigateEntryData();
 	
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+		$fileSyncConsolePlugin = Kaltura_Client_FileSync_Plugin::get($client);
+		
 		if(!$client)
 		{
 			$errors[] = 'init client failed';
@@ -621,7 +627,7 @@ class BatchController extends Zend_Controller_Action
 		}
 		
 		try{
-			$entry = $client->entryAdmin->get($entryId);
+			$entry = $adminConsolePlugin->entryAdmin->get($entryId);
 		}
 		catch(Exception $e){
 			$errors[] = 'Entry not found: ' . $e->getMessage();
@@ -630,15 +636,15 @@ class BatchController extends Zend_Controller_Action
 		$investigateData->entry = $entry;
 		
 		try{
-			$trackList = $client->entryAdmin->getTracks($entryId);
+			$trackList = $adminConsolePlugin->entryAdmin->getTracks($entryId);
 			$investigateData->tracks = $trackList->objects;
 		}
 		catch(Exception $e){
 			$errors[] = 'Tracks not found: ' . $e->getMessage();
 		}
 		
-		$filter = new Kaltura_BatchJobFilter();
-		$filter->jobTypeNotIn = KalturaBatchJobType::DELETE;
+		$filter = new Infra_BatchJobFilter();
+		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 		$filter->entryIdEqual = $entryId;
 		try{
 			$jobsList = $client->jobs->listBatchJobs($filter);
@@ -648,18 +654,18 @@ class BatchController extends Zend_Controller_Action
 			$errors[] = 'Jobs not found: ' . $e->getMessage();
 		}
 		
-		if($entry->status == KalturaEntryStatus::DELETED)
+		if($entry->status == Kaltura_Client_Enum_EntryStatus::DELETED)
 		{
 			$investigateData->fileSyncs = array();
 			$investigateData->flavorAssets = array();
 			return $investigateData;
 		}
 		
-		$filter = new KalturaFileSyncFilter();
-		$filter->objectTypeEqual = KalturaFileSyncObjectType::ENTRY;
+		$filter = new Kaltura_Client_FileSync_Type_FileSyncFilter();
+		$filter->objectTypeEqual = Kaltura_Client_Enum_FileSyncObjectType::ENTRY;
 		$filter->objectIdEqual = $entryId;
 		try{
-			$filesList = $client->fileSync->listAction($filter);
+			$filesList = $fileSyncConsolePlugin->fileSync->listAction($filter);
 			$investigateData->fileSyncs = $filesList;
 		}
 		catch(Exception $e){
@@ -689,7 +695,7 @@ class BatchController extends Zend_Controller_Action
 			$errors[] = 'Template Thumb Params not found: ' . $e->getMessage();
 		}
 	
-		Kaltura_ClientHelper::impersonate($entry->partnerId);
+		Infra_ClientHelper::impersonate($entry->partnerId);
 		
 		try{
 			$partnerFlavorParamsList = $client->flavorParams->listAction();
@@ -707,23 +713,23 @@ class BatchController extends Zend_Controller_Action
 			$errors[] = 'Partner Thumb Params not found: ' . $e->getMessage();
 		}
 	
-		if(count($templateFlavorParams))
+		if(is_array($templateFlavorParams) && count($templateFlavorParams))
 		{
 			foreach($templateFlavorParams as $param)
 				$flavorParams[$param->id] = $param;
 		}
-		if(count($partnerFlavorParams))
+		if(is_array($partnerFlavorParams) && count($partnerFlavorParams))
 		{
 			foreach($partnerFlavorParams as $param)
 				$flavorParams[$param->id] = $param;
 		}
 	
-		if(count($templateThumbParams))
+		if(is_array($templateThumbParams) && count($templateThumbParams))
 		{
 			foreach($templateThumbParams as $param)
 				$thumbParams[$param->id] = $param;
 		}
-		if(count($partnerThumbParams))
+		if(is_array($partnerThumbParams) && count($partnerThumbParams))
 		{
 			foreach($partnerThumbParams as $param)
 				$thumbParams[$param->id] = $param;
@@ -745,88 +751,94 @@ class BatchController extends Zend_Controller_Action
 			$errors[] = 'Thumbs not found: ' . $e->getMessage();
 		}
 		
-		Kaltura_ClientHelper::unimpersonate();
+		Infra_ClientHelper::unimpersonate();
 		
 		$flavorsData = array();
-		foreach($flavors as $flavor)
+		if(is_array($flavors) && count($flavors))
 		{
-			$flavorData = new KalturaInvestigateFlavorAssetData();
-			$flavorData->flavorAsset = $flavor;
-			$flavorData->flavorParams = null;
-			$flavorData->flavorParamsOutputs = array();
-			$flavorData->mediaInfos = array();
-			$flavorData->fileSyncs = array();
+			foreach($flavors as $flavor)
+			{
+				$flavorData = new Kaltura_Client_AdminConsole_Type_InvestigateFlavorAssetData();
+				$flavorData->flavorAsset = $flavor;
+				$flavorData->flavorParams = null;
+				$flavorData->flavorParamsOutputs = array();
+				$flavorData->mediaInfos = array();
+				$flavorData->fileSyncs = array();
+				
+				if(isset($flavorParams[$flavor->flavorParamsId]))
+					$flavorData->flavorParams = $flavorParams[$flavor->flavorParamsId];
 			
-			if(isset($flavorParams[$flavor->flavorParamsId]))
-				$flavorData->flavorParams = $flavorParams[$flavor->flavorParamsId];
-		
-			$filter = new KalturaFileSyncFilter();
-			$filter->objectTypeEqual = KalturaFileSyncObjectType::FLAVOR_ASSET;
-			$filter->objectIdEqual = $flavor->id;
-			try{
-				$filesList = $client->fileSync->listAction($filter);
-				$flavorData->fileSyncs = $filesList;
-			}
-			catch(Exception $e){
-				$errors[] = "Flavor [$flavor->id] files not found: " . $e->getMessage();
-			}
-		
-			$filter = new KalturaFlavorParamsOutputFilter();
-			$filter->flavorAssetIdEqual = $flavor->id;
-			try{
-				$flavorParamsOutputsList = $client->flavorParamsOutput->listAction($filter);
-				$flavorData->flavorParamsOutputs = $flavorParamsOutputsList;
-			}
-			catch(Exception $e){
-				$errors[] = "Flavor [$flavor->id] flavor params outputs not found: " . $e->getMessage();
-			}
+				$filter = new Kaltura_Client_FileSync_Type_FileSyncFilter();
+				$filter->objectTypeEqual = Kaltura_Client_Enum_FileSyncObjectType::FLAVOR_ASSET;
+				$filter->objectIdEqual = $flavor->id;
+				try{
+					$filesList = $fileSyncConsolePlugin->fileSync->listAction($filter);
+					$flavorData->fileSyncs = $filesList;
+				}
+				catch(Exception $e){
+					$errors[] = "Flavor [$flavor->id] files not found: " . $e->getMessage();
+				}
 			
-			$filter = new KalturaMediaInfoFilter();
-			$filter->flavorAssetIdEqual = $flavor->id;
-			try{
-				$mediaInfosList = $client->mediaInfo->listAction($filter);
-				$flavorData->mediaInfos = $mediaInfosList;
+				$filter = new Kaltura_Client_Type_FlavorParamsOutputFilter();
+				$filter->flavorAssetIdEqual = $flavor->id;
+				try{
+					$flavorParamsOutputsList = $adminConsolePlugin->flavorParamsOutput->listAction($filter);
+					$flavorData->flavorParamsOutputs = $flavorParamsOutputsList;
+				}
+				catch(Exception $e){
+					$errors[] = "Flavor [$flavor->id] flavor params outputs not found: " . $e->getMessage();
+				}
+				
+				$filter = new Kaltura_Client_Type_MediaInfoFilter();
+				$filter->flavorAssetIdEqual = $flavor->id;
+				try{
+					$mediaInfosList = $adminConsolePlugin->mediaInfo->listAction($filter);
+					$flavorData->mediaInfos = $mediaInfosList;
+				}
+				catch(Exception $e){
+					$errors[] = "Flavor [$flavor->id] flavor params outputs not found: " . $e->getMessage();
+				}
+				$flavorsData[] = $flavorData;
 			}
-			catch(Exception $e){
-				$errors[] = "Flavor [$flavor->id] flavor params outputs not found: " . $e->getMessage();
-			}
-			$flavorsData[] = $flavorData;
 		}
 		$investigateData->flavorAssets = $flavorsData;
 		
 		$thumbsData = array();
-		foreach($thumbs as $thumb)
+		if(is_array($thumbs) && count($thumbs))
 		{
-			$thumbData = new KalturaInvestigateThumbAssetData();
-			$thumbData->thumbAsset = $thumb;
-			$thumbData->thumbParams = null;
-			$thumbData->thumbParamsOutputs = array();
-			$thumbData->fileSyncs = array();
+			foreach($thumbs as $thumb)
+			{
+				$thumbData = new Kaltura_Client_AdminConsole_Type_InvestigateThumbAssetData();
+				$thumbData->thumbAsset = $thumb;
+				$thumbData->thumbParams = null;
+				$thumbData->thumbParamsOutputs = array();
+				$thumbData->fileSyncs = array();
+				
+				if(isset($thumbParams[$thumb->thumbParamsId]))
+					$thumbData->thumbParams = $thumbParams[$thumb->thumbParamsId];
 			
-			if(isset($thumbParams[$thumb->thumbParamsId]))
-				$thumbData->thumbParams = $thumbParams[$thumb->thumbParamsId];
-		
-			$filter = new KalturaFileSyncFilter();
-			$filter->objectTypeEqual = KalturaFileSyncObjectType::FLAVOR_ASSET;
-			$filter->objectIdEqual = $thumb->id;
-			try{
-				$filesList = $client->fileSync->listAction($filter);
-				$thumbData->fileSyncs = $filesList;
+				$filter = new Kaltura_Client_FileSync_Type_FileSyncFilter();
+				$filter->objectTypeEqual = Kaltura_Client_Enum_FileSyncObjectType::FLAVOR_ASSET;
+				$filter->objectIdEqual = $thumb->id;
+				try{
+					$filesList = $fileSyncConsolePlugin->fileSync->listAction($filter);
+					$thumbData->fileSyncs = $filesList;
+				}
+				catch(Exception $e){
+					$errors[] = "Thumb [$thumb->id] files not found: " . $e->getMessage();
+				}
+			
+				$filter = new Kaltura_Client_Type_ThumbParamsOutputFilter();
+				$filter->thumbAssetIdEqual = $thumb->id;
+				try{
+					$thumbParamsOutputsList = $adminConsolePlugin->thumbParamsOutput->listAction($filter);
+					$thumbData->thumbParamsOutputs = $thumbParamsOutputsList;
+				}
+				catch(Exception $e){
+					$errors[] = "Thumb [$thumb->id] thumb params outputs not found: " . $e->getMessage();
+				}
+				$thumbsData[] = $thumbData;
 			}
-			catch(Exception $e){
-				$errors[] = "Thumb [$thumb->id] files not found: " . $e->getMessage();
-			}
-		
-			$filter = new KalturaThumbParamsOutputFilter();
-			$filter->thumbAssetIdEqual = $thumb->id;
-			try{
-				$thumbParamsOutputsList = $client->thumbParamsOutput->listAction($filter);
-				$thumbData->thumbParamsOutputs = $thumbParamsOutputsList;
-			}
-			catch(Exception $e){
-				$errors[] = "Thumb [$thumb->id] thumb params outputs not found: " . $e->getMessage();
-			}
-			$thumbsData[] = $thumbData;
 		}
 		$investigateData->thumbAssets = $thumbsData;
 		
@@ -850,7 +862,7 @@ class BatchController extends Zend_Controller_Action
         $submitAction = $this->view->searchEntryForm->getElement('submitAction');
         $submitAction->setValue('');
         
-        if(Kaltura_Support::isAdminEnabled())
+        if(Infra_Support::isAdminEnabled())
         {
 			$upload = new Zend_File_Transfer_Adapter_Http();
 			$files = $upload->getFileInfo();
@@ -873,19 +885,20 @@ class BatchController extends Zend_Controller_Action
 		if(!$entryId)
 			return;
 			
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		if(!$client)
 		{
 			$this->view->errors[] = 'init client failed';
 			return;
 		}
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 		
 		if (($request->getParam('searchType') == 'by-flavor-asset-id'))
 		{
 			try
 			{
 				// $entryId is actually flavor id in this case
-				$entry = $client->entryAdmin->getByFlavorId($entryId);
+				$entry = $adminConsolePlugin->entryAdmin->getByFlavorId($entryId);
 			}
 			catch(Exception $e)
 			{
@@ -899,7 +912,7 @@ class BatchController extends Zend_Controller_Action
 		if($submitAction && strlen($submitAction))
 		{
 			$partnerId = $request->getParam('partnerId', 0);
-			Kaltura_ClientHelper::impersonate($partnerId);
+			Infra_ClientHelper::impersonate($partnerId);
 			
 			if($submitAction == 'retry')
 			{
@@ -925,7 +938,7 @@ class BatchController extends Zend_Controller_Action
 				$client->thumbAsset->regenerate($thumbAssetId);
 			}
 			
-			Kaltura_ClientHelper::unimpersonate();
+			Infra_ClientHelper::unimpersonate();
 		}
 		
 		$this->view->investigateData = $this->getEntryInvestigationData($entryId, $this->view->errors);

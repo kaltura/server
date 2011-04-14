@@ -26,7 +26,7 @@ class Form_Batch_SearchEntry extends Form_Base
             'validators' => array(),
         ));
         
-        if(Kaltura_Support::isAdminEnabled())
+        if(Infra_Support::isAdminEnabled())
 	        $this->addElement('file', 'entryFile');
         
         // Add the search button

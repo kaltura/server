@@ -83,11 +83,11 @@
 
 	var entryId;
 	
-	var kConfig = new KalturaConfiguration(<?php echo Kaltura_ClientHelper::getPartnerId(); ?>);
-	kConfig.serviceUrl = "<?php echo Kaltura_ClientHelper::getServiceUrl(); ?>";
+	var kConfig = new KalturaConfiguration(<?php echo Infra_ClientHelper::getPartnerId(); ?>);
+	kConfig.serviceUrl = "<?php echo Infra_ClientHelper::getServiceUrl(); ?>";
 	
 	var kClient = new KalturaClient(kConfig);
-	kClient.setKs("<?php echo Kaltura_ClientHelper::getKs(); ?>");
+	kClient.setKs("<?php echo Infra_ClientHelper::getKs(); ?>");
 
 	// Path to the blank image must point to a valid location on your server
 	Ext.BLANK_IMAGE_URL = 'ext/resources/images/default/s.gif';
@@ -194,20 +194,20 @@
 
 	function translateJobType(jobType, jobSubType)
 	{
-		if(jobType == <?php echo KalturaBatchJobType::CONVERT; ?>)
+		if(jobType == <?php echo Kaltura_Client_Enum_BatchJobType::CONVERT; ?>)
 		{
 			switch(jobSubType)
 			{
 				<?php
 				 
-					$oClass = new ReflectionClass('KalturaConversionEngineType');
+					$oClass = new ReflectionClass('Kaltura_Client_Enum_ConversionEngineType');
 					$constants = $oClass->getConstants();
 					
 					foreach($constants as $constName => $constValue)
 					{
 						?>
 							case <?php echo $constValue; ?>:
-								return "<?php echo $this->translate("KalturaConversionEngineType::$constName"); ?>"
+								return "<?php echo $this->translate("Kaltura_Client_Enum_ConversionEngineType::$constName"); ?>"
 						<?php
 					} 
 				?>
@@ -218,14 +218,14 @@
 		{
 			<?php
 			 
-				$oClass = new ReflectionClass('KalturaBatchJobType');
+				$oClass = new ReflectionClass('Kaltura_Client_Enum_BatchJobType');
 				$constants = $oClass->getConstants();
 				
 				foreach($constants as $constName => $constValue)
 				{
 					?>
 						case <?php echo $constValue; ?>:
-							return "<?php echo $this->translate("KalturaBatchJobType::$constName"); ?>"
+							return "<?php echo $this->translate("Kaltura_Client_Enum_BatchJobType::$constName"); ?>"
 					<?php
 				} 
 			?>

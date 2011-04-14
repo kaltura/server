@@ -1,5 +1,5 @@
 <?php 
-class Form_Widget extends Kaltura_Form
+class Form_Widget extends Infra_Form
 {
 	public function init()
 	{
@@ -46,8 +46,8 @@ class Form_Widget extends Kaltura_Form
 			'filters'		=> array('StringTrim'),
 			'required'		=> true,
 			'multiOptions' 		=> array(
-				KalturaUiConfCreationMode::ADVANCED => 'Advanced',
-				KalturaUiConfCreationMode::WIZARD => 'AppStudio Wizard',
+				Kaltura_Client_Enum_UiConfCreationMode::ADVANCED => 'Advanced',
+				Kaltura_Client_Enum_UiConfCreationMode::WIZARD => 'AppStudio Wizard',
 			)
 		));
 
@@ -131,7 +131,7 @@ class Form_Widget extends Kaltura_Form
 	
 	public function loadVersions($objType)
 	{
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		$typesInfo = $client->uiConf->getAvailableTypes();
 		$versionElement = $this->getElement('version');
 		$versionElement->addMultiOption('', '');
@@ -166,7 +166,7 @@ class Form_Widget extends Kaltura_Form
 		
 		$confFileButtons = array();
 		$confFileButtons[] = $openEditorButton;
-		if ($this->getValue('obj_type') == KalturaUiConfObjType::CONTRIBUTION_WIZARD)
+		if ($this->getValue('obj_type') == Kaltura_Client_Enum_UiConfObjType::CONTRIBUTION_WIZARD)
 			$confFileButtons[] = $openVisualEditorButton;
 
 		$confFileFeaturesButtons = array();
