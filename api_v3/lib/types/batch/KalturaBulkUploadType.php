@@ -5,7 +5,7 @@
  * Represents the bulk upload type
  * @author Roni
  * @package api
- * @subpackage objects
+ * @subpackage batch
  *
  */
 class KalturaBulkUploadType extends KalturaDynamicEnum implements BulkUploadType

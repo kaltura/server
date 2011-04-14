@@ -23,7 +23,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 		if(is_null($baseEnumName))
 			return array('BulkUploadXmlType');
 		
-		if($baseEnumName == 'KalturaBulkUploadType')
+		if($baseEnumName == 'BulkUploadType')
 			return array('BulkUploadXmlType');
 			
 		return array();
