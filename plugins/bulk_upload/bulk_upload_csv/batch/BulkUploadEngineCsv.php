@@ -311,7 +311,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$this->startMultiRequest(true);
 		$multiRequestCounter = 0;
 		
-		KalturaLog::info("job[$this->job->id] start creating entries");
+		KalturaLog::info("job[{$this->job->id}] start creating entries");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
 				
 		foreach($this->bulkUploadResults as $bulkUploadResult)
