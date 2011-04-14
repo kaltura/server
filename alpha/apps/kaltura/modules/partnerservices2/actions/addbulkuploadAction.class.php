@@ -64,10 +64,8 @@ class addbulkuploadAction extends defPartnerservices2Action
 		$filePath = $_FILES[$fileField]['tmp_name'];
 			
 		$kuser = kuser::getKuserById($puser_kuser->getKuserId());
-		kBulkUploadManager::setKuser($kuser);
 		$partner = PartnerPeer::retrieveByPK($partner_id);
-		kBulkUploadManager::setPartner($partner);
 		
-		kBulkUploadManager::add($filePath, $fileName, $profileId);
+		kJobsManager::addBulkUploadJob($filePath, $partner, $kuser->getPuserId(), $profileId);
 	}
 }
