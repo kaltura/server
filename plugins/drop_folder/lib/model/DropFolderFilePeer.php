@@ -39,5 +39,14 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 		return $dropFolderFile;		
 	}
 	
+	public static function retrieveByDropFolderIdAndStatus($dropFolderId, $status)
+	{
+		$c = new Criteria();
+		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
+		$c->addAnd(DropFolderFilePeer::STATUS, $status, Criteria::EQUAL);
+		$dropFolderFile = DropFolderFilePeer::doSelectOne($c);
+		return $dropFolderFile;		
+	}
+	
 	
 } // DropFolderFilePeer

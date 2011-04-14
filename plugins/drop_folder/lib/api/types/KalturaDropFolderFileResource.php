@@ -8,8 +8,8 @@
 class KalturaDropFolderFileResource extends KalturaContentResource 
 {
 	/**
-	 * Token that returned from media server such as FMS or red5. 
-	 * @var string
+	 * Id of the drop folder file object
+	 * @var int
 	 */
 	public $dropFolderFileId;
 

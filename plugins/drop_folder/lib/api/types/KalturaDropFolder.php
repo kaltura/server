@@ -4,7 +4,7 @@
  * @subpackage api.objects
  */
 class KalturaDropFolder extends KalturaObject implements IFilterable
-{
+{	
 	/**
 	 * @var int
 	 * @readonly

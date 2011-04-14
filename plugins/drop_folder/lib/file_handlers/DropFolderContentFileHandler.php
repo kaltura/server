@@ -7,22 +7,26 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 */
 	public function setConfig(DropFolderFileHandlerConfig $config) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	/* (non-PHPdoc)
 	 * @see DropFolderFileHandler::getType()
 	 */
 	public function getType() {
-		// TODO Auto-generated method stub
-		
+		return DropFolderFileHandlerType::CONTENT;
 	}
 
-	/* (non-PHPdoc)
-	 * @see DropFolderFileHandler::handleFile()
+	/**
+	 * Add a new entry with the given drop folder file as the resource.
+	 * Entry's ingestion profile id should be the one defined on the file's drop folder object.
 	 */
-	public function handleFile($dropFolderFileId) {
-		// TODO Auto-generated method stub
+	public function handleFile($dropFolderFileId)
+	{
+		$dropFolderFileResource = new KalturaDropFolderFileResource();
+		$dropFolderFileResource->dropFolderFileId = $dropFolderFileId;
+		
+		//TODO: add a new entry using the $dropFolderFileResource
+		//TODO: the entry should be set with conversion profile from the drop folder's $ingestionProfileId property
 		
 	}
 }

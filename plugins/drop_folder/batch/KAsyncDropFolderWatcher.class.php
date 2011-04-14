@@ -1,11 +1,13 @@
 <?php
 require_once("bootstrap.php");
 
+//TODO: update errorDescription on KalturaDropFolderFile for each error
+
 /**
  * Watches drop folder files and executes file handlers as required 
  *
  * @package plugins.dropFolder
- * @subpackage Scheduler.dropFolder
+ * @subpackage Scheduler
  */
 class KAsyncDropFolderWatcher extends KBatchBase
 {
@@ -39,7 +41,8 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$filter = new KalturaDropFolderFilter();
 		//TODO: use filter to get only folders relevant to current worker's config
 		//TODO: filter by current data center - how to know the current data center ?
-		$dropFolders = $this->kClient->dropFolder->listAction($filter);
+		$dropFolders = $this->kClient->dropFolder->listAction($filter); //TODO: Add try/catch
+		$dropFolders = $dropFolders->objects;
 		
 		foreach ($dropFolders as $folder)
 		{
@@ -60,14 +63,14 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$dropFolderFiles = null;
 		$deletedDropFolderFiles = null;
 		try {
-			$dropFolderFiles = self::getDropFolderFileObjects($folder);
-			$deletedDropFolderFiles = self::getDeletedDropFolderFileObjects($folder); // deleted objects
+			$dropFolderFiles = $this->getDropFolderFileObjects($folder);
+			$deletedDropFolderFiles = $this->getDeletedDropFolderFileObjects($folder); // deleted objects
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot get drop folder file list from the server for drop folder id ['.$folder->id.'] - '.$e->getMessage());
 			return; // skipping to next folder
 		}
-		
+				
 		$dropFolderFileMapByName = array();
 		$deletedDropFolderFileMapByName = array();
 		foreach ($dropFolderFiles as $dropFolderFile)
@@ -117,7 +120,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			// purge file marked as deleted
 			if (array_key_exists($physicalFileName, $deletedDropFolderFileMapByName))
 			{
-				self::purgeFile($deletedDropFolderFileMapByName['$physicalFileName'], $sharedPhysicalFilePath);
+				$this->purgeFile($deletedDropFolderFileMapByName[$physicalFileName], $sharedPhysicalFilePath);
 				continue;
 			}
 			
@@ -125,19 +128,19 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			if (!array_key_exists($physicalFileName, $dropFolderFileMapByName))
 			{
 				// new physical file found in folder - add new drop folder file object with status UPLOADING
-				self::addNewDropFolderFile($folder->id, $physicalFileName, filesize($sharedPhysicalFilePath));	
+				$this->addNewDropFolderFile($folder->id, $physicalFileName, filesize($sharedPhysicalFilePath));	
 			}
 			else
 			{
 				// update existing drop folder file object according to current physical file size
-				$currentDropFolderFile = $dropFolderFileMapByName['$physicalFileName'];
+				$currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
 				if ($currentDropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
 				{
-					self::updateDropFolderFile($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
+					$this->updateDropFolderFile($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
 				}
 				else if	($currentDropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
 				{
-					self::purgeHandledFileIfNeeded($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
+					$this->purgeHandledFileIfNeeded($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
 				}
 			}
 		}
@@ -156,11 +159,12 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolder $folder
 	 * @return array of KalturaDropFolderFile objects that belong to the given $folder
 	 */
-	private static function getDropFolderFileObjects(KalturaDropFolder $folder)
+	private function getDropFolderFileObjects(KalturaDropFolder $folder)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
 		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
+		$dropFolderFiles = $dropFolderFiles->objects; //TODO: add error check
 		return $dropFolderFiles;
 	}
 	
@@ -168,12 +172,13 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolder $folder
 	 * @return array of KalturaDropFolderFile objects that belong to the given $folder and have status KalturaDropFolderFileStatus::DELETED
 	 */
-	private static function getDeletedDropFolderFileObjects(KalturaDropFolder $folder)
+	private function getDeletedDropFolderFileObjects(KalturaDropFolder $folder)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
 		$dropFolderFileFilter->statusEqual = KalturaDropFolderFileStatus::DELETED;
 		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
+		$dropFolderFiles = $dropFolderFiles->objects; //TODO: add error check
 		return $dropFolderFiles;
 	}
 	
@@ -204,7 +209,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param string $fileName
 	 * @param size $fileSize
 	 */
-	private static function addNewDropFolderFile($folderId, $fileName, $fileSize)
+	private function addNewDropFolderFile($folderId, $fileName, $fileSize)
 	{
 		$newDropFolderFile = new KalturaDropFolderFile();
 		$newDropFolderFile->dropFolderId = $folderId;
@@ -228,7 +233,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolderFile $dropFolderFile
 	 * @param string $sharedPhysicalFilePath
 	 */
-	private static function updateDropFolderFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
+	private function updateDropFolderFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
 	{
 		$physicalFileSize = self::getFileSize($sharedPhysicalFilePath);
 		
@@ -284,7 +289,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolderFile $dropFolderFile
 	 * @param string $sharedPhysicalFilePath
 	 */
-	private static function purgeHandledFileIfNeeded(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
+	private function purgeHandledFileIfNeeded(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
 	{
 		if ($dropFolderFile->status != KalturaDropFolderFileStatus::HANDLED) {
 			return null;
@@ -296,7 +301,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		
 		if (time() > $dropFolderFile->updatedAt + $dropFolder->autoFileDeleteDays*86400)
 		{
-			return self::purgeFile($dropFolderFile, $sharedPhysicalFilePath);
+			return $this->purgeFile($dropFolderFile, $sharedPhysicalFilePath);
 		}
 		
 		return true;		
@@ -308,7 +313,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolderFile $dropFolderFile
 	 * @param string $sharedPhysicalFilePath
 	 */
-	private static function purgeFile(KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
+	private function purgeFile(KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
 	{
 		// physicaly delete the file
 		$delResult = unlink($sharedPhysicalFilePath);

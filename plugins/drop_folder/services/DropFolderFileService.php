@@ -12,7 +12,7 @@ class DropFolderFileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		if (!DropFolderPlugin::isAllowedPartner($this->getPartnerId()))
+		if (!in_array($this->getPartnerId(), array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID)) && !DropFolderPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 		
 		myPartnerUtils::addPartnerToCriteria(new DropFolderPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
@@ -28,7 +28,6 @@ class DropFolderFileService extends KalturaBaseService
 	 * 
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND
-	 * @throws KalturaDropFolderErrors::DROP_FOLDER_PARTNER_ID_NO_MATCH
 	 * @throws KalturaDropFolderErrors::DROP_FOLDER_FILE_ALREADY_EXISTS
 	 */
 	public function addAction(KalturaDropFolderFile $dropFolderFile)
@@ -43,12 +42,7 @@ class DropFolderFileService extends KalturaBaseService
 		if (!$dropFolder) {
 			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_NOT_FOUND, $dropFolderFile->dropFolderId);
 		}
-		
-		// check that drop folder partner id = current partner id
-		if ($dropFolder->getPartnerId() !== $this->getPartnerId()){
-			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_PARTNER_ID_NO_MATCH, $dropFolder->getPartnerId(), $this->getPartnerId());
-		}
-		
+				
 		// check that the file doesn't already exist in the drop folder
 		if (DropFolderFilePeer::retrieveByDropFolderIdAndFileName($dropFolderFile->dropFolderId, $dropFolderFile->fileName)) {
 			throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_FILE_ALREADY_EXISTS, $dropFolderFile->dropFolderId, $dropFolderFile->fileName);
