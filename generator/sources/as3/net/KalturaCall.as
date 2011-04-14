@@ -87,8 +87,16 @@ package com.kaltura.net {
 			var objArr : Array;
 			var objKeys : Array;
 			
-			if(obj["getUpdatedFieldsOnly"]())
-				objKeys = obj["getUpdateableParamKeys"]();
+			if(obj["getUpdatedFieldsOnly"]() || obj["getInsertedFields"]()) {
+				objKeys = [];
+				if (obj["getUpdatedFieldsOnly"]() ) {
+					objKeys.concat( obj["getUpdateableParamKeys"]());
+				}
+				if (obj["getInsertedFields"]() ) {
+					objKeys.concat( obj["getInsertableParamKeys"]());
+				}
+				
+			}
 			else
 				objKeys = ObjectUtil.getObjectAllKeys( obj );
 	

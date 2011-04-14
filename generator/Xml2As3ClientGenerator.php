@@ -117,6 +117,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 					$str = $this->addImport2String( "	import com.kaltura.vo." .  $type , $str );
 				break;
 			}
+			$str .= "		/** \n";
+			$str .= "		* " . $child->attributes()->description ;
+			$str .= "		* */ \n";
 			$str .= "		public var " . $child->attributes()->name . " : " . $type . ";\n\n"; 
 		}
 
@@ -124,8 +127,12 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		///////////////////////////////////////////////
 		if($xml->attributes()->base)
 			$str .= "		override public function getUpdateableParamKeys():Array\n";
-		else
+		else {
+			$str .= "		/** \n";
+			$str .= "		* a list of attributes which may be updated on this object \n";
+			$str .= "		* */ \n";
 			$str .= "		public function getUpdateableParamKeys():Array\n";
+		}
 
 		$str .="		{\n";
 		$str .= "			var arr : Array;\n";
@@ -142,9 +149,39 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		}
 			
 		$str .= "			return arr;\n";	
-		$str .= "		}\n";
+		$str .= "		}\n\n";
+		
+		///////////////////////////////////////////////
+		if($xml->attributes()->base)
+			$str .= "		override public function getInsertableParamKeys():Array\n";
+		else {
+			$str .= "		/** \n";
+			$str .= "		* a list of attributes which may only be inserted when initializing this object \n";
+			$str .= "		* */ \n";
+			$str .= "		public function getInsertableParamKeys():Array\n";
+		}
+
+		$str .="		{\n";
+		$str .= "			var arr : Array;\n";
+		
+		if($xml->attributes()->base)
+			$str .= "			arr = super.getInsertableParamKeys();\n";
+		else
+			$str .= "			arr = new Array();\n"; 
+				
+		foreach($xml->children() as $child)
+		{
+			if($child->attributes()->readOnly == "0" && $child->attributes()->insertOnly == "1")
+				$str .= "			arr.push('" . $child->attributes()->name . "');\n";
+		}
+			
+		$str .= "			return arr;\n";	
+		$str .= "		}\n\n";
+		
 		
 		////////////////////////////////////////////////
+		
+		
 		if($xml->attributes()->name == "KalturaBaseEntry")
 		{
 			$str .= 	"		// required for backwards compatibility with an old, un-optimized client\n";
@@ -259,7 +296,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							if($prop->attributes()->optional == "1")
 							{	
 								$add_check_init = true;
-								$check_init .= "			if(" . $prop->attributes()->name . "== null)" . $prop->attributes()->name . "= new Array();\n";
+								//$check_init .= "			if(" . $prop->attributes()->name . "== null)" . $prop->attributes()->name . "= new Array();\n";
 								
 								if($prop->attributes()->default)
 									$const_props .= "=" . $prop->attributes()->default;
@@ -267,9 +304,17 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 									$const_props .= "=null";
 							}
 							$const_props .= ",";	 
+							if($prop->attributes()->optional == "1")
+							{	
+								$keys_values_creator .= " 			if (" . $prop->attributes()->name . ") { \n";
+							}
 							$keys_values_creator .= " 			keyValArr = extractArray(" . $prop->attributes()->name . ",'" . $prop->attributes()->name . "');\n";
 							$keys_values_creator .= "			keyArr = keyArr.concat(keyValArr[0]);\n";
 							$keys_values_creator .= "			valueArr = valueArr.concat(keyValArr[1]);\n";
+							if($prop->attributes()->optional == "1")
+							{	
+								$keys_values_creator .= " 			} \n";
+							}
 						break;
 						case "file" :
 							$const_doc_param .= ' Object - FileReference or ByteArray';
@@ -295,7 +340,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							if($prop->attributes()->optional == "1")
 							{	
 								$add_check_init = true;
-								$check_init .= "			if(" . $prop->attributes()->name . "== null)" . $prop->attributes()->name . "= new " .$prop->attributes()->type . "();\n";
+								//$check_init .= "			if(" . $prop->attributes()->name . "== null)" . $prop->attributes()->name . "= new " .$prop->attributes()->type . "();\n";
 								
 								if($prop->attributes()->default)
 									$const_props .= "=" . $prop->attributes()->default;
@@ -304,9 +349,18 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							}
 							$const_props .= ",";	
 							$imports .=  "	import com.kaltura.vo." .  $this->toUpperCamaleCase($prop->attributes()->type) . ";\n"; 
+							if($prop->attributes()->optional == "1")
+							{	
+								$keys_values_creator .= " 			if (" . $prop->attributes()->name . ") { \n";
+							}
 							$keys_values_creator .= " 			keyValArr = kalturaObject2Arrays(" . $prop->attributes()->name . ", '" . $prop->attributes()->name . "');\n";
 							$keys_values_creator .= "			keyArr = keyArr.concat(keyValArr[0]);\n";
 							$keys_values_creator .= "			valueArr = valueArr.concat(keyValArr[1]);\n";
+							
+							if($prop->attributes()->optional == "1")
+							{	
+								$keys_values_creator .= " 			} \n";
+							}
 						break;
 					}
 					$const_doc_params[] = $const_doc_param;
@@ -354,7 +408,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "		public function " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . "( " . $const_props . " )\n";
 			$str .= "		{\n";
 			if($add_check_init)
-			$str .= $check_init;
+				$str .= $check_init;
 			$str .= "			service= '" . $xml->attributes()->id . "';\n";
 			$str .= "			action= '" . $child->attributes()->name . "';\n";
 			$str .=	$keys_values_creator;
