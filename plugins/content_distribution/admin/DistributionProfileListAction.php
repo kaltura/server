@@ -18,7 +18,7 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 	
 	public function getRequiredPermissions()
 	{
-		return array(KalturaPermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE);
+		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE);
 	}
 	
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)
@@ -27,7 +27,7 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 		if(!strlen($filterInput))
 			return null;
 			
-		$filter = new KalturaPartnerFilter();
+		$filter = new Kaltura_Client_Type_PartnerFilter();
 		$filterType = $request->getParam('filter_type');
 		if ($filterType == 'byid')
 		{
@@ -58,25 +58,28 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 		// init filter
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
 		
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
+		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("distributionProfile", "listByPartner", null, $partnerFilter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
+		$paginatorAdapter = new Infra_FilterPaginator($contentDistributionPlugin->distributionProfile, "listByPartner", null, $partnerFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
 		$providers = array(
-			KalturaDistributionProviderType::GENERIC => 'Generic',
-			KalturaDistributionProviderType::SYNDICATION => 'Syndication'
+			Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::GENERIC => 'Generic',
+			Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::SYNDICATION => 'Syndication'
 		);
 		$genericProviders = array();
-		$client = Kaltura_ClientHelper::getClient();
-		$contentDistributionClientPlugin = KalturaContentDistributionClientPlugin::get($client);
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionClientPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
 		$providersList = $contentDistributionClientPlugin->distributionProvider->listAction();
 		if($providersList)
 		{
 			foreach($providersList->objects as $provider)
 			{
-				if($provider->type == KalturaDistributionProviderType::GENERIC)
+				if($provider->type == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::GENERIC)
 					$genericProviders[$provider->id] = $provider->name;
 				else
 					$providers[$provider->type] = $provider->name;

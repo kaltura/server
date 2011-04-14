@@ -3,18 +3,19 @@ class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 {
 	private $properties = null;
 
-	public function populateActions(KalturaGenericDistributionProvider $object)
+	public function populateActions(Kaltura_Client_ContentDistribution_Type_GenericDistributionProvider $object)
 	{
 		$this->addProviderActions();
 		
-		$client = Kaltura_ClientHelper::getClient();
-		$filter = new KalturaGenericDistributionProviderActionFilter();
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
+		$filter = new Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderActionFilter();
 		$filter->genericDistributionProviderIdEqual = $object->id;
 		
 		$actionsList = null;
 		try
 		{
-			$actionsList = $client->genericDistributionProviderAction->listAction($filter);
+			$actionsList = $contentDistributionPlugin->genericDistributionProviderAction->listAction($filter);
 		}
 		catch(Exception $e)
 		{
@@ -40,16 +41,16 @@ class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 			$action = null;
 			switch ($actionObject->action)
 			{
-				case KalturaDistributionAction::SUBMIT:
+				case Kaltura_Client_ContentDistribution_Enum_DistributionAction::SUBMIT:
 					$action = 'submit';
 					break;
-				case KalturaDistributionAction::UPDATE:
+				case Kaltura_Client_ContentDistribution_Enum_DistributionAction::UPDATE:
 					$action = 'update';
 					break;
-				case KalturaDistributionAction::DELETE:
+				case Kaltura_Client_ContentDistribution_Enum_DistributionAction::DELETE:
 					$action = 'delete';
 					break;
-				case KalturaDistributionAction::FETCH_REPORT:
+				case Kaltura_Client_ContentDistribution_Enum_DistributionAction::FETCH_REPORT:
 					$action = 'fetchReport';
 					break;
 			}
@@ -84,12 +85,12 @@ class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 	}
 	
 	/**
-	 * @param KalturaGenericDistributionProviderAction $object
+	 * @param Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderAction $object
 	 * @param string $action
 	 * @param int $actionType
-	 * @return KalturaGenericDistributionProviderAction
+	 * @return Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderAction
 	 */
-	public function getActionObject(KalturaGenericDistributionProviderAction $object, $action, $actionType)
+	public function getActionObject(Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderAction $object, $action, $actionType)
 	{
 		$object->action = $actionType;
 		
@@ -157,11 +158,11 @@ class Form_GenericProviderConfiguration extends Form_DistributionConfiguration
 		));
 		
 		$element = $this->getElement("protocol-$action");
-		$element->addMultiOption(KalturaDistributionProtocol::FTP, 'FTP');
-		$element->addMultiOption(KalturaDistributionProtocol::SFTP, 'SFTP');
-		$element->addMultiOption(KalturaDistributionProtocol::SCP, 'SCP');
-		$element->addMultiOption(KalturaDistributionProtocol::HTTP, 'HTTP');
-		$element->addMultiOption(KalturaDistributionProtocol::HTTPS, 'HTTPS');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::FTP, 'FTP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP, 'SFTP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SCP, 'SCP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::HTTP, 'HTTP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::HTTPS, 'HTTPS');
 			
 		$this->addElement('text', "serverAddress-$action", array(
 			'label'	  =>  'Server Address',

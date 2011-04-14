@@ -6,14 +6,17 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 	 */
 	public function getDataArray($entryId, $partnerId)
 	{
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
+		$fileSyncPlugin = Kaltura_Client_FileSync_Plugin::get($client);
+		
 		if(!$client)
 		{
 			$errors[] = 'init client failed';
 			return;
 		}
 		
-		$filter = new KalturaEntryDistributionFilter();
+		$filter = new Kaltura_Client_ContentDistribution_Type_EntryDistributionFilter();
 		$filter->entryIdEqual = $entryId;
 		
 		$distributions = array();
@@ -21,9 +24,9 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 		$errDescription = null;
 		try
 		{
-			Kaltura_ClientHelper::impersonate($partnerId);
-			$entryDistributionList = $client->entryDistribution->listAction($filter);
-			Kaltura_ClientHelper::unimpersonate();
+			Infra_ClientHelper::impersonate($partnerId);
+			$entryDistributionList = $contentDistributionPlugin->entryDistribution->listAction($filter);
+			Infra_ClientHelper::unimpersonate();
 			$distributions = $entryDistributionList->objects;
 		}
 		catch (Exception $e)
@@ -42,14 +45,14 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 		{
 			try
 			{
-				$filter = new KalturaFileSyncFilter();
-				$filter->fileObjectTypeEqual = KalturaFileSyncObjectType::ENTRY_DISTRIBUTION;
+				$filter = new Kaltura_Client_FileSync_Type_FileSyncFilter();
+				$filter->fileObjectTypeEqual = Kaltura_Client_Enum_FileSyncObjectType::ENTRY_DISTRIBUTION;
 				$filter->objectIdIn = implode(',', $distributionIds);
 				
-				$pager = new KalturaFilterPager();
+				$pager = new Kaltura_Client_Type_FilterPager();
 				$pager->pageSize = 100;
 				
-				$fileSyncList = $client->fileSync->listAction($filter, $pager);
+				$fileSyncList = $fileSyncPlugin->fileSync->listAction($filter, $pager);
 				$fileSyncs = $fileSyncList->objects;
 				foreach($fileSyncs as $fileSync)
 					$distributionFileSyncs[$fileSync->objectId][] = $fileSync;			

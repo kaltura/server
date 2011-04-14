@@ -25,17 +25,17 @@
 		<tbody>
 			<?php foreach($this->paginator as /* KalturaDistributionProfile */ $profile): ?>
 			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
-				<td><?php echo $this->enumTranslate('KalturaDistributionProfileStatus', $profile->status); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus', $profile->status); ?></td>
 				<td><?php echo $profile->id; ?></td>
 				<td><?php echo $profile->partnerId; ?></td>
-				<td><?php echo ($profile->providerType == KalturaDistributionProviderType::GENERIC ? 'Generic ' . (isset($this->genericProviders[$profile->genericProviderId]) ? '(' . $this->genericProviders[$profile->genericProviderId] . ')' : '') : $this->providers[$profile->providerType]); ?></td>
+				<td><?php echo ($profile->providerType == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::GENERIC ? 'Generic ' . (isset($this->genericProviders[$profile->genericProviderId]) ? '(' . $this->genericProviders[$profile->genericProviderId] . ')' : '') : $this->providers[$profile->providerType]); ?></td>
 				<td><?php echo $profile->name; ?></td>
 				<td><?php $d = (new Zend_Date($profile->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $profile->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="configure"><?php echo $this->translate('Configure'); ?></option>
-						<?php if($profile->status == KalturaDistributionProfileStatus::ENABLED): ?>
+						<?php if($profile->status == Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::ENABLED): ?>
 							<option value="disableProfile"><?php echo $this->translate('Disable'); ?></option>
 						<?php else: ?>
 							<option value="enableProfile"><?php echo $this->translate('Enable'); ?></option>
@@ -113,7 +113,7 @@ function configure(profileId) {
 function disableProfile(profileId){
 	updateStatus(
 		profileId, 
-		<?php echo KalturaDistributionProfileStatus::DISABLED; ?>, 
+		<?php echo Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::DISABLED; ?>, 
 		function() {
 			alert('<?php echo $this->translate('profile was disabled');?>');
 		}
@@ -123,7 +123,7 @@ function disableProfile(profileId){
 function enableProfile(profileId){
 	updateStatus(
 		profileId, 
-		<?php echo KalturaDistributionProfileStatus::ENABLED; ?>, 
+		<?php echo Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::ENABLED; ?>, 
 		function() {
 			alert('<?php echo $this->translate('profile was enabled');?>');
 		}
@@ -138,7 +138,7 @@ function remove(profileId)
 
 	updateStatus(
 		profileId, 
-		<?php echo KalturaDistributionProfileStatus::DELETED; ?>, 
+		<?php echo Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::DELETED; ?>, 
 		function() {
 			alert('<?php echo $this->translate('profile was removed');?>');
 		}

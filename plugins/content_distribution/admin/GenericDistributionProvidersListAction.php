@@ -18,7 +18,7 @@ class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
 	
 	public function getRequiredPermissions()
 	{
-		return array(KalturaPermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE);
+		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_BASE);
 	}
 	
 	public function doAction(Zend_Controller_Action $action)
@@ -30,11 +30,14 @@ class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
 		$newForm = new Form_NewGenericProvider();
 		
 		// init filter
-		$genericProviderFilter = new KalturaGenericDistributionProviderFilter();
+		$genericProviderFilter = new Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderFilter();
+		
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
 		
 		// get results and paginate
-		$paginatorAdapter = new Kaltura_FilterPaginator("genericDistributionProvider", "listAction", null, $genericProviderFilter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter, $request);
+		$paginatorAdapter = new Infra_FilterPaginator($contentDistributionPlugin->genericDistributionProvider, "listAction", null, $genericProviderFilter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		

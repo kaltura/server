@@ -86,17 +86,22 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 			return self::$metadataProfileFields;
 			
 		self::$metadataProfileFields = array();
-		$client = Kaltura_ClientHelper::getClient();
-		Kaltura_ClientHelper::impersonate($this->partnerId);
+		$client = Infra_ClientHelper::getClient();
+		$metadataPlugin = Kaltura_Client_Metadata_Plugin::get($client);
+		
+		Infra_ClientHelper::impersonate($this->partnerId);
 		
 		try
 		{
-			$metadataProfileList = $client->metadataProfile->listAction();
-			foreach($metadataProfileList->objects as $metadataProfile)
+			$metadataProfileList = $metadataPlugin->metadataProfile->listAction();
+			if($metadataProfileList->totalCount)
 			{
-				$metadataFieldList = $client->metadataProfile->listFields($metadataProfile->id);
-				foreach($metadataFieldList->objects as $metadataField)
-					self::$metadataProfileFields[$metadataField->xPath] = $metadataField->label;
+				foreach($metadataProfileList->objects as $metadataProfile)
+				{
+					$metadataFieldList = $metadataPlugin->metadataProfile->listFields($metadataProfile->id);
+					foreach($metadataFieldList->objects as $metadataField)
+						self::$metadataProfileFields[$metadataField->xPath] = $metadataField->label;
+				}
 			}
 		}
 		catch (Exception $e)
@@ -105,7 +110,7 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 			return array();
 		}
 		
-		Kaltura_ClientHelper::unimpersonate();
+		Infra_ClientHelper::unimpersonate();
 		
 		return self::$metadataProfileFields;
 	}
@@ -210,7 +215,7 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 		if(!$object->$attributeName)
 			$object->$attributeName = new KalturaGenericDistributionProfileAction();
 		
-		if(!$properties || !isset($properties["{$action}_enabled"]) || $properties["{$action}_enabled"] == KalturaDistributionProfileActionStatus::DISABLED)
+		if(!$properties || !isset($properties["{$action}_enabled"]) || $properties["{$action}_enabled"] == Kaltura_Client_ContentDistribution_Enum_DistributionProfileActionStatus::DISABLED)
 			return;
 			
 		foreach($properties as $property => $value)
@@ -280,10 +285,11 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
 		
-		$client = Kaltura_ClientHelper::getClient();
-		Kaltura_ClientHelper::impersonate($this->partnerId);
-		$genericDistributionProviderList = $client->genericDistributionProvider->listAction();
-		Kaltura_ClientHelper::unimpersonate();
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
+		Infra_ClientHelper::impersonate($this->partnerId);
+		$genericDistributionProviderList = $contentDistributionPlugin->genericDistributionProvider->listAction();
+		Infra_ClientHelper::unimpersonate();
 		
 		$this->addElement('select', 'generic_provider_id', array(
 			'label'	  =>  'Provider',
@@ -315,11 +321,11 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'prepend')), array('HtmlTag',  array('tag' => 'dt', 'style' => 'display: none', 'class' => "action-fields-$action")))
 		));
 		
-		$element->addMultiOption(KalturaDistributionProtocol::FTP, 'FTP');
-		$element->addMultiOption(KalturaDistributionProtocol::SFTP, 'SFTP');
-		$element->addMultiOption(KalturaDistributionProtocol::SCP, 'SCP');
-		$element->addMultiOption(KalturaDistributionProtocol::HTTP, 'HTTP');
-		$element->addMultiOption(KalturaDistributionProtocol::HTTPS, 'HTTPS');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::FTP, 'FTP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SFTP, 'SFTP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::SCP, 'SCP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::HTTP, 'HTTP');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProtocol::HTTPS, 'HTTPS');
 		$displayGroup->addElement($element);
 			
 		$element = $this->createElement('text', "{$action}_server_url", array(

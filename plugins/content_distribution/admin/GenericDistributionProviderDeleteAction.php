@@ -16,18 +16,18 @@ class GenericDistributionProviderDeleteAction extends KalturaAdminConsolePlugin
 	
 	public function getRequiredPermissions()
 	{
-		return array(KalturaPermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY);
+		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY);
 	}
 	
 	public function doAction(Zend_Controller_Action $action)
 	{
 		$action->getHelper('viewRenderer')->setNoRender();
 		$providerId = $this->_getParam('provider_id');
-		$client = Kaltura_ClientHelper::getClient();
-		
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
 		try
 		{
-			$client->genericDistributionProvider->delete($providerId);
+			$contentDistributionPlugin->genericDistributionProvider->delete($providerId);
 			echo $action->getHelper('json')->sendJson('ok', false);
 		}
 		catch(Exception $e)

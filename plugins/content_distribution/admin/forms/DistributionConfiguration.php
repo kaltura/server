@@ -1,5 +1,5 @@
 <?php 
-class Form_DistributionConfiguration extends Kaltura_Form
+class Form_DistributionConfiguration extends Infra_Form
 {
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
@@ -26,7 +26,7 @@ class Form_DistributionConfiguration extends Kaltura_Form
 			{
 				$thumbIndex = $matches[1];
 				
-				$dimensions = new KalturaDistributionThumbDimensions();
+				$dimensions = new Kaltura_Client_ContentDistribution_Type_DistributionThumbDimensions();
 				$dimensions->width = $value;
 				$dimensions->height = $properties["dimensionsHeight_{$thumbIndex}"];
 				
@@ -46,7 +46,7 @@ class Form_DistributionConfiguration extends Kaltura_Form
 				$dimensionsHeight = $properties['dimensionsHeight'][$index];
 				$dimensionsRequired = $properties['dimensionsRequired'][$index];
 				
-				$dimensions = new KalturaDistributionThumbDimensions();
+				$dimensions = new Kaltura_Client_ContentDistribution_Type_DistributionThumbDimensions();
 				$dimensions->width = $dimensionsWidth;
 				$dimensions->height = $dimensionsHeight;
 				
@@ -60,7 +60,7 @@ class Form_DistributionConfiguration extends Kaltura_Form
 		return $object;
 	}
 	
-	public function addFlavorParamsFields(KalturaFlavorParamsListResponse $flavorParams, array $optionalFlavorParamsIds = array(), array $requiredFlavorParamsIds = array())
+	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $optionalFlavorParamsIds = array(), array $requiredFlavorParamsIds = array())
 	{
 		$this->addElement('hidden', 'crossLine2', array(
 			'lable'			=> 'line',
@@ -106,7 +106,7 @@ class Form_DistributionConfiguration extends Kaltura_Form
 	}
 	
 	private $dimensionsCounter = 0;
-	public function addThumbDimensions(KalturaDistributionThumbDimensions $dimensions, $isRequired)
+	public function addThumbDimensions(Kaltura_Client_ContentDistribution_Type_DistributionThumbDimensions $dimensions, $isRequired)
 	{
 		if(!$this->dimensionsCounter)
 		{

@@ -16,7 +16,7 @@ class DistributionProfileUpdateStatusAction extends KalturaAdminConsolePlugin
 	
 	public function getRequiredPermissions()
 	{
-		return array(KalturaPermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY);
+		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY);
 	}
 	
 	public function doAction(Zend_Controller_Action $action)
@@ -24,11 +24,12 @@ class DistributionProfileUpdateStatusAction extends KalturaAdminConsolePlugin
 		$action->getHelper('viewRenderer')->setNoRender();
 		$profileId = $this->_getParam('profile_id');
 		$status = $this->_getParam('status');
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($client);
 		
 		try
 		{
-			$client->distributionProfile->updateStatus($profileId, $status);
+			$contentDistributionPlugin->distributionProfile->updateStatus($profileId, $status);
 			echo $action->getHelper('json')->sendJson('ok', false);
 		}
 		catch(Exception $e)

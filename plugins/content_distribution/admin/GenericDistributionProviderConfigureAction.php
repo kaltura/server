@@ -18,15 +18,15 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 	
 	public function getRequiredPermissions()
 	{
-		return array(KalturaPermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY);
+		return array(Kaltura_Client_Enum_PermissionName::SYSTEM_ADMIN_CONTENT_DISTRIBUTION_MODIFY);
 	}
 	
 	public function saveProviderActions($providerId, Form_GenericProviderConfiguration $form)
 	{
-		$this->saveProviderAction($providerId, $form, 'submit', KalturaDistributionAction::SUBMIT);
-		$this->saveProviderAction($providerId, $form, 'update', KalturaDistributionAction::UPDATE);
-		$this->saveProviderAction($providerId, $form, 'delete', KalturaDistributionAction::DELETE);
-		$this->saveProviderAction($providerId, $form, 'fetchReport', KalturaDistributionAction::FETCH_REPORT);
+		$this->saveProviderAction($providerId, $form, 'submit', Kaltura_Client_ContentDistribution_Enum_DistributionAction::SUBMIT);
+		$this->saveProviderAction($providerId, $form, 'update', Kaltura_Client_ContentDistribution_Enum_DistributionAction::UPDATE);
+		$this->saveProviderAction($providerId, $form, 'delete', Kaltura_Client_ContentDistribution_Enum_DistributionAction::DELETE);
+		$this->saveProviderAction($providerId, $form, 'fetchReport', Kaltura_Client_ContentDistribution_Enum_DistributionAction::FETCH_REPORT);
 	}
 	
 	public function saveProviderAction($providerId, Form_GenericProviderConfiguration $form, $action, $actionType)
@@ -45,7 +45,7 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 		}
 		else
 		{
-			$actionObject = new KalturaGenericDistributionProviderAction();
+			$actionObject = new Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderAction();
 			$actionObject->genericDistributionProviderId = $providerId;
 			$actionObject->action = $actionType;
 		}
@@ -113,13 +113,14 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 		$action->getHelper('layout')->disableLayout();
 		
 		$providerId = $this->_getParam('provider_id');
-		$this->client = Kaltura_ClientHelper::getClient();
+		$this->client = Infra_ClientHelper::getClient();
+		$contentDistributionPlugin = Kaltura_Client_ContentDistribution_Plugin::get($this->client);
 		$form = new Form_GenericProviderConfiguration();
 		$form->setAction($action->view->url(array('controller' => 'plugin', 'action' => 'GenericDistributionProviderConfigureAction')));
 		
 		$request = $action->getRequest();
 		
-		$pager = new KalturaFilterPager();
+		$pager = new Kaltura_Client_Type_FilterPager();
 		$pager->pageSize = 100;
 		$flavorParamsResponse = $this->client->flavorParams->listAction(null, $pager);
 			
@@ -135,12 +136,12 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 					$form->populate($request->getPost());
 					$genericDistributionProvider = $form->getObject("KalturaGenericDistributionProvider", $request->getPost());
 					$genericDistributionProvider->partnerId = null;
-					$this->client->genericDistributionProvider->update($providerId, $genericDistributionProvider);
+					$contentDistributionPlugin->genericDistributionProvider->update($providerId, $genericDistributionProvider);
 					$this->saveProviderActions($providerId, $form);
 				}
 				else
 				{
-					$genericDistributionProvider = $this->client->genericDistributionProvider->get($providerId);
+					$genericDistributionProvider = $contentDistributionPlugin->genericDistributionProvider->get($providerId);
 					$form->populateFromObject($genericDistributionProvider);
 					
 					$optionalFlavorParamsIds = array();
@@ -152,10 +153,13 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 						
 					$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
 					
-					foreach($genericDistributionProvider->requiredThumbDimensions as $dimensions)
-						$form->addThumbDimensions($dimensions, true);
-					foreach($genericDistributionProvider->optionalThumbDimensions as $dimensions)
-						$form->addThumbDimensions($dimensions, false);
+					if(is_array($genericDistributionProvider->requiredThumbDimensions))
+						foreach($genericDistributionProvider->requiredThumbDimensions as $dimensions)
+							$form->addThumbDimensions($dimensions, true);
+							
+					if(is_array($genericDistributionProvider->optionalThumbDimensions))
+						foreach($genericDistributionProvider->optionalThumbDimensions as $dimensions)
+							$form->addThumbDimensions($dimensions, false);
 						
 					$form->addThumbDimensionsForm();
 					$form->addProviderActions();
@@ -168,15 +172,15 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 				if ($request->isPost())
 				{
 					$form->populate($request->getPost());
-					$genericDistributionProvider = $form->getObject("KalturaGenericDistributionProvider", $request->getPost());
+					$genericDistributionProvider = $form->getObject("Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderAction", $request->getPost());
 					
 					if(!$genericDistributionProvider->partnerId)
 						$genericDistributionProvider->partnerId = 0;
-					Kaltura_ClientHelper::impersonate($genericDistributionProvider->partnerId);
+					Infra_ClientHelper::impersonate($genericDistributionProvider->partnerId);
 					$genericDistributionProvider->partnerId = null;
-					$genericDistributionProvider = $this->client->genericDistributionProvider->add($genericDistributionProvider);
+					$genericDistributionProvider = $contentDistributionPlugin->genericDistributionProvider->add($genericDistributionProvider);
 					$this->saveProviderActions($genericDistributionProvider->id, $form);
-					Kaltura_ClientHelper::unimpersonate();
+					Infra_ClientHelper::unimpersonate();
 				}
 				else 
 				{

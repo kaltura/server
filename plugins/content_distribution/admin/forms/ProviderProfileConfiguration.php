@@ -12,14 +12,14 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		parent::__construct();
 	}
 	
-	public function saveProviderAdditionalObjects(KalturaDistributionProfile $distributionProfile)
+	public function saveProviderAdditionalObjects(Kaltura_Client_ContentDistribution_Type_DistributionProfile $distributionProfile)
 	{
 		// called after the profile element is saved
 	}
 	
 	abstract protected function addProviderElements();
 	
-	public function resetUnUpdatebleAttributes(KalturaDistributionProfile $distributionProfile)
+	public function resetUnUpdatebleAttributes(Kaltura_Client_ContentDistribution_Type_DistributionProfile $distributionProfile)
 	{
 		// reset readonly attributes
 		$distributionProfile->id = null;
@@ -97,9 +97,9 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		));
 		
 		$element = $this->getElement("{$action}_enabled");
-		$element->addMultiOption(KalturaDistributionProfileActionStatus::DISABLED, 'Disabled');
-		$element->addMultiOption(KalturaDistributionProfileActionStatus::MANUAL, 'Manual');
-		$element->addMultiOption(KalturaDistributionProfileActionStatus::AUTOMATIC, 'Automatic');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProfileActionStatus::DISABLED, 'Disabled');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProfileActionStatus::MANUAL, 'Manual');
+		$element->addMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionProfileActionStatus::AUTOMATIC, 'Automatic');
 			
 		$this->addDisplayGroup(
 			array(
@@ -120,17 +120,17 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		$metadataProfiles = null;
 		try
 		{
-			$metadataProfileFilter = new KalturaMetadataProfileFilter();
+			$metadataProfileFilter = new Kaltura_Client_Metadata_Type_MetadataProfileFilter();
 			$metadataProfileFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
 			
-			$client = Kaltura_ClientHelper::getClient();
-			Kaltura_ClientHelper::impersonate($this->partnerId);
+			$client = Infra_ClientHelper::getClient();
+			Infra_ClientHelper::impersonate($this->partnerId);
 			$metadataProfileList = $client->metadataProfile->listAction($metadataProfileFilter);
-			Kaltura_ClientHelper::unimpersonate();
+			Infra_ClientHelper::unimpersonate();
 			
 			$metadataProfiles = $metadataProfileList->objects;
 		}
-		catch (KalturaClientException $e)
+		catch (Kaltura_Client_Exception $e)
 		{
 			$metadataProfiles = null;
 		}
