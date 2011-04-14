@@ -860,7 +860,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function getSubpId()
 	{
-		return ($this->subp_id != null ? $this->subp_id : 0);
+		return $this->subp_id;
 	}
 
 	/**
