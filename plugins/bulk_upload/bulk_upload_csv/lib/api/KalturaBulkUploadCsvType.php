@@ -6,7 +6,7 @@
  * @author Roni
  *
  */
-class KalturaBulkUploadCsvType extends KalturaBulkUploadCsvType
+class KalturaBulkUploadCsvType extends KalturaBulkUploadType
 {
 	/**
 	 * 
