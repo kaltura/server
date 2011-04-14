@@ -3,16 +3,17 @@ class UserController extends Zend_Controller_Action
 {
 	public function indexAction()
 	{
+		$client = Infra_ClientHelper::getClient();
+			
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		
-		$settings = Zend_Registry::get('config')->settings;
-		$adminConsolePartnerId = $settings->partnerId;
+		$config = Zend_Registry::get('config');
 		
-		$filter = new KalturaUserFilter();
-		$filter->partnerIdEqual = $adminConsolePartnerId;
-		$paginatorAdapter = new Kaltura_FilterPaginator("user", "listAction", null, $filter);
-		$paginator = new Kaltura_Paginator($paginatorAdapter);
+		$filter = new Kaltura_Client_Type_UserFilter();
+		$filter->partnerIdEqual = $config->settings->partnerId;
+		$paginatorAdapter = new Infra_FilterPaginator($client->user, "listAction", null, $filter);
+		$paginator = new Infra_Paginator($paginatorAdapter);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
@@ -49,7 +50,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
-			$client = Kaltura_ClientHelper::getClient();
+			$client = Infra_ClientHelper::getClient();
 			$userEmail = $request->getPost('email');
 
 			$client->user->resetPassword($userEmail); // ask to reset password
@@ -91,7 +92,7 @@ class UserController extends Zend_Controller_Action
 		
 		if ($request->isPost())
 		{
-			$adapter = new Kaltura_AuthAdapter($request->getPost('email'), $request->getPost('password'));
+			$adapter = new Infra_AuthAdapter($request->getPost('email'), $request->getPost('password'));
 			$auth = Zend_Auth::getInstance();
 			$result = $auth->authenticate($adapter);
 
@@ -112,7 +113,7 @@ class UserController extends Zend_Controller_Action
 			}
 		}
 		
-		$loginForm->setDefault('next_uri', $this->_getParam('next_uri')); // set in Kaltura_AuthPlugin
+		$loginForm->setDefault('next_uri', $this->_getParam('next_uri')); // set in Infra_AuthPlugin
 		
 		$this->view->loginForm = $loginForm;
 		$this->view->resetForm = $resetForm;
@@ -122,7 +123,7 @@ class UserController extends Zend_Controller_Action
 	public function logoutAction()
 	{
 		Zend_Session::forgetMe();
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		$client->session->end();
 		Zend_Auth::getInstance()->clearIdentity();
 		$this->_helper->redirector('index', 'index');
@@ -132,9 +133,9 @@ class UserController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$userId = $this->_getParam('userId');
-		$client = Kaltura_ClientHelper::getClient();
-		$user = new KalturaUser();
-		$user->status = KalturaUserStatus::BLOCKED;
+		$client = Infra_ClientHelper::getClient();
+		$user = new Kaltura_Client_Type_User();
+		$user->status = Kaltura_Client_Enum_UserStatus::BLOCKED;
 		$client->user->update($userId, $user);
 		echo $this->_helper->json('ok', false);
 	}
@@ -143,9 +144,9 @@ class UserController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$userId = $this->_getParam('userId');
-		$client = Kaltura_ClientHelper::getClient();
-		$user = new KalturaUser();
-		$user->status = KalturaUserStatus::ACTIVE;
+		$client = Infra_ClientHelper::getClient();
+		$user = new Kaltura_Client_Type_User();
+		$user->status = Kaltura_Client_Enum_UserStatus::ACTIVE;
 		$client->user->update($userId, $user);
 		echo $this->_helper->json('ok', false);
 	}
@@ -154,7 +155,7 @@ class UserController extends Zend_Controller_Action
 	{
 		$this->_helper->viewRenderer->setNoRender();
 		$userId = $this->_getParam('userId');
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		$client->user->delete($userId);
 		echo $this->_helper->json('ok', false);
 	}
@@ -165,7 +166,7 @@ class UserController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$userId = $this->_getParam('userId');
 		
-		$client = Kaltura_ClientHelper::getClient();
+		$client = Infra_ClientHelper::getClient();
 		$user = $client->user->get($userId);
 		
 		$form = new Form_ChangeUserRole();
@@ -189,12 +190,12 @@ class UserController extends Zend_Controller_Action
 		{
 			try
 			{
-				$client = Kaltura_ClientHelper::getClient();
-				$user = new KalturaUser();
+				$client = Infra_ClientHelper::getClient();
+				$user = new Kaltura_Client_Type_User();
 				$user->email = $request->getPost('email');
 				$user->firstName = $request->getPost('first_name');
 				$user->lastName = $request->getPost('last_name');
-				$user->status = KalturaUserStatus::ACTIVE;
+				$user->status = Kaltura_Client_Enum_UserStatus::ACTIVE;
 				$user->id = $user->email;
 				$user->isAdmin = true;
 				$user->roleIds = $request->getPost('role');
@@ -228,7 +229,7 @@ class UserController extends Zend_Controller_Action
 		$formData = $request->getPost();
 		if ($form->isValid($formData))
 		{
-			$client = Kaltura_ClientHelper::getClient();
+			$client = Infra_ClientHelper::getClient();
 			$client->setKs(null);
 			$auth = Zend_Auth::getInstance();
 			$identity = $auth->getIdentity();
@@ -242,14 +243,14 @@ class UserController extends Zend_Controller_Action
 					$request->getPost('new_password')
 				);
 				
-				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Kaltura_ClientHelper::getPartnerId());				
+				$ks = $client->user->loginByLoginId($request->getPost('email_address'), $request->getPost('new_password'), Infra_ClientHelper::getPartnerId());				
 				$client->setKs($ks);
-				$user = $client->user->getByLoginId($request->getPost('email_address'), Kaltura_ClientHelper::getPartnerId());
-				if ($user->partnerId != Kaltura_ClientHelper::getPartnerId()) {
+				$user = $client->user->getByLoginId($request->getPost('email_address'), Infra_ClientHelper::getPartnerId());
+				if ($user->partnerId != Infra_ClientHelper::getPartnerId()) {
 					throw new Exception('', 'LOGIN_DATA_NOT_FOUND');
 				}
 				
-				$identity = new Kaltura_UserIdentity($user, $ks);
+				$identity = new Infra_UserIdentity($user, $ks);
 				$auth->getStorage()->write($identity); // new identity (email could be updated)
 				
 				$this->view->done = true;
@@ -300,12 +301,12 @@ class UserController extends Zend_Controller_Action
 		{
 			try
 			{
-				$client = Kaltura_ClientHelper::getClient();
+				$client = Infra_ClientHelper::getClient();
 				
 				$userId = $request->getParam('userId');
 				$roleId = $request->getPost('role');
 				
-				$user = new KalturaUser();
+				$user = new Kaltura_Client_Type_User();
 				$user->roleIds = $roleId;
 				$client->user->update($userId, $user); // call api user->update
 				$this->_helper->redirector('index');
@@ -350,7 +351,7 @@ class UserController extends Zend_Controller_Action
 			{
 				$newPassword = $userId = $request->getParam('newPassword');
 				
-				$client = Kaltura_ClientHelper::getClient();
+				$client = Infra_ClientHelper::getClient();
 				$client->setKs(null);
 				$client->user->setInitialPassword($token, $newPassword);
 				
