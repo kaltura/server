@@ -38,11 +38,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function validate() 
 	{
 		$xdoc = new DomDocument;
-		$xdoc->Load(dirname(__FILE__) . $this->data->filePath);
+		$xdoc->Load($this->data->filePath);
 		//Validate the XML file against the schema
-		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
+		if(!$xdoc->schemaValidate(dirname(__FILE__) . $this->xsdFilePath)) 
 		{
-			throw new KalturaException("Validate files failed on job [$this->job->id]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+			throw new KalturaException("Validate files failed on job [{$this->job->id}]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
 		return true;
