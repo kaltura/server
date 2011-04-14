@@ -38,23 +38,22 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		//Gets the right job for the engine	(only for server)
-		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::XML))
+		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
 			return new kBulkUploadCsvJobData();
 		
 		//Gets the right job for the engine (only for Server)
 		if($baseClass == 'KalturaBulkUploadJobData')
 		{
-			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::XML))
+			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
 			{
 				return new KalturaBulkUploadCsvJobData();
 			}
 		}
 			
-			
 		//Gets the right job for the engine (only for clients)	
 		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
 		{
-			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::XML))
+			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
 				return new KalturaBulkUploadCsvJobData();
 		}
 		
