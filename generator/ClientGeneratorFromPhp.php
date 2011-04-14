@@ -321,19 +321,19 @@ abstract class ClientGeneratorFromPhp
 	
 	private function loadChildTypes(KalturaTypeReflector $typeReflector)
 	{
-		$typesDir = KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."types".DIRECTORY_SEPARATOR;
-		$typesDir = realpath($typesDir);
+//		$typesDir = KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."types".DIRECTORY_SEPARATOR;
+//		$typesDir = realpath($typesDir);
 		$classMapFileLcoation = KAutoloader::getClassMapFilePath();
 		
 		$classMap = unserialize(file_get_contents($classMapFileLcoation));
 		
 		foreach($classMap as $class => $path)
 		{
-			if (strpos($path, $typesDir) === 0) // make sure the class exists in the types directory of api v3
+			if (strpos($class, 'Kaltura') === 0 && strpos($class, '_') === false && strpos($path, 'api') !== false) // make sure the class is api object
 			{
 				$reflector = new ReflectionClass($class);
-				if($class=='KalturaFileSyncFilter') continue;
-				if ($reflector->isSubclassOf($typeReflector->getType()))
+//				if($class=='KalturaFileSyncFilter') continue;
+				if ($reflector->isSubclassOf('KalturaObject') && $reflector->isSubclassOf($typeReflector->getType()))
 				{
 					$classTypeReflector = KalturaTypeReflectorCacher::get($class);
 					if($classTypeReflector)
