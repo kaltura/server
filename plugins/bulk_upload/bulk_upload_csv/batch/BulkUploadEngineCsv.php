@@ -198,14 +198,13 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	public function init()
 	{
-		//to support EOF of mac files
+		//To support EOF of mac files
 		ini_set('auto_detect_line_endings', true);
 		$this->currentPartnerId = $this->job->partnerId;
 		$this->multiRequestCounter = 0;
 				
-		// opens the csv file
+		//Opens the csv file
 		$this->lineNumber = $this->getStartLineNumber($this->job->id);
-		
 		$this->bulkUploadResults = array();
 	 
 		return true;
@@ -265,12 +264,12 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		KalturaLog::info("Sent $this->multiRequestCounter invalid lines results");
 		KalturaLog::info("CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($this->bulkUploadResults)) . ' invalid records');
 		
-		// reports that the parsing done
+		//Reports that the parsing done
 		$msg = "CSV file parsed, $this->lineNumber lines with " . ($this->lineNumber - count($this->bulkUploadResults)) . ' invalid records';
 		$updateData = new KalturaBulkUploadCsvJobData();
 		$updateData->csvVersion = $this->csvVersion;
 				
-		// check if job aborted
+		//Check if job aborted
 		$this->checkAborted();
 
 		//Create the entries from the bulk upload results
