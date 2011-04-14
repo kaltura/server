@@ -5,7 +5,7 @@
  */
 class KalturaExampleDistributionAssetPathArray extends KalturaTypedArray
 {
-	public static function fromArray($arr)
+	public static function fromDbArray($arr)
 	{
 		$newArr = new KalturaExampleDistributionAssetPathArray();
 		if ($arr == null)
