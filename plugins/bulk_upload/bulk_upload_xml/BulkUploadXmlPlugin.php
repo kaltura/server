@@ -39,14 +39,14 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	{
 		//Gets the right job for the engine	(only for server)
 		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
-			return new kBulkUploadCsvJobData();
+			return new kBulkUploadXmlJobData();
 		
 		//Gets the right job for the engine (only for Server)
 		if($baseClass == 'KalturaBulkUploadJobData')
 		{
 			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
 			{
-				return new KalturaBulkUploadCsvJobData();
+				return new KalturaBulkUploadXmlJobData();
 			}
 		}
 			
@@ -54,7 +54,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
 		{
 			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
-				return new KalturaBulkUploadCsvJobData();
+				return new KalturaBulkUploadXmlJobData();
 		}
 		
 		//Gets the engine (only for clients)
@@ -63,7 +63,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 			if($enumValue == KalturaBulkUploadType::XML)
 			{
 				list($taskConfig, $kClient, $job) = $constructorArgs;
-				return new BulkUploadEngineCsv($taskConfig, $kClient, $job);
+				return new BulkUploadEngineXml($taskConfig, $kClient, $job);
 			}
 		}
 				
