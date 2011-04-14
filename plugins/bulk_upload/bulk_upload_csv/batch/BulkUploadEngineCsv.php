@@ -442,7 +442,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		}
 				
 		// trim the values
-		array_walk($values, array('KBulkUploadEngine', 'trimArray'));
+		array_walk($values, array('BulkUploadEngineCsv', 'trimArray'));
 		
 	    $scheduleStartDate = null;
 	    $scheduleEndDate = null;
