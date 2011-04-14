@@ -14,8 +14,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	{
 		return self::PLUGIN_NAME;
 	}
-	
-	
+		
 	/**
 	 * @return array<string> list of enum classes names that extend the base enum name
 	 */
@@ -38,18 +37,39 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
-			return new kBulkUploadXmlJobData();
-				
-		//If we are on the client side (like batch)
+		//Gets the right job for the engine	(only for server)
+		if($baseClass == 'kBulkUploadJobData' && $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::XML))
+			return new kBulkUploadCsvJobData();
+		
+		//Gets the right job for the engine (only for Server)
+		if($baseClass == 'KalturaBulkUploadJobData')
+		{
+			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::XML))
+			{
+				return new KalturaBulkUploadCsvJobData();
+			}
+		}
+			
+			
+		//Gets the right job for the engine (only for clients)	
+		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
+		{
+			if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::XML))
+				return new KalturaBulkUploadCsvJobData();
+		}
+		
+		//Gets the engine (only for clients)
 		if(class_exists('KalturaClient') && $baseClass == 'KBulkUploadEngine')
 		{
 			if($enumValue == KalturaBulkUploadType::XML)
 			{
 				list($taskConfig, $kClient, $job) = $constructorArgs;
-				return new BulkUploadEngineXml($taskConfig, $kClient, $job);
+				return new BulkUploadEngineCsv($taskConfig, $kClient, $job);
 			}
 		}
+				
+		return null;
+		
 	
 		return null;
 	}
