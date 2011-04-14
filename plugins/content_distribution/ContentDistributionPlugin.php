@@ -9,6 +9,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
 	const CONTENT_DSTRIBUTION_MANAGER = 'kContentDistributionFlowManager';
+	const CONTENT_DSTRIBUTION_COPY_HANDLER = 'kContentDistributionObjectCopiedHandler';
 
 	public function getInstance($interface)
 	{
@@ -75,6 +76,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	{
 		return array(
 			self::CONTENT_DSTRIBUTION_MANAGER,
+			self::CONTENT_DSTRIBUTION_COPY_HANDLER,
 		);
 	}
 	
