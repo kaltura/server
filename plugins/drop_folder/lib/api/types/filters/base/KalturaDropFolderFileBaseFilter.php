@@ -162,7 +162,7 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavorEqual;
 
@@ -176,7 +176,7 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavorLike;
 

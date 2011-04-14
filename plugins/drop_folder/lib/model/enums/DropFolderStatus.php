@@ -5,8 +5,7 @@
  */ 
 interface DropFolderStatus extends BaseEnum
 {
-	const DISABLED  = 0;
-	const AUTOMATIC = 1;
-	const MANUAL    = 2;
-	const DELETED   = 3;
+	const DISABLED = 0;
+	const ENABLED  = 1;
+	const DELETED  = 2;
 }

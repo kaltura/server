@@ -59,7 +59,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	public $parsedSlug;
 	
 	/**
-	 * @var int
+	 * @var string
 	 * @filter eq,in,like,order
 	 */
 	public $parsedFlavor;
