@@ -566,17 +566,19 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 				
 				case 'string':
 				case 'array':
+					$this->appendLine("		if(!\$resultObject)");
+					$this->appendLine("			\$resultObject = array();");
 					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					break;
 				
 				default:
 					if ($resultType)
 					{
-						$resultType = $this->getTypeClass($resultType);	
+						$resultType = $this->getTypeClass($resultType);
 						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					}
 			}
-	    	}
+	    }
 			
 		$this->appendLine("		return \$resultObject;");
 		$this->appendLine("	}");
@@ -592,11 +594,18 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$defaultValue = $paramNode->getAttribute("default");
 						
 			if ($this->isSimpleType($paramType) || $paramType == "file")
+			{
 				$signature .= "$".$paramName;
+			}
 			else if ($paramType == "array")
+			{
 				$signature .= "array $".$paramName;
+			}
 			else
-				$signature .= $paramType." $".$paramName;
+			{
+				$typeClass = $this->getTypeClass($paramType);
+				$signature .= $typeClass." $".$paramName;
+			}
 			
 			
 			if ($paramNode->getAttribute("optional"))

@@ -137,9 +137,6 @@ class Kaltura_Client_ClientBase
 			$files = $call->files;
 		}
 		
-		// reset
-		$this->callsQueue = array();
-		
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 		
@@ -172,6 +169,9 @@ class Kaltura_Client_ClientBase
 				throw new Kaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
+		
+		// reset
+		$this->callsQueue = array();
 		$this->isMultiRequest = false; 
 		
 		$endTime = microtime (true);
@@ -181,34 +181,53 @@ class Kaltura_Client_ClientBase
 		return $result;
 	}
 
-	private function unmarshalItem(DOMElement $xml)
+	private function unmarshalArray(SimpleXMLElement $xmls)
 	{
-		if(!$xml->objectType)
-			return $xml->textContent;
+		$ret = array();
+		foreach($xmls as $xml)
+			$ret[] = $this->unmarshalItem($xml);
 			
-		$type = Kaltura_Client_TypeMap::getZendType($xml->objectType);
+		return $ret;
+	}
+
+	private function unmarshalItem(SimpleXMLElement $xml)
+	{
+		$nodeName = $xml->getName();
+		
+		if(!$xml->objectType)
+		{
+			if($xml->item)
+				return $this->unmarshalArray($xml->children());
+				
+			if($xml->error)
+			{
+				$code = "{$xml->error->code}";
+				$message = "{$xml->erroe->message}";
+				throw new Kaltura_Client_Exception($message, $code);
+			}
+			
+			return "$xml";
+		}
+		$objectType = reset($xml->objectType);
+			
+		$type = Kaltura_Client_TypeMap::getZendType($objectType);
 		$ret = new $type();
+	
+		foreach($xml->children() as $attributeName => $attributeValue)
+		{
+			if($attributeName == 'objectType')
+				continue;
+				
+			$ret->$attributeName = $this->unmarshalItem($attributeValue);
+		}
+		
+		return $ret;
 	}
 
 	private function unmarshal($xmlData)
 	{
-		$xml = new DOMDocument();
-		$xml->loadXML($xmlData);
-		$xPath = new DOMXPath($xml);
-		
-		if(!$this->isMultiRequest)
-		{
-			$results = $xPath->query("/xml/result");
-			$result = reset($results);
-			return $this->unmarshalItem($result);
-		}
-			
-		$items = $xPath->query("/xml/result/item");
-		$ret = array();
-		foreach($items as $item)
-			$ret[] = $this->unmarshalItem($item);
-		
-		return $ret;
+		$xml = new SimpleXMLElement($xmlData);
+		return $this->unmarshalItem($xml->result);
 	}
 
 	/**
@@ -432,9 +451,9 @@ class Kaltura_Client_ClientBase
 			if (!($resultObject instanceof $objectType))
 				throw new Kaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
-		else if (gettype($resultObject) !== "NULL" && gettype($resultObject) !== $objectType)
+		else if (gettype($resultObject) != "NULL" && gettype($resultObject) != $objectType)
 		{
-			throw new Kaltura_Client_ClientException("Invalid object type", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+			throw new Kaltura_Client_ClientException("Invalid object type [" . gettype($resultObject) . "] expected [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
 		}
 	}
 	
