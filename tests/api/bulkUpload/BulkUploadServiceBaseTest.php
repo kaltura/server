@@ -8,7 +8,7 @@ abstract class BulkUploadServiceBaseTest extends KalturaApiTestCase
 	/**
 	 * Tests bulkUpload->add action
 	 * @param int $conversionProfileId Convertion profile id to use for converting the current bulk (-1 to use partner's default)
-	 * @param file $fileData CSV File
+	 * @param file $fileData bullk upload file
 	 * @param KalturaBulkUploadType $bulkUploadType 
 	 * @param KalturaBulkUpload $reference 
 	 * @return int

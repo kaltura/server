@@ -6179,6 +6179,32 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
+{
+	/**
+	 * The version of the csv file
+	 * 
+	 *
+	 * @var KalturaBulkUploadCsvVersion
+	 */
+	public $csvVersion = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaSearchCondition extends KalturaSearchItem
 {
 	/**

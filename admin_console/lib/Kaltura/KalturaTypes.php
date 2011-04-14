@@ -7693,6 +7693,32 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
  * @package Admin
  * @subpackage Client
  */
+class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
+{
+	/**
+	 * The version of the csv file
+	 * 
+	 *
+	 * @var KalturaBulkUploadCsvVersion
+	 */
+	public $csvVersion = null;
+
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
+class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
+{
+
+}
+
+/**
+ * @package Admin
+ * @subpackage Client
+ */
 class KalturaAssetParamsOutput extends KalturaAssetParams
 {
 	/**

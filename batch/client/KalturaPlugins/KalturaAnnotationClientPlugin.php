@@ -11,6 +11,106 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaAnnotationOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaAnnotationBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parentIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $parentIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIdIn = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaAnnotationFilter extends KalturaAnnotationBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaAnnotationClientPlugin extends KalturaClientPlugin
 {
 	/**

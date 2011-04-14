@@ -11,6 +11,72 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaDistributionAction
+{
+	const SUBMIT = 1;
+	const UPDATE = 2;
+	const DELETE = 3;
+	const FETCH_REPORT = 4;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionErrorType
+{
+	const MISSING_FLAVOR = 1;
+	const MISSING_THUMBNAIL = 2;
+	const MISSING_METADATA = 3;
+	const INVALID_DATA = 4;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionProfileActionStatus
+{
+	const DISABLED = 1;
+	const AUTOMATIC = 2;
+	const MANUAL = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionProfileStatus
+{
+	const DISABLED = 1;
+	const ENABLED = 2;
+	const DELETED = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionProviderOrderBy
+{
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
@@ -20,6 +86,1189 @@ class KalturaDistributionProviderType
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
 	const VERIZON = "verizonDistribution.VERIZON";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaEntryDistributionFlag
+{
+	const NONE = 0;
+	const SUBMIT_REQUIRED = 1;
+	const DELETE_REQUIRED = 2;
+	const UPDATE_REQUIRED = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaEntryDistributionOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+	const SUBMITTED_AT_ASC = "+submittedAt";
+	const SUBMITTED_AT_DESC = "-submittedAt";
+	const SUNRISE_ASC = "+sunrise";
+	const SUNRISE_DESC = "-sunrise";
+	const SUNSET_ASC = "+sunset";
+	const SUNSET_DESC = "-sunset";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaEntryDistributionStatus
+{
+	const PENDING = 0;
+	const QUEUED = 1;
+	const READY = 2;
+	const DELETED = 3;
+	const SUBMITTING = 4;
+	const UPDATING = 5;
+	const DELETING = 6;
+	const ERROR_SUBMITTING = 7;
+	const ERROR_UPDATING = 8;
+	const ERROR_DELETING = 9;
+	const REMOVED = 10;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaEntryDistributionSunStatus
+{
+	const BEFORE_SUNRISE = 1;
+	const AFTER_SUNRISE = 2;
+	const AFTER_SUNSET = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericDistributionProviderActionOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericDistributionProviderOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericDistributionProviderStatus
+{
+	const ACTIVE = 2;
+	const DELETED = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionThumbDimensions extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $width = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $height = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaDistributionProfile extends KalturaObjectBase
+{
+	/**
+	 * Auto generated unique id
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * Profile creation date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Profile last update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 * @insertonly
+	 */
+	public $providerType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileStatus
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $submitEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $updateEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $deleteEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileActionStatus
+	 */
+	public $reportEnabled = null;
+
+	/**
+	 * Comma separated flavor params ids that should be auto converted
+	 *
+	 * @var string
+	 */
+	public $autoCreateFlavors = null;
+
+	/**
+	 * Comma separated thumbnail params ids that should be auto generated
+	 *
+	 * @var string
+	 */
+	public $autoCreateThumb = null;
+
+	/**
+	 * Comma separated flavor params ids that should be submitted if ready
+	 *
+	 * @var string
+	 */
+	public $optionalFlavorParamsIds = null;
+
+	/**
+	 * Comma separated flavor params ids that required to be readt before submission
+	 *
+	 * @var string
+	 */
+	public $requiredFlavorParamsIds = null;
+
+	/**
+	 * Thumbnail dimensions that should be submitted if ready
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $optionalThumbDimensions;
+
+	/**
+	 * Thumbnail dimensions that required to be readt before submission
+	 *
+	 * @var array of KalturaDistributionThumbDimensions
+	 */
+	public $requiredThumbDimensions;
+
+	/**
+	 * If entry distribution sunrise not specified that will be the default since entry creation time, in seconds
+	 *
+	 * @var int
+	 */
+	public $sunriseDefaultOffset = null;
+
+	/**
+	 * If entry distribution sunset not specified that will be the default since entry creation time, in seconds
+	 *
+	 * @var int
+	 */
+	public $sunsetDefaultOffset = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaDistributionValidationError extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionAction
+	 */
+	public $action = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionErrorType
+	 */
+	public $errorType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaEntryDistribution extends KalturaObjectBase
+{
+	/**
+	 * Auto generated unique id
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * Entry distribution creation date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Entry distribution last update date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * Entry distribution submission date as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $submittedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @insertonly
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionFlag
+	 * @readonly
+	 */
+	public $dirtyStatus = null;
+
+	/**
+	 * Comma separated thumbnail asset ids
+	 *
+	 * @var string
+	 */
+	public $thumbAssetIds = null;
+
+	/**
+	 * Comma separated flavor asset ids
+	 *
+	 * @var string
+	 */
+	public $flavorAssetIds = null;
+
+	/**
+	 * Entry distribution publish time as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunrise = null;
+
+	/**
+	 * Entry distribution un-publish time as Unix timestamp (In seconds)
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunset = null;
+
+	/**
+	 * The id as returned from the distributed destination
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $remoteId = null;
+
+	/**
+	 * The plays as retrieved from the remote destination reports
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $plays = null;
+
+	/**
+	 * The views as retrieved from the remote destination reports
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $views = null;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionValidationError
+	 * @readonly
+	 */
+	public $validationErrors;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaBatchJobErrorTypes
+	 * @readonly
+	 */
+	public $errorType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $errorNumber = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $errorDescription = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaNullableBoolean
+	 * @readonly
+	 */
+	public $hasSubmitResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaNullableBoolean
+	 * @readonly
+	 */
+	public $hasSubmitSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaNullableBoolean
+	 * @readonly
+	 */
+	public $hasUpdateResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaNullableBoolean
+	 * @readonly
+	 */
+	public $hasUpdateSentDataLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaNullableBoolean
+	 * @readonly
+	 */
+	public $hasDeleteResultsLog = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaNullableBoolean
+	 * @readonly
+	 */
+	public $hasDeleteSentDataLog = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionRemoteMediaFile extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $remoteId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfile
+	 */
+	public $distributionProfile;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $entryDistributionId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistribution
+	 */
+	public $entryDistribution;
+
+	/**
+	 * Id of the media in the remote system
+	 *
+	 * @var string
+	 */
+	public $remoteId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 */
+	public $providerType = null;
+
+	/**
+	 * Additional data that relevant for the provider only
+	 *
+	 * @var KalturaDistributionJobProviderData
+	 */
+	public $providerData;
+
+	/**
+	 * The results as returned from the remote destination
+	 *
+	 * @var string
+	 */
+	public $results = null;
+
+	/**
+	 * The data as sent to the remote destination
+	 *
+	 * @var string
+	 */
+	public $sentData = null;
+
+	/**
+	 * Stores array of media files that submitted to the destination site
+	 * Could be used later for media update 
+	 *
+	 * @var array of KalturaDistributionRemoteMediaFile
+	 */
+	public $mediaFiles;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $plays = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $views = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaContentDistributionSearchItem extends KalturaSearchItem
+{
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $noDistributionProfiles = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionSunStatus
+	 */
+	public $distributionSunStatus = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionFlag
+	 */
+	public $entryDistributionFlag = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionStatus
+	 */
+	public $entryDistributionStatus = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $hasEntryDistributionValidationErrors = null;
+
+	/**
+	 * Comma seperated validation error types
+	 *
+	 * @var string
+	 */
+	public $entryDistributionValidationErrors = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionProfileFilter extends KalturaDistributionProfileBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 */
+	public $typeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $typeIn = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDistributionProviderFilter extends KalturaDistributionProviderBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $submittedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $submittedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $distributionProfileIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionFlag
+	 */
+	public $dirtyStatusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $dirtyStatusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunriseGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunriseLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunsetGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $sunsetLessThanOrEqual = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $genericDistributionProviderIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $genericDistributionProviderIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionAction
+	 */
+	public $actionEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $actionIn = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericDistributionProviderActionFilter extends KalturaGenericDistributionProviderActionBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isDefaultEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $isDefaultIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProviderStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericDistributionProviderFilter extends KalturaGenericDistributionProviderBaseFilter
+{
+
 }
 
 

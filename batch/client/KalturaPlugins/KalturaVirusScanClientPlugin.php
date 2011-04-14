@@ -7,6 +7,200 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaVirusFoundAction
+{
+	const NONE = 0;
+	const DELETE = 1;
+	const CLEAN_NONE = 2;
+	const CLEAN_DELETE = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaVirusScanEngineType
+{
+	const SYMANTEC_SCAN_ENGINE = "symantecScanEngine.SymantecScanEngine";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaVirusScanJobResult
+{
+	const SCAN_ERROR = 1;
+	const FILE_IS_CLEAN = 2;
+	const FILE_WAS_CLEANED = 3;
+	const FILE_INFECTED = 4;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaVirusScanProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaVirusScanProfileStatus
+{
+	const DISABLED = 1;
+	const ENABLED = 2;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaVirusScanJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $srcFilePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanJobResult
+	 */
+	public $scanResult = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusFoundAction
+	 */
+	public $virusFoundAction = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerIdEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanProfileStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanEngineType
+	 */
+	public $engineTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $engineTypeIn = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaVirusScanProfileFilter extends KalturaVirusScanProfileBaseFilter
+{
+
+}
+
 
 /**
  * @package Scheduler

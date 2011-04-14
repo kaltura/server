@@ -505,7 +505,7 @@ class KalturaDropFolderFile extends KalturaObjectBase
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavor = null;
 
@@ -721,6 +721,22 @@ class KalturaDropFolderFileListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDropFolderFileResource extends KalturaContentResource
+{
+	/**
+	 * Id of the drop folder file object
+	 *
+	 * @var int
+	 */
+	public $dropFolderFileId = null;
 
 
 }
