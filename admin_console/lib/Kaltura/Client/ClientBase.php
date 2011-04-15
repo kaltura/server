@@ -148,9 +148,9 @@ class Kaltura_Client_ClientBase
 		}
 		else 
 		{
-			if(strlen($postResult) > 8192)
-				$this->log("result (serialized): " . strlen($postResult) . " bytes");
-			else
+//			if(strlen($postResult) > 8192)
+//				$this->log("result (serialized): " . strlen($postResult) . " bytes");
+//			else
 				$this->log("result (serialized): " . $postResult);
 			
 			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_XML)
@@ -161,7 +161,7 @@ class Kaltura_Client_ClientBase
 					throw new Kaltura_Client_ClientException("failed to unserialize server result\n$postResult", Kaltura_Client_ClientException::ERROR_UNSERIALIZE_FAILED);
 					
 				$dump = print_r($result, true);
-				if(strlen($dump) < 8192)
+//				if(strlen($dump) < 8192)
 					$this->log("result (object dump): " . $dump);
 			}
 			else
@@ -211,6 +211,7 @@ class Kaltura_Client_ClientBase
 		$objectType = reset($xml->objectType);
 			
 		$type = Kaltura_Client_TypeMap::getZendType($objectType);
+		$this->log("Instantiating new object type [$type] server type [$objectType]");
 		$ret = new $type();
 	
 		foreach($xml->children() as $attributeName => $attributeValue)
