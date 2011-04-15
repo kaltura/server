@@ -38,32 +38,8 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
 		 //Gets the right job for the engine	
-		if($baseClass == 'kBulkUploadJobData')
-		{
-			//Only for server
-			if(is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))
-				return new kBulkUploadCsvJobData();
-				
-			//for the API objects
-			if(is_null($enumValue) || $enumValue == self::getApiValue((BulkUploadCsvType::CSV)))
-				return new kBulkUploadCsvJobData();
-		}
-		
-		//Gets the right job for the engine (only for Server)	
-		if($baseClass == 'KalturaBulkUploadJobData')
-		{
-			if(is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))
-			{
-				return new KalturaBulkUploadCsvJobData();
-			}
-		}
-				
-		//Gets the right job for the engine (only for clients)	
-		if(class_exists('KalturaClient') && $baseClass == 'KalturaBulkUploadJobData')
-		{
-			if(is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))
-				return new KalturaBulkUploadCsvJobData();
-		}
+		if($baseClass == 'kBulkUploadJobData' && (is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)))
+			return new kBulkUploadCsvJobData();
 		
 		//Gets the engine (only for clients)
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && (is_null($enumValue) || $enumValue == KalturaBulkUploadType::CSV))
