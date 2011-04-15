@@ -1,10 +1,9 @@
 <?php
 
 /**
- * 
  * Represents the Bulk upload job data for xml bulk upload
- * @author Roni
- *
+ * @package plugins.bulkUpload
+ * @subpackage lib
  */
 class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
 {	
