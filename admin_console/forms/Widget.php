@@ -116,6 +116,14 @@ class Form_Widget extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'validators' 	=> array()
 		));
+		
+		$this->addElement('checkbox', 'is_public', array(
+			'label'			=> 'Is Public:',
+			'required'		=> true,
+			'value'			=> '0',
+			'filters'		=> array('StringTrim'),
+			'validators' 	=> array()
+		));
 	}
 	
 	public function populateFromObject($object, $addUnderscore = true)

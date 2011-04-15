@@ -11,7 +11,7 @@ class Kaltura_Client_AdminConsole_UiConfAdminService extends Kaltura_Client_Serv
 		parent::__construct($client);
 	}
 
-	function add(Kaltura_Client_Type_UiConf $uiConf)
+	function add(Kaltura_Client_AdminConsole_Type_UiConfAdmin $uiConf)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
@@ -20,11 +20,11 @@ class Kaltura_Client_AdminConsole_UiConfAdminService extends Kaltura_Client_Serv
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "Kaltura_Client_Type_UiConf");
+		$this->client->validateObjectType($resultObject, "Kaltura_Client_AdminConsole_Type_UiConfAdmin");
 		return $resultObject;
 	}
 
-	function update($id, Kaltura_Client_Type_UiConf $uiConf)
+	function update($id, Kaltura_Client_AdminConsole_Type_UiConfAdmin $uiConf)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
@@ -34,7 +34,7 @@ class Kaltura_Client_AdminConsole_UiConfAdminService extends Kaltura_Client_Serv
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "Kaltura_Client_Type_UiConf");
+		$this->client->validateObjectType($resultObject, "Kaltura_Client_AdminConsole_Type_UiConfAdmin");
 		return $resultObject;
 	}
 
@@ -47,7 +47,7 @@ class Kaltura_Client_AdminConsole_UiConfAdminService extends Kaltura_Client_Serv
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "Kaltura_Client_Type_UiConf");
+		$this->client->validateObjectType($resultObject, "Kaltura_Client_AdminConsole_Type_UiConfAdmin");
 		return $resultObject;
 	}
 
@@ -75,7 +75,7 @@ class Kaltura_Client_AdminConsole_UiConfAdminService extends Kaltura_Client_Serv
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "Kaltura_Client_Type_UiConfListResponse");
+		$this->client->validateObjectType($resultObject, "Kaltura_Client_AdminConsole_Type_UiConfAdminListResponse");
 		return $resultObject;
 	}
 }

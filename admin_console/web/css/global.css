@@ -273,8 +273,11 @@ div#my_info, div#new_admin { clear: both;}
    #widget-dialog #width-element, #widget-dialog #height-element { margin: 5px 10px 12px; }
    #widget-dialog #conf_file_features-element .description,
    #widget-dialog #conf_file-element .description { text-align: right; }
-   #widget-dialog #use_cdn-label { float: left; }
-   #widget-dialog #use_cdn-element { float: left; margin: 5px; } 
+   #widget-dialog #use_cdn-label,
+   #widget-dialog #is_public-label { float: left; }
+   #widget-dialog #use_cdn-element,
+   #widget-dialog #is_public-element { float: left; margin: 5px; }
+   #widget-dialog #is_public-label { margin-left: 10px; } 
 		
 .CodeMirror-line-numbers { width: 2.2em; color: #aaa; background-color: #eee; text-align: right; padding: .4em .3em 0 0; font-size: 9pt; font-family: monospace; } 
 		

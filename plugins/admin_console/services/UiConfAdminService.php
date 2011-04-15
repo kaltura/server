@@ -20,10 +20,10 @@ class UiConfAdminService extends KalturaBaseService
 	 * Adds new UIConf with no partner limitation
 	 * 
 	 * @action add
-	 * @param KalturaUiConf $uiConf
-	 * @return KalturaUiConf
+	 * @param KalturaUiConfAdmin $uiConf
+	 * @return KalturaUiConfAdmin
 	 */
-	function addAction(KalturaUiConf $uiConf)
+	function addAction(KalturaUiConfAdmin $uiConf)
 	{
 		// if not specified set to true (default)
 		if(is_null($uiConf->useCdn))
@@ -32,7 +32,7 @@ class UiConfAdminService extends KalturaBaseService
 		$dbUiConf = $uiConf->toObject(new uiConf());
 		$dbUiConf->save();
 		
-		$uiConf = new KalturaUiConf();
+		$uiConf = new KalturaUiConfAdmin();
 		$uiConf->fromUiConf($dbUiConf);
 		
 		return $uiConf;
@@ -43,12 +43,12 @@ class UiConfAdminService extends KalturaBaseService
 	 * 
 	 * @action update
 	 * @param int $id 
-	 * @param KalturaUiConf $uiConf
-	 * @return KalturaUiConf
+	 * @param KalturaUiConfAdmin $uiConf
+	 * @return KalturaUiConfAdmin
 	 *
 	 * @throws APIErrors::INVALID_UI_CONF_ID
 	 */	
-	function updateAction($id, KalturaUiConf $uiConf)
+	function updateAction($id, KalturaUiConfAdmin $uiConf)
 	{
 		$dbUiConf = uiConfPeer::retrieveByPK( $id );
 		
@@ -58,7 +58,7 @@ class UiConfAdminService extends KalturaBaseService
 		$dbUiConf = $uiConf->toObject($dbUiConf);
 		$dbUiConf->save();
 		
-		$uiConf = new KalturaUiConf();
+		$uiConf = new KalturaUiConfAdmin();
 		$uiConf->fromObject($dbUiConf);
 		
 		return $uiConf;
@@ -69,7 +69,7 @@ class UiConfAdminService extends KalturaBaseService
 	 * 
 	 * @action get
 	 * @param int $id 
-	 * @return KalturaUiConf
+	 * @return KalturaUiConfAdmin
 	 *
 	 * @throws APIErrors::INVALID_UI_CONF_ID
 	 */		
@@ -80,7 +80,7 @@ class UiConfAdminService extends KalturaBaseService
 		if (!$dbUiConf)
 			throw new KalturaAPIException(APIErrors::INVALID_UI_CONF_ID, $id);
 			
-		$uiConf = new KalturaUiConf();
+		$uiConf = new KalturaUiConfAdmin();
 		$uiConf->fromObject($dbUiConf);
 		
 		return $uiConf;
@@ -111,7 +111,7 @@ class UiConfAdminService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaUiConfFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaUiConfListResponse
+	 * @return KalturaUiConfAdminListResponse
 	 */		
 	function listAction( KalturaUiConfFilter $filter = null , KalturaFilterPager $pager = null)
 	{
@@ -130,9 +130,9 @@ class UiConfAdminService extends KalturaBaseService
 			$pager->attachToCriteria($c);
 		$list = uiConfPeer::doSelect($c);
 		
-		$newList = KalturaUiConfArray::fromUiConfArray($list);
+		$newList = KalturaUiConfAdminArray::fromUiConfAdminArray($list);
 		
-		$response = new KalturaUiConfListResponse();
+		$response = new KalturaUiConfAdminListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $count;
 		

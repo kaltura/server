@@ -113,6 +113,8 @@ class Kaltura_Client_TypeMap
 		'KalturaMediaInfoBaseFilter' => 'Kaltura_Client_Type_MediaInfoBaseFilter',
 		'KalturaMediaInfoFilter' => 'Kaltura_Client_Type_MediaInfoFilter',
 		'KalturaTrackEntryListResponse' => 'Kaltura_Client_AdminConsole_Type_TrackEntryListResponse',
+		'KalturaUiConfAdmin' => 'Kaltura_Client_AdminConsole_Type_UiConfAdmin',
+		'KalturaUiConfAdminListResponse' => 'Kaltura_Client_AdminConsole_Type_UiConfAdminListResponse',
 		'KalturaInternalToolsSession' => 'Kaltura_Client_KalturaInternalTools_Type_InternalToolsSession',
 		'KalturaExclusiveLockKey' => 'Kaltura_Client_Type_ExclusiveLockKey',
 		'KalturaFreeJobResponse' => 'Kaltura_Client_Type_FreeJobResponse',

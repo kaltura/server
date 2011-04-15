@@ -46,7 +46,7 @@ class WidgetController extends Zend_Controller_Action
 			$form->loadVersions($request->getParam('obj_type'));
 			if ($form->isValid($request->getParams()))
 			{
-				$uiConf = $form->getObject('Kaltura_Client_Type_UiConf', $request->getPost());
+				$uiConf = $form->getObject('Kaltura_Client_AdminConsole_Type_UiConfAdmin', $request->getPost());
 				$uiConf = $adminConsolePlugin->uiConfAdmin->add($uiConf);
 				$form->setAttrib('class', 'valid');
 			}
@@ -78,7 +78,7 @@ class WidgetController extends Zend_Controller_Action
 			$form->loadVersions($request->getParam('obj_type'));
 			if ($form->isValid($request->getParams()))
 			{
-				$uiConfUpdate = $form->getObject('Kaltura_Client_Type_UiConf', $request->getPost());
+				$uiConfUpdate = $form->getObject('Kaltura_Client_AdminConsole_Type_UiConfAdmin', $request->getPost());
 				$uiConf = $adminConsolePlugin->uiConfAdmin->update($id, $uiConfUpdate);
 				$form->populateFromObject($uiConf);
 				$form->setAttrib('class', 'valid');
