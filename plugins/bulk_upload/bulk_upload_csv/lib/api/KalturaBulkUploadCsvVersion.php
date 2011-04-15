@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins
- * @subpackage bulk_upload_csv
+ * @package plugins.bulkUpload
+ * @subpackage lib
  */
-class KalturaBulkUploadCsvVersion extends KalturaStringEnum
+class KalturaBulkUploadCsvVersion extends KalturaEnum
 {
 	const V1 = 1; // 5 values in a row
 	const V2 = 2; // 12 values in a row
