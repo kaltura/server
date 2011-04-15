@@ -56,6 +56,12 @@ class DropFolderEventsManager implements kObjectChangedEventConsumer
 		{
 			if (!is_null($pattern) && ($pattern != '')) {
 				$pattern = '/^'.$pattern.'$/';
+				/*
+				 TODO: use fnmatch for wildcard matching - only works on windows from php5.3
+				if (fnmatch($pattern, $fileName)) {
+					$matchFound = true;
+				}
+				*/
 				if (@preg_match($pattern, $fileName)) {
 					$matchFound = true;	
 				}

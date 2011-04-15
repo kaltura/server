@@ -35,9 +35,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			//TODO: add error!
 		}
 		
-		if (!$this->config)
+		if ($this->config)
 		{
-			$this->setDefaultConfig();
+			//TODO: error - config not set
 		}
 		
 		//TODO: parse slug and flavor and save on drop folder file object
@@ -68,14 +68,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		{
 			//TODO: update status to ERROR and update error description
 		}		
-	}
-	
-	private function setDefaultConfig()
-	{
-		$config = new DropFolderContentFileHandlerConfig();
-		$config->setHandlerType(DropFolderFileHandlerType::CONTENT);
-		$config->setSlugRegex(null);
-		$config->setContentMatchPolicy(DropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW);
 	}
 	
 	private function getDefaultApiEntryObject()
