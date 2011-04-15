@@ -64,14 +64,14 @@ class Form_DailymotionProfileConfiguration extends Form_ProviderProfileConfigura
 //			$metadataProfileFilter->partnerIdEqual = $this->partnerId;
 			$metadataProfileFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
 			
-			$client = Kaltura_ClientHelper::getClient();
-			Kaltura_ClientHelper::impersonate($this->partnerId);
+			$client = Infra_ClientHelper::getClient();
+			Infra_ClientHelper::impersonate($this->partnerId);
 			$metadataProfileList = $client->metadataProfile->listAction($metadataProfileFilter);
-			Kaltura_ClientHelper::unimpersonate();
+			Infra_ClientHelper::unimpersonate();
 			
 			$metadataProfiles = $metadataProfileList->objects;
 		}
-		catch (KalturaClientException $e)
+		catch (Kaltura_Client_Exception $e)
 		{
 			$metadataProfiles = null;
 		}
