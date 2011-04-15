@@ -2,8 +2,8 @@
 /**
  * Class for the handling Bulk upload using SCV in the system 
  * 
- * @package Scheduler
- * @subpackage Provision
+ * @package plugins.bulkUpload
+ * @subpackage batch
  */
 class BulkUploadEngineCsv extends KBulkUploadEngine
 {

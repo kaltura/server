@@ -1,6 +1,6 @@
 <?php
 /**
- * @package Core
+ * @package plugins.bulkUpload
  * @subpackage model.data
  */
 class kBulkUploadCsvJobData extends kBulkUploadJobData
