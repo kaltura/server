@@ -54,8 +54,11 @@ class DropFolderEventsManager implements kObjectChangedEventConsumer
 		$matchFound = false;
 		foreach ($filePatterns as $pattern)
 		{
-			if (preg_match($pattern, $fileName)) {
-				$matchFound = true;	
+			if (!is_null($pattern) && ($pattern != '')) {
+				$pattern = '/^'.$pattern.'$/';
+				if (@preg_match($pattern, $fileName)) {
+					$matchFound = true;	
+				}
 			}
 		}
 		
@@ -63,8 +66,8 @@ class DropFolderEventsManager implements kObjectChangedEventConsumer
 		if ($matchFound)
 		{
 			$fileHandler = DropFolderFileHandler::getHandler($dropFolder->getFileHandlerType(), $dropFolder->getFileHandlerConfig());
-			$fileHandler->handleFile($this->getId());
+			$fileHandler->handleFile($dropFolderFile->getId());
 		}
 	}
-	
+		
 }

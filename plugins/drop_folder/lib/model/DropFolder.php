@@ -61,13 +61,16 @@ class DropFolder extends BaseDropFolder
 	{
 		$serializedConfig = parent::getFileHandlerConfig();
 		try {
-			$config = unserialize($serializedConfig);
+			$config = @unserialize($serializedConfig);
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Error unserializing file handler config for drop folder id ['.$this->getId().']');
 			$config = null;
 		}
-		return $config;
+		if ($config instanceof DropFolderFileHandlerConfig) {
+			return $config;
+		}
+		return null;
 	}
 	
 	/**
@@ -75,9 +78,15 @@ class DropFolder extends BaseDropFolder
 	 */
 	public function setFileHandlerConfig($fileHandlerConfig)
 	{
-		//TODO: verify that $fileHandlerConfig instanceof DropFolderFileHandlerConfig
-		$serializedConfig = serialize($fileHandlerConfig);
-		parent::setFileHandlerConfig($serializedConfig);
+		if ($fileHandlerConfig instanceof DropFolderFileHandlerConfig)
+		{
+			$serializedConfig = serialize($fileHandlerConfig);
+			parent::setFileHandlerConfig($serializedConfig);
+		}
+		else
+		{
+			KalturaLog::err('Given input $fileHandlerConfig is not an instance of DropFolderFileHandlerConfig - ignoring');
+		}
 	}	
 	
 	

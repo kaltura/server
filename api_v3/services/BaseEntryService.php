@@ -137,8 +137,10 @@ class BaseEntryService extends KalturaEntryService
 				return;
 				
 			case 'KalturaDropFolderFileResource':
-				// TODO - get the file name from the drop folder file object
-				return;
+				$resource = new KalturaDropFolderFileResource();
+				$dropFolderFile = DropFolderFilePeer::retrieveByPK($resource->dropFolderFileId);
+				$fullPath = $dropFolderFile ? $dropFolderFile->getFullPath() : null;
+				break;
 				
 			case 'KalturaFileSyncResource':
 				$key = new FileSyncKey();

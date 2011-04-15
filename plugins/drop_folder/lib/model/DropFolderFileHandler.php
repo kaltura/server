@@ -13,7 +13,7 @@ abstract class DropFolderFileHandler
 		if ($config) {
 			$handler->setConfig($config);
 		}
-		return $config;
+		return $handler;
 	}
 		
 	protected abstract function setConfig(DropFolderFileHandlerConfig $config);

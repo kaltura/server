@@ -89,7 +89,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public $fileNamePatterns;
 	
 	/**
-	 * KalturaDropFolderFileHandlerConfig
+	 * @var KalturaDropFolderFileHandlerConfig
 	 */
 	public $fileHandlerConfig;	
 	

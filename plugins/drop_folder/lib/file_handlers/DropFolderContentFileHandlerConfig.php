@@ -3,18 +3,19 @@
 class DropFolderContentFileHandlerConfig extends DropFolderFileHandlerConfig
 {
 		
-	//TODO: to slug or not to slug ?!?
-	
-	private $slugRegex;
+	/**
+	 * @var DropFolderContentFileHandlerMatchPolicy //TODO: change name
+	 */
+	private $contentMatchPolicy;
 	
 	/**
-	 * @var DropFolderUnmatchedContentFilePolicy
+	 * @var string
 	 */
-	private $unmatchedFilePolicy;
+	private $slugRegex;
 	
 
-	// override type parameter - should always be DropFolderFileHandlerType::CONTENT
 	public function getHandlerType() {
+		// override type parameter - should always be DropFolderFileHandlerType::CONTENT
 		return DropFolderFileHandlerType::CONTENT;
 	}
 	
@@ -31,6 +32,21 @@ class DropFolderContentFileHandlerConfig extends DropFolderFileHandlerConfig
 	 */
 	public function setSlugRegex($slugRegex) {
 		$this->slugRegex = $slugRegex;
-	}	
+	}
+	
+
+	/**
+	 * @return DropFolderContentFileHandlerMatchPolicy the $contentMatchPolicy
+	 */
+	public function getContentMatchPolicy() {
+		return $this->contentMatchPolicy;
+	}
+
+	/**
+	 * @param DropFolderContentFileHandlerMatchPolicy
+	 */
+	public function setContentMatchPolicy($contentMatchPolicy) {
+		$this->contentMatchPolicy = $contentMatchPolicy;
+	}
 	
 }

@@ -3,19 +3,24 @@
  * @package plugins.dropFolder
  * @subpackage api.objects
  */
-class KalturaDropFolderFileHandlerConfig extends KalturaObject
+class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHandlerConfig
 {	
 	/**
-	 * @var KalturaDropFolderFileHandlerType
+	 * @var KalturaDropFolderContentFileHandlerMatchPolicy
 	 */
-	public $handlerType;
-
+	public $contentMatchPolicy;
 	
+	/**
+	 * string
+	 */
+	public $slugRegex;
+		
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
-		'handlerType',
+		'contentMatchPolicy',
+		'slugRegex',
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -26,16 +31,10 @@ class KalturaDropFolderFileHandlerConfig extends KalturaObject
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
-			$dbObject = new DropFolder();
+			$dbObject = new DropFolderContentFileHandlerConfig();
 			
 		parent::toObject($dbObject, $skip);
 		
 		return $dbObject;
-	}
-	
-	public function fromObject ($source_object)
-	{
-		parent::fromObject($source_object);
-	}
-	
+	}	
 }

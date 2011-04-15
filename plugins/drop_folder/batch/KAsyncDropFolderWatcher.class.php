@@ -41,6 +41,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$filter = new KalturaDropFolderFilter();
 		//TODO: use filter to get only folders relevant to current worker's config
 		//TODO: filter by current data center - how to know the current data center ?
+		//TODO: filter drop fodlers by status = ENABLED
 		$dropFolders = $this->kClient->dropFolder->listAction($filter); //TODO: Add try/catch
 		$dropFolders = $dropFolders->objects;
 		
@@ -93,7 +94,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			$physicalFiles = null;
 		}
 		if (!$physicalFiles) {
-			KalturaLog::err('Cannot get physical file list for drop folder id ['.$folder->id.'] - '.$e->getMessage());
+			KalturaLog::err('Cannot get physical file list for drop folder id ['.$folder->id.'] with path ['.$folder->path.']');
 			return; // skipping to next folder
 		}
 		
