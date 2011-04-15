@@ -136,12 +136,6 @@ class BaseEntryService extends KalturaEntryService
 				
 				return;
 				
-			case 'KalturaDropFolderFileResource':
-				$resource = new KalturaDropFolderFileResource();
-				$dropFolderFile = DropFolderFilePeer::retrieveByPK($resource->dropFolderFileId);
-				$fullPath = $dropFolderFile ? $dropFolderFile->getFullPath() : null;
-				break;
-				
 			case 'KalturaFileSyncResource':
 				$key = new FileSyncKey();
 				$key->object_type = $resource->fileSyncObjectType;
@@ -156,24 +150,6 @@ class BaseEntryService extends KalturaEntryService
 				$fullPath = $resource->localFilePath;
 				break;
 				
-			case 'KalturaSearchResultsResource':
-				$source = $resource->result->searchSource;
-				if ($source == KalturaSearchProviderType::KALTURA ||
-					$source == KalturaSearchProviderType::KALTURA_PARTNER ||
-					$source == KalturaSearchProviderType::KALTURA_USER_CLIPS)
-				{
-					$sourceEntry = entryPeer::retrieveByPK($searchResult->id);
-					if($sourceEntry)
-					{
-						$dbEntry->setType($sourceEntry->getType());
-						$dbEntry->setMediaType($sourceEntry->getMediaType());
-					}
-					return;
-				}
-				
-				$fullPath = $resource->result->url;
-				break;
-				
 			case 'KalturaUploadedFileResource':
 				$fullPath = $resource->fileData['name'];
 				break;
@@ -184,6 +160,8 @@ class BaseEntryService extends KalturaEntryService
 				break;
 				
 			case 'KalturaUrlResource':
+			case 'KalturaBulkResource':
+			case 'KalturaRemoteStorageResource':
 				$fullPath = $resource->url;
 				break;
 				
