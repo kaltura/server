@@ -282,6 +282,14 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public $partnerSortValue;
 	
+	/**
+	 * Override the default ingestion profile  
+	 * 
+	 * @var string
+	 * @insertonly
+	 */
+	public $ingestionProfileId;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -320,6 +328,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		"partnerSortValue",
 	 	"categories",
 	 	"categoriesIds",
+	 	"ingestionProfileId" => "conversionQuality",
 	 );
 		 
 	public function getMapBetweenObjects()

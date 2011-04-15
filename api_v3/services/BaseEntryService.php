@@ -41,7 +41,7 @@ class BaseEntryService extends KalturaEntryService
      */
     function addAction(KalturaBaseEntry $entry, KalturaResource $resource, $type = -1)
     {
-    	$dbEntry = parent::add($entry);
+    	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
     	
     	$kResource = $resource->toObject();
     	if($type == KalturaEntryType::AUTOMATIC)
