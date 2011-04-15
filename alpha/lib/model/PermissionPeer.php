@@ -46,11 +46,17 @@ class PermissionPeer extends BasePermissionPeer
 		}
 	}
 			
-	public static function addToPartner($permission, $partnerId)
+	public static function addToPartner($permission, $partnerId, $checkGlobalPartner = true)
 	{
 		$permission->setPartnerId($partnerId);
 		$c = new Criteria();
-		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		if ($checkGlobalPartner) {
+			$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+			$c->addDescendingOrderByColumn(PermissionPeer::PARTNER_ID);
+		}
+		else {
+			$c->addAnd(PermissionPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		}
 		$c->addAnd(PermissionPeer::NAME, $permission->getName(), Criteria::EQUAL);
 		$existingPermission = PermissionPeer::doSelectOne($c);
 		if (!$existingPermission) {
@@ -89,7 +95,7 @@ class PermissionPeer extends BasePermissionPeer
 		
 		try {
 			// try to add permission
-			self::addToPartner($permission, $partnerId);
+			self::addToPartner($permission, $partnerId, false);
 			return true;
 		}
 		catch (kPermissionException $e) {
