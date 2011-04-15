@@ -3,5 +3,5 @@ del /F /S /Q ..\cache\generator\*
 
 php generate.php
 
-xcopy /Y /S /R C:\web\content\generator\output\adminConsoleClient\* ..\admin_console\lib\Kaltura
+xcopy /Y /S /R C:\web\content\generator\output\php5ZendClientAdminConsole\* ..\admin_console\lib
 xcopy /Y /S /R C:\web\content\generator\output\batchClient\* ..\batch\client
