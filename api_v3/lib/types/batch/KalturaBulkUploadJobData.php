@@ -82,6 +82,9 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 */
 	public function toSubType($subType)
 	{
+		if(is_null($subType))
+			return null;
+			
 		return kPluginableEnumsManager::apiToCore('BulkUploadType', $subType);
 	}
 	
@@ -91,6 +94,9 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	 */
 	public function fromSubType($subType)
 	{
+		if(is_null($subType))
+			return null;
+			
 		return kPluginableEnumsManager::coreToApi('BulkUploadType', $subType);
 	}
 }
