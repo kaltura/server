@@ -91,7 +91,10 @@ class MediaService extends KalturaEntryService
      */
     function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
-    	$dbEntry = parent::add($entry, $entry->conversionQuality);
+    	if($entry->conversionQuality && !$entry->ingestionProfileId)
+    		$entry->ingestionProfileId = $entry->conversionQuality;
+    		
+    	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
     	
     	if(!$resource)
     	{
@@ -964,7 +967,7 @@ class MediaService extends KalturaEntryService
 				$tempMediaEntry = new KalturaMediaEntry();
 			 	$tempMediaEntry->type = $mediaEntry->type;
 				$tempMediaEntry->mediaType = $mediaEntry->mediaType;
-				$tempMediaEntry->conversionQuality = $mediaEntry->conversionQuality;
+				$tempMediaEntry->ingestionProfileId = $mediaEntry->ingestionProfileId;
 				
 				$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
 				$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);

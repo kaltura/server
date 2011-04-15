@@ -98,7 +98,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 				case entryType::MEDIA_CLIP:
 					$defaultApiEntry = new KalturaMediaEntry();
 					$defaultApiEntry = $defaultApiEntry->fromObject($templateDbEntry); 
-					$defaultApiEntry->conversionQuality = $conversionProfileId;
+					$defaultApiEntry->ingestionProfileId = $conversionProfileId;
 					break;
 				/*
 				 * document service doesn't yet support KalturaResource

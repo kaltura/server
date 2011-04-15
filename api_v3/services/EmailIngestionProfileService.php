@@ -167,10 +167,10 @@ class EmailIngestionProfileService extends KalturaEntryService
 	
 	
 			// handle defaults for media entry metadata
-			$this->changeIfNull($mediaEntry->tags,              $emailIP->defaultTags);
-			$this->changeIfNull($mediaEntry->adminTags,         $emailIP->defaultAdminTags);
-			$this->changeIfNull($mediaEntry->conversionQuality, $emailIP->conversionProfile2Id);
-			$this->changeIfNull($mediaEntry->userId,            $emailIP->defaultUserId);
+			$this->changeIfNull($mediaEntry->tags,              	$emailIP->defaultTags);
+			$this->changeIfNull($mediaEntry->adminTags,         	$emailIP->defaultAdminTags);
+			$this->changeIfNull($mediaEntry->ingestionProfileId,	$emailIP->conversionProfile2Id);
+			$this->changeIfNull($mediaEntry->userId,            	$emailIP->defaultUserId);
 			if ( is_null($mediaEntry->categories) || is_null(categoryPeer::getByFullNameExactMatch($mediaEntry->categories)) )  {
 				$mediaEntry->categories = $emailIP->defaultCategory;
 			}
