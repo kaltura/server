@@ -42,13 +42,13 @@ class BaseEntryService extends KalturaEntryService
     function addAction(KalturaBaseEntry $entry, KalturaResource $resource, $type = -1)
     {
     	$dbEntry = parent::add($entry);
+    	
+    	$kResource = $resource->toObject();
     	if($type == KalturaEntryType::AUTOMATIC)
-    		$this->setEntryTypeByResource($dbEntry, $resource);
+    		$this->setEntryTypeByResource($dbEntry, $kResource);
     	$dbEntry->save();
     	
-    	
     	$resource->validateEntry($dbEntry);
-    	$kResource = $resource->toObject();
     	
     	$this->attachResource($kResource, $dbEntry);
     	
@@ -99,70 +99,46 @@ class BaseEntryService extends KalturaEntryService
     }
     
     /**
-     * @param KalturaResource $resource
+     * @param kResource $resource
      */
-    protected function setEntryTypeByResource(entry $dbEntry, KalturaResource $resource)
+    protected function setEntryTypeByResource(entry $dbEntry, kResource $resource)
     {
     	$fullPath = null;
     	switch(get_class($resource))
     	{
-    		case 'KalturaAssetParamsResourceContainer':
-    			return $this->setEntryTypeByResource($dbEntry, $resource->resource);
+    		case 'kAssetParamsResourceContainer':
+    			return $this->setEntryTypeByResource($dbEntry, $resource->getResource());
     			
-			case 'KalturaAssetsParamsResourceContainers':
-    			return $this->setEntryTypeByResource(reset($dbEntry, $resource->resources));
+			case 'kAssetsParamsResourceContainers':
+    			return $this->setEntryTypeByResource($dbEntry, reset($resource->getResources()));
 				
-			case 'KalturaAssetResource':
-				assetPeer::resetInstanceCriteriaFilter();
-				$asset = assetPeer::retrieveById($resource->assetId);
-				if($asset)
-				{
-					$sourceEntry = $asset->getentry();
-					if($sourceEntry)
-					{
-						$dbEntry->setType($sourceEntry->getType());
-						$dbEntry->setMediaType($sourceEntry->getMediaType());
-					}
-				}
-				return;
-				
-			case 'KalturaEntryResource':
-				$sourceEntry = entryPeer::retrieveByPK($resource->entryId);
+			case 'kFileSyncResource':
+				$sourceEntry = null;
+		    	if($resource->getFileSyncObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY)
+		    		$sourceEntry = entryPeer::retrieveByPK($resource->getObjectId());
+		    	if($resource->getFileSyncObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET)
+		    	{
+		    		assetPeer::resetInstanceCriteriaFilter();
+		    		$sourceAsset = assetPeer::retrieveByPK($resource->getObjectId());
+		    		if($sourceAsset)
+		    			$sourceEntry = $sourceAsset->getentry();
+		    	}
+		    	
 				if($sourceEntry)
 				{
 					$dbEntry->setType($sourceEntry->getType());
 					$dbEntry->setMediaType($sourceEntry->getMediaType());
 				}
-				
 				return;
 				
-			case 'KalturaFileSyncResource':
-				$key = new FileSyncKey();
-				$key->object_type = $resource->fileSyncObjectType;
-				$key->object_sub_type = $resource->objectSubType;
-				$key->object_id = $resource->objectId;
-				$key->version = $resource->version;
-				$key->partner_id = $this->getPartnerId();
-				$fullPath = kFileSyncUtils::getLocalFilePathForKey($key);
+			case 'kLocalFileResource':
+				$fullPath = $resource->getLocalFilePath();
 				break;
 				
-			case 'KalturaLocalFileResource':
-				$fullPath = $resource->localFilePath;
-				break;
-				
-			case 'KalturaUploadedFileResource':
-				$fullPath = $resource->fileData['name'];
-				break;
-				
-			case 'KalturaUploadedFileTokenResource':
-			case 'KalturaWebcamTokenResource':
-				$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($resource->token);
-				break;
-				
-			case 'KalturaUrlResource':
-			case 'KalturaBulkResource':
-			case 'KalturaRemoteStorageResource':
-				$fullPath = $resource->url;
+			case 'kUrlResource':
+			case 'kBulkResource':
+			case 'kRemoteStorageResource':
+				$fullPath = $resource->getUrl();
 				break;
 				
 			default:
