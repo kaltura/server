@@ -994,7 +994,7 @@ class kJobsManager
 		
 		$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 		
-		$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $bulkUploadType, array());
+		$data = KalturaPluginManager::loadObject('kBulkUploadJobData', $bulkUploadType);
 
 		if(is_null($data))
 		{
