@@ -211,6 +211,7 @@ class Kaltura_Client_ClientBase
 		$objectType = reset($xml->objectType);
 			
 		$type = Kaltura_Client_TypeMap::getZendType($objectType);
+		$this->log("Instantiating new object  [$type]");
 		$ret = new $type();
 	
 		foreach($xml->children() as $attributeName => $attributeValue)
