@@ -108,6 +108,7 @@ class KAsyncBulkUpload extends KBatchBase {
 			
 		if($engine->shouldRetry())
 		{
+			$this->updateJob($job, null, KalturaBatchJobStatus::RETRY);
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 			return $job;
 		}
