@@ -87,7 +87,7 @@ class KAsyncBulkUpload extends KBatchBase {
 	{
 		KalturaLog::debug ( "startBulkUpload($job->id)" );
 		
-		if($job->status == KalturaBatchJobStatus::PENDING || $job->status == KalturaBatchJobStatus::RETRY)
+		if($job->status == KalturaBatchJobStatus::PENDING)
 			$job = $this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED, 1);
 		
 		//Gets the right Engine instance 
