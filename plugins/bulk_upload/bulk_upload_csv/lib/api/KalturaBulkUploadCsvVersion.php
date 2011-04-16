@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.bulkUpload
+ * @package plugins.bulkUploadCsv
  * @subpackage lib
  */
 class KalturaBulkUploadCsvVersion extends KalturaEnum

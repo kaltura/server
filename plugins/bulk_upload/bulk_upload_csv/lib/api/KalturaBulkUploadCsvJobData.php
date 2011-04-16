@@ -2,7 +2,7 @@
 
 /**
  * Represents the Bulk upload job data for xml bulk upload
- * @package plugins.bulkUpload
+ * @package plugins.bulkUploadCsv
  * @subpackage lib
  */
 class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
