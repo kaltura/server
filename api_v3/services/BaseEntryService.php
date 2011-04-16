@@ -271,13 +271,63 @@ class BaseEntryService extends KalturaEntryService
 	 * @action update
 	 * @param string $entryId Entry id to update
 	 * @param KalturaBaseEntry $baseEntry Base entry metadata to update
+	 * @param KalturaResource $resource Resource to be used to replace entry content
 	 * @return KalturaBaseEntry The updated entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function updateAction($entryId, KalturaBaseEntry $baseEntry)
+	function updateAction($entryId, KalturaBaseEntry $baseEntry = null, KalturaResource $resource = null)
 	{
-		return $this->updateEntry($entryId, $baseEntry);
+    	switch($baseEntry->type)
+    	{
+			case entryType::MEDIA_CLIP:
+				$service = new MediaService();
+    			$service->initService('media', 'media', $this->actionName);
+    			return $service->updateAction($entryId, $baseEntry, $resource);
+				
+			case entryType::MIX:
+				if(is_null($baseEntry))
+					throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'baseEntry');
+				if(!is_null($resource))
+					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
+					
+				$service = new MixingService();
+    			$service->initService('mixing', 'mixing', $this->actionName);
+    			return $service->updateAction($entryId, $baseEntry);
+				
+			case entryType::PLAYLIST:
+				if(is_null($baseEntry))
+					throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'baseEntry');
+				if(!is_null($resource))
+					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
+					
+				$service = new PlaylistService();
+    			$service->initService('playlist', 'playlist', $this->actionName);
+    			return $service->updateAction($entryId, $baseEntry);
+				
+			case entryType::DATA:
+				if(is_null($baseEntry))
+					throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'baseEntry');
+				if(!is_null($resource))
+					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
+					
+				$service = new DataService();
+    			$service->initService('data', 'data', $this->actionName);
+    			return $service->updateAction($entryId, $baseEntry);
+				
+			case entryType::LIVE_STREAM:
+				if(is_null($baseEntry))
+					throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'baseEntry');
+				if(!is_null($resource))
+					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
+					
+				$service = new LiveStreamService();
+    			$service->initService('liveStream', 'liveStream', $this->actionName);
+    			return $service->updateAction($entryId, $baseEntry);
+    			
+    		default:
+    			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
+    	}
 	}
 	
 	/**
