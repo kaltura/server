@@ -92,18 +92,20 @@ class KAsyncBulkUpload extends KBatchBase {
 		if (is_null ( $engine )) {
 			throw new KalturaException ( "Unable to find bulk upload engine", KalturaBatchJobAppErrors::ENGINE_NOT_FOUND );
 		}
+		$this->updateJob($job, 'Paring file [' . $engine->getName() . ']', KalturaBatchJobStatus::QUEUED, 1);
 
 		$engine->handleBulkUpload();
 		$job = $engine->getJob();
 		$data = $engine->getData();
 
-		if(!$this->countCreatedEntries($job->id))
+		$countCreatedEntries = $this->countCreatedEntries($job->id);
+		if(!$countCreatedEntries)
 			throw new KalturaBatchException("No entries created", KalturaBatchJobAppErrors::BULK_NO_ENRIES_CREATED);
 			
 		if($engine->shouldRetry())
 		{
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-			return $job;
+			return $this->closeJob($job, null, null, "Created [$countCreatedEntries] entries", KalturaBatchJobStatus::RETRY);
 		}
 			
 		return $this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE, $data);
