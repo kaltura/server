@@ -11,7 +11,7 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 	public $contentMatchPolicy;
 	
 	/**
-	 * string
+	 * @var string
 	 */
 	public $slugRegex;
 		

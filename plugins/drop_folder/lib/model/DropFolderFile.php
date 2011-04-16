@@ -33,11 +33,12 @@ class DropFolderFile extends BaseDropFolderFile
 	public function getFullPath()
 	{
 		$dropFolder = DropFolderPeer::retrieveByPK($this->getDropFolderId());
-		if ($dropFolder && !empty($dropFolder->getPath()))
+		if ($dropFolder && strlen($dropFolder->getPath()) > 0)
 		{
 			$fullPath = $dropFolder->getPath().'/'.$this->getFileName();
 			return $fullPath;
 		}
+		return null;
 	}
 		
 } // DropFolderFile

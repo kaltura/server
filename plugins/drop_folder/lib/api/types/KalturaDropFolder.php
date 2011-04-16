@@ -91,7 +91,13 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	/**
 	 * @var KalturaDropFolderFileHandlerConfig
 	 */
-	public $fileHandlerConfig;	
+	public $fileHandlerConfig;
+
+	/**
+	 * @var string
+	 * @filter like,mlikeor,mlikeand
+	 */
+	public $tags;
 	
 	/**
 	 * @var int
@@ -126,7 +132,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'autoFileDeleteDays',
 		'fileHandlerType',
 		'fileNamePatterns',
-		'fileHandlerConfig',
 		'createdAt',
 		'updatedAt',
 	 );
@@ -142,6 +147,11 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 			$dbObject = new DropFolder();
 			
 		parent::toObject($dbObject, $skip);
+		if ($this->fileHandlerConfig)
+		{
+			$dbFileHandlerConfig = $this->fileHandlerConfig->toObject();
+			$dbObject->setFileHandlerConfig($dbFileHandlerConfig);
+		}
 		
 		return $dbObject;
 	}
@@ -149,6 +159,12 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public function fromObject ($source_object)
 	{
 		parent::fromObject($source_object);
+		$dbFileHandlerConfig = $source_object->getFileHandlerConfig();
+		if ($dbFileHandlerConfig)
+		{
+			$apiFileHandlerConfig = KalturaPluginManager::loadObject('KalturaDropFolderFileHandlerConfig', $dbFileHandlerConfig->getType());
+			$this->fileHandlerConfig  = $apiFileHandlerConfig;
+		}
 	}
 
 	

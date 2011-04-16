@@ -27,6 +27,9 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 		"fileNamePatternsLike" => "_like_file_name_patterns",
 		"fileNamePatternsMultiLikeOr" => "_mlikeor_file_name_patterns",
 		"fileNamePatternsMultiLikeAnd" => "_mlikeand_file_name_patterns",
+		"tagsLike" => "_like_tags",
+		"tagsMultiLikeOr" => "_mlikeor_tags",
+		"tagsMultiLikeAnd" => "_mlikeand_tags",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -189,6 +192,27 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $fileNamePatternsMultiLikeAnd;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsLike;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd;
 
 	/**
 	 * 

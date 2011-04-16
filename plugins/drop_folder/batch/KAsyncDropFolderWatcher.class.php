@@ -42,6 +42,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		//TODO: use filter to get only folders relevant to current worker's config
 		//TODO: filter by current data center - how to know the current data center ?
 		//TODO: filter drop fodlers by status = ENABLED
+		//TODO: filter by configured TAGS
 		$dropFolders = $this->kClient->dropFolder->listAction($filter); //TODO: Add try/catch
 		$dropFolders = $dropFolders->objects;
 		
@@ -64,8 +65,8 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$dropFolderFiles = null;
 		$deletedDropFolderFiles = null;
 		try {
-			$dropFolderFiles = $this->getDropFolderFileObjects($folder);
-			$deletedDropFolderFiles = $this->getDeletedDropFolderFileObjects($folder); // deleted objects
+			$dropFolderFiles = $this->getDropFolderFileObjects($folder->id);
+			$deletedDropFolderFiles = $this->getDropFolderFileObjects($folder->id, KalturaDropFolderFileStatus::DELETED);
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot get drop folder file list from the server for drop folder id ['.$folder->id.'] - '.$e->getMessage());
@@ -137,7 +138,10 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				$currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
 				if ($currentDropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
 				{
-					$this->updateDropFolderFile($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
+					$newStatus = $this->updateDropFolderFile($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
+					if ($newStatus == KalturaDropFolderFileStatus::PENDING) {
+						$this->handlePendingFile($folder, $currentDropFolderFile);
+					}
 				}
 				else if	($currentDropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
 				{
@@ -157,32 +161,22 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	
 	
 	/**
-	 * @param KalturaDropFolder $folder
-	 * @return array of KalturaDropFolderFile objects that belong to the given $folder
+	 * @param int $dropFolderId
+	 * @param KalturaDropFolderFileStatus 
+	 * @return array of KalturaDropFolderFile objects that belong to the given folder id and status
 	 */
-	private function getDropFolderFileObjects(KalturaDropFolder $folder)
+	private function getDropFolderFileObjects($dropFolderId, $status = null)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
-		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
+		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
+		if (!is_null($status)) {
+			$dropFolderFileFilter->statusEqual = $status;
+		}
 		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
 		$dropFolderFiles = $dropFolderFiles->objects; //TODO: add error check
 		return $dropFolderFiles;
 	}
-	
-	/**
-	 * @param KalturaDropFolder $folder
-	 * @return array of KalturaDropFolderFile objects that belong to the given $folder and have status KalturaDropFolderFileStatus::DELETED
-	 */
-	private function getDeletedDropFolderFileObjects(KalturaDropFolder $folder)
-	{
-		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
-		$dropFolderFileFilter->dropFolderIdEqual = $folder->id;
-		$dropFolderFileFilter->statusEqual = KalturaDropFolderFileStatus::DELETED;
-		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
-		$dropFolderFiles = $dropFolderFiles->objects; //TODO: add error check
-		return $dropFolderFiles;
-	}
-	
+		
 	/**
 	 * @param KalturaDropFolder $folder
 	 * @return array of file names in the given $folder's path
@@ -269,7 +263,8 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				try {
 					$updateDropFolderFile = new KalturaDropFolderFile();
 					$updateDropFolderFile->status = KalturaDropFolderFileStatus::PENDING;
-					$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);				
+					$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+					return KalturaDropFolderFileStatus::PENDING;
 				}
 				catch (Exception $e) {
 					KalturaLog::err('Cannot update status to PENDING for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
@@ -335,6 +330,52 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		}
 		
 		return true;
+	}
+	
+	
+	private function handlePendingFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile)
+	{
+		// handle the PENDING file
+		$this->handleFile($dropFolder, $dropFolderFile);
+		
+		// handle all files in status WAITING
+		$waitingFiles = $this->getDropFolderFileObjects($dropFolderFile->dropFolderId, KalturaDropFolderFileStatus::WAITING);
+		foreach ($waitingFiles as $waitingFile)
+		{
+			//TODO: get the file from the API again, because its status might have been changed
+			$this->handleFile($dropFolder, $waitingFile);
+		}				
+	}
+	
+	
+	private function handleFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile)
+	{
+		// get defined file name patterns
+		$filePatterns = $dropFolder->fileNamePatterns;
+		$filePatterns = array_map('trim', explode(',', $filePatterns));
+		
+		// get current file name
+		$fileName = $dropFolderFile->fileName;
+		
+		// search for a match
+		$matchFound = false;
+		foreach ($filePatterns as $pattern)
+		{
+			if (!is_null($pattern) && ($pattern != '')) {
+				if (fnmatch($pattern, $fileName)) {
+					$matchFound = true;
+				}
+			}
+		}
+		
+		// if match found -> handle file by the file handelr configured for its drop folder
+		if ($matchFound)
+		{
+			$fileHandler = DropFolderFileHandler::getHandler($dropFolder->fileHandlerType);
+			$fileHandler->setConfig($this->kClient, $dropFolderFile, $dropFolder);
+			$fileHandler->handle();
+		}		
+		
 	}
 	
 	

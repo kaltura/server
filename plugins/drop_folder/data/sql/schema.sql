@@ -25,6 +25,7 @@ CREATE TABLE `drop_folder`
 	`file_handler_type` INTEGER,
 	`file_name_patterns` TEXT  NOT NULL,
 	`file_handler_config` TEXT  NOT NULL,
+	`tags` TEXT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,

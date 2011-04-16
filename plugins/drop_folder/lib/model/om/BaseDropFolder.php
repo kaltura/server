@@ -98,6 +98,12 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $file_handler_config;
 
 	/**
+	 * The value for the tags field.
+	 * @var        string
+	 */
+	protected $tags;
+
+	/**
 	 * The value for the created_at field.
 	 * @var        string
 	 */
@@ -271,6 +277,16 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	public function getFileHandlerConfig()
 	{
 		return $this->file_handler_config;
+	}
+
+	/**
+	 * Get the [tags] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getTags()
+	{
+		return $this->tags;
 	}
 
 	/**
@@ -663,6 +679,29 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	} // setFileHandlerConfig()
 
 	/**
+	 * Set the value of [tags] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     DropFolder The current object (for fluent API support)
+	 */
+	public function setTags($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderPeer::TAGS]))
+			$this->oldColumnsValues[DropFolderPeer::TAGS] = $this->tags;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->tags !== $v) {
+			$this->tags = $v;
+			$this->modifiedColumns[] = DropFolderPeer::TAGS;
+		}
+
+		return $this;
+	} // setTags()
+
+	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
 	 * 
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
@@ -825,9 +864,10 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$this->file_handler_type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->file_name_patterns = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->file_handler_config = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->created_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->updated_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-			$this->custom_data = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->tags = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->created_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->updated_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->custom_data = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -837,7 +877,7 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 16; // 16 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 17; // 17 = DropFolderPeer::NUM_COLUMNS - DropFolderPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolder object", $e);
@@ -1284,12 +1324,15 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				return $this->getFileHandlerConfig();
 				break;
 			case 13:
-				return $this->getCreatedAt();
+				return $this->getTags();
 				break;
 			case 14:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 15:
+				return $this->getUpdatedAt();
+				break;
+			case 16:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1326,9 +1369,10 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			$keys[10] => $this->getFileHandlerType(),
 			$keys[11] => $this->getFileNamePatterns(),
 			$keys[12] => $this->getFileHandlerConfig(),
-			$keys[13] => $this->getCreatedAt(),
-			$keys[14] => $this->getUpdatedAt(),
-			$keys[15] => $this->getCustomData(),
+			$keys[13] => $this->getTags(),
+			$keys[14] => $this->getCreatedAt(),
+			$keys[15] => $this->getUpdatedAt(),
+			$keys[16] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1400,12 +1444,15 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 				$this->setFileHandlerConfig($value);
 				break;
 			case 13:
-				$this->setCreatedAt($value);
+				$this->setTags($value);
 				break;
 			case 14:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 15:
+				$this->setUpdatedAt($value);
+				break;
+			case 16:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1445,9 +1492,10 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[10], $arr)) $this->setFileHandlerType($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setFileNamePatterns($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setFileHandlerConfig($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setCustomData($arr[$keys[15]]);
+		if (array_key_exists($keys[13], $arr)) $this->setTags($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setCustomData($arr[$keys[16]]);
 	}
 
 	/**
@@ -1472,6 +1520,7 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderPeer::FILE_HANDLER_TYPE)) $criteria->add(DropFolderPeer::FILE_HANDLER_TYPE, $this->file_handler_type);
 		if ($this->isColumnModified(DropFolderPeer::FILE_NAME_PATTERNS)) $criteria->add(DropFolderPeer::FILE_NAME_PATTERNS, $this->file_name_patterns);
 		if ($this->isColumnModified(DropFolderPeer::FILE_HANDLER_CONFIG)) $criteria->add(DropFolderPeer::FILE_HANDLER_CONFIG, $this->file_handler_config);
+		if ($this->isColumnModified(DropFolderPeer::TAGS)) $criteria->add(DropFolderPeer::TAGS, $this->tags);
 		if ($this->isColumnModified(DropFolderPeer::CREATED_AT)) $criteria->add(DropFolderPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(DropFolderPeer::UPDATED_AT)) $criteria->add(DropFolderPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(DropFolderPeer::CUSTOM_DATA)) $criteria->add(DropFolderPeer::CUSTOM_DATA, $this->custom_data);
@@ -1552,6 +1601,8 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		$copyObj->setFileNamePatterns($this->file_name_patterns);
 
 		$copyObj->setFileHandlerConfig($this->file_handler_config);
+
+		$copyObj->setTags($this->tags);
 
 		$copyObj->setCreatedAt($this->created_at);
 
