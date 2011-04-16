@@ -45,7 +45,7 @@ class kConf extends kConfLocal
 				"default_job_execution_attempt" => 3 ,
 				"job_execution_attempt" => array(
 					16 => 5, //BatchJobType::NOTIFICATION
-					4 => 1, //BatchJobType::BULK_UPLOAD
+					4 => 3, //BatchJobType::BULK_UPLOAD
 					23 => 2, //BatchJobType::STORAGE_EXPORT
 					28 => 10, //BatchJobType::METADATA_TRANSFORM
 				) ,
