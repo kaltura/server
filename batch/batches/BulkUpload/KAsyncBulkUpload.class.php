@@ -137,7 +137,7 @@ class KAsyncBulkUpload extends KBatchBase {
 	protected function freeExclusiveJob(KalturaBatchJob $job) 
 	{
 		$resetExecutionAttempts = false;
-		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE)
+		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE || $job->status == KalturaBatchJobStatus::RETRY)
 			$resetExecutionAttempts = true;
 		
 		$response = $this->kClient->batch->freeExclusiveBulkUploadJob ( $job->id, $this->getExclusiveLockKey (), $resetExecutionAttempts );
