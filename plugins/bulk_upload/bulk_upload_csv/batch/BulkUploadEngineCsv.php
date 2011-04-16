@@ -363,13 +363,17 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		// check variables count
 		if($this->csvVersion != KalturaBulkUploadCsvVersion::V3)
 		{
-			if(count($values) == self::VALUES_COUNT_V2)
+			if(count($values) == self::VALUES_COUNT_V1)
+			{
+				$this->csvVersion = KalturaBulkUploadCsvVersion::V1;
+				$columns = $this->getV1Columns();
+			}
+			elseif(count($values) == self::VALUES_COUNT_V2)
 			{
 				$this->csvVersion = KalturaBulkUploadCsvVersion::V2;
 				$columns = $this->getV2Columns();
-				KalturaLog::info("Columns V2:\n" . print_r($columns, true));
 			}
-			elseif(count($values) != self::VALUES_COUNT_V1)
+			else
 			{
 				// fail and continue with next line
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
@@ -377,6 +381,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 				$this->addBulkUploadResult($bulkUploadResult);
 				return;
 			}
+			KalturaLog::info("Columns:\n" . print_r($columns, true));
 		}
 				
 		// trim the values
