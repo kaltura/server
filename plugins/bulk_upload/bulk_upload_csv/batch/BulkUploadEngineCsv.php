@@ -177,7 +177,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	public function handleBulkUpload()
 	{
-		$this->lineNumber = $this->getStartLineNumber($this->job->id);
+		$startLineNumber = $this->getStartLineNumber($this->job->id);
 	
 		$filePath = $this->data->filePath;
 		$fileHandle = fopen($filePath, "r");
@@ -206,6 +206,11 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			}
 			
 			$this->lineNumber ++;
+			if($this->lineNumber < $startLineNumber)
+			{
+				$values = fgetcsv($fileHandle);
+				continue;
+			}
 			
 			// creates a result object
 			$this->createUploadResult($values, $columns);
