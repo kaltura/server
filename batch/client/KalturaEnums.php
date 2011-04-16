@@ -329,17 +329,6 @@ class KalturaBitRateMode
  * @package Scheduler
  * @subpackage Client
  */
-class KalturaBulkUploadCsvVersion
-{
-	const V1 = "1";
-	const V2 = "2";
-	const V3 = "3";
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
 class KalturaBulkUploadType
 {
 }

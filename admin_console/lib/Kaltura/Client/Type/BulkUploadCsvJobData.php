@@ -14,7 +14,7 @@ class Kaltura_Client_Type_BulkUploadCsvJobData extends Kaltura_Client_Type_BulkU
 	 * The version of the csv file
 	 * 
 	 *
-	 * @var Kaltura_Client_BulkUpload_Enum_BulkUploadCsvVersion
+	 * @var Kaltura_Client_Enum_BulkUploadCsvVersion
 	 */
 	public $csvVersion = null;
 

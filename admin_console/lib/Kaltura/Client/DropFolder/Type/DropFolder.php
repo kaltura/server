@@ -104,11 +104,25 @@ class Kaltura_Client_DropFolder_Type_DropFolder extends Kaltura_Client_ObjectBas
 	public $fileHandlerType = null;
 
 	/**
-	 * KalturaDropFolderFileHandlerConfig
+	 * 
 	 *
 	 * @var string
 	 */
 	public $fileNamePatterns = null;
+
+	/**
+	 * 
+	 *
+	 * @var Kaltura_Client_DropFolder_Type_DropFolderFileHandlerConfig
+	 */
+	public $fileHandlerConfig;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
 
 	/**
 	 * 

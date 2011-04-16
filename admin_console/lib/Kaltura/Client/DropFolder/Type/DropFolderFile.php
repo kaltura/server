@@ -74,7 +74,7 @@ class Kaltura_Client_DropFolder_Type_DropFolderFile extends Kaltura_Client_Objec
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavor = null;
 

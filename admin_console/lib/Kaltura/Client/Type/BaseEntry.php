@@ -284,6 +284,15 @@ class Kaltura_Client_Type_BaseEntry extends Kaltura_Client_ObjectBase
 	 */
 	public $partnerSortValue = null;
 
+	/**
+	 * Override the default ingestion profile  
+	 * 
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $ingestionProfileId = null;
+
 
 }
 

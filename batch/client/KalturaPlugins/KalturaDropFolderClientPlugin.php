@@ -11,6 +11,17 @@ require_once(dirname(__FILE__) . "/../KalturaTypes.php");
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaDropFolderContentFileHandlerMatchPolicy
+{
+	const ADD_AS_NEW = 1;
+	const MATCH_EXISTING_OR_ADD_AS_NEW = 2;
+	const MATCH_EXISTING_OR_KEEP_IN_FOLDER = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaDropFolderFileDeletePolicy
 {
 	const MANUAL_DELETE = 1;
@@ -92,9 +103,8 @@ class KalturaDropFolderOrderBy
 class KalturaDropFolderStatus
 {
 	const DISABLED = 0;
-	const AUTOMATIC = 1;
-	const MANUAL = 2;
-	const DELETED = 3;
+	const ENABLED = 1;
+	const DELETED = 2;
 }
 
 /**
@@ -289,6 +299,22 @@ class KalturaDropFolderFilter extends KalturaDropFolderBaseFilter
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaDropFolderFileHandlerConfig extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDropFolderFileHandlerType
+	 */
+	public $handlerType = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaDropFolder extends KalturaObjectBase
 {
 	/**
@@ -385,11 +411,25 @@ class KalturaDropFolder extends KalturaObjectBase
 	public $fileHandlerType = null;
 
 	/**
-	 * KalturaDropFolderFileHandlerConfig
+	 * 
 	 *
 	 * @var string
 	 */
 	public $fileNamePatterns = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDropFolderFileHandlerConfig
+	 */
+	public $fileHandlerConfig;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tags = null;
 
 	/**
 	 * 
@@ -642,7 +682,7 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavorEqual = null;
 
@@ -656,7 +696,7 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavorLike = null;
 
@@ -737,6 +777,29 @@ class KalturaDropFolderFileResource extends KalturaContentResource
 	 * @var int
 	 */
 	public $dropFolderFileId = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHandlerConfig
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDropFolderContentFileHandlerMatchPolicy
+	 */
+	public $contentMatchPolicy = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $slugRegex = null;
 
 
 }

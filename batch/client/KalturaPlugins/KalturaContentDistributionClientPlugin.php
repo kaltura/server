@@ -152,6 +152,18 @@ class KalturaEntryDistributionSunStatus
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaGenericDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaGenericDistributionProviderActionOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -180,6 +192,26 @@ class KalturaGenericDistributionProviderStatus
 {
 	const ACTIVE = 2;
 	const DELETED = 3;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSyndicationDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSyndicationDistributionProviderOrderBy
+{
 }
 
 /**
@@ -1085,6 +1117,24 @@ class KalturaEntryDistributionFilter extends KalturaEntryDistributionBaseFilter
  * @package Scheduler
  * @subpackage Client
  */
+abstract class KalturaGenericDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaGenericDistributionProfileFilter extends KalturaGenericDistributionProfileBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 abstract class KalturaGenericDistributionProviderActionBaseFilter extends KalturaFilter
 {
 	/**
@@ -1267,6 +1317,42 @@ abstract class KalturaGenericDistributionProviderBaseFilter extends KalturaDistr
  * @subpackage Client
  */
 class KalturaGenericDistributionProviderFilter extends KalturaGenericDistributionProviderBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaSyndicationDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSyndicationDistributionProfileFilter extends KalturaSyndicationDistributionProfileBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaSyndicationDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSyndicationDistributionProviderFilter extends KalturaSyndicationDistributionProviderBaseFilter
 {
 
 }

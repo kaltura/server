@@ -7,6 +7,43 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaFileSyncImportJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sourceUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $filesyncId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $tmpFilePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $destFilePath = null;
+
+
+}
+
 
 /**
  * @package Scheduler

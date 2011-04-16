@@ -111,7 +111,7 @@ abstract class Kaltura_Client_DropFolder_Type_DropFolderFileBaseFilter extends K
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavorEqual = null;
 
@@ -125,7 +125,7 @@ abstract class Kaltura_Client_DropFolder_Type_DropFolderFileBaseFilter extends K
 	/**
 	 * 
 	 *
-	 * @var int
+	 * @var string
 	 */
 	public $parsedFlavorLike = null;
 

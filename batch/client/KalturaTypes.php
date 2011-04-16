@@ -294,6 +294,15 @@ class KalturaBaseEntry extends KalturaObjectBase
 	 */
 	public $partnerSortValue = null;
 
+	/**
+	 * Override the default ingestion profile  
+	 * 
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $ingestionProfileId = null;
+
 
 }
 
@@ -6171,23 +6180,6 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 	 * @var bool
 	 */
 	public $force = null;
-
-
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaBulkUploadCsvJobData extends KalturaBulkUploadJobData
-{
-	/**
-	 * The version of the csv file
-	 * 
-	 *
-	 * @var KalturaBulkUploadCsvVersion
-	 */
-	public $csvVersion = null;
 
 
 }
