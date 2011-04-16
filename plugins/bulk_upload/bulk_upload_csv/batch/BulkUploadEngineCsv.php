@@ -331,7 +331,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 		// commit the multi request entries
 		$requestResults = $this->doMultiRequestForPartner();
-		KalturaLog::info("job[$this->job->id] finish creating entries");
+		KalturaLog::info("job[{$this->job->id}] finish creating entries");
 	
 		if(count($requestResults) != count($bulkUploadResultChunk))
 		{
