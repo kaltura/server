@@ -215,6 +215,18 @@ class BatchService extends KalturaBaseService
 	}
 	
 	/**
+	 * Returns total created entries count
+	 * 
+	 * @action countBulkUploadEntries
+	 * @param int $bulkUploadJobId The id of the bulk upload job
+	 * @return int the number of created entries 
+	 */
+	function countBulkUploadEntriesAction($bulkUploadJobId)
+	{
+		return BulkUploadResultPeer::countWithEntryByBulkUploadId($bulkUploadJobId);
+	}
+	
+	/**
 	 * batch updateBulkUploadResults action adds KalturaBulkUploadResult to the DB
 	 * 
 	 * @action updateBulkUploadResults

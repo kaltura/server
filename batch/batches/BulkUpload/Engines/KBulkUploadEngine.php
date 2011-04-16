@@ -183,7 +183,7 @@ abstract class KBulkUploadEngine
 			if(count($requestResults) != count($bulkUploadResultChunk))
 			{
 				$err = __FILE__ . ', line: ' . __LINE__ . ' $requestResults and $$bulkUploadResultChunk must have the same size';
-				throw new KalturaException($err, KalturaBatchJobAppErrors::BULK_INVLAID_BULK_REQUEST_COUNT);
+				throw new KalturaBatchException($err, KalturaBatchJobAppErrors::BULK_INVLAID_BULK_REQUEST_COUNT);
 			}
 				
 			// saving the results with the created enrty ids

@@ -56,6 +56,10 @@ class KAsyncBulkUpload extends KBatchBase {
 			{
 				$jobResults[] = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ABORTED);
 			}
+			catch(KalturaBatchException $kbex)
+			{
+				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $kbex->getCode(), "Error: " . $kbex->getMessage(), KalturaBatchJobStatus::FAILED);
+			}
 			catch(KalturaException $kex)
 			{
 				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
@@ -93,14 +97,28 @@ class KAsyncBulkUpload extends KBatchBase {
 		$job = $engine->getJob();
 		$data = $engine->getData();
 
+		if(!$this->countCreatedEntries($job->id))
+			throw new KalturaBatchException("No entries created", KalturaBatchJobAppErrors::BULK_NO_ENRIES_CREATED);
+			
 		return $this->closeJob($job, null, null, 'Waiting for imports and conversion', KalturaBatchJobStatus::ALMOST_DONE, $data);
+	}
+	
+	/**
+	 * Return the count of created entries
+	 * @param int $jobId
+	 * @return int
+	 */
+	protected function countCreatedEntries($jobId) 
+	{
+		return $this->kClient->batch->countBulkUploadEntries($jobId);
 	}
 	
 	/**
 	 * (non-PHPdoc)
 	 * @see KBatchBase::updateExclusiveJob()
 	 */
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job) {
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job) 
+	{
 		return $this->kClient->batch->updateExclusiveBulkUploadJob ( $jobId, $this->getExclusiveLockKey (), $job );
 	}
 	
@@ -108,7 +126,8 @@ class KAsyncBulkUpload extends KBatchBase {
 	 * (non-PHPdoc)
 	 * @see KBatchBase::freeExclusiveJob()
 	 */
-	protected function freeExclusiveJob(KalturaBatchJob $job) {
+	protected function freeExclusiveJob(KalturaBatchJob $job) 
+	{
 		$resetExecutionAttempts = false;
 		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE)
 			$resetExecutionAttempts = true;

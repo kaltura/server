@@ -45,7 +45,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$isValid = $this->parse();
 		if(!$isValid)
 		{
-			throw new KalturaException("Parse rows failed on job [$this->job->id]", KalturaBatchJobAppErrors::BULK_PARSE_ITEMS_FAILED);
+			throw new KalturaBatchException("Parse rows failed on job [$this->job->id]", KalturaBatchJobAppErrors::BULK_PARSE_ITEMS_FAILED);
 		}
 	}
 	
@@ -287,7 +287,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$filePath = $this->data->filePath;
 		$fileHandle = fopen($filePath, "r");
 		if(!$fileHandle) // fails and exit
-			throw new KalturaException("Unable to open file: {$filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
+			throw new KalturaBatchException("Unable to open file: {$filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 					
 		KalturaLog::info("Opened file: $filePath");
 		return $fileHandle;
@@ -336,7 +336,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		if(count($requestResults) != count($bulkUploadResultChunk))
 		{
 			$err = __FILE__ . ', line: ' . __LINE__ . ' $requestResults and $$bulkUploadResultChunk must have the same size';
-			throw new KalturaException($err, KalturaBatchJobAppErrors::INVLAID_BULK_REQUEST_COUNT);		
+			throw new KalturaBatchException($err, KalturaBatchJobAppErrors::INVLAID_BULK_REQUEST_COUNT);		
 		}
 		
 		// saving the results with the created enrty ids

@@ -27,6 +27,7 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	const BULK_PARSE_ITEMS_FAILED = 73;
 	const BULK_UNKNOWN_ERROR = 74;
 	const BULK_INVLAID_BULK_REQUEST_COUNT = 75;
+	const BULK_NO_ENRIES_CREATED = 76;
 	
 	const CONVERSION_FAILED = 81;
 	
