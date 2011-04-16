@@ -31,6 +31,21 @@ abstract class KBulkUploadEngine
 	 * @var int
 	 */
 	protected $maxRecords = 1000;
+	
+	/**
+	 * @var int
+	 */
+	protected $maxRecordsEachRun = 100;
+	
+	/**
+	 * @var int
+	 */
+	protected $handledRecordsThisRun = 0;
+	
+	/**
+	 * @var bool
+	 */
+	protected $exceededMaxRecordsEachRun = false;
 
 	/**
 	 * 
@@ -38,13 +53,6 @@ abstract class KBulkUploadEngine
 	 * @var KalturaClient
 	 */
 	protected $kClient; 
-	
-	/**
-	 * 
-	 * The multirequest counter
-	 * @var int
-	 */
-	protected $multiRequestCounter = 0;
 	
 	/**
 	 * 
@@ -63,14 +71,20 @@ abstract class KBulkUploadEngine
 	 */
 	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
 	{
-		$this->multiRequestSize = $taskConfig->params->multiRequestSize;
-		$this->maxRecords = $taskConfig->params->maxRecords;
+		if($taskConfig->params->multiRequestSize)
+			$this->multiRequestSize = $taskConfig->params->multiRequestSize;
+		if($taskConfig->params->maxRecords)
+			$this->maxRecords = $taskConfig->params->maxRecords;
+		if($taskConfig->params->maxRecordsEachRun)
+			$this->maxRecordsEachRun = $taskConfig->params->maxRecordsEachRun;
 		
 		$this->kClient = $kClient;
 		$this->kClientConfig = $kClient->getConfig();
 		
 		$this->job = $job;
 		$this->data = $job->data;
+		
+		$this->currentPartnerId = $this->job->partnerId;
 	}
 	
 	/**
@@ -92,6 +106,14 @@ abstract class KBulkUploadEngine
 	}
 	
 	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return get_class($this);
+	}
+	
+	/**
 	 * @return KalturaBatchJob
 	 */
 	public function getJob()
@@ -105,6 +127,14 @@ abstract class KBulkUploadEngine
 	public function getData()
 	{
 		return $this->data;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function shouldRetry()
+	{
+		return $this->exceededMaxRecordsEachRun;
 	}
 
 	/**
@@ -139,64 +169,6 @@ abstract class KBulkUploadEngine
 		catch(Exception $e){
 			KalturaLog::notice("getBulkUploadLastResult: " . $e->getMessage());
 			return 0;
-		}
-	}
-	
-	/**
-	 * 
-	 * Gets the number of current multy request counter and decides if to send the chunked data or not
-	 * @return bool - true if the chunked data was sent, false if the data is not sent and ERROR on error
-	 * 
-	 */
-	protected function sendChunkedData()
-	{
-		// send chunk of requests
-		if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
-		{
-			$this->kClient->doMultiRequest();
-			
-			KalturaLog::info("Sent $this->multiRequestCounter invalid lines results");
-			
-			// check if job aborted
-			$this->isAborted();
-			
-			// start a new multi request
-			$this->kClient->startMultiRequest();
-			
-			$this->multiRequestCounter = 0;
-		}
-	}
-
-	/**
-	 * 
-	 * Gets the number of current multy request counter and decides if to send the chunked data or not
-	 * @param array $bulkUploadResultChunk
-	 */
-	protected function sendChunkedDataForPartner(array &$bulkUploadResultChunk)
-	{
-		// send chunk of requests
-		if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
-		{
-			// commit the multi request entries
-			$requestResults = $this->doMultiRequestForPartner();
-			
-			if(count($requestResults) != count($bulkUploadResultChunk))
-			{
-				$err = __FILE__ . ', line: ' . __LINE__ . ' $requestResults and $$bulkUploadResultChunk must have the same size';
-				throw new KalturaBatchException($err, KalturaBatchJobAppErrors::BULK_INVLAID_BULK_REQUEST_COUNT);
-			}
-				
-			// saving the results with the created enrty ids
-			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
-					
-			// check if job aborted
-			$this->checkAborted();
-			
-			// start a new multi request
-			$this->startMultiRequest(true);
-			
-			$bulkUploadResultChunk = array();
-			$this->multiRequestCounter = 0;
 		}
 	}
 	
@@ -237,7 +209,10 @@ abstract class KBulkUploadEngine
 	 */
 	protected function updateEntriesResults(array $requestResults, array $bulkUploadResults)
 	{
-		KalturaLog::debug("updateEntriesResults(" . count($requestResults) . ", " . count($bulkUploadResults) . ")");
+		if(count($requestResults) != count($bulkUploadResults))
+			throw new KalturaBatchException("request results [$requestResults] and bulk upload results [$bulkUploadResults] must have the same size", KalturaBatchJobAppErrors::BULK_INVLAID_BULK_REQUEST_COUNT);
+			
+		KalturaLog::debug("request results [$requestResults], bulk upload results [$bulkUploadResults]");
 		
 		$this->kClient->startMultiRequest();
 		
