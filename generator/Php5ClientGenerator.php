@@ -98,20 +98,17 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 	    
     	$this->addFile("KalturaClient.php", $this->getTextBlock());
     	
-    	
 		// plugins
-		$pluginNodes = $xpath->query("/xml/plugins/plugin");
-		foreach($pluginNodes as $pluginNode)
-		{
-		    $this->writePlugin($pluginNode);
-		}
+    	$plugins = KalturaPluginManager::getPluginInstances();
+		foreach($plugins as $plugin)
+		    $this->writePlugin($plugin);
 	}
 	
-	function writePlugin(DOMElement $pluginNode)
+	function writePlugin(KalturaPlugin $plugin)
 	{
-		$xpath = new DOMXPath($this->_doc);
+		$pluginName = $plugin->getPluginName();
 		
-		$pluginName = $pluginNode->getAttribute("name");
+		$xpath = new DOMXPath($this->_doc);
 		$pluginClassName = "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
 		
     	$this->startNewTextBlock();
@@ -130,23 +127,29 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaTypes.php");');
 		$this->appendLine('');
 		
+		$classsAdded = false;
 		$enumNodes = $xpath->query("/xml/enums/enum[@plugin = '$pluginName']");
 		foreach($enumNodes as $enumNode)
 		{
+			$classsAdded = true;
 			$this->writeEnum($enumNode);
 		}
 	
 		$classNodes = $xpath->query("/xml/classes/class[@plugin = '$pluginName']");
 		foreach($classNodes as $classNode)
 		{
+			$classsAdded = true;
 			$this->writeClass($classNode);
 		}
 	
 		$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
 		foreach($serviceNodes as $serviceNode)
 		{
+			$classsAdded = true;
 		    $this->writeService($serviceNode);
 		}
+		if(!$classsAdded)
+			return;
 		
 		$serviceNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
 		$services = array();
