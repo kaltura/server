@@ -172,7 +172,7 @@ abstract class KBulkUploadEngine
 	 * Gets the number of current multy request counter and decides if to send the chunked data or not
 	 * @param array $bulkUploadResultChunk
 	 */
-	protected function sendChunkedDataForPartner(array $bulkUploadResultChunk)
+	protected function sendChunkedDataForPartner(array &$bulkUploadResultChunk)
 	{
 		// send chunk of requests
 		if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
