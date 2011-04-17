@@ -65,7 +65,7 @@ class kConf extends kConfLocal
 							
 				"batch_ignore_duplication" => true ,
 				"priority_percent" => array(1 => 33, 2 => 27, 3 => 20, 4 => 13, 5 => 7),
-				"priority_time_range" => 60,
+				"priority_time_range" => 600,
 		
 				"system_allow_edit_kConf" => false,
 				"testmeconsole_state" => true,
@@ -78,7 +78,7 @@ class kConf extends kConfLocal
 				
 			
 				/* kmc tabs rules */
-				"kmc_display_customize_tab" => true,
+				
 				"kmc_display_account_tab" => true, 
 				"kmc_content_enable_commercial_transcoding" => true, 
 				"kmc_content_enable_live_streaming" => true,
