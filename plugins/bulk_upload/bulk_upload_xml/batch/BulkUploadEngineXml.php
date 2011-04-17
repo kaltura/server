@@ -211,7 +211,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 		if(is_null($resource))
 		{
-			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement->saveXML()}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
+			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
 	}
 	
