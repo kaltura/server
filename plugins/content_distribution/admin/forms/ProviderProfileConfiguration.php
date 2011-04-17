@@ -121,7 +121,7 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		try
 		{
 			$metadataProfileFilter = new Kaltura_Client_Metadata_Type_MetadataProfileFilter();
-			$metadataProfileFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
+			$metadataProfileFilter->metadataObjectTypeEqual = Kaltura_Client_Metadata_Enum_MetadataObjectType::ENTRY;
 			
 			$client = Infra_ClientHelper::getClient();
 			Infra_ClientHelper::impersonate($this->partnerId);
