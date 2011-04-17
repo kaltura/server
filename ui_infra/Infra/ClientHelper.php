@@ -62,6 +62,9 @@ class Infra_ClientHelper
 	{
 		if(self::$client)
 			return self::$client;
+
+		if (!class_exists('Kaltura_Client_Client'))
+			throw new Exception('Kaltura client not found, maybe it wasn\'t generated');
 			
 		$partnerId = self::getPartnerId();
 		$ks = self::getKs();
