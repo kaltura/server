@@ -630,7 +630,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setMediaElementValues(KalturaMediaEntry &$mediaEntry, DOMElement $mediaElement)
 	{
-		$mediaTypeElement = $this->getElement(mediaType, $mediaElement);
+		$mediaTypeElement = $this->getElement("mediaType", $mediaElement);
 		$mediaEntry->mediaType = $this->getMediaTypeByName($mediaTypeElement->nodeValue);
 		 
 		$this->checkMediaTypes($mediaEntry->type ,$mediaEntry->mediaType);
