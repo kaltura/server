@@ -237,6 +237,7 @@ class flavorAssetPeer extends assetPeer
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
 		
 		return self::doSelect($c);
 	}
