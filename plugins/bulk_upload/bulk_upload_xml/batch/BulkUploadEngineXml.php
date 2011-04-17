@@ -755,10 +755,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//TODO: Roni - check if the ',' in the end is bad 
 		foreach ($element->childNodes as $child)
 		{
-			if(!empty($child))
+			if($child != null)
 			{
-				KalturaLog::debug("In getStringFromElement - child value [". trim($child->nodeValue) . "]");
-				$commaSeperatedString = $commaSeperatedString . trim($child->nodeValue) .',';
+				if(!empty($child->nodeValue))
+				{
+					KalturaLog::debug("In getStringFromElement - child value [". trim($child->nodeValue) . "]");
+					$commaSeperatedString = $commaSeperatedString . trim($child->nodeValue) .',';
+				}
 			}
 		}
 		
