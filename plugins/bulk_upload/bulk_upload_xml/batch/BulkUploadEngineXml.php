@@ -223,7 +223,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param bool $isThrowException
 	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND
 	 */
-	private function getElement($elementName, $elementToSearchIn, $isThrowException = true)
+	private function getElement($elementName, DOMElement $elementToSearchIn, $isThrowException = true)
 	{
 		$elements = $elementToSearchIn->getElementsByTagName($elementName);
 		if($elements->length > 0)
@@ -245,7 +245,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param string $elementName
 	 * @param DOMElement $elementToSearchIn
 	 */
-	private function hasElement($elementName, $elementToSearchIn)
+	private function hasElement($elementName, DOMElement $elementToSearchIn)
 	{
 		$elements = $elementToSearchIn->getElementsByTagName($elementName);
 		if($elements->length > 0)
@@ -319,22 +319,70 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
 	 */
-	private function getFlavorParamsId($elementToSearchIn)
+	private function getFlavorParamsId(DOMElement $elementToSearchIn, $isAttribute = true)
 	{
-		//TODO: fix this
-		$flavorParamsId = $this->sourceContent->getAttribute("flavorParamsId"); 
-		$flavorParamsName = $this->sourceContent->getAttribute("flavorParams");
+		if($isAttribute) //Gets value from attributes
+		{
+			$flavorParamsId = $elementToSearchIn->getAttribute("flavorParamsId"); 
+			$flavorParamsName = $elementToSearchIn->getAttribute("flavorParams");
+		}
+		else //Gets value from elements
+		{
+			$flavorParamsId = $this->getElement("flavorParamsId", $elementToSearchIn, false)->nodeValue; 
+			$flavorParamsName = $this->getElement("flavorParams", $elementToSearchIn, false)->nodeValue;
+		}
 			
 		return $this->getFlavorParamsByIdAndName($flavorParamsId, $flavorParamsName);
 	}
 	
 	/**
 	 * 
+	 * Returns from the given object it's flavor params ids
+	 * @param DOMElement $elementToSearchIn
+	 */
+	private function getFlavorParamsIds(DOMElement $elementToSearchIn)
+	{
+		KalturaLog::debug("In getFlavorParamsIds");
+		
+		$flavorParamsIds = "";
+		
+		//Can be null
+		$flavorParamsIdsElement = $this->getElement("flavorParamsIds", $elementToSearchIn, false);
+		 
+		if(is_null($flavorParamsIdsElement)) // id is null so we get by names
+		{
+			//get the names
+			$flavorParamsElement = $this->getElement("flavorParams", $elementToSearchIn, false);
+			$flavorParamsNamesArray = explode(",", $this->getStringFromElement($flavorParamsElement));
+			
+			//Load the names to id array
+			$this->initFlavorParamsNameToId();
+			
+			foreach ($flavorParamsNamesArray as $flavorParamName) 
+			{
+				if(!is_null($flavorParamName) || empty($flavorParamName))
+				{
+					$flavorParamsIds = $flavorParamsIds . trim($this->flavorParamsNameToId[$flavorParamName]) .',';
+				}
+				KalturaLog::debug("Flavor params name [$flavorParamName]");
+			}
+		}
+		else
+		{
+			$flavorParamsIds = $this->getStringFromElement($flavorParamsIdsElement);
+		}
+		
+		KalturaLog::debug("In getFlavorParamsIds - flavorParamsIds []$flavorParamsIds ");
+		return $flavorParamsIds;
+	}
+		
+	/**
+	 * 
 	 * Gets the flavor params id from the source content element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
 	 */
-	private function getAccessControlId($elementToSearchIn)
+	private function getAccessControlId(DOMElement $elementToSearchIn)
 	{
 		//TODO: fix this
 		$accessControlIdElement = $this->getElement("accessControlId", $elementToSearchIn, false);
@@ -342,8 +390,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		return $this->getAccessControlIdByIdAndName($accessControlIdElement->nodeValue ,$accessControlElement->nodeValue);
 	}
-	
-	
+		
 	/**
 	 * 
 	 * Gets the access control id by it's id or name   
@@ -376,15 +423,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//If we got here then the id or name weren't found
 		throw new KalturaBatchException("Can't find flavor params with id [$accessControlId], name [$accessControlName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);	
 	}
-	
-	
+		
 	/**
 	 * 
 	 * Gets the storage profile id from the source content element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the storage profile
 	 */
-	private function getStorageProfileId($elementToSearchIn)
+	private function getStorageProfileId(DOMElement $elementToSearchIn)
 	{
 		$storageProfileId = $elementToSearchIn->getAttribute("storageProfileId"); 
 		$storageProfileName = $elementToSearchIn->getAttribute("storageProfile");
@@ -441,7 +487,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			return;
 		}
 		
-		if(!empty($flavorParamsName))//if we have no id then we search by name
+		if(!empty($flavorParamsName)) //If we have no id then we search by name
 		{
 			if(is_null($this->flavorParamsNameToId))
 			{
@@ -545,7 +591,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$mediaEntry->startDate = $dateElement->nodeValue;
 
 		$mediaElement = $this->getElement("media", $item);
-		$mediaEntry->type = $this->getTypeByName($mediaTypeElement->nodeValue); 
+		$mediaEntry->type = $this->getEntryTypeByName($mediaTypeElement->nodeValue); 
 		
 		//Adds to the media entry the media element data
 		$this->setMediaElementValues(&$mediaEntry, $mediaElement);
@@ -583,9 +629,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		 
 		$this->checkMediaTypes($mediaEntry->type ,$mediaEntry->mediaType);
 		
-		$flavorParamsIdsElement = $this->getElement("flavorParamsIds", $mediaElement);
-		$mediaEntry->flavorParamsIds = $this->getStringFromElement($flavorParamsIdsElement);
-
+		$mediaEntry->flavorParamsIds = $this->getFlavorParamsIds($mediaElement);
+		
 		//$mediaEntry->thumbParamsId = $mediaElement->getElementsByTagName("thumbParamsIds")->nodeValue;
 		
 //		$mediaEntry->playList = $this->addToPlaylists($mediaEntry, $mediaElement->getElementsByTagName("playlists"));
@@ -697,7 +742,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Returns a comma seperated string with the values of the child nodes of the given element 
 	 * @param DOMElement $element
 	 */
-	private function getStringFromElement($element)
+	private function getStringFromElement(DOMElement $element)
 	{
 		$commaSeperatedString = ""; 
 		
@@ -706,6 +751,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(!is_null($child) || $child != "")
 			{
+				KalturaLog::debug("In getStringFromElement - child value [{$child->nodeValue}]");
 				$commaSeperatedString = $commaSeperatedString . trim($child->nodeValue) .',';
 			}
 		}
