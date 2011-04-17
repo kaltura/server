@@ -270,7 +270,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			KalturaLog::debug("Resource is : localFileContentResource");
 			$resource = new KalturaLocalFileResource();
-			$resource->localFilePath =$this->currentContentElement->getAttribute("filePath");
+			$localContentResorce = $this->getElement("localFileContentResource", $this->currentContentElement, true);
+			$resource->localFilePath = $localContentResorce ->getAttribute("filePath");
+			
 			//TODO: Roni - what to do with those?
 //		<xs:choice minOccurs="1" maxOccurs="1">
 //			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
@@ -281,19 +283,22 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			KalturaLog::debug("Resource is : urlContentResource");
 			$resource = new KalturaUrlResource();
-			$resource->url = $this->currentContentElement->getAttribute("url");
+			$urlContentResource = $this->getElement("urlContentResource", $this->currentContentElement, true);
+			$resource->url = $urlContentResource->getAttribute("url");
 		}
 		elseif($this->hasElement("remoteStorageContentResource", $this->currentContentElement))
 		{
 			KalturaLog::debug("Resource is : remoteStorageContentResource");
 			$resource = new KalturaRemoteStorageResource();
-			$resource->url = $this->currentContentElement->getAttribute("url");
-			$resource->storageProfileId = $this->getStorageProfileId($this->currentContentElement, "storageProfile", "storageProfile");
+			$remoteContentResource = $this->getElement("urlContentResource", $this->currentContentElement, true);
+			$resource->url = $remoteContentResource->getAttribute("url");
+			$resource->storageProfileId = $this->getStorageProfileId($remoteContentResource);
 		}
 		elseif($this->hasElement("entryContentResource", $this->currentContentElement))
 		{
 			KalturaLog::debug("Resource is : entryContentResource");
 			$resource = new KalturaEntryResource();
+			
 			$resource->entryId = $this->currentContentElement->getAttribute("entryId");
 			
 			$resource->flavorParamsId = $this->getFlavorParamsId();
@@ -305,15 +310,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->assetId = $this->currentContentElement->getAttribute("assetId");
 		}
 		
-		KalturaLog::debug("Returned Null from getResourceInstancee");
 		return $resource;
 	}
 	
 	/**
 	 * 
 	 * Gets the flavor params id from the source content element
+	 * @param $elementToSearchIn - The element to search in
+	 * @return int - The id of the flavor params
 	 */
-	private function getFlavorParamsId()
+	private function getFlavorParamsId($elementToSearchIn)
 	{
 		//TODO: fix this
 		$flavorParamsId = $this->sourceContent->getAttribute("flavorParamsId"); 
@@ -324,12 +330,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * Gets the storage profile id from the source content element  
+	 * Gets the storage profile id from the source content element
+	 * @param $elementToSearchIn - The element to search in
+	 * @return int - The id of the storage profile
 	 */
-	private function getStorageProfileId()
+	private function getStorageProfileId($elementToSearchIn)
 	{
-		$storageProfileId = $this->sourceContent->getAttribute("storageProfileId"); 
-		$storageProfileName = $this->sourceContent->getAttribute("storageProfile");
+		$storageProfileId = $elementToSearchIn->getAttribute("storageProfileId"); 
+		$storageProfileName = $elementToSearchIn->getAttribute("storageProfile");
 			
 		//TODO: implement this (after validation of the flavor params)
 		return $this->getStorageProfileByIdAndName($storageProfileId, $storageProfileName);
