@@ -59,6 +59,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private $thumbParamsNameToId = null;
 	
 	/**
+	 * 
+	 * The current handled content element
+	 * @var DOMElement
+	 */
+	private $currentContentElement;
+	 
+	/**
 	 * @return string
 	 */
 	public function getName()
@@ -204,7 +211,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 		if(is_null($resource))
 		{
-			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement->saveXml()}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
+			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement->saveXML()}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
 	}
 	
