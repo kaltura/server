@@ -9,7 +9,7 @@ class Form_SynacorProfileConfiguration extends Form_ProviderProfileConfiguration
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof KalturaSynacorDistributionProfile)
+		if($object instanceof Kaltura_Client_SynacorDistribution_Type_SynacorDistributionProfile)
 		{
 			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
 			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);

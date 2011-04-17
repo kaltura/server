@@ -9,7 +9,7 @@ class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfigura
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof KalturaYoutube_apiDistributionProfile)
+		if($object instanceof Kaltura_Client_Youtube_apiDistribution_Type_Youtube_apiDistributionProfile)
 		{
 			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
 			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);

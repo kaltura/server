@@ -9,7 +9,7 @@ class Form_YouTubeProfileConfiguration extends Form_ProviderProfileConfiguration
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof KalturaYouTubeDistributionProfile)
+		if($object instanceof Kaltura_Client_YouTubeDistribution_Type_YouTubeDistributionProfile)
 		{
 			$upload = new Zend_File_Transfer_Adapter_Http();
 			$files = $upload->getFileInfo();

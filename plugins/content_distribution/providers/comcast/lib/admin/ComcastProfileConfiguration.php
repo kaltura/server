@@ -9,7 +9,7 @@ class Form_ComcastProfileConfiguration extends Form_ProviderProfileConfiguration
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof KalturaComcastDistributionProfile)
+		if($object instanceof Kaltura_Client_ComcastDistribution_Type_ComcastDistributionProfile)
 		{
 			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
 			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);

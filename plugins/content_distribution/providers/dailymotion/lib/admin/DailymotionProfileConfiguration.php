@@ -9,7 +9,7 @@ class Form_DailymotionProfileConfiguration extends Form_ProviderProfileConfigura
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof KalturaDailymotionDistributionProfile)
+		if($object instanceof Kaltura_Client_DailymotionDistribution_Type_DailymotionDistributionProfile)
 		{
 			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
 			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);
