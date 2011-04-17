@@ -353,7 +353,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	protected function createUploadResult($values, $columns)
 	{
-		if($this->handledRecordsThisRun >= $this->maxRecordsEachRun)
+		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
 		{
 			$this->exceededMaxRecordsEachRun = true;
 			return;
