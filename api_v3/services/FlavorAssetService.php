@@ -69,7 +69,7 @@ class FlavorAssetService extends KalturaBaseService
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
-    	if($flavorAsset->flavorParamsId)
+    	if(!is_null($flavorAsset->flavorParamsId))
     	{
     		$dbFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavorAsset->flavorParamsId);
     		if($dbFlavorAsset)
