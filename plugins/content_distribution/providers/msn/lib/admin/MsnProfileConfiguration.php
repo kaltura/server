@@ -50,6 +50,11 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 		return $object;
 	}
 	
+	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $optionalFlavorParamsIds = array(), array $requiredFlavorParamsIds = array())
+	{
+		// overrides the default flavors form
+	}
+	
 	protected function addProviderElements()
 	{
 		$element = new Zend_Form_Element_Hidden('providerElements');
