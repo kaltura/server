@@ -68,6 +68,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 				$form = KalturaPluginManager::loadObject('Form_ProviderProfileConfiguration', $providerType, array($partnerId, $providerType));
 				$profileClass = KalturaPluginManager::getObjectClass($profileClass, $providerType);
 			}
+			KalturaLog::debug("profile class [$profileClass]");
 			
 			if(!$form)
 			{
