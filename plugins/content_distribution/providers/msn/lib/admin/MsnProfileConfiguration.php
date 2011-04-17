@@ -9,6 +9,7 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
+		KalturaLog::debug("object [" . get_class($object) . "]");
 		if($object instanceof Kaltura_Client_MsnDistribution_Type_MsnDistributionProfile)
 		{
 			$requiredFlavorParamsIds = array(
@@ -16,6 +17,7 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 				$object->flvFlavorParamsId,
 				$object->wmvFlavorParamsId,
 			);
+			KalturaLog::debug("requiredFlavorParamsIds [" . print_r($requiredFlavorParamsIds, true) . "]");
 			
 			$object->requiredFlavorParamsIds = implode(',', $requiredFlavorParamsIds);
 		}
