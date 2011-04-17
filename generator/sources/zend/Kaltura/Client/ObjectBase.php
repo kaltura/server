@@ -26,12 +26,13 @@ abstract class Kaltura_Client_ObjectBase
 	
 	public function toParams()
 	{
-		$params = array();
-		$params["objectType"] = get_class($this);
+		$params = array(
+			'objectType' => $this->getKalturaObjectType()
+		);
+		
 	    foreach($this as $prop => $val)
-		{
 			$this->addIfNotNull($params, $prop, $val);
-		}
+			
 		return $params;
 	}
 }
