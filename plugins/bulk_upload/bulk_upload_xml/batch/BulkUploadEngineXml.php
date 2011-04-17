@@ -337,8 +337,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getAccessControlId($elementToSearchIn)
 	{
 		//TODO: fix this
-		$accessControlIdElement = $this->getElement("accessControlId", $elementToSearchIn);
-		$accessControlElement = $this->getElement("accessControl", $elementToSearchIn);
+		$accessControlIdElement = $this->getElement("accessControlId", $elementToSearchIn, false);
+		$accessControlElement = $this->getElement("accessControl", $elementToSearchIn, false);
 		
 		return $this->getAccessControlIdByIdAndName($accessControlIdElement->nodeValue ,$accessControlElement->nodeValue);
 	}
