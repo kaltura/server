@@ -150,4 +150,3 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 		return $entry;
 	}
 }
-?>
