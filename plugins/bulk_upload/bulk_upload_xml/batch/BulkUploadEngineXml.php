@@ -247,7 +247,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function hasElement($elementName, $elementToSearchIn)
 	{
-		$elements = $elementToSearchIn->getElementByName($elementName);
+		$elements = $elementToSearchIn->getElementsByName($elementName);
 		if(!empty($elements))
 		{
 			return true;  
