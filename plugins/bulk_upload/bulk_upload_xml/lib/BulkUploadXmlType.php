@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.bulkUpload
+ * @package plugins.bulkUploadXml
  * @subpackage lib
  */
 class BulkUploadXmlType implements IKalturaPluginEnum, BulkUploadType
