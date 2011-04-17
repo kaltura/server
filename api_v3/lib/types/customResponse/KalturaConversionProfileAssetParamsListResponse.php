@@ -6,7 +6,7 @@
 class KalturaConversionProfileAssetParamsListResponse extends KalturaObject
 {
 	/**
-	 * @var KalturaConversionProfileAssetParams
+	 * @var KalturaConversionProfileAssetParamsArray
 	 * @readonly
 	 */
 	public $objects;
