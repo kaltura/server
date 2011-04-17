@@ -46,8 +46,13 @@ function askToDelete($path)
 		echo 'Are you sure you want to delete all contents of ['.$path.'] (y/n) ?  ';
 		$input = trim(fgets(STDIN));
 		if ($input === 'y') {
-			echo 'rm -rf '.$path.DIRECTORY_SEPARATOR.'*'.PHP_EOL;
-			system('rm -rf '.$path.DIRECTORY_SEPARATOR.'*');
+			$cmd = 'rm -rf '.$path.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'*';
+			echo "$cmd\n";
+			system($cmd);
+			
+			$cmd = 'rm -rf '.$path.DIRECTORY_SEPARATOR.'*.*';
+			echo "$cmd\n";
+			system($cmd);
 		}
 		else {
 			echo 'Skipping...'.PHP_EOL;
