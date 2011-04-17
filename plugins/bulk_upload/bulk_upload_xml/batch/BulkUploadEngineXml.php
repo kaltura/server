@@ -761,7 +761,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if($child != null)
 			{
-				if(!empty($child->nodeValue))
+				if(!empty(trim($child->nodeValue)))
 				{
 					KalturaLog::debug("In getStringFromElement - child value [". trim($child->nodeValue) . "]");
 					$commaSeperatedString = $commaSeperatedString . trim($child->nodeValue) .',';
