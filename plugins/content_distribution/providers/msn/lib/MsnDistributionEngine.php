@@ -93,6 +93,8 @@ class MsnDistributionEngine extends DistributionEngine implements
 		$password = $distributionProfile->password;
 		
 		$url = "https://{$domain}{$path}";
+		KalturaLog::debug("url [$url]");
+		KalturaLog::debug("xml [{$providerData->xml}]");
 		
 		$ch = curl_init();
 
