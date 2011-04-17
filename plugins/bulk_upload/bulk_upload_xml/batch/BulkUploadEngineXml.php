@@ -29,6 +29,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var int
 	 */
 	private $currentFlavorId;
+
+	/**
+	 * 
+	 * The current handled content element
+	 * @var DOMElement
+	 */
+	private $currentContentElement;
 	
 	/**
 	 * 
@@ -57,13 +64,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var array()
 	 */
 	private $thumbParamsNameToId = null;
-	
-	/**
-	 * 
-	 * The current handled content element
-	 * @var DOMElement
-	 */
-	private $currentContentElement;
 	
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
@@ -635,7 +635,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		 
 		$this->checkMediaTypes($mediaEntry->type ,$mediaEntry->mediaType);
 		
-		$mediaEntry->flavorParamsIds = $this->getFlavorParamsIds($mediaElement);
+//		$mediaEntry->flavorParamsIds = $this->getFlavorParamsIds($mediaElement);
 		
 		//$mediaEntry->thumbParamsId = $mediaElement->getElementsByTagName("thumbParamsIds")->nodeValue;
 		
