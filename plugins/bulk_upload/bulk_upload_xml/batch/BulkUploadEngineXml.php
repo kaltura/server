@@ -226,9 +226,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getElement($elementName, $elementToSearchIn, $isThrowException)
 	{
 		$elements = $elementToSearchIn->getElementsByTagName($elementName);
-		if(!empty($elements))
+		if($elements->length > 0)
 		{
-			return $elements[0];  
+			return $elements->item(0);  
 		}
 		
 		if($isThrowException)
@@ -248,9 +248,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function hasElement($elementName, $elementToSearchIn)
 	{
 		$elements = $elementToSearchIn->getElementsByTagName($elementName);
-		if(!empty($elements))
+		if($elements->length > 0)
 		{
-			return true;  
+			return true;
 		}
 				
 		return false;
