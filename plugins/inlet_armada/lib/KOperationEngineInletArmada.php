@@ -92,7 +92,9 @@ $encodingTemplate;
 		}
 		
 		KalturaLog::debug("Job completed successfully - ".print_r($rvObj,1));
-		copy($inFilePath, $this->outFilePath);
+		if($rvObj->job_list[0]->job_output_file!=$this->outFilePath) {
+			copy($rvObj->job_list[0]->job_output_file, $this->outFilePath);
+		}
 /*
 		parent::operate($operator, $inFilePath, $configFilePath);
 		rename("$this->outFilePath//playlist.m3u8", "$this->outFilePath//playlist.tmp");
