@@ -14,6 +14,11 @@ class KalturaFreewheelDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $password;
+
+	/**
+	 * @var string
+	 */
+	public $contact;
 	
 	/**
 	 * @var int
@@ -27,6 +32,7 @@ class KalturaFreewheelDistributionProfile extends KalturaDistributionProfile
 	(
 		'username',
 		'password',
+		'contact',
 		'metadataProfileId',
 	 );
 		 

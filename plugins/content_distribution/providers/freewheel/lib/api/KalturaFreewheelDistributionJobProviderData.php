@@ -9,7 +9,12 @@ class KalturaFreewheelDistributionJobProviderData extends KalturaDistributionJob
 	 * @var string
 	 */
 	public $xml;
-		
+
+	/**
+	 * @var string
+	 */
+	public $contact;
+	
 	/**
 	 * @var int
 	 */
@@ -32,6 +37,7 @@ class KalturaFreewheelDistributionJobProviderData extends KalturaDistributionJob
 		$this->distributionProfileId = $distributionJobData->distributionProfile->id;
 	
 		$this->metadataProfileId = $distributionJobData->distributionProfile->metadataProfileId;
+		$this->contact = $distributionJobData->distributionProfile->contact;
 			
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
 			$this->xml = FreewheelDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId, $this);

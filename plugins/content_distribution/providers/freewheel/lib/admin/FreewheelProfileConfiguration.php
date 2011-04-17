@@ -21,7 +21,12 @@ class Form_FreewheelProfileConfiguration extends Form_ProviderProfileConfigurati
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
 		));
-	
+
+		$this->addElement('text', 'contact', array(
+			'label'			=> 'Contact email:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$metadataProfiles = null;
 		try
 		{

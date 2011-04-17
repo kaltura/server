@@ -62,7 +62,7 @@ file_put_contents('out.xml', $providerData->xml);
 KalturaLog::debug("XML [$providerData->xml]");
 
 return;
-$engine = new GenericDistributionEngine();
+$engine = new FreewheelDistributionEngine();
 $engine->submit($distributionJobData);
 
 

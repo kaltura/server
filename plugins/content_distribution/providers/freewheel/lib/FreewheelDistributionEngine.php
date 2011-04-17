@@ -24,7 +24,8 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 	const USAGE_COUNTER_RECOMMENDED = 9;
 
 	protected $tempXmlPath;
-	
+	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
+	const API_URL = "https://api.freewheel.tv/services/upload/bvi.xml";
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
@@ -57,7 +58,7 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaFreewheelDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaFreewheelDistributionJobProviderData");
 		
-		$data->remoteId = $this->handleSend($this->submitPath, $data, $data->distributionProfile, $data->providerData);
+		$data->remoteId = $this->handleSend($data, $data->distributionProfile, $data->providerData);
 		
 		return true;
 	}
@@ -69,39 +70,71 @@ class FreewheelDistributionEngine extends DistributionEngine implements
 	 * @param KalturaFreewheelDistributionJobProviderData $providerData
 	 * @throws Exception
 	 */
-	public function handleSend($path, KalturaDistributionJobData $data, KalturaFreewheelDistributionProfile $distributionProfile, KalturaFreewheelDistributionJobProviderData $providerData)
+	public function handleSend(KalturaDistributionJobData $data, KalturaFreewheelDistributionProfile $distributionProfile, KalturaFreewheelDistributionJobProviderData $providerData)
 	{
-		$domain = $distributionProfile->domain;
+	
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
+		$fileName = uniqid() . '.xml';
+		$srcFile = $this->tempXmlPath . '/' . $fileName;
+			
+		
+		$params = array("upload_file[]" => "@{$srcFile}");
+//		$params = array("upload_file[]" => "@test.xml");
 		
 		KalturaLog::debug("freewheel: send");
+//		KalturaLog::debug($providerData->xml);		
 		if(!$providerData->xml)
 			throw new Exception("XML data not supplied");
 
-		if (!isset($data->remoteId) || $data->remoteId == "")
-		{
-			$remoteId = uniqid();
-		}
-		else
-		{
-			$remoteId = $data->remoteId;
-		}
-		$fileName = $remoteId . '.xml';
-		$srcFile = $this->tempXmlPath . '/' . $fileName;
-		$destFile = "{$path}/{$fileName}";
-			
 		file_put_contents($srcFile, $providerData->xml);
-		KalturaLog::debug("XML written to file [$srcFile]");
-		
-		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
-		if(!$fileTransferMgr)
-			throw new Exception("FTP manager not loaded");
-			
-		$fileTransferMgr->login($this->domain, $username, $password);
-		$fileTransferMgr->putFile($destFile, $srcFile, true);
 
-		return $remoteId;
+//		echo $srcFile;
+		$ch = curl_init();
+
+/*		curl_setopt($ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		
+		curl_setopt($ch, CURLOPT_NOSIGNAL, true);
+		curl_setopt($ch, CURLOPT_FORBID_REUSE, true); 
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+
+		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
+
+		curl_setopt($ch, CURLOPT_URL, self::API_URL);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_RANGE, false);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_VERBOSE, true); 		
+*/
+//		curl_setopt($ch, CURLOPT_HTTPHEADER	, array('Expect:','Content-Type: multipart/form-data','Content-Disposition: form-data; name="upload_file[]";filename="a.xml"', 'X-FreeWheelToken: 39102300472f'));
+		
+
+		curl_setopt($ch, CURLOPT_URL,  self::API_URL);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		
+		$results = curl_exec($ch);
+//		unlink($srcFile);
+//		echo "1" . $results;
+
+		if(!$results)
+		{
+			$errNumber = curl_errno($ch);
+			$errDescription = curl_error($ch);
+		
+			if(!$results)
+				throw new Exception($errDescription, $errNumber);
+		}
+//		echo $results;
+		return '';
 //		return $results;
 	}
 

@@ -3,9 +3,10 @@
 <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no"/>
 <xsl:variable name="distributionProfileId" />
 <xsl:variable name="metadataProfileId" />
+<xsl:variable name="contact" />
 
   <xsl:template match="item">
-    <FWCoreContainer bvi_xsd_version="1" contact_email="mgoodberg@freewheel.tv">
+    <FWCoreContainer bvi_xsd_version="1" contact_email="{$contact}">
       <FWVideoDocument>
 			<xsl:attribute name="video_id"><xsl:value-of select="entryId"/></xsl:attribute>
 			<xsl:variable name="series" select="normalize-space(string(media:custom/series))" />
@@ -29,6 +30,7 @@
         		<fwContentOwner>
             			<SelfContentOwner />
         		</fwContentOwner>
+			<fwOperation>upsert</fwOperation>				
 			<fwReplaceGroup>true</fwReplaceGroup>
 			<fwTitles>
 				<titleItem>
@@ -170,11 +172,7 @@
 							<xsl:with-param name="softString" select="$genre" />
 					</xsl:call-template></genreItem>
         		</fwGenres>
-        		<fwDuration>
-			<xsl:call-template name="transformTimeToSenconds">
-				<xsl:with-param name="time" select="bc:duration" />
-			</xsl:call-template>
-			</fwDuration>
+        		<fwDuration><xsl:value-of select="media/duration" /></fwDuration>
     		</FWVideoDocument>
     </FWCoreContainer>
   </xsl:template>

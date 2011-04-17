@@ -9,7 +9,12 @@ class kFreewheelDistributionJobProviderData extends kDistributionJobProviderData
 	 * @var string
 	 */
 	private $xml;
-		
+
+	/**
+	 * @var string
+	 */
+	private $contact;
+	
 	/**
 	 * @var int
 	 */
@@ -74,4 +79,22 @@ class kFreewheelDistributionJobProviderData extends kDistributionJobProviderData
 	{
 		$this->xml = $xml;
 	}
+	
+	/**
+	 * @param string $contact
+	 */
+	public function setContact($contact)
+	{
+		$this->contact = $contact;
+	}
+
+	/**
+	 * @return the $contact
+	 */
+	public function getContact()
+	{
+		return $this->contact;
+	}
+
+	
 }
