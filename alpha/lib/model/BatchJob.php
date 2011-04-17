@@ -373,9 +373,11 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
 	}
 	
-	public function getChildJobs()
+	public function getChildJobs(Criteria $c = null)
 	{
-		$c = new Criteria();
+		if(!$c)
+			$c = new Criteria();
+			
 		$crit = $c->getNewCriterion(BatchJobPeer::ROOT_JOB_ID, $this->id);
 		$crit->addOr($c->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id));
 		$c->addAnd($crit);

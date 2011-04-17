@@ -1032,10 +1032,11 @@ class JobsService extends KalturaBaseService
 	 * 
 	 * @action getStatus
 	 * @param int $jobId the id of the job  
-	 * @param KalturaBatchJobType $jobType the type of the job  
+	 * @param KalturaBatchJobType $jobType the type of the job
+	 * @param KalturaFilterPager $pager pager for the child jobs  
 	 * @return KalturaBatchJobResponse 
 	 */
-	function getStatusAction($jobId, $jobType)
+	function getStatusAction($jobId, $jobType, KalturaFilterPager $pager = null)
 	{
 		$dbJobType = kPluginableEnumsManager::apiToCore('BatchJobType', $jobType);
 		
@@ -1049,7 +1050,13 @@ class JobsService extends KalturaBaseService
 		$batchJobResponse = new KalturaBatchJobResponse();
 		$batchJobResponse->batchJob = $job;
 		
-		$childBatchJobs = $dbBatchJob->getChildJobs();
+		if(!$pager)
+			$pager = new KalturaFilterPager();
+			
+		$c = new Criteria();
+		$pager->attachToCriteria($c);
+		
+		$childBatchJobs = $dbBatchJob->getChildJobs($c);
 		$batchJobResponse->childBatchJobs = KalturaBatchJobArray::fromBatchJobArray($childBatchJobs);
 		
 		return $batchJobResponse;
