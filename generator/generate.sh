@@ -5,7 +5,9 @@ rm -fr ../cache/generatorv3/*
 
 php generate.php "$@"
 
-rsync -avC /web/content/generator/output/php5ZendClientAdminConsole/ ../admin_console/lib
-rsync -avC /web/content/generator/output/batchClient/ ../batch/client
+output_path=`php -r 'require_once("bootstrap.php"); echo myContentStorage::getFSContentRootPath() . "/content/generator/output";' 2>&1`
+
+rsync -avC $output_path/php5ZendClientAdminConsole/ ../admin_console/lib
+rsync -avC $output_path/batchClient/ ../batch/client
 
 rm -fr ../cache/batch/*
