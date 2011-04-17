@@ -183,7 +183,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("In handleItemAdd");
 		$entryToInsert = $this->createMediaEntryFromItem($item);
 		
-		foreach ($item->getElementsByTag("content") as $contentElement)
+		foreach ($item->getElementsByTagName("content") as $contentElement)
 		{
 			$this->currentContentElement = $contentElement;
 			$resource = $this->getResource($contentElement);
