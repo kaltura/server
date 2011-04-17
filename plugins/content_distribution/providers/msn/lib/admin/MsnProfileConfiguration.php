@@ -11,41 +11,13 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 		
 		if($object instanceof KalturaMsnDistributionProfile)
 		{
-			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
-			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);
-			
-			if($object->movFlavorParamsId)
-			{
-				if(!in_array($object->movFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->movFlavorParamsId ? $object->movFlavorParamsId : '0';
-					
-				$flavorKey = array_search($object->movFlavorParamsId, $optionalFlavorParamsIds);
-				if($flavorKey !== false)
-					unset($optionalFlavorParamsIds[$flavorKey]);
-			}
-			
-			if($object->flvFlavorParamsId)
-			{
-				if(!in_array($object->flvFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->flvFlavorParamsId ? $object->flvFlavorParamsId : '0';
-					
-				$flavorKey = array_search($object->flvFlavorParamsId, $optionalFlavorParamsIds);
-				if($flavorKey !== false)
-					unset($optionalFlavorParamsIds[$flavorKey]);
-			}
-			
-			if($object->wmvFlavorParamsId)
-			{
-				if(!in_array($object->wmvFlavorParamsId, $requiredFlavorParamsIds))
-					$requiredFlavorParamsIds[] = $object->wmvFlavorParamsId ? $object->wmvFlavorParamsId : '0';
-					
-				$flavorKey = array_search($object->wmvFlavorParamsId, $optionalFlavorParamsIds);
-				if($flavorKey !== false)
-					unset($optionalFlavorParamsIds[$flavorKey]);
-			}
+			$requiredFlavorParamsIds = array(
+				$object->movFlavorParamsId,
+				$object->flvFlavorParamsId,
+				$object->wmvFlavorParamsId,
+			);
 			
 			$object->requiredFlavorParamsIds = implode(',', $requiredFlavorParamsIds);
-			$object->optionalFlavorParamsIds = implode(',', $optionalFlavorParamsIds);
 		}
 		return $object;
 	}
