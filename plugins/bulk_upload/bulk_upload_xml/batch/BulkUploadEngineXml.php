@@ -5,6 +5,7 @@
  * @package Scheduler
  * @subpackage Provision
  */
+
 class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	//(not the final version i still checking the code please don't kill me :) )
@@ -182,11 +183,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("In handleItemAdd");
 		$entryToInsert = $this->createMediaEntryFromItem($item);
 		
-		$resource = $this->getResource($item);
-		
-		KalturaLog::debug("Entry to add is: {$entryToInsert->name}");
-		$result = $this->kClient->media->add($entryToInsert, $resource);
-		KalturaLog::debug("result is: " .var_dump($result));
+		foreach ($item->getElementsByTag("content") as $contentElement)
+		{
+			$this->currentContentElement = $contentElement;
+			$resource = $this->getResource($contentElement);
+			
+			KalturaLog::debug("Entry to add is: {$entryToInsert->name}");
+			$result = $this->kClient->media->add($entryToInsert, $resource);
+			KalturaLog::debug("result is: " .var_dump($result));
+		}
 	}
 
 	/**
@@ -194,7 +199,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Gets an item and returns the resource
 	 * @param DOMElement $item
 	 */
-	private function getResource(DOMElement $item)
+	private function getResource()
 	{
 		$resource = $this->getResourceInstance(); 
 				
@@ -214,43 +219,43 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$resource = null;
 	
-		if($this->sourceContent->hasAttribute("localFileContentResource"))
+		if($this->currentContentElement->hasAttribute("localFileContentResource"))
 		{
 			KalturaLog::debug("Resource is : localFileContentResource");
 			$resource = new KalturaLocalFileResource();
-			$resource->localFilePath =$this->sourceContent->getAttribute("filePath");
+			$resource->localFilePath =$this->currentContentElement->getAttribute("filePath");
 			//TODO: Roni - what to do with those?
 //		<xs:choice minOccurs="1" maxOccurs="1">
 //			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
 //			<xs:element name="fileChecksum" type="xs:string" minOccurs="1" maxOccurs="1"/>
 //		</xs:choice>
 		}
-		elseif($this->sourceContent->hasAttribute("urlContentResource"))
+		elseif($this->currentContentElement->hasAttribute("urlContentResource"))
 		{
 			KalturaLog::debug("Resource is : urlContentResource");
 			$resource = new KalturaUrlResource();
-			$resource->url = $this->sourceContent->getAttribute("url");
+			$resource->url = $this->currentContentElement->getAttribute("url");
 		}
-		elseif($this->sourceContent->hasAttribute("remoteStorageContentResource"))
+		elseif($this->currentContentElement->hasAttribute("remoteStorageContentResource"))
 		{
 			KalturaLog::debug("Resource is : remoteStorageContentResource");
 			$resource = new KalturaRemoteStorageResource();
-			$resource->url = $this->sourceContent->getAttribute("url");
-			$resource->storageProfileId = $this->getStorageProfileId($this->sourceContent, "storageProfile", "storageProfile");
+			$resource->url = $this->currentContentElement->getAttribute("url");
+			$resource->storageProfileId = $this->getStorageProfileId($this->currentContentElement, "storageProfile", "storageProfile");
 		}
-		elseif($this->sourceContent->hasAttribute("entryContentResource"))
+		elseif($this->currentContentElement->hasAttribute("entryContentResource"))
 		{
 			KalturaLog::debug("Resource is : entryContentResource");
 			$resource = new KalturaEntryResource();
-			$resource->entryId = $this->sourceContent->getAttribute("entryId");
+			$resource->entryId = $this->currentContentElement->getAttribute("entryId");
 			
 			$resource->flavorParamsId = $this->getFlavorParamsId();
 		}
-		elseif($this->sourceContent->hasAttribute("assetContentResource"))
+		elseif($this->currentContentElement->hasAttribute("assetContentResource"))
 		{
 			KalturaLog::debug("Resource is : assetContentResource");
 			$resource = new KalturaAssetResource();
-			$resource->assetId = $this->sourceContent->getAttribute("assetId");
+			$resource->assetId = $this->currentContentElement->getAttribute("assetId");
 		}
 		
 		return $resource;
@@ -262,6 +267,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getFlavorParamsId()
 	{
+		//TODO: fix this
 		$flavorParamsId = $this->sourceContent->getAttribute("flavorParamsId"); 
 		$flavorParamsName = $this->sourceContent->getAttribute("flavorParams");
 			
@@ -412,6 +418,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setContentElementValues(KalturaMediaEntry $mediaEntry, DOMElement $contentElement)
 	{
 		//TODO: Roni - handle content element logic
+		
 	}
 	
 	/**
