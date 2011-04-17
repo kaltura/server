@@ -380,7 +380,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$accessControlIdElement = $this->getElement("accessControlId", $elementToSearchIn, false);
 		$accessControlElement = $this->getElement("accessControl", $elementToSearchIn, false);
 		
-		return $this->getAccessControlIdByIdAndName($accessControlIdElement->nodeValue ,$accessControlElement->nodeValue);
+		$accessControlId = null;
+		$accessControlName = null;
+		
+		if(!is_null($accessControlIdElement))
+		{
+			$accessControlId = $accessControlIdElement->nodeValue;
+		}
+		
+		if(!is_null($accessControlElement))
+		{
+			$accessControlName = $accessControlElement->nodeValue;
+		}
+						
+		return $this->getAccessControlIdByIdAndName($accessControlId, $accessControlName);
 	}
 		
 	/**
