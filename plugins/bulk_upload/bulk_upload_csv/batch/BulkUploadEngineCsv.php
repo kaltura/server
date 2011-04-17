@@ -186,6 +186,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 					
 		KalturaLog::info("Opened file: $filePath");
 		
+		$columns = $this->getV1Columns();
 		$values = fgetcsv($fileHandle);
 		while($values)
 		{
