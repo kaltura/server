@@ -5,7 +5,6 @@
  * @package Scheduler
  * @subpackage Provision
  */
-
 class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	//(not the final version i still checking the code please don't kill me :) )
@@ -205,7 +204,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 		if(is_null($resource))
 		{
-			throw new KalturaBatchException("Resorce is not supported: {$this->sourceContent->saveXml()}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
+			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement->saveXml()}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
 	}
 	
