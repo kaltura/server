@@ -66,7 +66,7 @@ $encodingTemplate;
 		if(!$rv) {
 			throw new KOperationEngineException("Inlet failure: add job, rv(".print_r($rvObj,1).")");
 		}
-		KalturaLog::debug("jobAdd - ".print_r($rvObj,1));
+		KalturaLog::debug("jobAdd - encodingTemplate($encodingTemplate), inFilePath($inFilePath), outFilePath($this->outFilePath),rv-".print_r($rvObj,1));
 		
 		$jobId=$rvObj->job_id;
 		$attemptCnt=0;
@@ -91,6 +91,7 @@ $encodingTemplate;
 			$attemptCnt++;
 		}
 		
+		KalturaLog::debug("Job completed successfully - ".print_r($rvObj,1));
 		copy($inFilePath, $this->outFilePath);
 /*
 		parent::operate($operator, $inFilePath, $configFilePath);
