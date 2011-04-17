@@ -82,17 +82,20 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 			if($baseClass == 'IDistributionEngineUpdate')
 				return new HuluDistributionEngine();
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-			{
-				$reflect = new ReflectionClass('Form_HuluProfileConfiguration');
-				return $reflect->newInstanceArgs($constructorArgs);
-			}
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaHuluDistributionProfile();
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return new KalturaHuluDistributionJobProviderData();
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::HULU)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+			{
+				$reflect = new ReflectionClass('Form_HuluProfileConfiguration');
+				return $reflect->newInstanceArgs($constructorArgs);
+			}
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
@@ -151,14 +154,17 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 			if($baseClass == 'IDistributionEngineUpdate')
 				return 'HuluDistributionEngine';
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-				return 'Form_HuluProfileConfiguration';
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaHuluDistributionProfile';
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return 'KalturaHuluDistributionJobProviderData';
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::HULU)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+				return 'Form_HuluProfileConfiguration';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

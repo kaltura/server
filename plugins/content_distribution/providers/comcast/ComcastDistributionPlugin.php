@@ -80,17 +80,20 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			if($baseClass == 'IDistributionEngineUpdate')
 				return new ComcastDistributionEngine();
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-			{
-				$reflect = new ReflectionClass('Form_ComcastProfileConfiguration');
-				return $reflect->newInstanceArgs($constructorArgs);
-			}
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaComcastDistributionProfile();
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return new KalturaComcastDistributionJobProviderData();
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::COMCAST)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+			{
+				$reflect = new ReflectionClass('Form_ComcastProfileConfiguration');
+				return $reflect->newInstanceArgs($constructorArgs);
+			}
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
@@ -149,14 +152,17 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			if($baseClass == 'IDistributionEngineUpdate')
 				return 'ComcastDistributionEngine';
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-				return 'Form_ComcastProfileConfiguration';
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaComcastDistributionProfile';
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return 'KalturaComcastDistributionJobProviderData';
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::COMCAST)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+				return 'Form_ComcastProfileConfiguration';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

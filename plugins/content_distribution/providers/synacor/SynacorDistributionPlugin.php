@@ -77,17 +77,20 @@ class SynacorDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			if($baseClass == 'IDistributionEngineUpdate')
 				return new SynacorDistributionEngine();
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-			{
-				$reflect = new ReflectionClass('Form_SynacorProfileConfiguration');
-				return $reflect->newInstanceArgs($constructorArgs);
-			}
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaSynacorDistributionProfile();
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return new KalturaSynacorDistributionJobProviderData();
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::SYNACOR)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+			{
+				$reflect = new ReflectionClass('Form_SynacorProfileConfiguration');
+				return $reflect->newInstanceArgs($constructorArgs);
+			}
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
@@ -146,14 +149,17 @@ class SynacorDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			if($baseClass == 'IDistributionEngineUpdate')
 				return 'SynacorDistributionEngine';
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-				return 'Form_SynacorProfileConfiguration';
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaSynacorDistributionProfile';
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return 'KalturaSynacorDistributionJobProviderData';
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::SYNACOR)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+				return 'Form_SynacorProfileConfiguration';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

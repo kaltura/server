@@ -83,19 +83,20 @@ class IdeticDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 			if($baseClass == 'IDistributionEngineUpdate')
 				return new IdeticDistributionEngine();
 		
+			if($baseClass == 'KalturaDistributionProfile')
+				return new KalturaIdeticDistributionProfile();
+		
+			if($baseClass == 'KalturaDistributionJobProviderData')
+				return new KalturaIdeticDistributionJobProviderData();
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::IDETIC)
+		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 			{
 				$reflect = new ReflectionClass('Form_IdeticProfileConfiguration');
 				return $reflect->newInstanceArgs($constructorArgs);
 			}
-		
-		
-			if($baseClass == 'KalturaDistributionProfile')
-				return new KalturaIdeticDistributionProfile();
-
-		
-			if($baseClass == 'KalturaDistributionJobProviderData')
-				return new KalturaIdeticDistributionJobProviderData();
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
@@ -155,14 +156,17 @@ class IdeticDistributionPlugin extends KalturaPlugin implements IKalturaPermissi
 			if($baseClass == 'IDistributionEngineUpdate')
 				return 'IdeticDistributionEngine';
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-				return 'Form_IdeticProfileConfiguration';
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaIdeticDistributionProfile';
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return 'KalturaIdeticDistributionJobProviderData';
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::IDETIC)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+				return 'Form_IdeticProfileConfiguration';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

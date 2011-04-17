@@ -83,12 +83,6 @@ class VerizonDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			if($baseClass == 'IDistributionEngineUpdate')
 				return new VerizonDistributionEngine();
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-			{
-				$reflect = new ReflectionClass('Form_VerizonProfileConfiguration');
-				return $reflect->newInstanceArgs($constructorArgs);
-			}
-		
 		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaVerizonDistributionProfile();
@@ -96,6 +90,15 @@ class VerizonDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return new KalturaVerizonDistributionJobProviderData();
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::VERIZON)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+			{
+				$reflect = new ReflectionClass('Form_VerizonProfileConfiguration');
+				return $reflect->newInstanceArgs($constructorArgs);
+			}
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
@@ -155,14 +158,17 @@ class VerizonDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			if($baseClass == 'IDistributionEngineUpdate')
 				return 'VerizonDistributionEngine';
 		
-			if($baseClass == 'Form_ProviderProfileConfiguration')
-				return 'Form_VerizonProfileConfiguration';
-		
 			if($baseClass == 'KalturaDistributionProfile')
 				return 'KalturaVerizonDistributionProfile';
 		
 			if($baseClass == 'KalturaDistributionJobProviderData')
 				return 'KalturaVerizonDistributionJobProviderData';
+		}
+		
+		if (class_exists('Kaltura_Client_Client') && $enumValue == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::VERIZON)
+		{
+			if($baseClass == 'Form_ProviderProfileConfiguration')
+				return 'Form_VerizonProfileConfiguration';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
