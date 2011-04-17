@@ -277,20 +277,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 //			<xs:element name="fileChecksum" type="xs:string" minOccurs="1" maxOccurs="1"/>
 //		</xs:choice>
 		}
-		elseif($this->currentContentElement->hasAttribute("urlContentResource"))
+		elseif($this->hasElement("urlContentResource", $this->currentContentElement))
 		{
 			KalturaLog::debug("Resource is : urlContentResource");
 			$resource = new KalturaUrlResource();
 			$resource->url = $this->currentContentElement->getAttribute("url");
 		}
-		elseif($this->currentContentElement->hasAttribute("remoteStorageContentResource"))
+		elseif($this->hasElement("remoteStorageContentResource", $this->currentContentElement))
 		{
 			KalturaLog::debug("Resource is : remoteStorageContentResource");
 			$resource = new KalturaRemoteStorageResource();
 			$resource->url = $this->currentContentElement->getAttribute("url");
 			$resource->storageProfileId = $this->getStorageProfileId($this->currentContentElement, "storageProfile", "storageProfile");
 		}
-		elseif($this->currentContentElement->hasAttribute("entryContentResource"))
+		elseif($this->hasElement("entryContentResource", $this->currentContentElement))
 		{
 			KalturaLog::debug("Resource is : entryContentResource");
 			$resource = new KalturaEntryResource();
@@ -298,7 +298,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			$resource->flavorParamsId = $this->getFlavorParamsId();
 		}
-		elseif($this->currentContentElement->hasAttribute("assetContentResource"))
+		elseif($this->hasElement("assetContentResource", $this->currentContentElement))
 		{
 			KalturaLog::debug("Resource is : assetContentResource");
 			$resource = new KalturaAssetResource();
@@ -331,16 +331,49 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$storageProfileId = $this->sourceContent->getAttribute("storageProfileId"); 
 		$storageProfileName = $this->sourceContent->getAttribute("storageProfile");
 			
-		//TODO: implement this
+		//TODO: implement this (after validation of the flavor params)
 		return $this->getStorageProfileByIdAndName($storageProfileId, $storageProfileName);
 	}
 	
 	/**
 	 * 
-	 * Tries to get the given attribute / Element name form the given element by iud or name   
-	 * @param $elementToSearchIn
-	 * @param $attributeName
-	 * @throws KalturaBatchException - in case the id and name reference different objects
+	 * Gets the storage profile id by it's id or name   
+	 * @param $storageProfileId - the storage profile id
+	 * @param string $storageProfileName - the storage profile system name 
+	 * @throws KalturaBatchException - in case ther is not such storage profile with the given name
+	 */
+	private function getStorageProfileByIdAndName($storageProfileId, $storageProfileName)
+	{
+		if(isset($storageProfileId) && !empty($storageProfileId))
+		{
+			$this->currentFlavorId = trim($storageProfileId);
+			return;
+		}
+		
+		if(!empty($storageProfileName))//if we have no id then we search by name
+		{
+			if(is_null($this->flavorParamsNameToId))
+			{
+				$this->initFlavorParamsNameToId();
+			}
+			
+			if(isset($this->flavorParamsNameToId[$storageProfileName]))
+			{
+				$this->currentFlavorId = trim($this->flavorParamsNameToId[$storageProfileName]);
+				return;
+			}
+		}
+
+		//If we got here then the id or name weren't found
+		throw new KalturaBatchException("Can't find flavor params with id [$storageProfileId], name [$storageProfileName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+	}
+	
+	/**
+	 * 
+	 * Gets the flavor params id by it's id or name   
+	 * @param $flavorParamsId - the flavor params id
+	 * @param $flavorParamsName - the flavor params name
+	 * @throws KalturaBatchException - in case there is not flavor params by the given name
 	 */
 	private function getFlavorParamsByIdAndName($flavorParamsId, $flavorParamsName)
 	{
