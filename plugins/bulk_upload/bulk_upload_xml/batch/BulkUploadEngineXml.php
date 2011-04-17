@@ -233,7 +233,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if($isThrowException)
 		{
-			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn] ", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn->nodeName] ", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
 		}
 		
 		return null;
