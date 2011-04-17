@@ -467,7 +467,7 @@ class kuserPeer extends BasekuserPeer
 				
 				if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // Mail for admin console user
 				{
-					$bodyParams = array($adminName, $creatorUserName, $publisherName, $loginEmail, $roleName);
+					$bodyParams = array($adminName, $creatorUserName, $loginEmail, $roleName);
 				}
 				else
 				{
