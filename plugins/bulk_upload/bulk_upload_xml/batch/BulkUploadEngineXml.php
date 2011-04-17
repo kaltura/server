@@ -757,11 +757,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(!is_null($child) || $child != "")
 			{
-				KalturaLog::debug("In getStringFromElement - child value [{$child->nodeValue}]");
+				KalturaLog::debug("In getStringFromElement - child value [{trim($child->nodeValue)}]");
 				$commaSeperatedString = $commaSeperatedString . trim($child->nodeValue) .',';
 			}
 		}
 		
+		KalturaLog::debug("In getStringFromElement - The created string [$commaSeperatedString]");
 		return $commaSeperatedString;
 	}
 }
