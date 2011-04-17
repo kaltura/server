@@ -20,6 +20,20 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 	 */
 	private $distributionProfileId;
 
+	/**
+	 * @var string
+	 */
+	private $vrzFlavorAssetId;
+	
+	/**
+	 * @var string
+	 */
+	private $providerName;
+	/**
+	 * @var string
+	 */
+	private $providerId;
+	
 	public function __construct(kDistributionJobData $distributionJobData = null)
 	{
 		parent::__construct($distributionJobData);
@@ -74,4 +88,53 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 	{
 		$this->xml = $xml;
 	}
+	
+	/**
+	 * @param string $vrzFlavorAssetId
+	 */
+	public function setVrzlavorAssetId($vrzFlavorAssetId)
+	{
+		$this->vrzFlavorAssetId = $vrzFlavorAssetId;
+	}
+
+	/**
+	 * @return the $vrzFlavorAssetId
+	 */
+	public function getVrzFlavorAssetId()
+	{
+		return $this->vrzFlavorAssetId;
+	}
+
+	/**
+	 * @param string $providerName
+	 */
+	public function setProviderName($providerName)
+	{
+		$this->providerName = $providerName;
+	}
+
+	/**
+	 * @return the $providerName
+	 */
+	public function getProviderName()
+	{
+		return $this->providerName;
+	}
+
+	/**
+	 * @param string $providerId
+	 */
+	public function setProviderId($providerId)
+	{
+		$this->providerId = $providerId;
+	}
+
+	/**
+	 * @return the $providerId
+	 */
+	public function getProviderId()
+	{
+		return $this->providerId;
+	}
+	
 }

@@ -5,6 +5,31 @@
  */
 class Form_VerizonProfileConfiguration extends Form_ProviderProfileConfiguration
 {	
+	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
+	{
+		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		
+		if($object instanceof KalturaVerizonDistributionProfile)
+		{
+			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
+			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);
+			
+			if($object->vrzFlavorParamsId)
+			{
+				if(!in_array($object->vrzFlavorParamsId, $requiredFlavorParamsIds))
+					$requiredFlavorParamsIds[] = $object->vrzFlavorParamsId ? $object->vrzFlavorParamsId : '0';
+					
+				$flavorKey = array_search($object->vrzFlavorParamsId, $optionalFlavorParamsIds);
+				if($flavorKey !== false)
+					unset($optionalFlavorParamsIds[$flavorKey]);
+			}
+						
+			$object->requiredFlavorParamsIds = implode(',', $requiredFlavorParamsIds);
+			$object->optionalFlavorParamsIds = implode(',', $optionalFlavorParamsIds);
+		}
+		return $object;
+	}
+
 	protected function addProviderElements()
 	{
 		$element = new Zend_Form_Element_Hidden('providerElements');
@@ -27,6 +52,21 @@ class Form_VerizonProfileConfiguration extends Form_ProviderProfileConfiguration
 			'filters'		=> array('StringTrim'),
 		));
 
+		$this->addElement('text', 'vrz_flavor_params_id', array(
+			'label'			=> 'Verizon Flavor Params ID:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'provider_name', array(
+			'label'			=> 'Verizon provider name:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'provider_id', array(
+			'label'			=> 'Verizon provider id:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$metadataProfiles = null;
 		try
 		{

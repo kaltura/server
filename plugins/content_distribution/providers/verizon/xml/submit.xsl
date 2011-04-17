@@ -7,6 +7,10 @@
 	<xsl:variable name="distributionProfileId" />
 	<xsl:variable name="metadataProfileId" />	
 	<xsl:variable name="deleteOp"/>	
+	<xsl:variable name="vrzFlavorAssetId" />
+	<xsl:variable name="providerName" />
+	<xsl:variable name="providerId" />
+	
 
 	<xsl:template name="implode">
 		<xsl:param name="items" />
@@ -19,33 +23,7 @@
 			<xsl:value-of select="." />
 		</xsl:for-each>
 	</xsl:template>
-	
-	<xsl:template name="flavor-item">
-		<xsl:param name="flavorAssetId" />
 		
-		<xsl:for-each select="/item/content">
-			<xsl:if test="@flavorAssetId = $flavorAssetId">
-				<item>
-					<title>
-						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
-							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
-						</xsl:if>
-					</title>
-					<link>None</link>
-					<description>
-						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
-							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription" />
-						</xsl:if>
-					</description>
-					<msdp:encode>Y</msdp:encode>
-					<msdp:move>Y</msdp:move>
-					<enclosure url="{@url}" length="00:00:00" type="video" />
-					<guid></guid>
-				</item>
-			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
-	
 	<xsl:template match="item">
 		<rss xmlns="http://www.real.com/msdp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<xsl:attribute name="xsi:schemaLocation">http://www.real.com/msdp VCastRSS.xsd</xsl:attribute>
@@ -128,23 +106,33 @@
 				<msdp:downloadPriceCode>283</msdp:downloadPriceCode>
 				<msdp:allowFastForwarding>Y</msdp:allowFastForwarding>
 				<msdp:provider>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProvider) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProvider" />
-					</xsl:if>					
+					<xsl:value-of select="$providerName" />
  				</msdp:provider>
 				<msdp:providerid>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProviderId) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonProviderId" />
-					</xsl:if>	
+					<xsl:value-of select="$providerId" />
 				</msdp:providerid>
 				<msdp:alertCode></msdp:alertCode>
 				<msdp:alertTimeToLive></msdp:alertTimeToLive>
 				<msdp:alertShowImage>N</msdp:alertShowImage>
-				<xsl:for-each select="distribution[@distributionProfileId=$distributionProfileId]/flavorAssetIds/flavorAssetId">
-					<xsl:call-template name="flavor-item">
-						<xsl:with-param name="flavorAssetId" select="." />
-					</xsl:call-template>
-				</xsl:for-each>
+				<item>
+					<title>
+						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
+							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
+						</xsl:if>
+					</title>
+					<link>None</link>
+					<description>
+						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
+							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription" />
+						</xsl:if>
+					</description>
+					<msdp:encode>Y</msdp:encode>
+					<msdp:move>Y</msdp:move>
+					<xsl:if test="count(content[@flavorAssetId = $vrzFlavorAssetId])">
+						<enclosure url="{content[@flavorAssetId = $vrzFlavorAssetId]/@url}" length="00:00:00" type="video" />
+					</xsl:if>
+					<guid></guid>
+				</item>
 			</channel>
 		</rss>
 	</xsl:template>

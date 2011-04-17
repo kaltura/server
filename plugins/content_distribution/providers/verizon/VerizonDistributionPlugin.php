@@ -222,9 +222,10 @@ class VerizonDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function getEventConsumers()
 	{
-		return array(
-			self::VERIZON_REPORT_HANDLER,
-		);
+		return array();
+//		return array(
+//			self::VERIZON_REPORT_HANDLER,
+//		);
 	}
 	
 	/**

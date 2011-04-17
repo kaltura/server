@@ -21,6 +21,21 @@ class KalturaVerizonDistributionProfile extends KalturaDistributionProfile
 	public $domain;
 
 	/**
+	 * @var string
+	 */
+	public $providerName;
+
+	/**
+	 * @var string
+	 */
+	public $providerId;
+	
+	/**
+	 * @var int
+	 */
+	public $vrzFlavorParamsId;
+
+	/**
 	 * @var int
 	 */
 	public $metadataProfileId;
@@ -33,6 +48,9 @@ class KalturaVerizonDistributionProfile extends KalturaDistributionProfile
 		'username',
 		'password',
 		'domain',
+		'providerName',
+		'providerId',
+		'vrzFlavorParamsId',
 		'metadataProfileId',
 	 );
 		 

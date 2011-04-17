@@ -32,8 +32,19 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-$entryId = '0_s0hymwue';
-
+$entryId = '0_g0bhfji7';
+/*
+$matches = null;
+if (preg_match ( "/x0y.*.err/" , '/pub/in/x0y.title.err' , $matches))
+{
+	print_r($matches);
+	print_r(preg_split ("/\./", $matches[0]));
+}
+else
+{
+ echo 'non';
+}
+return;
 if(isset($argv[1]))
 	$entryId = $argv[1];
 
@@ -47,10 +58,20 @@ foreach($argv as $arg)
 	}
 }
 
+		$fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		if(!$fileTransferMgr)
+			throw new Exception("SFTP manager not loaded");
+			
+		$fileTransferMgr->login('ftp-int.vzw.real.com', 'vp_foxsports', 'X4ul3ap');
+		print_r($fileTransferMgr->listDir("/pub/in"));
+//		$fileTransferMgr->putFile($destFile, $srcFile, true);
+
+		return;*/
 $entry = entryPeer::retrieveByPKNoFilter($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
 file_put_contents('mrss.xml', $mrss);
 KalturaLog::debug("MRSS [$mrss]");
+
 
 $distributionJobData = new KalturaDistributionSubmitJobData();
 
@@ -62,11 +83,15 @@ $distributionJobData->distributionProfileId = $distributionProfile->id;
 
 $distributionJobData->distributionProfile = $distributionProfile;
 
-$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(2);
+$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(39);
 $entryDistribution = new KalturaEntryDistribution();
 $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
 $distributionJobData->entryDistribution = $entryDistribution;
+
+$vez = new VerizonDistributionProfile();
+print_r($vez->validateForSubmission($dbEntryDistribution, "submit"));
+return;
 
 $providerData = new KalturaVerizonDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;

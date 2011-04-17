@@ -20,11 +20,25 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 	 */
 	public $distributionProfileId;
 
-
+	/**
+	 * @var string
+	 */
+	public $vrzFlavorAssetId;
+	
 	/**
 	 * @var string
 	 */
 	public $deleteOp = '';
+
+	/**
+	 * @var string
+	 */
+	public $providerName;
+
+	/**
+	 * @var string
+	 */
+	public $providerId;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
@@ -37,7 +51,13 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 		$this->distributionProfileId = $distributionJobData->distributionProfile->id;
 	
 		$this->metadataProfileId = $distributionJobData->distributionProfile->metadataProfileId;
-			
+		$this->providerName = $distributionJobData->distributionProfile->providerName;
+		$this->providerId = $distributionJobData->distributionProfile->providerId;
+	
+		$vrzFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile->vrzFlavorParamsId);
+		if($vrzFlavorAsset)
+			$this->vrzFlavorAssetId = $vrzFlavorAsset->getId();
+	
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
 			$this->xml = VerizonDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId, $this);
 			
@@ -51,6 +71,9 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 	private static $map_between_objects = array
 	(
 		"xml" ,
+		"vrzFlavorAssetId" ,		
+		"providerName" ,		
+		"providerId" ,		
 		"metadataProfileId" ,
 		"distributionProfileId" ,
 	);

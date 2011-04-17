@@ -47,7 +47,7 @@ class VerizonDistributionProvider implements IDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return true;
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -71,7 +71,7 @@ class VerizonDistributionProvider implements IDistributionProvider
 	 */
 	public function isReportsEnabled()
 	{
-		return true;
+		return false;
 	}
 
 	/* (non-PHPdoc)
