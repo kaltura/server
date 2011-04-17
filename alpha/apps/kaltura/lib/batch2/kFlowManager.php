@@ -199,7 +199,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		{
 			$jobType = $dbBatchJob->getJobType();
 			
-			if(is_null($dbBatchJob->getQueueTime()) && $dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_PENDING)
+			if(is_null($dbBatchJob->getQueueTime()) && $dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_PENDING && $dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_RETRY)
 			{
 				$dbBatchJob->setQueueTime(time());
 				$dbBatchJob->save();
