@@ -223,7 +223,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param bool $isThrowException
 	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND
 	 */
-	private function getElement($elementName, $elementToSearchIn, $isThrowException)
+	private function getElement($elementName, $elementToSearchIn, $isThrowException = true)
 	{
 		$elements = $elementToSearchIn->getElementsByTagName($elementName);
 		if($elements->length > 0)
@@ -327,6 +327,56 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 		return $this->getFlavorParamsByIdAndName($flavorParamsId, $flavorParamsName);
 	}
+	
+	/**
+	 * 
+	 * Gets the flavor params id from the source content element
+	 * @param $elementToSearchIn - The element to search in
+	 * @return int - The id of the flavor params
+	 */
+	private function getAccessControlId($elementToSearchIn)
+	{
+		//TODO: fix this
+		$accessControlIdElement = $this->getElement("accessControlId", $elementToSearchIn);
+		$accessControlElement = $this->getElement("accessControl", $elementToSearchIn);
+		
+		return $this->getAccessControlIdByIdAndName($accessControlIdElement->nodeValue ,$accessControlElement->nodeValue);
+	}
+	
+	
+	/**
+	 * 
+	 * Gets the access control id by it's id or name   
+	 * @param $accessControlId - the storage profile id
+	 * @param string $accessControlName - the storage profile system name 
+	 * @throws KalturaBatchException - in case ther is not such storage profile with the given name
+	 */
+	private function getAccessControlIdByIdAndName($accessControlId, $accessControlName)
+	{
+		if(isset($accessControlId) && !empty($accessControlId))
+		{
+			$this->currentFlavorId = trim($accessControlId);
+			return;
+		}
+		
+		if(!empty($accessControlName))//if we have no id then we search by name
+		{
+			if(is_null($this->flavorParamsNameToId))
+			{
+				$this->initFlavorParamsNameToId();
+			}
+			
+			if(isset($this->flavorParamsNameToId[$accessControlName]))
+			{
+				$this->currentFlavorId = trim($this->flavorParamsNameToId[$accessControlName]);
+				return;
+			}
+		}
+
+		//If we got here then the id or name weren't found
+		throw new KalturaBatchException("Can't find flavor params with id [$accessControlId], name [$accessControlName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);	
+	}
+	
 	
 	/**
 	 * 
@@ -472,23 +522,33 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		//Create the new media entry and set basic values
 		$mediaEntry = new KalturaMediaEntry();
-		$mediaEntry->name = $item->getElementsByTagName("name")->item(0)->nodeValue;
-		$mediaEntry->description = $item->getElementsByTagName("description")->item(0)->nodeValue;
 
-		$tagsElement = $item->getElementsByTagName("tags")->item(0);
+		$nameElement = $this->getElement("name", $item);
+		$mediaEntry->name = $nameElement->nodeValue;
+		
+		$descriptionElement = $this->getElement("description", $item);
+		$mediaEntry->description = $descriptionElement->nodeValue;
+		
+		$tagsElement = $this->getElement("tags", $item);
 		$mediaEntry->tags = $this->getStringFromElement($tagsElement);
 		
-		$categoriesElement = $item->getElementsByTagName("categories")->item(0);
+		$categoriesElement = $this->getElement("categories", $item);
 		$mediaEntry->categories = $this->getStringFromElement($categoriesElement);
-		$mediaEntry->userId = $item->getElementsByTagName("userId")->item(0)->nodeValue;
+				
+		$userIdElement = $this->getElement("userId", $item);
+		$mediaEntry->userId = $userIdElement->nodeValue;
 
-		$mediaEntry->accessControlId =  $item->getElementsByTagName("accessControlId")->item(0)->nodeValue;
-		
+		$mediaEntry->accessControlId =  $this->getAccessControlId($item);
+				
 		//TODO: Roni - Parse the date
-		$mediaEntry->startDate = $item->getElementsByTagName("startDate")->item(0)->nodeValue;
+		$dateElement = $this->getElement("startDate", $item);
+		$mediaEntry->startDate = $dateElement->nodeValue;
 
+		$mediaElement = $this->getElement("media", $item);
+		$mediaEntry->type = $this->getTypeByName($mediaTypeElement->nodeValue); 
+		
 		//Adds to the media entry the media element data
-		$this->setMediaElementValues(&$mediaEntry, $item->getElementsByTagName("media")->item(0));
+		$this->setMediaElementValues(&$mediaEntry, $mediaElement);
 		
 		foreach ($item->getElementsByTagName("content") as $contentElement)
 		{
@@ -518,8 +578,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setMediaElementValues(KalturaMediaEntry &$mediaEntry, DOMElement $mediaElement)
 	{
-		$mediaEntry->type = $this->getTypeByName($mediaElement->getElementsByTagName("mediaType")->item(0)->nodeValue);
-		$mediaEntry->flavorParamsIds = $this->getStringFromElement($mediaElement->getElementsByTagName("flavorParamsIds")->item(0));
+		$mediaTypeElement = $this->getElement(mediaType, $mediaElement);
+		$mediaEntry->mediaType = $this->getMediaTypeByName($mediaTypeElement->nodeValue);
+		 
+		$this->checkMediaTypes($mediaEntry->type ,$mediaEntry->mediaType);
+		
+		$flavorParamsIdsElement = $this->getElement("flavorParamsIds", $mediaElement);
+		$mediaEntry->flavorParamsIds = $this->getStringFromElement($flavorParamsIdsElement);
 
 		//$mediaEntry->thumbParamsId = $mediaElement->getElementsByTagName("thumbParamsIds")->nodeValue;
 		
@@ -530,6 +595,28 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		//TODO: Roni maybe add conversion quality to the xml
 //		$mediaEntry->conversionQuality = $bulkUploadJobData->conversionProfileId;
+	}
+	
+	/**
+	 * 
+	 * Checks if the media type and the type are valid
+	 * @param KalturaEntryType $type
+	 * @param KalturaMediaType $mediaType
+	 */
+	private function checkMediaTypes($type ,$mediaType)
+	{
+		//TODO: Roni - add support for all other types
+		switch ($type)
+		{
+			case KalturaEntryType::MEDIA_CLIP:
+				if($mediaType != KalturaMediaType::VIDEO)
+				{
+					throw new KalturaBatchException("the entry type [$type] is not supported with media type [$mediaType]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+				}
+				break;
+			default:
+				throw new KalturaBatchException("The type [$type] is not supported", KalturaBatchJobAppErrors::BULK_NOT_SUPPORTED_EXCEPTION);
+		}
 	}
 	
 	/**
@@ -549,16 +636,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * Retutrns the right type by its name
+	 * Retutrns the right media type by its name
 	 * @param string $typeName
 	 */
-	private function getTypeByName($typeName)
+	private function getMediaTypeByName($mediaTypeName)
 	{
 		$mediaType = null;
 		
 		//TODO: Roni - Fix this to use numbers instead of string 
 		//Set the content type
-		switch(strtolower($typeName))
+		switch(strtolower($mediaTypeName))
 		{
 			case 'image':
 				$mediaType = KalturaMediaType::IMAGE;
@@ -574,6 +661,35 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}	
 		
 		return $mediaType;
+	}
+	
+	/**
+	 * 
+	 * Returns the right entry type by its name
+	 * @param string $typeName
+	 */
+	private function getEntryTypeByName($typeName)
+	{
+		$entryType = null;
+		
+		//TODO: Roni - Fix this to use numbers instead of string 
+		//Set the content type
+		switch(strtolower($typeName))
+		{
+			case 'image':
+				$entryType = KalturaEntryType::MEDIA_CLIP;
+				break;
+			
+			case 'audio':
+				$entryType = KalturaEntryType::MEDIA_CLIP;
+				break;
+			
+			default:
+				$entryType = KalturaEntryType::MEDIA_CLIP;
+				break;
+		}	
+		
+		return $entryType;
 	}
 	
 	/**

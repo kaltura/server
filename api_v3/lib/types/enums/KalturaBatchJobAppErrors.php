@@ -30,6 +30,7 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	const BULK_NO_ENRIES_CREATED = 76;
 	const BULK_ACTION_NOT_SUPPORTED = 77;
 	const BULK_OBJECT_NOT_FOUND = 78;
+	const BULK_NOT_SUPPORTED_EXCEPTION = 79;
 	
 	const CONVERSION_FAILED = 81;
 	
