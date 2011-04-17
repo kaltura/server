@@ -222,7 +222,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED)
+		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED || $dbDistributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $entryDistribution->distributionProfileId);
 		
 		kContentDistributionManager::submitAddEntryDistribution($dbEntryDistribution, $dbDistributionProfile, $submitWhenReady);
@@ -264,7 +264,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED)
+		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED || $dbDistributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $entryDistribution->distributionProfileId);
 		
 		kContentDistributionManager::submitUpdateEntryDistribution($dbEntryDistribution, $dbDistributionProfile);
@@ -304,7 +304,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED)
+		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED || $dbDistributionProfile->getReportEnabled() == DistributionProfileActionStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $entryDistribution->distributionProfileId);
 		
 		kContentDistributionManager::submitFetchEntryDistributionReport($dbEntryDistribution, $dbDistributionProfile);
@@ -346,7 +346,7 @@ class EntryDistributionService extends KalturaBaseService
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 		if(!$dbDistributionProfile)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
-		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED)
+		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED || $dbDistributionProfile->getDeleteEnabled() == DistributionProfileActionStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $entryDistribution->distributionProfileId);
 		
 		kContentDistributionManager::submitDeleteEntryDistribution($dbEntryDistribution, $dbDistributionProfile);
