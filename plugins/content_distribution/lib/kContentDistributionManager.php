@@ -340,17 +340,13 @@ class kContentDistributionManager
 			
 		$originalList = $entryDistribution->getFlavorAssetIds();
 		// remove deleted flavor assets
-		$assignedFlavorAssetIds = $originalList;
-		if($assignedFlavorAssetIds)
+		if($originalList)
 		{
-			$flavorAssetIds = explode(',', $assignedFlavorAssetIds);
-			$assignedFlavorAssets = flavorAssetPeer::retrieveByIds($flavorAssetIds);
+			$assignedFlavorAssetIds = explode(',', $originalList);
+			$assignedFlavorAssets = flavorAssetPeer::retrieveByIds($assignedFlavorAssetIds);
 			foreach($assignedFlavorAssets as $assignedFlavorAsset)
-			{					
-				$flavorParamsKey = array_search($assignedFlavorAsset->getFlavorParamsId(), $flavorParamsIds);
-				if($flavorParamsKey !== false)
-					unset($flavorParamsIds[$flavorParamsKey]);
-			}
+				if(in_array($assignedFlavorAsset->getFlavorParamsId(), $flavorParamsIds))
+					$flavorAssetIds[] = $assignedFlavorAsset->getId();
 		}
 		
 		// adds added flavor assets
