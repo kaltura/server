@@ -152,7 +152,7 @@ class KalturaServiceReflector
 	 * @param bool $ignoreDeprecated
 	 * @return array
 	 */
-	public function getActions($ignoreDeprecated = true)
+	public function getActions($ignoreDeprecated = false)
 	{
 		$actionsArrayType = intval($ignoreDeprecated);
 		if (isset($this->_actions[$actionsArrayType]) && is_array($this->_actions[$actionsArrayType]))
