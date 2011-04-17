@@ -152,7 +152,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			case "delete":
 				$this->handleItemDelete($item);
 				break;
-			default:
+			default :
 				throw new KalturaException("Action: {$actionToPerform} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
 	}
@@ -214,6 +214,47 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement->textContent}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
 	}
+		
+	/**
+	 * 
+	 * Gets the element name
+	 * @param string $elementName
+	 * @param DOMElement $elementToSearchIn
+	 * @param bool $isThrowException
+	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND
+	 */
+	private function getElement($elementName, $elementToSearchIn, $isThrowException)
+	{
+		$elements = $elementToSearchIn->getElementByName($elementName);
+		if(!empty($elements))
+		{
+			return $elements[0];  
+		}
+		
+		if($isThrowException)
+		{
+			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn] ", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+		}
+		
+		return null;
+	} 
+	
+	/**
+	 * 
+	 * Checks if the given element to search in has the wanted element
+	 * @param string $elementName
+	 * @param DOMElement $elementToSearchIn
+	 */
+	private function hasElement($elementName, $elementToSearchIn)
+	{
+		$elements = $elementToSearchIn->getElementByName($elementName);
+		if(!empty($elements))
+		{
+			return true;  
+		}
+				
+		return false;
+	}
 	
 	/**
 	 * 
@@ -224,8 +265,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("In getResourceInstance");
 		
 		$resource = null;
-	
-		if($this->currentContentElement->hasAttribute("localFileContentResource"))
+			
+		if($this->hasElement("localFileContentResource", $this->currentContentElement))
 		{
 			KalturaLog::debug("Resource is : localFileContentResource");
 			$resource = new KalturaLocalFileResource();
@@ -264,6 +305,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->assetId = $this->currentContentElement->getAttribute("assetId");
 		}
 		
+		KalturaLog::debug("Returned Null from getResourceInstancee");
 		return $resource;
 	}
 	
