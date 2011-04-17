@@ -136,12 +136,15 @@ class kPluginableEnumsManager
 			
 		list($pluginName, $valueName) = $split;
 		
-		$dynamicEnum = new DynamicEnum();
-		$dynamicEnum->setEnumName($type);
-		$dynamicEnum->setValueName($valueName);
-		$dynamicEnum->setPluginName($pluginName);
-		$dynamicEnum->save();
-		
+		$dynamicEnum = DynamicEnumPeer::retrieveByPluginConstant($type, $valueName, $pluginName);
+		if(!$dynamicEnum)
+		{
+			$dynamicEnum = new DynamicEnum();
+			$dynamicEnum->setEnumName($type);
+			$dynamicEnum->setValueName($valueName);
+			$dynamicEnum->setPluginName($pluginName);
+			$dynamicEnum->save();
+		}
 		self::reloadMaps();
 		
 		return $dynamicEnum->getId();
