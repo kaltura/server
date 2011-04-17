@@ -187,7 +187,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource = $this->getResource($contentElement);
 			
 			KalturaLog::debug("Entry to add is: {$entryToInsert->name}");
+			
+			$this->startMultiRequest(true);
 			$result = $this->kClient->media->add($entryToInsert, $resource);
+			$this->doMultiRequestForPartner();
+			
 			KalturaLog::debug("result is: " .var_dump($result));
 		}
 	}
