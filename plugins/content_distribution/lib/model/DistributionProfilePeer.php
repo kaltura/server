@@ -79,7 +79,7 @@ class DistributionProfilePeer extends BaseDistributionProfilePeer
 				self::$class_types_cache[$assetType] = $extendedCls;
 				return $extendedCls;
 			}
-			self::$class_types_cache[$assetType] = parent::OM_CLASS;
+			self::$class_types_cache[$assetType] = GenericDistributionProfilePeer::OM_CLASS;
 		}
 			
 		return GenericDistributionProfilePeer::OM_CLASS;
