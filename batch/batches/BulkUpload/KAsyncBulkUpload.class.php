@@ -94,6 +94,13 @@ class KAsyncBulkUpload extends KBatchBase {
 		}
 		$this->updateJob($job, 'Parsing file [' . $engine->getName() . ']', KalturaBatchJobStatus::QUEUED, 1);
 
+		$openedEntries = $this->kClient->batch->updateBulkUploadResults($job->id);
+		if($openedEntries)
+		{
+			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::RETRY);
+		}
+			
 		$engine->handleBulkUpload();
 		$job = $engine->getJob();
 		$data = $engine->getData();
