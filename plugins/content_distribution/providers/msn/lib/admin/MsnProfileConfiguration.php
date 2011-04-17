@@ -9,7 +9,7 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof KalturaMsnDistributionProfile)
+		if($object instanceof Kaltura_Client_MsnDistribution_Type_MsnDistributionProfile)
 		{
 			$requiredFlavorParamsIds = array(
 				$object->movFlavorParamsId,
