@@ -64,14 +64,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var DOMElement
 	 */
 	private $currentContentElement;
-	 
-	/**
-	 * @return string
-	 */
-	public function getName()
-	{
-		return get_class($this);
-	}
 	
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
@@ -372,7 +364,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$flavorParamsIds = $this->getStringFromElement($flavorParamsIdsElement);
 		}
 		
-		KalturaLog::debug("In getFlavorParamsIds - flavorParamsIds []$flavorParamsIds ");
+		KalturaLog::debug("In getFlavorParamsIds - flavorParamsIds [$flavorParamsIds]");
 		return $flavorParamsIds;
 	}
 		
@@ -590,10 +582,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$dateElement = $this->getElement("startDate", $item);
 		$mediaEntry->startDate = $dateElement->nodeValue;
 
-		$mediaElement = $this->getElement("media", $item);
+		$mediaTypeElement = $this->getElement("mediaType", $item);
 		$mediaEntry->type = $this->getEntryTypeByName($mediaTypeElement->nodeValue); 
 		
 		//Adds to the media entry the media element data
+		$mediaElement = $this->getElement("media", $item);
 		$this->setMediaElementValues(&$mediaEntry, $mediaElement);
 		
 		foreach ($item->getElementsByTagName("content") as $contentElement)
