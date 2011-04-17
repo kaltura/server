@@ -163,6 +163,9 @@ class ComcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_ComcastProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_ComcastDistribution_Type_ComcastDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

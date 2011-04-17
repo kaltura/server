@@ -165,6 +165,9 @@ class HuluDistributionPlugin extends KalturaPlugin implements IKalturaPermission
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_HuluProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_HuluDistribution_Type_HuluDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

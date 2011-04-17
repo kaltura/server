@@ -167,6 +167,9 @@ class FreewheelDistributionPlugin extends KalturaPlugin implements IKalturaPermi
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_FreewheelProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_FreewheelDistribution_Type_FreewheelDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

@@ -165,6 +165,9 @@ class MsnDistributionPlugin extends KalturaPlugin implements IKalturaPermissions
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_MsnProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_MsnDistribution_Type_MsnDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

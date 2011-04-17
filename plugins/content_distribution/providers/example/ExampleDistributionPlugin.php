@@ -163,6 +163,9 @@ class ExampleDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_ExampleProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_ExampleDistribution_Type_ExampleDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

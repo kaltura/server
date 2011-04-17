@@ -56,17 +56,17 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			if($providerType == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::GENERIC)
 			{
 				$form = new Form_GenericProviderProfileConfiguration($partnerId, $providerType);
-				$profileClass = 'KalturaGenericDistributionProfile';
+				$profileClass = 'Kaltura_Client_ContentDistribution_Type_GenericDistributionProfile';
 			}
 			elseif($providerType == Kaltura_Client_ContentDistribution_Enum_DistributionProviderType::SYNDICATION)
 			{
 				$form = new Form_SyndicationProviderProfileConfiguration($partnerId, $providerType);
-				$profileClass = 'KalturaSyndicationDistributionProfile';
+				$profileClass = 'Kaltura_Client_ContentDistribution_Type_SyndicationDistributionProfile';
 			}
 			else
 			{
 				$form = KalturaPluginManager::loadObject('Form_ProviderProfileConfiguration', $providerType, array($partnerId, $providerType));
-				$profileClass = KalturaPluginManager::getObjectClass('KalturaDistributionProfile', $providerType);
+				$profileClass = KalturaPluginManager::getObjectClass($profileClass, $providerType);
 			}
 			
 			if(!$form)

@@ -160,6 +160,9 @@ class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPer
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_DailymotionProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_DailymotionDistribution_Type_DailymotionDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

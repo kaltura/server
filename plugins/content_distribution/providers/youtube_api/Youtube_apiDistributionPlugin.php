@@ -160,6 +160,9 @@ class Youtube_apiDistributionPlugin extends KalturaPlugin implements IKalturaPer
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_Youtube_apiProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_Youtube_apiDistribution_Type_Youtube_apiDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums

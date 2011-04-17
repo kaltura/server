@@ -165,6 +165,9 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		{
 			if($baseClass == 'Form_ProviderProfileConfiguration')
 				return 'Form_YouTubeProfileConfiguration';
+				
+			if($baseClass == 'Kaltura_Client_ContentDistribution_Type_DistributionProfile')
+				return 'Kaltura_Client_YouTubeDistribution_Type_YouTubeDistributionProfile';
 		}
 		
 		// content distribution does not work in partner services 2 context because it uses dynamic enums
