@@ -58,23 +58,24 @@ abstract class BaseEntryServiceBaseTest extends KalturaApiTestCase
 	 * Tests baseEntry->update action
 	 * @param string $entryId Entry id to update
 	 * @param KalturaBaseEntry $baseEntry Base entry metadata to update
+	 * @param KalturaResource $resource Resource to be used to replace entry content
 	 * @param KalturaBaseEntry $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testUpdate($entryId, KalturaBaseEntry $baseEntry, KalturaBaseEntry $reference)
+	public function testUpdate($entryId, KalturaBaseEntry $baseEntry = null, KalturaResource $resource = null, KalturaBaseEntry $reference)
 	{
-		$resultObject = $this->client->baseEntry->update($entryId, $baseEntry);
+		$resultObject = $this->client->baseEntry->update($entryId, $baseEntry, $resource);
 		$this->assertType('KalturaBaseEntry', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateUpdate($entryId, $baseEntry, $reference);
+		$this->validateUpdate($entryId, $baseEntry, $resource, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testUpdate results
 	 */
-	protected function validateUpdate($entryId, KalturaBaseEntry $baseEntry, KalturaBaseEntry $reference)
+	protected function validateUpdate($entryId, KalturaBaseEntry $baseEntry = null, KalturaResource $resource = null, KalturaBaseEntry $reference)
 	{
 	}
 
