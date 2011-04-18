@@ -13,6 +13,10 @@ class ComcastDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_AUTHOR = 'author';
 	const CUSTOM_DATA_ALBUM = 'album';
 
+	const METADATA_FIELD_COPYRIGHT = 'copyright';
+	const METADATA_FIELD_LONG_TITLE = 'LongTitle';
+	const METADATA_FIELD_SHORT_DESCRIPTION = 'ShortDescription';
+	const METADATA_FIELD_RATING = 'ComcastRating';
 	const METADATA_FIELD_CATEGORY = 'ComcastCategory';
 	
 	/* (non-PHPdoc)
@@ -33,41 +37,58 @@ class ComcastDistributionProfile extends DistributionProfile
 		if(!class_exists('MetadataProfile'))
 			return $validationErrors;
 			
+		$metadataFields = array(
+			self::METADATA_FIELD_COPYRIGHT,
+			self::METADATA_FIELD_LONG_TITLE,
+			self::METADATA_FIELD_SHORT_DESCRIPTION,
+			self::METADATA_FIELD_RATING,
+			self::METADATA_FIELD_CATEGORY,
+		);
+		
 		$metadataProfileId = $this->getMetadataProfileId();
 		if(!$metadataProfileId)
 		{
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
+			foreach($metadataFields as $metadataField)
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
 			return $validationErrors;
 		}
 		
-		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, self::METADATA_FIELD_CATEGORY);
-		if(!$metadataProfileCategoryField)
+		foreach($metadataFields as $index => $metadataField)
 		{
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
-			return $validationErrors;
+			$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, $metadataField);
+			if(!$metadataProfileCategoryField)
+			{
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
+				unset($metadataFields[$index]);
+				continue;
+			}
 		}
 		
 		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
 		if(!count($metadatas))
 		{
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
+			foreach($metadataFields as $metadataField)
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
 			return $validationErrors;
 		}
 		
-		$values = $this->findMetadataValue($metadatas, self::METADATA_FIELD_CATEGORY);
-		
-		if(!count($values))
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
-			
-		foreach($values as $value)
+		foreach($metadataFields as $index => $metadataField)
 		{
-			if(!strlen($value))
+			$values = $this->findMetadataValue($metadatas, $metadataField);
+			
+			if(!count($values))
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
+				
+			foreach($values as $value)
 			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY);
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-				$validationError->setMetadataProfileId($metadataProfileId);
-				$validationErrors[] = $validationError;
-				return $validationErrors;
+				if(!strlen($value))
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $metadataField);
+					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+					$validationError->setMetadataProfileId($metadataProfileId);
+					$validationErrors[] = $validationError;
+					break;
+				}
 			}
 		}
 		
