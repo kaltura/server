@@ -606,7 +606,7 @@ class DocumentsService extends KalturaEntryService
 		
 		$dbEntry = parent::prepareEntryForInsert($entry);
 	
-		if ($entry->conversionProfileId) 
+		if ($entry->ingestionProfileId) 
 		{
 			$dbEntry->setStatus(entryStatus::PRECONVERT);
 		}
