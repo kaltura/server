@@ -98,17 +98,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function parse() 
 	{
-//		$xdoc = new DomDocument;
-//		//Load the xml document in the DOMDocument object
-//		$xdoc->Load($this->data->filePath);
-////		$this->startMultiRequest(true);
-
 		$xdoc = simplexml_load_file($this->data->filePath);
 		
-		KalturaLog::debug("Test1 - is it working? {$xdoc->channel}");
 		foreach( $xdoc->channel as $channel)
 		{
-//			KalturaLog::debug("Channel name: {$channel->nodeName}, Channel Type = {$channel->nodeType}, Channel Value = {$channel->nodeValue}");
+			KalturaLog::debug("Handling channel");
 			$this->handleChannel($channel);
 		}
 	}
@@ -123,11 +117,25 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
+			KalturaLog::debug("Validating item [{$item->name}]");
+			$this->validateItem($item);
+			
 			//TODO: add check if the bulk count has reached its max size and send the data
-//			KalturaLog::debug("Item name: {$item->nodeName}, Item Type = {$item->nodeType}, Item Value = {$item->nodeValue}");
+			KalturaLog::debug("Handling item [{$item->name}]");
 			$this->handleItem($item);
 		}	
 	}
+	
+	/**
+	 * 
+	 * Validates the given item so it's valid (some validation can't be enforced in the schema)
+	 * @param SimpleXMLElement $item
+	 */
+	private function validateItem(SimpleXMLElement $item)
+	{
+		//Validates that the item type has a matching type element
+		$this->checkTypeToTypeElement($item);
+	}		
 	
 	/**
 	 * 
@@ -394,22 +402,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getAccessControlId(SimpleXMLElement $elementToSearchIn)
 	{
 		//TODO: fix this
-		$accessControlIdElement = $this->getElement("accessControlId", $elementToSearchIn, false);
-		$accessControlElement = $this->getElement("accessControl", $elementToSearchIn, false);
-		
-		$accessControlId = null;
-		$accessControlName = null;
-		
-		if(!is_null($accessControlIdElement))
-		{
-			$accessControlId = $accessControlIdElement->nodeValue;
-		}
-		
-		if(!is_null($accessControlElement))
-		{
-			$accessControlName = $accessControlElement->nodeValue;
-		}
-						
+		$accessControlId = (string)$elementToSearchIn->accessControlId;
+		$accessControlName = $elementToSearchIn->accessControl;
+							
 		return $this->getAccessControlIdByIdAndName($accessControlId, $accessControlName);
 	}
 		
@@ -592,38 +587,156 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Create the new media entry and set basic values
 		$mediaEntry = new KalturaMediaEntry();
 
-		KalturaLog::debug("Test1 - is it working?");
 		$mediaEntry->name = (string)$item->name;
+		$mediaEntry->description = (string)$item->description;
+		$mediaEntry->tags = $this->getStringFromElement($item->tags);
 		
-		$descriptionElement = $this->getElement("description", $item);
-		$mediaEntry->description = $descriptionElement->nodeValue;
-		
-		$tagsElement = $this->getElement("tags", $item);
-		$mediaEntry->tags = $this->getStringFromElement($tagsElement);
-		
-		$categoriesElement = $this->getElement("categories", $item);
+		$categoriesElement = $item->categories;
 		$mediaEntry->categories = $this->getStringFromElement($categoriesElement);
 				
-		$userIdElement = $this->getElement("userId", $item, false);
-		$mediaEntry->userId = $userIdElement->nodeValue;
+		$mediaEntry->userId = (string)$item->userId;;
 
-		$licenseTypeElement = $this->getElement("licenseType", $item, false);
-		$mediaEntry->licenseType = $licenseTypeElement->nodeValue;
+		$mediaEntry->licenseType = (string)$item->licenseType;
 
 		$mediaEntry->accessControlId =  $this->getAccessControlId($item);
 				
 		//TODO: Roni - Parse the date
-		$dateElement = $this->getElement("startDate", $item);
-		$mediaEntry->startDate = $dateElement->nodeValue;
+		$mediaEntry->startDate = $item->startDate;
 
-		$mediaTypeElement = $this->getElement("mediaType", $item);
-		$mediaEntry->type = $this->getEntryTypeByName($mediaTypeElement->nodeValue); 
-		
-		//Adds to the media entry the media element data
-		$mediaElement = $this->getElement("media", $item);
+		$mediaEntry->type = $this->getEntryTypeByNumber($item->type); 
+
+		//Adds to the media entry the media element datav
+		//If this doesn't exist
+		$mediaElement = $item->media;
 		$this->setMediaElementValues(&$mediaEntry, $mediaElement);
 			
 		return $mediaEntry;
+	}
+	
+	/**
+	 * 
+	 * Check if the item type and the type element are matching
+	 * @param SimpleXMLElement $item
+	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED ;  
+	 */
+	private function checkTypeToTypeElement(SimpleXMLElement $item) 
+	{
+		//Gets all the possible elements 
+		$mediaElement = $item->media;
+		$mixElement = $item->mix;
+		$playlistElement = $item->playlist;
+		$documentElement = $item->document;
+		$liveStreamElement = $item->liveStream;
+		$dataElement = $item->data;
+
+		//Now we get the entry type and check if only the rigth element is not null
+		$typeNumber = $item->type;
+		
+		switch(trim($typeNumber))
+		{
+			case KalturaEntryType::MEDIA_CLIP :
+				if(is_null($mediaElement))
+				{
+					KalturaLog::alert("Media Element is missing for type [$typeNumber], using nulls / defaults");
+				}
+				if(! (is_null($mixElement) &&
+					  is_null($documentElement) &&
+					  is_null($liveStreamElement) &&
+					  is_null($playlistElement) && 
+					  is_null($dataElement)
+					 )
+				  )
+				{
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::AUTOMATIC:
+				//What to do here?
+				
+				break;
+			case KalturaEntryType::DATA:
+				if(is_null($dataElement))
+				{
+					KalturaLog::alert("Data Element is missing for type [$typeNumber], using nulls / defaults");
+				}
+				if(! (is_null($mixElement) &&
+					  is_null($documentElement) &&
+					  is_null($liveStreamElement) &&
+					  is_null($playlistElement) && 
+					  is_null($mediaElement)
+					 )
+				  )
+				{
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::DOCUMENT:
+				if(is_null($documentElement))
+				{
+					KalturaLog::alert("Document Element is missing for type [$typeNumber], using nulls / defaults");
+				}
+				if(! (is_null($mixElement) &&
+					  is_null($dataElement) &&
+					  is_null($liveStreamElement) &&
+					  is_null($playlistElement) && 
+					  is_null($mediaElement)
+					 )
+				  )
+				{
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::LIVE_STREAM:
+				if(is_null($liveStreamElement))
+				{
+					KalturaLog::alert("Live Stream Element is missing for type [$typeNumber], using nulls / defaults");
+				}
+				if(! (is_null($mixElement) &&
+					  is_null($documentElement) &&
+					  is_null($dataElement) &&
+					  is_null($playlistElement) && 
+					  is_null($mediaElement)
+					 )
+				  )
+				{
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::MIX:
+				if(is_null($mixElement))
+				{
+					KalturaLog::alert("Mix Element is missing for type [$typeNumber], using nulls / defaults");
+				}
+				if(! (is_null($liveStreamElement) &&
+					  is_null($documentElement) &&
+					  is_null($dataElement) &&
+					  is_null($playlistElement) && 
+					  is_null($mediaElement)
+					 )
+				  )
+				{
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::PLAYLIST:
+				if(is_null($playlistElement))
+				{
+					KalturaLog::alert("Playlist Element is missing for type [$typeNumber], using nulls / defaults");
+				}
+				if(! (is_null($liveStreamElement) &&
+					  is_null($documentElement) &&
+					  is_null($dataElement) &&
+					  is_null($mixElement) && 
+					  is_null($mediaElement)
+					 )
+				  )
+				{
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+				}
+				break;
+			default:
+				throw new KalturaBatchException("type [$typeNumber] is not supported ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED); 
+		}
 	}
 	
 	/**
@@ -771,25 +884,37 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Returns the right entry type by its name
 	 * @param string $typeName
 	 */
-	private function getEntryTypeByName($typeName)
+	private function getEntryTypeByNumber($typeNumber)
 	{
 		$entryType = null;
 		
 		//TODO: Roni - Fix this to use numbers instead of string 
 		//Set the content type
-		switch(strtolower($typeName))
+		switch(trim($typeNumber))
 		{
-			case 'image':
+			case KalturaEntryType::MEDIA_CLIP :
 				$entryType = KalturaEntryType::MEDIA_CLIP;
 				break;
-			
-			case 'audio':
-				$entryType = KalturaEntryType::MEDIA_CLIP;
+			case KalturaEntryType::AUTOMATIC:
+				$entryType = KalturaEntryType::AUTOMATIC;
 				break;
-			
+			case KalturaEntryType::DATA:
+				$entryType = KalturaEntryType::DATA;
+				break;
+			case KalturaEntryType::DOCUMENT:
+				$entryType = KalturaEntryType::DOCUMENT;
+				break;
+			case KalturaEntryType::LIVE_STREAM:
+				$entryType = KalturaEntryType::LIVE_STREAM;
+				break;
+			case KalturaEntryType::MIX:
+				$entryType = KalturaEntryType::MIX;
+				break;
+			case KalturaEntryType::PLAYLIST:
+				$entryType = KalturaEntryType::PLAYLIST;
+				break;
 			default:
-				$entryType = KalturaEntryType::MEDIA_CLIP;
-				break;
+				throw new KalturaBatchException("type [$typeNumber] is not supported ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED); 
 		}	
 		
 		return $entryType;
@@ -805,11 +930,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$commaSeperatedString = ""; 
 		
 		//TODO: Roni - check if the ',' in the end is bad 
-		foreach ($element->childNodes as $child)
+		foreach ($element->children() as $child)
 		{
 			if($child != null)
 			{
-				$childNodeValue = trim($child->nodeValue);
+				$childNodeValue = trim($child);
 				if(!empty($childNodeValue))
 				{
 					KalturaLog::debug("In getStringFromElement - child value [". $childNodeValue . "]");
