@@ -16,6 +16,8 @@
 class DropFolderFile extends BaseDropFolderFile
 {
 
+	const CUSTOM_DATA_HANDLE_BATCH_JOB_ID  = 'handle_batch_job_id';
+	
 	public function setFileSize($size)
 	{
 		parent::setFileSize($size);
@@ -39,6 +41,16 @@ class DropFolderFile extends BaseDropFolderFile
 			return $fullPath;
 		}
 		return null;
+	}
+	
+	public function setHandleBatchJobId($id)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_HANDLE_BATCH_JOB_ID, $id);
+	}
+	
+	public function getHandleBatchJobId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_HANDLE_BATCH_JOB_ID);
 	}
 		
 } // DropFolderFile

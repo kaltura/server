@@ -1,8 +1,6 @@
 <?php
 require_once("bootstrap.php");
 
-//TODO: update errorDescription on KalturaDropFolderFile for each error
-
 /**
  * Watches drop folder files and executes file handlers as required 
  *
@@ -39,8 +37,13 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$folderTags = $this->taskConfig->params->tags;
 		$currentDc  = $this->taskConfig->params->dc;
 		
-		if (empty($folderTags)) {
+		if (strlen($folderTags) == 0) {
 			KalturaLog::err('Tags configuration is empty - cannot continue');
+			return;
+		}
+		
+		if (strlen($currentDc) == 0) {
+			KalturaLog::err('DC configuration is empty - cannot continue');
 			return;
 		}
 		
@@ -51,19 +54,19 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			$filter->tagsMultiLikeOr = $folderTags;
 		}
 			
-		//TODO: how to know the current dc ?
-		//$filter->dcEqual = kDataCenterMgr::getCurrentDcId();
+		$filter->dcEqual = $currentDc;
 		$filter->statusEqual = KalturaDropFolderStatus::ENABLED;
 		
 		try {
 			$dropFolders = $this->kClient->dropFolder->listAction($filter);
 		}
 		catch (Exception $e) {
-			//TODO: add error
+			KalturaLog::err('Cannot get drop folder list - '.$e->getMessage());
 			return;
 		}
 		
-		$dropFolders = $dropFolders->objects; // TODO: Add error
+		$dropFolders = $dropFolders->objects;
+		KalturaLog::log('['.count($dropFolders->objects).'] folders to watch');
 		
 		foreach ($dropFolders as $folder)
 		{
@@ -79,6 +82,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 */
 	private function watchFolder(KalturaDropFolder $folder)
 	{
+		KalturaLog::debug('Watching folder ['.$folder->id.']');
 		
 		// get list of DropFolderFile objects from the current $folder
 		$dropFolderFiles = null;
@@ -157,10 +161,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				$currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
 				if ($currentDropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
 				{
-					$newStatus = $this->updateDropFolderFile($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
-					if ($newStatus == KalturaDropFolderFileStatus::PENDING) {
-						$this->handlePendingFile($folder, $currentDropFolderFile);
-					}
+					$this->updateDropFolderFile($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
 				}
 				else if	($currentDropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
 				{
@@ -283,7 +284,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 					$updateDropFolderFile = new KalturaDropFolderFile();
 					$updateDropFolderFile->status = KalturaDropFolderFileStatus::PENDING;
 					$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
-					return KalturaDropFolderFileStatus::PENDING;
+					return true;
 				}
 				catch (Exception $e) {
 					KalturaLog::err('Cannot update status to PENDING for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
@@ -350,53 +351,5 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		
 		return true;
 	}
-	
-	
-	private function handlePendingFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile)
-	{
-		// handle the PENDING file
-		$this->handleFile($dropFolder, $dropFolderFile);
 		
-		// handle all files in status WAITING
-		$waitingFiles = $this->getDropFolderFileObjects($dropFolderFile->dropFolderId, KalturaDropFolderFileStatus::WAITING);
-		foreach ($waitingFiles as $waitingFile)
-		{
-			//TODO: get the file from the API again, because its status might have been changed
-			$this->handleFile($dropFolder, $waitingFile);
-		}				
-	}
-	
-	
-	private function handleFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile)
-	{
-		// get defined file name patterns
-		$filePatterns = $dropFolder->fileNamePatterns;
-		$filePatterns = array_map('trim', explode(',', $filePatterns));
-		
-		// get current file name
-		$fileName = $dropFolderFile->fileName;
-		
-		// search for a match
-		$matchFound = false;
-		foreach ($filePatterns as $pattern)
-		{
-			if (!is_null($pattern) && ($pattern != '')) {
-				if (fnmatch($pattern, $fileName)) {
-					$matchFound = true;
-				}
-			}
-		}
-		
-		// if match found -> handle file by the file handelr configured for its drop folder
-		if ($matchFound)
-		{
-			$fileHandler = DropFolderFileHandler::getHandler($dropFolder->fileHandlerType);
-			$fileHandler->setConfig($this->kClient, $dropFolderFile, $dropFolder);
-			$fileHandler->handle();
-		}		
-		
-	}
-	
-	
-	
 }

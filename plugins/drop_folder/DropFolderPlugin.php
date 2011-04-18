@@ -103,15 +103,15 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('DropFolderWatcherBatchType','DropFolderPermissionName');
+			return array('DropFolderBatchType','DropFolderPermissionName');
 			
 		if($baseEnumName == 'BatchJobType')
-			return array('DropFolderWatcherBatchType');
+			return array('DropFolderBatchType');
 			
 		if($baseEnumName == 'PermissionName')
 			return array('DropFolderPermissionName');
 			
 		return array();
 	}	
-
+	
 }

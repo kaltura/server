@@ -57,20 +57,64 @@ abstract class DropFolderFileHandler
 	 * 2. WAITING - waiting for another file
 	 * 3. ERROR_HANDLING - an error happened
 	 * 4. NO_MATCH - no error occured, but the file cannot be handled since it does not match any entry
+	 * 
+	 * @return true if file was handled or false otherwise
 	 */
 	public abstract function handle();	
 		// must be implemented by extending classes
 	
-		/**
+	
+	/**
 	 * @return DropFolderFileHandlerType
 	 */
 	public abstract function getType();
 		// must be implemented by extending classes
 		
 	
+	/**
+	 * Update the associated drop folder file object with its current state
+	 * @return KalturaDropFolderFile
+	 */
 	protected function updateDropFolderFile()
 	{
 		return $this->kClient->dropFolderFile->update($this->dropFolderFile->id, $this->dropFolderFile);
 	}
+	
+	
+	/**
+	 * @param string $parsedFlavor
+	 * @return KalturaFlavorParams the flavor matching the given $systemName
+	 */
+	protected function getFlavorBySystemName($systemName)
+	{
+		$flavorFilter = new KalturaFlavorParamsFilter();
+		$flavorFilter->systemNameEqual = $systemName;
+		$flavorList = $this->kClient->flavorParams->listAction($flavorFilter);
 		
+		if (is_array($flavorList->objects) && isset($flavorList->objects[0]) ) {
+			return $flavor->objects[0];
+		}
+		else {
+			return null;
+		}			
+	}
+		
+	
+	/**
+	 * @param string $referenceId
+	 * @return KalturaFlavorParams the entry matching the given $referenceId
+	 */
+	protected function getEntryByReferenceId($referenceId)
+	{
+		$entryFilter = new KalturaBaseEntryFilter();
+		$entryFilter->referenceIdEqual = $referenceId;
+		$entryList = $this->kClient->baseEntry->listAction($entryFilter);
+		
+		if (is_array($entryList->objects) && isset($entryList->objects[0]) ) {
+			return $matchedEntryList->objects[0];
+		}
+		else {
+			return null;
+		}
+	}
 }
