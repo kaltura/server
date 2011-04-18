@@ -35,10 +35,13 @@ class Kaltura_View_Helper_EntryInvestigateDistribution extends Kaltura_View_Help
 		}
 		
 		$distributionIds = array();
-		foreach($distributions as $distribution)
+		if(is_array($distributions))
 		{
-			$distributionFileSyncs[$distribution->id] = array();
-			$distributionIds[] = $distribution->id;
+			foreach($distributions as $distribution)
+			{
+				$distributionFileSyncs[$distribution->id] = array();
+				$distributionIds[] = $distribution->id;
+			}
 		}
 	
 		if(count($distributionIds))

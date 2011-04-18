@@ -25,117 +25,120 @@
 	</thead>
 	<tbody>
 		<?php 
-			foreach($this->distributions as $distribution)
+			if(is_array($this->distributions))
 			{
-				$fileSyncs = array();
-				if(isset($this->distributionFileSyncs[$distribution->id]))
-					$fileSyncs = $this->distributionFileSyncs[$distribution->id];
-					
-				?>	
-					<tr class="<?php echo $this->cycle(array('odd', 'even'), 'distributions')->next(); ?>">
-						<td class="link" onclick="toggleView('tr_distribution_data_<?php echo $distribution->id; ?>')"><?php echo $distribution->id; ?></td>
-						<td><?php echo date($this->translate('date format'), $distribution->createdAt); ?></td>
-						<td><?php echo date($this->translate('date format'), $distribution->updatedAt); ?></td>
-						<td><?php echo date($this->translate('date format'), $distribution->submittedAt); ?></td>
-						<td><?php echo $distribution->distributionProfileId; ?></td>				
-						<td><?php echo $this->enumTranslate('KalturaEntryDistributionStatus', $distribution->status); ?></td>
-						<td><?php echo $this->enumTranslate('KalturaEntryDistributionFlag', $distribution->dirtyStatus); ?></td>
-						<td><?php echo $distribution->thumbAssetIds; ?></td>
-						<td><?php echo $distribution->flavorAssetIds; ?></td>
-						<td><?php echo date($this->translate('date format'), $distribution->sunrise); ?></td>
-						<td><?php echo date($this->translate('date format'), $distribution->sunset); ?></td>
-						<td><?php echo $distribution->remoteId; ?></td>
-						<td><?php echo $distribution->plays; ?></td>
-						<td><?php echo $distribution->views; ?></td>
-						<td><?php echo $this->enumTranslate('KalturaDistributionErrorType', $distribution->errorType); ?></td>
-						<td><?php echo $distribution->errorNumber; ?></td>
-						<td><?php echo $distribution->errorDescription; ?></td>
-					</tr>
-					<tr class="additionalData" id="tr_distribution_data_<?php echo $distribution->id; ?>" style="display: none">
-						<td colspan="18">
-							<?php 
-							
-								if($fileSyncs && count($fileSyncs))
-								{
-									?>
-										<h3><?php echo $this->translate('entry-investigate files title'); ?></h3>
-										<table>
-											<thead>
-												<tr>
-													<th><?php echo $this->translate('entry-investigate files id th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files version th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files sub type th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files dc th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files original th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files created th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files ready time th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files sync time th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files status th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files type th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files link id th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files link count th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files root th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files path th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files size th'); ?></th>
-													<th><?php echo $this->translate('entry-investigate files disc size th'); ?></th>
-												</tr>
-											</thead>
-											<tfoot>
-											</tfoot>
-											<tbody>
-												<?php foreach($fileSyncs as $file): ?>
-													<tr class="<?php echo $this->cycle(array('odd', 'even'), "thumbFiles{$distribution->id}")->next(); ?>">
+				foreach($this->distributions as $distribution)
+				{
+					$fileSyncs = array();
+					if(isset($this->distributionFileSyncs[$distribution->id]))
+						$fileSyncs = $this->distributionFileSyncs[$distribution->id];
+						
+					?>	
+						<tr class="<?php echo $this->cycle(array('odd', 'even'), 'distributions')->next(); ?>">
+							<td class="link" onclick="toggleView('tr_distribution_data_<?php echo $distribution->id; ?>')"><?php echo $distribution->id; ?></td>
+							<td><?php echo date($this->translate('date format'), $distribution->createdAt); ?></td>
+							<td><?php echo date($this->translate('date format'), $distribution->updatedAt); ?></td>
+							<td><?php echo date($this->translate('date format'), $distribution->submittedAt); ?></td>
+							<td><?php echo $distribution->distributionProfileId; ?></td>				
+							<td><?php echo $this->enumTranslate('KalturaEntryDistributionStatus', $distribution->status); ?></td>
+							<td><?php echo $this->enumTranslate('KalturaEntryDistributionFlag', $distribution->dirtyStatus); ?></td>
+							<td><?php echo $distribution->thumbAssetIds; ?></td>
+							<td><?php echo $distribution->flavorAssetIds; ?></td>
+							<td><?php echo date($this->translate('date format'), $distribution->sunrise); ?></td>
+							<td><?php echo date($this->translate('date format'), $distribution->sunset); ?></td>
+							<td><?php echo $distribution->remoteId; ?></td>
+							<td><?php echo $distribution->plays; ?></td>
+							<td><?php echo $distribution->views; ?></td>
+							<td><?php echo $this->enumTranslate('KalturaDistributionErrorType', $distribution->errorType); ?></td>
+							<td><?php echo $distribution->errorNumber; ?></td>
+							<td><?php echo $distribution->errorDescription; ?></td>
+						</tr>
+						<tr class="additionalData" id="tr_distribution_data_<?php echo $distribution->id; ?>" style="display: none">
+							<td colspan="18">
+								<?php 
+								
+									if($fileSyncs && count($fileSyncs))
+									{
+										?>
+											<h3><?php echo $this->translate('entry-investigate files title'); ?></h3>
+											<table>
+												<thead>
+													<tr>
+														<th><?php echo $this->translate('entry-investigate files id th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files version th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files sub type th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files dc th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files original th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files created th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files ready time th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files sync time th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files status th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files type th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files link id th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files link count th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files root th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files path th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files size th'); ?></th>
+														<th><?php echo $this->translate('entry-investigate files disc size th'); ?></th>
+													</tr>
+												</thead>
+												<tfoot>
+												</tfoot>
+												<tbody>
+													<?php foreach($fileSyncs as $file): ?>
+														<tr class="<?php echo $this->cycle(array('odd', 'even'), "thumbFiles{$distribution->id}")->next(); ?>">
+															<?php 
+																if(strlen($file->fileContent))
+																{
+																	?>
+																	<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
+																	<?php
+																}
+																elseif($file->status == KalturaFileSyncStatus::READY)
+																{
+																	?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
+																}
+																else
+																{
+																	?><td><?php echo $file->id; ?></td><?php
+																}
+															?>
+															<td><?php echo $file->version; ?></td>
+															<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
+															<td><?php echo $file->dc; ?></td>
+															<td><?php echo $file->original; ?></td>
+															<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
+															<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
+															<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
+															<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
+															<td><?php echo $file->linkedId; ?></td>
+															<td><?php echo $file->linkCount; ?></td>
+															<td><?php echo $file->fileRoot; ?></td>
+															<td><?php echo $file->filePath; ?></td>
+															<td><?php echo $file->fileSize; ?></td>
+															<td><?php echo $file->fileDiscSize; ?></td>
+														</tr>
 														<?php 
 															if(strlen($file->fileContent))
 															{
 																?>
-																<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
+																<tr class="additionalData" id="tr_filesync_data_<?php echo $file->id; ?>" style="display: none">
+																	<td colspan="15"><textarea rows="20" cols="150"><?php echo $file->fileContent; ?></textarea> </td>
+																</tr>
 																<?php
 															}
-															elseif($file->status == KalturaFileSyncStatus::READY)
-															{
-																?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
-															}
-															else
-															{
-																?><td><?php echo $file->id; ?></td><?php
-															}
 														?>
-														<td><?php echo $file->version; ?></td>
-														<td><?php echo $this->fileSyncSubTypeTranslate($file->fileObjectType, $file->objectSubType); ?></td>
-														<td><?php echo $file->dc; ?></td>
-														<td><?php echo $file->original; ?></td>
-														<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
-														<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
-														<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
-														<td><?php echo $this->enumTranslate('KalturaFileSyncStatus', $file->status); ?></td>
-														<td><?php echo $this->enumTranslate('KalturaFileSyncType', $file->fileType); ?></td>
-														<td><?php echo $file->linkedId; ?></td>
-														<td><?php echo $file->linkCount; ?></td>
-														<td><?php echo $file->fileRoot; ?></td>
-														<td><?php echo $file->filePath; ?></td>
-														<td><?php echo $file->fileSize; ?></td>
-														<td><?php echo $file->fileDiscSize; ?></td>
-													</tr>
-													<?php 
-														if(strlen($file->fileContent))
-														{
-															?>
-															<tr class="additionalData" id="tr_filesync_data_<?php echo $file->id; ?>" style="display: none">
-																<td colspan="15"><textarea rows="20" cols="150"><?php echo $file->fileContent; ?></textarea> </td>
-															</tr>
-															<?php
-														}
-													?>
-												<?php endforeach; ?>
-											</tbody>
-										</table>
-									<?php
-								} 
-							?>
-						</td>
-					</tr>
-				<?php 
+													<?php endforeach; ?>
+												</tbody>
+											</table>
+										<?php
+									} 
+								?>
+							</td>
+						</tr>
+					<?php 
+				}
 			}
 		?>
 	</tbody>
