@@ -244,7 +244,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if($isThrowException)
 		{
-			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn->nodeName] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn->nodeName] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
 		return null;
@@ -611,7 +611,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Check if the item type and the type element are matching
 	 * @param SimpleXMLElement $item
-	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED ;  
+	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED ;  
 	 */
 	private function checkTypeToTypeElement(SimpleXMLElement $item) 
 	{
@@ -641,7 +641,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::AUTOMATIC:
@@ -661,7 +661,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::DOCUMENT:
@@ -677,7 +677,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::LIVE_STREAM:
@@ -693,7 +693,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::MIX:
@@ -709,7 +709,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::PLAYLIST:
@@ -725,11 +725,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			default:
-				throw new KalturaBatchException("type [$typeNumber] is not supported ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED); 
+				throw new KalturaBatchException("type [$typeNumber] is not supported ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED); 
 		}
 	}
 	
@@ -908,7 +908,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$entryType = KalturaEntryType::PLAYLIST;
 				break;
 			default:
-				throw new KalturaBatchException("type [$typeNumber] is not supported ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED); 
+				throw new KalturaBatchException("type [$typeNumber] is not supported ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED); 
 		}	
 		
 		return $entryType;
