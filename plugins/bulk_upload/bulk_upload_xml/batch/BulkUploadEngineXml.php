@@ -317,12 +317,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$flavorParamsIds = "";
 		
 		//Can be null
-		$flavorParamsIdsElement = $this->getElement("flavorParamsIds", $elementToSearchIn, false);
+		$flavorParamsIdsElement = $elementToSearchIn->flavorParamsIds;
 		 
 		if(is_null($flavorParamsIdsElement)) // id is null so we get by names
 		{
 			//get the names
-			$flavorParamsElement = $this->getElement("flavorParams", $elementToSearchIn, false);
+			$flavorParamsElement = $elementToSearchIn->flavorParam;
 			$flavorParamsNamesArray = explode(",", $this->getStringFromElement($flavorParamsElement));
 			
 			//Load the names to id array
@@ -724,8 +724,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setMediaElementValues(KalturaMediaEntry &$mediaEntry, SimpleXMLElement $mediaElement)
 	{
-		$mediaTypeElement = $this->getElement("mediaType", $mediaElement);
-		$mediaEntry->mediaType = $this->getMediaTypeByName($mediaTypeElement->nodeValue);
+		$mediaEntry->mediaType = $mediaElement->mediaType;
 		 
 		$this->checkMediaTypes($mediaEntry->type ,$mediaEntry->mediaType);
 		$mediaEntry->ingestionProfileId = $this->data->conversionProfileId;
