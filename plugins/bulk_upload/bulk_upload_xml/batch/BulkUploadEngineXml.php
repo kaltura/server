@@ -600,7 +600,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$mediaEntry->type = $this->getEntryTypeByNumber($item->type); 
 
 		//Handles the type element additional data
-		this->handleTypedElement(&$mediaEntry, $item);
+		$this->handleTypedElement(&$mediaEntry, $item);
 			
 		return $mediaEntry;
 	}
@@ -623,7 +623,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Check if the item type and the type element are matching
 	 * @param SimpleXMLElement $item
-	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED ;  
+	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED ; 
 	 */
 	private function checkTypeToTypedElement(SimpleXMLElement $item) 
 	{
@@ -837,7 +837,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 				break;
 			default:
-				throw new KalturaBatchException("The type [$type] is not supported", KalturaBatchJobAppErrors::BULK_NOT_SUPPORTED_EXCEPTION);
+				throw new KalturaBatchException("The type [$type] is not supported", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 	}
 	
