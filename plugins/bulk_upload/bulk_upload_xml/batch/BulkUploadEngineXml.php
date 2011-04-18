@@ -127,7 +127,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function validateItem(SimpleXMLElement $item)
 	{
 		//Validates that the item type has a matching type element
-		$this->checkTypeToTypeElement($item);
+		$this->checkTypeToTypedElement($item);
 	}		
 	
 	/**
@@ -599,21 +599,33 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		$mediaEntry->type = $this->getEntryTypeByNumber($item->type); 
 
-		//Adds to the media entry the media element datav
-		//If this doesn't exist
-		$mediaElement = $item->media;
-		$this->setMediaElementValues(&$mediaEntry, $mediaElement);
+		//Handles the type element additional data
+		this->handleTypedElement(&$mediaEntry, $item);
 			
 		return $mediaEntry;
 	}
 	
 	/**
 	 * 
+	 * Handles the type additional data for the given media entry
+	 * @param KalturaMediaEntry $mediaEntry
+	 * @param SimpleXMLElement $item
+	 */
+	private function handleTypedElement(KalturaMediaEntry $mediaEntry, SimpleXMLElement $item)
+	{
+		if($mediaEntry->type)
+		{
+			$mediaElement = $item->media;
+			$this->setMediaElementValues(&$mediaEntry, $mediaElement);
+		}
+	} 
+	/**
+	 * 
 	 * Check if the item type and the type element are matching
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED ;  
 	 */
-	private function checkTypeToTypeElement(SimpleXMLElement $item) 
+	private function checkTypeToTypedElement(SimpleXMLElement $item) 
 	{
 		//Gets all the possible elements 
 		$mediaElement = $item->media;
@@ -623,6 +635,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$liveStreamElement = $item->liveStream;
 		$dataElement = $item->data;
 
+		KalturaLog::info("Test - " . is_null($mixElement) . is_null($documentElement) . is_null($liveStreamElement) .is_null($playlistElement) . is_null($dataElement));
 		//Now we get the entry type and check if only the rigth element is not null
 		$typeNumber = $item->type;
 		
@@ -631,7 +644,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			case KalturaEntryType::MEDIA_CLIP :
 				if(is_null($mediaElement))
 				{
-					KalturaLog::alert("Media Element is missing for type [$typeNumber], using nulls / defaults");
+					KalturaLog::info("Media Element is missing for type [$typeNumber], using nulls / defaults");
 				}
 				if(! (is_null($mixElement) &&
 					  is_null($documentElement) &&
@@ -641,7 +654,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::AUTOMATIC:
@@ -651,7 +664,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			case KalturaEntryType::DATA:
 				if(is_null($dataElement))
 				{
-					KalturaLog::alert("Data Element is missing for type [$typeNumber], using nulls / defaults");
+					KalturaLog::info("Data Element is missing for type [$typeNumber], using nulls / defaults");
 				}
 				if(! (is_null($mixElement) &&
 					  is_null($documentElement) &&
@@ -661,13 +674,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::DOCUMENT:
 				if(is_null($documentElement))
 				{
-					KalturaLog::alert("Document Element is missing for type [$typeNumber], using nulls / defaults");
+					KalturaLog::info("Document Element is missing for type [$typeNumber], using nulls / defaults");
 				}
 				if(! (is_null($mixElement) &&
 					  is_null($dataElement) &&
@@ -677,13 +690,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::LIVE_STREAM:
 				if(is_null($liveStreamElement))
 				{
-					KalturaLog::alert("Live Stream Element is missing for type [$typeNumber], using nulls / defaults");
+					KalturaLog::info("Live Stream Element is missing for type [$typeNumber], using nulls / defaults");
 				}
 				if(! (is_null($mixElement) &&
 					  is_null($documentElement) &&
@@ -693,13 +706,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::MIX:
 				if(is_null($mixElement))
 				{
-					KalturaLog::alert("Mix Element is missing for type [$typeNumber], using nulls / defaults");
+					KalturaLog::info("Mix Element is missing for type [$typeNumber], using nulls / defaults");
 				}
 				if(! (is_null($liveStreamElement) &&
 					  is_null($documentElement) &&
@@ -709,13 +722,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			case KalturaEntryType::PLAYLIST:
 				if(is_null($playlistElement))
 				{
-					KalturaLog::alert("Playlist Element is missing for type [$typeNumber], using nulls / defaults");
+					KalturaLog::info("Playlist Element is missing for type [$typeNumber], using nulls / defaults");
 				}
 				if(! (is_null($liveStreamElement) &&
 					  is_null($documentElement) &&
@@ -725,7 +738,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					 )
 				  )
 				{
-					throw new KalturaBatchException("Conflicted element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+					throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
 				break;
 			default:
