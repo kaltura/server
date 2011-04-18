@@ -225,47 +225,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement->textContent}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
 	}
-		
-	/**
-	 * 
-	 * Gets the element name
-	 * @param string $elementName
-	 * @param SimpleXMLElement $elementToSearchIn
-	 * @param bool $isThrowException
-	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND
-	 */
-	private function getElement($elementName, SimpleXMLElement $elementToSearchIn, $isThrowException = true)
-	{
-		$elements = $elementToSearchIn->getElementsByTagName($elementName);
-		if($elements->length > 0)
-		{
-			return $elements->item(0);  
-		}
-		
-		if($isThrowException)
-		{
-			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn->nodeName] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
-		
-		return null;
-	} 
-	
-	/**
-	 * 
-	 * Checks if the given element to search in has the wanted element
-	 * @param string $elementName
-	 * @param SimpleXMLElement $elementToSearchIn
-	 */
-	private function hasElement($elementName, SimpleXMLElement $elementToSearchIn)
-	{
-		$elements = $elementToSearchIn->getElementsByTagName($elementName);
-		if($elements->length > 0)
-		{
-			return true;
-		}
-				
-		return false;
-	}
 	
 	/**
 	 * 
@@ -635,22 +594,22 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$liveStreamElement = $item->liveStream;
 		$dataElement = $item->data;
 
-		KalturaLog::info("Test - " . is_null($mixElement) . is_null($documentElement) . is_null($liveStreamElement) .is_null($playlistElement) . is_null($dataElement));
+		KalturaLog::info("Test - " . empty($mixElement) . empty($documentElement) . isset($liveStreamElement) .isset($playlistElement) . isset($dataElement));
 		//Now we get the entry type and check if only the rigth element is not null
 		$typeNumber = $item->type;
 		
 		switch(trim($typeNumber))
 		{
 			case KalturaEntryType::MEDIA_CLIP :
-				if(is_null($mediaElement))
+				if(empty($mediaElement))
 				{
 					KalturaLog::info("Media Element is missing for type [$typeNumber], using nulls / defaults");
 				}
-				if(! (is_null($mixElement) &&
-					  is_null($documentElement) &&
-					  is_null($liveStreamElement) &&
-					  is_null($playlistElement) && 
-					  is_null($dataElement)
+				if( !(empty($mixElement) &&
+					  empty($documentElement) &&
+					  empty($liveStreamElement) &&
+					  empty($playlistElement) &&
+					  empty($dataElement)
 					 )
 				  )
 				{
