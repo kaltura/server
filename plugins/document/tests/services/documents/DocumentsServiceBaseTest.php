@@ -6,6 +6,30 @@
 abstract class DocumentsServiceBaseTest extends KalturaApiTestCase
 {
 	/**
+	 * Tests documents->add action
+	 * @param KalturaDocumentEntry $entry 
+	 * @param KalturaResource $resource 
+	 * @param KalturaMediaEntry $reference 
+	 * @return int
+	 * @dataProvider provideData
+	 */
+	public function testAdd(KalturaDocumentEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	{
+		$resultObject = $this->client->documents->add($entry, $resource);
+		$this->assertType('KalturaMediaEntry', $resultObject);
+		$this->assertNotNull($resultObject->id);
+		$this->validateAdd($entry, $resource, $reference);
+		return $resultObject->id;
+	}
+
+	/**
+	 * Validates testAdd results
+	 */
+	protected function validateAdd(KalturaDocumentEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	{
+	}
+
+	/**
 	 * Tests documents->get action
 	 * @param string $entryId Document entry id
 	 * @param int $version Desired version of the data
