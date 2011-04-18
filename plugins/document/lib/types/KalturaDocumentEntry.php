@@ -19,6 +19,7 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 	 * 
 	 * @var string
 	 * @insertonly
+	 * @deprecated use ingestionProfileId instead
 	 */
 	public $conversionProfileId;
 	

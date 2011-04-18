@@ -23,6 +23,9 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromUploadedFileAction(KalturaDocumentEntry $documentEntry, $uploadTokenId)
 	{
+    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
+    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
+    		
 		try
 	    {
 	    	// check that the uploaded file exists
@@ -108,6 +111,9 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromEntryAction($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = null)
 	{
+    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
+    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
+    		
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
 		if (!$srcEntry || $srcEntry->getType() != entryType::DOCUMENT)
@@ -155,6 +161,9 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaDocumentEntry $documentEntry = null)
 	{
+    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
+    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
+    		
 		assetPeer::resetInstanceCriteriaFilter();
 		$srcFlavorAsset = assetPeer::retrieveById($sourceFlavorAssetId);
 
