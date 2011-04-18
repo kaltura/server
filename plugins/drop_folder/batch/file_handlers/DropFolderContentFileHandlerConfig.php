@@ -4,7 +4,7 @@ class DropFolderContentFileHandlerConfig extends DropFolderFileHandlerConfig
 {
 		
 	/**
-	 * @var DropFolderContentFileHandlerMatchPolicy //TODO: change name
+	 * @var DropFolderContentFileHandlerMatchPolicy
 	 */
 	private $contentMatchPolicy;
 	
