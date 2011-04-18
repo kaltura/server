@@ -9,6 +9,93 @@
  */
 class DocumentsService extends KalturaEntryService
 {
+	
+    /**
+     * Add entry
+     *
+     * @action add
+     * @param KalturaDocumentEntry $entry
+     * @param KalturaResource $resource
+     * @return KalturaMediaEntry
+     * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+     * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+     * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+     * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+     * @throws KalturaErrors::UPLOAD_ERROR
+     * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
+     * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
+     */
+    function addAction(KalturaDocumentEntry $entry, KalturaResource $resource = null)
+    {
+    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
+    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
+    		
+    	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
+    	
+    	if(!$resource)
+    	{
+    		$dbEntry->setStatus(entryStatus::NO_CONTENT);
+    		$dbEntry->save();
+    		
+			$entry->fromObject($dbEntry);
+			return $entry;
+    	}
+    	
+    	$resource->validateEntry($dbEntry);
+    	$kResource = $resource->toObject();
+    	
+    	$this->attachResource($kResource, $dbEntry);
+    	
+		if(!$dbEntry || !$dbEntry->getId())
+			return null;
+			
+    	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
+		
+		$entry = new KalturaMediaEntry();
+		$entry->fromObject($dbEntry);
+		return $entry;
+    }
+    
+    /**
+     * @param kResource $resource
+     * @param entry $dbEntry
+     * @param asset $dbAsset
+     * @return asset
+     */
+    protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
+    {
+    	switch(get_class($resource))
+    	{
+			case 'kAssetsParamsResourceContainers':
+				return $this->attachAssetsParamsResourceContainers($resource, $dbEntry);
+				
+			case 'kAssetParamsResourceContainer':
+				return $this->attachAssetParamsResourceContainer($resource, $dbEntry, $dbAsset);
+				
+			case 'kUrlResource':
+				return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
+				
+			case 'kLocalFileResource':
+				return $this->attachLocalFileResource($resource, $dbEntry, $dbAsset);
+				
+			case 'kFileSyncResource':
+				return $this->attachFileSyncResource($resource, $dbEntry, $dbAsset);
+				
+			case 'kRemoteStorageResource':
+				return $this->attachRemoteStorageResource($resource, $dbEntry, $dbAsset);
+				
+			default:
+				KalturaLog::err("Resource of type [" . get_class($resource) . "] is not supported");
+				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+				$dbEntry->save();
+				
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($resource));
+    	}
+    }
+    
 	/**
 	 * Add new document entry after the specific document file was uploaded and the upload token id exists
 	 *
