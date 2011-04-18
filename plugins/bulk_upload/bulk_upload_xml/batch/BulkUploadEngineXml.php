@@ -19,13 +19,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * The element for the source content
-	 * @var SimpleXMLElement
-	 */
-	private $sourceContent;
-	
-	/**
-	 *  //TODO: Roni - maybe support more then 1 id
 	 * The current flavor id
 	 * @var int
 	 */
@@ -200,7 +193,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("In handleItemAdd");
 		$entryToInsert = $this->createMediaEntryFromItem($item);
 		
-		foreach ($item->getElementsByTagName("content") as $contentElement)
+		//For each content in the item element
+		foreach ($item->content as $contentElement)
 		{
 			$this->currentContentElement = $contentElement;
 			$resource = $this->getResource();
@@ -283,12 +277,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$resource = null;
 			
-		if($this->hasElement("localFileContentResource", $this->currentContentElement))
+		if($this->currentContentElement->localFileContentResource)
 		{
 			KalturaLog::debug("Resource is : localFileContentResource");
 			$resource = new KalturaLocalFileResource();
-			$localContentResorce = $this->getElement("localFileContentResource", $this->currentContentElement, true);
-			$resource->localFilePath = $localContentResorce ->getAttribute("filePath");
+			$localContentResource = $this->currentContentElement->localFileContentResource;
+			$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
 			
 			//TODO: Roni - what to do with those?
 //		<xs:choice minOccurs="1" maxOccurs="1">
@@ -296,35 +290,35 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 //			<xs:element name="fileChecksum" type="xs:string" minOccurs="1" maxOccurs="1"/>
 //		</xs:choice>
 		}
-		elseif($this->hasElement("urlContentResource", $this->currentContentElement))
+		elseif($this->currentContentElement->urlContentResource)
 		{
 			KalturaLog::debug("Resource is : urlContentResource");
 			$resource = new KalturaUrlResource();
-			$urlContentResource = $this->getElement("urlContentResource", $this->currentContentElement, true);
-			$resource->url = $urlContentResource->getAttribute("url");
+			$urlContentResource = $this->currentContentElement->urlContentResource;
+			$resource->url = kXml::getXmlAttributeAsString($urlContentResource, "url");
 		}
-		elseif($this->hasElement("remoteStorageContentResource", $this->currentContentElement))
+		elseif($this->currentContentElement->remoteStorageContentResource)
 		{
 			KalturaLog::debug("Resource is : remoteStorageContentResource");
 			$resource = new KalturaRemoteStorageResource();
-			$remoteContentResource = $this->getElement("urlContentResource", $this->currentContentElement, true);
-			$resource->url = $remoteContentResource->getAttribute("url");
+			$remoteContentResource = $this->currentContentElement->remoteStorageContentResource;
+			$resource->url = kXml::getXmlAttributeAsString($remoteContentResource, "url");
 			$resource->storageProfileId = $this->getStorageProfileId($remoteContentResource);
 		}
-		elseif($this->hasElement("entryContentResource", $this->currentContentElement))
+		elseif($this->currentContentElement->entryContentResource)
 		{
 			KalturaLog::debug("Resource is : entryContentResource");
 			$resource = new KalturaEntryResource();
-			
-			$resource->entryId = $this->currentContentElement->getAttribute("entryId");
-			
-			$resource->flavorParamsId = $this->getFlavorParamsId();
+			$entryContentResource = $this->currentContentElement->entryContentResource;
+			$resource->entryId = kXml::getXmlAttributeAsString($entryContentResource, "entryId");
+			$resource->flavorParamsId = $this->getFlavorParamsId($entryContentResource, false);
 		}
-		elseif($this->hasElement("assetContentResource", $this->currentContentElement))
+		elseif($this->currentContentElement->assetContentResource)
 		{
 			KalturaLog::debug("Resource is : assetContentResource");
 			$resource = new KalturaAssetResource();
-			$resource->assetId = $this->currentContentElement->getAttribute("assetId");
+			$assetContentResource = $this->currentContentElement->assetContentResource;
+			$resource->assetId = kXml::getXmlAttributeAsString($assetContentResource, "assetId");
 		}
 		
 		return $resource;
@@ -340,13 +334,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if($isAttribute) //Gets value from attributes
 		{
-			$flavorParamsId = $elementToSearchIn->getAttribute("flavorParamsId"); 
-			$flavorParamsName = $elementToSearchIn->getAttribute("flavorParams");
+			$flavorParamsId = kXml::getXmlAttributeAsString($elementToSearchIn, "flavorParamsId"); 
+			$flavorParamsName = kXml::getXmlAttributeAsString($elementToSearchIn,"flavorParams");
 		}
 		else //Gets value from elements
 		{
-			$flavorParamsId = $this->getElement("flavorParamsId", $elementToSearchIn, false)->nodeValue; 
-			$flavorParamsName = $this->getElement("flavorParams", $elementToSearchIn, false)->nodeValue;
+			$flavorParamsId = (string)$elementToSearchIn->flavorParamsId; 
+			$flavorParamsName = (string)$elementToSearchIn->flavorParams;
 		}
 			
 		return $this->getFlavorParamsByIdAndName($flavorParamsId, $flavorParamsName);
@@ -450,8 +444,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getStorageProfileId(SimpleXMLElement $elementToSearchIn)
 	{
-		$storageProfileId = $elementToSearchIn->getAttribute("storageProfileId"); 
-		$storageProfileName = $elementToSearchIn->getAttribute("storageProfile");
+		$storageProfileId = kXml::getXmlAttributeAsString($elementToSearchIn, "storageProfileId"); 
+		$storageProfileName = kXml::getXmlAttributeAsString($elementToSearchIn, "storageProfile");
 			
 		//TODO: implement this (after validation of the flavor params)
 		return $this->getStorageProfileByIdAndName($storageProfileId, $storageProfileName);
