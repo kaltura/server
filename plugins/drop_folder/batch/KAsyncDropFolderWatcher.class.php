@@ -18,9 +18,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	}
 	
 	protected function init()
-	{
-		//TODO: implement somehow ?
-	}
+	{ /* non-relevant abstract function */ }
 	
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
 	{ /* non-relevant abstract function */ }
@@ -37,14 +35,35 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		if($this->taskConfig->isInitOnly())
 			return $this->init();
 		
+		// get drop folder tags to work on from configuration
+		$folderTags = $this->taskConfig->params->tags;
+		$currentDc  = $this->taskConfig->params->dc;
+		
+		if (empty($folderTags)) {
+			KalturaLog::err('Tags configuration is empty - cannot continue');
+			return;
+		}
+		
 		// get list of drop folders according to configuration
 		$filter = new KalturaDropFolderFilter();
-		//TODO: use filter to get only folders relevant to current worker's config
-		//TODO: filter by current data center - how to know the current data center ?
-		//TODO: filter drop fodlers by status = ENABLED
-		//TODO: filter by configured TAGS
-		$dropFolders = $this->kClient->dropFolder->listAction($filter); //TODO: Add try/catch
-		$dropFolders = $dropFolders->objects;
+		
+		if ($folderTags != '*') {
+			$filter->tagsMultiLikeOr = $folderTags;
+		}
+			
+		//TODO: how to know the current dc ?
+		//$filter->dcEqual = kDataCenterMgr::getCurrentDcId();
+		$filter->statusEqual = KalturaDropFolderStatus::ENABLED;
+		
+		try {
+			$dropFolders = $this->kClient->dropFolder->listAction($filter);
+		}
+		catch (Exception $e) {
+			//TODO: add error
+			return;
+		}
+		
+		$dropFolders = $dropFolders->objects; // TODO: Add error
 		
 		foreach ($dropFolders as $folder)
 		{
@@ -103,7 +122,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		// sync between physical file list and drop folder file objects
 		foreach ($physicalFiles as $physicalFileName)
 		{
-			//TODO: translate file name to path+name on the shared location
+			// translate file name to path+name on the shared location
 			$sharedPhysicalFilePath = self::getRealPath($folder->path, $physicalFileName);
 			
 			// skip non-accessible files
