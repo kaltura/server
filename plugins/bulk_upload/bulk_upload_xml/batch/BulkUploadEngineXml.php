@@ -8,7 +8,8 @@
 class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	//(not the final version i still checking the code please don't kill me :) )
-	
+	const ADD_ACTION_STRING = "add";
+	 
 	/**
 	 * 
 	 * The engine xsd file path
@@ -19,7 +20,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * The element for the source content
-	 * @var DOMElement
+	 * @var SimpleXMLElement
 	 */
 	private $sourceContent;
 	
@@ -33,7 +34,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * The current handled content element
-	 * @var DOMElement
+	 * @var SimpleXMLElement
 	 */
 	private $currentContentElement;
 	
@@ -97,12 +98,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function parse() 
 	{
-		$xdoc = new DomDocument;
-		//Load the xml document in the DOMDocument object
-		$xdoc->Load($this->data->filePath);
-//		$this->startMultiRequest(true);
+//		$xdoc = new DomDocument;
+//		//Load the xml document in the DOMDocument object
+//		$xdoc->Load($this->data->filePath);
+////		$this->startMultiRequest(true);
+
+		$xdoc = simplexml_load_file($this->data->filePath);
 		
-		foreach( $xdoc->getElementsByTagName("channel") as $channel)
+		KalturaLog::debug("Test1 - is it working? {$xdoc->channel}");
+		foreach( $xdoc->channel as $channel)
 		{
 //			KalturaLog::debug("Channel name: {$channel->nodeName}, Channel Type = {$channel->nodeType}, Channel Value = {$channel->nodeValue}");
 			$this->handleChannel($channel);
@@ -112,12 +116,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Gets and handles a channel from the mrss
-	 * @param DOMElement $channel
+	 * @param SimpleXMLElement $channel
 	 */
-	private function handleChannel(DOMElement $channel)
+	private function handleChannel(SimpleXMLElement $channel)
 	{
 		//Gets all items from the channel
-		foreach( $channel->getElementsByTagName("item") as $item)
+		foreach( $channel->item as $item)
 		{
 			//TODO: add check if the bulk count has reached its max size and send the data
 //			KalturaLog::debug("Item name: {$item->nodeName}, Item Type = {$item->nodeType}, Item Value = {$item->nodeValue}");
@@ -128,11 +132,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Gets and handles an item from the channel
-	 * @param DOMElement $item
+	 * @param SimpleXMLElement $item
 	 */
-	private function handleItem(DOMElement$item)
+	private function handleItem(SimpleXMLElement $item)
 	{
-		$actionToPerform  = $item->getElementsByTagName("action")->item(0)->nodeValue;
+		$actionToPerform = self::ADD_ACTION_STRING;
+		$actionElement = (string)$item->action;
+				
+		if(!empty($actionElement))
+		{
+			$actionToPerform  = $actionElement;
+		}
+		
 		switch(strtolower($actionToPerform))
 		{
 			case "add":
@@ -152,10 +163,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Handles xml bulk upload update
-	 * @param DOMElement $item
+	 * @param SimpleXMLElement $item
 	 * @throws KalturaException
 	 */
-	private function handleItemUpdate(DOMElement $item)
+	private function handleItemUpdate(SimpleXMLElement $item)
 	{
 		throw new KalturaException("Action: Update is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 	}
@@ -163,10 +174,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Handles xml bulk upload delete
-	 * @param DOMElement $item
+	 * @param SimpleXMLElement $item
 	 * @throws KalturaException
 	 */
-	private function handleItemDelete(DOMElement $item)
+	private function handleItemDelete(SimpleXMLElement $item)
 	{
 		throw new KalturaException("Action: Delete is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 	}
@@ -174,9 +185,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Gets an item and insert it into the system
-	 * @param DOMElement $item
+	 * @param SimpleXMLElement $item
 	 */
-	private function handleItemAdd(DOMElement $item)
+	private function handleItemAdd(SimpleXMLElement $item)
 	{
 		KalturaLog::debug("In handleItemAdd");
 		$entryToInsert = $this->createMediaEntryFromItem($item);
@@ -184,7 +195,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($item->getElementsByTagName("content") as $contentElement)
 		{
 			$this->currentContentElement = $contentElement;
-			$resource = $this->getResource($contentElement);
+			$resource = $this->getResource();
+			
+			$this->setContentElementValues(&$entryToInsert);
 			
 			KalturaLog::debug("Entry to add is: {$entryToInsert->name}");
 			
@@ -199,7 +212,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Gets an item and returns the resource
-	 * @param DOMElement $item
+	 * @param SimpleXMLElement $item
 	 */
 	private function getResource()
 	{
@@ -215,11 +228,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Gets the element name
 	 * @param string $elementName
-	 * @param DOMElement $elementToSearchIn
+	 * @param SimpleXMLElement $elementToSearchIn
 	 * @param bool $isThrowException
 	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND
 	 */
-	private function getElement($elementName, DOMElement $elementToSearchIn, $isThrowException = true)
+	private function getElement($elementName, SimpleXMLElement $elementToSearchIn, $isThrowException = true)
 	{
 		$elements = $elementToSearchIn->getElementsByTagName($elementName);
 		if($elements->length > 0)
@@ -229,7 +242,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if($isThrowException)
 		{
-			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn->nodeName] ", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+			throw new KalturaBatchException("Unable to get Element [$elementName] in parnet element[$elementToSearchIn->nodeName] ", KalturaBatchJobAppErrors::BULK_CONTENT_VALIDATION_FAILED);
 		}
 		
 		return null;
@@ -239,9 +252,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Checks if the given element to search in has the wanted element
 	 * @param string $elementName
-	 * @param DOMElement $elementToSearchIn
+	 * @param SimpleXMLElement $elementToSearchIn
 	 */
-	private function hasElement($elementName, DOMElement $elementToSearchIn)
+	private function hasElement($elementName, SimpleXMLElement $elementToSearchIn)
 	{
 		$elements = $elementToSearchIn->getElementsByTagName($elementName);
 		if($elements->length > 0)
@@ -315,7 +328,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
 	 */
-	private function getFlavorParamsId(DOMElement $elementToSearchIn, $isAttribute = true)
+	private function getFlavorParamsId(SimpleXMLElement $elementToSearchIn, $isAttribute = true)
 	{
 		if($isAttribute) //Gets value from attributes
 		{
@@ -334,9 +347,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Returns from the given object it's flavor params ids
-	 * @param DOMElement $elementToSearchIn
+	 * @param SimpleXMLElement $elementToSearchIn
 	 */
-	private function getFlavorParamsIds(DOMElement $elementToSearchIn)
+	private function getFlavorParamsIds(SimpleXMLElement $elementToSearchIn)
 	{
 		KalturaLog::debug("In getFlavorParamsIds");
 		
@@ -378,7 +391,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
 	 */
-	private function getAccessControlId(DOMElement $elementToSearchIn)
+	private function getAccessControlId(SimpleXMLElement $elementToSearchIn)
 	{
 		//TODO: fix this
 		$accessControlIdElement = $this->getElement("accessControlId", $elementToSearchIn, false);
@@ -435,11 +448,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 	/**
 	 * 
+	 * 
 	 * Gets the storage profile id from the source content element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the storage profile
 	 */
-	private function getStorageProfileId(DOMElement $elementToSearchIn)
+	private function getStorageProfileId(SimpleXMLElement $elementToSearchIn)
 	{
 		$storageProfileId = $elementToSearchIn->getAttribute("storageProfileId"); 
 		$storageProfileName = $elementToSearchIn->getAttribute("storageProfile");
@@ -571,15 +585,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 	/**
   	 * Creates and returns a new media entry for the given job data and bulk upload result object
-	 * @param DOMElement $bulkUploadResult
+	 * @param SimpleXMLElement $bulkUploadResult
 	 */
-	private function createMediaEntryFromItem(DOMElement $item)
+	private function createMediaEntryFromItem(SimpleXMLElement $item)
 	{
 		//Create the new media entry and set basic values
 		$mediaEntry = new KalturaMediaEntry();
 
-		$nameElement = $this->getElement("name", $item);
-		$mediaEntry->name = $nameElement->nodeValue;
+		KalturaLog::debug("Test1 - is it working?");
+		$mediaEntry->name = (string)$item->name;
 		
 		$descriptionElement = $this->getElement("description", $item);
 		$mediaEntry->description = $descriptionElement->nodeValue;
@@ -590,8 +604,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$categoriesElement = $this->getElement("categories", $item);
 		$mediaEntry->categories = $this->getStringFromElement($categoriesElement);
 				
-		$userIdElement = $this->getElement("userId", $item);
+		$userIdElement = $this->getElement("userId", $item, false);
 		$mediaEntry->userId = $userIdElement->nodeValue;
+
+		$licenseTypeElement = $this->getElement("licenseType", $item, false);
+		$mediaEntry->licenseType = $licenseTypeElement->nodeValue;
 
 		$mediaEntry->accessControlId =  $this->getAccessControlId($item);
 				
@@ -605,22 +622,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Adds to the media entry the media element data
 		$mediaElement = $this->getElement("media", $item);
 		$this->setMediaElementValues(&$mediaEntry, $mediaElement);
-		
-		foreach ($item->getElementsByTagName("content") as $contentElement)
-		{
-			$this->setContentElementValues($mediaEntry, $contentElement);
-		}
-	
+			
 		return $mediaEntry;
 	}
 	
 	/**
 	 * 
 	 * Sets values in the media entry by the given content element
-	 * @param DOMElement $mediaEntry
-	 * @param KalturaMediaEntry $contentElement
+	 * @param SimpleXMLElement $mediaEntry
 	 */
-	private function setContentElementValues(KalturaMediaEntry $mediaEntry, DOMElement $contentElement)
+	private function setContentElementValues(KalturaMediaEntry $mediaEntry)
 	{
 		//TODO: Roni - handle content element logic
 		
@@ -630,14 +641,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Sets the media values in the media entry according to the given media node
 	 * @param KalturaMediaEntry $mediaEntry
-	 * @param DOMElement $mediaElement
+	 * @param SimpleXMLElement $mediaElement
 	 */
-	private function setMediaElementValues(KalturaMediaEntry &$mediaEntry, DOMElement $mediaElement)
+	private function setMediaElementValues(KalturaMediaEntry &$mediaEntry, SimpleXMLElement $mediaElement)
 	{
 		$mediaTypeElement = $this->getElement("mediaType", $mediaElement);
 		$mediaEntry->mediaType = $this->getMediaTypeByName($mediaTypeElement->nodeValue);
 		 
 		$this->checkMediaTypes($mediaEntry->type ,$mediaEntry->mediaType);
+		$mediaEntry->ingestionProfileId = $this->data->conversionProfileId;
 		
 //		$mediaEntry->flavorParamsIds = $this->getFlavorParamsIds($mediaElement);
 		
@@ -660,10 +672,45 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function checkMediaTypes($type ,$mediaType)
 	{
-		//TODO: Roni - add support for all other types
+		//TODO: Roni - add support for all other types with TanTan
 		switch ($type)
 		{
 			case KalturaEntryType::MEDIA_CLIP:
+				if($mediaType != KalturaMediaType::VIDEO)
+				{
+					throw new KalturaBatchException("the entry type [$type] is not supported with media type [$mediaType]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::DATA:
+				//TODO: what to put here?
+//				if($mediaType != KalturaMediaType::IMAGE)
+//				{
+//					throw new KalturaBatchException("the entry type [$type] is not supported with media type [$mediaType]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+//				}
+				break;
+			case KalturaEntryType::DOCUMENT :
+//				if($mediaType != KalturaMediaType::)
+//				{
+//					throw new KalturaBatchException("the entry type [$type] is not supported with media type [$mediaType]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+//				}
+				break;
+			case KalturaEntryType::LIVE_STREAM : //if it is not one of the above
+				if( !($mediaType == KalturaMediaType::LIVE_STREAM_FLASH) ||
+					 ($mediaType == KalturaMediaType::LIVE_STREAM_QUICKTIME) ||
+					 ($mediaType == KalturaMediaType::LIVE_STREAM_REAL_MEDIA) ||
+					 ($mediaType == KalturaMediaType::LIVE_STREAM_WINDOWS_MEDIA)
+				  )
+				{
+					throw new KalturaBatchException("the entry type [$type] is not supported with media type [$mediaType]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::MIX :
+				if($mediaType != KalturaMediaType::VIDEO)
+				{
+					throw new KalturaBatchException("the entry type [$type] is not supported with media type [$mediaType]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+				}
+				break;
+			case KalturaEntryType::PLAYLIST :
 				if($mediaType != KalturaMediaType::VIDEO)
 				{
 					throw new KalturaBatchException("the entry type [$type] is not supported with media type [$mediaType]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
@@ -678,12 +725,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Adds the given media entry to the given playlists in the element
 	 * @param KalturaMediaEntry $mediaEntry
-	 * @param DOMElement $playlistsElement
+	 * @param SimpleXMLElement $playlistsElement
 	 */
-	private function addToPlaylists(KalturaMediaEntry $mediaEntry, DOMElement $playlistsElement)
+	private function addToPlaylists(KalturaMediaEntry $mediaEntry, SimpleXMLElement $playlistsElement)
 	{
 		foreach ($playlistsElement->childNodes as $playlist)
 		{
+		
 			//TODO: Roni - add the media to the play list 
 			//AddToPlaylist();
 		}
@@ -750,9 +798,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Returns a comma seperated string with the values of the child nodes of the given element 
-	 * @param DOMElement $element
+	 * @param SimpleXMLElement $element
 	 */
-	private function getStringFromElement(DOMElement $element)
+	private function getStringFromElement(SimpleXMLElement $element)
 	{
 		$commaSeperatedString = ""; 
 		
