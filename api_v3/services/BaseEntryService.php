@@ -136,7 +136,6 @@ class BaseEntryService extends KalturaEntryService
 				break;
 				
 			case 'kUrlResource':
-			case 'kBulkResource':
 			case 'kRemoteStorageResource':
 				$fullPath = $resource->getUrl();
 				break;

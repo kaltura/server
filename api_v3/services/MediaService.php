@@ -379,19 +379,6 @@ class MediaService extends KalturaEntryService
     }
     
     /**
-     * @param kBulkResource $resource
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     */
-    protected function attachBulkResource(kBulkResource $resource, entry $dbEntry, asset $dbAsset = null)
-    {
-		$dbEntry->setBulkUploadId($resource->getBulkUploadId());
-
-		return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
-    }
-    
-    /**
      * @param kAssetsParamsResourceContainers $resource
      * @param entry $dbEntry
      * @return asset
@@ -491,9 +478,6 @@ class MediaService extends KalturaEntryService
 			case 'kUrlResource':
 				return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
 				
-			case 'kBulkResource':
-				return $this->attachBulkResource($resource, $dbEntry, $dbAsset);
-				
 			case 'kLocalFileResource':
 				return $this->attachLocalFileResource($resource, $dbEntry, $dbAsset);
 				
@@ -554,6 +538,9 @@ class MediaService extends KalturaEntryService
 	
 	private function addDbFromUrl(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId = null)
 	{
+    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
+    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    		
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 		if($bulkUploadId)
 			$dbEntry->setBulkUploadId($bulkUploadId);
@@ -600,6 +587,9 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromSearchResultAction(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null)
 	{
+    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
+    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    		
 		if ($mediaEntry === null)
 			$mediaEntry = new KalturaMediaEntry();
 			
@@ -696,6 +686,9 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromUploadedFileAction(KalturaMediaEntry $mediaEntry, $uploadTokenId)
 	{
+    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
+    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    		
 		try
 		{
 		    // check that the uploaded file exists
@@ -771,6 +764,9 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromRecordedWebcamAction(KalturaMediaEntry $mediaEntry, $webcamTokenId)
 	{
+    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
+    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    		
 	    // check that the webcam file exists
 	    $content = myContentStorage::getFSContentRootPath();
 	    $webcamBasePath = $content."/content/webcam/".$webcamTokenId; // filesync ok
@@ -822,6 +818,9 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromEntryAction($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = null)
 	{
+    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
+    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    		
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
 		if (!$srcEntry || $srcEntry->getType() != entryType::MEDIA_CLIP)
@@ -870,6 +869,9 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null)
 	{
+    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
+    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    		
 		$srcFlavorAsset = flavorAssetPeer::retrieveById($sourceFlavorAssetId);
 
 		if (!$srcFlavorAsset)
