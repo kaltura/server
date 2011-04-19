@@ -396,7 +396,14 @@ abstract class BaseFileSyncPeer {
 						trim($p); // make sure there are not leading or trailing spaces
 	
 					// add the partner_id to the partner_group
-					$partners[] = $partnerId;
+					if (!in_array($partnerId, $partners))
+					{
+						// NOTE: we need to add the partner as a string since we want all
+						// the PATNER_ID IN () values to be of the same type.
+						// otherwise mysql will fail choosing the right index and will
+						// do a full table scan
+						$partners[] = "".$partnerId;
+					}
 					
 					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
 				}
