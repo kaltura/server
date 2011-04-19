@@ -211,15 +211,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($item->content as $contentElement)
 		{
 			$this->currentContentElement = $contentElement;
-			
-			$flavorAsset = $this->getFlavorAsset();		
+			$flavorAsset = $this->getFlavorAsset($newEntry);
 			$resource = $this->getResource($this->currentContentElement);
-			
 //			$this->setContentElementValues(&$entryToInsert);
-			
 			KalturaLog::debug("Flavor assest to add is: {$entryToInsert->name}");
-				
-
 			$result = $this->kClient->flavorAsset->add($result->id, $flavorAsset, $resource);
 		}
 //		$this->doMultiRequestForPartner();
@@ -229,7 +224,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($item->thumbnail as $thumbnailElement)
 		{
 			$this->currentThumbnailElement = $thumbnailElement;
-			$thumbnailAsset = $this->getThumbAsset();		
+			$thumbnailAsset = $this->getThumbAsset($newEntry);		
 			$resource = $this->getResource($this->currentThumbnailElement);
 //			$this->setThumbElementValues(&$entryToInsert);
 			KalturaLog::debug("Thumb assest to add is: {$entryToInsert->name}");
@@ -241,10 +236,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * returns a flavor asset form the current content element
-	 * @param KalturaMeidaEntry $newEntry
+	 * @param KalturaMediaEntry $newEntry
 	 * @return KalturaFlavorAsset
 	 */
-	private function getFlavorAsset(KalturaMeidaEntry $newEntry)
+	private function getFlavorAsset(KalturaMediaEntry $newEntry)
 	{
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->entryId = $newEntry->id;
@@ -255,10 +250,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * returns a thumbnail asset form the current thumbnail element
-	 * @param KalturaMeidaEntry $newEntry
+	 * @param KalturaMediaEntry $newEntry
 	 * @return KalturaThumbAsset
 	 */
-	private function getThumbAsset(KalturaMeidaEntry $newEntry)
+	private function getThumbAsset(KalturaMediaEntry $newEntry)
 	{
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->entryId = $newEntry->id;
