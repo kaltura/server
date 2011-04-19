@@ -19,13 +19,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * The current flavor id
-	 * @var int
-	 */
-	private $currentFlavorId;
-
-	/**
-	 * 
 	 * The current handled content element
 	 * @var SimpleXMLElement
 	 */
@@ -33,10 +26,24 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
+	 * The current handled thumbnail element
+	 * @var SimpleXMLElement
+	 */
+	private $currentThumbnailElement;
+	
+	/**
+	 * 
 	 * Maps the flavor params name to id
 	 * @var array()
 	 */
 	private $flavorParamsNameToId = null;
+	
+	/**
+	 * 
+	 * Maps the access control name to id
+	 * @var array()
+	 */
+	private $accessControlNameToId = null;
 	
 	/**
 	 * 
@@ -192,55 +199,108 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		KalturaLog::debug("In handleItemAdd");
 		$entryToInsert = $this->createMediaEntryFromItem($item);
+		KalturaLog::debug("Entry to add is: {$entryToInsert->name}");
 		
-		//For each content in the item element
+		$entryToInsert->ingestionProfileId = -1; // Add the entry first as a no convert entry and then add all the flavors
+//		$result = $this->kClient->media->add($entryToInsert, $resource);
+		$newEntry = $this->kClient->media->add($entryToInsert);
+		KalturaLog::debug("newEntry is: " .var_dump($newEntry));
+		
+//		$this->startMultiRequest(true);
+		//For each content in the item element we add a new flavor asset
 		foreach ($item->content as $contentElement)
 		{
 			$this->currentContentElement = $contentElement;
-			$resource = $this->getResource();
 			
-			$this->setContentElementValues(&$entryToInsert);
+			$flavorAsset = $this->getFlavorAsset();		
+			$resource = $this->getResource($this->currentContentElement);
 			
-			KalturaLog::debug("Entry to add is: {$entryToInsert->name}");
+//			$this->setContentElementValues(&$entryToInsert);
 			
-			$this->startMultiRequest(true);
-			$result = $this->kClient->media->add($entryToInsert, $resource);
-			$this->doMultiRequestForPartner();
-			
-			KalturaLog::debug("result is: " .var_dump($result));
+			KalturaLog::debug("Flavor assest to add is: {$entryToInsert->name}");
+				
+
+			$result = $this->kClient->flavorAsset->add($result->id, $flavorAsset, $resource);
 		}
+//		$this->doMultiRequestForPartner();
+
+//		$this->startMultiRequest(true);
+		//For each thumbnail in the item element we create a new thumb asset
+		foreach ($item->thumbnail as $thumbnailElement)
+		{
+			$this->currentThumbnailElement = $thumbnailElement;
+			$thumbnailAsset = $this->getThumbAsset();		
+			$resource = $this->getResource($this->currentThumbnailElement);
+//			$this->setThumbElementValues(&$entryToInsert);
+			KalturaLog::debug("Thumb assest to add is: {$entryToInsert->name}");
+			$result = $this->kClient->thumbAsset->add($result->id, $flavorAsset, $resource);
+		}
+//		$this->doMultiRequestForPartner();
 	}
 
 	/**
 	 * 
-	 * Gets an item and returns the resource
-	 * @param SimpleXMLElement $item
+	 * returns a flavor asset form the current content element
+	 * @param KalturaMeidaEntry $newEntry
+	 * @return KalturaFlavorAsset
 	 */
-	private function getResource()
+	private function getFlavorAsset(KalturaMeidaEntry $newEntry)
 	{
-		$resource = $this->getResourceInstance(); 
+		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset->entryId = $newEntry->id;
+		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($this->currentContentElement);
+		return $flavorAsset;
+	}
+	
+	/**
+	 * 
+	 * returns a thumbnail asset form the current thumbnail element
+	 * @param KalturaMeidaEntry $newEntry
+	 * @return KalturaThumbAsset
+	 */
+	private function getThumbAsset(KalturaMeidaEntry $newEntry)
+	{
+		$thumbAsset = new KalturaThumbAsset();
+		$thumbAsset->entryId = $newEntry->id;
+		$thumbAsset->thumbParamsId= $this->getThumbParamsId($this->currentThumbnailElement);
+		return $thumbAsset;
+	}
+	
+	/**
+	 * 
+	 * Gets an item and returns the resource
+	 * @param SimpleXMLElement $elementToSearchIn
+	 * @return KalturaResource - the resource located in the given element
+	 */
+	private function getResource(SimpleXMLElement $elementToSearchIn)
+	{
+		$resource = $this->getResourceInstance($elementToSearchIn); 
 				
 		if(is_null($resource))
 		{
 			throw new KalturaBatchException("Resource is not supported: {$this->currentContentElement->textContent}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 		}
+		
+		return $resource;
 	}
 	
 	/**
 	 * 
 	 * Returns the right resource instance for the source content of the item
+	 * @param SimpleXMLElement $elementToSearchIn
+	 * @return KalturaResource - the resource located in the given element
 	 */
-	private function getResourceInstance()
+	private function getResourceInstance(SimpleXMLElement $elementToSearchIn)
 	{
 		KalturaLog::debug("In getResourceInstance");
 		
 		$resource = null;
 			
-		if($this->currentContentElement->localFileContentResource)
+		if(!empty($elementToSearchIn->localFileContentResource))
 		{
 			KalturaLog::debug("Resource is : localFileContentResource");
 			$resource = new KalturaLocalFileResource();
-			$localContentResource = $this->currentContentElement->localFileContentResource;
+			$localContentResource = $elementToSearchIn->localFileContentResource;
 			$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
 			
 			//TODO: Roni - what to do with those?
@@ -249,34 +309,34 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 //			<xs:element name="fileChecksum" type="xs:string" minOccurs="1" maxOccurs="1"/>
 //		</xs:choice>
 		}
-		elseif($this->currentContentElement->urlContentResource)
+		elseif(!empty($elementToSearchIn->urlContentResource))
 		{
 			KalturaLog::debug("Resource is : urlContentResource");
 			$resource = new KalturaUrlResource();
-			$urlContentResource = $this->currentContentElement->urlContentResource;
+			$urlContentResource = $elementToSearchIn->urlContentResource;
 			$resource->url = kXml::getXmlAttributeAsString($urlContentResource, "url");
 		}
-		elseif($this->currentContentElement->remoteStorageContentResource)
+		elseif(!empty($elementToSearchIn->remoteStorageContentResource))
 		{
 			KalturaLog::debug("Resource is : remoteStorageContentResource");
 			$resource = new KalturaRemoteStorageResource();
-			$remoteContentResource = $this->currentContentElement->remoteStorageContentResource;
+			$remoteContentResource = $elementToSearchIn->remoteStorageContentResource;
 			$resource->url = kXml::getXmlAttributeAsString($remoteContentResource, "url");
 			$resource->storageProfileId = $this->getStorageProfileId($remoteContentResource);
 		}
-		elseif($this->currentContentElement->entryContentResource)
+		elseif(!empty($elementToSearchIn->entryContentResource))
 		{
 			KalturaLog::debug("Resource is : entryContentResource");
 			$resource = new KalturaEntryResource();
-			$entryContentResource = $this->currentContentElement->entryContentResource;
+			$entryContentResource = $elementToSearchIn->entryContentResource;
 			$resource->entryId = kXml::getXmlAttributeAsString($entryContentResource, "entryId");
 			$resource->flavorParamsId = $this->getFlavorParamsId($entryContentResource, false);
 		}
-		elseif($this->currentContentElement->assetContentResource)
+		elseif(!empty($elementToSearchIn->assetContentResource))
 		{
 			KalturaLog::debug("Resource is : assetContentResource");
 			$resource = new KalturaAssetResource();
-			$assetContentResource = $this->currentContentElement->assetContentResource;
+			$assetContentResource = $elementToSearchIn->assetContentResource;
 			$resource->assetId = kXml::getXmlAttributeAsString($assetContentResource, "assetId");
 		}
 		
@@ -285,7 +345,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * Gets the flavor params id from the source content element
+	 * Gets the flavor params id from the given element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
 	 */
@@ -303,6 +363,28 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 			
 		return $this->getFlavorParamsByIdAndName($flavorParamsId, $flavorParamsName);
+	}
+	
+	/**
+	 * 
+	 * Gets the thumb params id from the given element
+	 * @param $elementToSearchIn - The element to search in
+	 * @return int - The id of the thumb params
+	 */
+	private function getThumbParamsId(SimpleXMLElement $elementToSearchIn, $isAttribute = true)
+	{
+		if($isAttribute) //Gets value from attributes
+		{
+			$thumbParamsId = kXml::getXmlAttributeAsString($elementToSearchIn, "thumbParamsId"); 
+			$thumbParamsName = kXml::getXmlAttributeAsString($elementToSearchIn,"thumbParams");
+		}
+		else //Gets value from elements
+		{
+			$thumbParamsId = (string)$elementToSearchIn->thumbParamsId; 
+			$thumbParamsName = (string)$elementToSearchIn->thumbParams;
+		}
+			
+		return $this->getThumbParamsByIdAndName($thumbParamsId, $thumbParamsName);
 	}
 	
 	/**
@@ -366,32 +448,31 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Gets the access control id by it's id or name   
 	 * @param $accessControlId - the storage profile id
 	 * @param string $accessControlName - the storage profile system name 
+	 * @return int The Access Control id 
 	 * @throws KalturaBatchException - in case ther is not such storage profile with the given name
 	 */
 	private function getAccessControlIdByIdAndName($accessControlId, $accessControlName)
 	{
 		if(isset($accessControlId) && !empty($accessControlId))
 		{
-			$this->currentFlavorId = trim($accessControlId);
-			return;
+			return trim($accessControlId);
 		}
 		
 		if(!empty($accessControlName))//if we have no id then we search by name
 		{
-			if(is_null($this->flavorParamsNameToId))
+			if(is_null($this->accessControlNameToId))
 			{
-				$this->initFlavorParamsNameToId();
+				$this->initAccessControlNameToId();
 			}
 			
-			if(isset($this->flavorParamsNameToId[$accessControlName]))
+			if(isset($this->accessControlNameToId[$accessControlName]))
 			{
-				$this->currentFlavorId = trim($this->flavorParamsNameToId[$accessControlName]);
-				return;
+				return trim($this->accessControlNameToId[$accessControlName]);
 			}
 		}
 
 		//If we got here then the id or name weren't found
-		throw new KalturaBatchException("Can't find flavor params with id [$accessControlId], name [$accessControlName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);	
+		throw new KalturaBatchException("Can't find acess control with id [$accessControlId], name [$accessControlName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);	
 	}
 		
 	/**
@@ -414,33 +495,33 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Gets the storage profile id by it's id or name   
 	 * @param $storageProfileId - the storage profile id
-	 * @param string $storageProfileName - the storage profile system name 
+	 * @param string $storageProfileName - the storage profile system name
+	 * @return int - The id of the storage profile 
 	 * @throws KalturaBatchException - in case ther is not such storage profile with the given name
 	 */
 	private function getStorageProfileByIdAndName($storageProfileId, $storageProfileName)
 	{
 		if(isset($storageProfileId) && !empty($storageProfileId))
 		{
-			$this->currentFlavorId = trim($storageProfileId);
-			return;
+			return trim($storageProfileId);
+			
 		}
 		
 		if(!empty($storageProfileName))//if we have no id then we search by name
 		{
-			if(is_null($this->flavorParamsNameToId))
+			if(is_null($this->storageProfileNameToId))
 			{
-				$this->initFlavorParamsNameToId();
+				$this->initStorageProfileNameToId();
 			}
 			
-			if(isset($this->flavorParamsNameToId[$storageProfileName]))
+			if(isset($this->storageProfileNameToId[$storageProfileName]))
 			{
-				$this->currentFlavorId = trim($this->flavorParamsNameToId[$storageProfileName]);
-				return;
+				return trim($this->storageProfileNameToId[$storageProfileName]);
 			}
 		}
 
 		//If we got here then the id or name weren't found
-		throw new KalturaBatchException("Can't find flavor params with id [$storageProfileId], name [$storageProfileName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+		throw new KalturaBatchException("Can't find storage profile with id [$storageProfileId], name [$storageProfileName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
 	}
 	
 	/**
@@ -448,14 +529,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Gets the flavor params id by it's id or name   
 	 * @param $flavorParamsId - the flavor params id
 	 * @param $flavorParamsName - the flavor params name
+	 * @return int - The id of the flaovr params
 	 * @throws KalturaBatchException - in case there is not flavor params by the given name
 	 */
 	private function getFlavorParamsByIdAndName($flavorParamsId, $flavorParamsName)
 	{
 		if(isset($flavorParamsId) && !empty($flavorParamsId))
 		{
-			$this->currentFlavorId = trim($flavorParamsId);
-			return;
+			return trim($flavorParamsId);
 		}
 		
 		if(!empty($flavorParamsName)) //If we have no id then we search by name
@@ -467,8 +548,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			if(isset($this->flavorParamsNameToId[$flavorParamsName]))
 			{
-				$this->currentFlavorId = trim($this->flavorParamsNameToId[$flavorParamsName]);
-				return;
+				return trim($this->flavorParamsNameToId[$flavorParamsName]);
 			}
 		}
 
@@ -478,7 +558,39 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * Inits the array of flavor params to Id (with all given flavor params)
+	 * Gets the thumb params id by it's id or name   
+	 * @param $thumbParamsId - the thumb params id
+	 * @param $thumbParamsName - the thumb params name
+	 * @return int - The id of the thumb params
+	 * @throws KalturaBatchException - in case there is not thumb params by the given name
+	 */
+	private function getThumbParamsByIdAndName($thumbParamsId, $thumbParamsName)
+	{
+		if(isset($thumbParamsId) && !empty($thumbParamsId))
+		{
+			return trim($thumbParamsId);
+		}
+		
+		if(!empty($thumbParamsName)) //If we have no id then we search by name
+		{
+			if(is_null($this->thumbParamsNameToId))
+			{
+				$this->initThumbParamsNameToId();
+			}
+			
+			if(isset($this->thumbParamsNameToId[$thumbParamsName]))
+			{
+				return trim($this->thumbParamsNameToId[$thumbParamsName]);
+			}
+		}
+
+		//If we got here then the id or name weren't found
+		throw new KalturaBatchException("Can't find thumb params with id [], name [$thumbParamsName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+	}
+	
+	/**
+	 * 
+	 * Inits the array of flavor params name to Id (with all given flavor params)
 	 */
 	private function initFlavorParamsNameToId()
 	{
@@ -489,10 +601,24 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->flavorParamsNameToId[$flavorParam->systemName] = $flavorParam->id;
 		}
 	}
-		
+
 	/**
 	 * 
-	 * Inits the array of flavor params to Id (with all given flavor params)
+	 * Inits the array of access control name to Id (with all given flavor params)
+	 */
+	private function initAccessControlNameToId()
+	{
+		$allAccessControl = $this->kClient->accessControl->listAction(null, null);
+		
+		foreach ($allAccessControl as $accessControl)
+		{
+			$this->accessControlNameToId[$accessControl->systemName] = $accessControl->id;
+		}
+	}
+	
+	/**
+	 * 
+	 * Inits the array of thumb params name to Id (with all given flavor params)
 	 */
 	private function initThumbParamsNameToId()
 	{
@@ -500,13 +626,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allThumbParams as $thumbParam)
 		{
-			$this->flavorParamsNameToId[$thumbParam->systemName] = $thumbParam->id;
+			$this->thumbParamsNameToId[$thumbParam->systemName] = $thumbParam->id;
 		}
 	}
 		
 	/**
 	 * 
-	 * Inits the array of conversion profile to Id (with all given flavor params)
+	 * Inits the array of conversion profile name to Id (with all given flavor params)
 	 */
 	private function initConversionProfileNameToId()
 	{
@@ -514,7 +640,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allConversionProfile as $conversionProfile)
 		{
-			$this->flavorParamsNameToId[$conversionProfile->systemName] = $conversionProfile->id;
+			$this->conversionProfileNameToId[$conversionProfile->systemName] = $conversionProfile->id;
 		}
 	}
 
@@ -527,7 +653,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allStorageProfiles = $this->kClient->storageProfile->listAction(null, null);		
 		foreach ($allStorageProfiles as $storageProfile)
 		{
-			$this->flavorParamsNameToId[$storageProfile->systemName] = $storageProfile->id;
+			$this->storageProfileNameToId[$storageProfile->systemName] = $storageProfile->id;
 		}
 	}
 		
