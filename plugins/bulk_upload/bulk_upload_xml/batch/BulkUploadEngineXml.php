@@ -467,7 +467,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		//If we got here then the id or name weren't found
-		throw new KalturaBatchException("Can't find acess control with id [$accessControlId], name [$accessControlName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);	
+		throw new KalturaBatchException("Can't find acess control with id [$accessControlId], name [$accessControlName]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);	
 	}
 		
 	/**
@@ -516,7 +516,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		//If we got here then the id or name weren't found
-		throw new KalturaBatchException("Can't find storage profile with id [$storageProfileId], name [$storageProfileName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+		throw new KalturaBatchException("Can't find storage profile with id [$storageProfileId], name [$storageProfileName]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -548,7 +548,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		//If we got here then the id or name weren't found
-		throw new KalturaBatchException("Can't find flavor params with id [], name [$flavorParamsName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+		throw new KalturaBatchException("Can't find flavor params with id [], name [$flavorParamsName]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -580,7 +580,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		//If we got here then the id or name weren't found
-		throw new KalturaBatchException("Can't find thumb params with id [], name [$thumbParamsName]", KalturaBatchJobAppErrors::BULK_OBJECT_NOT_FOUND);
+		throw new KalturaBatchException("Can't find thumb params with id [], name [$thumbParamsName]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
