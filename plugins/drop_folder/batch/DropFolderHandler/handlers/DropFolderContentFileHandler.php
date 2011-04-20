@@ -170,7 +170,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		else
 		{
 			//TODO: what to do if drop folder's ingestion profile is null ??
-			$resource = $this->getAllRequiredFiles($this->dropFolder->ingestionProfileId);
+			$resource = $this->getAllIngestedFiles();
 			if (!$resource) {
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
 				return true;
@@ -182,7 +182,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		
 		$newEntry = new KalturaBaseEntry();
-		$newEntry->ingestionProfileId = $this->dropFolder->ingestionProfileId;
+		$newEntry->ingestionProfileId = $this->getIngestionProfileId();
 		$newEntry->name = $this->dropFolderFile->parsedSlug;
 		
 		if (is_null($newEntry->name))
@@ -247,79 +247,122 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			return false; // file not handled
 		}
 		
+	
+		// [Tan-Tan] My code starts here 
+	
+		$entryConversionProfileId = $matchedEntry->ingestionProfileId;
+		if (is_null($entryConversionProfileId))
+			$entryConversionProfileId = $this->getIngestionProfileId();
+
+		//TODO: what to do if drop folder's ingestion profile is null ??
+		$resource = $this->getAllIngestedFiles($entryConversionProfileId);
+		if (!$resource) {
+			$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
+			return true;
+		}
+		$addionnalFileIds = array();
+		foreach ($resource->resources as $assetContainer) {
+			$addionnalFileIds[] = $assetContainer->resource->dropFolderFileId;
+		}
 		
-		// check if current flavor already exists for the entry
+		try 
+		{
+			$updatedEntry = $this->kClient->baseEntry->update($matchedEntry->id, null, $resource);
+			
+			// set all addional files as handled
+			if ($addionnalFileIds) {
+				$this->setAsHandled($addionnalFileIds);
+			}
 		
-		try {
-			$existingAssets = $this->kClient->flavorAsset->getByEntryId($matchedEntry->id);
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::err('Cannot update entry - '.$e->getMessage());
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
-			$this->dropFolderFile->errorDescription = 'Internal handling error';
-			KalturaLog::err('Cannot get list of flavor assets for entry id ['.$matchedEntry->id.'] - '.$e->getMessage());
-			return false; // file not handled
+			$this->dropFolderFile->errorDescription = 'Internal error updating entry';	
+			return false;
 		}
 		
-		$existingAssets = $existingAssets->objects;
-		$flavorAssetExists = false;
-		foreach ($existingAssets->objects as $existingAsset)
-		{
-			if ($existingAsset->flavorParamsId === $matchedFlavor->id) {
-				$flavorAssetExists = true; // asset exists for entry
-				break;
-			}
-		}
+		// [Tan-Tan] My code ends here
+
 		
 		
-		if (!$flavorAssetExists) // flavor asset does not exist yet
-		{
-			// add the current file as a new flavor asset for the existing entry
-			$flavorAsset = new KalturaFlavorAsset();
-			$flavorAsset->flavorParamsId == $matchedFlavor->id;
-			
-			$resource = new KalturaDropFolderFileResource();
-			$resource->dropFolderFileId = $this->dropFolderFile->getId();
-			$addedEntry = $this->kClient->flavorAsset->add($matchedEntry->id, $flavorAsset, $resource); //TODO: add try/catch
-			return true;
-		}
-		else // flavor asset already exits
-		{
-			$entryConversionProfileId = $matchedEntry->ingestionProfileId;
-			if (is_null($entryConversionProfileId))
-			{
-				//  => TODO: call baseEntry.update to replace all relevant flavors!
-			}
-			else
-			{
-				$entryConversionProfile = $this->kClient->conversionProfile->get($entryConversionProfileId);  //TODO: add try/catch
-				$profileParamsIds = explode(',', $entryConversionProfile->flavorParamsIds);
-				
-				if (!in_array($matchedFlavor->id, $profileParamsIds))
-				{
-					//  => TODO: call baseEntry.update to replace all relevant flavors!
-				}
-				else
-				{
-					//TODO: what to do if drop folder's ingestion profile is null ??
-					$resource = $this->getAllRequiredFiles($entryConversionProfileId);
-					if (!$resource) {
-						$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
-						return false;
-					}
-					foreach ($resource->resources as $assetContainer) {
-						$addionnalFileIds[] = $assetContainer->resource->dropFolderFileId;
-					}
-					
-					//  => TODO: call baseEntry.update to replace all relevant flavors!
-				}				
-				
-			}
-			
-			//TODO: Remember to go over additional file ids
-			
-			//TODO: return true/false
-		}
+		
+		
+//		// commented by Tan-Tan
+//		
+//		// check if current flavor already exists for the entry
+//		
+//		try {
+//			$existingAssets = $this->kClient->flavorAsset->getByEntryId($matchedEntry->id);
+//		}
+//		catch (Exception $e)
+//		{
+//			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+//			$this->dropFolderFile->errorDescription = 'Internal handling error';
+//			KalturaLog::err('Cannot get list of flavor assets for entry id ['.$matchedEntry->id.'] - '.$e->getMessage());
+//			return false; // file not handled
+//		}
+//		
+//		$existingAssets = $existingAssets->objects;
+//		$flavorAssetExists = false;
+//		foreach ($existingAssets->objects as $existingAsset)
+//		{
+//			if ($existingAsset->flavorParamsId === $matchedFlavor->id) {
+//				$flavorAssetExists = true; // asset exists for entry
+//				break;
+//			}
+//		}
+//		
+//		
+//		if (!$flavorAssetExists) // flavor asset does not exist yet
+//		{
+//			// add the current file as a new flavor asset for the existing entry
+//			$flavorAsset = new KalturaFlavorAsset();
+//			$flavorAsset->flavorParamsId == $matchedFlavor->id;
+//			
+//			$resource = new KalturaDropFolderFileResource();
+//			$resource->dropFolderFileId = $this->dropFolderFile->getId();
+//			$addedEntry = $this->kClient->flavorAsset->add($matchedEntry->id, $flavorAsset, $resource); //TODO: add try/catch
+//			return true;
+//		}
+//		else // flavor asset already exits
+//		{
+//			$entryConversionProfileId = $matchedEntry->ingestionProfileId;
+//			if (is_null($entryConversionProfileId))
+//			{
+//				//  => TODO: call baseEntry.update to replace all relevant flavors!
+//			}
+//			else
+//			{
+//				$entryConversionProfile = $this->kClient->conversionProfile->get($entryConversionProfileId);  //TODO: add try/catch
+//				$profileParamsIds = explode(',', $entryConversionProfile->flavorParamsIds);
+//				
+//				if (!in_array($matchedFlavor->id, $profileParamsIds))
+//				{
+//					//  => TODO: call baseEntry.update to replace all relevant flavors!
+//				}
+//				else
+//				{
+//					//TODO: what to do if drop folder's ingestion profile is null ??
+//					$resource = $this->getAllIngestedFiles($entryConversionProfileId);
+//					if (!$resource) {
+//						$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
+//						return false;
+//					}
+//					foreach ($resource->resources as $assetContainer) {
+//						$addionnalFileIds[] = $assetContainer->resource->dropFolderFileId;
+//					}
+//					
+//					//  => TODO: call baseEntry.update to replace all relevant flavors!
+//				}				
+//				
+//			}
+//			
+//			//TODO: Remember to go over additional file ids
+//			
+//			//TODO: return true/false
+//		}
 		
 	}
 	
@@ -331,8 +374,10 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 * @param int $ingestionProfileId
 	 * @return KalturaAssetsParamsResourceContainers
 	 */
-	private function getAllRequiredFiles($ingestionProfileId)
+	private function getAllIngestedFiles($ingestionProfileId = null)
 	{
+		if(is_null($ingestionProfileId))
+			$ingestionProfileId = $this->getIngestionProfileId();
 		
 		$fileFilter = new KalturaDropFolderFileFilter();
 		$fileFilter->dropFolderIdEqual = $this->dropFolder->id;
@@ -354,11 +399,11 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($ingestionProfileId);
 		foreach ($assetParamsList->objects as $assetParams)
 		{
-			if ($assetParams->readyBehavior != KalturaFlavorReadyBehaviorType::REQUIRED &&  $assetParams->origin != KalturaAssetParamsOrigin::INGEST) {
+			if ($assetParams->origin == KalturaAssetParamsOrigin::CONVERT) {
 				continue;
 			}
 			
-			if (!array_key_exists($assetParams->systemName, $existingFlavors)) {
+			if ($assetParams->readyBehavior == KalturaFlavorReadyBehaviorType::REQUIRED && !array_key_exists($assetParams->systemName, $existingFlavors)) {
 				return false;
 			}
 			

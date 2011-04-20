@@ -124,4 +124,16 @@ abstract class DropFolderFileHandler
 			return null;
 		}
 	}
+	
+	/**
+	 * @return int
+	 */
+	protected function getIngestionProfileId()
+	{
+		if($this->dropFolder->ingestionProfileId)
+			return $this->dropFolder->ingestionProfileId;
+			
+		// TODO - get the partner default conversion profile
+		return null;
+	}
 }
