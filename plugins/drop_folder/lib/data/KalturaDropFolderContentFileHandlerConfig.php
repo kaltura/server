@@ -34,6 +34,7 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 			$dbObject = new DropFolderContentFileHandlerConfig();
 			
 		parent::toObject($dbObject, $skip);
+		$dbObject->setHandlerType(DropFolderFileHandlerType::CONTENT);
 		
 		return $dbObject;
 	}	

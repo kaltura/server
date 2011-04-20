@@ -26,7 +26,7 @@ class KalturaDropFolderFileHandlerConfig extends KalturaObject
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
-			$dbObject = new DropFolder();
+			$dbObject = new DropFolderFileHandlerConfig();
 			
 		parent::toObject($dbObject, $skip);
 		

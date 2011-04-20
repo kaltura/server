@@ -29,8 +29,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	}
 	
 	
-	
-
 
 	public function handle()
 	{
@@ -131,6 +129,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$this->dropFolderFile->parsedSlug   = isset($matches[self::REFERENCE_ID_WILDCARD]) ? $matches[self::REFERENCE_ID_WILDCARD] : null;
 		$this->dropFolderFile->parsedFlavor = isset($matches[self::FLAVOR_NAME_WILDCARD])  ? $matches[self::FLAVOR_NAME_WILDCARD]  : null;
 			
+		KalturaLog::debug('Parsed slug ['.$this->dropFolderFile->parsedSlug.'], Parsed flavor ['.$this->dropFolderFile->parsedFlavor.']');
 		return true; // file name matches the defined regex
 	}
 	
@@ -170,6 +169,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		else
 		{
+			//TODO: what to do if drop folder's ingestion profile is null ??
 			$resource = $this->getAllRequiredFiles($this->dropFolder->ingestionProfileId);
 			if (!$resource) {
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
@@ -196,6 +196,12 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		try 
 		{
 			$addedEntry = $this->kClient->baseEntry->add($newEntry, $resource);
+			
+			// set all addional files as handled
+			if ($addionnalFileIds) {
+				$this->setAsHandled($addionnalFileIds);
+			}
+		
 		}
 		catch (Exception $e)
 		{
@@ -203,11 +209,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 			$this->dropFolderFile->errorDescription = 'Internal error adding new entry';	
 			return false;
-		}
-		
-		// set all addional files as handled
-		if ($addionnalFileIds) {
-			$this->setAsHandled($addionnalFileIds);
 		}
 		
 		return true;
@@ -300,6 +301,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 				}
 				else
 				{
+					//TODO: what to do if drop folder's ingestion profile is null ??
 					$resource = $this->getAllRequiredFiles($entryConversionProfileId);
 					if (!$resource) {
 						$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;

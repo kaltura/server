@@ -134,6 +134,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'fileNamePatterns',
 		'createdAt',
 		'updatedAt',
+		'tags',
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -162,7 +163,8 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		$dbFileHandlerConfig = $source_object->getFileHandlerConfig();
 		if ($dbFileHandlerConfig)
 		{
-			$apiFileHandlerConfig = KalturaPluginManager::loadObject('KalturaDropFolderFileHandlerConfig', $dbFileHandlerConfig->getType());
+			$apiFileHandlerConfig = KalturaPluginManager::loadObject('KalturaDropFolderFileHandlerConfig', $dbFileHandlerConfig->getHandlerType());
+			$apiFileHandlerConfig->fromObject($dbFileHandlerConfig);
 			$this->fileHandlerConfig  = $apiFileHandlerConfig;
 		}
 	}

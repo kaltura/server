@@ -31,11 +31,59 @@ class KalturaDocumentEntryOrderBy
  * @package Scheduler
  * @subpackage Client
  */
+class KalturaDocumentFlavorParamsOrderBy
+{
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDocumentFlavorParamsOutputOrderBy
+{
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
 class KalturaDocumentType
 {
 	const DOCUMENT = 11;
 	const SWF = 12;
 	const PDF = 13;
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaPdfFlavorParamsOrderBy
+{
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaPdfFlavorParamsOutputOrderBy
+{
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSwfFlavorParamsOrderBy
+{
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSwfFlavorParamsOutputOrderBy
+{
 }
 
 /**
@@ -92,6 +140,182 @@ abstract class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
  * @subpackage Client
  */
 class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaDocumentFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDocumentFlavorParamsFilter extends KalturaDocumentFlavorParamsBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaDocumentFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDocumentFlavorParamsOutputFilter extends KalturaDocumentFlavorParamsOutputBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaPdfFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaPdfFlavorParamsFilter extends KalturaPdfFlavorParamsBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaPdfFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaPdfFlavorParamsOutputFilter extends KalturaPdfFlavorParamsOutputBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaSwfFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSwfFlavorParamsFilter extends KalturaSwfFlavorParamsBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+abstract class KalturaSwfFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSwfFlavorParamsOutputFilter extends KalturaSwfFlavorParamsOutputBaseFilter
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDocumentFlavorParams extends KalturaFlavorParams
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaDocumentFlavorParamsOutput extends KalturaFlavorParamsOutput
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaPdfFlavorParams extends KalturaFlavorParams
+{
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $readonly = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaPdfFlavorParamsOutput extends KalturaFlavorParamsOutput
+{
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $readonly = null;
+
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSwfFlavorParams extends KalturaFlavorParams
+{
+
+}
+
+/**
+ * @package Scheduler
+ * @subpackage Client
+ */
+class KalturaSwfFlavorParamsOutput extends KalturaFlavorParamsOutput
 {
 
 }

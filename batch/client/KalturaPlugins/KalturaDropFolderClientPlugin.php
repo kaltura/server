@@ -35,8 +35,6 @@ class KalturaDropFolderFileDeletePolicy
 class KalturaDropFolderFileHandlerType
 {
 	const CONTENT = "1";
-	const XML = "2";
-	const CSV = "3";
 }
 
 /**
@@ -798,29 +796,6 @@ class KalturaDropFolderFileResource extends KalturaContentResource
 	 * @var int
 	 */
 	public $dropFolderFileId = null;
-
-
-}
-
-/**
- * @package Scheduler
- * @subpackage Client
- */
-class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHandlerConfig
-{
-	/**
-	 * 
-	 *
-	 * @var KalturaDropFolderContentFileHandlerMatchPolicy
-	 */
-	public $contentMatchPolicy = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $slugRegex = null;
 
 
 }

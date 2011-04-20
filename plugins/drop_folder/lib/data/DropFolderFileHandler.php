@@ -77,7 +77,14 @@ abstract class DropFolderFileHandler
 	 */
 	protected function updateDropFolderFile()
 	{
-		return $this->kClient->dropFolderFile->update($this->dropFolderFile->id, $this->dropFolderFile);
+		$updateFile = new KalturaDropFolderFile();
+		$updateFile->status = $this->dropFolderFile->status;
+		$updateFile->fileSize = $this->dropFolderFile->fileSize;
+		$updateFile->parsedSlug = $this->dropFolderFile->parsedSlug;
+		$updateFile->parsedFlavor = $this->dropFolderFile->parsedFlavor;
+		$updateFile->errorDescription = $this->dropFolderFile->errorDescription;		
+		
+		return $this->kClient->dropFolderFile->update($this->dropFolderFile->id, $updateFile);
 	}
 	
 	
@@ -92,7 +99,7 @@ abstract class DropFolderFileHandler
 		$flavorList = $this->kClient->flavorParams->listAction($flavorFilter);
 		
 		if (is_array($flavorList->objects) && isset($flavorList->objects[0]) ) {
-			return $flavor->objects[0];
+			return $flavorList->objects[0];
 		}
 		else {
 			return null;

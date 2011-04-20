@@ -169,7 +169,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Enable entry replacement approval',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_entry_replacement_approval')))
 		));
-				
+
+		$this->addElement('checkbox', 'enable_drop_folder', array(
+			'label'	  => 'Enable drop folder',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_drop_folder')))
+		));
+		
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_StorageProfile_Enum_StorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');
 		$this->addElements(array($storageServP));

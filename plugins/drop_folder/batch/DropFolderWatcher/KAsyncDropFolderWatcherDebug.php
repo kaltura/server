@@ -6,7 +6,7 @@
  */
 
 // /opt/kaltura/app/batch
-chdir(dirname( __FILE__ ) . "/../../../batch");
+chdir(dirname( __FILE__ ) . "/../../../../batch");
 
 require_once("bootstrap.php");
 

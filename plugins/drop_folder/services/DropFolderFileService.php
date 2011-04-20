@@ -156,7 +156,7 @@ class DropFolderFileService extends KalturaBaseService
 		$dropFolderFileFilter = $filter->toObject();
 
 		$c = new Criteria();
-		$dropFolderFileFilter->attachToCriteria($c);
+		$dropFolderFileFilter->attachToCriteria($c);		
 		$count = DropFolderFilePeer::doCount($c);
 		
 		if ($pager)

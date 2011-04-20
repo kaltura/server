@@ -66,7 +66,7 @@ class KAsyncDropFolderHandler extends KBatchBase
 		}
 		
 		$dropFolders = $dropFolders->objects;
-		KalturaLog::log('['.count($dropFolders->objects).'] folders to handle');
+		KalturaLog::log('['.count($dropFolders).'] folders to handle');
 		
 		foreach ($dropFolders as $folder)
 		{
@@ -126,6 +126,7 @@ class KAsyncDropFolderHandler extends KBatchBase
 			if (!is_null($pattern) && ($pattern != '')) {
 				if (fnmatch($pattern, $fileName)) {
 					$matchFound = true;
+					break;
 				}
 			}
 		}

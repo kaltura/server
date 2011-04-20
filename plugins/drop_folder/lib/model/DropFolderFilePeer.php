@@ -25,7 +25,7 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 		}
 		
 		$c = new myCriteria(); 
-		$c->addAnd ( self::STATUS, array(DropFolderFileStatus::DELETED, DropFolderFileStatus::PURGED) , Criteria::NOT_IN);
+		$c->addAnd ( self::STATUS, DropFolderFileStatus::PURGED , Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter ( $c );
 	}
 	

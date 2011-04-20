@@ -170,6 +170,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $enableEntryReplacementApproval;
 	
+	/**
+	 * @var bool
+	 */
+	public $enableDropFolder;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -220,6 +225,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		if(class_exists('AnnotationPlugin'))
 			$this->enableAnnotation = $source_object->getPluginEnabled(AnnotationPlugin::getPluginName());
+			
+		if(class_exists('DropFolderPlugin'))
+			$this->enableDropFolder = $source_object->getPluginEnabled(DropFolderPlugin::getPluginName());
 		
 		$this->enableMobileFlavors = $source_object->getEnabledService(PermissionName::FEATURE_MOBILE_FLAVORS);
 		$this->enablePs2PermissionValidation = $source_object->getEnabledService(PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
@@ -254,6 +262,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			
 		if(!is_null($this->enableEntryReplacementApproval))
 			$object_to_fill->setEnabledService($this->enableEntryReplacementApproval, PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL);
+			
+		if(class_exists('DropFolderPlugin') && !is_null($this->enableDropFolder))
+			$object_to_fill->setPluginEnabled(DropFolderPlugin::getPluginName(), $this->enableDropFolder);
 		
 		return $object_to_fill;
 	}
