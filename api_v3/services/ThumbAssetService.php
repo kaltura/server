@@ -380,7 +380,7 @@ class ThumbAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
 		$entry = $thumbAsset->getentry();
-		if(!$entry)
+		if(!$entry || (!$this->getKuser()->getIsAdmin() && $entry->getKuserId() != $this->getKuser()->getId()))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
 			
 		$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
