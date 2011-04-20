@@ -497,19 +497,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if($isAttribute) //Gets value from attributes
 		{
-			$flavorParamsId = kXml::getXmlAttributeAsString($elementToSearchIn, "conversionProfileId"); 
-			$flavorParamsName = kXml::getXmlAttributeAsString($elementToSearchIn,"conversioProfile");
+			$conversionProfileId = kXml::getXmlAttributeAsString($elementToSearchIn, "conversionProfileId"); 
+			$conversionProfileName = kXml::getXmlAttributeAsString($elementToSearchIn,"conversioProfile");
 		}
 		else //Gets value from elements
 		{
-			$flavorParamsId = (string)$elementToSearchIn->conversionProfileId; 
-			$flavorParamsName = (string)$elementToSearchIn->conversionProfile;
+			$conversionProfileId = (string)$elementToSearchIn->conversionProfileId; 
+			$conversionProfileName = (string)$elementToSearchIn->conversionProfile;
 		}
 			
-		return $this->getCoversionProfileByIdAndName($flavorParamsId, $flavorParamsName);
+		return $this->getConversionProfileByIdAndName($conversionProfileId, $conversionProfileName);
 	}
-	
-	
+		
 	/**
 	 * 
 	 * Gets the thumb params id from the given element
@@ -688,14 +687,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!empty($conversionProfileName)) //If we have no id then we search by name
 		{
-			if(is_null($this->flavorParamsNameToId))
+			if(is_null($this->conversionProfileNameToId))
 			{
 				$this->initFlavorParamsNameToId();
 			}
 			
-			if(isset($this->flavorParamsNameToId[$conversionProfileName]))
+			if(isset($this->conversionProfileNameToId[$conversionProfileName]))
 			{
-				return trim($this->flavorParamsNameToId[$conversionProfileName]);
+				return trim($this->conversionProfileNameToId[$conversionProfileName]);
 			}
 		}
 
@@ -1014,7 +1013,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setMediaElementValues(SimpleXMLElement $mediaElement)
 	{
 		$this->typedElement->mediaType = $mediaElement->mediaType;
-		$this->typedElement->ingestionProfileId = $this->getCoversionProfileId();
+		$this->typedElement->ingestionProfileId = $this->getConversionProfileId();
 		$this->checkMediaTypes($this->entry->type ,$this->typedElement->mediaType);
 	}
 	
