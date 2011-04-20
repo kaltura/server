@@ -28,6 +28,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Holds all the bulk upload results
 	 * @var array<KalturaBulkUploadResult>
+	 * @todo consider to delete it
 	 */
 	private $bulkUploadResults = array();
 	 
@@ -35,6 +36,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * The current proccessed entry
 	 * @var KalturaMediaEntry
+	 * @todo consider to pass within functions
 	 */
 	private $entry = null;
 	
@@ -42,6 +44,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * The current item flavor assests
 	 * @var array<KalturaFlavorAssest>
+	 * @todo consider to pass within functions
 	 */
 	private $flavorAssets = array();
 	
@@ -49,18 +52,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * The current thumb assests
 	 * @var array<KalturaThumbAssest>
+	 * @todo consider to pass within functions
 	 */
 	private $thumbAssets = array();
 
 	/**
 	 * The thumb assets resuorces
 	 * @var array<KalturaResource>
+	 * @todo consider to pass within functions
 	 */
 	private $thumbResources = array();
 	
 	/**
 	 * The thumb assets resuorces
 	 * @var array<KalturaResource> 
+	 * @todo consider to pass within functions
 	 */
 	private $flavorResources = array();
 
@@ -69,6 +75,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * The typed elemenet (the additional data needed for the element)
 	 * such as: Media, Mix ...
 	 * @var unknown_type
+	 * @todo try to manage without it
 	 */
 	private $typedElement = null;
 	
@@ -78,6 +85,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var array()
 	 */
 	private $flavorParamsNameToId = null;
+	
+	/**
+	 * 
+	 * Maps the thumb params name to id
+	 * @var array()
+	 */
+	private $thumbParamsNameToId = null;
 	
 	/**
 	 * 
@@ -100,13 +114,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private $storageProfileNameToId = null;
 	
-	/**
-	 * 
-	 * Maps the thumb params name to id
-	 * @var array()
-	 */
-	private $thumbParamsNameToId = null;
-	
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
 	 */
@@ -119,6 +126,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Validates that the xml is valid using the XSD
+	 * @todo check err desc like in kMetadataManager::validateMetadata
 	 */
 	protected function validate() 
 	{
@@ -127,7 +135,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Validate the XML file against the schema
 		if(!$xdoc->schemaValidate(dirname(__FILE__) . $this->xsdFilePath)) 
 		{
-			throw new KalturaException("Validate files failed on job [{$this->job->id}]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}]", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
 		return true;
@@ -159,7 +167,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach( $channel->item as $item)
 		{
 			KalturaLog::debug("Validating item [{$item->name}]");
-			$this->validateItem($item);
+			try{
+				$this->validateItem($item);
+			}
+			catch (BulkUploadXmlException $e)
+			{
+				// TODO create bulk upload results with falure
+			}
 			
 			//TODO: add check if the bulk count has reached its max size and send the data
 			KalturaLog::debug("Handling item [{$item->name}]");
@@ -171,11 +185,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Validates the given item so it's valid (some validation can't be enforced in the schema)
 	 * @param SimpleXMLElement $item
+	 * @return bool
 	 */
 	private function validateItem(SimpleXMLElement $item)
 	{
 		//Validates that the item type has a matching type element
-		$this->checkTypeToTypedElement($item);
+		if(!$this->validateTypeToTypedElement($item))
+			return false;
+			
+		return true;
 	}		
 	
 	/**
@@ -288,48 +306,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->startMultiRequest();
 		
 		$this->updateEntriesResults($this->requestResults, $this->bulkUploadResults);
-	}
-	
-	/**
-	 * save the results for returned created entries
-	 * 
-	 * @param array $requestResults
-	 * @param array $bulkUploadResults
-	 */
-	protected function updateEntriesResults(array $requestResults, array $bulkUploadResults)
-	{
-		if(count($requestResults) != count($bulkUploadResults))
-			throw new KalturaBatchException("request results [$requestResults] and bulk upload results [$bulkUploadResults] must have the same size", KalturaBatchJobAppErrors::BULK_INVLAID_BULK_REQUEST_COUNT);
-			
-		KalturaLog::debug("request results [$requestResults], bulk upload results [$bulkUploadResults]");
-		KalturaLog::info("Updating " . count($requestResults) . " results");
-		
-		// checking the created entries
-		foreach($requestResults as $index => $requestResult)
-		{
-			$bulkUploadResult = $bulkUploadResults[$index];
-			
-			if($requestResult instanceof Exception)
-			{
-				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
-				$bulkUploadResult->errorDescription = $requestResult->getMessage();
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
-			}
-			
-			// TODO: support when we don't insert media entries
-			if(! ($requestResult instanceof KalturaMediaEntry)) 
-			{
-				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
-				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue;
-			}
-			
-			// update the results with the new entry id
-			$bulkUploadResult->entryId = $requestResult->id;
-			$this->addBulkUploadResult($bulkUploadResult);
-		}
 	}
 	
 	/**
@@ -884,8 +860,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED ; 
 	 */
-	private function checkTypeToTypedElement(SimpleXMLElement $item) 
+	private function validateTypeToTypedElement(SimpleXMLElement $item) 
 	{
+		if(!empty($item->media) && $item->type != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			
+		if(!empty($item->mix) && $item->type != KalturaEntryType::MIX)
+			throw new KalturaBatchException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			
+		// TODO ....
+		
 		//Gets all the possible elements 
 		$mediaElement = $item->media;
 		$mixElement = $item->mix;
