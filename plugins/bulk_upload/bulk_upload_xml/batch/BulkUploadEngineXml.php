@@ -400,7 +400,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 		if(is_null($resource))
 		{
-			throw new KalturaBatchException("Resource is not supported: {$elementToSearchIn->asXml()}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
+			throw new KalturaBatchException("Resource is not supported: {$elementToSearchIn->asXml()}", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED); //failed to get teh resource from the given item
 		}
 		
 		return $resource;
