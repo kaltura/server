@@ -201,6 +201,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entryToInsert = $this->createMediaEntryFromItem($item);
 		KalturaLog::debug("Entry to add is: {$entryToInsert->name}");
 		
+		//TODO: add the entry with 
 		$entryToInsert->ingestionProfileId = -1; // Add the entry first as a no convert entry and then add all the flavors
 //		$result = $this->kClient->media->add($entryToInsert, $resource);
 		
@@ -219,6 +220,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 //			$this->setContentElementValues(&$entryToInsert);
 			KalturaLog::debug("Flavor assest to add to: {$newEntry->id}");
 			$result = $this->kClient->flavorAsset->add($newEntry->id, $flavorAsset, $resource);
+			KalturaLog::debug("Flavor assest is: {$result->id}");
 		}
 //		$this->doMultiRequestForPartner();
 
@@ -232,6 +234,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 //			$this->setThumbElementValues(&$entryToInsert);
 			KalturaLog::debug("Thumb assest to add is: {$newEntry->id}");
 			$result = $this->kClient->thumbAsset->add($newEntry->id, $flavorAsset, $resource);
+			KalturaLog::debug("Thumb assest is: {$result->id}");
 		}
 //		$this->doMultiRequestForPartner();
 	}
@@ -245,8 +248,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getFlavorAsset(KalturaMediaEntry $newEntry)
 	{
 		$flavorAsset = new KalturaFlavorAsset();
-		$flavorAsset->entryId = $newEntry->id;
+//		$flavorAsset->entryId = $newEntry->id;
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($this->currentContentElement);
+		$flavorAsset->tags = $this->getStringFromElement($this->currentContentElement->tags);
 		return $flavorAsset;
 	}
 	
@@ -259,8 +263,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getThumbAsset(KalturaMediaEntry $newEntry)
 	{
 		$thumbAsset = new KalturaThumbAsset();
-		$thumbAsset->entryId = $newEntry->id;
+//		$thumbAsset->entryId = $newEntry->id;
 		$thumbAsset->thumbParamsId= $this->getThumbParamsId($this->currentThumbnailElement);
+		$thumbAsset->tags = $this->getStringFromElement($this->currentThumbnailElement->tags);
 		return $thumbAsset;
 	}
 	
@@ -451,7 +456,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getAccessControlIdByIdAndName($accessControlId, $accessControlName)
 	{
-		if(!empty($accessControlId) || $accessControlId == 0 || $accessControlId== '0')
+		if(!empty($accessControlId) || $accessControlId == 0 || $accessControlId == '0')
 		{
 			return trim($accessControlId);
 		}
