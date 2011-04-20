@@ -10,11 +10,11 @@
  */
 class PlaylistService extends KalturaEntryService
 {
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClassNoKalturaNetwork ( new accessControlPeer() );
-	}
+//	public function initService($serviceId, $serviceName, $actionName)
+//	{
+//		parent::initService($serviceId, $serviceName, $actionName);
+//		parent::applyPartnerFilterForClassNoKalturaNetwork ( new accessControlPeer() );
+//	}
 	
 	protected function kalturaNetworkAllowed($actionName)
 	{
