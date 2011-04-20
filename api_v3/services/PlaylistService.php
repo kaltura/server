@@ -263,7 +263,7 @@ class PlaylistService extends KalturaEntryService
 			$filter = new KalturaPlaylistFilter();
 			
 	    $filter->typeEqual = KalturaEntryType::PLAYLIST;
-	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager, baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+	    list($list, $totalCount) = parent::listEntriesByFilter($filter, $pager);
 	    
 	    $newList = KalturaPlaylistArray::fromPlaylistArray($list);
 		$response = new KalturaPlaylistListResponse();
