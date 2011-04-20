@@ -73,11 +73,13 @@ package com.kaltura.commands {
 						}
 					}
 
+					// add parameters which are not in the map but are in the request
 					if (!inMap && argsArr[k]) //if not in the multi request map
 					{
 						keyArray.push((j + 1) + ":" + key);
 						valueArr.push(decodeURIComponent(argsArr[k].split('=')[1]));
 					}
+					//TODO add params which ARE in the map and are NOT in the request (some params are removed if they have default values)
 				}
 			}
 
