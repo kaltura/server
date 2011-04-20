@@ -529,7 +529,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getFlavorParamsByIdAndName($flavorParamsId, $flavorParamsName)
 	{
-		if(isset($flavorParamsId) && !empty($flavorParamsId))
+		KalturaLog::info("In getFlavorParamsByIdAndName - flavorParamsId [$flavorParamsId] flavorParamsName [$flavorParamsName]");
+		
+		if(!empty($flavorParamsId) ||  $flavorParamsId = 0 || $flavorParamsId = '0')
 		{
 			return trim($flavorParamsId);
 		}
