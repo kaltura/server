@@ -150,14 +150,14 @@ class MediaService extends KalturaEntryService
 			case 'kAssetsParamsResourceContainers':
 				// image entry doesn't support asset params
 				if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-					return null;
+					throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($resource));
 					
 				return $this->attachAssetsParamsResourceContainers($resource, $dbEntry);
 				
 			case 'kAssetParamsResourceContainer':
 				// image entry doesn't support asset params
 				if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-					return null;
+					throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($resource));
 					
 				return $this->attachAssetParamsResourceContainer($resource, $dbEntry, $dbAsset);
 				
