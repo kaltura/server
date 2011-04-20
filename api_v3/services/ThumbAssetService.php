@@ -85,6 +85,9 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
 		
+		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+			$this->setAsDefaultAction($dbThumbAsset->getId());
+		
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->fromObject($dbThumbAsset);
 		return $thumbAsset;
@@ -119,6 +122,9 @@ class ThumbAssetService extends KalturaBaseService
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbThumbAsset, $kContentResource);
 		
+		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+			$this->setAsDefaultAction($dbThumbAsset->getId());
+			
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->fromObject($dbThumbAsset);
 		return $thumbAsset;

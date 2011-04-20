@@ -19,6 +19,7 @@ class FlavorAssetService extends KalturaBaseService
 		
 		$partnerGroup = null;
 		if(
+			$actionName == 'add' ||
 			$actionName == 'get' ||
 			$actionName == 'list' ||
 			$actionName == 'getByEntryId' ||
