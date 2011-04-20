@@ -531,7 +531,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		KalturaLog::info("In getFlavorParamsByIdAndName - flavorParamsId [$flavorParamsId] flavorParamsName [$flavorParamsName]");
 		
-		if(!empty($flavorParamsId) ||  $flavorParamsId = 0 || $flavorParamsId = '0')
+		if(!empty($flavorParamsId) ||  $flavorParamsId == 0 || $flavorParamsId == '0')
 		{
 			return trim($flavorParamsId);
 		}
@@ -550,7 +550,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		//If we got here then the id or name weren't found
-		throw new KalturaBatchException("Can't find flavor params with id [], name [$flavorParamsName]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		throw new KalturaBatchException("Can't find flavor params with id [$flavorParamsId], name [$flavorParamsName]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
