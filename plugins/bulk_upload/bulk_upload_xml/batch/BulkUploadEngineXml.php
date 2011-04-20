@@ -203,6 +203,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$entryToInsert->ingestionProfileId = -1; // Add the entry first as a no convert entry and then add all the flavors
 //		$result = $this->kClient->media->add($entryToInsert, $resource);
+		
+		$this->kClientConfig->partnerId = $this->currentPartnerId;
+		$this->kClient->setConfig($this->kClientConfig);
 		$newEntry = $this->kClient->media->add($entryToInsert);
 		KalturaLog::debug("newEntry is: " .var_dump($newEntry));
 		
