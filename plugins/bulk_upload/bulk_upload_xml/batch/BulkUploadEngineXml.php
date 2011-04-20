@@ -214,8 +214,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$flavorAsset = $this->getFlavorAsset($newEntry);
 			$resource = $this->getResource($this->currentContentElement);
 //			$this->setContentElementValues(&$entryToInsert);
-			KalturaLog::debug("Flavor assest to add is: {$entryToInsert->name}");
-			$result = $this->kClient->flavorAsset->add($result->id, $flavorAsset, $resource);
+			KalturaLog::debug("Flavor assest to add to: {$newEntry->id}");
+			$result = $this->kClient->flavorAsset->add($newEntry->id, $flavorAsset, $resource);
 		}
 //		$this->doMultiRequestForPartner();
 
@@ -227,8 +227,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumbnailAsset = $this->getThumbAsset($newEntry);		
 			$resource = $this->getResource($this->currentThumbnailElement);
 //			$this->setThumbElementValues(&$entryToInsert);
-			KalturaLog::debug("Thumb assest to add is: {$entryToInsert->name}");
-			$result = $this->kClient->thumbAsset->add($result->id, $flavorAsset, $resource);
+			KalturaLog::debug("Thumb assest to add is: {$newEntry->id}");
+			$result = $this->kClient->thumbAsset->add($newEntry->id, $flavorAsset, $resource);
 		}
 //		$this->doMultiRequestForPartner();
 	}
@@ -448,7 +448,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getAccessControlIdByIdAndName($accessControlId, $accessControlName)
 	{
-		if(isset($accessControlId) && !empty($accessControlId))
+		if(!empty($accessControlId) || $accessControlId == 0 || $accessControlId== '0')
 		{
 			return trim($accessControlId);
 		}
@@ -496,7 +496,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getStorageProfileByIdAndName($storageProfileId, $storageProfileName)
 	{
-		if(isset($storageProfileId) && !empty($storageProfileId))
+		if(!empty($storageProfileId) || $storageProfileId == 0 || $storageProfileId == '0')
 		{
 			return trim($storageProfileId);
 			
@@ -563,7 +563,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getThumbParamsByIdAndName($thumbParamsId, $thumbParamsName)
 	{
-		if(isset($thumbParamsId) && !empty($thumbParamsId))
+		if(!empty($thumbParamsId) || $thumbParamsId == 0 || $thumbParamsId == '0')
 		{
 			return trim($thumbParamsId);
 		}
