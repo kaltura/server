@@ -22,6 +22,16 @@ class KalturaAssetParamsResourceContainer extends KalturaResource
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('resource');
     	$this->validatePropertyNotNull('assetParamsId');
+    	
+   		$this->resource->validateEntry($dbEntry);
+	}
+	
+	public function entryHandled(entry $dbEntry)
+	{
+		parent::entryHandled($dbEntry);
+		
+    	if($this->resource)
+    		$this->resource->entryHandled($dbEntry);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

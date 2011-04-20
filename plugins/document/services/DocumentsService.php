@@ -52,6 +52,8 @@ class DocumentsService extends KalturaEntryService
 		if(!$dbEntry || !$dbEntry->getId())
 			return null;
 			
+    	$resource->entryHandled($dbEntry);
+    		
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
 		
 		$entry = new KalturaMediaEntry();

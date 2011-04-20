@@ -15,6 +15,17 @@ class KalturaAssetsParamsResourceContainers extends KalturaResource
 	{
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('resources');
+    	
+    	foreach($this->resources as $resource)
+    		$resource->validateEntry($dbEntry);
+	}
+	
+	public function entryHandled(entry $dbEntry)
+	{
+		parent::entryHandled($dbEntry);
+		
+    	foreach($this->resources as $resource)
+    		$resource->entryHandled($dbEntry);
 	}
 
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

@@ -20,6 +20,11 @@ class KalturaUploadedFileTokenResource extends KalturaContentResource
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('token');
 	}
+	public function entryHandled(entry $dbEntry)
+	{
+		parent::entryHandled($dbEntry);
+		kUploadTokenMgr::closeUploadTokenById($this->token);
+	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
