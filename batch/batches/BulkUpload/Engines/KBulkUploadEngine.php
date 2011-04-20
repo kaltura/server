@@ -231,7 +231,7 @@ abstract class KBulkUploadEngine
 				continue;
 			}
 			
-			if(! ($requestResult instanceof KalturaMediaEntry))
+			if(! ($requestResult instanceof KalturaBaseEntry))
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->errorDescription = "Returned type is " . get_class($requestResult) . ', KalturaMediaEntry was expected';
