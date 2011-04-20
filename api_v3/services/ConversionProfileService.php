@@ -52,6 +52,18 @@ class ConversionProfileService extends KalturaBaseService
 	}
 	
 	/**
+	 * Get the partner's default conversion profile
+	 * 
+	 * @action getDefault
+	 * @return int
+	 */
+	public function getDefaultAction()
+	{
+		$defaultProfileId = $this->getPartner()->getDefaultConversionProfileId();
+		return $this->getAction($defaultProfileId);
+	}
+	
+	/**
 	 * Add new Conversion Profile
 	 * 
 	 * @action add
