@@ -1,10 +1,10 @@
 <?php
 require_once("KalturaClientBase.php");
 
-class KalturaDynamicEnum extends KalturaObjectBase
+/*class KalturaDynamicEnum extends KalturaObjectBase
 {
 
-}
+}*/
 
 class KalturaJobData extends KalturaObjectBase
 {
