@@ -1013,7 +1013,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setMediaElementValues(SimpleXMLElement $mediaElement)
 	{
 		$this->typedElement->mediaType = $mediaElement->mediaType;
-		$this->typedElement->ingestionProfileId = $this->getConversionProfileId();
+		$this->typedElement->ingestionProfileId = $this->getConversionProfileId($mediaElement);
 		$this->checkMediaTypes($this->entry->type ,$this->typedElement->mediaType);
 	}
 	
