@@ -338,6 +338,14 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$delResult = @unlink($sharedPhysicalFilePath);
 		if (!$delResult) {
 			KalturaLog::err("Cannot delete physical file at path [$sharedPhysicalFilePath]");
+			try {
+				$updateDropFolderFile = new KalturaDropFolderFile();
+				$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_DELETING;
+				$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+			}
+			catch (Exception $e) {
+				KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
+			}
 			return false;
 		}
 		
