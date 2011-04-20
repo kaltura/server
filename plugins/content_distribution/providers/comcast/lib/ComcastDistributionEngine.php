@@ -174,7 +174,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->contentType = ComcastContentType::_IMAGE;
 				$mediaFile->format = ComcastFormat::_JPEG;
 				$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
-				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}";
+				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}.jpg";
 				$mediaFile->height = $thumbAsset->width;
 				$mediaFile->width = $thumbAsset->height;
 				$mediaFile->isThumbnail = true;
@@ -206,7 +206,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
 			$mediaFile->length = $entry->duration;
 			$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
-			$mediaFile->originalLocation = "$url/filename/{$flavorAsset->id}";
+			$mediaFile->originalLocation = "$url/filename/{$flavorAsset->id}.{$flavorAsset->fileExt}";
 			$mediaFile->height = $flavorAsset->width;
 			$mediaFile->width = $flavorAsset->height;
 			$mediaFiles[] = $mediaFile;
@@ -397,7 +397,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->contentType = ComcastContentType::_IMAGE;
 				$mediaFile->format = ComcastFormat::_JPEG;
 				$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
-				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}";
+				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}.jpg";
 				$mediaFile->height = $thumbAsset->width;
 				$mediaFile->width = $thumbAsset->height;
 				$mediaFile->isThumbnail = true;
@@ -438,7 +438,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
 			$mediaFile->length = $entry->duration;
 			$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
-			$mediaFile->originalLocation = "$url/filename/{$flavorAsset->id}";
+			$mediaFile->originalLocation = "$url/filename/{$flavorAsset->id}.{$flavorAsset->fileExt}";
 			$mediaFile->height = $flavorAsset->width;
 			$mediaFile->width = $flavorAsset->height;
 	
