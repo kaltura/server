@@ -8,6 +8,106 @@
  */
 abstract class KBulkUploadEngine
 {
+		/**
+	 * @param string $str
+	 * @return int
+	 */
+	protected function parseFormatedDate($str)
+	{
+		if(function_exists('strptime'))
+		{
+			$ret = strptime($str, self::BULK_UPLOAD_DATE_FORMAT);
+			if($ret)
+			{
+				KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
+				return $ret;
+			}
+		}
+			
+		$fields = null;
+		$regex = $this->getDateFormatRegex($fields);
+		
+		$values = null;
+		if(!preg_match($regex, $str, $values))
+			return null;
+			
+		$hour = 0;
+		$minute = 0;
+		$second = 0;
+		$month = 0;
+		$day = 0;
+		$year = 0;
+		$is_dst = 0;
+		
+		foreach($fields as $index => $field)
+		{
+			$value = $values[$index + 1];
+			
+			switch($field)
+			{
+				case 'Y':
+					$year = intval($value);
+					break;
+					
+				case 'm':
+					$month = intval($value);
+					break;
+					
+				case 'd':
+					$day = intval($value);
+					break;
+					
+				case 'H':
+					$hour = intval($value);
+					break;
+					
+				case 'i':
+					$minute = intval($value);
+					break;
+					
+				case 's':
+					$second = intval($value);
+					break;
+					
+//				case 'T':
+//					$date = date_parse($value);
+//					$hour -= ($date['zone'] / 60);
+//					break;
+					
+			}
+		}
+		
+		KalturaLog::debug("gmmktime($hour, $minute, $second, $month, $day, $year)");
+		$ret = gmmktime($hour, $minute, $second, $month, $day, $year);
+		if($ret)
+		{
+			KalturaLog::debug("Formated Date [$ret] " . date('Y-m-d\TH:i:s', $ret));
+			return $ret;
+		}
+		return null;
+	}
+		
+	/**
+	 * @param string $str
+	 * @return boolean
+	 */
+	protected function isUrl($str)
+	{
+		$str = KCurlWrapper::encodeUrl($str);
+		
+		$strRegex = "^((https?)|(ftp)):\\/\\/" . "?(([0-9a-z_!~*'().&=+$%-]+:)?[0-9a-z_!~*'().&=+$%-]+@)?" . //user@
+					"(([0-9]{1,3}\\.){3}[0-9]{1,3}" . // IP- 199.194.52.184
+					"|" . // allows either IP or domain
+					"([0-9a-z_!~*'()-]+\\.)*" . // tertiary domain(s)- www.
+					"([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." . // second level domain
+					"[a-z]{2,6})" . // first level domain- .com or .museum
+					"(:[0-9]{1,4})?" . // port number- :80
+					"((\\/?)|" . // a slash isn't required if there is no file name
+					"(\\/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+)$";
+		
+		return preg_match("/$strRegex/i", $str);
+	}
+		
 	/**
 	 * @param array $fields
 	 * @return string
