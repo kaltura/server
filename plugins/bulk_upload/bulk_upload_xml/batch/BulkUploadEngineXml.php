@@ -9,13 +9,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	/**
 	 * 
-	 * The batch partner id (used to un impersonate)
-	 * @var unknown_type
-	 */
-	const BATCH_PARTNER_ID = -1;
-	
-	/**
-	 * 
 	 * The add action (default) string
 	 * @var string
 	 */
@@ -382,8 +375,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
 	{
-		$this->impersonate(self::BATCH_PARTNER_ID);
-		
 		//Gets the created thumbs and flavors
 		$createdFlavorAssets = $this->kClient->flavorAsset->getByEntryId($createdEntryId);
 		$createdThumbAssets = $this->kClient->thumbAsset->getByEntryId($createdEntryId);
