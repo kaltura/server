@@ -39,6 +39,9 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
+		if(is_null($baseEnumName))
+			return array('YoutubeApiDistributionProviderType');
+	
 		if($baseEnumName == 'DistributionProviderType')
 			return array('YoutubeApiDistributionProviderType');
 			
