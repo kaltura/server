@@ -337,6 +337,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->startMultiRequest(true);
 		
+		if(!count($resource->resources))
+			$resource = null;
+			
 		$this->kClient->baseEntry->add($entry, $resource, $entry->type);
 		$newEntryId = "{1:result:id}";
 		
