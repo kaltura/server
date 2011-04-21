@@ -217,7 +217,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("xml [" . $item->asXML() . "]");
 			
 		$entry = $this->createEntryFromItem($item);
-		$this->handleTypedElement(&$entry, $item);
+		$this->handleTypedElement($entry, $item);
 		KalturaLog::debug("current entry is: " .var_dump($entry));
 				
 		$thumbAssets = array();
@@ -749,27 +749,27 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			case KalturaEntryType::AUTOMATIC:
 			case KalturaEntryType::MEDIA_CLIP:
-				$this->setMediaElementValues(&$entry, $item);
+				$this->setMediaElementValues($entry, $item);
 				break;
 				
 			case KalturaEntryType::MIX:
-				$this->setMixElementValues(&$entry, $item);
+				$this->setMixElementValues($entry, $item);
 				break;
 				
 			case KalturaEntryType::DATA:
-				$this->setDataElementValues(&$entry, $item);
+				$this->setDataElementValues($entry, $item);
 				break;
 				
 			case KalturaEntryType::DOCUMENT:
-				$this->setDocumentElementValues(&$entry, $item);
+				$this->setDocumentElementValues($entry, $item);
 				break;
 				
 			case KalturaEntryType::LIVE_STREAM:
-				$this->setLiveStreamElementValues(&$entry, $item);
+				$this->setLiveStreamElementValues($entry, $item);
 				break;
 			
 			case KalturaEntryType::PLAYLIST:
-				$this->setPlaylistElementValues(&$entry, $item);
+				$this->setPlaylistElementValues($entry, $item);
 				break;
 				
 			default:
