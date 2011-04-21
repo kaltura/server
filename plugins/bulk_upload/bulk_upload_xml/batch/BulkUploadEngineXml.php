@@ -288,7 +288,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		$requestResult = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 				
-		$createdEntry = reset($requestResults);
+		$createdEntry = reset($requestResult);
 		
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
