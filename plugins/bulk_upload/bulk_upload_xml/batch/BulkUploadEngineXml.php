@@ -283,8 +283,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$requestResult = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 				
 		$createdEntry = reset($requestResults);
-		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 		
+		//Throw exception in case of  max proccessed items and handle all exceptions there
+		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
+				
 		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
 		$this->handleFlavorAndThumbsAdditionalData($createdEntry->id, $flavorAssets, $thumbAssets);
@@ -439,8 +441,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getResourceInstance(SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug("In getResourceInstance");
-		
 		$resource = null;
 			
 		if(!empty($elementToSearchIn->localFileContentResource))
@@ -944,14 +944,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$childNodeValue = trim($child);
 				if(!empty($childNodeValue))
 				{
-					KalturaLog::debug("In getStringFromElement - child value [". $childNodeValue . "]");
+					KalturaLog::debug("child value [". $childNodeValue . "]");
 					$ret[] = $childNodeValue;
 				}
 			}
 		}
 		
 		$ret = implode(',', $ret);
-		KalturaLog::debug("In getStringFromElement - The created string [$ret]");
+		KalturaLog::debug("The created string [$ret]");
 		return $ret;
 	}
 
