@@ -42,7 +42,8 @@ class KalturaBulkUpload extends KalturaObject
 	
 	/**
 	 * @var string;
-	 */
+	 * //TODO: Roni - can you please change this to be $bulkFileUrl? instead of csvFileUrl
+     */
 	public $csvFileUrl;
 	
 	/**
