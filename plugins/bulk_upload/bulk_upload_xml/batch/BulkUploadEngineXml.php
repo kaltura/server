@@ -337,8 +337,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->startMultiRequest(true);
 		
-		KalturaLog::debug("resources are: " . var_dump($resource));
-		
 		$this->kClient->baseEntry->add($entry, $resource, $entry->type);
 		$newEntryId = "{1:result:id}";
 		
@@ -985,11 +983,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$ret = array();
 		if($currentTags)
 			$ret = explode(',', $currentTags);
-		
-		if(empty($element)) // if the element is empty we return an empty string
-		{
-			return "";
-		}
 		
 		foreach ($element->children() as $child)
 		{
