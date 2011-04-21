@@ -89,7 +89,7 @@ class KAsyncBulkUpload extends KBatchBase {
 	 */
 	private function unimpersonate()
 	{
-		$this->kClientConfig->partnerId = Partner::BATCH_PARTNER_ID;
+		$this->kClientConfig->partnerId = -1;
 		$this->kClient->setConfig($this->kClientConfig);
 	}
 	
