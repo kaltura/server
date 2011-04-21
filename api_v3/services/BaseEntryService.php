@@ -43,14 +43,21 @@ class BaseEntryService extends KalturaEntryService
     {
     	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
     	
-    	$kResource = $resource->toObject();
-    	if($type == KalturaEntryType::AUTOMATIC)
-    		$this->setEntryTypeByResource($dbEntry, $kResource);
+    	$kResource = null;
+    	if($resource)
+    	{
+    		$kResource = $resource->toObject();
+	    	if($type == KalturaEntryType::AUTOMATIC)
+	    		$this->setEntryTypeByResource($dbEntry, $kResource);
+    	}
     	$dbEntry->save();
     	
-    	$resource->validateEntry($dbEntry);
-    	
-    	$this->attachResource($kResource, $dbEntry);
+    	if($resource)
+    	{
+    		$resource->validateEntry($dbEntry);
+    		$this->attachResource($kResource, $dbEntry);
+    		$resource->entryHandled($dbEntry);
+    	}
     	
 	    $entry->fromObject($dbEntry);
 	    return $entry;
