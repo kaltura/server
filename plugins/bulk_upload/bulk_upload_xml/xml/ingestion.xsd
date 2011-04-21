@@ -468,25 +468,6 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<!--
-			<xs:choice minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>
-						List of thumbnail params to be generated for this distribution destination.
-					</xs:documentation>
-				</xs:annotation>
-				<xs:element name="thumbParamsIds" minOccurs="1" maxOccurs="1">
-					<xs:complexType mixed="true">
-						<xs:attribute name="generateIfMissing" use="optional" type="xs:boolean" default="false"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="thumbParams" minOccurs="1" maxOccurs="1">
-					<xs:complexType mixed="true">
-						<xs:attribute name="generateIfMissing" use="optional" type="xs:boolean" default="false"/>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
-			-->
 			<xs:element name="ingestedThumbIds" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
