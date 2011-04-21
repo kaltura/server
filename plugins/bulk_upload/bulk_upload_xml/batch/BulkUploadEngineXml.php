@@ -730,7 +730,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 		//TODO: Roni - Parse the date
 		$entry->startDate = $item->startDate;
-		$entry->type = $item->type;
+		$entry->type = (int)$item->type;
 		$entry->ingestionProfileId = $this->getIngestionProfileId($item);	
 		
 		return $entry;
