@@ -816,7 +816,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setMediaElementValues(KalturaMediaEntry $media, SimpleXMLElement $itemElement)
 	{
-		$mediaElement = $item->media;
+		$mediaElement = $itemElement->media;
 		$media->mediaType = $mediaElement->mediaType;
 		$media->ingestionProfileId = $this->getIngestionProfileId($mediaElement);
 		$this->checkMediaTypes($media->type ,$media->mediaType);
@@ -830,7 +830,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setPlaylistElementValues(KalturaPlaylist $playlistEntry, SimpleXMLElement $itemElement)
 	{
-		$playlistElement = $item->playlist;
+		$playlistElement = $itemElement->playlist;
 		$playlistEntry->playlistType = $playlistElement->playlistType;
 		$playlistEntry->playlistContent = $playlistElement->playlistContent;
 	}
@@ -843,7 +843,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setLiveStreamElementValues(KalturaLiveStreamEntry $liveStreamEntry, SimpleXMLElement $itemElement)
 	{
-		$liveStreamElement = $item->liveStream;
+		$liveStreamElement = $itemElement->liveStream;
 		$liveStreamEntry->bitrates = $liveStreamElement->bitrates;
 		//What to do with those?
 //		$liveStreamEntry->encodingIP1 = $dataElement->encodingIP1;
@@ -859,7 +859,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setDataElementValues(KalturaDataEntry $dataEntry, SimpleXMLElement $itemElement)
 	{
-		$dataElement = $item->media;
+		$dataElement = $itemElement->media;
 		$dataEntry->dataContent = $dataElement->dataContent;
 		$dataEntry->retrieveDataContentByGet = $dataElement->retrieveDataContentByGet;
 	}
@@ -873,7 +873,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setMixElementValues(KalturaMixEntry $mix, SimpleXMLElement $itemElement)
 	{
 		//TOOD: add support for the mix elements
-		$mixElement = $item->mix;
+		$mixElement = $itemElement->mix;
 		$mix->editorType = $mixElement->editorType;
 		$mix->dataContent = $mixElement->dataContent;
 	}
@@ -886,7 +886,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function setDocumentElementValues(KalturaDocumentEntry $document, SimpleXMLElement $itemElement)
 	{
-		$documentElement = $item->document;
+		$documentElement = $itemElement->document;
 		$document->documentType = $documentElement->documentType;
 	}
 	
