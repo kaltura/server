@@ -242,7 +242,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 		return $this;
 	}
 	    
-	public function fromData($dbData)
+	public function fromData(BatchJob $dbBatchJob, $dbData)
 	{
 		if(!$dbData)
 			return;
@@ -319,7 +319,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
-					$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $this->jobSubType);
+					$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $dbBatchJob->getJobSubType());
 				else
 					$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
 		}
@@ -338,7 +338,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 			return $this;
 			
 		$dbData = $dbBatchJob->getData();
-		$this->fromData($dbData);
+		$this->fromData($dbBatchJob, $dbData);
 		if($this->data)
 			$this->jobSubType = $this->data->fromSubType($dbBatchJob->getJobSubType());
 		
