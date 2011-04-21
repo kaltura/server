@@ -2,7 +2,7 @@
 /**
  * @package plugins.bulkUploadCsv
  */
-class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader
+class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload
 {
 	const PLUGIN_NAME = 'bulkUploadCsv';
 
@@ -63,6 +63,16 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		return null;
+	}
+	
+	/**
+	 * Returns the correct file extension for bulk upload type
+	 * @param int $enumValue code API value
+	 */
+	public static function getFileExtension($enumValue)
+	{
+		if(is_null($enumValue) || $enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
+			return 'csv';
 	}
 	
 	/**

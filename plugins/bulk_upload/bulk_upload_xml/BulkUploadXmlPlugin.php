@@ -2,7 +2,7 @@
 /**
  * @package plugins.bulkUploadXml
  */
-class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader
+class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload
 {
 	const PLUGIN_NAME = 'bulkUploadXml';
 	
@@ -61,6 +61,16 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaEnumerator, I
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		return null;
+	}
+	
+	/**
+	 * Returns the correct file extension for bulk upload type
+	 * @param int $enumValue code API value
+	 */
+	public static function getFileExtension($enumValue)
+	{
+		if($enumValue == self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML))
+			return 'xml';
 	}
 		
 	/**

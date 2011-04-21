@@ -1232,7 +1232,7 @@ class kFlowHelper
 	{
 		// moved to BulkUploadService
 		// create file sunc
-//		$syncKey = $dbBatchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
+//		$syncKey = $dbBatchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 //		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($data->getCsvFilePath()));
 //
 //		// sets the pointer to the csv file

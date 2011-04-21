@@ -34,8 +34,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const BATCHJOB_STATUS_FATAL = 10;
 	const BATCHJOB_STATUS_DONT_PROCESS = 11;
 	
-	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV = 1;
-	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADLOG = 2;
+	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
 
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
@@ -304,14 +303,23 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	
 		switch($sub_type)
 		{
-			case self::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV:
-				return "csv_".$this->getId().".csv";
+			case self::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD:
+				$ext = 'csv';
+				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUpload');
+				foreach($pluginInstances as $pluginInstance)
+				{
+					$pluginExt = $pluginInstance->getFileExtension($this->getJobSubType());
+					if($pluginExt)
+					{
+						$ext = $pluginExt;
+						break;
+					}
+				}
 				
-			case self::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADLOG:
-				return "log_".$this->getId().".csv";
+				return 'bulk_' . $this->getId() . '.' . $ext;
 				
 			case self::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG:
-				return "config_".$this->getId().".xml";
+				return 'config_' . $this->getId() . '.xml';
 		}
 		
 		return null;
@@ -352,8 +360,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	private static function validateFileSyncSubType ( $sub_type )
 	{
 		$valid_sub_types = array(
-			self::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV, 
-			self::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADLOG, 
+			self::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD, 
 			self::FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG
 		);
 		

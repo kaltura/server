@@ -22,18 +22,7 @@ class bulkuploadfileAction extends sfAction
 		{
 			$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($jobId);
 			if(!count($bulkUploadResults))
-			{
-				$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADLOG);
-	
-				if (kFileSyncUtils::file_exists($syncKey, true))
-				{
-					$content = kFileSyncUtils::file_get_contents($syncKey, true);
-					echo $content;
-					die;
-				}
-				
 				die("Log file is not ready");
-			}
 				
 			$STDOUT = fopen('php://output', 'w');
 			$data = $batchJob->getData();
@@ -68,7 +57,7 @@ class bulkuploadfileAction extends sfAction
 		}
 		else
 		{ 
-			$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
+			$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 
 			if (kFileSyncUtils::file_exists($syncKey, true))
 			{

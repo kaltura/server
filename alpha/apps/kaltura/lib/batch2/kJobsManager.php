@@ -982,7 +982,7 @@ class kJobsManager
 		$job->setJobSubType($bulkUploadType);
 		$job->save();
 
-		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOADCSV);
+		$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 //		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 		try{
 			kFileSyncUtils::moveFromFile($filePath, $syncKey, true);
