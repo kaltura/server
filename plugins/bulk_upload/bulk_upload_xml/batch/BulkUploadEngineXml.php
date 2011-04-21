@@ -819,7 +819,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$mediaElement = $itemElement->media;
 		$media->mediaType = $mediaElement->mediaType;
 		$media->ingestionProfileId = $this->getIngestionProfileId($mediaElement);
-		$this->checkMediaTypes($media->type ,$media->mediaType);
+		//TODO: handle exceptions in the handle item method
+		$this->validateMediaTypes($media->mediaType);
 	}
 
 	/**
