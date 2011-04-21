@@ -180,7 +180,6 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	
 	private static function getRealPath($dropFolderPath, $fileName)
 	{
-		//TODO: some other logic might be required here
 		$realPath = realpath($dropFolderPath.'/'.$fileName);
 		return $realPath;
 	}
@@ -196,7 +195,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
 		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
-		$dropFolderFiles = $dropFolderFiles->objects; //TODO: add error check
+		$dropFolderFiles = $dropFolderFiles->objects;
 		return $dropFolderFiles;
 	}
 	

@@ -14,7 +14,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * @readonly
+	 * @insertonly
 	 * @filter eq,in
 	 */
 	public $partnerId;

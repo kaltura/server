@@ -22,6 +22,12 @@ abstract class DropFolderFileHandler
 	 */
 	protected $dropFolderFile;
 	
+	/**
+	 * @var int
+	 */
+	private $batchPartnerId;
+	
+	
 	
 	/**
 	 * Return a new instance of a class extending DropFolderFileHandler, according to give $type
@@ -47,6 +53,7 @@ abstract class DropFolderFileHandler
 		$this->dropFolder = $dropFolder;
 		$this->dropFolderFile = $dropFolderFile;
 		$this->config = $dropFolder->fileHandlerConfig;
+		$this->batchPartnerId = $this->kClient->getConfig()->partnerId;
 	}
 
 	
@@ -115,7 +122,10 @@ abstract class DropFolderFileHandler
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = $referenceId;
-		$entryList = $this->kClient->baseEntry->listAction($entryFilter);
+		$entryPager = new KalturaFilterPager();
+		$entryPager->pageSize = 1;
+		$entryPager->pageIndex = 1;
+		$entryList = $this->kClient->baseEntry->listAction($entryFilter, $entryPager);
 		
 		if (is_array($entryList->objects) && isset($entryList->objects[0]) ) {
 			return $matchedEntryList->objects[0];
@@ -126,14 +136,33 @@ abstract class DropFolderFileHandler
 	}
 	
 	/**
-	 * @return int
+	 * @return KalturaConversionProfile
 	 */
-	protected function getIngestionProfileId()
+	protected function getIngestionProfile()
 	{
-		if($this->dropFolder->ingestionProfileId)
-			return $this->dropFolder->ingestionProfileId;
-			
-		// TODO - get the partner default conversion profile
-		return null;
+		if (!is_null($this->dropFolder->ingestionProfileId)) {
+			$result = $this->kClient->conversionProfile->get($this->dropFolder->ingestionProfileId);
+		}
+		else {
+			$this->impersonate($this->dropFolderFile->partnerId);
+			$result = $this->kClient->conversionProfile->getDefault();
+			$this->unimpersonate();
+		}
+		return $result;
+	}
+		
+	
+	protected function impersonate($partnerId)
+	{
+		$config = $this->kClient->getConfig();
+		$config->partnerId = $partnerId;
+		$this->kClient->setConfig($config);
+	}
+	
+	protected function unimpersonate()
+	{
+		$config = $this->kClient->getConfig();
+		$config->partnerId = $this->batchPartnerId;
+		$this->kClient->setConfig($config);
 	}
 }

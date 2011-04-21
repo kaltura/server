@@ -41,6 +41,7 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyNotNull('type');
 		$dropFolder->validatePropertyNotNull('dc');
 		$dropFolder->validatePropertyNotNull('path');
+		$dropFolder->validatePropertyNotNull('partnerId');
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0);
 		
 		// validate values
@@ -64,7 +65,6 @@ class DropFolderService extends KalturaBaseService
 		
 		// save in database
 		$dbDropFolder = $dropFolder->toInsertableObject();
-		$dbDropFolder->setPartnerId($this->getPartnerId()); //TODO: ok ?
 		$dbDropFolder->save();
 		
 		// return the saved object
