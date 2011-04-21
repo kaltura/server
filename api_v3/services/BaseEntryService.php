@@ -39,7 +39,7 @@ class BaseEntryService extends KalturaEntryService
      * @return KalturaBaseEntry
      * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
      */
-    function addAction(KalturaBaseEntry $entry, KalturaResource $resource, $type = -1)
+    function addAction(KalturaBaseEntry $entry, KalturaResource $resource = null, $type = -1)
     {
     	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
     	
