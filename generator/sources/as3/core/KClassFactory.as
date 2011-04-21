@@ -71,7 +71,11 @@ package com.kaltura.core
 							var objectKeys : Array = ObjectUtil.getObjectAllKeys( newComplexObject );
 							for(var i:int=0;i<objectKeys.length-1; i++)
 							{
-								instance[prop.name()][objectKeys[i]] = newComplexObject[objectKeys[i]];
+								//TODO if the value is an empty string, use the default value for the 
+								// required type
+								if (newComplexObject[objectKeys[i]]) {
+									instance[prop.name()][objectKeys[i]] = newComplexObject[objectKeys[i]];
+								}
 							}
 						}
 	        		}
