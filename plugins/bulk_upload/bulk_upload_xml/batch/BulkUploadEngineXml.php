@@ -986,6 +986,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if($currentTags)
 			$ret = explode(',', $currentTags);
 		
+		if(empty($element)) // if the element is empty we return an empty string
+		{
+			return "";
+		}
+		
 		foreach ($element->children() as $child)
 		{
 			if($child != null)
