@@ -276,9 +276,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$assetResource->assetParamsId = $thumbAsset->thumbParamsId;
 			$resource->resources[] = $assetResource;
 		}
-		
-		if(!count($resource->resources))
-			$resource = null;
 
 		$requestResult = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 				
@@ -309,6 +306,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function sendItemAddData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
+		//If we dont have a resources we null the resource
+		if(!count($resource->resources))
+			$resource = null;
+			
 		$this->startMultiRequest(true);
 		
 		$this->kClient->baseEntry->add($entry, $resource, $entry->type);
