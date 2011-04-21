@@ -70,7 +70,7 @@ class KalturaBulkUpload extends KalturaObject
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUpload');
 		foreach($pluginInstances as $pluginInstance)
 		{
-			$pluginExt = $pluginInstance->getFileExtension($this->getJobSubType());
+			$pluginExt = $pluginInstance->getFileExtension($batchJob->getJobSubType());
 			if($pluginExt)
 			{
 				$type = $pluginExt;
