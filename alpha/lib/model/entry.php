@@ -2016,6 +2016,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		return $startDateCheck && $endDateCheck;
 	}
 	
+	/**
+	 * Force modifiedColumns to be affected even if the value not changed
+	 * @param mixed $v string, integer (timestamp), or DateTime value.  Empty string will
+	 *						be treated as NULL for temporal objects.
+	 * @return entry The current object (for fluent API support)
+	 * @see Baseentry::setUpdatedAt()
+	 */
+	public function setUpdatedAt($v)
+	{
+		parent::setUpdatedAt($v);
+		if(!in_array(entryPeer::UPDATED_AT, $this->modifiedColumns));
+			$this->modifiedColumns[] = entryPeer::UPDATED_AT;
+			
+		return $this;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Baseentry::setAccessControlId()
+	 */
 	public function setAccessControlId($v)
 	{
 		if ($v === 0 || $v === -1) // handle 0 and -1 as null
