@@ -249,8 +249,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$noParamsFlavorAssets = array();
 		$noParamsFlavorResources = array();
 		$resource = new KalturaAssetsParamsResourceContainers();
-//		$resource->resources = array;
-		$resource->resources = new KalturaAssetParamsResourceContainerArray();
+		$resource->resources = array();
 		
 		//For each content in the item element we add a new flavor asset
 		foreach ($item->content as $contentElement)
@@ -337,6 +336,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function sendItemAddData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
 		$this->startMultiRequest(true);
+		
+		KalturaLog::debug("resources are: " . var_dump($resource));
 		
 		$this->kClient->baseEntry->add($entry, $resource, $entry->type);
 		$newEntryId = "{1:result:id}";
