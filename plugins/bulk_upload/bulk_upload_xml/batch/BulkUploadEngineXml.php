@@ -131,10 +131,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			$this->currentItem++;
 			
-			KalturaLog::debug("Validating item [{$item->name}]");
-			
 			try
 			{
+				KalturaLog::debug("Validating item [{$item->name}]");
 				$this->validateItem($item);
 			}
 			catch (KalturaBulkUploadXmlException $e)
@@ -311,9 +310,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
-		
-		KalturaLog::debug("Created entry is: " . print_r($createdEntry, true));
-				
+							
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 				
@@ -360,9 +357,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		$requestResults = $this->doMultiRequestForPartner();
-		
-		KalturaLog::debug("The multirequest results are: " . print_r($requestResults, true));
-		
+				
 		return $requestResults;
 	}
 	
