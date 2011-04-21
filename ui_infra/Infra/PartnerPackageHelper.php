@@ -20,7 +20,7 @@ class Infra_PartnerPackageHelper
 	{
 		if (is_null(self::$packages))
 		{
-			$client = Kaltura_ClientHelper::getClient();
+			$client = Infra_ClientHelper::getClient();
 			self::$packages = $client->systemPartner->getPackages();
 		}
 	}
