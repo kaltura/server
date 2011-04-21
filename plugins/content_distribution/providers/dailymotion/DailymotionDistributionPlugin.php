@@ -39,6 +39,9 @@ class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPer
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
+		if(is_null($baseEnumName))
+			return array('DailymotionDistributionProviderType');
+			
 		if($baseEnumName == 'DistributionProviderType')
 			return array('DailymotionDistributionProviderType');
 			
