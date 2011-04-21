@@ -280,7 +280,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!count($resource->resources))
 			$resource = null;
 
-		$requestResult = $this->sendItemAddData($resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
+		$requestResult = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 				
 		$createdEntry = reset($requestResults);
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
