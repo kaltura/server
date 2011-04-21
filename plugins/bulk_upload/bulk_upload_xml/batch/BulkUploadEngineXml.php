@@ -301,7 +301,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		$requestResult = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 				
-		$createdEntry = reset($requestResult);
+		if(is_array($requestResult)) // if we got a response of array then we return the first object
+		{
+			$createdEntry = reset($requestResult);
+		}
+		else // else the entry is the created result
+		{
+			$createdEntry = $requestResult;
+		}
 		
 		if(is_null($createdEntry))
 		{
