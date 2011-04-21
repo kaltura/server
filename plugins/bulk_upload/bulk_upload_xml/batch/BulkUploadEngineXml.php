@@ -26,7 +26,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * The engine xsd file path
 	 * @var string
 	 */
-	private $xsdFilePath = "/../lib/ingestion.xsd";
+	private $xsdFilePath = "/../xml/ingestion.xsd";
 
 	/**
 	 * 
