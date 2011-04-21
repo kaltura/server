@@ -35,6 +35,7 @@ class KalturaDropFolderFileResource extends KalturaContentResource
 		$localFilePath = $dropFolder->getPath() . '/' . $dropFolderFile->getFileName();
 		
 		$object_to_fill->setLocalFilePath($localFilePath);
+		$object_to_fill->setKeepOriginalFile(true);
 		return $object_to_fill;
 	}
 }
