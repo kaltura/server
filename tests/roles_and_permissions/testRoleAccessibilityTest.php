@@ -566,4 +566,4 @@ class testRoleAccessibilityTest extends KalturaApiTestCase
     	}
 	}
 }
-?>
+
