@@ -9,6 +9,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	/**
 	 * 
+	 * The batch partner id (used to un impersonate)
+	 * @var unknown_type
+	 */
+	const BATCH_PARTNER_ID = -1;
+	
+	/**
+	 * 
 	 * The add action (default) string
 	 * @var string
 	 */
@@ -301,15 +308,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		$requestResult = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 				
+		$createdEntry = $requestResult;
 		if(is_array($requestResult)) // if we got a response of array then we return the first object
 		{
 			$createdEntry = reset($requestResult);
 		}
-		else // else the entry is the created result
-		{
-			$createdEntry = $requestResult;
-		}
-		
+				
 		if(is_null($createdEntry))
 		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
@@ -378,7 +382,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
 	{
-		$this->impersonate(-1);
+		$this->impersonate(self::BATCH_PARTNER_ID);
 		
 		//Gets the created thumbs and flavors
 		$createdFlavorAssets = $this->kClient->flavorAsset->getByEntryId($createdEntryId);
