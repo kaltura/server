@@ -28,7 +28,7 @@ function removeThumbDimensions(index){
 function actionEnabledChanged(action){
 	var enabled = jQuery("." + action + "-enabled").find(':selected').val();
 	var fields = jQuery(".action-fields-" + action);
-	if(enabled == <?php echo KalturaDistributionProfileActionStatus::DISABLED; ?>)
+	if(enabled == <?php echo Kaltura_Client_ContentDistribution_Enum_DistributionProfileActionStatus::DISABLED; ?>)
 		fields.hide();
 	else
 		fields.show();
