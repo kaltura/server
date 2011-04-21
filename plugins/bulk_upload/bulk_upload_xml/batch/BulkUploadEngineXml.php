@@ -75,7 +75,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	public function handleBulkUpload() 
 	{
-		$this->impersonate();
+		$this->impersonate($this->currentPartnerId);
 		
 		$this->validate();
 	    $this->parse();
@@ -371,6 +371,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
 	{
+		$this->impersonate(-1);
+		
 		//Gets the created thumbs and flavors
 		$createdFlavorAssets = $this->kClient->flavorAsset->getByEntryId($createdEntryId);
 		$createdThumbAssets = $this->kClient->thumbAsset->getByEntryId($createdEntryId);

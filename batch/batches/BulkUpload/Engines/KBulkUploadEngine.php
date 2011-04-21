@@ -277,12 +277,12 @@ abstract class KBulkUploadEngine
 	 * 
 	 * Impersonates into the current partner (overrides the batch partner) 
 	 */
-	protected function impersonate()
+	protected function impersonate($partnerId)
 	{
-		$this->kClientConfig->partnerId = $this->currentPartnerId;
+		$this->kClientConfig->partnerId = $partnerId;
 		$this->kClient->setConfig($this->kClientConfig);
 	}
-	
+		
 	/**
 	 * 
 	 * Handles the bulk upload
