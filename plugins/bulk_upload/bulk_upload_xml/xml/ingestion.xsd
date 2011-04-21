@@ -124,6 +124,10 @@
 				<xs:element name="accessControlId" minOccurs="1" maxOccurs="1" type="xs:int" />
 				<xs:element name="accessControl" minOccurs="1" maxOccurs="1" type="xs:string" />
 			</xs:choice>
+			<xs:choice minOccurs="0" maxOccurs="1">
+				<xs:element name="ingestionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
+				<xs:element name="ingestionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
+			</xs:choice>
 			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
@@ -483,26 +487,6 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<!--
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>
-						List of flavor params to be generated for this distribution destination.
-						Could be used only if source flavor exists or specified.
-					</xs:documentation>
-				</xs:annotation>
-				<xs:element name="flavorParamsIds" minOccurs="1" maxOccurs="1">
-					<xs:complexType mixed="true">
-						<xs:attribute name="generateIfMissing" use="optional" type="xs:boolean" default="false"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="flavorParams" minOccurs="1" maxOccurs="1">
-					<xs:complexType mixed="true">
-						<xs:attribute name="generateIfMissing" use="optional" type="xs:boolean" default="false"/>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
-			-->				
 			<xs:element name="ingestedFlavorIds" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>

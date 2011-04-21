@@ -36,42 +36,6 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected $csvVersion = KalturaBulkUploadCsvVersion::V1;
 	
 	/**
-	 * @param array $fields
-	 * @return string
-	 */
-	protected function getDateFormatRegex(&$fields = null)
-	{
-		$replace = array(
-			'%Y' => '([1-2][0-9]{3})',
-			'%m' => '([0-1][0-9])',
-			'%d' => '([0-3][0-9])',
-			'%H' => '([0-2][0-9])',
-			'%i' => '([0-5][0-9])',
-			'%s' => '([0-5][0-9])',
-//			'%T' => '([A-Z]{3})',
-		);
-	
-		$fields = array();
-		$arr = null;
-		if(!preg_match_all('/%([YmdTHis])/', self::BULK_UPLOAD_DATE_FORMAT, $arr))
-			return false;
-	
-		$fields = $arr[1];
-		
-		return '/' . str_replace(array_keys($replace), $replace, self::BULK_UPLOAD_DATE_FORMAT) . '/';
-	}
-	
-	/**
-	 * @param string $str
-	 * @return boolean
-	 */
-	protected function isFormatedDate($str)
-	{
-		$regex = $this->getDateFormatRegex();
-		return preg_match($regex, $str);
-	}
-	
-	/**
 	 * @param string $str
 	 * @return int
 	 */

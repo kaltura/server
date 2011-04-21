@@ -20,6 +20,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var string
 	 */
 	const DEFAULT_THUMB_TAG = 'default_thumb';
+
+	/**
+	 * 
+	 * Holds the number of the current proccessed item
+	 * @var int
+	 */
+	private $currentItem = 0;
 	
 	/**
 	 * 
@@ -122,6 +129,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
+			$this->currentItem++;
+			
 			KalturaLog::debug("Validating item [{$item->name}]");
 			try{
 				$this->validateItem($item);
@@ -989,7 +998,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$bulkUploadResult = new KalturaBulkUploadResult();
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		
-		$bulkUploadResult->lineIndex = $this->lineNumber;
+		$bulkUploadResult->lineIndex = $this->currentItem;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
 		$bulkUploadResult->rowData = $item->asXml();
 		$bulkUploadResult->entryStatus = KalturaEntryStatus::IMPORT;
