@@ -742,14 +742,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry->name = (string)$item->name;
 		$entry->description = (string)$item->description;
 		$entry->tags = $this->getStringFromElement($item->tags);
-		$categoriesElement = $item->categories;
-		$entry->categories = $this->getStringFromElement($categoriesElement);
+		$entry->categories = $this->getStringFromElement($item->categories);
 		$entry->userId = (string)$item->userId;;
 		$entry->licenseType = (string)$item->licenseType;
 		$entry->accessControlId =  $this->getAccessControlId($item);
 				
 		//TODO: Roni - Parse the date
-		$entry->startDate = $item->startDate;
+		$entry->startDate = (string)$item->startDate;
 		$entry->type = (int)$item->type;
 		$entry->ingestionProfileId = $this->getIngestionProfileId($item);	
 		
@@ -864,7 +863,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setMediaElementValues(KalturaMediaEntry $media, SimpleXMLElement $itemElement)
 	{
 		$mediaElement = $itemElement->media;
-		$media->mediaType = $mediaElement->mediaType;
+		$media->mediaType = (int)$mediaElement->mediaType;
 		$media->ingestionProfileId = $this->getIngestionProfileId($mediaElement);
 		//TODO: handle exceptions in the handle item method
 		$this->validateMediaTypes($media->mediaType);
@@ -879,8 +878,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setPlaylistElementValues(KalturaPlaylist $playlistEntry, SimpleXMLElement $itemElement)
 	{
 		$playlistElement = $itemElement->playlist;
-		$playlistEntry->playlistType = $playlistElement->playlistType;
-		$playlistEntry->playlistContent = $playlistElement->playlistContent;
+		$playlistEntry->playlistType = (int)$playlistElement->playlistType;
+		$playlistEntry->playlistContent = (string)$playlistElement->playlistContent;
 	}
 	
 	/**
@@ -892,7 +891,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setLiveStreamElementValues(KalturaLiveStreamEntry $liveStreamEntry, SimpleXMLElement $itemElement)
 	{
 		$liveStreamElement = $itemElement->liveStream;
-		$liveStreamEntry->bitrates = $liveStreamElement->bitrates;
+		$liveStreamEntry->bitrates = (int)$liveStreamElement->bitrates;
 		//What to do with those?
 //		$liveStreamEntry->encodingIP1 = $dataElement->encodingIP1;
 //		$liveStreamEntry->encodingIP2 = $dataElement->encodingIP2;
@@ -908,8 +907,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function setDataElementValues(KalturaDataEntry $dataEntry, SimpleXMLElement $itemElement)
 	{
 		$dataElement = $itemElement->media;
-		$dataEntry->dataContent = $dataElement->dataContent;
-		$dataEntry->retrieveDataContentByGet = $dataElement->retrieveDataContentByGet;
+		$dataEntry->dataContent = (string)$dataElement->dataContent;
+		$dataEntry->retrieveDataContentByGet = (bool)$dataElement->retrieveDataContentByGet;
 	}
 	
 	/**
@@ -1035,7 +1034,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 		if(!empty($item->startDate))
 		{
-			if($item->startDate && !$this->isFormatedDate($item->startDate))
+			if((string)$item->startDate && !$this->isFormatedDate((string)$item->startDate))
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->errorDescription = "Invalid schedule start date {$item->startDate} on item $item->name";
@@ -1044,7 +1043,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!empty($item->endDate))
 		{
-			if($item->endDate && !$this->isFormatedDate($item->endDate))
+			if((string)$item->endDate && !$this->isFormatedDate((string)$item->endDate))
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->errorDescription = "Invalid schedule end date {$item->endDate} on item $item->name";
@@ -1057,8 +1056,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			return;
 		}
 		
-		$bulkUploadResult->scheduleStartDate = $this->parseFormatedDate($item->startDate);
-		$bulkUploadResult->scheduleEndDate = $this->parseFormatedDate($item->endDate);
+		$bulkUploadResult->scheduleStartDate = $this->parseFormatedDate((string)$item->startDate);
+		$bulkUploadResult->scheduleEndDate = $this->parseFormatedDate((string)$item->endDate);
 		
 		return $bulkUploadResult;
 	}
