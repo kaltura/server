@@ -60,9 +60,9 @@ class Form_DailymotionProfileConfiguration extends Form_ProviderProfileConfigura
 		$metadataProfiles = null;
 		try
 		{
-			$metadataProfileFilter = new KalturaMetadataProfileFilter();
+			$metadataProfileFilter = new Kaltura_Client_Metadata_Type_MetadataProfileFilter();
 //			$metadataProfileFilter->partnerIdEqual = $this->partnerId;
-			$metadataProfileFilter->metadataObjectTypeEqual = KalturaMetadataObjectType::ENTRY;
+			$metadataProfileFilter->metadataObjectTypeEqual = Kaltura_Client_Metadata_Enum_MetadataObjectType::ENTRY;
 			
 			$client = Infra_ClientHelper::getClient();
 			Infra_ClientHelper::impersonate($this->partnerId);
