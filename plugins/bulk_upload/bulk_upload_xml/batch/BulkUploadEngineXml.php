@@ -249,7 +249,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$noParamsFlavorAssets = array();
 		$noParamsFlavorResources = array();
 		$resource = new KalturaAssetsParamsResourceContainers();
-		$resource->resources = array();
+//		$resource->resources = array;
+		$resource->resources = new KalturaAssetParamsResourceContainerArray();
 		
 		//For each content in the item element we add a new flavor asset
 		foreach ($item->content as $contentElement)
