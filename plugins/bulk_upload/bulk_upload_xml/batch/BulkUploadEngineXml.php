@@ -384,7 +384,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getFlavorAsset(SimpleXMLElement $contentElement)
 	{
 		$flavorAsset = new KalturaFlavorAsset();
-		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement);
+		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, true);
 		$flavorAsset->tags = $this->getStringFromElement($contentElement->tags);
 		
 		if(is_null($flavorAsset->flavorParamsId) && is_null($flavorAsset->tags))
@@ -492,19 +492,38 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getFlavorParamsId(SimpleXMLElement $elementToSearchIn, $isAttribute = true)
 	{
-		if(!empty($elementToSearchIn->flavorParamsId))
-			return (int)$elementToSearchIn->flavorParamsId;
-
-		if(empty($elementToSearchIn->flavorParams))
-			return null;	
-			
-		if(is_null($this->flavorParamsNameToId))
+		if($isAttribute)
 		{
-			$this->initFlavorParamsNameToId();
+			if(!empty($elementToSearchIn["flavorParamsId"]))
+				return (int)$elementToSearchIn["flavorParamsId"];
+	
+			if(empty($elementToSearchIn["flavorParams"]))
+				return null;	
+				
+			if(is_null($this->flavorParamsNameToId))
+			{
+				$this->initFlavorParamsNameToId();
+			}
+				
+			if(isset($this->flavorParamsNameToId[$elementToSearchIn["flavorParams"]]))
+				return trim($this->flavorParamsNameToId[$elementToSearchIn["flavorParams"]]);
 		}
-			
-		if(isset($this->flavorParamsNameToId[$elementToSearchIn->flavorParams]))
-			return trim($this->flavorParamsNameToId[$elementToSearchIn->flavorParams]);
+		else 
+		{
+			if(!empty($elementToSearchIn->flavorParamsId))
+				return (int)$elementToSearchIn->flavorParamsId;
+	
+			if(empty($elementToSearchIn->flavorParams))
+				return null;	
+				
+			if(is_null($this->flavorParamsNameToId))
+			{
+				$this->initFlavorParamsNameToId();
+			}
+				
+			if(isset($this->flavorParamsNameToId[$elementToSearchIn->flavorParams]))
+				return trim($this->flavorParamsNameToId[$elementToSearchIn->flavorParams]);
+		}
 			
 		return null;
 	}
