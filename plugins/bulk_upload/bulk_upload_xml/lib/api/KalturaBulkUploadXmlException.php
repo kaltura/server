@@ -1,5 +1,5 @@
 <?php
-class KalturaBulkUploadXmlException extends KalturaBatchException
+class KalturaBulkUploadXmlException extends KalturaAPIException
 {
 
 }
