@@ -290,6 +290,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 		$createdEntry = reset($requestResult);
 		
+		KalturaLog::debug("Created entry is: " . var_dump($createdEntry));
+				
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 				
