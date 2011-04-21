@@ -54,28 +54,43 @@ class KAsyncBulkUpload extends KBatchBase {
 			}
 			catch (KalturaBulkUploadAbortedException $abortedException)
 			{
+				$this->unimpersonate();
 				$jobResults[] = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ABORTED);
 			}
 			catch(KalturaBatchException $kbex)
 			{
+				$this->unimpersonate();
 				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $kbex->getCode(), "Error: " . $kbex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
 			catch(KalturaException $kex)
 			{
+				$this->unimpersonate();
 				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
 			catch(KalturaClientException $kcex)
 			{
+				$this->unimpersonate();
 				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
 			}
 			catch(Exception $ex)
 			{
+				$this->unimpersonate();
 				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 			}
 		}
 		ini_set('auto_detect_line_endings', false);
 		
 		return $jobResults;
+	}
+	
+	/**
+	 * 
+	 * Unimpersonated the client - so it will be the batch partner
+	 */
+	private function unimpersonate()
+	{
+		$this->kClientConfig->partnerId = Partner::BATCH_PARTNER_ID;
+		$this->kClient->setConfig($this->kClientConfig);
 	}
 	
 	/**

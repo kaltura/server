@@ -68,6 +68,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	public function handleBulkUpload() 
 	{
+		$this->impersonate();
+		
 		$this->validate();
 	    $this->parse();
 	}
