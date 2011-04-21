@@ -21,7 +21,8 @@ class Infra_PartnerPackageHelper
 		if (is_null(self::$packages))
 		{
 			$client = Infra_ClientHelper::getClient();
-			self::$packages = $client->systemPartner->getPackages();
+			$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+			self::$packages = $systemPartnerPlugin->systemPartner->getPackages();
 		}
 	}
 }
