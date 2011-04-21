@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -fr ../cache/api_v3/*
-rm -fr ../cache/generatorv3/*
+rm -fr ../cache/generator/*
 
 php generate.php "$@"
 
