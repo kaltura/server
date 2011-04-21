@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youtube_apiDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage lib
  */
-class Youtube_apiDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
+class YoutubeApiDistributionProviderType implements IKalturaPluginEnum, DistributionProviderType
 {
 	const YOUTUBE_API = 'YOUTUBE_API';
 	

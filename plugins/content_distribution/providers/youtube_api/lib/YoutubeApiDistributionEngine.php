@@ -1,10 +1,10 @@
 <?php
-require_once 'Youtube_apiImpl.php';
+require_once 'YoutubeApiImpl.php';
 /**
- * @package plugins.youtube_apiDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage lib
  */
-class Youtube_apiDistributionEngine extends DistributionEngine implements 
+class YoutubeApiDistributionEngine extends DistributionEngine implements 
 	IDistributionEngineSubmit,
 	IDistributionEngineCloseSubmit, 
 	IDistributionEngineUpdate,
@@ -36,15 +36,15 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	 */
 	public function submit(KalturaDistributionSubmitJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutube_apiDistributionProfile))
-			throw new Exception("Distribution profile must be of type KalturaYoutube_apiDistributionProfile");
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaYoutubeApiDistributionProfile");
 	
 		return $this->doSubmit($data, $data->distributionProfile);
 	}
 
 	protected function newCustomDataElement($title, $value = '')
 	{
-		$customDataElement = new Youtube_apiCustomDataElement();
+		$customDataElement = new YoutubeApiCustomDataElement();
 		$customDataElement->title = $title;
 		$customDataElement->value = $value;
 		return $customDataElement;
@@ -56,15 +56,15 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		if(isset(self::$containerFormatMap[$containerFormat]))
 			return self::$containerFormatMap[$containerFormat];
 			
-		return Youtube_apiFormat::_UNKNOWN;
+		return YoutubeApiFormat::_UNKNOWN;
 	}
 	
 	/**
 	 * @param KalturaDistributionJobData $data
-	 * @param KalturaYoutube_apiDistributionProfile $distributionProfile
+	 * @param KalturaYoutubeApiDistributionProfile $distributionProfile
 	 * @return array()
 	 */
-	public function getYoutube_apiProps(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaYoutube_apiDistributionProfile $distributionProfile)
+	public function getYoutubeApiProps(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
 	{	
 		$entryId = $data->entryDistribution->entryId;
 		$entry = $this->kalturaClient->media->get($entryId);
@@ -87,11 +87,11 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		return $props;
 	}
 	
-	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutube_apiDistributionProfile $distributionProfile)
+	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
 	{	
 		$needDel = false;
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getYoutube_apiProps($entry, $data, $distributionProfile);
+		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
 		if($data->entryDistribution->remoteId)
 		{
 			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
@@ -154,7 +154,7 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 		switch($status)
 		{
 			case 'encoding_error':
-				throw new Exception("Youtube_api error encoding");
+				throw new Exception("YoutubeApi error encoding");
 							
 			case 'waiting':
 			case 'processing':
@@ -173,22 +173,22 @@ class Youtube_apiDistributionEngine extends DistributionEngine implements
 	 */
 	public function update(KalturaDistributionUpdateJobData $data)
 	{
-		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutube_apiDistributionProfile))
-			throw new Exception("Distribution profile must be of type KalturaYoutube_apiDistributionProfile");
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaYoutubeApiDistributionProfile");
 	
 		return $this->doUpdate($data, $data->distributionProfile);
 	}
 	
-	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutube_apiDistributionProfile $distributionProfile)
+	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
 	{
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getYoutube_apiProps($entry, $data, $distributionProfile);
+		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
 	
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
 		$youTubeApiImpl->updateEntry($data->remoteId, $props);
 		
-//		$data->sentData = $youtube_apiMediaService->request;
-//		$data->results = $youtube_apiMediaService->response;
+//		$data->sentData = $youtubeApiMediaService->request;
+//		$data->results = $youtubeApiMediaService->response;
 		
 		return true;
 	}

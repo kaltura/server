@@ -1,15 +1,15 @@
 <?php 
 /**
- * @package plugins.youtube_apiDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage admin
  */
-class Form_Youtube_apiProfileConfiguration extends Form_ProviderProfileConfiguration
+class Form_YoutubeApiProfileConfiguration extends Form_ProviderProfileConfiguration
 {
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof Kaltura_Client_Youtube_apiDistribution_Type_Youtube_apiDistributionProfile)
+		if($object instanceof Kaltura_Client_YoutubeApiDistribution_Type_YoutubeApiDistributionProfile)
 		{
 			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
 			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);

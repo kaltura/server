@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youtube_apiDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage api.objects
  */
-class KalturaYoutube_apiDistributionProfile extends KalturaDistributionProfile
+class KalturaYoutubeApiDistributionProfile extends KalturaDistributionProfile
 {
 	/**
 	 * @var string

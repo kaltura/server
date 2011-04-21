@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youtube_apiDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage model
  */
-class Youtube_apiDistributionProfile extends DistributionProfile
+class YoutubeApiDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_USERNAME = 'username';
 	const CUSTOM_DATA_PASSWORD = 'password';
@@ -32,7 +32,7 @@ class Youtube_apiDistributionProfile extends DistributionProfile
 	 */
 	public function getProvider()
 	{
-		return Youtube_apiDistributionPlugin::getProvider();
+		return YoutubeApiDistributionPlugin::getProvider();
 	}
 			
 	/* (non-PHPdoc)

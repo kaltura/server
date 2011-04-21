@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.youtube_apiDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage lib
  */
-class Youtube_apiDistributionProvider implements IDistributionProvider
+class YoutubeApiDistributionProvider implements IDistributionProvider
 {
 	/**
-	 * @var Youtube_apiDistributionProvider
+	 * @var YoutubeApiDistributionProvider
 	 */
 	protected static $instance;
 	
@@ -15,12 +15,12 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	}
 	
 	/**
-	 * @return Youtube_apiDistributionProvider
+	 * @return YoutubeApiDistributionProvider
 	 */
 	public static function get()
 	{
 		if(!self::$instance)
-			self::$instance = new Youtube_apiDistributionProvider();
+			self::$instance = new YoutubeApiDistributionProvider();
 			
 		return self::$instance;
 	}
@@ -30,7 +30,7 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	 */
 	public function getType()
 	{
-		return Youtube_apiDistributionPlugin::getDistributionProviderTypeCoreValue(Youtube_apiDistributionProviderType::YOUTUBE_API);
+		return YoutubeApiDistributionPlugin::getDistributionProviderTypeCoreValue(YoutubeApiDistributionProviderType::YOUTUBE_API);
 	}
 	
 	/* (non-PHPdoc)
@@ -38,7 +38,7 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	 */
 	public function getName()
 	{
-		return 'Youtube_api';
+		return 'YoutubeApi';
 	}
 
 	/* (non-PHPdoc)
@@ -119,8 +119,8 @@ class Youtube_apiDistributionProvider implements IDistributionProvider
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
 		return array(
-			"/*[local-name()='metadata']/*[local-name()='".Youtube_apiDistributionProfile::METADATA_FIELD_PLAYLIST."']",
-			"/*[local-name()='metadata']/*[local-name()='".Youtube_apiDistributionProfile::METADATA_FIELD_PLAYLISTS."']",
+			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLIST."']",
+			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLISTS."']",
 		);	
 	}
 	

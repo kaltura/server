@@ -75,7 +75,7 @@ KalturaLog::debug("MRSS [$mrss]");
 $distributionJobData = new KalturaDistributionSubmitJobData();
 
 $dbDistributionProfile = DistributionProfilePeer::retrieveByPK(2);
-$distributionProfile = new KalturaYoutube_apiDistributionProfile();
+$distributionProfile = new KalturaYoutubeApiDistributionProfile();
 $distributionProfile->fromObject($dbDistributionProfile);
 $distributionJobData->distributionProfileId = $distributionProfile->id;
 
@@ -88,7 +88,7 @@ $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
 $distributionJobData->entryDistribution = $entryDistribution;
 
-$providerData = new KalturaYoutube_apiDistributionJobProviderData($distributionJobData);
+$providerData = new KalturaYoutubeApiDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;
 
 file_put_contents('out.xml', $providerData->xml);

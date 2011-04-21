@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.youtube_apiDistribution
+ * @package plugins.youtubeApiDistribution
  * @subpackage api.objects
  */
-class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJobProviderData
+class KalturaYoutubeApiDistributionJobProviderData extends KalturaDistributionJobProviderData
 {
 	/**
 	 * @var string
@@ -25,7 +25,7 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 		if(!$distributionJobData)
 			return;
 			
-		if(!($distributionJobData->distributionProfile instanceof KalturaYoutube_apiDistributionProfile))
+		if(!($distributionJobData->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
 			return;
 			
 		$flavorAssets = flavorAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
@@ -102,7 +102,7 @@ class KalturaYoutube_apiDistributionJobProviderData extends KalturaDistributionJ
 		$this->thumbAssetFilePath = $thumbAssetFilePath;
 	}	
 	
-	protected function loadPlaylistsFromMetadata($entryId, KalturaYoutube_apiDistributionProfile $distributionProfile)
+	protected function loadPlaylistsFromMetadata($entryId, KalturaYoutubeApiDistributionProfile $distributionProfile)
 	{
 		$playlists = array();
 		$metadataProfileId = $distributionProfile->metadataProfileId; 
