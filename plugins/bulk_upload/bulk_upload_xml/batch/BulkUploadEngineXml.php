@@ -370,12 +370,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
 	{
-		$this->impersonate($this->currentPartnerId);
-		//Gets the created thumbs and flavors
-		$createdFlavorAssets = $this->kClient->flavorAsset->getByEntryId($createdEntryId);
+		$this->startMultiRequest(true);
 		
-		$this->impersonate($this->currentPartnerId);
-		$createdThumbAssets = $this->kClient->thumbAsset->getByEntryId($createdEntryId);
+		//Gets the created thumbs and flavors
+		$this->kClient->flavorAsset->getByEntryId($createdEntryId);
+		$this->kClient->thumbAsset->getByEntryId($createdEntryId);
+		$result = $this->doMultiRequestForPartner();
+		
+		$createdFlavorAssets = $result[0]; 
+		$createdThumbAssets =  $result[1];
 		
 		$this->startMultiRequest(true);
 		///For each flavor asset that we just added without his data then we need to update his additional data
