@@ -37,7 +37,7 @@ class Form_MyspaceProfileConfiguration extends Form_ProviderProfileConfiguration
 			$client = Infra_ClientHelper::getClient();
 			$metadataPlugin = Kaltura_Client_Metadata_Plugin::get($client);
 			Infra_ClientHelper::impersonate($this->partnerId);
-			$metadataProfileList = $client->metadataProfile->listAction($metadataProfileFilter);
+			$metadataProfileList = $metadataPlugin->metadataProfile->listAction($metadataProfileFilter);
 			Infra_ClientHelper::unimpersonate();
 			
 			$metadataProfiles = $metadataProfileList->objects;
