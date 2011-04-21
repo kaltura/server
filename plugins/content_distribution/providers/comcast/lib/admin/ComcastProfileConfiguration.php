@@ -65,8 +65,9 @@ class Form_ComcastProfileConfiguration extends Form_ProviderProfileConfiguration
 			$metadataProfileFilter->metadataObjectTypeEqual = Kaltura_Client_Metadata_Enum_MetadataObjectType::ENTRY;
 			
 			$client = Infra_ClientHelper::getClient();
+			$metadataPlugin = Kaltura_Client_Metadata_Plugin::get($client);
 			Infra_ClientHelper::impersonate($this->partnerId);
-			$metadataProfileList = $client->metadataProfile->listAction($metadataProfileFilter);
+			$metadataProfileList = $metadataPlugin->metadataProfile->listAction($metadataProfileFilter);
 			Infra_ClientHelper::unimpersonate();
 			
 			$metadataProfiles = $metadataProfileList->objects;
