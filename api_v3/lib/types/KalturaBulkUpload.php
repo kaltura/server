@@ -42,9 +42,14 @@ class KalturaBulkUpload extends KalturaObject
 	
 	/**
 	 * @var string;
-	 * //TODO: Roni - can you please change this to be $bulkFileUrl? instead of csvFileUrl
-     */
+	 * @deprecated
+	 */
 	public $csvFileUrl;
+	
+	/**
+	 * @var string;
+	 */
+	public $bulkFileUrl;
 	
 	/**
 	 * @var KalturaBulkUploadResultArray;
@@ -60,9 +65,22 @@ class KalturaBulkUpload extends KalturaObject
 		$this->uploadedOn = $batchJob->getCreatedAt(null);
 		$this->status = $batchJob->getStatus();
 		$this->error = $batchJob->getDescription();
-
+		
+		$type = 'csv';
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUpload');
+		foreach($pluginInstances as $pluginInstance)
+		{
+			$pluginExt = $pluginInstance->getFileExtension($this->getJobSubType());
+			if($pluginExt)
+			{
+				$type = $pluginExt;
+				break;
+			}
+		}
+		
 		$this->logFileUrl = requestUtils::getHost() . "/index.php/extwidget/bulkuploadfile/id/{$batchJob->getId()}/pid/{$batchJob->getPartnerId()}/type/log";
-		$this->csvFileUrl = requestUtils::getCdnHost() . "/index.php/extwidget/bulkuploadfile/id/{$batchJob->getId()}/pid/{$batchJob->getPartnerId()}/type/csv";
+		$this->bulkFileUrl = requestUtils::getCdnHost() . "/index.php/extwidget/bulkuploadfile/id/{$batchJob->getId()}/pid/{$batchJob->getPartnerId()}/type/$type";
+		$this->csvFileUrl = $this->bulkFileUrl;
 					
 		$jobData = $batchJob->getData();
 		if($jobData instanceof kBulkUploadJobData)
