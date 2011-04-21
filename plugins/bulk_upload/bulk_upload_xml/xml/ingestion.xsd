@@ -181,28 +181,6 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
-				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
-			</xs:choice>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>
-						Flavors to add additional to the conversion profile and ingested flavors.
-					</xs:documentation>
-				</xs:annotation>
-				<xs:element name="flavorParamsIds" minOccurs="1" maxOccurs="1" type="xs:string" />
-				<xs:element name="flavorParams" minOccurs="1" maxOccurs="1" type="xs:string" />
-			</xs:choice>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>
-						Thumbnails to add additional to the conversion profile and ingested thumbnails.
-					</xs:documentation>
-				</xs:annotation>
-				<xs:element name="thumbParamsIds" minOccurs="0" maxOccurs="1" type="xs:string" />
-				<xs:element name="thumbParams" minOccurs="0" maxOccurs="1" type="xs:string" />
-			</xs:choice>
 			<xs:element ref="playlists" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
@@ -299,19 +277,6 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
-				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
-			</xs:choice>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>
-						Flavors to add additional to the conversion profile and ingested flavors.
-					</xs:documentation>
-				</xs:annotation>
-				<xs:element name="flavorParamsIds" minOccurs="1" maxOccurs="1" type="xs:string" />
-				<xs:element name="flavorParams" minOccurs="1" maxOccurs="1" type="xs:string" />
-			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 
