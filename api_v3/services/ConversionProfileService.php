@@ -55,7 +55,7 @@ class ConversionProfileService extends KalturaBaseService
 	 * Get the partner's default conversion profile
 	 * 
 	 * @action getDefault
-	 * @return int
+	 * @return KalturaConversionProfile
 	 */
 	public function getDefaultAction()
 	{
