@@ -47,7 +47,7 @@ class BaseEntryService extends KalturaEntryService
     	if($resource)
     	{
     		$kResource = $resource->toObject();
-	    	if($type == KalturaEntryType::AUTOMATIC)
+	    	if($type == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
 	    		$this->setEntryTypeByResource($dbEntry, $kResource);
     	}
     	$dbEntry->save();
