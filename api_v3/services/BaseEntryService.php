@@ -284,7 +284,12 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function updateAction($entryId, KalturaBaseEntry $baseEntry = null, KalturaResource $resource = null)
 	{
-    	switch($baseEntry->type)
+    	$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		switch($dbEntry->getType())
     	{
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
