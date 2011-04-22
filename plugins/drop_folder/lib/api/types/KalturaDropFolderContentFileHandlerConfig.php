@@ -37,5 +37,18 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 		$dbObject->setHandlerType(DropFolderFileHandlerType::CONTENT);
 		
 		return $dbObject;
-	}	
+	}
+	
+
+	public function validateForInsert()
+	{
+		if (is_null($this->contentMatchPolicy)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, get_class($this).'::contentMatchPolicy');
+		}
+		if (is_null($this->slugRegex)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, get_class($this).'::slugRegex');
+		}
+		return parent::validateForInsert();
+	}
+	
 }

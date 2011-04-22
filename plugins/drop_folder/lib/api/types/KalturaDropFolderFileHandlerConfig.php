@@ -7,6 +7,7 @@ class KalturaDropFolderFileHandlerConfig extends KalturaObject
 {	
 	/**
 	 * @var KalturaDropFolderFileHandlerType
+	 * @insertonly
 	 */
 	public $handlerType;
 
@@ -37,5 +38,15 @@ class KalturaDropFolderFileHandlerConfig extends KalturaObject
 	{
 		parent::fromObject($source_object);
 	}
+	
+
+	public function validateForInsert()
+	{
+		if (is_null($this->handlerType)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, get_class($this).'::handlerType');
+		}
+		return parent::validateForInsert();
+	}
+	
 	
 }
