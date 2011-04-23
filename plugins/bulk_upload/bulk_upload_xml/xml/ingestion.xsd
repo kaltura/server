@@ -452,27 +452,11 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="ingestedFlavorIds" minOccurs="0" maxOccurs="1" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						List of flavor asset that ingested in this XML to be used in this distribution destination.
-						The id must be specified in the node /mrss/channel/item/content@id
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
 			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
 						List of existing thumbnail asset ids to be used in this distribution destination.
 						Could be used only on existing entry.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="ingestedThumbIds" minOccurs="0" maxOccurs="1" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						List of thumbnail asset that ingested in this XML to be used in this distribution destination.
-						The id must be specified in the node /mrss/channel/item/thumbnail@id
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
