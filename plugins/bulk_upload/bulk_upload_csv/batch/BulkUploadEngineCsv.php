@@ -320,13 +320,13 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			$bulkUploadResult->errorDescription = "Invalid url '$bulkUploadResult->url' on line $this->lineNumber";
 		}
 		
-		if($scheduleStartDate && !$this->isFormatedDate($scheduleStartDate))
+		if($scheduleStartDate && !self::isFormatedDate($scheduleStartDate))
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 			$bulkUploadResult->errorDescription = "Invalid schedule start date '$scheduleStartDate' on line $this->lineNumber";
 		}
 		
-		if($scheduleEndDate && !$this->isFormatedDate($scheduleEndDate))
+		if($scheduleEndDate && !self::isFormatedDate($scheduleEndDate))
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 			$bulkUploadResult->errorDescription = "Invalid schedule end date '$scheduleEndDate' on line $this->lineNumber";
@@ -338,8 +338,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			return;
 		}
 		
-		$bulkUploadResult->scheduleStartDate = $this->parseFormatedDate($scheduleStartDate);
-		$bulkUploadResult->scheduleEndDate = $this->parseFormatedDate($scheduleEndDate);
+		$bulkUploadResult->scheduleStartDate = self::parseFormatedDate($scheduleStartDate);
+		$bulkUploadResult->scheduleEndDate = self::parseFormatedDate($scheduleEndDate);
 			
 		$this->bulkUploadResults[] = $bulkUploadResult;
 	}

@@ -2,17 +2,31 @@
 /**
  * @package plugins.bulkUploadXml
  */
-class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload
+class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaVersion
 {
 	const PLUGIN_NAME = 'bulkUploadXml';
+	const PLUGIN_VERSION_MAJOR = 1;
+	const PLUGIN_VERSION_MINOR = 1;
+	const PLUGIN_VERSION_BUILD = 0;
 	
 	/**
-	 * 
 	 * Returns the plugin name
 	 */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+	
+	/**
+	 * @return KalturaVersion
+	 */
+	public static function getVersion()
+	{
+		return new KalturaVersion(
+			self::PLUGIN_VERSION_MAJOR,
+			self::PLUGIN_VERSION_MINOR,
+			self::PLUGIN_VERSION_BUILD
+		);
 	}
 		
 	/**
