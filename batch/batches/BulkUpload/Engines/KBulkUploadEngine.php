@@ -8,11 +8,11 @@
  */
 abstract class KBulkUploadEngine
 {
-		/**
+	/**
 	 * @param string $str
 	 * @return int
 	 */
-	protected function parseFormatedDate($str)
+	public static function parseFormatedDate($str)
 	{
 		if(function_exists('strptime'))
 		{
@@ -25,7 +25,7 @@ abstract class KBulkUploadEngine
 		}
 			
 		$fields = null;
-		$regex = $this->getDateFormatRegex($fields);
+		$regex = self::getDateFormatRegex($fields);
 		
 		$values = null;
 		if(!preg_match($regex, $str, $values))
@@ -112,7 +112,7 @@ abstract class KBulkUploadEngine
 	 * @param array $fields
 	 * @return string
 	 */
-	protected function getDateFormatRegex(&$fields = null)
+	private static function getDateFormatRegex(&$fields = null)
 	{
 		$replace = array(
 			'%Y' => '([1-2][0-9]{3})',
@@ -138,9 +138,9 @@ abstract class KBulkUploadEngine
 	 * @param string $str
 	 * @return boolean
 	 */
-	protected function isFormatedDate($str)
+	public static function isFormatedDate($str)
 	{
-		$regex = $this->getDateFormatRegex();
+		$regex = self::getDateFormatRegex();
 		return preg_match($regex, $str);
 	}
 	
