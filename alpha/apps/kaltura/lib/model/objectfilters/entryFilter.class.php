@@ -111,10 +111,20 @@ class entryFilter extends baseObjectFilter
 			"_eq_access_control_id",
 			"_in_access_control_id",
 			"_free_text",
+			"_eq_reference_id",
+			"_in_reference_id",
+			"_eq_replacing_entry_id",
+			"_in_replacing_entry_id",
+			"_eq_replaced_entry_id",
+			"_in_replaced_entry_id",
+			"_eq_replacement_status",
+			"_in_replacement_status",
+			"_gte_partner_sort_value",
+			"_lte_partner_sort_value",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
-			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , "modified_at", "available_from", "duration" ,)	;
+			"type" , "media_type" , "plays" , "views" , "rank" , "moderation_count" , "moderation_status" , "modified_at", "available_from", "duration" , "partner_sort_value")	;
 
 		$this->aliases = array ( 
 			"user_id" => "kuser_id",
