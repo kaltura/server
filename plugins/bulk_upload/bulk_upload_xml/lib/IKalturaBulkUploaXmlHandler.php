@@ -1,37 +1,37 @@
 <?php
 /**
- * 
- * Represents a XML bulk upload handler
- * @author Roni
- * @package plugins.bulk_upload.bulk_upload_xml
+ * Plugins can handle bulk upload xml additional data by implementing this interface
+ * @package plugins.bulkUploadXml
  * @subpackage lib
  */
-interface IKalturaBulkUploadXMLHandler
+interface IKalturaBulkUploadXmlHandler
 {
 	/**
-	 * 
-	 * Handles plugin data for item add bulk upload 
-	 * @param KalturaBaseEntry $entry
+	 * Handles plugin data for new created object 
+	 * @param KalturaClient $client
+	 * @param KalturaObjectBase $object
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaBulkUploadXmlException  
 	 */
-	public function handleItemAdded(KalturaBaseEntry $entry, SimpleXMLElement $item);
+	public function handleItemAdded(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item);
 
 	/**
 	 * 
-	 * Handles plugin data for item update bulk upload 
-	 * @param KalturaBaseEntry $entry
+	 * Handles plugin data for updated object  
+	 * @param KalturaClient $client
+	 * @param KalturaObjectBase $object
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaBulkUploadXmlException  
 	 */
-	public function handleItemUpdated(KalturaBaseEntry $entry, SimpleXMLElement $item);
+	public function handleItemUpdated(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item);
 
 	/**
 	 * 
-	 * Handles plugin data for item delete bulk upload 
-	 * @param KalturaBaseEntry $entry
+	 * Handles plugin data for deleted object  
+	 * @param KalturaClient $client
+	 * @param KalturaObjectBase $object
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaBulkUploadXmlException  
 	 */
-	public function handleItemDeleted(KalturaBaseEntry $entry, SimpleXMLElement $item);
+	public function handleItemDeleted(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item);
 }
