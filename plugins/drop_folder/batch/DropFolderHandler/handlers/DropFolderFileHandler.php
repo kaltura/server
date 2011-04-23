@@ -122,17 +122,44 @@ abstract class DropFolderFileHandler
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = $referenceId;
+		$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;		
+		
 		$entryPager = new KalturaFilterPager();
+		/* -------------------------------------------------
+		 * -- !!TODO!! un comment when workaround is no longer needed
+		 * -------------------------------------------------
 		$entryPager->pageSize = 1;
 		$entryPager->pageIndex = 1;
+		 * ------------------------------------------------- */
+		$this->impersonate($this->dropFolderFile->partnerId);
 		$entryList = $this->kClient->baseEntry->listAction($entryFilter, $entryPager);
+		$entryList = $entryList->objects;
+		$this->unimpersonate();
 		
+		// -- workaround start - !!TODO!! need to remove once baseEntry->list can be used to filter by referenceId parameter
+		foreach ($entryList as $entry)
+		{
+			if ($entry->referenceId === $this->dropFolderFile->parsedSlug) {
+				return $entry;
+			}
+		}
+		// -- workaround end
+		
+		
+		/* -------------------------------------------------
+		 * -- !!TODO!! un comment when workaround is no longer needed
+		 * -------------------------------------------------
 		if (is_array($entryList->objects) && isset($entryList->objects[0]) ) {
-			return $matchedEntryList->objects[0];
+			$result = $matchedEntryList->objects[0];
+			if ($result->referenceId === $this->dropFolderFile->parsedSlug) {
+				return $result;
+			}
+			else {
+				KalturaLog::err("baseEntry->list returned wrong results when filtered by referenceId [$referenceId]");
+			}
 		}
-		else {
-			return null;
-		}
+		 -------------------------------------------------- */
+		return null;
 	}
 	
 	/**
@@ -140,14 +167,14 @@ abstract class DropFolderFileHandler
 	 */
 	protected function getIngestionProfile()
 	{
+		$this->impersonate($this->dropFolderFile->partnerId);
 		if (!is_null($this->dropFolder->ingestionProfileId)) {
 			$result = $this->kClient->conversionProfile->get($this->dropFolder->ingestionProfileId);
 		}
 		else {
-			$this->impersonate($this->dropFolderFile->partnerId);
 			$result = $this->kClient->conversionProfile->getDefault();
-			$this->unimpersonate();
 		}
+		$this->unimpersonate();
 		return $result;
 	}
 		

@@ -95,6 +95,10 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 					$this->addAsNewContent();
 				}
 				break;
+				
+			default:
+				KalturaLog::err('No content match policy is defined for drop folder ['.$this->dropFolder->id.']');
+				return false;
 		}
 
 		// update file with all changes that were done during the handling process
@@ -166,6 +170,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$addionnalFileIds = null;
 		$resource = null;
 		
+		$ingestionProfile = null;
 		if (is_null($this->dropFolderFile->parsedFlavor))
 		{
 			$resource = new KalturaDropFolderFileResource();
@@ -173,7 +178,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		else
 		{
-			$resource = $this->getAllIngestedFiles();
+			$ingestionProfile = $this->getIngestionProfile();
+			$resource = $this->getAllIngestedFiles($ingestionProfile->id);
 			if (!$resource) {
 				KalturaLog::debug('Some required flavors do not exist in the drop folder - changing status to WAITING');
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
@@ -188,7 +194,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		
 		$newEntry = new KalturaBaseEntry();
-		$ingestionProfile = $this->getIngestionProfile();
+		if (!$ingestionProfile) {
+			$ingestionProfile = $this->getIngestionProfile();
+		}
 		$newEntry->ingestionProfileId = $ingestionProfile->id;
 		$newEntry->name = $this->dropFolderFile->parsedSlug;
 		
@@ -243,7 +251,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			KalturaLog::err($this->dropFolderFile->errorDescription);
 			return false; // file not handled
 		}
-
+		
 		$matchedEntry = $this->getEntryByReferenceId($this->dropFolderFile->parsedSlug);
 		
 		if (!$matchedEntry)
@@ -282,9 +290,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		
 		try 
 		{
-			$this->impersonate($this->dropFolderFile->partnerId);
+			//$this->impersonate($this->dropFolderFile->partnerId);
 			$updatedEntry = $this->kClient->baseEntry->update($matchedEntry->id, null, $resource);
-			$this->unimpersonate();
+			//$this->unimpersonate();
 			
 			// set all addional files as handled
 			if ($addionnalFileIds) {
@@ -314,8 +322,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 */
 	private function getAllIngestedFiles($ingestionProfileId = null)
 	{
-		if(is_null($ingestionProfileId))
+		if (is_null($ingestionProfileId)) {
 			$ingestionProfileId = $this->getIngestionProfile()->id;
+		}
 		
 		$fileFilter = new KalturaDropFolderFileFilter();
 		$fileFilter->dropFolderIdEqual = $this->dropFolder->id;
@@ -329,7 +338,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		
 		foreach ($existingFileList->objects as $existingFile)
 		{
-			$existingFlavors[$existing->parsedSlug] = $existingFile->id;
+			$existingFlavors[$existingFile->parsedFlavor] = $existingFile->id;
 		}
 		
 		$assetContainerArray = array();
@@ -347,7 +356,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			}
 			
 			$assetContainer = new KalturaAssetParamsResourceContainer();
-			$assetContainer->assetParamsId = $assetParams->id;
+			$assetContainer->assetParamsId = $assetParams->assetParamsId;
 			$assetContainer->resource = new KalturaDropFolderFileResource();
 			$assetContainer->resource->dropFolderFileId = $existingFlavors[$assetParams->systemName];
 			$assetContainerArray[] = $assetContainer;

@@ -43,6 +43,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_FETCH_REPORT' => 'Distribution Fetch Report',
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_SYNC' => 'Distribution Sync',
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_WATCHER' => 'Drop Folder Watcher',
+	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_HANDLER' => 'Drop Folder Handler',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
