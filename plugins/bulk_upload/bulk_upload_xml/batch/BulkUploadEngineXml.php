@@ -1047,7 +1047,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 		if(!empty($item->startDate))
 		{
-			if((string)$item->startDate && !$this->isFormatedDate((string)$item->startDate))
+			if((string)$item->startDate && !self::isFormatedDate((string)$item->startDate))
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->errorDescription = "Invalid schedule start date {$item->startDate} on item $item->name";
@@ -1056,7 +1056,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!empty($item->endDate))
 		{
-			if((string)$item->endDate && !$this->isFormatedDate((string)$item->endDate))
+			if((string)$item->endDate && !self::isFormatedDate((string)$item->endDate))
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$bulkUploadResult->errorDescription = "Invalid schedule end date {$item->endDate} on item $item->name";
@@ -1069,8 +1069,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			return;
 		}
 		
-		$bulkUploadResult->scheduleStartDate = $this->parseFormatedDate((string)$item->startDate);
-		$bulkUploadResult->scheduleEndDate = $this->parseFormatedDate((string)$item->endDate);
+		$bulkUploadResult->scheduleStartDate = self::parseFormatedDate((string)$item->startDate);
+		$bulkUploadResult->scheduleEndDate = self::parseFormatedDate((string)$item->endDate);
 		
 		return $bulkUploadResult;
 	}
