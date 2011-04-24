@@ -5,9 +5,14 @@
 class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler
 {
 	const PLUGIN_NAME = 'contentDistributionBulkUploadXml';
+	
 	const BULK_UPLOAD_XML_VERSION_MAJOR = 1;
 	const BULK_UPLOAD_XML_VERSION_MINOR = 0;
 	const BULK_UPLOAD_XML_VERSION_BUILD = 0;
+	
+	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 1;
+	const CONTENT_DSTRIBUTION_VERSION_MINOR = 1;
+	const CONTENT_DSTRIBUTION_VERSION_BUILD = 0;
 	
 	/**
 	 * @var array<string, int> of distribution profiles by their system name
@@ -37,13 +42,20 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 	 */
 	public static function dependsOn()
 	{
-		$contentDistributionVersion = new KalturaVersion(
+		$bulkUploadXmlVersion = new KalturaVersion(
 			self::BULK_UPLOAD_XML_VERSION_MAJOR,
 			self::BULK_UPLOAD_XML_VERSION_MINOR,
 			self::BULK_UPLOAD_XML_VERSION_BUILD);
 			
-		$dependency = new KalturaDependency(BulkUploadXmlPlugin::getPluginName(), $contentDistributionVersion);
-		return array($dependency);
+		$contentDistributionVersion = new KalturaVersion(
+			self::CONTENT_DSTRIBUTION_VERSION_MAJOR,
+			self::CONTENT_DSTRIBUTION_VERSION_MINOR,
+			self::CONTENT_DSTRIBUTION_VERSION_BUILD);
+			
+		$bulkUploadXmlDependency = new KalturaDependency(BulkUploadXmlPlugin::getPluginName(), $bulkUploadXmlVersion);
+		$contentDistributionDependency = new KalturaDependency(ContentDistributionPlugin::getPluginName(), $contentDistributionVersion);
+		
+		return array($bulkUploadXmlDependency, $contentDistributionDependency);
 	}
 	
 	public function getDistributionProfileId($systemName, $providerName)
@@ -156,7 +168,7 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 			$entryDistribution->thumbAssetIds = $distribution->thumbAssetIds;
 			
 		$submitWhenReady = false;
-		if($distribution->submitWhenReady)
+		if($distribution['submitWhenReady'])
 			$submitWhenReady = true;
 			
 		$this->impersonate($partnerId);

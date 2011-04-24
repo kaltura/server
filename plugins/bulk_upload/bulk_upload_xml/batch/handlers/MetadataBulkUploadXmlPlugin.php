@@ -5,6 +5,7 @@
 class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler
 {
 	const PLUGIN_NAME = 'metadataBulkUploadXml';
+	
 	const BULK_UPLOAD_XML_VERSION_MAJOR = 1;
 	const BULK_UPLOAD_XML_VERSION_MINOR = 0;
 	const BULK_UPLOAD_XML_VERSION_BUILD = 0;
@@ -32,13 +33,15 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	 */
 	public static function dependsOn()
 	{
-		$contentDistributionVersion = new KalturaVersion(
+		$bulkUploadXmlVersion = new KalturaVersion(
 			self::BULK_UPLOAD_XML_VERSION_MAJOR,
 			self::BULK_UPLOAD_XML_VERSION_MINOR,
 			self::BULK_UPLOAD_XML_VERSION_BUILD);
 			
-		$dependency = new KalturaDependency(BulkUploadXmlPlugin::getPluginName(), $contentDistributionVersion);
-		return array($dependency);
+		$bulkUploadXmlDependency = new KalturaDependency(BulkUploadXmlPlugin::getPluginName(), $bulkUploadXmlVersion);
+		$metadataDependency = new KalturaDependency(MetadataPlugin::getPluginName());
+		
+		return array($bulkUploadXmlDependency, $metadataDependency);
 	}
 	
 	public function getMetadataProfileId($systemName)
@@ -81,11 +84,11 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	public function handleCustomData($objectType, $objectId, SimpleXMLElement $customData)
 	{
 		$metadataProfileId = null;
-		if(!empty($customData->metadataProfileId))
-			$metadataProfileId = (int)$customData->metadataProfileId;
+		if(!empty($customData['metadataProfileId']))
+			$metadataProfileId = (int)$customData['metadataProfileId'];
 
-		if(!$metadataProfileId && !empty($customData->metadataProfile))
-			$metadataProfileId = $this->getMetadataProfileId($customData->metadataProfile);
+		if(!$metadataProfileId && !empty($customData['metadataProfile']))
+			$metadataProfileId = $this->getMetadataProfileId($customData['metadataProfile']);
 				
 		if(!$metadataProfileId)
 			throw new KalturaBatchException("Missing custom data metadataProfile attribute", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
