@@ -8,6 +8,64 @@
  */
 abstract class KBulkUploadEngine
 {
+	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
+
+	/**
+	 * 
+	 * The batch current partner id
+	 * @var int
+	 */
+	protected $currentPartnerId;
+	
+	/**
+	 * @var KalturaConfiguration
+	 */
+	protected $kClientConfig = null;
+		
+	/**
+	 * @var int
+	 */
+	protected $multiRequestSize = 5;
+	
+	/**
+	 * @var int
+	 */
+	protected $maxRecords = 1000;
+	
+	/**
+	 * @var int
+	 */
+	protected $maxRecordsEachRun = 100;
+	
+	/**
+	 * @var int
+	 */
+	protected $handledRecordsThisRun = 0;
+	
+	/**
+	 * @var bool
+	 */
+	protected $exceededMaxRecordsEachRun = false;
+
+	/**
+	 * 
+	 * The Engine client
+	 * @var KalturaClient
+	 */
+	protected $kClient; 
+	
+	/**
+	 * 
+	 * @var KalturaBatchJob
+	 */
+	protected $job = null;
+	
+	/**
+	 * 
+	 * @var KalturaBulkUploadJobData
+	 */
+	protected $data = null;
+	
 	/**
 	 * @param string $str
 	 * @return int
@@ -144,64 +202,6 @@ abstract class KBulkUploadEngine
 		return preg_match($regex, $str);
 	}
 	
-	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
-
-	/**
-	 * 
-	 * The batch current partner id
-	 * @var int
-	 */
-	protected $currentPartnerId;
-	
-	/**
-	 * @var KalturaConfiguration
-	 */
-	protected $kClientConfig = null;
-		
-	/**
-	 * @var int
-	 */
-	protected $multiRequestSize = 5;
-	
-	/**
-	 * @var int
-	 */
-	protected $maxRecords = 1000;
-	
-	/**
-	 * @var int
-	 */
-	protected $maxRecordsEachRun = 100;
-	
-	/**
-	 * @var int
-	 */
-	protected $handledRecordsThisRun = 0;
-	
-	/**
-	 * @var bool
-	 */
-	protected $exceededMaxRecordsEachRun = false;
-
-	/**
-	 * 
-	 * The Engine client
-	 * @var KalturaClient
-	 */
-	protected $kClient; 
-	
-	/**
-	 * 
-	 * @var KalturaBatchJob
-	 */
-	protected $job = null;
-	
-	/**
-	 * 
-	 * @var KalturaBulkUploadJobData
-	 */
-	protected $data = null;
-
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
