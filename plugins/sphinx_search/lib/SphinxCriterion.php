@@ -106,7 +106,7 @@ class SphinxCriterion extends KalturaCriterion
 			}
 		}
 		
-		if($type == 'string')
+		if($type == IIndexable::FIELD_TYPE_STRING)
 		{
 			switch($comparison)
 			{
