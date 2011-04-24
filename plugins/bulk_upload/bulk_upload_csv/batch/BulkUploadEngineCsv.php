@@ -40,7 +40,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	public function handleBulkUpload()
 	{
-		$startLineNumber = $this->getStartLineNumber($this->job->id);
+		$startLineNumber = $this->getStartIndex($this->job->id);
 	
 		$filePath = $this->data->filePath;
 		$fileHandle = fopen($filePath, "r");
@@ -132,7 +132,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			
 			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
-				$requestResults = $this->doMultiRequestForPartner();
+				$requestResults = $this->kClient->doMultiRequest();
+				$this->impersonate();
 				$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
 				$this->startMultiRequest(true);
@@ -141,7 +142,8 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		}
 		
 		// commit the multi request entries
-		$requestResults = $this->doMultiRequestForPartner();
+		$requestResults = $this->kClient->doMultiRequest();
+		$this->impersonate();
 		if(count($requestResults))
 			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 
