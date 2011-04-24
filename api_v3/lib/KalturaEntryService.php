@@ -14,6 +14,15 @@ class KalturaEntryService extends KalturaBaseService
     }
     
     /**
+     * @param KalturaResource $resource
+     * @param entry $dbEntry
+     */
+    protected function replaceResource(KalturaResource $resource, entry $dbEntry)
+    {
+    	throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
+    }
+    
+    /**
      * @param kFileSyncResource $resource
      * @param entry $dbEntry
      * @param asset $dbAsset
