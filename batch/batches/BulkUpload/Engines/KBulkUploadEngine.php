@@ -233,12 +233,8 @@ abstract class KBulkUploadEngine
 	 */
 	public static function getEngine($batchJobSubType, KSchedularTaskConfig $taskConfig, $kClient, KalturaBatchJob $job)
 	{
-		$engine =  null;
-		
 		//Gets the engine from the plugin (as we moved all engines to the plugin)
-		$engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $job));
-						
-		return $engine;
+		return $engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $job));
 	}
 	
 	/**
@@ -277,9 +273,9 @@ abstract class KBulkUploadEngine
 	 * 
 	 * Impersonates into the current partner (overrides the batch partner) 
 	 */
-	protected function impersonate($partnerId)
+	protected function impersonate()
 	{
-		$this->kClientConfig->partnerId = $partnerId;
+		$this->kClientConfig->partnerId = $this->currentPartnerId;
 		$this->kClient->setConfig($this->kClientConfig);
 	}
 		
@@ -306,7 +302,7 @@ abstract class KBulkUploadEngine
 	 * Gets the start line number for the given job id
 	 * @return int - the start line for the job id
 	 */
-	protected function getStartLineNumber()
+	protected function getStartIndex()
 	{
 		try{
 			$bulkUploadLastResult = $this->kClient->batch->getBulkUploadLastResult($this->job->id);
@@ -332,20 +328,7 @@ abstract class KBulkUploadEngine
 		}
 		
 		$this->kClient->startMultiRequest();
-	}
-	
-	/**
-	 * @return array
-	 */
-	protected function doMultiRequestForPartner()
-	{
-		$requestResults = $this->kClient->doMultiRequest();
-		
-		$this->kClientConfig->partnerId = $this->currentPartnerId;
-		$this->kClient->setConfig($this->kClientConfig);
-		
-		return $requestResults;
-	}
+	}	
 	
 	/**
 	 * save the results for returned created entries
@@ -355,13 +338,7 @@ abstract class KBulkUploadEngine
 	 */
 	protected function updateEntriesResults(array $requestResults, array $bulkUploadResults)
 	{
-		if(count($requestResults) != count($bulkUploadResults))
-			throw new KalturaBatchException("request results [$requestResults] and bulk upload results [$bulkUploadResults] must have the same size", KalturaBatchJobAppErrors::BULK_INVLAID_BULK_REQUEST_COUNT);
-			
-		KalturaLog::debug("request results [$requestResults], bulk upload results [$bulkUploadResults]");
-		
 		$this->kClient->startMultiRequest();
-		
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
 		// checking the created entries

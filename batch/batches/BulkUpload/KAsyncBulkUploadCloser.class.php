@@ -91,5 +91,3 @@ class KAsyncBulkUploadCloser extends KBatchBase
 		return $response->job;
 	}
 }
-
-?>
