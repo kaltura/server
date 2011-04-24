@@ -17,7 +17,8 @@ class DropFolder extends BaseDropFolder
 {
 	
 	const AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE = 3;
-	const FILE_SIZE_CHECK_INTERNAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minutes
+	const FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minutes
+	const FILE_NAME_PATTERNS_DEFAULT_VALUE = '*';
 	
 	
 	// -------------------------------------
@@ -35,7 +36,7 @@ class DropFolder extends BaseDropFolder
     	
 		// set default values where null		
 		if (is_null($this->getFileSizeCheckInterval())) {
-			$this->setFileSizeCheckInterval(DropFolder::FILE_SIZE_CHECK_INTERNAL_DEFAULT_VALUE);
+			$this->setFileSizeCheckInterval(DropFolder::FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE);
 		}
 				
 		if (is_null($this->getFileDeletePolicy())) {

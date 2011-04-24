@@ -33,6 +33,7 @@ class KAsyncDropFolderHandler extends KBatchBase
 		if($this->taskConfig->isInitOnly())
 			return $this->init();
 		
+		//TODO: use getFilter instead of taskConfig->params
 		// get drop folder tags to work on from configuration
 		$folderTags = $this->taskConfig->params->tags;
 		$currentDc  = $this->taskConfig->params->dc;

@@ -42,15 +42,26 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyNotNull('dc');
 		$dropFolder->validatePropertyNotNull('path');
 		$dropFolder->validatePropertyNotNull('partnerId');
-		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0);
+		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0, true);
 		$dropFolder->validatePropertyNotNull('fileHandlerType');
-		$dropFolder->validatePropertyNotNull('fileNamePatterns');
 		$dropFolder->validatePropertyNotNull('fileHandlerConfig');
 		
 		// validate values
 		
+		if (is_null($dropFolder->fileSizeCheckInterval)) {
+			$dropFolder->fileSizeCheckInterval = DropFolder::FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE;
+		}
+		
+		if (is_null($dropFolder->fileNamePatterns)) {
+			$dropFolder->fileNamePatterns = DropFolder::FILE_NAME_PATTERNS_DEFAULT_VALUE;
+		}
+		
 		if (!kDataCenterMgr::dcExists($dropFolder->dc)) {
 			throw new KalturaAPIException(KalturaErrors::DATA_CENTER_ID_NOT_FOUND, $dropFolder->dc);
+		}
+		
+		if (!PartnerPeer::retrieveByPK($dropFolder->partnerId)) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $dropFolder->partnerId);
 		}
 				
 		$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);

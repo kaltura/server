@@ -9,9 +9,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	const REFERENCE_ID_WILDCARD = 'referenceId';
 	const FLAVOR_NAME_WILDCARD  = 'flavorName';
 	
-	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.](?P<extension>\w+)/'; // matches "referenceId_flavorName.extension"
-	
-	
 	/**
 	 * @var KalturaDropFolderContentFileHandlerConfig
 	 */
@@ -116,13 +113,17 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	
 	
 	/**
-	 * Parse file name according to defined slugRegex and set the extracted parsedSlug and parsedFlavor
+	 * Parse file name according to defined slugRegex and set the extracted parsedSlug and parsedFlavor.
+	 * The following expressions are currently recognized and used:
+	 * 	- (?P<referenceId>\w+) - will be used as the drop folder file's parsed slug.
+	 *  - (?P<flavorName>\w+)  - will be used as the drop folder file's parsed flavor. 
+	 * 
 	 * @return bool true if file name matches the slugRegex or false otherwise
 	 */
 	private function parseRegex()
 	{
 		$matches = null;
-		$slugRegex = is_null($this->config->slugRegex) ? self::DEFAULT_SLUG_REGEX : $this->config->slugRegex;
+		$slugRegex = is_null($this->config->slugRegex) ? KalturaDropFolderContentFileHandlerConfig::DEFAULT_SLUG_REGEX : $this->config->slugRegex;
 		$matchFound = @preg_match($slugRegex, $this->dropFolderFile->fileName, $matches);
 		
 		if (!$matchFound) {
