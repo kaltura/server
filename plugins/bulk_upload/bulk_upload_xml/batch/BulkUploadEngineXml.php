@@ -75,8 +75,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	public function handleBulkUpload() 
 	{
-		$this->impersonate($this->currentPartnerId);
-		
 		$this->validate();
 	    $this->parse();
 	}
@@ -84,7 +82,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Validates that the xml is valid using the XSD
-	 *
+	 *@return bool - if the validation is ok
 	 */
 	protected function validate() 
 	{
@@ -126,27 +124,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleChannel(SimpleXMLElement $channel)
 	{
+		$this->currentItem = $this->getStartIndex();
+		
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
-			$this->currentItem++;
-			
+			$this->currentItem++; //moveto the next item (first item is 1)
 			try
 			{
 				KalturaLog::debug("Validating item [{$item->name}]");
 				$this->validateItem($item);
-			}
-			catch (KalturaBulkUploadXmlException $e)
-			{
-				$bulkUploadResult = $this->createUploadResult($item);
-				$bulkUploadResult->errorDescription = $e->getMessage();
-				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
-				$this->addBulkUploadResult($bulkUploadResult);
-				continue; // move to next item
-			}
-			
-			try
-			{
+				
 				KalturaLog::debug("Handling item [{$item->name}]");
 				$this->handleItem($item);
 			}
@@ -157,7 +145,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$this->addBulkUploadResult($bulkUploadResult);
 				continue; // move to next item
-			}
+			}			
 		}	
 	}
 	
@@ -237,17 +225,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		KalturaLog::debug("xml [" . $item->asXML() . "]");
 			
-		$entry = $this->createEntryFromItem($item);
-		$this->handleTypedElement($entry, $item);
+		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
+		$this->handleTypedElement($entry, $item); //Sets teh typed element values (Mix, Media, ...)
 		KalturaLog::debug("current entry is: " . print_r($entry, true));
 				
 		$thumbAssets = array();
 		$flavorAssets = array();
-		$noParamsThumbAssets = array();
-		$noParamsThumbResources = array();
-		$noParamsFlavorAssets = array();
-		$noParamsFlavorResources = array();
-		$resource = new KalturaAssetsParamsResourceContainers();
+		$noParamsThumbAssets = array(); //Holds the no flavor params thumb assests
+		$noParamsThumbResources = array(); //Holds the no flavor params resources assests
+		$noParamsFlavorAssets = array();  //Holds the no flavor params flavor assests
+		$noParamsFlavorResources = array(); //Holds the no flavor params flavor resources
+		$resource = new KalturaAssetsParamsResourceContainers(); // holds all teh needed resources for the conversion
 		$resource->resources = array();
 		
 		//For each content in the item element we add a new flavor asset
@@ -298,26 +286,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->resources[] = $assetResource;
 		}
 
-		$requestResult = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
-				
-		$createdEntry = $requestResult;
-		if(is_array($requestResult)) // if we got a response of array then we return the first object
-		{
-			$createdEntry = reset($requestResult);
-		}
-				
-		if(is_null($createdEntry))
-		{
-			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
-							
+		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
+									
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 				
+		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
+		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($createdEntry->id, $flavorAssets, $thumbAssets);
 				
+		//Handles the plugin added data
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
 		foreach($pluginsInstances as $pluginsInstance)
 			$pluginsInstance->handleAddedItem($createdEntry, $item);
@@ -341,24 +321,36 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!count($resource->resources))
 			$resource = null;
 			
-		$this->kClient->baseEntry->add($entry, $resource, $entry->type);
+		$this->kClient->baseEntry->add($entry, $resource, $entry->type); // Adds the entry
 		$newEntryId = "{1:result:id}";
 		
-		foreach($noParamsFlavorAssets as $index => $flavorAsset)
+		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
 			$this->kClient->flavorAsset->add($newEntryId, $flavorAsset, $flavorResource);
 		}
 	
-		foreach($noParamsThumbAssets as $index => $thumbAsset)
+		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			$thumbResource = $noParamsThumbResources[$index];
 			$this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
 		}
-		
-		$requestResults = $this->doMultiRequestForPartner();
 				
-		return $requestResults;
+		$requestResults = $this->kClient->doMultiRequest();;
+		$this->impersonate();
+		
+		$createdEntry = $requestResults;
+		if(is_array($requestResults)) // if we got a response of array then we return the first object
+		{
+			$createdEntry = reset($requestResults);
+		}
+		
+		if(is_null($createdEntry)) //checks that the entry was created
+		{
+			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+		
+		return $createdEntry;
 	}
 	
 	/**
@@ -371,15 +363,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
 	{
 		$this->startMultiRequest(true);
-		
 		//Gets the created thumbs and flavors
 		$this->kClient->flavorAsset->getByEntryId($createdEntryId);
 		$this->kClient->thumbAsset->getByEntryId($createdEntryId);
-		$result = $this->doMultiRequestForPartner();
-		
+		$result = $this->kClient->doMultiRequest();
+			
 		$createdFlavorAssets = $result[0]; 
 		$createdThumbAssets =  $result[1];
-		
+				
 		$this->startMultiRequest(true);
 		///For each flavor asset that we just added without his data then we need to update his additional data
 		foreach($createdFlavorAssets as $createdFlavorAsset)
@@ -406,7 +397,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->kClient->thumbAsset->update($createdThumbAsset->id, $thumbAsset);
 		}
 		
-		$requestResults = $this->doMultiRequestForPartner();
+		$requestResults = $this->kClient->mu();
 		
 		return $requestResults;
 	}
