@@ -397,8 +397,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->kClient->thumbAsset->update($createdThumbAsset->id, $thumbAsset);
 		}
 		
-		$requestResults = $this->kClient->mu();
-		
+		$requestResults = $requestResults = $this->kClient->doMultiRequest();;
+				
 		return $requestResults;
 	}
 	
