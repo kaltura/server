@@ -234,7 +234,7 @@ abstract class KBulkUploadEngine
 	public static function getEngine($batchJobSubType, KSchedularTaskConfig $taskConfig, $kClient, KalturaBatchJob $job)
 	{
 		//Gets the engine from the plugin (as we moved all engines to the plugin)
-		return $engine = KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $job));
+		return KalturaPluginManager::loadObject('KBulkUploadEngine', $batchJobSubType, array($taskConfig, $kClient, $job));
 	}
 	
 	/**
