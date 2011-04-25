@@ -762,7 +762,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//TODO: Roni - Parse the date
 		$entry->startDate = (string)$item->startDate;
 		$entry->type = (int)$item->type;
-		$entry->ingestionProfileId = $this->getIngestionProfileId($item);	
+		$entry->ingestionProfileId = $this->getIngestionProfileId($item);
+		
+		if(is_null($entry->ingestionProfileId)) // if we didn't set it in the item element
+		{
+			$entry->ingestionProfileId = $this->data->conversionProfileId;
+			if(is_null($entry->ingestionProfileId)) // if we didn't set it in the item element
+			{
+				//TODO: Get the user default conversion profile is it good?
+				$this->impersonate();
+				$entry->ingestionProfileId = $this->kClient->conversionProfile->getDefault();
+			}
+		}
 		
 		return $entry;
 	}
