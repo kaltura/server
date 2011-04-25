@@ -40,14 +40,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Maps the flavor params name to id
 	 * @var array()
 	 */
-	private $flavorParamsNameToId = null;
+	private $flavorParamsNameToIdPerConversionProfile = null;
 	
 	/**
 	 * 
 	 * Maps the thumb params name to id
 	 * @var array()
 	 */
-	private $thumbParamsNameToId = null;
+	private $thumbParamsNameToIdPerConversionProfile = null;
 	
 	/**
 	 * 
@@ -61,7 +61,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Maps the converstion profile name to id
 	 * @var array()
 	 */
-	private $conversionProfileNameToId = null;
+	private $ingestionProfileNameToId = null;
 	
 	/**
 	 * 
@@ -124,11 +124,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleChannel(SimpleXMLElement $channel)
 	{
-		$this->currentItem = $this->getStartIndex();
+		$this->currentItem = 
+		$startIndex = $this->getStartIndex();
+		
 		
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
+			
 			$this->currentItem++; //moveto the next item (first item is 1)
 			try
 			{
@@ -226,7 +229,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("xml [" . $item->asXML() . "]");
 			
 		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
-		$this->handleTypedElement($entry, $item); //Sets teh typed element values (Mix, Media, ...)
+		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
 		KalturaLog::debug("current entry is: " . print_r($entry, true));
 				
 		$thumbAssets = array();
@@ -241,7 +244,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//For each content in the item element we add a new flavor asset
 		foreach ($item->content as $contentElement)
 		{
-			$flavorAsset = $this->getFlavorAsset($contentElement);
+			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
 			if(is_null($flavorAsset))
 			{
 				$resource->resources[] = $this->getResource($contentElement);
@@ -265,7 +268,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//For each thumbnail in the item element we create a new thumb asset
 		foreach ($item->thumbnail as $thumbElement)
 		{
-			$thumbAsset = $this->getThumbAsset($thumbElement);
+			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
 			if(is_null($thumbAsset))
 			{
 				$resource->resources[] = $this->getResource($thumbElement);
@@ -408,10 +411,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $contentElement
 	 * @return KalturaFlavorAsset
 	 */
-	private function getFlavorAsset(SimpleXMLElement $contentElement)
+	private function getFlavorAsset(SimpleXMLElement $contentElement, $conversionProfileId)
 	{
 		$flavorAsset = new KalturaFlavorAsset();
-		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, true);
+		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
 		$flavorAsset->tags = $this->getStringFromElement($contentElement->tags);
 		
 		if(is_null($flavorAsset->flavorParamsId) && is_null($flavorAsset->tags))
@@ -424,12 +427,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * returns a thumbnail asset form the current thumbnail element
 	 * @param SimpleXMLElement $thumbElement
+	 * @param int $conversionProfileId - The converrsion profile id 
 	 * @return KalturaThumbAsset
 	 */
-	private function getThumbAsset(SimpleXMLElement $thumbElement)
+	private function getThumbAsset(SimpleXMLElement $thumbElement, $conversionProfileId)
 	{
 		$thumbAsset = new KalturaThumbAsset();
-		$thumbAsset->thumbParamsId = $this->getThumbParamsId($thumbElement);
+		$thumbAsset->thumbParamsId = $this->getThumbParamsId($thumbElement, $conversionProfileId);
 	
 		if($thumbElement->isDefault)
 			$thumbAsset->tags = self::DEFAULT_THUMB_TAG;
@@ -515,9 +519,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Gets the flavor params id from the given element
 	 * @param $elementToSearchIn - The element to search in
+	 * @param $conversionProfileId - The conversion profile on the item
 	 * @return int - The id of the flavor params
 	 */
-	private function getFlavorParamsId(SimpleXMLElement $elementToSearchIn, $isAttribute = true)
+	private function getFlavorParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
 	{
 		if($isAttribute)
 		{
@@ -527,13 +532,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(empty($elementToSearchIn["flavorParams"]))
 				return null;	
 				
-			if(is_null($this->flavorParamsNameToId))
+			if(is_null($this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId]))
 			{
-				$this->initFlavorParamsNameToId();
+				$this->initFlavorParamsNameToId($conversionProfileId);
 			}
 				
-			if(isset($this->flavorParamsNameToId[$elementToSearchIn["flavorParams"]]))
-				return trim($this->flavorParamsNameToId[$elementToSearchIn["flavorParams"]]);
+			if(isset($this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]))
+				return trim($this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]);
 		}
 		else 
 		{
@@ -543,13 +548,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(empty($elementToSearchIn->flavorParams))
 				return null;	
 				
-			if(is_null($this->flavorParamsNameToId))
+			if(is_null($this->flavorParamsNameToIdPerConversionProfile))
 			{
-				$this->initFlavorParamsNameToId();
+				$this->initFlavorParamsNameToId($conversionProfileId);
 			}
 				
-			if(isset($this->flavorParamsNameToId[$elementToSearchIn->flavorParams]))
-				return trim($this->flavorParamsNameToId[$elementToSearchIn->flavorParams]);
+			if(isset($this->flavorParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]))
+				return trim($this->flavorParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]);
 		}
 			
 		return null;
@@ -584,9 +589,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Gets the thumb params id from the given element
 	 * @param $elementToSearchIn - The element to search in
+	 * @param $conversionProfileId - The conversion profile id
+	 * @param $isAttribute - bool
 	 * @return int - The id of the thumb params
 	 */
-	private function getThumbParamsId(SimpleXMLElement $elementToSearchIn, $isAttribute = true)
+	private function getThumbParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
 	{
 		if(!empty($elementToSearchIn->thumbParamsId))
 			return (int)$elementToSearchIn->thumbParamsId;
@@ -594,13 +601,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(empty($elementToSearchIn->thumbParams))
 			return null;	
 			
-		if(is_null($this->thumbParamsNameToId))
+		if(is_null($this->thumbParamsNameToIdPerConversionProfile))
 		{
 			$this->initThumbParamsNameToId();
 		}
 			
-		if(isset($this->thumbParamsNameToId[$elementToSearchIn->thumbParams]))
-			return trim($this->thumbParamsNameToId[$elementToSearchIn->thumbParams]);
+		if(isset($this->thumbParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]))
+			return trim($this->thumbParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]);
 			
 		return null;
 	}
@@ -659,15 +666,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Inits the array of flavor params name to Id (with all given flavor params)
+	 * @param $coversionProfileId - The conversion profile for which we ini the arrays for
 	 */
-	private function initFlavorParamsNameToId()
+	private function initFlavorParamsNameToId($conversionProfileId)
 	{
-		$allFlavorParams = $this->kClient->flavorParams->listAction(null, null);
+		$allFlavorParams = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
 		
 		foreach ($allFlavorParams as $flavorParam)
 		{
 			if(!is_null($flavorParam->systemName))
-				$this->flavorParamsNameToId[$flavorParam->systemName] = $flavorParam->id;
+				$this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParam->systemName] = $flavorParam->id;
 		}
 	}
 
@@ -688,14 +696,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Inits the array of thumb params name to Id (with all given flavor params)
+	 * @param int $conversionProfileId
 	 */
-	private function initThumbParamsNameToId()
+	private function initThumbParamsNameToId($conversionProfileId)
 	{
-		$allThumbParams = $this->kClient->thumbParams->listAction(null, null);
+		$allThumbParams = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
 		foreach ($allThumbParams as $thumbParam) // Gets all access controls
 		{
 			if(!is_null($thumbParams->systemName)) 
-				$this->thumbParamsNameToId[$thumbParams->systemName] = $thumbParams->id;
+				$this->thumbParamsNameToIdPerConversionProfile[$conversionProfileId][$thumbParams->systemName] = $thumbParams->id;
 		}
 	}
 		
@@ -705,12 +714,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function initIngestionProfileNameToId()
 	{
-		$allConversionProfile = $this->kClient->conversioProfile->listAction(null, null);
+		$allIngestionProfile = $this->kClient->conversioProfile->listAction(null, null);
 		
-		foreach ($allConversionProfile as $conversionProfile)
+		foreach ($allIngestionProfile as $ingestionProfile)
 		{
-			if(!is_null($conversionProfile->systemName))
-				$this->conversionProfileNameToId[$conversionProfile->systemName] = $conversionProfile->id;
+			if(!is_null($ingestionProfile->systemName))
+				$this->ingestionProfileNameToId[$ingestionProfile->systemName] = $ingestionProfile->id;
 		}
 	}
 
