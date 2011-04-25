@@ -124,15 +124,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleChannel(SimpleXMLElement $channel)
 	{
-		$this->currentItem = 
+		$this->currentItem = 0;
 		$startIndex = $this->getStartIndex();
-		
-		
+				
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
+			if($this->currentItem < startIndex)
+			{
+				$this->currentItem++;
+				continue;
+			}
 			
-			$this->currentItem++; //moveto the next item (first item is 1)
+			$this->currentItem++; //move to the next item (first item is 1)
 			try
 			{
 				KalturaLog::debug("Validating item [{$item->name}]");
