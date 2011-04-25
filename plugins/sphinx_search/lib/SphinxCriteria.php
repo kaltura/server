@@ -269,7 +269,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					
 					if(count($vals))
 					{
-						$vals = array_slice($vals, 0, self::MAX_IN_VALUES);
+						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 						$val = '!' . implode(' & !', $vals);
 						$this->matchClause[] = "@$sphinxField $val";
 						$filter->unsetByName($field);
@@ -291,7 +291,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					
 					if(count($vals))
 					{
-						$vals = array_slice($vals, 0, self::MAX_IN_VALUES);
+						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
 						$val = '(^' . implode('$ | ^', $vals) . '$)';
 						$this->matchClause[] = "@$sphinxField $val";
 						$filter->unsetByName($field);
