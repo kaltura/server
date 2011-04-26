@@ -460,10 +460,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getFilePathFromResource($resource)
 	{
 		$type = get_class($resource);
+		KalturaLog::debug("Resource clas is [$type]");
+		
 		switch($type)
 		{
 			case 'KalturaLocalFileResource':
-				return $resourse->localFilePath;
+				return $resource->localFilePath;
 				break;
 			case 'KalturaUrlResource':
 				return $resource->url;
