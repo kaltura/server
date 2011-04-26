@@ -540,13 +540,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if($isAttribute)
 		{
-			KalturaLog::debug("is empty :" . empty($elementToSearchIn["flavorParamsId"]) . empty($elementToSearchIn["flavorParams"]));
-			KalturaLog::debug("is set :" . isset($elementToSearchIn["flavorParamsId"]) . isset($elementToSearchIn["flavorParams"]));
-			
 			if(isset($elementToSearchIn["flavorParamsId"]))
 				return (int)$elementToSearchIn["flavorParamsId"];
 	
-			if(empty($elementToSearchIn["flavorParams"]))
+			if(isset($elementToSearchIn["flavorParams"]))
 				return null;	
 				
 			if(is_null($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
@@ -644,20 +641,39 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getThumbParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
 	{
-		if(!empty($elementToSearchIn->thumbParamsId))
-			return (int)$elementToSearchIn->thumbParamsId;
-
-		if(empty($elementToSearchIn->thumbParams))
-			return null;	
-			
-		if(is_null($this->assetParamsNameToIdPerConversionProfile))
+		if($isAttribute)
 		{
-			$this->initAssetParamsNameToId();
+			if(isset($elementToSearchIn["thumbParamsId"]))
+				return (int)$elementToSearchIn["thumbParamsId"];
+	
+			if(isset($elementToSearchIn["thumbParams"]))
+				return null;	
+				
+			if(is_null($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
+			{
+				$this->initAssetParamsNameToId($conversionProfileId);
+			}
+				
+			if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["thumbParams"]]))
+				return trim($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["thumbParams"]]);
 		}
-			
-		if(isset($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]))
-			return trim($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]);
-			
+		else 
+		{
+			if(!empty($elementToSearchIn->thumbParamsId))
+				return (int)$elementToSearchIn->thumbParamsId;
+	
+			if(empty($elementToSearchIn->thumbParams))
+				return null;	
+				
+			if(is_null($this->assetParamsNameToIdPerConversionProfile))
+			{
+				$this->initAssetParamsNameToId();
+			}
+				
+			if(isset($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]))
+				return trim($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]);
+		}	
+		
 		return null;
 	}
 		
