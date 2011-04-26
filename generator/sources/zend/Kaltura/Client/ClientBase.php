@@ -181,23 +181,23 @@ class Kaltura_Client_ClientBase
 		return $result;
 	}
 
-	private function unmarshalArray(SimpleXMLElement $xmls)
+	public static function unmarshalArray(SimpleXMLElement $xmls)
 	{
 		$ret = array();
 		foreach($xmls as $xml)
-			$ret[] = $this->unmarshalItem($xml);
+			$ret[] = self::unmarshalItem($xml);
 			
 		return $ret;
 	}
 
-	private function unmarshalItem(SimpleXMLElement $xml)
+	public static function unmarshalItem(SimpleXMLElement $xml)
 	{
 		$nodeName = $xml->getName();
 		
 		if(!$xml->objectType)
 		{
 			if($xml->item)
-				return $this->unmarshalArray($xml->children());
+				return self::unmarshalArray($xml->children());
 				
 			if($xml->error)
 			{
@@ -211,16 +211,7 @@ class Kaltura_Client_ClientBase
 		$objectType = reset($xml->objectType);
 			
 		$type = Kaltura_Client_TypeMap::getZendType($objectType);
-		$this->log("Instantiating new object type [$type] server type [$objectType]");
-		$ret = new $type();
-	
-		foreach($xml->children() as $attributeName => $attributeValue)
-		{
-			if($attributeName == 'objectType')
-				continue;
-				
-			$ret->$attributeName = $this->unmarshalItem($attributeValue);
-		}
+		$ret = new $type($xml);
 		
 		return $ret;
 	}
@@ -228,7 +219,7 @@ class Kaltura_Client_ClientBase
 	private function unmarshal($xmlData)
 	{
 		$xml = new SimpleXMLElement($xmlData);
-		return $this->unmarshalItem($xml->result);
+		return self::unmarshalItem($xml->result);
 	}
 
 	/**

@@ -375,6 +375,51 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("		return '$kalturaType';");
 		$this->appendLine("	}");
 		$this->appendLine("	");
+	
+		$this->appendLine('	public function __construct(SimpleXMLElement $xml = null)');
+		$this->appendLine('	{');
+		$this->appendLine('		if(is_null($xml))');
+		$this->appendLine('			return;');
+		$this->appendLine('		');
+		
+		foreach($classNode->childNodes as $propertyNode)
+		{
+			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+			
+			$propName = $propertyNode->getAttribute("name");
+			$isEnum = $propertyNode->hasAttribute("enumType");
+			$propType = $this->getTypeClass($propertyNode->getAttribute("type"));
+		
+			switch ($propType) 
+			{
+				case "int" :
+				case "float" :
+				case "bool" :
+					$this->appendLine("		if(!empty(\$xml->$propName))");
+					$this->appendLine("			\$this->$propName = ($propType)\$xml->$propName;");
+					break;
+					
+				case "string" :
+					$this->appendLine("		\$this->$propName = \$xml->$propName;");
+					break;
+					
+				case "array" :
+					$this->appendLine("		if(empty(\$xml->$propName))");
+					$this->appendLine("			\$this->$propName = array();");
+					$this->appendLine("		else");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalArray(\$xml->$propName);");
+					break;
+				default : // sub object
+					$this->appendLine("		if(!empty(\$xml->$propName))");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalItem(\$xml->$propName);");
+					break;
+			}
+			
+			
+		}
+		
+		$this->appendLine('	}');
 		
 		// class properties
 		foreach($classNode->childNodes as $propertyNode)
@@ -386,6 +431,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 			$isReadyOnly = $propertyNode->getAttribute("readOnly") == 1;
 			$isInsertOnly = $propertyNode->getAttribute("insertOnly") == 1;
 			$isEnum = $propertyNode->hasAttribute("enumType");
+			$propType = null;
 			if ($isEnum)
 				$propType = $propertyNode->getAttribute("enumType");
 			else
