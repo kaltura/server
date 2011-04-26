@@ -522,6 +522,9 @@ class KalturaTypeReflector
 	//		$baseEnumName = $type::getEnumClass();
 	 
 			$pluginInstance = KalturaPluginManager::getPluginInstance($pluginName);
+			if (!$pluginInstance)
+				return false;
+
 			$enums = $pluginInstance->getEnums($baseEnumName);
 			
 			foreach($enums as $enum)
