@@ -306,12 +306,14 @@ abstract class KBulkUploadEngine
 	{
 		try{
 			$bulkUploadLastResult = $this->kClient->batch->getBulkUploadLastResult($this->job->id);
-			return $bulkUploadLastResult->lineIndex;
+			if(!is_null($bulkUploadLastResult))
+				return $bulkUploadLastResult->lineIndex;
 		}
 		catch(Exception $e){
 			KalturaLog::notice("getBulkUploadLastResult: " . $e->getMessage());
-			return 0;
 		}
+		
+		return 0;
 	}
 	
 	/**

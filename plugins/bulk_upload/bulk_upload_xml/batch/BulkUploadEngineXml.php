@@ -454,6 +454,82 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
+	 * Returns the file path from the given resource
+	 * @param KalturaResouyce $resource
+	 */
+	private function getFilePathFromResource($resource)
+	{
+		$type = get_class($resource);
+		switch($type)
+		{
+			case 'KalturaLocalFileResource':
+				return $resourse->localFilePath;
+				break;
+			case 'KalturaUrlResource':
+				return $resource->url;
+				break;
+			case 'KalturaEntryResource':
+				//TODO: get the file path from the $resource->entryId
+				throw new KalturaBulkUploadXmlException("Resource validation is not supported", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+				break;
+			case 'KalturaAssetResource':
+				//TODO: get the file path from the $resource->assetId
+				throw new KalturaBulkUploadXmlException("Resource validation is not supported", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+				break;
+
+			case 'KalturaRemoteStorageResource':
+				//TODO: get the file path from the $resource->storageProfileId
+				throw new KalturaBulkUploadXmlException("Resource validation is not supported", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+				break;
+			default:
+				return null;				
+		}
+	}
+	
+	/**
+	 * 
+	 * Validates if the resource is valid
+	 * @param KalturaResource $resource
+	 * @param SimpleXMLElement $elementToSearchIn
+	 */
+	private function validateResource($resource, $elementToSearchIn)
+	{
+		$filePath = $this->getFilePathFromResource($resource);
+		
+		if(is_null($filePath))
+		{
+			throw new KalturaBulkUploadXmlException("Can't validate file as file path is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+			
+		if(!empty($elementToSearchIn->fileChecksum) || $elementToSearchIn->fileChecksum == '0' || $elementToSearchIn->fileChecksum == 0) //Check checksum if exists
+		{
+			if($elementToSearchIn->fileChecksum['type'] == 'sha1')
+			{
+				 $checksum = sha1_file($filePath);
+			}
+			else
+			{
+				$checksum = md5_file($filePath);
+			}
+			
+			if((string)$elementToSearchIn->fileChecksum != $checksum)
+			{
+				throw new KalturaBulkUploadXmlException("File checksum is invalid for file [$filePath], Xml checksum [$elementToSearchIn->fileChecksum], actual checksum [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			}
+		}
+		
+		if(!empty($elementToSearchIn->fileSize) || $elementToSearchIn->fileSize == '0' || $elementToSearchIn->fileSize == 0) //Check checksum if exists
+		{
+			$fileSize = filesize($filePath);
+			if((int)$elementToSearchIn->fileSize != $fileSize)
+			{
+					throw new KalturaBulkUploadXmlException("File size is invalid for file [$filePath], Xml size [$elementToSearchIn->fileChecksum], actual size [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			}
+		}
+	}
+	
+	/**
+	 * 
 	 * Gets an item and returns the resource
 	 * @param SimpleXMLElement $elementToSearchIn
 	 * @return KalturaResource - the resource located in the given element
@@ -461,8 +537,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getResource(SimpleXMLElement $elementToSearchIn)
 	{
 		$resource = $this->getResourceInstance($elementToSearchIn); 
+		$isValid = $this->validateResource($resource, $elementToSearchIn);
 				
-		if(is_null($resource))
+		if(!isValid)
 		{
 			throw new KalturaBatchException("Resource is not supported: {$elementToSearchIn->asXml()}", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED); //failed to get teh resource from the given item
 		}

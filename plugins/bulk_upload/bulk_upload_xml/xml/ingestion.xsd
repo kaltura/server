@@ -315,9 +315,20 @@
 	</xs:complexType>
 
 	<xs:complexType name="T_localFileContentResource">
-		<xs:choice minOccurs="1" maxOccurs="1">
+		<xs:choice minOccurs="0" maxOccurs="1">
 			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="fileChecksum" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:attribute name="type" use="optional" default="md5">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="md5"/>
+								<xs:enumeration value="sha1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
 		</xs:choice>
 		<xs:attribute name="filePath" type="xs:string" use="required"/>
 	</xs:complexType>
