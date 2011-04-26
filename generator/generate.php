@@ -56,9 +56,6 @@ $generateSingle = isset($argv[1]) ? $argv[1] : null;
 //pull the generator config ini
 $config = new Zend_Config_Ini("config.ini");
 
-//TODO: fix cache mechanism to have an expiry of some kind.
-KalturaTypeReflectorCacher::disable();
-
 //if we got specific generator request, tes if this requested generator does exist
 if ($generateSingle != null)
 {
