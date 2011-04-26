@@ -378,6 +378,8 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 	
 		$this->appendLine('	public function __construct(SimpleXMLElement $xml = null)');
 		$this->appendLine('	{');
+		$this->appendLine('		parent::__construct($xml);');
+		$this->appendLine('		');
 		$this->appendLine('		if(is_null($xml))');
 		$this->appendLine('			return;');
 		$this->appendLine('		');
