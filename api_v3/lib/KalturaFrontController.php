@@ -45,6 +45,8 @@ class KalturaFrontController
 		set_error_handler(array(&$this, "errorHandler"));
 		set_exception_handler(array(&$this, "exceptionHandler"));
 		
+		
+		KalturaLog::debug("Params [" . print_r($this->params, true) . "]");
 		if ($this->service == "multirequest")
 		{
 		    set_exception_handler(null);
