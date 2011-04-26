@@ -147,6 +147,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 			catch (KalturaBulkUploadXmlException $e)
 			{
+				KalturaLog::err("Item failed because excpetion was raised': " . $e->getMessage());
 				$bulkUploadResult = $this->createUploadResult($item);
 				$bulkUploadResult->errorDescription = $e->getMessage();
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
@@ -460,7 +461,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getFilePathFromResource($resource)
 	{
 		$type = get_class($resource);
-		KalturaLog::debug("Resource clas is [$type]");
+		KalturaLog::debug("Resource class is [$type]");
 		
 		switch($type)
 		{
