@@ -540,6 +540,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if($isAttribute)
 		{
+			KalturaLog::debug("is empty :" . print_r(empty($elementToSearchIn["flavorParamsId"])) . empty($elementToSearchIn["flavorParams"]));
+			
 			if(!empty($elementToSearchIn["flavorParamsId"]))
 				return (int)$elementToSearchIn["flavorParamsId"];
 	
