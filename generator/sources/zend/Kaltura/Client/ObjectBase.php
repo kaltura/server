@@ -9,6 +9,11 @@ abstract class Kaltura_Client_ObjectBase
 {
 	abstract public function getKalturaObjectType();
 	
+	public function __construct(SimpleXMLElement $xml = null)
+	{
+		
+	}
+	
 	protected function addIfNotNull(&$params, $paramName, $paramValue)
 	{
 		if ($paramValue !== null)
