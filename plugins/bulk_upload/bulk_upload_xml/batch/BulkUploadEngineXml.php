@@ -504,7 +504,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBulkUploadXmlException("Can't validate file as file path is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 			
-		if((!empty($elementToSearchIn->fileChecksum)) || $elementToSearchIn->fileChecksum == '0' || $elementToSearchIn->fileChecksum == 0) //Check checksum if exists
+		if((!empty($elementToSearchIn->fileChecksum)) && $elementToSearchIn->fileChecksum != '0' && $elementToSearchIn->fileChecksum != 0) //Check checksum if exists
 		{
 			if($elementToSearchIn->fileChecksum['type'] == 'sha1')
 			{
@@ -514,15 +514,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				$checksum = md5_file($filePath);
 			}
-			$xmlChecksum = (string)$elementToSearchIn->fileChecksum;
 			
+			$xmlChecksum = (string)$elementToSearchIn->fileChecksum;
+						
 			if($xmlChecksum  != $checksum)
 			{
 				throw new KalturaBulkUploadXmlException("File checksum is invalid for file [$filePath], Xml checksum [$xmlChecksum], actual checksum [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
 		}
 		
-		if(!empty($elementToSearchIn->fileSize) || $elementToSearchIn->fileSize == '0' || $elementToSearchIn->fileSize == 0) //Check checksum if exists
+		if((!empty($elementToSearchIn->fileSize)) && $elementToSearchIn->fileSize != '0' && $elementToSearchIn->fileSize != 0) //Check checksum if exists
 		{
 			$fileSize = filesize($filePath);
 			$xmlFileSize = (int)$elementToSearchIn->fileSize;
