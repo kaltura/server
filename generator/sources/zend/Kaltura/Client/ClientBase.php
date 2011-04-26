@@ -181,7 +181,7 @@ class Kaltura_Client_ClientBase
 		return $result;
 	}
 
-	public static function unmarshalArray(SimpleXMLElement $xmls)
+	private static function unmarshalArray(SimpleXMLElement $xmls)
 	{
 		$ret = array();
 		foreach($xmls as $xml)

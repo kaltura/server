@@ -408,7 +408,7 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("		if(empty(\$xml->$propName))");
 					$this->appendLine("			\$this->$propName = array();");
 					$this->appendLine("		else");
-					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalArray(\$xml->$propName);");
+					$this->appendLine("			\$this->$propName = Kaltura_Client_Client::unmarshalItem(\$xml->$propName);");
 					break;
 					
 				default : // sub object
