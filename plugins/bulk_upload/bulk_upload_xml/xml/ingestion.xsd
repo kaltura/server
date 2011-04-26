@@ -319,14 +319,18 @@
 			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
 				<xs:complexType>
-					<xs:attribute name="type" use="optional" default="md5">
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:enumeration value="md5"/>
-								<xs:enumeration value="sha1"/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:attribute>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="type" use="optional" default="md5">				
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="md5"/>
+										<xs:enumeration value="sha1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
 				</xs:complexType>
 			</xs:element>
 		</xs:choice>
