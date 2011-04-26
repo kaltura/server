@@ -370,14 +370,6 @@
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="optional" />
-		<xs:attribute name="isSource" type="xs:boolean" use="optional" default="false">
-			<xs:annotation>
-				<xs:documentation>
-					Indicates that this flavor will be used for conversions.
-					Could be used only once and only if no other source ingested before.
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>
@@ -477,7 +469,7 @@
 	
 	<xs:simpleType name="T_url">
 		<xs:restriction base="xs:string">
-			<!--<xs:pattern value="((https?)|(ftp)):\/\/?(([0-9a-z_!~*'().&amp;=+$%-]+:)?[0-9a-z_!~*'().&amp;=+$%-]+@)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-z_!~*'()-]+\.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\.[a-z]{2,6})(:[0-9]{1,4})?((\/?)|(\/[0-9a-z_!~*'().;?:@&amp;=+$,%#-]+)+)"/> 
+			<!-- TODO: fix this!!!<xs:pattern value="((https?)|(ftp)):\/\/?(([0-9a-z_!~*'().&amp;=+$%-]+:)?[0-9a-z_!~*'().&amp;=+$%-]+@)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-z_!~*'()-]+\.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\.[a-z]{2,6})(:[0-9]{1,4})?((\/?)|(\/[0-9a-z_!~*'().;?:@&amp;=+$,%#-]+)+)"/> 
 			 -->
 		</xs:restriction>
 	</xs:simpleType>

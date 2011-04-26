@@ -293,8 +293,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->resources[] = $assetResource;
 		}
 
-		KalturaLog::debug("");
-		
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 									
 		//Throw exception in case of  max proccessed items and handle all exceptions there
@@ -332,7 +330,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!count($resource->resources))
 			$resource = null;
 			
-			//Fix resource is null :)
 		$this->kClient->baseEntry->add($entry, $resource, $entry->type); // Adds the entry
 		$newEntryId = "{1:result:id}";
 		
@@ -428,8 +425,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(is_null($flavorAsset->flavorParamsId) && is_null($flavorAsset->tags))
 			return null;
-
-		KalturaLog::debug("Flavor asset is: " . print_r($flavorAsset, true));
 		
 		return $flavorAsset;
 	}
@@ -446,15 +441,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->thumbParamsId = $this->getThumbParamsId($thumbElement, $conversionProfileId);
 	
-		if($thumbElement->isDefault)
+		if(isset($thumbElement["isDefault"]) && $thumbElement["isDefault"] == true) // if the attribute is set to true we add the is default tag to the thumb
 			$thumbAsset->tags = self::DEFAULT_THUMB_TAG;
 		
 		$thumbAsset->tags = $this->getStringFromElement($thumbElement->tags, $thumbAsset->tags);
 			
 		if(is_null($thumbAsset->thumbParamsId) && is_null($thumbAsset->tags))
 			return null;
-			
-		KalturaLog::debug("Flavor asset is: " . print_r($thumbAsset, true));
+
 		return $thumbAsset;
 	}
 	
@@ -472,8 +466,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			throw new KalturaBatchException("Resource is not supported: {$elementToSearchIn->asXml()}", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED); //failed to get teh resource from the given item
 		}
-		
-		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
 		return $resource;
 	}
