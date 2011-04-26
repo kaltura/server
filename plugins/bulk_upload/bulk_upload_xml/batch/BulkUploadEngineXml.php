@@ -325,9 +325,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->startMultiRequest(true);
 		
+		KalturaLog::debug("Resource is: " . print_r($resource, true));
+		
 		if(!count($resource->resources))
 			$resource = null;
 			
+			//Fix resource is null :)
 		$this->kClient->baseEntry->add($entry, $resource, $entry->type); // Adds the entry
 		$newEntryId = "{1:result:id}";
 		
@@ -464,6 +467,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			throw new KalturaBatchException("Resource is not supported: {$elementToSearchIn->asXml()}", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED); //failed to get teh resource from the given item
 		}
+		
+		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
 		return $resource;
 	}
