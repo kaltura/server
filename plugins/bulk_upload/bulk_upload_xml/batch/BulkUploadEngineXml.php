@@ -293,6 +293,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->resources[] = $assetResource;
 		}
 
+		KalturaLog::debug("");
+		
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 									
 		//Throw exception in case of  max proccessed items and handle all exceptions there
@@ -426,7 +428,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(is_null($flavorAsset->flavorParamsId) && is_null($flavorAsset->tags))
 			return null;
-			
+
+		KalturaLog::debug("Flavor asset is: " . print_r($flavorAsset, true));
+		
 		return $flavorAsset;
 	}
 	
@@ -450,6 +454,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(is_null($thumbAsset->thumbParamsId) && is_null($thumbAsset->tags))
 			return null;
 			
+		KalturaLog::debug("Flavor asset is: " . print_r($thumbAsset, true));
 		return $thumbAsset;
 	}
 	
