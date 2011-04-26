@@ -243,7 +243,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var string
 	 * @filter eq,in
-	 * @todo requiresPermission insert,update
+	 * @requiresPermission insert,update
 	 */
 	public $referenceId;
 	
