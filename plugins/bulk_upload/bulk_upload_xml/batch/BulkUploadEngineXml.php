@@ -20,7 +20,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var string
 	 */
 	const DEFAULT_THUMB_TAG = 'default_thumb';
-
+	
+	/**
+	 * 
+	 * The default ingestion profile id
+	 * @var int
+	 */
+	private $defaultIngestionProfileId = null;
+	
 	/**
 	 * 
 	 * Holds the number of the current proccessed item
@@ -41,14 +48,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var array()
 	 */
 	private $flavorParamsNameToIdPerConversionProfile = null;
-	
-	/**
-	 * 
-	 * Maps the thumb params name to id
-	 * @var array()
-	 */
-	private $thumbParamsNameToIdPerConversionProfile = null;
-	
+
 	/**
 	 * 
 	 * Maps the access control name to id
@@ -130,7 +130,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
-			if($this->currentItem < startIndex)
+			if($this->currentItem < $startIndex)
 			{
 				$this->currentItem++;
 				continue;
@@ -576,13 +576,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(is_null($conversionProfileId)) // if we didn't set it in the item element
 		{
-			$entry->ingestionProfileId = $this->data->conversionProfileId;
-			if(is_null($conversionProfileId)) // if we didn't set it in the item element
+			$conversionProfileId = $this->data->conversionProfileId;
+		}
+		
+		if(is_null($conversionProfileId)) // if we didn't set it in the item element
+		{
+			$this->impersonate();
+
+			//Gets the user default conversion
+			if(!isset($this->defaultIngestionProfileId))
 			{
-				//TODO: Get the user default conversion profile is it good?
-				$this->impersonate();
-				$conversionProfileId = $this->kClient->conversionProfile->getDefault();
+				$conversionProfile = $this->kClient->conversionProfile->getDefault();
+				$this->defaultIngestionProfileId = $conversionProfile->id;
 			}
+			
+			$conversionProfileId = $this->defaultIngestionProfileId; 
 		}
 		
 		return $conversionProfileId;
