@@ -543,7 +543,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			KalturaLog::debug("is empty :" . empty($elementToSearchIn["flavorParamsId"]) . empty($elementToSearchIn["flavorParams"]));
 			KalturaLog::debug("is set :" . isset($elementToSearchIn["flavorParamsId"]) . isset($elementToSearchIn["flavorParams"]));
 			
-			if(isset(($elementToSearchIn["flavorParamsId"])))
+			if(isset($elementToSearchIn["flavorParamsId"]))
 				return (int)$elementToSearchIn["flavorParamsId"];
 	
 			if(empty($elementToSearchIn["flavorParams"]))
