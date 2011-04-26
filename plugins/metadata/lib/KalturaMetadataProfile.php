@@ -134,5 +134,8 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 		
 		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
 		$this->views = kFileSyncUtils::file_get_contents($key, true, false);
+		
+		if(is_null($this->createMode) && $this->name == 'KMC_PROFILE')
+			$this->createMode = KalturaMetadataProfileCreateMode::KMC;
 	}
 }
