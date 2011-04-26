@@ -566,11 +566,35 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
+	 * Gets the ingestion profile id in this order: 
+	 * 1.from the element 2.from the data of the bulk 3.use default)
+	 * @param SimpleXMLElement $elementToSearchIn
+	 */
+	private function getIngestionProfileId(SimpleXMLElement $elementToSearchIn)
+	{
+		$conversionProfileId = $this->getIngestionProfileIdFromElement($elementToSearchIn);
+		
+		if(is_null($conversionProfileId)) // if we didn't set it in the item element
+		{
+			$entry->ingestionProfileId = $this->data->conversionProfileId;
+			if(is_null($conversionProfileId)) // if we didn't set it in the item element
+			{
+				//TODO: Get the user default conversion profile is it good?
+				$this->impersonate();
+				$conversionProfileId = $this->kClient->conversionProfile->getDefault();
+			}
+		}
+		
+		return $conversionProfileId;
+	}
+	
+	/**
+	 * 
 	 * Gets the coversion profile id from the given element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the ingestion profile params
 	 */
-	private function getIngestionProfileId(SimpleXMLElement $elementToSearchIn)
+	private function getIngestionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
 	{
 		if(!empty($elementToSearchIn->ingestionProfileId))
 			return (int)$elementToSearchIn->ingestionProfileId;
@@ -764,17 +788,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry->type = (int)$item->type;
 		$entry->ingestionProfileId = $this->getIngestionProfileId($item);
 		
-		if(is_null($entry->ingestionProfileId)) // if we didn't set it in the item element
-		{
-			$entry->ingestionProfileId = $this->data->conversionProfileId;
-			if(is_null($entry->ingestionProfileId)) // if we didn't set it in the item element
-			{
-				//TODO: Get the user default conversion profile is it good?
-				$this->impersonate();
-				$entry->ingestionProfileId = $this->kClient->conversionProfile->getDefault();
-			}
-		}
-		
 		return $entry;
 	}
 	
@@ -887,7 +900,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$mediaElement = $itemElement->media;
 		$media->mediaType = (int)$mediaElement->mediaType;
-		$media->ingestionProfileId = $this->getIngestionProfileId($mediaElement);
 		//TODO: handle exceptions in the handle item method
 		$this->validateMediaTypes($media->mediaType);
 	}
