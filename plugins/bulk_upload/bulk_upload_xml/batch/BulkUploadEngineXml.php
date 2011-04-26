@@ -514,19 +514,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				$checksum = md5_file($filePath);
 			}
+			$xmlChecksum = (string)$elementToSearchIn->fileChecksum;
 			
-			if((string)$elementToSearchIn->fileChecksum != $checksum)
+			if($xmlChecksum  != $checksum)
 			{
-				throw new KalturaBulkUploadXmlException("File checksum is invalid for file [$filePath], Xml checksum [$elementToSearchIn->fileChecksum], actual checksum [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+				throw new KalturaBulkUploadXmlException("File checksum is invalid for file [$filePath], Xml checksum [$xmlChecksum], actual checksum [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
 		}
 		
 		if(!empty($elementToSearchIn->fileSize) || $elementToSearchIn->fileSize == '0' || $elementToSearchIn->fileSize == 0) //Check checksum if exists
 		{
 			$fileSize = filesize($filePath);
-			if((int)$elementToSearchIn->fileSize != $fileSize)
+			$xmlFileSize = (int)$elementToSearchIn->fileSize;
+			if($xmlFileSize != $fileSize)
 			{
-					throw new KalturaBulkUploadXmlException("File size is invalid for file [$filePath], Xml size [$elementToSearchIn->fileChecksum], actual size [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+				throw new KalturaBulkUploadXmlException("File size is invalid for file [$filePath], Xml size [$xmlFileSize], actual size [$fileSize]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
 		}
 	}
