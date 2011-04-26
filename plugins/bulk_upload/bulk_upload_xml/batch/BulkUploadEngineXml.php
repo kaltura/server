@@ -543,13 +543,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private function getResource(SimpleXMLElement $elementToSearchIn)
 	{
 		$resource = $this->getResourceInstance($elementToSearchIn); 
-		$isValid = $this->validateResource($resource, $elementToSearchIn);
+		$this->validateResource($resource, $elementToSearchIn);
 				
-		if(!isValid)
-		{
-			throw new KalturaBatchException("Resource is not supported: {$elementToSearchIn->asXml()}", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED); //failed to get teh resource from the given item
-		}
-		
 		return $resource;
 	}
 	
