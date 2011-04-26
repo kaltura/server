@@ -504,7 +504,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBulkUploadXmlException("Can't validate file as file path is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 			
-		if(!empty($elementToSearchIn->fileChecksum) || $elementToSearchIn->fileChecksum == '0' || $elementToSearchIn->fileChecksum == 0) //Check checksum if exists
+		if((!empty($elementToSearchIn->fileChecksum)) || $elementToSearchIn->fileChecksum == '0' || $elementToSearchIn->fileChecksum == 0) //Check checksum if exists
 		{
 			if($elementToSearchIn->fileChecksum['type'] == 'sha1')
 			{
