@@ -47,7 +47,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Maps the flavor params name to id
 	 * @var array()
 	 */
-	private $flavorParamsNameToIdPerConversionProfile = null;
+	private $assetParamsNameToIdPerConversionProfile = null;
 
 	/**
 	 * 
@@ -536,13 +536,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(empty($elementToSearchIn["flavorParams"]))
 				return null;	
 				
-			if(is_null($this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId]))
+			if(is_null($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
 			{
-				$this->initFlavorParamsNameToId($conversionProfileId);
+				$this->initAssetParamsNameToId($conversionProfileId);
 			}
 				
-			if(isset($this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]))
-				return trim($this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]);
+			if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]))
+				return trim($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]);
 		}
 		else 
 		{
@@ -552,13 +552,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(empty($elementToSearchIn->flavorParams))
 				return null;	
 				
-			if(is_null($this->flavorParamsNameToIdPerConversionProfile))
+			if(is_null($this->assetParamsNameToIdPerConversionProfile))
 			{
-				$this->initFlavorParamsNameToId($conversionProfileId);
+				$this->initAssetParamsNameToId($conversionProfileId);
 			}
 				
-			if(isset($this->flavorParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]))
-				return trim($this->flavorParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]);
+			if(isset($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]))
+				return trim($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]);
 		}
 			
 		return null;
@@ -637,13 +637,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(empty($elementToSearchIn->thumbParams))
 			return null;	
 			
-		if(is_null($this->thumbParamsNameToIdPerConversionProfile))
+		if(is_null($this->assetParamsNameToIdPerConversionProfile))
 		{
-			$this->initThumbParamsNameToId();
+			$this->initAssetParamsNameToId();
 		}
 			
-		if(isset($this->thumbParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]))
-			return trim($this->thumbParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]);
+		if(isset($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]))
+			return trim($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]);
 			
 		return null;
 	}
@@ -704,14 +704,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Inits the array of flavor params name to Id (with all given flavor params)
 	 * @param $coversionProfileId - The conversion profile for which we ini the arrays for
 	 */
-	private function initFlavorParamsNameToId($conversionProfileId)
+	private function initAssetParamsNameToId($conversionProfileId)
 	{
 		$allFlavorParams = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
 		
 		foreach ($allFlavorParams as $flavorParam)
 		{
 			if(!is_null($flavorParam->systemName))
-				$this->flavorParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParam->systemName] = $flavorParam->id;
+				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParam->systemName] = $flavorParam->id;
 		}
 	}
 
@@ -728,22 +728,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->accessControlNameToId[$accessControl->systemName] = $accessControl->id;
 		}
 	}
-	
-	/**
-	 * 
-	 * Inits the array of thumb params name to Id (with all given flavor params)
-	 * @param int $conversionProfileId
-	 */
-	private function initThumbParamsNameToId($conversionProfileId)
-	{
-		$allThumbParams = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
-		foreach ($allThumbParams as $thumbParam) // Gets all access controls
-		{
-			if(!is_null($thumbParams->systemName)) 
-				$this->thumbParamsNameToIdPerConversionProfile[$conversionProfileId][$thumbParams->systemName] = $thumbParams->id;
-		}
-	}
-		
+			
 	/**
 	 * 
 	 * Inits the array of conversion profile name to Id (with all given flavor params)
