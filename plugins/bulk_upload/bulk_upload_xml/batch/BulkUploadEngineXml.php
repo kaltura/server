@@ -69,6 +69,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var array()
 	 */
 	private $storageProfileNameToId = null;
+
+	/**
+	 * @param KSchedularTaskConfig $taskConfig
+	 */
+	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
+	{
+		parent::__construct($taskConfig, $kClient, $job);
+		
+		if($taskConfig->params->xsdFilePath)
+			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
+	}
 	
 	/* (non-PHPdoc)
 	 * @see KBulkUploadEngine::HandleBulkUpload()
