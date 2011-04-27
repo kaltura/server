@@ -466,42 +466,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * Returns the file path from the given resource
-	 * @param KalturaResouyce $resource
-	 */
-	private function getFilePathFromResource($resource)
-	{
-		$type = get_class($resource);
-		KalturaLog::debug("Resource class is [$type]");
-		
-		switch($type)
-		{
-			case 'KalturaLocalFileResource':
-				return $resource->localFilePath;
-				break;
-			case 'KalturaUrlResource':
-				return $resource->url;
-				break;
-			case 'KalturaEntryResource':
-				//TODO: get the file path from the $resource->entryId
-				throw new KalturaBulkUploadXmlException("Resource validation is not supported", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-				break;
-			case 'KalturaAssetResource':
-				//TODO: get the file path from the $resource->assetId
-				throw new KalturaBulkUploadXmlException("Resource validation is not supported", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-				break;
-
-			case 'KalturaRemoteStorageResource':
-				//TODO: get the file path from the $resource->storageProfileId
-				throw new KalturaBulkUploadXmlException("Resource validation is not supported", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-				break;
-			default:
-				return null;				
-		}
-	}
-	
-	/**
-	 * 
 	 * Validates if the resource is valid
 	 * @param KalturaResource $resource
 	 * @param SimpleXMLElement $elementToSearchIn
@@ -511,7 +475,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//We only check for filesize and check sum in local files 
 		if($resource instanceof KalturaLocalFileResource)
 		{
-			$filePath = $this->getFilePathFromResource($resource);
+			$filePath = $resource->localFilePath;
 			
 			if(is_null($filePath))
 			{
@@ -889,9 +853,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry->userId = (string)$item->userId;;
 		$entry->licenseType = (string)$item->licenseType;
 		$entry->accessControlId =  $this->getAccessControlId($item);
-				
-		//TODO: Roni - Parse the date
-		$entry->startDate = (string)$item->startDate;
+		$entry->startDate = self::parseFormatedDate((string)$item->startDate);
+		$entry->endDate = self::parseFormatedDate((string)$item->endDate);
 		$entry->type = (int)$item->type;
 		$entry->ingestionProfileId = $this->getIngestionProfileId($item);
 		
@@ -908,7 +871,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		switch(trim($type))
 		{
-			case KalturaEntryType::AUTOMATIC:
 			case KalturaEntryType::MEDIA_CLIP :
 				return new KalturaMediaEntry();
 			case KalturaEntryType::DATA:
@@ -934,9 +896,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function handleTypedElement(KalturaBaseEntry $entry, SimpleXMLElement $item)
 	{
+		// TODO take type from ingestion profile default entry
 		switch ($entry->type)
 		{
-			case KalturaEntryType::AUTOMATIC:
 			case KalturaEntryType::MEDIA_CLIP:
 				$this->setMediaElementValues($entry, $item);
 				break;
@@ -962,6 +924,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				break;
 				
 			default:
+				// TODO ingest as automatic
 				throw new KalturaBatchException("Type is not supported type [$media->type]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				break;
 		}
@@ -1007,7 +970,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$mediaElement = $itemElement->media;
 		$media->mediaType = (int)$mediaElement->mediaType;
-		//TODO: handle exceptions in the handle item method
 		$this->validateMediaTypes($media->mediaType);
 	}
 
@@ -1086,16 +1048,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function validateMediaTypes($mediaType)
 	{
+		$mediaTypes = array(
+			KalturaMediaType::LIVE_STREAM_FLASH,
+			KalturaMediaType::LIVE_STREAM_QUICKTIME,
+			KalturaMediaType::LIVE_STREAM_REAL_MEDIA,
+			KalturaMediaType::LIVE_STREAM_WINDOWS_MEDIA
+		);
+		 
 		//TODO: use this function
-		if( $mediaType == KalturaMediaType::LIVE_STREAM_FLASH ||
-			$mediaType == KalturaMediaType::LIVE_STREAM_QUICKTIME ||
-			$mediaType == KalturaMediaType::LIVE_STREAM_REAL_MEDIA ||
-			$mediaType == KalturaMediaType::LIVE_STREAM_WINDOWS_MEDIA )
+		if(in_array($mediaType, $mediaTypes))
 			return false;
 		
 		if($mediaType == KalturaMediaType::IMAGE)
-		
+		{
 			// TODO - make sure that there are no flavors or thumbnails in the XML
+		}
 		
 		return true;
 	}
