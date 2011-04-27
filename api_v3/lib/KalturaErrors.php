@@ -274,6 +274,8 @@ class KalturaErrors extends APIErrors
 	
 	const PERMISSION_ITEM_NOT_FOUND = "PERMISSION_ITEM_NOT_FOUND,Permission item does not exist";
 	
+	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED,The property \"%s\" is deprecated and should not be used";
+	
 	/*
 	 * syndication service
 	 */
