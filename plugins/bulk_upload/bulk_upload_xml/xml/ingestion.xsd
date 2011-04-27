@@ -319,18 +319,14 @@
 			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
 				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="xs:string">
-							<xs:attribute name="type" use="optional" default="md5">				
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:enumeration value="md5"/>
-										<xs:enumeration value="sha1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:attribute>
-						</xs:extension>
-					</xs:simpleContent>
+					<xs:attribute name="type" use="optional" default="md5">				
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="md5"/>
+								<xs:enumeration value="sha1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
 				</xs:complexType>
 			</xs:element>
 		</xs:choice>
@@ -484,8 +480,7 @@
 	
 	<xs:simpleType name="T_url">
 		<xs:restriction base="xs:string">
-			<!-- TODO: fix this!!!<xs:pattern value="((https?)|(ftp)):\/\/?(([0-9a-z_!~*'().&amp;=+$%-]+:)?[0-9a-z_!~*'().&amp;=+$%-]+@)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-z_!~*'()-]+\.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\.[a-z]{2,6})(:[0-9]{1,4})?((\/?)|(\/[0-9a-z_!~*'().;?:@&amp;=+$,%#-]+)+)"/> 
-			 -->
+			<xs:pattern value="((https?)|(ftp))://?(([0-9a-zA-Z_!~*'().&amp;=+$%-]+:)?[0-9a-zA-Z_!~*'().&amp;=+$%-]+@)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-zA-Z_!~*'()-]+\.)*([0-9a-zA-Z][0-9a-zA-Z-]{0,61})?[0-9a-zA-Z]\.[a-zA-Z]{2,6})(:[0-9]{1,4})?((/?)|(/[0-9a-zA-Z_!~*'().;?:@&amp;=+$,%#-]+)+)"/>
 		</xs:restriction>
 	</xs:simpleType>
 	
