@@ -122,9 +122,8 @@ class DailymotionDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		if(kConf::hasParam('dailymotion_update_required_metadata_xpaths'))
-			return kConf::get('dailymotion_update_required_metadata_xpaths');
-			
-		return array();
+		return array(
+			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_CATEGORY."']",
+		);
 	}
 }
