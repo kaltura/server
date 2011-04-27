@@ -13,7 +13,7 @@ class ComcastDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_AUTHOR = 'author';
 	const CUSTOM_DATA_ALBUM = 'album';
 
-	const METADATA_FIELD_COPYRIGHT = 'copyright';
+	const METADATA_FIELD_COPYRIGHT = 'Copyright';
 	const METADATA_FIELD_LONG_TITLE = 'LongTitle';
 	const METADATA_FIELD_SHORT_DESCRIPTION = 'ShortDescription';
 	const METADATA_FIELD_RATING = 'ComcastRating';
