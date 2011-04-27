@@ -202,7 +202,7 @@ class Kaltura_Client_ClientBase
 			if($xml->error)
 			{
 				$code = "{$xml->error->code}";
-				$message = "{$xml->erroe->message}";
+				$message = "{$xml->error->message}";
 				throw new Kaltura_Client_Exception($message, $code);
 			}
 			
