@@ -238,14 +238,13 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			$mediaFileIDs[] = $mediaFileID;
 
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
-		KalturaLog::debug("Request [$comcastMediaService->request]");
-		KalturaLog::debug("Response [$comcastMediaService->response]");
 		if($comcastMediaFileList)
 		{
 			foreach($comcastMediaFileList as $comcastMediaFile)
 			{
 				// the storedFileName is the asset id because we specified it at the end of the url
-				$assetId = $comcastMediaFile->storedFileName;
+				$storedFileName = explode('.', $comcastMediaFile->storedFileName);
+				list($assetId, $ext) = $storedFileName;
 				$remoteMediaFileId = $comcastMediaFile->ID;
 				if(isset($data->mediaFiles[$assetId]))
 					$data->mediaFiles[$assetId]->remoteId = $remoteMediaFileId;
@@ -286,7 +285,11 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		try
 		{
-			return $comcastMediaService->getMediaFiles($template, $query, $sort, $range);
+			$ret = $comcastMediaService->getMediaFiles($template, $query, $sort, $range);
+			KalturaLog::debug("Request [$comcastMediaService->request]");
+			KalturaLog::debug("Response [$comcastMediaService->response]");
+			
+			return $ret;
 		}
 		catch(Exception $e)
 		{
@@ -494,7 +497,8 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			foreach($comcastMediaFileList as $comcastMediaFile)
 			{
 				// the storedFileName is the asset id because we specified it at the end of the url
-				$assetId = $comcastMediaFile->storedFileName;
+				$storedFileName = explode('.', $comcastMediaFile->storedFileName);
+				list($assetId, $ext) = $storedFileName;
 				$remoteMediaFileId = $comcastMediaFile->ID;
 				if(isset($data->mediaFiles[$assetId]))
 					$data->mediaFiles[$assetId]->remoteId = $remoteMediaFileId;
