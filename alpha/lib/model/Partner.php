@@ -468,6 +468,28 @@ class Partner extends BasePartner
 	public function getImportRemoteSourceForConvert() { return $this->getFromCustomData("importRemoteSourceForConvert", null, false); }
 	public function setImportRemoteSourceForConvert( $v ) { $this->putInCustomData("importRemoteSourceForConvert", $v); }
 	
+	/** 27Apr2011 - added fields for new registration form **/
+	// first name
+	public function getFirstName() { return $this->getFromCustomData("firstName", null); }
+	public function setFirstName( $v ) { $this->putInCustomData("firstName", $v); }
+
+	// last name
+	public function getLastName() { return $this->getFromCustomData("lastName", null); }
+	public function setLastName( $v ) { $this->putInCustomData("lastName", $v); }
+
+	// country
+	public function getCountry() { return $this->getFromCustomData("country", null); }
+	public function setCountry( $v ) { $this->putInCustomData("country", $v); }
+
+	// state
+	public function getState() { return $this->getFromCustomData("state", null); }
+	public function setState( $v ) { $this->putInCustomData("state", $v); }
+
+	// additionalParams - key/value array
+	public function getAdditionalParams() { return $this->getFromCustomData("additionalParams", null); }
+	public function setAdditionalParams( $v ) { $this->putInCustomData("additionalParams", $v); }
+	
+	
 	public function lockCategories()
 	{
 		$this->setCategoriesLockTime(time());
