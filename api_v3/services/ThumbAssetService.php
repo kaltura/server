@@ -110,7 +110,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
-    function updateAction($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource)
+    function updateAction($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource = null)
     {
 		$dbThumbAsset = thumbAssetPeer::retrieveById($id);
 		if(!$dbThumbAsset)
@@ -118,9 +118,16 @@ class ThumbAssetService extends KalturaBaseService
     	
     	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
     	
-		$contentResource->validateEntry($dbThumbAsset->getentry());
-		$kContentResource = $contentResource->toObject();
-    	$this->attachContentResource($dbThumbAsset, $kContentResource);
+    	if($contentResource)
+    	{
+			$contentResource->validateEntry($dbThumbAsset->getentry());
+			$kContentResource = $contentResource->toObject();
+	    	$this->attachContentResource($dbThumbAsset, $kContentResource);
+    	}
+    	else 
+    	{
+    		$dbThumbAsset->save();
+    	}
 		
 		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			$this->setAsDefaultAction($dbThumbAsset->getId());

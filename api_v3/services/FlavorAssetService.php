@@ -118,7 +118,7 @@ class FlavorAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
-    function updateAction($id, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource)
+    function updateAction($id, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource = null)
     {
    		$dbFlavorAsset = flavorAssetPeer::retrieveById($id);
    		if(!$dbFlavorAsset)
@@ -126,9 +126,16 @@ class FlavorAssetService extends KalturaBaseService
     	
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
     	
-		$contentResource->validateEntry($dbFlavorAsset->getentry());
-		$kContentResource = $contentResource->toObject();
-    	$this->attachContentResource($dbFlavorAsset, $kContentResource);
+    	if($contentResource)
+    	{
+			$contentResource->validateEntry($dbFlavorAsset->getentry());
+			$kContentResource = $contentResource->toObject();
+	    	$this->attachContentResource($dbFlavorAsset, $kContentResource);
+    	}
+    	else
+    	{
+    		$dbFlavorAsset->save();
+    	}
 		
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->fromObject($dbFlavorAsset);
