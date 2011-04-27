@@ -442,7 +442,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->thumbParamsId = $this->getThumbParamsId($thumbElement, $conversionProfileId);
 	
-		if(isset($thumbElement["isDefault"]) && $thumbElement["isDefault"] == true) // if the attribute is set to true we add the is default tag to the thumb
+		if(isset($thumbElement["isDefault"]) && $thumbElement["isDefault"] == 'true') // if the attribute is set to true we add the is default tag to the thumb
 			$thumbAsset->tags = self::DEFAULT_THUMB_TAG;
 		
 		$thumbAsset->tags = $this->getStringFromElement($thumbElement->tags, $thumbAsset->tags);
