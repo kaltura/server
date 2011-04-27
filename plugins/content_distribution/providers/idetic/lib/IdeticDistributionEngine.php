@@ -359,7 +359,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		
 		$this->handleSend($this->updatePath, $data, $data->distributionProfile, $data->providerData);
 		
-		return false;
+		return true;
 	}
 
 }
