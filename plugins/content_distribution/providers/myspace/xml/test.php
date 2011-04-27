@@ -32,9 +32,9 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-$entryId = '0_ola7u9py';
+$entryId = '0_g0bhfji7';
 
-if(isset($argv[1]))
+/*if(isset($argv[1]))
 	$entryId = $argv[1];
 
 foreach($argv as $arg)
@@ -46,7 +46,7 @@ foreach($argv as $arg)
 //		$providerData->$field = $matches[2];
 	}
 }
-
+*/
 $entry = entryPeer::retrieveByPKNoFilter($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
 file_put_contents('mrss.xml', $mrss);
@@ -62,11 +62,15 @@ $distributionJobData->distributionProfileId = $distributionProfile->id;
 
 $distributionJobData->distributionProfile = $distributionProfile;
 
-$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(1);
+$dbEntryDistribution = EntryDistributionPeer::retrieveByPK(45);
 $entryDistribution = new KalturaEntryDistribution();
 $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
 $distributionJobData->entryDistribution = $entryDistribution;
+
+//$myp = new MyspaceDistributionProfile();
+//print_r($myp->validateForSubmission($dbEntryDistribution, "submit"));
+//return;
 
 $providerData = new KalturaMyspaceDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;

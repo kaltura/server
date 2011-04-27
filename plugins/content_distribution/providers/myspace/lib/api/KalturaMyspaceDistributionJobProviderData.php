@@ -20,7 +20,26 @@ class KalturaMyspaceDistributionJobProviderData extends KalturaDistributionJobPr
 	 */
 	public $distributionProfileId;
 
+	/**
+	 * @var string
+	 */
+	public $myspFlavorAssetId;
 
+	/**
+	 * @var string
+	 */
+	public $feedTitle;
+
+	/**
+	 * @var string
+	 */
+	public $feedDescription;
+
+	/**
+	 * @var string
+	 */
+	public $feedContact;
+	
 	/**
 	 * @var string
 	 */
@@ -35,9 +54,15 @@ class KalturaMyspaceDistributionJobProviderData extends KalturaDistributionJobPr
 			return;
 	
 		$this->distributionProfileId = $distributionJobData->distributionProfile->id;
-	
 		$this->metadataProfileId = $distributionJobData->distributionProfile->metadataProfileId;
-			
+		$this->feedTitle = $distributionJobData->distributionProfile->feedTitle;
+		$this->feedDescription = $distributionJobData->distributionProfile->feedDescription;
+		$this->feedContact = $distributionJobData->distributionProfile->feedContact;
+
+		$myspFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile->myspFlavorParamsId);
+		if($myspFlavorAsset)
+			$this->myspFlavorAssetId = $myspFlavorAsset->getId();
+		
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
 			$this->xml = MyspaceDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId, $this);
 			
@@ -51,6 +76,10 @@ class KalturaMyspaceDistributionJobProviderData extends KalturaDistributionJobPr
 	private static $map_between_objects = array
 	(
 		"xml" ,
+		"myspFlavorAssetId" ,		
+		"feedTitle",
+		"feedDescription",
+		"feedContact",
 		"metadataProfileId" ,
 		"distributionProfileId" ,
 	);

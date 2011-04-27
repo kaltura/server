@@ -5,6 +5,10 @@
 	<xsl:output omit-xml-declaration="no" method="xml" />
 	<xsl:variable name="distributionProfileId" />
 	<xsl:variable name="metadataProfileId" />	
+	<xsl:variable name="myspFlavorAssetId" />	
+	<xsl:variable name="feedTitle" />
+	<xsl:variable name="feedDescription" />
+	<xsl:variable name="feedContact" />	
 	<xsl:variable name="existingFile" />	
 
 	<xsl:template match="@*|node()">
@@ -27,17 +31,13 @@
 	<xsl:template match="item">
 	<MySpaceFeed xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 	<Title>
-	<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/FeedTitle) > 0">
-		<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/FeedTitle" />
-	</xsl:if>
+		<xsl:value-of select="$feedTitle" />
 	</Title>
 	<Description>
-	<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/FeedDescription) > 0">
-		<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/FeedDescription" />
-	</xsl:if>	
+		<xsl:value-of select="$feedDescription" />
 	</Description>
 	<Contact>
-		<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/FeedContact" />
+		<xsl:value-of select="$feedContact" />
 	</Contact>
 	<LastUpdate>
 			<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z')" />	
@@ -74,11 +74,12 @@
 			</LastUpdate>			
 			<Location>
 				<xsl:choose>
-					<xsl:when test="string-length(distribution[@distributionProfileId=$distributionProfileId]/flavorAssetIds/flavorAssetId) > 0">
-						<xsl:variable name="flavourId" select="distribution[@distributionProfileId=$distributionProfileId]/flavorAssetIds/flavorAssetId"/>
-						<xsl:value-of select="content[@flavorAssetId=$flavourId]/@url"/>
+					<xsl:when test="count(content[@flavorAssetId = $myspFlavorAssetId])">
+						<xsl:value-of select="content[@flavorAssetId=$myspFlavorAssetId]/@url"/>
 					</xsl:when>
 					<xsl:otherwise>
+						<xsl:variable name="flavourId" select="distribution[@distributionProfileId=$distributionProfileId]/flavorAssetIds/flavorAssetId"/>
+						<xsl:value-of select="content[@flavorAssetId=$flavourId]/@url"/>
 					</xsl:otherwise>					
 				</xsl:choose>
 			</Location>

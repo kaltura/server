@@ -24,6 +24,26 @@ class KalturaMyspaceDistributionProfile extends KalturaDistributionProfile
 	 * @var int
 	 */
 	public $metadataProfileId;
+
+	/**
+	 * @var int
+	 */
+	public $myspFlavorParamsId;
+	
+	/**
+	 * @var string
+	 */
+	public $feedTitle;
+
+	/**
+	 * @var string
+	 */
+	public $feedDescription;
+
+	/**
+	 * @var string
+	 */
+	public $feedContact;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -33,6 +53,10 @@ class KalturaMyspaceDistributionProfile extends KalturaDistributionProfile
 		'username',
 		'password',
 		'domain',
+		'myspFlavorParamsId',		
+		'feedTitle',
+		'feedDescription',
+		'feedContact',		
 		'metadataProfileId',
 	 );
 		 
