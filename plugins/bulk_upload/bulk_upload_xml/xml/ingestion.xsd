@@ -159,7 +159,6 @@
 			
 			<xs:element ref="distribution" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element ref="customData" minOccurs="0" maxOccurs="unbounded" />
-			
 		</xs:sequence>
 	</xs:complexType>
 
@@ -309,7 +308,7 @@
 							</xs:restriction>
 						</xs:simpleType>
 					</xs:attribute>
-				</xs:complexType>	
+				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
