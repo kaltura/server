@@ -106,6 +106,7 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 		}
 		catch (Exception $e)
 		{
+			Infra_ClientHelper::unimpersonate();
 			KalturaLog::err($e->getMessage());
 			return array();
 		}

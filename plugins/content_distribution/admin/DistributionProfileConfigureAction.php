@@ -80,7 +80,10 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			
 			$pager = new Kaltura_Client_Type_FilterPager();
 			$pager->pageSize = 100;
+			
+			Infra_ClientHelper::impersonate($partnerId);
 			$flavorParamsResponse = $this->client->flavorParams->listAction(null, $pager);
+			Infra_ClientHelper::unimpersonate();
 		
 			if($profileId)
 			{
