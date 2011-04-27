@@ -253,38 +253,6 @@ class PartnerController extends Zend_Controller_Action
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages());
 		
-		
-		$moduls = Zend_Registry::get('config')->moduls;
-		if ($moduls)
-		{
-			if (!$moduls->silverLight)
-				$form->getElement('enable_silver_light')->setAttrib('disabled',true);
-				
-			if (!$moduls->liveStream)
-				$form->getElement('live_stream_enabled')->setAttrib('disabled',true);
-				
-			if (!$moduls->vast)
-				$form->getElement('enable_vast')->setAttrib('disabled',true);
-				
-			if (!$moduls->players508)
-				$form->getElement('enable508_players')->setAttrib('disabled',true);
-				
-			if (!$moduls->metadata)
-				$form->getElement('enable_metadata')->setAttrib('disabled',true);
-				
-			if (!$moduls->contentDistribution)
-				$form->getElement('enable_content_distribution')->setAttrib('disabled',true);
-				
-			if (!$moduls->auditTrail)
-				$form->getElement('enable_audit_trail')->setAttrib('disabled',true);
-			
-			if (!$moduls->annotation)
-				$form->getElement('enable_annotation')->setAttrib('disabled',true);
-			
-			if (!$moduls->mobileFlavors)
-				$form->getElement('enable_mobile_flavors')->setAttrib('disabled',true);
-		}
-		
 		$request = $this->getRequest();
 		
 		if ($request->isPost())

@@ -89,61 +89,21 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElements(array($element));
 		
-
-		$this->addElement('checkbox', 'live_stream_enabled', array(
-			'label'	  => 'Live workFlow',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
-		));
-		
-		$this->addElement('checkbox', 'enable_silver_light', array(
-			'label'	  => 'Silverlight',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_silver_light'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_vast', array(
-			'label'	  => 'Vast',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_vast'))),
-		));
-		
-		$this->addElement('checkbox', 'enable508_players', array(
-			'label'	  => '508 players',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_508_players'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_ps2_permission_validation', array(
-			'label'	  => 'PS2 permission validation',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_ps2_permission_validation'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_metadata', array(
-			'label'	  => 'Metadata',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_metadata'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_content_distribution', array(
-			'label'	  => 'Content Distribution',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_content_distribution'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_audit_trail', array(
-			'label'	  => 'Audit trail',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_audit_trail'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_annotation', array(
-			'label'	  => 'Aannotation',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_annotation'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_mobile_flavors', array(
-			'label'	  => 'Mobile flavors',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_mobile_flavors'))),
-		));
-		
-		$this->addElement('checkbox', 'enable_analytics_tab', array(
-			'label'	  => 'Analytics tab',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_analytics_tab'))),
-		));
+		$moduls = Zend_Registry::get('config')->moduls;
+		if ($moduls)
+		{
+			foreach($moduls as $name => $modul)
+			{
+				$attributes = array(
+					'label'	  => $modul->label,
+					'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => $name)))
+				);
+				if(!$modul->enabled)
+					$attributes['disabled'] = true;
+					
+				$this->addElement('checkbox', $modul->permissionName, $attributes);
+			}
+		}
 		
 		$this->addElement('checkbox', 'moderate_content', array(
 			'label'	  => 'Content Moderation',
@@ -160,23 +120,56 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'import_remote_source_for_convert')))
 		));
 		
-		$this->addElement('checkbox', 'enable_entry_replacement', array(
-			'label'	  => 'Enable entry replacement',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_entry_replacement')))
-		));
-		
-		$this->addElement('checkbox', 'enable_entry_replacement_approval', array(
-			'label'	  => 'Enable entry replacement approval',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_entry_replacement_approval')))
-		));
-
-		$this->addElement('checkbox', 'enable_drop_folder', array(
-			'label'	  => 'Enable drop folder',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'enable_drop_folder')))
-		));
-		
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_StorageProfile_Enum_StorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');
 		$this->addElements(array($storageServP));
+	}
+
+	/**
+	 * @param Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration $object
+	 * @param bool $add_underscore
+	 */
+	public function populateFromObject($object, $add_underscore = true)
+	{
+		parent::populateFromObject($object, $add_underscore);
+		
+		if(!$object->permissions || !count($object->permissions))
+			return;
+			
+		foreach($object->permissions as $permission)
+			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Infra_Form::getObject()
+	 */
+	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
+	{
+		$systemPartnerConfiguration = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		
+		$moduls = Zend_Registry::get('config')->moduls;
+		if ($moduls)
+		{
+			if(is_null($systemPartnerConfiguration->permissions))
+				$systemPartnerConfiguration->permissions = array();
+				
+			foreach($moduls as $name => $modul)
+			{
+				if(!$modul->enabled)
+					continue;
+					
+				$permission = new Kaltura_Client_Type_Permission();
+				$permission->type = $modul->permissionType;
+				$permission->name = $modul->permissionName;
+				$permission->status = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
+				
+				if(!isset($properties[$modul->permissionName]) || !$properties[$modul->permissionName])
+					$permission->status = Kaltura_Client_Enum_PermissionStatus::BLOCKED;
+					
+				$systemPartnerConfiguration->permissions[] = $permission;
+			}
+		}
+		
+		return $systemPartnerConfiguration;
 	}
 }

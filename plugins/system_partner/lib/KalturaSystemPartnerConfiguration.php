@@ -53,11 +53,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var bool
 	 */
-	public $liveStreamEnabled;
-	
-	/**
-	 * @var bool
-	 */
 	public $moderateContent;
 	
 	/**
@@ -81,55 +76,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $kmcVersion;
 	
-	/**
-	 * @var bool
-	 */
-	public $enableAnalyticsTab;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableSilverLight;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableVast;
-	
-	/**
-	 * @var bool
-	 */
-	public $enable508Players;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableMetadata;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableContentDistribution;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableAuditTrail;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableAnnotation;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableMobileFlavors;
-	
-	/**
-	 * @var bool
-	 */
-	public $enablePs2PermissionValidation;
 	/**
 	 * @var int
 	 */
@@ -161,19 +107,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $importRemoteSourceForConvert;
 	
 	/**
-	 * @var bool
+	 * @var KalturaPermissionArray
 	 */
-	public $enableEntryReplacement;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableEntryReplacementApproval;
-	
-	/**
-	 * @var bool
-	 */
-	public $enableDropFolder;
+	public $permissions;
 	
 	
 	private static $map_between_objects = array
@@ -187,16 +123,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"maxBulkSize",
 		"partnerPackage",
 		"monitorUsage",
-		"liveStreamEnabled",
 		"moderateContent",
 		"rtmpUrl",
 		"storageDeleteFromKaltura",
 		"storageServePriority",
 		"kmcVersion",
-		"enableAnalyticsTab",
-		"enableSilverLight",
-		"enableVast",
-		"enable508Players",
 		"defThumbOffset",
 		"adminLoginUsersQuota",
 		"userSessionRoleId",
@@ -214,57 +145,35 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	{
 		parent::fromObject($source_object);
 		
-		if(class_exists('MetadataPlugin'))
-			$this->enableMetadata = $source_object->getPluginEnabled(MetadataPlugin::getPluginName());
-			
-		if(class_exists('ContentDistributionPlugin'))
-			$this->enableContentDistribution = $source_object->getPluginEnabled(ContentDistributionPlugin::getPluginName());
-			
-		if(class_exists('AuditPlugin'))
-			$this->enableAuditTrail = $source_object->getPluginEnabled(AuditPlugin::getPluginName());
-		
-		if(class_exists('AnnotationPlugin'))
-			$this->enableAnnotation = $source_object->getPluginEnabled(AnnotationPlugin::getPluginName());
-			
-		if(class_exists('DropFolderPlugin'))
-			$this->enableDropFolder = $source_object->getPluginEnabled(DropFolderPlugin::getPluginName());
-		
-		$this->enableMobileFlavors = $source_object->getEnabledService(PermissionName::FEATURE_MOBILE_FLAVORS);
-		$this->enablePs2PermissionValidation = $source_object->getEnabledService(PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
-		$this->enableEntryReplacement = $source_object->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT);
-		$this->enableEntryReplacementApproval = $source_object->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL);
+		$permissions = PermissionPeer::retrievePartnerLevelPermissions($source_object->getId());
+		$this->permissions = KalturaPermissionArray::fromDbArray($permissions);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
 		
-		if(class_exists('MetadataPlugin') && !is_null($this->enableMetadata))
-			$object_to_fill->setPluginEnabled(MetadataPlugin::getPluginName(), $this->enableMetadata);
-			
-		if(class_exists('ContentDistributionPlugin') && !is_null($this->enableContentDistribution))
-			$object_to_fill->setPluginEnabled(ContentDistributionPlugin::getPluginName(), $this->enableContentDistribution);
-			
-		if(class_exists('AuditPlugin') && !is_null($this->enableAuditTrail))
-			$object_to_fill->setPluginEnabled(AuditPlugin::getPluginName(), $this->enableAuditTrail);
-		
-		if(class_exists('AnnotationPlugin') && !is_null($this->enableAnnotation))
-			$object_to_fill->setPluginEnabled(AnnotationPlugin::getPluginName(), $this->enableAnnotation);
-						
-		if(!is_null($this->enableMobileFlavors))
-			$object_to_fill->setEnabledService($this->enableMobileFlavors, PermissionName::FEATURE_MOBILE_FLAVORS);
-			
-		if(!is_null($this->enablePs2PermissionValidation))
-			$object_to_fill->setEnabledService($this->enablePs2PermissionValidation, PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
-			
-		if(!is_null($this->enableEntryReplacement))
-			$object_to_fill->setEnabledService($this->enableEntryReplacement, PermissionName::FEATURE_ENTRY_REPLACEMENT);
-			
-		if(!is_null($this->enableEntryReplacementApproval))
-			$object_to_fill->setEnabledService($this->enableEntryReplacementApproval, PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL);
-			
-		if(class_exists('DropFolderPlugin') && !is_null($this->enableDropFolder))
-			$object_to_fill->setPluginEnabled(DropFolderPlugin::getPluginName(), $this->enableDropFolder);
+		if(!is_null($this->permissions))
+		{
+			foreach($this->permissions as $permission)
+			{
+				$dbPermission = PermissionPeer::getByNameAndPartner($permission->name, $object_to_fill->getId());
+				if($dbPermission)
+				{
+					$dbPermission->setStatus($permission->status);
+				}
+				else
+				{
+					$dbPermission = new Permission();
+					$dbPermission->setType($permission->type);
+					$dbPermission->setPartnerId($object_to_fill->getId());
+					
+					$permission->type = null;
+					$dbPermission = $permission->toInsertableObject($dbPermission);
+				}
+				$dbPermission->save();
+			}
+		}
 		
 		return $object_to_fill;
 	}
