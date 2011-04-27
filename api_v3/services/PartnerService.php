@@ -36,6 +36,8 @@ class PartnerService extends KalturaBaseService
 		$partner->validatePropertyNotNull("adminName");
 		$partner->validatePropertyNotNull("adminEmail");
 		$partner->validatePropertyNotNull("description");
+		$partner->validatePropertyMaxLength("country", 2, true);
+		$partner->validatePropertyMaxLength("state", 2, true);
 		
 		$c = new Criteria();
 		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
