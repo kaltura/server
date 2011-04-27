@@ -194,9 +194,9 @@ class KalturaObject
 		$this->validatePropertyMaxValue($propertyName, $maxValue, $allowNull);
 	}
 	
-	public function validatePropertyMaxLength($propertyName, $maxLength)
+	public function validatePropertyMaxLength($propertyName, $maxLength, $allowNull = false)
 	{
-		$this->validatePropertyNotNull($propertyName);
+		if(!$allowNull) $this->validatePropertyNotNull($propertyName);
 		if (strlen($this->$propertyName) > $maxLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
 	}
