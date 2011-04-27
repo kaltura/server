@@ -42,6 +42,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $createdAt;
 	
 	/**
+	 * deprecated - lastName and firstName replaces this field
 	 * @var string
 	 * @filter order
 	 */
@@ -188,6 +189,36 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $adminUserId;
 	
+	/**
+	 * firstName and lastName replace the old (deprecated) adminName
+	 * @var string
+	 */
+	public $firstName;
+
+	/**
+	 * lastName and firstName replace the old (deprecated) adminName
+	 * @var string
+	 */
+	public $lastName;
+
+	/**
+	 * country code (2char) - this field is optional
+	 * 
+	 * @var string
+	 */
+	public $country;
+
+	/**
+	 * state code (2char) - this field is optional
+	 * @var string
+	 */
+	public $state;
+	
+	/**
+	 * @var KalturaKeyValueArray
+	 * @insertonly
+	 */
+	public $additionalParams;
 	
 	private static $map_between_objects = array
 	(
@@ -195,6 +226,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		"description" , "commercialUse" , "landingPage" , "userLandingPage" , "contentCategories" , "type" , "phone" , "describeYourself" ,
 		"adultContent" , "defConversionProfileType" , "notify" , "status" , "allowQuickEdit" , "mergeEntryLists" , "notificationsConfig" ,
 		"maxUploadSize" , "partnerPackage" , "secret" , "adminSecret" , "allowMultiNotification", "adminLoginUsersQuota", "adminUserId",
+		"firstName" , "lastName" , "country" , "state" , "additionalParams" ,
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -215,8 +247,31 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	public function toPartner()
 	{
+		if($this->adminName && $this->firstName === null && $this->lastName === null)
+		{
+			$this->firstName = $this->adminEmail;
+		}
+		elseif(
+			($this->firstName || $this->lastName) &&
+			($this->adminName === null || $this->adminName == "")
+		)
+		{
+			$this->adminName = $this->firstName . " " . $this->lastName;
+		}
+		elseif(($this->firstName || $this->lastName) && $this->adminName)
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_DEPRECATED, "adminName");
+		}
+
 		$partner = new Partner();
-		return parent::toObject( $partner );
+		$partner = parent::toObject( $partner );
+		$additionalParamsArray = array();
+		foreach($this->additionalParams as $pairObject)
+		{
+			$additionalParamsArray[$pairObject->key] = $pairObject->value;
+			$partner->setAdditionalParams($additionalParamsArray);
+		}
+		return $partner;
 	}
 	
 	public function getExtraFilters()
