@@ -61,7 +61,7 @@ class VerizonDistributionProfile extends DistributionProfile
 		
 		foreach($requiredFields as $field)
 		{
-			$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, $field, "");
+			$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, $field);
 			if(!$metadataProfileCategoryField)
 			{
 				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $field);
