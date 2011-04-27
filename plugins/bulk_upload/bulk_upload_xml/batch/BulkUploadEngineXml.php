@@ -562,21 +562,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$resource = null;
 			
-		if(!empty($elementToSearchIn->localFileContentResource))
+		if(isset($elementToSearchIn->localFileContentResource))
 		{
 			KalturaLog::debug("Resource is : localFileContentResource");
 			$resource = new KalturaLocalFileResource();
 			$localContentResource = $elementToSearchIn->localFileContentResource;
 			$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
 		}
-		elseif(!empty($elementToSearchIn->urlContentResource))
+		elseif(isset($elementToSearchIn->urlContentResource))
 		{
 			KalturaLog::debug("Resource is : urlContentResource");
 			$resource = new KalturaUrlResource();
 			$urlContentResource = $elementToSearchIn->urlContentResource;
 			$resource->url = kXml::getXmlAttributeAsString($urlContentResource, "url");
 		}
-		elseif(!empty($elementToSearchIn->remoteStorageContentResource))
+		elseif(isset($elementToSearchIn->remoteStorageContentResource))
 		{
 			KalturaLog::debug("Resource is : remoteStorageContentResource");
 			$resource = new KalturaRemoteStorageResource();
@@ -584,7 +584,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->url = kXml::getXmlAttributeAsString($remoteContentResource, "url");
 			$resource->storageProfileId = $this->getStorageProfileId($remoteContentResource);
 		}
-		elseif(!empty($elementToSearchIn->entryContentResource))
+		elseif(isset($elementToSearchIn->entryContentResource))
 		{
 			KalturaLog::debug("Resource is : entryContentResource");
 			$resource = new KalturaEntryResource();
@@ -592,7 +592,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->entryId = kXml::getXmlAttributeAsString($entryContentResource, "entryId");
 			$resource->flavorParamsId = $this->getFlavorParamsId($entryContentResource, false);
 		}
-		elseif(!empty($elementToSearchIn->assetContentResource))
+		elseif(isset($elementToSearchIn->assetContentResource))
 		{
 			KalturaLog::debug("Resource is : assetContentResource");
 			$resource = new KalturaAssetResource();
