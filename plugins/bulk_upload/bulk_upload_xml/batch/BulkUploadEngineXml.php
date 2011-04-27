@@ -433,7 +433,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
-		$flavorAsset->tags = $this->getStringFromElement($contentElement->tags);
+		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
 		
 		if(is_null($flavorAsset->flavorParamsId) && is_null($flavorAsset->tags))
 			return null;
@@ -456,7 +456,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($thumbElement["isDefault"]) && $thumbElement["isDefault"] == 'true') // if the attribute is set to true we add the is default tag to the thumb
 			$thumbAsset->tags = self::DEFAULT_THUMB_TAG;
 		
-		$thumbAsset->tags = $this->getStringFromElement($thumbElement->tags, $thumbAsset->tags);
+		$thumbAsset->tags = $this->implodeChildElements($thumbElement->tags, $thumbAsset->tags);
 			
 		if(is_null($thumbAsset->thumbParamsId) && is_null($thumbAsset->tags))
 			return null;
@@ -587,38 +587,49 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getFlavorParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
 	{
+		return $this->getAssetParamsId($elementToSearchIn, $conversionProfileId, $isAttribute, 'flavor');
+	}
+	
+	/**
+	 * 
+	 * Gets the flavor params id from the given element
+	 * @param SimpleXMLElement $elementToSearchIn - The element to search in
+	 * @param int $conversionProfileId - The conversion profile on the item
+	 * @param bool $isAttribute
+	 * @param string $assetType flavor / thumb
+	 * @return int - The id of the flavor params
+	 */
+	private function getAssetParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute, $assetType)
+	{
+		$assetParams = "{$assetType}Params";
+		$assetParamsId = "{$assetParams}Id";
+		$assetParamsName = null;
+		
 		if($isAttribute)
 		{
-			if(isset($elementToSearchIn["flavorParamsId"]))
-				return (int)$elementToSearchIn["flavorParamsId"];
+			if(isset($elementToSearchIn[$assetParamsId]))
+				return (int)$elementToSearchIn[$assetParamsId];
 	
-			if(isset($elementToSearchIn["flavorParams"]))
-				return null;	
-				
-			if(is_null($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
-			{
-				$this->initAssetParamsNameToId($conversionProfileId);
-			}
-				
-			if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]))
-				return trim($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["flavorParams"]]);
+			if(isset($elementToSearchIn[$assetParams]))
+				$assetParamsName = $elementToSearchIn[$assetParams];
 		}
 		else 
 		{
-			if(!empty($elementToSearchIn->flavorParamsId))
-				return (int)$elementToSearchIn->flavorParamsId;
+			if(isset($elementToSearchIn->$assetParamsId))
+				return (int)$elementToSearchIn->$assetParamsId;
 	
-			if(empty($elementToSearchIn->flavorParams))
-				return null;	
-				
-			if(is_null($this->assetParamsNameToIdPerConversionProfile))
-			{
-				$this->initAssetParamsNameToId($conversionProfileId);
-			}
-				
-			if(isset($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]))
-				return trim($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->flavorParams]);
+			if(isset($elementToSearchIn->$assetParams))
+				$assetParamsName = $elementToSearchIn->$assetParams;
 		}
+			
+		if(!$assetParamsName)
+			return null;	
+			
+		if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
+			$this->initAssetParamsNameToId($conversionProfileId);
+			
+		if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$assetParamsName]))
+			return $this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$assetParamsName];
 			
 		return null;
 	}
@@ -690,40 +701,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getThumbParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
 	{
-		if($isAttribute)
-		{
-			if(isset($elementToSearchIn["thumbParamsId"]))
-				return (int)$elementToSearchIn["thumbParamsId"];
-	
-			if(isset($elementToSearchIn["thumbParams"]))
-				return null;	
-				
-			if(is_null($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
-			{
-				$this->initAssetParamsNameToId($conversionProfileId);
-			}
-				
-			if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["thumbParams"]]))
-				return trim($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$elementToSearchIn["thumbParams"]]);
-		}
-		else 
-		{
-			if(!empty($elementToSearchIn->thumbParamsId))
-				return (int)$elementToSearchIn->thumbParamsId;
-	
-			if(empty($elementToSearchIn->thumbParams))
-				return null;	
-				
-			if(is_null($this->assetParamsNameToIdPerConversionProfile))
-			{
-				$this->initAssetParamsNameToId();
-			}
-				
-			if(isset($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]))
-				return trim($this->assetParamsNameToIdPerConversionProfile[$elementToSearchIn->thumbParams]);
-		}	
-		
-		return null;
+		return $this->getAssetParamsId($elementToSearchIn, $conversionProfileId, $isAttribute, 'thumb');
 	}
 		
 	/**
@@ -848,8 +826,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		$entry->name = (string)$item->name;
 		$entry->description = (string)$item->description;
-		$entry->tags = $this->getStringFromElement($item->tags);
-		$entry->categories = $this->getStringFromElement($item->categories);
+		$entry->tags = $this->implodeChildElements($item->tags);
+		$entry->categories = $this->implodeChildElements($item->categories);
 		$entry->userId = (string)$item->userId;;
 		$entry->licenseType = (string)$item->licenseType;
 		$entry->accessControlId =  $this->getAccessControlId($item);
@@ -1086,28 +1064,23 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Returns a comma seperated string with the values of the child nodes of the given element 
 	 * @param SimpleXMLElement $element
 	 */
-	private function getStringFromElement(SimpleXMLElement $element, $currentTags = null)
+	private function implodeChildElements(SimpleXMLElement $element, $baseValues = null)
 	{
 		$ret = array();
-		if($currentTags)
-			$ret = explode(',', $currentTags);
+		if($baseValues)
+			$ret = explode(',', $baseValues);
 		
 		if(empty($element))
-		{
-			return "";
-		}
+			return $baseValues;
 		
 		foreach ($element->children() as $child)
 		{
-			if($child != null)
-			{
-				$childNodeValue = trim($child);
-				if(!empty($childNodeValue))
-				{
-					KalturaLog::debug("child value [". $childNodeValue . "]");
-					$ret[] = $childNodeValue;
-				}
-			}
+			if(is_null($child))
+				continue;
+				
+			$value = trim("$child");
+			if($value)
+				$ret[] = $value;
 		}
 		
 		$ret = implode(',', $ret);
