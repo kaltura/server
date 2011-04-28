@@ -912,7 +912,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->impersonate();
 		
 		$allFlavorParams = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
-		
+		$allFlavorParams = $allFlavorParams->objects;
 		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
 		
 		foreach ($allFlavorParams as $flavorParam)
@@ -932,6 +932,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->impersonate();
 		$allAccessControl = $this->kClient->accessControl->listAction(null, null);
+		$allAccessControl = $allAccessControl->objects;
 		
 		KalturaLog::debug("allAccessControl [" . print_r($allAccessControl, true). "]");
 		
