@@ -355,6 +355,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$createdEntry = reset($requestResults);
 		}
 		
+		KalturaLog::debug("Created entry [". print_r($createdEntry,true) ."]");
+		
 		if(!($createdEntry instanceof KalturaObjectBase)) // if the entry is not kaltura object (in case of errors)
 		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
