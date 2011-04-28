@@ -16,6 +16,20 @@
 class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 {
 
+	public static function setDefaultCriteriaFilter ()
+	{
+		parent::setDefaultCriteriaFilter();
+		if ( self::$s_criteria_filter == null )
+		{
+			self::$s_criteria_filter = new criteriaFilter ();
+		}
+		
+		$c = new myCriteria(); 
+		$c->addAnd ( self::STATUS, VirusScanProfileStatus::DELETED , Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter ( $c );
+	}
+	
+	
 	/**
 	 * Will return the first virus scan profile of the entry's partner, that defines an entry filter suitable for the given entry.
 	 * @param int $entryId
@@ -33,7 +47,7 @@ class VirusScanProfilePeer extends BaseVirusScanProfilePeer
 		
 		$cProfile = new Criteria();
 		$cProfile->addAnd(VirusScanProfilePeer::PARTNER_ID, $entry->getPartnerId());
-		$cProfile->addAnd(VirusScanProfilePeer::STATUS, KalturaVirusScanProfileStatus::DISABLED, Criteria::NOT_EQUAL);
+		$cProfile->addAnd(VirusScanProfilePeer::STATUS, VirusScanProfileStatus::ENABLED, Criteria::EQUAL);
 		$profiles = VirusScanProfilePeer::doSelect($cProfile);
 		
 		if (!$profiles)

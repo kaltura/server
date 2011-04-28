@@ -14,9 +14,6 @@
  * @subpackage model
  */
 class VirusScanProfile extends BaseVirusScanProfile {
-
-	const VIRUS_SCAN_PROFILE_STATUS_DISABLED = 1;
-	const VIRUS_SCAN_PROFILE_STATUS_ENABLED = 2;
 	
 	/**
 	 * @param      entryFilter $v

@@ -3,8 +3,7 @@
  * @package plugins.virusScan
  * @subpackage api.enum
  */
-class KalturaVirusScanProfileStatus extends KalturaEnum
+class KalturaVirusScanProfileStatus extends KalturaEnum implements VirusScanProfileStatus
 {
-	const DISABLED = 1;
-	const ENABLED = 2;
+	// see VirusScanProfileStatus interface
 }

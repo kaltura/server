@@ -13,7 +13,7 @@ class VirusScanProfileService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 
 		myPartnerUtils::addPartnerToCriteria(new VirusScanProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria(new flavorAssetPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		myPartnerUtils::addPartnerToCriteria(flavorAssetPeer::getInstance(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 		
 		if(!VirusScanPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
@@ -141,7 +141,7 @@ class VirusScanProfileService extends KalturaBaseService
 		if (!$dbVirusScanProfile)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $virusScanProfileId);
 		
-		$dbVirusScanProfile->setStatus(KalturaVirusScanProfileStatus::DISABLED);
+		$dbVirusScanProfile->setStatus(KalturaVirusScanProfileStatus::DELETED);
 		$dbVirusScanProfile->save();
 			
 		$virusScanProfile = new KalturaVirusScanProfile();
