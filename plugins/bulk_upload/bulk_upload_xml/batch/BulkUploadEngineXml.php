@@ -61,7 +61,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Maps the converstion profile name to id
 	 * @var array()
 	 */
-	private $ingestionProfileNameToId = null;
+	private $ingestionProfileNameToId = array();
 	
 	/**
 	 * 
@@ -188,7 +188,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$actionToPerform = self::ADD_ACTION_STRING;
 				
-		if(!empty($item->action))
+		if(isset($item->action))
 			$actionToPerform = strtolower($item->action);
 		
 		switch($actionToPerform)
@@ -615,7 +615,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				throw new KalturaBulkUploadXmlException("Can't validate file as file path is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
 				
-			if((!empty($elementToSearchIn->fileChecksum)) && $elementToSearchIn->fileChecksum != '0' && $elementToSearchIn->fileChecksum != 0) //Check checksum if exists
+			if((isset($elementToSearchIn->fileChecksum)) || $elementToSearchIn->fileChecksum == '0' || $elementToSearchIn->fileChecksum == 0) //Check checksum if exists
 			{
 				if($elementToSearchIn->fileChecksum['type'] == 'sha1')
 				{
@@ -634,7 +634,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 			}
 			
-			if((!empty($elementToSearchIn->fileSize)) && $elementToSearchIn->fileSize != '0' && $elementToSearchIn->fileSize != 0) //Check checksum if exists
+			if((isset($elementToSearchIn->fileSize)) || $elementToSearchIn->fileSize == '0' && $elementToSearchIn->fileSize == 0) //Check checksum if exists
 			{
 				$fileSize = filesize($filePath);
 				$xmlFileSize = (int)$elementToSearchIn->fileSize;
@@ -807,13 +807,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getIngestionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
 	{
-		if(!empty($elementToSearchIn->ingestionProfileId))
+		if(isset($elementToSearchIn->ingestionProfileId))
 			return (int)$elementToSearchIn->ingestionProfileId;
 
-		if(empty($elementToSearchIn->ingestionProfile))
+		if(!isset($elementToSearchIn->ingestionProfile))
 			return null;	
 			
-		if(is_null($this->ingestionProfileNameToId))
+		if(!isset($this->ingestionProfileNameToId[$elementToSearchIn->ingestionProfile]))
 		{
 			$this->initIngestionProfileNameToId();
 		}
@@ -845,10 +845,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getAccessControlId(SimpleXMLElement $elementToSearchIn)
 	{
-		if(!empty($elementToSearchIn->accessControlId))
+		if(isset($elementToSearchIn->accessControlId))
 			return (int)$elementToSearchIn->accessControlId;
 
-		if(empty($elementToSearchIn->accessControl))
+		if(!isset($elementToSearchIn->accessControl))
 			return null;	
 			
 		if(is_null($this->accessControlNameToId))
@@ -871,10 +871,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getStorageProfileId(SimpleXMLElement $elementToSearchIn)
 	{
-		if(!empty($elementToSearchIn->storageProfileId))
+		if(isset($elementToSearchIn->storageProfileId))
 			return (int)$elementToSearchIn->storageProfileId;
 
-		if(empty($elementToSearchIn->storageProfile))
+		if(!isset($elementToSearchIn->storageProfile))
 			return null;	
 			
 		if(is_null($this->storageProfileNameToId))
@@ -1057,22 +1057,22 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$typeNumber = $item->type;
 		$typeNumber = trim($typeNumber);
 		
-		if(!empty($item->media) && $item->type != KalturaEntryType::MEDIA_CLIP)
+		if(isset($item->media) && $item->type != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			
-		if(!empty($item->mix) && $item->type != KalturaEntryType::MIX)
+		if(isset($item->mix) && $item->type != KalturaEntryType::MIX)
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			
-		if(!empty($item->playlist) && $item->type != KalturaEntryType::PLAYLIST)
+		if(isset($item->playlist) && $item->type != KalturaEntryType::PLAYLIST)
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 
-		if(!empty($item->document) && $item->type != KalturaEntryType::DOCUMENT)
+		if(isset($item->document) && $item->type != KalturaEntryType::DOCUMENT)
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 
-		if(!empty($item->liveStream) && $item->type != KalturaEntryType::LIVE_STREAM)
+		if(isset($item->liveStream) && $item->type != KalturaEntryType::LIVE_STREAM)
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		
-		if(!empty($item->data) && $item->type != KalturaEntryType::DATA)
+		if(isset($item->data) && $item->type != KalturaEntryType::DATA)
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 
@@ -1208,7 +1208,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if($baseValues)
 			$ret = explode(',', $baseValues);
 		
-		if(empty($element))
+		if(!isset($element))
 			return $baseValues;
 		
 		foreach ($element->children() as $child)
@@ -1257,7 +1257,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!is_numeric($bulkUploadResult->accessControlProfileId))
 			$bulkUploadResult->accessControlProfileId = null;
 			
-		if(!empty($item->startDate))
+		if(isset($item->startDate))
 		{
 			if((string)$item->startDate && !self::isFormatedDate((string)$item->startDate))
 			{
@@ -1266,7 +1266,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 		
-		if(!empty($item->endDate))
+		if(isset($item->endDate))
 		{
 			if((string)$item->endDate && !self::isFormatedDate((string)$item->endDate))
 			{
