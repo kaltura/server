@@ -17,6 +17,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		KalturaLog::debug('boostrap destructed, application run for ' . $t . ' seconds');
 	}
 	
+	/**
+	 * Run a check to make sure the client existing in the lib directory.
+	 * It must be checked before session is initiated, as the session object might contain a class from the client that will cause a fatal error 
+	 */
+	protected function _initClient()
+	{
+		$this->bootstrap('autoloaders'); // "autoloaders" is the only bootstrap that is mandatory
+		if (!class_exists('Kaltura_Client_Client'))
+			throw new Exception('Kaltura client not found, maybe it wasn\'t generated');
+	}
+	
 	protected function _initLog()
 	{
 		$this->bootstrap('autoloaders');
