@@ -616,9 +616,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaResource $resource
 	 * @param SimpleXMLElement $elementToSearchIn
 	 */
-	private function validateResource($resource, $elementToSearchIn)
+	private function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
+		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn, true) . "]");
+		
 		//We only check for filesize and check sum in local files 
 		if($resource instanceof KalturaLocalFileResource)
 		{
@@ -629,7 +630,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				throw new KalturaBulkUploadXmlException("Can't validate file as file path is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			}
 				
-			if((!empty($elementToSearchIn->fileChecksum)) || $elementToSearchIn->fileChecksum == '0' || $elementToSearchIn->fileChecksum == 0) //Check checksum if exists
+			if(isset($elementToSearchIn->fileChecksum)) //Check checksum if exists
 			{
 				if($elementToSearchIn->fileChecksum['type'] == 'sha1')
 				{
@@ -651,7 +652,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 			}
 			
-			if((!empty($elementToSearchIn->fileSize)) || $elementToSearchIn->fileSize == '0' && $elementToSearchIn->fileSize == 0) //Check checksum if exists
+			if(isset($elementToSearchIn->fileSize)) //Check checksum if exists
 			{
 				$fileSize = filesize($filePath);
 				$xmlFileSize = (int)$elementToSearchIn->fileSize;
