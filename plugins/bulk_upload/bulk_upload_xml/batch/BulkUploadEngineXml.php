@@ -944,11 +944,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->impersonate();
 		$allIngestionProfile = $this->kClient->conversionProfile->listAction(null, null);
 		
+		KalturaLog::debug("allingestion profiles [" . print_r($allIngestionProfile,true) ." ]");
+		
 		foreach ($allIngestionProfile as $ingestionProfile)
 		{
-			KalturaLog::debug("ingestionProfileId [$ingestionProfile->id]");
-			KalturaLog::debug("ingestionProfileName [$ingestionProfile->systemName]");
-			
+			KalturaLog::debug("ingestionProfile [" . print_r($ingestionProfile,true) . "]");
+						
 			$systemName = "$ingestionProfile->systemName";
 			if(!is_null($systemName))
 				$this->ingestionProfileNameToId[$systemName] = $ingestionProfile->id;
