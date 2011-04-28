@@ -9,7 +9,11 @@ require_once("bootstrap.php");
  */
 class KAsyncDropFolderWatcher extends KBatchBase
 {
-
+	/**
+	 * @var KalturaDropFolderClientPlugin
+	 */
+	protected $dropFolderPlugin = null;
+	
 	public static function getType()
 	{
 		return KalturaBatchJobType::DROP_FOLDER_WATCHER;
@@ -29,6 +33,8 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	public function run()
 	{
 		KalturaLog::info("Drop folder watcher batch is running");
+		
+		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get($this->kClient);
 		
 		if($this->taskConfig->isInitOnly())
 			return $this->init();
@@ -59,7 +65,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$filter->statusEqual = KalturaDropFolderStatus::ENABLED;
 		
 		try {
-			$dropFolders = $this->kClient->dropFolder->listAction($filter);
+			$dropFolders = $this->dropFolderPlugin->dropFolder->listAction($filter);
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot get drop folder list - '.$e->getMessage());
@@ -195,7 +201,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
-		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
+		$dropFolderFiles = $this->dropFolderPlugin->dropFolderFile->listAction($dropFolderFileFilter);
 		$dropFolderFiles = $dropFolderFiles->objects;
 		return $dropFolderFiles;
 	}
@@ -236,7 +242,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$newDropFolderFile->status = KalturaDropFolderFileStatus::UPLOADING;
 		
 		try {	
-			$this->kClient->dropFolderFile->add($newDropFolderFile);
+			$this->dropFolderPlugin->dropFolderFile->add($newDropFolderFile);
 		}
 		catch (Exception $e) {
 			KalturaLog::err("Cannot add new drop folder file [$fileName] - ".$e->getMessage());
@@ -270,7 +276,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			try {
 				$updateDropFolderFile = new KalturaDropFolderFile();
 				$updateDropFolderFile->fileSize = $physicalFileSize;
-				$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);				
+				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);				
 			}
 			catch (Exception $e) {
 				KalturaLog::err('Cannot update file size for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
@@ -286,7 +292,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				try {
 					$updateDropFolderFile = new KalturaDropFolderFile();
 					$updateDropFolderFile->status = KalturaDropFolderFileStatus::PENDING;
-					$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+					$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 					return true;
 				}
 				catch (Exception $e) {
@@ -341,7 +347,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			try {
 				$updateDropFolderFile = new KalturaDropFolderFile();
 				$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_DELETING;
-				$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 			}
 			catch (Exception $e) {
 				KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
@@ -353,7 +359,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		try {
 			$updateDropFolderFile = new KalturaDropFolderFile();
 			$updateDropFolderFile->status = KalturaDropFolderFileStatus::PURGED;
-			$this->kClient->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
