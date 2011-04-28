@@ -237,22 +237,24 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($item->content as $contentElement)
 		{
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
+			$flavorAssetResource = $this->getResource($contentElement);
+			
 			if(is_null($flavorAsset))
 			{
-				$resource->resources[] = $this->getResource($contentElement);
+				$resource->resources[] = $flavorAssetResource;
 				continue;
 			}
 			
 			if(is_null($flavorAsset->flavorParamsId))
 			{
 				$noParamsFlavorAssets[] = $flavorAsset;
-				$noParamsFlavorResources[] = $this->getResource($contentElement);
+				$noParamsFlavorResources[] = $flavorAssetResource;
 				continue;
 			}
 			
 			$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
 			$assetResource = new KalturaAssetParamsResourceContainer();
-			$assetResource->resource = $this->getResource($contentElement);
+			$assetResource->resource = $flavorAssetResource;
 			$assetResource->assetParamsId = $flavorAsset->flavorParamsId;
 			$resource->resources[] = $assetResource;
 		}
@@ -261,22 +263,24 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($item->thumbnail as $thumbElement)
 		{
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
+			$thumbAssetResource = $this->getResource($thumbElement);
+			
 			if(is_null($thumbAsset))
 			{
-				$resource->resources[] = $this->getResource($thumbElement);
+				$resource->resources[] = $thumbAssetResource;
 				continue;
 			}
 			
 			if(is_null($thumbAsset->thumbParamsId))
 			{
 				$noParamsThumbAssets[] = $thumbAsset;
-				$noParamsThumbResources[] = $this->getResource($thumbElement);
+				$noParamsThumbResources[] = $thumbAssetResource;
 				continue;
 			}
 			
 			$thumbAssets[$thumbAsset->thumbParamsId] = $thumbAsset;
 			$assetResource = new KalturaAssetParamsResourceContainer();
-			$assetResource->resource = $this->getResource($thumbElement);
+			$assetResource->resource = $thumbAssetResource;
 			$assetResource->assetParamsId = $thumbAsset->thumbParamsId;
 			$resource->resources[] = $assetResource;
 		}
