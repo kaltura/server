@@ -856,8 +856,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->initAccessControlNameToId();
 		}
 			
-		if(isset($this->accessControlNameToId[$elementToSearchIn->accessControl]))
-			return trim($this->accessControlNameToId[$elementToSearchIn->accessControl]);
+		if(isset($this->accessControlNameToId["$elementToSearchIn->accessControl"]))
+			return trim($this->accessControlNameToId["$elementToSearchIn->accessControl"]);
 			
 		return null;
 	}
@@ -882,8 +882,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->initStorageProfileNameToId();
 		}
 			
-		if(isset($this->storageProfileNameToId[$elementToSearchIn->storageProfile]))
-			return trim($this->storageProfileNameToId[$elementToSearchIn->storageProfile]);
+		if(isset($this->storageProfileNameToId["$elementToSearchIn->storageProfile"]))
+			return trim($this->storageProfileNameToId["$elementToSearchIn->storageProfile"]);
 			
 		return null;
 	}
@@ -933,7 +933,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($allIngestionProfile as $ingestionProfile)
 		{
 			if(!is_null($ingestionProfile->systemName))
-				$this->ingestionProfileNameToId[$ingestionProfile->systemName] = $ingestionProfile->id;
+				$this->ingestionProfileNameToId["$ingestionProfile->systemName"] = $ingestionProfile->id;
 		}
 	}
 
@@ -948,7 +948,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($allStorageProfiles as $storageProfile)
 		{
 			if(!is_null($storageProfile->systemName))
-				$this->accessControlNameToId[$storageProfile->systemName] = $storageProfile->id;
+				$this->accessControlNameToId["$storageProfile->systemName"] = $storageProfile->id;
 		}
 	}
 		
