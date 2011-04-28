@@ -626,9 +626,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$checksum = md5_file($filePath);
 				}
 				
+				KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
+				$data = $elementToSearchIn->fileChecksum->asXml();
+				KalturaLog::debug("fileChecksum [$data]");
 				$xmlChecksum = (string)$elementToSearchIn->fileChecksum;
-							
-				if($xmlChecksum  != $checksum)
+
+				if($xmlChecksum != $checksum)
 				{
 					throw new KalturaBulkUploadXmlException("File checksum is invalid for file [$filePath], Xml checksum [$xmlChecksum], actual checksum [$checksum]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 				}
