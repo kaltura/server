@@ -777,9 +777,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$conversionProfileId = $this->getIngestionProfileIdFromElement($elementToSearchIn);
 		
+		KalturaLog::debug("conversionProfileid from element [ $conversionProfileId ]");
+		
 		if(is_null($conversionProfileId)) // if we didn't set it in the item element
 		{
 			$conversionProfileId = $this->data->conversionProfileId;
+			KalturaLog::debug("conversionProfileid from data [ $conversionProfileId ]");
 		}
 		
 		if(is_null($conversionProfileId)) // if we didn't set it in the item element
@@ -793,7 +796,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->defaultIngestionProfileId = $conversionProfile->id;
 			}
 			
-			$conversionProfileId = $this->defaultIngestionProfileId; 
+			$conversionProfileId = $this->defaultIngestionProfileId;
+			KalturaLog::debug("conversionProfileid from default [ $conversionProfileId ]"); 
 		}
 		
 		return $conversionProfileId;
@@ -829,12 +833,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]))
 		{
 			$this->initIngestionProfileNameToId();
+			KalturaLog::debug("The new ingestionProfileNameToId [". print_r($this->ingestionProfileNameToId,true) . "]");
 		}
 			
 		if(isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]))
-			return trim($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]);
-			
-		KalturaLog::debug("The new ingestionProfileNameToId [". print_r($this->ingestionProfileNameToId,true) . "]");
+			return $this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"];
+
 		return null;
 	}
 		
