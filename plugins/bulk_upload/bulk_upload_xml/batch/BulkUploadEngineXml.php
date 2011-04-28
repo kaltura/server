@@ -163,7 +163,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$bulkUploadResult->errorDescription = $e->getMessage();
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$this->addBulkUploadResult($bulkUploadResult);
-				continue; // move to next item
 			}			
 		}	
 	}
@@ -357,19 +356,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		KalturaLog::debug("Created entry [". print_r($createdEntry,true) ."]");
 		
-		if(!($createdEntry instanceof KalturaObjectBase)) // if the entry is not kaltura object (in case of errors)
-		{
-			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
-		
 		if(is_null($createdEntry)) //checks that the entry was created
 		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
-		
-		if(!isset($createdEntry->id) || empty($createdEntry->id)) //checks that the entry id was set and it is not empty
-		{
-			throw new KalturaBulkUploadXmlException("The entry id [$createdEntry->id] wasn't set", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
 		return $createdEntry;
@@ -520,6 +509,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(is_null($createdEntry)) //checks that the entry was created
 		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+		
+		if(!($createdEntry instanceof KalturaObjectBase)) // if the entry is not kaltura object (in case of errors)
+		{
+			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+		
+		if(!isset($createdEntry->id) || empty($createdEntry->id)) //checks that the entry id was set and it is not empty
+		{
+			throw new KalturaBulkUploadXmlException("The entry id [$createdEntry->id] wasn't set", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
 		return $createdEntry;
@@ -1281,6 +1280,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function createUploadResult(SimpleXMLElement $item)
 	{
+		KalturaLog::debug("Creating upload result");
+		
 		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
 		{
 			$this->exceededMaxRecordsEachRun = true;
