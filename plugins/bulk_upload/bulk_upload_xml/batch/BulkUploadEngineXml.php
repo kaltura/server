@@ -282,7 +282,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		$createdEntry = $this->sendItemUpdateData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
-									
+				
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 				
@@ -347,6 +347,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(is_null($createdEntry)) //checks that the entry was created
 		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+		
+		if(!isset($createdEntry->id)) //checks that the entry id was set
+		{
+			throw new KalturaBulkUploadXmlException("The entry id [$createdEntry->id] wasn't set", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
 		return $createdEntry;	
