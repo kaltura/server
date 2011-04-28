@@ -807,6 +807,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getIngestionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
 	{
+		$isSetId = isset($elementToSearchIn->ingestionProfileId);
+		$isNotSetName = !isset($elementToSearchIn->ingestionProfile);
+		$isNotSetArray = !isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]);
+				
+		KalturaLog::debug("isset elementToSearchIn->ingestionProfileId [$isSetId ]");
+		KalturaLog::debug("value elementToSearchIn->ingestionProfileid [$elementToSearchIn->ingestionProfileId]");
+				
+		KalturaLog::debug("isset elementToSearchIn->ingestionProfile [$isNotSetName]");
+		KalturaLog::debug("value elementToSearchIn->ingestionProfile [$elementToSearchIn->ingestionProfile]");
+		
+		KalturaLog::debug("isset ingestionProfileNameToId [$isNotSetArray]");
+		KalturaLog::debug("value ingestionProfileNameToId [$this->ingestionProfileNameToId[$elementToSearchIn->ingestionProfile]");
+		
 		if(isset($elementToSearchIn->ingestionProfileId))
 			return (int)$elementToSearchIn->ingestionProfileId;
 
@@ -821,6 +834,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]))
 			return trim($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]);
 			
+		KalturaLog::debug("The new ingestionProfileNameToId [". print_r($this->ingestionProfileNameToId,true) . "]");
 		return null;
 	}
 		
