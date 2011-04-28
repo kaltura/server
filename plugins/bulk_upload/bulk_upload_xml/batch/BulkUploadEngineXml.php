@@ -943,6 +943,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->impersonate();
 		$allIngestionProfile = $this->kClient->conversionProfile->listAction(null, null);
+		$allIngestionProfile = $allIngestionProfile->objects;
 		
 		KalturaLog::debug("allingestion profiles [" . print_r($allIngestionProfile,true) ." ]");
 		
