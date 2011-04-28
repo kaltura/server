@@ -813,13 +813,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!isset($elementToSearchIn->ingestionProfile))
 			return null;	
 			
-		if(!isset($this->ingestionProfileNameToId[$elementToSearchIn->ingestionProfile]))
+		if(!isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]))
 		{
 			$this->initIngestionProfileNameToId();
 		}
 			
-		if(isset($this->ingestionProfileNameToId[$elementToSearchIn->ingestionProfile]))
-			return trim($this->ingestionProfileNameToId[$elementToSearchIn->ingestionProfile]);
+		if(isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]))
+			return trim($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]);
 			
 		return null;
 	}
