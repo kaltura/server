@@ -626,7 +626,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$checksum = md5_file($filePath);
 				}
 				
-				$xmlChecksum = "$elementToSearchIn->fileChecksum";
+				$xmlChecksum = (string)$elementToSearchIn->fileChecksum;
 							
 				if($xmlChecksum  != $checksum)
 				{
