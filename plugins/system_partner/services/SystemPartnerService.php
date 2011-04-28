@@ -246,7 +246,7 @@ class SystemPartnerService extends KalturaBaseService
 	 * @action getPackages
 	 * @return KalturaSystemPartnerPackageArray
 	 */
-	public function getPackages()
+	public function getPackagesAction()
 	{
 		$partnerPackages = new PartnerPackages();
 		$packages = $partnerPackages->listPackages();
