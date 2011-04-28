@@ -236,6 +236,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//For each content in the item element we add a new flavor asset
 		foreach ($item->content as $contentElement)
 		{
+			KalturaLog::debug("contentElement [" . print_r($contentElement->asXml(), true). "]");
+			
+			if(empty($contentElement)) // if the item is empty
+			{
+				continue;
+			}
+			
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
 			$flavorAssetResource = $this->getResource($contentElement);
 			
@@ -262,6 +269,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//For each thumbnail in the item element we create a new thumb asset
 		foreach ($item->thumbnail as $thumbElement)
 		{
+			KalturaLog::debug("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
+						
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
 			$thumbAssetResource = $this->getResource($thumbElement);
 			
@@ -662,13 +671,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getResource(SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
+		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn->asXml(), true). "]");
 		$resource = $this->getResourceInstance($elementToSearchIn);
 		
-		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
+		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn->asXml(), true). "]");
 		$this->validateResource($resource, $elementToSearchIn);
 		
-		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
+		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn->asXml(), true). "]");
 						
 		return $resource;
 	}
@@ -932,12 +941,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allFlavorParams = $allFlavorParams->objects;
 		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
 		
-		foreach ($allFlavorParams as $flavorParam)
+		foreach ($allFlavorParams as $flavorParams)
 		{
-			KalturaLog::debug("flavorParams [" . print_r($flavorParam, true). "]");
+			KalturaLog::debug("flavorParams [" . print_r($flavorParams, true). "]");
 			
-			if(!is_null($flavorParam->systemName))
-				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParam->systemName] = $flavorParam->id;
+			if(!empty($flavorParams->systemName))
+				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParams->systemName] = $flavorParams->id;
 		}
 	}
 
