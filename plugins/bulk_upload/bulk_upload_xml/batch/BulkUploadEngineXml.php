@@ -1257,7 +1257,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if($baseValues)
 			$ret = explode(',', $baseValues);
 		
-		if(!isset($element))
+		if(empty($element))
 			return $baseValues;
 		
 		foreach ($element->children() as $child)
