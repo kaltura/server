@@ -950,7 +950,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			KalturaLog::debug("ingestionProfile [" . print_r($ingestionProfile,true) . "]");
 						
-			$systemName = "$ingestionProfile->systemName";
+			$systemName = $ingestionProfile->systemName;
 			if(!is_null($systemName))
 				$this->ingestionProfileNameToId[$systemName] = $ingestionProfile->id;
 		}
