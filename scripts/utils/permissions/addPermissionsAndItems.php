@@ -181,7 +181,7 @@ function addParameterPermissionItem($itemCfg)
 	$existingItem = PermissionItemPeer::doSelectOne($c);
 	
 	$item = null;
-	if (existingItem)
+	if ($existingItem)
 	{
 		$item = $existingItem;
 		KalturaLog::log('Permission item for ['.$item->getAction().'->'.$item->getObject().'->'.$item->getParameter().'] partner id ['.$item->getPartnerId().'] already exists with id ['.$item->getId().']');
