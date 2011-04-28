@@ -605,6 +605,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function validateResource($resource, $elementToSearchIn)
 	{
+		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
 		//We only check for filesize and check sum in local files 
 		if($resource instanceof KalturaLocalFileResource)
 		{
@@ -657,8 +658,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getResource(SimpleXMLElement $elementToSearchIn)
 	{
+		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
 		$resource = $this->getResourceInstance($elementToSearchIn);
+		
+		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
 		$this->validateResource($resource, $elementToSearchIn);
+		
+		KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
 						
 		return $resource;
 	}
