@@ -913,8 +913,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$allFlavorParams = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
 		
+		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
+		
 		foreach ($allFlavorParams as $flavorParam)
 		{
+			KalturaLog::debug("flavorParams [" . print_r($flavorParam, true). "]");
+			
 			if(!is_null($flavorParam->systemName))
 				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParam->systemName] = $flavorParam->id;
 		}
@@ -928,8 +932,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->impersonate();
 		$allAccessControl = $this->kClient->accessControl->listAction(null, null);
+		
+		KalturaLog::debug("allAccessControl [" . print_r($allAccessControl, true). "]");
+		
 		foreach ($allAccessControl as $accessControl)
 		{
+			KalturaLog::debug("accessControl [" . print_r($accessControl, true). "]");
+			
 			if(!is_null($accessControl->systemName))
 				$this->accessControlNameToId[$accessControl->systemName] = $accessControl->id;
 		}
@@ -965,6 +974,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->impersonate();
 		$allStorageProfiles = $this->kClient->storageProfile->listAction(null, null);
+		$allStorageProfiles = $allStorageProfiles->objects;
+		
 		foreach ($allStorageProfiles as $storageProfile)
 		{
 			if(!is_null($storageProfile->systemName))
