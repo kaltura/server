@@ -946,8 +946,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allIngestionProfile as $ingestionProfile)
 		{
-			if(!is_null($ingestionProfile->systemName))
-				$this->ingestionProfileNameToId["$ingestionProfile->systemName"] = $ingestionProfile->id;
+			KalturaLog::debug("ingestionProfileId [$ingestionProfile->id]");
+			KalturaLog::debug("ingestionProfileName [$ingestionProfile->systemName]");
+			
+			$systemName = "$ingestionProfile->systemName";
+			if(!is_null($systemName))
+				$this->ingestionProfileNameToId[$systemName] = $ingestionProfile->id;
 		}
 	}
 
