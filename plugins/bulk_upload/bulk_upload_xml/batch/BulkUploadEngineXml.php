@@ -309,8 +309,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
 		foreach($pluginsInstances as $pluginsInstance)
 			$pluginsInstance->handleItemUpdated($this->kClient, $createdEntry, $item);
-		
-		
 	}
 
 	/**
@@ -618,8 +616,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn, true) . "]");
-		
 		//We only check for filesize and check sum in local files 
 		if($resource instanceof KalturaLocalFileResource)
 		{
@@ -632,6 +628,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 			if(isset($elementToSearchIn->fileChecksum)) //Check checksum if exists
 			{
+				KalturaLog::debug("Validating checksum");
 				if($elementToSearchIn->fileChecksum['type'] == 'sha1')
 				{
 					 $checksum = sha1_file($filePath);
@@ -641,9 +638,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 					$checksum = md5_file($filePath);
 				}
 				
-				KalturaLog::debug("elementToSearchIn [$elementToSearchIn->asXml()]");
-				$data = $elementToSearchIn->fileChecksum->asXml();
-				KalturaLog::debug("fileChecksum [$data]");
 				$xmlChecksum = (string)$elementToSearchIn->fileChecksum;
 
 				if($xmlChecksum != $checksum)
@@ -654,6 +648,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			if(isset($elementToSearchIn->fileSize)) //Check checksum if exists
 			{
+				KalturaLog::debug("Validating file size");
+				
 				$fileSize = filesize($filePath);
 				$xmlFileSize = (int)$elementToSearchIn->fileSize;
 				if($xmlFileSize != $fileSize)
@@ -672,14 +668,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	private function getResource(SimpleXMLElement $elementToSearchIn)
 	{
-		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn->asXml(), true). "]");
 		$resource = $this->getResourceInstance($elementToSearchIn);
-		
-		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn->asXml(), true). "]");
 		$this->validateResource($resource, $elementToSearchIn);
-		
-		KalturaLog::debug("elementToSearchIn [" . print_r($elementToSearchIn->asXml(), true). "]");
-						
+										
 		return $resource;
 	}
 	
