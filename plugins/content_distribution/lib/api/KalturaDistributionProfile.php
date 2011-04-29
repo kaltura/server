@@ -52,6 +52,7 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaDistributionProfileStatus
+	 * @filter eq,in
 	 */
 	public $status;
 

@@ -14,6 +14,8 @@ class KalturaDistributionProfileBaseFilter extends KalturaFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"statusEqual" => "_eq_status",
+		"statusIn" => "_in_status",
 	);
 
 	private $order_by_map = array
@@ -75,4 +77,18 @@ class KalturaDistributionProfileBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaDistributionProfileStatus
+	 */
+	public $statusEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $statusIn;
 }
