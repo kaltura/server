@@ -25,6 +25,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::DUPLICATE_USER_BY_LOGIN_ID
+	 * @throws KalturaErrors::USER_ROLE_NOT_FOUND
 	 */
 	function addAction(KalturaUser $user)
 	{				
@@ -77,6 +78,9 @@ class UserService extends KalturaBaseUserService
 			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
 				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
 			}
+			else if ($code == kPermissionException::USER_ROLE_NOT_FOUND) {
+				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
+			}
 			throw $e;
 		}	
 			
@@ -114,7 +118,7 @@ class UserService extends KalturaBaseUserService
 		try
 		{
 			if (!is_null($user->roleIds)) {
-				UserRolePeer::testValidRolesForUser($user->roleIds);
+				UserRolePeer::testValidRolesForUser($user->roleIds, $this->getPartnerId());
 			}
 			if (!is_null($user->id) && $user->id != $userId) {
 				if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {

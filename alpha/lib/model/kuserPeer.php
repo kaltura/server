@@ -390,7 +390,7 @@ class kuserPeer extends BasekuserPeer
 			$userRoleId = $user->getPartner()->getAdminSessionRoleId();
 			$user->setRoleIds($userRoleId);
 		}
-		UserRolePeer::testValidRolesForUser($user->getRoleIds());
+		UserRolePeer::testValidRolesForUser($user->getRoleIds(), $user->getPartnerId());
 		
 		if($user->getScreenName() === null) {
 			$user->setScreenName($user->getPuserId());

@@ -36,13 +36,22 @@ class UserRolePeer extends BaseUserRolePeer
 	 * @throws kPermissionException::ROLE_ID_MISSING
 	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
 	 */
-	public static function testValidRolesForUser($idsString)
+	public static function testValidRolesForUser($idsString, $partnerId)
 	{
 		$ids = explode(',', trim($idsString));
 		
 		if (count($ids) > 1)
 		{
 			throw new kPermissionException('', kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED);	
+		}
+		
+		foreach ($ids as $id)
+		{
+			$userRole = UserRolePeer::retrieveByPK($id);
+			if (!$userRole || !in_array($userRole->getPartnerId(),array($partnerId, PartnerPeer::GLOBAL_PARTNER) ) )
+			{
+				throw new kPermissionException("A user role with ID [$id] does not exist", kPermissionException::USER_ROLE_NOT_FOUND);
+			}
 		}
 		
 		return true;
