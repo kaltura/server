@@ -4,8 +4,8 @@ class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
 	public function __construct()
 	{
 		$this->action = 'listGenericDistributionProviders';
-		$this->label = 'Generic Providers';
-		$this->rootLabel = 'Distribution';
+		$this->label = 'Distribution Providers';
+		$this->rootLabel = 'Publishers';
 	}
 	
 	/**

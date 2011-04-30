@@ -2,11 +2,11 @@
 class KalturaInternalToolsPluginSystemHelperAction extends KalturaAdminConsolePlugin
 {
 	
-	public function __construct($label = null, $action = null, $rootLabel = null)
+	public function __construct()
 	{
-		$this->action = $action;
-		$this->label = $label;
-		$this->rootLabel = $rootLabel;
+		$this->action = 'KalturaInternalToolsPluginSystemHelper';
+		$this->label = 'System Helper';
+		$this->rootLabel = 'Developer';
 	}
 	
 	/**

@@ -91,14 +91,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			if(!($pluginAdminConsolePage instanceof KalturaAdminConsolePlugin))
 				continue;
 			if(!($pluginAdminConsolePage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
-				continue;				
-				
-			$navigation->addPage(array(
-				    'label' => $pluginAdminConsolePage->getNavigationActionLabel(),
-				    'controller' => 'plugin',
-					'action' => get_class($pluginAdminConsolePage)));
+				continue;		
 			
-			$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
 			$menuPage = null;
 			
 			if($pluginAdminConsolePage->getNavigationRootLabel())
@@ -116,7 +110,24 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 				}
 			}
 				
-			if($menuPage)
+			$subMenuPage = null;
+			
+			if($pluginAdminConsolePage->getNavigationActionLabel())
+			{
+				$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
+				
+				if (!$subMenuPage)
+				{
+					$navigation->addPage(array(
+					    'label' => $pluginAdminConsolePage->getNavigationActionLabel(),
+					    'controller' => 'plugin',
+						'action' => get_class($pluginAdminConsolePage)));
+				}
+
+				$subMenuPage = $navigation->findOneBy('label', $pluginAdminConsolePage->getNavigationActionLabel());
+			}		
+				
+			if($menuPage && $subMenuPage)
 				$subMenuPage->setParent($menuPage);
 		}
 		
