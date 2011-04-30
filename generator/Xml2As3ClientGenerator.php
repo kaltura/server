@@ -65,7 +65,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		$str .= "	}\n";
 		$str .= "}\n";
 		
-		$this->write2File( "types/" . $xml->attributes()->name . ".as" , $str );
+		$this->write2File( "com/kaltura/types/" . $xml->attributes()->name . ".as" , $str );
 	}
 	
 	private function createVoClass( $xml )
@@ -193,7 +193,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		
 		$str .= "	}\n";
 		$str .= "}\n";
-		$this->write2File( "vo/" . $xml->attributes()->name . ".as" , $str );
+		$this->write2File( "com/kaltura/vo/" . $xml->attributes()->name . ".as" , $str );
 	}
 
 	private function createCommands ( $xml )
@@ -424,7 +424,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "	}\n";
 			$str .= "}\n";
 			
-			$this->write2File( "commands/" . $xml->attributes()->name . "/" . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase($child->attributes()->name) . ".as" , $str );
+			$this->write2File( "com/kaltura/commands/" . $xml->attributes()->name . "/" . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase($child->attributes()->name) . ".as" , $str );
 		}
 	}
 	
@@ -583,7 +583,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$str .= "	}\n";
 			$str .= "}\n";
 			
-			$this->write2File( "delegates/" . $xml->attributes()->name . "/" . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase($child->attributes()->name) . "Delegate.as" , $str );
+			$this->write2File( "com/kaltura/delegates/" . $xml->attributes()->name . "/" . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase($child->attributes()->name) . "Delegate.as" , $str );
 		}
 	}
 	
