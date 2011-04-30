@@ -400,49 +400,47 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//For each content in the item element we add a new flavor asset
 		foreach ($item->content as $contentElement)
 		{
+			$assetResource = $this->getResource($contentElement);
+			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
+			
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
-			if(is_null($flavorAsset))
+			if(!is_null($flavorAsset))
 			{
-				$resource->resources[] = $this->getResource($contentElement);
-				continue;
-			}
+				if(is_null($flavorAsset->flavorParamsId))
+				{
+					$noParamsFlavorAssets[] = $flavorAsset;
+					$noParamsFlavorResources[] = $assetResource;
+					continue;
+				}
 			
-			if(is_null($flavorAsset->flavorParamsId))
-			{
-				$noParamsFlavorAssets[] = $flavorAsset;
-				$noParamsFlavorResources[] = $this->getResource($contentElement);
-				continue;
+				$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
+				$assetResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
 			}
-			
-			$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
-			$assetResource = new KalturaAssetParamsResourceContainer();
-			$assetResource->resource = $this->getResource($contentElement);
-			$assetResource->assetParamsId = $flavorAsset->flavorParamsId;
-			$resource->resources[] = $assetResource;
+			$assetResourceContainer->resource = $assetResource;
+			$resource->resources[] = $assetResourceContainer;
 		}
 
 		//For each thumbnail in the item element we create a new thumb asset
 		foreach ($item->thumbnail as $thumbElement)
 		{
-			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
-			if(is_null($thumbAsset))
-			{
-				$resource->resources[] = $this->getResource($thumbElement);
-				continue;
-			}
+			$assetResource = $this->getResource($thumbElement);
+			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
+			$flavorAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
 			
-			if(is_null($thumbAsset->thumbParamsId))
+			if(!is_null($flavorAsset))
 			{
-				$noParamsThumbAssets[] = $thumbAsset;
-				$noParamsThumbResources[] = $this->getResource($thumbElement);
-				continue;
-			}
+				if(is_null($flavorAsset->thumbParamsId))
+				{
+					$noParamsThumbAssets[] = $flavorAsset;
+					$noParamsThumbResources[] = $assetResource;
+					continue;
+				}
 			
-			$thumbAssets[$thumbAsset->thumbParamsId] = $thumbAsset;
-			$assetResource = new KalturaAssetParamsResourceContainer();
-			$assetResource->resource = $this->getResource($thumbElement);
-			$assetResource->assetParamsId = $thumbAsset->thumbParamsId;
-			$resource->resources[] = $assetResource;
+				$thumbAssets[$flavorAsset->thumbParamsId] = $flavorAsset;
+				$assetResourceContainer->assetParamsId = $flavorAsset->thumbParamsId;
+			}
+			$assetResourceContainer->resource = $assetResource;
+			$resource->resources[] = $assetResourceContainer;
 		}
 
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
