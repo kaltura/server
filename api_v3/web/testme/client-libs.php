@@ -48,9 +48,12 @@
 		<div id="content">
 			<div id="header">
 				<h1>Kaltura API SDK - Native Client Libraries</h1>
-				<p>When developing applications that interact with the Kaltura API, it is best practice to use a native Client Library.</p>
-				<p style="margin-bottom:5px;">Please download below the Client Library for the programming language of your choice.</p>
-				<p>To learn how to use the client libraries and see example code implementations, use the <a href="#" >API Test Console</a>.<br>The Test Console generates sample code based on the API actions and parameters selected.</p>
+				<p>When developing applications that interact with the Kaltura API, it is best to use a native Client Library.</p>
+				<p style="margin-bottom:5px;">Below, please download the Client Library for the programming language of your choice.</p>
+				<p>Please note, the client libraries provided here have been generated for the Kaltura.com SaaS API.<br />
+				Users of self-hosted (On Prem or CE) Kaltura servers are encouraged to use their Kaltura Server Clients Generator for optimal compatability.</p>
+				<p>To learn how to use the client libraries and see example code implementations, use the <a href="#" >API Test Console</a>.<br />
+				The Test Console generates sample code based on the API actions and parameters selected.</p>
 			</div>
 			<div id="boxs">
 				<div id="downloads-box">
@@ -84,7 +87,7 @@
 				<div id="notifications-box">
 					<div id="notifications-header">
 						<strong>Missing a language?</strong>
-						<p style="margin-top:4px;">Tweet - <a class="bluelink" target="_blank" href="http://twitter.com/?status=@Kaltura_API%20pls%20add%20sdk%20for%3A%20%5Bprogramming_language%5D" title="Tweet for a new client library">@Kaltura_API pls add sdk for: [lang]</a>.<br>
+						<p style="margin-top:4px;">Tweet - <a class="bluelink" target="_blank" href="http://twitter.com/?status=@Kaltura_API%20pls%20add%20sdk%20for%3A%20%5Bprogramming_language%5D" title="Tweet for a new client library">@Kaltura_API pls add sdk for: [lang]</a>.<br />
 						Or <a class="bluelink" target="_blank" href="http://www.kaltura.org/api-client-library-generator-guide" title="Creating a client library generator script">create your own Client Library Generator</a>.</p>
 					</div>
 					<div id="notifications-feed">
@@ -97,9 +100,9 @@
 				</div>
 				<div class="clear"></div>
 			</div>
-			<p class="graytext">To help developers leverage the Kaltura APIs in their own native programming language,<br>
-Kaltura have create a mechanism that automatically generates up-to-date software development kits in various languages.<br>
-Every time the API will be updated, the above client libraries will be updated too.<br></p>
+			<p class="graytext">To help developers leverage the Kaltura APIs in their own native programming language,<br />
+Kaltura has created a mechanism that automatically generates up-to-date software development kits in various languages.<br />
+Every time the API is updated, all of the client libraries listed above will be updated too.<br /></p>
 		</div>
 	</body>
 </html>
