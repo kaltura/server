@@ -486,14 +486,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
-			$flavorAsset->entryId = $newEntryId; 
 			$this->kClient->flavorAsset->add($newEntryId, $flavorAsset, $flavorResource);
 		}
 	
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			$thumbResource = $noParamsThumbResources[$index];
-			$thumbAsset->entryId = $newEntryId;
 			$this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
 		}
 				
