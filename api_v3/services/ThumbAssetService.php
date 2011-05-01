@@ -391,7 +391,7 @@ class ThumbAssetService extends KalturaBaseService
 		$thisKuserId = $this->getKuser()->getId();
 		$isNotAdmin = !$this->getKuser()->getIsAdmin();
 		
-		if(!$entry || ($isNotAdmin && $entryKuserId != null && $entryKuserId != $thisKuserId)) // Check with Eran if $entryKuserId = null is valid (when inserting with default admin user) 
+		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId)) // Check with Eran if $entryKuserId = null is valid (when inserting with default admin user) 
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
 			
 		$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
