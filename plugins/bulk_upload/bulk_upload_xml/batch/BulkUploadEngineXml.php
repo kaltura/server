@@ -458,6 +458,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 
+		if($this->exceededMaxRecordsEachRun)
+			return;
+		
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
