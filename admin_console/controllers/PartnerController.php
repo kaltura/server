@@ -115,7 +115,8 @@ class PartnerController extends Zend_Controller_Action
 		$storageId = $this->_getParam('storageId');
 		$status = $this->_getParam('status');
 		$client = Infra_ClientHelper::getClient();
-		$client->storageProfile->updateStatus($storageId, $status);
+		$storageProfilePlugin = Kaltura_Client_StorageProfile_Plugin::get($client);
+		$storageProfilePlugin->storageProfile->updateStatus($storageId, $status);
 		echo $this->_helper->json('ok', false);
 	}
 	
