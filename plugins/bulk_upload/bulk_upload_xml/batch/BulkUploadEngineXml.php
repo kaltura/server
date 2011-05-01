@@ -124,6 +124,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach( $xdoc->channel as $channel)
 		{
 			KalturaLog::debug("Handling channel");
+			if($this->exceededMaxRecordsEachRun) //we exit if we already passed our allowed max size
+				return;
+				
 			$this->handleChannel($channel);
 		}
 	}
@@ -147,6 +150,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				continue;
 			}
 			
+			if($this->exceededMaxRecordsEachRun) //we exit if we already passed our allowed max size
+				return;
+			
 			$this->currentItem++; //move to the next item (first item is 1)
 			try
 			{
@@ -158,7 +164,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 			catch (KalturaBulkUploadXmlException $e)
 			{
-				KalturaLog::err("Item failed because excpetion was raised': " . $e->getMessage());
+				KalturaLog::err("Item failed because an excpetion was raised': " . $e->getMessage());
 				$bulkUploadResult = $this->createUploadResult($item);
 				$bulkUploadResult->errorDescription = $e->getMessage();
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
@@ -447,7 +453,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 									
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
-				
+
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
@@ -1005,7 +1011,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry->description = (string)$item->description;
 		$entry->tags = $this->implodeChildElements($item->tags);
 		$entry->categories = $this->implodeChildElements($item->categories);
-		$entry->userId = (string)$item->userId;;
+		$entry->userId = (string)$item->userId;
+
+		if(!$entry->userId) //if wan't set by the XML then we take the original user id that made the call
+			$entry->userId = $this->data->userId;
+		
 		$entry->licenseType = (string)$item->licenseType;
 		$entry->accessControlId =  $this->getAccessControlId($item);
 		$entry->startDate = self::parseFormatedDate((string)$item->startDate);
@@ -1015,7 +1025,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		return $entry;
 	}
-	
+			
 	/**
 	 * 
 	 * Returns the right entry instace by the given item type
