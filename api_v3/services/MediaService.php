@@ -51,6 +51,7 @@ class MediaService extends KalturaEntryService
      * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
      * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
+     * @throws KalturaErrors::INVALID_OBJECT_ID
      */
     function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
     {
@@ -624,6 +625,7 @@ class MediaService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS
+     * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	function updateAction($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null)
 	{

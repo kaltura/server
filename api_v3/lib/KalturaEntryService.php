@@ -28,13 +28,20 @@ class KalturaEntryService extends KalturaBaseService
      * @param asset $dbAsset
      * @return asset
      * @throws KalturaErrors::UPLOAD_ERROR
+     * @throws KalturaErrors::INVALID_OBJECT_ID
      */
     protected function attachFileSyncResource(kFileSyncResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
 		$dbEntry->setSource(entry::ENTRY_MEDIA_SOURCE_KALTURA);
 		$dbEntry->save();
 		
-    	$syncable = kFileSyncObjectManager::retrieveObject($resource->getFileSyncObjectType(), $resource->getObjectId());
+		try{
+    		$syncable = kFileSyncObjectManager::retrieveObject($resource->getFileSyncObjectType(), $resource->getObjectId());
+		}
+		catch(kFileSyncException $e){
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $resource->getObjectId());
+		}
+		
     	$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
     	
         return $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);

@@ -48,7 +48,7 @@ class kFileSyncObjectManager
 		{
 			$error = __METHOD__. " Cannot find object type [" . $objectType . "] with object_id [" . $objectId . "]";
 			KalturaLog::err($error);
-			throw new Exception ( $error );
+			throw new kFileSyncException($error);
 		}
 		return $object;
 	}
