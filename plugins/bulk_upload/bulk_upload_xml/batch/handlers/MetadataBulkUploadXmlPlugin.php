@@ -59,8 +59,8 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 					$this->metadataProfiles[$metadataProfile->systemName] = $metadataProfile->id;
 		}
 		
-		if(isset($this->metadataProfiles[$systemName]))
-			return $this->metadataProfiles[$systemName];
+		if(isset($this->metadataProfiles["$systemName"]))
+			return $this->metadataProfiles["$systemName"];
 			
 		return null;
 	}
