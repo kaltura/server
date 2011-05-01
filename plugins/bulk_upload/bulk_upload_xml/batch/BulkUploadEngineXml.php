@@ -404,13 +404,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
 			
-			if(is_null($flavorAsset) || is_null($flavorAsset->flavorParamsId))
+			if(is_null($flavorAsset->flavorParamsId))
 			{
+				KalturaLog::debug("flavorAsset [". print_r($flavorAsset, true) . "]");
 				$noParamsFlavorAssets[] = $flavorAsset;
 				$noParamsFlavorResources[] = $assetResource;
 			}
 			else 
 			{
+				KalturaLog::debug("flavorAsset->flavorParamsId [$flavorAsset->flavorParamsId]");
 				$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
 				$assetResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
 				$assetResourceContainer->resource = $assetResource;
@@ -425,9 +427,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
 			
-			if(is_null($thumbAsset) || is_null($thumbAsset->thumbParamsId))
+			if(is_null($thumbAsset->thumbParamsId))
 			{
-				KalturaLog::debug("thumbAsset->thumbParamsId is null");
+				KalturaLog::debug("thumbAsset [". print_r($thumbAsset, true) . "]");
 				$noParamsThumbAssets[] = $thumbAsset;
 				$noParamsThumbResources[] = $assetResource;
 			}
@@ -580,10 +582,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
 		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
-		
-		if(is_null($flavorAsset->flavorParamsId) && is_null($flavorAsset->tags))
-			return null;
-		
+				
 		return $flavorAsset;
 	}
 	
@@ -604,10 +603,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumbAsset->tags = self::DEFAULT_THUMB_TAG;
 		
 		$thumbAsset->tags = $this->implodeChildElements($thumbElement->tags, $thumbAsset->tags);
-			
-		if(is_null($thumbAsset->thumbParamsId) && is_null($thumbAsset->tags))
-			return null;
-
+		
 		return $thumbAsset;
 	}
 	
