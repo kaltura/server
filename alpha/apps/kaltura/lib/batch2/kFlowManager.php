@@ -400,6 +400,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		
 		$entry = $object->getentry();
 		
+		KalturaLog::debug("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
 		if($object->getIsOriginal())
 		{
 			if($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED && $entry->getType() == entryType::MEDIA_CLIP)
