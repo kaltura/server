@@ -402,22 +402,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			$assetResource = $this->getResource($contentElement);
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
-			
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
-			if(!is_null($flavorAsset))
-			{
-				if(is_null($flavorAsset->flavorParamsId))
-				{
-					$noParamsFlavorAssets[] = $flavorAsset;
-					$noParamsFlavorResources[] = $assetResource;
-					continue;
-				}
 			
+			if(is_null($flavorAsset) || is_null($flavorAsset->flavorParamsId))
+			{
+				$noParamsFlavorAssets[] = $flavorAsset;
+				$noParamsFlavorResources[] = $assetResource;
+			}
+			else 
+			{
 				$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
 				$assetResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
+				$assetResourceContainer->resource = $assetResource;
+				$resource->resources[] = $assetResourceContainer;
 			}
-			$assetResourceContainer->resource = $assetResource;
-			$resource->resources[] = $assetResourceContainer;
 		}
 
 		//For each thumbnail in the item element we create a new thumb asset
@@ -426,25 +424,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$assetResource = $this->getResource($thumbElement);
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
-
-			if(!is_null($thumbAsset))
-			{
-				KalturaLog::debug("thumbAsset is no null");
-				if(is_null($thumbAsset->thumbParamsId))
-				{
-					KalturaLog::debug("thumbAsset->thumbParamsId is null");
-					$noParamsThumbAssets[] = $thumbAsset;
-					$noParamsThumbResources[] = $assetResource;
-					continue;
-				}
 			
-					KalturaLog::debug("thumbAsset->thumbParamsId [$thumbAsset->thumbParamsId]");
+			if(is_null($thumbAsset) || is_null($thumbAsset->thumbParamsId))
+			{
+				KalturaLog::debug("thumbAsset->thumbParamsId is null");
+				$noParamsThumbAssets[] = $thumbAsset;
+				$noParamsThumbResources[] = $assetResource;
+			}
+			else //we have a thumbParamsId so we add to the resources
+			{
+				KalturaLog::debug("thumbAsset->thumbParamsId [$thumbAsset->thumbParamsId]");
 				$thumbAssets[$thumbAsset->thumbParamsId] = $thumbAsset;
 				$assetResourceContainer->assetParamsId = $thumbAsset->thumbParamsId;
+				$assetResourceContainer->resource = $assetResource;
+				$resource->resources[] = $assetResourceContainer;
 			}
-			
-			$assetResourceContainer->resource = $assetResource;
-			$resource->resources[] = $assetResourceContainer;
 		}
 
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
