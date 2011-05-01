@@ -171,6 +171,13 @@ class myPartnerRegistration
 			if ( $partner->getDescribeYourself() ) $newPartner->setDescribeYourself( $partner->getDescribeYourself() );
 			if ( $partner->getAdultContent() ) $newPartner->setAdultContent( $partner->getAdultContent() );
 			if ( $partner->getDefConversionProfileType() ) $newPartner->setDefConversionProfileType( $partner->getDefConversionProfileType() );
+			// new fields of registration form
+			if ( $partner->getFirstName() ) $newPartner->setFirstName( $partner->getFirstName() );
+			if ( $partner->getLastName() ) $newPartner->setLastName( $partner->getLastName() );
+			if ( $partner->getCountry() ) $newPartner->setCountry( $partner->getCountry() );
+			if ( $partner->getState() ) $newPartner->setState( $partner->getState() );
+			if ( $partner->getAdditionalParams() && is_array($partner->getAdditionalParams()) && count($partner->getAdditionalParams())) $newPartner->setAdditionalParams( $partner->getAdditionalParams() );
+			
 		}
 		$newPartner->save();
 
