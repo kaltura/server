@@ -509,7 +509,7 @@ $target->_video = null;
 
 		$widSrc = $source->_width;
 		$hgtSrc = $source->_height;
-		if($widSrc==0 || $hgtSrc)
+		if($widSrc==0 || $hgtSrc==0)
 			return;
 		$darSrcFrame = $widSrc/$hgtSrc;
 		/*
