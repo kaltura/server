@@ -133,7 +133,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Gets and handles a channel from the mrss
 	 * @param SimpleXMLElement $channel
 	 */
-	private function handleChannel(SimpleXMLElement $channel)
+	protected function handleChannel(SimpleXMLElement $channel)
 	{
 		$this->currentItem = 0;
 		$startIndex = $this->getStartIndex();
@@ -172,7 +172,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Validates the given item so it's valid (some validation can't be enforced in the schema)
 	 * @param SimpleXMLElement $item
 	 */
-	private function validateItem(SimpleXMLElement $item)
+	protected function validateItem(SimpleXMLElement $item)
 	{
 		//Validates that the item type has a matching type element
 		$this->validateTypeToTypedElement($item);
@@ -183,7 +183,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Gets and handles an item from the channel
 	 * @param SimpleXMLElement $item
 	 */
-	private function handleItem(SimpleXMLElement $item)
+	protected function handleItem(SimpleXMLElement $item)
 	{
 		$actionToPerform = self::ADD_ACTION_STRING;
 				
@@ -212,7 +212,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaException
 	 */
-	private function handleItemUpdate(SimpleXMLElement $item)
+	protected function handleItemUpdate(SimpleXMLElement $item)
 	{
 		throw new KalturaBatchException("Action: Update is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		
@@ -321,7 +321,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param array $noParamsThumbResources
 	 * @return $requestResults - the multi request result
 	 */
-	private function sendItemUpdateData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
+	protected function sendItemUpdateData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
 //		$this->startMultiRequest(true);
 //		
@@ -370,7 +370,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaException
 	 */
-	private function handleItemDelete(SimpleXMLElement $item)
+	protected function handleItemDelete(SimpleXMLElement $item)
 	{
 		throw new KalturaBatchException("Action: Delete is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 	}
@@ -380,7 +380,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Gets an item and insert it into the system
 	 * @param SimpleXMLElement $item
 	 */
-	private function handleItemAdd(SimpleXMLElement $item)
+	protected function handleItemAdd(SimpleXMLElement $item)
 	{
 		KalturaLog::debug("xml [" . $item->asXML() . "]");
 			
@@ -471,7 +471,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param array $noParamsThumbResources
 	 * @return $requestResults - the multi request result
 	 */
-	private function sendItemAddData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
+	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
 		$this->startMultiRequest(true);
 		
@@ -531,7 +531,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param array $flavorAssets
 	 * @param array $thumbAssets
 	 */
-	private function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
+	protected function handleFlavorAndThumbsAdditionalData($createdEntryId, $flavorAssets, $thumbAssets)
 	{
 		$this->startMultiRequest(true);
 		//Gets the created thumbs and flavors
@@ -579,7 +579,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $contentElement
 	 * @return KalturaFlavorAsset
 	 */
-	private function getFlavorAsset(SimpleXMLElement $contentElement, $conversionProfileId)
+	protected function getFlavorAsset(SimpleXMLElement $contentElement, $conversionProfileId)
 	{
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
@@ -595,7 +595,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param int $conversionProfileId - The converrsion profile id 
 	 * @return KalturaThumbAsset
 	 */
-	private function getThumbAsset(SimpleXMLElement $thumbElement, $conversionProfileId)
+	protected function getThumbAsset(SimpleXMLElement $thumbElement, $conversionProfileId)
 	{
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->thumbParamsId = $this->getThumbParamsId($thumbElement, $conversionProfileId);
@@ -614,7 +614,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaResource $resource
 	 * @param SimpleXMLElement $elementToSearchIn
 	 */
-	private function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
+	protected function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
 	{
 		//We only check for filesize and check sum in local files 
 		if($resource instanceof KalturaLocalFileResource)
@@ -666,7 +666,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $elementToSearchIn
 	 * @return KalturaResource - the resource located in the given element
 	 */
-	private function getResource(SimpleXMLElement $elementToSearchIn)
+	protected function getResource(SimpleXMLElement $elementToSearchIn)
 	{
 		$resource = $this->getResourceInstance($elementToSearchIn);
 		$this->validateResource($resource, $elementToSearchIn);
@@ -680,7 +680,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $elementToSearchIn
 	 * @return KalturaResource - the resource located in the given element
 	 */
-	private function getResourceInstance(SimpleXMLElement $elementToSearchIn)
+	protected function getResourceInstance(SimpleXMLElement $elementToSearchIn)
 	{
 		$resource = null;
 			
@@ -732,7 +732,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $conversionProfileId - The conversion profile on the item
 	 * @return int - The id of the flavor params
 	 */
-	private function getFlavorParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
+	protected function getFlavorParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
 	{
 		return $this->getAssetParamsId($elementToSearchIn, $conversionProfileId, $isAttribute, 'flavor');
 	}
@@ -746,7 +746,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param string $assetType flavor / thumb
 	 * @return int - The id of the flavor params
 	 */
-	private function getAssetParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute, $assetType)
+	protected function getAssetParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute, $assetType)
 	{
 		$assetParams = "{$assetType}Params";
 		$assetParamsId = "{$assetParams}Id";
@@ -787,7 +787,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 1.from the element 2.from the data of the bulk 3.use default)
 	 * @param SimpleXMLElement $elementToSearchIn
 	 */
-	private function getIngestionProfileId(SimpleXMLElement $elementToSearchIn)
+	protected function getIngestionProfileId(SimpleXMLElement $elementToSearchIn)
 	{
 		$conversionProfileId = $this->getIngestionProfileIdFromElement($elementToSearchIn);
 		
@@ -823,7 +823,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the ingestion profile params
 	 */
-	private function getIngestionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
+	protected function getIngestionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
 	{
 		if(isset($elementToSearchIn->ingestionProfileId))
 			return (int)$elementToSearchIn->ingestionProfileId;
@@ -850,7 +850,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $isAttribute - bool
 	 * @return int - The id of the thumb params
 	 */
-	private function getThumbParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
+	protected function getThumbParamsId(SimpleXMLElement $elementToSearchIn, $conversionProfileId, $isAttribute = true)
 	{
 		return $this->getAssetParamsId($elementToSearchIn, $conversionProfileId, $isAttribute, 'thumb');
 	}
@@ -861,7 +861,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
 	 */
-	private function getAccessControlId(SimpleXMLElement $elementToSearchIn)
+	protected function getAccessControlId(SimpleXMLElement $elementToSearchIn)
 	{
 		if(isset($elementToSearchIn->accessControlId))
 			return (int)$elementToSearchIn->accessControlId;
@@ -887,7 +887,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the storage profile
 	 */
-	private function getStorageProfileId(SimpleXMLElement $elementToSearchIn)
+	protected function getStorageProfileId(SimpleXMLElement $elementToSearchIn)
 	{
 		if(isset($elementToSearchIn->storageProfileId))
 			return (int)$elementToSearchIn->storageProfileId;
@@ -911,7 +911,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Inits the array of flavor params name to Id (with all given flavor params)
 	 * @param $coversionProfileId - The conversion profile for which we ini the arrays for
 	 */
-	private function initAssetParamsNameToId($conversionProfileId)
+	protected function initAssetParamsNameToId($conversionProfileId)
 	{
 		$this->impersonate();
 		
@@ -933,7 +933,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Inits the array of access control name to Id (with all given flavor params)
 	 */
-	private function initAccessControlNameToId()
+	protected function initAccessControlNameToId()
 	{
 		$this->impersonate();
 		$allAccessControl = $this->kClient->accessControl->listAction(null, null);
@@ -954,7 +954,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Inits the array of conversion profile name to Id (with all given flavor params)
 	 */
-	private function initIngestionProfileNameToId()
+	protected function initIngestionProfileNameToId()
 	{
 		$this->impersonate();
 		$allIngestionProfile = $this->kClient->conversionProfile->listAction(null, null);
@@ -976,7 +976,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Inits the array of storage profile to Id (with all given flavor params)
 	 */
-	private function initStorageProfileNameToId()
+	protected function initStorageProfileNameToId()
 	{
 		$this->impersonate();
 		$allStorageProfiles = $this->kClient->storageProfile->listAction(null, null);
@@ -998,7 +998,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $bulkUploadResult
 	 * @return KalturaBaseEntry
 	 */
-	private function createEntryFromItem(SimpleXMLElement $item)
+	protected function createEntryFromItem(SimpleXMLElement $item)
 	{
 		//Create the new media entry and set basic values
 		$entry = $this->getEntryInstanceByType($item->type);
@@ -1024,7 +1024,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param int $item
 	 * @return KalturaBaseEntry 
 	 */
-	private function getEntryInstanceByType($type)
+	protected function getEntryInstanceByType($type)
 	{
 		switch(trim($type))
 		{
@@ -1051,7 +1051,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaBaseEntry $media
 	 * @param SimpleXMLElement $item
 	 */
-	private function handleTypedElement(KalturaBaseEntry $entry, SimpleXMLElement $item)
+	protected function handleTypedElement(KalturaBaseEntry $entry, SimpleXMLElement $item)
 	{
 		// TODO take type from ingestion profile default entry
 		switch ($entry->type)
@@ -1093,7 +1093,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED ; 
 	 */
-	private function validateTypeToTypedElement(SimpleXMLElement $item) 
+	protected function validateTypeToTypedElement(SimpleXMLElement $item) 
 	{
 		$typeNumber = $item->type;
 		$typeNumber = trim($typeNumber);
@@ -1123,7 +1123,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaMediaEntry $media 
 	 * @param SimpleXMLElement $itemElement
 	 */
-	private function setMediaElementValues(KalturaMediaEntry $media, SimpleXMLElement $itemElement)
+	protected function setMediaElementValues(KalturaMediaEntry $media, SimpleXMLElement $itemElement)
 	{
 		$mediaElement = $itemElement->media;
 		$media->mediaType = (int)$mediaElement->mediaType;
@@ -1136,7 +1136,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaPlaylist $playlistEntry 
 	 * @param SimpleXMLElement $itemElement
 	 */
-	private function setPlaylistElementValues(KalturaPlaylist $playlistEntry, SimpleXMLElement $itemElement)
+	protected function setPlaylistElementValues(KalturaPlaylist $playlistEntry, SimpleXMLElement $itemElement)
 	{
 		$playlistElement = $itemElement->playlist;
 		$playlistEntry->playlistType = (int)$playlistElement->playlistType;
@@ -1149,7 +1149,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaLiveStreamEntry $liveStreamEntry 
 	 * @param SimpleXMLElement $itemElement
 	 */
-	private function setLiveStreamElementValues(KalturaLiveStreamEntry $liveStreamEntry, SimpleXMLElement $itemElement)
+	protected function setLiveStreamElementValues(KalturaLiveStreamEntry $liveStreamEntry, SimpleXMLElement $itemElement)
 	{
 		$liveStreamElement = $itemElement->liveStream;
 		$liveStreamEntry->bitrates = (int)$liveStreamElement->bitrates;
@@ -1165,7 +1165,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaDataEntry $dataEntry 
 	 * @param SimpleXMLElement $itemElement
 	 */
-	private function setDataElementValues(KalturaDataEntry $dataEntry, SimpleXMLElement $itemElement)
+	protected function setDataElementValues(KalturaDataEntry $dataEntry, SimpleXMLElement $itemElement)
 	{
 		$dataElement = $itemElement->media;
 		$dataEntry->dataContent = (string)$dataElement->dataContent;
@@ -1178,7 +1178,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaMixEntry $mix 
 	 * @param SimpleXMLElement $itemElement
 	 */
-	private function setMixElementValues(KalturaMixEntry $mix, SimpleXMLElement $itemElement)
+	protected function setMixElementValues(KalturaMixEntry $mix, SimpleXMLElement $itemElement)
 	{
 		//TOOD: add support for the mix elements
 		$mixElement = $itemElement->mix;
@@ -1192,7 +1192,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaDocumentEntry $media 
 	 * @param SimpleXMLElement $itemElement
 	 */
-	private function setDocumentElementValues(KalturaDocumentEntry $document, SimpleXMLElement $itemElement)
+	protected function setDocumentElementValues(KalturaDocumentEntry $document, SimpleXMLElement $itemElement)
 	{
 		$documentElement = $itemElement->document;
 		$document->documentType = $documentElement->documentType;
@@ -1203,7 +1203,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Checks if the media type and the type are valid
 	 * @param KalturaMediaType $mediaType
 	 */
-	private function validateMediaTypes($mediaType)
+	protected function validateMediaTypes($mediaType)
 	{
 		$mediaTypes = array(
 			KalturaMediaType::LIVE_STREAM_FLASH,
@@ -1229,7 +1229,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Adds the given media entry to the given playlists in the element
 	 * @param SimpleXMLElement $playlistsElement
 	 */
-	private function addToPlaylists(SimpleXMLElement $playlistsElement)
+	protected function addToPlaylists(SimpleXMLElement $playlistsElement)
 	{
 		foreach ($playlistsElement->children() as $playlistElement)
 		{
@@ -1243,7 +1243,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Returns a comma seperated string with the values of the child nodes of the given element 
 	 * @param SimpleXMLElement $element
 	 */
-	private function implodeChildElements(SimpleXMLElement $element, $baseValues = null)
+	protected function implodeChildElements(SimpleXMLElement $element, $baseValues = null)
 	{
 		$ret = array();
 		if($baseValues)
