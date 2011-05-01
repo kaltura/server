@@ -166,6 +166,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				KalturaLog::err("Item failed because an excpetion was raised': " . $e->getMessage());
 				$bulkUploadResult = $this->createUploadResult($item);
+				
+				if($this->exceededMaxRecordsEachRun) //we exit if we already passed our allowed max size
+					return;
+				
 				$bulkUploadResult->errorDescription = $e->getMessage();
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$this->addBulkUploadResult($bulkUploadResult);
