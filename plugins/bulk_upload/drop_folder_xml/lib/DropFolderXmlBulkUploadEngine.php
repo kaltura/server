@@ -5,6 +5,15 @@
  */
 class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 {
+//	TODO - overwrite the ingestion.xsd with version that includes dropFolderFileContentResource
+//	/**
+//	 * 
+//	 * The engine xsd file path
+//	 * @var string
+//	 */
+//	private $xsdFilePath = "/../xml/ingestion.xsd";
+	
+	
 	/* (non-PHPdoc)
 	 * @see BulkUploadEngineXml::getResourceInstance()
 	 */
