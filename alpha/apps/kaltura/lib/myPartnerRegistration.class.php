@@ -132,6 +132,8 @@ class myPartnerRegistration
 		$admin_secret = md5($this->str_makerand(5,10,true, false, true));
 
 		$newPartner = new Partner();
+		if ($parnter_name)
+			$newPartner->setPartnerName($parnter_name);
 		$newPartner->setAdminSecret($admin_secret);
 		$newPartner->setSecret($secret);
 		$newPartner->setAdminName($contact);

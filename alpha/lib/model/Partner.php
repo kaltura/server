@@ -486,9 +486,18 @@ class Partner extends BasePartner
 	public function setState( $v ) { $this->putInCustomData("state", $v); }
 
 	// additionalParams - key/value array
-	public function getAdditionalParams() { return $this->getFromCustomData("additionalParams", null); }
-	public function setAdditionalParams( $v ) { $this->putInCustomData("additionalParams", $v); }
+	public function getAdditionalParams() 
+	{ 
+		$obj = $this->getFromCustomData("additionalParams", null);
+		return is_array($obj) ? $obj : array();
+	}
 	
+	public function setAdditionalParams($v) 
+	{ 
+		if (!is_array($v))
+			$v = array();
+		$this->putInCustomData("additionalParams", $v); 
+	}
 	
 	public function lockCategories()
 	{
