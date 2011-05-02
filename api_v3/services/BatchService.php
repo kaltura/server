@@ -171,6 +171,17 @@ class BatchService extends KalturaBaseService
 			$entry->setBulkUploadId($bulkUploadResult->bulkUploadJobId);
 			$entry->save();
 			
+			$jobs = BatchJobPeer::retrieveByEntryId($bulkUploadResult->entryId);
+			foreach($jobs as $job)
+			{
+				if(!$job->getParentJobId())
+				{
+					$job->setRootJobId($bulkUploadResult->bulkUploadJobId);
+					$job->setBulkJobId($bulkUploadResult->bulkUploadJobId);
+					$job->save();
+				}
+			}
+			
 			if($entry && $pluginDataArray && $pluginDataArray->count)
 			{
 				$pluginValues = $pluginDataArray->toValuesArray();
