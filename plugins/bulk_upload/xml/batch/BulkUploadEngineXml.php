@@ -137,7 +137,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$this->currentItem = 0;
 		$startIndex = $this->getStartIndex();
-				
+		KalturaLog::debug("startIndex [$startIndex] ");		
+		
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
