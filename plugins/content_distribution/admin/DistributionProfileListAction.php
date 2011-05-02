@@ -5,7 +5,7 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 	{
 		$this->action = 'listDistributionProfiles';
 		$this->label = 'Distribution Profiles';
-		$this->rootLabel = 'Publishers';
+		$this->rootLabel = 'Distribution';
 	}
 	
 	/**
