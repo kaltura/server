@@ -237,6 +237,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public function fromPartner(Partner $partner)
 	{
 		parent::fromObject($partner);
+		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($this->additionalParams);
 		return $this;
 	}
 	
