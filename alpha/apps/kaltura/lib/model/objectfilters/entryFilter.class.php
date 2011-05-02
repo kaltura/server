@@ -159,6 +159,9 @@ class entryFilter extends baseObjectFilter
 	// The base class should invoke $peek_class::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
 	public function getFieldNameFromPeer ( $field_name )
 	{
+		if($field_name == 'replacement_status')
+			return 'entry.REPLACEMENT_STATUS';
+			
 		return entryPeer::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
 	}
 

@@ -450,7 +450,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 			"reference_id",
 			"replacing_entry_id",
 			"replaced_entry_id",
-			"replacement_status",
 		));
 	}
 }
