@@ -25,7 +25,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		$criteria = new Criteria();
 		$criteria->add(invalidSessionPeer::KS, base64_decode($ks));
 
-		$cnt = invalidSessionPeer::doSelectOne($criteria, $con);
+		$cnt = invalidSessionPeer::doCount($criteria, $con);
 		return ($cnt > 0);
 	}
 	
