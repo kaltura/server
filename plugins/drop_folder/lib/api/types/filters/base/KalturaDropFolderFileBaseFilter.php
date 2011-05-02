@@ -25,6 +25,8 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 		"parsedFlavorEqual" => "_eq_parsed_flavor",
 		"parsedFlavorIn" => "_in_parsed_flavor",
 		"parsedFlavorLike" => "_like_parsed_flavor",
+		"errorCodeEqual" => "_eq_error_code",
+		"errorCodeIn" => "_in_error_code",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -179,6 +181,20 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $parsedFlavorLike;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaDropFolderFileErrorCode
+	 */
+	public $errorCodeEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $errorCodeIn;
 
 	/**
 	 * 

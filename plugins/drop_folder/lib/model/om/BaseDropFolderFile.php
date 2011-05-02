@@ -62,6 +62,12 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	protected $file_size_last_set_at;
 
 	/**
+	 * The value for the error_code field.
+	 * @var        int
+	 */
+	protected $error_code;
+
+	/**
 	 * The value for the error_description field.
 	 * @var        string
 	 */
@@ -223,6 +229,16 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [error_code] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getErrorCode()
+	{
+		return $this->error_code;
 	}
 
 	/**
@@ -536,6 +552,29 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 	} // setFileSizeLastSetAt()
 
 	/**
+	 * Set the value of [error_code] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     DropFolderFile The current object (for fluent API support)
+	 */
+	public function setErrorCode($v)
+	{
+		if(!isset($this->oldColumnsValues[DropFolderFilePeer::ERROR_CODE]))
+			$this->oldColumnsValues[DropFolderFilePeer::ERROR_CODE] = $this->error_code;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->error_code !== $v) {
+			$this->error_code = $v;
+			$this->modifiedColumns[] = DropFolderFilePeer::ERROR_CODE;
+		}
+
+		return $this;
+	} // setErrorCode()
+
+	/**
 	 * Set the value of [error_description] column.
 	 * 
 	 * @param      string $v new value
@@ -761,12 +800,13 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$this->status = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->file_size = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
 			$this->file_size_last_set_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->error_description = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->parsed_slug = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->parsed_flavor = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->error_code = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->error_description = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+			$this->parsed_slug = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->parsed_flavor = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->custom_data = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -776,7 +816,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 13; // 13 = DropFolderFilePeer::NUM_COLUMNS - DropFolderFilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 14; // 14 = DropFolderFilePeer::NUM_COLUMNS - DropFolderFilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating DropFolderFile object", $e);
@@ -1205,21 +1245,24 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				return $this->getFileSizeLastSetAt();
 				break;
 			case 7:
-				return $this->getErrorDescription();
+				return $this->getErrorCode();
 				break;
 			case 8:
-				return $this->getParsedSlug();
+				return $this->getErrorDescription();
 				break;
 			case 9:
-				return $this->getParsedFlavor();
+				return $this->getParsedSlug();
 				break;
 			case 10:
-				return $this->getCreatedAt();
+				return $this->getParsedFlavor();
 				break;
 			case 11:
-				return $this->getUpdatedAt();
+				return $this->getCreatedAt();
 				break;
 			case 12:
+				return $this->getUpdatedAt();
+				break;
+			case 13:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1250,12 +1293,13 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 			$keys[4] => $this->getStatus(),
 			$keys[5] => $this->getFileSize(),
 			$keys[6] => $this->getFileSizeLastSetAt(),
-			$keys[7] => $this->getErrorDescription(),
-			$keys[8] => $this->getParsedSlug(),
-			$keys[9] => $this->getParsedFlavor(),
-			$keys[10] => $this->getCreatedAt(),
-			$keys[11] => $this->getUpdatedAt(),
-			$keys[12] => $this->getCustomData(),
+			$keys[7] => $this->getErrorCode(),
+			$keys[8] => $this->getErrorDescription(),
+			$keys[9] => $this->getParsedSlug(),
+			$keys[10] => $this->getParsedFlavor(),
+			$keys[11] => $this->getCreatedAt(),
+			$keys[12] => $this->getUpdatedAt(),
+			$keys[13] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1309,21 +1353,24 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 				$this->setFileSizeLastSetAt($value);
 				break;
 			case 7:
-				$this->setErrorDescription($value);
+				$this->setErrorCode($value);
 				break;
 			case 8:
-				$this->setParsedSlug($value);
+				$this->setErrorDescription($value);
 				break;
 			case 9:
-				$this->setParsedFlavor($value);
+				$this->setParsedSlug($value);
 				break;
 			case 10:
-				$this->setCreatedAt($value);
+				$this->setParsedFlavor($value);
 				break;
 			case 11:
-				$this->setUpdatedAt($value);
+				$this->setCreatedAt($value);
 				break;
 			case 12:
+				$this->setUpdatedAt($value);
+				break;
+			case 13:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1357,12 +1404,13 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[4], $arr)) $this->setStatus($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setFileSize($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setFileSizeLastSetAt($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setErrorDescription($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setParsedSlug($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setParsedFlavor($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
+		if (array_key_exists($keys[7], $arr)) $this->setErrorCode($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setErrorDescription($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setParsedSlug($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setParsedFlavor($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setCustomData($arr[$keys[13]]);
 	}
 
 	/**
@@ -1381,6 +1429,7 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(DropFolderFilePeer::STATUS)) $criteria->add(DropFolderFilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE)) $criteria->add(DropFolderFilePeer::FILE_SIZE, $this->file_size);
 		if ($this->isColumnModified(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT)) $criteria->add(DropFolderFilePeer::FILE_SIZE_LAST_SET_AT, $this->file_size_last_set_at);
+		if ($this->isColumnModified(DropFolderFilePeer::ERROR_CODE)) $criteria->add(DropFolderFilePeer::ERROR_CODE, $this->error_code);
 		if ($this->isColumnModified(DropFolderFilePeer::ERROR_DESCRIPTION)) $criteria->add(DropFolderFilePeer::ERROR_DESCRIPTION, $this->error_description);
 		if ($this->isColumnModified(DropFolderFilePeer::PARSED_SLUG)) $criteria->add(DropFolderFilePeer::PARSED_SLUG, $this->parsed_slug);
 		if ($this->isColumnModified(DropFolderFilePeer::PARSED_FLAVOR)) $criteria->add(DropFolderFilePeer::PARSED_FLAVOR, $this->parsed_flavor);
@@ -1452,6 +1501,8 @@ abstract class BaseDropFolderFile extends BaseObject  implements Persistent {
 		$copyObj->setFileSize($this->file_size);
 
 		$copyObj->setFileSizeLastSetAt($this->file_size_last_set_at);
+
+		$copyObj->setErrorCode($this->error_code);
 
 		$copyObj->setErrorDescription($this->error_description);
 

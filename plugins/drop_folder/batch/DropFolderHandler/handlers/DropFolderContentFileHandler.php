@@ -21,7 +21,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	
 	
 	public function getType() {
-		return DropFolderFileHandlerType::CONTENT;
+		return KalturaDropFolderFileHandlerType::CONTENT;
 	}
 	
 	
@@ -55,6 +55,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$regexMatch = $this->parseRegex();
 		if (!$regexMatch) {
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::SLUG_REGEX_NO_MATCH;
 			$this->dropFolderFile->errorDescription = 'File name ['.$this->dropFolderFile->fileName.'] does not match defined slug regex ['.$this->config->slugRegex.']';
 			KalturaLog::err($this->dropFolderFile->errorDescription);
 			$this->updateDropFolderFile(); // update errors tatus
@@ -67,6 +68,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->parsedFlavorObject = $this->getFlavorBySystemName($this->dropFolderFile->parsedFlavor);
 			if (!$this->parsedFlavorObject) {
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_NOT_FOUND;
 				$this->dropFolderFile->errorDescription = 'Parsed flavor system name ['.$this->dropFolderFile->parsedFlavor.'] could not be found';
 				KalturaLog::err($this->dropFolderFile->errorDescription);
 				$this->updateDropFolderFile(); // update errors tatus
@@ -226,6 +228,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		{
 			KalturaLog::err('Cannot add new entry - '.$e->getMessage());
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_ADD_ENTRY;
 			$this->dropFolderFile->errorDescription = 'Internal error adding new entry';	
 			return false;
 		}
@@ -248,6 +251,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		if (is_null($this->dropFolderFile->parsedFlavor))
 		{
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_MISSING_IN_FILE_NAME;
 			$this->dropFolderFile->errorDescription = 'Cannot match to existing entry with no flavor reference';
 			KalturaLog::err($this->dropFolderFile->errorDescription);
 			return false; // file not handled
@@ -266,6 +270,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		if (!$this->parsedFlavorObject)
 		{
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_NOT_FOUND;
 			$this->dropFolderFile->errorDescription = 'Parsed flavor system name ['.$this->dropFolderFile->parsedFlavor.'] could not be found';
 			KalturaLog::err($this->dropFolderFile->errorDescription);
 			return false; // file not handled
@@ -306,6 +311,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		{
 			KalturaLog::err('Cannot update entry - '.$e->getMessage());
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_UPDATE_ENTRY;
 			$this->dropFolderFile->errorDescription = 'Internal error updating entry';	
 			return false;
 		}

@@ -51,6 +51,7 @@ CREATE TABLE `drop_folder_file`
 	`status` INTEGER  NOT NULL,
 	`file_size` INTEGER  NOT NULL,
 	`file_size_last_set_at` DATETIME,
+	`error_code` INTEGER,
 	`error_description` TEXT,
 	`parsed_slug` VARCHAR(500),
 	`parsed_flavor` VARCHAR(500),

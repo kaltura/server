@@ -36,6 +36,7 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="file_size" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_size_last_set_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_code" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="error_description" type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_slug" type="varchar" size="500" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="parsed_flavor" type="varchar" size="500" />

@@ -65,6 +65,12 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	public $parsedFlavor;
 	
 	/**
+	 * @var KalturaDropFolderFileErrorCode
+	 * @filter eq,in
+	 */
+	public $errorCode;
+	
+	/**
 	 * @var string
 	 */
 	public $errorDescription;
@@ -99,6 +105,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		'fileSizeLastSetAt',
 		'parsedSlug',
 		'parsedFlavor',
+		'errorCode',
 		'errorDescription',
 		'createdAt',
 		'updatedAt',

@@ -25,6 +25,8 @@ class DropFolderFileFilter extends baseObjectFilter
 			"_like_parsed_flavor",
 			"_eq_parsed_flavor",
 			"_in_parsed_flavor",
+			"_eq_error_code",
+			"_in_error_code",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_gte_updated_at",

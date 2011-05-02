@@ -89,6 +89,7 @@ abstract class DropFolderFileHandler
 		$updateFile->fileSize = $this->dropFolderFile->fileSize;
 		$updateFile->parsedSlug = $this->dropFolderFile->parsedSlug;
 		$updateFile->parsedFlavor = $this->dropFolderFile->parsedFlavor;
+		$updateFile->errorCode = $this->dropFolderFile->errorCode;
 		$updateFile->errorDescription = $this->dropFolderFile->errorDescription;		
 		
 		return $this->kClient->dropFolderFile->update($this->dropFolderFile->id, $updateFile);
