@@ -27,6 +27,9 @@ class KalturaLocalFileResource extends KalturaContentResource
 	{
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('localFilePath');
+    	
+    	if(!file_exists($this->localFilePath))
+    		throw new KalturaAPIException(KalturaErrors::LOCAL_FILE_NOT_FOUND, $this->localFilePath);
 	}
 
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
