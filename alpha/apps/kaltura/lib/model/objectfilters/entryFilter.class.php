@@ -133,6 +133,9 @@ class entryFilter extends baseObjectFilter
 			"categories" => "search_text_discrete",
 			"categories_ids" => "search_text_discrete",
 			"duration_type" => "search_text_discrete",
+			"reference_id" => "search_text_discrete", 
+			"replacing_entry_id" => "search_text_discrete", 
+			"replaced_entry_id" => "search_text_discrete",
 			"flavor_params_ids" => "search_text_discrete",
 		);
 	}
