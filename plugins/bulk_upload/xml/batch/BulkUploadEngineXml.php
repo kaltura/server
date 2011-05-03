@@ -216,9 +216,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function handleItemUpdate(SimpleXMLElement $item)
 	{
 		throw new KalturaBatchException("Action: Update is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
-		
+
+		KalturaLog::debug("xml [" . $item->asXML() . "]");
+				
+		$entryId = "$item->entryId";
+		if(!$entryId)
+			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
+
 //		//TODO: finish the update - NON reachable code please disregard 
-//		KalturaLog::debug("xml [" . $item->asXML() . "]");
+//		
 //			
 //		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
 //		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)

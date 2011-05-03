@@ -73,7 +73,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		if(!($object instanceof KalturaBaseEntry))
 			return;
 			
-		if(empty($item->customData))
+		if(empty($item->customData)) // if there is no costum data then we exit
 			return;
 			
 		$this->client = $client;
@@ -125,6 +125,9 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	 */
 	public function handleItemUpdated(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
 	{
+		if(empty($item->customData)) // if there is no costum data then we exit
+			return;
+			
 		$this->handleItemAdded($client, $object, $item);
 	}
 

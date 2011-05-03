@@ -230,7 +230,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$bulkUploadResult->partnerId = $this->job->partnerId;
 		$bulkUploadResult->rowData = join(',', $values);
 				
-		// check variables count
+		// Check variables count
 		if($this->csvVersion != KalturaBulkUploadCsvVersion::V3)
 		{
 			if(count($values) == self::VALUES_COUNT_V1)
