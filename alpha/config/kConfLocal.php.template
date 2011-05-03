@@ -22,6 +22,22 @@ class kConfLocal
 			
 				"memcache_host" => "@MEMCACHE_HOST@",
 				"memcache_port" => "11211",
+
+				/* Query cache parameters
+				   Notes:
+				    1.	In order to use the query cache, assign a single memcache per datacenter, 
+				    	shared by all servers. The host/port of this memcache should be specified 
+				    	under global_memcache_xxx.
+				    2.	To enable the query cache on single datacenter environments, you can simply 
+				    	set both query_cache_enabled and query_cache_invalidate_on_change to true.
+				    3.	On multi datacenter environments, the invalidation keys should be updated
+				    	by UDF's on the database. You should not use query_cache_invalidate_on_change
+				    	as it will cause inconsistencies between the two datacenters.
+				*/ 
+				"query_cache_enabled" => false,
+				"query_cache_invalidate_on_change" => false, 
+				"global_memcache_host" => "@GLOBAL_MEMCACHE_HOST@",
+				"global_memcache_port" => "11211",
 			
 				"apphome_url" => "@SERVICE_URL@",
 				"apphome_url_no_protocol" => "@KALTURA_VIRTUAL_HOST_NAME@",
