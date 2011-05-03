@@ -10,7 +10,7 @@ class KalturaServiceConfig extends myServiceConfig
 			$serviceConfigs = array();
 			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
 			foreach($pluginInstances as $pluginInstance){
-				if(method_exists($pluginInstance, getServiceConfig))
+				if(method_exists($pluginInstance, 'getServiceConfig'))
 					$serviceConfigs[] = $pluginInstance->getServiceConfig();
 			}
 			
