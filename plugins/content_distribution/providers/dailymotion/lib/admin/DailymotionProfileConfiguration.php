@@ -56,45 +56,7 @@ class Form_DailymotionProfileConfiguration extends Form_ProviderProfileConfigura
 		$element->setLabel('Dailymotion Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
-		
-		$metadataProfiles = null;
-		try
-		{
-			$metadataProfileFilter = new Kaltura_Client_Metadata_Type_MetadataProfileFilter();
-//			$metadataProfileFilter->partnerIdEqual = $this->partnerId;
-			$metadataProfileFilter->metadataObjectTypeEqual = Kaltura_Client_Metadata_Enum_MetadataObjectType::ENTRY;
-			
-			$client = Infra_ClientHelper::getClient();
-			$metadataPlugin = Kaltura_Client_Metadata_Plugin::get($client);
-			Infra_ClientHelper::impersonate($this->partnerId);
-			$metadataProfileList = $metadataPlugin->metadataProfile->listAction($metadataProfileFilter);
-			Infra_ClientHelper::unimpersonate();
-			
-			$metadataProfiles = $metadataProfileList->objects;
-		}
-		catch (Kaltura_Client_Exception $e)
-		{
-			$metadataProfiles = null;
-		}
-		
-		if(count($metadataProfiles))
-		{
-			$this->addElement('select', 'metadata_profile_id', array(
-				'label'			=> 'Metadata Profile ID:',
-				'filters'		=> array('StringTrim'),
-			));
-			
-			$element = $this->getElement('metadata_profile_id');
-			foreach($metadataProfiles as $metadataProfile)
-				$element->addMultiOption($metadataProfile->id, $metadataProfile->name);
-		}
-		else 
-		{
-			$this->addElement('hidden', 'metadata_profile_id', array(
-				'value'			=> 0,
-			));
-		}
-		
+				
 		$this->addElement('text', 'user', array(
 			'label'			=> 'User:',
 			'filters'		=> array('StringTrim'),
@@ -104,5 +66,7 @@ class Form_DailymotionProfileConfiguration extends Form_ProviderProfileConfigura
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
 		));
-		}
+		
+		$this->addMetadataProfile();		
+	}
 }

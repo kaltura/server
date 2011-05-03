@@ -111,10 +111,7 @@ class DailymotionDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		if(kConf::hasParam('dailymotion_update_required_entry_fields'))
-			return kConf::get('dailymotion_update_required_entry_fields');
-			
-		return array();
+		return array(entryPeer::NAME, entryPeer::DESCRIPTION);
 	}
 
 	/* (non-PHPdoc)
@@ -124,6 +121,7 @@ class DailymotionDistributionProvider implements IDistributionProvider
 	{
 		return array(
 			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_CATEGORY."']",
+			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_KEYWORDS."']",
 		);
 	}
 }

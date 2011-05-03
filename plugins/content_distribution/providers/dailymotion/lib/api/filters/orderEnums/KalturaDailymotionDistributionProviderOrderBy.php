@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.dailymotionDistribution
+ * @package 
  * @subpackage api.filters.enum
  */
 class KalturaDailymotionDistributionProviderOrderBy extends KalturaDistributionProviderOrderBy

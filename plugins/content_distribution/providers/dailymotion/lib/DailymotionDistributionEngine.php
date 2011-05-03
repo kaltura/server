@@ -69,9 +69,9 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = array();
 		$props['tags'] = explode(",",$this->findMetadataValue($metadataObjects, 'Keywords'));
-		$props['title'] = $this->findMetadataValue($metadataObjects, 'LongTitle');
+		$props['title'] = $entry->name;
 		$props['channel'] = $this->findMetadataValue($metadataObjects, 'DailymotionCategory');
-		$props['description'] = $this->findMetadataValue($metadataObjects, 'ShortDescription');
+		$props['description'] = $entry->description;
 		$props['date'] = time();
 		$props['language'] = 'en';
 		$props['published']= true;
