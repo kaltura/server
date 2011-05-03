@@ -129,7 +129,7 @@
 					<msdp:encode>Y</msdp:encode>
 					<msdp:move>Y</msdp:move>
 					<xsl:if test="count(content[@flavorAssetId = $vrzFlavorAssetId])">
-						<enclosure url="{content[@flavorAssetId = $vrzFlavorAssetId]/@url}" length="00:00:00" type="video" />
+						<enclosure url="{content[@flavorAssetId = $vrzFlavorAssetId]/@url}/name/{entryId}.mp4" length="00:00:00" type="video" />
 					</xsl:if>
 					<guid></guid>
 				</item>

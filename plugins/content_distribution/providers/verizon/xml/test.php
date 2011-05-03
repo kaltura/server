@@ -89,9 +89,9 @@ $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
 $distributionJobData->entryDistribution = $entryDistribution;
 
-$vez = new VerizonDistributionProfile();
-print_r($vez->validateForSubmission($dbEntryDistribution, "submit"));
-return;
+//$vez = new VerizonDistributionProfile();
+//print_r($vez->validateForSubmission($dbEntryDistribution, "submit"));
+//return;
 
 $providerData = new KalturaVerizonDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;
