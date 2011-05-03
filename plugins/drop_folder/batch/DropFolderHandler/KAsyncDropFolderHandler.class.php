@@ -161,7 +161,7 @@ class KAsyncDropFolderHandler extends KBatchBase
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $dropFolderId;
-		$dropFolderFileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING;
+		$dropFolderFileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
 		$dropFolderFiles = $this->kClient->dropFolderFile->listAction($dropFolderFileFilter);
 		$dropFolderFiles = $dropFolderFiles->objects;
 		return $dropFolderFiles;

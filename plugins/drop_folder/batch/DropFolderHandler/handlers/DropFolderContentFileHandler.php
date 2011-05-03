@@ -279,9 +279,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		
 		try 
 		{
-			//$this->impersonate($this->dropFolderFile->partnerId);
+			$this->impersonate($this->dropFolderFile->partnerId);
 			$updatedEntry = $this->kClient->baseEntry->update($matchedEntry->id, null, $resource);
-			//$this->unimpersonate();
+			$this->unimpersonate();
 			
 			// set all addional files as handled
 			if ($addionnalFileIds) {
@@ -292,6 +292,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		catch (Exception $e)
 		{
+			$this->unimpersonate();
 			KalturaLog::err('Cannot update entry - '.$e->getMessage());
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_UPDATE_ENTRY;
@@ -318,7 +319,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		
 		$fileFilter = new KalturaDropFolderFileFilter();
 		$fileFilter->dropFolderIdEqual = $this->dropFolder->id;
-		$fileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING;
+		$fileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
 		$fileFilter->parsedSlugEqual = $this->dropFolderFile->parsedSlug; // must belong to the same entry
 				
 		$existingFileList = $this->kClient->dropFolderFile->listAction($fileFilter); // current file will not be returned because parsed slug is not yet set
