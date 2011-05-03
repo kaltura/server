@@ -91,6 +91,11 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		return ($this->getTable()->getAttribute('raiseEvents', 'true') == 'true');
 	}
 	
+	public function shouldReloadAfterInsert()
+	{
+		return ($this->getTable()->getAttribute('reloadAfterInsert', 'false') == 'true');
+	}
+	
 	public function getSubpackage()
 	{
 		$pkg = $this->getBuildProperty('subpackage');
@@ -155,6 +160,20 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		
 		$script .= "
 	/**
+	 * Override in order to use the query cache.
+	 * Cache invalidation keys are used to determine when cached queries are valid.
+	 * Before returning a query result from the cache, the time of the cached query
+	 * is compared to the time saved in the invalidation key.
+	 * A cached query will only be used if it's newer than the matching invalidation key.
+	 *  
+	 * @return     array Array of keys that will should be updated when this object is modified.
+	 */
+	public function getCacheInvalidationKeys()
+	{
+		return array();
+	}
+		
+	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO \$con
 	 * @return bloolean
@@ -209,27 +228,65 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	}
 	";
 
-		if(!$this->shouldRaiseEvents())
-			return;
-	
 		$script .= "
 	/**
 	 * Code to be run after inserting to database
 	 * @param PropelPDO \$con 
 	 */
 	public function postInsert(PropelPDO \$con = null)
-	{
+	{";
+		if ($this->shouldReloadAfterInsert())
+		{
+			$script .= "
 		" . $this->getPeerClassname() . "::setUseCriteriaFilter(false);
 		\$this->reload();
 		" . $this->getPeerClassname() . "::setUseCriteriaFilter(true);
+		";
+		}
 
+		$script .= "
 		kQueryCache::invalidateQueryCache(\$this);
+		";
+		
+		if ($this->shouldRaiseEvents())
+		{
+			$script .= "
 		kEventsManager::raiseEvent(new kObjectCreatedEvent(\$this));
 		
 		if(\$this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent(\$this->copiedFrom, \$this));
+		";
+		}
+		$script .= "
 	}
 
+	/**
+	 * Code to be run after updating the object in database
+	 * @param PropelPDO \$con
+	 */
+	public function postUpdate(PropelPDO \$con = null)
+	{
+		kQueryCache::invalidateQueryCache(\$this);
+		";
+		if ($this->shouldRaiseEvents())
+		{
+			$script .= "
+		if(\$this->isModified())
+		{
+			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$this->tempModifiedColumns));
+		}
+			
+		\$this->tempModifiedColumns = array();
+		";
+		}
+		$script .= "
+	}
+	";
+		
+		if(!$this->shouldRaiseEvents())
+			return;
+	
+		$script .= "
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -280,35 +337,6 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		
 		\$this->tempModifiedColumns = \$this->modifiedColumns;
 		return true;
-	}
-
-	/**
-	 * Override in order to use the query cache.
-	 * Cache invalidation keys are used to determine when cached queries are valid.
-	 * Before returning a query result from the cache, the time of the cached query
-	 * is compared to the time saved in the invalidation key.
-	 * A cached query will only be used if it's newer than the matching invalidation key.
-	 *  
-	 * @return     array Array of keys that will should be updated when this object is modified.
-	 */
-	public function getCacheInvalidationKeys()
-	{
-		return array();
-	}
-	
-	/**
-	 * Code to be run after updating the object in database
-	 * @param PropelPDO \$con
-	 */
-	public function postUpdate(PropelPDO \$con = null)
-	{
-		if(\$this->isModified())
-		{
-			kQueryCache::invalidateQueryCache(\$this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$this->tempModifiedColumns));
-		}
-			
-		\$this->tempModifiedColumns = array();
 	}
 	";
 		
