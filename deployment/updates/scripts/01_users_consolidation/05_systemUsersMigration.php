@@ -79,7 +79,7 @@ while(count($users))
 		
 		$new_kuser->setPuserId($user->getEmail());
 		$new_kuser->setIsAdmin(true);
-		$partnerData = new Kaltura_AdminConsoleUserPartnerData();
+		$partnerData = new Infra_AdminConsoleUserPartnerData();
 		$partnerData->isPrimary = $user->getIsPrimary();
  		$partnerData->role = $user->getRole();
  		$new_kuser->setPartnerData(serialize($partnerData));
