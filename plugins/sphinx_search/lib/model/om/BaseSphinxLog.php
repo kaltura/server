@@ -630,6 +630,20 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
 	} // doSave()
 
 	/**
+	 * Override in order to use the query cache.
+	 * Cache invalidation keys are used to determine when cached queries are valid.
+	 * Before returning a query result from the cache, the time of the cached query
+	 * is compared to the time saved in the invalidation key.
+	 * A cached query will only be used if it's newer than the matching invalidation key.
+	 *  
+	 * @return     array Array of keys that will should be updated when this object is modified.
+	 */
+	public function getCacheInvalidationKeys()
+	{
+		return array();
+	}
+		
+	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
 	 * @return bloolean
@@ -658,6 +672,26 @@ abstract class BaseSphinxLog extends BaseObject  implements Persistent {
     	$this->setCreatedAt(time());
     	
 		return true;
+	}
+	
+	/**
+	 * Code to be run after inserting to database
+	 * @param PropelPDO $con 
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		kQueryCache::invalidateQueryCache($this);
+		
+	}
+
+	/**
+	 * Code to be run after updating the object in database
+	 * @param PropelPDO $con
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		kQueryCache::invalidateQueryCache($this);
+		
 	}
 	
 	/**
