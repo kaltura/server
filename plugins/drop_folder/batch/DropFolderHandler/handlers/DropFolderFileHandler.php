@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package dropFolder 
+ * @subpackage Scheduler.fileHandlers
+ */
 abstract class DropFolderFileHandler
 {
 	/**
@@ -72,7 +76,7 @@ abstract class DropFolderFileHandler
 	
 	
 	/**
-	 * @return DropFolderFileHandlerType
+	 * @return KalturaDropFolderFileHandlerType
 	 */
 	public abstract function getType();
 		// must be implemented by extending classes
@@ -122,20 +126,26 @@ abstract class DropFolderFileHandler
 	
 	/**
 	 * @param string $parsedFlavor
-	 * @return KalturaFlavorParams the flavor matching the given $systemName
+	 * @return KalturaConversionProfileAssetParams the flavor matching the given $systemName
 	 */
-	protected function getFlavorBySystemName($systemName)
+	protected function getFlavorBySystemName($systemName, $ingestionProfileId = null)
 	{
-		$flavorFilter = new KalturaFlavorParamsFilter();
-		$flavorFilter->systemNameEqual = $systemName;
-		$flavorList = $this->kClient->flavorParams->listAction($flavorFilter);
-		
-		if (is_array($flavorList->objects) && isset($flavorList->objects[0]) ) {
-			return $flavorList->objects[0];
+		if (is_null($ingestionProfileId)) {
+			$ingestionProfile = $this->getIngestionProfile();
+			$ingestionProfileId = $ingestionProfile->id;
 		}
-		else {
-			return null;
-		}			
+		
+		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($ingestionProfileId);
+		$assetParamsList = $assetParamsList->objects;
+		
+		foreach ($assetParamsList as $assetParams)
+		{
+			if ($assetParams->systemName === $systemName) {
+				return $assetParams;
+			}
+		}
+		
+		return null;		
 	}
 		
 	

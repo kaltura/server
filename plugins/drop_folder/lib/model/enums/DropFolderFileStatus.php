@@ -15,10 +15,4 @@ interface DropFolderFileStatus extends BaseEnum
 	const NO_MATCH          = 8;  // no match found for the file
 	const ERROR_HANDLING    = 9;  // error - file handling cannot continue
 	const ERROR_DELETING	= 10; // error occured while trying to delete the file
-	
-	// future remote drop folder status that might be in use
-	
-	// const DOWNLOADING
-	// const ERROR_DOWNLOADING
-	// const DELETING
 }

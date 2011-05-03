@@ -1,6 +1,9 @@
 <?php
 
-
+/**
+ * @package dropFolder 
+ * @subpackage Scheduler.fileHandlers
+ */
 class DropFolderContentFileHandler extends DropFolderFileHandler
 {	
 	
@@ -15,9 +18,14 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	protected $config;
 	
 	/**
-	 * @var KalturaFlavorParams
+	 * @var KalturaConversionProfileAssetParams
 	 */
 	private $parsedFlavorObject;
+	
+	/**
+	 * @var KalturaConversionProfile
+	 */
+	private $ingestionProfile = null;
 	
 	
 	public function getType() {
@@ -25,9 +33,23 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	}
 	
 	
+	/**
+	 * @return KalturaConversionProfile
+	 */
+	protected function getIngestionProfile()
+	{
+		if (is_null($this->ingestionProfile)) {
+			$this->ingestionProfile = parent::getIngestionProfile();
+		}
+		return $this->ingestionProfile;
+	}
+	
+	
 
 	public function handle()
 	{
+		$this->ingestionProfile = null;
+		
 		// check prerequisites
 		$checkConfig = $this->checkConfig();
 		if (!$checkConfig) {
@@ -48,7 +70,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		// check if parsed flavor exists
 		if (!is_null($this->dropFolderFile->parsedFlavor))
 		{
-			$this->parsedFlavorObject = $this->getFlavorBySystemName($this->dropFolderFile->parsedFlavor);
+			$ingestionProfileId = $this->getIngestionProfile()->id;
+			$this->parsedFlavorObject = $this->getFlavorBySystemName($this->dropFolderFile->parsedFlavor, $ingestionProfileId);
 			if (!$this->parsedFlavorObject) {
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_NOT_FOUND;
@@ -359,7 +382,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		// add current drop folder file to list even if it is not part of the ingestion profile
 		if (!$currentFlavorAdded) {
 			$assetContainer = new KalturaAssetParamsResourceContainer();
-			$assetContainer->assetParamsId = $this->parsedFlavorObject->id;
+			$assetContainer->assetParamsId = $this->parsedFlavorObject->assetParamsId;
 			$assetContainer->resource = new KalturaDropFolderFileResource();
 			$assetContainer->resource->dropFolderFileId = $this->dropFolderFile->id;
 			$assetContainerArray[] = $assetContainer;
