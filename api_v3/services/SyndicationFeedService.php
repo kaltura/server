@@ -180,6 +180,7 @@ class SyndicationFeedService extends KalturaBaseService
 
 		$c = new Criteria();
 		$syndicationFilter->attachToCriteria($c);
+		$c->add(syndicationFeedPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_NONE, Criteria::NOT_EQUAL);
 		
 		$totalCount = syndicationFeedPeer::doCount($c);
                 
