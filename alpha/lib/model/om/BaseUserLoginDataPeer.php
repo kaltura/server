@@ -210,15 +210,37 @@ abstract class BaseUserLoginDataPeer {
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
-		// BasePeer returns a PDOStatement
-		$stmt = UserLoginDataPeer::doCountStmt($criteria, $con);
+		UserLoginDataPeer::attachCriteriaFilter($criteria);
 
+		$cacheKey = null;
+		$cachedResult = kQueryCache::getCachedQueryResults(
+			$criteria, 
+			kQueryCache::QUERY_TYPE_COUNT,
+			'UserLoginDataPeer', 
+			$cacheKey);
+		if ($cachedResult !== null)
+		{
+			return $cachedResult;
+		}
+		
+		// set the connection to slave server
+		$con = UserLoginDataPeer::alternativeCon ($con);
+		
+		// BasePeer returns a PDOStatement
+		$stmt = BasePeer::doCount($criteria, $con);
+		
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
 			$count = 0; // no rows returned; we infer that means 0 matches.
 		}
 		$stmt->closeCursor();
+		
+		if ($cacheKey !== null)
+		{
+			kQueryCache::cacheQueryResults($cacheKey, $count);
+		}
+		
 		return $count;
 	}
 	/**
@@ -240,6 +262,68 @@ abstract class BaseUserLoginDataPeer {
 		}
 		return null;
 	}
+	
+	/**
+	 * Override in order to use the query cache.
+	 * Cache invalidation keys are used to determine when cached queries are valid.
+	 * Before returning a query result from the cache, the time of the cached query
+	 * is compared to the time saved in the invalidation key.
+	 * A cached query will only be used if it's newer than the matching invalidation key.
+	 *  
+	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
+	 * @param      string $queryType The type of the query: select / count.
+	 * @return     string The invalidation key that should be checked before returning a cached result for this criteria.
+	 *		 if null is returned, the query cache won't be used - the query will be performed on the DB.
+	 */
+	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	{
+		return array();
+	}
+
+	/**
+	 * Override in order to filter objects returned from doSelect.
+	 *  
+	 * @param      array $selectResults The array of objects to filter.
+	 */
+	public static function filterSelectResults(&$selectResults)
+	{
+	}
+	
+	/**
+	 * Adds the supplied object array to the instance pool, objects already found in the pool
+	 * will be replaced with instance from the pool.
+	 *  
+	 * @param      array $queryResult The array of objects to get / add to pool.
+	 */
+	public static function updateInstancePool(&$queryResult)
+	{
+		foreach ($queryResult as $curIndex => $curObject)
+		{
+			$objFromPool = UserLoginDataPeer::getInstanceFromPool($curObject->getPrimaryKey());
+			if ($objFromPool === null)
+			{
+				UserLoginDataPeer::addInstanceToPool($curObject);
+			}
+			else
+			{
+				$queryResult[$curIndex] = $objFromPool;
+			}
+		}
+	}
+	
+	/**
+	 * Adds the supplied object array to the instance pool.
+	 *  
+	 * @param      array $queryResult The array of objects to add to pool.
+	 */
+	public static function addInstancesToPool($queryResult)
+	{
+		foreach ($queryResult as $curResult)
+		{
+			UserLoginDataPeer::addInstanceToPool($curResult);
+		}
+	}
+	
 	/**
 	 * Method to do selects.
 	 *
@@ -250,8 +334,34 @@ abstract class BaseUserLoginDataPeer {
 	 *		 rethrown wrapped into a PropelException.
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
-	{
-		return UserLoginDataPeer::populateObjects(UserLoginDataPeer::doSelectStmt($criteria, $con));
+	{		
+		$criteria = UserLoginDataPeer::prepareCriteriaForSelect($criteria);
+		
+		$cacheKey = null;
+		$cachedResult = kQueryCache::getCachedQueryResults(
+			$criteria, 
+			kQueryCache::QUERY_TYPE_SELECT,
+			'UserLoginDataPeer', 
+			$cacheKey);
+		if ($cachedResult !== null)
+		{
+			UserLoginDataPeer::filterSelectResults($cachedResult);
+			UserLoginDataPeer::updateInstancePool($cachedResult);
+			return $cachedResult;
+		}
+
+		$con = UserLoginDataPeer::alternativeCon($con);
+		
+		$queryResult = UserLoginDataPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		
+		if ($cacheKey !== null)
+		{
+			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
+		}
+		
+		UserLoginDataPeer::filterSelectResults($queryResult);
+		UserLoginDataPeer::addInstancesToPool($queryResult);
+		return $queryResult;
 	}
 
 	public static function alternativeCon($con)
@@ -345,24 +455,8 @@ abstract class BaseUserLoginDataPeer {
 		return BasePeer::doCount($criteria, $con);
 	}
 	
-	
-	/**
-	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
-	 *
-	 * Use this method directly if you want to work with an executed statement durirectly (for example
-	 * to perform your own object hydration).
-	 *
-	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
-	 * @param      PropelPDO $con The connection to use
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 * @return     PDOStatement The executed PDOStatement object.
-	 * @see        BasePeer::doSelect()
-	 */
-	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
+	public static function prepareCriteriaForSelect(Criteria $criteria)
 	{
-		$con = UserLoginDataPeer::alternativeCon($con);
-		
 		if ($criteria->hasSelectClause()) 
 		{
 			$asColumns = $criteria->getAsColumns();
@@ -383,6 +477,28 @@ abstract class BaseUserLoginDataPeer {
 
 		// attach default criteria
 		UserLoginDataPeer::attachCriteriaFilter($criteria);
+
+		return $criteria;
+	}
+	
+	/**
+	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
+	 *
+	 * Use this method directly if you want to work with an executed statement durirectly (for example
+	 * to perform your own object hydration).
+	 *
+	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
+	 * @param      PropelPDO $con The connection to use
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 * @return     PDOStatement The executed PDOStatement object.
+	 * @see        BasePeer::doSelect()
+	 */
+	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
+	{
+		$con = UserLoginDataPeer::alternativeCon($con);
+		
+		$criteria = UserLoginDataPeer::prepareCriteriaForSelect($criteria);
 		
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
@@ -522,7 +638,6 @@ abstract class BaseUserLoginDataPeer {
 				$obj = new $cls();
 				$obj->hydrate($row);
 				$results[] = $obj;
-				UserLoginDataPeer::addInstanceToPool($obj, $key);
 			} // if key exists
 		}
 		$stmt->closeCursor();

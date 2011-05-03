@@ -257,7 +257,9 @@ class kshowPeer extends BasekshowPeer
 		kshowPeer::addSelectColumns($c);
 		$c->addJoin(kshowPeer::ID, roughcutEntryPeer::ROUGHCUT_KSHOW_ID);
 		$c->add(roughcutEntryPeer::ENTRY_ID, $entry_ids, Criteria::IN);
-		return kshowPeer::populateObjects(self::doSelectStmt($c));
+		$results = kshowPeer::populateObjects(self::doSelectStmt($c));
+		kshowPeer::addInstancesToPool($results);
+		return $results;
 	}
 
 	// this function deletes a KSHOW

@@ -648,6 +648,20 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	} // doSave()
 
 	/**
+	 * Override in order to use the query cache.
+	 * Cache invalidation keys are used to determine when cached queries are valid.
+	 * Before returning a query result from the cache, the time of the cached query
+	 * is compared to the time saved in the invalidation key.
+	 * A cached query will only be used if it's newer than the matching invalidation key.
+	 *  
+	 * @return     array Array of keys that will should be updated when this object is modified.
+	 */
+	public function getCacheInvalidationKeys()
+	{
+		return array();
+	}
+		
+	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
 	 * @return bloolean
@@ -684,16 +698,32 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{
-		kvotePeer::setUseCriteriaFilter(false);
-		$this->reload();
-		kvotePeer::setUseCriteriaFilter(true);
+		kQueryCache::invalidateQueryCache($this);
 		
 		kEventsManager::raiseEvent(new kObjectCreatedEvent($this));
 		
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
+		
 	}
 
+	/**
+	 * Code to be run after updating the object in database
+	 * @param PropelPDO $con
+	 */
+	public function postUpdate(PropelPDO $con = null)
+	{
+		kQueryCache::invalidateQueryCache($this);
+		
+		if($this->isModified())
+		{
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+		}
+			
+		$this->tempModifiedColumns = array();
+		
+	}
+	
 	/**
 	 * Saves the modified columns temporarily while saving
 	 * @var array
@@ -738,18 +768,6 @@ abstract class Basekvote extends BaseObject  implements Persistent {
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
 		return true;
-	}
-
-	/**
-	 * Code to be run after updating the object in database
-	 * @param PropelPDO $con
-	 */
-	public function postUpdate(PropelPDO $con = null)
-	{
-		if($this->isModified())
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
-			
-		$this->tempModifiedColumns = array();
 	}
 	
 	/**
