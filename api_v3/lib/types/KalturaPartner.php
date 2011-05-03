@@ -226,7 +226,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		"description" , "commercialUse" , "landingPage" , "userLandingPage" , "contentCategories" , "type" , "phone" , "describeYourself" ,
 		"adultContent" , "defConversionProfileType" , "notify" , "status" , "allowQuickEdit" , "mergeEntryLists" , "notificationsConfig" ,
 		"maxUploadSize" , "partnerPackage" , "secret" , "adminSecret" , "allowMultiNotification", "adminLoginUsersQuota", "adminUserId",
-		"firstName" , "lastName" , "country" , "state" , "additionalParams" ,
+		"firstName" , "lastName" , "country" , "state" , 
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -237,7 +237,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public function fromPartner(Partner $partner)
 	{
 		parent::fromObject($partner);
-		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($this->additionalParams);
+		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		return $this;
 	}
 	
