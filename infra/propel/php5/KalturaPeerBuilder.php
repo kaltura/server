@@ -125,19 +125,208 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
     $this->applyBehaviorModifier('preSelect', $script);
     
 		$script .= "
-		// BasePeer returns a PDOStatement
-		\$stmt = ".$this->getPeerClassname()."::doCountStmt(\$criteria, \$con);
+		".$this->getPeerClassname()."::attachCriteriaFilter(\$criteria);
 
+		\$cacheKey = null;
+		\$cachedResult = kQueryCache::getCachedQueryResults(
+			\$criteria, 
+			kQueryCache::QUERY_TYPE_COUNT,
+			'".$this->getPeerClassname()."', 
+			\$cacheKey);
+		if (\$cachedResult !== null)
+		{
+			return \$cachedResult;
+		}
+		
+		// set the connection to slave server
+		\$con = ".$this->getPeerClassname()."::alternativeCon (\$con);
+		
+		// BasePeer returns a PDOStatement
+		\$stmt = BasePeer::doCount(\$criteria, \$con);
+		
 		if (\$row = \$stmt->fetch(PDO::FETCH_NUM)) {
 			\$count = (int) \$row[0];
 		} else {
 			\$count = 0; // no rows returned; we infer that means 0 matches.
 		}
 		\$stmt->closeCursor();
+		
+		if (\$cacheKey !== null)
+		{
+			kQueryCache::cacheQueryResults(\$cacheKey, \$count);
+		}
+		
 		return \$count;
 	}";
 	}
 	
+	/**
+	 * Adds the doSelect() method.
+	 * @param      string &$script The script will be modified in this method.
+	 */
+	protected function addDoSelect(&$script)
+	{
+		$script .= "
+	
+	/**
+	 * Override in order to use the query cache.
+	 * Cache invalidation keys are used to determine when cached queries are valid.
+	 * Before returning a query result from the cache, the time of the cached query
+	 * is compared to the time saved in the invalidation key.
+	 * A cached query will only be used if it's newer than the matching invalidation key.
+	 *  
+	 * @param      Criteria \$criteria The Criteria object used to build the SELECT statement.
+	 * @param      string \$queryType The type of the query: select / count.
+	 * @return     string The invalidation key that should be checked before returning a cached result for this criteria.
+	 *		 if null is returned, the query cache won't be used - the query will be performed on the DB.
+	 */
+	public static function getCacheInvalidationKeys(Criteria \$criteria, \$queryType)
+	{
+		return array();
+	}
+
+	/**
+	 * Override in order to filter objects returned from doSelect.
+	 *  
+	 * @param      array \$selectResults The array of objects to filter.
+	 */
+	public static function filterSelectResults(&\$selectResults)
+	{
+	}
+	
+	/**
+	 * Adds the supplied object array to the instance pool, objects already found in the pool
+	 * will be replaced with instance from the pool.
+	 *  
+	 * @param      array \$queryResult The array of objects to get / add to pool.
+	 */
+	public static function updateInstancePool(&\$queryResult)
+	{
+		foreach (\$queryResult as \$curIndex => \$curObject)
+		{
+			\$objFromPool = ".$this->getPeerClassname()."::getInstanceFromPool(\$curObject->getPrimaryKey());
+			if (\$objFromPool === null)
+			{
+				".$this->getPeerClassname()."::addInstanceToPool(\$curObject);
+			}
+			else
+			{
+				\$queryResult[\$curIndex] = \$objFromPool;
+			}
+		}
+	}
+	
+	/**
+	 * Adds the supplied object array to the instance pool.
+	 *  
+	 * @param      array \$queryResult The array of objects to add to pool.
+	 */
+	public static function addInstancesToPool(\$queryResult)
+	{
+		foreach (\$queryResult as \$curResult)
+		{
+			".$this->getPeerClassname()."::addInstanceToPool(\$curResult);
+		}
+	}
+	
+	/**
+	 * Method to do selects.
+	 *
+	 * @param      Criteria \$criteria The Criteria object used to build the SELECT statement.
+	 * @param      PropelPDO \$con
+	 * @return     array Array of selected Objects
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function doSelect(Criteria \$criteria, PropelPDO \$con = null)
+	{		
+		\$criteria = ".$this->getPeerClassname()."::prepareCriteriaForSelect(\$criteria);
+		
+		\$cacheKey = null;
+		\$cachedResult = kQueryCache::getCachedQueryResults(
+			\$criteria, 
+			kQueryCache::QUERY_TYPE_SELECT,
+			'".$this->getPeerClassname()."', 
+			\$cacheKey);
+		if (\$cachedResult !== null)
+		{
+			".$this->getPeerClassname()."::filterSelectResults(\$cachedResult);
+			".$this->getPeerClassname()."::updateInstancePool(\$cachedResult);
+			return \$cachedResult;
+		}
+
+		\$con = ".$this->getPeerClassname()."::alternativeCon(\$con);
+		
+		\$queryResult = ".$this->getPeerClassname()."::populateObjects(".$this->basePeerClassname."::doSelect(\$criteria, \$con));
+		
+		if (\$cacheKey !== null)
+		{
+			kQueryCache::cacheQueryResults(\$cacheKey, \$queryResult);
+		}
+		
+		".$this->getPeerClassname()."::filterSelectResults(\$queryResult);
+		".$this->getPeerClassname()."::addInstancesToPool(\$queryResult);
+		return \$queryResult;
+	}";
+	}
+
+	/**
+	 * Adds the populateObjects() method.
+	 * @param      string &$script The script will be modified in this method.
+	 */
+	protected function addPopulateObjects(&$script)
+	{
+		$table = $this->getTable();
+		$script .= "
+	/**
+	 * The returned array will contain objects of the default type or
+	 * objects that inherit from the default.
+	 *
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 */
+	public static function populateObjects(PDOStatement \$stmt)
+	{
+		\$results = array();
+	";
+		if (!$table->getChildrenColumn()) {
+			$script .= "
+		// set the class once to avoid overhead in the loop
+		\$cls = ".$this->getPeerClassname()."::getOMClass(false);";
+		}
+
+		$script .= "
+		// populate the object(s)
+		while (\$row = \$stmt->fetch(PDO::FETCH_NUM)) {
+			\$key = ".$this->getPeerClassname()."::getPrimaryKeyHashFromRow(\$row, 0);
+			if (null !== (\$obj = ".$this->getPeerClassname()."::getInstanceFromPool(\$key))) {
+				// We no longer rehydrate the object, since this can cause data loss.
+				// See http://propel.phpdb.org/trac/ticket/509
+				// \$obj->hydrate(\$row, 0, true); // rehydrate
+				\$results[] = \$obj;
+			} else {";
+		if ($table->getChildrenColumn()) {
+			$script .= "
+				// class must be set each time from the record row
+				\$cls = ".$this->getPeerClassname()."::getOMClass(\$row, 0);
+				\$cls = substr('.'.\$cls, strrpos('.'.\$cls, '.') + 1);
+				" . $this->buildObjectInstanceCreationCode('$obj', '$cls') . "
+				\$obj->hydrate(\$row);
+				\$results[] = \$obj;";
+		} else {
+			$script .= "
+				" . $this->buildObjectInstanceCreationCode('$obj', '$cls') . "
+				\$obj->hydrate(\$row);
+				\$results[] = \$obj;";
+		}
+		$script .= "
+			} // if key exists
+		}
+		\$stmt->closeCursor();
+		return \$results;
+	}";
+	}
+
 	
 	/**
 	 * Adds the doSelectStmt() method.
@@ -340,24 +529,8 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		return ".$this->basePeerClassname."::doCount(\$criteria, \$con);
 	}
 	
-	
-	/**
-	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
-	 *
-	 * Use this method directly if you want to work with an executed statement durirectly (for example
-	 * to perform your own object hydration).
-	 *
-	 * @param      Criteria \$criteria The Criteria object used to build the SELECT statement.
-	 * @param      PropelPDO \$con The connection to use
-	 * @throws     PropelException Any exceptions caught during processing will be
-	 *		 rethrown wrapped into a PropelException.
-	 * @return     PDOStatement The executed PDOStatement object.
-	 * @see        ".$this->basePeerClassname."::doSelect()
-	 */
-	public static function doSelectStmt(Criteria \$criteria, PropelPDO \$con = null)
+	public static function prepareCriteriaForSelect(Criteria \$criteria)
 	{
-		\$con = ".$this->getPeerClassname()."::alternativeCon(\$con);
-		
 		if (\$criteria->hasSelectClause()) 
 		{
 			\$asColumns = \$criteria->getAsColumns();
@@ -384,6 +557,28 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 
 		// attach default criteria
 		".$this->getPeerClassname()."::attachCriteriaFilter(\$criteria);
+
+		return \$criteria;
+	}
+	
+	/**
+	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
+	 *
+	 * Use this method directly if you want to work with an executed statement durirectly (for example
+	 * to perform your own object hydration).
+	 *
+	 * @param      Criteria \$criteria The Criteria object used to build the SELECT statement.
+	 * @param      PropelPDO \$con The connection to use
+	 * @throws     PropelException Any exceptions caught during processing will be
+	 *		 rethrown wrapped into a PropelException.
+	 * @return     PDOStatement The executed PDOStatement object.
+	 * @see        ".$this->basePeerClassname."::doSelect()
+	 */
+	public static function doSelectStmt(Criteria \$criteria, PropelPDO \$con = null)
+	{
+		\$con = ".$this->getPeerClassname()."::alternativeCon(\$con);
+		
+		\$criteria = ".$this->getPeerClassname()."::prepareCriteriaForSelect(\$criteria);
 		
 		// BasePeer returns a PDOStatement
 		return ".$this->basePeerClassname."::doSelect(\$criteria, \$con);

@@ -222,7 +222,8 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		" . $this->getPeerClassname() . "::setUseCriteriaFilter(false);
 		\$this->reload();
 		" . $this->getPeerClassname() . "::setUseCriteriaFilter(true);
-		
+
+		kQueryCache::invalidateQueryCache(\$this);
 		kEventsManager::raiseEvent(new kObjectCreatedEvent(\$this));
 		
 		if(\$this->copiedFrom)
@@ -282,13 +283,30 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	}
 
 	/**
+	 * Override in order to use the query cache.
+	 * Cache invalidation keys are used to determine when cached queries are valid.
+	 * Before returning a query result from the cache, the time of the cached query
+	 * is compared to the time saved in the invalidation key.
+	 * A cached query will only be used if it's newer than the matching invalidation key.
+	 *  
+	 * @return     array Array of keys that will should be updated when this object is modified.
+	 */
+	public function getCacheInvalidationKeys()
+	{
+		return array();
+	}
+	
+	/**
 	 * Code to be run after updating the object in database
 	 * @param PropelPDO \$con
 	 */
 	public function postUpdate(PropelPDO \$con = null)
 	{
 		if(\$this->isModified())
+		{
+			kQueryCache::invalidateQueryCache(\$this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$this->tempModifiedColumns));
+		}
 			
 		\$this->tempModifiedColumns = array();
 	}
