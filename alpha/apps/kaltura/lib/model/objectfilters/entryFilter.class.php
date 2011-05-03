@@ -173,7 +173,18 @@ class entryFilter extends baseObjectFilter
 		
 	public static function hasMachableField ( $field_name )
 	{
-		return in_array($field_name, array("name", "description", "tags", "admin_tags", "categories_ids", "flavor_params_ids", "duration_type"));
+		return in_array($field_name, array(
+			"name", 
+			"description", 
+			"tags", 
+			"admin_tags", 
+			"categories_ids", 
+			"flavor_params_ids", 
+			"duration_type", 
+			"reference_id", 
+			"replacing_entry_id", 
+			"replaced_entry_id",
+		));
 	}
 	
 	
