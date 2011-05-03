@@ -50,6 +50,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private $assetParamsNameToIdPerConversionProfile = null;
 
 	/**
+	 * Maps the asset id to flavor params id
+	 * @var array()
+	 */
+	private $assetIdToflavorParamsId = null;
+	
+	/**
 	 * 
 	 * Maps the access control name to id
 	 * @var array()
@@ -223,152 +229,191 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!$entryId)
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 
-//		//TODO: finish the update - NON reachable code please disregard 
-//		
-//			
-//		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
-//		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
-//		KalturaLog::debug("current entry is: " . print_r($entry, true));
-//				
-//		$thumbAssets = array();
-//		$flavorAssets = array();
-//		$noParamsThumbAssets = array(); //Holds the no flavor params thumb assests
-//		$noParamsThumbResources = array(); //Holds the no flavor params resources assests
-//		$noParamsFlavorAssets = array();  //Holds the no flavor params flavor assests
-//		$noParamsFlavorResources = array(); //Holds the no flavor params flavor resources
-//		$resource = new KalturaAssetsParamsResourceContainers(); // holds all teh needed resources for the conversion
-//		$resource->resources = array();
-//		
-//		//For each content in the item element we add a new flavor asset
-//		foreach ($item->content as $contentElement)
-//		{
-//			KalturaLog::debug("contentElement [" . print_r($contentElement->asXml(), true). "]");
-//			
-//			if(empty($contentElement)) // if the item is empty
-//			{
-//				continue;
-//			}
-//			
-//			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
-//			$flavorAssetResource = $this->getResource($contentElement);
-//			
-//			if(is_null($flavorAsset))
-//			{
-//				$resource->resources[] = $flavorAssetResource;
-//				continue;
-//			}
-//			
-//			if(is_null($flavorAsset->flavorParamsId))
-//			{
-//				$noParamsFlavorAssets[] = $flavorAsset;
-//				$noParamsFlavorResources[] = $flavorAssetResource;
-//				continue;
-//			}
-//			
-//			$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
-//			$assetResource = new KalturaAssetParamsResourceContainer();
-//			$assetResource->resource = $flavorAssetResource;
-//			$assetResource->assetParamsId = $flavorAsset->flavorParamsId;
-//			$resource->resources[] = $assetResource;
-//		}
-//
-//		//For each thumbnail in the item element we create a new thumb asset
-//		foreach ($item->thumbnail as $thumbElement)
-//		{
-//			KalturaLog::debug("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
-//						
-//			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
-//			$thumbAssetResource = $this->getResource($thumbElement);
-//			
-//			if(is_null($thumbAsset))
-//			{
-//				$resource->resources[] = $thumbAssetResource;
-//				continue;
-//			}
-//			
-//			if(is_null($thumbAsset->thumbParamsId))
-//			{
-//				$noParamsThumbAssets[] = $thumbAsset;
-//				$noParamsThumbResources[] = $thumbAssetResource;
-//				continue;
-//			}
-//			
-//			$thumbAssets[$thumbAsset->thumbParamsId] = $thumbAsset;
-//			$assetResource = new KalturaAssetParamsResourceContainer();
-//			$assetResource->resource = $thumbAssetResource;
-//			$assetResource->assetParamsId = $thumbAsset->thumbParamsId;
-//			$resource->resources[] = $assetResource;
-//		}
-//
-//		$createdEntry = $this->sendItemUpdateData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
-//					
-//		//Throw exception in case of  max proccessed items and handle all exceptions there
-//		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
-//				
-//		//Updates the bulk upload result for the given entry (with the status and other data)
-//		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
-//		
-//		//Adds the additional data for the flavors and thumbs
-//		$this->handleFlavorAndThumbsAdditionalData($createdEntry->id, $flavorAssets, $thumbAssets);
-//				
-//		//Handles the plugin added data
-//		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
-//		foreach($pluginsInstances as $pluginsInstance)
-//			$pluginsInstance->handleItemUpdated($this->kClient, $createdEntry, $item);
+		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
+		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
+		KalturaLog::debug("current entry is: " . print_r($entry, true));
+				
+		$thumbAssets = array();
+		$flavorAssets = array();
+		$noParamsThumbAssets = array(); //Holds the no flavor params thumb assests
+		$noParamsThumbResources = array(); //Holds the no flavor params resources assests
+		$noParamsFlavorAssets = array();  //Holds the no flavor params flavor assests
+		$noParamsFlavorResources = array(); //Holds the no flavor params flavor resources
+		$resource = new KalturaAssetsParamsResourceContainers(); // holds all teh needed resources for the conversion
+		$resource->resources = array();
+		$updatedFlavorAssets = array();
+		$updatedFlavorResources = array();
+		$updatedThumbAssets = array();
+		$updatedThumbResources = array();
+			
+		//For each content in the item element we add a new flavor asset
+		foreach ($item->content as $contentElement)
+		{
+			KalturaLog::debug("contentElement [" . print_r($contentElement->asXml(), true). "]");
+			
+			if(empty($contentElement)) // if the content is empty skip
+			{
+				continue;
+			}
+			
+			$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
+			KalturaLog::debug("Asset id [ $assetId]");
+			
+			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
+			$flavorAssetResource = $this->getResource($contentElement);
+			
+			if($assetId) // if we have an asset id then we need to update the asset
+			{
+				$updatedFlavorAssets[] = $flavorAsset;
+				$updatedFlavorResources[] = $flavorAssetResource;
+				continue;
+			}
+			
+			if(is_null($flavorAsset))
+			{
+				$resource->resources[] = $flavorAssetResource;
+				continue;
+			}
+			
+			if(is_null($flavorAsset->flavorParamsId))
+			{
+				$noParamsFlavorAssets[] = $flavorAsset;
+				$noParamsFlavorResources[] = $flavorAssetResource;
+				continue;
+			}
+			
+			$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
+			$assetResource = new KalturaAssetParamsResourceContainer();
+			$assetResource->resource = $flavorAssetResource;
+			$assetResource->assetParamsId = $flavorAsset->flavorParamsId;
+			$resource->resources[] = $assetResource;
+		}
+
+		//For each thumbnail in the item element we create a new thumb asset
+		foreach ($item->thumbnail as $thumbElement)
+		{
+			if(empty($thumbElement)) // if the content is empty
+			{
+				continue;
+			}
+			
+			KalturaLog::debug("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
+						
+			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
+			$thumbAssetResource = $this->getResource($thumbElement);
+			
+			$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
+			KalturaLog::debug("Asset id [ $assetId]");
+			
+			if($assetId) // if we have an asset id then we need to update the asset
+			{
+				$updatedThumbAssets[] = $thumbAsset;
+				$updatedThumbResources[] = $thumbAssetResource;
+				continue;
+			}
+			
+			if(is_null($thumbAsset))
+			{
+				$resource->resources[] = $thumbAssetResource;
+				continue;
+			}
+			
+			if(is_null($thumbAsset->thumbParamsId))
+			{
+				$noParamsThumbAssets[] = $thumbAsset;
+				$noParamsThumbResources[] = $thumbAssetResource;
+				continue;
+			}
+			
+			$thumbAssets[$thumbAsset->thumbParamsId] = $thumbAsset;
+			$assetResource = new KalturaAssetParamsResourceContainer();
+			$assetResource->resource = $thumbAssetResource;
+			$assetResource->assetParamsId = $thumbAsset->thumbParamsId;
+			$resource->resources[] = $assetResource;
+		}
+
+		$updatedEntry = $this->sendItemUpdateData($entryId, $entry, $resource, 
+												  $noParamsFlavorAssets, $noParamsFlavorResources, 
+												  $noParamsThumbAssets, $noParamsThumbResources,
+												  $updatedFlavorAssets, $updatedThumbAssets, 
+												  $updatedThumbAssets, $updatedThumbResources);
+					
+		//Throw exception in case of  max proccessed items and handle all exceptions there
+		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
+				
+		//Updates the bulk upload result for the given entry (with the status and other data)
+		$this->updateEntriesResults(array($updatedEntry), array($createdEntryBulkUploadResult));
+		
+		//Adds the additional data for the flavors and thumbs
+		$this->handleFlavorAndThumbsAdditionalData($updatedEntry->id, $flavorAssets, $thumbAssets);
+				
+		//Handles the plugin added data
+		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
+		foreach($pluginsInstances as $pluginsInstance)
+			$pluginsInstance->handleItemUpdated($this->kClient, $updatedEntry, $item);
 	}
 
 	/**
 	 * 
 	 * Sends the data using a multi requsest according to the given data
+	 * @param int $entryID
 	 * @param KalturaBaseEntry $entry
-	 * @param KalturaAssetsParamsResourceContainers $resource
+	 * @param KalturaAssetsParamsResourceContainers $resource - the main resource collection for the entry
 	 * @param array $noParamsFlavorAssets
 	 * @param array $noParamsFlavorResources
 	 * @param array $noParamsThumbAssets
 	 * @param array $noParamsThumbResources
+	 * @param array $updatedFlavorAssets
+	 * @param array $updatedThumbAssets 
+	 * @param array $updatedThumbAssets
+	 * @param array $updatedThumbResources
 	 * @return $requestResults - the multi request result
 	 */
-	protected function sendItemUpdateData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
+	protected function sendItemUpdateData($entryId, KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, 
+										array $noParamsFlavorAssets, array $noParamsFlavorResources, 
+										array $noParamsThumbAssets, array $noParamsThumbResources,
+										array $updatedFlavorAssets, array $updatedThumbAssets, 
+										array $updatedThumbAssets, array $updatedThumbResources)
 	{
-//		$this->startMultiRequest(true);
-//		
-//		KalturaLog::debug("Resource is: " . print_r($resource, true));
-//		
-//		if(!count($resource->resources))
-//			$resource = null;
-//			
-//		$this->kClient->baseEntry->update($entry->id, $entry, $resource); // Adds the entry
-//		$newEntryId = "{1:result:id}";
-//		
-//		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
-//		{
-//			$flavorResource = $noParamsFlavorResources[$index];
-//			$this->kClient->flavorAsset->add($newEntryId, $flavorAsset, $flavorResource);
-//		}
-//	
-//		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
-//		{
-//			$thumbResource = $noParamsThumbResources[$index];
-//			$this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
-//		}
-//				
-//		$requestResults = $this->kClient->doMultiRequest();;
-//		$this->impersonate();
-//		
-//		$createdEntry = $requestResults;
-//		if(is_array($requestResults)) // if we got a response of array then we return the first object
-//		{
-//			$createdEntry = reset($requestResults);
-//		}
-//		
-//		KalturaLog::debug("Created entry [". print_r($createdEntry,true) ."]");
-//		
-//		if(is_null($createdEntry)) //checks that the entry was created
-//		{
-//			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-//		}
-//		
-//		return $createdEntry;
+		$this->startMultiRequest(true);
+		
+		KalturaLog::debug("Resource is: " . print_r($resource, true));
+		
+		if(!count($resource->resources))
+			$resource = null;
+			
+		$this->kClient->baseEntry->update($entryId, $entry, $resource); // updates the entry
+		$updatedEntryId = "{1:result:id}";
+		
+		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
+		{
+			$flavorResource = $noParamsFlavorResources[$index];
+			$this->kClient->flavorAsset->add($updatedEntryId, $flavorAsset, $flavorResource);
+		}
+
+		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
+		{
+			$thumbResource = $noParamsThumbResources[$index];
+			$this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset, $thumbResource);
+		}
+				
+		$requestResults = $this->kClient->doMultiRequest();;
+		$this->impersonate();
+		
+		$createdEntry = $requestResults;
+		if(is_array($requestResults)) // if we got a response of array then we return the first object
+		{
+			$createdEntry = reset($requestResults);
+		}
+		
+		KalturaLog::debug("Created entry [". print_r($createdEntry,true) ."]");
+		
+		if(is_null($createdEntry)) //checks that the entry was created
+		{
+			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+		
+		return $createdEntry;
 	}
 
 	/**
@@ -588,10 +633,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function getFlavorAsset(SimpleXMLElement $contentElement, $conversionProfileId)
 	{
-		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset = new KalturaFlavorAsset(); //we create a new asset (for add)
 		$flavorAsset->flavorParamsId = $this->getFlavorParamsId($contentElement, $conversionProfileId, true);
 		$flavorAsset->tags = $this->implodeChildElements($contentElement->tags);
-				
+			
 		return $flavorAsset;
 	}
 	
@@ -777,7 +822,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 			
 		if(!$assetParamsName)
-			return null;	
+			return null;
 			
 		if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
 			$this->initAssetParamsNameToId($conversionProfileId);
@@ -956,7 +1001,39 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		KalturaLog::debug("new accessControlNameToId [" . print_r($this->accessControlNameToId, true). "]");
 	}
-			
+
+	/**
+	 * 
+ 	 * Inits the array of access control name to Id (with all given flavor params)
+ 	 * @param $entryId - the entry id to take the flavor assets from
+	 */
+	protected function initAssetIdToflavorParamsId($entryId)
+	{
+		$this->impersonate();
+		
+		$allFlavorAssets = $this->kClient->flavorAsset->getByEntryId($entryId);
+		$allThumbAssets = $this->kClient->thumbAsset->getByEntryId($entryId);
+				
+		$allAccessControl = $allAccessControl->objects;
+		
+		KalturaLog::debug("allFlavorAssets [" . print_r($allFlavorAssets, true). "]");
+		KalturaLog::debug("allThumbAssets [" . print_r($allThumbAssets, true). "]");
+		
+		foreach ($allFlavorAssets as $flavorAsset)
+		{
+			if(!is_null($flavorAsset->assetParams))
+				$this->accessControlNameToId[$flavorAsset->id] = $flavorAsset->assetParams;
+		}
+		
+		foreach ($allThumbAssets as $thumbAsset)
+		{
+			if(!is_null($thumbAsset->assetParams))
+				$this->accessControlNameToId[$thumbAsset->id] = $thumbAsset->assetParams;
+		}
+		
+		KalturaLog::debug("new assetIdToflavorParamsId [" . print_r($this->assetIdToflavorParamsId, true). "]");
+	}
+	
 	/**
 	 * 
 	 * Inits the array of conversion profile name to Id (with all given flavor params)
@@ -1281,6 +1358,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function createUploadResult(SimpleXMLElement $item)
 	{
+		//TODO: What should we write in the bulk upload result? 
+		//only the changed parameters or just teh one theat was changed
+		
 		KalturaLog::debug("Creating upload result");
 		
 		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
