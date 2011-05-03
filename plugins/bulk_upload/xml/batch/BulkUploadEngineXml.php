@@ -335,7 +335,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$updatedEntry = $this->sendItemUpdateData($entryId, $entry, $resource, 
 												  $noParamsFlavorAssets, $noParamsFlavorResources, 
 												  $noParamsThumbAssets, $noParamsThumbResources,
-												  $updatedFlavorAssets, $updatedThumbAssets, 
+												  $updatedFlavorAssets, $updatedFlavorAssets, 
 												  $updatedThumbAssets, $updatedThumbResources);
 					
 		//Throw exception in case of  max proccessed items and handle all exceptions there
@@ -359,20 +359,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param int $entryID
 	 * @param KalturaBaseEntry $entry
 	 * @param KalturaAssetsParamsResourceContainers $resource - the main resource collection for the entry
-	 * @param array $noParamsFlavorAssets
-	 * @param array $noParamsFlavorResources
-	 * @param array $noParamsThumbAssets
-	 * @param array $noParamsThumbResources
-	 * @param array $updatedFlavorAssets
-	 * @param array $updatedThumbAssets 
-	 * @param array $updatedThumbAssets
-	 * @param array $updatedThumbResources
+	 * @param array $noParamsFlavorAssets - Holds the no flavor params flavor assets 
+	 * @param array $noParamsFlavorResources - Holds the no flavor params flavor resources
+	 * @param array $noParamsThumbAssets - Holds the no flavor params thumb assets
+	 * @param array $noParamsThumbResources - Holds the no flavor params thumb resources
+	 * @param array $updatedFlavorAssets - Holds the updated flavor assets
+	 * @param array $updatedFlavorResources - Holds the updated flavor resources
+	 * @param array $updatedThumbAssets - Holds the updated thumb assets
+	 * @param array $updatedThumbResources - Holds the updated thumb resources
 	 * @return $requestResults - the multi request result
 	 */
 	protected function sendItemUpdateData($entryId, KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, 
 										array $noParamsFlavorAssets, array $noParamsFlavorResources, 
 										array $noParamsThumbAssets, array $noParamsThumbResources,
-										array $updatedFlavorAssets, array $updatedThumbAssets, 
+										array $updatedFlavorAssets, array $updatedFlavorResources, 
 										array $updatedThumbAssets, array $updatedThumbResources)
 	{
 		$this->startMultiRequest(true);
@@ -405,6 +405,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			$createdEntry = reset($requestResults);
 		}
+		
+		//TODO: handle the update array
 		
 		KalturaLog::debug("Created entry [". print_r($createdEntry,true) ."]");
 		
