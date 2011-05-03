@@ -149,7 +149,8 @@ class kConf extends kConfLocal
 				"general_cache_dir" => dirname(__FILE__).'/../../cache/general',
                 'response_cache_dir' => dirname(__FILE__).'/../../cache/response/',
                 
-                'query_cache_enabled' => true,
+                'query_cache_enabled' => false,
+				"query_cache_invalidate_on_change" => false,
                 
                 'apc_cache_ttl' => 900, // 15 minutes in seconds - ttl for apc cache values
                 
