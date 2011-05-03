@@ -250,7 +250,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	{
 		if($this->adminName && $this->firstName === null && $this->lastName === null)
 		{
-			$this->firstName = $this->adminEmail;
+			$this->firstName = $this->adminName;
 		}
 		elseif(
 			($this->firstName || $this->lastName) &&
