@@ -29,27 +29,10 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	public function handle()
 	{
 		// check prerequisites
-		
-		if (!$this->config) {
-			KalturaLog::err('File handler configuration not defined');
-			return false; // file not handled
-		}
-		
-		if (!$this->kClient) {
-			KalturaLog::err('Kaltura client not defined');
-			return false; // file not handled
-		}
-		
-		if (!$this->dropFolder) {
-			KalturaLog::err('Drop folder not defined');
-			return false; // file not handled
-		}
-		
-		if (!$this->dropFolderFile) {
-			KalturaLog::err('Drop folder file not defined');
-			return false; // file not handled
-		}
-		
+		$checkConfig = $this->checkConfig();
+		if (!$checkConfig) {
+			return false;
+		}		
 		
 		// parse file name according to slugRegex and extract parsedSlug and parsedFlavor
 		$regexMatch = $this->parseRegex();
