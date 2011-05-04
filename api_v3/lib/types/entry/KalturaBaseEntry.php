@@ -248,7 +248,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	public $referenceId;
 	
 	/**
-	 * ID of temporary entry that will replace this entry when it’s approved and ready for replacement
+	 * ID of temporary entry that will replace this entry when it's approved and ready for replacement
 	 * 
 	 * @var string
 	 * @filter eq,in
