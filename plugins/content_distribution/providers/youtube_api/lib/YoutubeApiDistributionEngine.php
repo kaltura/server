@@ -68,11 +68,19 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$entryId = $data->entryDistribution->entryId;
 		$entry = $this->kalturaClient->media->get($entryId);
 	
-//		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$category = $distributionProfile->defaultCategory;
+		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, $distributionProfile->metadataProfileId);
+		if(count($metadataObjects))
+		{
+			$metadataCategory = $this->findMetadataValue($metadataObjects, 'YoutubeCategory');
+			if($metadataCategory)
+				$category = $metadataCategory;
+		}
+		
 		$props = array();
 		$props['keywords'] = $entry->tags;
 		$props['title'] = $entry->name;
-		$props['category'] = $distributionProfile->defaultCategory;
+		$props['category'] = $category;
 		$props['description'] = $entry->description;
 		$props['start_date'] = time();
 		$props['end_date'] = time();
