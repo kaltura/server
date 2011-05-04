@@ -223,15 +223,16 @@ class kBusinessPreConvertDL
 		
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
-			if($entryThumbAsset->getId() == $thumbAsset->getId())
-				continue;
-				
-			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-				continue;
-				
-			//we have a default tag not on this thumb so we remove the tag from given thumb 
-			$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			return; // if we removed the tag we get out
+			//if we found another asset with a defualt tag. we remove our default tag 
+			if($entryThumbAsset->getId() != $thumbAsset->getId() &&
+			   $entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+			   {
+			   	KalturaLog::debug("Found defualt tag on thumbAsset id[ $entryThumbAsset->getId()], ");
+			   	
+			   	$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			   	KalturaLog::debug("Removed defualt tag from thumbAsset id[ $thumbAsset->getId()], ");
+			   	return;   	
+			   }
 		}
 	}
 	
