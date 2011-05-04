@@ -83,8 +83,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		parent::__construct($taskConfig, $kClient, $job);
 		
-		if($taskConfig->params->xsdFilePath)
-			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
+		if($taskConfig->params->xsdFilePath) {
+			$this->xsdFilePath = dirname(__FILE__).$taskConfig->params->xsdFilePath;
+		}
+		else {
+			$this->xsdFilePath = dirname(__FILE__).$this->xsdFilePath;
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -109,7 +113,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xdoc = new DomDocument;
 		$xdoc->Load($this->data->filePath);
 		//Validate the XML file against the schema
-		if(!$xdoc->schemaValidate(dirname(__FILE__) . $this->xsdFilePath)) 
+		if(!$xdoc->schemaValidate(realpath($this->xsdFilePath))) 
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($this->data->filePath));
 			KalturaLog::debug("XML is invalid:\n$errorMessage");
@@ -1417,5 +1421,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$bulkUploadResult->scheduleEndDate = self::parseFormatedDate((string)$item->endDate);
 		
 		return $bulkUploadResult;
+	}
+	
+	protected function getXsdFilePath()
+	{
+		return $this->xsdFilePath;
+	}
+	
+	protected function setXsdFilePath($filePath)
+	{
+		$this->xsdFilePath = $filePath;
 	}
 }
