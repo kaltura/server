@@ -115,7 +115,7 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 		return $this->getDisplayGroup("{$action}_action_group");
 	}
 	
-	protected function addMetadataProfile()
+	protected function addMetadataProfile($enableNone = false)
 	{
 		$metadataProfiles = null;
 		try
@@ -144,6 +144,10 @@ abstract class Form_ProviderProfileConfiguration extends Form_DistributionConfig
 			));
 			
 			$element = $this->getElement('metadata_profile_id');
+			
+			if($enableNone)
+				$element->addMultiOption('', 'None');
+			
 			foreach($metadataProfiles as $metadataProfile)
 				$element->addMultiOption($metadataProfile->id, $metadataProfile->name);
 		}
