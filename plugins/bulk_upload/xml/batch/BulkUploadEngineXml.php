@@ -522,6 +522,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				
 		//Handles the plugin added data
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
+		
+		//we need to impersonate the client so the plugins will have an impersonated client
+		$this->impersonate();
 		foreach($pluginsInstances as $pluginsInstance)
 			$pluginsInstance->handleItemAdded($this->kClient, $createdEntry, $item);
 	}
