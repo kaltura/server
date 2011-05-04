@@ -151,9 +151,13 @@ class KalturaObject
 		}
 	}
 	
-	public function validatePropertyMinLength($propertyName, $minLength)
+	public function validatePropertyMinLength($propertyName, $minLength, $allowNull = false)
 	{
-		$this->validatePropertyNotNull($propertyName);
+		if(!$allowNull)
+			$this->validatePropertyNotNull($propertyName);
+		elseif(is_null($this->$propertyName))
+			return;
+			
 		if (strlen($this->$propertyName) < $minLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
 	}
