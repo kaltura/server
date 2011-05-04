@@ -689,7 +689,7 @@ class KalturaEntryService extends KalturaBaseService
 	
 			if($kuser) //If we have such a kuser
 			{
-				if($kuser->getPuserId() == $entry->getPuserId() || is_null($entry->getPuserId()))
+				if($kuser->getPuserId() == $entry->userId || is_null($entry->userId))
 				{
 					KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 					$dbEntry->setKuserId($kuser->getId());
@@ -701,13 +701,13 @@ class KalturaEntryService extends KalturaBaseService
 					if($this->getKs() && $this->getKs()->isAdmin()) // if is admin KS
 					{
 						//so we create a new kuser for that puser from entry user
-						$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $dbEntryPuserId);
-						KalturaLog::debug("We have a puser in the entry but with no kuser and admin KS so we create a new kuser [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+						$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
+						KalturaLog::debug("We have a puser in the entry but with kuser and admin KS so we get / create the kuser [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 					}
 					else // no admin KS
 					{
 						$kuser = $this->getKuser(); // create from KS
-						KalturaLog::debug("We have a puser in the entry but with no kuser and admin KS so we take the kuser from the KS [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+						KalturaLog::debug("We have a puser in the entry but with kuser and no admin KS so we take the kuser from the KS [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 					}
 					
 					$dbEntry->setKuserId($kuser->getId());
