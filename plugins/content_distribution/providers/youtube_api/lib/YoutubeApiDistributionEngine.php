@@ -41,23 +41,6 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		return $this->doSubmit($data, $data->distributionProfile);
 	}
 
-	protected function newCustomDataElement($title, $value = '')
-	{
-		$customDataElement = new YoutubeApiCustomDataElement();
-		$customDataElement->title = $title;
-		$customDataElement->value = $value;
-		return $customDataElement;
-	}
-	
-	private function getFlavorFormat($containerFormat)
-	{
-		$containerFormat = trim(strtolower($containerFormat));
-		if(isset(self::$containerFormatMap[$containerFormat]))
-			return self::$containerFormatMap[$containerFormat];
-			
-		return YoutubeApiFormat::_UNKNOWN;
-	}
-	
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaYoutubeApiDistributionProfile $distributionProfile
@@ -93,7 +76,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$props['start_date'] = time();
 		$props['end_date'] = time();
 		
-		$props['playlists']= $data->providerData->playlists;
+//		$props['playlists']= $data->providerData->playlists;
 		$props['comment']= $distributionProfile->allowComments;
 		$props['rate']= $distributionProfile->allowEmbedding;
 		$props['commentVote']= $distributionProfile->allowRatings;
