@@ -15,6 +15,8 @@ class VirusScanProfileFilter extends baseObjectFilter
 				"_in_partner_id",
 				"_eq_status",
 				"_in_status",
+				"_eq_name",
+				"_like_name",
 				"_eq_engine_type",
 				"_in_engine_type",
 			) , NULL );

@@ -16,6 +16,8 @@ class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
+		"nameEqual" => "_eq_name",
+		"nameLike" => "_like_name",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"engineTypeEqual" => "_eq_engine_type",
@@ -95,6 +97,20 @@ class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerIdIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $nameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $nameLike;
 
 	/**
 	 * 

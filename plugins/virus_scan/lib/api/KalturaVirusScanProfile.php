@@ -35,6 +35,7 @@ class KalturaVirusScanProfile extends KalturaObject implements IFilterable
 
 	/**
 	 * @var string
+	 * @filter eq,like
 	 */
 	public $name;
 
