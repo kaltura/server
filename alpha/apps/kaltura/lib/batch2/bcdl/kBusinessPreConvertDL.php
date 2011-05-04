@@ -105,12 +105,16 @@ class kBusinessPreConvertDL
 		$thumbAsset->setTags($destThumbParamsOutput->getTags());
 		$thumbAsset->setFileExt($destThumbParamsOutput->getFileExt());
 		
+		//Sets the default thumb if this the only default thumb
+		$this->setIsDefaultThumb($thumbAsset);
+		
 		if(!$destThumbParamsOutput)
 		{
 			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$thumbAsset->save();	
 			return null;
 		}
+
 		$thumbAsset->save();
 			
 		// save flavor params
@@ -205,6 +209,30 @@ class kBusinessPreConvertDL
 			kFlowHelper::generateThumbnailsFromFlavor($thumbAsset->getEntryId(), null, $thumbAsset->getFlavorParamsId());
 			
 		return $thumbAsset;
+	}
+		
+	/**
+	 * 
+	 * Sets the default thumb for the assets 
+	 * If others already exists then we don't set the asset as not default
+	 * @param thumbAsset $thumbAsset
+	 */
+	protected static function setIsDefaultThumb(thumbAsset $thumbAsset)
+	{
+		$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+		
+		foreach($entryThumbAssets as $entryThumbAsset)
+		{
+			if($entryThumbAsset->getId() == $thumbAsset->getId())
+				continue;
+				
+			if(!$entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+				continue;
+				
+			//we have a default tag not on this thumb so we remove the tag from given thumb 
+			$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			return; // if we removed the tag we get out
+		}
 	}
 	
 	public static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription)
