@@ -2,7 +2,7 @@
 class DailyMotionImpl
 {	
 	/**
-	 * @var DailyMotion
+	 * @var Dailymotion
 	 */
 	private $api = null;
 	
@@ -13,7 +13,7 @@ class DailyMotionImpl
 
 	public function __construct($user, $pass)
 	{
-		$this->api = new DailyMotion();
+		$this->api = new Dailymotion();
 		$this->user = $user;
 		$this->pass = $pass;
 		$this->_connect();
