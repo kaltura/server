@@ -1387,12 +1387,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		//TODO: What should we write in the bulk upload result for update? 
 		//only the changed parameters or just teh one theat was changed
-		
 		KalturaLog::debug("Creating upload result");
+		KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
 		
 		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
 		{
-			KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
 			KalturaLog::debug("Setting exceededMaxRecordsEachRun to true");
 			$this->exceededMaxRecordsEachRun = true;
 			return; // exit if we have proccessed max num of itemse
