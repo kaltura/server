@@ -1,5 +1,4 @@
 <?php
-require_once 'YoutubeApiImpl.php';
 /**
  * @package plugins.youtubeApiDistribution
  * @subpackage lib
