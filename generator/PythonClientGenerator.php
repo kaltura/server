@@ -423,6 +423,9 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				case "float" :
 					$this->appendLine ( "        kparams.addFloatIfNotNone(\"$propName\", self.$propName)" );
 					break;
+				case "array":
+					$this->appendLine("        kparams.addArrayIfNotNone(\"$propName\", self.$propName)");
+					break;
 				default :
 					$this->appendLine ( "        kparams.addObjectIfNotNone(\"$propName\", self.$propName)" );
 					break;
