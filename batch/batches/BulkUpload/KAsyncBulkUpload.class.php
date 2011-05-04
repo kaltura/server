@@ -112,6 +112,7 @@ class KAsyncBulkUpload extends KBatchBase {
 		$openedEntries = $this->kClient->batch->updateBulkUploadResults($job->id);
 		if($openedEntries)
 		{
+			KalturaLog::debug("If there are open entries on the job");
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::RETRY);
 		}
@@ -126,6 +127,7 @@ class KAsyncBulkUpload extends KBatchBase {
 			
 		if($engine->shouldRetry())
 		{
+			KalturaLog::debug("Set the job to retry");
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 			return $this->closeJob($job, null, null, "Created [$countCreatedEntries] entries", KalturaBatchJobStatus::RETRY);
 		}
