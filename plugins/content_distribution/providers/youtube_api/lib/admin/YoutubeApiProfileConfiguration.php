@@ -32,7 +32,7 @@ class Form_YoutubeApiProfileConfiguration extends Form_ProviderProfileConfigurat
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
 				
-		$this->addMetadataProfile();
+		$this->addMetadataProfile(true);
 		
 		//  Metadata
 		$this->addElement('text', 'default_category', array(
