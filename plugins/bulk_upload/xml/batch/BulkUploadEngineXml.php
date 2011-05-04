@@ -135,6 +135,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			KalturaLog::debug("Handling channel");
 			$this->handleChannel($channel);
+			if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
+				return;
 		}
 	}
 
@@ -157,6 +159,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->currentItem++;
 				continue;
 			}
+			
+			if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
+				return;
 			
 			$this->currentItem++; //move to the next item (first item is 1)
 			try
@@ -506,6 +511,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 				
+		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
+			return;
+		
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
@@ -1377,7 +1385,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
 		{
 			$this->exceededMaxRecordsEachRun = true;
-			return;
+			return; // exit if we have proccessed max num of itemse
 		}
 		
 		$this->handledRecordsThisRun++;
