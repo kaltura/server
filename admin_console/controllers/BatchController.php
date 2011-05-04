@@ -949,20 +949,27 @@ class BatchController extends Zend_Controller_Action
 			
         $partnerId = $this->view->investigateData->entry->partnerId;
 		
-		$this->view->plugins = array();
+		$plugins = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsoleEntryInvestigate');
+		KalturaLog::debug("plugin instances [" . count($pluginInstances) . "]");
 		foreach($pluginInstances as $pluginInstance)
 		{
 			$entryInvestigatePlugins = $pluginInstance->getEntryInvestigatePlugins();
 			if(!$entryInvestigatePlugins)
+			{
+				KalturaLog::debug("plugin [" . $pluginInstance->getPluginName() . "] returned no envestigation plugin");
 				continue;
+			}
 			
 			foreach($entryInvestigatePlugins as $plugin)
 			{
 	    		$this->view->addBasePath($plugin->getTemplatePath());
-	    		$this->view->plugins[$plugin->getPHTML()] = $plugin->getDataArray($entryId, $partnerId);
+	    		$plugins[$plugin->getPHTML()] = $plugin->getDataArray($entryId, $partnerId);
+	    		
+				KalturaLog::debug("plugin [" . $pluginInstance->getPluginName() . "] added phtml [" . $plugin->getPHTML() . "]");
 			}
 		}
+		$this->view->plugins = $plugins;
 	}
 	
 	public function learnMoreAction()
