@@ -631,35 +631,36 @@ class KalturaEntryService extends KalturaBaseService
 		return $totalCount;
 	}
     
-	/**
-	 * 
-	 * Gets a db entry and returns it's kuser
-	 * @param entry $dbEntry
-	 * @return kuser $kuser
-	 */
-	protected function getKuserForDbEntry(entry $dbEntry)
-	{
-		$kuser = null;
-		$dbEntryPuserId = $dbEntry->getPuserId();
-		$dbEntryKuserId =  $dbEntry->getKuserId();
-		
-		if($dbEntryKuserId) //If the db entry has a kuser
-		{
-			// get kuser object from entry kuserId
-			$kuser = kuserPeer::retrieveByPK($dbEntryKuserId);
-				
-			// if it has a different kuser we ignore that kuser
-			if(!$kuser || $kuser->getPuserId() != $dbEntryPuserId)
-			 	$kuser = null;
-		}
-		else //DB entry kuser id == null
-		{
-			//Get kuser object from entry puserId and partnerId
-			$kuser = kuserPeer::getKuserByPartnerAndUid($dbEntry->getPartnerId(), $dbEntryPuserId);
-		}
-		
-		return $kuser;
-	}
+//	/**
+//	 * 
+//	 * Gets a db entry and returns it's kuser
+//	 * @param entry $dbEntry
+//	 * @return kuser $kuser
+//	 */
+//	protected function getKuserForDbEntry(entry $dbEntry)
+//	{
+//		$kuser = null;
+//		
+//		$dbEntryPuserId = $dbEntry->getPuserId();
+//		$dbEntryKuserId =  $dbEntry->getKuserId();
+//		
+//		if($dbEntryKuserId) //If the db entry has a kuser
+//		{
+//			// get kuser object from entry kuserId
+//			$kuser = kuserPeer::retrieveByPK($dbEntryKuserId);
+//				
+//			// if it has a different kuser we ignore that kuser
+//			if(!$kuser || $kuser->getPuserId() != $dbEntryPuserId)
+//			 	$kuser = null;
+//		}
+//		else //DB entry kuser id == null
+//		{
+//			//Get kuser object from entry puserId and partnerId
+//			$kuser = kuserPeer::getKuserByPartnerAndUid($dbEntry->getPartnerId(), $dbEntryPuserId);
+//		}
+//		
+//		return $kuser;
+//	}
 	
 	/**
    	 * Sets the valid user for the entry 
@@ -670,88 +671,130 @@ class KalturaEntryService extends KalturaBaseService
    	 */
 	protected function checkAndSetValidUser(KalturaBaseEntry $entry, entry $dbEntry)
 	{
-		KalturaLog::debug("DB puser id [" . $dbEntry->getPuserId() . "] kuser id [" . $dbEntry->getKuserId() . "]");
-
-		//For new entry, puser ID is null
-		if($dbEntry->getPuserId() === null)
-		{
-			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
-			//Set the kuser from the service scope (KS)
-			$dbEntry->setKuserId($this->getKuser()->getId()); 
-			return;
-		}
-		else // DB entry has a puser id 
-		{
-			//Get puser ID from db entry to compare to userId on the updated entry object
-			$dbEntryPuserId = $dbEntry->getPuserId();
-			
-			$kuser = $this->getKuserForDbEntry($dbEntry); // get the kuser from the db entry
-	
-			if($kuser) //If we have such a kuser
-			{
-				if($kuser->getPuserId() == $entry->userId || is_null($entry->userId))
-				{
-					KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
-					$dbEntry->setKuserId($kuser->getId());
-					return;
-				}
-				else // we need to change the puser id 
-				{
-					// We have a puser in the entry and kuser on the dbEntry but we need to change the user 
-					if($this->getKs() && $this->getKs()->isAdmin()) // if is admin KS
-					{
-						//so we create a new kuser for that puser from entry user
-						$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
-						KalturaLog::debug("We have a puser in the entry but with kuser and admin KS so we get / create the kuser [" . $kuser->getId() . "] line [" . __LINE__ . "]");
-					}
-					else // no admin KS
-					{
-						$kuser = $this->getKuser(); // create from KS
-						KalturaLog::debug("We have a puser in the entry but with kuser and no admin KS so we take the kuser from the KS [" . $kuser->getId() . "] line [" . __LINE__ . "]");
-					}
+		$entryPuserId = $entry->userId;
+		$dbEntryPuserId = $dbEntry->getPuserId();
+		$dbEntryKuser = $dbEntry->getKuserId();
+		$isAdminKs = $this->getKs()->isAdmin(); //kCurrentContext::$ks_object->isAdmin();
 					
-					$dbEntry->setKuserId($kuser->getId());
-					return;
-				}
-			}
-			else 
+		KalturaLog::debug("entryPuserId [$entryPuserId], dbEntryPuserId [$dbEntryPuserId ]");
+		KalturaLog::debug("dbEntryKuser [$dbEntryKuser ], isAdminKs [$isAdminKs]");
+		
+		$kuser = null;
+		
+		if($entryPuserId == $dbEntryPuserId) //No user change / Add
+		{
+			$ksKuser = $this->getKuser();
+			$ksPuserId = $ksKuser->getPuserId();
+			if($isAdminKs || $ksPuserId == $entryPuserId) //If admin or the user is me
 			{
-				// We have a puser in the entry but with no kuser
-				if($this->getKs() && $this->getKs()->isAdmin()) // if is admin KS
-				{
-					//so we create a new kuser for that puser from entry user
-					$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $dbEntryPuserId);
-					KalturaLog::debug("We have a puser in the entry but with no kuser and admin KS so we create a new kuser [" . $kuser->getId() . "] line [" . __LINE__ . "]");
-				}
-				else // no admin KS
-				{
-					$kuser = $this->getKuser(); // create from KS
-					KalturaLog::debug("We have a puser in the entry but with no kuser and admin KS so we take the kuser from the KS [" . $kuser->getId() . "] line [" . __LINE__ . "]");
-				}
-				$dbEntry->setKuserId($kuser->getId());
+				$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $ksPuserId);
 			}
-					
-			// userID doesn't require change (it is null or the same as the db entry) - do nothing
-			if($entry->userId === null || $entry->userId === $dbEntryPuserId) {
-				// will always enter for add new entries as the db and new entry are the same 
-				KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['. $dbEntryPuserId . '] - no need to change - quitting');
-				return;
-			}
-			
-			// db user is going to be changed, only admin allowed - otherwise, throw exception
-			if(!$this->getKs() || !$this->getKs()->isAdmin())
+			else
 			{
-				KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['. $dbEntryPuserId .'] - change required but KS is not admin');
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
-			
-			// passed previous conditions, need to change userID on entry
-			// first step is to make sure the user exists
-			$puserKuser = PuserKuserPeer::createPuserKuser($this->getPartnerId(), $this->getPartnerId() * 100, $dbEntry->getPuserId(), $dbEntry->getPuserId(), $dbEntry->getPuserId(), true);
-			// second step is simply changing the userID on the entry
-			$dbEntry->setKuserId($puserKuser->getKuserId());
-			KalturaLog::debug("Set kuser id [" . $puserKuser->getKuserId() . "] line [" . __LINE__ . "]");
 		}
+		else  // We must update the user (as it is not as the Db entry user)
+		{
+			//From here we have a must user update (add was handled above)
+			if($isAdminKs) //if this is admin KS we can change and set a different user
+			{
+				if(!is_null($entryPuserId)) //If there is a user on the entry we get / create it
+					$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entryPuserId);
+				else 
+					$kuser = $this->getKuser(); //else we get / create from KS 
+			}
+			else //No admin KS only allowes when both users on the entries are valid
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));				
+			}
+		}
+		
+		$dbEntry->setkuser($kuser);
+		
+		return;
+//		KalturaLog::debug("DB puser id [" . $dbEntry->getPuserId() . "] kuser id [" . $dbEntry->getKuserId() . "]");
+//
+//		//For new entry, puser ID is null
+//		if($dbEntry->getPuserId() === null)
+//		{
+//			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
+//			//Set the kuser from the service scope (KS)
+//			$dbEntry->setKuserId($this->getKuser()->getId()); 
+//			return;
+//		}
+//		else // DB entry has a puser id 
+//		{
+//			//Get puser ID from db entry to compare to userId on the updated entry object
+//			$dbEntryPuserId = $dbEntry->getPuserId();
+//			
+//			$kuser = $this->getKuserForDbEntry($dbEntry); // get the kuser from the db entry
+//	
+//			if($kuser) //If we have such a kuser
+//			{
+//				if($kuser->getPuserId() == $entry->userId || is_null($entry->userId))
+//				{
+//					KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+//					$dbEntry->setKuserId($kuser->getId());
+//					return;
+//				}
+//				else // we need to change the puser id 
+//				{
+//					// We have a puser in the entry and kuser on the dbEntry but we need to change the user 
+//					if($this->getKs() && $this->getKs()->isAdmin()) // if is admin KS
+//					{
+//						//so we create a new kuser for that puser from entry user
+//						$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId);
+//						KalturaLog::debug("We have a puser in the entry but with kuser and admin KS so we get / create the kuser [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+//					}
+//					else // no admin KS
+//					{
+//						$kuser = $this->getKuser(); // create from KS
+//						KalturaLog::debug("We have a puser in the entry but with kuser and no admin KS so we take the kuser from the KS [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+//					}
+//					
+//					$dbEntry->setKuserId($kuser->getId());
+//					return;
+//				}
+//			}
+//			else 
+//			{
+//				// We have a puser in the entry but with no kuser
+//				if($this->getKs() && $this->getKs()->isAdmin()) // if is admin KS
+//				{
+//					//so we create a new kuser for that puser from entry user
+//					$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $dbEntryPuserId);
+//					KalturaLog::debug("We have a puser in the entry but with no kuser and admin KS so we create a new kuser [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+//				}
+//				else // no admin KS
+//				{
+//					$kuser = $this->getKuser(); // create from KS
+//					KalturaLog::debug("We have a puser in the entry but with no kuser and admin KS so we take the kuser from the KS [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+//				}
+//				$dbEntry->setKuserId($kuser->getId());
+//			}
+//					
+//			// userID doesn't require change (it is null or the same as the db entry) - do nothing
+//			if($entry->userId === null || $entry->userId === $dbEntryPuserId) {
+//				// will always enter for add new entries as the db and new entry are the same 
+//				KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['. $dbEntryPuserId . '] - no need to change - quitting');
+//				return;
+//			}
+//			
+//			// db user is going to be changed, only admin allowed - otherwise, throw exception
+//			if(!$this->getKs() || !$this->getKs()->isAdmin())
+//			{
+//				KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['. $dbEntryPuserId .'] - change required but KS is not admin');
+//				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+//			}
+//			
+//			// passed previous conditions, need to change userID on entry
+//			// first step is to make sure the user exists
+//			$puserKuser = PuserKuserPeer::createPuserKuser($this->getPartnerId(), $this->getPartnerId() * 100, $dbEntry->getPuserId(), $dbEntry->getPuserId(), $dbEntry->getPuserId(), true);
+//			// second step is simply changing the userID on the entry
+//			$dbEntry->setKuserId($puserKuser->getKuserId());
+//			KalturaLog::debug("Set kuser id [" . $puserKuser->getKuserId() . "] line [" . __LINE__ . "]");
+//		}
 	}
 	
 	/**
