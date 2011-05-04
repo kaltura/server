@@ -183,13 +183,16 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		
 		$fileSize = $localResource->getElementsByTagName(self::LOCAL_RESOURCE_FILE_SIZE_PARAM);
 		$fileSize = ($fileSize->length > 0) ? $fileSize->item(0)->nodeValue : null;
-		$localSize = $this->dropFolderFile->fileSize;
-		if (!is_null($fileSize) && $fileSize != $localSize) {
-			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::LOCAL_FILE_WRONG_SIZE;
-			$this->dropFolderFile->errorDescription = "Wrong filesize [$localSize] for file [$localPath]";
-			return false;
+		if (!is_null($fileSize))
+		{
+			$localSize = filesize($localPath);
+			if ($fileSize != $localSize) {
+				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::LOCAL_FILE_WRONG_SIZE;
+				$this->dropFolderFile->errorDescription = "Wrong filesize [$localSize] for file [$localPath]";
+				return false;
+			}
+			KalturaLog::debug("Filesize [$fileSize] verified for local resource [$filePath]");
 		}
-		KalturaLog::debug("Filesize [$fileSize] verified for local resource [$filePath]");
 		
 		$fileChecksumTags = $localResource->getElementsByTagName(self::LOCAL_RESOURCE_FILE_CHECKSUM_PARAM);
 		$fileChecksum = ($fileChecksumTags->length > 0) ? (string)$fileChecksumTags->item(0)->nodeValue : null;
@@ -199,16 +202,17 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 			$checksumType = $fileChecksumTags->item(0)->getAttribute('type');
 			
 			if ($checksumType == 'sha1') {
-				$localChecksum = sha1_file($filePath);
+				$localChecksum = sha1_file($localPath);
 			}
 			else {
-				$localChecksum = md5_file($filePath);
+				$localChecksum = md5_file($localPath);
 			}
 			if ($fileChecksum != $localChecksum) {
 				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::LOCAL_FILE_WRONG_CHECKSUM;
 				$this->dropFolderFile->errorDescription = "Wrong checksum [$localChecksum] for file [$localPath]";
 				return false;
 			}
+			KalturaLog::debug("Checksum [$fileChecksum] verified for local resource [$filePath]");
 		}
 
 		return true;

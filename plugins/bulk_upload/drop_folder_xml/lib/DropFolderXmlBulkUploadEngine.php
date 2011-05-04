@@ -29,7 +29,8 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		if(isset($elementToSearchIn->dropFolderFileContentResource))
 		{
 			$resource = new KalturaDropFolderFileResource();
-			$resource->dropFolderFileId = $elementToSearchIn->dropFolderFileContentResource->attributes()->dropFolderFileId;
+			$attributes = $elementToSearchIn->dropFolderFileContentResource->attributes();
+			$resource->dropFolderFileId = (string)$attributes['dropFolderFileId'];
 			return $resource;
 		}
 		
