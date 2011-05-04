@@ -106,7 +106,7 @@ class kBusinessPreConvertDL
 		$thumbAsset->setFileExt($destThumbParamsOutput->getFileExt());
 		
 		//Sets the default thumb if this the only default thumb
-		$this->setIsDefaultThumb($thumbAsset);
+		kBusinessPreConvertDL::setIsDefaultThumb($thumbAsset);
 		
 		if(!$destThumbParamsOutput)
 		{
@@ -227,10 +227,10 @@ class kBusinessPreConvertDL
 			if($entryThumbAsset->getId() != $thumbAsset->getId() &&
 			   $entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			   {
-			   	KalturaLog::debug("Found defualt tag on thumbAsset id[ $entryThumbAsset->getId()], ");
+			   	KalturaLog::debug("Found default tag on thumbAsset id[ $entryThumbAsset->getId()], ");
 			   	
 			   	$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			   	KalturaLog::debug("Removed defualt tag from thumbAsset id[ $thumbAsset->getId()], ");
+			   	KalturaLog::debug("Removed default tag from thumbAsset id[ $thumbAsset->getId()], ");
 			   	return;   	
 			   }
 		}
