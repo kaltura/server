@@ -78,7 +78,7 @@ class YoutubeApiDistributionProvider implements IDistributionProvider
 	 */
 	public function isScheduleUpdateEnabled()
 	{
-		return true;
+		return false;
 	}
 
 	/* (non-PHPdoc)
