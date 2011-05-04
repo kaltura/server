@@ -3,54 +3,6 @@
 	<xsd:element name="metadata">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="copyright" minOccurs="0" maxOccurs="1">
-					<xsd:annotation>
-						<xsd:documentation />
-						<xsd:appinfo>
-							<label>Copyright</label>
-							<key>copyright</key>
-							<searchable>true</searchable>
-							<description />
-						</xsd:appinfo>
-					</xsd:annotation>
-					<xsd:simpleType>
-						<xsd:restriction base="textType">
-							<xsd:maxLength value="40" />
-						</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:element>
-				<xsd:element name="LongTitle" minOccurs="0" maxOccurs="1">
-					<xsd:annotation>
-						<xsd:documentation />
-						<xsd:appinfo>
-							<label>Long Title</label>
-							<key>LongTitle</key>
-							<searchable>true</searchable>
-							<description />
-						</xsd:appinfo>
-					</xsd:annotation>
-					<xsd:simpleType>
-						<xsd:restriction base="textType">
-							<xsd:maxLength value="128"/>
-						</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:element>
-				<xsd:element name="ShortDescription" minOccurs="0" maxOccurs="1">
-					<xsd:annotation>
-						<xsd:documentation />
-						<xsd:appinfo>
-							<label>Short Description</label>
-							<key>ShortDescription</key>
-							<searchable>true</searchable>
-							<description />
-						</xsd:appinfo>
-					</xsd:annotation>
-					<xsd:simpleType>
-						<xsd:restriction base="textType">
-							<xsd:maxLength value="40" />
-						</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:element>
 				<xsd:element name="Keywords" minOccurs="0" maxOccurs="1" type="textType">
 				  <xsd:annotation>
 					<xsd:documentation/>
