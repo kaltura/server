@@ -94,7 +94,7 @@
 																	<td class="link" onclick="toggleView('tr_filesync_data_<?php echo $file->id; ?>')"><?php echo $file->id; ?></td>
 																	<?php
 																}
-																elseif($file->status == Kaltura_Client_Enum_FileSyncStatus::READY)
+																elseif($file->status == Kaltura_Client_FileSync_Enum_FileSyncStatus::READY)
 																{
 																	?><td><a href="<?php echo $file->fileUrl; ?>" target="_blank"><?php echo $file->id; ?></a></td><?php
 																}
@@ -110,7 +110,7 @@
 															<td><?php echo date($this->translate('time format'), $file->createdAt); ?></td>
 															<td><?php echo date($this->translate('time format'), $file->readyAt); ?></td>
 															<td><?php echo date($this->translate('time format'), $file->syncTime); ?></td>
-															<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_FileSyncStatus', $file->status); ?></td>
+															<td><?php echo $this->enumTranslate('Kaltura_Client_FileSync_Enum_FileSyncStatus', $file->status); ?></td>
 															<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_FileSyncType', $file->fileType); ?></td>
 															<td><?php echo $file->linkedId; ?></td>
 															<td><?php echo $file->linkCount; ?></td>

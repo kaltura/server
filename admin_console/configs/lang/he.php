@@ -124,11 +124,11 @@ return array(
 	'Kaltura_Client_Enum_FlavorAssetStatus::IMPORTING' => 'Importing',
 	'Kaltura_Client_Enum_FlavorAssetStatus::VALIDATING' => 'Validating',
 
-	'Kaltura_Client_Enum_FileSyncStatus::ERROR' => 'Error',
-	'Kaltura_Client_Enum_FileSyncStatus::PENDING' => 'Pending',
-	'Kaltura_Client_Enum_FileSyncStatus::READY' => 'Ready',
-	'Kaltura_Client_Enum_FileSyncStatus::DELETED' => 'Deleted',
-	'Kaltura_Client_Enum_FileSyncStatus::PURGED' => 'Purged',
+	'Kaltura_Client_FileSync_Enum_FileSyncStatus::ERROR' => 'Error',
+	'Kaltura_Client_FileSync_Enum_FileSyncStatus::PENDING' => 'Pending',
+	'Kaltura_Client_FileSync_Enum_FileSyncStatus::READY' => 'Ready',
+	'Kaltura_Client_FileSync_Enum_FileSyncStatus::DELETED' => 'Deleted',
+	'Kaltura_Client_FileSync_Enum_FileSyncStatus::PURGED' => 'Purged',
 
 	'Kaltura_Client_Enum_FileSyncType::FILE' => 'File',
 	'Kaltura_Client_Enum_FileSyncType::LINK' => 'Link',
