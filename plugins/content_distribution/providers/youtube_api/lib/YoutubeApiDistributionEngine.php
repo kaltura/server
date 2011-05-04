@@ -102,7 +102,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if($data->entryDistribution->remoteId)
 		{
 			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
-			$youTubeApiImpl->update($data->remoteId, $props);
+			$youTubeApiImpl->updateEntry($data->entryDistribution->remoteId, $props);
 		
 			$data->remoteId = $data->entryDistribution->remoteId;
 			return true;
