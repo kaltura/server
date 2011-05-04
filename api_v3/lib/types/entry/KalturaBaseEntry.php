@@ -366,6 +366,22 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->endDate = $sourceObject->getEndDate(null);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert()
+	{
+		$this->validatePropertyMinLength('referenceId', 2, true);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForUpdate()
+	{
+		$this->validatePropertyMinLength('referenceId', 2, true);
+	}
+	
 	public function getExtraFilters()
 	{
 		return array(
