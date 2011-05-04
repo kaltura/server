@@ -34,9 +34,46 @@ class Form_YoutubeApiProfileConfiguration extends Form_ProviderProfileConfigurat
 				
 		$this->addMetadataProfile(true);
 		
+		// taken from http://gdata.youtube.com/schemas/2007/categories.cat
+		$youTubeCategories = array(
+			'Film' => 'Film & Animation',
+			'Autos' => 'Autos & Vehicles',
+			'Music' => 'Music' ,
+			'Animals' => 'Pets & Animals',
+			'Sports' => 'Sports' ,
+			'Travel' => 'Travel & Events',
+			'Shortmov' => 'Short Movies',
+			'Videoblog' => 'Videoblogging',
+			'Games' => 'Gaming' ,
+			'Comedy' => 'Comedy' ,
+			'People' => 'People & Blogs',
+			'News' => 'News & Politics',
+			'Entertainment' => 'Entertainment',
+			'Education' => 'Education',
+			'Howto' => 'Howto & Style',
+			'Nonprofit' => 'Nonprofits & Activism',
+			'Tech' => 'Science & Technology',
+			'Movies_Anime_animation' => 'Movies - Anime/Animation' ,
+			'Movies' => 'Movies' ,
+			'Movies_Comedy' => 'Movies - Comedy',
+			'Movies_Documentary' => 'Movies - Documentary' ,
+			'Movies_Action_adventure' => 'Movies - Action/Adventure' ,
+			'Movies_Classics' => 'Movies - Classics',
+			'Movies_Foreign' => 'Movies - Foreign',
+			'Movies_Horror' => 'Movies - Horror',
+			'Movies_Drama' => 'Movies - Drama',
+			'Movies_Family' => 'Movies - Family',
+			'Movies_Shorts' => 'Movies - Shorts',
+			'Shows' => 'Shows' ,
+			'Movies_Sci_fi_fantasy' => 'Movies - Sci-Fi/Fantasy' ,
+			'Movies_Thriller' => 'Movies - Thriller',
+			'Trailers' => 'Trailers',			
+		);
+		
 		//  Metadata
-		$this->addElement('text', 'default_category', array(
+		$this->addElement('select', 'default_category', array(
 			'label' => 'Default Category:',
+			'multioptions' => $youTubeCategories,
 		));
 		
 		$this->addDisplayGroup(

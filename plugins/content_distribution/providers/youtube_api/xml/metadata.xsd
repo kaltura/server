@@ -1,41 +1,73 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<xsd:element name="metadata">
-		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:element name="YoutubeCategory" minOccurs="0" maxOccurs="1">
-					<xsd:annotation>
-						<xsd:documentation />
-						<xsd:appinfo>
-							<label>Youtube Category</label>
-							<key>YoutubeCategory</key>
-							<searchable>true</searchable>
-							<description />
-						</xsd:appinfo>
-					</xsd:annotation>
-					<xsd:simpleType>
-						<xsd:restriction base="textType">
-							<xsd:maxLength value="40" />
-						</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:element>
-			</xsd:sequence>
-		</xsd:complexType>
-	</xsd:element>
-	<xsd:simpleType name="textType">
-		<xsd:restriction base="xsd:string" />
-	</xsd:simpleType>
-	<xsd:complexType name="dateType">
-		<xsd:simpleContent>
-			<xsd:extension base="xsd:long" />
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<xsd:complexType name="objectType">
-		<xsd:simpleContent>
-			<xsd:extension base="xsd:string" />
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<xsd:simpleType name="listType">
-		<xsd:restriction base="xsd:string" />
-	</xsd:simpleType>
+  <xsd:element name="metadata">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="YoutubeCategory" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Youtube Category</label>
+              <key>Youtube Category</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="Film"/>
+              <xsd:enumeration value="Autos"/>
+              <xsd:enumeration value="Music"/>
+              <xsd:enumeration value="Animals"/>
+              <xsd:enumeration value="Sports"/>
+              <xsd:enumeration value="Travel"/>
+              <xsd:enumeration value="Shortmov"/>
+              <xsd:enumeration value="Videoblog"/>
+              <xsd:enumeration value="Games"/>
+              <xsd:enumeration value="Comedy"/>
+              <xsd:enumeration value="People"/>
+              <xsd:enumeration value="News"/>
+              <xsd:enumeration value="Entertainment"/>
+              <xsd:enumeration value="Education"/>
+              <xsd:enumeration value="Howto"/>
+              <xsd:enumeration value="Nonprofit"/>
+              <xsd:enumeration value="Tech"/>
+              <xsd:enumeration value="Movies_Anime_animation"/>
+              <xsd:enumeration value="Movies"/>
+              <xsd:enumeration value="Movies_Comedy"/>
+              <xsd:enumeration value="Movies_Documentary"/>
+              <xsd:enumeration value="Movies_Action_adventure"/>
+              <xsd:enumeration value="Movies_Classics"/>
+              <xsd:enumeration value="Movies_Foreign"/>
+              <xsd:enumeration value="Movies_Horror"/>
+              <xsd:enumeration value="Movies_Drama"/>
+              <xsd:enumeration value="Movies_Family"/>
+              <xsd:enumeration value="Movies_Shorts"/>
+              <xsd:enumeration value="Shows"/>
+              <xsd:enumeration value="Movies_Sci_fi_fantasy"/>
+              <xsd:enumeration value="Movies_Thriller"/>
+              <xsd:enumeration value="Trailers"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="textType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="dateType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:long"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="objectType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:simpleType name="listType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
 </xsd:schema>
