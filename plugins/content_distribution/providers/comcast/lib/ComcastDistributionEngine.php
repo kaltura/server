@@ -111,7 +111,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	 */
 	public function getComcastMedia(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaComcastDistributionProfile $distributionProfile)
 	{	
-		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, $distributionProfile->metadataProfileId);
+		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, KalturaMetadataObjectType::ENTRY, $distributionProfile->metadataProfileId);
 		
 		$media = new ComcastMedia();
 		$media->contentType = ComcastContentType::_VIDEO;
