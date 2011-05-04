@@ -414,6 +414,7 @@
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="dropFolderFileContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="optional" />
@@ -473,6 +474,13 @@
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="submitWhenReady" use="optional" type="xs:boolean" default="false" />
+		<xs:attribute name="assetId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>
+					The asset id to be updated with this resource userd only for update
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	
 	<xs:complexType name="T_customData">
