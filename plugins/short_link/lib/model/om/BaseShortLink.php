@@ -808,12 +808,17 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	 * method.  This method wraps all precipitate database operations in a
 	 * single transaction.
 	 *
+	 * Since this table was configured to reload rows on insert, the object will
+	 * be reloaded from the database if an INSERT operation is performed (unless
+	 * the $skipReload parameter is TRUE).
+	 *
 	 * @param      PropelPDO $con
+	 * @param      boolean $skipReload Whether to skip the reload for this object from database.
 	 * @return     int The number of rows affected by this insert/update and any referring fk objects' save() operations.
 	 * @throws     PropelException
 	 * @see        doSave()
 	 */
-	public function save(PropelPDO $con = null)
+	public function save(PropelPDO $con = null, $skipReload = false)
 	{
 		if ($this->isDeleted()) {
 			throw new PropelException("You cannot save an object that has been deleted.");
@@ -833,7 +838,7 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 				$ret = $ret && $this->preUpdate($con);
 			}
 			if ($ret) {
-				$affectedRows = $this->doSave($con);
+				$affectedRows = $this->doSave($con, $skipReload);
 				if ($isInsert) {
 					$this->postInsert($con);
 				} else {
@@ -859,21 +864,27 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	 * All related objects are also updated in this method.
 	 *
 	 * @param      PropelPDO $con
+	 * @param      boolean $skipReload Whether to skip the reload for this object from database.
 	 * @return     int The number of rows affected by this insert/update and any referring fk objects' save() operations.
 	 * @throws     PropelException
 	 * @see        save()
 	 */
-	protected function doSave(PropelPDO $con)
+	protected function doSave(PropelPDO $con, $skipReload = false)
 	{
 		$affectedRows = 0; // initialize var to track total num of affected rows
 		if (!$this->alreadyInSave) {
 			$this->alreadyInSave = true;
+
+			$reloadObject = false;
 
 
 			// If this object has been modified, then save it to the database.
 			if ($this->isModified()) {
 				if ($this->isNew()) {
 					$pk = ShortLinkPeer::doInsert($this, $con);
+					if (!$skipReload) {
+						$reloadObject = true;
+					}
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
 										 // should always be true here (even though technically
 										 // BasePeer::doInsert() can insert multiple rows).
@@ -887,6 +898,10 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 			}
 
 			$this->alreadyInSave = false;
+
+			if ($reloadObject) {
+				$this->reload($con);
+			}
 
 		}
 		return $affectedRows;
@@ -913,6 +928,8 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		ShortLinkPeer::setUseCriteriaFilter(false);
+		
 		return parent::preSave($con);
 	}
 
@@ -923,6 +940,7 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		$this->oldColumnsValues = array(); 
+		ShortLinkPeer::setUseCriteriaFilter(true); 
 	}
 	
 	/**
@@ -944,10 +962,6 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{
-		ShortLinkPeer::setUseCriteriaFilter(false);
-		$this->reload();
-		ShortLinkPeer::setUseCriteriaFilter(true);
-		
 		kQueryCache::invalidateQueryCache($this);
 		
 		kEventsManager::raiseEvent(new kObjectCreatedEvent($this));
