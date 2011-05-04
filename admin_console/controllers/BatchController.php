@@ -944,7 +944,7 @@ class BatchController extends Zend_Controller_Action
 		$this->view->investigateData = $this->getEntryInvestigationData($entryId, $this->view->errors);
 		$this->view->enableActions = true;
 		
-		if($this->view || !$this->view->investigateData)
+		if(!$this->view || !$this->view->investigateData)
 			return;
 			
         $partnerId = $this->view->investigateData->entry->partnerId;
