@@ -231,7 +231,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 								if($prop->attributes()->default && $prop->attributes()->default != 'null')
 									$const_props .= "='" . $prop->attributes()->default . "'";
 								else
-									$const_props .= " = ''";
+									$const_props .= " = null";
 							}
 							$const_props .= ",";			
 							
