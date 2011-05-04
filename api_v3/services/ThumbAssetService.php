@@ -392,7 +392,7 @@ class ThumbAssetService extends KalturaBaseService
 		
 		$entryKuserId = $entry->getKuserId();
 		$thisKuserId = $this->getKuser()->getId();
-		$isNotAdmin = !$this->getKuser()->getIsAdmin();
+		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
 		
 		KalturaLog::debug("entryKuserId [$entryKuserId], thisKuserId [$thisKuserId], isNotAdmin [$isNotAdmin ]");
 
