@@ -5,14 +5,21 @@
  */
 class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 {
-//	TODO - overwrite the ingestion.xsd with version that includes dropFolderFileContentResource
-//	/**
-//	 * 
-//	 * The engine xsd file path
-//	 * @var string
-//	 */
-//	private $xsdFilePath = "/../xml/ingestion.xsd";
+	/**
+	 * The engine xsd file path
+	 * @var string
+	 */
+	const DROP_FOLDER_XSD_PATH = "/../xml/ingestion.xsd";
 	
+	
+	/**
+	 * @param KSchedularTaskConfig $taskConfig
+	 */
+	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
+	{
+		parent::__construct($taskConfig, $kClient, $job);
+		$this->setXsdFilePath(dirname(__FILE__) . self::DROP_FOLDER_XSD_PATH);
+	}
 	
 	/* (non-PHPdoc)
 	 * @see BulkUploadEngineXml::getResourceInstance()
@@ -22,8 +29,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 		if(isset($elementToSearchIn->dropFolderFileContentResource))
 		{
 			$resource = new KalturaDropFolderFileResource();
-			$resource->dropFolderFileId = $elementToSearchIn->dropFolderFileContentResource->dropFolderFileId;
-			
+			$resource->dropFolderFileId = $elementToSearchIn->dropFolderFileContentResource->attributes()->dropFolderFileId;
 			return $resource;
 		}
 		
@@ -37,7 +43,15 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	{
 		if($resource instanceof KalturaDropFolderFileResource)
 		{
-			// TODO throw KalturaBulkUploadXmlException in not valid
+			$fileId = $resource->dropFolderFileId;
+			if (is_null($fileId)) {
+				throw new KalturaBulkUploadXmlException("Drop folder id is null", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			}
+			
+			$dropFolderFile = $this->kClient->dropFolderFile->get($fileId);
+			if (!$dropFolderFile) {
+				throw new KalturaBulkUploadXmlException("Cannot find drop folder file with id [$fileId]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			}
 		}
 		
 		return parent::validateResource($resource, $elementToSearchIn);

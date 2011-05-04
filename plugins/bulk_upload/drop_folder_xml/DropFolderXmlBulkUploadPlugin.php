@@ -39,13 +39,16 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('DropFolderXmlBulkUploadType', 'DropFolderXmlFileHandlerType');
+			return array('DropFolderXmlBulkUploadType', 'DropFolderXmlFileHandlerType', 'DropFolderXmlBulkUploadErrorCode');
 		
 		if($baseEnumName == 'BulkUploadType')
 			return array('DropFolderXmlBulkUploadType');
 		
 		if($baseEnumName == 'DropFolderFileHandlerType')
 			return array('DropFolderXmlFileHandlerType');
+			
+		if($baseEnumName == 'DropFolderFileErrorCode')
+			return array('DropFolderXmlBulkUploadErrorCode');
 			
 		return array();
 	}
@@ -70,15 +73,15 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		if($baseClass == 'KBulkUploadEngine' && class_exists('KalturaClient') && $enumValue == KalturaBulkUploadType::DROP_FOLDER_XML)
 		{
 			list($taskConfig, $kClient, $job) = $constructorArgs;
-			return new BulkUploadEngineXml($taskConfig, $kClient, $job);
+			return new DropFolderXmlBulkUploadEngine($taskConfig, $kClient, $job);
 		}
 		
-		if ($baseClass == 'DropFolderFileHandler' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
-			return new DropFolderXmlBulkUploadFileHandler();
+		if ($baseClass == 'DropFolderFileHandler' && $enumValue == KalturaDropFolderFileHandlerType::XML)
+				return new DropFolderXmlBulkUploadFileHandler();
 		
 		// drop folder does not work in partner services 2 context because it uses dynamic enums
 		if (class_exists('kCurrentContext') && kCurrentContext::$ps_vesion == 'ps3')
-		{
+		{			
 			if ($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
 				return new KalturaDropFolderXmlBulkUploadFileHandlerConfig();
 		}

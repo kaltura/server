@@ -336,6 +336,10 @@
 		<xs:attribute name="filePath" type="xs:string" use="required"/>
 	</xs:complexType>
 	
+	<xs:complexType name="T_dropFolderFileContentResource">
+		<xs:attribute name="dropFolderFileId" type="xs:string" use="required"/>
+	</xs:complexType>
+	
 	<xs:complexType name="T_bitrate">
 		<xs:attribute name="bitrate" use="required" type="xs:int"/>
 		<xs:attribute name="width" use="required" type="xs:int"/>
@@ -381,6 +385,7 @@
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="dropFolderFileContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="optional" />
@@ -525,6 +530,7 @@
 	<xs:element name="remoteStorageContentResource" type="T_remoteStorageContentResource" />
 	<xs:element name="entryContentResource" type="T_entryContentResource" />
 	<xs:element name="assetContentResource" type="T_assetContentResource" />
+	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" />
 	
 	<xs:element name="tags" type="T_tags" />
 	<xs:element name="categories" type="T_categories" />
