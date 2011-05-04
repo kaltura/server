@@ -167,7 +167,7 @@ abstract class DistributionEngine implements IDistributionEngine
 	 * @param KalturaMetadataObjectType $objectType
 	 * @return array<KalturaMetadata>
 	 */
-	protected function getMetadataObjects($partnerId, $objectId, $objectType = KalturaMetadataObjectType::ENTRY)
+	protected function getMetadataObjects($partnerId, $objectId, $objectType = KalturaMetadataObjectType::ENTRY, $metadataProfileId = null)
 	{
 		if(!class_exists('KalturaMetadata'))
 			return null;
@@ -178,6 +178,10 @@ abstract class DistributionEngine implements IDistributionEngine
 		$metadataFilter->objectIdEqual = $objectId;
 		$metadataFilter->metadataObjectTypeEqual = $objectType;
 		$metadataFilter->orderBy = KalturaMetadataOrderBy::CREATED_AT_DESC;
+		
+		if($metadataProfileId)
+			$metadataFilter->metadataProfileIdEqual = $metadataProfileId;
+		
 		$metadataPager = new KalturaFilterPager();
 		$metadataPager->pageSize = 1;
 		$metadataListResponse = $this->kalturaClient->metadata->listAction($metadataFilter, $metadataPager);
