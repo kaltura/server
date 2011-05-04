@@ -232,15 +232,60 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
+	function getParentClassNode(DOMElement $classNode)
+	{
+		if (!$classNode->hasAttribute("base"))
+		{
+			return null;
+		}
+
+		$base = $classNode->getAttribute("base");
+		$xpath = new DOMXPath($this->_doc);
+		$parentClass = $xpath->query("/xml/classes/class[@name = '$base']");
+		return $parentClass->item(0);
+	}
+	
+	function getCtorArguments(DOMElement $classNode = null, $delimiter = ", ", $argumentPostfix = "")
+	{
+		if (!$classNode)
+		{
+			return 'self';
+		}
+		
+		$parentNode = $this->getParentClassNode($classNode);
+		if ($parentNode)
+		{
+			$result = $this->getCtorArguments($parentNode, $delimiter, $argumentPostfix);
+		}
+		else
+		{
+			$result = 'self';
+		}
+		
+		foreach($classNode->childNodes as $propertyNode)
+		{
+			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
+				continue;
+			
+			$propName = $propertyNode->getAttribute("name");
+			
+			$result .= $delimiter.$propName.$argumentPostfix;
+		}
+		return $result;
+	}
+	
 	function writeClassCtor(DOMElement $classNode)
 	{
 		if ($classNode->hasAttribute("base"))
 			$base = $classNode->getAttribute ( "base" );
 		else
 			$base = "KalturaObjectBase";
+
+		$initParams = $this->getCtorArguments($classNode, ",\n            ", "=None");
+		$baseInitParams = $this->getCtorArguments($this->getParentClassNode($classNode), ",\n            ");
 			
-		$this->appendLine("    def __init__(self):");
-		$this->appendLine("        $base.__init__(self)");
+		$this->appendLine("    def __init__($initParams):");
+		$this->appendLine("        $base.__init__($baseInitParams)");
 		$this->appendLine();
 		// class properties
 		foreach($classNode->childNodes as $propertyNode)
@@ -270,7 +315,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			if ($isInsertOnly)
 				$this->appendLine("        # @insertonly");
 			
-			$this->appendLine("        self.$propName = None");
+			$this->appendLine("        self.$propName = $propName");
 			$this->appendLine("");
 		}
 		$this->appendLine();
