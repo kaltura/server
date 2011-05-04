@@ -81,7 +81,7 @@
 			<index-column name="login_data_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="kshow" phpName="kshow" reloadAfterInsert="true">
+	<table skipSql="false" abstract="false" name="kshow" phpName="kshow" reloadOnInsert="true">
 		<column lazyLoad="false" name="id" type="varchar" required="true" primaryKey="true" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="producer_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="episode_id" type="varchar" size="20" />
@@ -169,7 +169,7 @@
 			<index-column name="group_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="entry" phpName="entry" reloadAfterInsert="true">
+	<table skipSql="false" abstract="false" name="entry" phpName="entry" reloadOnInsert="true">
 		<column lazyLoad="false" name="id" type="varchar" required="true" primaryKey="true" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kshow_id" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="kuser_id" type="integer" />
@@ -973,7 +973,7 @@
 			<index-column name="roughcut_kshow_id" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="widget" phpName="widget" reloadAfterInsert="true">
+	<table skipSql="false" abstract="false" name="widget" phpName="widget" reloadOnInsert="true">
 		<column lazyLoad="false" name="id" type="varchar" required="true" primaryKey="true" size="32" />
 		<column primaryKey="false" lazyLoad="false" name="int_id" type="integer" required="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="source_widget_id" type="varchar" size="32" />
@@ -1415,7 +1415,7 @@
 			<index-column name="full_name" />
 		</index>
 	</table>
-	<table skipSql="false" abstract="false" name="syndication_feed" phpName="syndicationFeed" reloadAfterInsert="true">
+	<table skipSql="false" abstract="false" name="syndication_feed" phpName="syndicationFeed" reloadOnInsert="true">
 		<column lazyLoad="false" name="id" type="varchar" required="true" primaryKey="true" size="20" />
 		<column primaryKey="false" lazyLoad="false" name="int_id" type="integer" required="true" autoIncrement="true" />
 		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
@@ -1540,7 +1540,7 @@
 			<unique-column name="email_address" />
 		</unique>
 	</table>
-	<table skipSql="false" abstract="false" name="upload_token" reloadAfterInsert="true">
+	<table skipSql="false" abstract="false" name="upload_token" reloadOnInsert="true">
 		<column lazyLoad="false" name="id" type="varchar" required="true" primaryKey="true" size="35" />
 		<column primaryKey="false" lazyLoad="false" name="int_id" type="integer" required="true" autoIncrement="true" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
