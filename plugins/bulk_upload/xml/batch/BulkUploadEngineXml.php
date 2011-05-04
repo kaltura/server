@@ -1101,6 +1101,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry->licenseType = (string)$item->licenseType;
 		$entry->accessControlId =  $this->getAccessControlId($item);
 		$entry->startDate = self::parseFormatedDate((string)$item->startDate);
+		if(!$entry->startDate) //if start date is not set we will use now
+		{
+			$entry->startDate = date();
+		}
+		
 		$entry->endDate = self::parseFormatedDate((string)$item->endDate);
 		$entry->type = (int)$item->type;
 		$entry->ingestionProfileId = $this->getIngestionProfileId($item);
