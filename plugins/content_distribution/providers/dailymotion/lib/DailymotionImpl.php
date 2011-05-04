@@ -72,18 +72,3 @@ class DailyMotionImpl
 	}
 }
 
-
-/*$testUser = "kalturasb";
-$testPassword = "kalturasb";
-$testVideoFile = 'snake.aaa';
-
-$test = new DailyMotionImpl($testUser, $testPassword);
-//$remoteId = $test -> upload($testVideoFile);
-$remoteId = 'xhlco1';
-$ar1 = explode(",", "mytaga,mytagb,mytagd");
-$ar2 = array('tag3', 'tag4');
-print_r($ar1);
-print_r($ar2);
-$popsArray = array('tags' => $ar1, 'title' => 'about to delete', 'channel' => 'shortfilms', 'description' => 'yabadaa', 'language' => 'en', 'date' => time(), 'published' => true);
-$test -> update($remoteId, $popsArray);*/
-//$test -> delete('xh0k99');
