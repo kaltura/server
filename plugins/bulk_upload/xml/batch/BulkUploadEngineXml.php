@@ -201,6 +201,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function handleItem(SimpleXMLElement $item)
 	{
+		$this->checkAborted();
+		
 		$actionToPerform = self::ADD_ACTION_STRING;
 				
 		if(isset($item->action))
@@ -350,6 +352,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Throw exception in case of  max proccessed items and handle all exceptions there
 		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
 				
+		if($this->exceededMaxRecordsEachRun)
+			return;
+		
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($updatedEntry), array($createdEntryBulkUploadResult));
 		
@@ -506,14 +511,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 
-		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
-									
 		//Throw exception in case of  max proccessed items and handle all exceptions there
-		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
-				
+		$createdEntryBulkUploadResult = $this->createUploadResult($item);
+
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 			return;
-		
+			
+		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
+			
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($createdEntry), array($createdEntryBulkUploadResult));
 		
@@ -637,7 +642,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->kClient->thumbAsset->update($createdThumbAsset->id, $thumbAsset);
 		}
 		
-		$requestResults = $requestResults = $this->kClient->doMultiRequest();;
+		$requestResults = $this->kClient->doMultiRequest();
 				
 		return $requestResults;
 	}
@@ -1380,13 +1385,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function createUploadResult(SimpleXMLElement $item)
 	{
-		//TODO: What should we write in the bulk upload result? 
+		//TODO: What should we write in the bulk upload result for update? 
 		//only the changed parameters or just teh one theat was changed
 		
 		KalturaLog::debug("Creating upload result");
 		
 		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
 		{
+			KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
+			KalturaLog::debug("Setting exceededMaxRecordsEachRun to true");
 			$this->exceededMaxRecordsEachRun = true;
 			return; // exit if we have proccessed max num of itemse
 		}
