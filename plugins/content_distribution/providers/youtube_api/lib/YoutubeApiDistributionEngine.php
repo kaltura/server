@@ -93,6 +93,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$props['commentVote']= $distributionProfile->allowRatings;
 		$props['videoRespond']= $distributionProfile->allowResponses;
 		
+		KalturaLog::debug("Props [" . print_r($props, true) . "]");
 
 		return $props;
 	}
