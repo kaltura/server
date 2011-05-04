@@ -387,9 +387,7 @@ class ThumbAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
 		$entry = $thumbAsset->getentry();
-		
-		KalturaLog::debug("entry [". print_r($entry, true) . "]");
-		
+						
 		$entryKuserId = $entry->getKuserId();
 		$thisKuserId = $this->getKuser()->getId();
 		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
