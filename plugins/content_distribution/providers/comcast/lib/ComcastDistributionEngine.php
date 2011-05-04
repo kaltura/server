@@ -111,7 +111,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 	 */
 	public function getComcastMedia(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaComcastDistributionProfile $distributionProfile)
 	{	
-		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, $distributionProfile->metadataProfileId);
 		
 		$media = new ComcastMedia();
 		$media->contentType = ComcastContentType::_VIDEO;
@@ -200,7 +200,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id, true);
 			
 			$mediaFile = new ComcastMediaFile();
-			$mediaFile->allowRelease = true;
+			$mediaFile->allowRelease = false;
 			$mediaFile->bitrate = $flavorAsset->bitrate;
 			$mediaFile->contentType = ComcastContentType::_VIDEO;
 			$mediaFile->format = $this->getFlavorFormat($flavorAsset->containerFormat);
