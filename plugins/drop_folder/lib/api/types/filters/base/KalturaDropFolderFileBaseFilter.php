@@ -192,6 +192,7 @@ class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
+	 * @dynamicType KalturaDropFolderFileErrorCode
 	 * @var string
 	 */
 	public $errorCodeIn;
