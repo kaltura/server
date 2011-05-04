@@ -105,7 +105,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		$metadataListResponse = $metadataPlugin->metadata->listAction($metadataFilter, $pager);
 		
 		$metadataId = null;
-		if(is_array($metadataListResponse->objects))
+		if(is_array($metadataListResponse->objects) && count($metadataListResponse->objects) > 0)
 		{
 			$metadata = reset($metadataListResponse->objects);
 			$metadataId = $metadata->id;
