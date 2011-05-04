@@ -72,18 +72,20 @@ class Form_YoutubeApiProfileConfiguration extends Form_ProviderProfileConfigurat
 //		$this->addMetadataProfile();
 		
 		$this->addDisplayGroup(
-			array('username', 'password',  'metadata_profile_id'), 
+			array('username', 'password'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
 				
+		$this->addMetadataProfile();
+		
 		//  Metadata
 		$this->addElement('text', 'default_category', array(
 			'label' => 'Default Category:',
 		));
 		
 		$this->addDisplayGroup(
-			array('default_category'), 
+			array('default_category', 'metadata_profile_id'), 
 			'metadata',
 			array('legend' => 'Metadata', 'decorators' => array('FormElements', 'Fieldset'))
 		);
