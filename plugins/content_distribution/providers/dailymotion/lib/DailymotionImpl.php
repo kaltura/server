@@ -1,8 +1,4 @@
 <?php
-
-
-require_once 'Dailymotion.php';
-
 class DailyMotionImpl
 {	
 	/**
