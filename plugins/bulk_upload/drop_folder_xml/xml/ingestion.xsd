@@ -180,7 +180,11 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="playlists" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="playlists" minOccurs="0" maxOccurs="1" >
+				<xs:annotation>
+					<xs:documentation>Used to define the playlists of the media, currently not supported</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -400,6 +404,13 @@
 			<xs:annotation>
 				<xs:documentation>
 					The flavor params system name to be associated with this flavor asset.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="assetId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>
+					The asset id to be updated with this resource userd only for update
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
