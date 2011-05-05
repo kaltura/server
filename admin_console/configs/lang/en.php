@@ -918,6 +918,24 @@ return array(
 	// Distibution
 	'provider-list intro text'	=>	'From here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
 	'distribution-profiles intro text' =>	'From here you can define and manage specific distribution profiles for each publisher account.',
+
+	// Drop Folder
+	'drop folder list intro text' => 'Here you can manage all ingestion drop folders used by the publishers registered on your Kaltura video platform deployment',
+
+	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED' => 'Enabled',
+
+	'Kaltura_Client_DropFolder_Enum_DropFolderType::LOCAL' => 'Local',
+
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
+
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE' => 'Automatic',
+	'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::MANUAL_DELETE' => 'Manual',
+
+	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW' => 'Add as new',
+	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_ADD_AS_NEW' => 'Match existing or add as new',
+	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_KEEP_IN_FOLDER' => 'Match existing or keep in folder',
 );
 
 

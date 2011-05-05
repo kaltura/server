@@ -2,7 +2,7 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator
+class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages
 {
 	const PLUGIN_NAME = 'dropFolder';
 	
@@ -115,6 +115,17 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			return array('DropFolderPermissionName');
 			
 		return array();
-	}	
+	}
+
+	public static function getAdminConsolePages()
+	{
+		$pages = array();
+		/*
+		$pages[] = new DropFolderListAction();
+		$pages[] = new DropFolderConfigureAction();
+		$pages[] = new DropFolderSetStatusAction();
+		*/
+		return $pages;
+	}
 	
 }
