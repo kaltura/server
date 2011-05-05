@@ -224,6 +224,16 @@ class KalturaEntryService extends KalturaBaseService
         if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 			
+		$dbFlavorParams = assetParamsPeer::retrieveByPK($dbAsset->getFlavorParamsId());
+		if($dbFlavorParams)
+		{
+			$dbAsset->setBitrate($dbFlavorParams->getVideoBitrate());
+			$dbAsset->setContainerFormat($dbFlavorParams->getFormat());
+			$dbAsset->setFrameRate($dbFlavorParams->getFrameRate());
+			$dbAsset->setHeight($dbFlavorParams->getHeight());
+			$dbAsset->setWidth($dbFlavorParams->getWidth());
+			$dbAsset->setTags($dbFlavorParams->getTags());
+		}
 		$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 		$dbAsset->save();
 		
