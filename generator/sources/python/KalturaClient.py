@@ -2,6 +2,8 @@ from KalturaCoreClient import *
 from KalturaClientBase import *
 from xml.parsers.expat import ExpatError
 from xml.dom import minidom
+from threading import Timer
+import socket
 import urllib
 import time
 import sys
@@ -148,8 +150,12 @@ class KalturaClient:
 
         return (url, params, files)
 
-    # Send http request
-    def doHttpRequest(self, url, params = KalturaParams(), files = KalturaFiles()):
+    @staticmethod
+    def closeHandle(fh):
+        fh.close()
+
+    @staticmethod
+    def openRequestUrl(url, params, files):
         if len(files.get()) == 0:
             try:
                 f = urllib.urlopen(url, urllib.urlencode(params.get()))
@@ -164,11 +170,42 @@ class KalturaClient:
                 f = urllib2.urlopen(request)
             except Exception, e:
                 raise KalturaClientException(e, KalturaClientException.ERROR_CONNECTION_FAILED)
+        return f
 
+    @staticmethod
+    def readHttpResponse(f, requestTimeout):
+        if requestTimeout != None:
+            readTimer = Timer(requestTimeout, KalturaClient.closeHandle, [f])
+            readTimer.start()
         try:
-            return f.read()
-        except Exception, e:
-            raise KalturaClientException(e, KalturaClientException.ERROR_READ_FAILED)
+            try:
+                data = f.read()
+            except AttributeError, e:      # socket was closed while reading
+                raise KalturaClientException(e, KalturaClientException.ERROR_READ_TIMEOUT)
+            except Exception, e:
+                raise KalturaClientException(e, KalturaClientException.ERROR_READ_FAILED)
+        finally:
+            if requestTimeout != None:
+                readTimer.cancel()
+        return data
+
+    # Send http request
+    def doHttpRequest(self, url, params = KalturaParams(), files = KalturaFiles()):
+        if len(files.get()) == 0:
+            requestTimeout = self.config.requestTimeout
+        else:
+            requestTimeout = None
+            
+        if requestTimeout != None:
+            origSocketTimeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(requestTimeout)
+        try:
+            f = self.openRequestUrl(url, params, files)
+            data = self.readHttpResponse(f, requestTimeout)
+        finally:
+            if requestTimeout != None:
+                socket.setdefaulttimeout(origSocketTimeout)
+        return data
         
     def parsePostResult(self, postResult):
         if len(postResult) > 1024:

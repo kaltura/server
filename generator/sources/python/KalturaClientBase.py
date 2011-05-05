@@ -195,6 +195,7 @@ class KalturaClientException(Exception):
     ERROR_INVALID_PARTNER_ID = -6
     ERROR_INVALID_OBJECT_TYPE = -7
     ERROR_RESULT_NOT_FOUND = -8
+    ERROR_READ_TIMEOUT = -9
   
     def __init__(self, message, code):
         self.code = code
@@ -212,6 +213,7 @@ class KalturaConfiguration:
         self.partnerId                  = None
         self.format                     = KALTURA_SERVICE_FORMAT_XML
         self.clientTag                  = "python"
+        self.requestTimeout             = 10
         
         if type(partnerId) != int:
             raise KalturaClientException("Invalid partner id", KalturaClientException.ERROR_INVALID_PARTNER_ID)
