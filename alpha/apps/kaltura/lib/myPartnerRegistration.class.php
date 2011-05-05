@@ -156,7 +156,7 @@ class myPartnerRegistration
 		{
 			// this is a child partner of some VAR/partner GROUP
 			$newPartner->setPartnerParentId( $this->partnerParentId );
-			$newPartner->setMonitorUsage(0);
+			$newPartner->setMonitorUsage(PartnerFreeTrialType::NO_LIMIT);
 		}
 		
 		if(substr_count($description, 'Drupal module|'))
