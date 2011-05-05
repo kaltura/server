@@ -14,8 +14,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_ALLOW_RESPONSES = 'allowResponses';
 	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
 
-	const METADATA_FIELD_PLAYLIST = 'YouTubePlaylist';
-	const METADATA_FIELD_PLAYLISTS = 'YouTubePlaylists';
+	const METADATA_FIELD_DESCRIPTION = 'YoutubeDescription';
 	
 	const ENTRY_NAME_MINIMUM_LENGTH = 1;
 	const ENTRY_NAME_MAXIMUM_LENGTH = 60;
@@ -124,6 +123,50 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
 				$validationError->setValidationErrorParam(self::ENTRY_EACH_TAG_MAXIMUM_LENGTH);
 				$validationErrors[] = $validationError;
+			}
+		}
+	
+		$metadataProfileId = $this->getMetadataProfileId();
+		if(!$metadataProfileId)
+			return $validationErrors;
+		
+		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($this->getMet, self::METADATA_FIELD_DESCRIPTION);
+		if(!$metadataProfileCategoryField)
+			return $validationErrors;
+		
+		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		if(!$metadata)
+			return $validationErrors;
+		
+		if($metadata)
+		{
+			$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_DESCRIPTION);
+			
+			if(count($values))
+			{	
+				foreach($values as $value)
+				{
+					if(!strlen($value))
+						continue;
+				
+					// validate entry description minumum length of 1 character
+					if(strlen($value) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
+					{
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'YouTube description is too short');
+						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
+						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
+						$validationErrors[] = $validationError;
+					}
+				
+					// validate entry description maximum length of 60 characters
+					if(strlen($value) > self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH)
+					{
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'YouTube description is too long');
+						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH);
+						$validationErrors[] = $validationError;
+					}
+				}
 			}
 		}
 		

@@ -52,6 +52,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$entry = $this->kalturaClient->media->get($entryId);
 	
 		$category = $distributionProfile->defaultCategory;
+		$description = $entry->description;
 		try{
 			$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, KalturaMetadataObjectType::ENTRY, $distributionProfile->metadataProfileId);
 			if(count($metadataObjects))
@@ -59,6 +60,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				$metadataCategory = $this->findMetadataValue($metadataObjects, 'YoutubeCategory');
 				if($metadataCategory)
 					$category = $metadataCategory;
+					
+				$metadataDescription = $this->findMetadataValue($metadataObjects, 'YoutubeDescription');
+				if($metadataDescription && strlen($metadataDescription))
+					$description = $metadataDescription;
 			}
 		}
 		catch (Exception $e){}
@@ -67,7 +72,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$props['keywords'] = $entry->tags;
 		$props['title'] = $entry->name;
 		$props['category'] = $category;
-		$props['description'] = $entry->description;
+		$props['description'] = $description;
 		
 //		affects nothing
 //		$props['start_date'] = $data->entryDistribution->sunrise;

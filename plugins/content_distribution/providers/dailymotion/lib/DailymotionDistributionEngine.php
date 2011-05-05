@@ -42,23 +42,6 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		return $this->doSubmit($data, $data->distributionProfile);
 	}
 
-	protected function newCustomDataElement($title, $value = '')
-	{
-		$customDataElement = new DailymotionCustomDataElement();
-		$customDataElement->title = $title;
-		$customDataElement->value = $value;
-		return $customDataElement;
-	}
-	
-	private function getFlavorFormat($containerFormat)
-	{
-		$containerFormat = trim(strtolower($containerFormat));
-		if(isset(self::$containerFormatMap[$containerFormat]))
-			return self::$containerFormatMap[$containerFormat];
-			
-		return DailymotionFormat::_UNKNOWN;
-	}
-	
 	/**
 	 * @param KalturaDistributionJobData $data
 	 * @param KalturaDailymotionDistributionProfile $distributionProfile
@@ -66,16 +49,21 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	 */
 	public function getDailymotionProps(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaDailymotionDistributionProfile $distributionProfile)
 	{	
-		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
+		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, KalturaMetadataObjectType::ENTRY, $distributionProfile->metadataProfileId);
+	
+		$description = $entry->description;
+		$metadataDescription = $this->findMetadataValue($metadataObjects, 'DailymotionDescription');
+		if($metadataDescription && strlen($metadataDescription))
+			$description = $metadataDescription;
+		
 		$props = array();
 		$props['tags'] = explode(",",$this->findMetadataValue($metadataObjects, 'Keywords'));
 		$props['title'] = $entry->name;
 		$props['channel'] = $this->findMetadataValue($metadataObjects, 'DailymotionCategory');
-		$props['description'] = $entry->description;
+		$props['description'] = $description;
 		$props['date'] = time();
 		$props['language'] = 'en';
 		$props['published']= true;
-		
 
 		return $props;
 	}
