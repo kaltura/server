@@ -184,33 +184,35 @@ class assetParamsPeer extends BaseassetParamsPeer
 		return parent::OM_CLASS;
 	}
 
+	protected static function filterSelectResultsCallback($obj)
+	{
+		$requiredPermissions = $obj->getRequiredPermissions();
+		if(!$requiredPermissions || !count($requiredPermissions))
+		{
+			return true;
+		}
+		
+		foreach($requiredPermissions as $requiredPermission)
+		{
+			if(!PermissionPeer::isValidForPartner($requiredPermission, self::$filterPartner))
+			{
+				self::excludeId($obj->getId());
+				return false; 
+			}
+		}
+		return true;
+	}
 	public static function filterSelectResults(&$selectResults)
 	{
 		$criteria_filter = assetParamsPeer::getCriteriaFilter();
-		
 		if(!$criteria_filter->isEnabled() || !self::$filterPartner)
 		{
 			return;
 		}
 		
-		foreach ($selectResults as $key => $obj)
-		{
-			$requiredPermissions = $obj->getRequiredPermissions();
-			if(!$requiredPermissions || !count($requiredPermissions))
-			{
-				continue;
-			}
-			
-			foreach($requiredPermissions as $requiredPermission)
-			{
-				if(!PermissionPeer::isValidForPartner($requiredPermission, self::$filterPartner))
-				{
-					self::excludeId($obj->getId());
-					unset($selectResults[$key]);
-					break; 
-				}
-			}
-		}
+		$selectResults = array_filter(
+			$selectResults, 
+			array('assetParamsPeer', 'filterSelectResultsCallback'));
 	}
 		
 	public static function alternativeCon($con)

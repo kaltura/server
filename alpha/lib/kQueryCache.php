@@ -58,9 +58,9 @@ class kQueryCache
 			return null;
 		}
 		
-		foreach ($invalidationKeys as &$invalidationKey)
+		foreach ($invalidationKeys as $index => $invalidationKey)
 		{
-			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
+			$invalidationKeys[$index] = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 		}
 		$cacheKey = self::CACHE_PREFIX_QUERY.$queryType.md5(serialize($criteria));
 		
