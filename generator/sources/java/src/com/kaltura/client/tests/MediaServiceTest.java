@@ -88,8 +88,8 @@ public class MediaServiceTest extends BaseTest {
 		try {
 
 			//wait for the newly-added clip to process
-			getProcessedClip(id1);
-			getProcessedClip(id2);
+			getProcessedClip(id1, true);
+			getProcessedClip(id2, true);
 						
 			KalturaMediaService mediaService = this.client.getMediaService();
 
@@ -98,7 +98,7 @@ public class MediaServiceTest extends BaseTest {
 			filter.mediaTypeEqual = null;
 			filter.statusEqual = null;
 			filter.typeEqual = null;
-			filter.nameLike = "test";
+			filter.nameMultiLikeOr = name1 + "," + name2;
 			
 			KalturaMediaListResponse listResponse = mediaService.list(filter);			
 			assertEquals(listResponse.totalCount, 2);
@@ -295,7 +295,7 @@ public class MediaServiceTest extends BaseTest {
 		boolean exceptionThrown = false;
 		KalturaMediaEntry entry = new KalturaMediaEntry();
 		try {
-			File file = new File("/var/tmp/video.flv");
+			File file = new File("bin/DemoVideo.flv");
 			String result = mediaService.upload(file);
 			logger.debug("After upload, result:" + result);			
 			entry.name = name;

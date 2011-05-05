@@ -19,9 +19,9 @@ import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.types.KalturaMediaEntry;
 
 public class BaseTest extends TestCase {
-	public final int PARTNER_ID = 0; // PARTNER_ID_GOES_HERE
-	public final String SECRET = ""; // SERVICE_SECRET_GOES_HERE
-	public final String ADMIN_SECRET = ""; // ADMIN_SECRET_GOES_HERE
+	public final int PARTNER_ID = 224962; // PARTNER_ID_GOES_HERE
+	public final String SECRET = "22a4644b9e4522f34e957394c771fda2"; // SERVICE_SECRET_GOES_HERE
+	public final String ADMIN_SECRET = "b47cd50fad6d869b8d9ec0b706d2c07a"; // ADMIN_SECRET_GOES_HERE
 	public final String ENDPOINT = "http://www.kaltura.com";
 	
 	protected String testUrl = "http://kaldev.kaltura.com/content/zbale/java_client_test_video.flv";
@@ -108,21 +108,25 @@ public class BaseTest extends TestCase {
 	}
 	
 	protected KalturaMediaEntry getProcessedClip(String id) throws Exception {
+		return getProcessedClip(id, false);
+	}
+	
+	protected KalturaMediaEntry getProcessedClip(String id, Boolean checkReady) throws Exception {
 		int maxTries = 30;
-		int sleepInterval = 12000;
+		int sleepInterval = 60000;
 		int counter = 0;
 		KalturaMediaEntry retrievedEntry = null;		
 		try {
 			KalturaMediaService mediaService = this.client.getMediaService();
 			retrievedEntry = mediaService.get(id);
-			while (retrievedEntry.status != KalturaEntryStatus.READY) {
+			while (checkReady && retrievedEntry.status != KalturaEntryStatus.READY) {
 				
 				counter++;
 
 				if (counter >= maxTries) {
 					throw new Exception("Max retries (" + maxTries + ") when retrieving entry:" + id);
 				} else {
-					logger.debug("On try: " + counter + ", clip not ready. waiting...");
+					logger.info("On try: " + counter + ", clip not ready. waiting "+(sleepInterval/60000)+" minutes...");
 					try {
 						Thread.sleep(sleepInterval);
 					} catch (InterruptedException ie) {							
@@ -134,7 +138,7 @@ public class BaseTest extends TestCase {
 			} //wend
 		
 		} catch (KalturaApiException kae) {
-			logger.error("Problem retrieving entry");
+			logger.error("Problem retrieving entry: " + kae.getLocalizedMessage());
 		} 
 	
 		return retrievedEntry;
@@ -149,7 +153,7 @@ public class BaseTest extends TestCase {
 		
 		KalturaMediaService mediaService = this.client.getMediaService();
 		for (String id : this.testIds) {
-			logger.debug("Deleting " + id);
+			logger.info("Deleting " + id);
 			try {
 				getProcessedClip(id);
 				mediaService.delete(id);			

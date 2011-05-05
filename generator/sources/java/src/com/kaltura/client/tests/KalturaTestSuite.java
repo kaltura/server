@@ -11,7 +11,6 @@ public class KalturaTestSuite {
 		Class[] testClasses = { SystemServiceTest.class,
 								SessionServiceTest.class,
 								MediaServiceTest.class,
-								PlaylistServiceTest.class,
 								UiConfServiceTest.class };
 		
 		TestSuite suite = new TestSuite(testClasses);
