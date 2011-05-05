@@ -564,7 +564,10 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			}
 			if ($this->endsWith ( $paramsStr, ", " ))
 				$paramsStr = substr ( $paramsStr, 0, strlen ( $paramsStr ) - 2 );
-			$this->appendLine ( "        return this." . $action . "($paramsStr);" );
+			if ($resultType)
+				$this->appendLine ( "        return this." . $action . "($paramsStr);" );
+			else
+				$this->appendLine ( "        this." . $action . "($paramsStr);" );
 			$this->appendLine ( "    }" );
 		}
 		
