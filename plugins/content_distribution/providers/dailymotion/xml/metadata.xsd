@@ -13,6 +13,17 @@
 					  <description/>
 					</xsd:appinfo>
 				  </xsd:annotation>
+				</xsd:element>		
+				<xsd:element name="DailymotionDescription" minOccurs="0" maxOccurs="1" type="textType">
+				  <xsd:annotation>
+					<xsd:documentation/>
+					<xsd:appinfo>
+					  <label>Dailymotion Description</label>
+					  <key>DailymotionDescription</key>
+					  <searchable>true</searchable>
+					  <description/>
+					</xsd:appinfo>
+				  </xsd:annotation>
 				</xsd:element>							
 				<xsd:element name="DailymotionCategory" minOccurs="1" maxOccurs="1">
 					<xsd:annotation>

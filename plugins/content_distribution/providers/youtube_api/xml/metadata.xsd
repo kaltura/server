@@ -1,7 +1,18 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <xsd:element name="metadata">
     <xsd:complexType>
-      <xsd:sequence>
+      <xsd:sequence>		
+		<xsd:element name="YoutubeDescription" minOccurs="0" maxOccurs="1" type="textType">
+		  <xsd:annotation>
+			<xsd:documentation/>
+			<xsd:appinfo>
+			  <label>Youtube Description</label>
+			  <key>YoutubeDescription</key>
+			  <searchable>true</searchable>
+			  <description/>
+			</xsd:appinfo>
+		  </xsd:annotation>
+		</xsd:element>	
         <xsd:element name="YoutubeCategory" minOccurs="0" maxOccurs="1">
           <xsd:annotation>
             <xsd:documentation></xsd:documentation>
