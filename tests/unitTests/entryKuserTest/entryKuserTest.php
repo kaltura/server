@@ -1,8 +1,10 @@
 <?php
 
+define('KALTURA_CLIENT_PATH', dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'lib');
+
 require_once 'PHPUnit\Framework\TestCase.php';
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bootstrap.php');
-require_once(KALTURA_CLIENT_PATH);
+require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bootstrap.php');
+//require_once(KALTURA_CLIENT_PATH);
 
 /**
  * 
@@ -27,8 +29,6 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	public $entryId = '0_cdnzza3c';
 	public $puser1 = 'test1';
 	public $puser2 = 'test2';
-	public $ksuer1 = '';
-	public $ksuer2 = '';
 	public $partnerId = 495787;  
 	public $adminSecret = '2dc17b5563696fceb430a8431a2e4a32';
 	public $userSecret = '526603c21b71f4c43b9751bfcca6f387';
@@ -39,8 +39,9 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	 * @param KalturaSessionType $type
 	 * @param string $userId
 	 */
-	private function startSession($type, $userId)
+	private function startSession($type, $userId = null)
 	{
+		print("start session\n");
 		$secret = ($type == KalturaSessionType::ADMIN) ? self::TEST_ADMIN_SECRET : self::TEST_USER_SECRET;
 		$ks = $this->client->session->start($secret, $userId, $type, self::TEST_PARTNER_ID);
 		$this->assertNotNull($ks);
@@ -64,7 +65,9 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	 */
 	private function getKuserIdFromPuser($puserId)
 	{
+		kuserPeer::clearInstancePool();
 		$kuser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $puserId);
+		print("in getKuserIdFromPuser kuserId [" . $kuser->getId() . "]\n");
 		return $kuser->getId();
 	}
 	
@@ -75,61 +78,52 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	 */
 	private function getKuserIdFromEntry($entryId)
 	{
+		entryPeer::clearInstancePool();
 		$entry = entryPeer::retrieveByPK($entryId);
+		print("in getKuserIdFromEntry kuserId [ ". $entry->getKuserId() ."]\n");
 		return $entry->getKuserId();
 	}
 	
 	/**
 	 * 
-	 * Test if the user update is valid
+	 * Checks if the given exception has the same message and code
+	 * @param KalturaException $exceptionThrown
+	 * @param int $code
+	 * @param string $message
 	 */
-	public function testUpdateAction()
+	private function checkException($exceptionThrown, array $code = null, $message = null)
 	{
-		$this->startSession(KalturaSessionType::ADMIN, $this->getDbPartner()->getAdminUserId());
-		
-		$entry = $this->client->baseEntry->get($this->entryId);
-		$entry = $this->switchUsers($entry);
-		
-		$this->client->baseEntry->update($this->entryId, $entry);
-		$updatedEntry = $this->client->baseEntry->get($this->entryId);
-		
-		if($updatedEntry->userId != $this->originalPuser) // puser was update we now check if the kuser was changed as well
-		{
-			$newKuserId = $this->getKuserIdFromPuser($updatedEntry->userId);
-			$entryKuser = $this->getKuserIdFromEntry($this->entryId);
-			if($newKuserId == $entryKuser )
-			{
-				//if the kusers are the same then all is okay
-				return;
-			}
-			else  //the kusers are not the same
-			{
-				$this->fail("The Kuser wasn't changed");
-			}
-			
-		}
-		else 
-		{
-			$this->fail("The Puser wasn't changed");
+		print ("in checkException\n");
+		if (!$exceptionThrown) {
+			$this->fail('No exception was thrown');
 		}
 		
-		// failure to update partner 0 roles
-		
+		if ($code && !in_array($exceptionThrown->getCode(), $code)) {
+				$this->fail('Exception thrown with code ['.$exceptionThrown->getCode().'] instead of ['.$code.']');
+			}
+							
+		if ($message && $exceptionThrown->getMessage() != $message) {
+			$this->fail('Exception thrown with message ['.$exceptionThrown->getMessage().'] instead of ['.$message.']');
+		}
 	}
 
+	/**
+	 * 
+	 * Switchthe users on the entry
+	 * @param KalturaBaseEntry $entry
+	 */
 	private function switchUsers(KalturaBaseEntry $entry)
 	{
 		if($entry->userId == $this->puser1)
 		{
-			$this->originalPuser = $this->puser1;
 			$entry->userId = $this->puser2;
 		}
-		
-		if($entry->userId == $this->puser2)
+		else if($entry->userId == $this->puser2)
 		{
-			$this->originalPuser = $this->puser2;
 			$entry->userId = $this->puser1;
 		}
+		
+		print("In switchUsers originalPuser[$this->originalPuser], newUserId[$entry->userId]\n");
 		
 		return $entry;
 	}
@@ -163,425 +157,90 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		parent::tearDown ();
 	}
 
-}
-
-/**
- * test case.
- */
-class UserRoleServiceTest extends PHPUnit_Framework_TestCase {
-	
-	private $addedRoleIds = array();
-	
-//	private function checkException($exceptionThrown, $code = null, $message = null)
-//	{
-//		if (!$exceptionThrown) {
-//			$this->fail('No exception was thrown');
-//		}
-//		if ($code && $exceptionThrown->getCode() != $code) {
-//			$this->fail('Exception thrown with code ['.$exceptionThrown->getCode().'] instead of ['.$code.']');
-//		}
-//		if ($message && $exceptionThrown->getMessage() != $message) {
-//			$this->fail('Exception thrown with message ['.$exceptionThrown->getMessage().'] instead of ['.$message.']');
-//		}
-//	}
-	
-	
-	
-	private function addRoleWrap(KalturaUserRole $role)
+	/**
+	 * 
+	 * Test if the user update is valid
+	 */
+	public function testUpdateAction()
 	{
-		$addedRole = $this->client->userRole->add($role);
-		$this->addedRoleIds[] = $addedRole->id;
-		return $addedRole;
-	}
-	
-//	
-//	public function testFailuresUserSession()
-//	{
-//		// failure to make all requests with a user KS instead of an admin KS
-//		
-//		$this->startSession(KalturaSessionType::USER, null); // start a user session
-//		
-//		// add action
-//		$exceptionThrown = false;
-//		try { $this->addRoleWrap(new KalturaUserRole()); }
-//		catch (Exception $e) { $exceptionThrown = $e; }
-//		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
-//		
-//		// clone action
-//		$exceptionThrown = false;
-//		try { $this->client->userRole->cloneAction(rand(0, 10)); }
-//		catch (Exception $e) { $exceptionThrown = $e; }
-//		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
-//		
-//		// delete action
-//		$exceptionThrown = false;
-//		try { $this->client->userRole->delete(rand(0, 10)); }
-//		catch (Exception $e) { $exceptionThrown = $e; }
-//		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
-//		
-//		// get action
-//		$exceptionThrown = false;
-//		try { $this->client->userRole->get(rand(0, 10)); }
-//		catch (Exception $e) { $exceptionThrown = $e; }
-//		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
-//		
-//		// list action
-//		$exceptionThrown = false;
-//		try { $this->client->userRole->listAction(); }
-//		catch (Exception $e) { $exceptionThrown = $e; }
-//		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
-//		
-//		// update action
-//		$exceptionThrown = false;
-//		try { $this->client->userRole->update(rand(0, 10), new KalturaUserRole()); }
-//		catch (Exception $e) { $exceptionThrown = $e; }
-//		$this->checkException($exceptionThrown, 'SERVICE_FORBIDDEN');
-//	}
-//	
-	
-	public function testAddAction()
-	{
-		$this->startSession(KalturaSessionType::ADMIN, $this->getDbPartner()->getAdminUserId());
-				
-		// add role
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'New test role'.uniqid();
-		$newRole->description = 'Test description'.uniqid();
-		$newRole->status = KalturaUserRoleStatus::ACTIVE;
-		$newRole->permissionNames = KalturaPermissionName::ACCESS_CONTROL_BASE.','.KalturaPermissionName::INTEGRATION_BASE;
-		$addedRole = $this->addRoleWrap($newRole);
+		$this->startSession(KalturaSessionType::ADMIN);
 		
-		// verify the returned role object's parameters
-		$this->assertType('KalturaUserRole', $addedRole);
-		$this->assertEquals($newRole->name, $addedRole->name);
-		$this->assertEquals($newRole->description, $addedRole->description);
-		$this->assertEquals($newRole->status, $addedRole->status);
-		$this->assertEquals($newRole->permissionNames, $addedRole->permissionNames);
-		$this->assertEquals(self::TEST_PARTNER_ID, $addedRole->partnerId);
-		$this->assertNotNull($addedRole->id);
-		$this->assertNotNull($addedRole->createdAt);
-		$this->assertNotNull($addedRole->updatedAt);
+		$entry = $this->client->baseEntry->get($this->entryId);
+		$this->originalPuser = $entry->userId; 
+		$originalKuser = $this->getKuserIdFromEntry($this->entryId);
 		
-		// try to get the role and verify returned parameters
-		$getRole = $this->client->userRole->get($addedRole->id);
-		$this->assertType('KalturaUserRole', $getRole);
-		$this->assertEquals($newRole->name, $getRole->name);
-		$this->assertEquals($newRole->description, $getRole->description);
-		$this->assertEquals($newRole->status, $getRole->status);
-		$this->assertEquals($newRole->permissionNames, $getRole->permissionNames);
-		$this->assertEquals(self::TEST_PARTNER_ID, $getRole->partnerId);
-		$this->assertEquals($addedRole->id, $getRole->id);
-		$this->assertEquals($addedRole->createdAt, $getRole->createdAt);
-		$this->assertEquals($addedRole->updatedAt, $getRole->updatedAt);
+		print ("original puser [$this->originalPuser], original kuser [$originalKuser]\n");
+		$entry = $this->switchUsers($entry);
 		
-		// get the role in a list
-		$roleList = $this->client->userRole->listAction();
-		$roleList = $roleList->objects;
-		$found = false;
-		foreach ($roleList as $role) {
-			if ($role->id === $getRole->id && $role->name === $getRole->name) {
-				$found = true;
-				break;
+		$this->client->baseEntry->update($this->entryId, $entry);
+		
+		$updatedEntry = $this->client->baseEntry->get($this->entryId);
+		
+		print("updatedEntry->userId [$updatedEntry->userId], originalPuser [$this->originalPuser] \n");
+		if($updatedEntry->userId != $this->originalPuser) // puser was update we now check if the kuser was changed as well
+		{
+			$newKuserId = $this->getKuserIdFromPuser($updatedEntry->userId);
+			$entryKuserId = $this->getKuserIdFromEntry($this->entryId);
+			if($newKuserId == $entryKuserId)
+			{
+				//if the kusers are the same then all is okay
+				//return; success!!! so nothing todo
+				$this->assertEquals(true, true); // insert 1 success
 			}
-		}
-		if (!$found) {
-			$this->fail('New added role with id ['.$getRole->id.'] was not returned from userRole->list action');
-		}
-		
-		// add a role with no status and verify that it is set to ACTIVE
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Test role with no status'.uniqid();
-		$addedRole = $this->addRoleWrap($newRole);
-		$this->assertEquals(KalturaUserRoleStatus::ACTIVE, $addedRole->status);
-	}
-	
-	
-	public function testAddActionFailures()
-	{
-		$this->startSession(KalturaSessionType::ADMIN, $this->getDbPartner()->getAdminUserId());
-		
-		$failedRoleNames = array();
-		
-		// failure to add a role with no name
-		$newRole = new KalturaUserRole();
-		$exceptionThrown = false;
-		try { $addedRole = $this->addRoleWrap($newRole); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'PROPERTY_VALIDATION_CANNOT_BE_NULL');
-		$failedRoleNames[] = $newRole->name;
-		
-		// failure to add a role with an invalid permission
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Stam 1'.uniqid();
-		$newRole->permissionNames = uniqid();
-		$exceptionThrown = false;
-		try { $addedRole = $this->addRoleWrap($newRole); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'PERMISSION_NOT_FOUND');
-		$failedRoleNames[] = $newRole->name;
-		
-		// failure to add a role with a permission which the partner does not have
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Stam 2'.uniqid();
-		$newRole->permissionNames = PermissionName::BATCH_BASE;
-		$exceptionThrown = false;
-		try { $addedRole = $this->addRoleWrap($newRole); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'PERMISSION_NOT_FOUND');
-		$failedRoleNames[] = $newRole->name;
-		
-		// failure to choose role's ID
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Stam 3'.uniqid();
-		$newRole->id = rand(1,100);
-		$exceptionThrown = false;
-		try { $addedRole = $this->addRoleWrap($newRole); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'PROPERTY_VALIDATION_NOT_UPDATABLE');
-		$failedRoleNames[] = $newRole->name;
-		
-		// failure to choose role's partner ID
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Stam 4'.uniqid();
-		$newRole->partnerId = rand(100, 300);
-		$exceptionThrown = false;
-		try { $addedRole = $this->addRoleWrap($newRole); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'PROPERTY_VALIDATION_NOT_UPDATABLE');
-		$failedRoleNames[] = $newRole->name;
-		
-		// verify that none of the failed roles is returned in the roles list
-		$roleList = $this->client->userRole->listAction();
-		$roleList = $roleList->objects;
-		foreach ($roleList as $role) {
-			if (in_array($role->name, $failedRoleNames)) {
-				$this->fail('Failed role with name ['.$role->name.'] was mistakenly added and returned in list with ID ['.$role->id.']');
+			else  //the kusers are not the same
+			{
+				$this->fail("The Kuser wasn't changed");
 			}
-		}
-	}
-	
-	
-	public function testCloneAction()
-	{
-		$this->startSession(KalturaSessionType::ADMIN, $this->getDbPartner()->getAdminUserId());
-		
-		// failure to clone an invalid role
-		$roleId = rand(-100, -1);
-		$exceptionThrown = false;
-		try { $this->client->userRole->cloneAction($roleId); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_OBJECT_ID');
-		
-		// failure to clone another partner's role
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID), Criteria::IN);
-		$systemPartnersRoles = UserRolePeer::doSelect($c);
-		foreach ($systemPartnersRoles as $systemPartnerRole)
-		{
-			$exceptionThrown = false;
-			try { $this->client->userRole->cloneAction($systemPartnerRole->getId()); }
-			catch (Exception $e) { $exceptionThrown = $e; }
-			$this->checkException($exceptionThrown, 'INVALID_OBJECT_ID');
-		}
-		
-		// failure to clone a deleted role
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Deleted role'.uniqid();
-		$addedRole = $this->addRoleWrap($newRole);
-		$this->client->userRole->delete($addedRole->id);
-		$exceptionThrown = false;
-		try { $this->client->userRole->cloneAction($addedRole->id); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_OBJECT_ID');
-		
-		// clone a valid role and validate all fields except for ID
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'New test role to clone'.uniqid();
-		$newRole->description = 'Test description'.uniqid();
-		$newRole->permissionNames = KalturaPermissionName::ADMIN_ROLE_DELETE.','.KalturaPermissionName::CONTENT_MANAGE_RECONVERT;
-		$addedRole = $this->addRoleWrap($newRole); // add a new role
-		$clonedRole = $this->client->userRole->cloneAction($addedRole->id); // clone role
-		$this->addedRoleIds[] = $clonedRole->id;
-		$this->assertType('KalturaUserRole', $clonedRole);
-		$this->assertGreaterThan($addedRole->id, $clonedRole->id);
-		$this->assertEquals($newRole->name, $addedRole->name);
-		$this->assertEquals($newRole->description, $addedRole->description);
-		$this->assertEquals(KalturaUserRoleStatus::ACTIVE, $clonedRole->status);
-		$this->assertEquals($newRole->permissionNames, $clonedRole->permissionNames);
-		$this->assertEquals(self::TEST_PARTNER_ID, $clonedRole->partnerId);
-		$this->assertNotNull($clonedRole->createdAt);
-		$this->assertNotNull($clonedRole->updatedAt);
-	}
-	
-	
-	public function testDeleteAction()
-	{
-		$this->startSession(KalturaSessionType::ADMIN, $this->getDbPartner()->getAdminUserId());
-		
-		// failure to delete partner 0 role
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::EQUAL);
-		$partner0Roles = UserRolePeer::doSelect($c);
-		foreach ($partner0Roles as $role)
-		{
-			$exceptionThrown = false;
-			try { $this->client->userRole->delete($role->getId()); }
-			catch (Exception $e) { $exceptionThrown = $e; }
-			$this->checkException($exceptionThrown, 'INVALID_OBJECT_ID');
-		}
-		
-		// failure to delete another partner's role
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, self::TEST_PARTNER_ID, Criteria::NOT_EQUAL);
-		$otherPartnerRoles = UserRolePeer::doSelect($c);
-		for ($i=1; $i<4; $i++)
-		{
-			$randId = rand(0, count($otherPartnerRoles)-1);
-			$exceptionThrown = false;
-			try { $this->client->userRole->delete($otherPartnerRoles[$randId]->getId()); }
-			catch (Exception $e) { $exceptionThrown = $e; }
-			$this->checkException($exceptionThrown, 'INVALID_OBJECT_ID');
-		}
-		
-		// success deleting current partner's role
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Deleted role'.uniqid();
-		$addedRole = $this->addRoleWrap($newRole);
-		$getRole = $this->client->userRole->get($addedRole->id);
-		$this->assertEquals($newRole->name, $getRole->name);
-		$deletedRole = $this->client->userRole->delete($addedRole->id);
-		$this->assertEquals($newRole->name, $deletedRole->name);
-		$this->assertEquals(KalturaUserRoleStatus::DELETED, $deletedRole->status);
-
-		
-		// verify that deleted role is not returned in get or list
-		$exceptionThrown = false;
-		try { $this->client->userRole->get($addedRole->id); }
-		catch (Exception $e) { $exceptionThrown = $e; }
-		$this->checkException($exceptionThrown, 'INVALID_OBJECT_ID');
-		
-		$roleList = $this->client->userRole->listAction();
-		$roleList = $roleList->objects;
-		foreach ($roleList as $role) {
-			if ($role->name == $newRole->name) {
-				$this->fail('Deleted role with name ['.$role->name.'] was mistakenly returned in list with ID ['.$role->id.']');
-			}
-		}
-	}
-	
-	public function testGetAction()
-	{
-		$this->startSession(KalturaSessionType::ADMIN, $this->getDbPartner()->getAdminUserId());
-		
-		// get a partner 0 role and compare to DB record
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::EQUAL);
-		$partner0Roles = UserRolePeer::doSelect($c);
-		for ($i=1; $i<4; $i++)
-		{
-			$randId = rand(0, count($partner0Roles)-1);
-			$getRole = $this->client->userRole->get($partner0Roles[$randId]->getId());
-			$this->assertType('KalturaUserRole', $getRole);
-			$this->assertEquals(PartnerPeer::GLOBAL_PARTNER, $getRole->partnerId);
-			$this->assertEquals($partner0Roles[$randId]->getId(), $getRole->id);
-			$this->assertEquals($partner0Roles[$randId]->getName(), $getRole->name);
-			$this->assertEquals($partner0Roles[$randId]->getDescription(), $getRole->description);
-			$this->assertEquals($partner0Roles[$randId]->getPartnerId(), $getRole->partnerId);
-			$this->assertEquals($partner0Roles[$randId]->getPermissionNames(), $getRole->permissionNames);
-			$this->assertNotNull($getRole->createdAt);
-			$this->assertNotNull($getRole->updatedAt);					
-		}
-				
-		// get current partner's role and compare to DB record
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, self::TEST_PARTNER_ID, Criteria::EQUAL);
-		$partnerRoles = UserRolePeer::doSelect($c);
-		for ($i=1; $i<4; $i++)
-		{
-			$randId = rand(0, count($partner0Roles)-1);
-			$getRole = $this->client->userRole->get($partnerRoles[$randId]->getId());
-			$this->assertType('KalturaUserRole', $getRole);
-			$this->assertEquals(self::TEST_PARTNER_ID, $getRole->partnerId);
-			$this->assertEquals($partnerRoles[$randId]->getId(), $getRole->id);
-			$this->assertEquals($partnerRoles[$randId]->getName(), $getRole->name);
-			$this->assertEquals($partnerRoles[$randId]->getDescription(), $getRole->description);
-			$this->assertEquals($partnerRoles[$randId]->getPartnerId(), $getRole->partnerId);
-			$this->assertEquals($partnerRoles[$randId]->getPermissionNames(), $getRole->permissionNames);
-			$this->assertNotNull($getRole->createdAt);
-		}
-		
-		// failure to get another partner's role (not partner 0)
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, array(self::TEST_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER), Criteria::NOT_IN);
-		$otherPartnerRoles = UserRolePeer::doSelect($c);
-		for ($i=1; $i<4; $i++)
-		{
-			$randId = rand(0, count($partner0Roles)-1);
-			$exceptionThrown = false;
-			try { $this->client->userRole->get($otherPartnerRoles[$randId]->getId()); }
-			catch (Exception $e) { $exceptionThrown = $e; }
-			$this->checkException($exceptionThrown, 'INVALID_OBJECT_ID');
-		}
-		
-		// add role with permission names = * and verify that all relevant permissions are returned
-		$newRole = new KalturaUserRole();
-		$newRole->name = 'Test role with ';
-		$newRole->permissionNames = UserRole::ALL_PARTNER_PERMISSIONS_WILDCARD;
-		$addedRole = $this->addRoleWrap($newRole);
-		$getRole = $this->client->userRole->get($addedRole->id);
-		$this->assertEquals($addedRole->permissionNames, $getRole->permissionNames);
-		
-		$c = new Criteria();
-		$c->addAnd(PermissionPeer::PARTNER_ID, array(self::TEST_PARTNER_ID, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
-		$c->addAnd(PermissionPeer::TYPE, PermissionType::NORMAL, Criteria::EQUAL);
-		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
-		$allPartnerPermissions = PermissionPeer::doSelect($c);
-		$returnedPermissions = explode(',', trim($getRole->permissionNames,','));
-		$this->assertEquals(count($allPartnerPermissions), count($returnedPermissions));
-		foreach ($allPartnerPermissions as $permission)
-		{
-			$this->assertTrue(in_array($permission->getName(), $returnedPermissions));
-		}
-	}
-	
-	public function testListAction()
-	{
-		$this->startSession(KalturaSessionType::ADMIN, $this->getDbPartner()->getAdminUserId());
-		
-		// get list
-		$listResult = $this->client->userRole->listAction();
-		$roleList = $listResult->objects;
-		$returnedRoleNames = array();
-		foreach ($roleList as $role)
-		{
-			$returnedRoleNames[] = $role->name;
-		}
 			
-		// check that total count is right
-		$this->assertGreaterThan(0, count($roleList));
-		$this->assertEquals(count($roleList), $listResult->totalCount);
-		
-		// check that only partner 0 and current partner roles are returned
-		foreach ($roleList as $role)
+		}
+		else 
 		{
-			if ($role->partnerId != self::TEST_PARTNER_ID && $role->partnerId != PartnerPeer::GLOBAL_PARTNER) {
-				$this->fail('List returned role id ['.$role->id.'] of partner ['.$role->partnerId.'] instead of partner ['.self::TEST_PARTNER_ID.']');
-			}
+			$this->fail("The Puser wasn't changed");
 		}
 		
-		// check that all partner 0 roles are returned
-		$c = new Criteria();
-		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::EQUAL);
-		$partner0Roles = UserRolePeer::doSelect($c);
-		foreach ($partner0Roles as $role)
-		{
-			$this->assertTrue(in_array($role->getName(), $returnedRoleNames));
-		}		
-		
-		//TODO: test filters ?
+		// after we did this we need to fail an update
+		$this->failUpdate($this->puser1);
+		$this->failUpdate($this->puser2);
 	}
 	
+	/**
+	 * 
+	 * Tries to update an entry with a user KS (update should fail with exception)
+	 * @param string $puserId
+	 */
+	private function failUpdate($puserId)
+	{
+		$this->startSession(KalturaSessionType::USER, 'test1');
+				
+		$entry = $this->client->baseEntry->get($this->entryId);
+		$entry = $this->switchUsers($entry);
 		
-
+		try 
+		{
+			$this->client->baseEntry->update($this->entryId, $entry);
+			$this->fail("UpdateShould fail");
+		}
+		catch(Exception $e)
+		{
+			$this->checkException($e, array('INVALID_KS', 'PROPERTY_VALIDATION_ADMIN_PROPERTY'));
+		}
+	}
+	
+	/**
+	 * @param int $partnerId
+	 * @return KalturaClient
+	 */
+	private function getClient($partnerId)
+	{
+		if ($partnerId) {
+			$config = new KalturaConfiguration($partnerId);
+		}
+		else {
+			$config = new KalturaConfiguration();
+		}
+		
+		$config->serviceUrl = 'devtests.kaltura.co.cc';//kConf::get('apphome_url');
+		$client = new KalturaClient($config);
+		return $client;
+	}
 }
-
