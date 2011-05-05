@@ -52,7 +52,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 		if(!$metadataProfileId)
 			return $validationErrors;
 		
-		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($this->getMet, self::METADATA_FIELD_DESCRIPTION);
+		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, self::METADATA_FIELD_DESCRIPTION);
 		if(!$metadataProfileCategoryField)
 			return $validationErrors;
 		
