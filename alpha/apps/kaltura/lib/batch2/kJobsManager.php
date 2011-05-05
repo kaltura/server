@@ -733,33 +733,6 @@ class kJobsManager
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{	
-		// if file size is 0, do not create conversion profile and set entry status as error converting
-		if (filesize($inputFileSyncLocalPath) == 0)
-		{
-			$partner = $entry->getPartner();
-			if($partner && $partner->getImportRemoteSourceForConvert())
-			{
-				$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
-				$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
-				if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-				{
-					$url = $syncFile->getExternalUrl();
-					kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
-				}
-				return null;
-			}
-			
-			$entry->setStatus(entryStatus::ERROR_CONVERTING);
-			$entry->save();
-			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$flavorAsset->setDescription('Entry of size 0 should not be converted');
-			$flavorAsset->save();
-			KalturaLog::err('Entry of size 0 should not be converted');
-			return null;
-		}
-		
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);
@@ -773,6 +746,56 @@ class kJobsManager
 		{
 			$entry->setStatus(entryStatus::PRECONVERT);
 			$entry->save();
+		}
+		
+		// if file size is 0, do not create conversion profile and set entry status as error converting
+		if (filesize($inputFileSyncLocalPath) == 0)
+		{
+			$partner = $entry->getPartner();
+			if($partner && $partner->getImportRemoteSourceForConvert())
+			{
+				$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+				$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+				if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+				{
+					$addImport = false;
+					$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+					$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
+					foreach($flavors as $flavor)
+					{
+						$flavor = new flavorParamsConversionProfile;
+						if($flavor->getOrigin() == assetParamsOrigin::INGEST || $flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
+							continue;
+					
+						if($flavor->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
+						{
+							$siblingFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entry->getId(), $flavor->getFlavorParamsId());
+							if($siblingFlavorAsset)
+								continue;
+						}
+						
+						$addImport = true;
+						break;
+					}
+					
+					if($addImport)
+					{
+						$url = $syncFile->getExternalUrl();
+						kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
+					}
+				}
+				return null;
+			}
+			
+			$entry->setStatus(entryStatus::ERROR_CONVERTING);
+			$entry->save();
+			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->setDescription('Entry of size 0 should not be converted');
+			$flavorAsset->save();
+			KalturaLog::err('Entry of size 0 should not be converted');
+			return null;
 		}
 	
 		$jobData = new kConvertProfileJobData();
