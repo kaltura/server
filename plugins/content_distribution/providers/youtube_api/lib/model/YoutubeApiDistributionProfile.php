@@ -134,9 +134,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 		{
 			if(!strlen($entry->getDescription()))
 			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::DESCRIPTION, 'Description is empty');
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-				$validationErrors[] = $validationError;
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, entryPeer::DESCRIPTION, 'Description is empty');
 			}
 			elseif(strlen($entry->getDescription()) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
 			{
@@ -156,9 +154,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 	
 		if(!strlen($entry->getTags()))
 		{
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Tags are empty');
-			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-			$validationErrors[] = $validationError;
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, entryPeer::TAGS, 'Tags are empty');
 		}
 		elseif(strlen($entry->getTags()) < self::ENTRY_TAGS_MINIMUM_LENGTH)
 		{
