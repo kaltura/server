@@ -91,11 +91,6 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		return ($this->getTable()->getAttribute('raiseEvents', 'true') == 'true');
 	}
 	
-	public function shouldReloadAfterInsert()
-	{
-		return ($this->getTable()->getAttribute('reloadAfterInsert', 'false') == 'true');
-	}
-	
 	public function getSubpackage()
 	{
 		$pkg = $this->getBuildProperty('subpackage');
@@ -157,6 +152,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$createdAtColumn = $table->getColumn(self::KALTURA_COLUMN_CREATED_AT);
 		$updatedAtColumn = $table->getColumn(self::KALTURA_COLUMN_UPDATED_AT);
 		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
+		$reloadOnInsert = $table->isReloadOnInsert();
 		
 		$script .= "
 	/**
@@ -180,7 +176,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function preSave(PropelPDO \$con = null)
 	{";
-		
+		if ($reloadOnInsert)
+		{		
+			$script .= "
+		" . $this->getPeerClassname() . "::setUseCriteriaFilter(false);
+		";
+		}
 		if($customDataColumn)
 		$script .= "
 		\$this->setCustomDataObj();
@@ -202,6 +203,12 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= "
 		\$this->oldCustomDataValues = array();
     	";
+		
+		if ($reloadOnInsert)
+		{		
+			$script .= " 
+		" . $this->getPeerClassname() . "::setUseCriteriaFilter(true);";
+		}
 		
 		$script .= " 
 	}
@@ -234,17 +241,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 * @param PropelPDO \$con 
 	 */
 	public function postInsert(PropelPDO \$con = null)
-	{";
-		if ($this->shouldReloadAfterInsert())
-		{
-			$script .= "
-		" . $this->getPeerClassname() . "::setUseCriteriaFilter(false);
-		\$this->reload();
-		" . $this->getPeerClassname() . "::setUseCriteriaFilter(true);
-		";
-		}
-
-		$script .= "
+	{
 		kQueryCache::invalidateQueryCache(\$this);
 		";
 		
