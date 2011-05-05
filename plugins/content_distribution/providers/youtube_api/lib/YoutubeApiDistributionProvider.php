@@ -119,8 +119,7 @@ class YoutubeApiDistributionProvider implements IDistributionProvider
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
 		return array(
-			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLIST."']",
-			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLISTS."']",
+			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_DESCRIPTION."']",
 		);	
 	}
 	
