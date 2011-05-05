@@ -78,29 +78,24 @@ class DailymotionDistributionProfile extends DistributionProfile
 		if(!$metadataProfileCategoryField)
 			return $validationErrors;
 		
-		if($metadata)
-		{
-			$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_DESCRIPTION);
+		$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_DESCRIPTION);
+		
+		if(count($values))
+		{	
+			foreach($values as $value)
+			{
+				if(!strlen($value))
+					continue;
 			
-			if(count($values))
-			{	
-				foreach($values as $value)
-				{
-					if(!strlen($value))
-						continue;
+				$validateDescription = false;
 				
-					// validate entry description minumum length of 1 character
-					if(strlen($value) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
-					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'Dailymotion description is too short');
-						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
-						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
-						$validationErrors[] = $validationError;
-					}
-					else
-					{
-						$validateDescription = false;
-					}
+				// validate entry description minumum length of 1 character
+				if(strlen($value) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'Dailymotion description is too short');
+					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
+					$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
+					$validationErrors[] = $validationError;
 				}
 			}
 		}

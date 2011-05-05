@@ -61,7 +61,6 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 			return $validationErrors;
 		
 		$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_DESCRIPTION);
-		
 		if(count($values))
 		{	
 			foreach($values as $value)
