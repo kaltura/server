@@ -75,14 +75,6 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	public $format;
 
 	/**
-	 * The ingestion origin of the Flavor Params
-	 *  
-	 * @var KalturaAssetParamsOrigin
-	 * @filter eq,in
-	 */
-	public $origin;
-
-	/**
 	 * Array of partner permisison names that required for using this asset params
 	 *  
 	 * @var KalturaStringArray
@@ -100,7 +92,6 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"isSystemDefault" => "isDefault",
 		"tags",
 		"format",
-		"origin",
 	);
 	
 	/* (non-PHPdoc)
