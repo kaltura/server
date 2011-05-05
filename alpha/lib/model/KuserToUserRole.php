@@ -15,5 +15,9 @@
  */
 class KuserToUserRole extends BaseKuserToUserRole {
 
-
+	public function getCacheInvalidationKeys()
+	{
+		return array("kuserToUserRole:kuserId=".$this->getKuserId());
+	}
+	
 } // KuserToUserRole

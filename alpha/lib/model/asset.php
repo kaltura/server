@@ -335,4 +335,9 @@ class asset extends Baseasset implements ISyncableFile
 	{
 		$this->incInCustomData("logFileVersion", 1);
 	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("flavorAsset:entryId=".$this->getEntryId());
+	}
 }

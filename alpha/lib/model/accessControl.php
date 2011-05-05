@@ -454,5 +454,9 @@ class accessControl extends BaseaccessControl
 	{
 		throw new Exception("Internal use only");		
 	}
-		
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("accessControl:id=".$this->getId());
+	}
 }

@@ -47,4 +47,16 @@ class FileSyncPeer extends BaseFileSyncPeer
 		$c = self::getCriteriaForFileSyncKey($key);
 		return self::doSelect($c);
 	}
+
+	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	{
+		$criterion = $criteria->getCriterion(self::OBJECT_ID);
+		if (!$criterion || 
+			$criterion->getComparison() != Criteria::EQUAL)
+		{
+			return array();				
+		}
+		
+		return array("fileSync:objectId=".$criterion->getValue());
+	}
 }

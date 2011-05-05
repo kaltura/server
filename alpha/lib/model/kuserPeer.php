@@ -562,4 +562,22 @@ class kuserPeer extends BasekuserPeer
 		);
 	}
 			
+	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	{
+		$partnerIdCriterion = $criteria->getCriterion(self::PARTNER_ID);
+		if (!$partnerIdCriterion || 
+			$partnerIdCriterion->getComparison() != Criteria::EQUAL)
+		{
+			return array();				
+		}
+		
+		$puserIdCriterion = $criteria->getCriterion(self::PUSER_ID);
+		if (!$puserIdCriterion || 
+			$puserIdCriterion->getComparison() != Criteria::EQUAL)
+		{
+			return array();				
+		}
+		
+		return array("kuser:partnerId=".$partnerIdCriterion->getValue().",puserid=".$puserIdCriterion->getValue());
+	}
 }

@@ -194,4 +194,8 @@ class Permission extends BasePermission
 		$this->putInCustomData('partner_group', $group);
 	}
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("permission:partnerId=".$this->getPartnerId());
+	}
 } // Permission

@@ -106,6 +106,11 @@ class FileSync extends BaseFileSync
 			
 		return $ret;
 	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("fileSync:objectId=".$this->getObjectId());
+	}
 }
 
 

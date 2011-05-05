@@ -2395,4 +2395,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			
 		return null;
 	}
+	
+	public function getCacheInvalidationKeys()
+	{
+		return array("entry:id=".$this->getId());
+	}
 }

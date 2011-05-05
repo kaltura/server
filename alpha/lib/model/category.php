@@ -462,4 +462,9 @@ class category extends Basecategory
 		}
 		return $category;
 	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("category:partnerId=".$this->getPartnerId());
+	}
 }

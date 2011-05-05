@@ -1016,6 +1016,11 @@ class kuser extends Basekuser
 		return false;
 	}
 	
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("kuser:partnerId=".$this->getPartnerId().",puserid=".$this->getPuserId());
+	}
 	
 	// --------------------------------------
 	// -- end of user role handling functions
