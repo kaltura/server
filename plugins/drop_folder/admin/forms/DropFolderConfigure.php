@@ -4,14 +4,19 @@ class Form_DropFolderConfigure extends Infra_Form
 	public function init()
 	{
 		$this->setAttrib('id', 'frmDropFolderConfigure');
-		$this->setMethod('post');
+		$this->setMethod('post');			
 		
-
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
 		$titleElement->setLabel('General');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($titleElement));
 		
+		$this->addElement('text', 'id', array(
+			'label'			=> 'ID:',
+			'filters'		=> array('StringTrim'),
+			'readonly'		=> true,
+			'disabled'		=> 'disabled',
+		));
 		
 		$this->addElement('text', 'partnerId', array(
 			'label' 		=> 'Related Publisher ID:',
@@ -42,7 +47,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$this->addElement('hidden', 'crossLine1', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
-		
+				
 		// --------------------------------
 		
 		$titleElement = new Zend_Form_Element_Hidden('ingestionSettingsTitle');
@@ -56,6 +61,7 @@ class Form_DropFolderConfigure extends Infra_Form
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
+
 		
 		$this->addElement('text', 'fileNamePatterns', array(
 			'label' 		=> 'Source Files Patterns:',
@@ -68,14 +74,14 @@ class Form_DropFolderConfigure extends Infra_Form
 		$fileHandlerTypes->setLabel('Ingestion Source:');
 		$fileHandlerTypes->setRequired(true);
 		$fileHandlerTypes->setAttrib('onchange', 'handlerTypeChanged()');
-		$fileHandlerTypes->setAttrib('id', 'fileHandlerType()');
 		$this->addElements(array($fileHandlerTypes));
 		
-		$this->addContentHandlerElements();
-		
+		$handlerConfigForm = new Form_ContentFileHandlerConfig();
+		$this->addSubForm($handlerConfigForm, 'contentHandlerConfig'); 
+
 		$this->addElement('hidden', 'crossLine2', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
-		));
+		));		
 		
 		// --------------------------------
 		
@@ -126,20 +132,37 @@ class Form_DropFolderConfigure extends Infra_Form
 	}
 	
 	
-	private function addContentHandlerElements()
+	
+	public function populateFromObject($object, $add_underscore = true)
 	{
-		$fileDeletePolicies = new Kaltura_Form_Element_EnumSelect('contentMatchPolicy', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy'));
-		$fileDeletePolicies->setLabel('Content Match Policy:');
-		$fileDeletePolicies->setRequired(true);
-		$this->addElements(array($fileDeletePolicies));
+		parent::populateFromObject($object, $add_underscore);
 		
-		$this->addElement('text', 'slugRegex', array(
-			'label' 		=> 'Slug Regex:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-		));
+		if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
+			$this->getSubForm('contentHandlerConfig')->populateFromObject($object->fileHandlerConfig, false);
+		}
+				
+		$props = $object;
+		if(is_object($object))
+			$props = get_object_vars($object);
 		
-		//TODO: set as dispaly:none and only show if CONTENT is selected
+		$allElements = $this->getElements();
+		foreach ($allElements as $element)
+		{
+			if ($element instanceof Kaltura_Form_Element_EnumSelect)
+			{
+				$elementName = $element->getName();
+				$element->setValue(array($props[$elementName]));
+			}
+		}
 	}
 	
+	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
+	{
+		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
+			$object->fileHandlerConfig = $this->getSubForm('contentHandlerConfig')->getObject('Kaltura_Client_DropFolder_Type_DropFolderContentFileHandlerConfig', $properties, $add_underscore, $include_empty_fields);
+		}
+		return $object;
+	}
+			
 }

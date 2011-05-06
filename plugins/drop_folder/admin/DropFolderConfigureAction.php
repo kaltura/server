@@ -19,40 +19,54 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 		$action->getHelper('layout')->disableLayout();
 		$request = $action->getRequest();
 		$dropFolderForm = new Form_DropFolderConfigure();
-		if ($request->isPost())
+		
+		try
 		{
-			$this->processForm($dropFolderForm, $request->getPost());
+			$dropFolderId = $storageId = $this->_getParam('drop_folder_id');
+
+			if ($request->isPost())
+			{
+				$this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
+			}
+			else
+			{
+				if (!is_null($dropFolderId))
+				{
+					$client = Infra_ClientHelper::getClient();
+					$dropFolderPluginClient = Kaltura_Client_DropFolder_Plugin::get($client);
+					$dropFolder = $dropFolderPluginClient->dropFolder->get($dropFolderId);
+					$dropFolderForm->populateFromObject($dropFolder, false);
+				}
+			}
 		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
+			$action->view->errMessage = $e->getMessage();
+		}
+		
 		$action->view->form = $dropFolderForm;
 	}
 	
-	private function processForm(Form_DropFolderConfigure $form, $formData)
+	private function processForm(Form_DropFolderConfigure $form, $formData, $dropFolderId = null)
 	{
 		if ($form->isValid($formData))
 		{
-			try
-			{
-				$client = Infra_ClientHelper::getClient();
-				$dropFolderPluginClient = Kaltura_Client_DropFolder_Plugin::get($client);
-				
-				$dropFolder = $form->getObject("Kaltura_Client_DropFolder_Type_DropFolder", $request->getPost(), false, true);
-				
-				$dropFolderId = $newStatus = $this->_getParam('dropFolderId'); //TODO: implement
-
-				if (is_null($dropFolderId)) {
-					$responseDropFolder = $dropFolderPluginClient->dropfolder->add($dropFolder);
-				}
-				else {
-					$responseDropFolder = $dropFolderPluginClient->dropfolder->update($dropFolderId, $dropFolder);
-				}
-
-				$this->_helper->redirector('DropFolderList');
+			$client = Infra_ClientHelper::getClient();
+			$dropFolderPluginClient = Kaltura_Client_DropFolder_Plugin::get($client);
+			
+			$dropFolder = $form->getObject("Kaltura_Client_DropFolder_Type_DropFolder", $formData, false, true);
+			unset($dropFolder->id);
+			
+			if (is_null($dropFolderId)) {
+				$dropFolder->status = Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED;
+				$dropFolder->type = Kaltura_Client_DropFolder_Enum_DropFolderType::LOCAL;
+				$responseDropFolder = $dropFolderPluginClient->dropFolder->add($dropFolder);
 			}
-			catch(Exception $ex)
-			{
-				//TODO: implement
-				throw $ex;
+			else {
+				$responseDropFolder = $dropFolderPluginClient->dropFolder->update($dropFolderId, $dropFolder);
 			}
+			$form->setAttrib('class', 'valid');
 		}
 		else
 		{

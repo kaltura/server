@@ -59,15 +59,10 @@
 jQuery('#filter_type').change(function() {
 	if(this.value == "none") {
 		$("#filter_text").css("display","none");
-		$("div.help").hide();
 	}
 	else {
 		$("#filter_text").css("display","inline");
 		$("#filter_text input").focus();
-		if(this.value == "free")
-			$("div.help").show();
-		else
-			$("div.help").hide();
 	}
 });
 
@@ -147,7 +142,13 @@ function changeStatus(folderId, status, callback)
 
 
 function configureDropFolder(folderId) {
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DropFolderConfigureAction', 'drop_folder_id' => '')); ?>' + folderId;
+
+	folderIdStr = '';
+	if (typeof folderId !== 'undefined') {
+		folderIdStr = '/drop_folder_id/' + folderId;
+	}	
+	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DropFolderConfigureAction')); ?>' + folderIdStr;
 	
 	jQuery('#drop-folder-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="drop-folder-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
@@ -180,7 +181,7 @@ function configureDropFolder(folderId) {
 
 
 function configureDropfolderSuccess(html) {
-	if (jQuery(html).parent().find('#frmDistributionProfileConfig').hasClass('valid')) 
+	if (jQuery(html).parent().find('#frmDropFolderConfigure').hasClass('valid')) 
 	{
 		dialogDiv.dialog('close');
 		jQuery('#frmPaginator1').submit();
