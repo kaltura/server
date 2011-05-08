@@ -286,7 +286,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * Override the default ingestion profile  
 	 * 
 	 * @var string
-	 * @insertonly
 	 */
 	public $ingestionProfileId;
 	
@@ -369,17 +368,26 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
-	public function validateForInsert()
+	public function validateForInsert($source_object)
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
+		return parent::validateForInsert($source_object);
 	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
-	public function validateForUpdate()
+	public function validateForUpdate($source_object)
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
+		
+		if($source_object->getStatus() != entryStatus::NO_CONTENT)
+		{
+			if(!is_null($this->ingestionProfileId))
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_INGESTION_PROFILE_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('ingestionProfileId'), $source_object->getStatus());
+		}
+		
+		return parent::validateForUpdate($source_object);
 	}
 	
 	public function getExtraFilters()
