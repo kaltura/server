@@ -7,7 +7,7 @@
  * @see api/services/UploadService#uploadAction()
  * @see api/services/UploadTokenService#addAction()
  */
-class KalturaUploadedFileTokenResource extends KalturaContentResource 
+class KalturaUploadedFileTokenResource extends KalturaDataCenterContentResource
 {
 	/**
 	 * Token that returned from upload.upload action or uploadToken.add action. 
@@ -15,22 +15,54 @@ class KalturaUploadedFileTokenResource extends KalturaContentResource
 	 */
 	public $token;
 
+	public function getDc()
+	{
+		$dbUploadToken = UploadTokenPeer::retrieveByPK($this->token);
+		if (is_null($dbUploadToken))
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
+			
+		// not uploaded yet and therefore doesn't matter
+		if($dbUploadToken->getStatus() != UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
+			return null;
+			
+		return $dbUploadToken->getDc();
+	}
+	
 	public function validateEntry(entry $dbEntry)
 	{
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('token');
 	}
+	
 	public function entryHandled(entry $dbEntry)
 	{
 		parent::entryHandled($dbEntry);
-		kUploadTokenMgr::closeUploadTokenById($this->token);
+		
+		$dbUploadToken = UploadTokenPeer::retrieveByPK($this->token);
+		if (is_null($dbUploadToken))
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
+			
+		if($dbUploadToken->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
+			kUploadTokenMgr::closeUploadTokenById($this->token);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		if(!$object_to_fill)
-			$object_to_fill = new kLocalFileResource();
+		$dbUploadToken = UploadTokenPeer::retrieveByPK($this->token);
+		if (is_null($dbUploadToken))
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
 			
+		if(!$object_to_fill)
+			$object_to_fill = new kUploadedFileTokenResource();
+			
+		$object_to_fill->setToken($this->token);
+			
+		if($dbUploadToken->getStatus() != UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
+		{
+			$object_to_fill->setIsReady(false);
+			return $object_to_fill;
+		}
+		
 		try
 		{
 		    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($this->token);

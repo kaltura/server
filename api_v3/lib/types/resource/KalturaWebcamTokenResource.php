@@ -5,7 +5,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaWebcamTokenResource extends KalturaContentResource 
+class KalturaWebcamTokenResource extends KalturaDataCenterContentResource 
 {
 	/**
 	 * Token that returned from media server such as FMS or red5. 
@@ -13,6 +13,17 @@ class KalturaWebcamTokenResource extends KalturaContentResource
 	 */
 	public $token;
 
+	public function getDc()
+	{
+	    $content = myContentStorage::getFSContentRootPath();
+	    $entryFullPath = "{$content}/content/webcam/{$this->token}.flv";
+	    
+		if(file_exists($entryFullPath))
+			return kDataCenterMgr::getCurrentDcId();
+			
+		return -1; // none existing dc
+	}
+	
 	public function validateEntry(entry $dbEntry)
 	{
 		parent::validateEntry($dbEntry);
