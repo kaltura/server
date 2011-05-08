@@ -5,7 +5,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kLocalFileResource extends kContentResource 
+class kLocalFileResource extends kContentResource
 {
 	/**
 	 * Full path to the local file 
@@ -22,6 +22,11 @@ class kLocalFileResource extends kContentResource
 	 * @var int
 	 */
 	private $sourceType = entry::ENTRY_MEDIA_SOURCE_FILE;
+	
+	/**
+	 * @var bool
+	 */
+	private $isReady = true;
 	
 	/**
 	 * @return string
@@ -69,5 +74,28 @@ class kLocalFileResource extends kContentResource
 	public function setSourceType($sourceType)
 	{
 		$this->sourceType = $sourceType;
+	}
+	
+	/**
+	 * @return the $isReady
+	 */
+	public function getIsReady()
+	{
+		return $this->isReady;
+	}
+
+	/**
+	 * @param bool $isReady
+	 */
+	public function setIsReady($isReady)
+	{
+		$this->isReady = $isReady;
+	}
+
+	/**
+	 * @param BaseObject $object
+	 */
+	public function attachCreatedObject(BaseObject $object)
+	{
 	}
 }
