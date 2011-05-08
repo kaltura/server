@@ -1548,6 +1548,142 @@ class kFlowHelper
 	}
 	
 	/**
+	 * @param UploadToken $uploadToken
+	 */
+	public static function handleUploadCanceled(UploadToken $uploadToken)
+	{
+		$assetTypes = array(
+			assetPeer::OM_CLASS,
+			flavorAssetPeer::OM_CLASS,
+			thumbAssetPeer::OM_CLASS,
+		);
+		
+		$dbEntry = null;
+		
+		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
+			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
+		
+		if(in_array($uploadToken->getObjectType(), $assetTypes))
+		{
+			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
+			if(!$dbAsset)
+			{
+	 			KalturaLog::err("Asset id [" . $uploadToken->getObjectId() . "] not found");
+				return;
+			}
+			
+	    	if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
+	    	{
+				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$dbAsset->save();
+	    	}
+	    	
+	    	$dbEntry = $dbAsset->getentry();
+		}
+		
+		if($dbEntry && $dbEntry->getStatus() != entryStatus::READY)
+		{
+			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+			$dbEntry->save();	
+		}
+	}
+	
+	/**
+	 * @param UploadToken $uploadToken
+	 */
+	public static function handleUploadFinished(UploadToken $uploadToken)
+	{
+		$assetTypes = array(
+			assetPeer::OM_CLASS,
+			flavorAssetPeer::OM_CLASS,
+			thumbAssetPeer::OM_CLASS,
+		);
+		
+		if(!in_array($uploadToken->getObjectType(), $assetTypes) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
+			return;
+			
+	    $fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($this->token);
+				
+		if(!file_exists($fullPath))
+		{
+			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($this->token, kDataCenterMgr::getCurrentDcId());
+			if(!$remoteDCHost)
+				return;
+				
+			kFile::dumpApiRequest($remoteDCHost);
+		}
+			
+		if(in_array($uploadToken->getObjectType(), $assetTypes))
+		{
+			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
+			if(!$dbAsset)
+			{
+	 			KalturaLog::err("Asset id [" . $uploadToken->getObjectId() . "] not found");
+				return;
+			}
+			
+			$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+			$dbAsset->setFileExt($ext);
+			$dbAsset->save();
+			
+			$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			
+			try {
+				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
+			}
+			catch (Exception $e) {
+				$dbEntry = $dbAsset->getentry();
+				if($dbEntry)
+				{
+					$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+					$dbEntry->save();
+				}
+				
+				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$dbAsset->save();												
+				throw $e;
+			}
+			
+	    	if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
+	    	{
+				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+				$dbAsset->save();
+					
+	   			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+	    	}
+	    	
+			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);
+			$uploadToken->save();
+		}
+		
+		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
+		{
+			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
+			if(!$dbEntry)
+			{
+	 			KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
+				return;
+			}
+			
+			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			try
+			{
+				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
+			}
+			catch (Exception $e) {
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();											
+				throw $e;
+			}
+			$dbEntry->setStatus(entryStatus::READY);
+			$dbEntry->save();	
+	    	
+			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);
+			$uploadToken->save();
+		}
+	}
+	
+	/**
 	 * @param entry $tempEntry
 	 */
 	public static function handleEntryReplacement(entry $tempEntry)

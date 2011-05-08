@@ -8,7 +8,7 @@
  * @subpackage Batch
  *
  */
-class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer
+class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer, kObjectDeletedEventConsumer
 {
 	public final function __construct()
 	{ 
@@ -353,6 +353,12 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		{
 			if($entry->getType() == entryType::MEDIA_CLIP)
 			{
+				if($entry->getStatus() == entryStatus::NO_CONTENT)
+				{
+					$entry->setStatus(entryStatus::PENDING);
+					$entry->save();
+				}
+				
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			
@@ -394,6 +400,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 		
 		if(
+				$object instanceof UploadToken 
+			&&	in_array(UploadTokenPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD
+		)
+		{
+			kFlowHelper::handleUploadFinished($object);
+			return true;
+		}
+		
+		if(
 				!($object instanceof flavorAsset) 
 			||	!in_array(flavorAssetPeer::STATUS, $modifiedColumns))
 			return true;
@@ -428,4 +444,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		
 		return true;
 	}
+	
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		if($object instanceof UploadToken)
+			kFlowHelper::handleUploadCanceled($object);
+			
+		return true;
+	}
+	
 }
