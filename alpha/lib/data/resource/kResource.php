@@ -7,4 +7,8 @@
  */
 abstract class kResource 
 {
+	public function getType()
+	{
+		return get_class($this);
+	}
 }
