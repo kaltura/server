@@ -30,6 +30,7 @@ $confObj = uiConfDeployment::init($arguments['ini']); // get and read the config
 
 uiConfDeployment::$baseTag = $confObj->general->component->name; // gets the application name for the default tags 
 uiConfDeployment::$defaultTags = "autodeploy, ". uiConfDeployment::$baseTag . "_" . $confObj->general->component->version; // create the uiConf default tags (for ui confs of the application)
+uiConfDeployment::$partnerId = $arguments['partner'];
 
 if($includeCode)
 {
@@ -154,20 +155,17 @@ class uiConfDeployment
 					uiConfDeployment::$tags_search[$widgetValue->usage] = $widgetValue->usage;
 					$widgetIdentifier = $widgetValue->identifier;
 					
-					echo "creating uiconfs for widget $widgetName with default values ( $baseSwfUrl , $swfName , $objectType )" . PHP_EOL;
-					echo "$widgetName , $baseSwfUrl , $swfName , $objectType".PHP_EOL;
-					
 					//Create the ui conf from the xml
 					$uiConf = uiConfDeployment::populateUiconfFromConfig($widgetValue, $baseSwfUrl, $swfName, $objectType, uiConfDeployment::$arguments['disableUrlHashing']);
-				
+												
 					if($uiConf) //If the ui conf was generated successfully 
 					{
-//						//First we need to delete old versions of the widget
-//						uiConfDeployment::deprecateOldUiConf($widgetValue);
-						
 						//Then we need to insert the ui conf to the DB (so we can get his id)
 						$uiconf_id = uiConfDeployment::addUiConfThroughPropel($uiConf);
-						
+
+						echo "creating uiconf [$uiconf_id] for widget $widgetName with default values ( $baseSwfUrl , $swfName , $objectType )" . PHP_EOL;
+						echo "$widgetName , $baseSwfUrl , $swfName , $objectType".PHP_EOL;
+					
 						if(isset($widgetValue->features))
 						{
 							uiConfDeployment::updateFeaturesFile($uiConf, $uiconf_id, $widgetValue->features_identifier);
@@ -209,7 +207,8 @@ class uiConfDeployment
 	/**
 	 * 
 	 * Deprectes old ui confs which have the same Tags.
-	 * it replaces their tag from autodeploy to deprecated 
+	 * it replaces their tag from autodeploy to deprecated
+	 * @param string $tag - the tag to depracate
 	 */
 	public static function deprecateOldUiConfs($tag)
 	{
@@ -217,9 +216,10 @@ class uiConfDeployment
 		$con = Propel::getConnection();
 		$oldConfCriteria = new Criteria();
 		$oldConfCriteria->add(uiConfPeer::TAGS, "%{$tag}%", Criteria::LIKE);
+		$oldConfCriteria->add(uiConfPeer::PARTNER_ID, self::$partnerId, Criteria::EQUAL);
 		$oldConfCriteria->addSelectColumn(uiConfPeer::ID);
 		$oldConfCriteria->addSelectColumn(uiConfPeer::TAGS);
-
+		
 		//Select ID, tags from ui_conf where tags like %$newTag%;  
 		$uiConfs = BasePeer::doSelect($oldConfCriteria, $con);
 
@@ -232,7 +232,7 @@ class uiConfDeployment
 			$deprecatedTag = $newTag;
 			$deprecatedTag = str_replace("autodeploy", "deprecated", $deprecatedTag);
 		
-			echo "newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} \n";
+			echo "newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} for partner $partnerId\n";
 			
 			$confCriteria = new Criteria();
 			$confCriteria->add(uiConfPeer::ID, $oldUiConf[0]);
@@ -489,6 +489,7 @@ class uiConfDeployment
 		echo $message.PHP_EOL.PHP_EOL;
 		echo 'php '.$_SERVER['SCRIPT_NAME']." --ini={path to ini file} [--no-create]\n\n";
 		echo "    --ini: path to ui_conf deployment ini file\n";
+		echo "    --partner: The partner to deploty for (default is 0)\n";
 		echo "    --include-code: path to ui_conf deployment ini file\n";
 		echo "    --no-create: dry-run, do not really create the uiconfs\n";
 		die;
@@ -508,6 +509,7 @@ class uiConfDeployment
 		$arguments['no-create'] = false;
 		$arguments['ini']     = '';
 		$arguments['disableUrlHashing'] = false;
+		$arguments['partner'] = 0;
 	
 		/** get inputs from arguments **/
 		foreach($argv as $num => $value)
@@ -522,7 +524,9 @@ class uiConfDeployment
 			
 			if(!isset($arguments[$arg_name])) { uiConfDeployment::printUsage('unknown argument '.$arg_name); }
 			
-			if(is_null($arg_value)) $arg_value = true;
+			if(is_null($arg_value)) 
+				$arg_value = true;
+				
 			$arguments[$arg_name] = $arg_value;
 		}
 		
@@ -544,9 +548,15 @@ class uiConfDeployment
 			uiConfDeployment::printUsage('missing argument --ini'); 
 		}
 		
+		//Checks if the partner argument was given
+		if(!isset($arguments['partner']) || !($arguments['partner']) || is_null($arguments['partner'])) 
+		{ 
+			echo "--partner argument wasn't given. Using defualt partner 0\n"; 
+		}
+		
 		//Check if ini file exists
 		if(!file_exists($arguments['ini'])) 
-		{ 
+		{
 			uiConfDeployment::printUsage('config file not found '.$arguments['ini']); 
 		}
 	}
