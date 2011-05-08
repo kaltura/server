@@ -81,7 +81,10 @@ abstract class ClientGeneratorFromXml
 		while (false !== $entry = $dir->read()) 
 		{
 			// skip pointers & hidden files
-			if ($this->beginsWith($entry, ".")) 
+			if ($this->beginsWith($entry, ".") && 
+				$entry != ".project" && 
+				$entry != ".settings" && 
+				$entry != ".classpath" ) 
 			{
 				continue;
 			}

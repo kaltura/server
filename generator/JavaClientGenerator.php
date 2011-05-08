@@ -151,7 +151,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 			$str .= "    }\n";
 		}
 		$str .= "}\n";
-		$file = "com/kaltura/client/enums/$enumName.java";
+		$file = "src/com/kaltura/client/enums/$enumName.java";
 		$this->addFile ( $file, $str );
 	}
 	
@@ -412,7 +412,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		if ($needsObjectFactory)
 			$imports .= "import com.kaltura.client.KalturaObjectFactory;\n";
 		
-		$file = "com/kaltura/client/types/$type.java";
+		$file = "src/com/kaltura/client/types/$type.java";
 		$this->addFile ( $file, $imports . "\n" . $this->getTextBlock () );
 	}
 	
@@ -462,7 +462,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		}
 		$this->appendLine ( "}" );
 		
-		$file = "com/kaltura/client/services/" . $javaServiceType . ".java";
+		$file = "src/com/kaltura/client/services/" . $javaServiceType . ".java";
 		$this->addFile ( $file, $imports . $this->getTextBlock () );
 	}
 	
@@ -718,7 +718,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		
 		$imports .= "\n";
 		
-		$this->addFile ( "com/kaltura/client/KalturaClient.java", $imports . $this->getTextBlock () );
+		$this->addFile ( "src/com/kaltura/client/KalturaClient.java", $imports . $this->getTextBlock () );
 	
 	}
 	
@@ -804,7 +804,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine ( "    }" );
 		$this->appendLine ( "}" );
 		
-		$this->addFile ( "com/kaltura/client/KalturaObjectFactory.java", $imports . $this->getTextBlock () );
+		$this->addFile ( "src/com/kaltura/client/KalturaObjectFactory.java", $imports . $this->getTextBlock () );
 	}
 	
 	private function getBanner() 
