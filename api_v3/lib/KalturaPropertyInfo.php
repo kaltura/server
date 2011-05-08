@@ -17,6 +17,8 @@ class KalturaPropertyInfo
 	private $_filters = array();
 	private $_dynamicType = null;
 	private $_permissions = array();
+	private $_deprecated = false;
+	private $_serverOnly = false;
 	
 	const READ_PERMISSION_NAME = 'read';
 	const UPDATE_PERMISSION_NAME = 'update';
@@ -182,6 +184,26 @@ class KalturaPropertyInfo
 	public function isWriteOnly()
 	{
 		return $this->_writeOnly;
+	}
+	
+	public function setDeprecated($value)
+	{
+		$this->_deprecated = $value;
+	}
+	
+	public function isDeprecated()
+	{
+		return $this->_deprecated;
+	}
+	
+	public function setServerOnly($value)
+	{
+		$this->_serverOnly = $value;
+	}
+	
+	public function isServerOnly()
+	{
+		return $this->_serverOnly;
 	}
 	
 	public function setDescription($desc)

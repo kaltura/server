@@ -32,6 +32,8 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_DEPRECATED = "/\\@deprecated/i";
     
+    const DOCCOMMENT_DEPRECATION_MESSAGE = "/\\@deprecated (.*)/";
+
     const DOCCOMMENT_SERVER_ONLY = "/\\@serverOnly/i";
     
     const DOCCOMMENT_DYNAMIC_TYPE = "/\\@dynamicType (\\w*)/i";
@@ -152,13 +154,13 @@ class KalturaDocCommentParser
      */
     function KalturaDocCommentParser($comment , $replacements = null)
     {
-        $this->readOnly = preg_match( self::DOCCOMMENT_READONLY, $comment);
+    	$this->readOnly = preg_match( self::DOCCOMMENT_READONLY, $comment);
         $this->insertOnly = preg_match( self::DOCCOMMENT_INSERTONLY, $comment);
         $this->writeOnly = preg_match( self::DOCCOMMENT_WRITEONLY, $comment);
         $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);
-
+        
         $result = null;
         if (is_array($replacements) && key_exists(self::DOCCOMMENT_REPLACENET_PARAM_NAME, $replacements))
         {
@@ -177,6 +179,22 @@ class KalturaDocCommentParser
         $result = null;
         if (preg_match_all( self::DOCCOMMENT_DESCRIPTION, $comment, $result ))
             $this->description = preg_replace("/(\\*\\s*)/", "", implode("\n", $result[0]));
+            
+        if ($this->deprecated)
+        {
+			$this->description = trim($this->description);
+			if ($this->description)
+			{
+				$this->description .= "\n";
+			}
+			$this->description .= "DEPRECATED";
+        	$result = null;
+	        if (preg_match( self::DOCCOMMENT_DEPRECATION_MESSAGE, $comment, $result))
+	        {
+	        	$deprecationMessage = $result[1];
+	        	$this->description .= " - $deprecationMessage";
+	        }
+        }
             
         $result = null;
         if (preg_match( self::DOCCOMMENT_LINK, $comment, $result ))

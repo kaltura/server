@@ -71,6 +71,11 @@ class KalturaTypeReflector
 	private $_deprecated = false;
 	
 	/**
+	 * @var bool
+	 */
+	private $_serverOnly = false;
+	
+	/**
 	 * @var string
 	 */
 	private $_package;
@@ -111,7 +116,9 @@ class KalturaTypeReflector
 	    {
 	    	$this->_comments = $comments;
 	    	$commentsParser = new KalturaDocCommentParser($comments);
+	    	$this->_description = $commentsParser->description;
 	    	$this->_deprecated = $commentsParser->deprecated;
+	    	$this->_serverOnly = $commentsParser->serverOnly;
 	    	$this->_package = $commentsParser->package;
 	    	$this->_subpackage = $commentsParser->subpackage;
 	    	$this->_abstract = $commentsParser->abstract;
@@ -201,18 +208,13 @@ class KalturaTypeReflector
 							{
 								$prop = new KalturaPropertyInfo($parsedDocComment->varType, $name);
 								
-								if ($parsedDocComment->readOnly)
-									$prop->setReadOnly(true);
+								$prop->setReadOnly($parsedDocComment->readOnly);
+								$prop->setInsertOnly($parsedDocComment->insertOnly);
+								$prop->setWriteOnly($parsedDocComment->writeOnly);
+								$prop->setDynamicType($parsedDocComment->dynamicType);
+								$prop->setServerOnly($parsedDocComment->serverOnly);
+								$prop->setDeprecated($parsedDocComment->deprecated);
 								
-								if ($parsedDocComment->insertOnly)
-									$prop->setInsertOnly(true);
-								
-								if ($parsedDocComment->writeOnly)
-									$prop->setWriteOnly(true);
-								
-								if ($parsedDocComment->dynamicType)
-									$prop->setDynamicType($parsedDocComment->dynamicType);
-									
 								$this->_properties[$name] = $prop;
 								
 								if ($property->getDeclaringClass() == $reflectClass) // store current class properties
@@ -372,6 +374,16 @@ class KalturaTypeReflector
 	public function isDeprecated()
 	{
 		return $this->_deprecated; 
+	}
+	
+	/**
+	 * Returns true when the type should not be generated in client libraries
+	 *
+	 * @return boolean
+	 */
+	public function isServerOnly()
+	{
+		return $this->_serverOnly; 
 	}
 	
 	/**
