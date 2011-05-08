@@ -16,8 +16,33 @@ class KalturaAssetsParamsResourceContainers extends KalturaResource
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('resources');
     	
+		$dc = null;
     	foreach($this->resources as $resource)
+    	{
     		$resource->validateEntry($dbEntry);
+    	
+    		if(!($resource instanceof KalturaDataCenterContentResource))
+    			continue;
+    			
+    		$theDc = $resource->getDc();
+    		if(is_null($theDc))
+    			continue;
+    			
+    		if(is_null($dc))
+    		{
+    			$dc = $theDc;
+    		}
+    		elseif($dc != $theDc)
+    		{
+				throw new KalturaAPIException(KalturaErrors::RESOURCES_MULTIPLE_DATA_CENTERS);
+    		}
+    	}
+    	
+    	if(!is_null($dc) && $dc != kDataCenterMgr::getCurrentDcId())
+    	{
+    		$remoteHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($dc);
+    		kFile::dumpApiRequest($remoteHost);
+    	}
 	}
 	
 	public function entryHandled(entry $dbEntry)
