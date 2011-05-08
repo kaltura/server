@@ -125,9 +125,12 @@ class siteRestriction extends baseRestriction
 		
 		$referrerDomain = $this->extractDomainFromReferrer($referrerDomain);
 		
-		$globalWhitelistedDomains = kConf::get("global_whitelisted_domains");
-		if ($globalWhitelistedDomains && $this->isReferrerOnSameDomain($referrerDomain, $globalWhitelistedDomains))
-			return true; 
+		if(kConf::hasParam("global_whitelisted_domains"))
+		{
+			$globalWhitelistedDomains = kConf::get("global_whitelisted_domains");
+			if ($globalWhitelistedDomains && $this->isReferrerOnSameDomain($referrerDomain, $globalWhitelistedDomains))
+				return true;
+		} 
 		
 		// extract site list from restriction object
 		if ($this->siteList === "")
