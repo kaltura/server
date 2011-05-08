@@ -107,6 +107,21 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		//Create the entries from the bulk upload results
 		$this->createEntries();
 	}
+		
+	/* (non-PHPdoc)
+	 * @see KBulkUploadEngine::addBulkUploadResult()
+	 */
+	protected function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult)
+	{
+		parent::addBulkUploadResult($bulkUploadResult);
+			
+		if($bulkUploadResult->entryId && $bulkUploadResult->entryStatus == KalturaEntryStatus::IMPORT)
+		{
+			$resource = new KalturaUrlResource();
+			$resource->url = $bulkUploadResult->url;
+			$this->kClient->media->addContent($bulkUploadResult->entryId, $resource);
+		}
+	}
 	
 	/**
 	 * 
