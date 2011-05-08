@@ -434,7 +434,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function handleItemDelete(SimpleXMLElement $item)
 	{
-		throw new KalturaBatchException("Action: Delete is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+		$entryId = "$item->entryId";
+		if(!$entryId)
+			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
+		
+		$result = $this->kClient->baseEntry->delete($entryId);
+		
+		//TODO: should we check the result?
+		return;
 	}
 
 	/**

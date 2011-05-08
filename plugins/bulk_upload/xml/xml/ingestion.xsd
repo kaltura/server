@@ -96,7 +96,6 @@
 							</xs:restriction>
 						</xs:simpleType>
 					</xs:element>
-					<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string" />
 				</xs:sequence>
 				<xs:sequence>
 					<xs:element name="entryId" minOccurs="1" maxOccurs="1" nillable="false">
@@ -108,6 +107,7 @@
 					</xs:element>
 				</xs:sequence>
 			</xs:choice>
+			<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="name" minOccurs="0" maxOccurs="1">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
