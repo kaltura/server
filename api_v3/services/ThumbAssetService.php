@@ -220,7 +220,13 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	protected function attachLocalFileResource(thumbAsset $thumbAsset, kLocalFileResource $contentResource)
 	{
-		$this->attachFile($thumbAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
+		if($contentResource->getIsReady())
+			return $this->attachFile($thumbAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
+			
+		$thumbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+		$thumbAsset->save();
+		
+		$contentResource->attachCreatedObject($thumbAsset);
     }
     
 	/**
@@ -290,7 +296,7 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	protected function attachContentResource(thumbAsset $thumbAsset, kContentResource $contentResource)
 	{
-    	switch(get_class($contentResource))
+    	switch($contentResource->getType())
     	{
 			case 'kUrlResource':
 				return $this->attachUrlResource($thumbAsset, $contentResource);

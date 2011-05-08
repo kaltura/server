@@ -53,18 +53,11 @@ class FlavorAssetService extends KalturaBaseService
      * @action add
      * @param string $entryId
      * @param KalturaFlavorAsset $flavorAsset
-     * @param KalturaContentResource $contentResource
      * @return KalturaFlavorAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS
-	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
-	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
-    function addAction($entryId, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource)
+    function addAction($entryId, KalturaFlavorAsset $flavorAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
@@ -78,7 +71,7 @@ class FlavorAssetService extends KalturaBaseService
     	}
     	
     	$dbFlavorAsset = new flavorAsset();
-    	$dbFlavorAsset = $flavorAsset->toInsertableObject($dbFlavorAsset);
+//    	$dbFlavorAsset = $flavorAsset->toInsertableObject($dbFlavorAsset);
     	
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
@@ -89,54 +82,72 @@ class FlavorAssetService extends KalturaBaseService
     	
 		$dbFlavorAsset->setEntryId($entryId);
 		$dbFlavorAsset->setPartnerId($dbEntry->getPartnerId());
+		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbFlavorAsset->save();
     	
-		$contentResource->validateEntry($dbEntry);
-		$kContentResource = $contentResource->toObject();
-    	$this->attachContentResource($dbFlavorAsset, $kContentResource);
-				
-    	if($dbFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
-    		kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
-		
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->fromObject($dbFlavorAsset);
 		return $flavorAsset;
     }
-
+    
     /**
      * Update flavor asset
      *
      * @action update
      * @param string $id
      * @param KalturaFlavorAsset $flavorAsset
-     * @param KalturaContentResource $contentResource
      * @return KalturaFlavorAsset
-     * @throws KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS
-	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
-	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
+     * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
      */
-    function updateAction($id, KalturaFlavorAsset $flavorAsset, KalturaContentResource $contentResource = null)
+    function updateAction($id, KalturaFlavorAsset $flavorAsset)
     {
    		$dbFlavorAsset = flavorAssetPeer::retrieveById($id);
    		if(!$dbFlavorAsset)
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
-    	
-    	if($contentResource)
-    	{
-			$contentResource->validateEntry($dbFlavorAsset->getentry());
-			$kContentResource = $contentResource->toObject();
-	    	$this->attachContentResource($dbFlavorAsset, $kContentResource);
-    	}
-    	else
-    	{
-    		$dbFlavorAsset->save();
-    	}
+   		$dbFlavorAsset->save();
 		
+		$flavorAsset = new KalturaFlavorAsset();
+		$flavorAsset->fromObject($dbFlavorAsset);
+		return $flavorAsset;
+    }
+    
+    /**
+     * Update content of flavor asset
+     *
+     * @action setContent
+     * @param string $id
+     * @param KalturaContentResource $contentResource
+     * @return KalturaFlavorAsset
+     * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED 
+     */
+    function setContentAction($id, KalturaContentResource $contentResource)
+    {
+   		$dbFlavorAsset = flavorAssetPeer::retrieveById($id);
+   		if(!$dbFlavorAsset)
+   			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
+    	
+   		$previousStatus = $dbFlavorAsset->getStatus();
+		$contentResource->validateEntry($dbFlavorAsset->getentry());
+		$kContentResource = $contentResource->toObject();
+    	$this->attachContentResource($dbFlavorAsset, $kContentResource);
+		
+    	$newStatuses = array(
+    		flavorAsset::FLAVOR_ASSET_STATUS_READY,
+    		flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING,
+    		flavorAsset::FLAVOR_ASSET_STATUS_TEMP,
+    	);
+    	
+    	if($previousStatus == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED && in_array($dbFlavorAsset->getStatus(), $newStatuses))
+   			kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
+   		
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->fromObject($dbFlavorAsset);
 		return $flavorAsset;
@@ -223,7 +234,29 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	protected function attachLocalFileResource(flavorAsset $flavorAsset, kLocalFileResource $contentResource)
 	{
-		$this->attachFile($flavorAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
+		if($contentResource->getIsReady())
+			return $this->attachFile($flavorAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
+			
+//		I'm not sure about it...
+//				
+//		$lowerStatuses = array(
+//			entryStatus::ERROR_CONVERTING,
+//			entryStatus::ERROR_IMPORTING,
+//			entryStatus::PENDING,
+//			entryStatus::NO_CONTENT,
+//		);
+//		
+//		$entry = $flavorAsset->getentry();
+//		if(in_array($entry->getStatus(), $lowerStatuses))
+//		{
+//			$entry->setStatus(entryStatus::IMPORT);
+//			$entry->save();
+//		}
+    		
+		$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+		$flavorAsset->save();
+		
+		$contentResource->attachCreatedObject($flavorAsset);
     }
     
 	/**
@@ -301,7 +334,7 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	protected function attachContentResource(flavorAsset $flavorAsset, kContentResource $contentResource)
 	{
-    	switch(get_class($contentResource))
+    	switch($contentResource->getType())
     	{
 			case 'kUrlResource':
 				return $this->attachUrlResource($flavorAsset, $contentResource);
