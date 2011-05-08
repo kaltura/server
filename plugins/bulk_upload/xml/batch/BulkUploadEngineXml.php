@@ -359,13 +359,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 												  $noParamsThumbAssets, $noParamsThumbResources);
 					
 		//Throw exception in case of  max proccessed items and handle all exceptions there
-		$createdEntryBulkUploadResult = $this->createUploadResult($item); 
+		$updatedEntryBulkUploadResult = $this->createUploadResult($item); 
 				
 		if($this->exceededMaxRecordsEachRun)
 			return;
 		
 		//Updates the bulk upload result for the given entry (with the status and other data)
-		$this->updateEntriesResults(array($updatedEntry), array($createdEntryBulkUploadResult));
+		$this->updateEntriesResults(array($updatedEntry), array($updatedEntryBulkUploadResult));
 		
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($updatedEntry->id, $flavorAssets, $thumbAssets);
