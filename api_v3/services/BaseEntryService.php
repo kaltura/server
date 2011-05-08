@@ -34,33 +34,45 @@ class BaseEntryService extends KalturaEntryService
      *
      * @action add
      * @param KalturaBaseEntry $entry
-     * @param KalturaResource $resource
      * @param KalturaEntryType $type
      * @return KalturaBaseEntry
      * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
      */
-    function addAction(KalturaBaseEntry $entry, KalturaResource $resource = null, $type = -1)
+    function addAction(KalturaBaseEntry $entry, $type = -1)
     {
     	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
-    	
-    	$kResource = null;
-    	if($resource)
-    	{
-    		$kResource = $resource->toObject();
-	    	if($type == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
-	    		$this->setEntryTypeByResource($dbEntry, $kResource);
-    	}
     	$dbEntry->save();
-    	
-    	if($resource)
-    	{
-    		$resource->validateEntry($dbEntry);
-    		$this->attachResource($kResource, $dbEntry);
-    		$resource->entryHandled($dbEntry);
-    	}
     	
 	    $entry->fromObject($dbEntry);
 	    return $entry;
+    }
+	
+    /**
+     * Generic add entry, should be used when the uploaded entry type is not known
+     *
+     * @action addContent
+	 * @param string $entryId
+     * @param KalturaResource $resource
+     * @return KalturaBaseEntry
+     * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
+     */
+    function addContentAction($entryId, KalturaResource $resource)
+    {
+    	$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+    	
+		$kResource = $resource->toObject();
+    	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
+    		$this->setEntryTypeByResource($dbEntry, $kResource);
+		$dbEntry->save();
+		
+		$resource->validateEntry($dbEntry);
+		$this->attachResource($kResource, $dbEntry);
+		$resource->entryHandled($dbEntry);
+    	
+		return $this->getEntry($entryId);
     }
 
     /**
@@ -282,57 +294,48 @@ class BaseEntryService extends KalturaEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function updateAction($entryId, KalturaBaseEntry $baseEntry = null, KalturaResource $resource = null)
+	function updateAction($entryId, KalturaBaseEntry $baseEntry)
 	{
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	
-		if(is_null($baseEntry))
-		{
-			$baseEntry = new KalturaBaseEntry();
-			$baseEntry->fromObject($dbEntry);
-		}
-		else
-		{
-			$baseEntry = $this->updateEntry($entryId, $baseEntry);
-		}
+		$baseEntry = $this->updateEntry($entryId, $baseEntry);
+    	return $baseEntry;
+	}
+	
+	/**
+	 * Update base entry. Only the properties that were set will be updated.
+	 * 
+	 * @action updateContent
+	 * @param string $entryId Entry id to update
+	 * @param KalturaResource $resource Resource to be used to replace entry content
+	 * @return KalturaBaseEntry The updated entry
+	 * 
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 */
+	function updateContentAction($entryId, KalturaResource $resource)
+	{
+    	$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+	
+		$baseEntry = new KalturaBaseEntry();
+		$baseEntry->fromObject($dbEntry);
 		
 		switch($dbEntry->getType())
     	{
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
-    			
-				if(!is_null($resource))
-				{
-					$service->replaceResource($resource, $dbEntry);
-			    	$baseEntry->fromObject($dbEntry);
-				}
-				
+				$service->replaceResource($resource, $dbEntry);
+		    	$baseEntry->fromObject($dbEntry);
     			return $baseEntry;
 				
 			case entryType::MIX:
-				if(!is_null($resource))
-					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
-    			break;
-				
 			case entryType::PLAYLIST:
-				if(!is_null($resource))
-					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
-    			break;
-				
 			case entryType::DATA:
-				if(!is_null($resource))
-					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
-    			break;
-				
 			case entryType::LIVE_STREAM:
-				if(!is_null($resource))
-					throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
-    			break;
-    			
     		default:
     			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
     	}
