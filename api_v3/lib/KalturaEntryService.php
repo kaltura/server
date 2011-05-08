@@ -58,7 +58,53 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry->setSource($resource->getSourceType());
 		$dbEntry->save();
 		
-		return $this->attachFile($resource->getLocalFilePath(), $dbEntry, $dbAsset, $resource->getKeepOriginalFile());
+		if($resource->getIsReady())
+			return $this->attachFile($resource->getLocalFilePath(), $dbEntry, $dbAsset, $resource->getKeepOriginalFile());
+    
+		$lowerStatuses = array(
+			entryStatus::ERROR_CONVERTING,
+			entryStatus::ERROR_IMPORTING,
+			entryStatus::PENDING,
+			entryStatus::NO_CONTENT,
+		);
+		
+		if(in_array($dbEntry->getStatus(), $lowerStatuses))
+		{
+			$dbEntry->setStatus(entryStatus::IMPORT);
+			$dbEntry->save();
+		}
+    		
+    	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+    	{
+			$resource->attachCreatedObject($dbEntry);
+			return null;
+    	}
+    	
+		$isNewAsset = false;
+		if(!$dbAsset)
+		{
+			$isNewAsset = true;
+ 			KalturaLog::debug("Creating original flavor asset for unready local file");
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+		}
+		
+		if(!$dbAsset)
+		{
+			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+			$dbEntry->save();
+			
+			return null;
+		}
+		
+		$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+		$dbAsset->save();
+		
+		$resource->attachCreatedObject($dbAsset);
+		
+		if($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+			
+		return $dbAsset;
     }
     
     /**
@@ -93,7 +139,7 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$dbAsset)
 		{
 			$isNewAsset = true;
- 			KalturaLog::debug("Creating original flavor asset from file token");
+ 			KalturaLog::debug("Creating original flavor asset for local file");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 		
