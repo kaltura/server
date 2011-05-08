@@ -122,7 +122,7 @@ abstract class ClientGeneratorFromPhp
 			{
 				$actionInfo = $serviceReflector->getActionInfo($action);
 				
-				if($actionInfo->deprecated || $actionInfo->serverOnly)
+				if($actionInfo->serverOnly)
 					continue;
 					
 				if (strpos($actionInfo->clientgenerator, "ignore") !== false)
@@ -346,9 +346,9 @@ abstract class ClientGeneratorFromPhp
 	protected function addService(KalturaServiceReflector $serviceReflector)
 	{
 		$serviceName = $serviceReflector->getServiceName();
-		if($serviceReflector->isDeprecated())
+		if($serviceReflector->isServerOnly())
 		{
-			KalturaLog::info("Service deprecated [$serviceName]");
+			KalturaLog::info("Service is server only [$serviceName]");
 			return;
 		}
 			
@@ -366,9 +366,9 @@ abstract class ClientGeneratorFromPhp
 	{
 		$type = $objectReflector->getType();
 		
-		if($objectReflector->isDeprecated())
+		if($objectReflector->isServerOnly())
 		{
-			KalturaLog::info("Type deprecated [$type]");
+			KalturaLog::info("Type is server only [$type]");
 			return;
 		}
 			

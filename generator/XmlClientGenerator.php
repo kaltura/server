@@ -84,7 +84,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 					
 				$actionInfo = $serviceReflector->getActionInfo($action);
 				
-				if($actionInfo->deprecated || $actionInfo->serverOnly)
+				if($actionInfo->serverOnly)
 					continue;
 					
 				if (strpos($actionInfo->clientgenerator, "ignore") !== false)
@@ -200,9 +200,18 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 				$classElement->setAttribute("plugin", $packages[1]);
 		}
 		
+		$description = $typeReflector->getDescription();
+	    $description = $this->fixDescription($description);
+	    $classElement->setAttribute("description", $description);
+		
 	    $properties = $typeReflector->getCurrentProperties();
 		foreach($properties as $property)
 		{
+			if ($property->isServerOnly())
+			{
+				continue;
+			}
+			
 			$propType = $property->getType();
 			$propName = $property->getName();
 			

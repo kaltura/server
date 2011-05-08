@@ -207,6 +207,41 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine();
 	}
 	
+	static function buildMultilineComment($description, $indent = "")
+	{
+		$description = trim($description);
+		if (!$description)
+		{
+			return "";
+		}
+		
+		$description = str_replace("\n", "\n$indent# ", $description);
+		return "$indent# " . $description;
+	}
+	
+	static function buildMultilineString($description, $indent = "")
+	{
+		$description = trim($description);
+		if (!$description)
+		{
+			return "";
+		}
+		
+		$description = str_replace("\n", "\n$indent", $description);
+		
+		# make sure the description does not start or end with '"'
+		if (kString::beginsWith($description, '"'))
+		{
+			$description = " " . $description;
+		}
+		if (kString::endsWith($description, '"'))
+		{
+			$description .= " ";
+		}
+		
+		return $indent . '"""' . $description . '"""';
+	}
+	
 	function writeClass(DOMElement $classNode)
 	{
 		$type = $classNode->getAttribute("name");
@@ -222,7 +257,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("class $type(" . $classNode->getAttribute("base") . "):");
 		else
 			$this->appendLine("class $type(KalturaObjectBase):");
-
+			
+		$description = self::buildMultilineString($classNode->getAttribute("description"), "    ");
+		if ($description)
+			$this->appendLine($description . "\n");
+			
 		$this->writeClassCtor($classNode);
 		$this->writeClassFromXmlFunc($classNode);
 		$this->writeClassToParamsFunc($classNode);
@@ -301,11 +340,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
-			$propDescription = $propertyNode->getAttribute("description");
+				
+			$description = self::buildMultilineComment($propertyNode->getAttribute("description"), "        ");
+			if ($description)
+				$this->appendLine($description);
 			
-			$description = str_replace("\n", "\n        # ", trim($propDescription)); // to format multiline descriptions
-			if ($description != "")
-				$this->appendLine("        # " . $description);
 			if ($propType == "array")
 				$this->appendLine("        # @var $propType of {$propertyNode->getAttribute("arrayType")}");
 			else
@@ -495,6 +534,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$this->appendLine("class $serviceClassName(KalturaServiceBase):");
+		
+		$description = self::buildMultilineString($serviceNode->getAttribute("description"), "    ");
+		if ($description)
+			$this->appendLine($description . "\n");
+			
 		$this->appendLine("    def __init__(self, client = None):");
 		$this->appendLine("        KalturaServiceBase.__init__(self, client)");
 		
@@ -523,7 +567,12 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$signature .= "):";
 		
 		$this->appendLine();	
-		$this->appendLine("    $signature");		
+		$this->appendLine("    $signature");
+		
+		$description = self::buildMultilineString($actionNode->getAttribute("description"), "        ");
+		if ($description)
+			$this->appendLine($description . "\n");
+			
 		$this->appendLine("        kparams = KalturaParams()");
 		$haveFiles = false;
 		foreach($paramNodes as $paramNode)

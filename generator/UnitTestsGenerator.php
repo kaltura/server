@@ -104,7 +104,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		{
 			$actionInfo = $serviceReflector->getActionInfo($action);
 			
-			if($actionInfo->deprecated || $actionInfo->serverOnly)
+			if($actionInfo->serverOnly)
 				continue;
 				
 			if (strpos($actionInfo->clientgenerator, "ignore") !== false)
