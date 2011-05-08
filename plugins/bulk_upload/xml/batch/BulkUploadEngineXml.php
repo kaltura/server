@@ -1034,13 +1034,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($allFlavorAssets as $flavorAsset)
 		{
 			if(!is_null($flavorAsset->assetParams))
-				$this->assetIdToAssetParamsId[$entryId][$flavorAsset->id] = $flavorAsset->assetParams;
+				$this->assetIdToAssetParamsId[$entryId][$flavorAsset->id] = $flavorAsset->flavorParamsId;
 		}
 		
 		foreach ($allThumbAssets as $thumbAsset)
 		{
 			if(!is_null($thumbAsset->assetParams))
-				$this->assetIdToAssetParamsId[$entryId][$thumbAsset->id] = $thumbAsset->assetParams;
+				$this->assetIdToAssetParamsId[$entryId][$thumbAsset->id] = $thumbAsset->thumbParamsId;
 		}
 		
 		KalturaLog::debug("new assetIdToAssetParamsId [" . print_r($this->assetIdToAssetParamsId, true). "]");
