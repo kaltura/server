@@ -58,6 +58,8 @@ class KalturaErrors extends APIErrors
 	
 	const PROPERTY_VALIDATION_ADMIN_PROPERTY = "PROPERTY_VALIDATION_ADMIN_PROPERTY,The property \"%s\" is updatable with admin session only";
 	
+	const PROPERTY_VALIDATION_ENTRY_STATUS =  "PROPERTY_INGESTION_PROFILE_ENTRY_STATUS,The property \"%s\" cannot be set for entry status \"%s\"";
+	
 	const INVALID_USER_ID = "INVALID_USER_ID,Invalid user id";
 	
 	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND,There is no data center with id [%s]";
@@ -73,6 +75,8 @@ class KalturaErrors extends APIErrors
 	
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND,Entry id \"%s\" not found";
 	
+	const ENTRY_ALREADY_WITH_CONTENT = "ENTRY_ALREADY_WITH_CONTENT,Entry already associated with content";
+	
 	const ENTRY_ID_NOT_REPLACED = "ENTRY_ID_NOT_REPLACED,Entry id \"%s\" not replaced";
 	
 	const ENTRY_REPLACEMENT_ALREADY_EXISTS = "ENTRY_REPLACEMENT_ALREADY_EXISTS,Entry already in replacement";
@@ -80,6 +84,8 @@ class KalturaErrors extends APIErrors
 	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED,Entry type \"%s\" not suppported";
 	
 	const RESOURCE_TYPE_NOT_SUPPORTED = "RESOURCE_TYPE_NOT_SUPPORTED,Resource type \"%s\" not suppported";
+	
+	const RESOURCES_MULTIPLE_DATA_CENTERS = "RESOURCES_MULTIPLE_DATA_CENTERS,Resources created on different data centers";
 	
 	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED,Entry media type \"%s\" not suppported";
 	
