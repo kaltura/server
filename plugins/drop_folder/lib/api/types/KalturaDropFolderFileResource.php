@@ -5,7 +5,7 @@
  * @package plugins.dropFolder
  * @subpackage api.objects
  */
-class KalturaDropFolderFileResource extends KalturaContentResource 
+class KalturaDropFolderFileResource extends KalturaDataCenterContentResource 
 {
 	/**
 	 * Id of the drop folder file object
@@ -13,6 +13,19 @@ class KalturaDropFolderFileResource extends KalturaContentResource
 	 */
 	public $dropFolderFileId;
 
+	public function getDc()
+	{
+		$dropFolderFile = DropFolderFilePeer::retrieveByPK($this->dropFolderFileId);
+		if(!$dropFolderFile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->dropFolderFileId);
+		
+		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
+		if(!$dropFolder)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFile->getDropFolderId());
+			
+		return $dropFolder->getDc();
+	}
+	
 	public function validateEntry(entry $dbEntry)
 	{
 		parent::validateEntry($dbEntry);
