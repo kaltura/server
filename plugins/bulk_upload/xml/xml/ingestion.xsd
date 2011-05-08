@@ -422,6 +422,7 @@
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 		</xs:sequence>
+		<xs:attribute name="assetId" type="xs:string" use="optional"/>
 		<xs:attribute name="id" type="xs:string" use="optional" />
 		<xs:attribute name="isDefault" type="xs:boolean" use="optional" default="false" />
 		<xs:attribute name="thumbParamsId" type="xs:int" use="optional" >
