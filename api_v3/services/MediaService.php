@@ -39,44 +39,47 @@ class MediaService extends KalturaEntryService
      *
      * @action add
      * @param KalturaMediaEntry $entry
-     * @param KalturaResource $resource
      * @return KalturaMediaEntry
-     * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-     * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-     * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-     * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
-     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
-     * @throws KalturaErrors::UPLOAD_ERROR
-     * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
-     * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
-     * @throws KalturaErrors::INVALID_OBJECT_ID
      */
-    function addAction(KalturaMediaEntry $entry, KalturaResource $resource = null)
+    function addAction(KalturaMediaEntry $entry)
     {
     	if($entry->conversionQuality && !$entry->ingestionProfileId)
     		$entry->ingestionProfileId = $entry->conversionQuality;
     		
     	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
-    	
-    	if(!$resource)
-    	{
-    		$dbEntry->setStatus(entryStatus::NO_CONTENT);
-    		$dbEntry->save();
+		$dbEntry->setStatus(entryStatus::NO_CONTENT);
+		$dbEntry->save();
     		
-			$entry->fromObject($dbEntry);
-			return $entry;
-    	}
-    	
+    	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
+	
+		$entry->fromObject($dbEntry);
+		return $entry;
+    }
+
+    /**
+     * Add content to entry
+     *
+     * @action addContent
+     * @param string $entryId
+     * @param KalturaResource $resource
+     * @return KalturaMediaEntry
+     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @throws KalturaErrors::ENTRY_ALREADY_WITH_CONTENT
+     */
+    function addContentAction($entryId, KalturaResource $resource = null)
+    {
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
+		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
+			
     	$resource->validateEntry($dbEntry);
     	$kResource = $resource->toObject();
-    	
     	$this->attachResource($kResource, $dbEntry);
     	
-		if(!$dbEntry || !$dbEntry->getId())
-			return null;
-			
 		if($dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
@@ -89,9 +92,7 @@ class MediaService extends KalturaEntryService
 	    	}
 		}
     	$resource->entryHandled($dbEntry);
-    
-    	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
-		
+    	
 		$entry = new KalturaMediaEntry();
 		$entry->fromObject($dbEntry);
 		return $entry;
@@ -150,7 +151,7 @@ class MediaService extends KalturaEntryService
      */
     protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
-    	switch(get_class($resource))
+    	switch($resource->getType())
     	{
 			case 'kAssetsParamsResourceContainers':
 				// image entry doesn't support asset params
@@ -620,35 +621,43 @@ class MediaService extends KalturaEntryService
 	 * @action update
 	 * @param string $entryId Media entry id to update
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata to update
-	 * @param KalturaResource $resource Resource to be used to replace entry media content
 	 * @return KalturaMediaEntry The updated media entry
-	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @throws KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS
-     * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
-	function updateAction($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null)
+	function updateAction($entryId, KalturaMediaEntry $mediaEntry)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		if(is_null($mediaEntry))
-		{
-			$mediaEntry = new KalturaMediaEntry();
-			$mediaEntry->fromObject($dbEntry);
-		}
-		else
-		{
-			$mediaEntry = $this->updateEntry($entryId, $mediaEntry, KalturaEntryType::MEDIA_CLIP);
-		}
+		$mediaEntry = $this->updateEntry($entryId, $mediaEntry, KalturaEntryType::MEDIA_CLIP);
 		
-		if(!is_null($resource))
-		{
-			$this->replaceResource($resource, $dbEntry);
-	    	$mediaEntry->fromObject($dbEntry);
-		}
+		return $mediaEntry;
+	}
+
+	/**
+	 * Replace media content of the entry
+	 * 
+	 * @action updateContent
+	 * @param string $entryId Media entry id to update
+	 * @param KalturaResource $resource Resource to be used to replace entry media content
+	 * @return KalturaMediaEntry The updated media entry
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS
+     * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	function updateContentAction($entryId, KalturaResource $resource)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		$this->replaceResource($resource, $dbEntry);
+				
+		$mediaEntry = new KalturaMediaEntry();
+		$mediaEntry->fromObject($dbEntry);
 		
 		return $mediaEntry;
 	}
