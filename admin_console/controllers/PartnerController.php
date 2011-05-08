@@ -256,21 +256,34 @@ class PartnerController extends Zend_Controller_Action
 		
 		$request = $this->getRequest();
 		
+		$this->view->errMessage = false;
 		if ($request->isPost())
 		{
 			$form->populate($request->getPost());
 			$config = $form->getObject("Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration", $request->getPost());
-			$systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $config);
+			
+			try{
+				$systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $config);
+			}
+			catch (Exception $e){
+				$this->view->errMessage = $e->getMessage();
+			}
 		}
 		else
 		{
 			$client->startMultiRequest();
 			$systemPartnerPlugin->systemPartner->get($partnerId);
 			$systemPartnerPlugin->systemPartner->getConfiguration($partnerId);
-			$result = $client->doMultiRequest();
-			$partner = $result[0];
-			$config = $result[1];
-			$form->populateFromObject($config);
+			
+			try{
+				$result = $client->doMultiRequest();
+				$partner = $result[0];
+				$config = $result[1];
+				$form->populateFromObject($config);
+			}
+			catch (Exception $e){
+				$this->view->errMessage = $e->getMessage();
+			}
 //			$form->getElement('account_name')->setDescription($partner->name);
 			
 		}

@@ -1,2 +1,3 @@
+<?php if($this->errMessage) echo "<div class=\"error\">{$this->errMessage}</div>"; ?>
 <?php $this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'configure'))); ?>
 <?php echo $this->form; ?>
