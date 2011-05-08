@@ -229,7 +229,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Gets the flavor params from the given flavor asset
 	 * @param string $assetId
 	 */
-	protected function getFlavorParamsIdFromAssetId($assetId, $entryId)
+	protected function getAssetParamsIdFromAssetId($assetId, $entryId)
 	{
 		if(is_null($this->assetIdToAssetParamsId[$entryId]))
 		{
@@ -240,8 +240,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			return $this->assetIdToAssetParamsId[$entryId][$assetId];
 		}
-		
-		return null;
+		else //The asset wasn't found on the entry
+		{
+			throw new KalturaBatchException("Asset Id [$assetId] not found on entry [$entryId]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
 	}
 	
 	
@@ -288,14 +290,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
 			$flavorAssetResource = $this->getResource($contentElement);
 			
-			$flavorParamsId = $flavorAsset->flavorParamsId;
+			$assetParamsId = $flavorAsset->flavorParamsId;
 			 
 			if($assetId) // if we have an asset id then we need to update the asset
 			{
-				$flavorParamsId = $this->getFlavorParamsIdFromAssetId($assetId, $entryId);
+				$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 			}
 		
-			if(is_null($flavorParamsId)) // no params resource
+			if(is_null($assetParamsId)) // no params resource
 			{
 				$noParamsFlavorAssets[] = $flavorAsset;
 				$noParamsFlavorResources[] = $flavorAssetResource;
@@ -327,14 +329,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			KalturaLog::debug("Asset id [ $assetId]");
 			
-			$flavorParamsId = $thumbAsset->thumbParamsId;
+			$assetParamsId = $thumbAsset->thumbParamsId;
 			 
 			if($assetId) // if we have an asset id then we need to update the asset
 			{
-				$flavorParamsId = $this->getFlavorParamsIdFromAssetId($assetId, $entryId);
+				$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 			}
 						
-			if(is_null($flavorParamsId))
+			if(is_null($assetParamsId))
 			{
 				$noParamsThumbAssets[] = $thumbAsset;
 				$noParamsThumbResources[] = $thumbAssetResource;
@@ -393,6 +395,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!count($resource->resources))
 			$resource = null;
 			
+			//TODO: handle replacment entry issues
 		$this->kClient->baseEntry->update($entryId, $entry, $resource); // updates the entry
 		$updatedEntryId = "{1:result:id}";
 		
@@ -410,18 +413,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 		$requestResults = $this->kClient->doMultiRequest();;
 		
-		$createdEntry = reset($requestResults);
+		$updatedEntry = reset($requestResults);
 		
 		//TODO: handle the update array
-		KalturaLog::debug("Created entry [". print_r($createdEntry,true) ."]");
+		KalturaLog::debug("Updated entry [". print_r($updatedEntry,true) ."]");
 		
 		//Make thi closer to request
-		if(is_null($createdEntry)) //checks that the entry was created
+		if(is_null($updatedEntry)) //checks that the entry was created
 		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
-		return $createdEntry;
+		return $updatedEntry;
 	}
 
 	/**
@@ -1033,13 +1036,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allFlavorAssets as $flavorAsset)
 		{
-			if(!is_null($flavorAsset->assetParams))
+			if(!is_null($flavorAsset->id)) //should always have an id
 				$this->assetIdToAssetParamsId[$entryId][$flavorAsset->id] = $flavorAsset->flavorParamsId;
 		}
 		
-		foreach ($allThumbAssets as $thumbAsset)
+		foreach ($allThumbAssets as $thumbAsset) 
 		{
-			if(!is_null($thumbAsset->assetParams))
+			if(!is_null($thumbAsset->id)) //should always have an id
 				$this->assetIdToAssetParamsId[$entryId][$thumbAsset->id] = $thumbAsset->thumbParamsId;
 		}
 		
