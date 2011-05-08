@@ -53,7 +53,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Maps the asset id to flavor params id
 	 * @var array()
 	 */
-	private $assetIdToflavorParamsId = null;
+	private $assetIdToAssetParamsId = null;
 	
 	/**
 	 * 
@@ -231,14 +231,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function getFlavorParamsIdFromAssetId($assetId, $entryId)
 	{
-		if(is_null($this->assetIdToflavorParamsId[$entryId]))
+		if(is_null($this->assetIdToAssetParamsId[$entryId]))
 		{
-			$this->initAssetIdToflavorParamsId($entryId);
+			$this->initassetIdToAssetParamsId($entryId);
 		}
 		
-		if(isset($this->assetIdToflavorParamsId[$entryId][$assetId]))
+		if(isset($this->assetIdToAssetParamsId[$entryId][$assetId]))
 		{
-			return $this->assetIdToflavorParamsId[$entryId][$assetId];
+			return $this->assetIdToAssetParamsId[$entryId][$assetId];
 		}
 		
 		return null;
@@ -1021,14 +1021,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
  	 * Inits the array of access control name to Id (with all given flavor params)
  	 * @param $entryId - the entry id to take the flavor assets from
 	 */
-	protected function initAssetIdToflavorParamsId($entryId)
+	protected function initAssetIdToAssetParamsId($entryId)
 	{
 		$this->impersonate();
 		
 		$allFlavorAssets = $this->kClient->flavorAsset->getByEntryId($entryId);
 		$allThumbAssets = $this->kClient->thumbAsset->getByEntryId($entryId);
-		$allFlavorAssets = $allFlavorAssets->objects;
-		$allThumbAssets = $allThumbAssets->objects;
 						
 		KalturaLog::debug("allFlavorAssets [" . print_r($allFlavorAssets, true). "]");
 		KalturaLog::debug("allThumbAssets [" . print_r($allThumbAssets, true). "]");
@@ -1036,16 +1034,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($allFlavorAssets as $flavorAsset)
 		{
 			if(!is_null($flavorAsset->assetParams))
-				$this->assetIdToflavorParamsId[$entryId][$flavorAsset->id] = $flavorAsset->assetParams;
+				$this->assetIdToAssetParamsId[$entryId][$flavorAsset->id] = $flavorAsset->assetParams;
 		}
 		
 		foreach ($allThumbAssets as $thumbAsset)
 		{
 			if(!is_null($thumbAsset->assetParams))
-				$this->assetIdToflavorParamsId[$entryId][$thumbAsset->id] = $thumbAsset->assetParams;
+				$this->assetIdToAssetParamsId[$entryId][$thumbAsset->id] = $thumbAsset->assetParams;
 		}
 		
-		KalturaLog::debug("new assetIdToflavorParamsId [" . print_r($this->assetIdToflavorParamsId, true). "]");
+		KalturaLog::debug("new assetIdToAssetParamsId [" . print_r($this->assetIdToAssetParamsId, true). "]");
 	}
 	
 	/**
