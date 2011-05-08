@@ -309,7 +309,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$flavorAssets[$flavorAsset->flavorParamsId] = $flavorAsset;
 			$assetResource = new KalturaAssetParamsResourceContainer();
 			$assetResource->resource = $flavorAssetResource;
-			$assetResource->assetParamsId = $flavorAsset->flavorParamsId;
+			$assetResource->assetParamsId = $assetParamsId;
 			$resource->resources[] = $assetResource;
 		}
 
@@ -350,7 +350,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumbAssets[$thumbAsset->thumbParamsId] = $thumbAsset;
 			$assetResource = new KalturaAssetParamsResourceContainer();
 			$assetResource->resource = $thumbAssetResource;
-			$assetResource->assetParamsId = $thumbAsset->thumbParamsId;
+			$assetResource->assetParamsId = $assetParamsId;
 			$resource->resources[] = $assetResource;
 		}
 
