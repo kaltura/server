@@ -163,7 +163,7 @@ class uiConfDeployment
 						//Then we need to insert the ui conf to the DB (so we can get his id)
 						$uiconf_id = uiConfDeployment::addUiConfThroughPropel($uiConf);
 
-						echo "creating uiconf [$uiconf_id] for widget $widgetName with default values ( $baseSwfUrl , $swfName , $objectType )" . PHP_EOL;
+						echo "creating uiconf [$uiconf_id] for widget $widgetName with default values ( $baseSwfUrl , $swfName , $objectType ) for partner " . self::$partnerId . PHP_EOL;
 						echo "$widgetName , $baseSwfUrl , $swfName , $objectType".PHP_EOL;
 					
 						if(isset($widgetValue->features))
@@ -232,7 +232,7 @@ class uiConfDeployment
 			$deprecatedTag = $newTag;
 			$deprecatedTag = str_replace("autodeploy", "deprecated", $deprecatedTag);
 		
-			echo "newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} for partner $partnerId\n";
+			echo "newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} for partner ". self::$partnerId . "\n";
 			
 			$confCriteria = new Criteria();
 			$confCriteria->add(uiConfPeer::ID, $oldUiConf[0]);
