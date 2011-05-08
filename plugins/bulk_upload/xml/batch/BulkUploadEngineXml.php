@@ -1184,8 +1184,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				break;
 				
 			default:
-				// TODO ingest as automatic
-				throw new KalturaBatchException("Type is not supported type [$media->type]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+				$entry->type = KalturaEntryType::AUTOMATIC;
 				break;
 		}
 	}
