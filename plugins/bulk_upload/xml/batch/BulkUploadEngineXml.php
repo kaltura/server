@@ -322,7 +322,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
 			$thumbAssetResource = $this->getResource($thumbElement);
 			
-			$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
+			$assetId = kXml::getXmlAttributeAsString($thumbElement, "assetId");
 			//TODO: get the flavor params from the asset if exists.
 			
 			KalturaLog::debug("Asset id [ $assetId]");
