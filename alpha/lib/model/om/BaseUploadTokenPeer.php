@@ -26,7 +26,7 @@ abstract class BaseUploadTokenPeer {
 	const TM_CLASS = 'UploadTokenTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 13;
+	const NUM_COLUMNS = 15;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -70,6 +70,12 @@ abstract class BaseUploadTokenPeer {
 	/** the column name for the DC field */
 	const DC = 'upload_token.DC';
 
+	/** the column name for the OBJECT_TYPE field */
+	const OBJECT_TYPE = 'upload_token.OBJECT_TYPE';
+
+	/** the column name for the OBJECT_ID field */
+	const OBJECT_ID = 'upload_token.OBJECT_ID';
+
 	/**
 	 * An identiy map to hold any loaded instances of UploadToken objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -86,11 +92,11 @@ abstract class BaseUploadTokenPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'KuserId', 'Status', 'FileName', 'FileSize', 'UploadedFileSize', 'UploadTempPath', 'UserIp', 'CreatedAt', 'UpdatedAt', 'Dc', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'kuserId', 'status', 'fileName', 'fileSize', 'uploadedFileSize', 'uploadTempPath', 'userIp', 'createdAt', 'updatedAt', 'dc', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::KUSER_ID, self::STATUS, self::FILE_NAME, self::FILE_SIZE, self::UPLOADED_FILE_SIZE, self::UPLOAD_TEMP_PATH, self::USER_IP, self::CREATED_AT, self::UPDATED_AT, self::DC, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'kuser_id', 'status', 'file_name', 'file_size', 'uploaded_file_size', 'upload_temp_path', 'user_ip', 'created_at', 'updated_at', 'dc', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'PartnerId', 'KuserId', 'Status', 'FileName', 'FileSize', 'UploadedFileSize', 'UploadTempPath', 'UserIp', 'CreatedAt', 'UpdatedAt', 'Dc', 'ObjectType', 'ObjectId', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'partnerId', 'kuserId', 'status', 'fileName', 'fileSize', 'uploadedFileSize', 'uploadTempPath', 'userIp', 'createdAt', 'updatedAt', 'dc', 'objectType', 'objectId', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::PARTNER_ID, self::KUSER_ID, self::STATUS, self::FILE_NAME, self::FILE_SIZE, self::UPLOADED_FILE_SIZE, self::UPLOAD_TEMP_PATH, self::USER_IP, self::CREATED_AT, self::UPDATED_AT, self::DC, self::OBJECT_TYPE, self::OBJECT_ID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'partner_id', 'kuser_id', 'status', 'file_name', 'file_size', 'uploaded_file_size', 'upload_temp_path', 'user_ip', 'created_at', 'updated_at', 'dc', 'object_type', 'object_id', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
 	);
 
 	/**
@@ -100,11 +106,11 @@ abstract class BaseUploadTokenPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'KuserId' => 3, 'Status' => 4, 'FileName' => 5, 'FileSize' => 6, 'UploadedFileSize' => 7, 'UploadTempPath' => 8, 'UserIp' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'Dc' => 12, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'kuserId' => 3, 'status' => 4, 'fileName' => 5, 'fileSize' => 6, 'uploadedFileSize' => 7, 'uploadTempPath' => 8, 'userIp' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'dc' => 12, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::KUSER_ID => 3, self::STATUS => 4, self::FILE_NAME => 5, self::FILE_SIZE => 6, self::UPLOADED_FILE_SIZE => 7, self::UPLOAD_TEMP_PATH => 8, self::USER_IP => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::DC => 12, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'kuser_id' => 3, 'status' => 4, 'file_name' => 5, 'file_size' => 6, 'uploaded_file_size' => 7, 'upload_temp_path' => 8, 'user_ip' => 9, 'created_at' => 10, 'updated_at' => 11, 'dc' => 12, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'PartnerId' => 2, 'KuserId' => 3, 'Status' => 4, 'FileName' => 5, 'FileSize' => 6, 'UploadedFileSize' => 7, 'UploadTempPath' => 8, 'UserIp' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'Dc' => 12, 'ObjectType' => 13, 'ObjectId' => 14, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'partnerId' => 2, 'kuserId' => 3, 'status' => 4, 'fileName' => 5, 'fileSize' => 6, 'uploadedFileSize' => 7, 'uploadTempPath' => 8, 'userIp' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'dc' => 12, 'objectType' => 13, 'objectId' => 14, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::PARTNER_ID => 2, self::KUSER_ID => 3, self::STATUS => 4, self::FILE_NAME => 5, self::FILE_SIZE => 6, self::UPLOADED_FILE_SIZE => 7, self::UPLOAD_TEMP_PATH => 8, self::USER_IP => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::DC => 12, self::OBJECT_TYPE => 13, self::OBJECT_ID => 14, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'partner_id' => 2, 'kuser_id' => 3, 'status' => 4, 'file_name' => 5, 'file_size' => 6, 'uploaded_file_size' => 7, 'upload_temp_path' => 8, 'user_ip' => 9, 'created_at' => 10, 'updated_at' => 11, 'dc' => 12, 'object_type' => 13, 'object_id' => 14, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
 	);
 
 	/**
@@ -187,6 +193,8 @@ abstract class BaseUploadTokenPeer {
 		$criteria->addSelectColumn(UploadTokenPeer::CREATED_AT);
 		$criteria->addSelectColumn(UploadTokenPeer::UPDATED_AT);
 		$criteria->addSelectColumn(UploadTokenPeer::DC);
+		$criteria->addSelectColumn(UploadTokenPeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(UploadTokenPeer::OBJECT_ID);
 	}
 
 	/**

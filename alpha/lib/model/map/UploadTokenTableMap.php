@@ -50,6 +50,8 @@ class UploadTokenTableMap extends TableMap {
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('DC', 'Dc', 'INTEGER', false, null, null);
+		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'VARCHAR', false, 127, null);
+		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 31, null);
 		// validators
 	} // initialize()
 

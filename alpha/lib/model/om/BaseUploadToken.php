@@ -99,6 +99,18 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	protected $dc;
 
 	/**
+	 * The value for the object_type field.
+	 * @var        string
+	 */
+	protected $object_type;
+
+	/**
+	 * The value for the object_id field.
+	 * @var        string
+	 */
+	protected $object_id;
+
+	/**
 	 * @var        kuser
 	 */
 	protected $akuser;
@@ -340,6 +352,26 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	public function getDc()
 	{
 		return $this->dc;
+	}
+
+	/**
+	 * Get the [object_type] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getObjectType()
+	{
+		return $this->object_type;
+	}
+
+	/**
+	 * Get the [object_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getObjectId()
+	{
+		return $this->object_id;
 	}
 
 	/**
@@ -698,6 +730,52 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 	} // setDc()
 
 	/**
+	 * Set the value of [object_type] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     UploadToken The current object (for fluent API support)
+	 */
+	public function setObjectType($v)
+	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[UploadTokenPeer::OBJECT_TYPE] = $this->object_type;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->object_type !== $v) {
+			$this->object_type = $v;
+			$this->modifiedColumns[] = UploadTokenPeer::OBJECT_TYPE;
+		}
+
+		return $this;
+	} // setObjectType()
+
+	/**
+	 * Set the value of [object_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     UploadToken The current object (for fluent API support)
+	 */
+	public function setObjectId($v)
+	{
+		if(!isset($this->oldColumnsValues[UploadTokenPeer::OBJECT_ID]))
+			$this->oldColumnsValues[UploadTokenPeer::OBJECT_ID] = $this->object_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->object_id !== $v) {
+			$this->object_id = $v;
+			$this->modifiedColumns[] = UploadTokenPeer::OBJECT_ID;
+		}
+
+		return $this;
+	} // setObjectId()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -746,6 +824,8 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
 			$this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->dc = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+			$this->object_type = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->object_id = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -755,7 +835,7 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 13; // 13 = UploadTokenPeer::NUM_COLUMNS - UploadTokenPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 15; // 15 = UploadTokenPeer::NUM_COLUMNS - UploadTokenPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UploadToken object", $e);
@@ -1256,6 +1336,12 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 			case 12:
 				return $this->getDc();
 				break;
+			case 13:
+				return $this->getObjectType();
+				break;
+			case 14:
+				return $this->getObjectId();
+				break;
 			default:
 				return null;
 				break;
@@ -1290,6 +1376,8 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 			$keys[10] => $this->getCreatedAt(),
 			$keys[11] => $this->getUpdatedAt(),
 			$keys[12] => $this->getDc(),
+			$keys[13] => $this->getObjectType(),
+			$keys[14] => $this->getObjectId(),
 		);
 		return $result;
 	}
@@ -1360,6 +1448,12 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 			case 12:
 				$this->setDc($value);
 				break;
+			case 13:
+				$this->setObjectType($value);
+				break;
+			case 14:
+				$this->setObjectId($value);
+				break;
 		} // switch()
 	}
 
@@ -1397,6 +1491,8 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setDc($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setObjectType($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setObjectId($arr[$keys[14]]);
 	}
 
 	/**
@@ -1421,6 +1517,8 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UploadTokenPeer::CREATED_AT)) $criteria->add(UploadTokenPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(UploadTokenPeer::UPDATED_AT)) $criteria->add(UploadTokenPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(UploadTokenPeer::DC)) $criteria->add(UploadTokenPeer::DC, $this->dc);
+		if ($this->isColumnModified(UploadTokenPeer::OBJECT_TYPE)) $criteria->add(UploadTokenPeer::OBJECT_TYPE, $this->object_type);
+		if ($this->isColumnModified(UploadTokenPeer::OBJECT_ID)) $criteria->add(UploadTokenPeer::OBJECT_ID, $this->object_id);
 
 		return $criteria;
 	}
@@ -1498,6 +1596,10 @@ abstract class BaseUploadToken extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setDc($this->dc);
+
+		$copyObj->setObjectType($this->object_type);
+
+		$copyObj->setObjectId($this->object_id);
 
 
 		$copyObj->setNew(true);
