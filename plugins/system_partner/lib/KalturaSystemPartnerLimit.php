@@ -64,6 +64,42 @@ class KalturaSystemPartnerLimit extends KalturaObject
 		}
 		return $limit;
 	} 
+
+	public function validate()
+	{
+		switch($limit->type)
+		{
+			case ENTRIES:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+				
+			case STREAM_ENTRIES:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+				
+			case BANDWIDTH:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+				
+			case PUBLISHERS:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+				
+			case ADMIN_USERS:
+				$this->validatePropertyMinValue('max', 1, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+				
+			case END_USERS:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+		}
+	}
 	
 	/**
 	 * @param Partner $partner
