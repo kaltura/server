@@ -297,6 +297,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 			}
 		
+			KalturaLog::debug("assetParamsId [$assetParamsId]");
+						
 			if(is_null($assetParamsId)) // no params resource
 			{
 				$noParamsFlavorAssets[] = $flavorAsset;
@@ -336,6 +338,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 			}
 						
+			KalturaLog::debug("assetParamsId [$assetParamsId]");
+			
 			if(is_null($assetParamsId))
 			{
 				$noParamsThumbAssets[] = $thumbAsset;
