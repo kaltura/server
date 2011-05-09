@@ -93,6 +93,7 @@ $encodingTemplate;
 		
 		KalturaLog::debug("Job completed successfully - ".print_r($rvObj,1));
 		if($rvObj->job_list[0]->job_output_file!=$this->outFilePath) {
+			KalturaLog::debug("copy($rvObj->job_list[0]->job_output_file, $this->outFilePath)");
 			copy($rvObj->job_list[0]->job_output_file, $this->outFilePath);
 		}
 /*
