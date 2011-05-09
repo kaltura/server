@@ -445,17 +445,18 @@ class KalturaEntryService extends KalturaBaseService
 		if($conversionProfile && $conversionProfile->getDefaultEntryId())
 		{
 			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
-//			KalturaLog::debug("Template entry found id [" . $templateEntry->getId() . "] data [" . print_r($templateEntry->toArray(), true) . "]");
-			$dbEntry = $templateEntry->copy();
-			$dbEntry->save();
-			
-//			KalturaLog::debug("Copied entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
+			if($templateEntry)
+			{
+				$dbEntry = $templateEntry->copy();
+				$dbEntry->save();
+			}
+			else
+			{
+				KalturaLog::err("Template entry id [" . $conversionProfile->getDefaultEntryId() . "] not found");
+			}
 		}
 		
-		$dbEntry = $this->prepareEntryForInsert($entry, $dbEntry);
-//		KalturaLog::debug("Prepared entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
-		
-		return $dbEntry;
+		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
 	/**
