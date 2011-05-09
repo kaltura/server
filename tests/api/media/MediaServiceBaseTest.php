@@ -8,24 +8,23 @@ abstract class MediaServiceBaseTest extends KalturaApiTestCase
 	/**
 	 * Tests media->add action
 	 * @param KalturaMediaEntry $entry 
-	 * @param KalturaResource $resource 
 	 * @param KalturaMediaEntry $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	public function testAdd(KalturaMediaEntry $entry, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->add($entry, $resource);
+		$resultObject = $this->client->media->add($entry);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateAdd($entry, $resource, $reference);
+		$this->validateAdd($entry, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testAdd results
 	 */
-	protected function validateAdd(KalturaMediaEntry $entry, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	protected function validateAdd(KalturaMediaEntry $entry, KalturaMediaEntry $reference)
 	{
 	}
 
@@ -57,24 +56,23 @@ abstract class MediaServiceBaseTest extends KalturaApiTestCase
 	 * Tests media->update action
 	 * @param string $entryId Media entry id to update
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata to update
-	 * @param KalturaResource $resource Resource to be used to replace entry media content
 	 * @param KalturaMediaEntry $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testUpdate($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	public function testUpdate($entryId, KalturaMediaEntry $mediaEntry, KalturaMediaEntry $reference)
 	{
-		$resultObject = $this->client->media->update($entryId, $mediaEntry, $resource);
+		$resultObject = $this->client->media->update($entryId, $mediaEntry);
 		$this->assertType('KalturaMediaEntry', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateUpdate($entryId, $mediaEntry, $resource, $reference);
+		$this->validateUpdate($entryId, $mediaEntry, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testUpdate results
 	 */
-	protected function validateUpdate($entryId, KalturaMediaEntry $mediaEntry = null, KalturaResource $resource = null, KalturaMediaEntry $reference)
+	protected function validateUpdate($entryId, KalturaMediaEntry $mediaEntry, KalturaMediaEntry $reference)
 	{
 	}
 

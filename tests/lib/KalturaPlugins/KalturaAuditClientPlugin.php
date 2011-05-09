@@ -24,6 +24,13 @@ class KalturaAuditTrailContext
 	const API_V3 = 2;
 }
 
+class KalturaAuditTrailFileSyncType
+{
+	const FILE = 1;
+	const LINK = 2;
+	const URL = 3;
+}
+
 class KalturaAuditTrailObjectType
 {
 	const ACCESS_CONTROL = "accessControl";
@@ -549,6 +556,96 @@ class KalturaAuditTrailListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+class KalturaAuditTrailChangeItem extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $descriptor = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $oldValue = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $newValue = null;
+
+
+}
+
+class KalturaAuditTrailChangeInfo extends KalturaAuditTrailInfo
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaAuditTrailChangeItem
+	 */
+	public $changedItems;
+
+
+}
+
+class KalturaAuditTrailFileSyncCreateInfo extends KalturaAuditTrailInfo
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $objectSubType = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $dc = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $original = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAuditTrailFileSyncType
+	 */
+	public $fileType = null;
+
+
+}
+
+class KalturaAuditTrailTextInfo extends KalturaAuditTrailInfo
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $info = null;
 
 
 }

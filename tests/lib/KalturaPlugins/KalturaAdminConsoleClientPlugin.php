@@ -221,6 +221,39 @@ class KalturaTrackEntryListResponse extends KalturaObjectBase
 
 }
 
+class KalturaUiConfAdmin extends KalturaUiConf
+{
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isPublic = null;
+
+
+}
+
+class KalturaUiConfAdminListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaUiConfAdmin
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
 
 class KalturaFlavorParamsOutputService extends KalturaServiceBase
 {
@@ -350,7 +383,7 @@ class KalturaUiConfAdminService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function add(KalturaUiConf $uiConf)
+	function add(KalturaUiConfAdmin $uiConf)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "uiConf", $uiConf->toParams());
@@ -359,11 +392,11 @@ class KalturaUiConfAdminService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		$this->client->validateObjectType($resultObject, "KalturaUiConfAdmin");
 		return $resultObject;
 	}
 
-	function update($id, KalturaUiConf $uiConf)
+	function update($id, KalturaUiConfAdmin $uiConf)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "id", $id);
@@ -373,7 +406,7 @@ class KalturaUiConfAdminService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		$this->client->validateObjectType($resultObject, "KalturaUiConfAdmin");
 		return $resultObject;
 	}
 
@@ -386,7 +419,7 @@ class KalturaUiConfAdminService extends KalturaServiceBase
 			return null;
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaUiConf");
+		$this->client->validateObjectType($resultObject, "KalturaUiConfAdmin");
 		return $resultObject;
 	}
 
@@ -400,6 +433,22 @@ class KalturaUiConfAdminService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function listAction(KalturaUiConfFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$kparams = array();
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
+		$this->client->queueServiceActionCall("adminconsole_uiconfadmin", "list", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaUiConfAdminListResponse");
 		return $resultObject;
 	}
 }

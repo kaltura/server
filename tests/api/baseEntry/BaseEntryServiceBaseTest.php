@@ -8,25 +8,24 @@ abstract class BaseEntryServiceBaseTest extends KalturaApiTestCase
 	/**
 	 * Tests baseEntry->add action
 	 * @param KalturaBaseEntry $entry 
-	 * @param KalturaResource $resource 
 	 * @param KalturaEntryType $type 
 	 * @param KalturaBaseEntry $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd(KalturaBaseEntry $entry, KalturaResource $resource, KalturaEntryType $type = -1, KalturaBaseEntry $reference)
+	public function testAdd(KalturaBaseEntry $entry, KalturaEntryType $type = -1, KalturaBaseEntry $reference)
 	{
-		$resultObject = $this->client->baseEntry->add($entry, $resource, $type);
+		$resultObject = $this->client->baseEntry->add($entry, $type);
 		$this->assertType('KalturaBaseEntry', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateAdd($entry, $resource, $type, $reference);
+		$this->validateAdd($entry, $type, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testAdd results
 	 */
-	protected function validateAdd(KalturaBaseEntry $entry, KalturaResource $resource, KalturaEntryType $type = -1, KalturaBaseEntry $reference)
+	protected function validateAdd(KalturaBaseEntry $entry, KalturaEntryType $type = -1, KalturaBaseEntry $reference)
 	{
 	}
 
@@ -58,24 +57,23 @@ abstract class BaseEntryServiceBaseTest extends KalturaApiTestCase
 	 * Tests baseEntry->update action
 	 * @param string $entryId Entry id to update
 	 * @param KalturaBaseEntry $baseEntry Base entry metadata to update
-	 * @param KalturaResource $resource Resource to be used to replace entry content
 	 * @param KalturaBaseEntry $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testUpdate($entryId, KalturaBaseEntry $baseEntry = null, KalturaResource $resource = null, KalturaBaseEntry $reference)
+	public function testUpdate($entryId, KalturaBaseEntry $baseEntry, KalturaBaseEntry $reference)
 	{
-		$resultObject = $this->client->baseEntry->update($entryId, $baseEntry, $resource);
+		$resultObject = $this->client->baseEntry->update($entryId, $baseEntry);
 		$this->assertType('KalturaBaseEntry', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateUpdate($entryId, $baseEntry, $resource, $reference);
+		$this->validateUpdate($entryId, $baseEntry, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testUpdate results
 	 */
-	protected function validateUpdate($entryId, KalturaBaseEntry $baseEntry = null, KalturaResource $resource = null, KalturaBaseEntry $reference)
+	protected function validateUpdate($entryId, KalturaBaseEntry $baseEntry, KalturaBaseEntry $reference)
 	{
 	}
 

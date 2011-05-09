@@ -19,77 +19,131 @@ class KalturaDocumentEntryOrderBy
 	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
 
-class KalturaDocumentType
+class KalturaDocumentFlavorParamsOrderBy
 {
-	const DOCUMENT = 11;
-	const SWF = 12;
-	const PDF = 13;
 }
 
-class KalturaDocumentEntry extends KalturaBaseEntry
+class KalturaDocumentFlavorParamsOutputOrderBy
 {
-	/**
-	 * The type of the document
-	 *
-	 * @var KalturaDocumentType
-	 * @insertonly
-	 */
-	public $documentType = null;
-
-	/**
-	 * Conversion profile ID to override the default conversion profile
-	 * 
-	 *
-	 * @var string
-	 * @insertonly
-	 */
-	public $conversionProfileId = null;
-
-
 }
 
-abstract class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
+class KalturaPdfFlavorParamsOrderBy
 {
-	/**
-	 * 
-	 *
-	 * @var KalturaDocumentType
-	 */
-	public $documentTypeEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $documentTypeIn = null;
-
-
 }
 
-class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
+class KalturaPdfFlavorParamsOutputOrderBy
+{
+}
+
+class KalturaSwfFlavorParamsOrderBy
+{
+}
+
+class KalturaSwfFlavorParamsOutputOrderBy
+{
+}
+
+abstract class KalturaDocumentFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
 {
 
 }
 
-class KalturaDocumentListResponse extends KalturaObjectBase
+class KalturaDocumentFlavorParamsFilter extends KalturaDocumentFlavorParamsBaseFilter
+{
+
+}
+
+abstract class KalturaDocumentFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
+{
+
+}
+
+class KalturaDocumentFlavorParamsOutputFilter extends KalturaDocumentFlavorParamsOutputBaseFilter
+{
+
+}
+
+abstract class KalturaPdfFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
+{
+
+}
+
+class KalturaPdfFlavorParamsFilter extends KalturaPdfFlavorParamsBaseFilter
+{
+
+}
+
+abstract class KalturaPdfFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
+{
+
+}
+
+class KalturaPdfFlavorParamsOutputFilter extends KalturaPdfFlavorParamsOutputBaseFilter
+{
+
+}
+
+abstract class KalturaSwfFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
+{
+
+}
+
+class KalturaSwfFlavorParamsFilter extends KalturaSwfFlavorParamsBaseFilter
+{
+
+}
+
+abstract class KalturaSwfFlavorParamsOutputBaseFilter extends KalturaFlavorParamsOutputFilter
+{
+
+}
+
+class KalturaSwfFlavorParamsOutputFilter extends KalturaSwfFlavorParamsOutputBaseFilter
+{
+
+}
+
+class KalturaDocumentFlavorParams extends KalturaFlavorParams
+{
+
+}
+
+class KalturaDocumentFlavorParamsOutput extends KalturaFlavorParamsOutput
+{
+
+}
+
+class KalturaPdfFlavorParams extends KalturaFlavorParams
 {
 	/**
 	 * 
 	 *
-	 * @var array of KalturaDocumentEntry
-	 * @readonly
+	 * @var bool
 	 */
-	public $objects;
+	public $readonly = null;
 
+
+}
+
+class KalturaPdfFlavorParamsOutput extends KalturaFlavorParamsOutput
+{
 	/**
 	 * 
 	 *
-	 * @var int
-	 * @readonly
+	 * @var bool
 	 */
-	public $totalCount = null;
+	public $readonly = null;
 
+
+}
+
+class KalturaSwfFlavorParams extends KalturaFlavorParams
+{
+
+}
+
+class KalturaSwfFlavorParamsOutput extends KalturaFlavorParamsOutput
+{
 
 }
 
@@ -99,6 +153,21 @@ class KalturaDocumentsService extends KalturaServiceBase
 	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
+	}
+
+	function add(KalturaDocumentEntry $entry, KalturaResource $resource = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entry", $entry->toParams());
+		if ($resource !== null)
+			$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->queueServiceActionCall("document_documents", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
+		return $resultObject;
 	}
 
 	function addFromUploadedFile(KalturaDocumentEntry $documentEntry, $uploadTokenId)
@@ -219,20 +288,6 @@ class KalturaDocumentsService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaDocumentListResponse");
-		return $resultObject;
-	}
-
-	function upload($fileData)
-	{
-		$kparams = array();
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("document_documents", "upload", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 

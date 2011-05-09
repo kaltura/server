@@ -250,6 +250,19 @@ class KalturaFilesyncImportBatchService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function countBulkUploadEntries($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("multicenters_filesyncimportbatch", "countBulkUploadEntries", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
+		return $resultObject;
+	}
+
 	function updateBulkUploadResults($bulkUploadJobId)
 	{
 		$kparams = array();

@@ -36,39 +36,7 @@ class KalturaVirusScanProfileStatus
 {
 	const DISABLED = 1;
 	const ENABLED = 2;
-}
-
-class KalturaVirusScanJobData extends KalturaJobData
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $srcFilePath = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $flavorAssetId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaVirusScanJobResult
-	 */
-	public $scanResult = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaVirusFoundAction
-	 */
-	public $virusFoundAction = null;
-
-
+	const DELETED = 3;
 }
 
 abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
@@ -128,6 +96,20 @@ abstract class KalturaVirusScanProfileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerIdIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $nameLike = null;
 
 	/**
 	 * 
@@ -254,6 +236,39 @@ class KalturaVirusScanProfileListResponse extends KalturaObjectBase
 	 * @readonly
 	 */
 	public $totalCount = null;
+
+
+}
+
+class KalturaVirusScanJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $srcFilePath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flavorAssetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusScanJobResult
+	 */
+	public $scanResult = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaVirusFoundAction
+	 */
+	public $virusFoundAction = null;
 
 
 }
@@ -543,6 +558,19 @@ class KalturaVirusScanBatchService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaBulkUploadResult");
+		return $resultObject;
+	}
+
+	function countBulkUploadEntries($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("virusscan_virusscanbatch", "countBulkUploadEntries", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
 		return $resultObject;
 	}
 

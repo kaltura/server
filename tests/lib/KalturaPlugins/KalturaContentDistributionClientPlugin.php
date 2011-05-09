@@ -61,6 +61,22 @@ class KalturaDistributionProviderType
 	const MSN = "msnDistribution.MSN";
 	const COMCAST = "comcastDistribution.COMCAST";
 	const YOUTUBE = "youTubeDistribution.YOUTUBE";
+	const YOUTUBE_API = "youtubeApiDistribution.YOUTUBE_API";
+	const SYNACOR = "synacorDistribution.SYNACOR";
+	const IDETIC = "ideticDistribution.IDETIC";
+	const MYSPACE = "myspaceDistribution.MYSPACE";
+	const VERIZON = "verizonDistribution.VERIZON";
+	const DAILYMOTION = "dailymotionDistribution.DAILYMOTION";
+	const FREEWHEEL = "freewheelDistribution.FREEWHEEL";
+}
+
+class KalturaDistributionValidationErrorType
+{
+	const CUSTOM_ERROR = 0;
+	const STRING_EMPTY = 1;
+	const STRING_TOO_LONG = 2;
+	const STRING_TOO_SHORT = 3;
+	const INVALID_FORMAT = 4;
 }
 
 class KalturaEntryDistributionFlag
@@ -100,6 +116,21 @@ class KalturaEntryDistributionStatus
 	const REMOVED = 10;
 }
 
+class KalturaEntryDistributionSunStatus
+{
+	const BEFORE_SUNRISE = 1;
+	const AFTER_SUNRISE = 2;
+	const AFTER_SUNSET = 3;
+}
+
+class KalturaGenericDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
 class KalturaGenericDistributionProviderActionOrderBy
 {
 	const CREATED_AT_ASC = "+createdAt";
@@ -127,6 +158,18 @@ class KalturaGenericDistributionProviderStatus
 {
 	const ACTIVE = 2;
 	const DELETED = 3;
+}
+
+class KalturaSyndicationDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaSyndicationDistributionProviderOrderBy
+{
 }
 
 class KalturaDistributionThumbDimensions extends KalturaObjectBase
@@ -290,6 +333,93 @@ abstract class KalturaDistributionProfile extends KalturaObjectBase
 	 * @var int
 	 */
 	public $sunsetDefaultOffset = null;
+
+
+}
+
+abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfileStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+
+}
+
+class KalturaDistributionProfileFilter extends KalturaDistributionProfileBaseFilter
+{
+
+}
+
+class KalturaDistributionProfileListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionProfile
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
 
 
 }
@@ -535,449 +665,6 @@ class KalturaEntryDistribution extends KalturaObjectBase
 
 }
 
-abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
-{
-
-}
-
-class KalturaDistributionRemoteMediaFile extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $version = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $assetId = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $remoteId = null;
-
-
-}
-
-class KalturaDistributionJobData extends KalturaJobData
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $distributionProfileId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaDistributionProfile
-	 */
-	public $distributionProfile;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $entryDistributionId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaEntryDistribution
-	 */
-	public $entryDistribution;
-
-	/**
-	 * Id of the media in the remote system
-	 *
-	 * @var string
-	 */
-	public $remoteId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaDistributionProviderType
-	 */
-	public $providerType = null;
-
-	/**
-	 * Additional data that relevant for the provider only
-	 *
-	 * @var KalturaDistributionJobProviderData
-	 */
-	public $providerData;
-
-	/**
-	 * The results as returned from the remote destination
-	 *
-	 * @var string
-	 */
-	public $results = null;
-
-	/**
-	 * The data as sent to the remote destination
-	 *
-	 * @var string
-	 */
-	public $sentData = null;
-
-	/**
-	 * Stores array of media files that submitted to the destination site
-	 * Could be used later for media update 
-	 *
-	 * @var array of KalturaDistributionRemoteMediaFile
-	 */
-	public $mediaFiles;
-
-
-}
-
-class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $plays = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $views = null;
-
-
-}
-
-class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
-{
-
-}
-
-class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
-{
-
-}
-
-class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
-{
-
-}
-
-class KalturaGenericDistributionProfileAction extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var KalturaDistributionProtocol
-	 */
-	public $protocol = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $serverUrl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $serverPath = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $username = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $password = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $ftpPassiveMode = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $httpFieldName = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $httpFileName = null;
-
-
-}
-
-class KalturaGenericDistributionProfile extends KalturaDistributionProfile
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @insertonly
-	 */
-	public $genericProviderId = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaGenericDistributionProfileAction
-	 */
-	public $submitAction;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaGenericDistributionProfileAction
-	 */
-	public $updateAction;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaGenericDistributionProfileAction
-	 */
-	public $deleteAction;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaGenericDistributionProfileAction
-	 */
-	public $fetchReportAction;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $updateRequiredEntryFields = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $updateRequiredMetadataXPaths = null;
-
-
-}
-
-class KalturaSyndicationDistributionProfile extends KalturaDistributionProfile
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $xsl = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $feedId = null;
-
-
-}
-
-abstract class KalturaDistributionProvider extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var KalturaDistributionProviderType
-	 * @readonly
-	 */
-	public $type = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $name = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $scheduleUpdateEnabled = null;
-
-	/**
-	 * 
-	 *
-	 * @var bool
-	 */
-	public $deleteInsteadUpdate = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $intervalBeforeSunrise = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $intervalBeforeSunset = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $updateRequiredEntryFields = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $updateRequiredMetadataXPaths = null;
-
-
-}
-
-class KalturaSyndicationDistributionProvider extends KalturaDistributionProvider
-{
-
-}
-
-class KalturaGenericDistributionJobProviderData extends KalturaDistributionJobProviderData
-{
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $xml = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $resultParseData = null;
-
-	/**
-	 * 
-	 *
-	 * @var KalturaGenericDistributionProviderParser
-	 */
-	public $resultParserType = null;
-
-
-}
-
-abstract class KalturaDistributionProfileBaseFilter extends KalturaFilter
-{
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $idEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 */
-	public $idIn = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $createdAtLessThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtGreaterThanOrEqual = null;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 */
-	public $updatedAtLessThanOrEqual = null;
-
-
-}
-
-class KalturaDistributionProfileFilter extends KalturaDistributionProfileBaseFilter
-{
-
-}
-
-class KalturaDistributionProfileListResponse extends KalturaObjectBase
-{
-	/**
-	 * 
-	 *
-	 * @var array of KalturaDistributionProfile
-	 * @readonly
-	 */
-	public $objects;
-
-	/**
-	 * 
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $totalCount = null;
-
-
-}
-
 abstract class KalturaEntryDistributionBaseFilter extends KalturaFilter
 {
 	/**
@@ -1170,6 +857,68 @@ abstract class KalturaDistributionProviderBaseFilter extends KalturaFilter
 
 class KalturaDistributionProviderFilter extends KalturaDistributionProviderBaseFilter
 {
+
+}
+
+abstract class KalturaDistributionProvider extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 * @readonly
+	 */
+	public $type = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $name = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $scheduleUpdateEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $deleteInsteadUpdate = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $intervalBeforeSunrise = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $intervalBeforeSunset = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredEntryFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredMetadataXPaths = null;
+
 
 }
 
@@ -1640,6 +1389,447 @@ class KalturaGenericDistributionProviderActionListResponse extends KalturaObject
 	 */
 	public $totalCount = null;
 
+
+}
+
+class KalturaContentDistributionSearchItem extends KalturaSearchItem
+{
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $noDistributionProfiles = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionSunStatus
+	 */
+	public $distributionSunStatus = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionFlag
+	 */
+	public $entryDistributionFlag = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistributionStatus
+	 */
+	public $entryDistributionStatus = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $hasEntryDistributionValidationErrors = null;
+
+	/**
+	 * Comma seperated validation error types
+	 *
+	 * @var string
+	 */
+	public $entryDistributionValidationErrors = null;
+
+
+}
+
+abstract class KalturaGenericDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+{
+
+}
+
+class KalturaGenericDistributionProfileFilter extends KalturaGenericDistributionProfileBaseFilter
+{
+
+}
+
+abstract class KalturaSyndicationDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+{
+
+}
+
+class KalturaSyndicationDistributionProfileFilter extends KalturaSyndicationDistributionProfileBaseFilter
+{
+
+}
+
+abstract class KalturaSyndicationDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
+{
+
+}
+
+class KalturaSyndicationDistributionProviderFilter extends KalturaSyndicationDistributionProviderBaseFilter
+{
+
+}
+
+abstract class KalturaDistributionJobProviderData extends KalturaObjectBase
+{
+
+}
+
+class KalturaDistributionRemoteMediaFile extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $version = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $assetId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $remoteId = null;
+
+
+}
+
+class KalturaDistributionJobData extends KalturaJobData
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $distributionProfileId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProfile
+	 */
+	public $distributionProfile;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $entryDistributionId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaEntryDistribution
+	 */
+	public $entryDistribution;
+
+	/**
+	 * Id of the media in the remote system
+	 *
+	 * @var string
+	 */
+	public $remoteId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProviderType
+	 */
+	public $providerType = null;
+
+	/**
+	 * Additional data that relevant for the provider only
+	 *
+	 * @var KalturaDistributionJobProviderData
+	 */
+	public $providerData;
+
+	/**
+	 * The results as returned from the remote destination
+	 *
+	 * @var string
+	 */
+	public $results = null;
+
+	/**
+	 * The data as sent to the remote destination
+	 *
+	 * @var string
+	 */
+	public $sentData = null;
+
+	/**
+	 * Stores array of media files that submitted to the destination site
+	 * Could be used later for media update 
+	 *
+	 * @var array of KalturaDistributionRemoteMediaFile
+	 */
+	public $mediaFiles;
+
+
+}
+
+class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
+{
+
+}
+
+class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $plays = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $views = null;
+
+
+}
+
+class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
+{
+
+}
+
+class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
+{
+
+}
+
+class KalturaGenericDistributionProfileAction extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionProtocol
+	 */
+	public $protocol = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $serverUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $serverPath = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $username = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $password = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $ftpPassiveMode = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $httpFieldName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $httpFileName = null;
+
+
+}
+
+class KalturaGenericDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @insertonly
+	 */
+	public $genericProviderId = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $submitAction;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $updateAction;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $deleteAction;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaGenericDistributionProfileAction
+	 */
+	public $fetchReportAction;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredEntryFields = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $updateRequiredMetadataXPaths = null;
+
+
+}
+
+class KalturaSyndicationDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $xsl = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $feedId = null;
+
+
+}
+
+class KalturaDistributionValidationErrorInvalidData extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fieldName = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionValidationErrorType
+	 */
+	public $validationErrorType = null;
+
+	/**
+	 * Parameter of the validation error
+	 * For example, minimum value for KalturaDistributionValidationErrorType::STRING_TOO_SHORT validation error
+	 *
+	 * @var string
+	 */
+	public $validationErrorParam = null;
+
+
+}
+
+class KalturaDistributionValidationErrorInvalidMetadata extends KalturaDistributionValidationErrorInvalidData
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $metadataProfileId = null;
+
+
+}
+
+class KalturaDistributionValidationErrorMissingFlavor extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $flavorParamsId = null;
+
+
+}
+
+class KalturaDistributionValidationErrorMissingMetadata extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $fieldName = null;
+
+
+}
+
+class KalturaDistributionValidationErrorMissingThumbnail extends KalturaDistributionValidationError
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDistributionThumbDimensions
+	 */
+	public $dimensions;
+
+
+}
+
+class KalturaSyndicationDistributionProvider extends KalturaDistributionProvider
+{
 
 }
 
@@ -2674,6 +2864,19 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaBulkUploadResult");
+		return $resultObject;
+	}
+
+	function countBulkUploadEntries($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "countBulkUploadEntries", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
 		return $resultObject;
 	}
 

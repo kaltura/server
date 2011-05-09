@@ -138,13 +138,26 @@ class KalturaBaseEntryService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function add(KalturaBaseEntry $entry, KalturaResource $resource, $type = null)
+	function add(KalturaBaseEntry $entry, $type = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "entry", $entry->toParams());
-		$this->client->addParam($kparams, "resource", $resource->toParams());
 		$this->client->addParam($kparams, "type", $type);
 		$this->client->queueServiceActionCall("baseentry", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
+		return $resultObject;
+	}
+
+	function addContent($entryId, KalturaResource $resource)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->queueServiceActionCall("baseentry", "addContent", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -188,6 +201,20 @@ class KalturaBaseEntryService extends KalturaServiceBase
 		$this->client->addParam($kparams, "entryId", $entryId);
 		$this->client->addParam($kparams, "baseEntry", $baseEntry->toParams());
 		$this->client->queueServiceActionCall("baseentry", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBaseEntry");
+		return $resultObject;
+	}
+
+	function updateContent($entryId, KalturaResource $resource)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->queueServiceActionCall("baseentry", "updateContent", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -249,20 +276,6 @@ class KalturaBaseEntryService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "integer");
-		return $resultObject;
-	}
-
-	function upload($fileData)
-	{
-		$kparams = array();
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("baseentry", "upload", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 
@@ -763,6 +776,19 @@ class KalturaBatchService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaBulkUploadResult");
+		return $resultObject;
+	}
+
+	function countBulkUploadEntries($bulkUploadJobId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "bulkUploadJobId", $bulkUploadJobId);
+		$this->client->queueServiceActionCall("batch", "countBulkUploadEntries", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "integer");
 		return $resultObject;
 	}
 
@@ -1651,12 +1677,13 @@ class KalturaBulkUploadService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function add($conversionProfileId, $csvFileData)
+	function add($conversionProfileId, $fileData, $bulkUploadType = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "conversionProfileId", $conversionProfileId);
 		$kfiles = array();
-		$this->client->addParam($kfiles, "csvFileData", $csvFileData);
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->addParam($kparams, "bulkUploadType", $bulkUploadType);
 		$this->client->queueServiceActionCall("bulkupload", "add", $kparams, $kfiles);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -1776,6 +1803,31 @@ class KalturaConversionProfileService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
+	function setAsDefault($id)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->queueServiceActionCall("conversionprofile", "setAsDefault", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaConversionProfile");
+		return $resultObject;
+	}
+
+	function getDefault()
+	{
+		$kparams = array();
+		$this->client->queueServiceActionCall("conversionprofile", "getDefault", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaConversionProfile");
+		return $resultObject;
+	}
+
 	function add(KalturaConversionProfile $conversionProfile)
 	{
 		$kparams = array();
@@ -1799,6 +1851,34 @@ class KalturaConversionProfileService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaConversionProfile");
+		return $resultObject;
+	}
+
+	function listAssetParams($conversionProfileId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "conversionProfileId", $conversionProfileId);
+		$this->client->queueServiceActionCall("conversionprofile", "listAssetParams", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaConversionProfileAssetParamsListResponse");
+		return $resultObject;
+	}
+
+	function updateAssetParams($conversionProfileId, $assetParamsId, KalturaConversionProfileAssetParams $conversionProfileAssetParams)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "conversionProfileId", $conversionProfileId);
+		$this->client->addParam($kparams, "assetParamsId", $assetParamsId);
+		$this->client->addParam($kparams, "conversionProfileAssetParams", $conversionProfileAssetParams->toParams());
+		$this->client->queueServiceActionCall("conversionprofile", "updateAssetParams", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaConversionProfileAssetParams");
 		return $resultObject;
 	}
 
@@ -2031,6 +2111,48 @@ class KalturaFlavorAssetService extends KalturaServiceBase
 	function __construct(KalturaClient $client = null)
 	{
 		parent::__construct($client);
+	}
+
+	function add($entryId, KalturaFlavorAsset $flavorAsset)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "flavorAsset", $flavorAsset->toParams());
+		$this->client->queueServiceActionCall("flavorasset", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFlavorAsset");
+		return $resultObject;
+	}
+
+	function update($id, KalturaFlavorAsset $flavorAsset)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "flavorAsset", $flavorAsset->toParams());
+		$this->client->queueServiceActionCall("flavorasset", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFlavorAsset");
+		return $resultObject;
+	}
+
+	function setContent($id, KalturaContentResource $contentResource)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "contentResource", $contentResource->toParams());
+		$this->client->queueServiceActionCall("flavorasset", "setContent", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFlavorAsset");
+		return $resultObject;
 	}
 
 	function get($id)
@@ -3124,11 +3246,13 @@ class KalturaJobsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getStatus($jobId, $jobType)
+	function getStatus($jobId, $jobType, KalturaFilterPager $pager = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "jobId", $jobId);
 		$this->client->addParam($kparams, "jobType", $jobType);
+		if ($pager !== null)
+			$this->client->addParam($kparams, "pager", $pager->toParams());
 		$this->client->queueServiceActionCall("jobs", "getStatus", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -3312,12 +3436,10 @@ class KalturaMediaService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function add(KalturaMediaEntry $entry, KalturaResource $resource = null)
+	function add(KalturaMediaEntry $entry)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "entry", $entry->toParams());
-		if ($resource !== null)
-			$this->client->addParam($kparams, "resource", $resource->toParams());
 		$this->client->queueServiceActionCall("media", "add", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
@@ -3327,102 +3449,13 @@ class KalturaMediaService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function addFromBulk(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId)
+	function addContent($entryId, KalturaResource $resource = null)
 	{
 		$kparams = array();
-		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->addParam($kparams, "url", $url);
-		$this->client->addParam($kparams, "bulkUploadId", $bulkUploadId);
-		$this->client->queueServiceActionCall("media", "addFromBulk", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function addFromUrl(KalturaMediaEntry $mediaEntry, $url)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->addParam($kparams, "url", $url);
-		$this->client->queueServiceActionCall("media", "addFromUrl", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function addFromSearchResult(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null)
-	{
-		$kparams = array();
-		if ($mediaEntry !== null)
-			$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		if ($searchResult !== null)
-			$this->client->addParam($kparams, "searchResult", $searchResult->toParams());
-		$this->client->queueServiceActionCall("media", "addFromSearchResult", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function addFromUploadedFile(KalturaMediaEntry $mediaEntry, $uploadTokenId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->addParam($kparams, "uploadTokenId", $uploadTokenId);
-		$this->client->queueServiceActionCall("media", "addFromUploadedFile", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function addFromRecordedWebcam(KalturaMediaEntry $mediaEntry, $webcamTokenId)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->addParam($kparams, "webcamTokenId", $webcamTokenId);
-		$this->client->queueServiceActionCall("media", "addFromRecordedWebcam", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function addFromEntry($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = "")
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "sourceEntryId", $sourceEntryId);
-		if ($mediaEntry !== null)
-			$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->addParam($kparams, "sourceFlavorParamsId", $sourceFlavorParamsId);
-		$this->client->queueServiceActionCall("media", "addFromEntry", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
-	function addFromFlavorAsset($sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "sourceFlavorAssetId", $sourceFlavorAssetId);
-		if ($mediaEntry !== null)
-			$this->client->addParam($kparams, "mediaEntry", $mediaEntry->toParams());
-		$this->client->queueServiceActionCall("media", "addFromFlavorAsset", $kparams);
+		$this->client->addParam($kparams, "entryId", $entryId);
+		if ($resource !== null)
+			$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->queueServiceActionCall("media", "addContent", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();
@@ -3478,6 +3511,20 @@ class KalturaMediaService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function updateContent($entryId, KalturaResource $resource)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "resource", $resource->toParams());
+		$this->client->queueServiceActionCall("media", "updateContent", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
+		return $resultObject;
+	}
+
 	function delete($entryId)
 	{
 		$kparams = array();
@@ -3488,6 +3535,32 @@ class KalturaMediaService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "null");
+		return $resultObject;
+	}
+
+	function approveReplace($entryId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->queueServiceActionCall("media", "approveReplace", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
+		return $resultObject;
+	}
+
+	function cancelReplace($entryId)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->queueServiceActionCall("media", "cancelReplace", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
 		return $resultObject;
 	}
 
@@ -3518,20 +3591,6 @@ class KalturaMediaService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "integer");
-		return $resultObject;
-	}
-
-	function upload($fileData)
-	{
-		$kparams = array();
-		$kfiles = array();
-		$this->client->addParam($kfiles, "fileData", $fileData);
-		$this->client->queueServiceActionCall("media", "upload", $kparams, $kfiles);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "string");
 		return $resultObject;
 	}
 
@@ -4606,6 +4665,37 @@ class KalturaThumbAssetService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
+	function add($entryId, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "entryId", $entryId);
+		$this->client->addParam($kparams, "thumbAsset", $thumbAsset->toParams());
+		$this->client->addParam($kparams, "contentResource", $contentResource->toParams());
+		$this->client->queueServiceActionCall("thumbasset", "add", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
+	function update($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "thumbAsset", $thumbAsset->toParams());
+		if ($contentResource !== null)
+			$this->client->addParam($kparams, "contentResource", $contentResource->toParams());
+		$this->client->queueServiceActionCall("thumbasset", "update", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
+		return $resultObject;
+	}
+
 	function serveByEntryId($entryId, $thumbParamId = "")
 	{
 		$kparams = array();
@@ -4719,20 +4809,6 @@ class KalturaThumbAssetService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "KalturaThumbAssetListResponse");
-		return $resultObject;
-	}
-
-	function addFromUrl($entryId, $url)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entryId", $entryId);
-		$this->client->addParam($kparams, "url", $url);
-		$this->client->queueServiceActionCall("thumbasset", "addFromUrl", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaThumbAsset");
 		return $resultObject;
 	}
 
@@ -5495,7 +5571,7 @@ class KalturaClient extends KalturaClientBase
 	/**
 	 * @var string
 	 */
-	protected $apiVersion = '3.1.1';
+	protected $apiVersion = '3.1.3';
 
 	/**
 	 * Add & Manage Access Controls

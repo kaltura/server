@@ -39,7 +39,7 @@ abstract class ThumbAssetServiceBaseTest extends KalturaApiTestCase
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testUpdate($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource, KalturaThumbAsset $reference)
+	public function testUpdate($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource = null, KalturaThumbAsset $reference)
 	{
 		$resultObject = $this->client->thumbAsset->update($id, $thumbAsset, $contentResource);
 		$this->assertType('KalturaThumbAsset', $resultObject);
@@ -51,7 +51,7 @@ abstract class ThumbAssetServiceBaseTest extends KalturaApiTestCase
 	/**
 	 * Validates testUpdate results
 	 */
-	protected function validateUpdate($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource, KalturaThumbAsset $reference)
+	protected function validateUpdate($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource = null, KalturaThumbAsset $reference)
 	{
 	}
 
