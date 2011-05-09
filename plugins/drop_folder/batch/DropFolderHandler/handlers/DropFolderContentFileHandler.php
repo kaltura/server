@@ -208,6 +208,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		$newEntry->ingestionProfileId = $ingestionProfile->id;
 		$newEntry->name = $this->dropFolderFile->parsedSlug;
+		$newEntry->referenceId = $this->dropFolderFile->parsedSlug;
 		
 		if (is_null($newEntry->name))
 		{
@@ -220,7 +221,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		try 
 		{
 			$this->impersonate($this->dropFolderFile->partnerId);
-			$addedEntry = $this->kClient->baseEntry->add($newEntry, $resource, null);
+			$addedEntry = $this->kClient->baseEntry->add($newEntry, null);
+			$addedEntry = $this->kClient->baseEntry->addContent($addedEntry->id, $resource);			
 			$this->unimpersonate();
 			
 			// set all addional files as handled
@@ -303,7 +305,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		try 
 		{
 			$this->impersonate($this->dropFolderFile->partnerId);
-			$updatedEntry = $this->kClient->baseEntry->update($matchedEntry->id, null, $resource);
+			$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource);
 			$this->unimpersonate();
 			
 			// set all addional files as handled
