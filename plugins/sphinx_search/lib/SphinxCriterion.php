@@ -170,7 +170,8 @@ class SphinxCriterion extends KalturaCriterion
 				foreach($value as $valIndex => $valValue)
 					if(is_null($valValue) || !strlen(trim($valValue)))
 						unset($value[$valIndex]);
-						
+
+				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 				$values = implode(',', $value);
 				$whereClause[] = "$sphinxField in($values)";
 				break;
@@ -178,6 +179,8 @@ class SphinxCriterion extends KalturaCriterion
 			case Criteria::NOT_IN:
 				$value = is_array($value) ? $value : explode(',', $value);
 					
+				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
+				
 				foreach($value as $val)
 					$whereClause[] = "$sphinxField != $val";
 				break;
