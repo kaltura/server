@@ -9,7 +9,7 @@ class Form_MyspaceProfileConfiguration extends Form_ProviderProfileConfiguration
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		
-		if($object instanceof KalturaVerizonDistributionProfile)
+		if($object instanceof KalturaMyspaceDistributionProfile)
 		{
 			$requiredFlavorParamsIds = explode(',', $object->requiredFlavorParamsIds);
 			$optionalFlavorParamsIds = explode(',', $object->optionalFlavorParamsIds);
@@ -71,45 +71,7 @@ class Form_MyspaceProfileConfiguration extends Form_ProviderProfileConfiguration
 			'label'			=> 'Feed Contact:',
 			'filters'		=> array('StringTrim'),
 		));			
-		$metadataProfiles = null;
-		try
-		{
-			$metadataProfileFilter = new Kaltura_Client_Metadata_Type_MetadataProfileFilter();
-//			$metadataProfileFilter->partnerIdEqual = $this->partnerId;
-			$metadataProfileFilter->metadataObjectTypeEqual = Kaltura_Client_Metadata_Enum_MetadataObjectType::ENTRY;
-			
-			$client = Infra_ClientHelper::getClient();
-			$metadataPlugin = Kaltura_Client_Metadata_Plugin::get($client);
-			Infra_ClientHelper::impersonate($this->partnerId);
-			$metadataProfileList = $metadataPlugin->metadataProfile->listAction($metadataProfileFilter);
-			Infra_ClientHelper::unimpersonate();
-			
-			$metadataProfiles = $metadataProfileList->objects;
-		}
-		catch (Kaltura_Client_Exception $e)
-		{
-			$metadataProfiles = null;
-		}
-		
-		if(count($metadataProfiles))
-		{
-			$this->addElement('select', 'metadata_profile_id', array(
-				'label'			=> 'Metadata Profile ID:',
-				'filters'		=> array('StringTrim'),
-			));
-			
-			$element = $this->getElement('metadata_profile_id');
-			foreach($metadataProfiles as $metadataProfile)
-				$element->addMultiOption($metadataProfile->id, $metadataProfile->name);
-		}
-		else 
-		{
-			$this->addElement('hidden', 'metadata_profile_id', array(
-				'value'			=> 0,
-			));
-		}
 
-
-		
+		$this->addMetadataProfile();		
 	}
 }
