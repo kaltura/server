@@ -113,7 +113,7 @@ public class BaseTest extends TestCase {
 	
 	protected KalturaMediaEntry getProcessedClip(String id, Boolean checkReady) throws Exception {
 		int maxTries = 30;
-		int sleepInterval = 60000;
+		int sleepInterval = 300000;
 		int counter = 0;
 		KalturaMediaEntry retrievedEntry = null;		
 		try {
