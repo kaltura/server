@@ -768,7 +768,7 @@ class kJobsManager
 				list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
 				if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 				{
-					$addImport = false;
+					$conversionRequired = false;
 					$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
 					$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
 					KalturaLog::debug("Found flavors [" . count($flavors) . "] in conversion profile [" . $conversionProfile->getId() . "]");
@@ -796,15 +796,20 @@ class kJobsManager
 							}
 						}
 						
-						$addImport = true;
+						$conversionRequired = true;
 						break;
 					}
 					
-					if($addImport)
+					if($conversionRequired)
 					{
 						KalturaLog::debug("Creates import job for remote file sync");
 						$url = $syncFile->getExternalUrl();
 						kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
+					}
+					else
+					{
+						$entry->setStatus(entryStatus::READY);
+						$entry->save();
 					}
 				}
 				return null;
