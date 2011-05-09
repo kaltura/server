@@ -757,12 +757,6 @@ class kJobsManager
 			return null;
 		}
 		
-		if($entry->getStatus() != entryStatus::READY)
-		{
-			$entry->setStatus(entryStatus::PRECONVERT);
-			$entry->save();
-		}
-		
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (!file_exists($inputFileSyncLocalPath) || filesize($inputFileSyncLocalPath) == 0)
 		{
@@ -777,16 +771,29 @@ class kJobsManager
 					$addImport = false;
 					$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
 					$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
+					KalturaLog::debug("Found flavors [" . count($flavors) . "] in conversion profile [" . $conversionProfile->getId() . "]");
 					foreach($flavors as $flavor)
 					{
-						if($flavor->getOrigin() == assetParamsOrigin::INGEST || $flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
+						if($flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
+						{
+							KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] is ingested source");
 							continue;
+						}
+					
+						if($flavor->getOrigin() == assetParamsOrigin::INGEST || $flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
+						{
+							KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
+							continue;
+						}
 					
 						if($flavor->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
 						{
 							$siblingFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entry->getId(), $flavor->getFlavorParamsId());
 							if($siblingFlavorAsset)
+							{
+								KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] already ingested");
 								continue;
+							}
 						}
 						
 						$addImport = true;
@@ -795,6 +802,7 @@ class kJobsManager
 					
 					if($addImport)
 					{
+						KalturaLog::debug("Creates import job for remote file sync");
 						$url = $syncFile->getExternalUrl();
 						kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
 					}
@@ -812,6 +820,12 @@ class kJobsManager
 			return null;
 		}
 	
+		if($entry->getStatus() != entryStatus::READY)
+		{
+			$entry->setStatus(entryStatus::PRECONVERT);
+			$entry->save();
+		}
+		
 		$jobData = new kConvertProfileJobData();
 		$jobData->setFlavorAssetId($flavorAssetId);
 		$jobData->setInputFileSyncLocalPath($inputFileSyncLocalPath);
