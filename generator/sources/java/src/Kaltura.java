@@ -14,9 +14,9 @@ import com.kaltura.client.types.KalturaPartner;
 
 public class Kaltura {
 
-	private static final  String SECRET = "22a4644b9e4522f34e957394c771fda2";
-	private static final  String ADMIN_SECRET = "b47cd50fad6d869b8d9ec0b706d2c07a";
-	private static final  int PARTNER_ID = 224962;
+	private static final  int PARTNER_ID = 0;
+	private static final  String SECRET = "";
+	private static final  String ADMIN_SECRET = "";
 	private static final String UPLOAD_FILE = "bin/DemoVideo.flv";
 	
 	public Kaltura() {	}

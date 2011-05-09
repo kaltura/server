@@ -20,11 +20,11 @@ import com.kaltura.client.types.KalturaMediaEntry;
 
 public class BaseTest extends TestCase {
 	public final int PARTNER_ID = 224962; // PARTNER_ID_GOES_HERE
-	public final String SECRET = "22a4644b9e4522f34e957394c771fda2"; // SERVICE_SECRET_GOES_HERE
-	public final String ADMIN_SECRET = "b47cd50fad6d869b8d9ec0b706d2c07a"; // ADMIN_SECRET_GOES_HERE
+	public final String SECRET = ""; // SERVICE_SECRET_GOES_HERE
+	public final String ADMIN_SECRET = ""; // ADMIN_SECRET_GOES_HERE
 	public final String ENDPOINT = "http://www.kaltura.com";
 	
-	protected String testUrl = "http://kaldev.kaltura.com/content/zbale/java_client_test_video.flv";
+	protected String testUrl = "http://www.kaltura.org/demos/videos/DemoVideo.flv";
 
 	public KalturaConfiguration kalturaConfig = new KalturaConfiguration();
 
