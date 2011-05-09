@@ -93,9 +93,7 @@ class MediaService extends KalturaEntryService
 		}
     	$resource->entryHandled($dbEntry);
     	
-		$entry = new KalturaMediaEntry();
-		$entry->fromObject($dbEntry);
-		return $entry;
+		return $this->getEntry($entryId);
     }
     
     /**
@@ -656,10 +654,7 @@ class MediaService extends KalturaEntryService
 
 		$this->replaceResource($resource, $dbEntry);
 				
-		$mediaEntry = new KalturaMediaEntry();
-		$mediaEntry->fromObject($dbEntry);
-		
-		return $mediaEntry;
+		return $this->getEntry($entryId);
 	}
 
 	/**
