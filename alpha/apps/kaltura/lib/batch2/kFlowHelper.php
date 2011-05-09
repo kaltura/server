@@ -1602,11 +1602,11 @@ class kFlowHelper
 		if(!in_array($uploadToken->getObjectType(), $assetTypes) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
 			return;
 			
-	    $fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($this->token);
+	    $fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
 				
 		if(!file_exists($fullPath))
 		{
-			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($this->token, kDataCenterMgr::getCurrentDcId());
+			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadToken->getId(), kDataCenterMgr::getCurrentDcId());
 			if(!$remoteDCHost)
 				return;
 				
