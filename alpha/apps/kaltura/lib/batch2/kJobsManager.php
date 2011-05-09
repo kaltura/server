@@ -764,7 +764,7 @@ class kJobsManager
 		}
 		
 		// if file size is 0, do not create conversion profile and set entry status as error converting
-		if (filesize($inputFileSyncLocalPath) == 0)
+		if (!file_exists($inputFileSyncLocalPath) || filesize($inputFileSyncLocalPath) == 0)
 		{
 			$partner = $entry->getPartner();
 			if($partner && $partner->getImportRemoteSourceForConvert())
@@ -779,7 +779,6 @@ class kJobsManager
 					$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
 					foreach($flavors as $flavor)
 					{
-						$flavor = new flavorParamsConversionProfile;
 						if($flavor->getOrigin() == assetParamsOrigin::INGEST || $flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
 							continue;
 					
