@@ -353,16 +353,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		{
 			if($entry->getType() == entryType::MEDIA_CLIP)
 			{
+				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			
+				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+			
 				if($entry->getStatus() == entryStatus::NO_CONTENT)
 				{
 					$entry->setStatus(entryStatus::PENDING);
 					$entry->save();
 				}
-				
-				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			
-				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 			}
 		}
 		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
