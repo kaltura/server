@@ -140,11 +140,9 @@ class kFlowHelper
 		{
 			if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
-				$entry = $flavorAsset->getentry();
-				if($flavorAsset->getIsOriginal() && $entry->getStatus() == entryStatus::PRECONVERT)
-				{
-					kJobsManager::addConvertProfileJob($dbBatchJob, $entry, $flavorAsset->getId(), $localFilePath);
-				}
+				// is remote storage flavor
+				if($flavorAsset->getIsOriginal())
+					kJobsManager::addConvertProfileJob($dbBatchJob, $flavorAsset->getentry(), $flavorAsset->getId(), $localFilePath);
 			}
 			else
 			{ 
