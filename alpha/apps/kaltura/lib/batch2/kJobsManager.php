@@ -689,6 +689,21 @@ class kJobsManager
  			$jobData->setFlavorAssetId($asset->getId());
  		}
  			
+ 		$entry = entryPeer::retrieveByPK($entryId);
+ 		if($entry)
+ 		{
+ 			$higherStatuses = array(
+ 				entryStatus::PRECONVERT,
+ 				entryStatus::READY,
+ 			);
+ 			
+ 			if(!in_array($entry->getStatus(), $higherStatuses))
+ 			{
+	 			$entry->setStatus(entryStatus::IMPORT);
+	 			$entry->save();
+ 			}
+ 		}
+ 		
 		$batchJob = null;
 		if($parentJob)
 		{
