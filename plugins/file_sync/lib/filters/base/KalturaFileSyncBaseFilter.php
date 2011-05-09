@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.fileSync
+ * @package 
  * @subpackage api.filters.base
  * @abstract
  */
