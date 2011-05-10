@@ -520,4 +520,19 @@ form#frmCreateDropFolder dt { float: left; }
 #drop-folder-configure-dialog dd input { width:333px; height:22px;}
 #drop-folder-configure-dialog dd input#max_bulk_size { width:150px;}
 #drop-folder-configure-dialog select { width:156px; height:24px; padding:1px;}
+
+#virus-scan-configure-dialog { padding-top:10px;}
+#virus-scan-configure-dialog label { padding:0;}
+#virus-scan-configure-dialog dl { margin-top:15px;}
+#virus-scan-configure-dialog dl p { width:333px; padding:3px; margin-top:5px; border: solid 1px #ccc; background:#f0f0f0;}
+#virus-scan-configure-dialog dt { margin: 10px 0 5px;}
+#virus-scan-configure-dialog dd input { width:333px; height:22px;}
+#virus-scan-configure-dialog dd input#max_bulk_size { width:150px;}
+#virus-scan-configure-dialog select { width:165px; height:24px; padding:1px;}
+#virus-scan-configure-dialog #entryTypeToFilter{ width:156px; height:auto; padding:1px;}
+#virus-scan-configure-dialog #partnerId-element .readonly{ background-color: #D8EAEF }
+
+#frmVirusScanFilter #filter_text { float:left; display:block; }
+#frmVirusScanFilter .help { float:left; display:block; }
+#frmVirusScanFilter fieldset { margin-right:20px; }
   

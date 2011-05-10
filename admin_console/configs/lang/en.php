@@ -936,6 +936,20 @@ return array(
 	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW' => 'Add as new',
 	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_ADD_AS_NEW' => 'Match existing or add as new',
 	'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy::MATCH_EXISTING_OR_KEEP_IN_FOLDER' => 'Match existing or keep in folder',
+
+	// Virus Scan
+	'Kaltura_Client_VirusScan_Enum_VirusScanProfileStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_VirusScan_Enum_VirusScanProfileStatus::ENABLED' => 'Enabled',
+	
+	'Kaltura_Client_VirusScan_Enum_VirusFoundAction::NONE' => 'None',
+	'Kaltura_Client_VirusScan_Enum_VirusFoundAction::DELETE' => 'Delete',
+	'Kaltura_Client_VirusScan_Enum_VirusFoundAction::CLEAN_NONE' => 'Clean none',
+	'Kaltura_Client_VirusScan_Enum_VirusFoundAction::CLEAN_DELETE' => 'Clean delete',
+
+	'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::SYMANTEC_SCAN_ENGINE' => 'Symantec',
+	'VIRUS_SCAN_ENTRY_TYPE_ALL' =>'All',
+
+	'Virus Scan Profile' => 'Virus Scan Profile',
 );
 
 
