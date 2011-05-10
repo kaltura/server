@@ -107,6 +107,23 @@ class PartnerController extends Zend_Controller_Action
 		// set view
 		$this->view->form = $form;
 		$this->view->paginator = $paginator;
+		
+		$plugins = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAdminConsolePages');
+		$partnerActionPluginPages = array();
+		foreach($pluginInstances as $pluginInstance)
+		{
+			$pluginPages = $pluginInstance->getAdminConsolePages(Infra_AclHelper::getCurrentPermissions());
+			foreach ($pluginPages as $pluginPage)
+			{
+				if ($pluginPage instanceof IKalturaAdminConsolePublisherAction && $pluginPage->accessCheck(Infra_AclHelper::getCurrentPermissions()))
+				{
+					$partnerActionPluginPages[] = $pluginPage;
+				}
+			}
+		}
+		
+		$this->view->partnerActionPluginPages = $partnerActionPluginPages;
 	}
 		
 	public function updateStorageStatusAction()

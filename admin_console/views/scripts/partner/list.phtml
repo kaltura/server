@@ -65,12 +65,18 @@
 							<?php if (Infra_AclHelper::isAllowed('partner','remove')): ?>
 								<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 							<?php endif; ?>
-						<?php endif; ?>
-						<?php /* for next time, move the Distribution tab to here.
-						 if (Infra_AclHelper::isAllowed('partner','configure-distribution')): ?>
-							<option value="distributionProfiles"><?php echo $this->translate('Distribution Profiles'); ?></option>
-							<option value="distributionProviders"><?php echo $this->translate('Distribution Providers'); ?></option>
-						<?php endif; */ ?>
+						<?php endif; ?>						
+						<?php
+						// add options from plugin pages 
+						foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
+						{
+							$options = $partnerActionPluginPage->getPublisherAdminActionOptions($partner, Infra_AclHelper::getCurrentPermissions());
+							foreach ($options as $option)
+							{
+								echo '<option value="' . $option[1] . '">'. $this->translate($options[0]) .'</option>';
+							}						
+						}
+						?>
 					</select>
 				</td>
 			</tr>
@@ -285,17 +291,6 @@ function changeStatus(partnerId, status, callback)
 	});
 }
 
-function distributionProfiles(partnerId)
-{
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DistributionProfileListAction'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
-	document.location = url;
-}
-
-function distributionProviders(partnerId)
-{
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'GenericDistributionProvidersListAction'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
-	document.location = url;
-}
 
 jQuery(function() {
 	$("#configure-dialog").dialog({
@@ -336,4 +331,19 @@ jQuery(function() {
 	});
 });
 
+<?php
+
+// add javascript "pluginControllerUrl variable to be used by plugins javascript code
+echo 'var pluginControllerUrl = \''.$this->url(array('controller' => 'plugin'), null, true).'\';'.PHP_EOL.PHP_EOL;
+
+// add javascript from plugin pages 
+$pluginActionJavascriptStr = '';
+foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
+{
+	$pluginActionJavascriptStr .= $partnerActionPluginPage->getPublisherAdminActionJavascript().PHP_EOL.PHP_EOL;						
+}
+
+echo $pluginActionJavascriptStr;
+
+?>
 </script>

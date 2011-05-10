@@ -1,11 +1,11 @@
 <?php
-class DistributionProfileListAction extends KalturaAdminConsolePlugin
+class DistributionProfileListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()
 	{
 		$this->action = 'listDistributionProfiles';
-		$this->label = 'Distribution Profiles';
-		$this->rootLabel = 'Distribution';
+		$this->label = null;
+		$this->rootLabel = null;
 	}
 	
 	/**
@@ -95,5 +95,37 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin
 		$action->view->genericProviders = $genericProviders;
 		
 	}
+	
+	
+	/**
+	 * @return array<string, string> - array of <label, jsActionFunctionName> 
+	 */
+	public function getPublisherAdminActionOptions($partner, $permissions)
+	{
+		$options = array();
+		$options[] = array (0 => 'Distribution Profiles', 1 => 'distributionProfiles');
+		return $options;
+	}
+	
+	/**
+	 * @return string javascript code to add to publisher list view
+	 */
+	public function getPublisherAdminActionJavascript()
+	{
+		$functionStr = 'function distributionProfiles(partnerId) {
+			var url = pluginControllerUrl + /'.get_class($this).'/ + \'filter_type/byid/filter_input/\' + partnerId;
+			document.location = url;
+		}';
+		return $functionStr;
+	}
+	
+	public function getInstance($interface)
+	{
+		if($this instanceof $interface)
+			return $this;
+			
+		return null;
+	}
+	
 }
 

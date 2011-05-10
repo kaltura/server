@@ -1,11 +1,11 @@
 <?php
-class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
+class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()
 	{
 		$this->action = 'listGenericDistributionProviders';
-		$this->label = 'Generic Providers';
-		$this->rootLabel = 'Distribution';
+		$this->label = null;
+		$this->rootLabel = null;
 	}
 	
 	/**
@@ -45,5 +45,36 @@ class GenericDistributionProvidersListAction extends KalturaAdminConsolePlugin
 		$action->view->newForm = $newForm;
 		$action->view->paginator = $paginator;
 	}
+
+	/**
+	 * @return array<string, string> - array of <label, jsActionFunctionName> 
+	 */
+	public function getPublisherAdminActionOptions($partner, $permissions)
+	{
+		$options = array();
+		$options[] = array (0 => 'Generic Providers', 1 => 'distributionProviders');
+		return $options;
+	}
+	
+	/**
+	 * @return string javascript code to add to publisher list view
+	 */
+	public function getPublisherAdminActionJavascript()
+	{
+		$functionStr = 'function distributionProviders(partnerId) {
+			var url = pluginControllerUrl + /'.get_class($this).'/ + \'filter_type/byid/filter_input/\' + partnerId;
+			document.location = url;
+		}';
+		return $functionStr;
+	}
+	
+	public function getInstance($interface)
+	{
+		if($this instanceof $interface)
+			return $this;
+			
+		return null;
+	}
 }
+
 

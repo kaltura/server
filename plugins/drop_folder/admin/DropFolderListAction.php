@@ -1,11 +1,11 @@
 <?php
-class DropFolderListAction extends KalturaAdminConsolePlugin
+class DropFolderListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()
 	{
-		$this->action = 'listDropFolders';
-		$this->label = 'Drop Folders';
-		$this->rootLabel = 'Publishers';
+		$this->action = 'DropFolderListAction';
+		$this->label = null;
+		$this->rootLabel = null;
 	}
 	
 	/**
@@ -65,6 +65,38 @@ class DropFolderListAction extends KalturaAdminConsolePlugin
 		
 		return $filter;
 	}
+	
+	
+	/**
+	 * @return array<string, string> - array of <label, jsActionFunctionName> 
+	 */
+	public function getPublisherAdminActionOptions($partner, $permissions)
+	{
+		$options = array();
+		$options[] = array (0 => 'Drop folders', 1 => 'listDropFolders');
+		return $options;
+	}
+	
+	/**
+	 * @return string javascript code to add to publisher list view
+	 */
+	public function getPublisherAdminActionJavascript()
+	{
+		$functionStr = 'function listDropFolders(partnerId) {
+			var url = pluginControllerUrl + \'/'.get_class($this).'/partnerId\' + partnerId;
+			document.location = url;
+		}';
+		return $functionStr;
+	}
+	
+	public function getInstance($interface)
+	{
+		if($this instanceof $interface)
+			return $this;
+			
+		return null;
+	}
+
 	
 }
 

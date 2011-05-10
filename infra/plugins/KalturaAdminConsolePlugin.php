@@ -23,7 +23,7 @@ abstract class KalturaAdminConsolePlugin
 	/**
 	 * @var Zend_Controller_Action - the executed action
 	 */
-	private $currentAction = null;
+	protected $currentAction = null;
 	
 	/**
 	 * @return string - absolute file path of the phtml template
