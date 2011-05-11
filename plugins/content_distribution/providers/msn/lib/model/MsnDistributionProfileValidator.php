@@ -5,6 +5,16 @@
  */
 class MsnDistributionProfileValidator
 {
+	protected static function getMetadataValidationFields()
+	{
+		return array(
+			MsnDistributionProfile::METADATA_FIELD_VIDEO_CAT,
+			MsnDistributionProfile::METADATA_FIELD_VIDEO_TOP,
+			MsnDistributionProfile::METADATA_FIELD_VIDEO_TOP_CAT,
+			MsnDistributionProfile::METADATA_FIELD_PUBLIC,
+		);
+	}
+	
 	public static function validateForSubmission(MsnDistributionProfile $distributionProfile, EntryDistribution $entryDistribution, $action)
 	{
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
@@ -12,12 +22,7 @@ class MsnDistributionProfileValidator
 		if(!class_exists('MetadataProfile'))
 			return $validationErrors;
 			
-		$requiredFields = array(
-			self::METADATA_FIELD_VIDEO_CAT,
-			self::METADATA_FIELD_VIDEO_TOP,
-			self::METADATA_FIELD_VIDEO_TOP_CAT,
-			self::METADATA_FIELD_PUBLIC,
-		);
+		$requiredFields = self::getMetadataValidationFields();
 		
 		$metadataProfileId = $distributionProfile->getMetadataProfileId();
 		if(!$metadataProfileId)
