@@ -312,7 +312,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 * @param string $field
 	 * @return array|string
 	 */
-	protected function findMetadataValue(array $metadataObjects, $field)
+	public function findMetadataValue(array $metadataObjects, $field)
 	{
 		$results = array();
 		foreach($metadataObjects as $metadata)
@@ -331,7 +331,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $results;
 	}
 	
-	protected function createValidationError($action, $type, $data = null, $description)
+	public function createValidationError($action, $type, $data = null, $description)
 	{
 		$validationError = new kDistributionValidationError();
 		$validationError->setAction($action);
