@@ -227,7 +227,10 @@ class kMrssManager
 			if($category)
 			{
 				$categoryNode = $mrss->addChild('category', self::stringToSafeXml($category));
-				$categoryNode->addAttribute('name', self::stringToSafeXml(substr($category, strrpos($category, '>') + 1)));
+				if(strrpos($category, '>') > 0)
+					$categoryNode->addAttribute('name', self::stringToSafeXml(substr($category, strrpos($category, '>') + 1)));
+				else
+					$categoryNode->addAttribute('name', self::stringToSafeXml($category));
 			}
 		}
 		
