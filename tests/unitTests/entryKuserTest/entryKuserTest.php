@@ -359,9 +359,8 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 			}
 			else
 			{
-				print("Oh No\n");
-				var_dump($result);
-				
+				print("Result is invalid :" . var_dump($result) . " \n");
+							
 				$this->fail("Server didn't return an entry, " . var_dump($result) . "\n");
 			}
 		}
