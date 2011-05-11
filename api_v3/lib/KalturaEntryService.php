@@ -719,6 +719,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$kuser = null;
 		
+		//Question: maybe use ===
 		if($entryPuserId == $dbEntryPuserId) //No user change / Add
 		{
 			$ksKuser = $this->getKuser();
@@ -748,7 +749,13 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 		
+		$finalKuserId = $kuser->getId();
+		$finalPuserId = $dbEntry->getPuserId();
+		
 		$dbEntry->setkuser($kuser);
+		
+		KalturaLog::debug("Setting entry kuserId [$finalKuserId], psuerId [$finalPuserId]");
+		
 		
 		return;
 	}
