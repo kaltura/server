@@ -58,7 +58,7 @@ class KalturaErrors extends APIErrors
 	
 	const PROPERTY_VALIDATION_ADMIN_PROPERTY = "PROPERTY_VALIDATION_ADMIN_PROPERTY,The property \"%s\" is updatable with admin session only";
 	
-	const PROPERTY_VALIDATION_ENTRY_STATUS =  "PROPERTY_INGESTION_PROFILE_ENTRY_STATUS,The property \"%s\" cannot be set for entry status \"%s\"";
+	const PROPERTY_VALIDATION_ENTRY_STATUS =  "PROPERTY_VALIDATION_ENTRY_STATUS,The property \"%s\" cannot be set for entry status \"%s\"";
 	
 	const INVALID_USER_ID = "INVALID_USER_ID,Invalid user id";
 	

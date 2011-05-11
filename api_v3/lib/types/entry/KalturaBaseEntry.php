@@ -384,7 +384,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		if($source_object->getStatus() != entryStatus::NO_CONTENT)
 		{
 			if(!is_null($this->ingestionProfileId))
-				throw new KalturaAPIException(KalturaErrors::PROPERTY_INGESTION_PROFILE_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('ingestionProfileId'), $source_object->getStatus());
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('ingestionProfileId'), $source_object->getStatus());
 		}
 		
 		return parent::validateForUpdate($source_object);
