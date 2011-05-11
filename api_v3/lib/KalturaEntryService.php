@@ -722,11 +722,19 @@ class KalturaEntryService extends KalturaBaseService
 		//Question: maybe use ===
 		if($entryPuserId == $dbEntryPuserId) //No user change / Add
 		{
-			$ksKuser = $this->getKuser();
-			$ksPuserId = $ksKuser->getPuserId();
-			if($isAdminKs || $ksPuserId == $entryPuserId) //If admin or the user is me
+			if(!$dbEntryPuserId) //if the entry has no user
 			{
-				$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $ksPuserId);
+				$ksKuser = $this->getKuser(); //we take from the ks
+				$puserId = $ksKuser->getPuserId();
+			}
+			else //we take from the entry
+			{
+				$puserId = $entryPuserId;
+			}
+			
+			if($isAdminKs || $puserId == $entryPuserId) //If admin or the user is me
+			{
+				$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $puserId);
 			}
 			else
 			{
