@@ -43,6 +43,7 @@ class DropFolderListAction extends KalturaAdminConsolePlugin implements IKaltura
 		$paginator->setItemCountPerPage($pageSize);
 		
 		// set view
+		$dropFolderFilterForm->populate ( $request->getParams () );
 		$action->view->paginator = $paginator;
 		$action->view->filterForm = $dropFolderFilterForm;
 		
@@ -73,7 +74,7 @@ class DropFolderListAction extends KalturaAdminConsolePlugin implements IKaltura
 	public function getPublisherAdminActionOptions($partner, $permissions)
 	{
 		$options = array();
-		$options[] = array (0 => 'Drop folders', 1 => 'listDropFolders');
+		$options[] = array (0 => 'Drop Folders', 1 => 'listDropFolders');
 		return $options;
 	}
 	
@@ -83,7 +84,7 @@ class DropFolderListAction extends KalturaAdminConsolePlugin implements IKaltura
 	public function getPublisherAdminActionJavascript()
 	{
 		$functionStr = 'function listDropFolders(partnerId) {
-			var url = pluginControllerUrl + \'/'.get_class($this).'/partnerId\' + partnerId;
+			var url = pluginControllerUrl + \'/'.get_class($this).'/filter_type/partnerIdEqual/filter_input/\' + partnerId;
 			document.location = url;
 		}';
 		return $functionStr;
