@@ -116,7 +116,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$media = new ComcastMedia();
 		$media->contentType = ComcastContentType::_VIDEO;
 		$media->language = ComcastLanguage::_ENGLISH;
-		$media->rating = 'G';
+		$media->rating = $this->findMetadataValue($metadataObjects, 'ComcastRating');
 		
 		$media->album = $distributionProfile->album;
 		$media->author = $distributionProfile->author;
@@ -131,7 +131,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		foreach($categories as $category)
 			$media->categories[] = $category;
 			
-		$media->copyright = $this->findMetadataValue($metadataObjects, 'copyright');
+		$media->copyright = $this->findMetadataValue($metadataObjects, 'Copyright');
 		
 		$media->formats = array();
 		$media->formats[] = ComcastFormat::_JPEG;
@@ -143,11 +143,18 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		$media->externalID = $entry->id;
 		$media->length = $entry->duration;
-		$media->title = $entry->name;
-		$media->description = $entry->description;
+//		$media->title = $entry->name;
+		$media->title = $this->findMetadataValue($metadataObjects, 'LongTitle');
+		
+//		$media->description = $entry->description;
+		$media->description = $this->findMetadataValue($metadataObjects, 'LongDescription');
+//		whet if there is no sunrise?
+//		transltae date to right string "%m/%d/%y"
+//		$media->description .= ' (' . $data->entryDistribution->sunrise . ')';
 		
 		$media->customData = new ComcastCustomData();
 		$media->customData[] = $this->newCustomDataElement('Headline', $this->findMetadataValue($metadataObjects, 'LongTitle'));
+		$media->customData[] = $this->newCustomDataElement('providerExternalId', $entry->id);
 		$media->customData[] = $this->newCustomDataElement('Link Href');
 		$media->customData[] = $this->newCustomDataElement('Link Text');
 		
@@ -173,7 +180,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 				$mediaFile->allowRelease = true;
 				$mediaFile->contentType = ComcastContentType::_IMAGE;
 				$mediaFile->format = ComcastFormat::_JPEG;
-				$mediaFile->mediaFileType = ComcastMediaFileType::_INTERNAL;
+				$mediaFile->mediaFileType = ComcastMediaFileType::_EXTERNAL;
 				$mediaFile->originalLocation = "$url/filename/{$thumbAsset->id}.jpg";
 				$mediaFile->height = $thumbAsset->width;
 				$mediaFile->width = $thumbAsset->height;
@@ -219,9 +226,10 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$this->unimpersonate();
 		
 		$options = new ComcastAddContentOptions();
-		$options->generateThumbnail = false;
+		$options->generateThumbnail = true;
 		$options->publish = false;
 		$options->deleteSource = false;
+//		$options->releaseOutletAccount = 'Comcast';
 
 		$comcastMediaService = new ComcastMediaService($distributionProfile->email, $distributionProfile->password);
 		$comcastAddContentResults = $comcastMediaService->addContent($media, $mediaFiles, $options);

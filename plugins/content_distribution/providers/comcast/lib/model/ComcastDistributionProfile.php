@@ -15,6 +15,7 @@ class ComcastDistributionProfile extends DistributionProfile
 
 	const METADATA_FIELD_COPYRIGHT = 'Copyright';
 	const METADATA_FIELD_LONG_TITLE = 'LongTitle';
+	const METADATA_FIELD_LONG_DESCRIPTION = 'LongDescription';
 	const METADATA_FIELD_SHORT_DESCRIPTION = 'ShortDescription';
 	const METADATA_FIELD_RATING = 'ComcastRating';
 	const METADATA_FIELD_CATEGORY = 'ComcastCategory';
@@ -40,6 +41,7 @@ class ComcastDistributionProfile extends DistributionProfile
 		$metadataFields = array(
 			self::METADATA_FIELD_COPYRIGHT,
 			self::METADATA_FIELD_LONG_TITLE,
+			self::METADATA_FIELD_LONG_DESCRIPTION,
 			self::METADATA_FIELD_SHORT_DESCRIPTION,
 			self::METADATA_FIELD_RATING,
 			self::METADATA_FIELD_CATEGORY,
