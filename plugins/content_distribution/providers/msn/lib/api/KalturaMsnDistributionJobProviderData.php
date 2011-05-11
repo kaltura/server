@@ -13,6 +13,11 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 	/**
 	 * @var string
 	 */
+	public $configType;
+	
+	/**
+	 * @var string
+	 */
 	public $csId;
 	
 	/**
@@ -93,6 +98,7 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 		if(!($distributionJobData->distributionProfile instanceof KalturaMsnDistributionProfile))
 			return;
 			
+		$this->configType = $distributionJobData->distributionProfile->configType;
 		$this->csId = $distributionJobData->distributionProfile->csId;
 		$this->source = $distributionJobData->distributionProfile->source;
 		$this->metadataProfileId = $distributionJobData->distributionProfile->metadataProfileId;
@@ -127,6 +133,7 @@ class KalturaMsnDistributionJobProviderData extends KalturaDistributionJobProvid
 	(
 		"xml" ,
 		"csId" ,
+		"configType" ,
 		"source" ,
 		"metadataProfileId" ,
 		"movFlavorAssetId" ,

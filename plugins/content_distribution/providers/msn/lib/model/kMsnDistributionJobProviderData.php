@@ -18,6 +18,11 @@ class kMsnDistributionJobProviderData extends kDistributionJobProviderData
 	/**
 	 * @var string
 	 */
+	private $configType;
+	
+	/**
+	 * @var string
+	 */
 	private $source;
 	
 	/**
@@ -344,5 +349,21 @@ class kMsnDistributionJobProviderData extends kDistributionJobProviderData
 	public function setXml($xml)
 	{
 		$this->xml = $xml;
+	}
+	
+	/**
+	 * @return the $configType
+	 */
+	public function getConfigType()
+	{
+		return $this->configType;
+	}
+
+	/**
+	 * @param string $configType
+	 */
+	public function setConfigType($configType)
+	{
+		$this->configType = $configType;
 	}
 }

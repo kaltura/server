@@ -23,6 +23,11 @@ class KalturaMsnDistributionProfile extends KalturaDistributionProfile
 	/**
 	 * @var string
 	 */
+	public $configType;
+	
+	/**
+	 * @var string
+	 */
 	public $csId;
 	
 	/**
@@ -59,6 +64,7 @@ class KalturaMsnDistributionProfile extends KalturaDistributionProfile
 		'username',
 		'password',
 		'domain',
+		'configType',
 		'csId',
 		'source',
 		'metadataProfileId',

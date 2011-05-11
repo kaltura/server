@@ -8,6 +8,7 @@ class MsnDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_USERNAME = 'username';
 	const CUSTOM_DATA_PASSWORD = 'password';
 	const CUSTOM_DATA_DOMAIN = 'domain';
+	const CUSTOM_DATA_CONFIG_TYPE = 'config_type';
 	const CUSTOM_DATA_CS_ID = 'csId';
 	const CUSTOM_DATA_SOURCE = 'source';
 	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
@@ -33,12 +34,24 @@ class MsnDistributionProfile extends DistributionProfile
 	 */
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
-		return MsnDistributionProfileValidator::validateForSubmission($this, $entryDistribution, $action);
+		if(!msnContentDistributionConf::hasParam('provider_sub_types'))
+			return MsnDistributionProfileValidator::validateForSubmission($this, $entryDistribution, $action);
+			
+		$configs = msnContentDistributionConf::get('provider_sub_types');
+		if(!isset($configs[$this->getConfigType()]))
+			return array();
+			
+		$config = $configs[$this->getConfigType()];
+		if(!isset($config['validator']) || !class_exists($config['validator']))
+			return array();
+			
+		return call_user_func_array(array($config['validator'], 'validateForSubmission'), array($this, $entryDistribution, $action));
 	}
 
 	public function getUsername()				{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
 	public function getPassword()				{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
 	public function getDomain()					{return $this->getFromCustomData(self::CUSTOM_DATA_DOMAIN);}
+	public function getConfigType()				{return $this->getFromCustomData(self::CUSTOM_DATA_CONFIG_TYPE);}
 	public function getCsId()					{return $this->getFromCustomData(self::CUSTOM_DATA_CS_ID);}
 	public function getSource()					{return $this->getFromCustomData(self::CUSTOM_DATA_SOURCE);}
 	public function getMetadataProfileId()		{return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID);}
@@ -49,6 +62,7 @@ class MsnDistributionProfile extends DistributionProfile
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
 	public function setPassword($v)				{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
 	public function setDomain($v)				{$this->putInCustomData(self::CUSTOM_DATA_DOMAIN, $v);}
+	public function setConfigType($v)			{$this->putInCustomData(self::CUSTOM_DATA_CONFIG_TYPE, $v);}
 	public function setCsId($v)					{$this->putInCustomData(self::CUSTOM_DATA_CS_ID, $v);}
 	public function setSource($v)				{$this->putInCustomData(self::CUSTOM_DATA_SOURCE, $v);}
 	public function setMetadataProfileId($v)	{$this->putInCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID, $v);}

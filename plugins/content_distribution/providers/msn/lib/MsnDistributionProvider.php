@@ -111,12 +111,26 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		return array(
-			// entry columns
-			entryPeer::NAME, 
-			entryPeer::DESCRIPTION, 
-			entryPeer::TAGS, 
-		);
+		$defaultXPaths = array();
+		if(msnContentDistributionConf::hasParam('default_update_required_entry_fields'))
+			$defaultXPaths = msnContentDistributionConf::get('default_update_required_entry_fields');
+		
+		if(!msnContentDistributionConf::hasParam('provider_sub_types'))
+			return $defaultXPaths;
+			
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+		if(!$distributionProfile || !($distributionProfile instanceof MsnDistributionProfile))	
+			return $defaultXPaths;
+			
+		if(is_null($distributionProfile->getConfigType()))
+			return $defaultXPaths;
+		
+		$configType = $distributionProfile->getConfigType();			
+		$configs = msnContentDistributionConf::get('provider_sub_types');
+		if(!isset($configs[$configType]) || !isset($configs[$configType]['update_required_entry_fields']))	
+			return $defaultXPaths;
+			
+		return $configs[$configType]['update_required_entry_fields'];
 	}
 
 	/* (non-PHPdoc)
@@ -124,12 +138,26 @@ class MsnDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		return array(
-			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_PUBLIC . "']",
-			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_VIDEO_CAT . "']",
-			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_VIDEO_TOP . "']",
-			"/*[local-name()='metadata']/*[local-name()='" . MsnDistributionProfile::METADATA_FIELD_VIDEO_TOP_CAT . "']",
-		);
+		$defaultXPaths = array();
+		if(msnContentDistributionConf::hasParam('default_update_required_metadata_xpaths'))
+			$defaultXPaths = msnContentDistributionConf::get('default_update_required_metadata_xpaths');
+		
+		if(!msnContentDistributionConf::hasParam('provider_sub_types'))
+			return $defaultXPaths;
+			
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+		if(!$distributionProfile || !($distributionProfile instanceof MsnDistributionProfile))	
+			return $defaultXPaths;
+			
+		if(is_null($distributionProfile->getConfigType()))
+			return $defaultXPaths;
+		
+		$configType = $distributionProfile->getConfigType();			
+		$configs = msnContentDistributionConf::get('provider_sub_types');
+		if(!isset($configs[$configType]) || !isset($configs[$configType]['update_required_metadata_xpaths']))	
+			return $defaultXPaths;
+			
+		return $configs[$configType]['update_required_metadata_xpaths'];
 	}
 	
 	/**
@@ -223,7 +251,19 @@ class MsnDistributionProvider implements IDistributionProvider
 			return null;
 		}
 		
-		$xslPath = realpath(dirname(__FILE__) . '/../') . '/xml/submit.xsl';
+		$xslFolderPath = realpath(dirname(__FILE__) . '/../') . '/xml';
+		$xslPath = "$xslFolderPath/submit.xsl";
+		if(msnContentDistributionConf::hasParam('provider_sub_types'))
+		{
+			$configs = msnContentDistributionConf::get('provider_sub_types');
+			if(isset($configs[$providerData->configType]))
+			{
+				$config = $configs[$providerData->configType];
+				if(isset($config['xsl']) && file_exists("$xslFolderPath/" . $config['xsl']))
+					$xslPath = "$xslFolderPath/" . $config['xsl'];
+			}
+		}
+		
 		if(!file_exists($xslPath))
 		{
 			KalturaLog::err("XSL file not found [$xslPath]");

@@ -10,6 +10,7 @@ $xsl->load('submit.xsl');
 
 $providerData = array(
 	'metadataProfileId' => 1,
+	'movFlavorAssetId' => '0_bt7chimk',
 );
 
 $varNodes = $xsl->getElementsByTagName('variable');

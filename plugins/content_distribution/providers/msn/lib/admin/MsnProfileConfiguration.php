@@ -53,15 +53,31 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'cs_id', array(
-			'label'			=> 'CS ID:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'source', array(
-			'label'			=> 'Source:',
-			'filters'		=> array('StringTrim'),
-		));
+		if(msnContentDistributionConf::hasParam('provider_sub_types'))
+		{
+			$this->addElement('select', 'config_type', array(
+				'label'			=> 'Configuration type:',
+				'filters'		=> array('StringTrim'),
+			));
+			
+			$element = $this->getElement('config_type');
+			
+			$configs = msnContentDistributionConf::get('provider_sub_types');
+			foreach($configs as $key => $config)
+				$element->addMultiOption($key, $config['name']);
+		}
+		else
+		{
+			$this->addElement('text', 'cs_id', array(
+				'label'			=> 'CS ID:',
+				'filters'		=> array('StringTrim'),
+			));
+			
+			$this->addElement('text', 'source', array(
+				'label'			=> 'Source:',
+				'filters'		=> array('StringTrim'),
+			));
+		}
 		
 		$this->addElement('text', 'mov_flavor_params_id', array(
 			'label'			=> 'MOV Flavor Params ID:',
