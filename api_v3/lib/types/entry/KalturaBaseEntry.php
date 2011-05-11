@@ -368,14 +368,14 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
-	public function validateForInsert($source_object)
+	public function validateForInsert()
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
-		return parent::validateForInsert($source_object);
+		return parent::validateForInsert();
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForInsert()
+	 * @see KalturaObject::validateForUpdate($source_object)
 	 */
 	public function validateForUpdate($source_object)
 	{
