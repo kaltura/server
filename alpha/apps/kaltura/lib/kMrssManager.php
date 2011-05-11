@@ -202,6 +202,7 @@ class kMrssManager
 		}
 		
 		$mrss->addChild('entryId', $entry->getId());
+		$mrss->addChild('referenceID', $entry->getReferenceID());
 		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
 		$mrss->addChild('link', $link . $entry->getId());
@@ -221,8 +222,14 @@ class kMrssManager
 		
 		$categories = explode(',', $entry->getCategories());
 		foreach($categories as $category)
+		{
+			$category = trim($category);
 			if($category)
-				$mrss->addChild('category', self::stringToSafeXml($category));
+			{
+				$categoryNode = $mrss->addChild('category', self::stringToSafeXml($category));
+				$categoryNode->addAttribute('name', self::stringToSafeXml(substr($category, strrpos($category, '>'))));
+			}
+		}
 		
 		if($entry->getStartDate(null))
 			$mrss->addChild('startDate', $entry->getStartDate(null));
