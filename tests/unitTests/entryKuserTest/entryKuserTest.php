@@ -299,7 +299,7 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		
 		print("Checking Entry addedEntry->userId [$entryPuserId], puserId [$puserId]\n");
 		//If the user is the same we check if the kuser is valid
-		if($addedEntry->userId == $puserId)
+		if($entryPuserId == $puserId)
 		{
 			if(is_null($puserId)) //no user was added we search for the admin kuser
 			{
@@ -337,7 +337,7 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	 * @param unknown_type $ksType
 	 * @param unknown_type $puserId
 	 */
-	private function addEntryTest($ksType, $puserId)
+	private function addEntryTest($ksType, $puserId, $shouldFail = false, $errorCode = null)
 	{
 		if(!$this->startSession($ksType, $puserId))
 		{
@@ -347,20 +347,35 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		$entry = $this->createDefaultEntry($puserId);
 		
 		print("Before call\n");
-		$result = $this->client->baseEntry->add($entry);
 		
-		if($result != null && $result instanceof KalturaMediaEntry)
-		{
-			//var_dump($result);
-			$this->createdEntries[$result->id] = $result; //Adds the entry to the inserted items
-			$this->checkEntryAfterAdd($result, $puserId); //checks that the given user is the user on the entry
-		}
-		else
-		{
-			print("Oh No\n");
-			var_dump($result);
+		try {
+			$result = $this->client->baseEntry->add($entry);
 			
-			$this->fail("Server didn't return an entry, " . var_dump($result) . "\n");
+			if($result != null && $result instanceof KalturaMediaEntry)
+			{
+				//var_dump($result);
+				$this->createdEntries[$result->id] = $result; //Adds the entry to the inserted items
+				$this->checkEntryAfterAdd($result, $puserId); //checks that the given user is the user on the entry
+			}
+			else
+			{
+				print("Oh No\n");
+				var_dump($result);
+				
+				$this->fail("Server didn't return an entry, " . var_dump($result) . "\n");
+			}
+		}
+		catch(Exception $e)
+		{
+			if($shouldFail)
+			{
+				$this->checkException($e, $errorCode);
+			}
+			else 
+			{
+				print("Exception was raised: " . $e->getMessage(). "\n");
+				$this->fail("Exception not expected: " . $e->getMessage());
+			}
 		}
 	}
 	
@@ -385,14 +400,27 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		print("Testing User KS adds\n");
 		//Add with user KS - user / other user existing / not existing
 		print("Test4 KS [User], puser [null]\n");
-	//	$this->addEntryTest(KalturaSessionType::USER, null);
+		$this->addEntryTest(KalturaSessionType::USER, null, true, array('SERVICE_FORBIDDEN'));
 		
 		print("Test5 KS [User], puser [test1] existing\n");
 		$this->addEntryTest(KalturaSessionType::USER, $this->puser1); // existing
 				
 		print("Test6 KS [User], puser [test3] non existent\n");
 		$this->deleteKuser($this->puser3); //check that puser 3 is non existing
-		$this->addEntryTest(KalturaSessionType::USER, $this->puser3);
+		$this->addEntryTest(KalturaSessionType::USER, $this->puser3, true, array('SERVICE_FORBIDDEN'));
+	}
+	
+	/**
+	 * 
+	 * creates the update entry so we can update it (set only updatble fields)
+	 * @param KalturaMediaEntry $entry
+	 * @return KalturaMediaEntry $updatedEntry
+	 */
+	private function createEntryForUpdate(KalturaMediaEntry $entry)
+	{
+		$updateEntry = new KalturaMediaEntry();
+		$updateEntry->userId = $entry->userId;
+		return $updateEntry;
 	}
 	
 	/**
@@ -405,14 +433,17 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		$this->startSession(KalturaSessionType::ADMIN);
 		
 		$entry = $this->client->baseEntry->get($this->entryId);
-		$this->originalPuser = $entry->userId; 
+		$updatedEntry = $this->createEntryForUpdate($entry);
+		
+		$this->originalPuser = $entry->userId;
+						
 		$originalKuser = $this->getKuserIdFromEntry($this->entryId);
 		
 		print ("original puser [$this->originalPuser], original kuser [$originalKuser]\n");
-		$entry = $this->switchUsers($entry);
+		$updatedEntry = $this->switchUsers($updatedEntry);
 		
 		print("Before update call\n");
-		$result = $this->client->baseEntry->update($this->entryId, $entry);
+		$result = $this->client->baseEntry->update($this->entryId, $updatedEntry);
 		
 		if(!$result instanceof KalturaMediaEntry)
 		{
@@ -420,7 +451,7 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		}
 		
 		$updatedEntry = $this->client->baseEntry->get($this->entryId);
-		var_dump($updatedEntry);
+		//var_dump($updatedEntry);
 		
 		print("updatedEntry->userId [$updatedEntry->userId], originalPuser [$this->originalPuser] \n");
 		if($updatedEntry->userId != $this->originalPuser) // puser was update we now check if the kuser was changed as well
