@@ -84,7 +84,7 @@ class VirusScanListAction extends KalturaAdminConsolePlugin implements IKalturaA
 	public function getPublisherAdminActionJavascript()
 	{
 		$functionStr = 'function listVirusScanProfiles(partnerId) {
-			var url = pluginControllerUrl + \'/' . get_class ( $this ) . '/partnerId\' + partnerId;
+			var url = pluginControllerUrl + \'/' . get_class ( $this ) . '/filter_type/partnerIdEqual/filter_input/\' + partnerId;
 			document.location = url;
 		}';
 		return $functionStr;
