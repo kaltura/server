@@ -400,8 +400,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource = null;
 			
 			//TODO: handle replacment entry issues
-		$this->kClient->baseEntry->update($entryId, $entry, $resource); // updates the entry
+		$this->kClient->baseEntry->update($entryId, $entry);
 		$updatedEntryId = "{1:result:id}";
+		
+		$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource); // updates the entry maybe use the replacment entry id
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
@@ -560,8 +562,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!count($resource->resources))
 			$resource = null;
 			
-		$this->kClient->baseEntry->add($entry, $resource, $entry->type); // Adds the entry
+		$this->kClient->baseEntry->add($entry); //Adds the entry 
 		$newEntryId = "{1:result:id}";
+		
+		$this->kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
