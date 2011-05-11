@@ -38,6 +38,7 @@ if(!$partner)
 {
         die('no such partner.'.PHP_EOL);
 }
+
 $partner->setTemplatePartnerId($partner->getId());
 $partner->save();
 
