@@ -33,64 +33,7 @@ class MsnDistributionProfile extends DistributionProfile
 	 */
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
-		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
-		
-		if(!class_exists('MetadataProfile'))
-			return $validationErrors;
-			
-		$requiredFields = array(
-			self::METADATA_FIELD_VIDEO_CAT,
-			self::METADATA_FIELD_VIDEO_TOP,
-			self::METADATA_FIELD_VIDEO_TOP_CAT,
-			self::METADATA_FIELD_PUBLIC,
-		);
-		
-		$metadataProfileId = $this->getMetadataProfileId();
-		if(!$metadataProfileId)
-		{
-			foreach($requiredFields as $field)
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $field);
-			return $validationErrors;
-		}
-	
-		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
-		if(!count($metadatas))
-		{
-			foreach($requiredFields as $field)
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $field);
-			return $validationErrors;
-		}
-		
-		foreach($requiredFields as $field)
-		{
-			$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, $field);
-			if(!$metadataProfileCategoryField)
-			{
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $field);
-				continue;
-			}
-		
-			$values = $this->findMetadataValue($metadatas, $field);
-			if(!count($values))
-			{
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $field);
-				continue;
-			}
-				
-			foreach($values as $value)
-			{
-				if(!strlen($value))
-				{
-					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $field);
-					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
-					$validationError->setMetadataProfileId($metadataProfileId);
-					$validationErrors[] = $validationError;
-					return $validationErrors;
-				}
-			}
-		}
-		
-		return $validationErrors;
+		return MsnDistributionProfileValidator::validateForSubmission($this, $entryDistribution, $action);
 	}
 
 	public function getUsername()				{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
