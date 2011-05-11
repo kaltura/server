@@ -17,7 +17,6 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	const TEST_PARTNER_ID = 495787;
 	const TEST_ADMIN_SECRET = '2dc17b5563696fceb430a8431a2e4a32';
 	const TEST_USER_SECRET = '526603c21b71f4c43b9751bfcca6f387';
-
 	/**
 	 * @return Partner
 	 */
@@ -25,13 +24,74 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	{
 		return PartnerPeer::retrieveByPK(self::TEST_PARTNER_ID);
 	}
+
+	/**
+	 * 
+	 * The admin kuser id
+	 * @var int
+	 */
+	public $adminKuserId = 2821602; //2821599;
 	
-	public $entryId = '0_cdnzza3c';
-	public $puser1 = 'test1';
-	public $puser2 = 'test2';
-	public $partnerId = 495787;  
+	/**
+	 * 
+	 * Holds all created entries (for clean up)
+	 * @var array
+	 */
+	public $createdEntries = array();
+
+	/**
+	 * 
+	 * Holds the entry id for update
+	 * @var string
+	 */
+	public $entryId = '0_cdnzza3c'; // entry for update to do on
+	
+	/**
+	 * 
+	 * Holds an existing puser id
+	 * @var string
+	 */
+	public $puser1 = 'test1'; //existing puser 1
+	
+	/**
+	 * 
+	 * Holds an existing puser id 2
+	 * @var string
+	 */
+	public $puser2 = 'test2'; //Existing puser 2
+	
+	/**
+	 * 
+	 * Holds a non existing puser id
+	 * @var string
+	 */
+	public $puser3 = 'test3'; // non existing puser
+	
+	/**
+	 * 
+	 * The test partner id
+	 * @var int
+	 */
+	public $partnerId = 495787;
+
+	/**
+	 * 
+	 * The admin secret for the test partner
+	 * @var string
+	 */
 	public $adminSecret = '2dc17b5563696fceb430a8431a2e4a32';
+		
+	/**
+	 * The user secret for the test partner
+	 * @var string
+	 */
 	public $userSecret = '526603c21b71f4c43b9751bfcca6f387';
+	
+	/**
+	 * 
+	 * The original puser of the given entry
+	 * @var string
+	 */
 	public $originalPuser = null; 
 	
 	/**
@@ -67,8 +127,13 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	{
 		kuserPeer::clearInstancePool();
 		$kuser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $puserId);
-		print("in getKuserIdFromPuser kuserId [" . $kuser->getId() . "]\n");
-		return $kuser->getId();
+		if($kuser)
+		{
+			print("in getKuserIdFromPuser kuserId [" . $kuser->getId() . "]\n");
+			return $kuser->getId();
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -151,6 +216,7 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		kuserPeer::clearInstancePool();
 		PartnerPeer::clearInstancePool();
 		entryPeer::clearInstancePool();
+//		$this->clearEntries();
 		
 		$this->client = null;		
 		
@@ -159,10 +225,183 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 
 	/**
 	 * 
+	 * Creates and returns a default entry for insertion
+	 * @param $puserId - the entry puser
+	 * @return KalturaMediaEntry
+	 */
+	private function createDefaultEntry($puserId = null)
+	{
+		print("Creating default entry\n");
+		$entry = new KalturaMediaEntry();
+		
+		$entry->name = 'newEntry';
+		$entry->mediaType = 1;
+		$entry->categories = "Test User Logic";
+		$entry->description = "test for users logic changes";
+		$entry->userId = $puserId;
+		
+		return $entry;
+	}
+	
+	/**
+	 * 
+	 * Clears all created entries
+	 */
+	private function clearEntries()
+	{
+		foreach ($this->createdEntries as $id => $entry) {
+			$obj = entryPeer::retrieveByPK($id);
+				if ($obj) {
+					$obj->delete();
+				}
+		}
+		
+	} 
+	
+	/**
+	 * 
+	 * Deletes the given Kuser 
+	 */
+	private function deleteKuser($puserToDelete)
+	{
+		kuserPeer::clearInstancePool();
+		$kuser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $puserToDelete);
+
+		if($kuser)
+		{
+			$kuserId = $kuser->getId();
+			print ("In delete kuser: deleting puser [$puserToDelete], kuserId [$kuserId]\n");
+			$kuser->delete();
+		}
+		else
+			print("Nothing to delete\n");
+	}
+
+	/**
+	 * 
+	 * Gets the admin kuser Id
+	 */
+	private function getAdminKuserId()
+	{
+		return $this->adminKuserId;
+	}
+	
+	/**
+	 * 
+	 * Checks if the entry was created with the given puser
+	 * @param KalturaMediaEntry $addedEntry
+	 * @param string $entryPuser
+	 */
+	private function checkEntryAfterAdd($addedEntry, $puserId = null)
+	{
+		$entryKuser = $this->getKuserIdFromEntry($addedEntry->id);
+		$entryPuserId = $addedEntry->userId;
+		
+		print("Checking Entry addedEntry->userId [$entryPuserId], puserId [$puserId]\n");
+		//If the user is the same we check if the kuser is valid
+		if($addedEntry->userId == $puserId)
+		{
+			if(is_null($puserId)) //no user was added we search for the admin kuser
+			{
+				$puserKuser = $this->getAdminKuserId();
+				
+			}
+			else 
+			{
+				$puserKuser = $this->getKuserIdFromPuser($puserId);
+			}
+			
+			if($entryKuser == $puserKuser)
+			{
+				$this->assertEquals(true, true); // insert 1 success
+				return; //Valid we exit
+			}
+			else
+			{
+				print("Failed1");
+				$this->fail("puserId [$puserId], entry Kuser [$entryKuser], puser Kuser [$puserKuser] are not equal");
+			}
+			
+		}
+		else
+		{
+			print("Failed2");
+			
+			$this->fail("puserId [$puserId], entry Puser [$entryPuserId ] are not equal");
+		}
+	}
+
+	/**
+	 * 
+	 * tests if the entry insert is valid
+	 * @param unknown_type $ksType
+	 * @param unknown_type $puserId
+	 */
+	private function addEntryTest($ksType, $puserId)
+	{
+		if(!$this->startSession($ksType, $puserId))
+		{
+			$this->fail("Unable to start session");
+		}
+		
+		$entry = $this->createDefaultEntry($puserId);
+		
+		print("Before call\n");
+		$result = $this->client->baseEntry->add($entry);
+		
+		if($result != null && $result instanceof KalturaMediaEntry)
+		{
+			//var_dump($result);
+			$this->createdEntries[$result->id] = $result; //Adds the entry to the inserted items
+			$this->checkEntryAfterAdd($result, $puserId); //checks that the given user is the user on the entry
+		}
+		else
+		{
+			print("Oh No\n");
+			var_dump($result);
+			
+			$this->fail("Server didn't return an entry, " . var_dump($result) . "\n");
+		}
+	}
+	
+	/**
+	 * 
+	 * Tests insertion of new entry (and different users) 
+	 */
+	public function testAddAction()
+	{
+		print("Testing Admin KS adds\n");
+		//Add with admin KS - admin / user existing / not existing
+		print("Test1 KS [Admin], puser [null]\n");
+		$this->addEntryTest(KalturaSessionType::ADMIN, null);
+		
+		print("Test2 KS [Admin], puser [test1] existent \n");
+		$this->addEntryTest(KalturaSessionType::ADMIN, $this->puser1); // existing
+		
+		print("Test3 KS [Admin], puser [test3] non existent\n");
+		$this->deleteKuser($this->puser3); //check that puser 3 is non existing
+		$this->addEntryTest(KalturaSessionType::ADMIN, $this->puser3);
+		
+		print("Testing User KS adds\n");
+		//Add with user KS - user / other user existing / not existing
+		print("Test4 KS [User], puser [null]\n");
+	//	$this->addEntryTest(KalturaSessionType::USER, null);
+		
+		print("Test5 KS [User], puser [test1] existing\n");
+		$this->addEntryTest(KalturaSessionType::USER, $this->puser1); // existing
+				
+		print("Test6 KS [User], puser [test3] non existent\n");
+		$this->deleteKuser($this->puser3); //check that puser 3 is non existing
+		$this->addEntryTest(KalturaSessionType::USER, $this->puser3);
+	}
+	
+	/**
+	 * 
 	 * Test if the user update is valid
 	 */
 	public function testUpdateAction()
 	{
+		print("\nUpdate tests started\n");
 		$this->startSession(KalturaSessionType::ADMIN);
 		
 		$entry = $this->client->baseEntry->get($this->entryId);
@@ -172,9 +411,16 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 		print ("original puser [$this->originalPuser], original kuser [$originalKuser]\n");
 		$entry = $this->switchUsers($entry);
 		
-		$this->client->baseEntry->update($this->entryId, $entry);
+		print("Before update call\n");
+		$result = $this->client->baseEntry->update($this->entryId, $entry);
+		
+		if(!$result instanceof KalturaMediaEntry)
+		{
+			$this->fail("Entry was not updated " . var_dump($result) . "\n");
+		}
 		
 		$updatedEntry = $this->client->baseEntry->get($this->entryId);
+		var_dump($updatedEntry);
 		
 		print("updatedEntry->userId [$updatedEntry->userId], originalPuser [$this->originalPuser] \n");
 		if($updatedEntry->userId != $this->originalPuser) // puser was update we now check if the kuser was changed as well
@@ -184,8 +430,8 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 			if($newKuserId == $entryKuserId)
 			{
 				//if the kusers are the same then all is okay
-				//return; success!!! so nothing todo
 				$this->assertEquals(true, true); // insert 1 success
+				return; //success!!! so nothing todo
 			}
 			else  //the kusers are not the same
 			{
