@@ -468,8 +468,26 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		else
 		{
+			$ks = ks::fromSecureString(self::$ksString);
+			$ksSetRoleId = $ks->getSetRole();
+			
+			if ($ksSetRoleId != false){
+				//check if role exists
+				$c = new Criteria();
+				$c->addAnd(UserRolePeer::ID, $ksSetRoleId, Criteria::EQUAL);
+				$c->addAnd(UserRolePeer::PARTNER_ID, self::$ksPartnerId, Criteria::EQUAL);
+				$roleId = UserRolePeer::doSelectOne($c);
+				
+				if ($roleId){
+					$roleIds = $roleId->getId();
+				}else{
+					KalturaLog::debug("Role id [$ksSetRoleId] does not exists");
+					throw new KalturaAPIException ( APIErrors::UNKNOWN_ROLE_ID ,$ksSetRoleId);
+				}
+			}
+			
 			// if user is defined -> get his role IDs
-			if (self::$kuser) {
+			if (!$roleIds && self::$kuser) {
 				$roleIds = self::$kuser->getRoleIds();
 			}
 			
@@ -605,6 +623,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 									
 				case ks::LOGOUT:
 					KalturaLog::err('KS already logged out');
+					break;
+				
+				case ks::EXCEEDED_ACTIONS_LIMIT:
+					KalturaLog::err('KS exceeded number of actions limit');
 					break;
 			}
 			throw new KalturaAPIException (APIErrors::INVALID_KS ,self::$ksString ,$res ,ks::getErrorStr($res));
