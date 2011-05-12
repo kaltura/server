@@ -246,6 +246,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 	}
 	
+	/**
+	 * 
+	 * Removes all non updatble fields from the entry
+	 * @param KalturaBaseEntry $entry
+	 */
+	protected function removeNonUpdatbleFields(KalturaBaseEntry $entry)
+	{
+		$entry->ingestionProfileId = null;
+	}
+	
 	
 	/**
 	 * 
@@ -257,11 +267,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		KalturaLog::debug("xml [" . $item->asXML() . "]");
 				
-		$entryId = "$item->entryId";
+		$entryId = "{$item->entryId}";
+		
 		if(!$entryId)
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 
 		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
+		$entry = $this->removeNonUpdatbleFields($entry);
+		
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
 		KalturaLog::debug("current entry is: " . print_r($entry, true));
 				
