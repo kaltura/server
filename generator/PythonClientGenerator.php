@@ -588,28 +588,29 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 	        	$this->appendLine("        kfiles = KalturaFiles()");
 	    	}
 	    
-			if (!$this->isSimpleType($paramType))
+			switch ($paramType) 
 			{
-				if ($isEnum)
-				{
-					$this->appendLine("        kparams.put(\"$paramName\", $paramName)");
-				}
-				else if ($paramType == "file")
-				{
-					$this->appendLine("        kfiles.put(\"$paramName\", $paramName)");
-				}
-				else if ($paramType == "array")
-				{
+				case "string" :
+					$this->appendLine ( "        kparams.addStringIfNotNone(\"$paramName\", " . $paramName . ")" );
+					break;
+				case "float" :
+					$this->appendLine ( "        kparams.addFloatIfNotNone(\"$paramName\", " . $paramName . ")" );
+					break;
+				case "int" :
+					$this->appendLine ( "        kparams.addIntIfNotNone(\"$paramName\", " . $paramName . ");" );
+					break;
+				case "bool" :
+					$this->appendLine ( "        kparams.addBoolIfNotNone(\"$paramName\", " . $paramName . ");" );
+					break;
+				case "array" :
 					$this->appendLine("        kparams.addArrayIfNotNone(\"$paramName\", $paramName)");
-				}
-				else
-				{
+					break;
+				case "file" :
+					$this->appendLine ( "        kfiles.put(\"$paramName\", " . $paramName . ");" );
+					break;
+				default : // for objects
 					$this->appendLine("        kparams.addObjectIfNotNone(\"$paramName\", $paramName)");
-				}
-			}
-			else
-			{
-				$this->appendLine("        kparams.put(\"$paramName\", $paramName)");
+					break;
 			}
 		}
 		
