@@ -1,0 +1,35 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Falling leaves</name>
+	
+	<restrictions>	
+		<restriction type="number" default="20">
+			<id>numLeaves</id>
+			<range>
+				<stepSize value="1" />
+				<min value="1"/>
+				<max value="100"/>
+			</range>
+		</restriction>
+		
+		<restriction type="number" default="8">
+			<id>windSpeed</id>
+			<range>
+				<stepSize value="0.1" />
+				<min value="-20"/>
+				<max value="20"/>
+			</range>
+		</restriction>
+
+		<restriction type="number" default="8">
+			<id>gravity</id>
+			<range>
+				<stepSize value="0.1" />
+				<min value="0.1"/>
+				<max value="20"/>
+			</range>
+		</restriction>
+			
+	</restrictions>
+</definition>

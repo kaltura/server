@@ -1,0 +1,194 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Draggable Text</name>
+
+	<UI>
+		<InfoPanel>
+			<UIComponents>
+
+				<UIComponent type="Button" id="selectAllBtn">
+					<mxAttributes label="Select All Text"  width="100" height="20"/>
+				</UIComponent>
+
+				<UIComponent type="VBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Font type:" />
+					</UIComponent>
+
+					<UIComponent type="ComboBox" id="fontName" >
+						<parameters>
+							<parameter name="selectedItem" controls="fontName" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+
+			<UIComponent type="VBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Font width:" />
+					</UIComponent>
+
+					<UIComponent type="ComboBox" id="fontWidth">
+						<parameters>
+							<parameter name="selectedItem" controls="fontWidth" />
+						</parameters>
+					</UIComponent>
+				</UIComponent><UIComponent type="VBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Font size:" />
+					</UIComponent>
+
+					<UIComponent type="ComboBox" id="fontSize">
+						<parameters>
+							<parameter name="selectedItem" controls="fontSize" />
+						</parameters>
+					</UIComponent>
+				</UIComponent><UIComponent type="VBox">
+					<UIComponent type="Label">
+						<mxAttributes text="Background Opacity:" />
+					</UIComponent>
+
+					<UIComponent type="HSlider" id="bgAlpha">
+						<parameters>
+							<parameter name="value0" controls="bgAlpha" />
+						</parameters>
+						<mxAttributes liveDragging="true"></mxAttributes>
+					</UIComponent>
+				</UIComponent>
+
+				<UIComponent type="VBox">
+					<UIComponent type="HBox">
+						<UIComponent type="Label">
+							<mxAttributes text="Text Color: " />
+						</UIComponent>
+
+						<UIComponent type="ColorPicker" id="color" >
+							<parameters>
+								<parameter name="selectedColor" controls="fontColor" />
+							</parameters>
+						</UIComponent>
+					</UIComponent>
+
+					<UIComponent type="HBox">
+						<UIComponent type="Label">
+							<mxAttributes text="Background Color: " />
+						</UIComponent>
+
+						<UIComponent type="ColorPicker" id="bgColor">
+							<parameters>
+								<parameter name="selectedColor" controls="bgColor" />
+							</parameters>
+						</UIComponent>
+					</UIComponent>
+				</UIComponent>
+
+			</UIComponents>
+		</InfoPanel>
+
+		<PlayerPanel>
+			<UIComponents>
+				<UIComponent type="ModuleLoader" id="textHandlesUi">
+
+					<url>/swf/plugins/cvesdk/ui/TextHandlesUI.swf</url>
+
+					<parameters>
+						<parameter name="text" controls="text" />
+						<parameter name="xx" controls="textXPos" />
+						<parameter name="yy" controls="textYPos" />
+						<parameter name="rotationContent" controls="textRotation" />
+						<parameter name="scaleXContent" controls="textScaleX" ></parameter>
+						<parameter name="scaleYContent" controls="textScaleY" ></parameter><parameter
+							name="fontSize" controls="fontSize">
+</parameter>
+						<parameter name="fontColor" controls="fontColor"></parameter>
+					<parameter name="fontName" controls="fontName"></parameter><parameter name="fontWidth" controls="fontWidth"></parameter><parameter name="bgColor" controls="bgColor"></parameter><parameter name="bgAlpha" controls="bgAlpha"></parameter></parameters>
+
+
+
+				</UIComponent>
+			</UIComponents>
+		</PlayerPanel>
+
+		<UIBindings>
+			<Binding>
+				<source>
+					<UIComponentID>fontName</UIComponentID>
+					<parameterName>selectedItem</parameterName>
+				</source>
+
+				<target>
+					<UIComponentID>textHandlesUi</UIComponentID>
+					<propertyName>fontName</propertyName>
+				</target>
+			</Binding>
+
+			<Binding>
+				<source>
+					<UIComponentID>color</UIComponentID>
+					<parameterName>selectedColor</parameterName>
+				</source>
+
+				<target>
+					<UIComponentID>textHandlesUi</UIComponentID>
+					<propertyName>fontColor</propertyName>
+				</target>
+			</Binding>
+
+
+		<Binding>
+				<source>
+					<UIComponentID>fontWidth</UIComponentID>
+
+				</source>
+
+
+				<parameterName>selectedItem</parameterName><target>
+					<UIComponentID>textHandlesUi</UIComponentID>
+					<propertyName>fontWidth</propertyName>
+				</target>
+			</Binding><Binding>
+				<source>
+					<UIComponentID>fontSize</UIComponentID>
+
+				</source>
+
+				<parameterName>selectedItem</parameterName><target>
+					<UIComponentID>textHandlesUi</UIComponentID>
+					<propertyName>fontSize</propertyName>
+				</target>
+			</Binding><Binding>
+				<source>
+					<UIComponentID>bgColor</UIComponentID>
+
+				</source>
+
+				<parameterName>selectedItem</parameterName><target>
+					<UIComponentID>textHandlesUi</UIComponentID>
+					<propertyName>bgColor</propertyName>
+				</target>
+			</Binding><Binding>
+				<source>
+					<UIComponentID>bgAlpha</UIComponentID>
+
+				</source>
+
+				<parameterName>value0</parameterName><target>
+					<UIComponentID>textHandlesUi</UIComponentID>
+					<propertyName>bgAlpha</propertyName>
+				</target>
+			</Binding></UIBindings>
+			<Events>
+				<Event>
+					<source>
+						<UIComponentID>selectAllBtn</UIComponentID>
+						<eventName>click</eventName>
+					</source>
+
+					<target>
+						<UIComponentID>textHandlesUi</UIComponentID>
+						<handler>selectAllText</handler>
+					</target>
+				</Event>
+			</Events>
+	</UI>
+</definition>

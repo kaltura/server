@@ -1,0 +1,34 @@
+<?php
+
+if($this->error)
+{
+	?>
+	<div class="error">
+		<ul>
+			<li><?php echo $this->translate($this->error); ?></li>
+		</ul>
+	</div>
+	<?php 
+}
+
+if($this->debugText)
+{
+	?>
+	<div style="display: none"><?php echo $this->translate($this->debugText); ?></div>
+	<?php 
+}
+	
+if($this->html)
+	echo $this->html;
+?>
+<br/>
+<a style="text-decoration: none;" href="http://hobbitmon.sourceforge.net/" target="_blank">Xymon 4.2.3</a>
+
+<script type="text/javascript">
+	$(function(){
+		$("th").each(function(){
+			if(this.innerHTML == "Duration<br>(minutes)")
+				$(this).html("Duration (minutes)");
+		});
+	});
+</script>

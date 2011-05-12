@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editmodel:ActivityDiagramEditModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:editmodel="editmodel.xmi" xmlns:options="options.xmi" name="RemoteConvert" id="{UMLID=__Sm0gL5VEd6M19kKXhY_WA,JavaID=.}" metadata="uml2-1.0" initialized="true" scrolledX="-5" scrolledY="752" tag="10" key="3230303730363239206261746368">
+  <children xsi:type="editmodel:ActivityActivityEditModel" name="Remote Convert Lifecycle" size="1108,1597" fontInfo="Omondo_Font_Default-12-1" id="{UMLID=_kSPwEL5WEd6M19kKXhY_WA}" itemName="Remote Convert Lifecycle" numberOfThread="1">
+    <children xsi:type="editmodel:CompartmentEditModel" size="655,1548">
+      <children xsi:type="editmodel:StartEditModel" name="CE" location="260,20" size="16,16" itemName="CE">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.0" target="//@children.0/@children.0/@children.2" targetEnd="//@children.0/@children.0/@children.0/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.0/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.0/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="7,16" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="74,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="CE" location="281,21" size="17,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.0"/>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.0/@sourceConnections.0" name="addRemoteConvert" backgroundRGB="192,192,192" location="193,72" size="145,60" fontInfo="Omondo_Font_Default-8-0" itemName="addRemoteConvert">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.2" target="//@children.0/@children.0/@children.3" targetEnd="//@children.0/@children.0/@children.2/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.2/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.2/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="75,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="62,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.2/@sourceConnections.0" name="addPull" backgroundRGB="192,192,192" location="206,160" size="125,60" fontInfo="Omondo_Font_Default-8-0" itemName="addPull">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.3" target="//@children.0/@children.0/@children.4" targetEnd="//@children.0/@children.0/@children.3/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.3/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.3/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="60,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="50,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.3/@sourceConnections.0" name="Pull" backgroundRGB="251,251,251" location="216,249" size="101,60" stereotype="task" itemName="Pull">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.4" target="//@children.0/@children.0/@children.5" targetEnd="//@children.0/@children.0/@children.4/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.4/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.4/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="48,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="14,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:DecisionEditModel" targetConnections="//@children.0/@children.0/@children.4/@sourceConnections.0" name="pull status" backgroundRGB="251,251,251" location="250,347" size="30,30" itemName="pull status">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Failed" foregroundRGB="255,0,0" size="2,1" fontInfo="Omondo_Font_Default-8-0" stereotype="" source="//@children.0/@children.0/@children.5" target="//@children.0/@children.0/@children.7" targetEnd="//@children.0/@children.0/@children.5/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.5/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.5/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="Failed" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="0,20" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="45,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Failed" size="28,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Done" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.5" target="//@children.0/@children.0/@children.8" targetEnd="//@children.0/@children.0/@children.5/@sourceConnections.1/@children.1" label="//@children.0/@children.0/@children.5/@sourceConnections.1/@children.2" sourceEnd="//@children.0/@children.0/@children.5/@sourceConnections.1/@children.0" connectionRouterKind="Manhattan" eventName="Done" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="14,30" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="71,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Done" size="25,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="pull status" location="279,347" size="57,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.5"/>
+      <children xsi:type="editmodel:FlowFinalEditModel" targetConnections="//@children.0/@children.0/@children.5/@sourceConnections.0 //@children.0/@children.0/@children.10/@sourceConnections.0 //@children.0/@children.0/@children.19/@sourceConnections.0 //@children.0/@children.0/@children.22/@sourceConnections.0" name="Remote Convert Failed" backgroundRGB="255,0,0" location="11,1506" size="128,35" fontInfo="Omondo_Font_Default-8-0" itemName="Remote Convert Failed"/>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.5/@sourceConnections.1" name="addExtractMedia" backgroundRGB="192,192,192" location="193,418" size="136,60" fontInfo="Omondo_Font_Default-8-0" itemName="addExtractMedia">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.8" target="//@children.0/@children.0/@children.9" targetEnd="//@children.0/@children.0/@children.8/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.8/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.8/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="74,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="53,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.8/@sourceConnections.0" name="Extract Media" backgroundRGB="251,251,251" location="214,518" size="107,60" stereotype="task" itemName="Extract Media">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.9" target="//@children.0/@children.0/@children.10" targetEnd="//@children.0/@children.0/@children.9/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.9/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.9/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="54,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="14,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:DecisionEditModel" targetConnections="//@children.0/@children.0/@children.9/@sourceConnections.0" name="extract status" backgroundRGB="251,251,251" location="254,604" size="30,30" itemName="extract status">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Failed" foregroundRGB="255,0,0" size="2,1" fontInfo="Omondo_Font_Default-8-0" stereotype="" source="//@children.0/@children.0/@children.10" target="//@children.0/@children.0/@children.7" targetEnd="//@children.0/@children.0/@children.10/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.10/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.10/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="Failed" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="0,20" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="63,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Failed" size="28,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Done" size="2,1" stereotype="" source="//@children.0/@children.0/@children.10" target="//@children.0/@children.0/@children.12" targetEnd="//@children.0/@children.0/@children.10/@sourceConnections.1/@children.1" label="//@children.0/@children.0/@children.10/@sourceConnections.1/@children.2" sourceEnd="//@children.0/@children.0/@children.10/@sourceConnections.1/@children.0" connectionRouterKind="Manhattan" eventName="Done" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="14,29" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="73,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Done" size="25,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="extract status" location="288,610" size="72,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.10"/>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.10/@sourceConnections.1 //@children.0/@children.0/@children.17/@sourceConnections.1" name="addConvertFlavor" backgroundRGB="192,192,192" location="326,723" size="141,60" fontInfo="Omondo_Font_Default-8-0" itemName="addConvertFlavor">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.12" target="//@children.0/@children.0/@children.13" targetEnd="//@children.0/@children.0/@children.12/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.12/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.12/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="67,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="48,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.12/@sourceConnections.0" name="Convert" backgroundRGB="251,251,251" location="345,819" size="98,60" stereotype="task" itemName="Convert">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.13" target="//@children.0/@children.0/@children.14" targetEnd="//@children.0/@children.0/@children.13/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.13/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.13/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="56,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="14,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:DecisionEditModel" targetConnections="//@children.0/@children.0/@children.13/@sourceConnections.0 //@children.0/@children.0/@children.16/@sourceConnections.0" name="convert status" backgroundRGB="251,251,251" location="387,938" size="30,30" itemName="convert status">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Failed" size="2,1" stereotype="" source="//@children.0/@children.0/@children.14" target="//@children.0/@children.0/@children.17" targetEnd="//@children.0/@children.0/@children.14/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.14/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.14/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="Failed" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="1,15" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="14,1"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Failed" size="28,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Almost-Done" size="2,1" stereotype="" source="//@children.0/@children.0/@children.14" target="//@children.0/@children.0/@children.16" targetEnd="//@children.0/@children.0/@children.14/@sourceConnections.1/@children.1" label="//@children.0/@children.0/@children.14/@sourceConnections.1/@children.2" sourceEnd="//@children.0/@children.0/@children.14/@sourceConnections.1/@children.0" connectionRouterKind="Manhattan" eventName="Almost-Done" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="27,15" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="71,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Almost-Done" location="517,988" size="62,14" fontInfo="Arial-8-0" automaticRelocationAllowed="false" locationOnWireFromSource="44.0" distanceFromWire="-10.0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Done" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.14" target="//@children.0/@children.0/@children.20" targetEnd="//@children.0/@children.0/@children.14/@sourceConnections.2/@children.1" label="//@children.0/@children.0/@children.14/@sourceConnections.2/@children.2" sourceEnd="//@children.0/@children.0/@children.14/@sourceConnections.2/@children.0" connectionRouterKind="Manhattan" eventName="Done" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="14,30" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="48,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Done" location="409,1000" size="25,14" fontInfo="Arial-8-0" automaticRelocationAllowed="false" locationOnWireFromSource="-58.0" distanceFromWire="17.000000000000014" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="convert status" location="412,929" size="76,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.14"/>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.14/@sourceConnections.1" name="Close Convert" backgroundRGB="128,255,255" location="518,996" size="137,60" fontInfo="Omondo_Font_Default-8-0" itemName="Close Convert">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" source="//@children.0/@children.0/@children.16" target="//@children.0/@children.0/@children.14" targetEnd="//@children.0/@children.0/@children.16/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.16/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.16/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="137,29" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="14,1"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:DecisionEditModel" targetConnections="//@children.0/@children.0/@children.14/@sourceConnections.0" name="can try another transcoder" backgroundRGB="251,251,251" location="177,999" size="30,30" itemName="can try another transcoder">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="No" foregroundRGB="255,0,0" size="2,1" fontInfo="Omondo_Font_Default-8-0" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.17" target="//@children.0/@children.0/@children.19" targetEnd="//@children.0/@children.0/@children.17/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.17/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.17/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="No" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="14,30" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="57,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="No" size="13,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Yes" size="2,1" stereotype="" source="//@children.0/@children.0/@children.17" target="//@children.0/@children.0/@children.12" targetEnd="//@children.0/@children.0/@children.17/@sourceConnections.1/@children.1" label="//@children.0/@children.0/@children.17/@sourceConnections.1/@children.2" sourceEnd="//@children.0/@children.0/@children.17/@sourceConnections.1/@children.0" connectionRouterKind="Manhattan" eventName="Yes" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="1,15" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="38,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Yes" location="148,1020" size="20,14" fontInfo="Arial-8-0" automaticRelocationAllowed="false" locationOnWireFromSource="-144.99999999999997" distanceFromWire="-13.00000000000014" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="can try another transcoder" location="200,994" size="142,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.17"/>
+      <children xsi:type="editmodel:FlowFinalEditModel" targetConnections="//@children.0/@children.0/@children.17/@sourceConnections.0" name="Convert Flavor Failed" backgroundRGB="255,0,0" location="134,1067" size="122,35" fontInfo="Omondo_Font_Default-8-0" itemName="Convert Flavor Failed">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" foregroundRGB="255,0,0" size="2,1" fontInfo="Omondo_Font_Default-8-0" stereotype="" source="//@children.0/@children.0/@children.19" target="//@children.0/@children.0/@children.7" targetEnd="//@children.0/@children.0/@children.19/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.19/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.19/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="0,27" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="81,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.14/@sourceConnections.2" name="addPostConvert" backgroundRGB="192,192,192" location="353,1100" size="107,60" fontInfo="Omondo_Font_Default-8-0" itemName="addPostConvert">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.20" target="//@children.0/@children.0/@children.21" targetEnd="//@children.0/@children.0/@children.20/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.20/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.20/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="53,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="63,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.20/@sourceConnections.0" name="Post Convert" backgroundRGB="251,251,251" location="343,1190" size="123,60" stereotype="task" itemName="Post Convert">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.21" target="//@children.0/@children.0/@children.22" targetEnd="//@children.0/@children.0/@children.21/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.21/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.21/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="61,60" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="14,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:DecisionEditModel" targetConnections="//@children.0/@children.0/@children.21/@sourceConnections.0" name="post convert status" backgroundRGB="251,251,251" location="390,1278" size="30,30" itemName="post convert status">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Failed" foregroundRGB="255,0,0" size="2,1" fontInfo="Omondo_Font_Default-8-0" stereotype="" source="//@children.0/@children.0/@children.22" target="//@children.0/@children.0/@children.7" targetEnd="//@children.0/@children.0/@children.22/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.22/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.22/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="Failed" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="1,15" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="95,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Failed" size="28,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" name="Done" size="2,1" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.22" target="//@children.0/@children.0/@children.24" targetEnd="//@children.0/@children.0/@children.22/@sourceConnections.1/@children.1" label="//@children.0/@children.0/@children.22/@sourceConnections.1/@children.2" sourceEnd="//@children.0/@children.0/@children.22/@sourceConnections.1/@children.0" connectionRouterKind="Manhattan" eventName="Done" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="14,30" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="101,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" name="Done" size="25,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:LabelObjectEditModel" name="post convert status" location="416,1272" size="103,15" fontInfo="Omondo_Font_Default-9-0" description="Name" attachment="//@children.0/@children.0/@children.22"/>
+      <children xsi:type="editmodel:ActivityEditModel" targetConnections="//@children.0/@children.0/@children.22/@sourceConnections.1" name="updateRemoteConvert - Done" backgroundRGB="192,192,192" location="303,1383" size="199,63" fontInfo="Omondo_Font_Default-8-0" itemName="updateRemoteConvert - Done">
+        <sourceConnections xsi:type="editmodel:TransitionEditModel" foregroundRGB="128,255,0" size="2,1" fontInfo="Omondo_Font_Default-8-0" stereotype="" autoLocated="true" source="//@children.0/@children.0/@children.24" target="//@children.0/@children.0/@children.25" targetEnd="//@children.0/@children.0/@children.24/@sourceConnections.0/@children.1" label="//@children.0/@children.0/@children.24/@sourceConnections.0/@children.2" sourceEnd="//@children.0/@children.0/@children.24/@sourceConnections.0/@children.0" connectionRouterKind="Manhattan" eventName="" eventArgument="" condition="" action="">
+          <children xsi:type="editmodel:StateEndEditModel" location="100,63" attachSource="true"/>
+          <children xsi:type="editmodel:StateEndEditModel" location="71,0"/>
+          <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+        </sourceConnections>
+      </children>
+      <children xsi:type="editmodel:FlowFinalEditModel" targetConnections="//@children.0/@children.0/@children.24/@sourceConnections.0" name="Remote Convert Succeed" backgroundRGB="128,255,0" location="332,1513" size="143,35" fontInfo="Omondo_Font_Default-8-0" itemName="Remote Convert Succeed"/>
+    </children>
+  </children>
+  <diagramOptions xsi:type="options:ActivityDiagramOptions" level="0" autoName="false"/>
+  <boardSetting snapToGeometry="true" gridEnabled="true" gridSpacing="14,14" gridOrigin="574,1050" rulerUnit="cm" gridShow="true">
+    <leftRuler/>
+    <topRuler/>
+  </boardSetting>
+</editmodel:ActivityDiagramEditModel>

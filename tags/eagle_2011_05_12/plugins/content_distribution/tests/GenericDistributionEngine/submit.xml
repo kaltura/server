@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<item>
+	<entryId>0_4c6o03wp</entryId>
+	<createdAt>1293110906</createdAt>
+	<title>MSN test 1</title>
+	<link>0_4c6o03wp</link>
+	<type>1</type>
+	<licenseType>-1</licenseType>
+	<userId>tan-tan</userId>
+	<name>MSN test 1</name>
+	<description>My msn test</description>
+	<tags>
+		<tag>test</tag>
+		<tag>msn</tag>
+		<tag>ababab</tag>
+	</tags>
+	<partnerData></partnerData>
+	<accessControlId />
+	<endDate>1293484160</endDate>
+	<media>
+		<mediaType>1</mediaType>
+		<duration>26749</duration>
+		<conversionProfileId>3</conversionProfileId>
+		<flavorParamsIds>0,55</flavorParamsIds>
+	</media>
+	<content url="http://kaltura.trunk/p/1/sp/100/serveFlavor/flavorId/0_vo1lfb5n" flavorAssetId="0_vo1lfb5n" isSource="true" format="qt" flavorParamsId="0">
+		<tags>
+			<tag>web</tag>
+		</tags>
+	</content>
+	<content url="http://kaltura.trunk/p/1/sp/100/serveFlavor/flavorId/0_qz9lzewf" flavorAssetId="0_qz9lzewf" isSource="false" format="flash video" flavorParamsId="55">
+		<tags>
+			<tag>web</tag>
+			<tag>mbr</tag>
+		</tags>
+	</content>
+	<thumbnail url="http://kaltura.trunk/api_v3/service/thumbAsset/action/serve/partnerId/1/thumbAssetId/0_1e6adevn" thumbAssetId="0_1e6adevn" isDefault="false" format="">
+		<tags>
+			<tag></tag>
+		</tags>
+	</thumbnail>
+	<customData metadataId="59" metadataVersion="1" metadataProfileId="36" metadataProfileVersion="1">
+		<metadata>
+			<MSNVideoCat>FOX_big12</MSNVideoCat>
+			<MSNVideoTop>Fox Sports</MSNVideoTop>
+			<MSNVideoTopCat>Fox Sports_FOX_big12</MSNVideoTopCat>
+			<MSNPublic>Fox Sports</MSNPublic>
+		</metadata>
+	</customData>
+	<customData metadataId="60" metadataVersion="1" metadataProfileId="38" metadataProfileVersion="1">
+		<metadata>
+			<shortTitle>My short title</shortTitle>
+			<shortDescription>My short description</shortDescription>
+			<verizonCategory>FSPORTS_DTEST01</verizonCategory>
+			<verizonProvider>FOX Sports</verizonProvider>
+			<verizonProviderId>vp_foxsports</verizonProviderId>
+		</metadata>
+	</customData>
+	<distribution entryDistributionId="11" distributionProfileId="14" provider="MSN">
+		<sunset>1294484160</sunset>
+		<flavorAssetIds>
+			<flavorAssetId>0_vo1lfb5n</flavorAssetId>
+			<flavorAssetId>0_qz9lzewf</flavorAssetId>
+			<flavorAssetId>0_1e6adevn</flavorAssetId>
+		</flavorAssetIds>
+		<thumbAssetIds>
+			<thumbAssetId>0_1e6adevn</thumbAssetId>
+		</thumbAssetIds>
+	</distribution>
+	<distribution entryDistributionId="12" distributionProfileId="15" provider="Verison" distributionProviderId="19">
+		<sunset>1293484160</sunset>
+		<flavorAssetIds>
+			<flavorAssetId>0_vo1lfb5n</flavorAssetId>
+		</flavorAssetIds>
+		<thumbAssetIds>
+			<thumbAssetId></thumbAssetId>
+		</thumbAssetIds>
+	</distribution>
+</item>

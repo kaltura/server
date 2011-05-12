@@ -1,0 +1,85 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>simpleTextOverlay</name>
+	
+	<UI>
+		<version>1.00</version>
+		<type>xml</type>
+		
+		<InfoPanel>
+			<UIComponents>
+				<UIComponent type="HBox" >
+					<UIComponent type="Label">
+						<mxAttributes text="Enter text here:"/>
+					</UIComponent>
+					<UIComponent type="TextArea" id="text">
+						<parameters>
+							<parameter name="text" controls="text" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+		
+				<UIComponent type="HBox" verticalAlign="middle">
+					
+					<UIComponent type="Label">
+							<mxAttributes text="Font size"/>
+					</UIComponent>
+					<UIComponent type="HSlider" id="fontSize">
+						<mxAttributes liveDragging="true"/>
+						<parameters>
+							<parameter name="value0" controls="fontSize" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+				
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+							<mxAttributes text="Font type:" />
+					</UIComponent>
+					<UIComponent type="ComboBox" id="fontName" >
+						<parameters>
+							<parameter name="selectedItem" controls="fontName" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+				
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+							<mxAttributes text="Font color"/>
+					</UIComponent>
+					<UIComponent type="ColorPicker" id="fontColor">
+						<parameters>
+							<parameter name="selectedColor" controls="fontColor" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+				
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+							<mxAttributes text="Position"/>
+					</UIComponent>
+					<UIComponent type="ComboBox" id="textPosition">
+						<parameters>
+							<parameter name="selectedItem" controls="textPosition" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+				
+				<UIComponent type="HBox">
+					<UIComponent type="Label">
+							<mxAttributes text="Rotation"/>
+					</UIComponent>
+					<UIComponent type="ModuleLoader" id="rotation">
+						<parameters>
+							<parameter name="angle" controls="rotation" />
+						</parameters>
+						<url>plugins/editor/customUI/Dial.swf</url>
+						<familyType>ranges</familyType>
+					</UIComponent>
+				</UIComponent>
+				
+			</UIComponents>
+		</InfoPanel>
+	</UI>
+</definition>

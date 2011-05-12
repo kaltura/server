@@ -1,0 +1,24 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Simple text overlay</name>
+	<restrictions>	
+		<restriction type="string" default="Sample text.">
+			<id>text</id>
+		</restriction>
+		
+		<restriction type="number" default="20">
+			<id>fontSize</id>
+			<range>
+				<stepSize value="1" />
+				<min value="8"/>
+				<max value="72"/>
+			</range>
+		</restriction>
+		
+		<restriction type="number" default="0x000000">
+			<id>fontColor</id>
+		</restriction>
+		
+	</restrictions>
+</definition>

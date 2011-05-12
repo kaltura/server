@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <UnitTestsData>
+    <UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="103" secret="554ac9ee29650a512affd04d328f472b" serviceUrl="local.trunk" isAdmin="1" userId="123"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="103" secret="554ac9ee29650a512affd04d328f472b" serviceUrl="local.trunk" isAdmin="1" userId="1234"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="103" secret="554ac9ee29650a512affd04d328f472b" serviceUrl="local.trunk" isAdmin="0" userId="123"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="103" secret="554ac9ee29650a512affd04d328f472b" serviceUrl="local.trunk" isAdmin="0" userId="1234"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+  </UnitTestsData>
+</UnitTests>
+
+		
+<!-- <Input type="string" partnerId="103" secret="ee944fea8516ca202eba908ba81aa132"
+554ac9ee29650a512affd04d328f472b		serviceUrl="local.trunk" isAdmin="1" userId="109"/>
+
+<Input type="string" partnerId="-2" secret="adminconsoleadminsecret" serviceUrl="local.trunk" isAdmin="1" userId="0"/>
+
+-->
