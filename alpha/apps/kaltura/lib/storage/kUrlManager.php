@@ -173,11 +173,16 @@ class kUrlManager
 		$url = $fileSync->getFilePath();
 		$url = str_replace('\\', '/', $url);
 	
-		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP &&
-                        ($this->extention && strtolower($this->extention) != 'flv' ||
-                        $this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
-			$url = "mp4:$url";
-		
+		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+		{
+			if (($this->extention && strtolower($this->extention) != 'flv' ||
+				$this->containerFormat && strtolower($this->containerFormat) != 'flash video'))
+				$url = "mp4:$url";
+				
+			// when serving files directly via RTMP fms doesnt expect to get the file extension				
+			$url = str_replace('.mp4', '', str_replace('.flv','',$url));
+		}
+				
 		return $url;
 	}
 	
