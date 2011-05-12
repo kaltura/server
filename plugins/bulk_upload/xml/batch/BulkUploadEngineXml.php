@@ -254,6 +254,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function removeNonUpdatbleFields(KalturaBaseEntry $entry)
 	{
 		$entry->ingestionProfileId = null;
+		return $entry;
 	}
 	
 	
