@@ -43,7 +43,10 @@ class MsnDistributionProfile extends DistributionProfile
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
 		if(!msnContentDistributionConf::hasParam('provider_sub_types'))
-			return MsnDistributionProfileValidator::validateForSubmission($this, $entryDistribution, $action);
+		{
+			$validator = new MsnDistributionProfileValidator();
+			return $validator->validateForSubmission($this, $entryDistribution, $action);
+		}
 			
 		$configs = msnContentDistributionConf::get('provider_sub_types');
 		if(!isset($configs[$this->getConfigType()]))
@@ -53,7 +56,9 @@ class MsnDistributionProfile extends DistributionProfile
 		if(!isset($config['validator']) || !class_exists($config['validator']))
 			return array();
 			
-		return call_user_func_array(array($config['validator'], 'validateForSubmission'), array($this, $entryDistribution, $action));
+		$validatorClass = $config['validator'];
+		$validator = new $validatorClass();
+		return $validator->validateForSubmission($this, $entryDistribution, $action);
 	}
 
 	public function getUsername()				{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
