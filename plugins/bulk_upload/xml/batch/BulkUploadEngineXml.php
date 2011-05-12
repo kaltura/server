@@ -257,7 +257,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		return $entry;
 	}
 	
-	
 	/**
 	 * 
 	 * Handles xml bulk upload update
@@ -457,13 +456,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function handleItemDelete(SimpleXMLElement $item)
 	{
+		$this->impersonate();
+		
 		$entryId = "$item->entryId";
 		if(!$entryId)
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
 		$result = $this->kClient->baseEntry->delete($entryId);
-		
-		//TODO: should we check the result?
 		return;
 	}
 
