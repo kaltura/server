@@ -23,10 +23,10 @@ $arguments = uiConfDeployment::setArguments($argv);
 $includeCode = $arguments['include-code'];
 $skipAddUiconf = $arguments['no-create'];
 
-uiConfDeployment::checkArguments($arguments);
-
 //error_reporting(0);
 $confObj = uiConfDeployment::init($arguments['ini']); // get and read the config file
+
+uiConfDeployment::checkArguments($arguments);
 
 uiConfDeployment::$baseTag = $confObj->general->component->name; // gets the application name for the default tags 
 uiConfDeployment::$defaultTags = "autodeploy, ". uiConfDeployment::$baseTag . "_" . $confObj->general->component->version; // create the uiConf default tags (for ui confs of the application)
@@ -41,6 +41,9 @@ uiConfDeployment::deprecateOldUiConfs(uiConfDeployment::$defaultTags);
 
 //deploy all the ui confs
 uiConfDeployment::deploy($confObj);
+
+uiConfDeployment::setTemplatePartner();
+
 
 if($includeCode)
 {
@@ -84,6 +87,13 @@ class uiConfDeployment
 	 * @var unknown_type
 	 */
 	public static $arguments = array();
+	
+	/**
+	 * 
+	 * the partner for the ui conf deployment (currentlly defaulted to null)
+	 * @var int
+	 */
+	public static $partner = null;
 	
 	/**
 	 * 
@@ -553,11 +563,31 @@ class uiConfDeployment
 		{ 
 			echo "--partner argument wasn't given. Using defualt partner 0\n"; 
 		}
+		else 
+		{		
+			self::$partner = PartnerPeer::retrieveByPK($arguments['partner']);
+			if(!self::$partner)
+			{
+				die('no such partner.'.PHP_EOL);
+			}
+		}
 		
 		//Check if ini file exists
 		if(!file_exists($arguments['ini'])) 
 		{
 			uiConfDeployment::printUsage('config file not found '.$arguments['ini']); 
+		}
+	}
+	
+	/**
+	 * 
+	 * set template partner
+	 */
+	public static function setTemplatePartner()
+	{
+		if (!is_null(self::$partner)){
+			self::$partner->setTemplatePartnerId(self::$partner->getId());
+			self::$partner->save();
 		}
 	}
 }
