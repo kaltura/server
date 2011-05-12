@@ -63,6 +63,42 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		return date($format, $nextReport);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BaseEntryDistribution::getSunrise()
+	 */
+	public function getSunrise($format = 'Y-m-d H:i:s')
+	{
+		$sunrise = parent::getSunrise($format);
+		if(!is_null($sunrise))
+			return $sunrise;
+			
+		$entry = entryPeer::retrieveByPK($this->getEntryId());
+		if(!$entry)
+			return null;
+				
+		$sunrise = $entry->getStartDate($format);
+		if(!is_null($sunrise))
+			return $sunrise;
+			
+		return $entry->getCreatedAt($format);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseEntryDistribution::getSunset()
+	 */
+	public function getSunset($format = 'Y-m-d H:i:s')
+	{
+		$sunset = parent::getSunset($format);
+		if(!is_null($sunset))
+			return $sunset;
+			
+		$entry = entryPeer::retrieveByPK($this->getEntryId());
+		if(!$entry)
+			return null;
+				
+		return $entry->getEndDate($format);
+	}
+	
 	/**
 	 * @param int $sub_type
 	 * @throws string

@@ -426,10 +426,6 @@ class kContentDistributionManager
 		$entryDistribution->setDistributionProfileId($distributionProfile->getId());
 		$entryDistribution->setStatus(EntryDistributionStatus::PENDING);
 		
-		// TODO - take defaults from the distribution profile
-		$entryDistribution->setSunrise($entry->getStartDate(null));
-		$entryDistribution->setSunset($entry->getEndDate(null));
-		
 		self::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
 		self::assignThumbAssets($entryDistribution, $entry, $distributionProfile);
 		
