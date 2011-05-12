@@ -1836,6 +1836,7 @@ CREATE TABLE `invalid_session`
 	`ks` VARCHAR(300),
 	`ks_valid_until` DATETIME,
 	`created_at` DATETIME,
+	`actions_limit` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `ks_index`(`ks`)
 )Type=MyISAM;
