@@ -44,6 +44,12 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 	protected $created_at;
 
 	/**
+	 * The value for the actions_limit field.
+	 * @var        int
+	 */
+	protected $actions_limit;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -169,6 +175,16 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [actions_limit] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getActionsLimit()
+	{
+		return $this->actions_limit;
 	}
 
 	/**
@@ -319,6 +335,29 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 	} // setCreatedAt()
 
 	/**
+	 * Set the value of [actions_limit] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     invalidSession The current object (for fluent API support)
+	 */
+	public function setActionsLimit($v)
+	{
+		if(!isset($this->oldColumnsValues[invalidSessionPeer::ACTIONS_LIMIT]))
+			$this->oldColumnsValues[invalidSessionPeer::ACTIONS_LIMIT] = $this->actions_limit;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->actions_limit !== $v) {
+			$this->actions_limit = $v;
+			$this->modifiedColumns[] = invalidSessionPeer::ACTIONS_LIMIT;
+		}
+
+		return $this;
+	} // setActionsLimit()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -354,6 +393,7 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 			$this->ks = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
 			$this->ks_valid_until = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
 			$this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+			$this->actions_limit = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -363,7 +403,7 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 4; // 4 = invalidSessionPeer::NUM_COLUMNS - invalidSessionPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 5; // 5 = invalidSessionPeer::NUM_COLUMNS - invalidSessionPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating invalidSession object", $e);
@@ -736,6 +776,9 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 			case 3:
 				return $this->getCreatedAt();
 				break;
+			case 4:
+				return $this->getActionsLimit();
+				break;
 			default:
 				return null;
 				break;
@@ -761,6 +804,7 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 			$keys[1] => $this->getKs(),
 			$keys[2] => $this->getKsValidUntil(),
 			$keys[3] => $this->getCreatedAt(),
+			$keys[4] => $this->getActionsLimit(),
 		);
 		return $result;
 	}
@@ -804,6 +848,9 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 			case 3:
 				$this->setCreatedAt($value);
 				break;
+			case 4:
+				$this->setActionsLimit($value);
+				break;
 		} // switch()
 	}
 
@@ -832,6 +879,7 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setKs($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setKsValidUntil($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+		if (array_key_exists($keys[4], $arr)) $this->setActionsLimit($arr[$keys[4]]);
 	}
 
 	/**
@@ -847,6 +895,7 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(invalidSessionPeer::KS)) $criteria->add(invalidSessionPeer::KS, $this->ks);
 		if ($this->isColumnModified(invalidSessionPeer::KS_VALID_UNTIL)) $criteria->add(invalidSessionPeer::KS_VALID_UNTIL, $this->ks_valid_until);
 		if ($this->isColumnModified(invalidSessionPeer::CREATED_AT)) $criteria->add(invalidSessionPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(invalidSessionPeer::ACTIONS_LIMIT)) $criteria->add(invalidSessionPeer::ACTIONS_LIMIT, $this->actions_limit);
 
 		return $criteria;
 	}
@@ -906,6 +955,8 @@ abstract class BaseinvalidSession extends BaseObject  implements Persistent {
 		$copyObj->setKsValidUntil($this->ks_valid_until);
 
 		$copyObj->setCreatedAt($this->created_at);
+
+		$copyObj->setActionsLimit($this->actions_limit);
 
 
 		$copyObj->setNew(true);
