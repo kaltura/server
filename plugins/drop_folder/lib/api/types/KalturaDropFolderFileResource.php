@@ -51,4 +51,17 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 		$object_to_fill->setKeepOriginalFile(true);
 		return $object_to_fill;
 	}
+	
+	public function entryHandled(entry $dbEntry)
+	{
+		parent::entryHandled($dbEntry);
+		
+		$dropFolderFile = DropFolderFilePeer::retrieveByPK($this->dropFolderFileId);
+	
+		if (is_null($dropFolderFile))
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->dropFolderFileId);
+		
+		$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
+		$dropFolderFile->save();
+	}
 }

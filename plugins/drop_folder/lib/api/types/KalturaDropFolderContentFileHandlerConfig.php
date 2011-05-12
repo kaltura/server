@@ -7,7 +7,7 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 {	
 	
 	//TODO: should use the consts from DropFolderContentFileHandler
-	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.](?P<extension>\w+)/'; // matches "referenceId_flavorName.extension"
+	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.]\w+/'; // matches "referenceId_flavorName.extension"
 	
 	
 	/**
