@@ -32,6 +32,14 @@ class MsnDistributionProfile extends DistributionProfile
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::validateForSubmission()
 	 */
+	public function baseValidateForSubmission(EntryDistribution $entryDistribution, $action)
+	{
+		return parent::validateForSubmission($entryDistribution, $action);
+	}
+			
+	/* (non-PHPdoc)
+	 * @see DistributionProfile::validateForSubmission()
+	 */
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
 		if(!msnContentDistributionConf::hasParam('provider_sub_types'))

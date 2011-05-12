@@ -17,7 +17,7 @@ class MsnDistributionProfileValidator
 	
 	public static function validateForSubmission(MsnDistributionProfile $distributionProfile, EntryDistribution $entryDistribution, $action)
 	{
-		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
+		$validationErrors = $distributionProfile->baseValidateForSubmission($entryDistribution, $action);
 		
 		if(!class_exists('MetadataProfile'))
 			return $validationErrors;
