@@ -415,20 +415,22 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			//TODO: handle replacment entry issues
 		$this->kClient->baseEntry->update($entryId, $entry);
-		$updatedEntryId = "{1:result:id}";
 		
-		$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource); // updates the entry maybe use the replacment entry id
+		$updatedEntryId = "{1:result:id}";
+		$replacmentEntryId = "{1:result:replacingEntryId}";
+		
+		$this->kClient->baseEntry->updateContent($replacmentEntryId ,$resource); // updates the entry maybe use the replacment entry id
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
-			$this->kClient->flavorAsset->add($updatedEntryId, $flavorAsset, $flavorResource);
+			$this->kClient->flavorAsset->add($replacmentEntryId, $flavorAsset, $flavorResource);
 		}
 
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			$thumbResource = $noParamsThumbResources[$index];
-			$this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset, $thumbResource);
+			$this->kClient->thumbAsset->add($replacmentEntryId, $thumbAsset, $thumbResource);
 		}
 
 		$requestResults = $this->kClient->doMultiRequest();;
