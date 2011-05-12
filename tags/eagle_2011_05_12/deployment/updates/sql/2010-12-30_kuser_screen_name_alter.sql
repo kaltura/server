@@ -1,1 +1,0 @@
-ALTER TABLE  `kuser` CHANGE  `screen_name`  `screen_name` VARCHAR( 127 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;

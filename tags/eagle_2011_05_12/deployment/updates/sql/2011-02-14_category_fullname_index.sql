@@ -1,1 +1,0 @@
-ALTER TABLE category ADD INDEX full_name_index (full_name);
