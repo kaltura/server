@@ -1,0 +1,22 @@
+<?php 
+	$this->headLink()	->setIndent("	")
+						->appendStylesheet($this->baseUrl('css/jquery-ui/smoothness/jquery-ui-1.7.2.custom.css'))
+						->appendStylesheet($this->baseUrl('css/global.css'));
+					 
+	$this->headScript()	->setIndent("	")
+						->prependFile($this->baseUrl('js/jquery-1.3.2.min.js'))
+						->appendFile($this->baseUrl('js/jquery-ui-1.7.2.custom.min.js'))
+						->appendFile($this->baseUrl('js/jquery.form.js'));
+?>
+<?php echo $this->doctype().PHP_EOL; ?>
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head>  
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Kaltura Admin Console</title>
+<?php echo $this->headLink()->toString().PHP_EOL; ?>
+<?php echo $this->headScript()->toString().PHP_EOL;?>
+</head> 
+<body id="<?php echo $this->cssId(); ?>">
+<?php echo $this->layout()->content ?>
+</body>
+</html>

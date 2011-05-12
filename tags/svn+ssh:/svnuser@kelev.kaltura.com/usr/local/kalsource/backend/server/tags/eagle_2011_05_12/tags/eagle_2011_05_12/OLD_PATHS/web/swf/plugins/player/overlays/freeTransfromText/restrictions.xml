@@ -1,0 +1,50 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Draggable Text</name>
+	<restrictions>	
+		<restriction type="string" default="Sample text.">
+			<id>text</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>textXPos</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>textYPos</id>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>textRotation</id>
+		</restriction>
+		
+		<restriction type="number" default="1">
+			<id>textScaleX</id>
+		</restriction>
+		
+		<restriction type="number" default="1">
+			<id>textScaleY</id>
+		</restriction>
+		
+		<restriction type="number" default="0xffffff">
+			<id>fontColor</id>
+		</restriction>
+		
+		<restriction type="string" default="Arial">
+			<id>fontName</id>
+			<enums>
+				<enum value="Amsterdam"/>
+				<enum value="Arial"/>
+				<enum value="Arista"/>
+				<enum value="Berthsid"/>
+				<enum value="Chopin"/>
+				<enum value="Coolvetica"/>
+				<enum value="Grotesk"/>
+				<enum value="Retriga"/>
+				<enum value="Scribblings"/>
+			</enums>
+		</restriction>
+		
+	</restrictions>
+</definition>

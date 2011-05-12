@@ -1,0 +1,167 @@
+# default rules
+corp:
+  url:   /corp
+  param: { module: corp , action: index }
+
+home:
+  url:   /home
+  param: { module: home , action: index }
+
+homepage:
+  url:   /
+  param: { module: corp, action: index }
+
+default_symfony:
+  url:   /symfony/:action/*
+  param: { module: default }
+
+home:
+  url:   /home
+  param: { module: home , action: index }
+
+tour:
+  url:   /tour
+  param: { module: tour , action: tour }
+
+shows:
+  url:   /shows
+  param: { module: browse , action: defBrowse }
+
+
+browse:
+  url:   /browse
+  param: { module: browse , action: browse2 }
+
+contribute:
+  url:   /contribute
+  param: { module: contribute , action: defContribute }
+
+edit:
+  url:   /edit
+  param: { module: edit , action: defEdit }
+
+emailImport:
+  url:   /emailImport
+  param: { module: emailImport , action: defEmailImport }
+
+kshowcss:
+  url:   /kshowcss
+  param: { module: kshowcss , action: defKshowcss }
+
+flvprovider:
+  url:   /flv/:file_info
+  param: { module: keditorservices , action: flvprovider }
+  
+keditorservices:
+  url:   /keditorservices
+  param: { module: keditorservices , action: defKeditorservices }
+
+login:
+  url:   /login
+  param: { module: login , action: signin }
+
+mail:
+  url:   /mail
+  param: { module: mail , action: defMail }
+
+mykaltura:
+  url:   /mykaltura
+  param: { module: mykaltura , action: defMykaltura }
+
+produce:
+  url:   /produce
+  param: { module: produce , action: defProduce }
+
+search:
+  url:   /search
+  param: { module: search , action: defSearch }
+
+ #sns:
+ #  url:   /sns
+ #  param: { module: sns , action: defSns }
+
+static:
+  url:   /static
+  param: { module: static , action: defStatic }
+
+help:
+  url:   /help
+  param: { module: forum , action: defForum }
+
+system:
+  url:   /system
+  param: { module: system , action: defSystem }
+
+upload:
+  url:   /upload
+  param: { module: upload , action: defUpload }
+
+view:
+  url:   /view
+  param: { module: view , action: defView }
+
+widget:
+  url:  /widget/:kshow_id/:entry_id/:kmedia_type
+  param: { module: browse , action: widget }
+
+widget2:
+  url:  /widget/:kshow_id/:entry_id/:kmedia_type/:widget_type
+  param: { module: browse , action: widget }
+
+widget3:
+  url:  /widget/:kshow_id/:entry_id/:kmedia_type/:widget_type/:version
+  param: { module: browse , action: widget }
+
+widget4:
+  url:  /widget/:kshow_id/:entry_id/:kmedia_type/:widget_type/:version/:kdata
+  param: { module: browse , action: widget }
+
+kwidgetThumbail:
+  url:  /kwidget/thumbnail/:wid
+  param: { module: extwidget, action: getWidgetThumbnail }
+  
+kwidget:
+  url:  /kwidget/*
+  param: { module: extwidget , action: kwidget }
+
+forum:
+  url:   /forum
+  param: { module: forum , action: defForum }
+
+extservices:
+  url:   /extservices
+  param: { module: extservices , action: defExtservices }
+
+partnerservices:
+  url:   /partnerservices
+  param: { module: partnerservices , action: defPartnerservices }
+
+partnerservices2testme:
+  url:   /partnerservices2/testme
+  param: { module: partnerservices2 , action: testme }
+
+partnerservices2:
+  url:   /partnerservices2/:myaction
+  param: { module: partnerservices2 , action: defPartnerservices2base }
+
+cms_player_widget:
+  url: /cms/playerWidget/:kshow_id/:entry_id
+  param: { module: cms, action: playerWidget }
+
+cms:
+  url:   /cms
+  param: { module: cms , action: signup }
+
+kmc:
+  url:   /kmc
+  param: { module: kmc , action: kmc }
+
+default_index:
+  url:   /:module
+  param: { action: index }
+
+
+default:
+  url:   /:module/:action/*
+
+

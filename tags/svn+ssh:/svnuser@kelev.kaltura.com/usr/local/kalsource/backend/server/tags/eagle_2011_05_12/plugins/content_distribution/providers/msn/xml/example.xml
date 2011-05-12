@@ -1,0 +1,42 @@
+<video xmlns="urn:schemas-microsoft-com:msnvideo:catalog" xmlns:php="http://php.net/xsl">
+	<uuid />
+	<providerId>0_4c6o03wp</providerId>
+	<csId>Fox Sports</csId>
+	<source>FOX_big12</source>
+	<pageGroup />
+	<title>MSN test 1</title>
+	<description>My msn test</description>
+	<durationSecs>26</durationSecs>
+	<activeEndDate>2011-01-08T10:56:00Z</activeEndDate>
+	<searchableEndDate>2011-01-08T10:56:00Z</searchableEndDate>
+	<archiveEndDate>2011-01-08T10:56:00Z</archiveEndDate>
+	<tags>
+		<tag market="us" namespace="MSNVideo_Cat">FOX_big12</tag>
+		<tag market="us" namespace="MSNVideo_Top">Fox Sports</tag>
+		<tag market="us" namespace="MSNVideo_Top_Cat">Fox Sports_FOX_big12</tag>
+		<tag market="us" namespace="Public">Fox Sports</tag>
+	</tags>
+	<videoFiles>
+		<videoFile formatCode="1001">
+			<uri>http://kaltura.trunk/p/1/sp/100/serveFlavor/flavorId/0_vo1lfb5n</uri>
+		</videoFile>
+		<videoFile formatCode="1002">
+			<uri>http://kaltura.trunk/p/1/sp/100/serveFlavor/flavorId/0_qz9lzewf</uri>
+		</videoFile>
+		<videoFile formatCode="1003">
+			<uri>http://kaltura.trunk/p/1/sp/100/serveFlavor/flavorId/0_qz9lzewf</uri>
+		</videoFile>
+	</videoFiles>
+	<files>
+		<file formatCode="2009">
+			<uri>http://kaltura.trunk/api_v3/service/thumbAsset/action/serve/partnerId/1/thumbAssetId/0_1e6adevn</uri>
+		</file>
+	</files>
+	<extendedXml>
+		<relatedLinks>
+			<link url="http://www.foxsports.com">FOXSports.com on MSN</link>
+			<link url="http://msn.foxsports.com/other/page/fox-flash">Watch latest sports news and highlights</link>
+			<link url="http://msn.foxsports.com/video">More FOXSports.com video</link>
+		</relatedLinks>
+	</extendedXml>
+</video>

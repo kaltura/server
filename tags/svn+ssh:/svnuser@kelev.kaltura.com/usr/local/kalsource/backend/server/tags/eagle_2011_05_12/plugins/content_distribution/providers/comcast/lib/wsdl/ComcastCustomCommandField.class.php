@@ -1,0 +1,102 @@
+<?php
+
+
+class ComcastCustomCommandField extends SoapObject
+{				
+	const _ID = 'ID';
+					
+	const _URL = 'URL';
+					
+	const _URLPASSWORD = 'URLPassword';
+					
+	const _URLUSERNAME = 'URLUserName';
+					
+	const _ADDED = 'added';
+					
+	const _ADDEDBYUSER = 'addedByUser';
+					
+	const _ADDEDBYUSEREMAILADDRESS = 'addedByUserEmailAddress';
+					
+	const _ADDEDBYUSERID = 'addedByUserID';
+					
+	const _ADDEDBYUSERNAME = 'addedByUserName';
+					
+	const _CONFIRMATIONALERT = 'confirmationAlert';
+					
+	const _DESCRIPTION = 'description';
+					
+	const _DISABLED = 'disabled';
+					
+	const _INDEX = 'index';
+					
+	const _LASTMODIFIED = 'lastModified';
+					
+	const _LASTMODIFIEDBYUSER = 'lastModifiedByUser';
+					
+	const _LASTMODIFIEDBYUSEREMAILADDRESS = 'lastModifiedByUserEmailAddress';
+					
+	const _LASTMODIFIEDBYUSERID = 'lastModifiedByUserID';
+					
+	const _LASTMODIFIEDBYUSERNAME = 'lastModifiedByUserName';
+					
+	const _LOCKED = 'locked';
+					
+	const _MAXIMUMITEMS = 'maximumItems';
+					
+	const _MAXIMUMITEMSALERT = 'maximumItemsAlert';
+					
+	const _MINIMUMITEMS = 'minimumItems';
+					
+	const _MINIMUMITEMSALERT = 'minimumItemsAlert';
+					
+	const _ONLYFOROWNEDITEMS = 'onlyForOwnedItems';
+					
+	const _ONLYFOROWNEDITEMSALERT = 'onlyForOwnedItemsAlert';
+					
+	const _OPENINNEWWINDOW = 'openInNewWindow';
+					
+	const _OWNER = 'owner';
+					
+	const _OWNERACCOUNTID = 'ownerAccountID';
+					
+	const _REQUIREDCAPABILITYTYPES = 'requiredCapabilityTypes';
+					
+	const _SHOWASDIALOG = 'showAsDialog';
+					
+	const _SHOWSCROLLBARS = 'showScrollbars';
+					
+	const _SHOWTOREADONLYUSERS = 'showToReadOnlyUsers';
+					
+	const _SHOWTOSTANDARDUSERS = 'showToStandardUsers';
+					
+	const _TITLE = 'title';
+					
+	const _USESELECTION = 'useSelection';
+					
+	const _VERSION = 'version';
+					
+	const _VIEWS = 'views';
+					
+	const _WINDOWHEIGHT = 'windowHeight';
+					
+	const _WINDOWNAME = 'windowName';
+					
+	const _WINDOWWIDTH = 'windowWidth';
+					
+	protected function getAttributeType($attributeName)
+	{
+		switch($attributeName)
+		{	
+			default:
+				return parent::getAttributeType($attributeName);
+		}
+	}
+					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
+}
+
+

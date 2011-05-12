@@ -1,0 +1,224 @@
+ll @CHARSET "UTF-8";
+body, html{ height: 100%; }
+
+body{
+	color: #fff;
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 100.2%;
+	line-height:1.3;
+	background: #0c0e10 url(../images/main_bg.gif) 0 0 repeat-x; 
+}
+
+
+/*--------------------------------
+	Defaults 
+---------------------------------*/
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, 
+abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, 
+strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, 
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+}
+
+small, sup, sub { font-size: 85%; }
+big { font-size: 125%; line-height: 120%; }
+h1{ color: #79B4C8; font-size: 2.6em; font-weight: normal; margin-bottom: 15px; }
+h1.logo { color: #000; font-size: 26px; font-weight: bold; }
+h2{ color: #ED9C19; font-weight: normal; margin-bottom: 10px; font-size: 1.6em; }
+h3{ font-size:1.2em; }
+h4{ font-size:1em; }
+
+
+a{ color:#4d9eba; text-decoration:none; cursor:pointer; }
+a:hover{ color:#000; }
+table{ border: none; }
+ul, ol, dir, menu { list-style:none; }
+	.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }	/* Controls the BR tag, which makes the WRAPPER float stretch for GECKO */
+	.clearfix {display: inline-block; }
+	/* Hides from IE-mac \*/
+		* html .clearfix { height: 1%; }
+		.clearfix { display: block; }
+	/* End hide from IE-mac */
+
+:focus { -moz-outline-style: none; outline:none; }
+*::-moz-selection { background:#93BBC8; color:#000; }
+img{ border:none; }
+	
+.floatl{ float: left; }
+.floatr{ float: right; }
+.floatn{ float: none; }
+.center{ margin:0 auto; }
+.btt{ line-height:6em; }
+.med{ font-size:1.2em; }
+.big{ font-size:1.5em; }
+
+p { margin: 10px 0; line-height: 150%; }
+pre { font-size: 14px; }
+/*-------------------------------- 
+	Buttons
+---------------------------------*/
+button.btn{ border:0; color:#666; font-weight:bold; background:none; position:relative; cursor:pointer; background:url(../images/buttons_white_bg.png) right -34px repeat-x; padding:0 5px; }
+button.disabled{ color:#888; opacity:0.6; filter:alpha(opacity=60); }
+	button.btn b{ display: block; height:34px; width:7px; float:left; position: absolute; left:-2px; top:0; background:url(../images/buttons_white_bg.png) 0 -34px no-repeat; }
+	button.btn div{ font-size:1.2em; line-height:30px; }
+	html>/**/body button.btn{ padding:0 20px; }
+	html>/**/body button.btn b{ top:-1px; left:-24px; }
+	html>/**/body button.btn div{ line-height:32px; height:32px; }
+
+button.btn:hover{ background-position: right 0; color:#222; }
+	button.btn:hover b{ background-position: 0 0; }
+	
+button.btn-hover{ background-position: right 0; color:#222; }
+	button.btn-hover b{ background-position: 0 0; }
+	
+
+/*-------------------------------- 
+	Default Form
+---------------------------------*/
+fieldset{ border:0 none; }
+input, textarea{ color:#444; font-family:arial; font-weight:bold; padding:4px; }
+input{ border:1px solid #CCC; background:#F4F4F4 none; }
+input[disabled], textarea[disabled]{ color:#888; }
+textarea{ overflow:auto; border:1px solid #CCC; background:#F4F4F4 none; }
+legend{ color:#79B4C8; font-size:1.5em; padding: 0 5px; }
+input:focus, .formPage form textarea:focus{ background-color:#FBFBFB; color:#FD3E3C; }
+select:focus{ background-color:#FBFBFB; }
+input.checkbox, input.radio { border: 0; background: none; }
+
+
+
+/*-------------------------------- 
+	Header
+---------------------------------*/
+#header{ width:955px; height:135px; z-index:1; }
+	#header ul#menu { margin: 35px 0 0 0; padding: 0; }
+	#header ul#menu li { float: left; margin: 0 40px 0 0; font-size: 16px; }
+	#header ul#menu li a.active { color: #000; }
+	
+/*-------------------------------- 
+	Footer
+---------------------------------*/
+#footer{ clear:both; font-size:0.7em; width: 930px; margin:10px auto; padding-bottom:20px; }
+	#footer .content{ float:left; width:60%; color:#ddd; }
+	#footer ul{ cursor:default; float: right; }
+		#footer ul li{ display:inline; padding:0 0 0 35px; xfont-weight:bold; }
+	#footer a{ color:#A1B2B8; }
+	#footer a:hover{ color:#fff; }
+
+/*-------------------------------- 
+	General
+---------------------------------*/
+#wrap{ font-size:0.75em; }
+
+#contWrap{ width:950px; margin:0 auto; z-index:5; position:relative; xz-index:10; min-height:500px; }
+	#bottomCorners, #bottomCorners div{ width:950px; height:5px; margin:0 auto; margin-bottom: 9px; background:#fff url(../images/bottom_corners.gif) 0 0 no-repeat; overflow:hidden; }
+	#bottomCorners div{ width:6px; height:100%; background-position: 0 -5px; float:right; }
+* html #contWrap{ min-height:500px; }
+#contWrap.innerpage{ padding-bottom: 20px; }
+
+#contWrap #row1 ul.extBoxs{ margin:20px 0 50px 0; padding:0; }
+	#contWrap #row1 .extBoxs li.box{ float:left; margin:0 42px 25px 0; padding:0; width:404px; background:#F2F5F6 url(/images/corp/extBox.png) 0 -13px no-repeat; overflow:hidden; }
+	#contWrap #row1 .extBoxs2 li.box{ width:280px; margin:0 5px 20px 0; background-image:url(/images/corp/extBox2.png); } /* shorter image, so 3 could fit one beside the other */
+		#contWrap #row1 .extBoxs li.box .contwrap{ margin-top:10px; border-left:1px solid #e0e8eb; border-right:1px solid #e0e8eb; }
+			#contWrap #row1 .extBoxs li.box .contwrap .content{ min-height:175px; line-height:1.4; color:#2a210d; padding:0px 15px; border-left:2px solid #fff; border-right:2px solid #fff; overflow:hidden; }
+				#contWrap #row1 .extBoxs li.box .contwrap .content .inner{ margin:3.5em  0 1em 0; }
+					#contWrap #row1 .extBoxs .title div{ float:left; width:46px; height:46px; margin:0pt 8px 0pt -5px; background: url(/images/corp/extIconPack.png) 0 -92px no-repeat; }
+					#contWrap #row1 .extBoxs .title h2{ color:#555; padding-top:5px; font-size:1.7em; }
+					#contWrap #row1 .extBoxs .inner ul{ color:#5b6468; font-size:1.2em; font-weight:bold; }	
+					#contWrap #row1 .extBoxs .inner p{ color:#5b6468; padding:0 15px; font-size:1.5em; xfont-weight:bold; }	
+					* html #contWrap #row1 .extBoxs .inner ul li{ background: url(/images/corp/bullet_bluebg.gif) 0 0 no-repeat; }
+				#contWrap #row1 .extBoxs li.box .contwrap .content center p{ font-size:2em; color:#aebfc4; margin:0; }
+		#contWrap #row1 .extBoxs li.box .bottomCorner{ height:13px; background:url(/images/corp/extBox.png) 0 0 no-repeat; overflow:hidden; }
+		#contWrap #row1 .extBoxs2 li.box .bottomCorner{ background-image:url(/images/corp/extBox2.png); }
+
+
+/*-------------------------------- 
+	Inner Pages
+---------------------------------*/		
+.innerpage{ color:#333; background:white url(../images/top_white_grad.gif) 0 -240px repeat-x; }		
+	.innerpage .ipleftSide{ width:6px; height:120px; position:absolute; left:0; top:0; background:url(../images/top_white_grad.gif) 0 0 no-repeat; }
+	.innerpage .iprightSide{ background-position:0 -120px; left:auto; right:0; }	
+
+	
+/*-------------------------------- 
+	row1
+---------------------------------*/
+.innerpage #row1{ padding: 15px 25px 0 25px; margin-top: 10px; }
+.innerpage #row2 { text-align: center; }
+
+.innerpage #howItWorks { font-size: 1.2em; display: none; }
+.innerpage #howItWorks ul { width: 650px; margin: 0 150px; }
+	.innerpage #howItWorks ul li { text-align:left; background: url(../images/bullet_24.png) no-repeat scroll 0 0.2em; padding: 0 20px 15px 20px; }
+		.innerpage #howItWorks ul li div.code { overflow: hidden; width: 100%; border:1px solid #CCC; background:#F4F4F4 none; font-weight: bold; font-size: 0.9em; padding: 4px; margin-top: 3px; margin-bottom: 2px; }
+		.innerpage #howItWorks ul li div.scroll { overflow: scroll; }
+		
+
+ul.footerNav { width: 320px; margin: 0 auto; height: 25px; }
+ul.footerNav li { float: left; width: 80px; }
+ul.footerNav li a { color: #fff; }
+ul.footerNav li a:hover { color: #ddd; }
+
+/*-------------------------------- 
+	Add Video Page
+---------------------------------*/
+.addVideoPage #kcwWrap { height: 360px; margin: 40px 85px 40px 85px; }
+	.addVideoPage #kcw { }
+
+/*-------------------------------- 
+	Video Editor Page
+---------------------------------*/
+.videoEditorPage #kseWrap { height: 546px; margin: 0 0 20px -20px; }
+	.videoEditorPage #kse { }
+	
+/*-------------------------------- 
+	Player For Advanced Editor Page
+---------------------------------*/
+#contWrap.playerForAdvancedPage { min-height: 0; }
+.playerForAdvancedPage #kplayerWrap { height: 365px; width:410px; margin: 0 auto; }
+.playerForAdvancedPage button { width: 140px; margin: 0 auto; display: block; }
+
+/*-------------------------------- 
+	Playlists Page
+---------------------------------*/
+.playlistsPage #kaltura_playlist_horizontal_wrap { margin: 10px 0 30px 0; width: 724px; height: 322px; }
+.playlistsPage #kaltura_playlist_vertical_wrap { margin: 10px 0 30px 0; width: 400px; height: 600px; }
+.playlistsPage iframe { margin: 10px 0; border: 0; overflow: hidden; display: block; }
+
+/*-------------------------------- 
+	Players Page
+---------------------------------*/
+#contWrap.playersPage { min-height: 0; }
+#contWrap.playersPage .playerBox { float: left; margin: 25px 25px 25px 0; }
+#contWrap.playersPage .more { font-size: 14px; }
+
+/*-------------------------------- 
+	Player Page
+---------------------------------*/
+.playerPage #kplayerWrap { height: 365px; width: 410px; margin: 0px 220px 40px 220px; }
+.playerPage #kplayer { }
+.playerPage .back { margin-top: 10px; }
+
+/*-------------------------------- 
+    Image Page 
+---------------------------------*/
+.imagePage .imageEntry { display: block; margin: 0 auto; padding: 20px; }
+
+/*-------------------------------- 
+	Gallery Page
+---------------------------------*/
+.galleryPage div.options { position: absolute; top: 15px; right: 15px; }
+.galleryPage div.options input { position: relative; top: 2px; width: 12px; margin-right: 5px; background: none; border: 0; }
+.galleryPage div.options label { margin-right: 10px; }
+.galleryPage ul#entries { list-style: none; }
+	.galleryPage ul#entries li { float: left; width: 180px; margin: 0 15px 30px 15px; padding: 10px 0 5px 0; text-align: center; background:url("../images/entries_bg.png") center 0 no-repeat; }
+		.galleryPage ul#entries li .name { height: 35px; overflow: hidden; font-weight: bold; padding: 0 5px; }
+		.galleryPage ul#entries li .thumb { height: 90px; }
+		.galleryPage ul#entries li img { width: 120px; height: 90px; }
+		.galleryPage ul#entries li div.buttons { margin-top: 10px; }
+		.galleryPage ul#entries li div.buttons a { margin: 0 5px; }
+.galleryPage div#pager { text-align: center; margin-bottom: 40px; }
+	.galleryPage div#pager span.pages { font-weight: bold; padding: 2px 5px; margin: 5px; border: solid 1px #CCCCCC; }
+	.galleryPage div#pager span.current { background-color: #4d9eba; color: #fff; }
+	.galleryPage div#pager span.dots { border: 0; }
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProgramDescription>
+  <ProgramInformationTable>
+    <ProgramInformation>
+      <BasicDescription>
+        <Title>World Series Preview: Game 1</Title>
+        <ShortTitle>World Series Preview: Game 1</ShortTitle>
+        <Synopsis>Jim Bowden and Kevin Kennedy preview Game 1 of
+        the World Series. Plus, hear from Mark Kriegel.</Synopsis>
+        <Keyword>Giants, Video, AL West, NL West, Playoffs, MLB,
+        World Series, World Series, Baseball, AL, MLB, NL,
+        Rangers</Keyword>
+        <ReleaseInformation>
+          <ReleaseDate>
+            <DayAndYear>10-26-2010</DayAndYear>
+          </ReleaseDate>
+        </ReleaseInformation>
+      </BasicDescription>
+    </ProgramInformation>
+  </ProgramInformationTable>
+  <ProgramLocationTable>
+    <ProgramLocation>
+      <OnDemandProgram>
+        <Program>
+        http://video.foxsports.com/partners/idetic/1_b_101026_brother_game1_fullshow.mpg</Program>
+        <EndOfAvailability>2012-10-25T04:00:00Z</EndOfAvailability>
+      </OnDemandProgram>
+    </ProgramLocation>
+  </ProgramLocationTable>
+</ProgramDescription>

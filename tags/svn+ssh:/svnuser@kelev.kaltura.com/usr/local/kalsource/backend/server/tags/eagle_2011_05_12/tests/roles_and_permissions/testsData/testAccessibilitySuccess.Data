@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <UnitTestsData>
+  	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="unitTests@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="userkmc1@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="userkmc2@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="userkmc3@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="userkmc4@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="userkmc5@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="cb24b935480963373e0922fde9e147e7" serviceUrl="www.kaltura.co.cc" isAdmin="0" userId="enduser1"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="741" secret="4442d0abb393f4df80fcdec0acabba8c" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="enduser2"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+  </UnitTestsData>
+</UnitTests>

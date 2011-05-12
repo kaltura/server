@@ -1,0 +1,55 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>simpleTextOverlay</name>
+	<restrictions>	
+		<restriction type="string" default="Sample text.">
+			<id>text</id>
+		</restriction>
+		
+		<restriction type="number" default="40">
+			<id>fontSize</id>
+			<range>
+				<stepSize value="1" />
+				<min value="8"/>
+				<max value="72"/>
+			</range>
+		</restriction>
+		
+		<restriction type="string" default="Arial">
+			<id>fontName</id>
+			<enums>
+				<enum value="Amsterdam"/>
+				<enum value="Arial"/>
+				<enum value="Arista"/>
+				<enum value="Berthsid"/>
+				<enum value="Chopin"/>
+				<enum value="Coolvetica"/>
+				<enum value="Grotesk"/>
+				<enum value="Retriga"/>
+				<enum value="Scribblings"/>
+			</enums>
+		</restriction>
+		
+
+		
+		<restriction type="number" default="0x000000">
+			<id>fontColor</id>
+		</restriction>
+		
+		<restriction type="string" default="Center">
+			<id>textPosition</id>
+			<enums>
+				<enum value="Top" />
+				<enum value="Center" />
+				<enum value="Bottom" />
+			</enums>
+		</restriction>
+		
+		<restriction type="number" default="0">
+			<id>rotation</id>
+			
+		</restriction>
+		
+	</restrictions>
+</definition>

@@ -1,0 +1,5 @@
+generator:
+  class:              sfPropelCrudGenerator
+  param:
+    model_class:      ##MODEL_CLASS##
+    theme:            default

@@ -1,0 +1,83 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This table will block all services
+aliases for the columns:
+name = 	service name
+id =	id
+------------------------------------------------
+name						|id			|ticket	
+------------------------------------------------
+addbulkupload				|			|N
+addconversionprofile		|			|N
+adddownload					|			|N		
+adddvdentry					|			|N		
+adddvdjob					|			|N		
+addentry					|			|N		
+addkshow					|			|N		
+addmoderation				|			|N		
+addpartnerentry				|			|N		
+addplaylist					|			|N		
+addroughcutentry			|			|N		
+appendentrytoroughcut		|			|N		
+clonekshow					|			|N		
+cloneroughcut				|			|N		
+deleteentry					|			|N		
+deletekshow					|			|N		
+deleteplaylist				|			|N		
+executeplaylist				|			|N
+executeplaylistfromcontent	|			|N
+getadmintags				|			|N		
+getallentries				|			|N		
+getdvdentry					|			|N		
+getentries					|			|N		
+getentry					|			|N
+getentryroughcuts			|			|N
+getfilehash					|			|N		
+getkshow					|			|N		
+getlastversionsinfo			|			|N		
+getmetadata					|			|N		
+getpartner					|			|N		
+getplaylist					|			|N		
+getplayliststatsfromcontent	|			|N
+getroughcut					|			|N		
+getthumbnail				|			|N
+getwidget					|			|N
+listbulkuploads				|			|N
+listconversionprofiles		|			|N
+listdownloads				|			|N		
+listdvdentries				|			|N		
+listentries					|			|N		
+listkshows					|			|N		
+listmoderations				|			|N		
+listmydvdentries			|			|N		
+listmyentries				|			|N		
+listmykshows				|			|N		
+listpartnerentries			|			|N		
+listplaylists				|			|N		
+mrss						|			|N		
+myMultiRequest				|			|N		
+objdetails					|			|N
+rankkshow					|			|N		
+reportentry					|			|N		
+reporterror					|			|N		
+reportkshow					|			|N		
+rollbackkshow				|			|N		
+setmetadata					|			|N		
+startwidgetsession			|			|N		
+transcode					|			|N
+updatebatchjob				|			|N
+updatedvdentry				|			|N		
+updateentriesthumbnails		|			|N		
+updateentry					|			|N		
+updateentrythumbnail		|			|N		
+updateentrythumbnailjpeg	|			|N		
+updatekshow					|			|N		
+updatekshowowner			|			|N		
+updateplaylist				|			|N		
+upload						|			|N		
+uploadjpeg					|			|N		
+viewwidget					|			|N		
+webcamdummy					|			|N		
+------------------------------------------------
+                                                 	 

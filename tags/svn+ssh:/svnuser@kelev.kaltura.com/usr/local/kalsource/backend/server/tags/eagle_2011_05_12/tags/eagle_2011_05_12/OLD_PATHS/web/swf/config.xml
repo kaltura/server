@@ -1,0 +1,35 @@
+<XML>
+	<DebugFromIDE>
+		0
+	</DebugFromIDE>
+	<server>
+		<url>
+			www.kaltura.com
+		</url>
+		<defaultKshowID>
+			-1
+		</defaultKshowID>
+		<defaultEntryID>
+			-1
+		</defaultEntryID>
+		<XMLsource>
+			server	
+		</XMLsource>
+		<PluginsFolder url="swf/plugins">
+			<TransitionsFolder>
+				transitions
+			</TransitionsFolder>
+			<OverlaysFolder>
+				overlays
+			</OverlaysFolder>
+			<EffectsFolder>
+				effects
+			</EffectsFolder>
+		</PluginsFolder>
+	</server>
+	<ExtraInfo>
+		<LogoURL>
+			kalturaLogo.png
+		</LogoURL>
+	</ExtraInfo>
+</XML>

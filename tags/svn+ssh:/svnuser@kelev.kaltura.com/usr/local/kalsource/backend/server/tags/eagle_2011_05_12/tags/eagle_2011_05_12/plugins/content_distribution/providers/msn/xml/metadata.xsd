@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="metadata">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="MSNVideoCat" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation/>
+            <xsd:appinfo>
+              <label>MSNVideo_Cat</label>
+              <key>MSNVideo_Cat</key>
+              <searchable>true</searchable>
+              <description/>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="MSNVideoTop" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation/>
+            <xsd:appinfo>
+              <label>MSNVideo_Top</label>
+              <key>MSNVideo_Top</key>
+              <searchable>true</searchable>
+              <description/>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="MSNVideoTopCat" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation/>
+            <xsd:appinfo>
+              <label>MSNVideo_Top_Cat</label>
+              <key>MSNVideo_Top_Cat</key>
+              <searchable>true</searchable>
+              <description/>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="MSNPublic" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>MSNPublic</label>
+              <key>MSNPublic</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="textType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="dateType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:long"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="objectType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:simpleType name="listType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+</xsd:schema>

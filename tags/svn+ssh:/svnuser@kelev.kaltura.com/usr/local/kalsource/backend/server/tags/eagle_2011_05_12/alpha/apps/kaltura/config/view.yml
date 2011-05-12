@@ -1,0 +1,19 @@
+default:
+  http_metas:
+    content-type: text/html
+
+  metas:
+    title:        Kaltura - Open Source Video Platform
+    robots:       index, follow
+    description:  Kaltura homepage
+    keywords:     production, shows, talent, discover, contribute, share, enhance, first open source video platform, video editing, media collaboration, online video, movie, wikimentaries, wiki
+    language:     en
+    verify-v1:    JIjZEB+ZCdDyAw49II0fIpcLfFc40M9EzXEY5/Tva68=
+
+  stylesheets:    [wizards]
+
+  javascripts:    [ jqkaltura.js, utils ]
+
+  has_layout:     off
+  layout:         layout2
+

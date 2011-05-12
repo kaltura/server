@@ -1,0 +1,61 @@
+<?php
+/**
+ * @package plugins.verizonDistribution
+ * @subpackage api.objects
+ */
+class KalturaVerizonDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * @var string
+	 */
+	public $username;
+	
+	/**
+	 * @var string
+	 */
+	public $password;
+	
+	/**
+	 * @var string
+	 */
+	public $domain;
+
+	/**
+	 * @var string
+	 */
+	public $providerName;
+
+	/**
+	 * @var string
+	 */
+	public $providerId;
+	
+	/**
+	 * @var int
+	 */
+	public $vrzFlavorParamsId;
+
+	/**
+	 * @var int
+	 */
+	public $metadataProfileId;
+	
+	/*
+	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
+	 */
+	private static $map_between_objects = array 
+	(
+		'username',
+		'password',
+		'domain',
+		'providerName',
+		'providerId',
+		'vrzFlavorParamsId',
+		'metadataProfileId',
+	 );
+		 
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+}

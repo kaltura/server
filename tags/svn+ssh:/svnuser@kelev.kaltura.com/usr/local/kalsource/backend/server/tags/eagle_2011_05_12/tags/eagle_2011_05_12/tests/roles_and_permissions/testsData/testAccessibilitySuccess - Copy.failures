@@ -1,0 +1,317 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <Failures>
+    <UnitTestFailures>
+      <Inputs>
+        <Input type="string" stringId="103"/>
+        <Input type="string" stringId="554ac9ee29650a512affd04d328f472b"/>
+        <Input type="string" stringId="local.trunk"/>
+        <Input type="string" stringId="1"/>
+        <Input type="string" stringId="1234"/>
+      </Inputs>
+      <Failures>
+        <Failure>
+          <Field>batchcontrol::reportstatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::configloaded</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::setcommandresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>4096</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Object of class KalturaControlPanelCommandStatus could not be converted to string</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::reportstatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::configloaded</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INTERNAL_SERVERL_ERROR</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Internal server error occured</Message>
+        </Failure>
+        <Failure>
+          <Field>batchcontrol::setcommandresult</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "PENDING" for parameter "status", expecting enumeration type "KalturaControlPanelCommandStatus"</Message>
+        </Failure>
+        <Failure>
+          <Field>batch::resetjobexecutionattempts</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>batch::freeexclusivejob</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>batch::getexclusivejobs</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>batch::getexclusivealmostdone</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>data::serve</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, class 'KalturaDataService' does not have a method 'serve'</Message>
+        </Failure>
+        <Failure>
+          <Field>document::addfromentry</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>document::addfromflavorasset</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>document::convert</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>2</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>call_user_func_array() expects parameter 1 to be a valid callback, first array member is not a valid class name or object</Message>
+        </Failure>
+        <Failure>
+          <Field>jobs::getstatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>jobs::deletejob</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>jobs::abortjob</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>jobs::retryjob</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::addfrombulk</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "ENTRY" for parameter "objectType", expecting enumeration type "KalturaMetadataObjectType"</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;delete] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;get] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;update] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadata::updatefromfile</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadata-&gt;updateFromFile] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::listfields</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;listFields] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::add</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;add] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::delete</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;delete] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;get] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::update</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;update] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataProfile::revert</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [metadataProfile-&gt;revert] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataBatch::resetjobexecutionattempts</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataBatch::freeexclusivejob</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataBatch::getexclusivejobs</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>metadataBatch::getexclusivealmostdone</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>INVALID_ENUM_VALUE</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Invalid enumeration value "CONVERT" for parameter "jobType", expecting enumeration type "KalturaBatchJobType"</Message>
+        </Failure>
+        <Failure>
+          <Field>storageProfile::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>4096</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Object of class KalturaStorageProfileStatus could not be converted to string</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::listAction</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>SERVICE_FORBIDDEN</ActualOutput>
+          <Assert>assertNotEquals</Assert>
+          <Message>The access to service [fileSync-&gt;list] is forbidden</Message>
+        </Failure>
+        <Failure>
+          <Field>fileSync::sync</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>MISSING_MANDATORY_PARAMETER</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Missing parameter "fileData"</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::get</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>UNKNOWN_PARTNER_ID</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Unknown partner_id [1]</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::updatestatus</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>4096</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Object of class KalturaPartnerStatus could not be converted to string</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::getadminsession</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>UNKNOWN_PARTNER_ID</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Unknown partner_id [1]</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::updateconfiguration</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>UNKNOWN_PARTNER_ID</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Unknown partner_id [1]</Message>
+        </Failure>
+        <Failure>
+          <Field>systemPartner::getconfiguration</Field>
+          <OutputReference>SERVICE_FORBIDDEN</OutputReference>
+          <ActualOutput>UNKNOWN_PARTNER_ID</ActualOutput>
+          <Assert>assertEquals</Assert>
+          <Message>Unknown partner_id [1]</Message>
+        </Failure>
+      </Failures>
+    </UnitTestFailures>
+  </Failures>
+</UnitTests>

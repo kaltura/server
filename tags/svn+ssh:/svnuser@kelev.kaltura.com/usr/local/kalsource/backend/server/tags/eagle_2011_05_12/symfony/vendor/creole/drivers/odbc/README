@@ -1,0 +1,90 @@
+
+
+Creole ODBC Bridge Driver
+=========================
+
+
+I. Overview
+-----------
+
+In the text below, the word "driver" can get somewhat muddled since there are 
+two libraries concerned here (Creole & ODBC). So, we'll use the term "bridge 
+driver" to refer to Creole's ODBC bridge driver, and "ODBC driver" to refer to 
+an ODBC database driver.
+
+The Creole ODBC Bridge driver provides a solution for databases which 
+currently have no PHP-native interface. It is currently in an experimental
+stage of development. It has been tested with two ODBC drivers (Sequiter's
+CodeBase ODBC driver and the MySQL ODBC driver (as a baseline test)). To
+use any other ODBC drivers you may need to write your own ODBCAdapter-derived
+class (see below).
+
+
+II. ODBCAdapter
+---------------
+
+Because ODBC itself is a database abstraction library, the bridge driver needed
+a way of hiding ODBC driver-specific behavior. The solution to this was to 
+create an adapter layer (akin to how the Propel runtime engine works). Think of
+it as a sub-driver for the bridge driver. Any ODBC driver-specific behavior is
+handled by an ODBCAdapter-derived class. To use a specific adapter class, you
+specify its name via a parameter in the connection string:
+
+odbc://localhost/DSN=CodeBase;?adapter=CodeBase
+
+The string above will load the following file as the adapter to use with the
+bridge driver: creole/drivers/odbc/adapters/CodeBaseAdapter.php
+
+Some ODBC drivers are limited in support for various Creole features. The 
+ODBCAdapter also provides a method for emulation of some of these missing 
+features:
+
+    -The emulatePrepareStmt() method provides a switch for enabling prepared
+     statement emulation for drivers that do not support (or have trouble with)
+     prepared statements. This emulation is disabled by default.
+     
+    -The hasLimitOffset() method provides a switch for enabling LIMIT/OFFSET 
+     emulation for drivers that do not support this. This emulation is enabled
+     by default. The LIMIT/OFFSET emulation was borrowed from the MSSQL Creole 
+     driver.
+
+    -The createResultSet() method provides a switch for enabling cached 
+     result sets. To enable this feature, return an instance of 
+     ODBCCachedResultSet in the createResultSet() method of your ODBCAdapter-
+     derived class. This can be useful as a workaround for ODBC drivers which
+     lack support for record count retrieval, reverse/absolute cursor
+     scrolling, etc. In most cases, result rows are cached on-demand. So if 
+     you only read the first couple rows of a result, then only those rows will 
+     be cached.
+
+    -The getIdGenerator() method provides a switch for enabling sequence
+     emulation. This feature is enabled by default in ODBCAdapter and is 
+     implemented in the ODBCIdGenerator class. The emulation code was inspired
+     by the PEAR::DB nextID() method. If your database supports sequences or
+     autoincrement natively, you can return your own IdGenerator-derived class 
+     instead. Check out some of the other Creole drivers for IdGenerator 
+     examples.
+     
+     
+III. Incomplete Features
+------------------------
+
+    -The database metadata classes are not fully tested/complete. Specifically, 
+     the ODBCDatabaseInfo class does not currently set the database name. There 
+     may be other problems as well. 
+ 
+    -The Creole CallableStatement class (stored procedures) is not currently 
+     implemented. No immediate plans to do this in the future, but it looks
+     feasible.
+
+
+IV. Known Issues
+----------------
+
+This driver was developed using the PHP v5.0 final build. During the course 
+of testing I uncovered several bugs in the php_odbc module. I submitted
+patches for these bugs, but have not yet received word that they were 
+committed (they were just submitted this morning). If you want more details
+on the problems I encountered or would like a copy of the patches, please
+e-mail me (dlawson@masterytech.com).
+

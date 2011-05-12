@@ -1,0 +1,258 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+    <title>Ext Release Notes for 3.1.0</title>
+    <style>
+        * {
+            font-family: 'helvetica', tahoma, verdana, sans-serif;
+            font-size: 12px;
+        }
+        body { padding: 20px; }
+        h1 { font-size: 18px; }
+        h2 { font-size: 16px; }
+        h3 { font-size: 14px; }
+        li { padding: 2px 0; }
+        .doc { color: blue; }
+        .change { color: red; }
+        .new { color: green; }
+    </style>
+</head><body>
+
+<h1>Release Notes for Ext 3.1.0</h1>
+
+<p>
+    Release Date: Dec 14, 2009<br>
+
+    Current Version: 3.1.0 (rev 5770-119) <br>
+    Previous Version: 3.0.0 (rev 4747)
+</p>
+
+<h2>Overview</h2>
+<ul>
+<li>Bug fixes.</li>
+<li>Enhancements.</li>
+</ul>
+
+<h2 class="change">Changes</h2>
+
+<ul><li>Ext.DatePicker<ul>
+    <li>
+Fixed the first set of days when the startDay was not 0
+    </li>
+</ul></li></ul>
+
+<ul><li>Ext.menu.Menu<ul>
+    <li>
+Only cascade the menu hiding up when the menus are floating
+    </li>
+    <li>
+Moved the beforeshow event to showAt inside the menu, since show either always calls the superclass show method, or calls showAt
+    </li>
+    <li>
+Use the getItemId methods instead of referring to the itemId
+    </li>
+</ul></li></ul>
+
+<ul><li>Ext.form.HtmlEditor<ul>
+    <li>
+Used insertHTML because it's supported in Safari and Chrome
+    </li>
+</ul></li></ul>
+
+<ul><li>Ext.Panel<ul>
+    <li>
+Have onLayout method respect force to ensure that toolbars are laid out when force is passed
+    </li>
+    <li>
+Only add animation classes if we're actually animating. Helps resolve DOM reflow issues in FF
+    </li>
+    <li>
+Fixed the panel so that tools aren't created too early. A header will
+now be properly created when specifying tools (collapsible: true
+creates tool).
+It may be necessary to now explicitly set @cfg header:false in some
+situations (e.g. setting collapsible will now correctly create a
+header) </li>
+</ul></li></ul>
+
+<ul><li>Ext.MessageBox<ul>
+    <li>
+Fixed an issue where MessageBox width is calculated differently depending on the previous content
+    </li>
+</ul></li></ul>
+
+<ul><li>Ext.data.DirectProxy<ul>
+    <li>
+Remove idProperty being written in DataWriter. This was unnecessary
+information since all info required by server to perform some CRUD
+action is in the request "root." The examples were updated also. </li>
+</ul></li></ul>
+
+<ul><li>Ext.Window<ul>
+    <li>
+Changed the window animations event to not be blocked. This resolved
+the issue specified in the thread without having to modify the core
+code </li>
+</ul></li></ul>
+
+<ul><li>Ext.Component<ul>
+    <li>
+Add note to config: itemCls that it is only relevant when the Component is being rendered by a FormLayout layout manager
+    </li>
+    <li>
+Remove redundant config option
+    </li>
+    <li>
+Add a flag to ensure a component may only be destroyed once. This will
+fix a series of issues, but also fixes the one mentioned in the ticket </li>
+    <li>
+Components now have an onAdded and onRemoved method and are aware of
+when they are added/removed to their respective Container. They will
+fire an added and removed event. References are properly cleaned up
+after removing a component from its owning container. References are
+established at add time rather than at render time </li>
+    <li>
+Added tpl, tplWriteMode and data configurations to Ext.Component. Added
+an update method which accepts data for a template or an html
+fragment/domhelper configuration to update the content area of a
+component </li>
+</ul></li></ul>
+
+<ul><li>Ext.ux.StatusBar<ul>
+    <li>
+        Encapsulate the class under one folder (examples/ux/statusbar)
+    </li>
+    <li>
+        Correction to the animated hide of the element since the statusElement changed from an Ext.Element to a toolbar item
+    </li>
+    <li>
+        Correction to initial iconCls not being removed when the icon was updated
+    </li>
+</ul></li></ul>
+
+<ul><li>Ext.grid.ColumnDD<ul>
+    <li>
+Fix for columnmove event firing twice. The event for columnmove is now
+fired in onColumnMove in the GridView, which means the event in
+ColumnDD is now redundant </li>
+</ul></li></ul>
+
+<ul><li>Ext.tree.TreePanel, Ext.tree.TreeNodeUI, Ext.tree.TreeNode<ul>
+    <li>
+Added a beforedblclick event
+    </li>
+</ul></li></ul>
+
+<ul><li>Ext.util.CSS<ul>
+    <li>
+When interrogating rules in IE, elements are written in caps (eg DIV). This caused issues when retrieving the rules
+    </li>
+</ul></li></ul>
+
+<ul><li>Ext.form.Field, Ext.form.TextField<ul>
+    <li>
+Make validation more efficient if the validation event is set to blur.
+Prior behavior when setting validationEvent to 'blur' would cause an
+additional blur event handler to be attached, even though there was one
+already attached </li>
+</ul></li></ul>
+
+<ul><li>Ext.grid.Column, Ext.grid.ColumnModel<ul>
+    <li>
+Change to the 2.x behavior where column's that do not specify an id
+will use the ordinal position of the column to generate the id, instead
+of autogenerating unique id's for every column </li>
+</ul></li></ul>
+
+<ul><li>Ext.grid.GridView, Ext.grid.GroupingView, Ext.list.ListView, Ext Core<ul>
+    <li>
+Due to various factors, the scroll bars on the operating system can
+differ (theme, font size). As such, a static value isn't always
+appropriate. This adds a method to dynamically calculate this </li>
+</ul></li></ul>
+
+<ul><li>Ext.TabPanel, Et.form.Field, Ext.form.Form, AccordionLayout, ContainerLayout, FormLayout, Container<ul>
+    <li>Several modifications to fix issues with form layout:<ul>
+        <li>Added the ability to hide and show field labels with the Field</li>
+        <li>Added new template methods for when an item is added to and removed from a Container</li>
+        <li>Added a method to allow layouts to clean up after themselves</li>
+        <li>Form layouts can now be dynamic (moving fields to another form)</li>
+    </ul></li>
+</ul></li></ul>
+
+<ul><li>Ext.tree.TreeSelectionModel<ul>
+    <li>
+Fixed an issue where hidden tree nodes are visited when using keyboard
+navigation. The behaviour now is that they are skipped over properly </li>
+</ul></li></ul>
+
+<ul><li>Ext.data.Api, Ext.data.DataProxy<ul>
+    <li>
+Added 3 hook functions in Ext.data.Api for listening to proxy-events
+'beforewrite', 'write' and 'exception'. Since all proxies are run
+through Ext.data.Api#prepare, this was easily done automatically. These
+hooks are great places for devs to implement user-feedback messages.
+Also had to move a small block of code (The call to
+Ext.data.Api#prepare) in DataProxy to *after* the call to super
+(Observable), which will cause no problems </li>
+</ul></li></ul>
+
+<ul><li>Ext.Editor, Ext.form.Field, Ext.form.TriggerField,
+Ext.grid.GridPanel, Ext.form.TextField, Ext.grid.CellSelectionModel,
+Ext.grid.EditorGrid, Ext.form.Combo, Ext.grid.RowSelectionModel,
+Ext.util.KeyNav<ul>
+    <li>
+General overhaul of the key handling system to make events, especially
+in the editor grid, more consistent across browser and operating system
+</li>
+</ul></li></ul>
+
+<ul><li>Ext.data.DataWriter, Ext.data.JsonWriter, Ext.data.XmlWriter<ul>
+    <li>
+XmlWriter now renders XML using Ext.XTemplate. If users have a problem
+with the XML schema, they can provide their own template to XmlWriter
+constructor. Also made DataWriter#toHash a bit smarter dealing with
+meta.idProperty </li>
+</ul></li></ul>
+
+<ul><li>Ext.form.HtmlEditor<ul>
+    <li>
+Added a fix to stop the default value of the editor being posted to the server because it can cause encoding issues
+    </li>
+</ul></li></ul>
+
+<ul><li>jQuery Adapter, YUI Adapter, prototype Adapter<ul>
+    <li>
+        Fixed an issue where firefox would erroneously report elements as existing. Very old bug in FF, still not fixed
+    </li>
+</ul></li></ul>
+
+<h2 class="new">New</h2>
+
+<ul>
+    <li>Significant IE6-8 memory improvments</li>
+    <li><a href="http://www.extjs.com/deploy/ext-3.1.0/examples/grid/ColumnHeaderGroup.html" target="_blank">Grouping GridView</a></li>
+    <li><a href="http://www.extjs.com/deploy/ext-3.1.0/examples/grid/locking-grid.html" target="_blank">Locking Grid Column</a></li>
+    <li><a href="http://www.extjs.com/deploy/ext-3.1.0/examples/treegrid/treegrid.html" target="_blank">TreeGrid</a></li>
+    <li><a href="http://www.extjs.com/deploy/ext-3.1.0/examples/form/vbox-form.html" target="_blank">VBox Form</a></li>
+    <li><a href="http://www.extjs.com/deploy/ext-3.1.0/examples/grid-filtering/grid-filter-local.html" target="_blank">Grid Filtering</a></li>
+    <li><a href="http://www.extjs.com/deploy/ext-3.1.0/examples/simple-widgets/editor.html" target="_blank">Editor</a></li>
+</ul>
+
+<h2 class="new">Documentation Improvements</h2>
+
+<ul>
+    <li>Ext.grid.RowSelectionModel</li>
+    <li>Ext.grid.CheckboxSelectionModel</li>
+    <li>Ext.grid.GridView</li>
+    <li>Ext.grid.Column</li>
+    <li>Ext.Panel</li>
+    <li>Ext.XTemplate</li>
+    <li>Ext.form.Action</li>
+    <li>Ext.util.MixedCollection</li>
+    <li>Ext.tree.TreeNode</li>
+    <li>Ext.form.TextField</li>
+
+</ul>
+
+</body></html>

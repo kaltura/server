@@ -1,0 +1,46 @@
+
+	<?php echo $this->form; ?>
+	<div id="results" class="clear">
+	<h2><?php echo $this->translate('Results') ?> <span>(<?php /*echo $this->paginator->getItemsCount();*/ ?> publishers)</span></h2>
+	<table class="clear">
+		<thead>
+			<tr>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('ID'); ?></th>
+				<th><?php echo $this->translate('Publisher Name'); ?></th>
+				<th><?php echo $this->translate('Publisher Id'); ?></th>
+				<th><?php echo $this->translate('Object Type'); ?></th>
+				<th><?php echo $this->translate('Creation Date'); ?></th>
+				<th><?php echo $this->translate('XSD'); ?></th>
+				<th><?php echo $this->translate('Views'); ?></th>
+				<th><?php echo $this->translate('Action'); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<td colspan="16"><?php echo $this->paginator; ?></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<?php foreach($this->paginator as $profile): ?>
+			<tr class="<?php echo $this->cycle(array('odd', 'even'))->next(); ?>">
+				<td><?php echo $this->enumTranslate('KalturaPartnerStatus', $profile->status); ?></td>
+				<td><?php echo $profile->id; ?></td>
+				<td><?php echo $profile->name; ?></td>
+				<td><?php echo $profile->publisherId; ?></td>
+				<td><?php echo $profile->objectType; ?></td>
+				<td><?php echo $profile->creationDate; ?></td>
+				<td><?php echo $profile->xsd; ?></td>
+				<td><?php echo $profile->views; ?></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $profile->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="activateOrDeprecate" ><?php echo $this->translate('Activate / Deprecate'); ?></option>
+						<option value="Configure"><?php echo $this->translate('Configure'); ?></option>
+					</select>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>

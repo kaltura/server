@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="metadata">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="HuluChannel" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Channel</label>
+							<key>HuluChannel</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="25" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HuluCategories" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Categories</label>
+							<key>HuluCategories</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="Action and Adventure" />
+							<xsd:enumeration value="Animation" />
+							<xsd:enumeration value="Celebrity and Gossip" />
+							<xsd:enumeration value="Comedy" />
+							<xsd:enumeration value="Crime and Mystery" />
+							<xsd:enumeration value="Documentary and Biography" />
+							<xsd:enumeration value="Drama" />
+							<xsd:enumeration value="Family and Kids" />
+							<xsd:enumeration value="Gaming" />
+							<xsd:enumeration value="Horror and Thriller" />
+							<xsd:enumeration value="House and Home" />
+							<xsd:enumeration value="International" />
+							<xsd:enumeration value="Lifestyle and Fashion" />
+							<xsd:enumeration value="Live Events and Specials" />
+							<xsd:enumeration value="Local" />
+							<xsd:enumeration value="Music" />
+							<xsd:enumeration value="News and Information" />
+							<xsd:enumeration value="Political" />
+							<xsd:enumeration value="Reality and Game Show" />
+							<xsd:enumeration value="Sci Fi and Fantasy" />
+							<xsd:enumeration value="Soap Opera" />
+							<xsd:enumeration value="Sports and Fitness" />
+							<xsd:enumeration value="Talk and Interview" />
+							<xsd:enumeration value="Technology" />
+							<xsd:enumeration value="Travel and Nature" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HuluRating" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Rating</label>
+							<key>HuluRating</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="NSFW" /><!-- Not Suitable For Work -->
+							<xsd:enumeration value="TV-Y" />
+							<xsd:enumeration value="TV-Y7" />
+							<xsd:enumeration value="TV-G" />
+							<xsd:enumeration value="TV-PG" />
+							<xsd:enumeration value="TV-14" />
+							<xsd:enumeration value="TV-MA" />
+							<xsd:enumeration value="MPAA Rating" />
+							<xsd:enumeration value="G" /><!-- General -->
+							<xsd:enumeration value="PG" /><!-- Parental Guidance -->
+							<xsd:enumeration value="PG-13" /><!-- Parental - 13 -->
+							<xsd:enumeration value="R" /><!-- Restricted -->
+							<xsd:enumeration value="NC-17" /><!-- No one under 17 -->
+							<xsd:enumeration value="X" /><!-- Adults only -->
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HuluMediaType" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Media Type</label>
+							<key>HuluMediaType</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="TV" />
+							<xsd:enumeration value="Film" />
+							<xsd:enumeration value="Music Video" />
+							<xsd:enumeration value="Web Original" />
+							<xsd:enumeration value="Sports" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HuluProgrammingType" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Programming Type</label>
+							<key>HuluProgrammingType</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="Behind the Scenes" /><!-- Bonus footage depicting the making of a show -->
+							<xsd:enumeration value="Commentary" /><!-- For color commentary on another piece of content (i.e. season, episode) -->
+							<xsd:enumeration value="Concert" /><!-- Musical performance -->
+							<xsd:enumeration value="Condensed Game" /><!-- Sporting event which has been edited to a shorter form -->
+							<xsd:enumeration value="Current Preview" /><!-- Edited content promoting upcoming episode -->
+							<xsd:enumeration value="Excerpt" /><!-- Short form clip taken from a longer piece of content -->
+							<xsd:enumeration value="Full Episode" /><!-- Full-length television content (e.g. hour-long drama, half-hour sitcom) -->
+							<xsd:enumeration value="Full Game" /><!-- Full-length sporting event -->
+							<xsd:enumeration value="Full Movie" /><!-- Full-length feature film -->
+							<xsd:enumeration value="Highlight" /><!-- Sporting event moment (e.g. top play, amazing catch, etc.) -->
+							<xsd:enumeration value="Interview" /><!-- or interview with star of other content, news interview -->
+							<xsd:enumeration value="Music Video" /><!-- For produced music video -->
+							<xsd:enumeration value="Outtake" /><!-- Bonus footage depicting unused take from full length content -->
+							<xsd:enumeration value="Recap" /><!-- Overview of previous episodes (i.e. “Last week on…”) -->
+							<xsd:enumeration value="Short Film" /><!-- Short-form film content -->
+							<xsd:enumeration value="Sneak Peek" /><!-- Excerpt promoting an upcoming television show -->
+							<xsd:enumeration value="Special" /><!-- Special event that does not fall within other programming types -->
+							<xsd:enumeration value="Teaser Trailer" /><!-- Early preview of upcoming film -->
+							<xsd:enumeration value="Trailer" /><!-- Preview of upcoming film -->
+							<xsd:enumeration value="Web Exclusive" /><!-- Content produced specifically for consumption online -->
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HuluSeriesTitle" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Series Title</label>
+							<key>HuluSeriesTitle</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="50" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HuluEpisodeNumber" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Episode Number</label>
+							<key>HuluEpisodeNumber</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluSeasonNumber" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Season Number</label>
+							<key>HuluSeasonNumber</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluTmsProgramID" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu TMS Program ID</label>
+							<key>HuluTmsProgramID</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluTmsSeriesID" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu TMS Series ID</label>
+							<key>HuluTmsSeriesID</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluExternalID" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu External ID</label>
+							<key>HuluExternalID</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluFullDescription" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Full Description</label>
+							<key>HuluFullDescription</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluSeriesDescription" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Series Description</label>
+							<key>HuluSeriesDescription</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluSeasonSynopsis" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Season Synopsis</label>
+							<key>HuluSeasonSynopsis</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluStudio" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Studio</label>
+							<key>HuluStudio</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluPromotionalText" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Promotional Text</label>
+							<key>HuluPromotionalText</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluPromotionalLink" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Promotional Link</label>
+							<key>HuluPromotionalLink</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluTuneinInformation" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Tune in Information</label>
+							<key>HuluTuneinInformation</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluContentRatingReason" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Content Rating Reason</label>
+							<key>HuluContentRatingReason</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="listType">
+							<xsd:enumeration value="D" /><!-- Suggestive Dialog -->
+							<xsd:enumeration value="FV" /><!-- Fantasy Violence -->
+							<xsd:enumeration value="L" /><!-- Strong, Coarse Language -->
+							<xsd:enumeration value="S" /><!-- Explicit Sexual Situations -->
+							<xsd:enumeration value="V" /><!-- Violence -->
+							<xsd:enumeration value="AT" /><!-- Adult Themes -->
+							<xsd:enumeration value="N" /><!-- Nudity -->
+							<xsd:enumeration value="BN" /><!-- Brief Nudity -->
+							<xsd:enumeration value="SS" /><!-- Sexual Situations -->
+							<xsd:enumeration value="SL" /><!-- Strong Language -->
+							<xsd:enumeration value="V" /><!-- Violence -->
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="HuluOriginalPremiereDate" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Original Premiere Date</label>
+							<key>HuluOriginalPremiereDate</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluProgrammingPriority" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Programming Priority</label>
+							<key>HuluProgrammingPriority</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluDaypart" minOccurs="0" maxOccurs="1" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Daypart</label>
+							<key>HuluDaypart</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HuluSegments" minOccurs="0" maxOccurs="unbounded" type="textType">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Hulu Segments</label>
+							<key>HuluSegments</key>
+							<searchable>false</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="copyright" minOccurs="0" maxOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation />
+						<xsd:appinfo>
+							<label>Copyright</label>
+							<key>copyright</key>
+							<searchable>true</searchable>
+							<description />
+						</xsd:appinfo>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="textType">
+							<xsd:maxLength value="40" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="textType">
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
+	<xsd:complexType name="dateType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:long" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="objectType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="listType">
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
+</xsd:schema>
