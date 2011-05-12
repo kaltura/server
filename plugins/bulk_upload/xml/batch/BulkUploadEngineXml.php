@@ -12,8 +12,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * The add action (default) string
 	 * @var string
 	 */
-	const ADD_ACTION_STRING = "add";
+	const ADD_ACTION_STRING = 'add';
 
+	/**
+	 * 
+	 * tnhe delete action string
+	 * @var string
+	 */
+	const DELETE_ACTION_STRING = 'delete';
+	
 	/**
 	 * 
 	 * The defalut thumbnail tag
