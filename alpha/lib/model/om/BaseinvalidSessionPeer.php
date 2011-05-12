@@ -26,7 +26,7 @@ abstract class BaseinvalidSessionPeer {
 	const TM_CLASS = 'invalidSessionTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 4;
+	const NUM_COLUMNS = 5;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -42,6 +42,9 @@ abstract class BaseinvalidSessionPeer {
 
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'invalid_session.CREATED_AT';
+
+	/** the column name for the ACTIONS_LIMIT field */
+	const ACTIONS_LIMIT = 'invalid_session.ACTIONS_LIMIT';
 
 	/**
 	 * An identiy map to hold any loaded instances of invalidSession objects.
@@ -59,11 +62,11 @@ abstract class BaseinvalidSessionPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Ks', 'KsValidUntil', 'CreatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'ks', 'ksValidUntil', 'createdAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KS, self::KS_VALID_UNTIL, self::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'ks', 'ks_valid_until', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Ks', 'KsValidUntil', 'CreatedAt', 'ActionsLimit', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'ks', 'ksValidUntil', 'createdAt', 'actionsLimit', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::KS, self::KS_VALID_UNTIL, self::CREATED_AT, self::ACTIONS_LIMIT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'ks', 'ks_valid_until', 'created_at', 'actions_limit', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -73,11 +76,11 @@ abstract class BaseinvalidSessionPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Ks' => 1, 'KsValidUntil' => 2, 'CreatedAt' => 3, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'ks' => 1, 'ksValidUntil' => 2, 'createdAt' => 3, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KS => 1, self::KS_VALID_UNTIL => 2, self::CREATED_AT => 3, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'ks' => 1, 'ks_valid_until' => 2, 'created_at' => 3, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Ks' => 1, 'KsValidUntil' => 2, 'CreatedAt' => 3, 'ActionsLimit' => 4, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'ks' => 1, 'ksValidUntil' => 2, 'createdAt' => 3, 'actionsLimit' => 4, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KS => 1, self::KS_VALID_UNTIL => 2, self::CREATED_AT => 3, self::ACTIONS_LIMIT => 4, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'ks' => 1, 'ks_valid_until' => 2, 'created_at' => 3, 'actions_limit' => 4, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	/**
@@ -151,6 +154,7 @@ abstract class BaseinvalidSessionPeer {
 		$criteria->addSelectColumn(invalidSessionPeer::KS);
 		$criteria->addSelectColumn(invalidSessionPeer::KS_VALID_UNTIL);
 		$criteria->addSelectColumn(invalidSessionPeer::CREATED_AT);
+		$criteria->addSelectColumn(invalidSessionPeer::ACTIONS_LIMIT);
 	}
 
 	/**
