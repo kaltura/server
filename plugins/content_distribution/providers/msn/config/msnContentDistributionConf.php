@@ -12,7 +12,7 @@ class msnContentDistributionConf
 //					"/*[local-name()='metadata']/*[local-name()='LongDescription']",
 //				),
 //				'update_required_entry_fields' => array(
-//					entryPeer::TAGS, 
+//					'entry.::TAGS', 
 //				),
 //			),
 //			'fox_soccer' => array(
@@ -29,9 +29,9 @@ class msnContentDistributionConf
 		),
 		
 		'default_update_required_entry_fields' => array(
-			entryPeer::NAME, 
-			entryPeer::DESCRIPTION, 
-			entryPeer::TAGS, 
+			'entry.NAME', 
+			'entry.DESCRIPTION', 
+			'entry.TAGS', 
 		),
 	);
 	

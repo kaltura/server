@@ -61,6 +61,7 @@ class Form_MsnProfileConfiguration extends Form_ProviderProfileConfiguration
 			));
 			
 			$element = $this->getElement('config_type');
+			$element->addMultiOption('', 'None');
 			
 			$configs = msnContentDistributionConf::get('provider_sub_types');
 			foreach($configs as $key => $config)
