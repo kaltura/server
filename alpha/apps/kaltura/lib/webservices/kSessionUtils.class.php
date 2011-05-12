@@ -77,6 +77,7 @@ class kSessionUtils
 			$ks->privileges = $privileges;
 			$ks->additional_data = $additional_data;
 			$ks_str = $ks->toSecureString();
+			$ks->setActionsLimit();
 			return 0;
 		}
 		else
@@ -232,6 +233,7 @@ class ks
 	const INVALID_TYPE = -4;
 	const EXPIRED = -5;
 	const LOGOUT = -6;
+	const EXCEEDED_ACTIONS_LIMIT = -8;
 	const OK = 1;
 
 	const INVALID_LKS = -7;
@@ -248,6 +250,8 @@ class ks
 	const PRIVILEGE_DOWNLOAD = "download";
 	const PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST = "editplaylist";
 	const PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST = "sviewplaylist";
+	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
+	const PRIVILEGE_SET_ROLE = "setrole";
 
 	public $partner_id = null;
 	public $master_partner_id = null;
@@ -269,7 +273,7 @@ class ks
 		if ( self::$ERROR_MAP == null )
 		{
 			self::$ERROR_MAP  = array ( self::INVALID_STR => "INVALID_STR" , self::INVALID_PARTNER => "INVALID_PARTNER" , self::INVALID_USER => "INVALID_USER" ,
-				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED");
+				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED", self::EXCEEDED_ACTIONS_LIMIT => 'EXCEEDED_ACTIONS_LIMIT');
 		}
 		
 		$str =  @self::$ERROR_MAP[$code];
@@ -358,6 +362,16 @@ class ks
 		return $decoded_str;
 	}
 
+	/**
+	 * 
+	 * @param string $ks_str
+	 */
+	public function setActionsLimit()
+	{
+		$limit = $this->isSetLimitAction();
+		if ($limit)
+			invalidSessionPeer::actionsLimitKs($this, $limit);		
+	}
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
@@ -371,6 +385,14 @@ class ks
 	
 		if($this->original_str)
 		{
+			if ($this->isSetLimitAction()){
+				$isValidCctionLimit = invalidSessionPeer::isValidActionsLimit($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+				if (!$isValidCctionLimit){
+					KalturaLog::debug("actionLimits: EXCEEDED_ACTIONS_LIMIT");
+					return self::EXCEEDED_ACTIONS_LIMIT;
+				} 
+			}
+			
 			$invalid = invalidSessionPeer::isInvalid($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 			if($invalid)
 				return self::LOGOUT;
@@ -427,6 +449,48 @@ class ks
 		return false;
 	}
 
+	public function isSetLimitAction()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XXX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $priv)
+		{
+			// extract playlist ID from pair
+			$exPrivileges = explode(':', $priv);
+			if ($exPrivileges[0] == self::PRIVILEGE_ACTIONS_LIMIT)
+				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] > 0)){
+					return $exPrivileges[1];
+				}else{
+					throw new KalturaAPIException ( APIErrors::INVALID_ACTIONS_LIMIT);
+				}
+		}
+		
+		return false;
+	}
+	
+	public function getSetRole()
+	{
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XXX,edit:YYY,...)
+		$allPrivileges = explode(',', $this->privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $priv)
+		{
+			// extract playlist ID from pair
+			$exPrivileges = explode(':', $priv);
+			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE) 
+				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] > 0)){
+					return $exPrivileges[1];				
+				}else{
+					throw new KalturaAPIException ( APIErrors::INVALID_SET_ROLE);
+				}
+		}
+		
+		return false;
+	}
+	
 	private function expired ( )
 	{
 		return ( time() >= $this->valid_until );
