@@ -127,7 +127,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Parses the Xml file lines and creates the right actions in the system
 	 */
-	protected function parse() 
+	protected function parse()
 	{
 		$xdoc = simplexml_load_file($this->data->filePath);
 		
@@ -143,13 +143,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * 
 	 * Gets and handles a channel from the mrss
-	 * @param SimpleXMLElement $channel
+	 * @param SimpleXMLElement $channel 
 	 */
 	protected function handleChannel(SimpleXMLElement $channel)
 	{
 		$this->currentItem = 0;
 		$startIndex = $this->getStartIndex();
-		KalturaLog::debug("startIndex [$startIndex] ");		
+		KalturaLog::debug("startIndex [$startIndex]");
 		
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
@@ -180,7 +180,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$this->addBulkUploadResult($bulkUploadResult);
 			}			
-		}	
+		}
 	}
 	
 	/**
@@ -296,17 +296,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				continue;
 			}
-			
-			$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
-			KalturaLog::debug("Asset id [ $assetId]");
-			
+							
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
 			$flavorAssetResource = $this->getResource($contentElement);
 			
 			$assetParamsId = $flavorAsset->flavorParamsId;
-			 
+
+			$assetId = kXml::getXmlAttributeAsString($contentElement, "assetId");
 			if($assetId) // if we have an asset id then we need to update the asset
 			{
+				KalturaLog::debug("Asset id [ $assetId]");
 				$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 			}
 		
@@ -338,16 +337,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 						
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
 			$thumbAssetResource = $this->getResource($thumbElement);
-			
-			$assetId = kXml::getXmlAttributeAsString($thumbElement, "assetId");
-			//TODO: get the flavor params from the asset if exists.
-			
-			KalturaLog::debug("Asset id [ $assetId]");
-			
+									
 			$assetParamsId = $thumbAsset->thumbParamsId;
-			 
+
+			$assetId = kXml::getXmlAttributeAsString($thumbElement, "assetId");
 			if($assetId) // if we have an asset id then we need to update the asset
 			{
+				KalturaLog::debug("Asset id [ $assetId]");
 				$assetParamsId = $this->getAssetParamsIdFromAssetId($assetId, $entryId);
 			}
 						
@@ -370,16 +366,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$updatedEntry = $this->sendItemUpdateData($entryId, $entry, $resource, 
 												  $noParamsFlavorAssets, $noParamsFlavorResources, 
 												  $noParamsThumbAssets, $noParamsThumbResources);
-					
-		//Throw exception in case of  max proccessed items and handle all exceptions there
-		$updatedEntryBulkUploadResult = $this->createUploadResult($item); 
-				
-		if($this->exceededMaxRecordsEachRun)
-			return;
-		
-		//Updates the bulk upload result for the given entry (with the status and other data)
-		$this->updateEntriesResults(array($updatedEntry), array($updatedEntryBulkUploadResult));
-		
+												  
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($updatedEntry->id, $flavorAssets, $thumbAssets);
 				
@@ -387,8 +374,25 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
 		foreach($pluginsInstances as $pluginsInstance)
 			$pluginsInstance->handleItemUpdated($this->kClient, $updatedEntry, $item);
+	
+		//Throw exception in case of max proccessed items and handle all exceptions there
+		$updatedEntryBulkUploadResult = $this->createUploadResult($item); 
+		
+		//Updates the bulk upload result for the given entry (with the status and other data)
+		$this->updateEntriesResults(array($updatedEntry), array($updatedEntryBulkUploadResult));
 	}
 
+	/**
+	 * (non-PHPdoc)
+	 * @see KBulkUploadEngine::addBulkUploadResult()
+	 */
+	protected function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult)
+	{
+		parent::addBulkUploadResult($bulkUploadResult);
+					
+		$this->handledRecordsThisRun++; //adds one to the count of handled records
+	}
+	
 	/**
 	 * 
 	 * Sends the data using a multi requsest according to the given data
@@ -463,7 +467,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
 		$result = $this->kClient->baseEntry->delete($entryId);
-		return;
+		
+		$bulkUploadResult = $this->createUploadResult($item);
+		$bulkUploadResult->entryId = $entryId;
+		$this->addBulkUploadResult($bulkUploadResult);
 	}
 
 	/**
@@ -1395,34 +1402,40 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 	/**
 	 * 
+	 * Gets the entry status from the given item
+	 * @param unknown_type $item
+	 * @return KalturaEntryStatus - the new entry status
+	 */
+	protected function getEntryStatusFromItem(SimpleXMLElement $item)
+	{
+		$status = KalturaEntryStatus::IMPORT;
+		if($item->action == self::DELETE_ACTION_STRING)
+			$status = KalturaEntryStatus::DELETED;
+		
+		return $status;
+	}
+		
+	/**
+	 * 
 	 * Creates a new upload result object from the given SimpleXMLElement item
 	 * @param SimpleXMLElement $item
 	 */
 	protected function createUploadResult(SimpleXMLElement $item)
 	{
 		//TODO: What should we write in the bulk upload result for update? 
-		//only the changed parameters or just teh one theat was changed
+		//only the changed parameters or just the one theat was changed
 		KalturaLog::debug("Creating upload result");
 		KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
-		
-		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
-		{
-			KalturaLog::debug("Setting exceededMaxRecordsEachRun to true");
-			$this->exceededMaxRecordsEachRun = true;
-			return; // exit if we have proccessed max num of itemse
-		}
-		
-		$this->handledRecordsThisRun++;
-		
+					
 		$bulkUploadResult = new KalturaBulkUploadResult();
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		
 		$bulkUploadResult->lineIndex = $this->currentItem;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
 		$bulkUploadResult->rowData = $item->asXml();
-		$bulkUploadResult->entryStatus = KalturaEntryStatus::IMPORT;
+		$bulkUploadResult->entryStatus = $this->getEntryStatusFromItem($item);
 		$bulkUploadResult->conversionProfileId = $this->getIngestionProfileId($item);
-		$bulkUploadResult->accessControlProfileId = $this->getAccessControlId($item); 
+		$bulkUploadResult->accessControlProfileId = $this->getAccessControlId($item);
 		
 		if(!is_numeric($bulkUploadResult->conversionProfileId))
 			$bulkUploadResult->conversionProfileId = null;
