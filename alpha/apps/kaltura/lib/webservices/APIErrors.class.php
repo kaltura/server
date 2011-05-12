@@ -15,7 +15,11 @@ class APIErrors
 	const INVALID_KS ="INVALID_KS,Invalid KS [%s]. Error [%s,%s]";
 
 	// %s - partner_id
-	const START_SESSION_ERROR = "START_SESSION_ERROR,Error while starting session for partner [%s]"; 
+	const START_SESSION_ERROR = "START_SESSION_ERROR,Error while starting session for partner [%s]";
+
+	const INVALID_ACTIONS_LIMIT = "INVALID_ACTIONS_LIMIT,Invalid actions limit";
+	
+	const INVALID_SET_ROLE = "INVALID_SET_ROLE,Invalid set role id";
 	
 	// $s - media source
 	const UNKNOWN_MEDIA_SOURCE = "UNKNOWN_MEDIA_SOURCE,Unknown media source [%s]";
@@ -283,6 +287,8 @@ class APIErrors
 	const CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER = "CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER,Root admin user cannot be deleted";
 	
 	const ROLE_ID_MISSING = "ROLE_ID_MISSING,User must have an associated role";
+	
+	const UNKNOWN_ROLE_ID = "UNKNOWN_ROLE_ID,Unknown role id";
 	
 	const ONLY_ONE_ROLE_PER_USER_ALLOWED = "ONLY_ONE_ROLE_PER_USER_ALLOWED,User cannot have more than one role";
 	
