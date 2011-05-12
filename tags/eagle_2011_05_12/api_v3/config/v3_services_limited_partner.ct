@@ -1,0 +1,134 @@
+&delimiter=|&trim=1&null=NULL&pk=1
+----------------------------------------------------------------------------------------------
+The service config table will help set behavior for services per partner.
+This default table will hold the kaltura defaults for partnere that don't have specific requirements.
+It will be backward compatible with the hard-coded values that where in the service code.
+aliases for the columns:
+name = 	service name
+id =	id
+type =	ticket Type
+rp	 = 	requires partner - does the service require partner_id to work
+nkfp = 	need Kuser From Puser 
+cuod = 	create User On Demand 
+aep = 	allow Empty Puser
+rw = 	read write to db tables
+pg = 	partner group
+kn = 	kaltura network
+mip =	match ip - enables the ip match mecahnism for better in-site only security
+tags = 	tags for extra hints about the service - use ',' to separate tags. should add the alias of the flash widget that calls service
+--------------------------------------------------------
+name								|id			|ticket	
+--------------------------------------------------------
+session.startwidgetsession			|			|N		
+
+widget.get							|			|N		
+widget.list							|			|N		
+
+search.search						|			|N		
+search.getmediainfo					|			|N		
+search.searchurl					|			|N		
+search.externallogin				|			|N		
+
+playlist.add						|			|N		
+playlist.update						|			|N		
+playlist.get						|			|N		
+playlist.delete						|			|N		
+playlist.list						|			|N		
+playlist.execute					|			|N		
+playlist.executefromcontent			|			|N		
+playlist.getstatsfromcontent		|			|N		
+
+media.addfromurl					|			|N		
+media.addfromsearchresult			|			|N		
+media.addfromuploadedfile			|			|N		
+media.addfromrecordedwebcam			|			|N		
+media.get							|			|N		
+media.update						|			|N		
+media.upload						|			|N		
+media.delete						|			|N		
+media.list							|			|N		
+media.updatethumbnail				|			|N		
+media.updatethumbnailjpeg			|			|N		
+media.requestconversion				|			|N		
+media.flag							|			|N		
+media.reject						|			|N		
+media.approve						|			|N		
+media.listflags						|			|N		
+media.anonymousrank					|			|N		
+
+mixing.add							|			|N		
+mixing.get							|			|N		
+mixing.update						|			|N		
+mixing.delete						|			|N		
+mixing.list							|			|N		
+mixing.clone						|			|N		
+mixing.appendmediaentry				|			|N		
+mixing.requestflattening			|			|N		
+mixing.getmixesbymediaid			|			|N		
+mixing.getreadymediaentries			|			|N		
+mixing.anonymousrank				|			|N		
+
+document.addfromuploadedfile		|			|N		
+document.get						|			|N		
+document.update						|			|N		
+document.delete						|			|N		
+document.list						|			|N		
+document.upload						|			|N		
+document.convertppttoswf			|			|N		
+
+data.add							|			|N		
+data.get							|			|N		
+data.update							|			|N		
+data.delete							|			|N		
+data.list							|			|N		
+
+baseentry.addfromuploadedfile 		|			|N		
+baseentry.list						|			|N		
+baseentry.get						|			|N		
+baseentry.getbyids					|			|N		
+baseentry.delete					|			|N		
+baseentry.updatethumbnailjpeg		|			|N		
+baseentry.flag						|			|N		
+baseentry.reject					|			|N		
+baseentry.approve					|			|N		
+baseentry.listflags					|			|N		
+baseentry.anonymousrank				|			|N		
+
+bulkupload.add						|			|N		
+bulkupload.get						|			|N		
+bulkupload.delete					|			|N		
+bulkupload.list						|			|N		
+                                            
+batch.getexclusiveimportjobs		|			|N		
+batch.updateexclusiveimportjob		|			|N		
+batch.freeexclusiveimportjob		|			|N		
+batch.addpreconvertjob				|			|N		
+batch.getexclusivepreconvertjobs	|			|N		
+batch.updateexclusivepreconvertjob	|			|N		
+batch.freeexclusivepreconvertjob	|			|N		
+batch.createnotification			|			|N		
+batch.getexclusivenotificationjobs	|			|N		
+batch.updateexclusivenotificationjob|			|N		
+batch.freeexclusivenotificationjob	|			|N		
+batch.addmailjob					|			|N		
+batch.getexclusivemailjobs			|			|N		
+batch.updateexclusivemailjob		|			|N		
+batch.freeexclusivemailjob			|			|N		
+
+report.getgraphs					|			|N		
+report.gettotal						|			|N		
+report.gettable						|			|N		
+report.geturlforreportascsv			|			|N		
+                                            
+stats.collect						|			|N		
+stats.reportkceerror				|			|N		
+
+system.ping							|			|N		
+
+notification.getclientnotification	|			|N		
+
+conversionprofile.addcurrent		|			|N		
+conversionprofile.getcurrent		|			|N		
+
+
+--------------------------------------------------------

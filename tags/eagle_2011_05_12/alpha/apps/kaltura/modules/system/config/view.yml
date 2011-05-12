@@ -1,0 +1,98 @@
+default:
+  has_layout: on
+  layout: systemlayout
+  
+  stylesheets: 
+  javascripts: [ jqkaltura.packed.js, utils.js ]
+ 
+defSystemSuccess:
+  layout: emptylayout
+  stylesheets:  [ dashboard.css ]
+ 
+newDashboardSuccess:
+  stylesheets:  [ dashboard.css ]
+  javascripts: [ dashboardmedia.js ]
+  
+viewShowsSuccess:
+  stylesheets: [pages.css, layout.css]
+  javascripts: [dashboardmedia.js]
+
+viewUsersSuccess:
+  stylesheets: [pages.css, layout.css]
+  javascripts: [dashboardmedia.js]
+
+viewWidgetsSuccess:
+  stylesheets: [pages.css, layout.css]
+  javascripts: [dashboardmedia.js]
+
+viewPartnersSuccess:
+  stylesheets: [pages.css, layout.css]
+  javascripts: [dashboardmedia.js]
+
+viewPartnersASuccess:
+  stylesheets: [pages.css, layout.css]
+  javascripts: [dashboardmedia.js]
+
+viewUiconfSuccess:
+  stylesheets: [pages.css, layout.css]
+  javascripts: [dashboardmedia.js]
+  
+editUiconfSuccess:
+  stylesheets: [pages.css, layout.css, kcms.css]
+  javascripts: [dashboardmedia.js]
+  
+kcwUiConfEditorSuccess:
+  stylesheets: [pages.css, layout.css, kcms.css]
+  javascripts: [dashboardmedia.js]
+  
+addUiconfSuccess:
+  stylesheets: [pages.css, layout.css, kcms.css]
+  javascripts: [dashboardmedia.js]
+  
+createWidgetsFromUiConfSuccess:
+  stylesheets: [pages.css, layout.css, kcms.css]
+  javascripts: [dashboardmedia.js]
+  
+viewUiconfWidgetsSuccess:
+  stylesheets: [pages.css, layout.css]
+  javascripts: [dashboardmedia.js]
+
+showtimeSuccess:
+  has_layout: off
+
+
+editPrNewsSuccess:
+  stylesheets: [layout.css, kcms.css]
+  javascripts: [dashboardmedia.js, interface.js]
+
+emailCampaignMgrSuccess:
+  stylesheets: [layout.css]
+  javascripts: [dashboardmedia.js]
+
+editPartnershipSuccess:
+  stylesheets: [layout.css, kcms.css]
+  javascripts: [dashboardmedia.js, interface.js]
+
+uploadSuccess: 
+  stylesheets: [layout.css, kcms.css]
+  
+conversionProfileSuccess:
+  has_layout: on
+  layout: emptylayout
+
+conversionParamsSuccess:
+  has_layout: on
+  layout: emptylayout
+  
+partnerWidgetStatsSuccess:
+  has_layout: off
+  
+gallerySuccess:
+  javascripts:    [  /lib/js/jquery-1.3.1.min.js ]	
+  
+toolsSuccess:
+  javascripts:    [  /lib/js/jquery-1.3.1.min.js ]	
+  
+dashSuccess:
+  has_layout: off
+  
