@@ -47,7 +47,7 @@ class IdeticDistributionProvider implements IDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)
