@@ -25,6 +25,9 @@ public class Kaltura {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		if (SECRET == "") {
+			throw(new Error("Please fill the partner credentials to use"));
+		}
 		Kaltura samples = new Kaltura();
 		samples.list();
 		samples.multiReponse();

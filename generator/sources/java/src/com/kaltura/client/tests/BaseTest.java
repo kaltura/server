@@ -19,7 +19,7 @@ import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.types.KalturaMediaEntry;
 
 public class BaseTest extends TestCase {
-	public final int PARTNER_ID = 224962; // PARTNER_ID_GOES_HERE
+	public final int PARTNER_ID = 0; // PARTNER_ID_GOES_HERE
 	public final String SECRET = ""; // SERVICE_SECRET_GOES_HERE
 	public final String ADMIN_SECRET = ""; // ADMIN_SECRET_GOES_HERE
 	public final String ENDPOINT = "http://www.kaltura.com";
@@ -38,14 +38,15 @@ public class BaseTest extends TestCase {
 	private Logger logger = Logger.getLogger(BaseTest.class);
 
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {
+		if (SECRET == "") {
+			throw(new Error("Please fill the partner credentials to use"));
+		}
 		this.kalturaConfig.setPartnerId(PARTNER_ID);
 		this.kalturaConfig.setSecret(SECRET);
 		this.kalturaConfig.setAdminSecret(ADMIN_SECRET);
 		this.kalturaConfig.setEndpoint(ENDPOINT);
-
 		this.client = new KalturaClient(this.kalturaConfig);
-
 	}
 	
 	protected void startUserSession() {
