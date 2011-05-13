@@ -23,10 +23,13 @@
  * 			c. include - whether to include any specific API services from the client library (can only be either exclude or include defined)
  * 			d. plugins - whether to include any specific API services from plugins
  * 			e. additional - whether to include any additional objects not directly defined through API services
- * 			f. internal - whether to show this client in the Client Libraries UI in the testme console, or not
+ * 			f. internal - whether to show this client in the Client Libraries UI in the testme console, or not. 
+ * 							note that setting schemaxml, will also make the client internal
  * 			g. nopackage - whether to generate a tar.gz package from the client library folder 
  * 			h. nofolder - there will not be client folder, the client files will be in output folder (if it's a single file like XML schema) 
  * 			i. ignore - whether to ignore any objects although defined through API services by inheritance
+ * 			j. schemaxml - if empty, will introspect the code and create the schema XML, 
+ * 							otherwise this should be a url to download schema XML from. Setting this will make the client internal
  * 
  * Notes:
  * 		* Kaltura API ignores only un-sent parameters. Thus, if you would like a parameter value to be left unchanged
@@ -86,6 +89,9 @@ $generatedClients = array(
 // Loop through the config.ini and generate the client libraries -
 foreach($config as $name => $item)
 {
+	// check if we need to introspect code to create schema or use the ready schema from a given url
+	$useReadySchema = $item->get("schemaxml");
+	
 	//get the generator class name
 	$generator = $item->get("generator");
 	
@@ -97,7 +103,8 @@ foreach($config as $name => $item)
 
 	//check if this client should be internal or public (on the UI)
 	$isInternal = $item->get("internal");
-	if ($isInternal === null)
+	
+	if ($isInternal === null || ($useReadySchema != null && $useReadySchema != ''))
 		$generatedClients[] = $name;
 	
 	// check if generator is valid (not null and there is a class by this name)
@@ -146,14 +153,28 @@ foreach($config as $name => $item)
 	if ($fromXml)
 	{
 		KalturaLog::info("Using XmlSchemaGenerator to generate the api schema");
-		$xmlGenerator = new XmlClientGenerator();
-		$xmlGenerator->setIncludeOrExcludeList($include, $exclude);
-		$xmlGenerator->setIgnoreList($ignore);
-		$xmlGenerator->setAdditionalList($additional);
-		$xmlGenerator->generate();
-		$files = $xmlGenerator->getOutputFiles();
-		//save a temp schema to the disk to be used by the xml generator
-		file_put_contents("temp.xml", $files["KalturaClient.xml"]);
+		if ($useReadySchema == null || $useReadySchema == '')
+		{
+			KalturaLog::info("Using code introspection to generate XML schema");
+			$xmlGenerator = new XmlClientGenerator();
+			$xmlGenerator->setIncludeOrExcludeList($include, $exclude);
+			$xmlGenerator->setIgnoreList($ignore);
+			$xmlGenerator->setAdditionalList($additional);
+			$xmlGenerator->generate();
+			$files = $xmlGenerator->getOutputFiles();
+			//save a temp schema to the disk to be used by the xml generator
+			file_put_contents("temp.xml", $files["KalturaClient.xml"]);
+		} else {
+			KalturaLog::info("Downloading ready-made schema from: ".$useReadySchema);
+			$contents = file_get_contents($useReadySchema);
+			file_put_contents('temp.xml', $contents);
+			//Get the schema version and last generated date -
+			$schemaXml = new SimpleXMLElement( realpath('temp.xml') , NULL, TRUE);
+			$apiVersionOverride = $schemaXml->attributes()->apiVersion;
+			$schemaGenDate = (int)$schemaXml->attributes()->generatedDate;
+			$schemaGenDateOverride = date('d-m-Y', $schemaGenDate);
+			KalturaLog::info('Generating from api version: '.$apiVersionOverride.', generated at: '.strftime("%a %d %b %H:%M:%S %Y", $schemaGenDate));
+		}
 		
 		$instance = $reflectionClass->newInstance("temp.xml");
 		
@@ -238,7 +259,7 @@ foreach($config as $name => $item)
 	{
 		//tar gzip the client library
 		if (!$shouldNotPackage) 
-			createPackage($outputPath, $name);
+			createPackage($outputPath, $name, $schemaGenDateOverride);
 	}
 		
 	KalturaLog::info("$name generated successfully");
@@ -252,7 +273,7 @@ file_put_contents($outputPathBase.DIRECTORY_SEPARATOR.$summaryFileName, serializ
  * @param $outputPath 		The path the client library files are located at.
  * @param $generatorName	The name of the client library.
  */
-function createPackage($outputPath, $generatorName)
+function createPackage($outputPath, $generatorName, $overrideGenDate = null)
 {
 	global $generatedDate;
 	
@@ -264,7 +285,8 @@ function createPackage($outputPath, $generatorName)
 	}
 	else
 	{
-		$fileName = "{$generatorName}_{$generatedDate}.tar.gz";
+		if ($overrideGenDate == null) $overrideGenDate = $generatedDate;
+		$fileName = "{$generatorName}_{$overrideGenDate}.tar.gz";
 		$gzipOutputPath = "..".DIRECTORY_SEPARATOR.$fileName;
 		$cmd = "tar -czf \"$gzipOutputPath\" ..".DIRECTORY_SEPARATOR.$generatorName." --exclude-vcs --exclude \".svn\"";
 		$oldDir = getcwd();
