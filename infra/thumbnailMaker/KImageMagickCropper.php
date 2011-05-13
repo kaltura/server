@@ -25,8 +25,12 @@ class KImageMagickCropper extends KBaseCropper
 	 * @param string $filePath
 	 * @param string $cmdPath
 	 */
-	public function __construct($srcPath, $targetPath, $cmdPath = 'convert', $forceJpeg = false)
+	public function __construct($srcPath, $targetPath, $cmdPath = null, $forceJpeg = false)
 	{
+		if (is_null($cmdPath)) {
+			$cmdPath = kConf::get('bin_path_imagemagick');
+		}
+		
 		$this->cmdPath = $cmdPath;
 		
 		list($this->srcWidth, $this->srcHeight, $type, $attr) = getimagesize($srcPath);
@@ -232,6 +236,6 @@ class KImageMagickCropper extends KBaseCropper
 			return null;
 			
 		$options = implode(' ', $attributes);
-		return "\"$this->cmdPath\" \"$this->srcPath[0]\" $options \"$this->targetPath\"";
+		return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"";
 	}
 }
