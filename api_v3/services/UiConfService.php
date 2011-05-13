@@ -28,8 +28,12 @@ class UiConfService extends KalturaBaseService
 		if ($actionName === 'clone') {
 			return true;
 		}
+		if ($actionName === 'list') {
+			return true;
+		}
 		return parent::kalturaNetworkAllowed($actionName);
 	}
+	
 	
 	/**
 	 * UIConf Add action allows you to add a UIConf to Kaltura DB
