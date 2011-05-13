@@ -10,6 +10,7 @@ import com.kaltura.client.enums.KalturaSessionType;
 import com.kaltura.client.types.KalturaBaseEntry;
 import com.kaltura.client.types.KalturaBaseEntryListResponse;
 import com.kaltura.client.types.KalturaMediaEntry;
+import com.kaltura.client.types.KalturaMediaListResponse;
 import com.kaltura.client.types.KalturaPartner;
 
 public class Kaltura {
@@ -50,10 +51,12 @@ public class Kaltura {
 	public void list()
 	{
 		try {
-			KalturaClient client = getKalturaClient(PARTNER_ID, SECRET, false);			
-			KalturaBaseEntryListResponse list = client.getBaseEntryService().list();
-			KalturaBaseEntry entry = list.objects.get(0);
-			System.out.print("\nGot an entry: " + entry.name);
+			KalturaClient client = getKalturaClient(PARTNER_ID, ADMIN_SECRET, true);			
+			//Should not call Base directly - this is an Abstract!
+			//KalturaBaseEntryListResponse list = client.getBaseEntryService().list();
+			KalturaMediaListResponse list = client.getMediaService().list();
+			KalturaMediaEntry entry = list.objects.get(0);
+			System.out.print("\nGot an entry: \"" + entry.name + "\"");
 		} catch (KalturaApiException e) {
 			e.printStackTrace();
 		}		
@@ -78,6 +81,7 @@ public class Kaltura {
 	private void add()
 	{
 		try {
+			System.out.print("\nUploading test video...");
 			KalturaClient client = getKalturaClient(PARTNER_ID, SECRET, false);			
 			File up = new File(UPLOAD_FILE);
 			String token = client.getBaseEntryService().upload(up);
@@ -86,6 +90,15 @@ public class Kaltura {
 			entry.mediaType = KalturaMediaType.VIDEO;
 			KalturaMediaEntry newEntry = client.getMediaService().addFromUploadedFile(entry, token);
 			System.out.print("\nUploaded a new Video entry " + newEntry.id);
+			client.getMediaService().delete(newEntry.id);
+			try {
+				entry = null;
+				entry = client.getMediaService().get(newEntry.id);
+			} catch (KalturaApiException exApi) {
+				if (entry == null) {
+					System.out.print("\nDeleted the entry ("+newEntry.id+") successfully!");
+				}
+			}
 		} catch (KalturaApiException e) {
 			e.printStackTrace();
 		}	

@@ -35,17 +35,14 @@ To run the main class (Kaltura.java):
 
 To run the JUnit test suite that accompanies this source:
  - Edit your Partner ID, Service Secret & Admin Secret under 'src/com/kaltura/client/tests/BaseTest.java'
-  
+ - Compile the client library.
+ - Right click the KalturaTestSuite.java file and choose Debug As > JUnit Test.
   
 == SETUP log4j LOGGING IN ECLIPSE ==
 
+The launch settings are saved in the following files:
+- 1. KalturaTestSuite.launch (the JUnit tests)
+- 2. KalturaMainTest.launch (A main test class for quickly testing the build)
+
 There is a log4j.properties file in /src/log4j. 
  - Edit it to set the log level as desired.
- - In Eclipse, open the top Run menu, select "Debug Configurations..."
- - Select the Java Application profile or the JUnit profile
- - Select the Classpath tab
- - Select the "User Entries" node in the tree.
- - Click "Advanced..." button.
- - Select "Add folders" option and click OK.
- - Select the /src/log4j folder in the tree menu and click OK.
- * Repeat this step for every profile you wish to debug.
