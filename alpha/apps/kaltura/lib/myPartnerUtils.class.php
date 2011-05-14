@@ -1367,12 +1367,24 @@ class myPartnerUtils
 			return;
 
 		$deliveryRestrictions = $partner->getDeliveryRestrictions();
-
+		$deliveryRestrictionsArr = explode(",", $deliveryRestrictions);
+		
 		$delivery = kUrlManager::getUrlManagerIdentifyRequest();
-		if ($deliveryRestrictions != $delivery)
+		
+		$restricted = true;
+		foreach($deliveryRestrictionsArr as $deliveryRestriction)
+		{
+			if ($deliveryRestriction === $delivery)
+			{
+				$restricted = false;
+				break;
+			}
+		}
+		
+		if ($restricted)
 		{
 			KalturaLog::log ( "enforceDelivery: DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
 			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
-        }
+		}
 	}
 }
