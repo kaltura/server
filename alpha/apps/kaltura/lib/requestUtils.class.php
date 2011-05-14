@@ -423,10 +423,28 @@ class requestUtils
 			
 		if (!$remote_addr && isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'] ) )
 		{
-			$remote_addr = @$_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'];
+			list($remote_addr, $time, $uniqueId, $hash) = @explode(",", $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR']);
+			
+			if (kConf::hasParam('remote_addr_header_salt'))
+			{
+				$salt = kConf::get('remote_addr_header_salt');
+				$timeout = kConf::get("remote_addr_header_timeout");
+				
+				if ($timeout) {
+				    // Compare the absolute value of the difference between the current time
+		    		// and the "token" time.
+					if (abs(time() - $time) > $timeout )
+						die("REMOTE_ADDR header invalid time");
+				}
+				
+				if ($hash !== md5("$remote_addr,$time,$uniqueId,$salt"))
+				{
+					die("REMOTE_ADDR header invalid signature");
+				}
+			}						
 		}
 		
-		// if still mepty .... 
+		// if still empty .... 
 		if (!$remote_addr)
 			$remote_addr = $_SERVER['REMOTE_ADDR'];
 		
