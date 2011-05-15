@@ -39,6 +39,26 @@ class KalturaComcastDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $album;
+	
+	/**
+	 * @var string
+	 */
+	public $copyright;
+	
+	/**
+	 * @var string
+	 */
+	public $linkHref;
+	
+	/**
+	 * @var string
+	 */
+	public $linkText;
+	
+	/**
+	 * @var string
+	 */
+	public $notesToComcast;
 		
 			
 	/*
@@ -53,6 +73,10 @@ class KalturaComcastDistributionProfile extends KalturaDistributionProfile
 		'keywords',
 		'author',
 		'album',
+		'copyright',
+		'linkHref',
+		'linkText',
+		'notesToComcast',
 	 );
 		 
 	public function getMapBetweenObjects()

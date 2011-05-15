@@ -12,8 +12,11 @@ class ComcastDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_KEYWORDS = 'keywords';
 	const CUSTOM_DATA_AUTHOR = 'author';
 	const CUSTOM_DATA_ALBUM = 'album';
+	const CUSTOM_DATA_COPYRIGHT = 'copyright';
+	const CUSTOM_DATA_LINK_HREF = 'linkHref';
+	const CUSTOM_DATA_LINK_TEXT = 'linkText';
+	const CUSTOM_DATA_NOTES_TO_COMCAST = 'notesToComcast';
 
-	const METADATA_FIELD_COPYRIGHT = 'Copyright';
 	const METADATA_FIELD_LONG_TITLE = 'LongTitle';
 	const METADATA_FIELD_LONG_DESCRIPTION = 'LongDescription';
 	const METADATA_FIELD_SHORT_DESCRIPTION = 'ShortDescription';
@@ -39,7 +42,6 @@ class ComcastDistributionProfile extends DistributionProfile
 			return $validationErrors;
 			
 		$metadataFields = array(
-			self::METADATA_FIELD_COPYRIGHT,
 			self::METADATA_FIELD_LONG_TITLE,
 			self::METADATA_FIELD_LONG_DESCRIPTION,
 			self::METADATA_FIELD_SHORT_DESCRIPTION,
@@ -104,6 +106,10 @@ class ComcastDistributionProfile extends DistributionProfile
 	public function getKeywords()				{return $this->getFromCustomData(self::CUSTOM_DATA_KEYWORDS);}
 	public function getAuthor()					{return $this->getFromCustomData(self::CUSTOM_DATA_AUTHOR);}
 	public function getAlbum()					{return $this->getFromCustomData(self::CUSTOM_DATA_ALBUM);}
+	public function getCopyright()					{return $this->getFromCustomData(self::CUSTOM_DATA_COPYRIGHT);}
+	public function getLinkHref()					{return $this->getFromCustomData(self::CUSTOM_DATA_LINK_HREF);}
+	public function getLinkText()					{return $this->getFromCustomData(self::CUSTOM_DATA_LINK_TEXT);}
+	public function getNotesToComcast()					{return $this->getFromCustomData(self::CUSTOM_DATA_NOTES_TO_COMCAST);}
 	
 	public function setEmail($v)				{$this->putInCustomData(self::CUSTOM_DATA_EMAIL, $v);}
 	public function setPassword($v)				{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
@@ -112,4 +118,8 @@ class ComcastDistributionProfile extends DistributionProfile
 	public function setKeywords($v)				{$this->putInCustomData(self::CUSTOM_DATA_KEYWORDS, $v);}
 	public function setAuthor($v)				{$this->putInCustomData(self::CUSTOM_DATA_AUTHOR, $v);}
 	public function setAlbum($v)				{$this->putInCustomData(self::CUSTOM_DATA_ALBUM, $v);}
+	public function setCopyright($v)				{$this->putInCustomData(self::CUSTOM_DATA_COPYRIGHT, $v);}
+	public function setLinkHref($v)				{$this->putInCustomData(self::CUSTOM_DATA_LINK_HREF, $v);}
+	public function setLinkText($v)				{$this->putInCustomData(self::CUSTOM_DATA_LINK_TEXT, $v);}
+	public function setNotesToComcast($v)				{$this->putInCustomData(self::CUSTOM_DATA_NOTES_TO_COMCAST, $v);}
 }
