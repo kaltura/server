@@ -48,7 +48,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var string
 	 */
 	private $xsdFilePath = "/../xml/ingestion.xsd";
-
+	
+	/**
+	 * 
+	 * The ingested assets for the current item
+	 * @var array<string>()
+	 */
+	private $ingestedAssetsIds = array();
+	
 	/**
 	 * 
 	 * Maps the flavor params name to id
