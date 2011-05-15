@@ -148,7 +148,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 //		$media->description = $entry->description;
 		$media->description = $this->findMetadataValue($metadataObjects, 'LongDescription');
-		$media->description .= ' (' . date('m/d/Y', $data->entryDistribution->sunrise) . ')';
+		$media->description .= ' (' . date('m/d/y', $data->entryDistribution->sunrise) . ')';
 		
 		$media->customData = new ComcastCustomData();
 		$media->customData[] = $this->newCustomDataElement('Headline', $this->findMetadataValue($metadataObjects, 'LongTitle'));
