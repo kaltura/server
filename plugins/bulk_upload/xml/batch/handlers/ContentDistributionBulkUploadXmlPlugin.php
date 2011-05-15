@@ -144,7 +144,7 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 		
 		$entryDistribution = new KalturaEntryDistribution();
 		$entryDistributionId = null;
-		if(is_array($entryDistributionResponse->objects))
+		if(is_array($entryDistributionResponse->objects) && count($entryDistributionResponse->objects) > 0)
 		{
 			$existingEntryDistribution = reset($entryDistributionResponse->objects);
 			$entryDistributionId = $existingEntryDistribution->id;
