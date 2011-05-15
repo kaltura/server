@@ -48,38 +48,22 @@
 						</xsl:choose>					
 					</Title>				
 					<ShortTitle>
-            <xsl:choose>
-              <xsl:when test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
-							  <xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
+						<xsl:choose>
+						  <xsl:when test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
+							<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
 						  </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="title" />
-              </xsl:otherwise>
-            </xsl:choose>
+						  <xsl:otherwise>
+							<xsl:value-of select="title" />
+						  </xsl:otherwise>
+						</xsl:choose>
 					</ShortTitle>
 					<Synopsis>
-            <xsl:choose>
-              <xsl:when test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/MediumDescription) > 0">
-							  <xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/MediumDescription" />
-						  </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="description" />
-              </xsl:otherwise>
-            </xsl:choose>
+						<xsl:value-of select="description" />
 					</Synopsis>
 					<Keyword>
-            <xsl:choose>
-              <xsl:when test="count(customData/metadata/keywords/keyword) > 0">
-                <xsl:call-template name="implode">
-                  <xsl:with-param name="items" select="customData/metadata/keywords/keyword" />
-                </xsl:call-template>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="implode">
-                  <xsl:with-param name="items" select="tags/tag" />
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
+						<xsl:call-template name="implode">
+							<xsl:with-param name="items" select="customData[@metadataProfileId = $metadataProfileId]/metadata/StatskeysFull/statskeys/statskey/statskeyName" />
+						</xsl:call-template>
 					</Keyword>
 				</BasicDescription>
 			</ProgramInformation> 
@@ -90,17 +74,10 @@
 					<StartOfAvailability>
 						<xsl:choose>
 							<xsl:when test="$deleteOp = ''">
-								<xsl:choose>
-									<xsl:when test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise) > 0">
-										<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise))" />
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z')" />
-									</xsl:otherwise>
-								</xsl:choose>
+								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(createdAt))" />
 							</xsl:when>
 							<xsl:otherwise>
-									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z',1295449112-2*86400)" />
+								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z',1295449112-2*86400)" />
 							</xsl:otherwise>
 						</xsl:choose>
 					</StartOfAvailability>

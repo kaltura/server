@@ -111,7 +111,7 @@ class IdeticDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		return array(entryPeer::NAME, entryPeer::DESCRIPTION, entryPeer::TAGS);
+		return array(entryPeer::DESCRIPTION);
 	}
 
 	/* (non-PHPdoc)
@@ -123,7 +123,7 @@ class IdeticDistributionProvider implements IDistributionProvider
 		
 		return array(
 			"/*[local-name()='metadata']/*[local-name()='".IdeticDistributionProfile::METADATA_FIELD_SHORTTITLE."']",
-			"/*[local-name()='metadata']/*[local-name()='".IdeticDistributionProfile::METADATA_FIELD_MEDIUMDESCRIPTION."']",
+			"/*[local-name()='metadata']/*[local-name()='".IdeticDistributionProfile::METADATA_FIELD_STATSKEY."']",
 		);	
 	}
 	
@@ -188,6 +188,7 @@ class IdeticDistributionProvider implements IDistributionProvider
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		$mrss = kMrssManager::getEntryMrss($entry);
+
 		if(!$mrss)
 		{
 			KalturaLog::err("No MRSS returned for entry [$entryId]");

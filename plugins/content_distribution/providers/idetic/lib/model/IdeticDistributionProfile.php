@@ -11,7 +11,7 @@ class IdeticDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
 	
 	const METADATA_FIELD_SHORTTITLE = 'ShortTitle';
-	const METADATA_FIELD_MEDIUMDESCRIPTION = 'MediumDescription';	
+	const METADATA_FIELD_STATSKEY = 'Statskeys';	
 
 	const ENTRY_NAME_MINIMUM_LENGTH = 1;
 	const ENTRY_NAME_MAXIMUM_LENGTH = 32;
@@ -29,6 +29,7 @@ class IdeticDistributionProfile extends DistributionProfile
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
+		
 		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
 		if(!$entry)
 		{
@@ -37,24 +38,6 @@ class IdeticDistributionProfile extends DistributionProfile
 			return $validationErrors;
 		}
 		
-		// validate entry name minumum length of 1 character
-		if(strlen($entry->getName()) < self::ENTRY_NAME_MINIMUM_LENGTH)
-		{
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, '');
-			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
-			$validationError->setValidationErrorParam(self::ENTRY_NAME_MINIMUM_LENGTH);
-			$validationErrors[] = $validationError;
-		}
-		
-/*		// validate entry name maximum length of 60 characters
-		if(strlen($entry->getName()) > self::ENTRY_NAME_MAXIMUM_LENGTH)
-		{
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, '');
-			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
-			$validationError->setValidationErrorParam(self::ENTRY_NAME_MAXIMUM_LENGTH);
-			$validationErrors[] = $validationError;
-		}
-	*/	
 		// validate entry description minumum length of 1 character
 		if(strlen($entry->getDescription()) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
 		{
@@ -64,15 +47,60 @@ class IdeticDistributionProfile extends DistributionProfile
 			$validationErrors[] = $validationError;
 		}
 		
-/*		// validate entry description maximum length of 60 characters
-		if(strlen($entry->getDescription()) > self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH)
+		if(!class_exists('MetadataProfile'))
+			return $validationErrors;
+			
+		$metadataFields = array(
+			self::METADATA_FIELD_SHORTTITLE,
+		);
+		
+		$metadataProfileId = $this->getMetadataProfileId();
+		if(!$metadataProfileId)
 		{
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::DESCRIPTION, '');
-			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
-			$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH);
-			$validationErrors[] = $validationError;
+			foreach($metadataFields as $metadataField)
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
+			return $validationErrors;
 		}
-	*/	
+		
+		foreach($metadataFields as $index => $metadataField)
+		{
+			$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, $metadataField);
+			if(!$metadataProfileCategoryField)
+			{
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
+				unset($metadataFields[$index]);
+				continue;
+			}
+		}
+		
+		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		if(!count($metadatas))
+		{
+			foreach($metadataFields as $metadataField)
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
+			return $validationErrors;
+		}
+		
+		foreach($metadataFields as $index => $metadataField)
+		{
+			$values = $this->findMetadataValue($metadatas, $metadataField);
+			
+			if(!count($values))
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
+				
+			foreach($values as $value)
+			{
+				if(!strlen($value))
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $metadataField, "");
+					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+					$validationError->setMetadataProfileId($metadataProfileId);
+					$validationErrors[] = $validationError;
+					break;
+				}
+			}
+		}
+		
 		return $validationErrors;
 	}
 	
