@@ -51,13 +51,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
-	 * The ingested assets for the current item
-	 * @var array<string>()
-	 */
-	private $ingestedAssetsIds = array();
-	
-	/**
-	 * 
 	 * Maps the flavor params name to id
 	 * @var array()
 	 */

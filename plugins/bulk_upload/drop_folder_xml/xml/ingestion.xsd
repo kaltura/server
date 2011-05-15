@@ -484,24 +484,8 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="ingestedAssetsIds" minOccurs="0" maxOccurs="1" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						List of ingested assets ids to be used in this distribution destination.
-						Could be used only on existing entry.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		
 		</xs:sequence>
 		<xs:attribute name="submitWhenReady" use="optional" type="xs:boolean" default="false" />
-		<xs:attribute name="assetId" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>
-					The asset id to be updated with this resource userd only for update
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 	</xs:complexType>
 	
 	<xs:complexType name="T_customData">
