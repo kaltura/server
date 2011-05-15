@@ -25,6 +25,11 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 	 */
 	public $vrzFlavorAssetId;
 	
+		/**
+	 * @var string
+	 */
+	public $thumbAssetId;
+	
 	/**
 	 * @var string
 	 */
@@ -57,7 +62,11 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 		$vrzFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile->vrzFlavorParamsId);
 		if($vrzFlavorAsset)
 			$this->vrzFlavorAssetId = $vrzFlavorAsset->getId();
-	
+
+		$thumbAssets = thumbAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
+		if(count($thumbAssets))
+			$this->thumbAssetId = reset($thumbAssets)->getId();
+			
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
 			$this->xml = VerizonDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId, $this);
 			
@@ -71,7 +80,8 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 	private static $map_between_objects = array
 	(
 		"xml" ,
-		"vrzFlavorAssetId" ,		
+		"vrzFlavorAssetId" ,
+		"thumbAssetId",		
 		"providerName" ,		
 		"providerId" ,		
 		"metadataProfileId" ,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-				xmlns:msdp="http://www.real.com/msdp"
+				xmlns:ns2="http://www.real.com/msdp"
 				xmlns:php="http://php.net/xsl" version="1.0">
 
 	<xsl:output omit-xml-declaration="no" method="xml" />
@@ -8,6 +8,7 @@
 	<xsl:variable name="metadataProfileId" />	
 	<xsl:variable name="deleteOp"/>	
 	<xsl:variable name="vrzFlavorAssetId" />
+	<xsl:variable name="thumbAssetId" />
 	<xsl:variable name="providerName" />
 	<xsl:variable name="providerId" />
 	
@@ -25,115 +26,113 @@
 	</xsl:template>
 		
 	<xsl:template match="item">
-		<rss xmlns="http://www.real.com/msdp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-			<xsl:attribute name="xsi:schemaLocation">http://www.real.com/msdp VCastRSS.xsd</xsl:attribute>
-			<channel>
-				<title>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
+		<ns2:rss xmlns:ns2="http://www.real.com/msdp" xmlns="http://www.real.com/msdp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<xsl:attribute name="xsi:schemaLocation">http://www.real.com/ns2 VCastRSS.xsd</xsl:attribute>
+			<ns2:channel>
+				<ns2:title>
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/LongTitle) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/LongTitle" />
 					</xsl:if>
-				</title>
-				<link>None</link>
-				<msdp:externalid><xsl:value-of select="entryId" /></msdp:externalid>
-				<shortdescription>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription" />
+				</ns2:title>
+				<ns2:link>None</ns2:link>
+				<ns2:externalid><xsl:value-of select="entryId" /></ns2:externalid>
+				<ns2:shortdescription>
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/LongTitle) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/LongTitle" />
 					</xsl:if>
-				</shortdescription>
-				<description><xsl:value-of select="description" /></description>
-				<msdp:keywords>
+				</ns2:shortdescription>
+				<ns2:description>
+					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/LongDescription) > 0">
+						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/LongDescription" />
+					</xsl:if>				
+				</ns2:description>
+				<ns2:keywords>
 					<xsl:if test="count(tags/tag) > 0">
 						<xsl:call-template name="implode">
-							<xsl:with-param name="items" select="tags/tag" />
+							<xsl:with-param name="items" select="customData[@metadataProfileId = $metadataProfileId]/metadata/StatskeysFull/statskeys/statskey/statskeyName" />
 						</xsl:call-template>
 					</xsl:if>
-				</msdp:keywords>
-				<pubDate>
+				</ns2:keywords>
+				<ns2:pubDate>
 					<xsl:value-of select="php:function('date', 'Y-m-d', sum(createdAt))" />
-				</pubDate>
-				<category>
+				</ns2:pubDate>
+				<ns2:category>
 					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonCategory) > 0">
 						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonCategory" />
 					</xsl:if>
-				</category>
-				<msdp:topStory>00:00:00</msdp:topStory>
-				<msdp:genre></msdp:genre>
-				<generator />
-				<rating>None</rating>
-				<msdp:copyright>
+				</ns2:category>
+				<ns2:topStory>00:00:00</ns2:topStory>
+				<ns2:genre></ns2:genre>
+				<ns2:generator />
+				<ns2:rating>None</ns2:rating>
+				<ns2:copyright>
 					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/copyright) > 0">
 						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/copyright" />
 					</xsl:if>
-				</msdp:copyright>
-				<msdp:entitlement>BASIC</msdp:entitlement>
-				<msdp:year><xsl:value-of select="php:function('date', 'Y', sum(createdAt))" /></msdp:year>
-				<msdp:liveDate>
+				</ns2:copyright>
+				<ns2:entitlement>BASIC</ns2:entitlement>
+				<ns2:year><xsl:value-of select="php:function('date', 'Y', sum(createdAt))" /></ns2:year>
+				<ns2:liveDate>
 					<xsl:choose>
 						<xsl:when test="$deleteOp = ''">
-							<xsl:choose>
-								<xsl:when test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise) > 0">
-									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000', sum(distribution[@distributionProfileId=$distributionProfileId]/sunrise))" />
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000')" />
-								</xsl:otherwise>
-							</xsl:choose>
+							<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000', sum(createdAt))" />
 						</xsl:when>
 						<xsl:otherwise>
 								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000',1295449112-2*86400)" />
 						</xsl:otherwise>
 					</xsl:choose>
-				</msdp:liveDate>
-				<xsl:choose>
-					<xsl:when test="$deleteOp = ''">
-						<xsl:if test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunset) > 0">
-							<msdp:endDate>
+				</ns2:liveDate>
+				<ns2:endDate>
+					<xsl:choose>
+						<xsl:when test="$deleteOp = ''">
+							<xsl:if test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunset) > 0">
 								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
-							</msdp:endDate>
-						</xsl:if>
-					</xsl:when>
-					<xsl:otherwise>						
-						<msdp:endDate>
-								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000',1295449112-86400)" />
-						</msdp:endDate>
-					</xsl:otherwise>
-				</xsl:choose>
-				<msdp:purchaseEndDate />
-				<msdp:priority>1</msdp:priority>
-				<msdp:allowStreaming>Y</msdp:allowStreaming>
-				<msdp:streamingPriceCode>284</msdp:streamingPriceCode>
-				<msdp:allowDownload>Y</msdp:allowDownload>
-				<msdp:downloadPriceCode>283</msdp:downloadPriceCode>
-				<msdp:allowFastForwarding>Y</msdp:allowFastForwarding>
-				<msdp:provider>
+							</xsl:if>
+						</xsl:when>
+						<xsl:otherwise>						
+							<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000',1295449112-86400)" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</ns2:endDate>
+				<ns2:purchaseEndDate />
+				<ns2:priority>1</ns2:priority>
+				<ns2:allowStreaming>Y</ns2:allowStreaming>
+				<ns2:streamingPriceCode>284</ns2:streamingPriceCode>
+				<ns2:allowDownload>N</ns2:allowDownload>
+				<ns2:downloadPriceCode>283</ns2:downloadPriceCode>
+				<ns2:allowFastForwarding>Y</ns2:allowFastForwarding>
+				<ns2:provider>
 					<xsl:value-of select="$providerName" />
- 				</msdp:provider>
-				<msdp:providerid>
+ 				</ns2:provider>
+				<ns2:providerid>
 					<xsl:value-of select="$providerId" />
-				</msdp:providerid>
-				<msdp:alertCode></msdp:alertCode>
-				<msdp:alertTimeToLive></msdp:alertTimeToLive>
-				<msdp:alertShowImage>N</msdp:alertShowImage>
-				<item>
-					<title>
-						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle) > 0">
-							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortTitle" />
-						</xsl:if>
-					</title>
+				</ns2:providerid>
+				<ns2:alertCode></ns2:alertCode>
+				<ns2:alertTimeToLive></ns2:alertTimeToLive>
+				<ns2:alertShowImage>N</ns2:alertShowImage>
+				<ns2:image ignore="N">
+					<ns2:type>thumbnail</ns2:type>
+					<ns2:url>
+					<xsl:if test="count(thumbnail[@thumbAssetId = $thumbAssetId])">
+							<xsl:value-of select="thumbnail[@thumbAssetId = $thumbAssetId]/@url"/>
+					</xsl:if>					
+					</ns2:url>
+					<ns2:title></ns2:title>
+				</ns2:image>
+				<ns2:item>
+					<ns2:title>
+					</ns2:title>
 					<link>None</link>
-					<description>
-						<xsl:if test="count(/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription) > 0">
-							<xsl:value-of select="/item/customData[@metadataProfileId = $metadataProfileId]/metadata/ShortDescription" />
-						</xsl:if>
-					</description>
-					<msdp:encode>Y</msdp:encode>
-					<msdp:move>Y</msdp:move>
+					<ns2:description>
+					</ns2:description>
+					<ns2:encode>Y</ns2:encode>
+					<ns2:move>Y</ns2:move>
 					<xsl:if test="count(content[@flavorAssetId = $vrzFlavorAssetId])">
 						<enclosure url="{content[@flavorAssetId = $vrzFlavorAssetId]/@url}/name/{entryId}.mp4" length="00:00:00" type="video" />
 					</xsl:if>
-					<guid></guid>
-				</item>
-			</channel>
-		</rss>
+					<ns2:guid></ns2:guid>
+				</ns2:item>
+			</ns2:channel>
+		</ns2:rss>
 	</xsl:template>
 </xsl:stylesheet>

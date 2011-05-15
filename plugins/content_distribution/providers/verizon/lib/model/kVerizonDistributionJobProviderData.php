@@ -24,6 +24,11 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 	 * @var string
 	 */
 	private $vrzFlavorAssetId;
+
+	/**
+	 * @var string
+	 */
+	private $thumbAssetId;
 	
 	/**
 	 * @var string
@@ -135,6 +140,22 @@ class kVerizonDistributionJobProviderData extends kDistributionJobProviderData
 	public function getProviderId()
 	{
 		return $this->providerId;
+	}
+	
+	/**
+	 * @return the $thumbAssetId
+	 */
+	public function getThumbAssetId()
+	{
+		return $this->thumbAssetId;
+	}
+
+	/**
+	 * @param string $thumbAssetId
+	 */
+	public function setThumbAssetId($thumbAssetId)
+	{
+		$this->thumbAssetId = $thumbAssetId;
 	}
 	
 }
