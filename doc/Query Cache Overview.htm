@@ -6,9 +6,9 @@
 <h3>General</h3>
 <p>
 The query cache is a generic mechanism for caching the results of database queries using memcache.
-The query cache uses a single shared memcache that will be added to each datacenter, and 
-not the machine local memcaches we use today.
-The query cache will in time deprecate several caches we have today such as partnerPeer::retrieveByPK 
+The query cache uses a single shared memcache that will be added to each datacenter
+(not machine local memcaches).
+The query cache will in time deprecate several caches such as partnerPeer::retrieveByPK 
 and entryPeer::doCountWithCache.
 </p>
 <h3>How does it work ?</h3>
@@ -54,7 +54,12 @@ $this object is saved.
 <li>&lt;peer&gt;::getCacheInvalidationKeys – returns a list of invalidation keys that should be checked before
 the supplied $criteria can be returned from the cache.
 </ul>
-See asset.php & assetPeer.php as an example.
+Use the following samples:
+<ul>
+<li>Basic cache: asset.php & assetPeer.php.
+<li>Multiple invalidation fields: kuser.php & kuserPeer.php.
+<li>IN criteria caching: permission.php & permissionPeer.php.
+</ul>
 </p>
 <h3>What is the process for setting up the query cache ?</h3>
 <p>
@@ -79,5 +84,20 @@ command 'select memc_servers_set('&lt;global memcache host&gt;:&lt;global memcac
 </ul>
 On all servers, set query_cache_enabled to true in kConfLocal (query_cache_invalidate_on_change should be left false).
 </p>
+<h3>Compilation notes</h3>
+<pre>
+wget http://launchpad.net/memcached-udfs/trunk/version-1.0/+download/memcached_functions_mysql-1.0.tar.gz
+wget http://launchpad.net/libmemcached/1.0/0.37/+download/libmemcached-0.37.tar.gz
+change:
+libmemcached/visibility.h:#  define LIBMEMCACHED_LOCAL  __attribute__ ((visibility("hidden")))
+to:
+libmemcached/visibility.h-#  define LIBMEMCACHED_LOCAL __attribute__ ((visibility("default")))
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/ ; pkg-config --libs --cflags libmemcached
+export PKG_CONFIG=/usr/bin/pkg-config
+vi /etc/ld.so.conf and add /usr/local/lib
+./configure --with-mysql=/usr/bin/mysql_config --libdir=/usr/lib64/mysql/
+make install
+cp /usr/lib64/mysql/libmemcached_functions_mysql* /usr/lib64/mysql/plugin/
+</pre>
 </body>
 </html>
