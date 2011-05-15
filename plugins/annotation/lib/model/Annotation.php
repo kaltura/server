@@ -29,12 +29,18 @@ class Annotation extends BaseAnnotation {
 	public function getPuserId()
 	{
 		$kuser =  KuserPeer::retrieveByPK($this->getKuserId());
+	    if (! $kuser) {
+					throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+		}
 		return $kuser->getPuserId();
 	} 
 	
 	public function setPuserId($v)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $v);
+	    if (! $kuser) {
+					throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+		}
 		return $this->setKuserId($kuser->getId());
 	} 
 	
