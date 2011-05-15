@@ -2,7 +2,7 @@
 
 class SphinxCriterion extends KalturaCriterion
 {
-	const MAX_IN_VALUES = 500;
+	const MAX_IN_VALUES = 50;
 	
 	/**
 	 * @var bool
