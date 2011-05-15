@@ -252,12 +252,13 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		{
 			foreach($comcastMediaFileList as $comcastMediaFile)
 			{
-				// the storedFileName is the asset id because we specified it at the end of the url
-				$storedFileName = explode('.', $comcastMediaFile->storedFileName);
-				list($assetId, $ext) = $storedFileName;
-				$remoteMediaFileId = $comcastMediaFile->ID;
+				$matches = null;
+				if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
+					continue;
+					
+				$assetId = $matches[1];
 				if(isset($data->mediaFiles[$assetId]))
-					$data->mediaFiles[$assetId]->remoteId = $remoteMediaFileId;
+					$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
 			}
 		}
 		
@@ -276,7 +277,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$template = new ComcastMediaFileTemplate();
 		$template->fields[] = array();
 		$template->fields[] = ComcastMediaFileField::_ID;
-		$template->fields[] = ComcastMediaFileField::_STOREDFILENAME;
+		$template->fields[] = ComcastMediaFileField::_ORIGINALLOCATION;
 		
 		$query = new ComcastQuery();
 		$query->name = 'ByIDs';
@@ -508,12 +509,13 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		{
 			foreach($comcastMediaFileList as $comcastMediaFile)
 			{
-				// the storedFileName is the asset id because we specified it at the end of the url
-				$storedFileName = explode('.', $comcastMediaFile->storedFileName);
-				list($assetId, $ext) = $storedFileName;
-				$remoteMediaFileId = $comcastMediaFile->ID;
+				$matches = null;
+				if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
+					continue;
+					
+				$assetId = $matches[1];
 				if(isset($data->mediaFiles[$assetId]))
-					$data->mediaFiles[$assetId]->remoteId = $remoteMediaFileId;
+					$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
 			}
 		}
 		KalturaLog::debug("Final Media Files [" . print_r($data->mediaFiles, true) . "]");
