@@ -34,10 +34,13 @@ class AnnotationPeer extends BaseAnnotationPeer {
 		
 		$c = new Criteria();
 		$puserId = kCurrentContext::$ks_uid;
-		$partnerId = kCurrentContext::$partner_id;
+		$partnerId = kCurrentContext::$ks_partner_id;
 		if ($puserId && $partnerId)
 		{
 			$kuserId = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		    if (! $kuserId) {
+				throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+			}
 			$c->addAnd(AnnotationPeer::KUSER_ID, $kuserId->getId());
 		}
 		self::$s_criteria_filter->setFilter($c);
