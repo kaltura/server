@@ -69,6 +69,11 @@ class ComcastLocationField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'LocationField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

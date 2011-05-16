@@ -133,6 +133,11 @@ class ComcastStatusDetail extends SoapObject
 					
 	const _VERIFYING = 'Verifying';
 					
+	public function getType()
+	{
+		return 'StatusDetail';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

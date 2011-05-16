@@ -3,6 +3,11 @@
 
 class ComcastRole extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'Role';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

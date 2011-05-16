@@ -3,6 +3,11 @@
 
 class ComcastStorefrontPageSort extends SoapObject
 {				
+	public function getType()
+	{
+		return 'StorefrontPageSort';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

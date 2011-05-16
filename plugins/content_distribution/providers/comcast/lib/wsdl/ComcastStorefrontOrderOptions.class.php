@@ -3,6 +3,11 @@
 
 class ComcastStorefrontOrderOptions extends SoapObject
 {				
+	public function getType()
+	{
+		return 'StorefrontOrderOptions';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

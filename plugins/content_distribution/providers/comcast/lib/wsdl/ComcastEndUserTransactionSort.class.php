@@ -3,6 +3,11 @@
 
 class ComcastEndUserTransactionSort extends SoapObject
 {				
+	public function getType()
+	{
+		return 'EndUserTransactionSort';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

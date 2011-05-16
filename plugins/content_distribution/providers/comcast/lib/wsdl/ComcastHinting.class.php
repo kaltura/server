@@ -9,6 +9,11 @@ class ComcastHinting extends SoapObject
 					
 	const _OPTIMIZEFORSPEED = 'OptimizeForSpeed';
 					
+	public function getType()
+	{
+		return 'Hinting';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

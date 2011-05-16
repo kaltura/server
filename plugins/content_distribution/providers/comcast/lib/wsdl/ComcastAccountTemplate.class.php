@@ -3,6 +3,11 @@
 
 class ComcastAccountTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'AccountTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

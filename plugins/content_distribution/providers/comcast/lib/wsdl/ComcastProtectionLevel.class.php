@@ -11,6 +11,11 @@ class ComcastProtectionLevel extends SoapObject
 					
 	const _NONE = 'None';
 					
+	public function getType()
+	{
+		return 'ProtectionLevel';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastRequest extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'Request';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

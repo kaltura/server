@@ -3,6 +3,11 @@
 
 class ComcastPortalSort extends SoapObject
 {				
+	public function getType()
+	{
+		return 'PortalSort';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

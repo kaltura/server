@@ -3,6 +3,11 @@
 
 class ComcastRestriction extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'Restriction';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

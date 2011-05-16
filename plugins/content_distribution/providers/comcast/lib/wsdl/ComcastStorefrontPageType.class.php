@@ -15,6 +15,11 @@ class ComcastStorefrontPageType extends SoapObject
 					
 	const _PORTAL = 'Portal';
 					
+	public function getType()
+	{
+		return 'StorefrontPageType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

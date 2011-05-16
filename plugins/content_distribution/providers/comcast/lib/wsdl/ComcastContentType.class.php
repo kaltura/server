@@ -19,6 +19,11 @@ class ComcastContentType extends SoapObject
 					
 	const _VIDEO = 'Video';
 					
+	public function getType()
+	{
+		return 'ContentType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

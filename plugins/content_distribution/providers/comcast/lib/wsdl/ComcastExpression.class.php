@@ -11,6 +11,11 @@ class ComcastExpression extends SoapObject
 					
 	const _UNKNOWN = 'Unknown';
 					
+	public function getType()
+	{
+		return 'Expression';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

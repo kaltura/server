@@ -9,6 +9,11 @@ class ComcastAuthentication extends SoapObject
 					
 	const _NONE = 'None';
 					
+	public function getType()
+	{
+		return 'Authentication';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastSystemStatusTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'SystemStatusTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

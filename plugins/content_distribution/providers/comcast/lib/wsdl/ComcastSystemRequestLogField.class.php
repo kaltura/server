@@ -87,6 +87,11 @@ class ComcastSystemRequestLogField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'SystemRequestLogField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

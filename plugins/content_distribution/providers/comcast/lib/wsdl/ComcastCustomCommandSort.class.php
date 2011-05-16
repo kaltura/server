@@ -3,6 +3,11 @@
 
 class ComcastCustomCommandSort extends SoapObject
 {				
+	public function getType()
+	{
+		return 'CustomCommandSort';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

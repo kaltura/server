@@ -3,6 +3,11 @@
 
 class ComcastEndUser extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'EndUser';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

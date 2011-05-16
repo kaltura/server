@@ -61,6 +61,11 @@ class ComcastUserField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'UserField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

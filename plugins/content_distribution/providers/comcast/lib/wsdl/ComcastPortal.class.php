@@ -3,6 +3,11 @@
 
 class ComcastPortal extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'Portal';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

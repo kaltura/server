@@ -3,6 +3,11 @@
 
 class ComcastRequestSort extends SoapObject
 {				
+	public function getType()
+	{
+		return 'RequestSort';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

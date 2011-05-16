@@ -3,6 +3,11 @@
 
 class ComcastSystemTask extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'SystemTask';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastAddContentResults extends SoapObject
 {				
+	public function getType()
+	{
+		return 'AddContentResults';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

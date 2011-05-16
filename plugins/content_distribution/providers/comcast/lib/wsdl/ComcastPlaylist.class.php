@@ -3,6 +3,11 @@
 
 class ComcastPlaylist extends ComcastContent
 {				
+	public function getType()
+	{
+		return 'Playlist';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

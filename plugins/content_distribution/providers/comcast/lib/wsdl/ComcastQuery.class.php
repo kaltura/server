@@ -3,6 +3,11 @@
 
 class ComcastQuery extends SoapObject
 {				
+	public function getType()
+	{
+		return 'Query';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -31,6 +31,11 @@ class ComcastSystemRequestType extends SoapObject
 					
 	const _USAGEREPORT = 'UsageReport';
 					
+	public function getType()
+	{
+		return 'SystemRequestType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

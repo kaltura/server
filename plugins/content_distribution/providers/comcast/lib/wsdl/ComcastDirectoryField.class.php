@@ -67,6 +67,11 @@ class ComcastDirectoryField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'DirectoryField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

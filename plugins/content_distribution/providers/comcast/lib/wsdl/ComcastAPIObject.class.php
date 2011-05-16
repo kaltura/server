@@ -67,6 +67,11 @@ class ComcastAPIObject extends SoapObject
 					
 	const _USER = 'User';
 					
+	public function getType()
+	{
+		return 'APIObject';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

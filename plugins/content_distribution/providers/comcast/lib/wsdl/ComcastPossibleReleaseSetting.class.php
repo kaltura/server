@@ -3,6 +3,11 @@
 
 class ComcastPossibleReleaseSetting extends SoapObject
 {				
+	public function getType()
+	{
+		return 'PossibleReleaseSetting';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

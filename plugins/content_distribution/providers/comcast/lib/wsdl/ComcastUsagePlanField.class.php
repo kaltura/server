@@ -57,6 +57,11 @@ class ComcastUsagePlanField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'UsagePlanField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

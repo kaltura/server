@@ -17,6 +17,11 @@ class ComcastStatus extends SoapObject
 					
 	const _OK = 'OK';
 					
+	public function getType()
+	{
+		return 'Status';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

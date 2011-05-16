@@ -55,6 +55,11 @@ class ComcastRoleField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'RoleField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

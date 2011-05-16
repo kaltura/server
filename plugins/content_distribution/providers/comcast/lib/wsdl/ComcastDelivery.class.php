@@ -19,6 +19,11 @@ class ComcastDelivery extends SoapObject
 					
 	const _NONE = 'None';
 					
+	public function getType()
+	{
+		return 'Delivery';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

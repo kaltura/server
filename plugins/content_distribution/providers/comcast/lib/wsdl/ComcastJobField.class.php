@@ -57,6 +57,11 @@ class ComcastJobField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'JobField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

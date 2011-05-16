@@ -3,6 +3,11 @@
 
 class ComcastUser extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'User';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

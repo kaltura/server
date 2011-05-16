@@ -169,6 +169,11 @@ class ComcastMediaFileField extends SoapObject
 					
 	const _WIDTH = 'width';
 					
+	public function getType()
+	{
+		return 'MediaFileField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

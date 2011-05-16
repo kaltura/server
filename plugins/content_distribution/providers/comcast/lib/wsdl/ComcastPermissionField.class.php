@@ -55,6 +55,11 @@ class ComcastPermissionField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'PermissionField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

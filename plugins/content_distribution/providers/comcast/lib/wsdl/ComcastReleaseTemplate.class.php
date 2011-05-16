@@ -3,6 +3,11 @@
 
 class ComcastReleaseTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'ReleaseTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -15,6 +15,11 @@ class ComcastTimeUnits extends SoapObject
 					
 	const _YEARS = 'years';
 					
+	public function getType()
+	{
+		return 'TimeUnits';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

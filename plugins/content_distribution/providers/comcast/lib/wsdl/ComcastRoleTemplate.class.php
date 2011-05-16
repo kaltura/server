@@ -3,6 +3,11 @@
 
 class ComcastRoleTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'RoleTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

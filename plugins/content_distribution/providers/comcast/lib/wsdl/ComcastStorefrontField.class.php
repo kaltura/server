@@ -161,6 +161,11 @@ class ComcastStorefrontField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'StorefrontField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

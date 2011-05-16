@@ -71,6 +71,11 @@ class ComcastEncoding extends SoapObject
 					
 	const _WESTERN_EUROPEAN_CWINDOWSD = 'Western European CWindowsD';
 					
+	public function getType()
+	{
+		return 'Encoding';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

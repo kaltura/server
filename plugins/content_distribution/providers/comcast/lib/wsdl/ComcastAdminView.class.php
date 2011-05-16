@@ -65,6 +65,11 @@ class ComcastAdminView extends SoapObject
 					
 	const _USAGE_REPORTS = 'Usage Reports';
 					
+	public function getType()
+	{
+		return 'AdminView';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

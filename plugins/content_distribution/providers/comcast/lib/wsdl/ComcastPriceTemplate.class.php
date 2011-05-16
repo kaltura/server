@@ -3,6 +3,11 @@
 
 class ComcastPriceTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'PriceTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

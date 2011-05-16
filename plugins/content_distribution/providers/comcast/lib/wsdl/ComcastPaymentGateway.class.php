@@ -11,6 +11,11 @@ class ComcastPaymentGateway extends SoapObject
 					
 	const _VERISIGNPAYFLOWPRO = 'VeriSignPayflowPro';
 					
+	public function getType()
+	{
+		return 'PaymentGateway';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

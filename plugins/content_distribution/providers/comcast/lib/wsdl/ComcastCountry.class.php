@@ -489,6 +489,11 @@ class ComcastCountry extends SoapObject
 					
 	const _COTHERD = 'COtherD';
 					
+	public function getType()
+	{
+		return 'Country';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

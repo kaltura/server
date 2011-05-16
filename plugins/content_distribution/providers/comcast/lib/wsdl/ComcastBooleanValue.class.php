@@ -3,6 +3,11 @@
 
 class ComcastBooleanValue extends ComcastFieldValue
 {				
+	public function getType()
+	{
+		return 'BooleanValue';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

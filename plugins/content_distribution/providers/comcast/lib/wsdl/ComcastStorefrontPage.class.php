@@ -3,6 +3,11 @@
 
 class ComcastStorefrontPage extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'StorefrontPage';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

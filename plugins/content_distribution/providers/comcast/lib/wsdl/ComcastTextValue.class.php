@@ -3,6 +3,11 @@
 
 class ComcastTextValue extends ComcastFieldValue
 {				
+	public function getType()
+	{
+		return 'TextValue';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -51,6 +51,11 @@ class ComcastAssetTypeField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'AssetTypeField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

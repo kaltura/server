@@ -345,6 +345,11 @@ class ComcastAccountField extends SoapObject
 					
 	const _WRITEACTIONLIMIT = 'writeActionLimit';
 					
+	public function getType()
+	{
+		return 'AccountField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

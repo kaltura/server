@@ -13,6 +13,11 @@ class ComcastFieldState extends SoapObject
 					
 	const _RW = 'RW';
 					
+	public function getType()
+	{
+		return 'FieldState';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

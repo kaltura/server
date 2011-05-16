@@ -9,6 +9,11 @@ class ComcastContactInfo extends SoapObject
 					
 	const _REQUIRED = 'Required';
 					
+	public function getType()
+	{
+		return 'ContactInfo';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

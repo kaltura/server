@@ -3,6 +3,11 @@
 
 class ComcastRelease extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'Release';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

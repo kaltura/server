@@ -25,6 +25,11 @@ class ComcastEndUserTransactionType extends SoapObject
 					
 	const _RENEWED = 'Renewed';
 					
+	public function getType()
+	{
+		return 'EndUserTransactionType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

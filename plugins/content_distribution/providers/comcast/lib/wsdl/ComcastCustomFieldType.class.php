@@ -15,6 +15,11 @@ class ComcastCustomFieldType extends SoapObject
 					
 	const _TEXT = 'Text';
 					
+	public function getType()
+	{
+		return 'CustomFieldType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

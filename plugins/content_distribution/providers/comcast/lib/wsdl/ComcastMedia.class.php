@@ -3,6 +3,11 @@
 
 class ComcastMedia extends ComcastContent
 {				
+	public function getType()
+	{
+		return 'Media';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

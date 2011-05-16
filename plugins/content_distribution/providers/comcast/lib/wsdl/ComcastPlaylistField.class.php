@@ -171,6 +171,11 @@ class ComcastPlaylistField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'PlaylistField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

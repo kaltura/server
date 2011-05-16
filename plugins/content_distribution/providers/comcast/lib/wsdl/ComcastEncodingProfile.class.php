@@ -3,6 +3,11 @@
 
 class ComcastEncodingProfile extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'EncodingProfile';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

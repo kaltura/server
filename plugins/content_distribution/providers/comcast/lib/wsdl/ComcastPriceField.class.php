@@ -53,6 +53,11 @@ class ComcastPriceField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'PriceField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastCodec extends SoapObject
 {				
+	public function getType()
+	{
+		return 'Codec';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

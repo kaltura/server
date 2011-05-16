@@ -9,6 +9,11 @@ class ComcastBitrateMode extends SoapObject
 					
 	const _VARIABLEWITHOUTMAXIMUM = 'VariableWithoutMaximum';
 					
+	public function getType()
+	{
+		return 'BitrateMode';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

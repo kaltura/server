@@ -3,6 +3,11 @@
 
 class ComcastAssetType extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'AssetType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

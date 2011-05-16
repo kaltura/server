@@ -3,6 +3,11 @@
 
 class ComcastEncodingProfileTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'EncodingProfileTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

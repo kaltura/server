@@ -3,6 +3,11 @@
 
 class ComcastUsagePlanTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'UsagePlanTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

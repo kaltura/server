@@ -61,6 +61,11 @@ class ComcastSystemStatusField extends SoapObject
 					
 	const _WEBXML = 'webXML';
 					
+	public function getType()
+	{
+		return 'SystemStatusField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

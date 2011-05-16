@@ -3,6 +3,11 @@
 
 class ComcastLocationTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'LocationTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

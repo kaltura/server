@@ -73,6 +73,11 @@ class ComcastRestrictionField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'RestrictionField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

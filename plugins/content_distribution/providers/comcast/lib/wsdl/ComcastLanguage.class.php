@@ -25,6 +25,8 @@ class ComcastLanguage extends SoapObject
 					
 	const _BENGALI = 'Bengali';
 					
+	const _BOSNIAN = 'Bosnian';
+					
 	const _BULGARIAN = 'Bulgarian';
 					
 	const _BURMESE = 'Burmese';
@@ -36,6 +38,8 @@ class ComcastLanguage extends SoapObject
 	const _CHEROKEE = 'Cherokee';
 					
 	const _CHINESE = 'Chinese';
+					
+	const _CREOLE = 'Creole';
 					
 	const _CROATIAN = 'Croatian';
 					
@@ -121,9 +125,13 @@ class ComcastLanguage extends SoapObject
 					
 	const _KHMER = 'Khmer';
 					
+	const _KIRUNDI_KINYARWANDA = 'Kirundi/Kinyarwanda';
+					
 	const _KONKANI = 'Konkani';
 					
 	const _KOREAN = 'Korean';
+					
+	const _KURDISH = 'Kurdish';
 					
 	const _KYRGYZ = 'Kyrgyz';
 					
@@ -153,6 +161,8 @@ class ComcastLanguage extends SoapObject
 					
 	const _NEPALI = 'Nepali';
 					
+	const _NORTHERN_NDEBELE = 'Northern Ndebele';
+					
 	const _NORWEGIAN = 'Norwegian';
 					
 	const _ORIYA = 'Oriya';
@@ -180,6 +190,8 @@ class ComcastLanguage extends SoapObject
 	const _SANSKRIT = 'Sanskrit';
 					
 	const _SERBIAN = 'Serbian';
+					
+	const _SHONA = 'Shona';
 					
 	const _SINDHI = 'Sindhi';
 					
@@ -251,6 +263,11 @@ class ComcastLanguage extends SoapObject
 					
 	const _COTHERD = 'COtherD';
 					
+	public function getType()
+	{
+		return 'Language';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

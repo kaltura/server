@@ -11,6 +11,11 @@ class ComcastStorefrontOrderType extends SoapObject
 					
 	const _PLAYLIST = 'Playlist';
 					
+	public function getType()
+	{
+		return 'StorefrontOrderType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

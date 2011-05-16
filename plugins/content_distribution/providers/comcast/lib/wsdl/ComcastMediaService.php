@@ -223,6 +223,304 @@ class ComcastMediaService extends ComcastClient
 	
 	/**
 	 * 
+	 * @param ComcastReleaseTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastReleaseSort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastReleaseList
+	 **/
+	public function getReleases(ComcastReleaseTemplate $template, ComcastQuery $query, ComcastReleaseSort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns25:ReleaseTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns19:ReleaseSort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getReleases", $params, 'ComcastReleaseList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastCustomFieldTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastCustomFieldSort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastCustomFieldList
+	 **/
+	public function getCustomFields(ComcastCustomFieldTemplate $template, ComcastQuery $query, ComcastCustomFieldSort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns24:CustomFieldTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns15:CustomFieldSort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getCustomFields", $params, 'ComcastCustomFieldList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastJobList $objects
+	 * 
+	 * @return ComcastIDList
+	 **/
+	public function addJobs(array $objects)
+	{
+		$params = array();
+		
+		$params["objects"] = $this->parseParam($objects, 'ns11:JobList');
+
+		$result = $this->doCall("addJobs", $params, 'ComcastIDList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastMediaTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastMediaSort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastMediaList
+	 **/
+	public function getMedia(ComcastMediaTemplate $template, ComcastQuery $query, ComcastMediaSort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns25:MediaTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns19:MediaSort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getMedia", $params, 'ComcastMediaList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastMediaFileTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastMediaFileSort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastMediaFileList
+	 **/
+	public function getMediaFiles(ComcastMediaFileTemplate $template, ComcastQuery $query, ComcastMediaFileSort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns25:MediaFileTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns19:MediaFileSort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getMediaFiles", $params, 'ComcastMediaFileList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastMediaList $objects
+	 * 
+	 **/
+	public function setMedia(array $objects)
+	{
+		$params = array();
+		
+		$params["objects"] = $this->parseParam($objects, 'ns17:MediaList');
+
+		$result = $this->doCall("setMedia", $params);
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastAssetTypeTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastAssetTypeSort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastAssetTypeList
+	 **/
+	public function getAssetTypes(ComcastAssetTypeTemplate $template, ComcastQuery $query, ComcastAssetTypeSort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns25:AssetTypeTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns19:AssetTypeSort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getAssetTypes", $params, 'ComcastAssetTypeList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastAssetTypeList $objects
+	 * 
+	 **/
+	public function setAssetTypes(array $objects)
+	{
+		$params = array();
+		
+		$params["objects"] = $this->parseParam($objects, 'ns17:AssetTypeList');
+
+		$result = $this->doCall("setAssetTypes", $params);
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastArrayOfstring $PIDs
+	 * 
+	 * @return ComcastArrayOfstring
+	 **/
+	public function getMediaOwners(array $PIDs)
+	{
+		$params = array();
+		
+		$params["PIDs"] = $this->parseParam($PIDs, 'ns14:ArrayOfstring');
+
+		$result = $this->doCall("getMediaOwners", $params, 'ComcastArrayOfstring');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastCategoryTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastCategorySort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastCategoryList
+	 **/
+	public function getCategories(ComcastCategoryTemplate $template, ComcastQuery $query, ComcastCategorySort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns25:CategoryTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns19:CategorySort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getCategories", $params, 'ComcastCategoryList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastCategoryList $objects
+	 * 
+	 **/
+	public function setCategories(array $objects)
+	{
+		$params = array();
+		
+		$params["objects"] = $this->parseParam($objects, 'ns17:CategoryList');
+
+		$result = $this->doCall("setCategories", $params);
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastUsagePlanTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastUsagePlanSort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastUsagePlanList
+	 **/
+	public function getUsagePlans(ComcastUsagePlanTemplate $template, ComcastQuery $query, ComcastUsagePlanSort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns26:UsagePlanTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns22:UsagePlanSort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getUsagePlans", $params, 'ComcastUsagePlanList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastUsagePlanList $objects
+	 * 
+	 **/
+	public function setUsagePlans(array $objects)
+	{
+		$params = array();
+		
+		$params["objects"] = $this->parseParam($objects, 'ns20:UsagePlanList');
+
+		$result = $this->doCall("setUsagePlans", $params);
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastRestrictionList $objects
+	 * 
+	 **/
+	public function setRestrictions(array $objects)
+	{
+		$params = array();
+		
+		$params["objects"] = $this->parseParam($objects, 'ns17:RestrictionList');
+
+		$result = $this->doCall("setRestrictions", $params);
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
+	 * @param ComcastRestrictionTemplate $template
+	 * @param ComcastQuery $query
+	 * @param ComcastRestrictionSort $sort
+	 * @param ComcastRange $range
+	 * 
+	 * @return ComcastRestrictionList
+	 **/
+	public function getRestrictions(ComcastRestrictionTemplate $template, ComcastQuery $query, ComcastRestrictionSort $sort, ComcastRange $range)
+	{
+		$params = array();
+		
+		$params["template"] = $this->parseParam($template, 'ns25:RestrictionTemplate');
+		$params["query"] = $this->parseParam($query, 'ns12:Query');
+		$params["sort"] = $this->parseParam($sort, 'ns19:RestrictionSort');
+		$params["range"] = $this->parseParam($range, 'ns12:Range');
+
+		$result = $this->doCall("getRestrictions", $params, 'ComcastRestrictionList');
+		$this->logError();
+		return $result;
+	}
+	
+	/**
+	 * 
 	 * @param ComcastAccountList $objects
 	 * 
 	 * @return ComcastIDList
@@ -474,45 +772,6 @@ class ComcastMediaService extends ComcastClient
 	
 	/**
 	 * 
-	 * @param ComcastRestrictionList $objects
-	 * 
-	 **/
-	public function setRestrictions(array $objects)
-	{
-		$params = array();
-		
-		$params["objects"] = $this->parseParam($objects, 'ns17:RestrictionList');
-
-		$result = $this->doCall("setRestrictions", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastRestrictionTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastRestrictionSort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastRestrictionList
-	 **/
-	public function getRestrictions(ComcastRestrictionTemplate $template, ComcastQuery $query, ComcastRestrictionSort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns25:RestrictionTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns19:RestrictionSort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getRestrictions", $params, 'ComcastRestrictionList');
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
@@ -621,29 +880,6 @@ class ComcastMediaService extends ComcastClient
 		$params["objects"] = $this->parseParam($objects, 'ns11:CustomFieldList');
 
 		$result = $this->doCall("setCustomFields", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastCustomFieldTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastCustomFieldSort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastCustomFieldList
-	 **/
-	public function getCustomFields(ComcastCustomFieldTemplate $template, ComcastQuery $query, ComcastCustomFieldSort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns24:CustomFieldTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns15:CustomFieldSort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getCustomFields", $params, 'ComcastCustomFieldList');
 		$this->logError();
 		return $result;
 	}
@@ -1528,45 +1764,6 @@ class ComcastMediaService extends ComcastClient
 	
 	/**
 	 * 
-	 * @param ComcastCategoryTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastCategorySort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastCategoryList
-	 **/
-	public function getCategories(ComcastCategoryTemplate $template, ComcastQuery $query, ComcastCategorySort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns25:CategoryTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns19:CategorySort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getCategories", $params, 'ComcastCategoryList');
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastCategoryList $objects
-	 * 
-	 **/
-	public function setCategories(array $objects)
-	{
-		$params = array();
-		
-		$params["objects"] = $this->parseParam($objects, 'ns17:CategoryList');
-
-		$result = $this->doCall("setCategories", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
 	 * 
 	 * @return ComcastCategoryTemplate
 	 **/
@@ -1769,45 +1966,6 @@ class ComcastMediaService extends ComcastClient
 	
 	/**
 	 * 
-	 * @param ComcastMediaTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastMediaSort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastMediaList
-	 **/
-	public function getMedia(ComcastMediaTemplate $template, ComcastQuery $query, ComcastMediaSort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns25:MediaTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns19:MediaSort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getMedia", $params, 'ComcastMediaList');
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastMediaList $objects
-	 * 
-	 **/
-	public function setMedia(array $objects)
-	{
-		$params = array();
-		
-		$params["objects"] = $this->parseParam($objects, 'ns17:MediaList');
-
-		$result = $this->doCall("setMedia", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
 	 * 
 	 * @return ComcastMediaTemplate
 	 **/
@@ -1883,29 +2041,6 @@ class ComcastMediaService extends ComcastClient
 		$params["IDs"] = $this->parseParam($IDs, 'ns12:IDSet');
 
 		$result = $this->doCall("deleteMediaFiles", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastMediaFileTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastMediaFileSort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastMediaFileList
-	 **/
-	public function getMediaFiles(ComcastMediaFileTemplate $template, ComcastQuery $query, ComcastMediaFileSort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns25:MediaFileTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns19:MediaFileSort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getMediaFiles", $params, 'ComcastMediaFileList');
 		$this->logError();
 		return $result;
 	}
@@ -2140,29 +2275,6 @@ class ComcastMediaService extends ComcastClient
 		$params["IDs"] = $this->parseParam($IDs, 'ns12:IDSet');
 
 		$result = $this->doCall("deleteReleases", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastReleaseTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastReleaseSort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastReleaseList
-	 **/
-	public function getReleases(ComcastReleaseTemplate $template, ComcastQuery $query, ComcastReleaseSort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns25:ReleaseTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns19:ReleaseSort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getReleases", $params, 'ComcastReleaseList');
 		$this->logError();
 		return $result;
 	}
@@ -3250,45 +3362,6 @@ class ComcastMediaService extends ComcastClient
 	
 	/**
 	 * 
-	 * @param ComcastUsagePlanTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastUsagePlanSort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastUsagePlanList
-	 **/
-	public function getUsagePlans(ComcastUsagePlanTemplate $template, ComcastQuery $query, ComcastUsagePlanSort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns26:UsagePlanTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns22:UsagePlanSort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getUsagePlans", $params, 'ComcastUsagePlanList');
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastUsagePlanList $objects
-	 * 
-	 **/
-	public function setUsagePlans(array $objects)
-	{
-		$params = array();
-		
-		$params["objects"] = $this->parseParam($objects, 'ns20:UsagePlanList');
-
-		$result = $this->doCall("setUsagePlans", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
 	 * 
 	 * @return ComcastUsagePlanTemplate
 	 **/
@@ -3577,22 +3650,6 @@ class ComcastMediaService extends ComcastClient
 	
 	/**
 	 * 
-	 * @param ComcastAssetTypeList $objects
-	 * 
-	 **/
-	public function setAssetTypes(array $objects)
-	{
-		$params = array();
-		
-		$params["objects"] = $this->parseParam($objects, 'ns17:AssetTypeList');
-
-		$result = $this->doCall("setAssetTypes", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
 	 * @param ComcastIDSet $IDs
 	 * 
 	 **/
@@ -3620,29 +3677,6 @@ class ComcastMediaService extends ComcastClient
 		$params["IDs"] = $this->parseParam($IDs, 'ns12:IDList');
 
 		$result = $this->doCall("copyAssetTypes", $params, 'ComcastIDList');
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastAssetTypeTemplate $template
-	 * @param ComcastQuery $query
-	 * @param ComcastAssetTypeSort $sort
-	 * @param ComcastRange $range
-	 * 
-	 * @return ComcastAssetTypeList
-	 **/
-	public function getAssetTypes(ComcastAssetTypeTemplate $template, ComcastQuery $query, ComcastAssetTypeSort $sort, ComcastRange $range)
-	{
-		$params = array();
-		
-		$params["template"] = $this->parseParam($template, 'ns25:AssetTypeTemplate');
-		$params["query"] = $this->parseParam($query, 'ns12:Query');
-		$params["sort"] = $this->parseParam($sort, 'ns19:AssetTypeSort');
-		$params["range"] = $this->parseParam($range, 'ns12:Range');
-
-		$result = $this->doCall("getAssetTypes", $params, 'ComcastAssetTypeList');
 		$this->logError();
 		return $result;
 	}
@@ -3691,23 +3725,6 @@ class ComcastMediaService extends ComcastClient
 		$params["template"] = $this->parseParam($template, 'ns25:AssetTypeTemplate');
 
 		$result = $this->doCall("setRequiredAssetTypeFields", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastJobList $objects
-	 * 
-	 * @return ComcastIDList
-	 **/
-	public function addJobs(array $objects)
-	{
-		$params = array();
-		
-		$params["objects"] = $this->parseParam($objects, 'ns11:JobList');
-
-		$result = $this->doCall("addJobs", $params, 'ComcastIDList');
 		$this->logError();
 		return $result;
 	}
@@ -3811,23 +3828,6 @@ class ComcastMediaService extends ComcastClient
 		$params["template"] = $this->parseParam($template, 'ns24:JobTemplate');
 
 		$result = $this->doCall("setRequiredJobFields", $params);
-		$this->logError();
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param ComcastArrayOfstring $PIDs
-	 * 
-	 * @return ComcastArrayOfstring
-	 **/
-	public function getMediaOwners(array $PIDs)
-	{
-		$params = array();
-		
-		$params["PIDs"] = $this->parseParam($PIDs, 'ns14:ArrayOfstring');
-
-		$result = $this->doCall("getMediaOwners", $params, 'ComcastArrayOfstring');
 		$this->logError();
 		return $result;
 	}

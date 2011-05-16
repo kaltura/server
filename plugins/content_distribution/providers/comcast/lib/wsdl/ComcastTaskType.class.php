@@ -33,6 +33,11 @@ class ComcastTaskType extends SoapObject
 					
 	const _VERIFYFILE = 'VerifyFile';
 					
+	public function getType()
+	{
+		return 'TaskType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

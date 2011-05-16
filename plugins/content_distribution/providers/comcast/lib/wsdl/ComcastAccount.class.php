@@ -3,6 +3,11 @@
 
 class ComcastAccount extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'Account';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

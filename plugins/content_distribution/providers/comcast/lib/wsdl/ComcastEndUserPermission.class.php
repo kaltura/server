@@ -3,6 +3,11 @@
 
 class ComcastEndUserPermission extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'EndUserPermission';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

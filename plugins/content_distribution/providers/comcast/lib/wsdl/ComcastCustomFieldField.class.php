@@ -73,6 +73,11 @@ class ComcastCustomFieldField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'CustomFieldField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

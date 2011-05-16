@@ -3,6 +3,11 @@
 
 abstract class ComcastFieldValue extends SoapObject
 {				
+	public function getType()
+	{
+		return 'FieldValue';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -9,6 +9,11 @@ class ComcastNotificationAction extends SoapObject
 					
 	const _DELETE = 'Delete';
 					
+	public function getType()
+	{
+		return 'NotificationAction';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

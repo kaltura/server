@@ -63,6 +63,8 @@ class ComcastFormat extends SoapObject
 					
 	const _MXF = 'MXF';
 					
+	const _MATROSKA = 'Matroska';
+					
 	const _MOVE = 'Move';
 					
 	const _OGG = 'Ogg';
@@ -109,6 +111,11 @@ class ComcastFormat extends SoapObject
 					
 	const _ZIP = 'Zip';
 					
+	public function getType()
+	{
+		return 'Format';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -7,6 +7,8 @@ class ComcastEncodingProvider extends SoapObject
 					
 	const _DIGITALRAPIDS = 'DigitalRapids';
 					
+	const _ELEMENTAL = 'Elemental';
+					
 	const _FLASHACCESS = 'FlashAccess';
 					
 	const _FLASHDYNAMIC = 'FlashDynamic';
@@ -20,6 +22,10 @@ class ComcastEncodingProvider extends SoapObject
 	const _FLIXENGINE8 = 'FlixEngine8';
 					
 	const _IISTRANSFORMMANAGER = 'IISTransformManager';
+					
+	const _INLET = 'Inlet';
+					
+	const _MARLIN = 'Marlin';
 					
 	const _MOVENETWORKS = 'MoveNetworks';
 					
@@ -37,6 +43,11 @@ class ComcastEncodingProvider extends SoapObject
 					
 	const _WM9 = 'WM9';
 					
+	public function getType()
+	{
+		return 'EncodingProvider';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

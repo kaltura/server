@@ -155,6 +155,11 @@ class ComcastTimeZone extends SoapObject
 					
 	const _KIRITIMATI = 'Kiritimati';
 					
+	public function getType()
+	{
+		return 'TimeZone';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

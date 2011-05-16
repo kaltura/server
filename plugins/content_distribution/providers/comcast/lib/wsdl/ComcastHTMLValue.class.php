@@ -3,6 +3,11 @@
 
 class ComcastHTMLValue extends ComcastFieldValue
 {				
+	public function getType()
+	{
+		return 'HTMLValue';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

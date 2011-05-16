@@ -125,6 +125,11 @@ class ComcastEndUserTransactionField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'EndUserTransactionField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -7,6 +7,11 @@ class ComcastContentClass extends SoapObject
 					
 	const _PLAYLIST = 'Playlist';
 					
+	public function getType()
+	{
+		return 'ContentClass';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

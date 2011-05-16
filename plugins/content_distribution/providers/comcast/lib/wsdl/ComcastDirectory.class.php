@@ -3,6 +3,11 @@
 
 class ComcastDirectory extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'Directory';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastDRMChallengeState extends SoapObject
 {				
+	public function getType()
+	{
+		return 'DRMChallengeState';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

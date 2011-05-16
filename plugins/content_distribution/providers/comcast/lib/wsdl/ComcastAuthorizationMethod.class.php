@@ -9,6 +9,11 @@ class ComcastAuthorizationMethod extends SoapObject
 					
 	const _STOREDPASSWORD = 'StoredPassword';
 					
+	public function getType()
+	{
+		return 'AuthorizationMethod';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -29,6 +29,8 @@ class ComcastServerIcon extends SoapObject
 					
 	const _EDGECAST = 'EdgeCast';
 					
+	const _EDGEWARE = 'Edgeware';
+					
 	const _EXODUS = 'Exodus';
 					
 	const _EXTERNAL = 'External';
@@ -71,6 +73,13 @@ class ComcastServerIcon extends SoapObject
 					
 	const _WINDOWS_MEDIA = 'Windows Media';
 					
+	const _YOUTUBE = 'YouTube';
+					
+	public function getType()
+	{
+		return 'ServerIcon';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

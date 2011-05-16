@@ -117,6 +117,11 @@ class ComcastEncodingProfileField extends SoapObject
 					
 	const _VIDEOKEYFRAMEINTERVAL = 'videoKeyFrameInterval';
 					
+	public function getType()
+	{
+		return 'EncodingProfileField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

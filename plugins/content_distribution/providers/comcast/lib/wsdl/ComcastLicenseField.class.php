@@ -147,6 +147,11 @@ class ComcastLicenseField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'LicenseField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

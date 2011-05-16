@@ -7,6 +7,11 @@ class ComcastMediaFileType extends SoapObject
 					
 	const _INTERNAL = 'Internal';
 					
+	public function getType()
+	{
+		return 'MediaFileType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

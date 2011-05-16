@@ -3,6 +3,11 @@
 
 class ComcastPermissionSort extends SoapObject
 {				
+	public function getType()
+	{
+		return 'PermissionSort';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

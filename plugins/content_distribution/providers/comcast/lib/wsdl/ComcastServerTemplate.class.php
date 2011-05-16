@@ -3,6 +3,11 @@
 
 class ComcastServerTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'ServerTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

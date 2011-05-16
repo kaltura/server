@@ -3,6 +3,11 @@
 
 class ComcastRoleSort extends SoapObject
 {				
+	public function getType()
+	{
+		return 'RoleSort';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

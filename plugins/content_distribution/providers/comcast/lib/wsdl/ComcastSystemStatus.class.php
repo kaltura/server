@@ -3,6 +3,11 @@
 
 class ComcastSystemStatus extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'SystemStatus';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

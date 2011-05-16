@@ -3,6 +3,11 @@
 
 class ComcastSystemRequestLog extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'SystemRequestLog';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

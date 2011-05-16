@@ -181,6 +181,11 @@ class ComcastMediaField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'MediaField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastRequestTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'RequestTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastCategory extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'Category';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastCustomFieldTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'CustomFieldTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

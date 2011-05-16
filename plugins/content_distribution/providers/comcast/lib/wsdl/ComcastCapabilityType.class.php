@@ -19,6 +19,11 @@ class ComcastCapabilityType extends SoapObject
 					
 	const _EDITSELF = 'EditSelf';
 					
+	public function getType()
+	{
+		return 'CapabilityType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

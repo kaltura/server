@@ -17,6 +17,11 @@ class ComcastCreditCardType extends SoapObject
 					
 	const _VISA = 'Visa';
 					
+	public function getType()
+	{
+		return 'CreditCardType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

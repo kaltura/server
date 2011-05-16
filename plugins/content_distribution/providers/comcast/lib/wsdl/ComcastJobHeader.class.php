@@ -3,6 +3,11 @@
 
 class ComcastJobHeader extends SoapObject
 {				
+	public function getType()
+	{
+		return 'JobHeader';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

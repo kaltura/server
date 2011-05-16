@@ -251,6 +251,11 @@ class ComcastPortalField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'PortalField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

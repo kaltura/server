@@ -17,6 +17,11 @@ class ComcastDayOfWeek extends SoapObject
 					
 	const _SATURDAY = 'Saturday';
 					
+	public function getType()
+	{
+		return 'DayOfWeek';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

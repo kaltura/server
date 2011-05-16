@@ -261,6 +261,11 @@ class ComcastReleaseField extends SoapObject
 					
 	const _WMRMREVOCATIONPUBLICKEY = 'wmrmRevocationPublicKey';
 					
+	public function getType()
+	{
+		return 'ReleaseField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

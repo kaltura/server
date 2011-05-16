@@ -3,6 +3,11 @@
 
 class ComcastEndUserTemplate extends SoapObject
 {				
+	public function getType()
+	{
+		return 'EndUserTemplate';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

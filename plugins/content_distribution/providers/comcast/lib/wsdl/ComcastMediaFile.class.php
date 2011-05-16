@@ -3,6 +3,11 @@
 
 class ComcastMediaFile extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'MediaFile';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

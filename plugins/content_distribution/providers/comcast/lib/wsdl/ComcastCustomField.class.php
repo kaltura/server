@@ -3,6 +3,11 @@
 
 class ComcastCustomField extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'CustomField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -97,6 +97,11 @@ class ComcastRequestField extends SoapObject
 					
 	const _USERNAME = 'userName';
 					
+	public function getType()
+	{
+		return 'RequestField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

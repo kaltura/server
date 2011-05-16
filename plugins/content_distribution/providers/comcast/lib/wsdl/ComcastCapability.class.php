@@ -3,6 +3,11 @@
 
 class ComcastCapability extends SoapObject
 {				
+	public function getType()
+	{
+		return 'Capability';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

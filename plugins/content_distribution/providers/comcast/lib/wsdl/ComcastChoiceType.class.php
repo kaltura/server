@@ -9,6 +9,11 @@ class ComcastChoiceType extends SoapObject
 					
 	const _STATIC = 'Static';
 					
+	public function getType()
+	{
+		return 'ChoiceType';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

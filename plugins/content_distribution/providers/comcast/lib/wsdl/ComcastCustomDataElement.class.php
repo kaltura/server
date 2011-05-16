@@ -3,6 +3,11 @@
 
 class ComcastCustomDataElement extends SoapObject
 {				
+	public function getType()
+	{
+		return 'CustomDataElement';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -3,6 +3,11 @@
 
 class ComcastPermission extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'Permission';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

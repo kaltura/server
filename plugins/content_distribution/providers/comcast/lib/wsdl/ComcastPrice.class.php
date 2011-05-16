@@ -3,6 +3,11 @@
 
 class ComcastPrice extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'Price';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

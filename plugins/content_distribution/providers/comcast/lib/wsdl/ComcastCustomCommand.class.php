@@ -3,6 +3,11 @@
 
 class ComcastCustomCommand extends ComcastBusinessObject
 {				
+	public function getType()
+	{
+		return 'CustomCommand';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

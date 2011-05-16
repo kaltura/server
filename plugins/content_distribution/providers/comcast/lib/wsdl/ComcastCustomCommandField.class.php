@@ -83,6 +83,11 @@ class ComcastCustomCommandField extends SoapObject
 					
 	const _WINDOWWIDTH = 'windowWidth';
 					
+	public function getType()
+	{
+		return 'CustomCommandField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

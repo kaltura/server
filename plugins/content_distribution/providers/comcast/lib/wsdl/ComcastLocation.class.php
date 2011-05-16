@@ -3,6 +3,11 @@
 
 class ComcastLocation extends ComcastStatusObject
 {				
+	public function getType()
+	{
+		return 'Location';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

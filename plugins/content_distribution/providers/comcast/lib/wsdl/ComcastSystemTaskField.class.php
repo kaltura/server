@@ -83,6 +83,11 @@ class ComcastSystemTaskField extends SoapObject
 					
 	const _VERSION = 'version';
 					
+	public function getType()
+	{
+		return 'SystemTaskField';
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)
