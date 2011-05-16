@@ -125,7 +125,7 @@ class ComcastLanguage extends SoapObject
 					
 	const _KHMER = 'Khmer';
 					
-	const _KIRUNDI/KINYARWANDA = 'Kirundi/Kinyarwanda';
+	const _KIRUNDI_KINYARWANDA = 'Kirundi/Kinyarwanda';
 					
 	const _KONKANI = 'Konkani';
 					
