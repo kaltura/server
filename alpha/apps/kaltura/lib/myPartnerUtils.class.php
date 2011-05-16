@@ -774,68 +774,32 @@ class myPartnerUtils
                 $totalStorage = 0;
                 $totalTraffic = 0;
                 $totalUsage = 0;
-                
-		$db_config = kConf::get( "reports_db_config" );
-		if(!isset($db_config['port']) || $db_config['port'] === null)
-			$db_config['port'] = 3306;
 
-		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
-		
-		ini_set('mysql.connect_timeout', $timeout );
-		//$link  = mysql_connect ( $db_config["host"] , $db_config["user"] , $db_config["password"] , null );
-	
-		//$db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
-		$linki = mysqli_connect($db_config["host"], $db_config["user"] , $db_config["password"], $db_config["db_name"], $db_config['port']); // leave these values for production deployment
-		//$linki = mysqli_connect($db_config["host"], $db_config["user"] , $db_config["password"], $db_config["db_name"]);
+		$reportFilter = new reportsInputFilter();
+		list($year, $month, $day) = explode('-', $report_date);
+		$reportFilter->from_date = gmmktime(0,0,0,$month, $day, $year);
 
-                /**
-                 * call stored-procedure on DWH that based on daily aggregation will return
-                 * all the required data.
-                 */
-                $query = 'CALL kalturadw.calc_partner_billing_data("'.$report_date.'" , '.$partner->getId().');';
+		list($header, $data) = myReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE ,
+		 $reportFilter, 10000 , 1 , "", null);
 
-		$result = mysqli_query($linki, $query);
-		// Check result
-		// This shows the actual query sent to MySQL, and the error. Useful for debugging.
-		if (!$result) 
-		{
-		
-		    $message  = 'Invalid query: ' . mysqli_error($linki) . "\n";
-		    $message .= 'Whole query: ' . $query;
-		    throw new Exception('could not get partner usage from DWH');
-		}
-			
-		$res = array();
-	
-		while ($row = mysqli_fetch_assoc($result)) 
-		{			
-			$res[] = $row;
-		}
-
-		mysqli_free_result($result);
-		mysqli_close($linki);
-                if($data_for_graph)
-		{
-		    return $res;
-		}
+		$avg_continuous_aggr_storage_mb_key = array_search('avg_continuous_aggr_storage_mb', $header);
+		$sum_partner_bandwidth_kb_key = array_search('sum_partner_bandwidth_kb', $header);
 		
                 // according to $partnerPackage['id'], decide which row to take (last date, or full rollup row)
                 if ($partnerPackage['id'] == 1) // free package
                 {
-		    // $res[count($res)-1] => total rollup, always irrelevant
-		    // $res[count($res)-2] => specific partner rollup, relevant for free partner
-                    $relevant_row = count($res)-2;
+		    // $res[count($res)-1] => specific partner rollup, relevant for free partner
+                    $relevant_row = count($data)-1;
                 }
                 else
                 {
-		    // $res[count($res)-1] => total rollup, always irrelevant
-		    // $res[count($res)-2] => specific partner rollup, relevant for free partner
-		    // $res[count($res)-3] => specific partner, last month, relevant for paying partner
-                    $relevant_row = count($res)-3;
+		    // $res[count($res)-1] => specific partner rollup, relevant for free partner
+		    // $res[count($res)-2] => specific partner, last month, relevant for paying partner
+                    $relevant_row = count($data)-2;
                 }
           
-                $totalStorage = $res[$relevant_row]['avg_continuous_aggr_storage_mb']; // MB
-                $totalTraffic = $res[$relevant_row]['sum_partner_bandwidth_kb']; // KB
+                $totalStorage = $data[$relevant_row][$avg_continuous_aggr_storage_mb_key]; // MB
+                $totalTraffic = $data[$relevant_row][$sum_partner_bandwidth_kb_key]; // KB
                 $totalUsage = ($totalStorage*1024) + $totalTraffic; // (MB*1024 => KB) + KB
 
                 return array( $totalStorage , $totalUsage , $totalTraffic );
@@ -1011,7 +975,34 @@ class myPartnerUtils
 		$partner->save();		
 	}
 		
-	public static function getPartnerUsageGraph( $year , $month , $partner , $resolution = 'days')
+	
+	public static function getPartnerBandwidthUsageFromDWH($partnerId, $startDate, $endDate, $resolution, $tzOffset = null)
+	{
+		$reportFilter = new reportsInputFilter();
+		
+		// use gmmktime to avoid server timezone offset - this is for backward compatibility while the KMC is not sending TZ info
+		list($year, $month, $day) = explode('-', $startDate);
+		$reportFilter->from_date = gmmktime(0, 0, 0, $month, $day, $year);
+		list($year, $month, $day) = explode('-', $endDate);
+		$reportFilter->to_date = gmmktime(0, 0, 0, $month, $day, $year);
+		
+		// if TZ offset provided, add TZ offset to the UTC time created above to reflect the user's timezone
+		// in myReportsMgr the offset will be later cleaned again to reflect UTC time so that the DWH query will be correct (with the TIME_SHIFT)
+		if(!is_null($tzOffset))
+		{
+			$tzOffsetSec = $tzOffset*60;
+			$reportFilter->timeZoneOffset = $tzOffsetSec;
+			$reportFilter->from_date = $reportFilter->from_date + $tzOffsetSec;
+			$reportFilter->to_date = $reportFilter->to_date + $tzOffsetSec;
+		}
+		$reportFilter->extra_map = array(
+			'{GROUP_COLUMN}' => (($resolution == 'months')? "month_id": "date_id"),
+		);
+		
+		$res = myReportsMgr::getGraph ( $partnerId , myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE , $reportFilter , null , null );
+		return $res;
+	}
+	public static function getPartnerUsageGraph( $year , $month , $partner , $resolution = 'days', $tzOffset = null)
 	{
 		if (!$resolution) $resolution = 'days';
 		
@@ -1021,8 +1012,7 @@ class myPartnerUtils
 		{
 			case 'weeks':
 			case 'days':
-				$end_date = $year .'-'. ($month + 1) .'-01';
-				$end_date_filter = Criteria::LESS_THAN;
+				$end_date = $year .'-'. ($month) .'-'.date('t', strtotime($year .'-'. ($month) .'-01'));
 				break;
 			
 			case 'months':
@@ -1030,30 +1020,23 @@ class myPartnerUtils
 				if ((int)date('Y') == $year)
 				{
 					$end_date = date('Y-m-d');
-					$end_date_filter = Criteria::LESS_EQUAL;
 				}
 				else 
 				{
-					$end_date = ((int)$year + 1).'-01-01';
-					$end_date_filter = Criteria::LESS_THAN;
+					$end_date = ((int)$year).'-12-31';
 				}
 				break;
 		}
-		
-		$c = new Criteria();
-		$c->addAnd ( PartnerActivityPeer::PARTNER_ID , $partner->getId() );
-		$c->addAnd ( PartnerActivityPeer::ACTIVITY_DATE, $start_date, Criteria::GREATER_EQUAL );
-		$c->addAnd ( PartnerActivityPeer::ACTIVITY_DATE, $end_date, $end_date_filter );
+		$data = myPartnerUtils::getPartnerBandwidthUsageFromDWH($partner->getId(), $start_date, $end_date, $resolution, $tzOffset);
+
 		if ($resolution != 'months')
 		{
-			$c->addAnd ( PartnerActivityPeer::ACTIVITY , PartnerActivity::PARTNER_ACTIVITY_TRAFFIC );
-			$activity = PartnerActivityPeer::doSelect( $c );
-			$graph_points['line'] = myPartnerUtils::daily_activity_to_graph($activity, $resolution, $start_date);
+			$graph_points['line'] = myPartnerUtils::daily_activity_to_graph($data, $resolution, $start_date);
 		}
 		else
 		{
-			$activity = myPartnerUtils::collectPartnerUsageFromDWH($partner, 1, $end_date, true );
-			$graph_points['line'] = myPartnerUtils::year_activity_to_graph($activity, $year);
+			//$activity = myPartnerUtils::collectPartnerUsageFromDWH($partner, 1, $end_date, true );
+			$graph_points['line'] = myPartnerUtils::year_activity_to_graph($data, $year);
 		}
 		$strGraphLine = '';
 
@@ -1069,49 +1052,32 @@ class myPartnerUtils
 	
 	public static function year_activity_to_graph($act, $requested_year)
 	{
-		$points = array();
-		foreach($act as $activity)
+		$points = array_fill(1, 12, 0);
+		
+		if(!isset($act['bandwidth'])) return $points;
+		foreach($act['bandwidth'] as $month_id => $activity)
 		{
-			$year = floor($activity['month_id']/100);
-			$month = $activity['month_id'] - ($year*100);
+			$year = floor($month_id/100);
+			$month = $month_id - ($year*100);
 			if($requested_year != $year)
 				continue;
-			$points[(int)$month] = round($activity['sum_partner_bandwidth_kb']/1024); // Amount2 is in KB, converting to MB
+			$points[(int)$month] = round($activity/1024); // bandwidth info returned from DWH is in KB, converting to MB
 		}
 
-		// pad empty months value with value of 0
-		for($i=1;$i<=12;$i++) 
-		{
-			if (!isset($points[$i]))
-			{
-				$points[$i] = 0;
-			}
-		}
 		return $points;
 	}		
 
 	
 	public static function daily_activity_to_graph($act, $res, $start_date)
 	{
-		$points = array();
-		foreach ($act as $row)
-		{
-			$date = explode('/', $row->getActivityDate()); // expected output m/d/Y
-			if (!isset($points[(int)$date[1]]))
-			{
-				$points[(int)$date[1]] = 0;
-			}
-			$points[(int)$date[1]] += round(($row->getAmount()/1024)); // normalize to MB
-		}
-	
-		// pad empty array cells with 0 traffic
 		$days_in_month = date('t', (int)strtotime($start_date));
-		for($i=1;$i<=$days_in_month;$i++) 
+		$points = array_fill(1, $days_in_month, 0);
+		
+		if(!isset($act['bandwidth'])) return $points;
+		foreach ($act['bandwidth'] as $date_id => $bw)
 		{
-			if(!isset($points[$i])) 
-			{
-				$points[$i] = 0;
-			}
+			$day = $date_id%100;
+			$points[$day] += round($bw); // normalize to MB
 		}
 		return $points;
  	}
