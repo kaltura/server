@@ -1479,7 +1479,7 @@ class wsdl extends nusoap_base {
 			if (is_object($value)) {
 				$value = get_object_vars($value);
 			}
-			if (is_array($value)) {
+			if (is_array($value) || $value instanceof SoapArray) {
 				$elementAttrs = $this->serializeComplexTypeAttributes($typeDef, $value, $ns, $uqType);
 				if ($use == 'literal') {
 					if ($forceType) {
