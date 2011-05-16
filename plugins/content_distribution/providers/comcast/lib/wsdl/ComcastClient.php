@@ -11,6 +11,8 @@ class ComcastClient extends nusoap_client
 		$this->password = $password;
 		
 		parent::__construct($wsdlUrl, 'wsdl');
+		
+		$this->setDebugLevel(1);
 	}
 
 	function parseParam($value, $type = null)
@@ -42,6 +44,11 @@ class ComcastClient extends nusoap_client
 			throw new Exception($this->getError());
 		}
 	}
+
+	function appendDebug($string)
+	{
+		return parent::appendDebug("$string\n");
+	}
 	
 	/**
 	 * @param string $operation
@@ -50,7 +57,10 @@ class ComcastClient extends nusoap_client
 	 */
 	function doCall($operation, array $params = array(), $returnedType = null)
 	{
+		$this->clearDebug();
 		$result = $this->call($operation, $params);
+		KalturaLog::debug($this->debug_str);
+		
 		if(!$result)
 			return false;
 			
@@ -59,6 +69,7 @@ class ComcastClient extends nusoap_client
 			
 		$return = new $returnedType();
 		$return->fromArray($result);
+		
 		return $return;
 	}
 }
