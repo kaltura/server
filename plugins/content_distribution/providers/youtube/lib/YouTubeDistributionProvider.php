@@ -63,7 +63,7 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	 */
 	public function isMediaUpdateEnabled()
 	{
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)
@@ -71,6 +71,7 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	 */
 	public function isReportsEnabled()
 	{
+		// not in scope
 		return false;
 	}
 
@@ -90,29 +91,6 @@ class YouTubeDistributionProvider implements IDistributionProvider
 		return false;
 	}
 
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getJobIntervalBeforeSunrise()
-	 */
-	public function getJobIntervalBeforeSunrise()
-	{
-//		maybe should be taken from local config and not kConf
-		if(kConf::hasParam('msn_distribution_interval_before_sunrise'))
-			return kConf::get('msn_distribution_interval_before_sunrise');
-			
-		return 0;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getJobIntervalBeforeSunset()
-	 */
-	public function getJobIntervalBeforeSunset()
-	{
-//		maybe should be taken from local config and not kConf
-		if(kConf::hasParam('msn_distribution_interval_before_sunset'))
-			return kConf::get('msn_distribution_interval_before_sunset');
-			
-		return 0;
-	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
