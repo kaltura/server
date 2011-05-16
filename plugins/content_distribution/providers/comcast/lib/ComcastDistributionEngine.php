@@ -155,7 +155,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		$media->customData = array();
 		$media->customData[] = $this->newCustomDataElement('Headline', $this->findMetadataValue($metadataObjects, 'LongTitle'));
-		$media->customData[] = $this->newCustomDataElement('providerExternalId', $entry->id);
+//		$media->customData[] = $this->newCustomDataElement('providerExternalId', $entry->id);
 		$media->customData[] = $this->newCustomDataElement('Link Href', $distributionProfile->linkHref);
 		$media->customData[] = $this->newCustomDataElement('Link Text', $distributionProfile->linkText);
 		$media->customData[] = $this->newCustomDataElement('Notes to Comcast', $distributionProfile->notesToComcast);
