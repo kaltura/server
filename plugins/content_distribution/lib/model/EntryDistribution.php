@@ -72,7 +72,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		if(!is_null($sunrise))
 			return $sunrise;
 			
-		$entry = entryPeer::retrieveByPK($this->getEntryId());
+		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
 		if(!$entry)
 			return null;
 				
@@ -92,7 +92,7 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		if(!is_null($sunset))
 			return $sunset;
 			
-		$entry = entryPeer::retrieveByPK($this->getEntryId());
+		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
 		if(!$entry)
 			return null;
 				
