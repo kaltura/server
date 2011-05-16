@@ -64,10 +64,19 @@
 				<ns2:topStory>00:00:00</ns2:topStory>
 				<ns2:genre></ns2:genre>
 				<ns2:generator />
-				<ns2:rating>None</ns2:rating>
+				<ns2:rating>
+					<xsl:choose>
+						<xsl:when test="customData[@metadataProfileId = $metadataProfileId]/metadata/ContentRating = 'Y7FV'">
+							TV-Y7-FV
+						</xsl:when>
+						<xsl:otherwise>						
+							TV-<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/ContentRating" />
+						</xsl:otherwise>
+					</xsl:choose>				
+				</ns2:rating>
 				<ns2:copyright>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/copyright) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/copyright" />
+					<xsl:if test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunset) > 0">
+						<xsl:value-of select="php:function('date', 'Y', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
 					</xsl:if>
 				</ns2:copyright>
 				<ns2:entitlement>BASIC</ns2:entitlement>
@@ -86,7 +95,7 @@
 					<xsl:choose>
 						<xsl:when test="$deleteOp = ''">
 							<xsl:if test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunset) > 0">
-								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s\Z', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
+								<xsl:value-of select="php:function('date', 'Y-m-d\TH:i:s.000', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
 							</xsl:if>
 						</xsl:when>
 						<xsl:otherwise>						
