@@ -16,7 +16,8 @@ class myReportsMgr
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER = 100;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE = 101;
-
+	const REPORT_TYPE_PARTNER_BANDWIDTH_USAGE = 200;
+	
 	const REPORTS_COUNT_CACHE = 60;
 	
 
@@ -524,6 +525,7 @@ class myReportsMgr
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER => "system_generic_partner" ,
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE => "system_generic_partner_type" ,
+		self::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => "partner_bandwidth_usage" ,
 		
 	);
 	

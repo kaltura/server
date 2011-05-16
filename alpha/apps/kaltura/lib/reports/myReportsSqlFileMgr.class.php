@@ -194,7 +194,15 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"detail_no_text" => "!detail",
 				"count" => "count",
 				"count_no_text" => "!count",
-			),		
+			),
+			"partner_bandwidth_usage" => array (
+				"detail_no_text" => "",
+				"count_no_text" => "",
+				"total" => "",
+				"total_no_text" => "",
+				"graph" => "",
+				"graph_no_text" => "!graph",
+			),
 		);
 
 		if ( isset ( $map[$type_str] ) )
