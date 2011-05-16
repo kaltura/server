@@ -22,12 +22,17 @@ class SoapObject
 				{
 					$this->$field = new $attributeType();
 					$this->$field->fromArray($value);
+					continue;
+				}
+				
+				if(isset($value['!']))
+				{
+					$this->$field = $value['!'];
+					continue;
 				}
 			}
-			else
-			{
-				$this->$field = $value;
-			}
+			
+			$this->$field = $value;
 		}
 	}
 }
