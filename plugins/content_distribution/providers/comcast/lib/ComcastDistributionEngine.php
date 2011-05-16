@@ -254,9 +254,14 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			{
 				$matches = null;
 				if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
+				{
+					KalturaLog::err("Cannot extract asset id from original location [{$comcastMediaFile->originalLocation}]");
 					continue;
+				}
 					
 				$assetId = $matches[1];
+				KalturaLog::debug("Extract asset id [$assetId] for remote id [{$comcastMediaFile->ID}] from original location [{$comcastMediaFile->originalLocation}]");
+				
 				if(isset($data->mediaFiles[$assetId]))
 					$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
 			}
@@ -511,9 +516,14 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			{
 				$matches = null;
 				if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
+				{
+					KalturaLog::err("Cannot extract asset id from original location [{$comcastMediaFile->originalLocation}]");
 					continue;
+				}
 					
 				$assetId = $matches[1];
+				KalturaLog::debug("Extract asset id [$assetId] for remote id [{$comcastMediaFile->ID}] from original location [{$comcastMediaFile->originalLocation}]");
+				
 				if(isset($data->mediaFiles[$assetId]))
 					$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
 			}
