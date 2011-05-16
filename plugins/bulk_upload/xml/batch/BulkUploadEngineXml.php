@@ -1149,7 +1149,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry->startDate = self::parseFormatedDate((string)$item->startDate);
 		if(!$entry->startDate) //if start date is not set we will use now
 		{
-			$entry->startDate = date();
+			$entry->startDate = date('YmdTHis');
 		}
 		
 		$entry->endDate = self::parseFormatedDate((string)$item->endDate);
