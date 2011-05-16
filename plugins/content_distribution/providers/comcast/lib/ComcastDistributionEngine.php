@@ -89,9 +89,12 @@ class ComcastDistributionEngine extends DistributionEngine implements
 
 	protected function newCustomDataElement($title, $value = '')
 	{
+		$valueObject = new ComcastTextValue();
+		$valueObject->text = $value;
+		
 		$customDataElement = new ComcastCustomDataElement();
 		$customDataElement->title = $title;
-		$customDataElement->value = array($value);
+		$customDataElement->value = $valueObject;
 		return $customDataElement;
 	}
 	
