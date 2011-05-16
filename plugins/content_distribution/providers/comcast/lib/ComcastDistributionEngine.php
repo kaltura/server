@@ -248,24 +248,28 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			$mediaFileIDs[] = $mediaFileID;
 
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
-		if($comcastMediaFileList)
+		if(!count($comcastMediaFileList))
 		{
-			foreach($comcastMediaFileList as $comcastMediaFile)
-			{
-				$matches = null;
-				if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
-				{
-					KalturaLog::err("Cannot extract asset id from original location [{$comcastMediaFile->originalLocation}]");
-					continue;
-				}
-					
-				$assetId = $matches[1];
-				KalturaLog::debug("Extract asset id [$assetId] for remote id [{$comcastMediaFile->ID}] from original location [{$comcastMediaFile->originalLocation}]");
-				
-				if(isset($data->mediaFiles[$assetId]))
-					$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
-			}
+			KalturaLog::err("No media files returned");
+			return false;
 		}
+		
+		foreach($comcastMediaFileList as $comcastMediaFile)
+		{
+			$matches = null;
+			if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
+			{
+				KalturaLog::err("Cannot extract asset id from original location [{$comcastMediaFile->originalLocation}]");
+				continue;
+			}
+				
+			$assetId = $matches[1];
+			KalturaLog::debug("Extract asset id [$assetId] for remote id [{$comcastMediaFile->ID}] from original location [{$comcastMediaFile->originalLocation}]");
+			
+			if(isset($data->mediaFiles[$assetId]))
+				$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
+		}
+		KalturaLog::debug("Final Media Files [" . print_r($data->mediaFiles, true) . "]");
 		
 		return false;
 	}
@@ -509,24 +513,27 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
 		$data->mediaFiles = $finalMediaFiles;
-		KalturaLog::debug("Sent Media Files [" . print_r($finalMediaFiles, true) . "]");
-		if($comcastMediaFileList)
+	
+		if(!count($comcastMediaFileList))
 		{
-			foreach($comcastMediaFileList as $comcastMediaFile)
+			KalturaLog::err("No media files returned");
+			return true;
+		}
+		
+		foreach($comcastMediaFileList as $comcastMediaFile)
+		{
+			$matches = null;
+			if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
 			{
-				$matches = null;
-				if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
-				{
-					KalturaLog::err("Cannot extract asset id from original location [{$comcastMediaFile->originalLocation}]");
-					continue;
-				}
-					
-				$assetId = $matches[1];
-				KalturaLog::debug("Extract asset id [$assetId] for remote id [{$comcastMediaFile->ID}] from original location [{$comcastMediaFile->originalLocation}]");
-				
-				if(isset($data->mediaFiles[$assetId]))
-					$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
+				KalturaLog::err("Cannot extract asset id from original location [{$comcastMediaFile->originalLocation}]");
+				continue;
 			}
+				
+			$assetId = $matches[1];
+			KalturaLog::debug("Extract asset id [$assetId] for remote id [{$comcastMediaFile->ID}] from original location [{$comcastMediaFile->originalLocation}]");
+			
+			if(isset($data->mediaFiles[$assetId]))
+				$data->mediaFiles[$assetId]->remoteId = $comcastMediaFile->ID;
 		}
 		KalturaLog::debug("Final Media Files [" . print_r($data->mediaFiles, true) . "]");
 		
