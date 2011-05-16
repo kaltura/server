@@ -69,6 +69,11 @@ foreach($argv as $arg)
 		return;*/
 $entry = entryPeer::retrieveByPKNoFilter($entryId);
 $mrss = kMrssManager::getEntryMrss($entry);
+
+//$allParts = explode('</item>', $mrss);
+//$add  = '<customData metadataProfileId="1"><metadata><ContentRating>YY</ContentRating><LongDescription>Desc ong</LongDescription><LongTitle>Tan-Tan test 1 long title</LongTitle> <StatskeysFull> <statskeys><statskey>  <statskeyId>230</statskeyId> <statskeyName>More Sports</statskeyName>   <statskeyType>Sport</statskeyType>   <parentId>0</parentId> </statskey> <statskey>  <statskeyId>220</statskeyId> <statskeyName>Golf</statskeyName> <statskeyType>Sport</statskeyType>   <parentId>230</parentId>   </statskey> <statskey> <statskeyId>222</statskeyId> <statskeyName>LPGA</statskeyName>   <statskeyType>League</statskeyType>   <parentId>220</parentId> </statskey> <statskey>  <statskeyId>2241</statskeyId>   <statskeyName>Annika Sorenstam</statskeyName> <statskeyType>Player</statskeyType> <parentId>222</parentId> </statskey><statskey>  <statskeyId>433</statskeyId> <statskeyName>Premier League</statskeyName> <statskeyType>League</statskeyType> <parentId>177</parentId> </statskey> <statskey><statskeyId>568</statskeyId><statskeyName>Manchester United</statskeyName> <statskeyType>Team</statskeyType> <parentId>433</parentId></statskey></statskeys></StatskeysFull></metadata></customData>';
+//$mrss = $allParts[0] . $add . '</item>';
+
 file_put_contents('mrss.xml', $mrss);
 KalturaLog::debug("MRSS [$mrss]");
 
@@ -89,9 +94,9 @@ $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
 $distributionJobData->entryDistribution = $entryDistribution;
 
-//$vez = new VerizonDistributionProfile();
-//print_r($vez->validateForSubmission($dbEntryDistribution, "submit"));
-//return;
+$vez = new VerizonDistributionProfile();
+print_r($vez->validateForSubmission($dbEntryDistribution, "submit"));
+return;
 
 $providerData = new KalturaVerizonDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;

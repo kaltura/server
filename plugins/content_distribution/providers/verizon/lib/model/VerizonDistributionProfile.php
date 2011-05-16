@@ -13,9 +13,12 @@ class VerizonDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_PROVIDER_ID = 'providerId';	
 	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
 
-	const CUSTOM_DATA_METADATA_SHORT_TITLE = 'ShortTitle';	
-	const CUSTOM_DATA_METADATA_SHORT_DESCRIPTION = 'ShortDescription';	
+	const CUSTOM_DATA_METADATA_LONG_TITLE = 'LongTitle';	
+	const CUSTOM_DATA_METADATA_LONG_DESCRIPTION = 'LongDescription';	
 	const CUSTOM_DATA_METADATA_CATEGORY = 'VerizonCategory';	
+	const CUSTOM_METADATA_FIELD_STATSKEY = 'Statskeys';	
+	const CUSTOM_METADATA_FIELD_RATING = 'ContentRating';	
+	
 	
 	
 	
@@ -39,8 +42,9 @@ class VerizonDistributionProfile extends DistributionProfile
 			
 		$requiredFields = array(
 			self::CUSTOM_DATA_METADATA_CATEGORY,
-			self::CUSTOM_DATA_METADATA_SHORT_DESCRIPTION,
-			self::CUSTOM_DATA_METADATA_SHORT_TITLE,
+			self::CUSTOM_DATA_METADATA_LONG_DESCRIPTION,
+			self::CUSTOM_DATA_METADATA_LONG_TITLE,
+			self::CUSTOM_METADATA_FIELD_RATING,
 		);
 		
 		$metadataProfileId = $this->getMetadataProfileId();

@@ -111,9 +111,6 @@ class VerizonDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		if(kConf::hasParam('verizon_update_required_entry_fields'))
-			return kConf::get('verizon_update_required_entry_fields');
-			
 		return array();
 	}
 
@@ -122,10 +119,12 @@ class VerizonDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		if(kConf::hasParam('verizon_update_required_metadata_xpaths'))
-			return kConf::get('verizon_update_required_metadata_xpaths');
-			
-		return array();
+		return array(
+			"/*[local-name()='metadata']/*[local-name()='".VerizonDistributionProfile::CUSTOM_DATA_METADATA_LONG_DESCRIPTION."']",
+			"/*[local-name()='metadata']/*[local-name()='".VerizonDistributionProfile::CUSTOM_DATA_METADATA_LONG_TITLE."']",
+			"/*[local-name()='metadata']/*[local-name()='".VerizonDistributionProfile::CUSTOM_METADATA_FIELD_RATING."']",
+			"/*[local-name()='metadata']/*[local-name()='".VerizonDistributionProfile::CUSTOM_METADATA_FIELD_STATSKEY."']",
+		);	
 	}
 	
 	/**
