@@ -658,7 +658,11 @@ class kJobsManager
 		if($parentJob)
 		{
 			//Job will be created with parent job as his root job
-			$batchJob = $parentJob->createChild(false); 
+			$useSameRoot = true;
+			if($parentJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+				$useSameRoot = false;
+				
+			$batchJob = $parentJob->createChild($useSameRoot); 
 		}
 		else
 		{
