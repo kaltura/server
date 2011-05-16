@@ -32,7 +32,10 @@ DbManager::initialize();
 
 kCurrentContext::$ps_vesion = 'ps3';
 
-$entryId = '0_g0bhfji7';
+
+//$entryId = '0_g0bhfji7';
+$entryId = '0_jctc2lwp';
+
 /*
 $matches = null;
 if (preg_match ( "/x0y.*.err/" , '/pub/in/x0y.title.err' , $matches))
@@ -94,9 +97,9 @@ $entryDistribution->fromObject($dbEntryDistribution);
 $distributionJobData->entryDistributionId = $entryDistribution->id;
 $distributionJobData->entryDistribution = $entryDistribution;
 
-$vez = new VerizonDistributionProfile();
-print_r($vez->validateForSubmission($dbEntryDistribution, "submit"));
-return;
+//$vez = new VerizonDistributionProfile();
+//print_r($vez->validateForSubmission($dbEntryDistribution, "submit"));
+//return;
 
 $providerData = new KalturaVerizonDistributionJobProviderData($distributionJobData);
 $distributionJobData->providerData = $providerData;

@@ -111,7 +111,7 @@ class VerizonDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		return array();
+		return array(entryPeer::CATEGORIES);
 	}
 
 	/* (non-PHPdoc)

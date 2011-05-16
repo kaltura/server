@@ -1,4 +1,5 @@
 <?php
+require_once 'KalturaVerizonCategoryMapping.php';
 /**
  * @package plugins.verizonDistribution
  * @subpackage api.objects
@@ -24,6 +25,11 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 	 * @var string
 	 */
 	public $vrzFlavorAssetId;
+
+	/**
+	 * @var string
+	 */
+	public $vrzCategory;
 	
 		/**
 	 * @var string
@@ -66,7 +72,19 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 		$thumbAssets = thumbAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		if(count($thumbAssets))
 			$this->thumbAssetId = reset($thumbAssets)->getId();
-			
+		
+		$entry = entryPeer::retrieveByPKNoFilter($distributionJobData->entryDistribution->entryId);
+		$allCategories = explode(',',$entry->getCategories());
+		foreach ($allCategories  as $aCategory)
+		{
+			$val = KalturaVerizonCategoryMapping::getMapping(trim($aCategory));
+			if ($val != null)
+			{
+				$this->vrzCategory = $val;
+				break;
+			}
+		}
+		
 		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
 			$this->xml = VerizonDistributionProvider::generateSubmitXML($distributionJobData->entryDistribution->entryId, $this);
 			
@@ -82,6 +100,7 @@ class KalturaVerizonDistributionJobProviderData extends KalturaDistributionJobPr
 		"xml" ,
 		"vrzFlavorAssetId" ,
 		"thumbAssetId",		
+		"vrzCategory",
 		"providerName" ,		
 		"providerId" ,		
 		"metadataProfileId" ,

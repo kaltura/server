@@ -15,7 +15,6 @@ class VerizonDistributionProfile extends DistributionProfile
 
 	const CUSTOM_DATA_METADATA_LONG_TITLE = 'LongTitle';	
 	const CUSTOM_DATA_METADATA_LONG_DESCRIPTION = 'LongDescription';	
-	const CUSTOM_DATA_METADATA_CATEGORY = 'VerizonCategory';	
 	const CUSTOM_METADATA_FIELD_STATSKEY = 'Statskeys';	
 	const CUSTOM_METADATA_FIELD_RATING = 'ContentRating';	
 	
@@ -41,7 +40,6 @@ class VerizonDistributionProfile extends DistributionProfile
 			return $validationErrors;
 			
 		$requiredFields = array(
-			self::CUSTOM_DATA_METADATA_CATEGORY,
 			self::CUSTOM_DATA_METADATA_LONG_DESCRIPTION,
 			self::CUSTOM_DATA_METADATA_LONG_TITLE,
 			self::CUSTOM_METADATA_FIELD_RATING,

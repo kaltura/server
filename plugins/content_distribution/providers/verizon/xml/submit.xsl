@@ -11,6 +11,8 @@
 	<xsl:variable name="thumbAssetId" />
 	<xsl:variable name="providerName" />
 	<xsl:variable name="providerId" />
+	<xsl:variable name="vrzCategory" />
+	
 	
 
 	<xsl:template name="implode">
@@ -54,12 +56,9 @@
 					</xsl:if>
 				</ns2:keywords>
 				<ns2:pubDate>
-					<xsl:value-of select="php:function('date', 'Y-m-d', sum(createdAt))" />
 				</ns2:pubDate>
 				<ns2:category>
-					<xsl:if test="count(customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonCategory) > 0">
-						<xsl:value-of select="customData[@metadataProfileId = $metadataProfileId]/metadata/VerizonCategory" />
-					</xsl:if>
+					<xsl:value-of select="$vrzCategory" />
 				</ns2:category>
 				<ns2:topStory>00:00:00</ns2:topStory>
 				<ns2:genre></ns2:genre>
