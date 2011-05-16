@@ -11,6 +11,8 @@ class ComcastClient extends nusoap_client
 		$this->password = $password;
 		
 		parent::__construct($wsdlUrl, 'wsdl');
+		
+		$this->setDebugLevel(1);
 	}
 
 	function parseParam($value, $type = null)
@@ -33,12 +35,19 @@ class ComcastClient extends nusoap_client
 	{
 		if ($this->getError())
 		{
-			file_put_contents('err.log', $this->getError());
-			file_put_contents('request.log', $this->request);
-			file_put_contents('response.log', $this->response);
-			echo("ComcastClient error calling operation: [".$this->operation."], error: [".$this->getError()."], request: [".$this->request."], response: [".$this->response."]");
-			//KalturaLog::err("ComcastClient error calling operation: [".$this->operation."], error: [".$this->getError()."], request: [".$this->request."], response: [".$this->response."]");
+			$err = "Error calling operation: [".$this->operation."], error: [".$this->getError()."], request: [".$this->request."], response: [".$this->response."]";
+			if(class_exists('KalturaLog'))
+				KalturaLog::err($err);
+			else 
+				echo $err;
+				
+			throw new Exception($this->getError());
 		}
+	}
+
+	function appendDebug($string)
+	{
+		return parent::appendDebug("$string\n");
 	}
 	
 	/**
@@ -48,12 +57,19 @@ class ComcastClient extends nusoap_client
 	 */
 	function doCall($operation, array $params = array(), $returnedType = null)
 	{
+		$this->clearDebug();
 		$result = $this->call($operation, $params);
+		KalturaLog::debug($this->debug_str);
+		
+		if(!$result)
+			return false;
+			
 		if(!$returnedType)
 			return $returnedType;
 			
 		$return = new $returnedType();
 		$return->fromArray($result);
+		
 		return $return;
 	}
 }
