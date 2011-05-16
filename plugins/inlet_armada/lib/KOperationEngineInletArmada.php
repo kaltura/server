@@ -7,12 +7,13 @@
  */
 class KOperationEngineInletArmada  extends KSingleOutputOperationEngine
 {
-
+	protected $taskConfig = null;
+/*
 	protected $url=null;
 	protected $login=null;
 	protected $passw=null;
 	protected $prio=5;
-
+*/
 	public function __construct($cmd, $outFilePath)
 	{
 		parent::__construct($cmd,$outFilePath);
@@ -35,38 +36,69 @@ class KOperationEngineInletArmada  extends KSingleOutputOperationEngine
 	 */
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
-//$this->outFilePath = "k:".$this->outFilePath;
-		KalturaLog::debug("operator===>".print_r($operator,1));
-/*		if(mkdir($this->outFilePath))
-			KalturaLog::debug("SUCCESS");
-		else 
-			KalturaLog::debug("FAILURE");
-*/
-$encodingTemplate;
-		sscanf($operator->extra,"encodingTemplate=%s",&$encodingTemplate);
+		KalturaLog::debug("operator==>".print_r($operator,1));
 
-		$inlet = new InletAPIWrap($this->url);
+$encodingTemplate;
+$srcPrefixWindows;
+$srcPrefixLinux;
+$trgPrefixWindows;
+
+			// ---------------------------------
+			// Evaluate and set various Inlet Armada session params
+		if($this->taskConfig->params->InletStorageRootWindows) $srcPrefixWindows = $this->taskConfig->params->InletStorageRootWindows;
+		if($this->taskConfig->params->InletStorageRootLinux)   $srcPrefixLinux = $this->taskConfig->params->InletStorageRootLinux;
+		if($this->taskConfig->params->InletTmpStorageWindows)  $trgPrefixWindows = $this->taskConfig->params->InletTmpStorageWindows;
+
+		$url = $this->taskConfig->params->InletArmadaUrl;
+		$login = $this->taskConfig->params->InletArmadaLogin;
+		$passw = $this->taskConfig->params->InletArmadaPassword;
+		if($this->taskConfig->params->InletArmadaPriority)
+			$prio = $this->taskConfig->params->InletArmadaPriority;
+		else
+			$prio = 5;
+			// ----------------------------------
+			
+		sscanf($operator->extra,"encodingTemplate=%s",&$encodingTemplate);
+		
+		$inlet = new InletAPIWrap($url);
 		KalturaLog::debug(print_r($inlet,1));
 		$rvObj=new XmlRpcData;
 		
-		$rv=$inlet->userLogon($this->login, $this->passw, $rvObj);
+		$rv=$inlet->userLogon($login, $passw, $rvObj);
 		if(!$rv) {
 			throw new KOperationEngineException("Inlet failure: login, rv(".(print_r($rvObj,true)).")");
 		}
 		KalturaLog::debug("userLogon - ".print_r($rvObj,1));
 		
+			// Adjust linux file path to Inlet Armada Windows path
+		if($srcPrefixWindows && $srcPrefixLinux) {
+			$srcPrefixLinux = $this->addLastSlashInFolderPath($srcPrefixLinux, "/");
+			$srcPrefixWindows = $this->addLastSlashInFolderPath($srcPrefixWindows, "\\");
+			$srcFileWindows  = str_replace($srcPrefixLinux, $srcPrefixWindows, $inFilePath);
+		}
+		else
+			$srcFileWindows  = $inFilePath;
+			
+		if($trgPrefixWindows){
+			$trgPrefixLinux = $this->addLastSlashInFolderPath($this->taskConfig->params->localTempPath, "/");
+			$trgPrefixWindows = $this->addLastSlashInFolderPath($trgPrefixWindows, "\\");
+			$outFileWindows = str_replace($trgPrefixLinux, $trgPrefixWindows, $this->outFilePath);
+		}
+		else
+			$outFileWindows = $this->outFilePath;
+			
 		$rv=$inlet->jobAdd(			
 				$encodingTemplate,			// job template id
-				$inFilePath,		// String job_source_file, 
-				$this->outFilePath,		// String job_destination_file, 
-				$this->prio,				// Int priority, 
-				$inFilePath,			// String description, 
+				$srcFileWindows,		// String job_source_file, 
+				$outFileWindows,		// String job_destination_file, 
+				$prio,				// Int priority, 
+				$srcFileWindows,			// String description, 
 				array(),"",
 				$rvObj);						
 		if(!$rv) {
 			throw new KOperationEngineException("Inlet failure: add job, rv(".print_r($rvObj,1).")");
 		}
-		KalturaLog::debug("jobAdd - encodingTemplate($encodingTemplate), inFilePath($inFilePath), outFilePath($this->outFilePath),rv-".print_r($rvObj,1));
+		KalturaLog::debug("jobAdd - encodingTemplate($encodingTemplate), inFile($srcFileWindows), outFile($outFileWindows),rv-".print_r($rvObj,1));
 		
 		$jobId=$rvObj->job_id;
 		$attemptCnt=0;
@@ -90,17 +122,22 @@ $encodingTemplate;
 			}
 			$attemptCnt++;
 		}
-		
+//KalturaLog::debug("XXX taskConfig=>".print_r($this->taskConfig,1));
 		KalturaLog::debug("Job completed successfully - ".print_r($rvObj,1));
-		if($rvObj->job_list[0]->job_output_file!=$this->outFilePath) {
-			KalturaLog::debug("copy($rvObj->job_list[0]->job_output_file, $this->outFilePath)");
-			copy($rvObj->job_list[0]->job_output_file, $this->outFilePath);
+
+		if($trgPrefixWindows) {
+			$trgPrefixLinux = $this->addLastSlashInFolderPath($this->taskConfig->params->sharedTempPath, "/");
+			$outFileLinux = str_replace($trgPrefixWindows, $trgPrefixLinux, $rvObj->job_list[0]->job_output_file);
+//KalturaLog::debug("XXX str_replace($trgPrefixWindows, ".$trgPrefixLinux.", ".$rvObj->job_list[0]->job_output_file.")==>$outFileLinux");
 		}
-/*
-		parent::operate($operator, $inFilePath, $configFilePath);
-		rename("$this->outFilePath//playlist.m3u8", "$this->outFilePath//playlist.tmp");
-		self::parsePlayList("$this->outFilePath//playlist.tmp","$this->outFilePath//playlist.m3u8");
-*/
+		else
+			$outFileLinux = $rvObj->job_list[0]->job_output_file;
+			
+		if($outFileLinux!=$this->outFilePath) {
+			KalturaLog::debug("copy($outFileLinux, ".$this->outFilePath.")");
+			kFile::moveFile($outFileLinux, $this->outFilePath, true);
+			//copy($outFileLinux, $this->outFilePath);
+		}
 	}
 
 	/*************************************
@@ -109,7 +146,9 @@ $encodingTemplate;
 	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
 	{
 		parent::configure($taskConfig, $data);
-
+		
+		$this->taskConfig = $taskConfig;
+		
 		$errStr=null;
 		if(!$taskConfig->params->InletArmadaUrl)
 			$errStr="InletArmadaUrl";
@@ -128,7 +167,7 @@ $encodingTemplate;
 		
 		if($errStr)
 			throw new KOperationEngineException("Inlet failure: missing credentials - $errStr");//, url(".$taskConfig->params->InletArmadaUrl."), login(."$taskConfig->params->InletArmadaLogin."),passw(".$taskConfig->params->InletArmadaPassword.")");
-		
+/*		
 		$this->url =	$taskConfig->params->InletArmadaUrl;
 		$this->login =	$taskConfig->params->InletArmadaLogin;
 		$this->passw =	$taskConfig->params->InletArmadaPassword;
@@ -136,31 +175,18 @@ $encodingTemplate;
 			$this->prio =	$taskConfig->params->InletArmadaPriority;
 		else
 			$this->prio = 5;
+*/
 		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
 	}
 
 	/*************************************
 	 * 
 	 */
-	private function parsePlayList($fileIn, $fileOut)
+	private function addLastSlashInFolderPath($pathStr, $slashCh)
 	{
-		$fdIn = fopen($fileIn, 'r');
-		if($fdIn==false)
-			return false;
-		$fdOut = fopen($fileOut, 'w');
-		if($fdOut==false)
-			return false;
-		$strIn=null;
-		while ($strIn=fgets($fdIn)){
-			if(strstr($strIn,"---")){
-				$i=strrpos($strIn,"/");
-				$strIn = substr($strIn,$i+1);
-			}
-			fputs($fdOut,$strIn);
-			echo $strIn;
-		}
-		fclose($fdOut);
-		fclose($fdIn);
-		return true;
+		if($pathStr[strlen($pathStr)-1]!=$slashCh)
+			return $pathStr.$slashCh;
+		else
+			return $pathStr;
 	}
 }
