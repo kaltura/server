@@ -1545,7 +1545,7 @@ class wsdl extends nusoap_base {
 			} else {
 				$cols = '';
 			} 
-			if (is_array($value) && sizeof($value) >= 1) {
+			if ((is_array($value) || $value instanceof SoapArray) && sizeof($value) >= 1) {
 				$rows = sizeof($value);
 				$contents = '';
 				foreach($value as $k => $v) {
