@@ -657,7 +657,8 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild();
+			//Job will be created with parent job as his root job
+			$batchJob = $parentJob->createChild(false); 
 		}
 		else
 		{
