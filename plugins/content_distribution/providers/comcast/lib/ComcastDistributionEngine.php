@@ -150,7 +150,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$media->description = $this->findMetadataValue($metadataObjects, 'LongDescription');
 		$media->description .= ' (' . date('m/d/y', $data->entryDistribution->sunrise) . ')';
 		
-		$media->customData = array();
+		$media->customData = new ComcastCustomData();
 		$media->customData[] = $this->newCustomDataElement('Headline', $this->findMetadataValue($metadataObjects, 'LongTitle'));
 		$media->customData[] = $this->newCustomDataElement('providerExternalId', $entry->id);
 		$media->customData[] = $this->newCustomDataElement('Link Href', $distributionProfile->linkHref);
