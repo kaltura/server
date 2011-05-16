@@ -516,13 +516,16 @@ class ComcastDistributionEngine extends DistributionEngine implements
 		$comcastMediaFileList = $this->getMediaFiles($distributionProfile, $mediaFileIDs);
 		$data->mediaFiles = $finalMediaFiles;
 	
-		if(!count($comcastMediaFileList))
+		
+		$arr = $comcastMediaFileList->toArray();
+		if(!count($arr))
 		{
 			KalturaLog::err("No media files returned");
-			return true;
+			return false;
 		}
+		KalturaLog::debug("Media files [" . print_r($arr, true) . "]");
 		
-		foreach($comcastMediaFileList as $comcastMediaFile)
+		foreach($arr as $comcastMediaFile)
 		{
 			$matches = null;
 			if(!preg_match('/\/filename\/(\d_[^.]{8,})[.]/', $comcastMediaFile->originalLocation, $matches))
