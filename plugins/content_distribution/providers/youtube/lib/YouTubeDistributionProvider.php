@@ -90,6 +90,24 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	{
 		return false;
 	}
+	
+	/**
+	 * returns how many seconds before sunrise the job could be created.
+	 * @return int
+	 */
+	public function getJobIntervalBeforeSunrise()
+	{
+		return 0; //irrelevant
+	}
+	
+	/**
+	 * returns how many seconds before sunrise the job could be created.
+	 * @return int
+	 */
+	public function getJobIntervalBeforeSunset()
+	{
+		return 0; //irrelevant
+	}
 
 
 	/* (non-PHPdoc)
