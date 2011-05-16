@@ -1293,6 +1293,9 @@ class wsdl extends nusoap_base {
 	 */
 	function serializeType($name, $type, $value, $use='encoded', $encodingStyle=false, $unqualified=false)
 	{
+		if($value instanceof SoapObject && $value->getType())
+			$type = $value->getType();
+			
 		$this->debug("in serializeType: name=$name, type=$type, use=$use, encodingStyle=$encodingStyle, unqualified=" . ($unqualified ? "unqualified" : "qualified"));
 		$this->appendDebug("value=" . $this->varDump($value));
 		if($use == 'encoded' && $encodingStyle) {

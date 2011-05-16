@@ -6,6 +6,11 @@
  */
 class SoapObject
 {
+	public function getType()
+	{
+		return null;
+	}
+	
 	protected function getAttributeType($attributeName)
 	{
 		return null;
