@@ -5,9 +5,9 @@ class ComcastLargeTextValue extends ComcastFieldValue
 {				
 	public function getType()
 	{
-		return 'LargeTextValue';
+		return 'urn:theplatform-com:v4/base/:LargeTextValue';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

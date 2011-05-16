@@ -5,9 +5,9 @@ class ComcastAccount extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'Account';
+		return 'urn:theplatform-com:v4/admin/value/:Account';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

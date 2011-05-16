@@ -5,9 +5,9 @@ class ComcastStorefrontOrder extends SoapObject
 {				
 	public function getType()
 	{
-		return 'StorefrontOrder';
+		return 'urn:theplatform-com:v4/rights/enum/:StorefrontOrder';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

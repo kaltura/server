@@ -5,9 +5,9 @@ class ComcastChoice extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'Choice';
+		return 'urn:theplatform-com:v4/content/value/:Choice';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

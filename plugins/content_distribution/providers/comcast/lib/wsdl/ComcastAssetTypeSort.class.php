@@ -5,9 +5,9 @@ class ComcastAssetTypeSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'AssetTypeSort';
+		return 'urn:theplatform-com:v4/content/sort/:AssetTypeSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

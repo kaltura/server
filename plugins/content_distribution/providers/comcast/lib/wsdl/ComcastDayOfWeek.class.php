@@ -19,9 +19,9 @@ class ComcastDayOfWeek extends SoapObject
 					
 	public function getType()
 	{
-		return 'DayOfWeek';
+		return 'urn:theplatform-com:v4/enum/:DayOfWeek';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

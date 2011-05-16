@@ -5,9 +5,9 @@ class ComcastEncodingProfileSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'EncodingProfileSort';
+		return 'urn:theplatform-com:v4/content/sort/:EncodingProfileSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

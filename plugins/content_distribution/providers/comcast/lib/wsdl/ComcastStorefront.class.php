@@ -5,9 +5,9 @@ class ComcastStorefront extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'Storefront';
+		return 'urn:theplatform-com:v4/rights/value/:Storefront';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

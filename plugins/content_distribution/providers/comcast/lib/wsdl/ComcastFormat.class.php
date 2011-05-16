@@ -113,9 +113,9 @@ class ComcastFormat extends SoapObject
 					
 	public function getType()
 	{
-		return 'Format';
+		return 'urn:theplatform-com:v4/enum/:Format';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

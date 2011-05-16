@@ -85,9 +85,9 @@ class ComcastCustomCommandField extends SoapObject
 					
 	public function getType()
 	{
-		return 'CustomCommandField';
+		return 'urn:theplatform-com:v4/admin/enum/:CustomCommandField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

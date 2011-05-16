@@ -5,9 +5,9 @@ abstract class ComcastFieldValue extends SoapObject
 {				
 	public function getType()
 	{
-		return 'FieldValue';
+		return 'urn:theplatform-com:v4/base/:FieldValue';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

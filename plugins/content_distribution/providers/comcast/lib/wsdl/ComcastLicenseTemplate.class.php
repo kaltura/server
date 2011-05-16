@@ -5,9 +5,9 @@ class ComcastLicenseTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'LicenseTemplate';
+		return 'urn:theplatform-com:v4/rights/template/:LicenseTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

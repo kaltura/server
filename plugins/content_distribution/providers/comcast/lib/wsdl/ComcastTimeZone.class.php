@@ -157,9 +157,9 @@ class ComcastTimeZone extends SoapObject
 					
 	public function getType()
 	{
-		return 'TimeZone';
+		return 'urn:theplatform-com:v4/base/:TimeZone';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -5,9 +5,9 @@ class ComcastCustomFieldTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'CustomFieldTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:CustomFieldTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

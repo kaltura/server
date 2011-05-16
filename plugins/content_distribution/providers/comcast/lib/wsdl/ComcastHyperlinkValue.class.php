@@ -5,9 +5,9 @@ class ComcastHyperlinkValue extends ComcastFieldValue
 {				
 	public function getType()
 	{
-		return 'HyperlinkValue';
+		return 'urn:theplatform-com:v4/base/:HyperlinkValue';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

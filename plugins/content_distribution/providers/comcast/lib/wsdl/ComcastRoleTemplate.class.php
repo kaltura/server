@@ -5,9 +5,9 @@ class ComcastRoleTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'RoleTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:RoleTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

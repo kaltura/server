@@ -5,9 +5,9 @@ class ComcastChoiceTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'ChoiceTemplate';
+		return 'urn:theplatform-com:v4/content/template/:ChoiceTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

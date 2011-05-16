@@ -3,6 +3,11 @@
 
 class ComcastChoiceList extends SoapArray
 {				
+	public function getType()
+	{
+		return 'urn:theplatform-com:v4/content/value/:ChoiceList';
+	}
+				
 	public function __construct()
 	{
 		parent::__construct("ComcastChoice");	

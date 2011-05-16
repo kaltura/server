@@ -5,9 +5,9 @@ class ComcastEndUserTransaction extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'EndUserTransaction';
+		return 'urn:theplatform-com:v4/rights/value/:EndUserTransaction';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

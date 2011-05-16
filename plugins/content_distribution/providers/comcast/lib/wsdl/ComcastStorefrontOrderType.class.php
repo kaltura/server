@@ -13,9 +13,9 @@ class ComcastStorefrontOrderType extends SoapObject
 					
 	public function getType()
 	{
-		return 'StorefrontOrderType';
+		return 'urn:theplatform-com:v4/rights/enum/:StorefrontOrderType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

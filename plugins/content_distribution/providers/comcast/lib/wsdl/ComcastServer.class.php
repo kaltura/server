@@ -5,9 +5,9 @@ class ComcastServer extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'Server';
+		return 'urn:theplatform-com:v4/admin/value/:Server';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

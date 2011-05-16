@@ -63,9 +63,9 @@ class ComcastUserField extends SoapObject
 					
 	public function getType()
 	{
-		return 'UserField';
+		return 'urn:theplatform-com:v4/admin/enum/:UserField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

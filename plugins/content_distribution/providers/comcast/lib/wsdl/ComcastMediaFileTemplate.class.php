@@ -5,9 +5,9 @@ class ComcastMediaFileTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'MediaFileTemplate';
+		return 'urn:theplatform-com:v4/content/template/:MediaFileTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -15,9 +15,9 @@ class ComcastFieldState extends SoapObject
 					
 	public function getType()
 	{
-		return 'FieldState';
+		return 'urn:theplatform-com:v4/base/:FieldState';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -19,9 +19,9 @@ class ComcastCreditCardType extends SoapObject
 					
 	public function getType()
 	{
-		return 'CreditCardType';
+		return 'urn:theplatform-com:v4/enum/:CreditCardType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

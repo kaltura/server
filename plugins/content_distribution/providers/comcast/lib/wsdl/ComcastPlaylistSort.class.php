@@ -5,9 +5,9 @@ class ComcastPlaylistSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'PlaylistSort';
+		return 'urn:theplatform-com:v4/content/sort/:PlaylistSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

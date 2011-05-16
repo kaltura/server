@@ -5,9 +5,9 @@ class ComcastEndUser extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'EndUser';
+		return 'urn:theplatform-com:v4/rights/value/:EndUser';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

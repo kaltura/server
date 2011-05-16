@@ -5,9 +5,9 @@ class ComcastCustomFieldSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'CustomFieldSort';
+		return 'urn:theplatform-com:v4/admin/sort/:CustomFieldSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

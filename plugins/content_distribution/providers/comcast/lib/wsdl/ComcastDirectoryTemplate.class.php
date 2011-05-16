@@ -5,9 +5,9 @@ class ComcastDirectoryTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'DirectoryTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:DirectoryTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

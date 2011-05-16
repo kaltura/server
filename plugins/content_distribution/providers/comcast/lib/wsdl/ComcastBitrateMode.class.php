@@ -11,9 +11,9 @@ class ComcastBitrateMode extends SoapObject
 					
 	public function getType()
 	{
-		return 'BitrateMode';
+		return 'urn:theplatform-com:v4/content/enum/:BitrateMode';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

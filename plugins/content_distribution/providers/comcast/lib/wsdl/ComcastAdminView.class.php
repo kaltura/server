@@ -67,9 +67,9 @@ class ComcastAdminView extends SoapObject
 					
 	public function getType()
 	{
-		return 'AdminView';
+		return 'urn:theplatform-com:v4/enum/:AdminView';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

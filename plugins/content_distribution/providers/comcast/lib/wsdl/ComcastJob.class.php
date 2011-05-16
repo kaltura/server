@@ -5,9 +5,9 @@ class ComcastJob extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'Job';
+		return 'urn:theplatform-com:v4/admin/value/:Job';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -171,9 +171,9 @@ class ComcastMediaFileField extends SoapObject
 					
 	public function getType()
 	{
-		return 'MediaFileField';
+		return 'urn:theplatform-com:v4/content/enum/:MediaFileField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

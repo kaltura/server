@@ -5,9 +5,9 @@ class ComcastServerSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'ServerSort';
+		return 'urn:theplatform-com:v4/admin/sort/:ServerSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

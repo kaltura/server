@@ -5,9 +5,9 @@ class ComcastPermissionTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'PermissionTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:PermissionTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

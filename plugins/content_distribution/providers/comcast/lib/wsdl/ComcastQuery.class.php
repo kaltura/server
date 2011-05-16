@@ -5,9 +5,9 @@ class ComcastQuery extends SoapObject
 {				
 	public function getType()
 	{
-		return 'Query';
+		return 'urn:theplatform-com:v4/base/:Query';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

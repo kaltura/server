@@ -5,9 +5,9 @@ class ComcastJobTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'JobTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:JobTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

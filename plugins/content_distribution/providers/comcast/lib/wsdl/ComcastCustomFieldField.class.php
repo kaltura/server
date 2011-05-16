@@ -75,9 +75,9 @@ class ComcastCustomFieldField extends SoapObject
 					
 	public function getType()
 	{
-		return 'CustomFieldField';
+		return 'urn:theplatform-com:v4/admin/enum/:CustomFieldField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

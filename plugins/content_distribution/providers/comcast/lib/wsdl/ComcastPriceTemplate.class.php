@@ -5,9 +5,9 @@ class ComcastPriceTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'PriceTemplate';
+		return 'urn:theplatform-com:v4/rights/template/:PriceTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

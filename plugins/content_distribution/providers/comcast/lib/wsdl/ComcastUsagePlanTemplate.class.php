@@ -5,9 +5,9 @@ class ComcastUsagePlanTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'UsagePlanTemplate';
+		return 'urn:theplatform-com:v4/rights/template/:UsagePlanTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

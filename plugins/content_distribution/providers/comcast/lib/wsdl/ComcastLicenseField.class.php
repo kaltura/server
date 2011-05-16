@@ -149,9 +149,9 @@ class ComcastLicenseField extends SoapObject
 					
 	public function getType()
 	{
-		return 'LicenseField';
+		return 'urn:theplatform-com:v4/rights/enum/:LicenseField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

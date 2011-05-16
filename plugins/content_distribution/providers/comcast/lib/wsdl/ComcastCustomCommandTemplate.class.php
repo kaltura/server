@@ -5,9 +5,9 @@ class ComcastCustomCommandTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'CustomCommandTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:CustomCommandTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -75,9 +75,9 @@ class ComcastRestrictionField extends SoapObject
 					
 	public function getType()
 	{
-		return 'RestrictionField';
+		return 'urn:theplatform-com:v4/content/enum/:RestrictionField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

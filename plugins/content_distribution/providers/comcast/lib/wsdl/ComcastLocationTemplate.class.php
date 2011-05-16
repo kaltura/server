@@ -5,9 +5,9 @@ class ComcastLocationTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'LocationTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:LocationTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -33,9 +33,9 @@ class ComcastSystemRequestType extends SoapObject
 					
 	public function getType()
 	{
-		return 'SystemRequestType';
+		return 'urn:theplatform-com:v4/enum/:SystemRequestType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

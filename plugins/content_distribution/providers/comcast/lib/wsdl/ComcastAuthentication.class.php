@@ -11,9 +11,9 @@ class ComcastAuthentication extends SoapObject
 					
 	public function getType()
 	{
-		return 'Authentication';
+		return 'urn:theplatform-com:v4/rights/enum/:Authentication';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

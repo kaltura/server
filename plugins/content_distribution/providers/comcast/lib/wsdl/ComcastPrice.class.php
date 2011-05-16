@@ -5,9 +5,9 @@ class ComcastPrice extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'Price';
+		return 'urn:theplatform-com:v4/rights/value/:Price';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

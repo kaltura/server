@@ -5,9 +5,9 @@ class ComcastCategoryTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'CategoryTemplate';
+		return 'urn:theplatform-com:v4/content/template/:CategoryTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

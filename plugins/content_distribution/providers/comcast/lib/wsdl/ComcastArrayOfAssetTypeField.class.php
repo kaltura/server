@@ -3,6 +3,11 @@
 
 class ComcastArrayOfAssetTypeField extends SoapArray
 {				
+	public function getType()
+	{
+		return 'urn:theplatform-com:v4/content/enum/:ArrayOfAssetTypeField';
+	}
+				
 	public function __construct()
 	{
 		parent::__construct("ComcastAssetTypeField");	

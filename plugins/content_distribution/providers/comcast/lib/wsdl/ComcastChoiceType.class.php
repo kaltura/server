@@ -11,9 +11,9 @@ class ComcastChoiceType extends SoapObject
 					
 	public function getType()
 	{
-		return 'ChoiceType';
+		return 'urn:theplatform-com:v4/content/enum/:ChoiceType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

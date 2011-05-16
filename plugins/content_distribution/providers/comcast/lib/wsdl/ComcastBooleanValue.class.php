@@ -5,9 +5,9 @@ class ComcastBooleanValue extends ComcastFieldValue
 {				
 	public function getType()
 	{
-		return 'BooleanValue';
+		return 'urn:theplatform-com:v4/base/:BooleanValue';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

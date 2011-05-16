@@ -11,9 +11,9 @@ class ComcastAuthorizationMethod extends SoapObject
 					
 	public function getType()
 	{
-		return 'AuthorizationMethod';
+		return 'urn:theplatform-com:v4/base/:AuthorizationMethod';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

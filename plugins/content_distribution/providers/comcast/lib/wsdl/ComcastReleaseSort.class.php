@@ -5,9 +5,9 @@ class ComcastReleaseSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'ReleaseSort';
+		return 'urn:theplatform-com:v4/content/sort/:ReleaseSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

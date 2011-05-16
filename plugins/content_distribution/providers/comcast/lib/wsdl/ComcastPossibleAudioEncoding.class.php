@@ -5,9 +5,9 @@ class ComcastPossibleAudioEncoding extends SoapObject
 {				
 	public function getType()
 	{
-		return 'PossibleAudioEncoding';
+		return 'urn:theplatform-com:v4/content/value/:PossibleAudioEncoding';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

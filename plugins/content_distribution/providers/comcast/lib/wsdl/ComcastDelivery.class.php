@@ -21,9 +21,9 @@ class ComcastDelivery extends SoapObject
 					
 	public function getType()
 	{
-		return 'Delivery';
+		return 'urn:theplatform-com:v4/enum/:Delivery';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

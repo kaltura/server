@@ -5,9 +5,9 @@ abstract class ComcastStatusObject extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'StatusObject';
+		return 'urn:theplatform-com:v4/base/:StatusObject';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

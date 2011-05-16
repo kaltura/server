@@ -55,9 +55,9 @@ class ComcastPriceField extends SoapObject
 					
 	public function getType()
 	{
-		return 'PriceField';
+		return 'urn:theplatform-com:v4/rights/enum/:PriceField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

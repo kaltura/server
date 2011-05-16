@@ -71,9 +71,9 @@ class ComcastLocationField extends SoapObject
 					
 	public function getType()
 	{
-		return 'LocationField';
+		return 'urn:theplatform-com:v4/admin/enum/:LocationField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

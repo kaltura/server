@@ -21,9 +21,9 @@ class ComcastContentType extends SoapObject
 					
 	public function getType()
 	{
-		return 'ContentType';
+		return 'urn:theplatform-com:v4/content/enum/:ContentType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

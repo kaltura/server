@@ -5,9 +5,9 @@ class ComcastAssetTypeTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'AssetTypeTemplate';
+		return 'urn:theplatform-com:v4/content/template/:AssetTypeTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

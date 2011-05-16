@@ -5,9 +5,9 @@ class ComcastLicense extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'License';
+		return 'urn:theplatform-com:v4/rights/value/:License';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

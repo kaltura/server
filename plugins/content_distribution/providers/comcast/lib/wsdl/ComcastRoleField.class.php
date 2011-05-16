@@ -57,9 +57,9 @@ class ComcastRoleField extends SoapObject
 					
 	public function getType()
 	{
-		return 'RoleField';
+		return 'urn:theplatform-com:v4/admin/enum/:RoleField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

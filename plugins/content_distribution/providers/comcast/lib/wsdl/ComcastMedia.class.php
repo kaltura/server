@@ -5,9 +5,9 @@ class ComcastMedia extends ComcastContent
 {				
 	public function getType()
 	{
-		return 'Media';
+		return 'urn:theplatform-com:v4/content/value/:Media';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

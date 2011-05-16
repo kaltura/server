@@ -5,9 +5,9 @@ class ComcastSystemRequestLog extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'SystemRequestLog';
+		return 'urn:theplatform-com:v4/admin/value/:SystemRequestLog';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

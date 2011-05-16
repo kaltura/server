@@ -89,9 +89,9 @@ class ComcastSystemRequestLogField extends SoapObject
 					
 	public function getType()
 	{
-		return 'SystemRequestLogField';
+		return 'urn:theplatform-com:v4/admin/enum/:SystemRequestLogField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

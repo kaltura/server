@@ -5,9 +5,9 @@ class ComcastPlaylist extends ComcastContent
 {				
 	public function getType()
 	{
-		return 'Playlist';
+		return 'urn:theplatform-com:v4/content/value/:Playlist';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

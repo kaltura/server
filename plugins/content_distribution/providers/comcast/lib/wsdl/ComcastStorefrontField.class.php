@@ -163,9 +163,9 @@ class ComcastStorefrontField extends SoapObject
 					
 	public function getType()
 	{
-		return 'StorefrontField';
+		return 'urn:theplatform-com:v4/rights/enum/:StorefrontField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

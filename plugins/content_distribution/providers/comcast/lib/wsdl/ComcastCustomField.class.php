@@ -5,9 +5,9 @@ class ComcastCustomField extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'CustomField';
+		return 'urn:theplatform-com:v4/admin/value/:CustomField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -11,9 +11,9 @@ class ComcastHinting extends SoapObject
 					
 	public function getType()
 	{
-		return 'Hinting';
+		return 'urn:theplatform-com:v4/content/enum/:Hinting';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

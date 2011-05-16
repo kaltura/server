@@ -45,9 +45,9 @@ class ComcastEncodingProvider extends SoapObject
 					
 	public function getType()
 	{
-		return 'EncodingProvider';
+		return 'urn:theplatform-com:v4/content/enum/:EncodingProvider';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

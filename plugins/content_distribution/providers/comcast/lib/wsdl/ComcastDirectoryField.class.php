@@ -69,9 +69,9 @@ class ComcastDirectoryField extends SoapObject
 					
 	public function getType()
 	{
-		return 'DirectoryField';
+		return 'urn:theplatform-com:v4/admin/enum/:DirectoryField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

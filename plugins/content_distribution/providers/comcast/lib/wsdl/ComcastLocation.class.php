@@ -5,9 +5,9 @@ class ComcastLocation extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'Location';
+		return 'urn:theplatform-com:v4/admin/value/:Location';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

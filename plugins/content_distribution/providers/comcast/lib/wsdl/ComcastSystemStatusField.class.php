@@ -63,9 +63,9 @@ class ComcastSystemStatusField extends SoapObject
 					
 	public function getType()
 	{
-		return 'SystemStatusField';
+		return 'urn:theplatform-com:v4/admin/enum/:SystemStatusField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

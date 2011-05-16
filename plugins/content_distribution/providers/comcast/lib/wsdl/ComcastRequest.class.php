@@ -5,9 +5,9 @@ class ComcastRequest extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'Request';
+		return 'urn:theplatform-com:v4/content/value/:Request';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

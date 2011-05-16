@@ -5,9 +5,9 @@ class ComcastSystemTaskSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'SystemTaskSort';
+		return 'urn:theplatform-com:v4/admin/sort/:SystemTaskSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

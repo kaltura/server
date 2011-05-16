@@ -5,9 +5,9 @@ class ComcastCapability extends SoapObject
 {				
 	public function getType()
 	{
-		return 'Capability';
+		return 'urn:theplatform-com:v4/admin/value/:Capability';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

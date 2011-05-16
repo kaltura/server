@@ -107,9 +107,9 @@ class ComcastEndUserField extends SoapObject
 					
 	public function getType()
 	{
-		return 'EndUserField';
+		return 'urn:theplatform-com:v4/rights/enum/:EndUserField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

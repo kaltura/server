@@ -5,9 +5,9 @@ class ComcastAssetType extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'AssetType';
+		return 'urn:theplatform-com:v4/content/value/:AssetType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

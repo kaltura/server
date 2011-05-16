@@ -13,9 +13,9 @@ class ComcastPaymentGateway extends SoapObject
 					
 	public function getType()
 	{
-		return 'PaymentGateway';
+		return 'urn:theplatform-com:v4/enum/:PaymentGateway';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

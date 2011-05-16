@@ -5,9 +5,9 @@ class ComcastCustomCommand extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'CustomCommand';
+		return 'urn:theplatform-com:v4/admin/value/:CustomCommand';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

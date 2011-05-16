@@ -135,9 +135,9 @@ class ComcastStatusDetail extends SoapObject
 					
 	public function getType()
 	{
-		return 'StatusDetail';
+		return 'urn:theplatform-com:v4/base/:StatusDetail';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

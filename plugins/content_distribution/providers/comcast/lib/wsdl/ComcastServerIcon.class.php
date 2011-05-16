@@ -77,9 +77,9 @@ class ComcastServerIcon extends SoapObject
 					
 	public function getType()
 	{
-		return 'ServerIcon';
+		return 'urn:theplatform-com:v4/enum/:ServerIcon';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

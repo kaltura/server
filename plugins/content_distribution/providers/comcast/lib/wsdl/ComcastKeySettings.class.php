@@ -5,9 +5,9 @@ class ComcastKeySettings extends SoapObject
 {				
 	public function getType()
 	{
-		return 'KeySettings';
+		return 'urn:theplatform-com:v4/base/:KeySettings';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

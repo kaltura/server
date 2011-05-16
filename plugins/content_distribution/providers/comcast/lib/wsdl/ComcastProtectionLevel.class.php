@@ -13,9 +13,9 @@ class ComcastProtectionLevel extends SoapObject
 					
 	public function getType()
 	{
-		return 'ProtectionLevel';
+		return 'urn:theplatform-com:v4/enum/:ProtectionLevel';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

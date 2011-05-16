@@ -141,9 +141,9 @@ class ComcastServerField extends SoapObject
 					
 	public function getType()
 	{
-		return 'ServerField';
+		return 'urn:theplatform-com:v4/admin/enum/:ServerField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

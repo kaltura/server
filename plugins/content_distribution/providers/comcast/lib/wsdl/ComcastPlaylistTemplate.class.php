@@ -5,9 +5,9 @@ class ComcastPlaylistTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'PlaylistTemplate';
+		return 'urn:theplatform-com:v4/content/template/:PlaylistTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

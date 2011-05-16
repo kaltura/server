@@ -5,9 +5,9 @@ class ComcastPossibleReleaseSetting extends SoapObject
 {				
 	public function getType()
 	{
-		return 'PossibleReleaseSetting';
+		return 'urn:theplatform-com:v4/content/value/:PossibleReleaseSetting';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

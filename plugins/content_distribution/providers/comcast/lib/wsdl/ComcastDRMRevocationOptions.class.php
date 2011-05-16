@@ -5,9 +5,9 @@ class ComcastDRMRevocationOptions extends SoapObject
 {				
 	public function getType()
 	{
-		return 'DRMRevocationOptions';
+		return 'urn:theplatform-com:v4/rights/value/:DRMRevocationOptions';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

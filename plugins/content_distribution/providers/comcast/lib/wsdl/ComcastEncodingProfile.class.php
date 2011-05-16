@@ -5,9 +5,9 @@ class ComcastEncodingProfile extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'EncodingProfile';
+		return 'urn:theplatform-com:v4/content/value/:EncodingProfile';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

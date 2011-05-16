@@ -5,9 +5,9 @@ class ComcastImageValue extends ComcastFieldValue
 {				
 	public function getType()
 	{
-		return 'ImageValue';
+		return 'urn:theplatform-com:v4/base/:ImageValue';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

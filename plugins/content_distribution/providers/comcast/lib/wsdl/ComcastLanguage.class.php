@@ -125,7 +125,7 @@ class ComcastLanguage extends SoapObject
 					
 	const _KHMER = 'Khmer';
 					
-	const _KIRUNDI_KINYARWANDA = 'Kirundi/Kinyarwanda';
+	const _KIRUNDI/KINYARWANDA = 'Kirundi/Kinyarwanda';
 					
 	const _KONKANI = 'Konkani';
 					
@@ -265,9 +265,9 @@ class ComcastLanguage extends SoapObject
 					
 	public function getType()
 	{
-		return 'Language';
+		return 'urn:theplatform-com:v4/base/:Language';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

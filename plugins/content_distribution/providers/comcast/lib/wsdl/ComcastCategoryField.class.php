@@ -97,9 +97,9 @@ class ComcastCategoryField extends SoapObject
 					
 	public function getType()
 	{
-		return 'CategoryField';
+		return 'urn:theplatform-com:v4/content/enum/:CategoryField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

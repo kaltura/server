@@ -5,9 +5,9 @@ class ComcastSystemTaskTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'SystemTaskTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:SystemTaskTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

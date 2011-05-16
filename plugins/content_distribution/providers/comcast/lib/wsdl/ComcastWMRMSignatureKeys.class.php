@@ -5,9 +5,9 @@ class ComcastWMRMSignatureKeys extends SoapObject
 {				
 	public function getType()
 	{
-		return 'WMRMSignatureKeys';
+		return 'urn:theplatform-com:v4/rights/value/:WMRMSignatureKeys';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

@@ -5,9 +5,9 @@ class ComcastRestriction extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'Restriction';
+		return 'urn:theplatform-com:v4/content/value/:Restriction';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

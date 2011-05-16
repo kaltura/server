@@ -5,9 +5,9 @@ abstract class ComcastBusinessObject extends SoapObject
 {				
 	public function getType()
 	{
-		return 'BusinessObject';
+		return 'urn:theplatform-com:v4/base/:BusinessObject';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

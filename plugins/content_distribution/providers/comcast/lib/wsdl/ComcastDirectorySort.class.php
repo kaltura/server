@@ -5,9 +5,9 @@ class ComcastDirectorySort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'DirectorySort';
+		return 'urn:theplatform-com:v4/admin/sort/:DirectorySort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

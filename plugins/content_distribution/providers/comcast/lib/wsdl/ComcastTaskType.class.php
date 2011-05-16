@@ -35,9 +35,9 @@ class ComcastTaskType extends SoapObject
 					
 	public function getType()
 	{
-		return 'TaskType';
+		return 'urn:theplatform-com:v4/base/:TaskType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

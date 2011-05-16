@@ -5,9 +5,9 @@ class ComcastUsagePlan extends ComcastBusinessObject
 {				
 	public function getType()
 	{
-		return 'UsagePlan';
+		return 'urn:theplatform-com:v4/rights/value/:UsagePlan';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

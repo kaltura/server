@@ -5,9 +5,9 @@ class ComcastPortalSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'PortalSort';
+		return 'urn:theplatform-com:v4/rights/sort/:PortalSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

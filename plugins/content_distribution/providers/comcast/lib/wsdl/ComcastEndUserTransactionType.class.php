@@ -27,9 +27,9 @@ class ComcastEndUserTransactionType extends SoapObject
 					
 	public function getType()
 	{
-		return 'EndUserTransactionType';
+		return 'urn:theplatform-com:v4/rights/enum/:EndUserTransactionType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

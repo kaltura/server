@@ -99,9 +99,9 @@ class ComcastRequestField extends SoapObject
 					
 	public function getType()
 	{
-		return 'RequestField';
+		return 'urn:theplatform-com:v4/content/enum/:RequestField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

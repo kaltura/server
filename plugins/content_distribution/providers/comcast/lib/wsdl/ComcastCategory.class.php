@@ -5,9 +5,9 @@ class ComcastCategory extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'Category';
+		return 'urn:theplatform-com:v4/content/value/:Category';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

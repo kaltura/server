@@ -17,9 +17,9 @@ class ComcastTimeUnits extends SoapObject
 					
 	public function getType()
 	{
-		return 'TimeUnits';
+		return 'urn:theplatform-com:v4/base/:TimeUnits';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

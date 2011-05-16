@@ -69,9 +69,9 @@ class ComcastAPIObject extends SoapObject
 					
 	public function getType()
 	{
-		return 'APIObject';
+		return 'urn:theplatform-com:v4/base/:APIObject';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

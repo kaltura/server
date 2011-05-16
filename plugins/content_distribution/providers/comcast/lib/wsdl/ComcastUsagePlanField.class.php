@@ -59,9 +59,9 @@ class ComcastUsagePlanField extends SoapObject
 					
 	public function getType()
 	{
-		return 'UsagePlanField';
+		return 'urn:theplatform-com:v4/rights/enum/:UsagePlanField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

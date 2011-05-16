@@ -347,9 +347,9 @@ class ComcastAccountField extends SoapObject
 					
 	public function getType()
 	{
-		return 'AccountField';
+		return 'urn:theplatform-com:v4/admin/enum/:AccountField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

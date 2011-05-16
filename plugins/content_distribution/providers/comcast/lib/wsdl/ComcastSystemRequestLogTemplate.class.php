@@ -5,9 +5,9 @@ class ComcastSystemRequestLogTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'SystemRequestLogTemplate';
+		return 'urn:theplatform-com:v4/admin/template/:SystemRequestLogTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

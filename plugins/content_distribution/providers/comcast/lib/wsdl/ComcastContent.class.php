@@ -5,9 +5,9 @@ abstract class ComcastContent extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'Content';
+		return 'urn:theplatform-com:v4/content/value/:Content';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

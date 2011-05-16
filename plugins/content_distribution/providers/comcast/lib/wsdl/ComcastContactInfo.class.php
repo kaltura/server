@@ -11,9 +11,9 @@ class ComcastContactInfo extends SoapObject
 					
 	public function getType()
 	{
-		return 'ContactInfo';
+		return 'urn:theplatform-com:v4/enum/:ContactInfo';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

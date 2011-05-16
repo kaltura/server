@@ -119,9 +119,9 @@ class ComcastEncodingProfileField extends SoapObject
 					
 	public function getType()
 	{
-		return 'EncodingProfileField';
+		return 'urn:theplatform-com:v4/content/enum/:EncodingProfileField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

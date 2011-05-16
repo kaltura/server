@@ -491,9 +491,9 @@ class ComcastCountry extends SoapObject
 					
 	public function getType()
 	{
-		return 'Country';
+		return 'urn:theplatform-com:v4/base/:Country';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

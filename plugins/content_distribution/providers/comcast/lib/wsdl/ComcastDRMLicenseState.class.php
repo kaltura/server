@@ -5,9 +5,9 @@ class ComcastDRMLicenseState extends SoapObject
 {				
 	public function getType()
 	{
-		return 'DRMLicenseState';
+		return 'urn:theplatform-com:v4/rights/value/:DRMLicenseState';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

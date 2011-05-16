@@ -57,9 +57,9 @@ class ComcastPermissionField extends SoapObject
 					
 	public function getType()
 	{
-		return 'PermissionField';
+		return 'urn:theplatform-com:v4/admin/enum/:PermissionField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

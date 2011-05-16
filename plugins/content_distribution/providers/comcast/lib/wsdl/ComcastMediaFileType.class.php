@@ -9,9 +9,9 @@ class ComcastMediaFileType extends SoapObject
 					
 	public function getType()
 	{
-		return 'MediaFileType';
+		return 'urn:theplatform-com:v4/content/enum/:MediaFileType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

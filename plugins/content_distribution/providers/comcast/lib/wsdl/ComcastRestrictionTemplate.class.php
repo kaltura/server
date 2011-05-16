@@ -5,9 +5,9 @@ class ComcastRestrictionTemplate extends SoapObject
 {				
 	public function getType()
 	{
-		return 'RestrictionTemplate';
+		return 'urn:theplatform-com:v4/content/template/:RestrictionTemplate';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

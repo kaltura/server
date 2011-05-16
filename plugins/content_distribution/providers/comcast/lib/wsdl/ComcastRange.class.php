@@ -5,9 +5,9 @@ class ComcastRange extends SoapObject
 {				
 	public function getType()
 	{
-		return 'Range';
+		return 'urn:theplatform-com:v4/base/:Range';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

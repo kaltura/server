@@ -3,6 +3,11 @@
 
 class ComcastArrayOfStorefrontOrder extends SoapArray
 {				
+	public function getType()
+	{
+		return 'urn:theplatform-com:v4/rights/value/:ArrayOfStorefrontOrder';
+	}
+				
 	public function __construct()
 	{
 		parent::__construct("ComcastStorefrontOrder");	

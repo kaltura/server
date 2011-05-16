@@ -5,9 +5,9 @@ class ComcastDigest extends SoapObject
 {				
 	public function getType()
 	{
-		return 'Digest';
+		return 'urn:theplatform-com:v4/base/:Digest';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

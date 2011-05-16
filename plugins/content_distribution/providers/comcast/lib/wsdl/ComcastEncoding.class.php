@@ -73,9 +73,9 @@ class ComcastEncoding extends SoapObject
 					
 	public function getType()
 	{
-		return 'Encoding';
+		return 'urn:theplatform-com:v4/base/:Encoding';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

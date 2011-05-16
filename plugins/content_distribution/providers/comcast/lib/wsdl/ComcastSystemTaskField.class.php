@@ -85,9 +85,9 @@ class ComcastSystemTaskField extends SoapObject
 					
 	public function getType()
 	{
-		return 'SystemTaskField';
+		return 'urn:theplatform-com:v4/admin/enum/:SystemTaskField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

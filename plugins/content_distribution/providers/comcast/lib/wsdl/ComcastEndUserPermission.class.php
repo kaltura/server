@@ -5,9 +5,9 @@ class ComcastEndUserPermission extends ComcastStatusObject
 {				
 	public function getType()
 	{
-		return 'EndUserPermission';
+		return 'urn:theplatform-com:v4/rights/value/:EndUserPermission';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

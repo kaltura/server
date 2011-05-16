@@ -17,9 +17,9 @@ class ComcastStorefrontPageType extends SoapObject
 					
 	public function getType()
 	{
-		return 'StorefrontPageType';
+		return 'urn:theplatform-com:v4/enum/:StorefrontPageType';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

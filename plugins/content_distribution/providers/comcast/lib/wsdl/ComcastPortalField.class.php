@@ -253,9 +253,9 @@ class ComcastPortalField extends SoapObject
 					
 	public function getType()
 	{
-		return 'PortalField';
+		return 'urn:theplatform-com:v4/rights/enum/:PortalField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

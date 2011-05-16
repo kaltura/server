@@ -5,9 +5,9 @@ class ComcastMediaFileSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'MediaFileSort';
+		return 'urn:theplatform-com:v4/content/sort/:MediaFileSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

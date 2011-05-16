@@ -59,9 +59,9 @@ class ComcastJobField extends SoapObject
 					
 	public function getType()
 	{
-		return 'JobField';
+		return 'urn:theplatform-com:v4/admin/enum/:JobField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

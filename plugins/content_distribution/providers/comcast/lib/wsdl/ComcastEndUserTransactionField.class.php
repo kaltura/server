@@ -127,9 +127,9 @@ class ComcastEndUserTransactionField extends SoapObject
 					
 	public function getType()
 	{
-		return 'EndUserTransactionField';
+		return 'urn:theplatform-com:v4/rights/enum/:EndUserTransactionField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

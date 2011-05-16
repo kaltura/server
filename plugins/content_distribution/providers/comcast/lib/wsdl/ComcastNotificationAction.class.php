@@ -11,9 +11,9 @@ class ComcastNotificationAction extends SoapObject
 					
 	public function getType()
 	{
-		return 'NotificationAction';
+		return 'urn:theplatform-com:v4/enum/:NotificationAction';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

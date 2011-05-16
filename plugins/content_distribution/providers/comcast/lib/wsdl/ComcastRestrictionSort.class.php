@@ -5,9 +5,9 @@ class ComcastRestrictionSort extends SoapObject
 {				
 	public function getType()
 	{
-		return 'RestrictionSort';
+		return 'urn:theplatform-com:v4/content/sort/:RestrictionSort';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

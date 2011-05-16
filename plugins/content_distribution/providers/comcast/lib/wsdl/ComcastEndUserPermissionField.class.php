@@ -109,9 +109,9 @@ class ComcastEndUserPermissionField extends SoapObject
 					
 	public function getType()
 	{
-		return 'EndUserPermissionField';
+		return 'urn:theplatform-com:v4/rights/enum/:EndUserPermissionField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

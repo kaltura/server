@@ -13,9 +13,9 @@ class ComcastExpression extends SoapObject
 					
 	public function getType()
 	{
-		return 'Expression';
+		return 'urn:theplatform-com:v4/content/enum/:Expression';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

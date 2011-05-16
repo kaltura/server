@@ -151,9 +151,9 @@ class ComcastChoiceField extends SoapObject
 					
 	public function getType()
 	{
-		return 'ChoiceField';
+		return 'urn:theplatform-com:v4/content/enum/:ChoiceField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)

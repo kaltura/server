@@ -53,9 +53,9 @@ class ComcastAssetTypeField extends SoapObject
 					
 	public function getType()
 	{
-		return 'AssetTypeField';
+		return 'urn:theplatform-com:v4/content/enum/:AssetTypeField';
 	}
-	
+					
 	protected function getAttributeType($attributeName)
 	{
 		switch($attributeName)
