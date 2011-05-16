@@ -82,7 +82,7 @@ class ComcastDistributionEngine extends DistributionEngine implements
 			throw new Exception("Distribution profile must be of type KalturaComcastDistributionProfile");
 	
 		if($data->entryDistribution->remoteId)
-			return $this->doUpdate($data, $data->distributionProfile);
+			throw new Exception("Entry already distributed");
 			
 		return $this->doSubmit($data, $data->distributionProfile);
 	}
