@@ -119,8 +119,6 @@ class IdeticDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
 	{
-		return array();
-		
 		return array(
 			"/*[local-name()='metadata']/*[local-name()='".IdeticDistributionProfile::METADATA_FIELD_SHORTTITLE."']",
 			"/*[local-name()='metadata']/*[local-name()='".IdeticDistributionProfile::METADATA_FIELD_STATSKEY."']",
