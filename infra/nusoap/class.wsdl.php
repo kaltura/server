@@ -1479,7 +1479,7 @@ class wsdl extends nusoap_base {
 			if (is_object($value)) {
 				$value = get_object_vars($value);
 			}
-			if (is_array($value) || $value instanceof SoapArray) {
+			if (is_array($value)) {
 				$elementAttrs = $this->serializeComplexTypeAttributes($typeDef, $value, $ns, $uqType);
 				if ($use == 'literal') {
 					if ($forceType) {
@@ -1545,7 +1545,7 @@ class wsdl extends nusoap_base {
 			} else {
 				$cols = '';
 			} 
-			if ((is_array($value) || $value instanceof SoapArray) && sizeof($value) >= 1) {
+			if (is_array($value) && sizeof($value) >= 1) {
 				$rows = sizeof($value);
 				$contents = '';
 				foreach($value as $k => $v) {
