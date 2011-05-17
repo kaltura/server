@@ -119,7 +119,7 @@ class DailymotionDistributionProvider implements IDistributionProvider
 	 */
 	public function getUpdateRequiredEntryFields($distributionProfileId = null)
 	{
-		return array(entryPeer::NAME, entryPeer::DESCRIPTION);
+		return array(entryPeer::NAME, entryPeer::DESCRIPTION, entryPeer::TAGS);
 	}
 
 	/* (non-PHPdoc)
