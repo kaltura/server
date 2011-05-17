@@ -1,6 +1,6 @@
 <?php
 /**
- * @package 
+ * @package plugins.metadata
  * @subpackage api.filters.enum
  */
 class KalturaMetadataProfileOrderBy extends KalturaStringEnum
