@@ -51,7 +51,7 @@ class DailyMotionImpl
 		$dailymotionArray = array('id' => $id);
 		foreach($propsArray as $key => $value)
 		{
-			if (!empty($key) && !empty($value))
+			if (!empty($key) && (!empty($value) || is_bool($value)))
 			{
 				$dailymotionArray[$key]=$value;
 			}
