@@ -79,6 +79,12 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 					
 			if($baseClass == 'IDistributionEngineUpdate')
 				return new YoutubeApiDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineEnable')
+				return new YoutubeApiDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineDisable')
+				return new YoutubeApiDistributionEngine();
 		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaYoutubeApiDistributionProfile();
@@ -150,6 +156,12 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 				return 'YoutubeApiDistributionEngine';
 					
 			if($baseClass == 'IDistributionEngineUpdate')
+				return 'YoutubeApiDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineEnable')
+				return 'YoutubeApiDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineDisable')
 				return 'YoutubeApiDistributionEngine';
 		
 			if($baseClass == 'KalturaDistributionProfile')

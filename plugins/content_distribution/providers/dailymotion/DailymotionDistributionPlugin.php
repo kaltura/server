@@ -79,6 +79,12 @@ class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPer
 					
 			if($baseClass == 'IDistributionEngineUpdate')
 				return new DailymotionDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineEnable')
+				return new DailymotionDistributionEngine();
+					
+			if($baseClass == 'IDistributionEngineDisable')
+				return new DailymotionDistributionEngine();
 		
 			if($baseClass == 'KalturaDistributionProfile')
 				return new KalturaDailymotionDistributionProfile();
@@ -150,6 +156,12 @@ class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPer
 				return 'DailymotionDistributionEngine';
 					
 			if($baseClass == 'IDistributionEngineUpdate')
+				return 'DailymotionDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineEnable')
+				return 'DailymotionDistributionEngine';
+					
+			if($baseClass == 'IDistributionEngineDisable')
 				return 'DailymotionDistributionEngine';
 		
 			if($baseClass == 'KalturaDistributionProfile')
