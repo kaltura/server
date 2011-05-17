@@ -615,29 +615,29 @@ class Partner extends BasePartner
 
 	public function setLoginUsersQuota($v)				{$this->putInCustomData('login_users_quota', $v);}
 	public function setAdminLoginUsersQuota($v)			{$this->putInCustomData('admin_login_users_quota', $v);}
-	public function setPublishersQuota($v)				{$this->putInCustomData('admin_login_users_quota', $v);}
-	public function setBandwidthQuota($v)				{$this->putInCustomData('admin_login_users_quota', $v);}
-	public function setStreamEntriesQuota($v)			{$this->putInCustomData('admin_login_users_quota', $v);}
-	public function setEntriesQuota($v)					{$this->putInCustomData('admin_login_users_quota', $v);}
+	public function setPublishersQuota($v)				{$this->putInCustomData('publishers_quota', $v);}
+	public function setBandwidthQuota($v)				{$this->putInCustomData('bandwidth_quota', $v);}
+	public function setStreamEntriesQuota($v)			{$this->putInCustomData('stream_entries_quota', $v);}
+	public function setEntriesQuota($v)					{$this->putInCustomData('entries_quota', $v);}
 	public function setLoginUsersOveragePrice($v)		{$this->putInCustomData('login_users_overage_price', $v);}
-	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('login_users_overage_price', $v);}
-	public function setPublishersOveragePrice($v)		{$this->putInCustomData('admin_login_users_overage_price', $v);}
-	public function setBandwidthOveragePrice($v)		{$this->putInCustomData('admin_login_users_overage_price', $v);}
-	public function setStreamEntriesOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
-	public function setEntriesOveragePrice($v)			{$this->putInCustomData('admin_login_users_overage_price', $v);}
+	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
+	public function setPublishersOveragePrice($v)		{$this->putInCustomData('publishers_overage_price', $v);}
+	public function setBandwidthOveragePrice($v)		{$this->putInCustomData('bandwidth_overage_price', $v);}
+	public function setStreamEntriesOveragePrice($v)	{$this->putInCustomData('stream_entries_overage_price', $v);}
+	public function setEntriesOveragePrice($v)			{$this->putInCustomData('entries_overage_price', $v);}
 
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota');}
-	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('login_users_quota');}
-	public function getPublishersQuota()				{return $this->getFromCustomData('admin_login_users_quota');}
-	public function getBandwidthQuota()					{return $this->getFromCustomData('admin_login_users_quota');}
-	public function getStreamEntriesQuota()				{return $this->getFromCustomData('admin_login_users_quota');}
-	public function getEntriesQuota()					{return $this->getFromCustomData('admin_login_users_quota');}
+	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota');}
+	public function getPublishersQuota()				{return $this->getFromCustomData('publishers_quota');}
+	public function getBandwidthQuota()					{return $this->getFromCustomData('bandwidth_quota');}
+	public function getStreamEntriesQuota()				{return $this->getFromCustomData('stream_entries_quota');}
+	public function getEntriesQuota()					{return $this->getFromCustomData('entries_quota');}
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
-	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('login_users_overage_price');}
-	public function getPublishersOveragePrice()			{return $this->getFromCustomData('admin_login_users_overage_price');}
-	public function getBandwidthOveragePrice()			{return $this->getFromCustomData('admin_login_users_overage_price');}
-	public function getStreamEntriesOveragePrice()		{return $this->getFromCustomData('admin_login_users_overage_price');}
-	public function getEntriesOveragePrice()			{return $this->getFromCustomData('admin_login_users_overage_price');}
+	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
+	public function getPublishersOveragePrice()			{return $this->getFromCustomData('publishers_overage_price');}
+	public function getBandwidthOveragePrice()			{return $this->getFromCustomData('bandwidth_overage_price');}
+	public function getStreamEntriesOveragePrice()		{return $this->getFromCustomData('stream_entries_overage_price');}
+	public function getEntriesOveragePrice()			{return $this->getFromCustomData('entries_overage_price');}
 	
 	public function getAdminLoginUsersNumber()
 	{
