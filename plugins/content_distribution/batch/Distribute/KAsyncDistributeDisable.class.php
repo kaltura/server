@@ -6,14 +6,14 @@ require_once("bootstrap.php");
  * @package plugins.contentDistribution 
  * @subpackage Scheduler.Distribute
  */
-class KAsyncDistributeEnable extends KAsyncDistribute
+class KAsyncDistributeDisable extends KAsyncDistribute
 {
 	/**
 	 * @return number
 	 */
 	public static function getType()
 	{
-		return KalturaBatchJobType::DISTRIBUTION_ENABLE;
+		return KalturaBatchJobType::DISTRIBUTION_DISABLE;
 	}
 	
 	/* (non-PHPdoc)
@@ -37,7 +37,7 @@ class KAsyncDistributeEnable extends KAsyncDistribute
 	 */
 	public function getExclusiveDistributeJobs()
 	{
-		return $this->kClient->contentDistributionBatch->getExclusiveDistributionEnableJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->taskConfig->maxJobsEachRun, $this->getFilter());
+		return $this->kClient->contentDistributionBatch->getExclusiveDistributionDisableJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->taskConfig->maxJobsEachRun, $this->getFilter());
 	}
 	
 	/* (non-PHPdoc)
@@ -45,7 +45,7 @@ class KAsyncDistributeEnable extends KAsyncDistribute
 	 */
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
 	{
-		return $this->kClient->contentDistributionBatch->updateExclusiveDistributionEnableJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
+		return $this->kClient->contentDistributionBatch->updateExclusiveDistributionDisableJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
 	}
 	
 	/* (non-PHPdoc)
@@ -57,7 +57,7 @@ class KAsyncDistributeEnable extends KAsyncDistribute
 		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
 			$resetExecutionAttempts = true;
 	
-		$response = $this->kClient->contentDistributionBatch->freeExclusiveDistributionEnableJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
+		$response = $this->kClient->contentDistributionBatch->freeExclusiveDistributionDisableJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
 		
 		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
 		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
@@ -70,7 +70,7 @@ class KAsyncDistributeEnable extends KAsyncDistribute
 	 */
 	protected function getDistributionEngine($providerType, KalturaDistributionJobData $data)
 	{
-		return DistributionEngine::getEngine('IDistributionEngineEnable', $providerType, $this->getClient(), $this->taskConfig, $data);
+		return DistributionEngine::getEngine('IDistributionEngineDisable', $providerType, $this->getClient(), $this->taskConfig, $data);
 	}
 	
 	/* (non-PHPdoc)
@@ -78,6 +78,6 @@ class KAsyncDistributeEnable extends KAsyncDistribute
 	 */
 	protected function execute(KalturaDistributionJobData $data)
 	{
-		return $this->engine->enable($data);
+		return $this->engine->disable($data);
 	}
 }
