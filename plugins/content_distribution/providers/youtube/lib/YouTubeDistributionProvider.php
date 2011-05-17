@@ -82,6 +82,14 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	{
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isAvailabilityUpdateEnabled()
+	 */
+	public function isAvailabilityUpdateEnabled()
+	{
+		return false;
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::useDeleteInsteadOfUpdate()
@@ -90,19 +98,17 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	{
 		return false;
 	}
-	
-	/**
-	 * returns how many seconds before sunrise the job could be created.
-	 * @return int
+
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::getJobIntervalBeforeSunrise()
 	 */
 	public function getJobIntervalBeforeSunrise()
 	{
 		return 0; //irrelevant
 	}
-	
-	/**
-	 * returns how many seconds before sunrise the job could be created.
-	 * @return int
+
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::getJobIntervalBeforeSunset()
 	 */
 	public function getJobIntervalBeforeSunset()
 	{

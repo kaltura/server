@@ -81,6 +81,14 @@ class DailymotionDistributionProvider implements IDistributionProvider
 	{
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isAvailabilityUpdateEnabled()
+	 */
+	public function isAvailabilityUpdateEnabled()
+	{
+		return true;
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::useDeleteInsteadOfUpdate()

@@ -81,6 +81,14 @@ class FreewheelDistributionProvider implements IDistributionProvider
 	{
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isAvailabilityUpdateEnabled()
+	 */
+	public function isAvailabilityUpdateEnabled()
+	{
+		return false;
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::useDeleteInsteadOfUpdate()
