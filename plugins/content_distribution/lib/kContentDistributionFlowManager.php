@@ -622,8 +622,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if($distributionProvider->isAvailabilityUpdateEnabled())
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::ENABLE_REQUIRED);
 			}
-			
-			if($entryDistribution->getSunset(null) > 0)
+			elseif($entryDistribution->getSunset(null) > 0)
 			{
 				if($distributionProvider->isAvailabilityUpdateEnabled())
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DISABLE_REQUIRED);
@@ -675,8 +674,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if($distributionProvider->isAvailabilityUpdateEnabled())
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::ENABLE_REQUIRED);
 			}
-			
-			if($entryDistribution->getSunset(null) > 0)
+			elseif($entryDistribution->getSunset(null) > 0)
 			{
 				if($distributionProvider->isAvailabilityUpdateEnabled())
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DISABLE_REQUIRED);
@@ -728,8 +726,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if($distributionProvider->isAvailabilityUpdateEnabled())
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::ENABLE_REQUIRED);
 			}
-			
-			if($entryDistribution->getSunset(null) > 0)
+			elseif($entryDistribution->getSunset(null) > 0)
 			{
 				if($distributionProvider->isAvailabilityUpdateEnabled())
 					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DISABLE_REQUIRED);
