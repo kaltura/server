@@ -258,6 +258,86 @@ class kContentDistributionManager
 	 * @param DistributionProfile $distributionProfile
 	 * @return BatchJob
 	 */
+	public static function submitEnableEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	{
+		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+			return null;
+			
+		$validStatus = array(
+			EntryDistributionStatus::ERROR_DELETING,
+			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::READY,
+		);
+		
+		if(!in_array($entryDistribution->getStatus(), $validStatus))
+		{
+			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			return null;
+		} 
+		
+		
+		$validationErrors = $entryDistribution->getValidationErrors();
+		if(count($validationErrors))
+		{
+			KalturaLog::log("Validation errors found");
+			return null;
+		}
+		
+		$distributionProvider = $distributionProfile->getProvider();
+		if($distributionProvider->isUpdateEnabled() && $distributionProvider->isAvailabilityUpdateEnabled())
+			return self::addSubmitEnableJob($entryDistribution, $distributionProfile);
+	
+		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
+		$entryDistribution->save();
+		
+		return null;
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @return BatchJob
+	 */
+	public static function submitDisableEntryDistribution(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	{
+		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
+			return null;
+			
+		$validStatus = array(
+			EntryDistributionStatus::ERROR_DELETING,
+			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::READY,
+		);
+		
+		if(!in_array($entryDistribution->getStatus(), $validStatus))
+		{
+			KalturaLog::notice("wrong entry distribution status [" . $entryDistribution->getStatus() . "]");
+			return null;
+		} 
+		
+		
+		$validationErrors = $entryDistribution->getValidationErrors();
+		if(count($validationErrors))
+		{
+			KalturaLog::log("Validation errors found");
+			return null;
+		}
+		
+		$distributionProvider = $distributionProfile->getProvider();
+		if($distributionProvider->isUpdateEnabled() && $distributionProvider->isAvailabilityUpdateEnabled())
+			return self::addSubmitDisableJob($entryDistribution, $distributionProfile);
+	
+		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
+		$entryDistribution->save();
+		
+		return null;
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @return BatchJob
+	 */
 	public static function submitFetchEntryDistributionReport(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
 		if($distributionProfile->getStatus() != DistributionProfileStatus::ENABLED || $distributionProfile->getReportEnabled() == DistributionProfileActionStatus::DISABLED)

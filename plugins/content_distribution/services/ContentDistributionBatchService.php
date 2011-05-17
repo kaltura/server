@@ -543,6 +543,21 @@ class ContentDistributionBatchService extends BatchService
 		}
 		
 		
+		// serach all records that arrived their sunrise time and requires enable
+		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::ENABLE_REQUIRED);
+		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::LESS_EQUAL);
+		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
+		foreach($entryDistributions as $entryDistribution)
+		{
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+			if($distributionProfile)
+				kContentDistributionManager::submitEnableEntryDistribution($entryDistribution, $distributionProfile);
+			else
+				KalturaLog::err("Distribution profile [" . $entryDistribution->getDistributionProfileId() . "] not found for entry distribution [" . $entryDistribution->getId() . "]");
+		}
+		
+		
 		// serach all records that arrived their sunset time and requires deletion
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::DELETE_REQUIRED);
@@ -553,6 +568,21 @@ class ContentDistributionBatchService extends BatchService
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 			if($distributionProfile)
 				kContentDistributionManager::submitDeleteEntryDistribution($entryDistribution, $distributionProfile);
+			else
+				KalturaLog::err("Distribution profile [" . $entryDistribution->getDistributionProfileId() . "] not found for entry distribution [" . $entryDistribution->getId() . "]");
+		}
+		
+		
+		// serach all records that arrived their sunset time and requires disable
+		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
+		$criteria->add(EntryDistributionPeer::DIRTY_STATUS, EntryDistributionDirtyStatus::DISABLE_REQUIRED);
+		$criteria->add(EntryDistributionPeer::SUNSET, time(), Criteria::LESS_EQUAL);
+		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
+		foreach($entryDistributions as $entryDistribution)
+		{
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+			if($distributionProfile)
+				kContentDistributionManager::submitDisableEntryDistribution($entryDistribution, $distributionProfile);
 			else
 				KalturaLog::err("Distribution profile [" . $entryDistribution->getDistributionProfileId() . "] not found for entry distribution [" . $entryDistribution->getId() . "]");
 		}
