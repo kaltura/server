@@ -130,7 +130,7 @@ class DailymotionDistributionProvider implements IDistributionProvider
 		return array(
 			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_CATEGORY."']",
 			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_DESCRIPTION."']",
-			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_KEYWORDS."']",
+			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_TAGS."']",
 		);
 	}
 }
