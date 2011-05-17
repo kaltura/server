@@ -70,6 +70,12 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 
 	/**
 	 * @readonly
+	 * @var KalturaEntryDistributionSunStatus
+	 */
+	public $sunStatus;
+
+	/**
+	 * @readonly
 	 * @var KalturaEntryDistributionFlag
 	 * @filter eq,in
 	 */
@@ -219,18 +225,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		if (is_null($dbObject))
 			return new EntryDistribution();
 			
-		parent::toObject($dbObject, $skip);
-		
-//		if($this->validationErrors)
-//		{
-//			$validationErrorsArray = array();
-//			foreach($this->validationErrors as $validationError)
-//				$validationErrorsArray[] = $validationError->toObject();
-//				
-//			$dbObject->setValidationErrorsArray($validationErrorsArray);
-//		}
-
-		return $dbObject;
+		return parent::toObject($dbObject, $skip);
 	}
 	
 	public function fromObject($sourceObject)
@@ -240,6 +235,7 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 			
 		parent::fromObject($sourceObject);
 		
+		$this->sunStatus = $sourceObject->getSunStatus();
 		$this->sunrise = $sourceObject->getSunrise(null);
 		$this->sunset = $sourceObject->getSunset(null);
 		$this->submittedAt = $sourceObject->getSubmittedAt(null);

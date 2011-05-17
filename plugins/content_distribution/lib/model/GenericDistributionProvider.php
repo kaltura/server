@@ -72,6 +72,14 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SCHEDULE_UPDATE_ENABLED);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isAvailabilityUpdateEnabled()
+	 */
+	public function isAvailabilityUpdateEnabled()
+	{
+		return false;
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::useDeleteInsteadOfUpdate()

@@ -50,6 +50,12 @@ interface IDistributionProvider
 	public function isScheduleUpdateEnabled();
 	
 	/**
+	 * indicates that enable/disable or private/public attributes could be sent as part of the metadata and therefore there is no need to use the dirty flags for later enabling or disabling.
+	 * @return bool
+	 */
+	public function isAvailabilityUpdateEnabled();
+	
+	/**
 	 * indicates that since this provider doesn’t support update action, delete and submit should be used instead.
 	 * @return bool
 	 */

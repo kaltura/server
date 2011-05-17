@@ -96,6 +96,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
 			self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_ENABLE))
+			self::onDistributionUpdateJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
+			self::onDistributionUpdateJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		
 		return true;
 	}
 	
@@ -443,8 +449,22 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		
 		$distributionProvider = $distributionProfile->getProvider();
-		if(!$distributionProvider->isScheduleUpdateEnabled() && $entryDistribution->getSunset(null) > 0)
-			$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+		if(!$distributionProvider->isScheduleUpdateEnabled())
+		{
+			if($entryDistribution->getSunStatus() == EntryDistributionSunStatus::BEFORE_SUNRISE)
+			{
+				if($distributionProvider->isAvailabilityUpdateEnabled())
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::ENABLE_REQUIRED);
+			}
+			
+			if($entryDistribution->getSunset(null) > 0)
+			{
+				if($distributionProvider->isAvailabilityUpdateEnabled())
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DISABLE_REQUIRED);
+				else
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+			}
+		}
 			
 		$entryDistribution->save();
 		
@@ -482,8 +502,22 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		}
 		
 		$distributionProvider = $distributionProfile->getProvider();
-		if(!$distributionProvider->isScheduleUpdateEnabled() && $entryDistribution->getSunset(null) > 0)
-			$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+		if(!$distributionProvider->isScheduleUpdateEnabled())
+		{
+			if($entryDistribution->getSunStatus() == EntryDistributionSunStatus::BEFORE_SUNRISE)
+			{
+				if($distributionProvider->isAvailabilityUpdateEnabled())
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::ENABLE_REQUIRED);
+			}
+			
+			if($entryDistribution->getSunset(null) > 0)
+			{
+				if($distributionProvider->isAvailabilityUpdateEnabled())
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DISABLE_REQUIRED);
+				else
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+			}
+		}
 			
 		$entryDistribution->save();
 		

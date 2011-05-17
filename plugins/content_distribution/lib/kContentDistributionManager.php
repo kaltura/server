@@ -53,6 +53,54 @@ class kContentDistributionManager
 	 * @param DistributionProfile $distributionProfile
 	 * @return BatchJob
 	 */
+	protected static function addSubmitDisableJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	{
+ 		$jobData = new kDistributionDisableJobData();
+ 		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
+ 		$jobData->setEntryDistributionId($entryDistribution->getId());
+ 		$jobData->setProviderType($distributionProfile->getProviderType());
+ 		$jobData->setRemoteId($entryDistribution->getRemoteId());
+ 		$jobData->setMediaFiles($entryDistribution->getMediaFiles());
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($entryDistribution->getEntryId());
+		$batchJob->setPartnerId($entryDistribution->getPartnerId());
+		
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE);
+		$jobSubType = $distributionProfile->getProviderType();
+	
+		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @return BatchJob
+	 */
+	protected static function addSubmitEnableJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
+	{
+ 		$jobData = new kDistributionEnableJobData();
+ 		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
+ 		$jobData->setEntryDistributionId($entryDistribution->getId());
+ 		$jobData->setProviderType($distributionProfile->getProviderType());
+ 		$jobData->setRemoteId($entryDistribution->getRemoteId());
+ 		$jobData->setMediaFiles($entryDistribution->getMediaFiles());
+ 		
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($entryDistribution->getEntryId());
+		$batchJob->setPartnerId($entryDistribution->getPartnerId());
+		
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_ENABLE);
+		$jobSubType = $distributionProfile->getProviderType();
+	
+		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @return BatchJob
+	 */
 	protected static function addSubmitUpdateJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
  		$jobData = new kDistributionUpdateJobData();
@@ -144,6 +192,9 @@ class kContentDistributionManager
 		if($distributionProvider->isDeleteEnabled())
 			return self::addSubmitDeleteJob($entryDistribution, $distributionProfile);
 			
+		if($distributionProvider->isAvailabilityUpdateEnabled())
+			return self::addSubmitDisableJob($entryDistribution, $distributionProfile);
+		
 		if(!$distributionProvider->isScheduleUpdateEnabled() || !$distributionProvider->isUpdateEnabled())
 		{
 			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] doesn't support delete or update");
@@ -269,7 +320,7 @@ class kContentDistributionManager
 			if($sunrise)
 			{
 				$distributionProvider = $distributionProfile->getProvider();
-				if(!$distributionProvider->isScheduleUpdateEnabled())
+				if(!$distributionProvider->isScheduleUpdateEnabled() && !$distributionProvider->isAvailabilityUpdateEnabled())
 				{
 					$sunrise -= $distributionProvider->getJobIntervalBeforeSunrise();
 					if($sunrise > time())

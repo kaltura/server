@@ -26,6 +26,11 @@ class KalturaDistributionProvider extends KalturaObject implements IFilterable
 	/**
 	 * @var bool
 	 */
+	public $availabilityUpdateEnabled;
+	
+	/**
+	 * @var bool
+	 */
 	public $deleteInsteadUpdate;
 	
 	/**
@@ -63,6 +68,7 @@ class KalturaDistributionProvider extends KalturaObject implements IFilterable
 		parent::fromObject($sourceObject);
 		
 		$this->scheduleUpdateEnabled = $sourceObject->isScheduleUpdateEnabled();
+		$this->availabilityUpdateEnabled = $sourceObject->isAvailabilityUpdateEnabled();
 		$this->deleteInsteadUpdate = $sourceObject->useDeleteInsteadOfUpdate();
 		$this->intervalBeforeSunrise = $sourceObject->getJobIntervalBeforeSunrise();
 		$this->intervalBeforeSunset = $sourceObject->getJobIntervalBeforeSunset();
