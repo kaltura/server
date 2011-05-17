@@ -58,13 +58,13 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		if($metadataDescription && strlen($metadataDescription))
 			$description = $metadataDescription;
 	
-		$tags = $entry->description;
+		$tags = $entry->tags;
 		$metadataTags = $this->findMetadataValue($metadataObjects, 'DailymotionKeywords');
 		if($metadataTags && strlen($metadataTags))
 			$tags = $metadataTags;
 		
 		$props = array();
-		$props['tags'] = $tags;
+		$props['tags'] = str_replace(',', ' ', $tags);
 		$props['title'] = $entry->name;
 		$props['channel'] = $this->findMetadataValue($metadataObjects, 'DailymotionCategory');
 		$props['description'] = $description;
