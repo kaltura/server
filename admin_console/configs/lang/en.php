@@ -887,6 +887,8 @@ return array(
 	'Kaltura_Client_ContentDistribution_Enum_EntryDistributionFlag::SUBMIT_REQUIRED' => 'Submit Required',
 	'Kaltura_Client_ContentDistribution_Enum_EntryDistributionFlag::DELETE_REQUIRED' => 'Delete Required',
 	'Kaltura_Client_ContentDistribution_Enum_EntryDistributionFlag::UPDATE_REQUIRED' => 'Update Required',
+	'Kaltura_Client_ContentDistribution_Enum_EntryDistributionFlag::ENABLE_REQUIRED' => 'Enable Required',
+	'Kaltura_Client_ContentDistribution_Enum_EntryDistributionFlag::DISABLE_REQUIRED' => 'Disable Required',
 
 	'Kaltura_Client_ContentDistribution_Enum_DistributionErrorType::MISSING_FLAVOR' => 'Missing Flavor',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionErrorType::MISSING_THUMBNAIL' => 'Missing Thumbnail',

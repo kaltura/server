@@ -97,10 +97,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			self::onDistributionFetchReportJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_ENABLE))
-			self::onDistributionUpdateJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionEnableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
-			self::onDistributionUpdateJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+			self::onDistributionDisableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		return true;
 	}
@@ -266,6 +266,118 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionEnableJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		if($data->getResults() && $data->getSentData())
+		{
+			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+			if(!$entryDistribution)
+			{
+				KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+				return $dbBatchJob;
+			}
+			
+			if($data->getResults())
+				$entryDistribution->incrementUpdateResultsVersion();
+				
+			if($data->getSentData())
+				$entryDistribution->incrementUpdateDataVersion();
+				
+			$entryDistribution->save();
+			
+			if($data->getResults())
+			{
+				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS);
+				kFileSyncUtils::file_put_contents($key, $data->getResults());
+				$data->setResults(null);
+			}
+			
+			if($data->getSentData())
+			{
+				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA);
+				kFileSyncUtils::file_put_contents($key, $data->getSentData());
+				$data->setSentData(null);
+			}
+			$dbBatchJob->setData($data);
+			$dbBatchJob->save();
+		}
+		
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_PENDING:
+				return self::onDistributionEnableJobPending($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return self::onDistributionEnableJobFinished($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return self::onDistributionEnableJobFailed($dbBatchJob, $data, $twinJob);
+			default:
+				return $dbBatchJob;
+		}
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionDisableJobUpdated(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		if($data->getResults() && $data->getSentData())
+		{
+			$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+			if(!$entryDistribution)
+			{
+				KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+				return $dbBatchJob;
+			}
+			
+			if($data->getResults())
+				$entryDistribution->incrementUpdateResultsVersion();
+				
+			if($data->getSentData())
+				$entryDistribution->incrementUpdateDataVersion();
+				
+			$entryDistribution->save();
+			
+			if($data->getResults())
+			{
+				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_RESULTS);
+				kFileSyncUtils::file_put_contents($key, $data->getResults());
+				$data->setResults(null);
+			}
+			
+			if($data->getSentData())
+			{
+				$key = $entryDistribution->getSyncKey(EntryDistribution::FILE_SYNC_ENTRY_DISTRIBUTION_UPDATE_DATA);
+				kFileSyncUtils::file_put_contents($key, $data->getSentData());
+				$data->setSentData(null);
+			}
+			$dbBatchJob->setData($data);
+			$dbBatchJob->save();
+		}
+		
+		switch($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_PENDING:
+				return self::onDistributionDisableJobPending($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return self::onDistributionDisableJobFinished($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+				return self::onDistributionDisableJobFailed($dbBatchJob, $data, $twinJob);
+			default:
+				return $dbBatchJob;
+		}
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionDeleteJobData $data
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
@@ -371,6 +483,60 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 * @return BatchJob
 	 */
 	public static function onDistributionUpdateJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
+		$entryDistribution->setDirtyStatus(null);
+		$entryDistribution->save();
+	
+		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
+		{
+			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+		}
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionEnableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$entryDistribution->setStatus(EntryDistributionStatus::UPDATING);
+		$entryDistribution->setDirtyStatus(null);
+		$entryDistribution->save();
+	
+		if($data->getProviderType() == DistributionProviderType::SYNDICATION)
+		{
+			$dbBatchJob = kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+		}
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionDisableJobPending(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
@@ -526,6 +692,86 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionEnableJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$entryDistribution->setErrorType(null);
+		$entryDistribution->setErrorNumber(null);
+		$entryDistribution->setErrorDescription(null);
+		
+		$entryDistribution->setStatus(EntryDistributionStatus::READY);
+		$entryDistribution->setDirtyStatus(null);
+	
+		$distributionProfileId = $entryDistribution->getDistributionProfileId();
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+		if(!$distributionProfile)
+		{
+			KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
+			return $dbBatchJob;
+		}
+		
+		$distributionProvider = $distributionProfile->getProvider();
+		if(!$distributionProvider->isScheduleUpdateEnabled())
+		{
+			if($entryDistribution->getSunStatus() == EntryDistributionSunStatus::BEFORE_SUNRISE)
+			{
+				if($distributionProvider->isAvailabilityUpdateEnabled())
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::ENABLE_REQUIRED);
+			}
+			
+			if($entryDistribution->getSunset(null) > 0)
+			{
+				if($distributionProvider->isAvailabilityUpdateEnabled())
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DISABLE_REQUIRED);
+				else
+					$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::DELETE_REQUIRED);
+			}
+		}
+			
+		$entryDistribution->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionDisableJobFinished(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$entryDistribution->setErrorType(null);
+		$entryDistribution->setErrorNumber(null);
+		$entryDistribution->setErrorDescription(null);
+		
+		$entryDistribution->setStatus(EntryDistributionStatus::READY);
+		$entryDistribution->setDirtyStatus(null);
+			
+		$entryDistribution->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
 	 * @param kDistributionDeleteJobData $data
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
@@ -603,6 +849,58 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 * @return BatchJob
 	 */
 	public static function onDistributionUpdateJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$entryDistribution->setErrorType($dbBatchJob->getErrType());
+		$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
+		$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
+		
+		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
+		$entryDistribution->setDirtyStatus(null);
+		$entryDistribution->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionEnableJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
+	{
+		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
+		if(!$entryDistribution)
+		{
+			KalturaLog::err("Entry distribution [" . $data->getEntryDistributionId() . "] not found");
+			return $dbBatchJob;
+		}
+		
+		$entryDistribution->setErrorType($dbBatchJob->getErrType());
+		$entryDistribution->setErrorNumber($dbBatchJob->getErrNumber());
+		$entryDistribution->setErrorDescription($dbBatchJob->getMessage());
+		
+		$entryDistribution->setStatus(EntryDistributionStatus::ERROR_UPDATING);
+		$entryDistribution->setDirtyStatus(null);
+		$entryDistribution->save();
+		
+		return $dbBatchJob;
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kDistributionUpdateJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function onDistributionDisableJobFailed(BatchJob $dbBatchJob, kDistributionUpdateJobData $data, BatchJob $twinJob = null)
 	{
 		$entryDistribution = EntryDistributionPeer::retrieveByPK($data->getEntryDistributionId());
 		if(!$entryDistribution)
