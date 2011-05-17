@@ -8,7 +8,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	IDistributionEngineCloseSubmit, 
 	IDistributionEngineUpdate,
 	IDistributionEngineDelete,
-	IDistributionEngineReport
+	IDistributionEngineReport,
+	IDistributionEngineEnable,
+	IDistributionEngineDisable
 {
 	protected $tempXmlPath;
 	
@@ -53,6 +55,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 		$category = $distributionProfile->defaultCategory;
 		$description = $entry->description;
+		$tags = $entry->tags;
 		try{
 			$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, KalturaMetadataObjectType::ENTRY, $distributionProfile->metadataProfileId);
 			if(count($metadataObjects))
@@ -64,12 +67,16 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				$metadataDescription = $this->findMetadataValue($metadataObjects, 'YoutubeDescription');
 				if($metadataDescription && strlen($metadataDescription))
 					$description = $metadataDescription;
+					
+				$metadataTags = $this->findMetadataValue($metadataObjects, 'YoutubeKeywords');
+				if($metadataTags && strlen($metadataTags))
+					$tags = $metadataTags;
 			}
 		}
 		catch (Exception $e){}
 		
 		$props = array();
-		$props['keywords'] = $entry->tags;
+		$props['keywords'] = $tags;
 		$props['title'] = $entry->name;
 		$props['category'] = $category;
 		$props['description'] = $description;
@@ -94,13 +101,17 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
 	{	
+		$private = true;
+		if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
+			$private = false;
+		
 		$needDel = false;
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
 		if($data->entryDistribution->remoteId)
 		{
 			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
-			$youTubeApiImpl->updateEntry($data->entryDistribution->remoteId, $props);
+			$youTubeApiImpl->updateEntry($data->entryDistribution->remoteId, $props, $private);
 		
 			$data->remoteId = $data->entryDistribution->remoteId;
 			return true;
@@ -136,7 +147,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		}
 		
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
-		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath,$videoFilePath,$props);
+		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath, $videoFilePath, $props, $private);
 	
 		if ($needDel == true)
 		{
@@ -184,13 +195,39 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		return $this->doUpdate($data, $data->distributionProfile);
 	}
 	
-	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineDisable::disable()
+	 */
+	public function disable(KalturaDistributionDisableJobData $data)
 	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaYoutubeApiDistributionProfile");
+	
+		return $this->doUpdate($data, $data->distributionProfile, false);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineEnable::enable()
+	 */
+	public function enable(KalturaDistributionEnableJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
+			throw new Exception("Distribution profile must be of type KalturaYoutubeApiDistributionProfile");
+	
+		return $this->doUpdate($data, $data->distributionProfile, true);
+	}
+	
+	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enabled = null)
+	{
+		$private = true;
+		if($enabled === true || (is_null($enabled) && $data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE))
+			$private = false;
+		
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
 	
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
-		$youTubeApiImpl->updateEntry($data->remoteId, $props);
+		$youTubeApiImpl->updateEntry($data->remoteId, $props, $private);
 		
 //		$data->sentData = $youtubeApiMediaService->request;
 //		$data->results = $youtubeApiMediaService->response;

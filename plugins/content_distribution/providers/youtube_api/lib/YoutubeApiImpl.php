@@ -48,7 +48,7 @@ class YouTubeApiImpl
 		$this->yt->setMajorProtocolVersion(2);
 	}
 	
-	public function uploadVideo($fileDisk, $fileUrl,$props)
+	public function uploadVideo($fileDisk, $fileUrl, $props, $private = false)
 	{
 //		foreach ($props as $key => $val)
 //		{
@@ -72,7 +72,11 @@ class YouTubeApiImpl
 		// Set keywords. Please note that this must be a comma-separated string 
 		// and that individual keywords cannot contain whitespace 
 		$myVideoEntry->SetVideoTags($props['keywords']);  
-		$myVideoEntry->setVideoPublic();
+		
+		if($private)
+			$myVideoEntry->setVideoPrivate();
+		else
+			$myVideoEntry->setVideoPublic();
 		
 		$access = array();
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('comment',$props['comment']);
@@ -263,7 +267,7 @@ class YouTubeApiImpl
 		$this->printVideoEntry($videoEntry);
 	}
 
-	function updateEntry($remoteId, $props)
+	function updateEntry($remoteId, $props, $private = false)
 	{
 		$videoEntry = $this->yt->getVideoEntry($remoteId,null, true); 
 		$putUrl = $videoEntry->getEditLink()->getHref();
@@ -282,6 +286,11 @@ class YouTubeApiImpl
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('videoRespond',$props['videoRespond']);
 		
 		$videoEntry->setAccess($access);
+		
+		if($private)
+			$videoEntry->setVideoPrivate();
+		else
+			$videoEntry->setVideoPublic();
 		
 		$newEntry = $this->yt->updateEntry($videoEntry, $putUrl);
 		$newEntry->setMajorProtocolVersion(2);
