@@ -41,6 +41,8 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_UPDATE' => 'Distribution Update',
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_DELETE' => 'Distribution Delete',
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_FETCH_REPORT' => 'Distribution Fetch Report',
+	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_ENABLE' => 'Distribution Enable',
+	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_DISABLE' => 'Distribution Disable',
 	'Kaltura_Client_Enum_BatchJobType::DISTRIBUTION_SYNC' => 'Distribution Sync',
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_WATCHER' => 'Drop Folder Watcher',
 	'Kaltura_Client_Enum_BatchJobType::DROP_FOLDER_HANDLER' => 'Drop Folder Handler',
