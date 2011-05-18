@@ -115,14 +115,14 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaDistributionJo
 			$xml->loadXML($xmlContent);
 			
 			// first metada field
-			$nodes = $xml->getElementsByTagName(YouTubeDistributionProfile::METADATA_FIELD_PLAYLIST);
+			$nodes = $xml->getElementsByTagName(YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLIST);
 			foreach($nodes as $node)
 			{
 				$playlists[] = $node->textContent;
 			}
 			
 			// second metadata field
-			$nodes = $xml->getElementsByTagName(YouTubeDistributionProfile::METADATA_FIELD_PLAYLISTS);
+			$nodes = $xml->getElementsByTagName(YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLISTS);
 			foreach($nodes as $node)
 			{
 				$playlists[] = $node->textContent;

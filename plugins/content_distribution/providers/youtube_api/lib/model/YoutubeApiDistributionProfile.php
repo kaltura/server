@@ -16,6 +16,8 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 
 	const METADATA_FIELD_DESCRIPTION = 'YoutubeDescription';
 	const METADATA_FIELD_TAGS = 'YoutubeKeywords';
+	const METADATA_FIELD_PLAYLIST = 'YouTubePlaylist';
+	const METADATA_FIELD_PLAYLISTS = 'YouTubePlaylists';
 	
 	const ENTRY_NAME_MINIMUM_LENGTH = 1;
 	const ENTRY_NAME_MAXIMUM_LENGTH = 60;
