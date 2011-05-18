@@ -246,9 +246,9 @@ class DailymotionDistributionProfile extends DistributionProfile
 				{
 					if(strlen($tag) < self::ENTRY_TAG_MINIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Entry tag [$tag] must contain at least ' . self::ENTRY_TAG_MINIMUM_LENGTH . ' characters');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, "Entry tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
 						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-						$validationError->setValidationErrorParam('Entry tag [$tag] must contain at least ' . self::ENTRY_TAG_MINIMUM_LENGTH . ' characters');
+						$validationError->setValidationErrorParam("Entry tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
 						$validationErrors[] = $validationError;
 					}
 				}
