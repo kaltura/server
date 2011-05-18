@@ -15,8 +15,12 @@ class DailymotionDistributionProfile extends DistributionProfile
 	const METADATA_FIELD_TAGS = 'DailymotionKeywords';
 
 	const ENTRY_NAME_MINIMUM_LENGTH = 1;
+	const ENTRY_NAME_MAXIMUM_LENGTH = 60;
 	const ENTRY_DESCRIPTION_MINIMUM_LENGTH = 1;
-	const ENTRY_TAGS_MINIMUM_LENGTH = 1;
+	const ENTRY_DESCRIPTION_MAXIMUM_LENGTH = 2000;
+	const ENTRY_TAGS_MINIMUM_COUNT = 2;
+	const ENTRY_TAGS_MAXIMUM_LENGTH = 250;
+	const ENTRY_TAG_MINIMUM_LENGTH = 3;
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -99,6 +103,15 @@ class DailymotionDistributionProfile extends DistributionProfile
 						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
 						$validationErrors[] = $validationError;
 					}
+					
+					// validate entry description minumum length of 1 character
+					if(strlen($value) > self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH)
+					{
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_DESCRIPTION, 'Dailymotion description is too long');
+						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH);
+						$validationErrors[] = $validationError;
+					}
 				}
 			}
 		}
@@ -108,21 +121,35 @@ class DailymotionDistributionProfile extends DistributionProfile
 		{
 			$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_TAGS);
 			
-			if(count($values))
+			if(count($values) && strlen(implode('', $values)))
 			{	
-				foreach($values as $value)
-				{
-					if(!strlen($value))
-						continue;
+				$tags = implode(',', $values);
+				$tags = explode(',', $tags);
+				$tagsStr = implode(' , ', $tags);
 				
-					$validateTags = false;
-					
-					// validate entry tags minumum length of 1 character
-					if(strlen($value) < self::ENTRY_TAGS_MINIMUM_LENGTH)
+				$validateTags = false;
+			
+				if(strlen($tagsStr) > self::ENTRY_TAGS_MAXIMUM_LENGTH)
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tags is too long');
+					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+					$validationError->setValidationErrorParam(self::ENTRY_TAGS_MAXIMUM_LENGTH);
+					$validationErrors[] = $validationError;
+				}
+				if(count($tags) < self::ENTRY_TAGS_MINIMUM_COUNT)
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tags must contain at least ' . self::ENTRY_TAGS_MINIMUM_COUNT . ' tags');
+					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+					$validationError->setValidationErrorParam(self::ENTRY_TAGS_MINIMUM_COUNT);
+					$validationErrors[] = $validationError;
+				}
+				foreach($tags as $tag)
+				{
+					if(strlen($tag) < self::ENTRY_TAG_MINIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tags is too short');
-						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
-						$validationError->setValidationErrorParam(self::ENTRY_TAGS_MINIMUM_LENGTH);
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tag [$tag] must contain at least ' . self::ENTRY_TAG_MINIMUM_LENGTH . ' characters');
+						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+						$validationError->setValidationErrorParam(self::ENTRY_TAG_MINIMUM_LENGTH);
 						$validationErrors[] = $validationError;
 					}
 				}
@@ -155,7 +182,15 @@ class DailymotionDistributionProfile extends DistributionProfile
 			$validationError->setValidationErrorParam(self::ENTRY_NAME_MINIMUM_LENGTH);
 			$validationErrors[] = $validationError;
 		}
-
+		
+		if(strlen($entry->getName()) > self::ENTRY_NAME_MAXIMUM_LENGTH)
+		{
+			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, 'Name is too long');
+			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+			$validationError->setValidationErrorParam(self::ENTRY_NAME_MAXIMUM_LENGTH);
+			$validationErrors[] = $validationError;
+		}
+		
 		$validateDescription = true;
 		$validateTags = true;
 		$validationErrors = $this->validateMetadataForSubmission($entryDistribution, $action, $validationErrors, $validateDescription, $validateTags);
@@ -173,6 +208,13 @@ class DailymotionDistributionProfile extends DistributionProfile
 				$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
 				$validationErrors[] = $validationError;
 			}
+			elseif(strlen($entry->getDescription()) > self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH)
+			{
+				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::DESCRIPTION, 'Description is too long');
+				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+				$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH);
+				$validationErrors[] = $validationError;
+			}
 		}
 	
 		if($validateTags)
@@ -181,12 +223,35 @@ class DailymotionDistributionProfile extends DistributionProfile
 			{
 				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, entryPeer::TAGS, 'Tags is empty');
 			}
-			elseif(strlen($entry->getTags()) < self::ENTRY_TAGS_MINIMUM_LENGTH)
+			else
 			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Tags is too short');
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
-				$validationError->setValidationErrorParam(self::ENTRY_TAGS_MINIMUM_LENGTH);
-				$validationErrors[] = $validationError;
+				$tags = explode(',', $entry->getTags());
+				$tagsStr = implode(' , ', $tags);
+				
+				if(strlen($tagsStr) > self::ENTRY_TAGS_MAXIMUM_LENGTH)
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Entry tags is too long');
+					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+					$validationError->setValidationErrorParam(self::ENTRY_TAGS_MAXIMUM_LENGTH);
+					$validationErrors[] = $validationError;
+				}
+				if(count($tags) < self::ENTRY_TAGS_MINIMUM_COUNT)
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Entry tags must contain at least ' . self::ENTRY_TAGS_MINIMUM_COUNT . ' tags');
+					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+					$validationError->setValidationErrorParam(self::ENTRY_TAGS_MINIMUM_COUNT);
+					$validationErrors[] = $validationError;
+				}
+				foreach($tags as $tag)
+				{
+					if(strlen($tag) < self::ENTRY_TAG_MINIMUM_LENGTH)
+					{
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Entry tag [$tag] must contain at least ' . self::ENTRY_TAG_MINIMUM_LENGTH . ' characters');
+						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+						$validationError->setValidationErrorParam(self::ENTRY_TAG_MINIMUM_LENGTH);
+						$validationErrors[] = $validationError;
+					}
+				}
 			}
 		}
 		

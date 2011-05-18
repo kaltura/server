@@ -64,7 +64,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 			$tags = $metadataTags;
 		
 		$props = array();
-		$props['tags'] = str_replace(',', ' ', $tags);
+		$props['tags'] = str_replace(',', ' , ', $tags);
 		$props['title'] = $entry->name;
 		$props['channel'] = $this->findMetadataValue($metadataObjects, 'DailymotionCategory');
 		$props['description'] = $description;
