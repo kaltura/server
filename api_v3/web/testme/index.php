@@ -29,7 +29,7 @@
 		$include = $indexConfig->get("include");
 		$exclude = $indexConfig->get("exclude");
 
-		$cacheFileName = kConf::get("cache_root_path").'/testme/services';
+		$cacheFileName = kConf::get("cache_root_path").'/testme/services-'.$configSection;
 		
 		if (file_exists($cacheFileName))
 		{
