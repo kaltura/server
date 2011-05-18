@@ -31,7 +31,15 @@ class kConf extends kConfLocal
 				"delivery_block_countries" => "", // comma separated
 				
 				"enable_cache" => true,
-				
+			
+				// params that should be ignored from cache. can be used for tweaking
+				// production environment hit by unexpected random parameters
+				"v3cache_ignore_params" => array(),
+			
+				// actions that can be cached although an admin ks is used
+				// due to bad integration by the partner
+				"v3cache_ignore_admin_ks" => array(),
+							
 				"terms_of_use_uri" => "index.php/terms",
 			
 				"server_api_v2_path" => "/api/" ,
