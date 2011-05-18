@@ -94,7 +94,7 @@ class DailymotionDistributionProfile extends DistributionProfile
 					// validate entry description minumum length of 1 character
 					if(strlen($value) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'Dailymotion description is too short');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_DESCRIPTION, 'Dailymotion description is too short');
 						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
 						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
 						$validationErrors[] = $validationError;
@@ -120,7 +120,7 @@ class DailymotionDistributionProfile extends DistributionProfile
 					// validate entry tags minumum length of 1 character
 					if(strlen($value) < self::ENTRY_TAGS_MINIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'Dailymotion tags is too short');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tags is too short');
 						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
 						$validationError->setValidationErrorParam(self::ENTRY_TAGS_MINIMUM_LENGTH);
 						$validationErrors[] = $validationError;

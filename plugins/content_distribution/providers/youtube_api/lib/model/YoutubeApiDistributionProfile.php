@@ -75,7 +75,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 					// validate entry description minumum length of 1 character
 					if(strlen($value) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'YouTube description is too short');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_DESCRIPTION, 'YouTube description is too short');
 						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
 						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
 						$validationErrors[] = $validationError;
@@ -84,7 +84,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 					// validate entry description maximum length of 60 characters
 					if(strlen($value) > self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'YouTube description is too long');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_DESCRIPTION, 'YouTube description is too long');
 						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
 						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH);
 						$validationErrors[] = $validationError;
@@ -109,7 +109,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 					// validate entry tags minumum length of 1 character
 					if(strlen($value) < self::ENTRY_TAGS_MINIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'YouTube tags is too short');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'YouTube tags is too short');
 						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
 						$validationError->setValidationErrorParam(self::ENTRY_TAGS_MINIMUM_LENGTH);
 						$validationErrors[] = $validationError;
@@ -118,7 +118,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 					// validate entry tags maximum length of 60 characters
 					if(strlen($value) > self::ENTRY_TAGS_MAXIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, 'YouTube tags is too long');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'YouTube tags is too long');
 						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
 						$validationError->setValidationErrorParam(self::ENTRY_TAGS_MAXIMUM_LENGTH);
 						$validationErrors[] = $validationError;
