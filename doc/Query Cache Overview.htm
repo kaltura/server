@@ -45,14 +45,15 @@ functions. On multi datacenter environments this won't work, because it won't in
 that are cached on the remote DC. So, instead, we'll define triggers on the database that will perform 
 the invalidation - whether the database was modified locally or by the replication.
 </p>
-<h3>What's needed to add a new query to the cache ?</h3>
+<h3>How to add a new query to the cache ?</h3>
 <p>
-Override 2 functions:
 <ul>
-<li>&lt;object&gt;::getCacheInvalidationKeys – returns a list of invalidation keys that should be updated when
-$this object is saved.
-<li>&lt;peer&gt;::getCacheInvalidationKeys – returns a list of invalidation keys that should be checked before
+<li>Override &lt;peer&gt;::getCacheInvalidationKeys to return a list of invalidation keys that should be checked before
 the supplied $criteria can be returned from the cache.
+<li>Override &lt;object&gt;::getCacheInvalidationKeys to return a list of invalidation keys that should be updated when
+$this object is saved.
+<li>The list of invalidation keys to update should also be added to $INVALIDATION_KEYS in 
+deployment/base/scripts/createQueryCacheTriggers.php.
 </ul>
 Use the following samples:
 <ul>
@@ -80,7 +81,7 @@ Perform the following on one of the mysql slaves in each datacenter:
 command 'select memc_servers_set('&lt;global memcache host&gt;:&lt;global memcache port&gt;');' to the mysql init script.<br>
 <b>Note:</b> To add an init script for mysql, add the command line switch '--init-file=&lt;mysql init script path&gt;' to mysqld.
 <li>Restart mysql.
-<li>Install the triggers by running from deployment/base/scripts: php query_cache_triggers.php create &lt;host&gt; &lt;user&gt; &lt;password&gt;
+<li>Install the triggers by running from deployment/base/scripts: php createQueryCacheTriggers.php create &lt;host&gt; &lt;user&gt; &lt;password&gt;
 </ul>
 On all servers, set query_cache_enabled to true in kConfLocal (query_cache_invalidate_on_change should be left false).
 </p>
