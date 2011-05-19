@@ -222,7 +222,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 */
 	private static function getFileSize($filePath)
 	{
-		clearstatcache(true, $filePath);
+		clearstatcache();
 		$fileSize = @filesize($filePath);
 		return $fileSize;
 	}
