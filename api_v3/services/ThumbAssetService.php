@@ -84,9 +84,14 @@ class ThumbAssetService extends KalturaBaseService
     	}
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
-		
-		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
-			$this->setAsDefaultAction($dbThumbAsset->getId());
+
+		$dbEntryThumbs = thumbAssetPeer::retrieveByEntryId($entryId);
+    		
+ 		//If the thums has the default tag or the entry is in no content and this is the first thumb
+		if( $dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || 
+		  	($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT && count($dbEntryThumbs) == 1)
+		  )
+				$this->setAsDefaultAction($dbThumbAsset->getId());
 		
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->fromObject($dbThumbAsset);
@@ -706,6 +711,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @deprecated use thumbAsset.add instead
 	 */
 	public function addFromImageAction($entryId, $fileData)
 	{
@@ -735,6 +741,14 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
 		
+		$dbEntryThumbs = thumbAssetPeer::retrieveByEntryId($entryId);
+    		
+ 		//If the thums has the default tag or the entry is in no content and this is the first thumb
+		if( $dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || 
+		  	($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT && count($dbEntryThumbs) == 1)
+		  )
+				$this->setAsDefaultAction($dbThumbAsset->getId());
+			
 		$thumbAssets = new KalturaThumbAsset();
 		$thumbAssets->fromObject($dbThumbAsset);
 		return $thumbAssets;
