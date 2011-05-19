@@ -20,5 +20,6 @@ class KalturaVideoCodec extends KalturaStringEnum
 	const WMV3 = "wmv3";
 	const WVC1A = "wvc1a";
 	const VP8 = "vp8";
+	const MPEG2 = "mpeg2";
 	const COPY = "copy";
 }
