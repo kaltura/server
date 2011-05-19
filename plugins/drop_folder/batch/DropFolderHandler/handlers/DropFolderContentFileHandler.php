@@ -347,7 +347,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$fileFilter->statusIn = KalturaDropFolderFileStatus::PENDING.','.KalturaDropFolderFileStatus::WAITING.','.KalturaDropFolderFileStatus::NO_MATCH;
 		$fileFilter->parsedSlugEqual = $this->dropFolderFile->parsedSlug; // must belong to the same entry
 				
-		$existingFileList = $this->kClient->dropFolderFile->listAction($fileFilter); // current file will not be returned because parsed slug is not yet set
+		$existingFileList = $this->kClient->dropFolderFile->listAction($fileFilter);
 		
 		$existingFlavors = array();
 		$existingFlavors[$this->dropFolderFile->parsedFlavor] = $this->dropFolderFile->id;
@@ -367,8 +367,14 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 				continue;
 			}
 			
-			if ($assetParams->readyBehavior == KalturaFlavorReadyBehaviorType::REQUIRED && !array_key_exists($assetParams->systemName, $existingFlavors)) {
+			$assetExists = array_key_exists($assetParams->systemName, $existingFlavors);
+			
+			if ($assetParams->readyBehavior == KalturaFlavorReadyBehaviorType::REQUIRED && !$assetExists) {
 				return false;
+			}
+			
+			if (!$assetExists) {
+				continue;
 			}
 			
 			$assetContainer = new KalturaAssetParamsResourceContainer();
