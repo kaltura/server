@@ -131,7 +131,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	private function parseRegex()
 	{
 		$matches = null;
-		$slugRegex = is_null($this->config->slugRegex) ? KalturaDropFolderContentFileHandlerConfig::DEFAULT_SLUG_REGEX : $this->config->slugRegex;
+		$slugRegex = (is_null($this->config->slugRegex) || empty($this->config->slugRegex)) ? KalturaDropFolderContentFileHandlerConfig::DEFAULT_SLUG_REGEX : $this->config->slugRegex;
 		$matchFound = @preg_match($slugRegex, $this->dropFolderFile->fileName, $matches);
 		
 		if (!$matchFound) {
