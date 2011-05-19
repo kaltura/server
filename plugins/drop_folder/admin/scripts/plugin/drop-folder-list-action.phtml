@@ -57,8 +57,7 @@
 
 <script type="text/javascript">
 
-function onFilterTypeChange()
-{
+jQuery('#filter_type').change(function() {
 	if(this.value == "none") {
 		$("#filter_text").css("display","none");
 	}
@@ -66,10 +65,9 @@ function onFilterTypeChange()
 		$("#filter_text").css("display","inline");
 		$("#filter_text input").focus();
 	}
-}
+});
 
-jQuery('#filter_type').change(onFilterTypeChange);
-onFilterTypeChange();
+jQuery('#filter_type').change();
 
 function doAction(action, folderId) {
 	if (action && eval('typeof ' + action) == 'function')

@@ -28,8 +28,6 @@ class DropFolderListAction extends KalturaAdminConsolePlugin implements IKaltura
 		$pageSize = $this->_getParam('pageSize', 10);
 		$partnerId = $this->_getParam('partnerId');
 		
-		$dropFolderFilterForm = new Form_DropFolderFilter();
-
 		// init filter
 		$dropFolderFilter = $this->getDropFolderFilterFromRequest($request);
 		
@@ -43,10 +41,14 @@ class DropFolderListAction extends KalturaAdminConsolePlugin implements IKaltura
 		$paginator->setItemCountPerPage($pageSize);
 		
 		// set view
+		$dropFolderFilterForm = new Form_DropFolderFilter();
 		$dropFolderFilterForm->populate ( $request->getParams () );
-		$action->view->paginator = $paginator;
-		$action->view->filterForm = $dropFolderFilterForm;
+		$dropFolderFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
+		$dropFolderFilterForm->setAction($dropFolderFilterFormAction);
 		
+		$action->view->filterForm = $dropFolderFilterForm;
+		$action->view->paginator = $paginator;
+
 		$createFolderForm = new Form_CreateDropFolder();
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'DropFolderConfigure'), null, true);
 		$createFolderForm->setAction($actionUrl);
