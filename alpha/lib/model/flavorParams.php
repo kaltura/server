@@ -38,6 +38,7 @@ class flavorParams extends assetParams
 	const VIDEO_CODEC_WMV3 = "wmv3";
 	const VIDEO_CODEC_WVC1A = "wvc1a";
 	const VIDEO_CODEC_VP8 = "vp8";
+	const VIDEO_CODEC_MPEG2 = "mpeg2";
 	const VIDEO_CODEC_COPY = "copy";
 	
 	const AUDIO_CODEC_NONE = "";
