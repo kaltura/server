@@ -35,9 +35,6 @@ class KalturaResponseCacher
 			$params = requestUtils::getRequestParams();
 		}
 		
-		foreach(kConf::get('v3cache_ignore_params') as $name)
-			unset($params[$name]);
-		
 		// check the clientTag parameter for a cache start time (cache_st:<time>) directive
 		if (isset($params['clientTag']))
 		{
@@ -73,6 +70,9 @@ class KalturaResponseCacher
 		unset($params['ks']);
 		unset($params['kalsig']);
 		unset($params['clientTag']);
+		
+		foreach(kConf::get('v3cache_ignore_params') as $name)
+			unset($params[$name]);
 		
 		$this->_params = $params;
 		$this->setKS($ks);
@@ -254,23 +254,27 @@ class KalturaResponseCacher
 		// force caching of actions listed in kConf even if admin ks is used
 		foreach(kConf::get('v3cache_ignore_admin_ks') as $ignoreParams)
 		{
-			$matches = 0;
+			$foundRule = true;
 			
 			foreach($ignoreParams as $key => $value)
 			{
 				if ($key == 'partner_id')
 				{
 					if ($ks->partner_id != $value)
+					{
+						$foundRule = false;
 						break;
+					}
 				}
-				else if (!isset($this->_params[$key]) || $this->_params[$key] != $value)
+				elseif (!isset($this->_params[$key]) || $this->_params[$key] != $value)
+				{
+					$foundRule = false;
 					break;
-					
-				$matches++;
+				}
 			}
 			
 			// if all parameters where matched cache response
-			if ($matches == count($ignoreParams))
+			if ($foundRule && count($ignoreParams))
 				return true;
 		}
         
