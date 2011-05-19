@@ -63,6 +63,11 @@ class DropFolderService extends KalturaBaseService
 		if (!PartnerPeer::retrieveByPK($dropFolder->partnerId)) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $dropFolder->partnerId);
 		}
+		
+		if (!DropFolderPlugin::isAllowedPartner($dropFolder->partnerId))
+		{
+			throw new KalturaAPIException(KalturaErrors::PLUGIN_NOT_AVAILABLE_FOR_PARTNER, DropFolderPlugin::getPluginName(), $dropFolder->partnerId);
+		}
 				
 		$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);
 		if ($existingDropFolder) {

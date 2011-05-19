@@ -64,6 +64,8 @@ class KalturaErrors extends APIErrors
 	
 	const DATA_CENTER_ID_NOT_FOUND = "DATA_CENTER_ID_NOT_FOUND,There is no data center with id [%s]";
 	
+	const PLUGIN_NOT_AVAILABLE_FOR_PARTNER = "PLUGIN_NOT_AVAILABLE_FOR_PARTNER,Plugin [%s] is not available for partner [%s]";
+	
 	/**
 	 * Service Oriented Errors
 	 *
