@@ -509,13 +509,15 @@ class kContentDistributionManager
 		$assignedThumbAssetIds = $originalList;
 		if($assignedThumbAssetIds)
 		{
-			$thumbAssetsIds = explode(',', $assignedThumbAssetIds);
-			$assignedThumbAssets = thumbAssetPeer::retrieveByIds($thumbAssetsIds);
+			$assignedThumbAssets = thumbAssetPeer::retrieveByIds(explode(',', $assignedThumbAssetIds));
 			foreach($assignedThumbAssets as $assignedThumbAsset)
 			{					
 				$key = $assignedThumbAsset->getWidth() . 'x' . $assignedThumbAsset->getHeight();
 				if(isset($thumbDimensionsWithKeys[$key]))
+				{
 					unset($thumbDimensionsWithKeys[$key]);
+					$thumbAssetsIds[] = $assignedThumbAsset->getId();
+				}
 			}
 		}
 		
