@@ -269,7 +269,8 @@ class KalturaResponseCacher
 				$matches++;
 			}
 			
-			if ($matches != count($ignoreParams))
+			// if all parameters where matched cache response
+			if ($matches == count($ignoreParams))
 				return true;
 		}
         
