@@ -168,13 +168,18 @@ class FlavorAssetService extends KalturaBaseService
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
-		try {
+		try 
+		{
 			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, $copyOnly);
 		}
-		catch (Exception $e) {
-			$flavorAsset->setDescription($e->getMessage());
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$flavorAsset->save();												
+		catch (Exception $e) 
+		{
+        	if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED || $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+        	{
+				$flavorAsset->setDescription($e->getMessage());
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$flavorAsset->save();
+        	}												
 			throw $e;
 		}
 		
@@ -303,9 +308,12 @@ class FlavorAssetService extends KalturaBaseService
         $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->getStorageProfileId());
         if(!$storageProfile)
         {
-			$flavorAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$flavorAsset->save();
+        	if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED || $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+        	{
+				$flavorAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$flavorAsset->save();
+        	}
 			
         	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
         }
@@ -352,9 +360,12 @@ class FlavorAssetService extends KalturaBaseService
 				$msg = "Resource of type [" . get_class($contentResource) . "] is not supported";
 				KalturaLog::err($msg);
 				
-				$flavorAsset->setDescription($msg);
-				$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
-				$flavorAsset->save();
+				if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED || $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+				{
+					$flavorAsset->setDescription($msg);
+					$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+					$flavorAsset->save();
+				}
 				
 				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($contentResource));
     	}

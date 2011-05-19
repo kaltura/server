@@ -157,9 +157,13 @@ class ThumbAssetService extends KalturaBaseService
 			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, $copyOnly);
 		}
 		catch (Exception $e) {
-			$thumbAsset->setDescription($e->getMessage());
-			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$thumbAsset->save();												
+			
+			if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+			{
+				$thumbAsset->setDescription($e->getMessage());
+				$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$thumbAsset->save();
+			}												
 			throw $e;
 		}
     }
@@ -174,9 +178,12 @@ class ThumbAssetService extends KalturaBaseService
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($thumbAsset, $fullPath);
 			
-		$thumbAsset->setDescription("Failed downloading file[$url]");
-		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-		$thumbAsset->save();
+		if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+		{
+			$thumbAsset->setDescription("Failed downloading file[$url]");
+			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$thumbAsset->save();
+		}
 		
 		throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_DOWNLOAD_FAILED, $url);
     }
@@ -270,9 +277,12 @@ class ThumbAssetService extends KalturaBaseService
         $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->getStorageProfileId());
         if(!$storageProfile)
         {
-			$thumbAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
-			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$thumbAsset->save();
+        	if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+        	{
+				$thumbAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
+				$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$thumbAsset->save();
+        	}
 			
         	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
         }
@@ -314,9 +324,12 @@ class ThumbAssetService extends KalturaBaseService
 				$msg = "Resource of type [" . get_class($contentResource) . "] is not supported";
 				KalturaLog::err($msg);
 				
-				$thumbAsset->setDescription($msg);
-				$thumbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
-				$thumbAsset->save();
+				if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+				{
+					$thumbAsset->setDescription($msg);
+					$thumbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+					$thumbAsset->save();
+				}
 				
 				throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($contentResource));
     	}
