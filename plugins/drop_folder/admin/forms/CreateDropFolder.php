@@ -10,12 +10,16 @@ class Form_CreateDropFolder extends Zend_Form
 			array('Form', array('class' => 'simple')),
 		));
 		
+		$this->addElement('text', 'newPartnerId', array(
+			'label'			=> 'Publisher ID:',
+			'filters'		=> array('StringTrim'),
+		));		
 				
 		// submit button
 		$this->addElement('button', 'submit', array(
 			'ignore'	=> true,
 			'label'		=> 'Create New',
-			'onclick'		=> "configureDropFolder()",
+			'onclick'		=> "newDropFolder($('#newPartnerId').val())",
 			'decorators'	=> array('ViewHelper'),
 		));
 	}

@@ -18,14 +18,16 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 	{
 		$action->getHelper('layout')->disableLayout();
 		$request = $action->getRequest();
-		$dropFolderForm = new Form_DropFolderConfigure();
+		$dropFolderId = $this->_getParam('drop_folder_id');
+		$partnerId = $this->_getParam('new_partner_id');
+		$dropFolderForm = null;
 		
 		try
 		{
-			$dropFolderId = $storageId = $this->_getParam('drop_folder_id');
-
 			if ($request->isPost())
 			{
+				$partnerId = $this->_getParam('partnerId');
+				$dropFolderForm = new Form_DropFolderConfigure($partnerId);
 				$this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
 			}
 			else
@@ -35,7 +37,14 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 					$client = Infra_ClientHelper::getClient();
 					$dropFolderPluginClient = Kaltura_Client_DropFolder_Plugin::get($client);
 					$dropFolder = $dropFolderPluginClient->dropFolder->get($dropFolderId);
+					$partnerId = $dropFolder->partnerId;
+					$dropFolderForm = new Form_DropFolderConfigure($partnerId);
 					$dropFolderForm->populateFromObject($dropFolder, false);
+				}
+				else
+				{
+					$dropFolderForm = new Form_DropFolderConfigure($partnerId);
+					$dropFolderForm->getElement('partnerId')->setValue($partnerId);
 				}
 			}
 		}

@@ -56,7 +56,9 @@
 </div>
 
 <script type="text/javascript">
-jQuery('#filter_type').change(function() {
+
+function onFilterTypeChange()
+{
 	if(this.value == "none") {
 		$("#filter_text").css("display","none");
 	}
@@ -64,8 +66,10 @@ jQuery('#filter_type').change(function() {
 		$("#filter_text").css("display","inline");
 		$("#filter_text input").focus();
 	}
-});
+}
 
+jQuery('#filter_type').change(onFilterTypeChange);
+onFilterTypeChange();
 
 function doAction(action, folderId) {
 	if (action && eval('typeof ' + action) == 'function')
@@ -141,14 +145,34 @@ function changeStatus(folderId, status, callback)
 }
 
 
-function configureDropFolder(folderId) {
+function newDropFolder(partnerId)
+{
+	if(!partnerId.length || isNaN(partnerId)){
+		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
+		return;
+	}
 
-	folderIdStr = '';
-	if (typeof folderId !== 'undefined') {
-		folderIdStr = '/drop_folder_id/' + folderId;
-	}	
+	partnerIdStr = '/new_partner_id/' + partnerId;
+
+	loadDropFolder(partnerIdStr);
+}
+
+function configureDropFolder(folderId)
+{
+	if(typeof folderId == 'undefined'){
+		alert('<?php echo $this->translate('Drop folder ID not supplied'); ?>');
+		return;
+	}
+
+	folderIdStr = '/drop_folder_id/' + folderId;
 	
-	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DropFolderConfigureAction')); ?>' + folderIdStr;
+	loadDropFolder(folderIdStr);
+}
+
+
+function loadDropFolder(paramStr)
+{	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DropFolderConfigureAction')); ?>' + paramStr;
 	
 	jQuery('#drop-folder-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="drop-folder-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
@@ -174,13 +198,13 @@ function configureDropFolder(folderId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('#frmDropFolderConfigure').ajaxForm(configureDropfolderSuccess);
+			jQuery(this).find('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
 		}
 	);
 }
 
 
-function configureDropfolderSuccess(html) {
+function loadDropFolderSuccess(html) {
 	if (jQuery(html).parent().find('#frmDropFolderConfigure').hasClass('valid')) 
 	{
 		dialogDiv.dialog('close');
@@ -189,7 +213,7 @@ function configureDropfolderSuccess(html) {
 	else
 	{
 		jQuery('#frmDropFolderConfigure').replaceWith(html);
-		jQuery('#frmDropFolderConfigure').ajaxForm(configureDropfolderSuccess);
+		jQuery('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
 	}
 }
 

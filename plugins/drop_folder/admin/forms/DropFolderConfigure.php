@@ -1,6 +1,16 @@
 <?php 
 class Form_DropFolderConfigure extends Infra_Form
 {
+	protected $newPartnerId;
+	
+	public function __construct($partnerId)
+	{
+		$this->newPartnerId = $partnerId;
+		
+		parent::__construct();
+	}
+	
+	
 	public function init()
 	{
 		$this->setAttrib('id', 'frmDropFolderConfigure');
@@ -22,7 +32,8 @@ class Form_DropFolderConfigure extends Infra_Form
 			'label' 		=> 'Related Publisher ID:',
 			'required'		=> true,
 			'filters' 		=> array('StringTrim'),
-			'placement' => 'prepend',	
+			'placement' => 'prepend',
+			'readonly'		=> true,
 		));
 		
 		$this->addElement('text', 'name', array(
@@ -55,13 +66,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($titleElement));
 		
-		//TODO: change to ingestion profile name
-		$this->addElement('text', 'ingestionProfileId', array(
-			'label' 		=> 'Ingestion Profile ID:',
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-		));
-
+		$this->addIngestionProfiles();
 		
 		$this->addElement('text', 'fileNamePatterns', array(
 			'label' 		=> 'Source Files Patterns:',
@@ -163,6 +168,53 @@ class Form_DropFolderConfigure extends Infra_Form
 			$object->fileHandlerConfig = $this->getSubForm('contentHandlerConfig')->getObject('Kaltura_Client_DropFolder_Type_DropFolderContentFileHandlerConfig', $properties, $add_underscore, $include_empty_fields);
 		}
 		return $object;
+	}
+	
+	
+	protected function addIngestionProfiles()
+	{
+		$ingestionProfiles = null;
+		if (!is_null($this->newPartnerId))
+		{
+			try 
+			{
+				$ingestionProfileFilter = new Kaltura_Client_Type_ConversionProfileFilter();
+
+				$client = Infra_ClientHelper::getClient();
+				Infra_ClientHelper::impersonate($this->newPartnerId);
+				$ingestionProfileList = $client->conversionProfile->listAction($ingestionProfileFilter);
+				Infra_ClientHelper::unimpersonate();
+				
+				$ingestionProfiles = $ingestionProfileList->objects;
+			}
+			catch (Kaltura_Client_Exception $e)
+			{
+				$ingestionProfiles = null;
+			}
+		}
+		
+		if(!is_null($ingestionProfiles) && count($ingestionProfiles))
+		{
+			$this->addElement('select', 'ingestionProfileId', array(
+				'label' 		=> 'Ingestion Profile ID:',
+				'required'		=> false,
+				'filters'		=> array('StringTrim'),
+			));
+				
+			$element = $this->getElement('ingestionProfileId');
+			
+			foreach($ingestionProfiles as $ingestionProfile) {
+				$element->addMultiOption($ingestionProfile->id, $ingestionProfile->id.' - '.$ingestionProfile->name);
+			}
+		}
+		else 
+		{
+			$this->addElement('text', 'ingestionProfileId', array(
+				'label' 		=> 'Ingestion Profile ID:',
+				'required'		=> false,
+				'filters'		=> array('StringTrim'),
+			));
+		}
 	}
 			
 }
