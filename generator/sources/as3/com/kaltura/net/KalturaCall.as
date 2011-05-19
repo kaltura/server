@@ -176,6 +176,12 @@ package com.kaltura.net {
 					j = valArray.length;
 				}
 			}
+			if (arr.length == 0)
+			{
+				keyArray[j] = prefix + ":-";
+				valArray[j] = "";
+				j++;
+			}
 			
 			keyValArr = [ keyArray , valArray];
 			return keyValArr;

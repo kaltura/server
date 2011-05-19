@@ -75,8 +75,11 @@ class KalturaParams:
     def addArrayIfNotNone(self, key, array):
         if array == None:
             return
-        for curIndex in xrange(len(array)):
-            self.addObjectIfNotNone('%s:%s' % (key, curIndex), array[curIndex])
+        if len(array) == 0:
+            self.put('%s:-' % key, '')
+        else:
+            for curIndex in xrange(len(array)):
+                self.addObjectIfNotNone('%s:%s' % (key, curIndex), array[curIndex])
 
     def addStringIfNotNone(self, key, value):
         if value != None:

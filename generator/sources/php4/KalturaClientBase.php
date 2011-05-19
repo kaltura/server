@@ -74,9 +74,16 @@ class KalturaClientBase
 		{
 			if (is_array($val))
 			{
-				foreach($val as $subKey => $subVal)
+				if ($val)
 				{
-					$newParams[$key.":".$subKey] = $subVal;
+					foreach($val as $subKey => $subVal)
+					{
+						$newParams[$key.":".$subKey] = $subVal;
+					}
+				}
+				else
+				{
+					$newParams[$key.":-"] = "";
 				}
 			}
 			else

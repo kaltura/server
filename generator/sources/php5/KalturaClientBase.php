@@ -411,8 +411,15 @@ class KalturaClientBase
 			return;
 		}
 		
-		foreach($paramValue as $subParamName => $subParamValue)
-			$this->addParam($params, "$paramName:$subParamName", $subParamValue);
+		if ($paramValue)
+		{
+			foreach($paramValue as $subParamName => $subParamValue)
+				$this->addParam($params, "$paramName:$subParamName", $subParamValue);
+		}
+		else
+		{
+			$this->addParam($params, "$paramName:-", "");
+		}
 	}
 	
 	/**

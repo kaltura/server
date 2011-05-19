@@ -84,6 +84,10 @@ public class KalturaParams extends HashMap<String, String> {
 			}
 			index++;
 		}
+		if (array.isEmpty())
+		{
+			this.put(key + ":-", "");
+		}
     }
 
 	public void addStringIfNotNull(String key, String value) {
