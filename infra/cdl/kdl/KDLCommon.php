@@ -227,6 +227,7 @@
 		const WMV3 = "wmv3";
 		const THEORA = "theora";
 		const VP8 = "vp8";
+		const MPEG2= "mpeg2";
 		const COPY = "copy";
 	}
 
