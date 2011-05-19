@@ -29,6 +29,9 @@ class KalturaRequestDeserializer
 		$tmpArray = &$array;
 		while(($key = array_shift($path)) !== null)
 		{
+			if ($key == '-' && count($path) == 0)
+				break;
+			
 			if (!isset($tmpArray[$key]) || !is_array($tmpArray[$key]))
 				$tmpArray[$key] = array();
 				
