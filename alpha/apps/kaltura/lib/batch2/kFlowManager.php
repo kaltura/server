@@ -441,6 +441,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			if($srcFileSyncLocalPath)
 				kJobsManager::addPostConvertJob(null, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, true, $offset);
 		}
+		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY) 
+		{
+			// If we get a ready flavor and the entry is in no content 
+			if($entry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$entry->setStatus(entryStatus::PENDING); // we change the entry to pending 
+				$entry->save();
+			}
+		}
 		
 		return true;
 	}
