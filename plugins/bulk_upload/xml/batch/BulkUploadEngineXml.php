@@ -114,9 +114,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function validate() 
 	{
+		if(!file_exists($this->data->filePath))
+		{
+			throw new KalturaBatchException("File doesn't exist [{$this->data->filePath}]", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND);
+		}
+		
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
-						
+			
 		$xdoc = new DomDocument;
 		$xdoc->Load($this->data->filePath);
 		//Validate the XML file against the schema
