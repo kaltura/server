@@ -77,6 +77,7 @@ if ($generateSingle != null)
 $apiVersion = KALTURA_API_VERSION;
 //get the generation date in string (we'll use that for the client tgz file name)
 $generatedDate = date('d-m-Y', time());
+$schemaGenDateOverride = null;
 
 // Clear the output folder -
 exec ("rm -rf $outputPathBase/*");
