@@ -38,6 +38,9 @@ class VirusScanListAction extends KalturaAdminConsolePlugin implements IKalturaA
 		//filter form
 		$request = $action->getRequest ();
 		$virusScanFilterForm = new Form_VirusScanFilter ();
+		$virusScanFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
+  		$virusScanFilterForm->setAction($virusScanFilterFormAction);
+		
 		$virusScanFilter = $this->getVirusScanFilterFromRequest ( $request );
 		
 		//filter also by partnerId
