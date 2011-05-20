@@ -535,4 +535,10 @@ form#frmCreateDropFolder dt { float: left; }
 #frmVirusScanFilter #filter_text { float:left; display:block; }
 #frmVirusScanFilter .help { float:left; display:block; }
 #frmVirusScanFilter fieldset { margin-right:20px; }
+
+#requiredFields #required-label { display:none; }
+#requiredFields #systemName-label { display:none; }
+#requiredFields #label-label { display:none; }
+#requiredFields #visible-label { display:none; }
+#requiredFields #maxChars-label { display:none; }
   
