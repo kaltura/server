@@ -954,6 +954,11 @@ return array(
 	'VIRUS_SCAN_ENTRY_TYPE_ALL' =>'All',
 
 	'Virus Scan Profile' => 'Virus Scan Profile',
+
+	//metadate profile
+	'Kaltura_Client_Metadata_Enum_MetadataProfileStatus::ACTIVE' => 'Active',
+	'Kaltura_Client_Metadata_Enum_MetadataProfileStatus::DEPRECATED' => 'Deprecated',
+	'Kaltura_Client_Metadata_Enum_MetadataProfileStatus::TRANSFORMING' => 'Transforming',
 );
 
 
