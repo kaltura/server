@@ -135,8 +135,12 @@ module Kaltura
 			if value == nil
 				return
 			elsif value.is_a? Hash
-				value.each do |sub_name, sub_value|
-					add_param(params, "#{name}:#{sub_name}", sub_value);
+				if value.empty?
+					add_param(params, "#{name}:-", "");
+				else
+					value.each do |sub_name, sub_value|
+						add_param(params, "#{name}:#{sub_name}", sub_value);
+					end
 				end
 			elsif value.is_a? KalturaObjectBase
 				add_param(params, name, value.to_params)

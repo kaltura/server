@@ -423,13 +423,31 @@ KalturaClientBase.prototype.addParam = function(params, paramName, paramValue)
 {
 	if (paramValue == null)
 		return;
+	
+	// native
 	if(typeof(paramValue) != 'object') {
 		params[paramName] = paramValue;
 		return;
 	}
-	for(var subParamName in paramValue) {
-		var subParamValue = paramValue[subParamName];
-		this.addParam(params, paramName + ":" + subParamName, subParamValue);
+	
+	// object
+	if(isNaN(paramValue.length)){
+		for(var subParamName in paramValue) {
+			var subParamValue = paramValue[subParamName];
+			this.addParam(params, paramName + ":" + subParamName, subParamValue);
+		}
+		return;
+	}
+	
+	// array
+	if(paramValue.length){
+		for(var subParamName in paramValue) {
+			var subParamValue = paramValue[subParamName];
+			this.addParam(params, paramName + ":" + subParamName, subParamValue);
+		}
+	}
+	else{
+		this.addParam(params, paramName + ":-", "");
 	}
 };
 
