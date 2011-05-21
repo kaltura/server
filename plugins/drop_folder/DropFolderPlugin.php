@@ -2,7 +2,7 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages
+class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'dropFolder';
 	
@@ -126,4 +126,14 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		return $pages;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
+	}
 }

@@ -2,7 +2,7 @@
 /**
  * @package plugins.virusScan
  */
-class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaMemoryCleaner, IKalturaAdminConsolePages
+class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaMemoryCleaner, IKalturaAdminConsolePages, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'virusScan';
 	const VIRUS_SCAN_FLOW_MANAGER_CLASS = 'kVirusScanFlowManager';
@@ -167,5 +167,16 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 		$pages[] = new VirusScanConfigureAction();
 		$pages[] = new VirusScanSetStatusAction();
 		return $pages;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }

@@ -2,7 +2,7 @@
 /**
  * @package plugins.multiCenters
  */
-class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader
+class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'multiCenters';
 	const MULTI_CENTERS_SYNCER_CLASS = 'kMultiCentersSynchronizer';
@@ -97,6 +97,17 @@ class MultiCentersPlugin extends KalturaPlugin implements IKalturaServices, IKal
 			}
 		}
 		
+		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
 		return null;
 	}
 }
