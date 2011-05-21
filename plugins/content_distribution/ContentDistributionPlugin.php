@@ -2,7 +2,7 @@
 /**
  * @package plugins.contentDistribution
  */
-class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaAdminConsoleEntryInvestigate, IKalturaPending, IKalturaMemoryCleaner
+class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaEnumerator, IKalturaVersion, IKalturaSearchDataContributor, IKalturaObjectLoader, IKalturaAdminConsolePages, IKalturaAdminConsoleEntryInvestigate, IKalturaPending, IKalturaMemoryCleaner, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'contentDistribution';
 	const PLUGIN_VERSION_MAJOR = 2;
@@ -11,6 +11,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	const CONTENT_DSTRIBUTION_MANAGER = 'kContentDistributionFlowManager';
 	const CONTENT_DSTRIBUTION_COPY_HANDLER = 'kContentDistributionObjectCopiedHandler';
 
+	/* (non-PHPdoc)
+	 * @see KalturaPlugin::getInstance()
+	 */
 	public function getInstance($interface)
 	{
 		if($this instanceof $interface)
@@ -22,17 +25,26 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return null;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPluginName()
+	 */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
 	public static function dependsOn()
 	{
 		$dependency = new KalturaDependency(MetadataPlugin::getPluginName());
 		return array($dependency);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaPermissions::isAllowedPartner()
+	 */
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
@@ -45,8 +57,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 	
-	/**
-	 * @return array<string,string> in the form array[serviceName] = serviceClass
+	/* (non-PHPdoc)
+	 * @see IKalturaServices::getServicesMap()
 	 */
 	public static function getServicesMap()
 	{
@@ -61,16 +73,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return $map;
 	}
 	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/content_distribution.ct');
-	}
-
-	/**
-	 * @return array
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
 	 */
 	public static function getEventConsumers()
 	{
@@ -80,8 +84,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		);
 	}
 	
-	/**
-	 * @return array<string> list of enum classes names that extend the base enum name
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
@@ -97,6 +101,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return array();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaVersion::getVersion()
+	 */
 	public static function getVersion()
 	{
 		return new KalturaVersion(
@@ -106,11 +113,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		);
 	}
 	
-	/**
-	 * Return textual search data to be associated with the object
-	 * 
-	 * @param BaseObject $object
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
 	 */
 	public static function getSearchData(BaseObject $object)
 	{
@@ -120,11 +124,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return null;
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
@@ -206,10 +207,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return null;
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
@@ -272,6 +271,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return null;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaAdminConsolePages::getAdminConsolePages()
+	 */
 	public static function getAdminConsolePages()
 	{
 		$pages = array();
@@ -287,8 +289,8 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return $pages;
 	}
 	
-	/**
-	 * @return array<Kaltura_View_Helper_EntryInvestigatePlugin>
+	/* (non-PHPdoc)
+	 * @see IKalturaAdminConsoleEntryInvestigate::getEntryInvestigatePlugins()
 	 */
 	public static function getEntryInvestigatePlugins()
 	{
@@ -323,11 +325,25 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 
+	/* (non-PHPdoc)
+	 * @see IKalturaMemoryCleaner::cleanMemory()
+	 */
 	public static function cleanMemory()
 	{
 	    DistributionProfilePeer::clearInstancePool();
 	    EntryDistributionPeer::clearInstancePool();
 //	    GenericDistributionProviderPeer::clearInstancePool();
 //	    GenericDistributionProviderActionPeer::clearInstancePool();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }
