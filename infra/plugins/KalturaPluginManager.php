@@ -50,12 +50,12 @@ class KalturaPluginManager
 	}
 	
 	/**
-	 * @param Iterator|array $srcConfig
-	 * @param Iterator|array $newConfig
+	 * @param Iterator $srcConfig
+	 * @param Iterator $newConfig
 	 * @param bool $valuesOnly
-	 * @return Iterator|array
+	 * @return Iterator
 	 */
-	protected static function mergeConfigItem($srcConfig, $newConfig, $valuesOnly)
+	protected static function mergeConfigItem(Iterator $srcConfig, Iterator $newConfig, $valuesOnly)
 	{
 		$returnedConfig = $srcConfig;
 		
@@ -63,24 +63,24 @@ class KalturaPluginManager
 		{
 			foreach($srcConfig as $key => $value)
 			{
-				if(!$newConfig[$key]) // nothing to append
+				if(!$newConfig->$key) // nothing to append
 					continue;
-				elseif(is_array($value) || $value instanceof Iterator)
-					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+				elseif($value instanceof Iterator)
+					$returnedConfig->$key = self::mergeConfigItem($srcConfig->$key, $newConfig->$key, $valuesOnly);
 				else
-					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+					$returnedConfig->$key = $srcConfig->$key . ',' . $newConfig->$key;
 			}
 		}
 		else
 		{
 			foreach($newConfig as $key => $value)
 			{
-				if(!$srcConfig[$key])
-					$returnedConfig[$key] = $newConfig[$key];
-				elseif(is_array($value) || $value instanceof Iterator)
-					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+				if(!$srcConfig->$key)
+					$returnedConfig->$key = $newConfig->$key;
+				elseif($value instanceof Iterator)
+					$returnedConfig->$key = self::mergeConfigItem($srcConfig->$key, $newConfig->$key, $valuesOnly);
 				else
-					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+					$returnedConfig->$key = $srcConfig->$key . ',' . $newConfig->$key;
 			}
 		}
 		
