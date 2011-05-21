@@ -1,5 +1,6 @@
 <?php
 /**
+ * Plugin to load and search extended objects and types
  * @package infra
  * @subpackage Plugins
  */
