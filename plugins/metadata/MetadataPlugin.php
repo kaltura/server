@@ -2,7 +2,7 @@
 /**
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner
+class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'metadata';
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
@@ -526,15 +526,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	    MetadataProfileFieldPeer::clearInstancePool();
 	    MetadataPeer::clearInstancePool();
 	}
-
-//	/**
-//	 * @return array<KalturaAdminConsolePlugin>
-//	 */
-//	public static function getAdminConsolePages()
-//	{
-//		$metadata = new MetadataProfilesAction('Metadata', 'metadata');
-//		$metadataProfiles = new MetadataProfilesAction('Profiles Management', 'profiles', 'Metadata');
-//		$metadataObjects = new MetadataObjectsAction('Objects Management', 'objects', 'Metadata');
-//		return array($metadata, $metadataProfiles, $metadataObjects);
-//	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
+	}
 }
