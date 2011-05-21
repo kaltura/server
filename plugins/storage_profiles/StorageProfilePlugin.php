@@ -19,11 +19,6 @@ class StorageProfilePlugin extends KalturaPlugin implements IKalturaPermissions,
 		return $map;
 	}
 	
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/../config/storage_profile.ct');
-	}
-
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
