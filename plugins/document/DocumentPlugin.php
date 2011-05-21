@@ -2,7 +2,7 @@
 /**
  * @package plugins.document
  */
-class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaEnumerator
+class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaEnumerator, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
@@ -222,5 +222,16 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 			return array('DocumentAssetType');
 			
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }
