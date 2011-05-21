@@ -2,7 +2,7 @@
 /**
  * @package plugins.fileSync
  */
-class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
+class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'fileSync';
 	
@@ -31,5 +31,15 @@ class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
+	}
 }
-?>
