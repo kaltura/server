@@ -2,7 +2,7 @@
 /**
  * @package plugins.adminConsole
  */
-class AdminConsolePlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPermissions, IKalturaServices
+class AdminConsolePlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPermissions, IKalturaServices, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'adminConsole';
 	
@@ -31,16 +31,22 @@ class AdminConsolePlugin extends KalturaPlugin implements IKalturaPlugin, IKaltu
 		return $map;
 	}
 	
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/../config/admin_console.ct');
-	}
-
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			return true;
 		
 		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'testme')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
+			
+		return null;
 	}
 }

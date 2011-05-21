@@ -2,7 +2,7 @@
 /**
  * @package plugins.storageProfile
  */
-class StorageProfilePlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices
+class StorageProfilePlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'storageProfile';
 	
@@ -25,5 +25,16 @@ class StorageProfilePlugin extends KalturaPlugin implements IKalturaPermissions,
 			return true;
 		
 		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'testme')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
+			
+		return null;
 	}
 }

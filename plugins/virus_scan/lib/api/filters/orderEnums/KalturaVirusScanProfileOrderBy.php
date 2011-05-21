@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.virusScan
+ * @package 
  * @subpackage api.filters.enum
  */
 class KalturaVirusScanProfileOrderBy extends KalturaStringEnum
