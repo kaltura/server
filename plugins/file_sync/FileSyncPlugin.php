@@ -19,11 +19,6 @@ class FileSyncPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		return $map;
 	}
 	
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/../config/file_sync.ct');
-	}
-
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID)
