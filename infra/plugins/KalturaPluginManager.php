@@ -13,11 +13,13 @@ require_once realpath(dirname(__FILE__) . '/../../') . '/alpha/config/kConf.php'
 class KalturaPluginManager
 {
 	/**
+	 * Array of all installed plugin classes
 	 * @var array<string, string> in the form array[pluginName] = pluginClass
 	 */
 	protected static $plugins = array();
 	
 	/**
+	 * Array of all installed plugin instantiated classes
 	 * @var array<KalturaPlugin>
 	 */
 	protected static $pluginInstances = array();
@@ -28,6 +30,7 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * Loads an extended object that extended by plugin
 	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @param array $constructorArgs
@@ -47,6 +50,66 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * @param Iterator|array $srcConfig
+	 * @param Iterator|array $newConfig
+	 * @param bool $valuesOnly
+	 * @return Iterator|array
+	 */
+	protected static function mergeConfigItem($srcConfig, $newConfig, $valuesOnly)
+	{
+		$returnedConfig = $srcConfig;
+		
+		if($valuesOnly)
+		{
+			foreach($srcConfig as $key => $value)
+			{
+				if(!$newConfig[$key]) // nothing to append
+					continue;
+				elseif(is_array($value) || $value instanceof Iterator)
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+				else
+					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+			}
+		}
+		else
+		{
+			foreach($newConfig as $key => $value)
+			{
+				if(!$srcConfig[$key])
+					$returnedConfig[$key] = $newConfig[$key];
+				elseif(is_array($value) || $value instanceof Iterator)
+					$returnedConfig[$key] = self::mergeConfigItem($srcConfig[$key], $newConfig[$key], $valuesOnly);
+				else
+					$returnedConfig[$key] = $srcConfig[$key] . ',' . $newConfig[$key];
+			}
+		}
+		
+		return $returnedConfig;
+	}
+	
+	/**
+	 * Merge configuration data from the plugins
+	 * 
+	 * @param Iterator $config the configuration to be merged
+	 * @param string $configName
+	 * @param bool $valuesOnly if true, new keys won't be added to the original config
+	 * @return Iterator
+	 */
+	public static function mergeConfigs(Iterator $config, $configName, $valuesOnly = true)
+	{
+		$pluginInstances = self::getPluginInstances('IKalturaConfigurator');
+		foreach($pluginInstances as $pluginName => $pluginInstance)
+		{
+			$pluginConfig = $pluginInstance->getConfig($configName);
+			if($pluginConfig)
+				$config = self::mergeConfigItem($config, $pluginConfig, $valuesOnly);
+		}
+		
+		return $config;
+	}
+	
+	/**
+	 * Finds extended class the extended by plugin
 	 * @param string $baseClass
 	 * @param string $enumValue
 	 * @return object
@@ -68,6 +131,7 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * Validates plugin according to its dependencies
 	 * @param string $pluginClass 
 	 * @param array $validatedPlugins list of plugins that already validated
 	 * @return bool false if a required dependency is missing.
@@ -127,6 +191,8 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * Returns all instances that implement the requested interface or all of them in not supplied
+	 * @param string $interface
 	 * @return array<KalturaPlugin>
 	 */
 	public static function getPluginInstances($interface = null)
@@ -165,6 +231,7 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * Returns a single plugin instance by its name
 	 * @param string pluginName
 	 * @return KalturaPlugin
 	 */
