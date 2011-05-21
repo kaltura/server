@@ -46,14 +46,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $partnerPackage;
 	
 	/**
-	 * @var KalturaPartnerFreeTrialType
-	 */
-	public $monitorUsage;
-	
-	/**
 	 * @var int
 	 */
-	public $freeTrialLimit;
+	public $monitorUsage;
 	
 	/**
 	 * @var bool
@@ -88,7 +83,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	
 	/**
 	 * @var int
-	 * @deprecated use limits instead
 	 */
 	public $adminLoginUsersQuota;
 	
@@ -113,19 +107,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $importRemoteSourceForConvert;
 	
 	/**
-	 * @var int
-	 */
-	public $groupId;
-	
-	/**
 	 * @var KalturaPermissionArray
 	 */
 	public $permissions;
-	
-	/**
-	 * @var KalturaSystemPartnerLimitArray
-	 */
-	public $limits;
 	
 	
 	private static $map_between_objects = array
@@ -145,11 +129,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"storageServePriority",
 		"kmcVersion",
 		"defThumbOffset",
+		"adminLoginUsersQuota",
 		"userSessionRoleId",
 		"adminSessionRoleId",
 		"alwaysAllowedPermissionNames",
 		"importRemoteSourceForConvert",
-		"groupId" => "partnerParentId",
 	);
 
 	public function getMapBetweenObjects()
@@ -163,28 +147,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		$permissions = PermissionPeer::retrievePartnerLevelPermissions($source_object->getId());
 		$this->permissions = KalturaPermissionArray::fromDbArray($permissions);
-		$this->limits = KalturaSystemPartnerLimitArray::fromPartner($source_object);
 	}
 	
-	public function validateForUpdate($source_object)
-	{
-		if(!is_null($this->limits))
-		{
-			foreach($this->limits as $limit)
-				$limit->validate();
-		}
-	}
-	
-	public function toObject($object_to_fill = null, $props_to_skip = array())
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
-		
-		
-		if(!is_null($this->limits))
-		{
-			foreach($this->limits as $limit)
-				$limit->apply($object_to_fill);
-		}
 		
 		if(!is_null($this->permissions))
 		{
