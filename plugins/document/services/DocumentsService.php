@@ -13,7 +13,7 @@ class DocumentsService extends KalturaEntryService
     /**
      * Add entry
      *
-     * @action add
+     * action add - not fully implemented yet
      * @param KalturaDocumentEntry $entry
      * @param KalturaResource $resource
      * @return KalturaMediaEntry
