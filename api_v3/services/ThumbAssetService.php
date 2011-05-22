@@ -746,7 +746,6 @@ class ThumbAssetService extends KalturaBaseService
 	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @deprecated use thumbAsset.add and thumbAsset.setContent instead
 	 */
 	public function addFromImageAction($entryId, $fileData)
 	{
