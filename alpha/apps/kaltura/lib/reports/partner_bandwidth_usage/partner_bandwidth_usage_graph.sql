@@ -2,7 +2,7 @@ SELECT
 	{GROUP_COLUMN}, /*partner_id, */ SUM(ifnull(count_bandwidth, 0)) as bandwidth
 FROM (
 	SELECT
-		date_id, FLOOR(date_id/100) month_id, partner_id, count_bandwidth
+		date_id, FLOOR(date_id/100) month_id, partner_id, count_bandwidth/1024 count_bandwidth
 	FROM
 		kalturadw.dwh_hourly_partner
         WHERE
