@@ -1,6 +1,6 @@
 <?php
 /**
- * @package 
+ * @package plugins.adminConsole
  * @subpackage api.filters.base
  * @abstract
  */

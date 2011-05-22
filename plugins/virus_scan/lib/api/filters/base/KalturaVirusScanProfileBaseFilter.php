@@ -1,6 +1,6 @@
 <?php
 /**
- * @package 
+ * @package plugins.virusScan
  * @subpackage api.filters.base
  * @abstract
  */
