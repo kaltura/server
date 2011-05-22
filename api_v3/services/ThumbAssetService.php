@@ -24,7 +24,6 @@ class ThumbAssetService extends KalturaBaseService
 			$actionName == 'getByEntryId' ||
 			$actionName == 'getDownloadUrl' ||
 			$actionName == 'getWebPlayableByEntryId' ||
-			$actionName == 'getFlavorAssetsWithParams' ||
 			$actionName == 'generateByEntryId' ||
 			$actionName == 'regenerate'
 			)
@@ -39,7 +38,6 @@ class ThumbAssetService extends KalturaBaseService
      * @action add
      * @param string $entryId
      * @param KalturaThumbAsset $thumbAsset
-     * @param KalturaContentResource $contentResource
      * @return KalturaThumbAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::THUMB_ASSET_ALREADY_EXISTS
@@ -50,7 +48,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
-    function addAction($entryId, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource)
+    function addAction($entryId, KalturaThumbAsset $thumbAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
@@ -67,27 +65,53 @@ class ThumbAssetService extends KalturaBaseService
     	$dbThumbAsset = $thumbAsset->toInsertableObject($dbThumbAsset);
     	
 		$dbThumbAsset->setEntryId($entryId);
-		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
-    	
-		$contentResource->validateEntry($dbEntry);
-		$kContentResource = $contentResource->toObject();
-    	$this->attachContentResource($dbThumbAsset, $kContentResource);
-				
-    	$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-    	$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-    	if($filePath && file_exists($filePath) && filesize($filePath))
-    	{
-    		list($width, $height, $type, $attr) = getimagesize($filePath);
-    		$dbThumbAsset->setWidth($width);
-    		$dbThumbAsset->setHeight($height);
-    		$dbThumbAsset->setSize(filesize($filePath));
-    	}
-		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbThumbAsset->save();
 
-		assetPeer::resetInstanceCriteriaFilter();
-		$thumbAssetsCount = assetPeer::countThumbnailsByEntryId($entryId);
+		$thumbAsset = new KalturaThumbAsset();
+		$thumbAsset->fromObject($dbThumbAsset);
+		return $thumbAsset;
+    }
+    
+    /**
+     * Update content of thumbnail asset
+     *
+     * @action setContent
+     * @param string $id
+     * @param KalturaContentResource $contentResource
+     * @return KalturaThumbAsset
+     * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED 
+     */
+    function setContentAction($id, KalturaContentResource $contentResource)
+    {
+   		$dbThumbAsset = flavorAssetPeer::retrieveById($id);
+   		if(!$dbThumbAsset)
+   			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+    	
+   		$previousStatus = $dbThumbAsset->getStatus();
+		$contentResource->validateEntry($dbThumbAsset->getentry());
+		$kContentResource = $contentResource->toObject();
+    	$this->attachContentResource($dbThumbAsset, $kContentResource);
 		
+    	$newStatuses = array(
+    		thumbAsset::FLAVOR_ASSET_STATUS_READY,
+    		thumbAsset::FLAVOR_ASSET_STATUS_VALIDATING,
+    		thumbAsset::FLAVOR_ASSET_STATUS_TEMP,
+    	);
+    	
+    	if($previousStatus == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED && in_array($dbThumbAsset->getStatus(), $newStatuses))
+   			kEventsManager::raiseEvent(new kObjectAddedEvent($dbThumbAsset));
+   		
+		assetPeer::resetInstanceCriteriaFilter();
+		$thumbAssetsCount = assetPeer::countThumbnailsByEntryId($dbThumbAsset->getEntryId());
+		
+		$dbEntry = $dbThumbAsset->getentry();
 		$defaultThumbKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
     		
  		//If the thums has the default tag or the entry is in no content and this is the first thumb
@@ -680,7 +704,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @param string $url
 	 * @return KalturaThumbAsset
 	 * 
-	 * @deprecated use thumbAsset.add instead
+	 * @deprecated use thumbAsset.add and thumbAsset.setContent instead
 	 */
 	public function addFromUrlAction($entryId, $url)
 	{
@@ -722,7 +746,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @return KalturaThumbAsset
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-	 * @deprecated use thumbAsset.add instead
+	 * @deprecated use thumbAsset.add and thumbAsset.setContent instead
 	 */
 	public function addFromImageAction($entryId, $fileData)
 	{
