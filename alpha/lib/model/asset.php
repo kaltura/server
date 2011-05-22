@@ -203,8 +203,7 @@ class asset extends Baseasset implements ISyncableFile
 		self::validateFileSyncSubType ( $sub_type );
 		$version = (is_null($version) ? $this->getVersion() : $version);
 		
-		$entry = $this->getentry();
-	
+		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
 		if(!$entry)
 			throw new Exception("Could not find entry [" . $this->getEntryId() . "] for asset [" . $this->getId() . "]");
 		
