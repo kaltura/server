@@ -739,43 +739,53 @@ class myReportsMgr
 	
 	private static function executeQuery ( $query )
 	{
+		$mysql_function = (strpos($query, 'CALL') === false)? 'mysql': 'mysqli';
+		
 		$db_config = kConf::get( "reports_db_config" );
 		$timeout = isset ( $db_config["timeout"] ) ? $db_config["timeout"] : 40;
 		
 		ini_set('mysql.connect_timeout', $timeout );
 		$host = $db_config["host"];
-		if ( isset ( $db_config["port"] ) && $db_config["port"] ) $host .= ":" . $db_config["port"];
-		$link  = mysql_connect ( $host , $db_config["user"] , $db_config["password"] , null );
-			
+		if ( isset ( $db_config["port"] ) && $db_config["port"]  && $mysql_function != 'mysqli' ) $host .= ":" . $db_config["port"];
+		
+		$connect_function = $mysql_function.'_connect';
+		$link  = $connect_function( $host , $db_config["user"] , $db_config["password"] , null );
+
 KalturaLog::log( "Reports query using database host: [$host] user [" . $db_config["user"] . "]" );
 		
-		$db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
+		if($mysql_function == 'mysql') $db_selected =  mysql_select_db ( $db_config["db_name"] , $link );
+		else $db_selected =  mysqli_select_db ( $link , $db_config["db_name"] );
 		
 		if (!$db_selected) {
-    		throw new kCoreException('Can\'t use foo : ' . mysql_error(), kCoreException::INVALID_QUERY);
+			$error_function = $mysql_function.'_error';
+			throw new kCoreException('Can\'t use foo : ' . $error_function($link), kCoreException::INVALID_QUERY);
 		}
 
-		$result = mysql_query($query);
+		if($mysql_function == 'mysql') $result = mysql_query($query);
+		else $result = mysqli_query($link, $query);
 		
 		// Check result
 		// This shows the actual query sent to MySQL, and the error. Useful for debugging.
 		if (!$result) 
 		{
 		
-		    KalturaLog::err('Invalid query: ' . mysql_error());
+		    KalturaLog::err('Invalid query: ' . $error_function($link));
 		    $message = 'Invalid query';
 		    throw new kCoreException($message, kCoreException::INVALID_QUERY);
 		}
 			
 		$res = array();
 	
-		while ($row = mysql_fetch_assoc($result)) 
+		$fetch_function = $mysql_function.'_fetch_assoc';
+		while ($row = $fetch_function($result)) 
 		{			
 			$res[] = $row;
 		}
 		
-		mysql_free_result($result);
-		mysql_close($link);
+		$free_result_func = $mysql_function.'_free_result';
+		$free_result_func($result);
+		$close_function = $mysql_function.'_close';
+		$close_function($link);
 		
 		return $res;
 	}
