@@ -35,12 +35,15 @@ class kBusinessConvertDL
 				$newAsset = $newAssets[$oldAsset->getFlavorParamsId()];
 				
 				$oldAsset->incrementVersion();
+				$oldAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 				$oldAsset->save();
 				
 				$oldFileSync = $oldAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$newFileSync = $newAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				
 				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync, false);
+				
+				unset($newAssets[$oldAsset->getFlavorParamsId()]);
 			}	
 			else
 			{
@@ -52,6 +55,9 @@ class kBusinessConvertDL
 				$saveEntry = true;
 			}		
 		}
+		
+		foreach($newAssets as $newAsset)
+			$newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
 		
 		$entry->setReplacingEntryId(null);
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);		
