@@ -18,7 +18,7 @@ class kLocalPathUrlManager extends kUrlManager
 			$url = preg_replace('/\.[\w]+$/', '', $url);
 		
 		if ($this->protocol == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-			return $partnerPath.$fileSync->getFilePath()."/playlist.m3u8";
+			return $fileSync->getFilePath()."/playlist.m3u8";
 		
 		return $url;
 	}
