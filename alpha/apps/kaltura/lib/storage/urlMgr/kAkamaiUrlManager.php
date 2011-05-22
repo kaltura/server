@@ -103,12 +103,13 @@ class kAkamaiUrlManager extends kUrlManager
 		$partnerId = $flavorAsset->getPartnerId();
 		$subpId = $flavorAsset->getentry()->getSubpId();
 		$flavorAssetId = $flavorAsset->getId();
+		$flavorAssetVersion = $flavorAsset->getVersion();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$this->setContainerFormat($flavorAsset->getContainerFormat());	
 
-		$url = "$partnerPath/serveFlavor/flavorId/$flavorAssetId";
+		$url = "$partnerPath/serveFlavor/v/$flavorAssetVersion/flavorId/$flavorAssetId";
 		
 		if($this->protocol==StorageProfile::PLAY_FORMAT_APPLE_HTTP) {
 			if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
@@ -161,7 +162,7 @@ class kAkamaiUrlManager extends kUrlManager
 	 */
 	public function authenticateRequest($url)
 	{
-		return authenticateRequestUrl($_SERVER["SCRIPT_URL"]);
+		return $this->authenticateRequestUrl($_SERVER["SCRIPT_URL"]);
 	}
 	
 	/**

@@ -224,11 +224,12 @@ class kUrlManager
 		$subpId = $flavorAsset->getentry()->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $flavorAsset->getId();
+		$flavorAssetVersion = $flavorAsset->getVersion();
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$this->setContainerFormat($flavorAsset->getContainerFormat());
 	
-		$url = "$partnerPath/serveFlavor/flavorId/$flavorAssetId";
+		$url = "$partnerPath/serveFlavor/v/$flavorAssetVersion/flavorId/$flavorAssetId";
 		if($this->seekFromTime)
 			$url .= "/seekFrom/$this->seekFromTime";
 			
