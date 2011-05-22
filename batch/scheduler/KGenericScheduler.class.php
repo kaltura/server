@@ -259,6 +259,9 @@ class KGenericScheduler
 					$proc->_cleanup();
 					unset($tasks[$index]);
 					
+					if(!isset($indexedTaskConfigs[$taskName]))
+						continue;
+						
 					$taskConfig = $indexedTaskConfigs[$taskName];
 					self::onRunningInstancesEvent($taskConfig, count($tasks));
 				}
