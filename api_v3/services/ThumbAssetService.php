@@ -85,13 +85,24 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
 
-		$dbEntryThumbs = thumbAssetPeer::retrieveByEntryId($entryId);
+		assetPeer::resetInstanceCriteriaFilter();
+		$thumbAssetsCount = assetPeer::countThumbnailsByEntryId($entryId);
+		
+		$defaultThumbKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
     		
  		//If the thums has the default tag or the entry is in no content and this is the first thumb
-		if( $dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || 
-		  	($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT && count($dbEntryThumbs) == 1)
-		  )
-				$this->setAsDefaultAction($dbThumbAsset->getId());
+		if(
+			$dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) 
+			|| 
+			(
+				$dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT 
+				&& $thumbAssetsCount == 1 
+				&& !kFileSyncUtils::fileSync_exists($defaultThumbKey)
+			)
+		)
+		{
+			$this->setAsDefaultAction($dbThumbAsset->getId());
+		}
 		
 		$thumbAsset = new KalturaThumbAsset();
 		$thumbAsset->fromObject($dbThumbAsset);
