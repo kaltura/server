@@ -24,7 +24,14 @@ class kBusinessConvertDL
 		foreach($tempAssets as $newAsset)
 		{
 			if($newAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+			{
 				$newAssets[$newAsset->getFlavorParamsId()] = $newAsset;
+				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "]");
+			}
+			else
+			{
+				KalturaLog::debug("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
+			}
 		}
 		
 		$saveEntry = false;
@@ -33,6 +40,7 @@ class kBusinessConvertDL
 			if(isset($newAssets[$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getFlavorParamsId()];
+				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 				
 				$oldAsset->incrementVersion();
 				$oldAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
@@ -47,6 +55,8 @@ class kBusinessConvertDL
 			}	
 			else
 			{
+				KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
+				
 				$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 				$oldAsset->setDeletedAt(time());
 				$oldAsset->save();
@@ -57,7 +67,10 @@ class kBusinessConvertDL
 		}
 		
 		foreach($newAssets as $newAsset)
-			$newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
+		{
+			$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
+			KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
+		}
 		
 		$entry->setReplacingEntryId(null);
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);		
