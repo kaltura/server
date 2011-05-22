@@ -176,6 +176,7 @@ package com.kaltura.net {
 					j = valArray.length;
 				}
 			}
+
 			if (arr.length == 0)
 			{
 				keyArray[j] = prefix + ":-";
