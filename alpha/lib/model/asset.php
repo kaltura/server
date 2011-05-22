@@ -204,6 +204,9 @@ class asset extends Baseasset implements ISyncableFile
 		$version = (is_null($version) ? $this->getVersion() : $version);
 		
 		$entry = $this->getentry();
+	
+		if(!$entry)
+			throw new Exception("Could not find entry [" . $this->getEntryId() . "] for asset [" . $this->getId() . "]");
 		
 		$dir = (intval($entry->getIntId() / 1000000)).'/'.	(intval($entry->getIntId() / 1000) % 1000);
 		$path =  "/content/entry/data/$dir/" . $this->generateFileName($sub_type, $version);
