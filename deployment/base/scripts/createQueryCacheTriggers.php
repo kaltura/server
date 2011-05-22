@@ -84,9 +84,9 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 		);
 	if ($ACTION == 'create')
 	{
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, now());";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, now());";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW DO memc_set($deleteKey, now());";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, UNIX_TIMESTAMP(NOW()));";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, UNIX_TIMESTAMP(NOW()));";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW DO memc_set($deleteKey, UNIX_TIMESTAMP(NOW()));";
 		
 		print "Creating triggers on {$tableName}...\n";
 	}
