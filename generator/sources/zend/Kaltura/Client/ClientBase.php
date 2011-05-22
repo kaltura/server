@@ -211,9 +211,10 @@ class Kaltura_Client_ClientBase
 		$objectType = reset($xml->objectType);
 			
 		$type = Kaltura_Client_TypeMap::getZendType($objectType);
-		$ret = new $type($xml);
-		
-		return $ret;
+		if(!class_exists($type))
+			throw new Kaltura_Client_ClientException("Invalid object type class [$type] of Kaltura type [$objectType]", Kaltura_Client_ClientException::ERROR_INVALID_OBJECT_TYPE);
+			
+		return new $type($xml);
 	}
 
 	private function unmarshal($xmlData)
