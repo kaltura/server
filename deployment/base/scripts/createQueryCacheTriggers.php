@@ -2,14 +2,14 @@
 
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
-	array('table' => "flavor_asset", 		'key' => "concat('QCI-flavorAsset:entryId=',@OBJ@.entry_id)"),
-	array('table' => "kuser", 				'key' => "concat('QCI-kuser:partnerId=',@OBJ@.partner_id,',puserid=',@OBJ@.puser_id)"),
-	array('table' => "entry", 				'key' => "concat('QCI-entry:id=',@OBJ@.id)"),
-	array('table' => "access_control", 		'key' => "concat('QCI-accessControl:id=',@OBJ@.id)"),
-	array('table' => "permission", 			'key' => "concat('QCI-permission:partnerId=',@OBJ@.partner_id)"),
-	array('table' => "kuser_to_user_role", 	'key' => "concat('QCI-kuserToUserRole:kuserId=',@OBJ@.kuser_id)"),
-	array('table' => "category", 			'key' => "concat('QCI-category:partnerId=',@OBJ@.partner_id)"),
-	array('table' => "file_sync", 			'key' => "concat('QCI-fileSync:objectId=',@OBJ@.object_id)"),
+	array('table' => "flavor_asset", 		'key' => array("'flavorAsset:entryId='", '@OBJ@.entry_id')),
+	array('table' => "kuser", 				'key' => array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id')),
+	array('table' => "entry", 				'key' => array("'entry:id='", '@OBJ@.id')),
+	array('table' => "access_control", 		'key' => array("'accessControl:id='", '@OBJ@.id')),
+	array('table' => "permission", 			'key' => array("'permission:partnerId='", '@OBJ@.partner_id')),
+	array('table' => "kuser_to_user_role", 	'key' => array("'kuserToUserRole:kuserId='", '@OBJ@.kuser_id')),
+	array('table' => "category", 			'key' => array("'category:partnerId='", '@OBJ@.partner_id')),
+	array('table' => "file_sync", 			'key' => array("'fileSync:objectId='", '@OBJ@.object_id')),
 );
 
 // Default parameters
@@ -75,15 +75,28 @@ mysql_free_result($result);
 foreach ($INVALIDATION_KEYS as $invalidationKey)
 {
 	$tableName = $invalidationKey['table'];
-	$insertUpdateKey = str_replace('@OBJ@', 'NEW', $invalidationKey['key']);
-	$deleteKey = str_replace('@OBJ@', 'OLD', $invalidationKey['key']);
+	
 	$sqlCommands = array(
 		"DROP TRIGGER IF EXISTS {$tableName}_insert_memcache;",
 		"DROP TRIGGER IF EXISTS {$tableName}_update_memcache;",
 		"DROP TRIGGER IF EXISTS {$tableName}_delete_memcache;",
 		);
+	
 	if ($ACTION == 'create')
 	{
+		// build the invalidation key
+		$curKey = array("'QCI-'");
+		foreach ($invalidationKey['key'] as $curStr)
+		{
+			if (strpos($curStr, '@OBJ@') === false)
+				$curKey[] = $curStr;
+			else 
+				$curKey[] = "IF($curStr IS NULL,'',$curStr)";
+		}
+		$curKey = 'concat(' . implode(', ', $curKey) . ')';
+		$insertUpdateKey = str_replace('@OBJ@', 'NEW', $curKey);
+		$deleteKey = str_replace('@OBJ@', 'OLD', $curKey);
+		
 		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, UNIX_TIMESTAMP(NOW()));";
 		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, UNIX_TIMESTAMP(NOW()));";
 		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW DO memc_set($deleteKey, UNIX_TIMESTAMP(NOW()));";
