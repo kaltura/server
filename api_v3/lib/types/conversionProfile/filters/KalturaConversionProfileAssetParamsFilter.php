@@ -34,7 +34,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 		}
 		$this->conversionProfileIdEqual = null;
 		$this->conversionProfileIdFilter = null;
-		$this->conversionProfileIdIn = conversionProfile2Peer::getIds($conversionProfileCriteria);
+		$this->conversionProfileIdIn = implode(',', conversionProfile2Peer::getIds($conversionProfileCriteria));
 		
 		
 		$assetParamsCriteria = new Criteria();
@@ -52,7 +52,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 		$this->assetParamsIdEqual = null;
 		$this->assetParamsIdFilter = null;
 		assetParamsPeer::resetInstanceCriteriaFilter();
-		$this->assetParamsIdIn = assetParamsPeer::getIds($assetParamsCriteria);
+		$this->assetParamsIdIn = implode(',', assetParamsPeer::getIds($assetParamsCriteria));
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
