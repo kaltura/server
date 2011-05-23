@@ -49,4 +49,12 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 		self::setUseCriteriaFilter ( true );
 		return $res;
 	}
+
+	public static function getIds(Criteria $criteria, $con = null)
+	{
+		$criteria->addSelectColumn(conversionProfile2Peer::ID);
+
+		$stmt = conversionProfile2Peer::doSelectStmt($criteria, $con);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
 }

@@ -301,4 +301,12 @@ class assetPeer extends BaseassetPeer
 		
 		return array("flavorAsset:entryId=".$criterion->getValue());
 	}
+
+	public static function getIds(Criteria $criteria, $con = null)
+	{
+		$criteria->addSelectColumn(assetPeer::ID);
+
+		$stmt = assetPeer::doSelectStmt($criteria, $con);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
 }
