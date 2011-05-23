@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Add & Manage Conversion Profiles
+ * Manage the connection between Conversion Profiles and Asset Params
  *
- * @service conversionProfile
+ * @service conversionProfileAssetParams
  * @package api
  * @subpackage services
  */
-class ConversionProfileService extends KalturaBaseService
+class ConversionProfileAssetParamsService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
