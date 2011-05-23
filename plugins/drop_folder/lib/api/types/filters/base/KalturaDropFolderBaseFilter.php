@@ -17,8 +17,8 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 		"typeIn" => "_in_type",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
-		"ingestionProfileIdEqual" => "_eq_ingestion_profile_id",
-		"ingestionProfileIdIn" => "_in_ingestion_profile_id",
+		"conversionProfileIdEqual" => "_eq_conversion_profile_id",
+		"conversionProfileIdIn" => "_in_conversion_profile_id",
 		"dcEqual" => "_eq_dc",
 		"dcIn" => "_in_dc",
 		"pathLike" => "_like_path",
@@ -127,14 +127,14 @@ class KalturaDropFolderBaseFilter extends KalturaFilter
 	 * 
 	 * @var int
 	 */
-	public $ingestionProfileIdEqual;
+	public $conversionProfileIdEqual;
 
 	/**
 	 * 
 	 * 
 	 * @var string
 	 */
-	public $ingestionProfileIdIn;
+	public $conversionProfileIdIn;
 
 	/**
 	 * 
