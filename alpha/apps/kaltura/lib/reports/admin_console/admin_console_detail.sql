@@ -14,7 +14,7 @@ SELECT
 	aggr_p.count_mix "count mix",
 	FLOOR(aggr_p.count_bandwidth / 1024) "count bandwidth mb",
 	aggr_p.count_storage "count storage mb",
-	calc_partner_storage_data_time_range({FROM_DATE_ID}, {TO_DATE_ID}, aggr_p.partner_id) "storage all time mb"
+	kalturadw.calc_partner_storage_data_time_range({FROM_DATE_ID}, {TO_DATE_ID}, aggr_p.partner_id) "storage all time mb"
 FROM
 (
 	SELECT	partner_status_id STATUS,
