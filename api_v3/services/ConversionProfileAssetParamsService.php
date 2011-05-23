@@ -14,7 +14,7 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance());
+		parent::applyPartnerFilterForClass(new assetParamsPeer());
 	}
 	
 	/**
