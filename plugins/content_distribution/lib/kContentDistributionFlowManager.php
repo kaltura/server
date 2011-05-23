@@ -996,7 +996,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
-					continue;
+//					continue;
 				}
 				
 				$distributionProvider = $distributionProfile->getProvider();
@@ -1106,7 +1106,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED)
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
-					continue;
+//					continue;
 				}
 				
 				if(!$distributionProvider->isUpdateEnabled())
@@ -1311,7 +1311,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
-						continue;
+//						continue;
 					}
 						
 					$distributionProvider = $distributionProfile->getProvider();
