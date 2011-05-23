@@ -126,14 +126,6 @@ class kBusinessPostConvertDL
 			KalturaLog::debug("root batch job id [" . $rootBatchJob->getId() . "] type [" . $rootBatchJob->getJobType() . "]");
 		
 		// update the root job end exit
-		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
-		{
-			KalturaLog::debug("finish remote convert root job");
-			kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-			return $dbBatchJob;
-		}
-		
-		// update the root job end exit
 		if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
 			$siblingJobs = $rootBatchJob->getChildJobs();
@@ -150,7 +142,7 @@ class kBusinessPostConvertDL
 					continue;
 					
 				// if not complete leave function
-				if($siblingJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+				if(!in_array($siblingJob->getStatus(), BatchJobPeer::getClosedStatusList()))
 				{
 					KalturaLog::debug("job id [" . $siblingJob->getId() . "] status [" . $siblingJob->getStatus() . "]");
 					return $dbBatchJob;
