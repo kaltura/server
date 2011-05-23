@@ -14,7 +14,7 @@ SELECT
 	aggr_p.count_mix "count mix",
 	FLOOR(aggr_p.count_bandwidth / 1024) "count bandwidth mb",
 	aggr_p.count_storage "count storage mb",
-	all_time_aggr.count_storage_all_time "storage all time mb"
+	calc_partner_storage_data_time_range({FROM_DATE_ID}, {TO_DATE_ID}, aggr_p.partner_id) "storage all time mb"
 FROM
 (
 	SELECT	partner_status_id STATUS,
@@ -40,9 +40,7 @@ FROM
 ) aggr_p,
 (
 	SELECT	aggr_partner.partner_id, 
-		SUM(count_video + count_audio + count_image) count_media_all_time,
-		SUM(count_bandwidth ) count_bandwidth_all_time,
-		SUM(count_storage ) count_storage_all_time
+		SUM(count_video + count_audio + count_image) count_media_all_time
 	FROM kalturadw.dwh_hourly_partner aggr_partner inner join kalturadw.dwh_dim_partners dim_partner on (aggr_partner.partner_id = dim_partner.partner_id)
 	WHERE {OBJ_ID_CLAUSE} AND
 	aggr_partner.date_id <= {TO_DATE_ID}
@@ -50,4 +48,4 @@ FROM
 	ORDER BY aggr_partner.partner_id
 	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) all_time_aggr
-WHERE aggr_p.partner_id = all_time_aggr.partner_id
+WHERE aggr_p.partner_id = all_time_aggr.partner_id;
