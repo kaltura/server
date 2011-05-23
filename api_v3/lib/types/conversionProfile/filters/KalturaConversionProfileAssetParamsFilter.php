@@ -45,7 +45,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 			$assetParamsCriteria->add(assetParamsPeer::ID, explode(',', $this->assetParamsIdIn), Criteria::IN);
 		if($this->assetParamsIdFilter)
 		{
-			$assetParamsIdFilter = new conversionProfile2Filter();
+			$assetParamsIdFilter = new assetParamsFilter();
 			$this->assetParamsIdFilter->toObject($assetParamsIdFilter);
 			$assetParamsIdFilter->attachToCriteria($assetParamsCriteria);
 		}
