@@ -41,10 +41,7 @@ class BaseEntryService extends KalturaEntryService
     function addAction(KalturaBaseEntry $entry, $type = -1)
     {
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);
-    	
-    	if(!kFileSyncUtils::fileSync_exists($dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA)))
-    		$dbEntry->setStatus(entryStatus::NO_CONTENT);
-    		
+   		$dbEntry->setStatus(entryStatus::NO_CONTENT);
     	$dbEntry->save();
     	
 	    $entry->fromObject($dbEntry);
