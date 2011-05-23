@@ -77,6 +77,10 @@ class KalturaErrors extends APIErrors
 	
 	const ENTRY_ID_NOT_FOUND = "ENTRY_ID_NOT_FOUND,Entry id \"%s\" not found";
 	
+	const INVALID_ENTRY_TYPE = "INVALID_ENTRY_TYPE,Entry \"%s\" type is \"%s\", type must be \"%s\"";
+	
+	const INVALID_ENTRY_MEDIA_TYPE = "INVALID_ENTRY_MEDIA_TYPE,Entry \"%s\" media type is \"%s\", media type must be \"%s\"";
+	
 	const ENTRY_ALREADY_WITH_CONTENT = "ENTRY_ALREADY_WITH_CONTENT,Entry already associated with content";
 	
 	const ENTRY_ID_NOT_REPLACED = "ENTRY_ID_NOT_REPLACED,Entry id \"%s\" not replaced";

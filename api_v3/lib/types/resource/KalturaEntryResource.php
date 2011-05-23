@@ -25,8 +25,12 @@ class KalturaEntryResource extends KalturaContentResource
     	$this->validatePropertyNotNull('entryId');
 	
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
-		if (!$srcEntry || $srcEntry->getType() != entryType::MEDIA_CLIP || $srcEntry->getMediaType() != $dbEntry->getMediaType())
+		if (!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+		if ($srcEntry->getType() != entryType::MEDIA_CLIP)
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE, $this->entryId, $srcEntry->getType(), entryType::MEDIA_CLIP);
+		if ($srcEntry->getMediaType() != $dbEntry->getMediaType())
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_MEDIA_TYPE, $this->entryId, $srcEntry->getMediaType(), $dbEntry->getMediaType());
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
