@@ -9,24 +9,23 @@ abstract class ThumbAssetServiceBaseTest extends KalturaApiTestCase
 	 * Tests thumbAsset->add action
 	 * @param string $entryId 
 	 * @param KalturaThumbAsset $thumbAsset 
-	 * @param KalturaContentResource $contentResource 
 	 * @param KalturaThumbAsset $reference 
 	 * @return int
 	 * @dataProvider provideData
 	 */
-	public function testAdd($entryId, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource, KalturaThumbAsset $reference)
+	public function testAdd($entryId, KalturaThumbAsset $thumbAsset, KalturaThumbAsset $reference)
 	{
-		$resultObject = $this->client->thumbAsset->add($entryId, $thumbAsset, $contentResource);
+		$resultObject = $this->client->thumbAsset->add($entryId, $thumbAsset);
 		$this->assertType('KalturaThumbAsset', $resultObject);
 		$this->assertNotNull($resultObject->id);
-		$this->validateAdd($entryId, $thumbAsset, $contentResource, $reference);
+		$this->validateAdd($entryId, $thumbAsset, $reference);
 		return $resultObject->id;
 	}
 
 	/**
 	 * Validates testAdd results
 	 */
-	protected function validateAdd($entryId, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource, KalturaThumbAsset $reference)
+	protected function validateAdd($entryId, KalturaThumbAsset $thumbAsset, KalturaThumbAsset $reference)
 	{
 	}
 
