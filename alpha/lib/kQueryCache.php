@@ -69,7 +69,7 @@ class kQueryCache
 		$cacheResult = self::$s_memcache->get($keysToGet);
 		if (!array_key_exists($cacheKey, $cacheResult))
 		{	
-			KalturaLog::debug("kQueryCache: cache miss, key=$cacheKey");
+			KalturaLog::debug("kQueryCache: cache miss, peer=$peerClassName, key=$cacheKey");
 			return null;
 		}
 		
@@ -80,12 +80,12 @@ class kQueryCache
 			if (array_key_exists($invalidationKey, $cacheResult) &&
 				$queryTime < $cacheResult[$invalidationKey] + self::INVALIDATION_TIME_MARGIN_SEC)
 			{
-				KalturaLog::debug("kQueryCache: cached query invalid, key=$cacheKey invkey=$invalidationKey querytime=$queryTime invtime={$cacheResult[$invalidationKey]}");
+				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$cacheKey, invkey=$invalidationKey querytime=$queryTime invtime={$cacheResult[$invalidationKey]}");
 				return null;
 			}
 		}
 		
-		KalturaLog::debug("kQueryCache: returning from memcache, key=$cacheKey");
+		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$cacheKey");
 		return $queryResult;
 	}
 	
