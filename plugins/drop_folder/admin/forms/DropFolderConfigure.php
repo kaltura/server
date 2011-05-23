@@ -66,7 +66,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($titleElement));
 		
-		$this->addIngestionProfiles();
+		$this->addConversionProfiles();
 		
 		$this->addElement('text', 'fileNamePatterns', array(
 			'label' 		=> 'Source Files Patterns:',
@@ -171,46 +171,46 @@ class Form_DropFolderConfigure extends Infra_Form
 	}
 	
 	
-	protected function addIngestionProfiles()
+	protected function addConversionProfiles()
 	{
-		$ingestionProfiles = null;
+		$conversionProfiles = null;
 		if (!is_null($this->newPartnerId))
 		{
 			try 
 			{
-				$ingestionProfileFilter = new Kaltura_Client_Type_ConversionProfileFilter();
+				$conversionProfileFilter = new Kaltura_Client_Type_ConversionProfileFilter();
 
 				$client = Infra_ClientHelper::getClient();
 				Infra_ClientHelper::impersonate($this->newPartnerId);
-				$ingestionProfileList = $client->conversionProfile->listAction($ingestionProfileFilter);
+				$conversionProfileList = $client->conversionProfile->listAction($conversionProfileFilter);
 				Infra_ClientHelper::unimpersonate();
 				
-				$ingestionProfiles = $ingestionProfileList->objects;
+				$conversionProfiles = $conversionProfileList->objects;
 			}
 			catch (Kaltura_Client_Exception $e)
 			{
-				$ingestionProfiles = null;
+				$conversionProfiles = null;
 			}
 		}
 		
-		if(!is_null($ingestionProfiles) && count($ingestionProfiles))
+		if(!is_null($conversionProfiles) && count($conversionProfiles))
 		{
-			$this->addElement('select', 'ingestionProfileId', array(
-				'label' 		=> 'Ingestion Profile ID:',
+			$this->addElement('select', 'conversionProfileId', array(
+				'label' 		=> 'Conversion Profile ID:',
 				'required'		=> false,
 				'filters'		=> array('StringTrim'),
 			));
 				
-			$element = $this->getElement('ingestionProfileId');
+			$element = $this->getElement('conversionProfileId');
 			
-			foreach($ingestionProfiles as $ingestionProfile) {
-				$element->addMultiOption($ingestionProfile->id, $ingestionProfile->id.' - '.$ingestionProfile->name);
+			foreach($conversionProfiles as $conversionProfile) {
+				$element->addMultiOption($conversionProfile->id, $conversionProfile->id.' - '.$conversionProfile->name);
 			}
 		}
 		else 
 		{
-			$this->addElement('text', 'ingestionProfileId', array(
-				'label' 		=> 'Ingestion Profile ID:',
+			$this->addElement('text', 'conversionProfileId', array(
+				'label' 		=> 'Conversion Profile ID:',
 				'required'		=> false,
 				'filters'		=> array('StringTrim'),
 			));

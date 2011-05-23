@@ -33,7 +33,7 @@
 				<td><?php echo $dropFolder->name; ?></td>
 				<td><?php echo $dropFolder->partnerId; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_DropFolder_Enum_DropFolderType', $dropFolder->type); ?></td>
-				<td><?php echo $dropFolder->ingestionProfileId ? $dropFolder->ingestionProfileId : 'None defined'; ?></td>
+				<td><?php echo $dropFolder->conversionProfileId ? $dropFolder->conversionProfileId : 'None defined'; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType', $dropFolder->fileHandlerType); ?></td>
 				<td><?php echo $dropFolder->tags; ?></td>
 				<td><?php echo $this->dateFormat($dropFolder->createdAt, Zend_Date::DATE_LONG); ?></td>

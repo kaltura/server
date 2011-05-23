@@ -128,14 +128,14 @@ abstract class DropFolderFileHandler
 	 * @param string $parsedFlavor
 	 * @return KalturaConversionProfileAssetParams the flavor matching the given $systemName
 	 */
-	protected function getFlavorBySystemName($systemName, $ingestionProfileId = null)
+	protected function getFlavorBySystemName($systemName, $conversionProfileId = null)
 	{
-		if (is_null($ingestionProfileId)) {
-			$ingestionProfile = $this->getIngestionProfile();
-			$ingestionProfileId = $ingestionProfile->id;
+		if (is_null($conversionProfileId)) {
+			$conversionProfile = $this->getConversionProfile();
+			$conversionProfileId = $conversionProfile->id;
 		}
 		
-		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($ingestionProfileId);
+		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
 		$assetParamsList = $assetParamsList->objects;
 		
 		foreach ($assetParamsList as $assetParams)
@@ -182,11 +182,11 @@ abstract class DropFolderFileHandler
 	/**
 	 * @return KalturaConversionProfile
 	 */
-	protected function getIngestionProfile()
+	protected function getConversionProfile()
 	{
 		$this->impersonate($this->dropFolderFile->partnerId);
-		if (!is_null($this->dropFolder->ingestionProfileId)) {
-			$result = $this->kClient->conversionProfile->get($this->dropFolder->ingestionProfileId);
+		if (!is_null($this->dropFolder->conversionProfileId)) {
+			$result = $this->kClient->conversionProfile->get($this->dropFolder->conversionProfileId);
 		}
 		else {
 			$result = $this->kClient->conversionProfile->getDefault();

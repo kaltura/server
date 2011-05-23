@@ -460,7 +460,7 @@ class KAsyncEmailIngestion extends KBatchBase {
 		$this->putIfNotNull($mediaEntry->categories,		$this->getAndStrip('category', $mailBody));
 		$this->putIfNotNull($mediaEntry->tags,				$this->getAndStrip('tags', $mailBody));
 		$this->putIfNotNull($mediaEntry->adminTags,			$this->getAndStrip('admin_tags', $mailBody));
-		$this->putIfNotNull($mediaEntry->ingestionProfileId,$this->getAndStrip('transcoding_profile_id', $mailBody));
+		$this->putIfNotNull($mediaEntry->conversionProfileId,$this->getAndStrip('transcoding_profile_id', $mailBody));
 		$this->putIfNotNull($mediaEntry->partnerData,		$this->getAndStrip('partner_data', $mailBody));
 		$this->putIfNotNull($mediaEntry->userId,			$this->getAndStrip('user_id', $mailBody));
 		// description must be last (contains all text left after striping above parameters

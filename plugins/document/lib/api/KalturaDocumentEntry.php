@@ -14,19 +14,9 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 	 */
 	public $documentType;
 	
-	/**
-	 * Conversion profile ID to override the default conversion profile
-	 * 
-	 * @var string
-	 * @insertonly
-	 * @deprecated use ingestionProfileId instead
-	 */
-	public $conversionProfileId;
-	
 	private static $map_between_objects = array
 	(
 		"documentType" => "mediaType",
-		"conversionProfileId" => "conversionQuality",
 	);
 	
 	public function __construct()

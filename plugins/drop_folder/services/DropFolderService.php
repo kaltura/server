@@ -75,10 +75,10 @@ class DropFolderService extends KalturaBaseService
 		}
 		
 		
-		if (!is_null($dropFolder->ingestionProfileId)) {
-			$conversionProfileDb = conversionProfile2Peer::retrieveByPK($dropFolder->ingestionProfileId);
+		if (!is_null($dropFolder->conversionProfileId)) {
+			$conversionProfileDb = conversionProfile2Peer::retrieveByPK($dropFolder->conversionProfileId);
 			if (!$conversionProfileDb) {
-				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->ingestionProfileId);
+				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->conversionProfileId);
 			}
 		}
 		
@@ -153,10 +153,10 @@ class DropFolderService extends KalturaBaseService
 			}
 		}
 		
-		if (!is_null($dropFolder->ingestionProfileId)) {
-			$conversionProfileDb = conversionProfile2Peer::retrieveByPK($dropFolder->ingestionProfileId);
+		if (!is_null($dropFolder->conversionProfileId)) {
+			$conversionProfileDb = conversionProfile2Peer::retrieveByPK($dropFolder->conversionProfileId);
 			if (!$conversionProfileDb) {
-				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->ingestionProfileId);
+				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->conversionProfileId);
 			}
 		}
 					

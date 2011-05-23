@@ -33,7 +33,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * The default ingestion profile id
 	 * @var int
 	 */
-	private $defaultIngestionProfileId = null;
+	private $defaultConversionProfileId = null;
 	
 	/**
 	 * 
@@ -74,7 +74,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Maps the converstion profile name to id
 	 * @var array()
 	 */
-	private $ingestionProfileNameToId = array();
+	private $conversionProfileNameToId = array();
 	
 	/**
 	 * 
@@ -265,7 +265,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function removeNonUpdatbleFields(KalturaBaseEntry $entry)
 	{
-		$entry->ingestionProfileId = null;
+		$entry->conversionProfileId = null;
 		return $entry;
 	}
 	
@@ -309,7 +309,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				continue;
 			}
 							
-			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
+			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->conversionProfileId);
 			$flavorAssetResource = $this->getResource($contentElement);
 			
 			$assetParamsId = $flavorAsset->flavorParamsId;
@@ -347,7 +347,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			KalturaLog::debug("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
 						
-			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
+			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->conversionProfileId);
 			$thumbAssetResource = $this->getResource($thumbElement);
 									
 			$assetParamsId = $thumbAsset->thumbParamsId;
@@ -512,7 +512,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			$assetResource = $this->getResource($contentElement);
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
-			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->ingestionProfileId);
+			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->conversionProfileId);
 			
 			if(is_null($flavorAsset->flavorParamsId))
 			{
@@ -535,7 +535,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			$assetResource = $this->getResource($thumbElement);
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
-			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->ingestionProfileId);
+			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->conversionProfileId);
 			
 			if(is_null($thumbAsset->thumbParamsId))
 			{
@@ -898,9 +898,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 1.from the element 2.from the data of the bulk 3.use default)
 	 * @param SimpleXMLElement $elementToSearchIn
 	 */
-	protected function getIngestionProfileId(SimpleXMLElement $elementToSearchIn)
+	protected function getConversionProfileId(SimpleXMLElement $elementToSearchIn)
 	{
-		$conversionProfileId = $this->getIngestionProfileIdFromElement($elementToSearchIn);
+		$conversionProfileId = $this->getConversionProfileIdFromElement($elementToSearchIn);
 		
 		KalturaLog::debug("conversionProfileid from element [ $conversionProfileId ]");
 		
@@ -915,13 +915,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->impersonate();
 
 			//Gets the user default conversion
-			if(!isset($this->defaultIngestionProfileId))
+			if(!isset($this->defaultConversionProfileId))
 			{
 				$conversionProfile = $this->kClient->conversionProfile->getDefault();
-				$this->defaultIngestionProfileId = $conversionProfile->id;
+				$this->defaultConversionProfileId = $conversionProfile->id;
 			}
 			
-			$conversionProfileId = $this->defaultIngestionProfileId;
+			$conversionProfileId = $this->defaultConversionProfileId;
 			KalturaLog::debug("conversionProfileid from default [ $conversionProfileId ]"); 
 		}
 		
@@ -934,21 +934,21 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the ingestion profile params
 	 */
-	protected function getIngestionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
+	protected function getConversionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
 	{
-		if(isset($elementToSearchIn->ingestionProfileId))
-			return (int)$elementToSearchIn->ingestionProfileId;
+		if(isset($elementToSearchIn->conversionProfileId))
+			return (int)$elementToSearchIn->conversionProfileId;
 
-		if(!isset($elementToSearchIn->ingestionProfile))
+		if(!isset($elementToSearchIn->conversionProfile))
 			return null;	
 			
-		if(!isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]))
+		if(!isset($this->conversionProfileNameToId["$elementToSearchIn->conversionProfile"]))
 		{
-			$this->initIngestionProfileNameToId();
+			$this->initConversionProfileNameToId();
 		}
 			
-		if(isset($this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"]))
-			return $this->ingestionProfileNameToId["$elementToSearchIn->ingestionProfile"];
+		if(isset($this->conversionProfileNameToId["$elementToSearchIn->conversionProfile"]))
+			return $this->conversionProfileNameToId["$elementToSearchIn->conversionProfile"];
 
 		return null;
 	}
@@ -1095,22 +1095,22 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Inits the array of conversion profile name to Id (with all given flavor params)
 	 */
-	protected function initIngestionProfileNameToId()
+	protected function initConversionProfileNameToId()
 	{
 		$this->impersonate();
-		$allIngestionProfile = $this->kClient->conversionProfile->listAction(null, null);
-		$allIngestionProfile = $allIngestionProfile->objects;
+		$allConversionProfile = $this->kClient->conversionProfile->listAction(null, null);
+		$allConversionProfile = $allConversionProfile->objects;
 		
-		KalturaLog::debug("allIngestionProfile [" . print_r($allIngestionProfile,true) ." ]");
+		KalturaLog::debug("allConversionProfile [" . print_r($allConversionProfile,true) ." ]");
 		
-		foreach ($allIngestionProfile as $ingestionProfile)
+		foreach ($allConversionProfile as $conversionProfile)
 		{
-			$systemName = $ingestionProfile->systemName;
+			$systemName = $conversionProfile->systemName;
 			if(!empty($systemName))
-				$this->ingestionProfileNameToId[$systemName] = $ingestionProfile->id;
+				$this->conversionProfileNameToId[$systemName] = $conversionProfile->id;
 		}
 		
-		KalturaLog::debug("new ingestionProfileNameToId [" . print_r($this->ingestionProfileNameToId, true). "]");
+		KalturaLog::debug("new conversionProfileNameToId [" . print_r($this->conversionProfileNameToId, true). "]");
 	}
 
 	/**
@@ -1159,7 +1159,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$entry->endDate = self::parseFormatedDate((string)$item->endDate);
 		$entry->type = (int)$item->type;
-		$entry->ingestionProfileId = $this->getIngestionProfileId($item);
+		$entry->conversionProfileId = $this->getConversionProfileId($item);
 		
 		return $entry;
 	}
@@ -1446,7 +1446,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$bulkUploadResult->partnerId = $this->job->partnerId;
 		$bulkUploadResult->rowData = $item->asXml();
 		$bulkUploadResult->entryStatus = $this->getEntryStatusFromItem($item);
-		$bulkUploadResult->conversionProfileId = $this->getIngestionProfileId($item);
+		$bulkUploadResult->conversionProfileId = $this->getConversionProfileId($item);
 		$bulkUploadResult->accessControlProfileId = $this->getAccessControlId($item);
 		
 		if(!is_numeric($bulkUploadResult->conversionProfileId))

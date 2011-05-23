@@ -46,7 +46,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	 * @var int
 	 * @filter eq,in
 	 */
-	public $ingestionProfileId;
+	public $conversionProfileId;
 	
 	/**
 	 * @var int
@@ -125,7 +125,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'description',
 		'type',
 		'status',
-		'ingestionProfileId' => 'conversionProfileId',
+		'conversionProfileId',
 		'dc',
 		'path',
 		'fileSizeCheckInterval',

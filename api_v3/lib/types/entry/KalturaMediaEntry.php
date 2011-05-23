@@ -19,7 +19,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	 * 
 	 * @var string
 	 * @insertonly
-	 * @deprecated use ingestionProfileId instead
+	 * @deprecated use conversionProfileId instead
 	 */
 	public $conversionQuality;
 

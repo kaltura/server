@@ -285,9 +285,9 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/**
 	 * Override the default ingestion profile  
 	 * 
-	 * @var string
+	 * @var int
 	 */
-	public $ingestionProfileId;
+	public $conversionProfileId;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -327,7 +327,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		"partnerSortValue",
 	 	"categories",
 	 	"categoriesIds",
-	 	"ingestionProfileId" => "conversionQuality",
+	 	"conversionProfileId" => "conversionQuality",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -383,8 +383,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		
 		if($source_object->getStatus() != entryStatus::NO_CONTENT)
 		{
-			if(!is_null($this->ingestionProfileId))
-				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('ingestionProfileId'), $source_object->getStatus());
+			if(!is_null($this->conversionProfileId))
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $source_object->getStatus());
 		}
 		
 		return parent::validateForUpdate($source_object);

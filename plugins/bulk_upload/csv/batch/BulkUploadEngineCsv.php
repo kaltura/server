@@ -176,13 +176,13 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$mediaEntry->description = $bulkUploadResult->description;
 		$mediaEntry->tags = $bulkUploadResult->tags;
 		$mediaEntry->userId = $this->data->userId;
-		$mediaEntry->ingestionProfileId = $this->data->conversionProfileId;
+		$mediaEntry->conversionProfileId = $this->data->conversionProfileId;
 		
 		//Set values for V1 csv
 		if($this->csvVersion > KalturaBulkUploadCsvVersion::V1)
 		{
 			if($bulkUploadResult->conversionProfileId)
-		    	$mediaEntry->ingestionProfileId = $bulkUploadResult->conversionProfileId;
+		    	$mediaEntry->conversionProfileId = $bulkUploadResult->conversionProfileId;
 		    	
 			if($bulkUploadResult->accessControlProfileId)
 		    	$mediaEntry->accessControlId = $bulkUploadResult->accessControlProfileId;

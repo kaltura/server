@@ -25,7 +25,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	/**
 	 * @var KalturaConversionProfile
 	 */
-	private $ingestionProfile = null;
+	private $conversionProfile = null;
 	
 	
 	public function getType() {
@@ -36,19 +36,19 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	/**
 	 * @return KalturaConversionProfile
 	 */
-	protected function getIngestionProfile()
+	protected function getConversionProfile()
 	{
-		if (is_null($this->ingestionProfile)) {
-			$this->ingestionProfile = parent::getIngestionProfile();
+		if (is_null($this->conversionProfile)) {
+			$this->conversionProfile = parent::getConversionProfile();
 		}
-		return $this->ingestionProfile;
+		return $this->conversionProfile;
 	}
 	
 	
 
 	public function handle()
 	{
-		$this->ingestionProfile = null;
+		$this->conversionProfile = null;
 		
 		// check prerequisites
 		$checkConfig = $this->checkConfig();
@@ -70,8 +70,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		// check if parsed flavor exists
 		if (!is_null($this->dropFolderFile->parsedFlavor))
 		{
-			$ingestionProfileId = $this->getIngestionProfile()->id;
-			$this->parsedFlavorObject = $this->getFlavorBySystemName($this->dropFolderFile->parsedFlavor, $ingestionProfileId);
+			$conversionProfileId = $this->getConversionProfile()->id;
+			$this->parsedFlavorObject = $this->getFlavorBySystemName($this->dropFolderFile->parsedFlavor, $conversionProfileId);
 			if (!$this->parsedFlavorObject) {
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_NOT_FOUND;
@@ -179,7 +179,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$addionnalFileIds = null;
 		$resource = null;
 		
-		$ingestionProfile = null;
+		$conversionProfile = null;
 		if (is_null($this->dropFolderFile->parsedFlavor))
 		{
 			$resource = new KalturaDropFolderFileResource();
@@ -187,8 +187,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		else
 		{
-			$ingestionProfile = $this->getIngestionProfile();
-			$resource = $this->getAllIngestedFiles($ingestionProfile->id);
+			$conversionProfile = $this->getConversionProfile();
+			$resource = $this->getAllIngestedFiles($conversionProfile->id);
 			if (!$resource) {
 				KalturaLog::debug('Some required flavors do not exist in the drop folder - changing status to WAITING');
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
@@ -203,10 +203,10 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		
 		$newEntry = new KalturaBaseEntry();
-		if (!$ingestionProfile) {
-			$ingestionProfile = $this->getIngestionProfile();
+		if (!$conversionProfile) {
+			$conversionProfile = $this->getConversionProfile();
 		}
-		$newEntry->ingestionProfileId = $ingestionProfile->id;
+		$newEntry->conversionProfileId = $conversionProfile->id;
 		$newEntry->name = $this->dropFolderFile->parsedSlug;
 		$newEntry->referenceId = $this->dropFolderFile->parsedSlug;
 		
@@ -285,9 +285,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		
 
-		$entryConversionProfileId = $matchedEntry->ingestionProfileId;
+		$entryConversionProfileId = $matchedEntry->conversionProfileId;
 		if (is_null($entryConversionProfileId)) {
-			$entryConversionProfileId = $this->getIngestionProfile()->id;
+			$entryConversionProfileId = $this->getConversionProfile()->id;
 		}
 
 		$resource = $this->getAllIngestedFiles($entryConversionProfileId);
@@ -333,13 +333,13 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 * If yes -> retrun a KalturaAssetsParamsResourceContainers resource containing them + the current file
 	 * If not -> return false
 	 * 
-	 * @param int $ingestionProfileId
+	 * @param int $conversionProfileId
 	 * @return KalturaAssetsParamsResourceContainers
 	 */
-	private function getAllIngestedFiles($ingestionProfileId = null)
+	private function getAllIngestedFiles($conversionProfileId = null)
 	{
-		if (is_null($ingestionProfileId)) {
-			$ingestionProfileId = $this->getIngestionProfile()->id;
+		if (is_null($conversionProfileId)) {
+			$conversionProfileId = $this->getConversionProfile()->id;
 		}
 		
 		$fileFilter = new KalturaDropFolderFileFilter();
@@ -360,7 +360,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$assetContainerArray = array();
 		$currentFlavorAdded = false;
 		
-		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($ingestionProfileId);
+		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
 		foreach ($assetParamsList->objects as $assetParams)
 		{
 			if ($assetParams->origin == KalturaAssetParamsOrigin::CONVERT) {

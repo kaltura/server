@@ -30,10 +30,7 @@ class DocumentsService extends KalturaEntryService
      */
     function addAction(KalturaDocumentEntry $entry, KalturaResource $resource = null)
     {
-    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
-    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
-    		
-    	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
+    	$dbEntry = parent::add($entry, $entry->conversionProfileId);
     	
     	if(!$resource)
     	{
@@ -112,9 +109,6 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromUploadedFileAction(KalturaDocumentEntry $documentEntry, $uploadTokenId)
 	{
-    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
-    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
-    		
 		try
 	    {
 	    	// check that the uploaded file exists
@@ -200,9 +194,6 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromEntryAction($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = null)
 	{
-    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
-    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
-    		
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
 		if (!$srcEntry || $srcEntry->getType() != entryType::DOCUMENT)
@@ -250,9 +241,6 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaDocumentEntry $documentEntry = null)
 	{
-    	if($documentEntry->conversionProfileId && !$documentEntry->ingestionProfileId)
-    		$documentEntry->ingestionProfileId = $documentEntry->conversionProfileId;
-    		
 		assetPeer::resetInstanceCriteriaFilter();
 		$srcFlavorAsset = assetPeer::retrieveById($sourceFlavorAssetId);
 
@@ -608,7 +596,7 @@ class DocumentsService extends KalturaEntryService
 		
 		$dbEntry = parent::prepareEntryForInsert($entry);
 	
-		if ($entry->ingestionProfileId) 
+		if ($entry->conversionProfileId) 
 		{
 			$dbEntry->setStatus(entryStatus::PRECONVERT);
 		}

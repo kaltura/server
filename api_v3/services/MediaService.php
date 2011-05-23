@@ -43,10 +43,10 @@ class MediaService extends KalturaEntryService
      */
     function addAction(KalturaMediaEntry $entry)
     {
-    	if($entry->conversionQuality && !$entry->ingestionProfileId)
-    		$entry->ingestionProfileId = $entry->conversionQuality;
+    	if($entry->conversionQuality && !$entry->conversionProfileId)
+    		$entry->conversionProfileId = $entry->conversionQuality;
     		
-    	$dbEntry = parent::add($entry, $entry->ingestionProfileId);
+    	$dbEntry = parent::add($entry, $entry->conversionProfileId);
 		$dbEntry->setStatus(entryStatus::NO_CONTENT);
 		$dbEntry->save();
     		
@@ -120,7 +120,7 @@ class MediaService extends KalturaEntryService
 			$tempMediaEntry = new KalturaMediaEntry();
 		 	$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
-			$tempMediaEntry->ingestionProfileId = $dbEntry->getConversionQuality();
+			$tempMediaEntry->conversionProfileId = $dbEntry->getConversionQuality();
 			
 			$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
 			$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
@@ -228,8 +228,8 @@ class MediaService extends KalturaEntryService
 	
 	private function addDbFromUrl(KalturaMediaEntry $mediaEntry, $url, $bulkUploadId = null)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
-    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
     		
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 		if($bulkUploadId)
@@ -277,8 +277,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromSearchResultAction(KalturaMediaEntry $mediaEntry = null, KalturaSearchResult $searchResult = null)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
-    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
     		
 		if ($mediaEntry === null)
 			$mediaEntry = new KalturaMediaEntry();
@@ -376,8 +376,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromUploadedFileAction(KalturaMediaEntry $mediaEntry, $uploadTokenId)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
-    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
     		
 		try
 		{
@@ -454,8 +454,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromRecordedWebcamAction(KalturaMediaEntry $mediaEntry, $webcamTokenId)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
-    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
     		
 	    // check that the webcam file exists
 	    $content = myContentStorage::getFSContentRootPath();
@@ -508,8 +508,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromEntryAction($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = null)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
-    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
     		
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);
 
@@ -559,8 +559,8 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaMediaEntry $mediaEntry = null)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->ingestionProfileId)
-    		$mediaEntry->ingestionProfileId = $mediaEntry->conversionQuality;
+    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
     		
 		$srcFlavorAsset = flavorAssetPeer::retrieveById($sourceFlavorAssetId);
 
