@@ -40,7 +40,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoUrlResourceNoConvert()
 	{
 		$entry						= new KalturaMediaEntry();
-		$entry->ingestionProfileId	= -1;
+		$entry->conversionProfileId	= -1;
 		$entry->mediaType			= KalturaMediaType::VIDEO;
 		$entry->name				= 'VideoUrlResource - No Convert';
 		$entry->description			= 'Expected statuses: no content, import, pending';
@@ -62,7 +62,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoUrlResourceFromTemplate()
 	{
 		$entry						= new KalturaMediaEntry();
-		$entry->ingestionProfileId	= 1197623;
+		$entry->conversionProfileId	= 1197623;
 		$entry->mediaType			= KalturaMediaType::VIDEO;
 		$entry->name				= 'VideoUrlResource - From Template';
 		
@@ -82,7 +82,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoUrlResourceFromMetadataTemplate()
 	{
 		$entry						= new KalturaMediaEntry();
-		$entry->ingestionProfileId	= 1197626;
+		$entry->conversionProfileId	= 1197626;
 		$entry->mediaType			= KalturaMediaType::VIDEO;
 		$entry->name				= 'VideoUrlResource - From Metadata Template';
 		
@@ -102,7 +102,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddImageUrlResourceFromTemplate()
 	{
 		$entry						= new KalturaMediaEntry();
-		$entry->ingestionProfileId	= 1197625;
+		$entry->conversionProfileId	= 1197625;
 		$entry->mediaType			= KalturaMediaType::IMAGE;
 		$entry->name				= 'ImageUrlResource - From Template';
 		
@@ -343,7 +343,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoUrlResourceSourceOnly()
 	{
 		$entry						= new KalturaMediaEntry();
-		$entry->ingestionProfileId	= 1197619;
+		$entry->conversionProfileId	= 1197619;
 		$entry->mediaType			= KalturaMediaType::VIDEO;
 		$entry->name				= 'VideoUrlResource SourceOnly';
 		$entry->description			= 'Expected statuses: no content, import, converting, ready';
@@ -365,7 +365,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoRemoteStorageResourceSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoRemoteStorageResource SourceOnly';
 		$entry->description				= 'Expected statuses: no content, ready';
@@ -388,7 +388,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoFileSyncResourceSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoFileSyncResource SourceOnly';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -412,7 +412,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoLocalFileResourceSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoLocalFileResource SourceOnly';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -434,7 +434,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoWebcamTokenResourceSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoWebcamTokenResource SourceOnly';
 		$entry->description				= 'Expected statuses: no content, ready';
@@ -456,7 +456,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoEntryResourceSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoEntryResource SourceOnly';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -479,7 +479,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoAssetResourceSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoAssetResource SourceOnly';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -503,7 +503,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		$file							= 'C:\Documents and Settings\Tan-Tan\My Documents\My Videos\sample.1.flv';
 		
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoUploadedFileTokenResource SourceOnly';
 		$entry->description				= 'Expected statuses: no content, importing, converting, ready';
@@ -544,7 +544,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoAssetParamsResourceContainerSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoAssetParamsResourceContainer SourceOnly';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -568,7 +568,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoAssetsParamsResourceContainersSourceOnly()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197619;
+		$entry->conversionProfileId		= 1197619;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoAssetsParamsResourceContainers SourceOnly';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -595,7 +595,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedOK()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197621;
+		$entry->conversionProfileId		= 1197621;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested OK';
 		$entry->description				= 'Expected statuses: no content, ready';
@@ -627,7 +627,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedMissingOptionalIngested()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197622;
+		$entry->conversionProfileId		= 1197622;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested - Missing Optional Ingested';
 		$entry->description				= 'Expected statuses: no content, convert, ready';
@@ -659,7 +659,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedMissingRequiredIngested()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197622;
+		$entry->conversionProfileId		= 1197622;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested - Missing Required Ingested';
 		$entry->description				= 'Expected statuses: no content, converting';
@@ -686,7 +686,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedAllIngestedIngested()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197622;
+		$entry->conversionProfileId		= 1197622;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested - All Ingested Ingested';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -728,7 +728,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedAllIngestedImported()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197622;
+		$entry->conversionProfileId		= 1197622;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested - All Ingested Imported';
 		$entry->description				= 'Expected statuses: no content, import, converting, ready';
@@ -770,7 +770,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedAllIngestedRemote()
 	{
 		$entry								= new KalturaMediaEntry();
-		$entry->ingestionProfileId			= 1197622;
+		$entry->conversionProfileId			= 1197622;
 		$entry->mediaType					= KalturaMediaType::VIDEO;
 		$entry->name						= 'Video Ingested - All Ingested Remote';
 		$entry->description					= 'Expected statuses: no content, converting';
@@ -816,7 +816,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedAllIngested()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197622;
+		$entry->conversionProfileId		= 1197622;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested - All Ingested';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
@@ -863,7 +863,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoIngestedMissingRequired()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197621;
+		$entry->conversionProfileId		= 1197621;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested - Missing Required';
 		$entry->description				= 'Expected statuses: no content, converting';
@@ -1042,7 +1042,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		$file							= 'C:\Documents and Settings\Tan-Tan\My Documents\My Videos\sample.1.flv';
 		
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= -1;
+		$entry->conversionProfileId		= -1;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoUploadedFileTokenResource - No Convert';
 		$entry->description				= 'Expected statuses: no content, importing, pending';
@@ -1083,7 +1083,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	public function testAddVideoFlavorAsset()
 	{
 		$entry							= new KalturaMediaEntry();
-		$entry->ingestionProfileId		= 1197622;
+		$entry->conversionProfileId		= 1197622;
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'Video Ingested - All Ingested Ingested';
 		$entry->description				= 'Expected statuses: no content, converting, ready';
