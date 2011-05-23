@@ -757,7 +757,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		else
 			$data = myContentStorage::generateRandomFileName($filename, $this->getData());
 	
-		Baseentry::SetData( $data );
+		Baseentry::setData( $data );
 		return $this->getData();
 	}
 
