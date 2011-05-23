@@ -51,6 +51,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 		}
 		$this->assetParamsIdEqual = null;
 		$this->assetParamsIdFilter = null;
+		assetPeer::resetInstanceCriteriaFilter();
 		$this->assetParamsIdIn = assetPeer::getIds($assetParamsCriteria);
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
