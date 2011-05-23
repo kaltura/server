@@ -280,4 +280,12 @@ class assetParamsPeer extends BaseassetParamsPeer
 
 		return flavorParamsPeer::doSelect($criteria, $con);
 	}
+
+	public static function getIds(Criteria $criteria, $con = null)
+	{
+		$criteria->addSelectColumn(assetParamsPeer::ID);
+
+		$stmt = assetParamsPeer::doSelectStmt($criteria, $con);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
 }
