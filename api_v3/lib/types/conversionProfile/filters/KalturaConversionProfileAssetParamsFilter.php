@@ -25,7 +25,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 		if($this->conversionProfileIdEqual)
 			$conversionProfileCriteria->add(conversionProfile2Peer::ID, $this->conversionProfileIdEqual);
 		if($this->conversionProfileIdIn)
-			$conversionProfileCriteria->add(conversionProfile2Peer::ID, $this->conversionProfileIdIn, Criteria::IN);
+			$conversionProfileCriteria->add(conversionProfile2Peer::ID, explode(',', $this->conversionProfileIdIn), Criteria::IN);
 		if($this->conversionProfileIdFilter)
 		{
 			$conversionProfileIdFilter = new conversionProfile2Filter();
@@ -42,7 +42,7 @@ class KalturaConversionProfileAssetParamsFilter extends KalturaConversionProfile
 		if($this->assetParamsIdEqual)
 			$assetParamsCriteria->add(assetPeer::ID, $this->assetParamsIdEqual);
 		if($this->assetParamsIdIn)
-			$assetParamsCriteria->add(assetPeer::ID, $this->assetParamsIdIn, Criteria::IN);
+			$assetParamsCriteria->add(assetPeer::ID, explode(',', $this->assetParamsIdIn), Criteria::IN);
 		if($this->assetParamsIdFilter)
 		{
 			$assetParamsIdFilter = new conversionProfile2Filter();
