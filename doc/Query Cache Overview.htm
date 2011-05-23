@@ -97,8 +97,13 @@ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/ ; pkg-config --libs --cflags li
 export PKG_CONFIG=/usr/bin/pkg-config
 vi /etc/ld.so.conf and add /usr/local/lib
 ./configure --with-mysql=/usr/bin/mysql_config --libdir=/usr/lib64/mysql/
+
+in order to overcome a segmentation fault when passing a null value to memc_set the following fix should be inserted to src/set.c at line 64
+   if (args->args[0] == NULL)
+     args->lengths[0]= 0;
+
 make install
-cp /usr/lib64/mysql/libmemcached_functions_mysql* /usr/lib64/mysql/plugin/
+cp /usr/lib64/mysql/libmemcached_functions_mysql.so /usr/lib64/mysql/plugin/
 </pre>
 </body>
 </html>
