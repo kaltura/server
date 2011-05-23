@@ -1622,6 +1622,7 @@ class kFlowHelper
 			
 			$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 			$dbAsset->setFileExt($ext);
+			$dbAsset->incrementVersion();
 			$dbAsset->save();
 			
 			$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -1662,6 +1663,7 @@ class kFlowHelper
 	 			KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
 				return;
 			}
+			// TODO - maybe I need to increment the entry file sync version?
 			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
