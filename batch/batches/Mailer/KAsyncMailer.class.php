@@ -225,7 +225,10 @@ class KAsyncMailer extends KBatchBase
 		$footer = vsprintf( $footer, array( $forumsLink, $unsubscribeLink , self::createBlockEmailStr( $recipientemail ) ) );
 
 		$body .= "\n" . $footer;
-		KalturaLog::debug( __METHOD__ . " Debug: type [$type]\n " . print_r ( $bodyParamsArray , true ) );
+		KalturaLog::debug("type [$type]");
+		KalturaLog::debug("params [" . print_r($bodyParamsArray, true) . "]");
+		KalturaLog::debug("body [$body]");
+		KalturaLog::debug("footer [$footer]");
 		$body = vsprintf( $body, $bodyParamsArray );
 		if ($isHtml)
 			$body = str_replace( "<BR>", "<br />", $body );
@@ -235,6 +238,7 @@ class KAsyncMailer extends KBatchBase
 		$body = str_replace( "<EQ>", "=", $body );
 		$body = str_replace( "<EM>", "!", $body ); // exclamation mark
 		
+		KalturaLog::debug("final body [$body]");
 		return $body;
 	}
 		
