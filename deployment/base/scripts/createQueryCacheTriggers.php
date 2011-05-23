@@ -2,14 +2,14 @@
 
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
-	array('table' => "flavor_asset", 		'key' => "concat('flavorAsset:entryId=',@OBJ@.entry_id)"),
-	array('table' => "kuser", 				'key' => "concat('kuser:partnerId=',@OBJ@.partner_id,',puserid=',@OBJ@.puser_id)"),
-	array('table' => "entry", 				'key' => "concat('entry:id=',@OBJ@.id)"),
-	array('table' => "access_control", 		'key' => "concat('accessControl:id=',@OBJ@.id)"),
-	array('table' => "permission", 			'key' => "concat('permission:partnerId=',@OBJ@.partner_id)"),
-	array('table' => "kuser_to_user_role", 	'key' => "concat('kuserToUserRole:kuserId=',@OBJ@.kuser_id)"),
-	array('table' => "category", 			'key' => "concat('category:partnerId=',@OBJ@.partner_id)"),
-	array('table' => "file_sync", 			'key' => "concat('fileSync:objectId=',@OBJ@.object_id)"),
+	array('table' => "flavor_asset", 		'key' => "concat('QCI-flavorAsset:entryId=',@OBJ@.entry_id)"),
+	array('table' => "kuser", 				'key' => "concat('QCI-kuser:partnerId=',@OBJ@.partner_id,',puserid=',@OBJ@.puser_id)"),
+	array('table' => "entry", 				'key' => "concat('QCI-entry:id=',@OBJ@.id)"),
+	array('table' => "access_control", 		'key' => "concat('QCI-accessControl:id=',@OBJ@.id)"),
+	array('table' => "permission", 			'key' => "concat('QCI-permission:partnerId=',@OBJ@.partner_id)"),
+	array('table' => "kuser_to_user_role", 	'key' => "concat('QCI-kuserToUserRole:kuserId=',@OBJ@.kuser_id)"),
+	array('table' => "category", 			'key' => "concat('QCI-category:partnerId=',@OBJ@.partner_id)"),
+	array('table' => "file_sync", 			'key' => "concat('QCI-fileSync:objectId=',@OBJ@.object_id)"),
 );
 
 // Default parameters
