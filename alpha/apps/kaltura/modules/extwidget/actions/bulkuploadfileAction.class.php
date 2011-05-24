@@ -37,7 +37,7 @@ class bulkuploadfileAction extends sfAction
 					$bulkUploadResult->getContentType(),
 				);
 				
-				if($data instanceof kBulkUploadJobData && $data->getCsvVersion() > kBulkUploadJobData::BULK_UPLOAD_CSV_VERSION_V1)
+				if($data instanceof kBulkUploadJobData && $data->getCsvVersion() > 1)
 				{
 					$values[] = $bulkUploadResult->getConversionProfileId();
 					$values[] = $bulkUploadResult->getAccessControlProfileId();
@@ -73,4 +73,3 @@ class bulkuploadfileAction extends sfAction
 		die; //  no template needed
 	}
 }
-?>
