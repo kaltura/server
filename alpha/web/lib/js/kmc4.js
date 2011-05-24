@@ -1598,7 +1598,8 @@ kmc.vars.kmc_swf = {
 		openPlayer			: "kmc.preview_embed.doPreviewEmbed", // @todo: remove for 2.0.9 ?
 		openPlaylist		: "kmc.preview_embed.doPreviewEmbed",
 		email				: kmc.vars.email,
-		openCw				: "kmc.functions.openKcw"
+		openCw				: "kmc.functions.openKcw",
+		language			: kmc.vars.language
 		
 	// path to modules (optional):
 	//modules_path:kmc.vars.service_url+"/flash/kmc/"+kmc.vars.kmc_version+"/modules",
