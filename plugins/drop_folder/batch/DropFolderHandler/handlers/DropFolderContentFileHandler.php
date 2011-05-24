@@ -340,6 +340,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 */
 	private function getAllIngestedFiles($conversionProfileId = null)
 	{
+		KalturaLog::debug("Ingest files according to conversion profile [$conversionProfileId]");
+		
 		if (is_null($conversionProfileId)) {
 			$conversionProfileId = $this->getConversionProfile()->id;
 		}
@@ -371,13 +373,15 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 				continue;
 			}
 			
-			$assetExists = array_key_exists($assetParams->systemName, $existingFlavors);
+			if(!array_key_exists($assetParams->systemName, $existingFlavors))
+			{
+				if ($assetParams->readyBehavior == KalturaFlavorReadyBehaviorType::REQUIRED && $assetParams->origin == KalturaAssetParamsOrigin::INGEST)
+				{
+					KalturaLog::debug("Flavor [$assetParams->systemName] is required and must be ingested");
+					return false;
+				}
 			
-			if ($assetParams->readyBehavior == KalturaFlavorReadyBehaviorType::REQUIRED && !$assetExists) {
-				return false;
-			}
-			
-			if (!$assetExists) {
+				KalturaLog::debug("Flavor [$assetParams->systemName] not supplied");
 				continue;
 			}
 			
