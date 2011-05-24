@@ -69,11 +69,15 @@ class Form_DropFolderConfigure extends Infra_Form
 		$this->addConversionProfiles();
 		
 		$this->addElement('text', 'fileNamePatterns', array(
-			'label' 		=> 'Source Files Patterns:',
+			'label' 		=> 'Source File Name Patterns (to handle):',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('text', 'ignoreFileNamePatterns', array(
+			'label' 		=> 'Ignore file name patterns (don\'t even list them) :',
+			'filters'		=> array('StringTrim'),
+		));
 		
 		$fileHandlerTypes = new Kaltura_Form_Element_EnumSelect('fileHandlerType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType'));
 		$fileHandlerTypes->setLabel('Ingestion Source:');

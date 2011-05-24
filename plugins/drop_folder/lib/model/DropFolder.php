@@ -97,6 +97,7 @@ class DropFolder extends BaseDropFolder
 	
 	const CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL = 'file_size_check_interval';
 	const CUSTOM_DATA_AUTO_FILE_DELETE_DAYS  = 'auto_file_delete_days';
+	const CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS = 'ignore_file_name_patterns';
 	
 	
 	// File size check interval - value in seconds
@@ -130,6 +131,21 @@ class DropFolder extends BaseDropFolder
 	public function setAutoFileDeleteDays($days)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_AUTO_FILE_DELETE_DAYS, $days);
+	}
+	
+	// Ignore file patterns
+		
+	/**
+	 * @return int
+	 */
+	public function getIgnoreFileNamePatterns()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS);
+	}
+	
+	public function setIgnoreFileNamePatterns($patterns)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS, $patterns);
 	}
 	
 	

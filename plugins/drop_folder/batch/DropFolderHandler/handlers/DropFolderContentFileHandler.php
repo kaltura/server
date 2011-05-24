@@ -11,6 +11,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	
 	const REFERENCE_ID_WILDCARD = 'referenceId';
 	const FLAVOR_NAME_WILDCARD  = 'flavorName';
+	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.]\w+/'; // matches "referenceId_flavorName.extension"
+	
 	
 	/**
 	 * @var KalturaDropFolderContentFileHandlerConfig
@@ -131,7 +133,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	private function parseRegex()
 	{
 		$matches = null;
-		$slugRegex = (is_null($this->config->slugRegex) || empty($this->config->slugRegex)) ? KalturaDropFolderContentFileHandlerConfig::DEFAULT_SLUG_REGEX : $this->config->slugRegex;
+		$slugRegex = (is_null($this->config->slugRegex) || empty($this->config->slugRegex)) ? self::DEFAULT_SLUG_REGEX : $this->config->slugRegex;
 		$matchFound = @preg_match($slugRegex, $this->dropFolderFile->fileName, $matches);
 		
 		if (!$matchFound) {
@@ -360,7 +362,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$assetContainerArray = array();
 		$currentFlavorAdded = false;
 		
-		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
+		$assetParamsFilter = new KalturaConversionProfileAssetParamsFilter();
+		$assetParamsFilter->conversionProfileIdEqual = $conversionProfileId;
+		$assetParamsList = $this->kClient->conversionProfileAssetParams->listAction($assetParamsFilter);
 		foreach ($assetParamsList->objects as $assetParams)
 		{
 			if ($assetParams->origin == KalturaAssetParamsOrigin::CONVERT) {

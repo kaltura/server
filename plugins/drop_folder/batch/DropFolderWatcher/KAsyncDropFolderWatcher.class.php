@@ -101,21 +101,6 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			KalturaLog::err('Cannot get drop folder file list from the server for drop folder id ['.$folder->id.'] - '.$e->getMessage());
 			return; // skipping to next folder
 		}
-				
-		$dropFolderFileMapByName = array();
-		$deletedDropFolderFileMapByName = array();
-		
-		foreach ($dropFolderFiles as $dropFolderFile)
-		{
-			if ($dropFolderFile->status !== KalturaDropFolderFileStatus::PURGED) {
-				if ($dropFolderFile->status === KalturaDropFolderFileStatus::DELETED) {
-					$deletedDropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
-				}
-				else {
-					$dropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
-				}
-			}			
-		}		
 		
 		
 		// get a list of physical files from the folder's path
@@ -129,13 +114,52 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		if (!$physicalFiles) {
 			KalturaLog::err('Cannot get physical file list for drop folder id ['.$folder->id.'] with path ['.$folder->path.']');
 			return; // skipping to next folder
-		}
+		}	
+
 		
+		$dropFolderFileMapByName = array();
+		$deletedDropFolderFileMapByName = array();
+		
+		foreach ($dropFolderFiles as $dropFolderFile)
+		{
+			if ($dropFolderFile->status !== KalturaDropFolderFileStatus::PURGED) {
+				if ($dropFolderFile->status === KalturaDropFolderFileStatus::UPLOADING && !in_array($dropFolderFile->fileName, $physicalFiles))
+				{
+					$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 'Cannot find file with name ['.$dropFolderFile->fileName.']');
+					continue;
+				}				
+				if ($dropFolderFile->status === KalturaDropFolderFileStatus::DELETED) {
+					$deletedDropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
+				}
+				else {
+					$dropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
+				}
+			}			
+		}		
+		
+		// get defined file name patterns
+		$ignorePatterns = $folder->ignoreFileNamePatterns;
+		$ignorePatterns = array_map('trim', explode(',', $ignorePatterns));
 		
 		// sync between physical file list and drop folder file objects
 		foreach ($physicalFiles as $physicalFileName)
 		{
 			if ($physicalFileName === '.' || $physicalFileName === '..') {
+				continue;
+			}
+			
+			$shouldIgnore = false;
+			foreach ($ignorePatterns as $ignorePattern)
+			{
+				if (!is_null($ignorePattern) && ($ignorePattern != '')) {
+					if (fnmatch($ignorePattern, $physicalFileName)) {
+						$shouldIgnore = true;
+						KalturaLog::err("Ignoring file [$physicalFileName] matching ignore pattern [$ignorePattern]");
+						break;
+					}
+				}
+			}
+			if ($shouldIgnore) {
 				continue;
 			}
 			
@@ -262,6 +286,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		$physicalFileSize = self::getFileSize($sharedPhysicalFilePath);
 		
 		if (!$physicalFileSize) {
+			$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, "Cannot get file size for path [$sharedPhysicalFilePath]");
 			KalturaLog::err("Cannot get file size for path [$sharedPhysicalFilePath]");
 			return; // error - can't get file size
 		}
@@ -359,6 +384,24 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		try {
 			$updateDropFolderFile = new KalturaDropFolderFile();
 			$updateDropFolderFile->status = KalturaDropFolderFileStatus::PURGED;
+			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+		}
+		catch (Exception $e) {
+			KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
+	private function errorWithFile(KalturaDropFolderFile $dropFolderFile, $errorCode, $errorMessage)
+	{
+		try {
+			$updateDropFolderFile = new KalturaDropFolderFile();
+			$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+			$updateDropFolderFile->errorCode = $errorCode;
+			$updateDropFolderFile->errorDescription = $errorMessage;
 			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 		}
 		catch (Exception $e) {

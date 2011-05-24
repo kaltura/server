@@ -135,7 +135,10 @@ abstract class DropFolderFileHandler
 			$conversionProfileId = $conversionProfile->id;
 		}
 		
-		$assetParamsList = $this->kClient->conversionProfile->listAssetParams($conversionProfileId);
+		$assetParamsFilter = new KalturaConversionProfileAssetParamsFilter();
+		$assetParamsFilter->conversionProfileIdEqual = $conversionProfileId;
+		
+		$assetParamsList = $this->kClient->conversionProfileAssetParams->listAction($assetParamsFilter);
 		$assetParamsList = $assetParamsList->objects;
 		
 		foreach ($assetParamsList as $assetParams)

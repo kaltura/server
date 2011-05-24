@@ -101,6 +101,11 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public $tags;
 	
 	/**
+	 * @var string
+	 */
+	public $ignoreFileNamePatterns;
+	
+	/**
 	 * @var int
 	 * @readonly
 	 * @filter gte,lte,order
@@ -136,6 +141,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'createdAt',
 		'updatedAt',
 		'tags',
+		'ignoreFileNamePatterns',
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -204,7 +210,13 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		$this->validateForInsert(); // will check that not insertable properties are not set
 		$this->fileHandlerConfig->validateForInsert();
 		
-		return $this->toObject($object_to_fill, $props_to_skip);
+		$result = $this->toObject($object_to_fill, $props_to_skip);
+		if (!is_null($this->fileHandlerConfig))
+		{
+			$dbInsertedHandlerConfig = $this->fileHandlerConfig->toInsertableObject();
+			$result->setFileHandlerConfig($dbInsertedHandlerConfig);
+		}
+		return $result;
 	}
 	
 }

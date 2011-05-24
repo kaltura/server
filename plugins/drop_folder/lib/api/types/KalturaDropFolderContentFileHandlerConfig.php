@@ -6,10 +6,6 @@
 class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHandlerConfig
 {	
 	
-	//TODO: should use the consts from DropFolderContentFileHandler
-	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.]\w+/'; // matches "referenceId_flavorName.extension"
-	
-	
 	/**
 	 * @var KalturaDropFolderContentFileHandlerMatchPolicy
 	 */
@@ -56,11 +52,17 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, get_class($this).'::contentMatchPolicy');
 		}
 		
-		if (is_null($this->slugRegex)) {
-			$this->slugRegex = self::DEFAULT_SLUG_REGEX;
-		}
-		
 		return parent::validateForInsert();
 	}
+	
+	
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if (is_null($this->slugRegex)) {
+			$this->slugRegex = DropFolderContentFileHandler::DEFAULT_SLUG_REGEX;
+		}
+		
+		return $this->toObject($object_to_fill, $props_to_skip);
+	}	
 	
 }
