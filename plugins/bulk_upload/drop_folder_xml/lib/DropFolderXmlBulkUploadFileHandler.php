@@ -83,7 +83,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
 				KalturaLog::debug('Changing status to WAITING');
 				$this->updateDropFolderFile();
-				return true;
+				return false;
 			}
 			$localVerified = $this->verifyLocalResource($local);
 			if (!$localVerified) {
