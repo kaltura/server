@@ -17,6 +17,7 @@ else
 }
 ?>
 <?php
+
 	$defaultUiconfsArray = array();
 	foreach($content_uiconfs_previewembed_list as $uiconf)
 	{
@@ -135,7 +136,8 @@ else
 			//enableAds		 : <?php echo $enable_vast ?>,
 			appStudioExampleEntry : "<?php echo $appStudioExampleEntry ?>", 
 			appStudioExamplePlayList0	 : "<?php echo $appStudioExamplePlayList0 ?>",
-			appStudioExamplePlayList1	 : "<?php echo $appStudioExamplePlayList1 ?>"
+			appStudioExamplePlayList1	 : "<?php echo $appStudioExamplePlayList1 ?>",
+			language	 : "<?php echo $language ?>"
 		}
 	}
 </script>
