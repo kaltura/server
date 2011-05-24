@@ -471,12 +471,19 @@ class kFile
 		}
 		else
 		{
-			kLog::log("curl_exec failed [$entry_url]");
+			kLog::log("curl_exec failed [$sourceUrl]");
 		}
 		
 		curl_close($ch);
 		fclose($f);
-		return $result == 200;
+		
+		$validCodes = array(
+			200,
+			226,
+			301, 
+			302,
+		);
+		return in_array($result, $validCodes);
 	}
 	
 	public static function getFileData($file_full_path)
