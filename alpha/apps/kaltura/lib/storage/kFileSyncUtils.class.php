@@ -523,19 +523,19 @@ class kFileSyncUtils
 			if($file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
 			{
 				$tmp_file_sync = self::resolve($file_sync);
+				if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+					continue;
 			}
 			
-			// always preffer the current dc
-			if ( $tmp_file_sync->getDc() == $dc_id && $tmp_file_sync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
+			// always prefer the current dc
+			if ( $tmp_file_sync->getDc() == $dc_id)
 			{
 				$desired_file_sync = $tmp_file_sync;
-				
 				$local = true;
 				break;
 			}
 			else if ( $fetch_from_remote_if_no_local == true && $desired_file_sync == null )
 			{
-				$local = false;
 				$desired_file_sync = $tmp_file_sync;
 			}
 		}
