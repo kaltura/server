@@ -71,7 +71,7 @@ class YouTubeApiImpl
 		$myVideoEntry->setVideoCategory($props['category']);  
 		// Set keywords. Please note that this must be a comma-separated string 
 		// and that individual keywords cannot contain whitespace 
-		$myVideoEntry->SetVideoTags($props['keywords']);  
+		$myVideoEntry->setVideoTags($props['keywords']);  
 		
 		if($private)
 			$myVideoEntry->setVideoPrivate();
