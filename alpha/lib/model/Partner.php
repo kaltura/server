@@ -485,6 +485,10 @@ class Partner extends BasePartner
 	public function getState() { return $this->getFromCustomData("state", null); }
 	public function setState( $v ) { $this->putInCustomData("state", $v); }
 
+	//kmc language
+	public function setKMCLanguage($v) { $this->putInCustomData('language', $v, 'KMC');}
+	public function getKMCLanguage() { return $this->getFromCustomData('language', 'KMC', null);}
+	
 	// additionalParams - key/value array
 	public function getAdditionalParams() 
 	{ 
@@ -639,6 +643,8 @@ class Partner extends BasePartner
 	public function getStreamEntriesOveragePrice()		{return $this->getFromCustomData('stream_entries_overage_price');}
 	public function getEntriesOveragePrice()			{return $this->getFromCustomData('entries_overage_price');}
 	
+	
+		
 	public function getAdminLoginUsersNumber()
 	{
 		$c = new Criteria();
@@ -974,6 +980,7 @@ class Partner extends BasePartner
 	public function setLiveStreamEnabled( $v ) {
 		$this->setEnabledService($v, PermissionName::FEATURE_LIVE_STREAM);
 	}
+	
 	
 	// ----------------------------------
 	// -- end of enabled special features
