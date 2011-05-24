@@ -170,7 +170,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		$dbFileHandlerConfig = $source_object->getFileHandlerConfig();
 		if ($dbFileHandlerConfig)
 		{
-			$apiFileHandlerConfig = KalturaPluginManager::loadObject('KalturaDropFolderFileHandlerConfig', $dbFileHandlerConfig->getHandlerType());
+			$apiFileHandlerConfig = KalturaPluginManager::loadObject('KalturaDropFolderFileHandlerConfig', $source_object->getFileHandlerType());
 			$apiFileHandlerConfig->fromObject($dbFileHandlerConfig);
 			$this->fileHandlerConfig  = $apiFileHandlerConfig;
 		}

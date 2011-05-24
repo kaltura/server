@@ -171,6 +171,9 @@ class Form_DropFolderConfigure extends Infra_Form
 		if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
 			$object->fileHandlerConfig = $this->getSubForm('contentHandlerConfig')->getObject('Kaltura_Client_DropFolder_Type_DropFolderContentFileHandlerConfig', $properties, $add_underscore, $include_empty_fields);
 		}
+		else if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML){
+			$object->fileHandlerConfig = new Kaltura_Client_DropFolderXmlBulkUpload_Type_DropFolderXmlBulkUploadFileHandlerConfig();
+		}
 		return $object;
 	}
 	
@@ -220,5 +223,21 @@ class Form_DropFolderConfigure extends Infra_Form
 			));
 		}
 	}
+	
+	    /**
+     * Validate the form
+     *
+     * @param  array $data
+     * @return boolean
+     */
+    public function isValid($data)
+    {
+    	$fileHandlerType = $data['fileHandlerType'];
+    	if ($fileHandlerType != Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
+    		$this->removeSubForm('contentHandlerConfig');
+    	}
+    	return parent::isValid($data);
+    }
+ 
 			
 }
