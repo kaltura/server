@@ -2,9 +2,10 @@
 
 class myEntryUtils
 {
-	public static function updateThumbnailFromFile($dbEntry, $filePath, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	public static function updateThumbnailFromFile(entry $dbEntry, $filePath, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
 	{
 		$dbEntry->setThumbnail(".jpg"); // this will increase the thumbnail version
+		$dbEntry->setCreateThumb(false);
 		$dbEntry->save();
 		
 		$fileSyncKey = $dbEntry->getSyncKey($fileSyncType);
@@ -18,8 +19,6 @@ class myEntryUtils
 		
 		$mediaEntry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$mediaEntry->fromObject($dbEntry);
-		
-		self::disableAutoThumbnailCreation($dbEntry->getId());
 		
 		return $mediaEntry;
 	}
@@ -566,26 +565,6 @@ class myEntryUtils
 		return false;
 	}
 	
-	/**
-	 * Disable any automatic thumbnail creation by the conversion jobs
-	 * 
-	 * @param string $entryId
-	 */
-	public static function disableAutoThumbnailCreation($entryId)
-	{
-		$convertProfileJobs = BatchJobPeer::retrieveByEntryIdAndType($entryId, BatchJobType::CONVERT_PROFILE);
-		foreach($convertProfileJobs as $convertProfileJob)
-		{
-			$convertProfileJobData = $convertProfileJob->getData();
-			if($convertProfileJobData instanceof kConvertProfileJobData && $convertProfileJobData->getCreateThumb())
-			{
-				$convertProfileJobData->setCreateThumb(false);
-				$convertProfileJob->setData($convertProfileJobData);
-				$convertProfileJob->save();
-			}
-		}
-	}
-	
 	public static function createThumbnailFromEntry ( entry $entry , entry $source_entry, $time_offset, $flavorParamsId = null)
 	{
 		$media_type = $source_entry->getMediaType();
@@ -628,6 +607,7 @@ class myEntryUtils
 				return false;
 			}			
 			$entry->setThumbnail ( ".jpg");
+			$entry->setCreateThumb(false);
 			$entry->save();
 			
 			// create new thumb file for entry
@@ -644,6 +624,7 @@ class myEntryUtils
 			}
 
 			$entry->setThumbnail ( ".jpg");
+			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
 			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
@@ -654,6 +635,7 @@ class myEntryUtils
 			$thumb_key = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			$thumb_path = kFileSyncUtils::getLocalFilePathForKey($thumb_key);
 			$entry->setThumbnail ( ".jpg");
+			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
 			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
@@ -663,7 +645,6 @@ class myEntryUtils
 		{
 			return false;
 		}
-		self::disableAutoThumbnailCreation($entry->getId());
 		return true;
 	}
 	

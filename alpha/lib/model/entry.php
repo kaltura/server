@@ -1040,7 +1040,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		else
 			$data = myContentStorage::generateRandomFileName($filename, $this->getThumbnail());
 		
-		Baseentry::SetThumbnail( $data );
+		parent::setThumbnail($data);
 		return $this->getThumbnail();
 	}
 
@@ -1578,6 +1578,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
+	
+	public function setCreateThumb ( $v )		{	$this->putInCustomData ( "createThumb" , (bool) $v );	}
+	public function getCreateThumb (  )			{	return (bool) $this->getFromCustomData( "createThumb" ,null, true );	}
+	
+	public function setThumbBitrate ( $v )		{	$this->putInCustomData ( "thumbBitrate" , $v );	}
+	public function getThumbBitrate (  )			{	return $this->getFromCustomData( "thumbBitrate", null, 0 );	}
+	
+	public function setThumbHeight ( $v )		{	$this->putInCustomData ( "thumbHeight" , $v );	}
+	public function getThumbHeight (  )			{	return $this->getFromCustomData( "thumbHeight", null, 0 );	}
 	
 	public function setDynamicFlavorAttributes(array $v)
 	{

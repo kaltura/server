@@ -366,47 +366,31 @@ class kFlowHelper
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 		$flavorParamsOutput = $data->getFlavorParamsOutput();
 		
-		$createThumb = true;
+		$createThumb = $entry->getCreateThumb();
 		$extractMedia = true;
 		
 		if($entry->getType() != entryType::MEDIA_CLIP) // e.g. document
 			$extractMedia = false;
 			
 		$rootBatchJob = $dbBatchJob->getRootJob();
-		if(!$rootBatchJob)
+		if($extractMedia && $rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
-			$createThumb = false;
+			$rootBatchJobData = $rootBatchJob->getData();
+			if($rootBatchJobData instanceof kConvertProfileJobData)
+				$extractMedia = $rootBatchJobData->getExtractMedia();
 		}
-		else
+		
+		// For apple http flavors do not attempt to get thumbs and media info,
+		// It is up to the operator to provide that kind of data, rather than hardcoded check
+		// To-fix 
+		if($flavorParamsOutput->getFormat() == assetParams::CONTAINER_FORMAT_APPLEHTTP) 
 		{
-			if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
-			{
-				$createThumb = false;
-			}
-			else
-			{
-				$rootBatchJobData = $rootBatchJob->getData();
-				if($rootBatchJobData instanceof kConvertProfileJobData)
-				{
-					$createThumb = $rootBatchJobData->getCreateThumb();
-					$extractMedia = $rootBatchJobData->getExtractMedia();
-				}
-			}
-		}
-				// For apple http flavors do not attempt to get thumbs and media info,
-				// It is up to the operator to provide that kind of data, rather than hardcoded check
-				// To-fix 
-		if($flavorParamsOutput->getFormat()==assetParams::CONTAINER_FORMAT_APPLEHTTP) {
 			$createThumb = false;
 			$extractMedia = false;
 		}
 		
-		if($createThumb)
-		{
-			$videoCodec = $flavorParamsOutput->getVideoCodec();
-			if(in_array($videoCodec, self::$thumbUnSupportVideoCodecs))
-				$createThumb = false;
-		}
+		if($createThumb && in_array($flavorParamsOutput->getVideoCodec(), self::$thumbUnSupportVideoCodecs))
+			$createThumb = false;
 		
 		$operatorSet = new kOperatorSets();
 		$operatorSet->setSerialized(stripslashes($flavorParamsOutput->getOperators()));
@@ -583,6 +567,7 @@ class kFlowHelper
 				
 			// increment thumbnail version
 			$entry->setThumbnail(".jpg");
+			$entry->setCreateThumb(false);
 			$entry->save();
 			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey, false);
@@ -1078,27 +1063,25 @@ class kFlowHelper
 		$ignoreThumbnail = false;
 		
 		// this logic decide when this thumbnail should be used
-		$rootBatchJob = $dbBatchJob->getRootJob();
-		if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+		$entry = $dbBatchJob->getEntry();
+		if($entry)
 		{ 
 			$thisFlavorHeight = $data->getThumbHeight();
 			$thisFlavorBitrate = $data->getThumbBitrate();
 			
-			$rootBatchJobData = $rootBatchJob->getData();
-			if(!$rootBatchJobData->getCreateThumb() || $rootBatchJobData->getThumbBitrate() > $thisFlavorBitrate)
+			if(!$entry->getCreateThumb() || $entry->getThumbBitrate() > $thisFlavorBitrate)
 			{
 				$ignoreThumbnail = true;
 			}
-			elseif($rootBatchJobData->getThumbBitrate() == $thisFlavorBitrate && $rootBatchJobData->getThumbHeight() > $thisFlavorHeight)
+			elseif($entry->getThumbBitrate() == $thisFlavorBitrate && $entry->getThumbHeight() > $thisFlavorHeight)
 			{
 				$ignoreThumbnail = true;
 			}
 			else
 			{
-				$rootBatchJobData->setThumbHeight($thisFlavorHeight);
-				$rootBatchJobData->setThumbBitrate($thisFlavorBitrate);
-				$rootBatchJob->setData($rootBatchJobData);
-				$rootBatchJob->save();
+				$entry->setThumbHeight($thisFlavorHeight);
+				$entry->setThumbBitrate($thisFlavorBitrate);
+				$entry->save();
 			}
 		}
 		

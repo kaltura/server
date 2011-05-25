@@ -616,21 +616,17 @@ class kJobsManager
 			elseif($flavorAsset)
 			{
 				$entry = $flavorAsset->getentry();
-				
-				if($parentJob && $parentJob->getRootJob() && $parentJob->getRootJob()->getJobType() == BatchJobType::CONVERT_PROFILE)
+				if($entry)
 				{
-					$rootBatchJob = $parentJob->getRootJob();
-					
 					$thisFlavorHeight = $flavorParamsOutput->getHeight();
 					$thisFlavorBitrate = $flavorParamsOutput->getVideoBitrate();
 					
-					$rootBatchJobData = $rootBatchJob->getData();
 					$createThumb = false;
-					if($rootBatchJobData->getThumbBitrate() < $thisFlavorBitrate)
+					if($entry->getThumbBitrate() < $thisFlavorBitrate)
 					{
 						$createThumb = true;
 					}
-					elseif($rootBatchJobData->getThumbBitrate() == $thisFlavorBitrate && $rootBatchJobData->getThumbHeight() < $thisFlavorHeight)
+					elseif($entry->getThumbBitrate() == $thisFlavorBitrate && $entry->getThumbHeight() < $thisFlavorHeight)
 					{
 						$createThumb = true;
 					}
@@ -641,15 +637,6 @@ class kJobsManager
 						$postConvertData->setThumbHeight($thisFlavorHeight);
 						$postConvertData->setThumbBitrate($thisFlavorBitrate);
 					}
-				}
-				elseif(!$entry->getThumbnailVersion())
-				{ 
-					$thisFlavorHeight = $flavorParamsOutput->getHeight();
-					$thisFlavorBitrate = $flavorParamsOutput->getVideoBitrate();
-					
-					$postConvertData->setCreateThumb(true);
-					$postConvertData->setThumbHeight($thisFlavorHeight);
-					$postConvertData->setThumbBitrate($thisFlavorBitrate);
 				}
 			}
 		}
@@ -833,7 +820,6 @@ class kJobsManager
 		if($entry->getStatus() != entryStatus::READY)
 		{
 			$entry->setStatus(entryStatus::PRECONVERT);
-			$entry->save();
 		}
 		
 		$jobData = new kConvertProfileJobData();
@@ -844,8 +830,9 @@ class kJobsManager
 		if($entry->getType() != entryType::MEDIA_CLIP)
 		{
 			$jobData->setExtractMedia(false);
-			$jobData->setCreateThumb(false);
+			$entry->setCreateThumb(false);
 		}
+		$entry->save();
  		
 		$batchJob = null;
 		if($parentJob)

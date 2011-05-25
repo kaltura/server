@@ -183,6 +183,7 @@ class kBusinessPreConvertDL
 		{
 			// increment thumbnail version
 			$entry->setThumbnail(".jpg");
+			$entry->setCreateThumb(false);
 			$entry->save();
 			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey, false);
@@ -726,6 +727,17 @@ class kBusinessPreConvertDL
 				$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfo, $tagsArray);
 				$originalFlavorAsset->setTagsArray($finalTagsArray);
 			}
+		}
+		
+		if(!$entry->getCreateThumb())
+		{
+			// mark the asset as ready 
+			$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+			$originalFlavorAsset->save();
+			
+			kFlowHelper::generateThumbnailsFromFlavor($entry->getId(), null, $originalFlavorAsset->getFlavorParamsId());
+			kBusinessPostConvertDL::handleConvertFinished(null, $originalFlavorAsset);
+			return null;
 		}
 		
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration

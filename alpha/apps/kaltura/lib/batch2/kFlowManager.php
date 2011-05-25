@@ -377,7 +377,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($srcFileSyncLocalPath)
-				kJobsManager::addPostConvertJob($raisedJob, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, true, $offset);
+				kJobsManager::addPostConvertJob($raisedJob, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
 		}
 		
 		return true;
@@ -439,7 +439,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($srcFileSyncLocalPath)
-				kJobsManager::addPostConvertJob(null, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, true, $offset);
+				kJobsManager::addPostConvertJob(null, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
 		}
 		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY) 
 		{

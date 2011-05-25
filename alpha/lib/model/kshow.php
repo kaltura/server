@@ -472,6 +472,7 @@ class kshow extends Basekshow
 		}
 		//$entry->setData ( "&kal_show.flv");
 		$entry->setThumbnail ( $thumbnail ? $thumbnail : "&kal_show.jpg");
+		$entry->setCreateThumb(false);
 		$entry->setType( entryType::MIX );
 		$entry->setMediaType( entry::ENTRY_MEDIA_TYPE_SHOW );
 		$entry->setEditorType ( myMetadataUtils::METADATA_EDITOR_SIMPLE );

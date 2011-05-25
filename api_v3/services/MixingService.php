@@ -48,7 +48,10 @@ class MixingService extends KalturaEntryService
 		$dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_SHOW); // for backward compatibility
 
 		if (!$dbEntry->getThumbnail())
+		{
 			$dbEntry->setThumbnail("&auto_edit.jpg");
+			$dbEntry->setCreateThumb(false);
+		}
 			
 		$dbEntry->save(); // we need the id for setDataContent
 		

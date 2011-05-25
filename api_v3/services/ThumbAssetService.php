@@ -476,6 +476,7 @@ class ThumbAssetService extends KalturaBaseService
 		}
 		
 		$entry->setThumbnail(".jpg");
+		$entry->setCreateThumb(false);
 		$entry->save();
 		
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
