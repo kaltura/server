@@ -238,8 +238,15 @@ class kBusinessPostConvertDL
 		elseif($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
-			if(!$currentFlavorAsset->getentry()->getReplacedEntryId())
+			if($currentFlavorAsset->getentry()->getReplacedEntryId())
+			{
+				KalturaLog::debug('Entry is temporary replacement and requires all flavors to complete');
+			}
+			else
+			{
+				KalturaLog::debug('Mark the entry as ready');
 				kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
+			}
 		}
 		
 		if(!count($inCompleteFlavorIds))
