@@ -199,12 +199,12 @@ class RubyClientGenerator extends ClientGeneratorFromXml
 		    if ($paramNode->getAttribute("optional"))
 		    {
 		    	$default = $paramNode->getAttribute("default");
-		    	if ($paramNode->getAttribute("type") == "string")
-		    		$default = "'".$default."'";
+	    		if ($default === "null")
+	    			$default = "nil";
 	    		else if ($default === "")
 	    			$default = "''";
-	    		elseif ($default === "null")
-	    			$default = "nil";
+	    		else if ($paramNode->getAttribute("type") == "string")
+		    		$default = "'".$default."'";
 		    	$params[] = $this->camelCaseToUnderscoreAndLower($paramName) . "=" . $default;
 		    }
 		    else

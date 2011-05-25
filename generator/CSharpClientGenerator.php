@@ -547,11 +547,11 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					else if ($type == "int" && $paramNode->hasAttribute("enumType"))
 					{
 						$value = $paramNode->getAttribute("default");
-						if ($value == "")
+						if ($value == "null")
 							$value = "Int32.MinValue";
 						$paramsStr .=  "(".$paramNode->getAttribute("enumType").")(".$value.")";
 					}
-					elseif ($type == "int" && $paramNode->getAttribute("default") == "") // because Partner.GetUsage has an int field with empty default value
+					elseif ($type == "int" && $paramNode->getAttribute("default") == "null") // because Partner.GetUsage has an int field with empty default value
 						$paramsStr .= "Int32.MinValue";
 					else
 						$paramsStr .=  $paramNode->getAttribute("default");

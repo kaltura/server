@@ -228,7 +228,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							$const_props .= $prop->attributes()->name . " : String";
 							if($prop->attributes()->optional == "1")
 							{
-								if($prop->attributes()->default && $prop->attributes()->default != 'null')
+								if($prop->attributes()->default != 'null')
 									$const_props .= "='" . $prop->attributes()->default . "'";
 								else
 									$const_props .= " = null";
@@ -246,7 +246,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							{
 								if($prop->attributes()->optional == "1")
 								{	
-									if($prop->attributes()->default)
+									if($prop->attributes()->default != "null")
 										$const_props .= "=" . $prop->attributes()->default;
 									else
 										$const_props .= "=NaN";	
@@ -263,7 +263,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							$const_props .= $prop->attributes()->name . " : int";	
 							if($prop->attributes()->optional == "1")
 							{	
-								if($prop->attributes()->default && $prop->attributes()->default != "")
+								if($prop->attributes()->default != "null")
 									$const_props .= "=" . $prop->attributes()->default;
 								else
 									$const_props .= "=undefined";	

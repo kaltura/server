@@ -532,12 +532,15 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 					$type = $paramNode->getAttribute ( "type" );
 					if ($type == "string") 
 					{
-						$paramsStr .= "\"" . $paramNode->getAttribute ( "default" ) . "\"";
+						if ($paramNode->getAttribute ( "default" ) == 'null')
+							$paramsStr .= 'null';
+						else
+							$paramsStr .= "\"" . $paramNode->getAttribute ( "default" ) . "\"";
 					} 
 					else if ($type == "int") 
 					{
 						$value = trim ( $paramNode->getAttribute ( "default" ) );
-						if (! strlen ( $value ))
+						if ($value == 'null')
 							$value = "Integer.MIN_VALUE";
 						
 						if ($paramNode->hasAttribute ( "enumType" )) 

@@ -301,8 +301,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			        case "int":
 		            case "float":
 	                case "string":
-		                $actionParamElement->setAttribute("default", $actionParam->getDefaultValue());
-                        break;
+	                	if ($actionParam->getDefaultValue() === null)
+		                	$actionParamElement->setAttribute("default", "null");
+		                else
+		                	$actionParamElement->setAttribute("default", $actionParam->getDefaultValue());
+		                break;
 	                default:
 	                    if ($actionParam->isEnum())
                             $actionParamElement->setAttribute("default", $actionParam->getDefaultValue());
