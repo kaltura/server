@@ -204,16 +204,7 @@ class UserController extends Zend_Controller_Action
 			}
 			catch(Exception $ex)
 			{
-				if ($ex->getCode() === 'DUPLICATE_USER_BY_ID')
-					$form->setDescription($ex->getMessage());
-				else if ($ex->getCode() === 'PROPERTY_VALIDATION_CANNOT_BE_NULL')
-					$form->setDescription($ex->getMessage());
-				else if ($ex->getCode() === 'INVALID_FIELD_VALUE')
-					$form->setDescription($ex->getMessage());
-				else if ($ex->getCode() === 'PASSWORD_STRUCTURE_INVALID')
-					$form->setDescription($ex->getMessage());
-				else
-					throw $ex;
+				$form->setDescription($ex->getMessage());
 			}
 		}
 		else
