@@ -198,6 +198,8 @@ class KalturaErrors extends APIErrors
 	
 	const THUMB_ASSET_DOWNLOAD_FAILED = "THUMB_ASSET_DOWNLOAD_FAILED,Fail to download thumbnain from URL \"%s\"";
 	
+	const THUMB_ASSET_IS_DEFAULT = "THUMB_ASSET_IS_DEFAULT,Thumbnail asset \"%s\" is default and could not be deleted";
+	
 	/**
 	 * Category Service
 	 */

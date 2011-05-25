@@ -797,9 +797,12 @@ class ThumbAssetService extends KalturaBaseService
 	public function deleteAction($thumbAssetId)
 	{
 		$thumbAssetDb = thumbAssetPeer::retrieveById($thumbAssetId);
-		if (!$thumbAssetDb)
+		if(!$thumbAssetDb)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
-			
+	
+		if($thumbAssetDb->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_DEFAULT, $thumbAssetId);
+		
 		$thumbAssetDb->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$thumbAssetDb->setDeletedAt(time());
 		$thumbAssetDb->save();
