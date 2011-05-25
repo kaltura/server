@@ -331,16 +331,8 @@ class myReportsMgr
 
 	private static function createFileName ( $partner_id )
 	{
-		$args = func_get_args();
-		$file_name = "";
-		foreach ( $args as $arg )
-		{
-//			if ( $file_name ) $file_name .= "_";
-			if ( $arg instanceof reportsInputFilter )
-				$file_name .= $arg->toShortString();
-			else 
-				$file_name .= "{$arg}";
-		}
+	$args = func_get_args();
+		$file_name = uniqid();
 		$time_suffix = date ( "Y-m-D-H" , ((int)(time() / 43200))*  43200 ) ; // calculate for intervlas of half days (86400/2)  
 		
 		$folderPath = "/content/reports/$partner_id";
