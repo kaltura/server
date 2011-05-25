@@ -27,6 +27,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 	const ENTRY_TAGS_MAXIMUM_LENGTH = 500;
 	const ENTRY_EACH_TAG_MANIMUM_LENGTH = 2;
 	const ENTRY_EACH_TAG_MAXIMUM_LENGTH = 30;
+	const ENTRY_TAGS_FORBIDDEN_CHARS = '"';
 	
 	
 	/* (non-PHPdoc)
@@ -125,6 +126,18 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 						$validationError->setValidationErrorParam(self::ENTRY_TAGS_MAXIMUM_LENGTH);
 						$validationErrors[] = $validationError;
 					}
+					
+					$forbiddenChars = str_split(self::ENTRY_TAGS_FORBIDDEN_CHARS);
+					foreach($forbiddenChars as $forbiddenChar)
+					{
+						if(strpos($value, $forbiddenChar) !== false)
+						{
+							$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, "YouTube tags contain invalid char [$forbiddenChar]");
+							$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+							$validationError->setValidationErrorParam("YouTube tags contain invalid char [$forbiddenChar]");
+							$validationErrors[] = $validationError;
+						}
+					}
 				}
 			}
 		}
@@ -211,6 +224,18 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
 				$validationError->setValidationErrorParam(self::ENTRY_TAGS_MAXIMUM_LENGTH);
 				$validationErrors[] = $validationError;
+			}
+					
+			$forbiddenChars = str_split(self::ENTRY_TAGS_FORBIDDEN_CHARS);
+			foreach($forbiddenChars as $forbiddenChar)
+			{
+				if(strpos($tags, $forbiddenChar) !== false)
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, "Tags contain invalid char [$forbiddenChar]");
+					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+					$validationError->setValidationErrorParam("Tags contain invalid char [$forbiddenChar]");
+					$validationErrors[] = $validationError;
+				}
 			}
 		}
 		elseif(class_exists('MetadataProfile')) 
