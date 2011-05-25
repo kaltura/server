@@ -90,4 +90,3 @@ class updateentrythumbnailjpegAction extends defPartnerservices2Action
 
 	}
 }
-?>

@@ -107,5 +107,3 @@ class setRoughcutThumbnailAction extends defKeditorservicesAction
 
 
 }
-
-?>
