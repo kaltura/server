@@ -1109,4 +1109,3 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
  	}
 }
-?>
