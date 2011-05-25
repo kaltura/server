@@ -1588,6 +1588,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function setThumbHeight ( $v )		{	$this->putInCustomData ( "thumbHeight" , $v );	}
 	public function getThumbHeight (  )			{	return $this->getFromCustomData( "thumbHeight", null, 0 );	}
 	
+	
 	public function setDynamicFlavorAttributes(array $v)
 	{
 		$this->putInCustomData("dynamicFlavorAttributes", serialize($v));
