@@ -56,6 +56,11 @@ class playManifestAction extends kalturaAction
 	 */
 	private $flavorIds = null;
 	
+	/**
+	 * @var string
+	 */
+	private $deliveryCode = null;
+	
 	const PLAY_STREAM_TYPE_LIVE = 'live';
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
 	const PLAY_STREAM_TYPE_ANY = 'any';
@@ -522,6 +527,13 @@ class playManifestAction extends kalturaAction
 					$subpId = $this->entry->getSubpId();
 					$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 					$baseUrl = myPartnerUtils::getRtmpUrl($partnerId);
+					
+					// allow to replace {deliveryCode} place holder with the deliveryCode parameter passed to the action
+					// a publisher with a rtmpUrl set to {deliveryCode}.example.com/ondemand will be able to use different
+					// cdn configuration for different sub publishers by passing a different deliveryCode to the KDP
+
+					if ($this->deliveryCode)
+						$baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $baseUrl);
 				
 					$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost);
 		
@@ -694,6 +706,7 @@ class playManifestAction extends kalturaAction
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
+		$this->deliveryCode = $this-getRequestParameter( "deliveryCode", null );
 		
 		$flavorIdsStr = $this->getRequestParameter ( "flavorIds", null );
 		if ($flavorIdsStr)
