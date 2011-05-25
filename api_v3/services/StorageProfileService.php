@@ -3,8 +3,8 @@
  * Storage Profiles service
  *
  * @service storageProfile
- * @package plugins.storageProfile
- * @subpackage api.services
+ * @package api
+ * @subpackage services
  */
 class StorageProfileService extends KalturaBaseService
 {
@@ -12,54 +12,46 @@ class StorageProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		// since plugin might be using KS impersonation, we need to validate the requesting
-		// partnerId from the KS and not with the $_POST one
-		if(!StorageProfilePlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+		KalturaLog::debug("master_partner_id [" . kCurrentContext::$master_partner_id . "]");
+		KalturaLog::debug("partner_id [" . kCurrentContext::$partner_id . "]");
+		KalturaLog::debug("ks_partner_id [" . kCurrentContext::$ks_partner_id . "]");
+		KalturaLog::debug("getPartnerId [" . $this->getPartnerId() . "]");
+		KalturaLog::debug("getPartner getId [" . $this->getPartner()->getId() . "]");
+		if(kCurrentContext::$master_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			if($this->getPartner()->getEnabledService(PermissionName::FEATURE_REMOTE_STORAGE))
+				throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+				
+			parent::applyPartnerFilterForClass(new StorageProfilePeer());
+		}
 	}
 	
 	/**
-	 * @action listByPartner
-	 * @param KalturaPartnerFilter $filter
+	 * @action list
+	 * @param KalturaStorageProfileFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaStorageProfileListResponse
 	 */
-	public function listByPartnerAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaStorageProfileFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		$c = new Criteria();
 		
-		if (!is_null($filter))
-		{
-			
-			$partnerFilter = new partnerFilter();
-			$filter->toObject($partnerFilter);
-			$partnerFilter->set('_gt_id', 0);
-			
-			$partnerCriteria = new Criteria();
-			$partnerFilter->attachToCriteria($partnerCriteria);
-			$partnerCriteria->setLimit(1000);
-			$partnerCriteria->clearSelectColumns();
-			$partnerCriteria->addSelectColumn(PartnerPeer::ID);
-			$stmt = PartnerPeer::doSelectStmt($partnerCriteria);
-			
-			if($stmt->rowCount() < 1000) // otherwise, it's probably all partners
-			{
-				$partnerIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-				$c->add(StorageProfilePeer::PARTNER_ID, $partnerIds, Criteria::IN);
-			}
-		}
-			
-		if (is_null($pager))
-			$pager = new KalturaFilterPager();
+		if (!$filter)
+			$filter = new KalturaStorageProfileFilter();
 		
-		$totalCount = StorageProfilePeer::doCount($c);
-		$pager->attachToCriteria($c);
+		$storageProfileFilter = new StorageProfileFilter();
+		$filter->toObject($storageProfileFilter);
+		$storageProfileFilter->attachToCriteria($c);
 		$list = StorageProfilePeer::doSelect($c);
-		$newList = KalturaStorageProfileArray::fromStorageProfileArray($list);
+			
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+			
+		$pager->attachToCriteria($c);
 		
 		$response = new KalturaStorageProfileListResponse();
-		$response->totalCount = $totalCount;
-		$response->objects = $newList;
+		$response->totalCount = StorageProfilePeer::doCount($c);
+		$response->objects = KalturaStorageProfileArray::fromStorageProfileArray($list);
 		return $response;
 	}
 	

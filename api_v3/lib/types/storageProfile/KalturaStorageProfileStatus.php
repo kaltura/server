@@ -1,7 +1,7 @@
 <?php
 /**
- * @package plugins.storageProfile
- * @subpackage api.enum
+ * @package api
+ * @subpackage enum
  */
 class KalturaStorageProfileStatus extends KalturaEnum
 {

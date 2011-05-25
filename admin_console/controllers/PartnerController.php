@@ -38,7 +38,7 @@ class PartnerController extends Zend_Controller_Action
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
 				$config->storageDeleteFromKaltura = true;
-				$config->storageServePriority = Kaltura_Client_StorageProfile_Enum_StorageServePriority::EXTERNAL_FIRST;
+				$config->storageServePriority = Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST;
 				$systemPartnerPlugin->systemPartner->updateConfiguration('{1:result:id}', $config);
 				
 				// do multirequest
@@ -132,8 +132,7 @@ class PartnerController extends Zend_Controller_Action
 		$storageId = $this->_getParam('storageId');
 		$status = $this->_getParam('status');
 		$client = Infra_ClientHelper::getClient();
-		$storageProfilePlugin = Kaltura_Client_StorageProfile_Plugin::get($client);
-		$storageProfilePlugin->storageProfile->updateStatus($storageId, $status);
+		$client->storageProfile->updateStatus($storageId, $status);
 		echo $this->_helper->json('ok', false);
 	}
 	
@@ -182,7 +181,6 @@ class PartnerController extends Zend_Controller_Action
 			$editMode = true;
 			
 		$client = Infra_ClientHelper::getClient();
-		$storageProfilePlugin = Kaltura_Client_StorageProfile_Plugin::get($client);
 		
 		$form = new Form_Partner_StorageConfiguration();
 		Form_Partner_StorageHelper::addProtocolsToForm($form);
@@ -200,7 +198,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		else  
 		{			
-			$storage = $storageProfilePlugin->storageProfile->get($storageId);	
+			$storage = $client->storageProfile->get($storageId);	
 			Infra_ClientHelper::impersonate($storage->partnerId);
 			$flavorParamsResponse = $client->flavorParams->listAction();
 			Infra_ClientHelper::unimpersonate();
@@ -226,7 +224,7 @@ class PartnerController extends Zend_Controller_Action
 			{
 				KalturaLog::log('Request: ' . print_r($request->getPost(), true));
 				$form->populate($request->getPost());
-				$storage = $form->getObject("Kaltura_Client_StorageProfile_Type_StorageProfile", $request->getPost(), false, true);
+				$storage = $form->getObject("Kaltura_Client_Type_StorageProfile", $request->getPost(), false, true);
 				
 				$flavorParams = array();
 				foreach($flavorParamsResponse->objects as $flavorParamsItem)
@@ -245,11 +243,11 @@ class PartnerController extends Zend_Controller_Action
 				
 				if (!$editMode)
 				{
-					$storageProfilePlugin->storageProfile->add($storage);
+					$client->storageProfile->add($storage);
 				}
 				else
 				{
-					$storageProfilePlugin->storageProfile->update($storageId, $storage);
+					$client->storageProfile->update($storageId, $storage);
 				}
 			}
 			else
@@ -339,19 +337,18 @@ class PartnerController extends Zend_Controller_Action
 		$pageSize = $this->_getParam('pageSize', 10);
 		
 		$client = Infra_ClientHelper::getClient();
-		$storageProfilePlugin = Kaltura_Client_StorageProfile_Plugin::get($client);
-		$form = new Form_PartnerFilter();
+		$form = new Form_PartnerId();
 		$newForm = new Form_NewStorage();
 		
 		$action = $this->view->url(array('controller' => 'partner', 'action' => 'external-storages'), null, true);
 		$form->setAction($action);
 		
 		// init filter
-		$partnerFilter = $this->getPartnerFilterFromRequest($request);
+		$filter = new Kaltura_Client_Type_StorageProfileFilter();
+		$filter->partnerIdEqual = $request->getParam('filter_input');
 		
 		// get results and paginate
-		
-		$paginatorAdapter = new Infra_FilterPaginator($storageProfilePlugin->storageProfile, "listByPartner", null, $partnerFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($client->storageProfile, "listAction", null, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);

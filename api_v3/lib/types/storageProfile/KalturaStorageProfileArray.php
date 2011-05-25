@@ -1,7 +1,7 @@
 <?php
 /**
- * @package plugins.storageProfile
- * @subpackage api.objects
+ * @package api
+ * @subpackage objects
  */
 class KalturaStorageProfileArray extends KalturaTypedArray
 {

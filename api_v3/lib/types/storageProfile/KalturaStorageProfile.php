@@ -1,31 +1,35 @@
 <?php
 /**
- * @package plugins.storageProfile
- * @subpackage api.objects
+ * @package api
+ * @subpackage objects
  */
-class KalturaStorageProfile extends KalturaObject
+class KalturaStorageProfile extends KalturaObject implements IFilterable
 {
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $id;
 	
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter gte,lte,order
 	 */
 	public $createdAt;
 	
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
 	
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq,in
 	 */
 	public $partnerId;
 	
@@ -36,6 +40,7 @@ class KalturaStorageProfile extends KalturaObject
 	
 	/**
 	 * @var string
+	 * @filter eq,in
 	 */
 	public $systemName;
 	
@@ -46,11 +51,13 @@ class KalturaStorageProfile extends KalturaObject
 	
 	/**
 	 * @var KalturaStorageProfileStatus
+	 * @filter eq,in
 	 */
 	public $status;
 	
 	/**
 	 * @var KalturaStorageProfileProtocol
+	 * @filter eq,in
 	 */
 	public $protocol;
 	
@@ -125,7 +132,6 @@ class KalturaStorageProfile extends KalturaObject
 	public $urlManagerClass;
 	
 	/**
-	 * TODO - remove after events manager is implemented
 	 * No need to create enum for temp field
 	 * 
 	 * @var int
@@ -157,7 +163,7 @@ class KalturaStorageProfile extends KalturaObject
 		"maxConcurrentConnections",
 		"pathManagerClass",
 		"urlManagerClass",
-		"trigger", // TODO - remove after events manager is implemented
+		"trigger",
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -186,5 +192,15 @@ class KalturaStorageProfile extends KalturaObject
 			$object_to_fill = new StorageProfile();
 			
 		return parent::toObject($object_to_fill, $props_to_skip);
+	}
+	
+	public function getExtraFilters()
+	{
+		return array();
+	}
+	
+	public function getFilterDocs()
+	{
+		return array();
 	}
 }

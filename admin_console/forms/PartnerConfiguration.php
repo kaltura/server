@@ -120,7 +120,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'import_remote_source_for_convert')))
 		));
 		
-		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_StorageProfile_Enum_StorageServePriority'));
+		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');
 		$this->addElements(array($storageServP));
 	}

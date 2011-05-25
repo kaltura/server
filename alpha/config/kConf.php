@@ -138,7 +138,6 @@ class kConf extends kConfLocal
 					"MetadataPlugin" => "MetadataPlugin", // Should always be enabled
 					"DocumentPlugin" => "DocumentPlugin", // Should be enabled for document entries
 					"SphinxSearchPlugin" => "SphinxSearchPlugin", // Should always be enabled
-					"StorageProfilePlugin" => "StorageProfilePlugin", // Should always be enabled
 				),
 				
 				"event_consumers" => array(
