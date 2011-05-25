@@ -407,12 +407,20 @@ class kBatchManager
 		// backward compatibility 
 		// if entry has kshow, and this is the first entry in the mix, 
 		// the thumbnail of the entry should be copied into the mix entry  
-		if ($status == entryStatus::READY)
+		if ($status == entryStatus::READY && $entry->getKshowId())
 			myEntryUtils::createRoughcutThumbnailFromEntry($entry, false);
 			
 		// entry status is ready and above, not changing status through batch job
-		if($entry->getStatus() >= entryStatus::READY)
+		$unAcceptedStatuses = array(
+			entryStatus::READY,
+			entryStatus::DELETED,
+		);
+		
+		if(in_array($entry->getStatus(), $unAcceptedStatuses))
+		{
+			KalturaLog::debug("Entry status [" . $entry->getStatus() . "] will not be changed");
 			return $entry;
+		}
 		
 		$entry->setStatus($status);
 		$entry->save();
