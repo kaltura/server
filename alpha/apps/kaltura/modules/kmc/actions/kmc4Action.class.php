@@ -127,7 +127,8 @@ class kmc4Action extends kalturaAction
 		}
 	/** END - set enable_live_streaming flag **/
 
-	/** get partner languae **/ 
+	/** get partner languae **/
+		$this->language = null; 
 		if ($partner->getKMCLanguage())
 			$this->language = $partner->getKMCLanguage();
 	/** END - get partner languae **/		
