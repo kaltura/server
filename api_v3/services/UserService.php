@@ -502,7 +502,7 @@ class UserService extends KalturaBaseUserService
 	 */	
 	public function disableLoginAction($userId = null, $loginId = null)
 	{
-		if (!$loginId && !userId)
+		if (!$loginId && !$userId)
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'userId');
 		}
