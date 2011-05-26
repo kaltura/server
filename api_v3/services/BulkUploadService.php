@@ -27,6 +27,10 @@ class BulkUploadService extends KalturaBaseService
 	 */
 	function addAction($conversionProfileId, $fileData, $bulkUploadType = null)
 	{
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+		if(!$conversionProfile)
+			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+		
 		$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', $bulkUploadType);
 		
 		$dbJob = kJobsManager::addBulkUploadJob($fileData["tmp_name"], $this->getPartner(), $this->getKuser()->getPuserId(), $conversionProfileId, $coreBulkUploadType);
