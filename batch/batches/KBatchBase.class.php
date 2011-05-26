@@ -73,13 +73,13 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	protected function impersonate($partnerId)
 	{
 		$this->kClientConfig->partnerId = $partnerId;
-		$this->kClient->setConfig($config);
+		$this->kClient->setConfig($this->kClientConfig);
 	}
 	
 	protected function unimpersonate()
 	{
 		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
-		$this->kClient->setConfig($config);
+		$this->kClient->setConfig($this->kClientConfig);
 	}
 	
 	/**
