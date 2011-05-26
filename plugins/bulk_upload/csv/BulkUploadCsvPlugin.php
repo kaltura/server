@@ -2,7 +2,7 @@
 /**
  * @package plugins.bulkUploadCsv
  */
-class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload
+class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'bulkUploadCsv';
 
@@ -90,5 +90,16 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }
