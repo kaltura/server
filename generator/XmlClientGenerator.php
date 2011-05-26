@@ -290,25 +290,26 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			$actionParamElement->setAttribute("optional", $actionParam->isOptional() ? "1" : "0");
 			if ($actionParam->isOptional())
 			{
-			    switch($actionParam->getType())
+				$defaultValue = $actionParam->getDefaultValue();
+                if ($defaultValue === null)
+	                $defaultValue = "null";
+	                
+				switch($actionParam->getType())
 			    {
 			        case "bool":
-			            if ($actionParam->getDefaultValue() === true)
+			            if ($defaultValue === true)
 		                    $actionParamElement->setAttribute("default", "true");
-	                    else if ($actionParam->getDefaultValue() === false)
+	                    else if ($defaultValue === false)
 	                        $actionParamElement->setAttribute("default", "false");
                         break;
 			        case "int":
 		            case "float":
 	                case "string":
-	                	if ($actionParam->getDefaultValue() === null)
-		                	$actionParamElement->setAttribute("default", "null");
-		                else
-		                	$actionParamElement->setAttribute("default", $actionParam->getDefaultValue());
+		                $actionParamElement->setAttribute("default", $defaultValue);
 		                break;
 	                default:
-	                    if ($actionParam->isEnum())
-                            $actionParamElement->setAttribute("default", $actionParam->getDefaultValue());
+	                    if ($actionParam->isEnum())	                    	
+                            $actionParamElement->setAttribute("default", $defaultValue);
                         else
                             $actionParamElement->setAttribute("default", "null");
 			    }
