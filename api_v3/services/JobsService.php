@@ -330,7 +330,7 @@ class JobsService extends KalturaBaseService
 			
 		$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$flavorAsset)
-			throw new KalturaAPIException(APIErrors::INVALID_FLAVOR_ASSET_ID);
+			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		if(!kFileSyncUtils::file_exists($syncKey, true))
