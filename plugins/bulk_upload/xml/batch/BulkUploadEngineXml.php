@@ -310,7 +310,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 							
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->conversionProfileId);
-			$flavorAssetResource = $this->getResource($contentElement);
+			$flavorAssetResource = $this->getResource($contentElement, $entry->conversionProfileId);
 			
 			$assetParamsId = $flavorAsset->flavorParamsId;
 
@@ -348,7 +348,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			KalturaLog::debug("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
 						
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->conversionProfileId);
-			$thumbAssetResource = $this->getResource($thumbElement);
+			$thumbAssetResource = $this->getResource($thumbElement, $entry->conversionProfileId);
 									
 			$assetParamsId = $thumbAsset->thumbParamsId;
 
@@ -510,7 +510,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//For each content in the item element we add a new flavor asset
 		foreach ($item->content as $contentElement)
 		{
-			$assetResource = $this->getResource($contentElement);
+			$assetResource = $this->getResource($contentElement, $entry->conversionProfileId);
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->conversionProfileId);
 			
@@ -533,7 +533,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//For each thumbnail in the item element we create a new thumb asset
 		foreach ($item->thumbnail as $thumbElement)
 		{
-			$assetResource = $this->getResource($thumbElement);
+			$assetResource = $this->getResource($thumbElement, $entry->conversionProfileId);
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->conversionProfileId);
 			
@@ -775,11 +775,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Gets an item and returns the resource
 	 * @param SimpleXMLElement $elementToSearchIn
+	 * @param int $conversionProfileId
 	 * @return KalturaResource - the resource located in the given element
 	 */
-	protected function getResource(SimpleXMLElement $elementToSearchIn)
+	protected function getResource(SimpleXMLElement $elementToSearchIn, $conversionProfileId)
 	{
-		$resource = $this->getResourceInstance($elementToSearchIn);
+		$resource = $this->getResourceInstance($elementToSearchIn, $conversionProfileId);
 		$this->validateResource($resource, $elementToSearchIn);
 										
 		return $resource;
@@ -789,9 +790,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * 
 	 * Returns the right resource instance for the source content of the item
 	 * @param SimpleXMLElement $elementToSearchIn
+	 * @param int $conversionProfileId
 	 * @return KalturaResource - the resource located in the given element
 	 */
-	protected function getResourceInstance(SimpleXMLElement $elementToSearchIn)
+	protected function getResourceInstance(SimpleXMLElement $elementToSearchIn, $conversionProfileId)
 	{
 		$resource = null;
 			
@@ -823,7 +825,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource = new KalturaEntryResource();
 			$entryContentResource = $elementToSearchIn->entryContentResource;
 			$resource->entryId = kXml::getXmlAttributeAsString($entryContentResource, "entryId");
-			$resource->flavorParamsId = $this->getFlavorParamsId($entryContentResource, false);
+			$resource->flavorParamsId = $this->getFlavorParamsId($entryContentResource, $conversionProfileId, false);
 		}
 		elseif(isset($elementToSearchIn->assetContentResource))
 		{

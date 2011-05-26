@@ -24,7 +24,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	/* (non-PHPdoc)
 	 * @see BulkUploadEngineXml::getResourceInstance()
 	 */
-	protected function getResourceInstance(SimpleXMLElement $elementToSearchIn)
+	protected function getResourceInstance(SimpleXMLElement $elementToSearchIn, $conversionProfileId)
 	{
 		if(isset($elementToSearchIn->dropFolderFileContentResource))
 		{
@@ -34,11 +34,11 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 			return $resource;
 		}
 		
-		return parent::getResourceInstance($elementToSearchIn);
+		return parent::getResourceInstance($elementToSearchIn, $conversionProfileId);
 	}
 	
 	/* (non-PHPdoc)
-	 * @see BulkUploadEngineXml::getResourceInstance()
+	 * @see BulkUploadEngineXml::validateResource()
 	 */
 	protected function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
 	{
