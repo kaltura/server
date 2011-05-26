@@ -2,7 +2,7 @@
 /**
  * @package plugins.contentDistributionBulkUploadXml
  */
-class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler
+class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'contentDistributionBulkUploadXml';
 	
@@ -199,5 +199,16 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 	public function handleItemDeleted(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		// No handling required
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/contentDistributionBulkUploadXml.generator.ini');
+			
+		return null;
 	}
 }
