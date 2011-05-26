@@ -245,7 +245,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		if(is_null($this->assetIdToAssetParamsId[$entryId]))
 		{
-			$this->initassetIdToAssetParamsId($entryId);
+			$this->initAssetIdToAssetParamsId($entryId);
 		}
 		
 		if(isset($this->assetIdToAssetParamsId[$entryId][$assetId]))
@@ -421,37 +421,39 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 										array $noParamsFlavorAssets, array $noParamsFlavorResources, 
 										array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
-		$this->startMultiRequest(true);
 		
 		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
 		if(!count($resource->resources))
 			$resource = null;
 			
-			//TODO: handle replacment entry issues
-		$this->kClient->baseEntry->update($entryId, $entry);
+		$updatedEntry = $this->kClient->baseEntry->update($entryId, $entry);
 		
-		$updatedEntryId = "{1:result:id}";
-		$replacmentEntryId = "{1:result:replacingEntryId}";
+		$this->startMultiRequest(true);
 		
-		$this->kClient->baseEntry->updateContent($replacmentEntryId ,$resource); // updates the entry maybe use the replacment entry id
+		$updatedEntryId = $updatedEntry->id;   	
+		
+		if(!is_null($updatedEntry->replacingEntryId))
+		{
+			$updatedEntryId = $updatedEntry->replacingEntryId;
+		}
+					
+		$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource); // updates the entry maybe use the replacment entry id
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
-			$this->kClient->flavorAsset->add($replacmentEntryId, $flavorAsset, $flavorResource);
+			$this->kClient->flavorAsset->add($updatedEntryId, $flavorAsset, $flavorResource);
 		}
 
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			$thumbResource = $noParamsThumbResources[$index];
-			$this->kClient->thumbAsset->add($replacmentEntryId, $thumbAsset, $thumbResource);
+			$this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset, $thumbResource);
 		}
 
 		$requestResults = $this->kClient->doMultiRequest();;
-		
-		$updatedEntry = reset($requestResults);
-		
+			
 		//TODO: handle the update array
 		KalturaLog::debug("Updated entry [". print_r($updatedEntry,true) ."]");
 		
@@ -852,6 +854,27 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
+	 * Validates a given asset params id for the current partner
+	 * @param int $assetParamsId - The asset id
+	 * @param string $assetType - The asset type (flavor or thumb)
+	 * @param $conversionProfileId - The conversion profile this asset relates to
+	 * @throws KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED
+	 */
+	protected function validateAssetParamsId($assetParamsId, $assetType, $conversionProfileId)
+	{
+		if(count($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]) == 0) //the name to id profiles weren't initialized
+		{
+			$this->initAssetParamsNameToId($conversionProfileId);
+		}
+		
+		if(!in_array($assetParamsId, $this->assetParamsNameToIdPerConversionProfile($conversionProfileId)))
+		{
+			throw new KalturaBatchException("{$assetParams}Id [$assetParamsId] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+	}
+	
+	/**
+	 * 
 	 * Gets the flavor params id from the given element
 	 * @param SimpleXMLElement $elementToSearchIn - The element to search in
 	 * @param int $conversionProfileId - The conversion profile on the item
@@ -868,7 +891,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if($isAttribute)
 		{
 			if(isset($elementToSearchIn[$assetParamsId]))
+			{
+				$this->validateAssetParamsId($assetParamsId, $assetType, $conversionProfileId);
 				return (int)$elementToSearchIn[$assetParamsId];
+			}
 	
 			if(isset($elementToSearchIn[$assetParams]))
 				$assetParamsName = $elementToSearchIn[$assetParams];
@@ -876,7 +902,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		else
 		{
 			if(isset($elementToSearchIn->$assetParamsId))
-				return (int)$elementToSearchIn->$assetParamsId;
+			{
+				$this->validateAssetParamsId($assetParamsId, $assetType, $conversionProfileId);
+				return (int)$elementToSearchIn->$assetParamsId;	
+			}
 	
 			if(isset($elementToSearchIn->$assetParams))
 				$assetParamsName = $elementToSearchIn->$assetParams;
@@ -891,7 +920,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$assetParamsName]))
 			return $this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$assetParamsName];
 			
-		return null;
+		throw new KalturaBatchException("{$assetParams} system name [$assetParamsName] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -932,6 +961,44 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * 
+	 * Validates a given conversion profile id for the current partner
+	 * @param int $converionProfileId
+	 * @throws KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED
+	 */
+	protected function validateConversionProfileId($converionProfileId)
+	{
+		if(count($this->conversionProfileNameToId) == 0) //the name to id profiles weren't initialized
+		{
+			$this->initConversionProfileNameToId();
+		}
+		
+		if(!in_array($converionProfileId, $this->conversionProfileNameToId))
+		{
+			throw new KalturaBatchException("conversion profile Id [$converionProfileId] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+	}
+	
+	/**
+	 * 
+	 * Validates a given storage profile id for the current partner
+	 * @param int $storageProfileId
+	 * @throws KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED
+	 */
+	protected function validateStorageProfileId($storageProfileId)
+	{
+		if(count($this->storageProfileNameToId) == 0) //the name to id profiles weren't initialized
+		{
+			$this->initStorageProfileNameToId();
+		}
+		
+		if(!in_array($storageProfileId, $this->storageProfileNameToId))
+		{
+			throw new KalturaBatchException("Storage profile id [$storageProfileId] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+	}
+	
+	/**
+	 * 
 	 * Gets the coversion profile id from the given element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the ingestion profile params
@@ -939,7 +1006,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function getConversionProfileIdFromElement(SimpleXMLElement $elementToSearchIn)
 	{
 		if(isset($elementToSearchIn->conversionProfileId))
+		{
+			$this->validateConversionProfileId((int)$elementToSearchIn->conversionProfileId);
 			return (int)$elementToSearchIn->conversionProfileId;
+		}
 
 		if(!isset($elementToSearchIn->conversionProfile))
 			return null;	
@@ -952,7 +1022,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->conversionProfileNameToId["$elementToSearchIn->conversionProfile"]))
 			return $this->conversionProfileNameToId["$elementToSearchIn->conversionProfile"];
 
-		return null;
+		throw new KalturaBatchException("conversion profile system name [{$elementToSearchIn->conversionProfile}] not valid", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 		
 	/**
@@ -970,6 +1040,25 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 	/**
 	 * 
+	 * Validates a given access control id for the current partner
+	 * @param int $accessControlId
+	 * @throws KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED
+	 */
+	protected function validateAccessControlId($accessControlId)
+	{
+		if(count($this->accessControlNameToId) == 0) //the name to id profiles weren't initialized
+		{
+			$this->initAccessControlNameToId();
+		}
+		
+		if(!in_array($accessControlId, $this->accessControlNameToId))
+		{
+			throw new KalturaBatchException("access control Id [$accessControlId] not valid", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		}
+	}
+	
+	/**
+	 * 
 	 * Gets the flavor params id from the source content element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
@@ -977,7 +1066,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function getAccessControlId(SimpleXMLElement $elementToSearchIn)
 	{
 		if(isset($elementToSearchIn->accessControlId))
+		{
+			$this->validateAccessControlId($elementToSearchIn->accessControlId);
 			return (int)$elementToSearchIn->accessControlId;
+		}
 
 		if(!isset($elementToSearchIn->accessControl))
 			return null;	
@@ -990,7 +1082,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->accessControlNameToId["$elementToSearchIn->accessControl"]))
 			return trim($this->accessControlNameToId["$elementToSearchIn->accessControl"]);
 			
-		return null;
+		throw new KalturaBatchException("access control system name [{$elementToSearchIn->accessControl}] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 		
 	/**
@@ -1003,7 +1095,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function getStorageProfileId(SimpleXMLElement $elementToSearchIn)
 	{
 		if(isset($elementToSearchIn->storageProfileId))
+		{
+			$this->validateStorageProfileId($elementToSearchIn->storageProfileId);
 			return (int)$elementToSearchIn->storageProfileId;
+		}
 
 		if(!isset($elementToSearchIn->storageProfile))
 			return null;	
@@ -1016,7 +1111,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($this->storageProfileNameToId["$elementToSearchIn->storageProfile"]))
 			return trim($this->storageProfileNameToId["$elementToSearchIn->storageProfile"]);
 			
-		return null;
+		throw new KalturaBatchException("storage profile system name [{$elementToSearchIn->storageProfileId}] not found", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
 	
 	/**
@@ -1040,11 +1135,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(!empty($flavorParams->systemName))
 				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParams->systemName] = $flavorParams->id;
+			else //NO system name so we add them to a default name
+				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]["No system name " ."$flavorParams->id"] = $flavorParams->id;
 		}
 		
 		KalturaLog::debug("new assetParamsNameToIdPerConversionProfile [" . print_r($this->assetParamsNameToIdPerConversionProfile, true). "]");
 	}
-
+	
 	/**
 	 * 
 	 * Inits the array of access control name to Id (with all given flavor params)
@@ -1061,6 +1158,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(!is_null($accessControl->systemName))
 				$this->accessControlNameToId[$accessControl->systemName] = $accessControl->id;
+			else //NO system name so we add them to a default name
+				$this->accessControlNameToId["No system name " ."$accessControl->id"] = $accessControl->id;
+			
 		}
 		
 		KalturaLog::debug("new accessControlNameToId [" . print_r($this->accessControlNameToId, true). "]");
@@ -1083,13 +1183,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allFlavorAssets as $flavorAsset)
 		{
-			if(!is_null($flavorAsset->id)) //should always have an id
+			if(!is_null($flavorAsset->id)) //Should always have an id
 				$this->assetIdToAssetParamsId[$entryId][$flavorAsset->id] = $flavorAsset->flavorParamsId;
 		}
 		
 		foreach ($allThumbAssets as $thumbAsset) 
 		{
-			if(!is_null($thumbAsset->id)) //should always have an id
+			if(!is_null($thumbAsset->id)) //Should always have an id
 				$this->assetIdToAssetParamsId[$entryId][$thumbAsset->id] = $thumbAsset->thumbParamsId;
 		}
 		
@@ -1113,6 +1213,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$systemName = $conversionProfile->systemName;
 			if(!empty($systemName))
 				$this->conversionProfileNameToId[$systemName] = $conversionProfile->id;
+			else //NO system name so we add them to a default name
+				$this->conversionProfileNameToId["No system name " ."{$conversionProfile->id}"] = $conversionProfile->id;
 		}
 		
 		KalturaLog::debug("new conversionProfileNameToId [" . print_r($this->conversionProfileNameToId, true). "]");
@@ -1133,10 +1235,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($allStorageProfiles as $storageProfile)
 		{
 			if(!is_null($storageProfile->systemName))
-				$this->accessControlNameToId["$storageProfile->systemName"] = $storageProfile->id;
+				$this->storageProfileNameToId["$storageProfile->systemName"] = $storageProfile->id;
+			else //NO system name so we add them to a default name
+				$this->storageProfileNameToId["No system name " ."{$storageProfile->id}"] = $storageProfile->id;	
 		}
 		
-		KalturaLog::debug("new accessControlNameToId [" . print_r($this->accessControlNameToId, true). "]");
+		KalturaLog::debug("new storageProfileNameToId [" . print_r($this->storageProfileNameToId, true). "]");
 	}
 		
 	/**
