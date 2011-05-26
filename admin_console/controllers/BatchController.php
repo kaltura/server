@@ -918,24 +918,52 @@ class BatchController extends Zend_Controller_Action
 			{
 				$jobId = $request->getParam('actionJobId', 0);
 				$jobType = $request->getParam('actionJobType', 0);
-				$client->jobs->retryJob($jobId, $jobType);
+				try
+				{
+					$client->jobs->retryJob($jobId, $jobType);
+				}
+				catch (Exception $e)
+				{
+					$this->view->errors[] = "Retry job [$jobId] error: " . $e->getMessage();					
+				}
 			}
 			
 			if($submitAction == 'reconvertEntry')
 			{
-				$client->jobs->addConvertProfileJob($entryId);
+				try
+				{
+					$client->jobs->addConvertProfileJob($entryId);
+				}
+				catch (Exception $e)
+				{
+					$this->view->errors[] = "Reconvert entry [$entryId] error: " . $e->getMessage();					
+				}
 			}
 			
 			if($submitAction == 'reconvert')
 			{
 				$flavorAssetId = $request->getParam('actionFlavorAssetId', 0);
-				$client->flavorAsset->reconvert($flavorAssetId);
+				try
+				{
+					$client->flavorAsset->reconvert($flavorAssetId);
+				}
+				catch (Exception $e)
+				{
+					$this->view->errors[] = "Reconvert flavor [$flavorAssetId] error: " . $e->getMessage();					
+				}
 			}
 			
 			if($submitAction == 'regenerate')
 			{
 				$thumbAssetId = $request->getParam('actionFlavorAssetId', 0);
-				$client->thumbAsset->regenerate($thumbAssetId);
+				try
+				{
+					$client->thumbAsset->regenerate($thumbAssetId);
+				}
+				catch (Exception $e)
+				{
+					$this->view->errors[] = "Regenerate thumbnail [$thumbAssetId] error: " . $e->getMessage();					
+				}
 			}
 			
 			Infra_ClientHelper::unimpersonate();
