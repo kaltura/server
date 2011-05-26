@@ -632,8 +632,8 @@ class playManifestAction extends kalturaAction
 
 	private function serveAppleHttp()
 	{
-		
 		$content = "#EXTM3U\n";
+		$duration = null;
 		$flavors = $this->buildFlavorsArray($duration);
 		foreach($flavors as $flavor)
 		{
@@ -706,7 +706,7 @@ class playManifestAction extends kalturaAction
 		$this->flavorId = $this->getRequestParameter ( "flavorId", null );
 		$this->storageId = $this->getRequestParameter ( "storageId", null );
 		$this->maxBitrate = $this->getRequestParameter ( "maxBitrate", null );
-		$this->deliveryCode = $this-getRequestParameter( "deliveryCode", null );
+		$this->deliveryCode = $this->getRequestParameter( "deliveryCode", null );
 		
 		$flavorIdsStr = $this->getRequestParameter ( "flavorIds", null );
 		if ($flavorIdsStr)
@@ -724,7 +724,7 @@ class playManifestAction extends kalturaAction
 			$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
 			if ($flavorParamId)
 			{
-				$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entry->getId(), $flavorParamId);
+				$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($this->entry->getId(), $flavorParamId);
 				if(!$flavorAsset)
 				{
 					KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
