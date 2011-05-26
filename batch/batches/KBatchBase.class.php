@@ -68,6 +68,19 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	{
 		return $this->kClient;
 	}
+		
+	
+	protected function impersonate($partnerId)
+	{
+		$this->kClientConfig->partnerId = $partnerId;
+		$this->kClient->setConfig($config);
+	}
+	
+	protected function unimpersonate()
+	{
+		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
+		$this->kClient->setConfig($config);
+	}
 	
 	/**
 	 * @return KalturaBatchJobFilter
@@ -230,7 +243,7 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 		KalturaLog::debug('This batch index: ' . $this->getIndex());
 		KalturaLog::debug('This session key: ' . $this->sessionKey);
 		
-		$this->kClientConfig = new KalturaConfiguration();
+		$this->kClientConfig = new KalturaConfiguration($this->taskConfig->getPartnerId());
 		$this->kClientConfig->setLogger($this);
 		$this->kClientConfig->serviceUrl = $this->taskConfig->getServiceUrl();
 		$this->kClientConfig->curlTimeout = $this->taskConfig->getCurlTimeout();
