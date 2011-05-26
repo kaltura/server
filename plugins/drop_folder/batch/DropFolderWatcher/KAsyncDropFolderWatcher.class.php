@@ -301,7 +301,9 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			try {
 				$updateDropFolderFile = new KalturaDropFolderFile();
 				$updateDropFolderFile->fileSize = $physicalFileSize;
-				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);				
+				$this->impersonate($dropFolderFile->partnerId);
+				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+				$this->unimpersonate();				
 			}
 			catch (Exception $e) {
 				KalturaLog::err('Cannot update file size for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
@@ -317,7 +319,9 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				try {
 					$updateDropFolderFile = new KalturaDropFolderFile();
 					$updateDropFolderFile->status = KalturaDropFolderFileStatus::PENDING;
+					$this->impersonate($dropFolderFile->partnerId);
 					$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+					$this->unimpersonate();
 					return true;
 				}
 				catch (Exception $e) {
@@ -372,7 +376,9 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			try {
 				$updateDropFolderFile = new KalturaDropFolderFile();
 				$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_DELETING;
+				$this->impersonate($dropFolderFile->partnerId);
 				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+				$this->unimpersonate();
 			}
 			catch (Exception $e) {
 				KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
@@ -384,7 +390,9 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		try {
 			$updateDropFolderFile = new KalturaDropFolderFile();
 			$updateDropFolderFile->status = KalturaDropFolderFileStatus::PURGED;
+			$this->impersonate($dropFolderFile->partnerId);
 			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+			$this->unimpersonate();
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
@@ -402,7 +410,9 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 			$updateDropFolderFile->errorCode = $errorCode;
 			$updateDropFolderFile->errorDescription = $errorMessage;
+			$this->impersonate($dropFolderFile->partnerId);
 			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+			$this->unimpersonate();
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());

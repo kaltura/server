@@ -120,7 +120,11 @@ abstract class DropFolderFileHandler
 		$updateFile->errorCode = $this->dropFolderFile->errorCode;
 		$updateFile->errorDescription = $this->dropFolderFile->errorDescription;		
 		
-		return $this->kClient->dropFolderFile->update($this->dropFolderFile->id, $updateFile);
+		$this->impersonate($this->dropFolderFile->partnerId);
+		$updatedFile = $this->kClient->dropFolderFile->update($this->dropFolderFile->id, $updateFile);
+		$this->unimpersonate();
+		
+		return $updatedFile;
 	}
 	
 	

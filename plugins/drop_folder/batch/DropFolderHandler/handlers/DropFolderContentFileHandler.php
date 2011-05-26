@@ -158,6 +158,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$updateObj = new KalturaDropFolderFile();
 		$updateObj->status = KalturaDropFolderFileStatus::HANDLED;
 		
+		$this->impersonate($this->dropFolderFile->partnerId);
 		$this->kClient->startMultiRequest();
 		foreach ($idsArray as $id)
 		{
@@ -165,6 +166,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->kClient->dropFolderFile->update($id, $updateObj);
 		}
 		$this->kClient->doMultiRequest();		
+		$this->unimpersonate();
 	}
 	
 	
