@@ -85,16 +85,6 @@ class KAsyncBulkUpload extends KBatchBase {
 	
 	/**
 	 * 
-	 * Unimpersonated the client - so it will be the batch partner
-	 */
-	private function unimpersonate()
-	{
-		$this->kClientConfig->partnerId = -1;
-		$this->kClient->setConfig($this->kClientConfig);
-	}
-	
-	/**
-	 * 
 	 * Starts the bulk upload
 	 * @param KalturaBatchJob $job
 	 */
