@@ -220,7 +220,7 @@ class PartnerService extends KalturaBaseService
 	 * 
 	 * @throws APIErrors::UNKNOWN_PARTNER_ID
 	 */
-	function getUsageAction( $year = '' , $month = 1 , $resolution = "days" )
+	function getUsageAction( $year = null , $month = 1 , $resolution = "days" )
 	{
 
 		$dbPartner = PartnerPeer::retrieveByPK( $this->getPartnerId() );
@@ -247,7 +247,7 @@ class PartnerService extends KalturaBaseService
 		$partnerUsage->usageGB = $totalUsageGB;
 		$partnerUsage->reachedLimitDate = $dbPartner->getUsageLimitWarning();
 		
-		if($year != '' && is_int($year))
+		if($year && is_int($year))
 		{
 			$graph_lines = myPartnerUtils::getPartnerUsageGraph($year, $month, $dbPartner, $resolution);
 			// currently we provide only one line, output as a string.
