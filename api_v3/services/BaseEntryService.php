@@ -311,11 +311,12 @@ class BaseEntryService extends KalturaEntryService
 	 * @action updateContent
 	 * @param string $entryId Entry id to update
 	 * @param KalturaResource $resource Resource to be used to replace entry content
+	 * @param int $conversionProfileId The conversion profile id to be used on the entry
 	 * @return KalturaBaseEntry The updated entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 */
-	function updateContentAction($entryId, KalturaResource $resource)
+	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null)
 	{
     	$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
@@ -329,7 +330,7 @@ class BaseEntryService extends KalturaEntryService
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
-				$service->replaceResource($resource, $dbEntry);
+				$service->replaceResource($resource, $dbEntry, $conversionProfileId);
 		    	$baseEntry->fromObject($dbEntry);
     			return $baseEntry;
 				
@@ -338,6 +339,7 @@ class BaseEntryService extends KalturaEntryService
 			case entryType::DATA:
 			case entryType::LIVE_STREAM:
     		default:
+    			// TODO load from plugin manager other entry services such as document
     			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
     	}
     	

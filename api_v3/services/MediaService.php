@@ -99,8 +99,9 @@ class MediaService extends KalturaEntryService
     /**
      * @param KalturaResource $resource
      * @param entry $dbEntry
+     * @param int $conversionProfileId
      */
-    protected function replaceResource(KalturaResource $resource, entry $dbEntry)
+    protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null)
     {
 		$partner = $this->getPartner();
 		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
@@ -112,6 +113,13 @@ class MediaService extends KalturaEntryService
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$resource->validateEntry($dbEntry);
+			
+			if($conversionProfileId)
+			{
+				$dbEntry->setConversionQuality($conversionProfileId);
+				$dbEntry->save();
+			}
+			
 			$kResource = $resource->toObject();
 			$this->attachResource($kResource, $dbEntry);
 		}
@@ -121,6 +129,9 @@ class MediaService extends KalturaEntryService
 		 	$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
 			$tempMediaEntry->conversionProfileId = $dbEntry->getConversionQuality();
+			
+			if($conversionProfileId)
+				$tempMediaEntry->conversionProfileId = $conversionProfileId;
 			
 			$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
 			$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
@@ -640,19 +651,20 @@ class MediaService extends KalturaEntryService
 	 * @action updateContent
 	 * @param string $entryId Media entry id to update
 	 * @param KalturaResource $resource Resource to be used to replace entry media content
+	 * @param int $conversionProfileId The conversion profile id to be used on the entry
 	 * @return KalturaMediaEntry The updated media entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS
      * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
-	function updateContentAction($entryId, KalturaResource $resource)
+	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$this->replaceResource($resource, $dbEntry);
+		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
 				
 		return $this->getEntry($entryId);
 	}
