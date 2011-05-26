@@ -365,12 +365,30 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->endDate = $sourceObject->getEndDate(null);
 	}
 	
+	public function validateObjectsExist()
+	{
+		if(!is_null($this->conversionProfileId))
+		{
+			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
+			if(!$conversionProfile)
+				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
+		}
+	
+		if(!is_null($this->accessControlId))
+		{
+			$accessControlProfile = accessControlPeer::retrieveByPK($this->accessControlId);
+			if(!$accessControlProfile)
+				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $this->accessControlId);
+		}
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
 	public function validateForInsert()
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
+		$this->validateObjectsExist();
 		return parent::validateForInsert();
 	}
 	
@@ -381,11 +399,10 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
-		if($source_object->getStatus() != entryStatus::NO_CONTENT)
-		{
-			if(!is_null($this->conversionProfileId))
-				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $source_object->getStatus());
-		}
+		if(!is_null($this->conversionProfileId) && $source_object->getStatus() != entryStatus::NO_CONTENT)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $source_object->getStatus());
+				
+		$this->validateObjectsExist();
 		
 		return parent::validateForUpdate($source_object);
 	}
