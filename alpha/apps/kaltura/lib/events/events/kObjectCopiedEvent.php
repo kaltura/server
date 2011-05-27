@@ -46,6 +46,9 @@ class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		if(!$consumer->shouldConsumeCopiedEvent($this->fromObject, $this->toObject))
+			return true;
+			
 		$additionalLog1 = '';
 		$additionalLog2 = '';
 		if(method_exists($this->fromObject, 'getId'))

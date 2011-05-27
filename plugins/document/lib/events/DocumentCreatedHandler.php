@@ -77,17 +77,35 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return true;
 		
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+		return false;
+	}
+		
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::objectCreated()
 	 */
 	public function objectCreated(BaseObject $object)
 	{
-		if($object instanceof entry)
-			return $this->entryCreated($object);
-			
-		return true;
+		return $this->entryCreated($object);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof flavorAsset && $object->getIsOriginal())
+			return true;
+		
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -95,28 +113,25 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof flavorAsset && $object->getIsOriginal())
+		$entry = $object->getentry();
+		if($entry->getType() == entryType::DOCUMENT)
 		{
-			$entry = $object->getentry();
-			if($entry->getType() == entryType::DOCUMENT)
+			if($entry->getConversionQuality() > 0)
 			{
-				if($entry->getConversionQuality() > 0)
-				{
-					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			
+				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+			}
+			else
+			{
+				// only for documents entry, make the source ready since no conversion profile will be executed by default
+				$object->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+				$object->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+				$object->save();
 				
-					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
-				}
-				else
-				{
-					// only for documents entry, make the source ready since no conversion profile will be executed by default
-					$object->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
-					$object->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
-					$object->save();
-					
-					$entry->setStatusReady();
-					$entry->save();
-				}
+				$entry->setStatusReady();
+				$entry->save();
 			}
 		}
 		

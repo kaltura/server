@@ -15,15 +15,34 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kObjectUpdatedEventConsumer::shouldConsumeUpdatedEvent()
+	 */
+	public function shouldConsumeUpdatedEvent(BaseObject $object)
+	{
+		if($object instanceof IIndexable)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectUpdatedEventConsumer::objectUpdated()
 	 */
 	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if(!($object instanceof IIndexable))
-			return true;
-
 		$this->saveToSphinx($object);
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof IIndexable)
+			return true;
+		
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -31,9 +50,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if(!($object instanceof IIndexable))
-			return true;
-
 		$this->saveToSphinx($object, true);
 		return true;
 	}

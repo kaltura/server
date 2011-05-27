@@ -1,6 +1,7 @@
 <?php
 class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEventConsumer, kObjectCreatedEventConsumer, kObjectDeletedEventConsumer
 {
+	protected static $cachedPartnerEnabled = array();
 	protected static $cachedPartnerConfig = array();
 	
 	/**
@@ -14,23 +15,30 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			KalturaLog::debug("Partner id is null");
 			return false;
 		}
-			
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner)
+		
+		if(!isset(self::$cachedPartnerEnabled[$partnerId]))
 		{
-			KalturaLog::debug("Partner not found");
-			return false;
-		}
-			
-		if(!$partner->getPluginEnabled(AuditPlugin::PLUGIN_NAME))
-		{
-			KalturaLog::debug("Partner audit trail is disabled");
-			return false;
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if(!$partner)
+			{
+				KalturaLog::debug("Partner not found");
+				return false;
+			}
+				
+			if(!$partner->getPluginEnabled(AuditPlugin::PLUGIN_NAME))
+			{
+				KalturaLog::debug("Partner audit trail is disabled");
+				self::$cachedPartnerEnabled[$partnerId] = false;
+			}
+			else
+			{
+				self::$cachedPartnerEnabled[$partnerId] = true;
+			}
 		}
 			
 		// validate only partner
 		if(is_null($auditTrail))
-			return true;
+			return self::$cachedPartnerEnabled[$partnerId];
 			
 		$auditTrailConfig = self::getAuditTrailConfig($partnerId, $auditTrail->getObjectType());
 		if(is_null($auditTrailConfig))
@@ -277,10 +285,21 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$auditTrail->setData($data);
 		$auditTrail->save();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		$partnerId = $this->getPartnerId($object);
+		if($partnerId > 0 && $this->traceEnabled($partnerId))
+			return true;
+		
+		return false;
+	}
 
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::objectCreated()
 	 */
 	public function objectCreated(BaseObject $object) 
 	{
@@ -294,11 +313,21 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$auditTrail->save();
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::shouldConsumeCopiedEvent()
+	 */
+	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
+	{
+		$partnerId = $this->getPartnerId($toObject);
+		if($partnerId > 0 && $this->traceEnabled($partnerId))
+			return true;
+			
+		return false;
+	}
 
-	/**
-	 * @param BaseObject $fromObject
-	 * @param BaseObject $toObject
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::objectCopied()
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject) 
 	{
@@ -308,6 +337,18 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			
 		$auditTrail->save();
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		$partnerId = $this->getPartnerId($object);
+		if($partnerId > 0 && $this->traceEnabled($partnerId))
+			return true;
+			
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -322,11 +363,21 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		$auditTrail->save();
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		$partnerId = $this->getPartnerId($object);
+		if($partnerId > 0 && $this->traceEnabled($partnerId))
+			return true;
+			
+		return false;		
+	}
 
-	/**
-	 * @param BaseObject $object
-	 * @param array $modifiedColumns
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{

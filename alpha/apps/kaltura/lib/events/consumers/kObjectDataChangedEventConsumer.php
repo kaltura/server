@@ -11,4 +11,11 @@ interface kObjectDataChangedEventConsumer extends KalturaEventConsumer
 	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null);
+	
+	/**
+	 * @param BaseObject $object
+	 * @param string $previousVersion
+	 * @return bool true if the consumer should handle the event
+	 */
+	public function shouldConsumeDataChangedEvent(BaseObject $object, $previousVersion = null);
 }

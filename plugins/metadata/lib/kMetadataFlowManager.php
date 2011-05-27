@@ -1,27 +1,24 @@
 <?php
 class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataChangedEventConsumer
 {
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param BatchJob $twinJob
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+	 */
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		if($dbBatchJob->getJobType() == BatchJobType::METADATA_TRANSFORM)
+			return true;
+				
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
-		switch($dbBatchJob->getJobType())
-		{
-			case BatchJobType::METADATA_IMPORT:
-				$dbBatchJob = $this->updatedImportMetadata($dbBatchJob, $dbBatchJob->getData(), $twinJob);
-				break;
-		
-			case BatchJobType::METADATA_TRANSFORM:
-				$dbBatchJob = $this->updatedTransformMetadata($dbBatchJob, $dbBatchJob->getData(), $twinJob);
-				break;
-	
-			default:
-				break;
-		}
-		
+		$dbBatchJob = $this->updatedTransformMetadata($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+				
 		return true;
 	}
 	
@@ -99,6 +96,17 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		$metadataProfile->save();
 		
 		return $dbBatchJob;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectDataChangedEventConsumer::shouldConsumeDataChangedEvent()
+	 */
+	public function shouldConsumeDataChangedEvent(BaseObject $object, $previousVersion = null)
+	{
+		if(class_exists('Metadata') && $object instanceof Metadata)
+			return true;
+			
+		return false;
 	}
 	
 	/* (non-PHPdoc)

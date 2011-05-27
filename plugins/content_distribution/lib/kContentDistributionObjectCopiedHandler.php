@@ -1,15 +1,23 @@
 <?php
 class kContentDistributionObjectCopiedHandler implements kObjectCopiedEventConsumer
 {
-	/**
-	 * @param BaseObject $fromObject
-	 * @param BaseObject $toObject
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::shouldConsumeCopiedEvent()
+	 */
+	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
+	{
+		if($fromObject instanceof Partner)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::objectCopied()
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
-		if($fromObject instanceof Partner)
-			$this->copyDistributionProfiles($fromObject->getId(), $toObject->getId());
+		$this->copyDistributionProfiles($fromObject->getId(), $toObject->getId());
 		
 		return true;
 	}

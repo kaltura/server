@@ -2,10 +2,24 @@
 
 class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer
 {
-	/**
-	 * @param BaseObject $object
-	 * @param array $modifiedColumns
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		// if changed object is entry 
+		if($object instanceof entry && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
+			return true;
+		
+		// if changed object is flavor asset
+		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(flavorAssetPeer::STATUS, $modifiedColumns) && $object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			return true;
+			
+		return false;		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
@@ -165,16 +179,30 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$this->export($entry, $externalStorage, $key);
 	}
 	
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param BatchJob $twinJob
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+	 */
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+			return false;
+			
+		// convert profile finished - export source flavor
+		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+			return true;
+			
+		// convert collection finished - export ism and ismc files
+		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_COLLECTION && $dbBatchJob->getJobSubType() == conversionEngineType::EXPRESSION_ENCODER3)
+			return true;
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
-		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-			return true;
-			
 		// convert profile finished - export source flavor
 		if($dbBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{

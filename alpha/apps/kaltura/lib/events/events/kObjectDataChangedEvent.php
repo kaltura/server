@@ -33,6 +33,9 @@ class kObjectDataChangedEvent extends kApplicativeEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		if(!$consumer->shouldConsumeDataChangedEvent($this->object, $this->previousVersion))
+			return true;
+	
 		$additionalLog = '';
 		if(method_exists($this->object, 'getId'))
 			$additionalLog .= 'id [' . $this->object->getId() . ']';

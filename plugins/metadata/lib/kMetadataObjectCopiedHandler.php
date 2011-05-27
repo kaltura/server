@@ -1,10 +1,25 @@
 <?php
 class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
 {
-	/**
-	 * @param BaseObject $fromObject
-	 * @param BaseObject $toObject
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::shouldConsumeCopiedEvent()
+	 */
+	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
+	{
+		if($fromObject instanceof Partner)
+			return true;
+		
+		if($fromObject instanceof entry)
+			return true;
+		
+		if($fromObject instanceof MetadataProfile)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::objectCopied()
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{

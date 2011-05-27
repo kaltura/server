@@ -20,10 +20,22 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 		return self::$idsMap[$className][$fromId];
 	}
 	
-	/**
-	 * @param BaseObject $fromObject
-	 * @param BaseObject $toObject
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::shouldConsumeCopiedEvent()
+	 */
+	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
+	{
+		if($fromObject instanceof assetParams)
+			return true;
+			
+		if($fromObject instanceof assetParamsOutput)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCopiedEventConsumer::objectCopied()
 	 */
 	public function objectCopied(BaseObject $fromObject, BaseObject $toObject)
 	{
@@ -36,6 +48,7 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			if($flavorParamsId)
 				$toObject->setFlavorParamsId($flavorParamsId);
 		}
+		
 		return true;
 	}
 }

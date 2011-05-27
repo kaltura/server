@@ -9,4 +9,10 @@ interface kObjectCreatedEventConsumer extends KalturaEventConsumer
 	 * @return bool true if should continue to the next consumer
 	 */
 	public function objectCreated(BaseObject $object);
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if the consumer should handle the event
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object);
 }

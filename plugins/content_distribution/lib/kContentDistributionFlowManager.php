@@ -5,9 +5,25 @@
  */
 class kContentDistributionFlowManager extends kContentDistributionManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectDataChangedEventConsumer
 {
-	/**
-	 * @param BaseObject $object
-	 * @param array $modifiedColumns
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof entry && $object->getStatus() == entryStatus::READY)
+			return true;
+		
+		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && in_array(assetPeer::STATUS, $modifiedColumns) || in_array(assetPeer::VERSION, $modifiedColumns))
+			return true;
+		
+		if($object instanceof EntryDistribution)
+			return true;
+			
+		return false;		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
@@ -34,16 +50,34 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		return true;
 	}
 	
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+			return true;
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::objectCreated()
 	 */
 	public function objectCreated(BaseObject $object)
 	{
-		if($object instanceof asset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
-			return self::onAssetReadyOrDeleted($object);
+		return self::onAssetReadyOrDeleted($object);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectUpdatedEventConsumer::shouldConsumeUpdatedEvent()
+	 */
+	public function shouldConsumeUpdatedEvent(BaseObject $object)
+	{
+		if($object instanceof EntryDistribution)
+			return true;
 			
-		return true;
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -51,17 +85,25 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof EntryDistribution)
+		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		if($entry)
 		{
-			$entry = entryPeer::retrieveByPK($object->getEntryId());
-			if($entry)
-			{
-				$entry->setUpdatedAt(time());
-				$entry->save();
-			}
+			$entry->setUpdatedAt(time());
+			$entry->save();
 		}
 		
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof EntryDistribution)
+			return true;
+		
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -69,14 +111,37 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof EntryDistribution)
-		{
-			$entry = entryPeer::retrieveByPK($object->getEntryId());
-			if($entry) // updated in the indexing server (sphinx)
-				kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry, $raisedJob));
-		}
+		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		if($entry) // updated in the indexing server (sphinx)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entry, $raisedJob));
 		
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+	 */
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			return true;
+		
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE))
+			return true;
+		
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DELETE))
+			return true;
+		
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_FETCH_REPORT))
+			return true;
+		
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_ENABLE))
+			return true;
+		
+		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
+			return true;
+		
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -103,6 +168,32 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			self::onDistributionDisableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return true;
+		
+		if($object instanceof GenericDistributionProvider)
+			return true;
+	
+		if($object instanceof SyndicationDistributionProfile)
+			return true;
+	
+		if($object instanceof Metadata)
+			return true;
+	
+		if($object instanceof asset)
+			return true;
+			
+		if($object instanceof EntryDistribution)
+			return true;
+			
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -134,15 +225,23 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectDataChangedEventConsumer::shouldConsumeDataChangedEvent()
+	 */
+	public function shouldConsumeDataChangedEvent(BaseObject $object, $previousVersion = null)
+	{
+		if(class_exists('Metadata') && $object instanceof Metadata)
+			return true;
+			
+		return false;
+	}
 
 	/* (non-PHPdoc)
 	 * @see kObjectDataChangedEventConsumer::objectDataChanged()
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		if(!class_exists('Metadata') || !($object instanceof Metadata))
-			return true;
-
 		return self::onMetadataChanged($object, $previousVersion);
 	}
 	

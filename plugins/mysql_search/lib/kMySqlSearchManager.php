@@ -26,15 +26,34 @@ class kMySqlSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEv
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kObjectUpdatedEventConsumer::shouldConsumeUpdatedEvent()
+	 */
+	public function shouldConsumeUpdatedEvent(BaseObject $object)
+	{
+		if($object instanceof IIndexable)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectUpdatedEventConsumer::objectUpdated()
 	 */
 	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if(!($object instanceof IIndexable))
-			return true;
-
 		$this->saveToMySql($object);
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof IIndexable)
+			return true;
+		
+		return false;
 	}
 	
 	/* (non-PHPdoc)
@@ -42,9 +61,6 @@ class kMySqlSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEv
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if(!($object instanceof IIndexable))
-			return true;
-
 		$this->saveToMySql($object);
 		return true;
 	}

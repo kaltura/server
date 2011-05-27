@@ -42,6 +42,9 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		if(!$consumer->shouldConsumeChangedEvent($this->object, $this->modifiedColumns))
+			return true;
+			
 		$additionalLog = '';
 		if(method_exists($this->object, 'getId'))
 			$additionalLog .= 'id [' . $this->object->getId() . ']';

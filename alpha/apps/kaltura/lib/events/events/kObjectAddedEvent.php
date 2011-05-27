@@ -17,6 +17,9 @@ class kObjectAddedEvent extends kApplicativeEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		if(!$consumer->shouldConsumeAddedEvent($this->object))
+			return true;
+			
 		$additionalLog = '';
 		if(method_exists($this->object, 'getId'))
 			$additionalLog .= 'id [' . $this->object->getId() . ']';

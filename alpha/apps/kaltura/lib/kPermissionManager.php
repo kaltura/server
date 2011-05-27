@@ -789,25 +789,40 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return self::deleteFromCache($cacheKey);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
+			return true;
+		
+		if ($object instanceof UserRole && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER &&
+			     (in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns) || in_array(UserRolePeer::STATUS, $modifiedColumns))    )
+			return true;
+			
+		if ($object instanceof PermissionToPermissionItem)
+			return true;
+			
+		return false;		
+	}
 
-	public function objectChanged(BaseObject $object, array $modifiedColumns) {
-		if($object instanceof Permission)
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns) 
+	{
+		if($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 		{
-			if ($object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
-			{
-				self::markPartnerRoleCacheDirty($object->getPartnerId());
-				return true;
-			}
+			self::markPartnerRoleCacheDirty($object->getPartnerId());
+			return true;
 		}
 		
-		if ($object instanceof UserRole)
-		{
-			if ( $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER     &&
+		if ($object instanceof UserRole && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER &&
 			     (in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns) || in_array(UserRolePeer::STATUS, $modifiedColumns))    )
-			{
-				self::markPartnerRoleCacheDirty($object->getPartnerId());
-				return true;
-			}
+		{
+			self::markPartnerRoleCacheDirty($object->getPartnerId());
+			return true;
 		}
 		
 		if ($object instanceof PermissionToPermissionItem)
@@ -822,8 +837,26 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		return true;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		if($object instanceof Permission)
+			return true;
+		
+		if ($object instanceof PermissionToPermissionItem)
+			return true;
+		
+		return false;
+	}
 
-	public function objectCreated(BaseObject $object) {
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::objectCreated()
+	 */
+	public function objectCreated(BaseObject $object) 
+	{
 		if($object instanceof Permission)
 		{
 			// changes in permissions for partner, may require new cache generation

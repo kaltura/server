@@ -3,22 +3,23 @@
 
 class kMultiCentersFlowManager implements kBatchJobStatusEventConsumer
 {
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param BatchJob $twinJob
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+	 */
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		if($dbBatchJob->getJobType() == BatchJobType::FILESYNC_IMPORT)
+			return true;
+				
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
-		switch($dbBatchJob->getJobType())
-		{
-			case BatchJobType::FILESYNC_IMPORT:
-				$dbBatchJob = $this->updatedFileSyncImport($dbBatchJob, $dbBatchJob->getData(), $twinJob);
-				break;
-			
-			default:
-				break;
-		}
+		$dbBatchJob = $this->updatedFileSyncImport($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
 		return true;
 	}

@@ -188,10 +188,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 	}
 	
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param BatchJob $twinJob
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+	 */
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
@@ -340,13 +346,21 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		if($object instanceof flavorAsset)
+			return true;
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if(!($object instanceof flavorAsset))
-			return true;
-		
 		$entry = $object->getentry();
 		
 		if($object->getIsOriginal())
@@ -381,6 +395,34 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 		
 		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if(
+				$object instanceof entry 
+			&&	in_array(entryPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == entryStatus::READY
+			&&	$object->getReplacedEntryId()
+		)
+			return true;
+		
+		if(
+				$object instanceof UploadToken 
+			&&	in_array(UploadTokenPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD
+		)
+			return true;
+		
+		if(
+				$object instanceof flavorAsset 
+			&&	in_array(flavorAssetPeer::STATUS, $modifiedColumns))
+			return true;
+			
+		return false;		
 	}
 	
 	/* (non-PHPdoc)
@@ -454,11 +496,23 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		return true;
 	}
 	
-	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
 		if($object instanceof UploadToken)
-			kFlowHelper::handleUploadCanceled($object);
+			return true;
 			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::objectDeleted()
+	 */
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		kFlowHelper::handleUploadCanceled($object);
 		return true;
 	}
 	

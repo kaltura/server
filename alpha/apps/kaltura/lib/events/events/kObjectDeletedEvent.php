@@ -17,6 +17,9 @@ class kObjectDeletedEvent extends kApplicativeEvent
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		if(!$consumer->shouldConsumeDeletedEvent($this->object))
+			return true;
+	
 		$additionalLog = '';
 		if(method_exists($this->object, 'getId'))
 			$additionalLog .= 'id [' . $this->object->getId() . ']';

@@ -3,6 +3,32 @@
 class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return true;
+			
+		if($object instanceof uiConf)
+			return true;
+			
+		if($object instanceof BatchJob)
+			return true;
+			
+		if($object instanceof asset)
+			return true;
+			
+		if($object instanceof syndicationFeed)
+			return true;
+			
+		if($object instanceof conversionProfile2)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 

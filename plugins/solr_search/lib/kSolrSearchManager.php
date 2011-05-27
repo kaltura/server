@@ -3,15 +3,22 @@ require_once("Solr/Service.php");
 
 class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedEventConsumer, kObjectDeletedEventConsumer
 {
-	/**
-	 * @param BaseObject $object
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return true;
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectCreatedEventConsumer::objectCreated()
 	 */
 	public function objectCreated(BaseObject $object) 
 	{
-		if(!($object instanceof entry))
-			return true;
-
 		$document = $this->createEntryDocument($object);
 		$this->addDocument($document);
 		
@@ -19,29 +26,43 @@ class kSolrSearchManager implements kObjectChangedEventConsumer, kObjectCreatedE
 	}
 
 	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return true;
+			
+		return false;
+	}
+
+	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
 	{
-		if(!($object instanceof entry))
-			return true;
-
 		$solr = self::createSolrService();
 		$solr->deleteById($object->getIntId());
 		
 		return true;
 	}
 
-	/**
-	 * @param BaseObject $object
-	 * @param array $modifiedColumns
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof entry)
+			return true;
+			
+		return false;		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns) 
 	{
-		if(!($object instanceof entry))
-			return true;
-			
 		$document = $this->createEntryDocument($object);
 		$this->addDocument($document);
 		

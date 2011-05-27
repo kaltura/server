@@ -92,17 +92,29 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		return true; // no scan jobs to do, object added event consumption may continue normally
 	}
 	
-
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent()
+	 */
+	public function shouldConsumeAddedEvent(BaseObject $object)
+	{
+		// virus scan only works in api_v3 context because it uses dynamic enums
+		if (!class_exists('kCurrentContext') || !kCurrentContext::isApiV3Context())
+			return false;
+		
+		if($object instanceof flavorAsset)
+			return true;
+		
+		if($object instanceof FileSync)
+			return true;
+		
+		return false;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see kObjectAddedEventConsumer::objectAdded()
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		// virus scan only works in api_v3 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || !kCurrentContext::isApiV3Context()) {
-			return true;
-		}
-		
 		$response = true;
 		if($object instanceof flavorAsset)
 		{
@@ -120,21 +132,26 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		return $response;	
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
+	 */
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		if (!class_exists('kCurrentContext') || !kCurrentContext::isApiV3Context())
+			return false;
+			
+		if($dbBatchJob->getJobType() == VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN))
+			return true;
+				
+		return false;
+	}
 	
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param BatchJob $twinJob
-	 * @return bool true if should continue to the next consumer
+	/* (non-PHPdoc)
+	 * @see kBatchJobStatusEventConsumer::updatedJob()
 	 */
 	public function updatedJob(BatchJob $dbBatchJob, BatchJob $twinJob = null)
 	{
-		// virus scan only works in api_v3 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || !kCurrentContext::isApiV3Context()) {
-			return true;
-		}
-		
-		if($dbBatchJob->getJobType() == VirusScanPlugin::getBatchJobTypeCoreValue(VirusScanBatchJobType::VIRUS_SCAN))
-			$dbBatchJob = $this->updatedVirusScan($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+		$dbBatchJob = $this->updatedVirusScan($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 
 		return true;
 	}

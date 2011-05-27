@@ -39,6 +39,9 @@ class kBatchJobStatusEvent extends KalturaEvent implements IKalturaContinualEven
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
 	{
+		if(!$consumer->shouldConsumeJobStatusEvent($this->dbBatchJob))
+			return true;
+	
 		KalturaLog::debug(get_class($this) . " event consumed by " . get_class($consumer) . " job id [" . $this->dbBatchJob->getId() . "] type [" . $this->dbBatchJob->getJobType() . "] sub type [" . $this->dbBatchJob->getJobSubType() . "]");
 		return $consumer->updatedJob($this->dbBatchJob, $this->twinJob);
 	}
