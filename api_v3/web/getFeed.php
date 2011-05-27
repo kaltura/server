@@ -15,6 +15,7 @@ KalturaLog::setContext("syndicationFeedRenderer");
 KalturaLog::debug(">------------------------------------- syndicationFeedRenderer -------------------------------------");
 KalturaLog::info("syndicationFeedRenderer-start ");
 
+kCurrentContext::$ps_vesion = 'ps3';
 $feedId = $_GET['feedId'];
 $entryId = @$_GET['entryId'];
 try
