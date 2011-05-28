@@ -368,7 +368,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		
 		$assetParamsFilter = new KalturaConversionProfileAssetParamsFilter();
 		$assetParamsFilter->conversionProfileIdEqual = $conversionProfileId;
+		$this->impersonate($this->dropFolderFile->partnerId);
 		$assetParamsList = $this->kClient->conversionProfileAssetParams->listAction($assetParamsFilter);
+		$this->unimpersonate();
 		foreach ($assetParamsList->objects as $assetParams)
 		{
 			if ($assetParams->origin == KalturaAssetParamsOrigin::CONVERT) {
