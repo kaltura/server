@@ -1,12 +1,10 @@
 package com.kaltura.client.tests;
 
+
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
-
 import junit.framework.TestCase;
-
 import com.kaltura.client.KalturaApiException;
 import com.kaltura.client.KalturaClient;
 import com.kaltura.client.KalturaConfiguration;
@@ -19,13 +17,6 @@ import com.kaltura.client.services.KalturaSessionService;
 import com.kaltura.client.types.KalturaMediaEntry;
 
 public class BaseTest extends TestCase {
-	public final int PARTNER_ID = 0; // PARTNER_ID_GOES_HERE
-	public final String SECRET = ""; // SERVICE_SECRET_GOES_HERE
-	public final String ADMIN_SECRET = ""; // ADMIN_SECRET_GOES_HERE
-	public final String ENDPOINT = "http://www.kaltura.com";
-	
-	protected String testUrl = "http://www.kaltura.org/demos/videos/DemoVideo.flv";
-
 	public KalturaConfiguration kalturaConfig = new KalturaConfiguration();
 
 	protected KalturaClient client;
@@ -39,13 +30,13 @@ public class BaseTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		if (SECRET == "") {
+		if (KalturaTestConfig.SECRET == "") {
 			throw(new Error("Please fill the partner credentials to use"));
 		}
-		this.kalturaConfig.setPartnerId(PARTNER_ID);
-		this.kalturaConfig.setSecret(SECRET);
-		this.kalturaConfig.setAdminSecret(ADMIN_SECRET);
-		this.kalturaConfig.setEndpoint(ENDPOINT);
+		this.kalturaConfig.setPartnerId(KalturaTestConfig.PARTNER_ID);
+		this.kalturaConfig.setSecret(KalturaTestConfig.SECRET);
+		this.kalturaConfig.setAdminSecret(KalturaTestConfig.ADMIN_SECRET);
+		this.kalturaConfig.setEndpoint(KalturaTestConfig.ENDPOINT);
 		this.client = new KalturaClient(this.kalturaConfig);
 	}
 	
@@ -96,7 +87,7 @@ public class BaseTest extends TestCase {
 		KalturaMediaEntry addedEntry = null;
 		try {
 			KalturaMediaService mediaService = this.client.getMediaService();
-			addedEntry = mediaService.addFromUrl(entry, this.testUrl);
+			addedEntry = mediaService.addFromUrl(entry, KalturaTestConfig.testUrl);
 		} catch (KalturaApiException kae) {
 			logger.error("Caught exception during add from url", kae);
 		}

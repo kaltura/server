@@ -7,6 +7,7 @@ import com.kaltura.client.*;
 import com.kaltura.client.enums.KalturaEntryType;
 import com.kaltura.client.enums.KalturaMediaType;
 import com.kaltura.client.enums.KalturaSessionType;
+import com.kaltura.client.tests.KalturaTestConfig;
 import com.kaltura.client.types.KalturaBaseEntry;
 import com.kaltura.client.types.KalturaBaseEntryListResponse;
 import com.kaltura.client.types.KalturaMediaEntry;
@@ -15,19 +16,14 @@ import com.kaltura.client.types.KalturaPartner;
 
 public class Kaltura {
 
-	private static final  int PARTNER_ID = 0;
-	private static final  String SECRET = "";
-	private static final  String ADMIN_SECRET = "";
-	private static final String UPLOAD_FILE = "bin/DemoVideo.flv";
-	
 	public Kaltura() {	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (SECRET == "") {
-			throw(new Error("Please fill the partner credentials to use"));
+		if (KalturaTestConfig.SECRET == "") {
+			throw(new Error("Please fill the partner credentials to use in the KalturaTestConfig class"));
 		}
 		Kaltura samples = new Kaltura();
 		samples.list();
@@ -51,7 +47,7 @@ public class Kaltura {
 	public void list()
 	{
 		try {
-			KalturaClient client = getKalturaClient(PARTNER_ID, ADMIN_SECRET, true);			
+			KalturaClient client = getKalturaClient(KalturaTestConfig.PARTNER_ID, KalturaTestConfig.ADMIN_SECRET, true);			
 			//Should not call Base directly - this is an Abstract!
 			//KalturaBaseEntryListResponse list = client.getBaseEntryService().list();
 			KalturaMediaListResponse list = client.getMediaService().list();
@@ -65,7 +61,7 @@ public class Kaltura {
 	public void multiReponse()
 	{
 		try {
-			KalturaClient client = getKalturaClient(PARTNER_ID, ADMIN_SECRET, true);
+			KalturaClient client = getKalturaClient(KalturaTestConfig.PARTNER_ID, KalturaTestConfig.ADMIN_SECRET, true);
 			client.setMultiRequest(true);
 			client.getBaseEntryService().count();
 			client.getPartnerService().getInfo();
@@ -82,8 +78,8 @@ public class Kaltura {
 	{
 		try {
 			System.out.print("\nUploading test video...");
-			KalturaClient client = getKalturaClient(PARTNER_ID, SECRET, false);			
-			File up = new File(UPLOAD_FILE);
+			KalturaClient client = getKalturaClient(KalturaTestConfig.PARTNER_ID, KalturaTestConfig.SECRET, false);			
+			File up = new File(KalturaTestConfig.UPLOAD_FILE);
 			String token = client.getBaseEntryService().upload(up);
 			KalturaMediaEntry entry = new KalturaMediaEntry();
 			entry.name = "my upload entry";
