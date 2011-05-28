@@ -257,7 +257,9 @@ class BatchService extends KalturaBaseService
 			KalturaEntryStatus::ERROR_IMPORTING,
 			KalturaEntryStatus::ERROR_CONVERTING,
 			KalturaEntryStatus::READY,
-			KalturaEntryStatus::DELETED
+			KalturaEntryStatus::DELETED,
+			KalturaEntryStatus::PENDING,
+			KalturaEntryStatus::NO_CONTENT,
 		);
 		
 		$unclosedEntries = array();
