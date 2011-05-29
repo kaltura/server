@@ -16,25 +16,17 @@ class kExternalPathManager extends kPathManager
 		
 		if (is_null($path_format))
 		{
-			$format = '{defaultDateDir}/{partnerDir}/{filename}';
-		}
-		else
-		{
-			$format = '{pathFormat}/{filename}';
+			$path_format = '{year}{month}{day}/{partnerDir}/{fileName}';
 		}
 		
 		$fileName = $object->generateFileName($subType, $version);
 		$partnerDir = floor($object->getPartnerId() / 1000);
-		$defaultDateDir = date ("Ymd");
 		
-		$pathDir = str_replace ('Y', date ("Y"), $path_format);
-		$pathDir = str_replace('m', date ("m"), $pathDir);
-		$pathDir = str_replace('d', date ("d"), $pathDir);
-		
-		$path = str_replace('{filename}', $fileName, $format);
+		$path = str_replace('{fileName}', $fileName, $path_format);
 		$path = str_replace('{partnerDir}', $partnerDir, $path);
-		$path = str_replace('{defaultDateDir}', $defaultDateDir, $path);
-		$path = str_replace('{pathFormat}', $pathDir, $path);
+		$path = str_replace('{year}',  date("Y"), $path);
+		$path = str_replace('{month}', date("m"), $path);
+		$path = str_replace('{day}',   date("d"), $path);
 		
 		$root = '/';
 		return array($root, $path);
