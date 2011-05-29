@@ -46,8 +46,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		return $this->conversionProfile;
 	}
 	
-	
-
 	public function handle()
 	{
 		$this->conversionProfile = null;
@@ -309,7 +307,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		try 
 		{
 			$this->impersonate($this->dropFolderFile->partnerId);
-			$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource);
+			$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $this->getConversionProfile());
 			$this->unimpersonate();
 			
 			// set all addional files as handled
