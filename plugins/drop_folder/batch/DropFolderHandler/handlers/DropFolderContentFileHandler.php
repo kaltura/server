@@ -13,7 +13,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	const FLAVOR_NAME_WILDCARD  = 'flavorName';
 	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.]\w+/'; // matches "referenceId_flavorName.extension"
 	
-	
 	/**
 	 * @var KalturaDropFolderContentFileHandlerConfig
 	 */
@@ -29,11 +28,9 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 */
 	private $conversionProfile = null;
 	
-	
 	public function getType() {
 		return KalturaDropFolderFileHandlerType::CONTENT;
 	}
-	
 	
 	/**
 	 * @return KalturaConversionProfile
@@ -118,8 +115,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		return ($this->dropFolderFile->status === KalturaDropFolderFileStatus::HANDLED); // return true if handled, false otherwise
 	}
 	
-	
-	
 	/**
 	 * Parse file name according to defined slugRegex and set the extracted parsedSlug and parsedFlavor.
 	 * The following expressions are currently recognized and used:
@@ -144,9 +139,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		KalturaLog::debug('Parsed slug ['.$this->dropFolderFile->parsedSlug.'], Parsed flavor ['.$this->dropFolderFile->parsedFlavor.']');
 		return true; // file name matches the defined regex
 	}
-	
 
-	
 	/**
 	 * Update the status of all drop folder files with the given ids to be KalturaDropFolderFileStatus::HANDLED
 	 * @param array $idsArray array of drop folder file ids
@@ -166,10 +159,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		$this->kClient->doMultiRequest();		
 		$this->unimpersonate();
 	}
-	
-	
-	
-
 	
 	/**
 	 * Add the new file to a new entry, together with all other relevant drop folder files, according to the ingestion profile
@@ -245,9 +234,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		
 		return true;
 	}
-	
 
-	
 	/**
 	 * Match the current file to an existing entry and flavor according to the slug regex.
 	 * Update the matched entry with the new file and all other relevant files from the drop folder, according to the ingestion profile.
