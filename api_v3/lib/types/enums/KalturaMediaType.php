@@ -13,5 +13,4 @@ class KalturaMediaType extends KalturaEnum
 	const LIVE_STREAM_WINDOWS_MEDIA = 202;
 	const LIVE_STREAM_REAL_MEDIA = 203;
 	const LIVE_STREAM_QUICKTIME = 204;
-	
 }
