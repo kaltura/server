@@ -320,7 +320,7 @@ class KGenericScheduler
 	private function getLastExecutionTime($taskName)
 	{
 		if(!isset($this->lastRunTime[$taskName]))
-			return time();
+			$this->lastRunTime[$taskName] = time();
 			
 		return $this->lastRunTime[$taskName];
 	}
