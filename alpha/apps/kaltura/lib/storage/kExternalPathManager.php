@@ -9,11 +9,24 @@ class kExternalPathManager extends kPathManager
 	 * @param int $subType
 	 * @param $version
 	 */
-	public function generateFilePathArr(ISyncableFile $object, $subType, $version = null)
+	public function generateFilePathArr(ISyncableFile $object, $subType, $version = null, $storageProfileId = null)
 	{
-		$dateDir = date('Ymd');
-		$partnerDir = floor($object->getPartnerId() / 1000);
-		$path = "$dateDir/$partnerDir/" . $object->generateFileName($subType, $version);
+		$storageProfile = kPathManager::getStorageProfile($storageProfileId);
+		$date_format = $storageProfile->getDateFormat();
+		
+		if (is_null($date_format))
+		{
+			$dateDir = date('Ymd');
+			$partnerDir = floor($object->getPartnerId() / 1000);
+			$path = "$dateDir/$partnerDir/" . $object->generateFileName($subType, $version);
+		}
+		else
+		{
+			$dateDir = date('Y-m');
+			$day = date ("d");
+			$path = "$dateDir/$day/" . $object->generateFileName($subType, $version);
+		}
+		
 		$root = '/';
 		return array($root, $path);
 	}

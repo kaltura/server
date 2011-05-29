@@ -19,7 +19,7 @@ class kPathManager
 	 * @param int $subType
 	 * @param $version
 	 */
-	public function generateFilePathArr(ISyncableFile $object, $subType, $version = null)
+	public function generateFilePathArr(ISyncableFile $object, $subType, $version = null, $storageProfileId = null)
 	{
 //		$traces = debug_backtrace(false);
 //		foreach($traces as $i => $trace)
@@ -73,7 +73,8 @@ class kPathManager
 		$pathManager = $storageProfile->getPathManager();
 		
 		$object = kFileSyncUtils::retrieveObjectForSyncKey($key);
-		return $pathManager->generateFilePathArr($object, $key->object_sub_type, $key->version);
+		
+		return $pathManager->generateFilePathArr($object, $key->object_sub_type, $key->version, $storageProfileId);
 	}
 	
 	/**
