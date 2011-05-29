@@ -35,6 +35,7 @@ class StorageProfile extends BaseStorageProfile
 	/**
 	 * @return kPathManager
 	 */
+	
 	public function getPathManager()
 	{
 		$class = $this->getPathManagerClass();
@@ -62,6 +63,10 @@ class StorageProfile extends BaseStorageProfile
 		
 	public function getTrigger() { return $this->getFromCustomData("trigger", null, self::STORAGE_TEMP_TRIGGER_CONVERT_FINISHED); }
 	public function setTrigger( $v ) { $this->putInCustomData("trigger", (int)$v); }
+	
+	//external peth date format
+	public function setDateFormat($v) { $this->putInCustomData('date_format', $v);}
+	public function getDateFormat() { return $this->getFromCustomData('date_format', null);}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
 	
