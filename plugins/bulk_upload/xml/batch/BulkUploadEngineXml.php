@@ -1134,9 +1134,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($allFlavorParams as $flavorParams)
 		{
 			if(!empty($flavorParams->systemName))
-				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParams->systemName] = $flavorParams->id;
+				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParams->systemName] = $flavorParams->assetParamsId;
 			else //NO system name so we add them to a default name
-				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]["No system name " ."$flavorParams->id"] = $flavorParams->id;
+				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]["NO SYSTEM NAME $flavorParams->assetParamsId"] = $flavorParams->assetParamsId;
 		}
 		
 		KalturaLog::debug("new assetParamsNameToIdPerConversionProfile [" . print_r($this->assetParamsNameToIdPerConversionProfile, true). "]");
