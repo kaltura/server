@@ -64,9 +64,9 @@ class StorageProfile extends BaseStorageProfile
 	public function getTrigger() { return $this->getFromCustomData("trigger", null, self::STORAGE_TEMP_TRIGGER_CONVERT_FINISHED); }
 	public function setTrigger( $v ) { $this->putInCustomData("trigger", (int)$v); }
 	
-	//external peth date format
-	public function setDateFormat($v) { $this->putInCustomData('date_format', $v);}
-	public function getDateFormat() { return $this->getFromCustomData('date_format', null);}
+	//external path format
+	public function setPathFormat($v) { $this->putInCustomData('path_format', $v);}
+	public function getPathFormat() { return $this->getFromCustomData('path_format', null);}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
 	
