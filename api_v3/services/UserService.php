@@ -422,7 +422,6 @@ class UserService extends KalturaBaseUserService
 	 * @param string $userId
 	 * @param string $loginId
 	 * @param string $password
-	 * @param bool $sendEmail
 	 * @return KalturaUser
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
@@ -432,7 +431,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 *
 	 */	
-	public function enableLoginAction($userId, $loginId, $password = null, $sendEmail = true)
+	public function enableLoginAction($userId, $loginId, $password = null)
 	{		
 		try
 		{
@@ -447,7 +446,9 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'password');
 			}
 			
-			$user->enableLogin($loginId, $password, $sendEmail);	
+			// Gonen 2011-05-29 : NOTE - 3rd party uses this action and expect that email notification will not be sent by default
+			// if this call ever changes make sure you do not change default so mails are sent.
+			$user->enableLogin($loginId, $password, true);	
 			$user->save();
 		}
 		catch (Exception $e)
