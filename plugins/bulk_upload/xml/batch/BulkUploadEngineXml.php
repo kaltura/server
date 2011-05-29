@@ -867,9 +867,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->initAssetParamsNameToId($conversionProfileId);
 		}
 		
-		if(!in_array($assetParamsId, $this->assetParamsNameToIdPerConversionProfile($conversionProfileId)))
+		if(!in_array($assetParamsId, $this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
 		{
-			throw new KalturaBatchException("{$assetParams}Id [$assetParamsId] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			throw new KalturaBatchException("Asset Params Id [$assetParamsId] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 	}
 	
