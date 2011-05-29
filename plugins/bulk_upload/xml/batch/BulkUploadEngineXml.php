@@ -1126,7 +1126,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$conversionProfileFilter = new KalturaConversionProfileAssetParamsFilter();
 		$conversionProfileFilter->conversionProfileIdEqual = $conversionProfileId;
 		
-		$allFlavorParams = $this->kClient->conversionProfileAssetParams->list($conversionProfileFilter);
+		$allFlavorParams = $this->kClient->conversionProfileAssetParams->listAction($conversionProfileFilter);
 		$allFlavorParams = $allFlavorParams->objects;
 		
 		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
