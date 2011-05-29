@@ -292,15 +292,26 @@ class KAutoloader
 			if (self::$_noCache === false)
 			{
 				// save the cached map
-				file_put_contents(self::$_classMapFileLocation, serialize(self::$_classMap));
+				$bytesWritten = file_put_contents(self::$_classMapFileLocation, serialize(self::$_classMap));
+				if(!$bytesWritten)
+				{
+					$folderPermission = fileperms(dirname(self::$_classMapFileLocation));
+					error_log("PHP Class map could be saved to path [" . self::$_classMapFileLocation . "] folder permisisons [$folderPermission]");
+					die("PHP Class map could be saved");
+				}
 			}
 		}
 		else if (count(self::$_classMap) == 0) 
 		{
 			// if cached map was not loaded but exists on the disk, load it
 			self::$_classMap = unserialize(file_get_contents(self::$_classMapFileLocation));
+			
+			if(!is_array(self::$_classMap))
+			{
+				$permission = fileperms(self::$_classMapFileLocation);
+				error_log("PHP Class map could be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
+				die('PHP Class map could be loaded');
+			}
 		}
 	}
 }
-
-?>
