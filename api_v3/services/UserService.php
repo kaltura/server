@@ -422,6 +422,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $userId
 	 * @param string $loginId
 	 * @param string $password
+	 * @param bool $sendEmail
 	 * @return KalturaUser
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
@@ -431,7 +432,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 *
 	 */	
-	public function enableLoginAction($userId, $loginId, $password = null)
+	public function enableLoginAction($userId, $loginId, $password = null, $sendEmail = true)
 	{		
 		try
 		{
@@ -446,7 +447,7 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'password');
 			}
 			
-			$user->enableLogin($loginId, $password, true);	
+			$user->enableLogin($loginId, $password, $sendEmail);	
 			$user->save();
 		}
 		catch (Exception $e)
