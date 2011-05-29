@@ -41,6 +41,7 @@ class UiConfService extends KalturaBaseService
 	 */
 	function addAction( KalturaUiConf $uiConf )
 	{
+		$uiConf->validatePropertyNotNull('creationMode');
 		if($uiConf->creationMode != KalturaUiConfCreationMode::ADVANCED && $uiConf->creationMode != KalturaUiConfCreationMode::WIZARD)
 		{
 			throw new KalturaAPIException ( "Should not create MANUAL ui_confs via the API!! MANUAL is deprecated" );
