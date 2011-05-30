@@ -52,6 +52,7 @@ class kSessionUtils
 		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null)
 	{
 		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
+		ks::validatePrivileges($privileges,  $partner_id);
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
 		if ( $result >= 0 )
 		{
@@ -489,6 +490,37 @@ class ks
 		}
 		
 		return false;
+	}
+	
+	public static function validatePrivileges ( $privileges, $partnerId )
+	{
+		
+		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
+		// edit privilege (edit:XXX,edit:YYY,...)
+		$allPrivileges = explode(',', $privileges);
+		// foreach pair - check privileges on playlist
+		foreach($allPrivileges as $priv)
+		{
+			// extract playlist ID from pair
+			$exPrivileges = explode(':', $priv);
+			//validate setRole
+			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE){ 
+				if (!((is_numeric($exPrivileges[1])) && ($exPrivileges[1] > 0)))
+					throw new KalturaAPIException ( APIErrors::INVALID_SET_ROLE);
+				
+				$c = new Criteria();
+				$c->addAnd(UserRolePeer::ID, $exPrivileges[1], Criteria::EQUAL);
+				$c->addAnd(UserRolePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+				$roleId = UserRolePeer::doSelectOne($c);
+				
+				if ($roleId){
+					$roleIds = $roleId->getId();
+				}else{
+					KalturaLog::debug("Role id [$exPrivileges[1]] does not exists");
+					throw new KalturaAPIException ( APIErrors::UNKNOWN_ROLE_ID ,$exPrivileges[1]);
+				}
+			}
+		}
 	}
 	
 	private function expired ( )
