@@ -294,7 +294,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		try 
 		{
 			$this->impersonate($this->dropFolderFile->partnerId);
-			$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $this->getConversionProfile());
+			$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $this->getConversionProfile()->Id);
 			$this->unimpersonate();
 			
 			// set all addional files as handled
