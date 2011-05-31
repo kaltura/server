@@ -65,6 +65,7 @@ class ThumbAssetService extends KalturaBaseService
     	$dbThumbAsset = $thumbAsset->toInsertableObject($dbThumbAsset);
     	
 		$dbThumbAsset->setEntryId($entryId);
+		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbThumbAsset->save();
 
