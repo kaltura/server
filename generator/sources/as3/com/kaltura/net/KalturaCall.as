@@ -22,6 +22,8 @@ package com.kaltura.net {
 		public var service : String;
 		public var method : String = URLRequestMethod.POST;
 		
+		public var useTimeout:Boolean = true;
+		
 		public var delegate : IKalturaCallDelegate;
 		
 		/**

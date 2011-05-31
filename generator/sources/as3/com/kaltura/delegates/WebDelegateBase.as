@@ -48,12 +48,13 @@ package com.kaltura.delegates {
 			this.call = call;
 			this.config = config;
 			if(!call) return; //maybe a multi request
-			connectTimer = new Timer(CONNECT_TIME, 1);
-			connectTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onConnectTimeout);
-			
-			loadTimer = new Timer(LOAD_TIME, 1);
-			loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onLoadTimeOut);
-			
+			if (call.useTimeout) {
+				connectTimer = new Timer(CONNECT_TIME, 1);
+				connectTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onConnectTimeout);
+				
+				loadTimer = new Timer(LOAD_TIME, 1);
+				loadTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onLoadTimeOut);
+			}
 			execute();
 		}
 		
@@ -62,8 +63,10 @@ package com.kaltura.delegates {
 				loader.close();
 			} catch (e:*) { }
 			
-			connectTimer.stop();
-			loadTimer.stop();
+			if (call.useTimeout) {
+				connectTimer.stop();
+				loadTimer.stop();
+			}
 		}
 		
 		protected function onConnectTimeout(event:TimerEvent):void {
@@ -104,7 +107,9 @@ package com.kaltura.delegates {
 			
 			sendRequest();
 			
-			connectTimer.start();
+			if (call.useTimeout) {
+				connectTimer.start();
+			}
 		}
 		
 		protected function formatRequest():void 
@@ -155,8 +160,10 @@ package com.kaltura.delegates {
 		protected function onHTTPStatus(event:HTTPStatusEvent):void { }
 		
 		protected function onOpen(event:Event):void {
-			connectTimer.stop();
-			loadTimer.start();
+			if (call.useTimeout) {
+				connectTimer.stop();
+				loadTimer.start();
+			}
 		}
 		
 		protected function addOptionalArguments():void {
@@ -213,8 +220,10 @@ package com.kaltura.delegates {
 		 * stop timers and clean event listeners 
 		 */		
 		protected function clean():void {
-			connectTimer.stop();
-			loadTimer.stop();
+			if (call.useTimeout) {
+				connectTimer.stop();
+				loadTimer.stop();
+			}
 			
 			if (loader == null) { return; }
 			
