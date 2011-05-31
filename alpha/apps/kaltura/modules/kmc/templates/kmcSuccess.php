@@ -122,9 +122,9 @@ var kmc = {};
 					echo 'errorCode: "'.$hashKeyErrorCode.'",';
 				}
 			?>
-			loginF: "loginF" ,
-			closeF: "closeLoginF" ,
-			host: "<?php echo $www_host ?>",
+			loginF: "loginF",
+			closeF: "closeLoginF",
+			host: "<?php echo $www_host; ?>",
 			visibleSignup: "<?php echo (kConf::get('kmc_login_show_signup_link'))? 'true': 'false'; ?>",
 			urchinNumber: "UA-12055206-1",
 			srvurl: "api_v3/index.php"
