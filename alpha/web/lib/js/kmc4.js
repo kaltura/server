@@ -53,7 +53,8 @@ kmc.log = function(str) {
 kmc.functions = {
 	expired : function() {
 		// @todo: why no cookie killing ?
-		window.location = kmc.vars.service_url + "/index.php/kmc/kmc" + location.hash; // @todo: shouldn't require '/index.php/kmc/'
+		//window.location = kmc.vars.service_url + "/index.php/kmc/kmc" + location.hash; // @todo: shouldn't require '/index.php/kmc/'
+		kmc.utils.logout();
 	},
 	doNothing : function() {
 		return false;
