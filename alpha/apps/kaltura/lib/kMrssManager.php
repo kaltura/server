@@ -312,7 +312,7 @@ class kMrssManager
 			$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');
 			$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
 			$thumbnail->addAttribute('height', $thumbAsset->getHeight());
-			$thumbnail->addAttribute('weight', $thumbAsset->getWidth());
+			$thumbnail->addAttribute('width', $thumbAsset->getWidth());
 			if($thumbAsset->getFlavorParamsId())
 				$thumbnail->addAttribute('thumbParamsId', $thumbAsset->getFlavorParamsId());
 				
