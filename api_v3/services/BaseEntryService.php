@@ -239,6 +239,12 @@ class BaseEntryService extends KalturaEntryService
 	    $dbEntry->setSourceId( $uploadTokenId );
 	    $dbEntry->setSourceLink( $entryFullPath );
 	    $dbEntry->setDefaultModerationStatus();
+     
+	    // hack due to KCW of version  from KMC
+	    if (isset ( $_REQUEST ["conversionquality"] )) {
+			$dbEntry->setConversionQuality ( $_REQUEST ["conversionquality"] );
+		}
+		
 	    $dbEntry->save();
 	    
 	    $kshow = $this->createDummyKShow();
