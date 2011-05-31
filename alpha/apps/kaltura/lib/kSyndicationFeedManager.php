@@ -274,14 +274,15 @@ class kSyndicationFeedManager
 		$proc->importStyleSheet($xsl);
 		
 		$xml = $proc->transformToDoc($xml);
-		$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
-		error_reporting(E_ALL);
-		
+
 		if(!$xml)
 		{
 			KalturaLog::err("XML Transformation failed");
 			return null;
 		}
+		
+		$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
+		error_reporting(E_ALL);
 				
 		return $xml->saveXML();
 	}
