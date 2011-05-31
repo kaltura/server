@@ -151,6 +151,7 @@ class kConfLocal
 		// self::$map['default_plugins'][] = "ShortLinkPlugin";
 		// self::$map['default_plugins'][] = "ProfesionalServicesPlugin";
 		// self::$map['default_plugins'][] = "InletArmadaPlugin";
+		// self::$map['default_plugins'][] = "VlcPlugin";
 		
 }
 
