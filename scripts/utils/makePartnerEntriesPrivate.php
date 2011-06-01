@@ -18,8 +18,13 @@ KAutoloader::register();
 
 error_reporting(E_ALL);
 
-$databaseManager = new sfDatabaseManager();
+/*$databaseManager = new sfDatabaseManager();
 $databaseManager->initialize();
+*/
+$dbConf = kConf::getDB ();
+DbManager::setConfig ( $dbConf );
+DbManager::initialize ();
+
 
 if (count($argv) !== 2)
 {
