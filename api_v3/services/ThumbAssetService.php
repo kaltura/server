@@ -207,7 +207,10 @@ class ThumbAssetService extends KalturaBaseService
 			}												
 			throw $e;
 		}
-    }
+
+		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$thumbAsset->save();
+	}
     
 	/**
 	 * @param thumbAsset $thumbAsset
@@ -292,7 +295,8 @@ class ThumbAssetService extends KalturaBaseService
         $fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
         $fileSync = kFileSyncUtils::resolve($fileSync);
         
-		$thumbAsset->setSize($fileSync->getFileSize());
+		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+        $thumbAsset->setSize($fileSync->getFileSize());
 		$thumbAsset->save();
     }
     
