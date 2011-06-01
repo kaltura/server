@@ -268,7 +268,6 @@ class kSyndicationFeedManager
 			return null;
 		}
 		
-		error_reporting(0);
 		$proc = new XSLTProcessor;
 		$proc->registerPHPFunctions();
 		$proc->importStyleSheet($xsl);
@@ -282,7 +281,6 @@ class kSyndicationFeedManager
 		}
 		
 		$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
-		error_reporting(E_ALL);
 				
 		return $xml->saveXML();
 	}
