@@ -1255,15 +1255,15 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						break;
 				}
 				
+				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
+				$entryDistribution->setValidationErrorsArray($validationErrors);
+				$entryDistribution->save();
+				
 				if(!$updateRequired)
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
 					continue;	
-				}
-				
-				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
-				$entryDistribution->setValidationErrorsArray($validationErrors);
-				$entryDistribution->save();
+				}				
 				
 				if(!count($validationErrors) && $distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::AUTOMATIC)
 				{
@@ -1437,6 +1437,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 							break;
 						}
 					}
+					
+					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
+					$entryDistribution->setValidationErrorsArray($validationErrors);
+					$entryDistribution->save();
 					
 					if(!$updateRequired)
 					{
