@@ -91,7 +91,7 @@ class ThumbAssetService extends KalturaBaseService
      */
     function setContentAction($id, KalturaContentResource $contentResource)
     {
-   		$dbThumbAsset = flavorAssetPeer::retrieveById($id);
+   		$dbThumbAsset = thumbAssetPeer::retrieveById($id);
    		if(!$dbThumbAsset)
    			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
