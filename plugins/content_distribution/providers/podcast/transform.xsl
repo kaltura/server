@@ -7,7 +7,7 @@ xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
 xmlns:php="http://php.net/xsl"
 exclude-result-prefixes="xs">
   <xsl:output method="xml" encoding="UTF-8" indent="yes" />
-	<xsl:variable name="distributionProfileName" select="My Hub"/>
+   <xsl:variable name="distributionProfileName" select="'My Hub'"/>
   
   
   <xsl:template name="rss" match="/">
@@ -36,52 +36,44 @@ exclude-result-prefixes="xs">
 	</rss>
   </xsl:template>
   <xsl:template name="item" match="item">
-    <xsl:variable name="thumb" select="thumbnailUrl" />
-    <item>
-		<title>
-          <xsl:value-of select="name" />		
-		</title>
-		<itunes:author>
-		   <xsl:value-of select="customData/metadata/Author" />
-		</itunes:author>
-		<itunes:block>
-		   <xsl:value-of select="customData/metadata/Block" />
-		</itunes:block>
-		<itunes:explicit>
-		   <xsl:value-of select="customData/metadata/Explicit" />
-		</itunes:explicit>
-		<itunes:order>
-		   <xsl:value-of select="customData/metadata/Order" />
-		</itunes:order>
-		<itunes:summary>
-          <xsl:value-of select="description" />		
-		</itunes:summary>
-		<itunes:image href="{thumbnailUrl/@url}" />
-		<enclosure url="{content/@url}" length="" type="" />
-		<guid>
-          <xsl:value-of select="entryId" />				
-		</guid>
-		<pubDate>
-			<xsl:value-of select="php:function('date', 'D d M Y H:i:s \G\M\T', sum(createdAt))" />		
-		</pubDate>
-		<itunes:duration>
-			<xsl:value-of select="media/duration" />
-		</itunes:duration>
-		<itunes:keywords>
-		   <xsl:value-of select="customData/metadata/Keywords" />
-		</itunes:keywords>
-	  <xsl:if test="sum(distribution[@distributionProfileId=$distributionProfileId]/sunset) > 0">
-		  <field key="expiration_date">
-			  <xsl:attribute name="seconds">
-				<xsl:value-of select="distribution[@distributionProfileId=$distributionProfileId]/sunset" />
-			  </xsl:attribute>
-			  <xsl:attribute name="oraDate">
-				<xsl:value-of select="php:function('date', 'Y-m-d-H-i-s', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
-			  </xsl:attribute>
-			  <xsl:value-of select="php:function('date', 'D M d H:i:s \G\M\T Y', sum(distribution[@distributionProfileId=$distributionProfileId]/sunset))" />
-		  </field>
-	  </xsl:if>	  
-    </item>
+	<xsl:variable name="podFlvor" select="distribution[@distributionProfileName=$distributionProfileName]/flavorAssetIds/flavorAssetId" />
+		<item>
+			<m>
+			   <xsl:value-of select="$podFlvor" />
+			</m>
+			<title>
+			  <xsl:value-of select="name" />		
+			</title>
+			<itunes:author>
+			   <xsl:value-of select="customData/metadata/Author" />
+			</itunes:author>
+			<itunes:block>
+			   <xsl:value-of select="customData/metadata/Block" />
+			</itunes:block>
+			<itunes:explicit>
+			   <xsl:value-of select="customData/metadata/Explicit" />
+			</itunes:explicit>
+			<itunes:order>
+			   <xsl:value-of select="customData/metadata/Order" />
+			</itunes:order>
+			<itunes:summary>
+			  <xsl:value-of select="description" />		
+			</itunes:summary>
+			<itunes:image href="{thumbnailUrl/@url}" />
+			<enclosure url="{content[@flavorAssetId=$podFlvor]/@url}" length="" type="" />
+			<guid>
+			  <xsl:value-of select="entryId" />				
+			</guid>
+			<pubDate>
+				<xsl:value-of select="php:function('date', 'D d M Y H:i:s \G\M\T', sum(createdAt))" />		
+			</pubDate>
+			<itunes:duration>
+				<xsl:value-of select="media/duration" />
+			</itunes:duration>
+			<itunes:keywords>
+			   <xsl:value-of select="customData/metadata/Keywords" />
+			</itunes:keywords>
+		</item>
   </xsl:template>
   <xsl:template name="implode">
     <xsl:param name="items" />
