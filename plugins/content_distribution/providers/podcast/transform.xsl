@@ -37,6 +37,7 @@ exclude-result-prefixes="xs">
   </xsl:template>
   <xsl:template name="item" match="item">
 	<xsl:variable name="podFlvor" select="distribution[@distributionProfileName=$distributionProfileName]/flavorAssetIds/flavorAssetId" />
+	<xsl:variable name="server" select="'http://www.kaltura.com'" />
 		<item>
 			<title>
 			  <xsl:value-of select="name" />		
@@ -56,16 +57,16 @@ exclude-result-prefixes="xs">
 			<itunes:summary>
 			  <xsl:value-of select="description" />		
 			</itunes:summary>
-			<itunes:image href="{thumbnailUrl/@url}" />
-			<enclosure url="{content[@flavorAssetId=$podFlvor]/@url}" length="" type="video/mp4" />
+			<itunes:image href="{thumbnailUrl/@url}/ext.jpg" />
+			<enclosure url="{content[@flavorAssetId=$podFlvor]/@url}/ext.mp4" type="video/mp4" />
 			<guid>
 			  <xsl:value-of select="entryId" />				
 			</guid>
 			<pubDate>
-				<xsl:value-of select="php:function('date', 'D d M Y H:i:s \G\M\T', sum(createdAt))" />		
+				<xsl:value-of select="php:function('date', 'D, d M Y H:i:s \G\M\T', sum(createdAt))" />		
 			</pubDate>
 			<itunes:duration>
-				<xsl:value-of select="media/duration" />
+				<xsl:value-of select="round(sum(media/duration) div 1000)" />
 			</itunes:duration>
 			<itunes:keywords>
 			   <xsl:value-of select="customData/metadata/Keywords" />
