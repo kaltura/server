@@ -36,6 +36,10 @@ class kConf extends kConfLocal
 				// production environment hit by unexpected random parameters
 				"v3cache_ignore_params" => array(),
 			
+		     	//xslt_enabled_php_functions.can be used in as a parameter in registerPHPFunctions
+			    "xslt_enabled_php_functions" =>array(
+			       	 'date'),
+			
 				// actions that can be cached although an admin ks is used
 				// due to bad integration by the partner
 				"v3cache_ignore_admin_ks" => array(),
