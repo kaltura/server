@@ -7,7 +7,7 @@ xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
 xmlns:php="http://php.net/xsl"
 exclude-result-prefixes="xs">
   <xsl:output method="xml" encoding="UTF-8" indent="yes" />
-   <xsl:variable name="distributionProfileName" select="'My Hub'"/>
+   <xsl:variable name="distributionProfileName" select="'My Hab'"/>
   
   
   <xsl:template name="rss" match="/">
@@ -38,9 +38,6 @@ exclude-result-prefixes="xs">
   <xsl:template name="item" match="item">
 	<xsl:variable name="podFlvor" select="distribution[@distributionProfileName=$distributionProfileName]/flavorAssetIds/flavorAssetId" />
 		<item>
-			<m>
-			   <xsl:value-of select="$podFlvor" />
-			</m>
 			<title>
 			  <xsl:value-of select="name" />		
 			</title>
@@ -60,7 +57,7 @@ exclude-result-prefixes="xs">
 			  <xsl:value-of select="description" />		
 			</itunes:summary>
 			<itunes:image href="{thumbnailUrl/@url}" />
-			<enclosure url="{content[@flavorAssetId=$podFlvor]/@url}" length="" type="" />
+			<enclosure url="{content[@flavorAssetId=$podFlvor]/@url}" length="" type="video/mp4" />
 			<guid>
 			  <xsl:value-of select="entryId" />				
 			</guid>
