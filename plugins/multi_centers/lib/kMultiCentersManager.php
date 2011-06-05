@@ -5,13 +5,17 @@ class kMultiCentersManager
 	
 	/**
 	 * @param string $entryId
-	 * @param int $partnerId
+	 * @param FileSync $object
 	 * @param int $fileSyncId
 	 * @param string $sourceFileUrl
 	 * @return BatchJob
 	 */
-	public static function addFileSyncImportJob($entryId, $partnerId, $fileSyncId, $sourceFileUrl, BatchJob $parnetJob = null)
+	public static function addFileSyncImportJob($entryId, FileSync $fileSync, $sourceFileUrl, BatchJob $parnetJob = null)
 	{
+		$partnerId = $fileSync->getPartnerId();
+		$fileSyncId = $fileSync->getId();
+		$dc = $fileSync->getDc();
+		
 		KalturaLog::log(__METHOD__ . " entryId[$entryId], partnerId[$partnerId], fileSyncId[$fileSyncId], sourceFileUrl[$sourceFileUrl]");
 		
 		$fileSyncImportData = new kFileSyncImportJobData();
@@ -22,11 +26,12 @@ class kMultiCentersManager
 		$batchJob = null;
 		if($parnetJob)
 		{
-			$batchJob = $parentJob->createChild();
+			$batchJob = $parentJob->createChild(true, $dc);
 		}
 		else
 		{
 			$batchJob = new BatchJob();
+			$batchJob->setDc($dc);
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
