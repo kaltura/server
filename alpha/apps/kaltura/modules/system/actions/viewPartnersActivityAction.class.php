@@ -15,6 +15,7 @@ class viewPartnersActivityAction extends kalturaSystemAction
 {
 	public function execute()
 	{
+		die;
 		ini_set("memory_limit","128M");
 		$this->forceSystemAuthentication();
 		
