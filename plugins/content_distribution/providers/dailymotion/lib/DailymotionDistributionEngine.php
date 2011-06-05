@@ -66,7 +66,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$props = array();
 		$props['tags'] = str_replace(',', ' , ', $tags);
 		$props['title'] = $entry->name;
-		$props['channel'] = $this->findMetadataValue($metadataObjects, 'DailymotionCategory');
+		$props['channel'] = $this->getCategory($metadataObjects);
 		$props['description'] = $description;
 		$props['date'] = time();
 		$props['language'] = 'en';
@@ -76,6 +76,25 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 			$props['private']= !$enabled;
 
 		return $props;
+	}
+	
+	/**
+	 * Tries to transalte the friendly name of the category to the api value, if not found the same value will be returned (as a fallback)
+	 * @param string $category
+	 */
+	protected function translateCategory($category)
+	{
+		foreach(DailyMotionImpl::getCategoriesMap() as $id => $name)
+		{
+			if ($name == $category)
+				return $id;
+		}
+		return $category;
+	}
+	
+	protected function getCategory($metadataObjects)
+	{
+		return $this->translateCategory($this->findMetadataValue($metadataObjects, 'DailymotionCategory'));
 	}
 	
 	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaDailymotionDistributionProfile $distributionProfile)

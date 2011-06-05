@@ -10,6 +10,25 @@ class DailyMotionImpl
 	private $apiSecret = "aa8e888a2927dc1d54f2d1a0bd98ca51d1e65a98";
 	private $user = "";
 	private $pass = "";
+	
+	private static $categoriesMap = array(
+		"animals" => "Animals",
+		"creation" => "Arts",
+		"auto" => "Auto Moto",
+		"school" => "College",
+		"shortfilms" => "Film and TV",
+		"fun" => "Funny",
+		"videogames" => "Gaming",
+		"lifestyle" => "Life and Style",
+		"music" => "Music",
+		"news" => "News and Politics",
+		"people" => "People and Family",
+		"sexy" => "Sexy",
+		"sport" => "Sports and Extreme",
+		"tech" => "Tech and Science",
+		"travel" => "Travel",
+		"webcam" => "Webcam and Vlogs",
+	);
 
 	public function __construct($user, $pass)
 	{
@@ -69,6 +88,11 @@ class DailyMotionImpl
 	{
 		$result = $this->call('video.status', array('id' => $id));
 		return $result['status'];
+	}
+	
+	public static function getCategoriesMap()
+	{
+		return self::$categoriesMap;
 	}
 }
 
