@@ -135,7 +135,12 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		
 		if ( $this->isNew() )
 		{
-			$this->setDc ( kDataCenterMgr::getCurrentDcId());
+			// set the dc to the current data center ONLY if it wasnt initialized
+			// this is required in the special case of file_sync import jobs which are created on one dc but run from the other
+			// all other jobs run from the same datacenter they were created on.
+			// setting the dc later results in a race condition were the job is picked up by the current datacenter before the dc value is changed 
+			if(is_null($this->dc) || !$this->isColumnModified(BatchJobPeer::DC))
+				$this->setDc ( kDataCenterMgr::getCurrentDcId());
 		
 			// if the status not set upon creation
 			if(is_null($this->status) || !$this->isColumnModified(BatchJobPeer::STATUS))
@@ -402,7 +407,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	/**
 	 * @return BatchJob
 	 */
-	public function createChild($same_root = true)
+	public function createChild($same_root = true, $dc = null)
 	{
 		$child = new BatchJob();
 		
@@ -413,7 +418,9 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$child->setPriority($this->priority);
 		$child->setSubpId($this->subp_id);
 		$child->setBulkJobId($this->bulk_job_id);
-		$child->setDc($this->dc);
+		
+		// the condition is required in the special case of file_sync import jobs which are created on one dc but run from the other
+		$child->setDc($dc === null ? $this->dc : dc);
 		
 		if($same_root && $this->root_job_id)
 		{
