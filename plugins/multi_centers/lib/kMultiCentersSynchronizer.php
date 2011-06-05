@@ -64,9 +64,8 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 			return true;
 		}				
 		
-		$job = kMultiCentersManager::addFileSyncImportJob($this->getEntryId($object), $object->getPartnerId(), $object->getId(), $sourceFileUrl, $raisedJob);
+		$job = kMultiCentersManager::addFileSyncImportJob($this->getEntryId($object), $object, $sourceFileUrl, $raisedJob);
 		
-		$job->setDc($object->getDc());
 		$job->save();
 		
 		return true;
