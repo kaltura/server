@@ -477,11 +477,15 @@ class kFile
 		curl_close($ch);
 		fclose($f);
 		
+		//226:The server has fulfilled a GET request for the resource, and the response is a representation 
+		//    of the result of one or more instance-manipulations applied to the current instance.
+		//200:Standard response for successful HTTP requests. The actual response will depend on the request
+		//    method used. In a GET request, the response will contain an entity corresponding to the 
+		//    requested resource. In a POST request the response will contain an entity describing or
+		//    containing the result of the action
 		$validCodes = array(
 			200,
-			226,
-			301, 
-			302,
+			226
 		);
 		return in_array($result, $validCodes);
 	}
