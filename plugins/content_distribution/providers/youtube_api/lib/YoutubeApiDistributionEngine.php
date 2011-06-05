@@ -64,6 +64,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 				if($metadataCategory)
 					$category = $metadataCategory;
 					
+				$category = $this->translateCategory($category);
 				$metadataDescription = $this->findMetadataValue($metadataObjects, 'YoutubeDescription');
 				if($metadataDescription && strlen($metadataDescription))
 					$description = $metadataDescription;
@@ -97,6 +98,20 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		KalturaLog::debug("Props [" . print_r($props, true) . "]");
 
 		return $props;
+	}
+	
+	/**
+	 * Tries to transalte the friendly name of the category to the api value, if not found the input value will be returned (as a fallback)
+	 * @param string $category
+	 */
+	protected function translateCategory($category)
+	{
+		foreach(YouTubeApiImpl::getCategoriesMap() as $id => $name)
+		{
+			if ($name == $category)
+				return $id;
+		}
+		return $category;
 	}
 	
 	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)

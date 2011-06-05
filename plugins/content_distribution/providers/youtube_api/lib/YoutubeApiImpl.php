@@ -33,6 +33,24 @@ class YouTubeApiImpl
 	private $applicationId = 'APIDistributer'; 
 	private $clientId = 'APIDistributer'; 
 	
+	private static $categoriesMap = array(
+		'Autos' => 'Autos and Vehicles',
+		'Comedy' => 'Comedy',
+		'Education' => 'Education',
+		'Entertainment' => 'Entertainment',
+		'Film' => 'Film and Animation',
+		'Games' => 'Gaming',
+		'Howto' => 'Howto and Style',
+		'Music' => 'Music',
+		'News' => 'News and Politics',
+		'Nonprofit' => 'Nonprofits and Activism',
+		'People' => 'People and Blogs',
+		'Animals' => 'Pets and Animals',
+		'Tech' => 'Science and Technology',
+		'Sports' => 'Sports',
+		'Travel' => 'Travel and Events',
+	);
+	
 	public function __construct($user, $pass)
 	{
 		$this->httpClient = Zend_Gdata_ClientLogin::getHttpClient($username = $user,               
@@ -301,6 +319,11 @@ class YouTubeApiImpl
 	{
 		$videoEntry = $this->yt->getVideoEntry($remoteId,'http://gdata.youtube.com/feeds/users/default/uploads', true); 
 		$this->yt->delete($videoEntry);
+	}
+	
+	public static function getCategoriesMap()
+	{
+		return self::$categoriesMap;
 	}
 }
 /*
