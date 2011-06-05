@@ -109,13 +109,13 @@ class kBusinessPostConvertDL
 		$profile = null;
 		try{
 			$profile = myPartnerUtils::getConversionProfile2ForEntry($currentFlavorAsset->getEntryId());
+			KalturaLog::debug("profile [" . $profile->getId() . "]");
 		}
 		catch(Exception $e)
 		{
 			KalturaLog::err($e->getMessage());
 		}
-		KalturaLog::debug("profile [" . $profile->getId() . "]");
-		
+				
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
 		
