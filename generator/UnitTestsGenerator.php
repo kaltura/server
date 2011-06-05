@@ -4,12 +4,17 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	private $_txtBase = "";
 	private $_txtTest = "";
 	private $_txtIni = "";
+	private $_txtXml = "";
+	private $_txtXmlSource = "";
+	
 	private $lastDependencyTest = "testFunction";
 	
 	protected function writeHeader(){}
 	protected function writeFooter(){}
 	protected function writeBeforeServices(){}
+	
 	protected function writeAfterServices(){}
+	
 	protected function writeBeforeTypes(){}
 	protected function writeAfterTypes(){}
 	protected function writeType(KalturaTypeReflector $type){}
@@ -57,13 +62,19 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->_txtBase = '';
 		$this->_txtTest = '';
 		$this->_txtIni = '';
+		$this->_txtXml = '';
+		$this->_txtXmlSource = '';
+		
+		$this->writeXml("<?xml version='1.0'?>");
+		$this->writeXmlSource("<?xml version='1.0'?>");
+		$this->writeXmlSource("<TestsDataSource>");
 		
 		$this->writeBase("<?php");
 		$this->writeBase("");
 		$this->writeBase("/**");
 		$this->writeBase(" * $serviceName service base test case.");
 		$this->writeBase(" */");
-		$this->writeBase("abstract class {$serviceClass}BaseTest extends KalturaApiTestCase");
+		$this->writeBase("abstract class {$serviceClass}TestBase extends KalturaApiTestCase");
 		$this->writeBase("{");
 		
 		
@@ -74,22 +85,24 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeTest("/**");
 		$this->writeTest(" * $serviceName service test case.");
 		$this->writeTest(" */");
-		$this->writeTest("class {$serviceClass}Test extends {$serviceClass}BaseTest");
+		$this->writeTest("class {$serviceClass}Test extends {$serviceClass}TestBase");
 		$this->writeTest("{");
 
-		
 		$this->writeIni("[config]");
-		$this->writeIni("source                                            = ini");
-		$this->writeIni("serviceUrl                                        = http://localhost/");
-		$this->writeIni("partnerId                                         = 100");
+		$this->writeIni("source                                            = xml");
+		$this->writeIni("serviceUrl                                        = http://devtests.kaltura.dev/");
+		$this->writeIni("partnerId                                         = 495787");
 		$this->writeIni("clientTag                                         = unitTest");
 		$this->writeIni("curlTimeout                                       = 90");
 		$this->writeIni("startSession                                      = 1");
-		$this->writeIni("secret                                            = PARTNER_SECRET");
+		$this->writeIni("secret                                            = 2dc17b5563696fceb430a8431a2e4a32");
 		$this->writeIni("userId                                            = ");
 		$this->writeIni("sessionType                                       = 0");
 		$this->writeIni("expiry                                            = 86400");
 		$this->writeIni("privileges                                        = ");
+		
+		$this->writeXml("<TestCaseData testCaseName='{$serviceClass}Test'>");
+		$this->writeXmlSource("	<TestCaseData testCaseName='{$serviceClass}Test'>");
 	}
 	
 	protected function writeService(KalturaServiceReflector $serviceReflector)
@@ -98,8 +111,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$serviceId = $serviceReflector->getServiceId();
 		$serviceClass = $serviceReflector->getServiceClass();
 		$actions = $serviceReflector->getActions();
-	
-		
+				
 		foreach($actions as $action => $actionName)
 		{
 			$actionInfo = $serviceReflector->getActionInfo($action);
@@ -150,10 +162,16 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$servicePath = KAutoloader::getClassFilePath($serviceClass);
 			$testPath = realpath(dirname($servicePath) . '/../') . "/tests/services/$serviceName";
 		}
+
+		$this->writeXml("</TestCaseData>"); // Close the XML tag for the test case
+		$this->writeXmlSource("	</TestCaseData>"); // Close the XML tag for the test case
+		$this->writeXmlSource("</TestsDataSource>");
 		
-		$this->writeToFile("$testPath/{$serviceClass}BaseTest.php", $this->_txtBase);
+		$this->writeToFile("$testPath/{$serviceClass}TestBase.php", $this->_txtBase);
 		$this->writeToFile("$testPath/{$serviceClass}Test.php", $this->_txtTest, false);
 		$this->writeToFile("$testPath/{$serviceClass}Test.php.ini", $this->_txtIni, false);
+		$this->writeToFile("$testPath/testsData/{$serviceClass}Test.data", $this->_txtXml, false);
+		$this->writeToFile("$testPath/testsData/{$serviceClass}Test.config", $this->_txtXmlSource, false); //TODO: change the file extension to source
 	}
 
 	protected function writeServiceBaseAction($serviceId, $serviceName, $action, $actionParams, KalturaParamInfo $outputTypeReflector = null, $testReturnedType = 'int')
@@ -162,7 +180,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		$this->writeIni("");
 		$this->writeIni("[test{$actionName}]");
-		
+		$this->writeXml("<TestProcedureData testProcedureName='test$actionName'>");
+		$this->writeXml("	<TestCaseData testCaseInstanceName='test$actionName with data set #0'>");
+				
 		$this->writeBase("	/**");
 		$this->writeBase("	 * Tests {$serviceName}->{$action} action");
 	
@@ -174,26 +194,52 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		{
 			$paramType = $actionParam->getType();
 			$paramName = $actionParam->getName();
+			
 			if($paramType == 'int' && $paramName == 'id')
 			{
 				$addId = true;
 				$testValues[] = '$id';
-				$this->writeIni("test1.$paramName.type = dependency");
+				if($paramName == 'type')
+				{
+					$this->writeIni("test1.objType.$paramName = dependency");
+				}
+				else
+				{
+					$this->writeIni("test1.$paramName.type = dependency");
+				}
+				
+				$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = ''>");
+				$this->writeXml("		</Input>");
 				continue;
 			}
 		
 			if($actionParam->isSimpleType() || $actionParam->isEnum())
 			{
-				$this->writeIni("test1.$paramName = " . $actionParam->getDefaultValue());
+				$paramDefaultValue = $actionParam->getDefaultValue();
+				$this->writeIni("test1.$paramName = " . $paramDefaultValue );
+				$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = '$paramDefaultValue'>");
+				$this->writeXml("		</Input>");
 			}
 			elseif($actionParam->isFile())
 			{
 				$this->writeIni("test1.$paramName.type = file");
 				$this->writeIni("test1.$paramName.path = ");
+				$this->writeXml("		<Input name = '$paramName' type = 'file' key = ''>");
+				$this->writeXml("		</Input>");
 			}
 			else
 			{
-				$this->writeIni("test1.$paramName.type = $paramType");
+				if($paramName == 'type')
+				{
+					$this->writeIni("test1.objType.$paramName = $paramType");
+				}
+				else
+				{
+					$this->writeIni("test1.$paramName.type = $paramType");
+				}
+				
+				$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = ''>");
+				
 				$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
 				foreach($actionParamProperties as $actionParamProperty)
 				{
@@ -205,42 +251,70 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					
 					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
 					{
-						$this->writeIni("test1.$paramName.$propertyName = " . $actionParamProperty->getDefaultValue());
+						$defaultValue = $actionParamProperty->getDefaultValue();
+						$this->writeIni("test1.$paramName.$propertyName = " . $defaultValue);
+						$this->writeXml("			<$propertyName>$defaultValue</$propertyName>");
 					}
 					elseif($actionParamProperty->isFile())
 					{
 						$this->writeIni("test1.$paramName.$propertyName.type = file");
 						$this->writeIni("test1.$paramName.$propertyName.path = ");
+						$this->writeXml("			<$propertyName>file not supported yet...</$propertyName>");
 					}
 					else
 					{
-						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
+						if($propertyName == 'type')
+						{
+							$this->writeIni("test1.$paramName.objType.$propertyName = $propertyType");
+						}
+						else
+						{
+							$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
+						}
+						
+						$this->writeXml("			<$propertyName>$propertyType</$propertyName>");
 					}
 				}
+				$this->writeXml("		</Input>");
 			}
 			
 			$paramDesc = $actionParam->getDescription();
 			$this->writeBase("	 * @param $paramType \$$paramName $paramDesc");
-			if(!$actionParam->isComplexType())
-				$testParam = "\$$paramName";
+			
+			if(!$actionParam->isComplexType() || //it the param is not: complex
+			   $actionParam->isEnum() || //or it is an enum then we dont print the type 
+			   $actionParam->isStringEnum() || 
+			   $actionParam->isDynamicEnum())
+					$testParam = "\$$paramName";
 			else
 				$testParam = "$paramType \$$paramName";
 				
 			if($actionParam->isOptional())
 			{
-				if($actionParam->getDefaultValue())
+				if ($actionParam->isSimpleType())
 				{
-					if($actionParam->getType() == 'string')
-						$testParam .= " = '" . $actionParam->getDefaultValue() . "'";
-					else
-						$testParam .= " = " . $actionParam->getDefaultValue();
+					$defaultValue = $actionParam->getDefaultValue();
+					
+					if ($defaultValue === "false")
+						$testParam .= " = false";
+					else if ($defaultValue === "true")
+						$testParam .= " = true";
+					else if ($defaultValue === "null")
+						$testParam .= " = null";
+					else if ($paramType == "string")
+						$testParam .= " = \"$defaultValue\"";
+					else if ($paramType == "int")
+					{
+						if ($defaultValue == "")
+							$testParam .= " = \"\""; // hack for partner.getUsage
+						else
+							$testParam .= " = $defaultValue";
+					} 
 				}
 				else
-				{
 					$testParam .= " = null";
-				}
 			}
-				
+					
 			$testParams[] = $testParam;
 			$testValues[] = "\$$paramName";
 			$validateValues[] = "\$$paramName";
@@ -249,18 +323,26 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if($outputTypeReflector)
 		{
 			$paramType = $outputTypeReflector->getType();
+			$paramName = $outputTypeReflector->getName();
+			
 			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
 			{
 				$this->writeIni("test1.reference = " . $outputTypeReflector->getDefaultValue());
+				$this->writeXml("		<OutputReference name = '$paramName' type = '$paramType' key = '$defaultValue' >");
+				$this->writeXml("		</OutputReference>");
 			}
 			elseif($outputTypeReflector->isFile())
 			{
 				$this->writeIni("test1.reference.type = file");
 				$this->writeIni("test1.reference.path = ");
+				$this->writeXml("		<OutputReference name = '$paramName' type = 'file' key = 'path/to/file'>");
+				$this->writeXml("		</OutputReference>");
 			}
 			else
 			{
 				$this->writeIni("test1.reference.type = $paramType");
+				$this->writeXml("		<OutputReference name = '$paramName' type = '$paramType' key = 'object key'>");
+				
 				$actionParamProperties = $outputTypeReflector->getTypeReflector()->getProperties();
 				foreach($actionParamProperties as $actionParamProperty)
 				{
@@ -272,19 +354,32 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					
 					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
 					{
-						$this->writeIni("test1.reference.$propertyName = " . $actionParamProperty->getDefaultValue());
+						$defaultValue = $actionParamProperty->getDefaultValue();
+						$this->writeIni("test1.reference.$propertyName = " . $defaultValue);
+						$this->writeXml("			<$propertyName>$defaultValue </$propertyName>");
 					}
 					elseif($actionParamProperty->isFile())
 					{
 						$this->writeIni("test1.reference.$propertyName.type = file");
 						$this->writeIni("test1.reference.$propertyName.path = ");
+						$this->writeXml("			<$propertyName>'file is not supported yet'</$propertyName>");
 					}
 					else
 					{
-						$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+						if($propertyName == 'type')
+						{
+							$this->writeIni("test1.reference.objType.$propertyName = $propertyType");
+						}
+						else
+						{
+							$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+						}
+						
+						$this->writeXml("			<$propertyName>'$propertyType'</$propertyName>");
 					}
 				}
 			}
+			$this->writeXml("		</OutputReference>");
 			
 			$paramDesc = $outputTypeReflector->getDescription();
 			$this->writeBase("	 * @param $paramType \$reference $paramDesc");
@@ -310,6 +405,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$testParams[] = $testParam;
 			$validateValues[] = "\$reference";
 		}
+		
+		
+		$this->writeXml("	</TestCaseData>");
+		$this->writeXml("</TestProcedureData>");
 		
 		if($addId)
 		{
@@ -345,12 +444,15 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("	{");
 		$this->writeBase("		\$resultObject = \$this->client->{$serviceName}->{$action}($testValues);");
 		if($outputType)
-		$this->writeBase("		\$this->assertType('$outputType', \$resultObject);");
+		{
+			$this->writeBase("		\$this->assertType('$outputType', \$resultObject);");
+			$this->writeBase("		\$this->compareApiObjects('$paramName', \$reference);");
+		}
 		if($testReturnedType)
-		$this->writeBase("		\$this->assertNotNull(\$resultObject->id);");
+			$this->writeBase("		\$this->assertNotNull(\$resultObject->id);");
 		$this->writeBase("		\$this->validate{$actionName}($validateValues);");
 		if($testReturnedType)
-		$this->writeBase("		return \$resultObject->id;");
+			$this->writeBase("		return \$resultObject->id;");
 		$this->writeBase("	}");
 		$this->writeBase("");
 		
@@ -398,6 +500,12 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		$this->writeIni("");
 		$this->writeIni("[test{$actionName}]");
+
+		$this->writeXml("<TestProcedureData testProcedureName='test$actionName'>");
+		$this->writeXml("	<TestCaseData testCaseInstanceName='test$actionName with data set #0'>");
+		
+		$this->writeXmlSource("		<TestProcedureData testProcedureName='test$actionName'>");
+		$this->writeXmlSource("			<TestCaseData testCaseInstanceName='test$actionName with template data set'>");
 		
 		$this->writeTest("	/**");
 		$this->writeTest("	 * Tests {$serviceName}->{$action} action");
@@ -409,6 +517,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		{
 			$paramType = $actionParam->getType();
 			$paramName = $actionParam->getName();
+			$this->writeXmlSource("				<Input name = '$paramName' type = '$paramType' key = 'Fill object key'/>");
+			
 			if($paramType == 'int' && $paramName == 'id')
 			{
 				$addId = true;
@@ -417,24 +527,38 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			}
 			
 			$this->writeTest("	 * @param $paramType \$$paramName");
-			if(!$actionParam->isComplexType())
+			if(!$actionParam->isComplexType() || //it the param is not: complex
+			   $actionParam->isEnum() || //or it is an enum then we dont print the type 
+			   $actionParam->isStringEnum() || 
+			   $actionParam->isDynamicEnum())
 				$testParam = "\$$paramName";
 			else
 				$testParam = "$paramType \$$paramName";
 				
 			if($actionParam->isOptional())
 			{
-				if($actionParam->getDefaultValue())
+				if ($actionParam->isSimpleType())
 				{
-					if($actionParam->getType() == 'string')
-						$testParam .= " = '" . $actionParam->getDefaultValue() . "'";
-					else
-						$testParam .= " = " . $actionParam->getDefaultValue();
+					$defaultValue = $actionParam->getDefaultValue();
+					
+					if ($defaultValue === "false")
+						$testParam .= " = false";
+					else if ($defaultValue === "true")
+						$testParam .= " = true";
+					else if ($defaultValue === "null")
+						$testParam .= " = null";
+					else if ($paramType == "string")
+						$testParam .= " = \"$defaultValue\"";
+					else if ($paramType == "int")
+					{
+						if ($defaultValue == "")
+							$testParam .= " = \"\""; // hack for partner.getUsage
+						else
+							$testParam .= " = $defaultValue";
+					} 
 				}
 				else
-				{
 					$testParam .= " = null";
-				}
 			}
 				
 			$testParams[] = $testParam;
@@ -444,18 +568,31 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if($outputTypeReflector)
 		{
 			$paramType = $outputTypeReflector->getType();
+			$paramName = $outputTypeReflector->getName();
+			$this->writeXmlSource("				<OutputReference name = '$paramName' type = '$paramType' key = 'Fill the object key' />");
+			
 			if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
 			{
-				$this->writeIni("test1.reference = " . $outputTypeReflector->getDefaultValue());
+				$defaultValue = $outputTypeReflector->getDefaultValue();
+				
+				$this->writeIni("test1.reference = " . $defaultValue );
+				$this->writeXml("		<OutputReference name = '$paramName' type = '$paramType' key = '$defaultValue' >");
+				
 			}
 			elseif($outputTypeReflector->isFile())
 			{
 				$this->writeIni("test1.reference.type = file");
 				$this->writeIni("test1.reference.path = ");
+				
+				//TODO: add support for files in XML
+				$this->writeXml("		<OutputReference name = '$paramName' type='file' key='path/to/file'>");
+				$this->writeXml("		</OutputReference>");
 			}
 			else
 			{
 				$this->writeIni("test1.reference.type = $paramType");
+				$this->writeXml("		<OutputReference name = '$paramName' type = '$paramType' key = ''>");
+								
 				$actionParamProperties = $outputTypeReflector->getTypeReflector()->getProperties();
 				foreach($actionParamProperties as $actionParamProperty)
 				{
@@ -467,19 +604,35 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					
 					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
 					{
-						$this->writeIni("test1.reference.$propertyName = " . $actionParamProperty->getDefaultValue());
+						$paramDefaultValue = $actionParamProperty->getDefaultValue();
+						$this->writeIni("test1.reference.$propertyName = " . $paramDefaultValue);
+						$this->writeXml("			<$propertyName>$paramDefaultValue</$propertyName>");
 					}
 					elseif($actionParamProperty->isFile())
 					{
 						$this->writeIni("test1.reference.$propertyName.type = file");
 						$this->writeIni("test1.reference.$propertyName.path = ");
+						
+						//TODO: add support for files in XML
+						$this->writeXml("			<OutputReference name = '$paramName' type='file' key= 'path/to/file'>");
 					}
 					else
 					{
-						$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+						if($propertyName == 'type')
+						{
+							//Causes bug in the Zend config
+							$this->writeIni("test1.reference.objType.$propertyName = $propertyType");
+						}
+						else
+						{
+							$this->writeIni("test1.reference.$propertyName.type = $propertyType");
+						}
+						$this->writeXml("			<$propertyName>$propertyType</$propertyName>");
 					}
 				}
 			}
+			$this->writeXml("		</OutputReference>");
+			
 			$this->writeTest("	 * @param $paramType \$reference");
 			if(!$outputTypeReflector->isComplexType())
 				$testParam = "\$reference";
@@ -504,6 +657,12 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$testValues[] = "\$reference";	
 		}
 		
+		$this->writeXml("	</TestCaseData>");
+		$this->writeXml("</TestProcedureData>");
+	
+		$this->writeXmlSource("			</TestCaseData>");
+		$this->writeXmlSource("		</TestProcedureData>");
+	
 		if($addId)
 		{
 			$this->writeTest("	 * @param int id - returned from testAdd");
@@ -543,11 +702,43 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->_txtTest .= $txt ."\n";
 	}
 	
+	/**
+	 * 
+	 * Writes data to the ini var
+	 * @param string $txt
+	 */
 	private function writeIni($txt = "")
 	{
 		$this->_txtIni .= $txt ."\n";
 	}
 	
+	/**
+	 * 
+	 * Writes data to the xml var
+	 * @param string $txt
+	 */
+	private function writeXml($txt = "")
+	{
+		$this->_txtXml .= $txt ."\n";
+	}
+		
+	/**
+	 * 
+	 * Writes data to the xml var
+	 * @param string $txt
+	 */
+	private function writeXmlSource($txt = "")
+	{
+		$this->_txtXmlSource .= $txt ."\n";
+	}
+	
+	/**
+	 * 
+	 * Writes a given string into a given file (creates if non exists)
+	 * @param string $fileName
+	 * @param string $contents
+	 * @param bool $overwrite
+	 */
 	private function writeToFile($fileName, $contents, $overwrite = true)
 	{
 		if(file_exists($fileName) && !$overwrite)
