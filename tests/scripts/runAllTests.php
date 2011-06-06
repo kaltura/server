@@ -1,34 +1,31 @@
 <?php
 
-require_once (dirname(__FILE__) . "/../bootstrap.php");
-
 define('API_TEST_DIR', "c:/opt/kaltura/app/tests/api");
 
-if ($apiTestDir = opendir(API_TEST_DIR)) 
+if ($apiTestDir = opendir(API_TEST_DIR)) // Checks if the test API folder is a dir 
 {
     echo "API Tests Directory handle: " . API_TEST_DIR . "\n";
 
     /* This is the correct way to loop over the directory. */
     while (false !== ($serviceDirName = readdir($apiTestDir))) 
     {
-    	print("Checking service: $serviceDirName\n");
     	$isDir = is_dir(API_TEST_DIR . "/" . $serviceDirName);
         
-        if($isDir)
+        if($isDir) // Checks if the current service dir is a dir 
         {
         	print("Testing service: $serviceDirName\n");
         	$serviceDir = opendir(API_TEST_DIR . "/" . $serviceDirName);
         	
         	if($serviceDir)
         	{
-	        	while (false !== ($testFile = readdir($serviceDir))) 
+	        	while (false !== ($testFile = readdir($serviceDir))) //Reads all files from the service dir 
 	        	{
 	        		$testFile = API_TEST_DIR . "/" . $serviceDirName . "/" . $testFile;
 	        		$isFile = is_file($testFile);
 	        		$isIni = substr_count($testFile, "Test.php.ini");
 	        		$isTest = substr_count($testFile, "Test.php");
 	        		
-	        		if($isFile && $isIni && $isTest)
+	        		if($isFile && $isIni && $isTest) //Run only the test file
 	        		{
 	        			print("Running test: $testFile!\n");
 	        			$output = array();
