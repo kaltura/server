@@ -356,7 +356,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					{
 						$defaultValue = $actionParamProperty->getDefaultValue();
 						$this->writeIni("test1.reference.$propertyName = " . $defaultValue);
-						$this->writeXml("			<$propertyName>$defaultValue </$propertyName>");
+						$this->writeXml("			<$propertyName>$defaultValue</$propertyName>");
 					}
 					elseif($actionParamProperty->isFile())
 					{
