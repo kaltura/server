@@ -1,6 +1,6 @@
 <?php
 
-class KalturaTestCaseBase extends PHPUnit_Framework_TestCase{
+class exampleTest extends PHPUnit_Framework_TestCase{
 	public function testExample1(){ 
 			$res = 0;
 		
