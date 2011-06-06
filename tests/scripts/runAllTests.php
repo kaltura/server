@@ -25,7 +25,7 @@ if ($apiTestDir = opendir(API_TEST_DIR)) // Checks if the test API folder is a d
 	        		$isIni = substr_count($testFile, "Test.php.ini");
 	        		$isTest = substr_count($testFile, "Test.php");
 	        		
-	        		if($isFile && $isIni && $isTest) //Run only the test file
+	        		if($isFile && $isTest && !$isIni) //Run only the test file
 	        		{
 	        			print("Running test: $testFile!\n");
 	        			$output = array();
