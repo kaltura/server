@@ -1,6 +1,6 @@
 <?php
 
-define('API_TEST_DIR', "c:/opt/kaltura/app/tests/api");
+define('API_TEST_DIR', "/opt/kaltura/app/tests/api");
 
 if ($apiTestDir = opendir(API_TEST_DIR)) // Checks if the test API folder is a dir 
 {
