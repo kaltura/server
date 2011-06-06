@@ -28,7 +28,7 @@ FROM
 	SUM(count_audio) count_audio,
 	SUM(count_mix) count_mix,
 	SUM(count_image) count_image,
-	SUM(count_bandwidth) count_bandwidth,
+	SUM(ifnull(count_bandwidth, 0) + ifnull(count_streaming, 0)/1024) count_bandwidth,
 	SUM(count_storage) count_storage
 	FROM kalturadw.dwh_hourly_partner aggr_partner RIGHT JOIN kalturadw.dwh_dim_partners dim_partner
 	ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
