@@ -9,6 +9,13 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * 
+	 * The test result
+	 * @var bool
+	 */
+	protected $result;
+	
+	/**
+	 * 
 	 * Indicates wheter the test framework was initialized 
 	 * @var bool
 	 */
