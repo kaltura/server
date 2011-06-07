@@ -363,7 +363,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		print("In RunTest\n");
 
-		if(property_exists($this, dependencyInput))
+		if(property_exists($this, 'dependencyInput'))
 		{
 			foreach ($this->dependencyInput as $index => $value)
 				$this->data[$index] = $value;
