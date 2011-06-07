@@ -363,10 +363,14 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		print("In RunTest\n");
 
-		foreach ($this->dependencyInput as $index => $value)
-			$this->data[$index] = $value;
-		$this->dependencyInput = array();
-		
+		if(property_exists($this, dependencyInput))
+		{
+			foreach ($this->dependencyInput as $index => $value)
+				$this->data[$index] = $value;
+			
+			$this->dependencyInput = array();
+		}
+			
 		$this->currentFailure = null;
 		
 		//if the fraemwork wasn't initiated we need to init here (caused becasue only here we add our listener )
