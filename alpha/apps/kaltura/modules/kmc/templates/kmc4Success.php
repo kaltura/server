@@ -137,7 +137,7 @@ else
 			appStudioExampleEntry : "<?php echo $appStudioExampleEntry ?>", 
 			appStudioExamplePlayList0	 : "<?php echo $appStudioExamplePlayList0 ?>",
 			appStudioExamplePlayList1	 : "<?php echo $appStudioExamplePlayList1 ?>",
-			language	 : "<?php echo ($language?$language:'') ?>"
+			language	 : "<?php echo (isset($language) ? $language : '') ?>"
 		}
 	}
 </script>
