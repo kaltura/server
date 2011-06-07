@@ -81,6 +81,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeTest("<?php");
 		$this->writeTest("");
 		$this->writeTest("require_once(dirname(__FILE__) . '$bootstrapPath');");
+		$this->writeTest("require_once(dirname(__FILE__) . /'$serviceClass'TestBase.php);");
 		$this->writeTest("");
 		$this->writeTest("/**");
 		$this->writeTest(" * $serviceName service test case.");
