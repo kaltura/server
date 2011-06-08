@@ -242,7 +242,7 @@ class KalturaObject
 						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						$this->$propertyName = null;
-						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error: '.$e->getMessage());
 					}
 				}
 			}
@@ -288,7 +288,7 @@ class KalturaObject
 						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						$this->$propertyName = null;
-						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error: '.$e->getMessage());
 					}
 				}
 			}
