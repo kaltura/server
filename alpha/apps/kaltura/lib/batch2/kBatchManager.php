@@ -396,7 +396,7 @@ class kBatchManager
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry) {
-			KalturaLog::err("Entry was not found for job id [$entryId]");
+			KalturaLog::err("Entry was not found for id [$entryId]");
 			return null;
 		}
 		
