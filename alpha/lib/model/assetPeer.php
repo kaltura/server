@@ -215,6 +215,20 @@ class assetPeer extends BaseassetPeer
 	 * @param string $entryId
 	 * @return array<flavorAsset>
 	 */
+	public static function retrieveFlavorsByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(self::ENTRY_ID, $entryId);
+		$c->add(self::TYPE, assetType::THUMBNAIL, Criteria::NOT_EQUAL);
+		
+		return self::doSelect($c);
+	}
+	
+	/**
+	 * 
+	 * @param string $entryId
+	 * @return array<flavorAsset>
+	 */
 	public static function countThumbnailsByEntryId($entryId)
 	{
 		$c = new Criteria();
