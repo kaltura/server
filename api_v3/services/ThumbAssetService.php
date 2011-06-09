@@ -208,6 +208,13 @@ class ThumbAssetService extends KalturaBaseService
 			throw $e;
 		}
 
+		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$thumbAsset->setWidth($width);
+		$thumbAsset->setHeight($height);
+		$thumbAsset->setSize(filesize($finalPath));
+		
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$thumbAsset->save();
 	}
@@ -292,11 +299,14 @@ class ThumbAssetService extends KalturaBaseService
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
                 
-        $fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
-        $fileSync = kFileSyncUtils::resolve($fileSync);
-        
+		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
+		list($width, $height, $type, $attr) = getimagesize($finalPath);
+		
+		$thumbAsset->setWidth($width);
+		$thumbAsset->setHeight($height);
+		$thumbAsset->setSize(filesize($finalPath));
+		
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
-        $thumbAsset->setSize($fileSync->getFileSize());
 		$thumbAsset->save();
     }
     
@@ -332,6 +342,7 @@ class ThumbAssetService extends KalturaBaseService
         	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
         }
         $thumbAsset->incrementVersion();
+		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
         $thumbAsset->save();
         	
         $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

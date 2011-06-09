@@ -1616,12 +1616,9 @@ class kFlowHelper
 				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
 			}
 			catch (Exception $e) {
-				$dbEntry = $dbAsset->getentry();
-				if($dbEntry)
-				{
-					$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-					$dbEntry->save();
-				}
+				
+				if($dbAsset instanceof flavorAsset)
+					kBatchManager::updateEntry($dbAsset->getEntryId(), entryStatus::ERROR_IMPORTING);
 				
 				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 				$dbAsset->save();												
@@ -1630,7 +1627,23 @@ class kFlowHelper
 			
 	    	if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
 	    	{
-				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+				$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				$dbAsset->setSize(filesize($finalPath));
+					
+				if($dbAsset instanceof flavorAsset)
+				{
+					$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+				}
+	    	
+				if($dbAsset instanceof thumbAsset)
+				{
+					list($width, $height, $type, $attr) = getimagesize($finalPath);
+					
+					$dbAsset->setWidth($width);
+					$dbAsset->setHeight($height);
+					$dbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+				}
+				
 				$dbAsset->save();
 					
 	   			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
@@ -1656,8 +1669,10 @@ class kFlowHelper
 				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
 			}
 			catch (Exception $e) {
-				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-				$dbEntry->save();											
+				
+				if($dbAsset instanceof flavorAsset)
+					kBatchManager::updateEntry($dbEntry->getId(), entryStatus::ERROR_IMPORTING);
+					
 				throw $e;
 			}
 			$dbEntry->setStatus(entryStatus::READY);
