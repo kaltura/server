@@ -53,9 +53,9 @@ class kBusinessConvertDL
 				
 				unset($newAssets[$oldAsset->getFlavorParamsId()]);
 			}	
-			else
+			elseif($oldAsset instanceof flavorAsset)
 			{
-				KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
+				KalturaLog::debug("Delete old flavor asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 				
 				$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 				$oldAsset->setDeletedAt(time());
