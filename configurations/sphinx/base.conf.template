@@ -49,11 +49,11 @@ index kaltura_entry
 	
 	rt_attr_string			= str_entry_id
 	
-	blend_chars				= `, ~, !, @, #, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, ', ", \, |, /, ?, U+0C, ., <, >
+	blend_chars				= `, ~, !, @, U+23, $, %, ^, &, *, (, ), -, _, =, +, [, ], {, }, ;, :, ', ", \, |, /, ?, U+0C, ., <, >
 
 	charset_type			= utf-8
 								
-	charset_table			= 0..9, A..Z->a..z, _, a..z, U+410..U+42F->U+430..U+44F, U+430..U+44F, \
+	charset_table			= 0..9, A..Z->a..z, a..z, U+410..U+42F->U+430..U+44F, U+430..U+44F, \
 							U+00C6->U+00E6, U+01E2->U+00E6, U+01E3->U+00E6, U+01FC->U+00E6, U+01FD->U+00E6, U+1D01->U+00E6, U+1D02->U+00E6, U+1D2D->U+00E6, U+1D46->U+00E6, U+00E6, \
 							U+0622->U+0627, U+0623->U+0627, U+0624->U+0648, U+0625->U+0627, U+0626->U+064A, U+06C0->U+06D5, U+06C2->U+06C1, U+06D3->U+06D2, U+FB50->U+0671, U+FB51->U+0671, U+FB52->U+067B, U+FB53->U+067B, U+FB54->U+067B, U+FB56->U+067E, U+FB57->U+067E, U+FB58->U+067E, U+FB5A->U+0680, U+FB5B->U+0680, U+FB5C->U+0680, U+FB5E->U+067A, U+FB5F->U+067A, U+FB60->U+067A, U+FB62->U+067F, U+FB63->U+067F, U+FB64->U+067F, U+FB66->U+0679, U+FB67->U+0679, U+FB68->U+0679, U+FB6A->U+06A4, U+FB6B->U+06A4, U+FB6C->U+06A4, U+FB6E->U+06A6, U+FB6F->U+06A6, U+FB70->U+06A6, U+FB72->U+0684, U+FB73->U+0684, U+FB74->U+0684, U+FB76->U+0683, U+FB77->U+0683, U+FB78->U+0683, U+FB7A->U+0686, U+FB7B->U+0686, U+FB7C->U+0686, U+FB7E->U+0687, U+FB7F->U+0687, U+FB80->U+0687, U+FB82->U+068D, U+FB83->U+068D, U+FB84->U+068C, U+FB85->U+068C, U+FB86->U+068E, U+FB87->U+068E, U+FB88->U+0688, U+FB89->U+0688, U+FB8A->U+0698, U+FB8B->U+0698, U+FB8C->U+0691, U+FB8D->U+0691, U+FB8E->U+06A9, U+FB8F->U+06A9, U+FB90->U+06A9, U+FB92->U+06AF, U+FB93->U+06AF, U+FB94->U+06AF, U+FB96->U+06B3, U+FB97->U+06B3, U+FB98->U+06B3, U+FB9A->U+06B1, U+FB9B->U+06B1, U+FB9C->U+06B1, U+FB9E->U+06BA, U+FB9F->U+06BA, U+FBA0->U+06BB, U+FBA1->U+06BB, U+FBA2->U+06BB, U+FBA4->U+06C0, U+FBA5->U+06C0, U+FBA6->U+06C1, U+FBA7->U+06C1, U+FBA8->U+06C1, U+FBAA->U+06BE, U+FBAB->U+06BE, U+FBAC->U+06BE, U+FBAE->U+06D2, U+FBAF->U+06D2, U+FBB0->U+06D3, U+FBB1->U+06D3, U+FBD3->U+06AD, U+FBD4->U+06AD, U+FBD5->U+06AD, U+FBD7->U+06C7, U+FBD8->U+06C7, U+FBD9->U+06C6, U+FBDA->U+06C6, U+FBDB->U+06C8, U+FBDC->U+06C8, U+FBDD->U+0677, U+FBDE->U+06CB, U+FBDF->U+06CB, U+FBE0->U+06C5, U+FBE1->U+06C5, U+FBE2->U+06C9, U+FBE3->U+06C9, U+FBE4->U+06D0, U+FBE5->U+06D0, U+FBE6->U+06D0, U+FBE8->U+0649, U+FBFC->U+06CC, U+FBFD->U+06CC, U+FBFE->U+06CC, U+0621, U+0627..U+063A, U+0641..U+064A, U+0660..U+0669, U+066E, U+066F, U+0671..U+06BF, U+06C1, U+06C3..U+06D2, U+06D5, U+06EE..U+06FC, U+06FF, U+0750..U+076D, U+FB55, U+FB59, U+FB5D, U+FB61, U+FB65, U+FB69, U+FB6D, U+FB71, U+FB75, U+FB79, U+FB7D, U+FB81, U+FB91, U+FB95, U+FB99, U+FB9D, U+FBA3, U+FBA9, U+FBAD, U+FBD6, U+FBE7, U+FBE9, U+FBFF, \
 							U+0531..U+0556->U+0561..U+0586, U+0561..U+0586, U+0587, \
@@ -89,10 +89,10 @@ index kaltura_entry
 							U+1900..U+191C, U+1930..U+1938, U+1946..U+194F, \
 							U+0D05..U+0D0C, U+0D0E..U+0D10, U+0D12..U+0D28, U+0D2A..U+0D39, U+0D60, U+0D61, U+0D66..U+0D6F, \
 							U+C5->U+E5, U+E5, U+D8->U+F8, U+F8, U+C6->U+E6, U+E6, \
-							0..9, A..Z->a..z, _, -, a..z, U+D6->U+F6, U+C4->U+E4, U+C5->U+E5, U+F6, U+E4, U+E5, \
+							U+D6->U+F6, U+C4->U+E4, U+C5->U+E5, U+F6, U+E4, U+E5, \
 							U+0B94->U+0B92, U+0B85..U+0B8A, U+0B8E..U+0B90, U+0B92, U+0B93, U+0B95, U+0B99, U+0B9A, U+0B9C, U+0B9E, U+0B9F, U+0BA3, U+0BA4, U+0BA8..U+0BAA, U+0BAE..U+0BB9, U+0BE6..U+0BEF, \
 							U+0E01..U+0E30, U+0E32, U+0E33, U+0E40..U+0E46, U+0E50..U+0E5B, \
-							0..9, A..Z->a..z, a..z, U+0143->U+0144, U+0104->U+0105, U+0106->U+0107, U+0118->U+0119, U+0141->U+0142, U+00D3->U+00F3, U+015A->U+015B, U+0179->U+017A, U+017B->U+017C, U+0105, U+0107, U+0119, U+0142, U+00F3, U+015B, U+017A, U+017C, U+0144, \
+							U+0143->U+0144, U+0104->U+0105, U+0106->U+0107, U+0118->U+0119, U+0141->U+0142, U+00D3->U+00F3, U+015A->U+015B, U+0179->U+017A, U+017B->U+017C, U+0105, U+0107, U+0119, U+0142, U+00F3, U+015B, U+017A, U+017C, U+0144, \
 							U+0e1->a, U+0c1->a, U+0e4->a, U+0c4->a, U+10d->c, U+10c->c, U+10f->d, U+10e->d, U+0e9->e, U+0c9->e, U+0ed->i, U+0cd->i, U+13e->l, U+13d->l, U+13a->l, U+139->l, U+148->n, U+147->n, U+0f3->o, U+0d3->o, U+0f4->o, U+0d4->o, U+155->r, U+154->r, U+161->s, U+160->s, U+165->t, U+164->t, U+0fa->u, U+0da->u, U+0fd->y, U+0dd->y, U+17e->z, U+17d->z, \
 							U+C5->U+E5, U+E5, U+C4->U+E4, U+E4, U+D6->U+F6, U+F6
 }
@@ -216,13 +216,15 @@ searchd
 	preopen_indexes			= 0
 	unlink_old				= 1
 	workers					= threads
+	binlog_path				= @LOG_DIR@/sphinx/data
+	binlog_flush			= 1
 	listen					= 0.0.0.0:9312:mysql41
 	
 	# binlog files path; use empty string to disable binlog
 	# optional, default is build-time configured data directory
 	#
-	# binlog_path		= # disable logging
-	binlog_path		= @LOG_DIR@/sphinx # binlog.001 etc will be created there
+	# binlog_path			= # disable logging
+	# binlog_path			= @LOG_DIR@/sphinx # binlog.001 etc will be created there
 
 
 	# binlog flush/sync mode
@@ -231,7 +233,7 @@ searchd
 	# 2 means flush every transaction, sync every second
 	# optional, default is 2
 	#
-	# binlog_flush		= 2
+	# binlog_flush			= 2
 
 
 	# binlog per-file size limit
