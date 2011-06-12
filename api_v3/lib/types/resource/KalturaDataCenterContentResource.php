@@ -10,4 +10,19 @@ class KalturaDataCenterContentResource extends KalturaContentResource
 	{
 		return kDataCenterMgr::getCurrentDcId();
 	}
+	
+	public function validateEntry(entry $dbEntry)
+	{
+		parent::validateEntry($dbEntry);
+		
+		$dc = $this->getDc();
+		if($dc == kDataCenterMgr::getCurrentDcId())
+			return;
+			
+		$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId($dc);
+		if($remoteDCHost)
+			kFile::dumpApiRequest($remoteDCHost);
+			
+		throw new KalturaAPIException(KalturaErrors::REMOTE_DC_NOT_FOUND, $dc);
+	}
 }

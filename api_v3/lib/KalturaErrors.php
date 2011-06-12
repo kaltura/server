@@ -97,6 +97,8 @@ class KalturaErrors extends APIErrors
 	
 	const UPLOADED_FILE_NOT_FOUND_BY_TOKEN = "UPLOADED_FILE_NOT_FOUND_BY_TOKEN,The uploaded file was not found by the given token id, or was already used";
 	
+	const REMOTE_DC_NOT_FOUND = "REMOTE_DC_NOT_FOUND,Remote data center \"%s\" not found";
+	
 	const LOCAL_FILE_NOT_FOUND = "LOCAL_FILE_NOT_FOUND,Local file was not found \"%s\"";
 	
 	const RECORDED_WEBCAM_FILE_NOT_FOUND = "RECORDED_WEBCAM_FILE_NOT_FOUND,The recorded webcam file was not found by the given token id, or was already used";
