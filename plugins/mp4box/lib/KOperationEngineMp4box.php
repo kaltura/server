@@ -25,25 +25,4 @@ class KOperationEngineMp4box  extends KSingleOutputOperationEngine
 		KalturaLog::info("taskConfig-->".print_r($taskConfig,true)."\ndata->".print_r($data,true));
 	}
 
-	private function parsePlayList($fileIn, $fileOut)
-	{
-		$fdIn = fopen($fileIn, 'r');
-		if($fdIn==false)
-			return false;
-		$fdOut = fopen($fileOut, 'w');
-		if($fdOut==false)
-			return false;
-		$strIn=null;
-		while ($strIn=fgets($fdIn)){
-			if(strstr($strIn,"---")){
-				$i=strrpos($strIn,"/");
-				$strIn = substr($strIn,$i+1);
-			}
-			fputs($fdOut,$strIn);
-			echo $strIn;
-		}
-		fclose($fdOut);
-		fclose($fdIn);
-		return true;
-	}
 }

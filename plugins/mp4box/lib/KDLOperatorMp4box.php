@@ -23,22 +23,21 @@ $format = "fl";
 $acodec = "libmp3lam";
 
 		if(isset($target->_inFileName)){
-			$cmdStr .= " \"".$target->_inFileName."\"";
+			$cmdStr .= " ".$target->_inFileName;
 		}
 		else {
-			$cmdStr .= " \"".KDLCmdlinePlaceholders::InFileName."\"";
+			$cmdStr .= " ".KDLCmdlinePlaceholders::InFileName;
 		}
 
 		$cmdStr .= " -out";
 		if(isset($target->_outFileName)){
-			$cmdStr .= " \"".$target->_outFileName."\"";
+			$cmdStr .= " ".$target->_outFileName;
 		}
 		else {
-			$cmdStr .= " \"".KDLCmdlinePlaceholders::OutFileName."\"";
+			$cmdStr .= " ".KDLCmdlinePlaceholders::OutFileName;
 		}
 		return $cmdStr;
 	}
 	
-
 }
 	
