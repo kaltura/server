@@ -351,6 +351,33 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		if ($this->endDate === -1) // save -1 as null
 			$dbObject->setEndDate(null);
 			
+		if ($this->categoriesIds != "")
+		{
+			$catsNames = array ();
+			
+			$cats = explode(",", $this->categoriesIds);
+			
+			foreach ($cats as $cat)
+			{ 
+				$catName = categoryPeer::retrieveByPK($cat);
+				if (!is_null($catName))
+					$catsNames[] = $catName->getFullName();
+				else
+				{
+					throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $cat);
+				}
+			}
+			
+			$catNames = implode(",", $catsNames);
+			
+			if (($this->categories != "") && ($this->categories != $catNames))
+			{
+				throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $this->categories);
+			}
+			
+			$dbObject->setCategories($catNames);
+		}
+			
 		return $dbObject;
 	}
 	
