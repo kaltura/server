@@ -219,15 +219,27 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
-		if ($filter->get("_matchand_categories") !== null)
+		$matchAndCats = $filter->get("_matchand_categories");
+		if ($matchAndCats !== null)
 		{
-			$filter->set("_matchand_categories_ids", $filter->categoryNamesToIds($filter->get("_matchand_categories")));
+			//if the category exist or the category name is an empty string
+			if ( $filter->categoryNamesToIds ( $matchAndCats )!==null || $matchAndCats =='')
+				$filter->set ( "_matchand_categories_ids", $filter->categoryNamesToIds ( $matchAndCats ) );
+			else
+		  		$filter->set ( "_matchand_categories_ids", category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchand_categories');
 		}
-			
-		if ($filter->get("_matchor_categories") !== null)
+
+		
+		$matchOrCats = $filter->get("_matchor_categories");
+		if ($matchOrCats !== null)
 		{
-			$filter->set("_matchor_categories_ids", $filter->categoryNamesToIds($filter->get("_matchor_categories")));
+			//if the category exist or the category name is an empty string
+			if( $filter->categoryNamesToIds ( $matchOrCats )!==null || $matchOrCats=='')
+				$filter->set("_matchor_categories_ids", $filter->categoryNamesToIds($matchOrCats));
+			else
+			
+				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchor_categories');
 		}
 			
