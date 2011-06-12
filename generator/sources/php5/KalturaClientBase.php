@@ -101,7 +101,7 @@ class KalturaClientBase
 		}
 	}
 
-	public function getServeUrl($service, $action, array $params = null)
+	public function getServeUrl()
 	{
 		if (count($this->callsQueue) != 1)
 			return null;
