@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to return extended KalturaCriteria object according to the searched object type
  * @package infra
  * @subpackage Plugins
  */

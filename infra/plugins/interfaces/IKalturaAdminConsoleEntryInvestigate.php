@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to add information to the entry investigation page
  * @package infra
  * @subpackage Plugins
  */

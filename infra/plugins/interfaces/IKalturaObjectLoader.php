@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin to load and search extended objects and types
+ * Enable the plugin to load and search extended objects and types
  * @package infra
  * @subpackage Plugins
  */

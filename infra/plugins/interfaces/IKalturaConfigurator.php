@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin to append configuration
+ * Enable the plugin to append configuration to existing server configuration
  * @package infra
  * @subpackage Plugins
  */

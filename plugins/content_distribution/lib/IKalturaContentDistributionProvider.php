@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to add content distribution provider, AKA connector
  * @package plugins.contentDistribution
  * @subpackage lib
  */

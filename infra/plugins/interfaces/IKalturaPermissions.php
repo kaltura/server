@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to define what partners allowed to use the plugin
  * @package infra
  * @subpackage Plugins
  */

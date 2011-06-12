@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to add partner actions in the admin console partners management page
  * @package infra
  * @subpackage Plugins
  */

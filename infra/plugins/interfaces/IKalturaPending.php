@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to define dependency on another plugin
  * @package infra
  * @subpackage Plugins
  */

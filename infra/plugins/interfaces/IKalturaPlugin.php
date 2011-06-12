@@ -1,5 +1,6 @@
 <?php
 /**
+ * Must be implemented by all plugins
  * @package infra
  * @subpackage Plugins
  */

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Enable the plugin to add sphinx indexes
+ * @package plugins.sphinxSearch
+ * @subpackage lib
+ */
 interface IKalturaSphinxConfiguration extends IKalturaBase
 {
 	/**

@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to handle bulk upload additional data
  * @package infra
  * @subpackage Plugins
  */

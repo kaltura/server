@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable the plugin to return additional data to be saved on indexed object
  * @package infra
  * @subpackage Plugins
  */

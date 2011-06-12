@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable you to add database connections
  * @package infra
  * @subpackage Plugins
  */

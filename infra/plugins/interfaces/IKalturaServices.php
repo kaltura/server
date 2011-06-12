@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable adding new API V3 services
  * @package infra
  * @subpackage Plugins
  */
