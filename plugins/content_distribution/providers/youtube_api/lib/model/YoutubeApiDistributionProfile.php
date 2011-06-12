@@ -15,6 +15,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
 
 	const METADATA_FIELD_DESCRIPTION = 'YoutubeDescription';
+	const METADATA_FIELD_CATEGORY = 'YoutubeCategory';
 	const METADATA_FIELD_TAGS = 'YoutubeKeywords';
 	const METADATA_FIELD_PLAYLIST = 'YouTubePlaylist';
 	const METADATA_FIELD_PLAYLISTS = 'YouTubePlaylists';

@@ -129,6 +129,7 @@ class YoutubeApiDistributionProvider implements IDistributionProvider
 		return array(
 			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_DESCRIPTION."']",
 			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_TAGS."']",
+			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_CATEGORY."']",
 		);	
 	}
 	
