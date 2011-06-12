@@ -22,20 +22,21 @@ class KalturaTestDataBase
 	
 	/**
 	 * the test data type
+	 * @var mixed
 	 */
 	private $type;
 	
 	/**
 	 * 
 	 * The test data id
-	 * @var unknown_type
+	 * @var mixed
 	 */
 	private $id;
 	
 	/**
 	 * 
 	 * The test data value (single value data)
-	 * @var unknown_type
+	 * @var mixed
 	 */
 	private $value;
 

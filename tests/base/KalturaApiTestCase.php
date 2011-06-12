@@ -110,7 +110,7 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 	 * @param KalturaObjectBase $object1
 	 * @param KalturaObjectBase $object2
 	 */
-	public static function CompareAPIObjects(KalturaObjectBase $outputReference, KalturaObjectBase $actualResult, $validErrorFields)
+	public function CompareAPIObjects(KalturaObjectBase $outputReference, KalturaObjectBase $actualResult, $validErrorFields)
 	{
 		//Use reflection to compare the objects
 		$outputReferenceReflector = new ReflectionClass($outputReference);

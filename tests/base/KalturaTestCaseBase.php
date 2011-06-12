@@ -12,7 +12,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 * The test result
 	 * @var bool
 	 */
-	protected $result;
+	//protected $result;
 	
 	/**
 	 * 
@@ -124,15 +124,18 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		KalturaLog::info("Loads config file [$testFilePath.ini]");
 		$this->config = new KalturaTestConfig("$testFilePath.ini");
 		$testConfig = $this->config->get('config');
+		
 		if(!$testConfig)
 		{
 			$testConfig = new Zend_Config(array(
-				'source' => KalturaTestSource::INI,
+				'source' => KalturaTestSource::XML,
 			), true);
 			
 			$this->config->config = $testConfig;
 			$this->config->saveToIniFile();
 		}
+		
+		$this->dataSource = $testConfig->source;
 		
 		$this->outputFolder = $testConfig->outputFolder;
 		if($this->outputFolder && !is_dir($this->outputFolder))
@@ -350,7 +353,14 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		{
 			try
 			{
-				return $this->provideTestData($className, $methodName);
+				if($this->dataSource == KalturaTestSource::INI)
+				{
+					return $this->provideTestData($className, $methodName);
+				}
+				elseif($this->dataSource == KalturaTestSource::XML)
+				{
+					return $this->provider($className, $methodName);
+				}
 			}
 			catch (Exception $e)
 			{
@@ -368,7 +378,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function runTest()
 	{
-		print("In RunTest\n");
+		KalturaLog::debug("In RunTest\n");
 
 		if(property_exists($this, 'dependencyInput'))
 		{
@@ -411,16 +421,19 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	/**
 	 * 
 	 * The test data provider (gets the data for the different tests)
-	 * @param string $dataFilePath - the data file path (with the objects)
+	 * @param string $className - The class name
+	 * @param string $procedureName - The current method (test) name
 	 * @return array<array>();
 	 */
-	public function provider($procedureName)
+	public function provider($className, $procedureName)
 	{
 		//Gets from the given class the class data file
 		$class = get_class($this);
 		$classFilePath = KAutoloader::getClassFilePath($class);
 		$testClassDir = dirname($classFilePath);
-		$dataFilePath = $testClassDir . DIRECTORY_SEPARATOR . "testsData/{$this->name}.Data";
+		$dataFilePath = $testClassDir . DIRECTORY_SEPARATOR . "testsData/{$className}.Data";
+		
+		KalturaLog::debug("The data file path [" . $dataFilePath . "]");
 		
 		if(file_exists($dataFilePath))
 		{
@@ -428,9 +441,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		}
 		else
 		{
-			//TODO: give notice or create the file don't throw an exception
+			//TODO: Give notice or create the file don't throw an exception
 			throw new Exception("Data file not found");
-		}		
+		}
 		
 		$inputsForTestProcedure = array();
 		
@@ -466,7 +479,53 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			}
 		}
 		
+		if($procedureName == "testAdd")
+		{
+		//	print("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
+		}
+		
+		$inputsForTestProcedure = $this->transformToObjects($inputsForTestProcedure);
+		
+		KalturaLog::info("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
+		
+		if($procedureName == "testAdd")
+		{
+			//print("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
+		}
 		return $inputsForTestProcedure; 
+	}
+	
+	/**
+	 * 
+	 * Transforms the test data from an array KalturaTestDataObject to the real objects 
+	 * @param array<KalturaTestDataObject> $inputsForTestProcedure
+	 */
+	protected function transformToObjects(array $inputsForTestProcedure)
+	{
+		$inputsAsObjects = array();
+		
+		$currentIndex = 0;
+		foreach ($inputsForTestProcedure as $inputForTestProcedure)
+		{
+			$inputsAsObjects[] = array();
+			foreach ($inputForTestProcedure as $inputObject)
+			{
+				print("Before \n");
+				$inputAsObject = $inputObject->getDataObject();
+				print("Input As object" . print_r($inputAsObject, true) . "\n");
+				if(is_null($inputAsObject) || empty($inputAsObject)) //No object is available
+				{
+					$inputAsObject =  $inputObject->getValue();
+					print("Input As object is NULL new value is " . print_r($inputAsObject, true) . "\n");
+				}
+				
+				$inputsAsObjects[$currentIndex][] = $inputAsObject; 
+			}
+			
+			$currentIndex++;
+		}
+		
+		return $inputsAsObjects;
 	}
 	
 	/**

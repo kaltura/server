@@ -40,7 +40,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 	 * The data object to be retrieved like propel or kaltura object
 	 * @var unknown_type
 	 */
-	private $dataObject;
+	private $dataObject = null;
 	
 	/**
 	 * 
@@ -48,6 +48,32 @@ class KalturaTestDataObject extends KalturaTestDataBase
 	 * @var array<string> - key => value where key is the object field name and value is the value in the comment
 	 */
 	private $comments = array(); 
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see KalturaTestDataBase::getValue()
+	 */
+	public function getValue()
+	{
+		$value = parent::getValue();
+		
+		if(is_null($value) || empty($value)) //If value property was not set
+		{
+			print("Value is null\n");
+			print("isKey = " . isset($this->additionalData['key']) . "\n");
+			print("isValue = " . isset($this->additionalData['value']) . "\n");
+			
+			//We get the value from teh additional data
+			if(isset($this->additionalData['key']))
+			{
+				$value = $this->additionalData['key'];					
+			}
+			elseif(isset($this->additionalData['value']))
+			{
+				$value = $this->additionalData['value'];					
+			}
+		} 
+	}
 	
 	/**
 	 * @return the $additionalData
@@ -435,4 +461,26 @@ class KalturaTestDataObject extends KalturaTestDataBase
 			$objectInstace = $fieldValue;
 		}
 	} 
+
+	/**
+	 * 
+	 * Returns the data object behind the test data object
+	 */
+	public function toObject()
+	{
+		$value = null;
+		
+		if(isset($this->dataObject) || !is_null($this->dataObject)) //There is an object behind the data object 
+		{
+			print("Take value from data object\n");
+			$value = $this->dataObject;
+		}
+		else //Simple Type
+		{
+			print("Take value from value\n");
+			$value = $this->getValue();
+		}
+		
+		return $value;
+	}
 }
