@@ -237,6 +237,7 @@ class PodcastDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function getEventConsumers()
 	{
+		return array();
 		return array(
 			self::PODCAST_REPORT_HANDLER,
 		);

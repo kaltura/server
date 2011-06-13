@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.contentDistribution
+ * @package plugins.podcastDistribution
  * @subpackage lib
  */
 class PodcastDistributionProvider implements IDistributionProvider
@@ -31,7 +31,7 @@ class PodcastDistributionProvider implements IDistributionProvider
 	 */
 	public function getType()
 	{
-		return DistributionProviderType::PODCAST;
+		return PodcastDistributionPlugin::getDistributionProviderTypeCoreValue(PodcastDistributionProviderType::PODCAST);
 	}
 	
 	/**

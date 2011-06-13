@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.contentDistribution
+ * @package plugins.podcastDistribution
  * @subpackage api.filters.base
  * @abstract
  */

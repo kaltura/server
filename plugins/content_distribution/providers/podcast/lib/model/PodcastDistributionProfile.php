@@ -1,11 +1,16 @@
 <?php
 /**
- * @package plugins.contentDistribution
+ * @package plugins.podcastDistribution
  * @subpackage model
  */
 class PodcastDistributionProfile extends DistributionProfile
 {
+	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
 	const CUSTOM_DATA_FEED_ID = 'feedId';
+	const METADATA_FIELD_KEYWORDS = 'Keywords';
+
+	const ENTRY_NAME_MINIMUM_LENGTH = 1;
+	const ENTRY_NAME_MAXIMUM_LENGTH = 255;
 	
 	/**
 	 * @var string
@@ -22,9 +27,96 @@ class PodcastDistributionProfile extends DistributionProfile
 	 */
 	public function getProvider()
 	{
-		return PodcastDistributionProvider::get();
+//		return PodcastDistributionProvider::get();
+		return PodcastDistributionPlugin::getProvider();
+
 	}
 
+	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
+	{
+		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
+		
+		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
+		if(!$entry)
+		{
+			KalturaLog::err("Entry [" . $entryDistribution->getEntryId() . "] not found");
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'entry', 'entry not found');
+			return $validationErrors;
+		}
+		
+		// validate entry name minumum length of 1 character
+		if(strlen($entry->getName()) < self::ENTRY_NAME_MINIMUM_LENGTH)
+		{
+			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, '');
+			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
+			$validationError->setValidationErrorParam(self::ENTRY_NAME_MINIMUM_LENGTH);
+			$validationErrors[] = $validationError;
+		}
+		if(strlen($entry->getName()) > self::ENTRY_NAME_MAXIMUM_LENGTH)
+		{
+			$description = 'entry name length must be between ' . self::ENTRY_NAME_MINIMUM_LENGTH . ' and ' . self::ENTRY_NAME_MAXIMUM_LENGTH;
+			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, $description);
+			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+			$validationError->setValidationErrorParam(self::ENTRY_NAME_MAXIMUM_LENGTH);
+			$validationErrors[] = $validationError;
+		}
+		
+		if(!class_exists('MetadataProfile'))
+			return $validationErrors;
+			
+		$metadataFields = array(
+			self::METADATA_FIELD_KEYWORDS,
+		);
+		
+		$metadataProfileId = $this->getMetadataProfileId();
+		if(!$metadataProfileId)
+		{
+			foreach($metadataFields as $metadataField)
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
+			return $validationErrors;
+		}
+		
+		foreach($metadataFields as $index => $metadataField)
+		{
+			$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, $metadataField);
+			if(!$metadataProfileCategoryField)
+			{
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
+				unset($metadataFields[$index]);
+				continue;
+			}
+		}
+				
+		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
+		if(!count($metadatas))
+		{
+			foreach($metadataFields as $metadataField)
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
+			return $validationErrors;
+		}
+		
+		foreach($metadataFields as $index => $metadataField)
+		{
+			$values = $this->findMetadataValue($metadatas, $metadataField);
+			
+			if(!count($values))
+				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
+				
+			foreach($values as $value)
+			{
+				if(!strlen($value))
+				{
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $metadataField, "");
+					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+					$validationError->setMetadataProfileId($metadataProfileId);
+					$validationErrors[] = $validationError;
+					break;
+				}
+			}
+		}
+		
+		return $validationErrors;
+	}	
 	/* (non-PHPdoc)
 	 * @see BaseDistributionProfile::preSave()
 	 */
@@ -156,6 +248,8 @@ class PodcastDistributionProfile extends DistributionProfile
 	}
 
 	public function getFeedId()			{return $this->getFromCustomData(self::CUSTOM_DATA_FEED_ID);}
+	public function getMetadataProfileId()			{return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID);}
 		
 	public function setFeedId($v)		{$this->putInCustomData(self::CUSTOM_DATA_FEED_ID, $v);}
+	public function setMetadataProfileId($v)		{$this->putInCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID, $v);}	
 }

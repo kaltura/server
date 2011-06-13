@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.contentDistribution
+ * @package plugins.podcastDistribution
  * @subpackage api.objects
  */
 class KalturaPodcastDistributionProfile extends KalturaDistributionProfile
@@ -15,6 +15,11 @@ class KalturaPodcastDistributionProfile extends KalturaDistributionProfile
 	 * @readonly
 	 */
 	public $feedId;
+
+	/**
+	 * @var int
+	 */
+	public $metadataProfileId;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -23,6 +28,7 @@ class KalturaPodcastDistributionProfile extends KalturaDistributionProfile
 	(
 		'xsl',
 		'feedId',
+		'metadataProfileId',
 	);
 	
 	public function getMapBetweenObjects()
@@ -40,7 +46,7 @@ class KalturaPodcastDistributionProfile extends KalturaDistributionProfile
 		if(is_null($object_to_fill))
 			$object_to_fill = new PodcastDistributionProfile();
 		
-		kPodcastFeedManager::validateXsl($this->xsl);	
+		kSyndicationFeedManager::validateXsl($this->xsl);	
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -55,7 +61,7 @@ class KalturaPodcastDistributionProfile extends KalturaDistributionProfile
 		if(is_null($object_to_fill))
 			$object_to_fill = new PodcastDistributionProfile();
 		
-		kPodcastFeedManager::validateXsl($this->xsl);
+		kSyndicationFeedManager::validateXsl($this->xsl);
 		
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip );
 	}

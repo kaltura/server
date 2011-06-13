@@ -7,10 +7,26 @@ class PodcastDistributionProviderType implements IKalturaPluginEnum, Distributio
 {
 	const PODCAST = 'PODCAST';
 	
+	/**
+	 * @return PodcastDistributionProviderType
+	 */
+	public static function get()
+	{
+		if(!self::$instance)
+			self::$instance = new PodcastDistributionProviderType();
+			
+		return self::$instance;
+	}
+		
 	public static function getAdditionalValues()
 	{
 		return array(
 			'PODCAST' => self::PODCAST,
 		);
 	}
+	
+	public function getPluginName()
+	{
+		return PodcastDistributionPlugin::getPluginName();
+	}	
 }
