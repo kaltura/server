@@ -384,7 +384,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			
 			$paramDesc = $outputTypeReflector->getDescription();
 			$this->writeBase("	 * @param $paramType \$reference $paramDesc");
-			if(!$outputTypeReflector->isComplexType())
+			if(!$outputTypeReflector->isComplexType() || //it the param is not: complex
+			   $outputTypeReflector->isEnum() || //or it is an enum then we dont print the type 
+			   $outputTypeReflector->isStringEnum() || 
+			   $outputTypeReflector->isDynamicEnum())
 				$testParam = "\$reference";
 			else
 				$testParam = "$paramType \$reference";
@@ -447,7 +450,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if($outputType)
 		{
 			$this->writeBase("		\$this->assertType('$outputType', \$resultObject);");
-			$this->writeBase("		\$this->compareApiObjects('$paramName', \$reference);");
+			$this->writeBase("		\$this->compareApiObjects(\$reference, \$resultObject, array());");
 		}
 		if($testReturnedType)
 			$this->writeBase("		\$this->assertNotNull(\$resultObject->id);");
@@ -635,7 +638,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$this->writeXml("		</OutputReference>");
 			
 			$this->writeTest("	 * @param $paramType \$reference");
-			if(!$outputTypeReflector->isComplexType())
+			if(!$outputTypeReflector->isComplexType() || //it the param is not: complex
+			   $outputTypeReflector->isEnum() || //or it is an enum then we dont print the type 
+			   $outputTypeReflector->isStringEnum() || 
+			   $outputTypeReflector->isDynamicEnum())
 				$testParam = "\$reference";
 			else
 				$testParam = "$paramType \$reference";
@@ -688,6 +694,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeTest("		\$resultObject = \$this->client->{$serviceName}->{$action}($testValues);");
 		if($outputType)
 		$this->writeTest("		\$this->assertType('$outputType', \$resultObject);");
+		$this->writeBase("		\$this->compareApiObjects(\$reference, \$resultObject, array());");
 		$this->writeTest("		// TODO - add here your own validations");
 		$this->writeTest("	}");
 		$this->writeTest("");
