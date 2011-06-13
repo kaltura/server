@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.bulkUploadCsv
- * @subpackage lib
+ * @subpackage api.enums
  */
 class KalturaBulkUploadCsvVersion extends KalturaEnum
 {

@@ -3,7 +3,8 @@
 /**
  * 
  * Represents the Bulk upload job data for xml bulk upload
- * @author Roni
+ * @package plugins.bulkUploadXml
+ * @subpackage api.objects
  *
  */
 class KalturaBulkUploadXmlJobData extends KalturaBulkUploadJobData
