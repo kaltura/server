@@ -91,6 +91,14 @@ class PodcastDistributionProvider implements IDistributionProvider
 	}
 
 	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isAvailabilityUpdateEnabled()
+	 */
+	public function isAvailabilityUpdateEnabled()
+	{
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getJobIntervalBeforeSunrise()
 	 */
 	public function getJobIntervalBeforeSunrise()
