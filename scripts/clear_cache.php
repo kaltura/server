@@ -53,6 +53,14 @@ function askToDelete($path)
 			$cmd = 'rm -rf '.$path.DIRECTORY_SEPARATOR.'*.*';
 			echo "$cmd\n";
 			system($cmd);
+			
+			$cmd = 'del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*'.DIRECTORY_SEPARATOR.'*';
+			echo "$cmd\n";
+			system($cmd);
+			
+			$cmd = 'del /F /S /Q '.$path.DIRECTORY_SEPARATOR.'*.*';
+			echo "$cmd\n";
+			system($cmd);
 		}
 		else {
 			echo 'Skipping...'.PHP_EOL;
