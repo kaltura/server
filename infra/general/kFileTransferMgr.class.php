@@ -372,6 +372,7 @@ abstract class kFileTransferMgr
 			$this->mkDir(dirname($remote_file));
 		}
 
+		$remote_file  = trim($remote_file,'/');
 		// try to upload file
 		$res = @($this->doPutFile($remote_file, $local_file, $ftp_mode, $http_field_name, $http_file_name));
 
@@ -456,9 +457,6 @@ abstract class kFileTransferMgr
 
 		// recursivly try to create the new directory
 		$temp_path = '';
-		if ($remote_path[0] == '/' || $remote_path[0] == '\\') {
-			$temp_path = '/';
-		}
 		$split_path = explode("/", $remote_path);
 		$res = true;
 		$i = 0;
