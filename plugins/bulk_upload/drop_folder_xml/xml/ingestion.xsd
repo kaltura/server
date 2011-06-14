@@ -3,49 +3,17 @@
 	
 	<xs:redefine schemaLocation="../../xml/xml/ingestion.xsd">
 	
-		<xs:complexType name="T_content">
+		<xs:complexType name="T_serverFileContentResource">
 			<xs:complexContent>
-				<xs:extension base="T_content">
-					<xs:sequence>
-						<xs:choice minOccurs="1" maxOccurs="1">
-							<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="dropFolderFileContentResource" minOccurs="1" maxOccurs="1" />
-						</xs:choice>
-					</xs:sequence>
+				<xs:extension base="T_serverFileContentResource">
+					<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
 				</xs:extension>
 			</xs:complexContent>
 		</xs:complexType>
 		
-		<xs:complexType name="T_thumbnail">
-			<xs:complexContent>
-				<xs:extension base="T_thumbnail">
-					<xs:sequence>
-						<xs:choice minOccurs="1" maxOccurs="1">
-							<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
-							<xs:element ref="dropFolderFileContentResource" minOccurs="1" maxOccurs="1" />
-						</xs:choice>
-					</xs:sequence>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-		
-	</xs:redefine>
+	</xs:redefine>	
 	
-	<xs:complexType name="T_dropFolderFileContentResource">
-		<xs:complexContent>
-			<xs:extension base="T_serverFileContentResource">
-				<xs:attribute name="dropFolderFileId" type="xs:string" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+
+	<xs:element name="dropFolderFileContentResource" substitutionGroup="serverFileContentResource" />
 	
-	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" />
 </xs:schema>

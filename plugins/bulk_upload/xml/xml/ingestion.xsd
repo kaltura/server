@@ -125,8 +125,8 @@
 				<xs:element name="accessControl" minOccurs="1" maxOccurs="1" type="xs:string" />
 			</xs:choice>
 			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element name="ingestionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
-				<xs:element name="ingestionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
+				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
+				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
 			</xs:choice>
 			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
