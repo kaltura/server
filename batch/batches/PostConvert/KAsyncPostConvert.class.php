@@ -134,62 +134,61 @@ class KAsyncPostConvert extends KBatchBase
 			
 			KalturaLog::debug("flavorAssetId [$data->flavorAssetId]");
 			$mediaInfo->flavorAssetId = $data->flavorAssetId;
-			$mediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
+			$createdMediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
 			
 			// must save the mediaInfoId before reporting that the task is finished
-			$this->updateJob($job, "Saving media info id $mediaInfo->id", KalturaBatchJobStatus::PROCESSED, 50, $data);
+			$this->updateJob($job, "Saving media info id $createdMediaInfo->id", KalturaBatchJobStatus::PROCESSED, 50, $data);
 			
 			$data->thumbPath = null;
-			if($data->createThumb)
-			{
-				// creates a temp file path 
-				$rootPath = $this->taskConfig->params->localTempPath;
-				if(! is_dir($rootPath))
-				{
-					if(! file_exists($rootPath))
-					{
-						KalturaLog::info("Creating temp thumbnail directory [$rootPath]");
-						mkdir($rootPath);
-					}
-					else
-					{
-						// already exists but not a directory 
-						KalutraLog::err("Cannot create temp thumbnail directory [$rootPath] due to an error. Please fix and restart");
-						die();
-					}
-				}
-				
-				// creates the path
-				$uniqid = uniqid('thumb_');
-				$thumbPath = realpath($rootPath) . "/$uniqid";
-				
-				$videoDurationSec = floor($mediaInfo->videoDuration / 1000);
-				$data->thumbOffset = max(0 ,min($data->thumbOffset, $videoDurationSec));
-				$width = $mediaInfo->videoWidth;
-				$height = $mediaInfo->videoHeight;
-					
-				// generates the thumbnail
-				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, $this->taskConfig->params->FFMpegCmd);
-				$created = $thumbMaker->createThumnail($data->thumbOffset, $width, $height);
-				
-				if(!$created || !file_exists($thumbPath))
-				{
-					$data->createThumb = false;
-					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, 'Thumbnail not created', KalturaBatchJobStatus::FINISHED, $data);
-				}
-				
-				$data->thumbPath = $thumbPath;
-				
-				$job = $this->moveFile($job, $data);
-				
-				if($this->checkFileExists($job->data->thumbPath))
-					return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $data);
-				
-				$data->createThumb = false;
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FINISHED, $data);
-			}
+			if(!$data->createThumb)
+				return $this->closeJob($job, null, null, "Media info id $createdMediaInfo->id saved", KalturaBatchJobStatus::FINISHED, $data);
 			
-			return $this->closeJob($job, null, null, "Media info id $mediaInfo->id saved", KalturaBatchJobStatus::FINISHED, $data);
+			// creates a temp file path 
+			$rootPath = $this->taskConfig->params->localTempPath;
+			if(! is_dir($rootPath))
+			{
+				if(file_exists($rootPath))
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, "Cannot create temp thumbnail directory [$rootPath] due to an error", KalturaBatchJobStatus::FAILED, $data);
+					
+				KalturaLog::info("Creating temp thumbnail directory [$rootPath]");
+				mkdir($rootPath);
+			}
+				
+			// creates the path
+			$uniqid = uniqid('thumb_');
+			$thumbPath = realpath($rootPath) . "/$uniqid";
+			
+			$videoDurationSec = floor($mediaInfo->videoDuration / 1000);
+			$data->thumbOffset = max(0 ,min($data->thumbOffset, $videoDurationSec));
+			
+			if($mediaInfo->videoHeight)
+				$data->thumbHeight = $mediaInfo->videoHeight;
+			
+			if($mediaInfo->videoBitRate)
+				$data->thumbBitrate = $mediaInfo->videoBitRate;
+					
+//			$width = $mediaInfo->videoWidth;
+//			$height = $mediaInfo->videoHeight;
+					
+			// generates the thumbnail
+			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, $this->taskConfig->params->FFMpegCmd);
+//			$created = $thumbMaker->createThumnail($data->thumbOffset, $width, $height);
+			$created = $thumbMaker->createThumnail($data->thumbOffset);
+			
+			if(!$created || !file_exists($thumbPath))
+			{
+				$data->createThumb = false;
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, 'Thumbnail not created', KalturaBatchJobStatus::FINISHED, $data);
+			}
+			$data->thumbPath = $thumbPath;
+			
+			$job = $this->moveFile($job, $data);
+			
+			if($this->checkFileExists($job->data->thumbPath))
+				return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $data);
+			
+			$data->createThumb = false;
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::FINISHED, $data);
 		}
 		catch(Exception $ex)
 		{
