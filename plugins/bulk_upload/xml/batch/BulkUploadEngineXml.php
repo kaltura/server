@@ -438,7 +438,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$updatedEntryId = $updatedEntry->replacingEntryId;
 		}
 					
-		$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource); // updates the entry maybe use the replacment entry id
+		$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource);
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
@@ -730,7 +730,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
 	{
 		//We only check for filesize and check sum in local files 
-		if($resource instanceof KalturaLocalFileResource)
+		if($resource instanceof KalturaServerLocalFileResource)
 		{
 			$filePath = $resource->localFilePath;
 			
@@ -802,7 +802,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($elementToSearchIn->serverFileContentResource))
 		{
 			KalturaLog::debug("Resource is : serverFileContentResource");
-			$resource = new KalturaLocalFileResource();
+			$resource = new KalturaServerLocalFileResource();
 			$localContentResource = $elementToSearchIn->serverFileContentResource;
 			$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
 		}
@@ -914,11 +914,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(!$assetParamsName)
 			return null;
 			
-		if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
+		if(!isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]))
 			$this->initAssetParamsNameToId($conversionProfileId);
 			
-		if(isset($this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$assetParamsName]))
-			return $this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$assetParamsName];
+		if(isset($this->assetParamsNameToIdPerConversionProfile["$conversionProfileId"]["$assetParamsName"]))
+			return $this->assetParamsNameToIdPerConversionProfile["$conversionProfileId"]["$assetParamsName"];
 			
 		throw new KalturaBatchException("{$assetParams} system name [$assetParamsName] not found for conversion profile [$conversionProfileId] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 	}
