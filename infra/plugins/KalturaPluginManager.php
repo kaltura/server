@@ -2,7 +2,7 @@
 /**
  * @package infra
  * @subpackage Plugins
- * @todo remove kConf require onceafter config moved to DB or external file
+ * @todo remove kConf require after config moved to DB or external file
  */
 require_once realpath(dirname(__FILE__) . '/../../') . '/alpha/config/kConf.php';
 
