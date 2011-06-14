@@ -295,8 +295,8 @@ class KAutoloader
 				$bytesWritten = file_put_contents(self::$_classMapFileLocation, serialize(self::$_classMap));
 				if(!$bytesWritten)
 				{
-					$folderPermission = fileperms(dirname(self::$_classMapFileLocation));
-					error_log("PHP Class map could be saved to path [" . self::$_classMapFileLocation . "] folder permisisons [$folderPermission]");
+					$folderPermission = dechex(fileperms(dirname(self::$_classMapFileLocation)));
+					error_log("PHP Class map could not be saved to path [" . self::$_classMapFileLocation . "] folder permisisons [$folderPermission]");
 					die("PHP Class map could be saved");
 				}
 			}
@@ -308,8 +308,8 @@ class KAutoloader
 			
 			if(!is_array(self::$_classMap))
 			{
-				$permission = fileperms(self::$_classMapFileLocation);
-				error_log("PHP Class map could be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
+				$permission = dechex(fileperms(self::$_classMapFileLocation));
+				error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
 				die('PHP Class map could be loaded');
 			}
 		}
