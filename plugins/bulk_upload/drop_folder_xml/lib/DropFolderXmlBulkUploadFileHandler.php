@@ -6,13 +6,11 @@
  */
 class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 {	
-	const LOCAL_RESOURCE_NODE_NAME = 'localFileContentResource';
-	const LOCAL_RESOURCE_PATH_ATTRIBUTE = 'filePath';
-	const LOCAL_RESOURCE_FILE_SIZE_PARAM = 'fileSize';
-	const LOCAL_RESOURCE_FILE_CHECKSUM_PARAM = 'fileChecksum';
-	
 	const DROP_FOLDER_RESOURCE_NODE_NAME = 'dropFolderFileContentResource';
 	const DROP_FOLDER_RESOURCE_FILE_ID_ATTRIBUTE = 'dropFolderFileId';
+	const DROP_FOLDER_RESOURCE_PATH_ATTRIBUTE = 'filePath';
+	const DROP_FOLDER_RESOURCE_FILE_SIZE_PARAM = 'fileSize';
+	const DROP_FOLDER_RESOURCE_FILE_CHECKSUM_PARAM = 'fileChecksum';
 	
 	private $tempDirectory = null;
 	
@@ -58,7 +56,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 			return false;
 		}
 		
-		$localResources = $xmlDoc->getElementsByTagName(self::LOCAL_RESOURCE_NODE_NAME);
+		$localResources = $xmlDoc->getElementsByTagName(self::DROP_FOLDER_RESOURCE_NODE_NAME);
 		
 		if (!$localResources) {
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
@@ -75,8 +73,11 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		$localResourcesLength = $localResources->length;
 		foreach ($localResources as $local)
 		{
+			// already have drop folder file id
+			if(!is_null($this->getDropFolderFileId($local)))
+				continue;
+				
 			// replacement/modification of $local must not happen inside this foreach loop
-			
 			$dropFolderFileId = $this->checkFileExists($local);
 			if (is_null($dropFolderFileId)) {
 				KalturaLog::debug('Some required files do not exist in the drop folder - changing status to WAITING');
@@ -148,9 +149,18 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	}
 	
 	
+	private function getDropFolderFileId(DOMElement $localResource)
+	{
+		if(!$localResource->hasAttribute(self::DROP_FOLDER_RESOURCE_FILE_ID_ATTRIBUTE))
+			return null;
+		
+		return $localResource->getAttribute(self::DROP_FOLDER_RESOURCE_FILE_ID_ATTRIBUTE);
+	}
+	
+	
 	private function checkFileExists(DOMElement $localResource)
 	{
-		$filePath = $localResource->getAttribute(self::LOCAL_RESOURCE_PATH_ATTRIBUTE);
+		$filePath = $localResource->getAttribute(self::DROP_FOLDER_RESOURCE_PATH_ATTRIBUTE);
 		
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolderFile->dropFolderId;
@@ -173,7 +183,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	{
 		clearstatcache();
 		
-		$filePath = $localResource->getAttribute(self::LOCAL_RESOURCE_PATH_ATTRIBUTE);
+		$filePath = $localResource->getAttribute(self::DROP_FOLDER_RESOURCE_PATH_ATTRIBUTE);
 		$localPath = realpath($this->dropFolder->path.'/'.$filePath);
 		if (!$localPath) {
 			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_READING_FILE;
@@ -181,7 +191,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 			return false;	
 		}
 		
-		$fileSize = $localResource->getElementsByTagName(self::LOCAL_RESOURCE_FILE_SIZE_PARAM);
+		$fileSize = $localResource->getElementsByTagName(self::DROP_FOLDER_RESOURCE_FILE_SIZE_PARAM);
 		$fileSize = ($fileSize->length > 0) ? $fileSize->item(0)->nodeValue : null;
 		if (!is_null($fileSize))
 		{
@@ -194,7 +204,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 			KalturaLog::debug("Filesize [$fileSize] verified for local resource [$filePath]");
 		}
 		
-		$fileChecksumTags = $localResource->getElementsByTagName(self::LOCAL_RESOURCE_FILE_CHECKSUM_PARAM);
+		$fileChecksumTags = $localResource->getElementsByTagName(self::DROP_FOLDER_RESOURCE_FILE_CHECKSUM_PARAM);
 		$fileChecksum = ($fileChecksumTags->length > 0) ? (string)$fileChecksumTags->item(0)->nodeValue : null;
 		
 		if (!is_null($fileChecksum))
@@ -220,13 +230,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	
 	private function replaceResource(DOMElement $localResource, $dropFolderFileId, DOMDocument $xmlDoc)
 	{
-		// create a new XML drop folder resource with the given id
-		$newDropFolderResource = $xmlDoc->createElement(self::DROP_FOLDER_RESOURCE_NODE_NAME);
-		$newDropFolderResource->setAttribute(self::DROP_FOLDER_RESOURCE_FILE_ID_ATTRIBUTE, $dropFolderFileId);
-		
-		// replace the local resource with the new drop folder file resource
-		$parent = $localResource->parentNode;
-		$parent-> replaceChild($newDropFolderResource, $localResource);
+		$localResource->setAttribute(self::DROP_FOLDER_RESOURCE_FILE_ID_ATTRIBUTE, $dropFolderFileId);
 	}
 	
 	/**
