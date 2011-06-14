@@ -8,7 +8,7 @@
 class KalturaRemoteStorageResource extends KalturaUrlResource 
 {
 	/**
-	 * ID of storage profile to be associated with the created file sync, used for file serving URL composing, keep null to use the default. 
+	 * ID of storage profile to be associated with the created file sync, used for file serving URL composing. 
 	 * @var int
 	 */
 	public $storageProfileId;
