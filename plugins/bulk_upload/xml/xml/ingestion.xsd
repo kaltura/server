@@ -317,7 +317,7 @@
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:complexType name="T_localFileContentResource">
+	<xs:complexType name="T_serverFileContentResource">
 		<xs:choice minOccurs="0" maxOccurs="1">
 			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
@@ -380,7 +380,7 @@
 		<xs:sequence>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1" />
 			<xs:choice minOccurs="1" maxOccurs="1">
-				<xs:element ref="localFileContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
@@ -415,7 +415,7 @@
 		<xs:sequence>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1" />
 			<xs:choice minOccurs="1" maxOccurs="1">
-				<xs:element ref="localFileContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
@@ -532,7 +532,7 @@
 	
 	<xs:attribute name="url" type="T_url" />
 	
-	<xs:element name="localFileContentResource" type="T_localFileContentResource" />
+	<xs:element name="serverFileContentResource" type="T_serverFileContentResource" />
 	<xs:element name="urlContentResource" type="T_urlContentResource" />
 	<xs:element name="remoteStorageContentResource" type="T_remoteStorageContentResource" />
 	<xs:element name="entryContentResource" type="T_entryContentResource" />

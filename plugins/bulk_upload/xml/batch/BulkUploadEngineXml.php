@@ -799,11 +799,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		$resource = null;
 			
-		if(isset($elementToSearchIn->localFileContentResource))
+		if(isset($elementToSearchIn->serverFileContentResource))
 		{
-			KalturaLog::debug("Resource is : localFileContentResource");
+			KalturaLog::debug("Resource is : serverFileContentResource");
 			$resource = new KalturaLocalFileResource();
-			$localContentResource = $elementToSearchIn->localFileContentResource;
+			$localContentResource = $elementToSearchIn->serverFileContentResource;
 			$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
 		}
 		elseif(isset($elementToSearchIn->urlContentResource))
