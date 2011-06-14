@@ -121,7 +121,32 @@ class KalturaTestCaseInstanceFailure
 			$this->failures = array();
 		}
 		
-		array_push($this->failures, $failure);
+		$name = $failure->getName();
+		
+		if(!isset($this->failures["$name"]))
+		{
+			$this->failures["$name"] = $failure;
+		}
+		else
+		{
+			throw new Exception("Failure with name [$name] already exists"); 
+		}
+		
+		return $this->failures["$name"]; 
+	}
+	
+	/**
+	 * 
+	 * Gets a failure by it's name
+	 * @param string $failure
+	 * @return KalturaFailure $failure
+	 */
+	public function getFailure($failureName)
+	{
+		if(isset($this->failures["$failureName"]))
+			return $this->failures["$failureName"];
+		else
+			return null;
 	}
 	
 	/**
@@ -182,24 +207,38 @@ class KalturaTestCaseInstanceFailure
 		{
 			$node = $dom->createElement("Input");
 			
-			$type = gettype($inputValue);
-			
-			if(class_exists(get_class($inputValue)))
+			if($inputValue != null)
 			{
-				$type = get_class($inputValue);
+				$type = gettype($inputValue);
+				
+				if(is_object($inputValue))
+				{
+					$class = get_class($inputValue);
+				
+					KalturaLog::debug("class [" . $class ."]\n");
+				
+					if(class_exists($class))
+					{
+						$type = get_class($inputValue);
+					}
+				}
+				
+				print("type [" . $type ."]\n");
+				$node->setAttribute("type", $type);
+				
+				$id = $inputValue;
+				
+				if($inputValue instanceof BaseObject)
+				{
+					$id = $inputValue->getId();
+				}
+				elseif ($inputValue instanceof KalturaObjectBase)
+				{
+					$id = $inputValue->id;
+				}
+								
+				$node->setAttribute($type."Id", $id);
 			}
-			 
-			$node->setAttribute("type", $type);
-			
-			$id = $inputValue;
-			
-			//TODO: add support for non propel objects
-			if($inputValue instanceof BaseObject)
-			{
-				$id = $inputValue->getId();
-			}
-			
-			$node->setAttribute($type."Id", $id);
 			$inputsNode->appendChild($node);
 		}
 		

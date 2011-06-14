@@ -77,8 +77,16 @@ class KalturaTestCaseInstanceData
 	/**
 	 * @return the $outputReference
 	 */
-	public function getOutputReference() {
+	public function getOutputReferences() {
 		return $this->outputReference;
+	}
+	
+	/**
+	 * @var string $name
+	 * @return KalturaTestDataObject $outputReference
+	 */
+	public function getOutputReference($name) {
+		return $this->outputReference["$name"];
 	}
 
 	/**
@@ -114,7 +122,8 @@ class KalturaTestCaseInstanceData
 			$this->input = array();
 		}
 		
-		$this->input[] = $input;
+		//TODO: maybe Unique key is not so uniqe....
+		$this->input[$input->getUniqueKey()] = $input;
 	}
 	
 	/**
@@ -129,7 +138,7 @@ class KalturaTestCaseInstanceData
 			$this->outputReference= array();
 		}
 		
-		$this->outputReference[] = $outputReference;
+		$this->outputReference[$outputReference->getUniqueKey()] = $outputReference;
 	}
 	
 	/**
@@ -201,7 +210,7 @@ class KalturaTestCaseInstanceData
 		}
 		
 		//For each outputReference:
-		foreach ($testCaseInstanceData->getOutputReference() as $outputReference)
+		foreach ($testCaseInstanceData->getOutputReferences() as $outputReference)
 		{
 			//Create the xml from the object
 			$objectAsDOM = KalturaTestDataObject::toXml($outputReference, "OutputReference");

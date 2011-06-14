@@ -20,11 +20,19 @@ class KalturaFailure
 	function __construct($field, $actualValue, $outputReferenceValue, $assert = null, $message = null)
 	{
 		$this->field = $field;
+		$this->name = $field;
 		$this->outputReferenceValue = $outputReferenceValue;
 		$this->actualValue = $actualValue;
 		$this->assert = $assert;
 		$this->message = $message;
 	}
+	
+	/**
+	 * 
+	 * The failure name
+	 * @var string
+	 */
+	private $name;
 	
 	/**
 	 * 
@@ -61,6 +69,20 @@ class KalturaFailure
 	 */
 	private $outputReferenceValue;
 	
+	/**
+	 * @return the $name
+	 */
+	public function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public function setName($name) {
+		$this->name = $name;
+	}
+
 	/**
 	 * @return the $field
 	 */

@@ -7,12 +7,12 @@
  */
 class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 {
-	/**
-	 * 
-	 * The test result
-	 * @var bool
-	 */
-	//protected $result;
+//	/**
+//	 * 
+//	 * The test result
+//	 * @var bool
+//	 */
+//	protected $result;
 	
 	/**
 	 * 
@@ -396,6 +396,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			$class = get_class($this);
 			$classPath = KAutoloader::getClassFilePath($class);
 			KalturaTestListener::setFailureFilePath(dirname($classPath) . "/testsData/{$class}.failures");
+			KalturaTestListener::setDataFilePath(dirname($classPath) . "/testsData/{$class}.data");
 
 			//add Listener from config with all params such as: when to report
 			$this->result->addListener(new KalturaTestListener());
@@ -510,13 +511,13 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			$inputsAsObjects[] = array();
 			foreach ($inputForTestProcedure as $inputObject)
 			{
-				print("Before \n");
 				$inputAsObject = $inputObject->getDataObject();
-				print("Input As object" . print_r($inputAsObject, true) . "\n");
+				
+				//print("Input As object" . print_r($inputAsObject, true) . "\n");
 				if(is_null($inputAsObject) || empty($inputAsObject)) //No object is available
 				{
 					$inputAsObject =  $inputObject->getValue();
-					print("Input As object is NULL new value is " . print_r($inputAsObject, true) . "\n");
+					//print("Input As object is NULL new value is " . print_r($inputAsObject, true) . "\n");
 				}
 				
 				$inputsAsObjects[$currentIndex][] = $inputAsObject; 

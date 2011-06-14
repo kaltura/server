@@ -59,9 +59,9 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		
 		if(is_null($value) || empty($value)) //If value property was not set
 		{
-			print("Value is null\n");
-			print("isKey = " . isset($this->additionalData['key']) . "\n");
-			print("isValue = " . isset($this->additionalData['value']) . "\n");
+			KalturaLog::debug("Value is null or empty\n");
+			KalturaLog::debug("isKey = " . isset($this->additionalData['key']) . "\n");
+			KalturaLog::debug("isValue = " . isset($this->additionalData['value']) . "\n");
 			
 			//We get the value from teh additional data
 			if(isset($this->additionalData['key']))
@@ -72,7 +72,9 @@ class KalturaTestDataObject extends KalturaTestDataBase
 			{
 				$value = $this->additionalData['value'];					
 			}
-		} 
+		}
+		
+		return $value;
 	}
 	
 	/**
@@ -182,10 +184,12 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		{			
 			$this->dataObject->setByName($field, $value);
 		}
-		else
+		elseif($this->dataObject instanceof KalturaObjectBase)
 		{
-			throw new Exception("Currentl only propel objects are supported");
+			$this->dataObject->$field = $value; //Set the field as all fields are public in the API
 		}
+		else
+			throw new Exception("Currentl only propel objects are supported");
 	}
 
 	/**
@@ -240,13 +244,39 @@ class KalturaTestDataObject extends KalturaTestDataBase
 			{
 				$reflector = new ReflectionClass($data->getDataObject());
 				$properties = $reflector->getProperties(ReflectionProperty::IS_PUBLIC);
+				$comments = $data->getComments();
+				
 				foreach ($properties as $property)
 				{
 					$value = $property->getValue($data->getDataObject());
 					$propertyName = $property->getName();
-					$propertyValueType = gettype($value);
-					$comments = $data->getComments();
-					$comment = $comments[$propertyName];
+					$propertyValueType = null;
+					
+					if($value != null)
+					{
+						print("value [" . print_r($value, true) . "]\n");
+						$propertyValueType = gettype($value);
+						if($propertyValueType == "NULL") //No such base type (int, string, ...)
+						{
+							$propertyValueType = null; //we null the type
+							
+							$class = get_class($value);
+							if(class_exists($class))
+							{
+								$propertyValueType = $class;
+							}							
+						}
+						else 
+						{
+							print("propertyValueType1 [$propertyValueType]\n");
+						}
+					}
+																		
+					$comment = null;
+					if(isset($comments[$propertyName]))
+					{
+						$comment = $comments[$propertyName];
+					}
 					
 					KalturaTestDataObject::createFieldElement($dom, $rootNode, $value, $propertyName, $propertyValueType, $comment);
 				}
@@ -278,8 +308,9 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		{
 			$node = $xml->createElement($fieldName, $value);
 			
-			if($fieldType != null)
+			if($fieldType !== null)
 			{
+				//print("type3 [" . $fieldType ."]\n");
 				$node->setAttribute("type", $fieldType);
 			}
 			
@@ -301,6 +332,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 				
 				if($fieldType != null)
 				{
+					print("type3 [" . $fieldType ."]\n");
 					$node->setAttribute("type", $fieldType);
 				}
 				
@@ -472,12 +504,12 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		
 		if(isset($this->dataObject) || !is_null($this->dataObject)) //There is an object behind the data object 
 		{
-			print("Take value from data object\n");
+			KalturaLog::debug("Take value from data object [" . print_r($this->dataObject,true) ."]");
 			$value = $this->dataObject;
 		}
 		else //Simple Type
 		{
-			print("Take value from value\n");
+			KalturaLog::debug("Take value from value [" .print_r($this->getValue(),true) ."]");
 			$value = $this->getValue();
 		}
 		

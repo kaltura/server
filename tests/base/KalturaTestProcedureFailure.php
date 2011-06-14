@@ -44,7 +44,18 @@ class KalturaTestProcedureFailure
 			$this->testCaseInstanceFailures = array();
 		}
 		
-		array_push($this->testCaseInstanceFailures, $testCaseInstanceFailure); 
+		$name = $testCaseInstanceFailure->getTestCaseInstanceName();
+				
+		if(!isset($this->testCaseInstanceFailures["$name"]))
+		{
+			$this->testCaseInstanceFailures["$name"] = $testCaseInstanceFailure;
+		}
+		else
+		{
+			throw new Exception("Test Case instance failures [$name] were already added");
+		}
+		
+		return $this->testCaseInstanceFailures["$name"];
 	}
 
 	/**
@@ -69,6 +80,18 @@ class KalturaTestProcedureFailure
 	 */
 	public function getTestCaseInstanceFailures() {
 		return $this->testCaseInstanceFailures;
+	}
+	
+	/**
+	 * @var string $testCaseInstanceFailureName - the test case instance name to get
+	 * @return the $testCaseInstanceFailure
+	 */
+	public function getTestCaseInstanceFailure($testCaseInstanceFailureName) 
+	{
+		if(isset($this->testCaseInstanceFailures["$testCaseInstanceFailureName"]))
+			return $this->testCaseInstanceFailures["$testCaseInstanceFailureName"];
+		else
+			return null;
 	}
 	
 	/**

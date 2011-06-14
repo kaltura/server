@@ -43,7 +43,31 @@ class KalturaTestCaseFailures
 			$this->testProceduresFailures = array();
 		}
 		
-		array_push($this->testProceduresFailures, $testProcedureFailure);
+		$name = $testProcedureFailure->getTestProcedureName();
+		
+		if(!isset($this->testProceduresFailures[$name]))
+		{
+			$this->testProceduresFailures[$name] = $testProcedureFailure;
+		}
+		else
+		{
+			throw new Exception("Test procedure [$name] already exists");
+		}
+		
+		return $this->testProceduresFailures[$name];
+	}
+	
+	/**
+	 * @var string $testProcudureFailureName - the test procedure name to get
+	 * @return KalturaTestProcedureFailures - testProcudereFailure or null if not exists
+	 * 
+	 */
+	public function getTestProcedureFailure($testProcudureFailureName) 
+	{
+		if(isset($this->testProceduresFailures[$testProcudureFailureName]))
+			return $this->testProceduresFailures[$testProcudureFailureName];
+		else
+			return null;
 	}
 	
 	/**

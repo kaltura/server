@@ -55,7 +55,9 @@ class KalturaTestProcedureData
 			$this->testCasesData = array();
 		}
 		
-		$this->testCasesData[] = $testCaseInstance;
+		$name = $testCaseInstance->getTestCaseInstanceName();
+		
+		$this->testCasesData["$name"] = $testCaseInstance;
 	}
 	
 	/**
@@ -70,6 +72,23 @@ class KalturaTestProcedureData
 	 */
 	public function getTestCasesData() {
 		return $this->testCasesData;
+	}
+	
+	/**
+	 * @var string $testCaseName
+	 * @return KalturaTestCaseInstanceData $testCasesData
+	 */
+	public function getTestCaseData($testCaseName) {
+		if(isset($this->testCasesData[$testCaseName]))
+		{
+			KalturaLog::debug("testCaseName [$testCaseName] was found\n");
+			return $this->testCasesData["$testCaseName"];
+		}
+		else
+		{
+			KalturaLog::debug("testCaseName [$testCaseName] was NOT FOUND\n");
+			return null;
+		}
 	}
 
 	/**
@@ -114,7 +133,8 @@ class KalturaTestProcedureData
 		foreach ($xmlTestProcedureData->TestCaseData as $testCaseInstanceDataXml)
 		{
 			$testCaseData = KalturaTestCaseInstanceData::generateFromDataXml($testCaseInstanceDataXml);
-			$this->testCasesData[] = $testCaseData;
+			$name = $testCaseData->getTestCaseInstanceName();
+			$this->testCasesData["$name"] = $testCaseData;
 		}
 	}
 	
@@ -139,4 +159,27 @@ class KalturaTestProcedureData
 		
 		return $dom;
 	}
+
+	/**
+	 * 
+	 * Checks if the given test case instance data exists
+	 * @param string $testCaseInstanceKey
+	 * @return bool - if the test case instance exists
+	 */
+	public function isTestCaseInstanceExists($testCaseInstanceKey)
+	{
+		$isExists = false;
+		
+		foreach ($this->testCasesData as $key => $testCaseData)
+		{
+			if($key == $testCaseInstanceKey)
+			{
+				$isExists = true;
+				break;
+			}
+		}
+		
+		return $isExists; 
+	}
 }
+

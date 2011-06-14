@@ -48,6 +48,14 @@ class KalturaTestCaseDataFile
 	public function getTestProceduresData() {
 		return $this->testProceduresData;
 	}
+	
+	/**
+	 * @var string $procedureName
+  	 * @return KalturaTestProcedureData $testProcedureData
+	 */
+	public function getTestProcedureData($procedureName) {
+		return $this->testProceduresData["$procedureName"];
+	}
 
 	/**
 	 * @param string $testCaseName
@@ -75,7 +83,7 @@ class KalturaTestCaseDataFile
 			$this->testProceduresData = array();
 		}
 		
-		$this->testProceduresData[] = $testProcedureData;
+		$this->testProceduresData[$testProcedureData->getProcedureName()] = $testProcedureData;
 	}
 	
 	
@@ -165,9 +173,12 @@ class KalturaTestCaseDataFile
 	 */
 	public function fromDataXml($dataFilePath)
 	{
+		KalturaLog::debug("Data file path [" . $dataFilePath . "]\n");
 		$simpleXmlElement = kXml::openXmlFile($dataFilePath);
 		
 		$this->testCaseName = (string)$simpleXmlElement["testCaseName"];
+		
+		KalturaLog::debug("data file [". $simpleXmlElement->asXML() ."]\n");
 		
 		foreach ($simpleXmlElement->TestProcedureData as $xmlTestProcedureData)
 		{
@@ -176,4 +187,26 @@ class KalturaTestCaseDataFile
 			$this->testProceduresData[$testProcedureData->getProcedureName()] = $testProcedureData;
 		}
 	}
+
+	/**
+	 * 
+	 * Checks if the given test case instance name exists in the data file
+	 * @param string $testCaseInstanceKey
+	 * @return bool - is the test case instance exists
+	 */
+	public function isTestCaseInstanceExists($testCaseInstanceKey)
+	{
+		$isExists = false;
+		
+		foreach ($this->testProceduresData as $testProcedureData)
+		{
+			$isExists = $testProcedureData->isTestCaseInstanceExists($testCaseInstanceKey);
+			if($isExists == true)
+			{
+				break;
+			}	
+		}
+		
+		return $isExists;
+	}	
 }

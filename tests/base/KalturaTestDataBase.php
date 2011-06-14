@@ -39,7 +39,6 @@ class KalturaTestDataBase
 	 * @var mixed
 	 */
 	private $value;
-
 	
 	/**
 	 * @param field_type $type
@@ -128,6 +127,7 @@ class KalturaTestDataBase
 			
 			if($fieldType != null)
 			{
+				print("type2 [" . $fieldType ."]\n");
 				$node->setAttribute("type", $fieldType);
 			}
 			
@@ -150,6 +150,7 @@ class KalturaTestDataBase
 				
 				if($fieldType != null)
 				{
+					print("type1 [" . $fieldType ."]\n");
 					$node->setAttribute("type", $fieldType);
 				}
 				
@@ -247,4 +248,14 @@ class KalturaTestDataBase
 			$objectInstace = $fieldValue;
 		}
 	} 
+
+	/**
+	 * 
+	 * Returns the unique key for the data object
+	 * @return string
+	 */
+	public function getUniqueKey()
+	{
+		$uniqueKey = "{$this->id}_{$this->type}_{$this->value}";
+	}
 }

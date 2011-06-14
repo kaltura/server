@@ -25,6 +25,20 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	
 	/**
 	 * 
+	 * The current data file
+	 * @var string
+	 */
+	private static $failureFilePath = null;
+	
+	/**
+	 * 
+	 * The current data file
+	 * @var string
+	 */
+	private static $dataFilePath = null;
+	
+	/**
+	 * 
 	 * The current test case the listener is working on
 	 * This is identified by the class path 
 	 * @var static
@@ -87,30 +101,28 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	{
 		if($test instanceof KalturaTestCaseBase)
 		{
-			if($test->getCurrentFailure() != null)
+			$currentFailure = $test->getCurrentFailure();
+			if($currentFailure != null)
 			{
-				$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProceduresFailures();
+				$testProcedureName = $test->getName(false);
+				$testProcedureFailure = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testProcedureName);
 				
 				//If the test procedure failure wasn't added (first use)
-				if(count($testProcedureFailures) == 0)
+				if(is_null($testProcedureFailure))
 				{
 					//Then add the test procedure failure
-					KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($test->getName(false)));
-					$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProceduresFailures();
+					$testProcedureFailure = KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($testProcedureName));
 				}
 				
-				//Get the current test procedure
-				$currentTestProcedureFailures = end($testProcedureFailures);
-				$testCaseInstancesFailures = $currentTestProcedureFailures->getTestCaseInstanceFailures();
-					
-				if(count($testCaseInstancesFailures) == 0)
+				$testCaseInstanceName = $test->getName(true);
+				$testCaseInstanceFailures = $testProcedureFailure->getTestCaseInstanceFailure($testCaseInstanceName);
+				
+				if(is_null($testCaseInstanceFailures))
 				{
-					$currentTestProcedureFailures->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
-					$testCaseInstancesFailures = $currentTestProcedureFailures->getTestCaseInstanceFailures(); 
+					$testCaseInstanceFailures = $testProcedureFailure->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
 				}
 								
-				$currentTestCaseInstanceFailures = end($testCaseInstancesFailures);
-				$currentTestCaseInstanceFailures->addFailure($test->getCurrentFailure());
+				$testCaseInstanceFailures->addFailure($currentFailure);
 			}
 		}
 	}
@@ -120,6 +132,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
 		print("In addIncompleteTest\n");
+		KalturaLog::debug("In addIncompleteTest");
 		
 	}
 
@@ -128,6 +141,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
 		print("In addSkippedTest\n");
+		KalturaLog::debug("In addSkippedTest");
 		
 	}
 
@@ -136,6 +150,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function startTestSuite(PHPUnit_Framework_TestSuite $suite) {
 		print("In startTestSuite - for suite = {$suite->getName()}\n");
+		KalturaLog::debug("In startTestSuite - for suite = {$suite->getName()}");
 		
 		if (preg_match("*::*" ,$suite->getName()) != 0)
 		{ 
@@ -161,10 +176,13 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 				//Gets the class path for the failure file
 				$classPath = KAutoloader::getClassFilePath($class);
 				
+				KalturaTestListener::$failureFilePath = dirname($classPath) . "/testsData/{$class}.failures";
+				KalturaTestListener::$dataFilePath = dirname($classPath) . "/testsData/{$class}.data";
+				
 				$this->writeFailuresToFile();
 				
 				//Opens the new failure file for the new test
-				KalturaTestListener::$failuresFile = fopen(dirname($classPath) . "/testsData/{$class}.failures", "w+");
+				KalturaTestListener::$failuresFile = fopen(KalturaTestListener::$failureFilePath, "w+");
 	
 				//Change the current test case
 				KalturaTestListener::$currentTestCase = $class;
@@ -188,9 +206,12 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	public function endTestSuite(PHPUnit_Framework_TestSuite $suite) 
 	{
 		print("\nIn endTestSuite\n");
+		KalturaLog::debug("In endTestSuite");
 		if (preg_match("*::*" ,$suite->getName()) != 0)
 		{ // if it is a dataprovider test suite
 			print("A data provider test suite was finished no action taken\n");
+			KalturaLog::debug("A data provider test suite was finished no action taken");
+			//TODO: add here logic for multi nested tests
 		}
 		else //real test suite
 		{
@@ -216,21 +237,21 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	public function startTest(PHPUnit_Framework_Test $test) 
 	{
 		print("In startTest\n");
+		KalturaLog::debug("In startTest");
 
 		if($test instanceof KalturaTestCaseBase)
 		{
 			//Add another test case instance failure for this test
-			$testProceduresFailures = KalturaTestListener::$testCaseFailures->getTestProceduresFailures();
+			$testProcedureName = $test->getName(false); 
+			$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testProcedureName);
 			
-			if(count($testProceduresFailures) == 0)
+			if(is_null($testProcedureFailures))
 			{
 				//Handle when test name includes the test case name
-				KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($test->getName(false)));
-				$testProceduresFailures = KalturaTestListener::$testCaseFailures->getTestProceduresFailures();
+				$testProcedureFailures = KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure());
 			}
-						
-			$currentTestProcedureFailures = end($testProceduresFailures);
-			$currentTestProcedureFailures->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
+	
+			$testProcedureFailures->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
 		}
 	}
 
@@ -240,6 +261,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	public function endTest(PHPUnit_Framework_Test $test, $time) 
 	{
 		print("In endTest\n");
+		KalturaLog::debug("In endTest");
 
 		if($test instanceof KalturaTestCaseBase)
 		{
@@ -248,17 +270,13 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			{
 				if(KalturaTestListener::$testCaseFailures != null)
 				{
-					$testProceduresFailures = KalturaTestListener::$testCaseFailures->getTestProceduresFailures();
-					
-					$testProcedureFailures = end($testProceduresFailures);
-					
-					$testCaseInstnaceFailures = $testProcedureFailures->getTestCaseInstanceFailures();
-					
-					end($testCaseInstnaceFailures);
-					$testCaseInstanceFailureKey = key($testCaseInstnaceFailures);
-					
+					$testProcedureName = $test->getName(false);
+					$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testProcedureName);
+
+					$testCaseInstanceName = $test->getName(true);
+				
 					//Clean the test failures from the procedures failures
-					$testProcedureFailures->removeTestCaseInstanceFailure($testCaseInstanceFailureKey);
+					$testProcedureFailures->removeTestCaseInstanceFailure($testCaseInstanceName);
 				}
 			}
 		}
@@ -311,7 +329,19 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public static function setFailureFilePath($failureFilePath)
 	{
+		KalturaTestListener::$failureFilePath = $failureFilePath;
 		KalturaTestListener::$failuresFile = fopen($failureFilePath, 'w+');
+		
+	}
+	
+	/**
+	 * 
+	 * Sets the listeners data file path
+	 * @param string $dataFilePath
+	 */
+	public static function setDataFilePath($dataFilePath)
+	{
+		KalturaTestListener::$dataFilePath = $dataFilePath;
 	}
 
 	/**
@@ -328,10 +358,13 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			{
 				$testCaseFailuresXml->formatOutput = true;
 				fwrite(KalturaTestListener::$failuresFile, $testCaseFailuresXml->saveXML());
+				
+				KalturaTestResultUpdater::UpdateResults(KalturaTestListener::$dataFilePath,KalturaTestListener::$failureFilePath);
 			}
 			else
 			{
 				print("failures XML is null!!!\n");
+				KalturaLog::debug("failures XML is null!!!");
 				var_dump($testCaseFailuresXml);
 			}
 		}
