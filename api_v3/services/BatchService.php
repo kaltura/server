@@ -168,6 +168,9 @@ class BatchService extends KalturaBaseService
 		if($bulkUploadResult->entryId)
 		{
 			$entry = entryPeer::retrieveByPK($bulkUploadResult->entryId);
+			if(!$entry)
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $bulkUploadResult->entryId);
+				
 			$entry->setBulkUploadId($bulkUploadResult->bulkUploadJobId);
 			$entry->save();
 			
