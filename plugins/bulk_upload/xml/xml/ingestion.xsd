@@ -157,8 +157,10 @@
 			<xs:element ref="content" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element ref="thumbnail" minOccurs="0" maxOccurs="unbounded" />
 			
-			<xs:element ref="distribution" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element ref="customData" minOccurs="0" maxOccurs="unbounded" />
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="distribution" />
+				<xs:element ref="customData" />
+			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 
