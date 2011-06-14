@@ -274,10 +274,10 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		}
 		
 
-		$entryConversionProfileId = $matchedEntry->conversionProfileId;
-		if (is_null($entryConversionProfileId)) {
+//		$entryConversionProfileId = $matchedEntry->conversionProfileId;
+//		if (is_null($entryConversionProfileId)) {
 			$entryConversionProfileId = $this->getConversionProfile()->id;
-		}
+//		}
 
 		$resource = $this->getAllIngestedFiles($entryConversionProfileId);
 		if (!$resource) {
