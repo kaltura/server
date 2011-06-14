@@ -311,4 +311,9 @@ class KalturaErrors extends APIErrors
 	const FILE_DOESNT_EXIST = "FILE_DOESNT_EXIST,File doesnt exist";
 	
 	const STORAGE_PROFILE_ID_NOT_FOUND = "STORAGE_PROFILE_ID_NOT_FOUND,Storage profile id %s not found";
+	
+	/*
+	 * resetUserPassword
+	 */
+	const CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER = "CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER,Password cannot be reset for system partner";
 }

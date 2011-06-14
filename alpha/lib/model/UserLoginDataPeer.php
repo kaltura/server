@@ -117,21 +117,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		if ($newLoginEmail && UserLoginDataPeer::getByEmail($newLoginEmail)) {
 			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 		}
-				
-		// check that new password structure is valid
-		if ($newPassword && 
-				  !UserLoginDataPeer::isPasswordStructureValid($newPassword) ||
-				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
-				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
-				  (stripos($newPassword, $loginData->getFullName()) !== false)         ){
-			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
-		}
-		
-		// check that password hasn't been used before by this user
-		if ($newPassword && $loginData->passwordUsedBefore($newPassword)) {
-			throw new kUserException('', kUserException::PASSWORD_ALREADY_USED);
-		}		
-		 
+
+		self::checkPasswordValidation ( $newPassword, $loginData );
+				 
 		// update password if requested
 		if ($newPassword && $newPassword != $oldPassword) {
 			$password = $loginData->resetPassword($newPassword, $oldPassword);
@@ -164,6 +152,23 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer {
 		
 		return $loginData;
 	}
+	
+	public static function checkPasswordValidation($newPassword, $loginData) {
+		// check that new password structure is valid
+		if ($newPassword && 
+				  !UserLoginDataPeer::isPasswordStructureValid($newPassword) ||
+				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
+				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
+				  (stripos($newPassword, $loginData->getFullName()) !== false)         ){
+			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
+		}
+		
+		// check that password hasn't been used before by this user
+		if ($newPassword && $loginData->passwordUsedBefore($newPassword)) {
+			throw new kUserException('', kUserException::PASSWORD_ALREADY_USED);
+		}
+	}
+
 		
 
 	

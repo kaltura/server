@@ -362,7 +362,6 @@ class PartnerController extends Zend_Controller_Action
 		$this->view->paginator = $paginator;
 	}
 	
-	
 	public function kmcUsersAction()
 	{
 		$this->_helper->layout->disableLayout();
@@ -390,4 +389,38 @@ class PartnerController extends Zend_Controller_Action
 		$this->view->partnerId = $partnerId;
 		$this->view->paginator = $paginator;
 	}
+
+	public function resetUserPasswordAction()
+	{
+		$this->_helper->layout->disableLayout();
+		$userId = $this->_getParam('user_id');
+		$partnerId = $this->_getParam('partner_id');
+		$client = Infra_ClientHelper::getClient();			
+		$resetPasswordForm = new Form_Partner_KmcUsersResetPassword();	
+		if (!$userId || !$partnerId){
+			$this->view->errMessage = "Missing userId/partnerId";
+			$this->view->form = $resetPasswordForm;
+			return;
+		}	
+		$request = $this->getRequest();
+		//reset button was clicked
+		if ($request->isPost())
+		{				
+			$formData = $request->getPost();
+			//password was provided
+			if ($resetPasswordForm->isValid($formData))
+			{
+				$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+				try{
+					$systemPartnerPlugin->systemPartner->resetUserPassword($userId, $partnerId, $formData['newPassword']);
+					$resetPasswordForm->setAttrib('class', 'valid');					
+				}
+				catch (Exception $e){
+					$this->view->errMessage = $e->getMessage();
+				}			
+			}
+		}
+		$this->view->form = $resetPasswordForm;
+	}
+
 }

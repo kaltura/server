@@ -252,4 +252,50 @@ class SystemPartnerService extends KalturaBaseService
 		$partnerPackages->fromArray($packages);
 		return $partnerPackages;
 	}
+	
+	/**
+	 * 
+	 * @action resetUserPassword
+	 * @param string $userId
+	 * @param int $partnerId
+	 * @param string $newPassword
+	 * @throws KalturaAPIException
+	 */
+	public function resetUserPasswordAction($userId, $partnerId, $newPassword)
+	{
+		if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID)
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER);
+		}				
+		//get loginData using userId and PartnerId 
+		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId, $userId);
+		if (!$kuser){
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+		}
+		$userLoginDataId = $kuser->getLoginDataId();
+		$userLoginData = UserLoginDataPeer::retrieveByPK($userLoginDataId);
+		
+		// check if login data exists
+		if (!$userLoginData) {
+			throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
+		}
+		try {
+			UserLoginDataPeer::checkPasswordValidation($newPassword, $userLoginData);
+		}
+		catch (kUserException $e) {
+			$code = $e->getCode();
+			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+			}
+			else if ($code == kUserException::PASSWORD_ALREADY_USED) {
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_ALREADY_USED);
+			}			
+			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);						
+		}
+		// update password if requested
+		if ($newPassword) {
+			$password = $userLoginData->resetPassword($newPassword);
+		}		
+		$userLoginData->save();
+	}
 }

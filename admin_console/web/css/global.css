@@ -536,3 +536,7 @@ form#frmCreateDropFolder dt { float: left; }
 #frmVirusScanFilter .help { float:left; display:block; }
 #frmVirusScanFilter fieldset { margin-right:20px; }
 
+.resetUserPassword {margin-bottom:13px; }
+#frmKmcUsersResetPassword dt { width:120px; float:left; }
+#frmKmcUsersResetPassword dd input  { width:200px; float:left; height:20px }
+#frmKmcUsersResetPassword button { float:left; margin-left:10px; }

@@ -33,7 +33,14 @@
 					?>
 				
 				</td>
-				<td><button type="button" onclick="kmcLogin(<?php echo $user->partnerId; ?>,'<?php echo $user->id; ?>')">Login</button></td>
+				<td>
+					<select class="options" onchange="doAction(this.value, '<?php echo $user->partnerId; ?>','<?php echo $user->id; ?>')">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<option value="kmcLogin"><?php echo $this->translate('Login'); ?></option>
+						<?php //if (Infra_AclHelper::isAllowed('partner','reset-user-password')): ?>
+							<option value="resetUserPassword" ><?php echo $this->translate('Reset Password'); ?></option>
+						<?php //endif; ?>
+				</td>
 			</tr>
 			<?php endforeach; ?>
 		</tbody>
@@ -59,5 +66,65 @@ $( function() {
 		return false;
 	};
 });
+
+
+
+function doAction(action, partnerId, userId) {
+	if (action && eval('typeof ' + action) == 'function')
+	{
+		f = eval(action);
+		Array.prototype.shift.apply(arguments);
+		f.apply(this, arguments);
+	}
+	jQuery('select.options').val('');
+}
+
+function resetUserPassword(partnerId, userId) {
+
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'reset-user-password', 'partner_id' => '')); ?>' + partnerId + '/user_id/' + userId;
+	
+	jQuery('#reset-user-password-dialog').remove();
+	var dialogDiv = jQuery('<div id="reset-user-password-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: true,
+		width: 508,
+		height: 300,
+		title: '<?php echo $this->translate('Reset User Password'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			},
+			'<?php echo $this->translate('Reset'); ?>': function() {
+				jQuery(this).find('#frmKmcUsersResetPassword').submit();
+			}
+		}
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmKmcUsersResetPassword').ajaxForm(resetUserPasswordSuccess);
+		}
+	);
+
+}
+
+function resetUserPasswordSuccess(html) {
+	if (jQuery(html).parent().find('#frmKmcUsersResetPassword').hasClass('valid')) 
+	{
+		jQuery('#reset-user-password-dialog').dialog('close');
+	}
+	else
+	{
+		jQuery('#resetUserPasswordPage').replaceWith(html);
+		jQuery('#frmKmcUsersResetPassword').ajaxForm(resetUserPasswordSuccess);
+	}
+}
+
+
 
 </script>
