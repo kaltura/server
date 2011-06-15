@@ -26,6 +26,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	{
 	    if (is_null($this->fieldConfigArray))
 	    {
+	        $this->fieldConfigArray = array();
 	        $tempArray = unserialize($this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY));
 	        if (!is_array($tempArray)) {
 	            $tempArray = array();
@@ -277,8 +278,52 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	    return $this->getFieldValueFromXml($fieldName, $valuesXmlObj);
 	}
 	
-	    
-    
+	
+	/*****************************************/
+	/* Update required entry/metadata fields */
+    /*****************************************/
+	
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
+	 */
+	public function getUpdateRequiredEntryFields()
+	{
+	    $updateRequired = array();
+        $fieldConfigArray = $this->getFieldConfigArray();
+        foreach ($fieldConfigArray as $fieldConfig)
+        {
+            if ($fieldConfig->getUpdateOnChange()) {
+                $updateParam = $fieldConfig->getUpdateParam();
+                if (stripos($updateParam, 'ENTRY.') === 0) {
+                    $updateRequired[] = $updateParam;
+                }
+            }            
+        }
+        return $updateRequired;
+	}
+	
+
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::getUpdateRequiredMetadataXPaths()
+	 */
+	public function getUpdateRequiredMetadataXPaths()
+	{
+	    $updateRequired = array();
+        $fieldConfigArray = $this->getFieldConfigArray();
+        foreach ($fieldConfigArray as $fieldConfig)
+        {
+            if ($fieldConfig->getUpdateOnChange()) {
+                $updateParam = $fieldConfig->getUpdateParam();
+                if (stripos($updateParam, "/*[local-name()='metadata']/*[local-name()='") === 0) {
+                    $updateRequired[] = $updateParam;
+                }
+            }            
+        }
+        return $updateRequired;
+	}
+	
+
 	/*******************************/
 	/* Validation helper functions */
     /*******************************/
