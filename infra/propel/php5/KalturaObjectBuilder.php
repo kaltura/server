@@ -263,6 +263,11 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function postUpdate(PropelPDO \$con = null)
 	{
+		if (\$this->alreadyInSave)
+		{
+			return;
+		}
+	
 		kQueryCache::invalidateQueryCache(\$this);
 		";
 		if ($this->shouldRaiseEvents())
@@ -324,10 +329,16 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function preUpdate(PropelPDO \$con = null)
 	{
-		if(\$this->isModified())";
+		if (\$this->alreadyInSave)
+		{
+			return true;
+		}	
+		";
 		
 		if($updatedAtColumn)
 		$script .= "
+		
+		if(\$this->isModified())
 			\$this->setUpdatedAt(time());";
 		
 		$script .= "
