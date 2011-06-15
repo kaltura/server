@@ -119,7 +119,7 @@ div#my_info, div#new_admin { clear: both;}
 	 fieldset fieldset { height:40px; padding: 10px 10px 7px; border:none; margin: 10px 10px 5px; display:block; float:left; clear:none;}
 	  fieldset fieldset legend { margin: 0 0 0 -8px; padding: 4px 8px 0; #padding: 0 0 5px 0; font: normal 11px arial,sans-serif; color:#222;}
 	button#do_filter { margin: 34px 0 0 11px; float:left;}
-	table { margin: 10px 0 6px; min-width:1133px;}
+	table { margin: 10px 0 6px;}
 	h1 span, h2 span { font: normal 11px arial,sans-serif;}
 	h1 span { font-size:16px;}
 	 h1 span span { margin: 5px 0 10px; font-size:12px;}
