@@ -167,7 +167,7 @@ class BatchService extends KalturaBaseService
 	
 		if($bulkUploadResult->entryId)
 		{
-			$entry = entryPeer::retrieveByPK($bulkUploadResult->entryId);
+			$entry = entryPeer::retrieveByPKNoFilter($bulkUploadResult->entryId); //Gets also deleted entries
 			if(!$entry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $bulkUploadResult->entryId);
 				
