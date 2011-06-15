@@ -46,6 +46,9 @@ interface YouTubeDistributionField extends BaseEnum
 	// item/yt:playlists
 	const PLAYLISTS = 'PLAYLISTS';
 	
+	/*
+	 * //TODO: add advertising fields
+	 * 
 	// item/video_breaks
 	const THIRD_PARTY_AD_SERVER_TARGETING_URL = 'THIRD_PARTY_AD_SERVER_TARGETING_URL';
 	const THIRD_PARTY_AD_SERVER_VIDEO_ID = 'THIRD_PARTY_AD_SERVER_VIDEO_ID';
@@ -54,7 +57,5 @@ interface YouTubeDistributionField extends BaseEnum
 	const AD_POLICY_ALLOW_PREROLLS = 'AD_POLICY_ALLOW_PREROLLS';
 	const AD_POLICY_ALLOW_POSTROLLS = 'AD_POLICY_ALLOW_POSTROLLS';
 	const AD_POLOCY_ALLOW_THIRD_PARTY_ADS = 'AD_POLOCY_ALLOW_THIRD_PARTY_ADS';
-	
-	
-	//TODO: add advertising fields
+	*/	
 }

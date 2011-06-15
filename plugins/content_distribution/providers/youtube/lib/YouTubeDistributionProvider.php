@@ -3,7 +3,7 @@
  * @package plugins.youTubeDistribution
  * @subpackage lib
  */
-class YouTubeDistributionProvider implements IDistributionProvider
+class YouTubeDistributionProvider extends ConfigurableDistributionProvider
 {
 	/**
 	 * @var YouTubeDistributionProvider
@@ -120,24 +120,5 @@ class YouTubeDistributionProvider implements IDistributionProvider
 	public function getJobIntervalBeforeSunset()
 	{
 		return 0; //irrelevant
-	}
-
-
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
-	 */
-	public function getUpdateRequiredEntryFields($distributionProfileId = null)
-	{
-		//TODO: change placement of update required entry fields
-        return array();
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getUpdateRequiredMetadataXPaths()
-	 */
-	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
-	{
-		//TODO: change placement of update required metadata xpaths
-		return array();
 	}
 }
