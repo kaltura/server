@@ -84,7 +84,7 @@ class kConfLocal
 			
 				"ga_account" => '@GOOGLE_ANALYTICS_ACCOUNT@', //google analytics
 				
-				'track_kdpwrapper' =>@TRACK_KDPWRAPPER@,
+				'track_kdpwrapper' =>"@TRACK_KDPWRAPPER@",
 			
 
 				"reports_db_config" => array (
@@ -115,7 +115,7 @@ class kConfLocal
 				"replace_passwords" => "@REPLACE_PASSWORDS@",
 				"kaltura_version" => "@KALTURA_VERSION@",
 				"report_admin_email" => "@REPORT_ADMIN_EMAIL@",
-				"usage_tracking_optin" => @USAGE_TRACKING_OPTIN@,
+				"usage_tracking_optin" => "@USAGE_TRACKING_OPTIN@",
 				"installation_id" => "@INSTALLATION_UID@",
                 		// end of ce only settings
 			)
