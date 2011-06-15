@@ -1180,6 +1180,11 @@ abstract class BaseControlPanelCommand extends BaseObject  implements Persistent
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+		{
+			return;
+		}
+	
 		kQueryCache::invalidateQueryCache($this);
 		
 	}

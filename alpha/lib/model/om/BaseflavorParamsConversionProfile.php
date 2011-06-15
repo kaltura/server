@@ -865,6 +865,11 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+		{
+			return;
+		}
+	
 		kQueryCache::invalidateQueryCache($this);
 		
 	}

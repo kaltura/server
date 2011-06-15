@@ -1144,6 +1144,11 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+		{
+			return;
+		}
+	
 		kQueryCache::invalidateQueryCache($this);
 		
 		if($this->isModified())
@@ -1195,6 +1200,12 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function preUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+		{
+			return true;
+		}	
+		
+		
 		if($this->isModified())
 			$this->setUpdatedAt(time());
 		
