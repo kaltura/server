@@ -20,17 +20,13 @@ class KalturaUploadedFileTokenResource extends KalturaDataCenterContentResource
 		$dbUploadToken = UploadTokenPeer::retrieveByPK($this->token);
 		if (is_null($dbUploadToken))
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
-			
-		// not uploaded yet and therefore doesn't matter
-		if($dbUploadToken->getStatus() != UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
-			return null;
-			
+		
 		return $dbUploadToken->getDc();
 	}
 	
 	public function validateEntry(entry $dbEntry)
 	{
-		parent::validateEntry($dbEntry);
+		//parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('token');
 	}
 	
