@@ -22,7 +22,7 @@ class category extends Basecategory
 	
 	const MAX_CATEGORY_DEPTH = 8;
 	
-	const CATEGORY_THAT_DOES_NOT_EXIST = 0;
+	const CATEGORY_ID_THAT_DOES_NOT_EXIST = 0;
 	
 	public function save(PropelPDO $con = null)
 	{
