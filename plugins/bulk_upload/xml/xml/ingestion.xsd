@@ -4,12 +4,18 @@
 	<xs:complexType name="T_mrss">
 		<xs:sequence>
 			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1"/>
+			
+			<xs:element ref="mrss-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="T_channel">
 		<xs:sequence>
 			<xs:element ref="item" maxOccurs="unbounded" minOccurs="1"/>
+			
+			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 	</xs:complexType>
 		
@@ -161,6 +167,9 @@
 				<xs:element ref="distribution" />
 				<xs:element ref="customData" />
 			</xs:choice>
+			
+			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 	</xs:complexType>
 
@@ -187,6 +196,9 @@
 					<xs:documentation>Used to define the playlists of the media, currently not supported</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			
+			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 	</xs:complexType>
 
@@ -218,6 +230,9 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			
+			<xs:element ref="mix-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 	</xs:complexType>
 
@@ -245,6 +260,9 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			
+			<xs:element ref="playlist-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 	</xs:complexType>
 
@@ -252,6 +270,9 @@
 		<xs:sequence>
 			<xs:element name="dataContent" minOccurs="0" maxOccurs="1" type="xs:string"/>
 			<xs:element name="retrieveDataContentByGet" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+		
+			<xs:element ref="data-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 	</xs:complexType>
 
@@ -263,6 +284,9 @@
 					<xs:element name="encodingIP1" minOccurs="1" maxOccurs="1" />
 					<xs:element name="encodingIP2" minOccurs="0" maxOccurs="1" />
 					<xs:element name="streamPassword" minOccurs="0" maxOccurs="1" />
+				
+					<xs:element ref="liveStream-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -282,6 +306,9 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
+			
+			<xs:element ref="document-extension" minOccurs="0" maxOccurs="unbounded" />
+		
 		</xs:sequence>
 	</xs:complexType>
 
@@ -388,6 +415,9 @@
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
+		
+			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
+		
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="optional" />
 		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
@@ -423,6 +453,9 @@
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
+		
+			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 		<xs:attribute name="assetId" type="xs:string" use="optional"/>
 		<xs:attribute name="id" type="xs:string" use="optional" />
@@ -480,6 +513,9 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+		
+			<xs:element ref="distribution-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 		<xs:attribute name="submitWhenReady" use="optional" type="xs:boolean" default="false" />
 	</xs:complexType>
@@ -490,6 +526,9 @@
 			<!-- 
 			<xs:element ref="xsd:metadata" minOccurs="1" maxOccurs="1"/>
 			-->
+		
+			<xs:element ref="customData-extension" minOccurs="0" maxOccurs="unbounded" />
+			
 		</xs:sequence>
 		<xs:attribute name="metadataProfileId" use="optional" type="xs:int"/>
 		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
@@ -545,4 +584,18 @@
 	
 	<xs:element name="distribution" type="T_distribution" />
 	<xs:element name="customData" type="T_customData" />
+	
+	<xs:element name="mrss-extension" />
+	<xs:element name="channel-extension" />
+	<xs:element name="item-extension" />
+	<xs:element name="media-extension" />
+	<xs:element name="mix-extension" />
+	<xs:element name="playlist-extension" />
+	<xs:element name="data-extension" />
+	<xs:element name="liveStream-extension" />
+	<xs:element name="document-extension" />
+	<xs:element name="content-extension" />
+	<xs:element name="thumbnail-extension" />
+	<xs:element name="distribution-extension" />
+	<xs:element name="customData-extension" />
 </xs:schema>
