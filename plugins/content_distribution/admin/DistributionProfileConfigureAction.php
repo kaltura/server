@@ -142,7 +142,6 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					$form->addFlavorParamsFields($flavorParamsResponse);
 					$form->addThumbDimensionsForm();
 				}
-				$action->view->form = $form;
 			}
 		}
 		catch(Exception $e)
@@ -150,6 +149,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
 		}
+		$action->view->form = $form;
 	}
 }
 
