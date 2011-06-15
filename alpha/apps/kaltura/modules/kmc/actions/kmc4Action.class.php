@@ -212,12 +212,18 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed", true, $kmcGeneralUiConf);
 		$this->content_uiconfs_previewembed_list = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed_list", true, $kmcGeneralUiConf);
 		$this->content_uiconfs_flavorpreview = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_flavorpreview", false, $kmcGeneralUiConf);
+
+		/* KCW uiconfs */
+		$this->content_uiconfs_upload_webcam = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_uploadWebCam", false, $kmcGeneralUiConf);
+		$this->content_uiconfs_upload_import = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_uploadImport", false, $kmcGeneralUiConf);
+
 		/** content KCW,KSE,KAE **/
-		$this->content_uiconfs_upload = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_upload", false, $kmcGeneralUiConf);
-		$this->simple_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_simpleedit", false, $kmcGeneralUiConf);
-		$this->advanced_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_advanceedit", false, $kmcGeneralUiConf);
+		//$this->content_uiconfs_upload = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_upload", false, $kmcGeneralUiConf);
+		//$this->simple_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_simpleedit", false, $kmcGeneralUiConf);
+		//$this->advanced_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_advanceedit", false, $kmcGeneralUiConf);
 		
 		/** silverlight uiconfs **/
+		/*
 		$this->silverLightPlayerUiConfs = array();
 		$this->silverLightPlaylistUiConfs = array();
 		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnableSilverLight())
@@ -225,11 +231,13 @@ class kmc4Action extends kalturaAction
 			$this->silverLightPlayerUiConfs = kmcUtils::getSilverLightPlayerUiConfs('slp');
 			$this->silverLightPlaylistUiConfs = kmcUtils::getSilverLightPlayerUiConfs('sll');
 		}
-
+		*/
 		/** jw uiconfs **/
+		/*
 		$this->jw_uiconfs_array = kmcUtils::getJWPlayerUIConfs();
 		$this->jw_uiconf_playlist = kmcUtils::getJWPlaylistUIConfs();
-		
+		*/
+
 		/** 508 uicinfs **/
 		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnable508Players())
 		{
@@ -241,6 +249,7 @@ class kmc4Action extends kalturaAction
 		$this->content_pne_partners_playlist = kmcUtils::getPartnersUiconfs($this->partner_id, 'playlist');
 		
 		/** appstudio: default entry and playlists **/
+		/*
 		$this->appStudioExampleEntry = $partner->getAppStudioExampleEntry();
 		$appStudioExampleEntry = entryPeer::retrieveByPK($this->appStudioExampleEntry);
 		if (!($appStudioExampleEntry && $appStudioExampleEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK && $appStudioExampleEntry->getStatus()== entryStatus::READY &&	$appStudioExampleEntry->getType() == entryType::MEDIA_CLIP ))
@@ -255,12 +264,13 @@ class kmc4Action extends kalturaAction
 		$appStudioExamplePlayList1 = entryPeer::retrieveByPK($this->appStudioExamplePlayList1);
 		if (!($appStudioExamplePlayList1 && $appStudioExamplePlayList1->getStatus()== entryStatus::READY && $appStudioExamplePlayList1->getType() == entryType::PLAYLIST ))
 			$this->appStudioExamplePlayList1 = "_KMCSPL2";
+		 */
 		/** END - appstudio: default entry and playlists **/
 		
 	/** END - uiconf listing work **/
 		
 		/** get templateXmlUrl for whitelabeled partners **/
-		$this->appstudio_templatesXmlUrl = $this->getAppStudioTemplatePath();
+		//$this->appstudio_templatesXmlUrl = $this->getAppStudioTemplatePath();
 	}
 
 	private function getAppStudioTemplatePath()

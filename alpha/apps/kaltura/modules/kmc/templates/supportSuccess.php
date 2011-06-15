@@ -273,7 +273,11 @@ if(isset($_GET['type']) && $_GET['type'] == md5('true')) {
 		<div id="submit"><button type="submit"><span>Send</span></button></div> 
 	</form> 
 	<p>&nbsp;</p> 
-</div><!--wrapper--> 
+</div><!--wrapper-->
+<script type="text/javascript" >
+	window.parent.document.getElementById("support").height = $(document).height() - 50;
+	window.parent.kmc.layout.modal.position();
+</script>
 	<?php
 	}
 }

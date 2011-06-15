@@ -42,7 +42,7 @@ else
 
 		$partnerUiconfsArray[] = $uiconf_array;
 	}
-	$fullPlaylistPreviewEmbedList = array_merge($defaultUiconfsArray, $silverLightPlaylistUiConfs, $partnerUiconfsArray, $jw_uiconf_playlist);
+	$fullPlaylistPreviewEmbedList = array_merge($defaultUiconfsArray, $partnerUiconfsArray);
 	$ui_confs_playlist = json_encode($fullPlaylistPreviewEmbedList);
 
 	$defaultUiconfsArray = array();
@@ -71,13 +71,19 @@ else
 	}
 	if(is_array($kdp508_players) && count($kdp508_players))
 	{
-		$fullPlayerPreviewEmbedList = array_merge($defaultUiconfsArray, $kdp508_players, $silverLightPlayerUiConfs, $partnerUiconfsArray, $jw_uiconfs_array);
+		$fullPlayerPreviewEmbedList = array_merge($defaultUiconfsArray, $kdp508_players, $partnerUiconfsArray);
 	}
 	else
 	{
-		$fullPlayerPreviewEmbedList = array_merge($defaultUiconfsArray, $silverLightPlayerUiConfs, $partnerUiconfsArray, $jw_uiconfs_array);
+		$fullPlayerPreviewEmbedList = array_merge($defaultUiconfsArray, $partnerUiconfsArray);
 	}
 	$ui_confs_player = json_encode($fullPlayerPreviewEmbedList);
+
+	// Multi Account User
+	$currentAccount = '';
+	if( count($allowedPartners) > 1 ) {
+		$currentAccount = ' &nbsp;|&nbsp; Account: '.  $partner->getName() .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
+	}
 ?>
 
 <script type="text/javascript"> // move to kmc_js.php and include ?
@@ -97,46 +103,25 @@ else
 			cdn_host		: "<?php echo $cdn_host; ?>",
 			rtmp_host		: "<?php echo $rtmp_host; ?>",
 			flash_dir		: "<?php echo $flash_dir ?>",
-			createmix_url	: "<?php echo url_for('kmc/createmix'); ?>",
 			getuiconfs_url	: "<?php echo url_for('kmc/getuiconfs'); ?>",
 			terms_of_use	: "<?php echo kConf::get('terms_of_use_uri'); ?>",
-			jw_swf			: "<?php echo $jw_swf_name; ?>.swf",
 			ks				: "<?php echo $ks; ?>",
 			partner_id		: "<?php echo $partner_id; ?>",
 			subp_id			: "<?php echo $subp_id; ?>",
 			user_id			: "<?php echo $uid; ?>",
-			screen_name		: <?php echo json_encode($screen_name); ?>,
-			email			: "<?php echo $email; ?>",
 			first_login		: <?php echo ($first_login) ? "true" : "false"; ?>,
-			paying_partner	: "<?php echo $payingPartner; ?>",
 			whitelabel		: <?php echo $templatePartnerId; ?>,
-			show_usage		: <?php echo (kConf::get("kmc_account_show_usage"))? "true" : "false"; ?>,
-			kse_uiconf		: "<?php echo $simple_editor->getId(); ?>", // add "id"
-			kae_uiconf		: "<?php echo $advanced_editor->getId(); ?>", // add "id"
-			kcw_uiconf		: "<?php echo $content_uiconfs_upload->getId(); ?>", // add "id"
+			kcw_webcam_uiconf : "<?php echo $content_uiconfs_upload_webcam->getId(); ?>",
+			kcw_import_uiconf : "<?php echo $content_uiconfs_upload_import->getId(); ?>",
 			default_kdp		: {
 					height		: "<?php echo $content_uiconfs_flavorpreview->getHeight(); ?>",
 					width		: "<?php echo $content_uiconfs_flavorpreview->getWidth(); ?>",
 					uiconf_id	: "<?php echo $content_uiconfs_flavorpreview->getId(); ?>",
 					swf_version	: "<?php echo $content_uiconfs_flavorpreview->getswfUrlVersion(); ?>"
 			},
-			//appstudio_uiconfid	: "<?php //echo $appstudio_uiconfs_templates->getId(); ?>",
-			//reports_drilldown	: "<?php //echo $reports_uiconfs_drilldown->getId(); ?>",
-			//enable_live			: "<?php echo $enable_live_streaming; ?>",
-			next_state			: { module : "dashboard", subtab : "default" },
-			disableurlhashing	: "<?php echo $disableurlhashing; ?>",
 			players_list		: <?php echo $ui_confs_player; ?>,
 			playlists_list		: <?php echo $ui_confs_playlist; ?>,
-			enable_custom_data	: "<?php echo $kmc_enable_custom_data; ?>",
-			//metadata_view_uiconf	: "<?php //echo $content_uiconfs_metadataview->getId(); ?>",
-			//content_drilldown_uiconf : "<?php //echo $content_uiconfs_drilldown->getId(); ?>",
-			//content_moderate_uiconf	 : "<?php //echo $content_uiconfs_moderation->getId(); ?>",
 			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
-			appstudio_templatesXmlUrl: <?php echo ($appstudio_templatesXmlUrl ? '"'.$appstudio_templatesXmlUrl.'"' : "false"); ?>,
-			//enableAds		 : <?php echo $enable_vast ?>,
-			appStudioExampleEntry : "<?php echo $appStudioExampleEntry ?>", 
-			appStudioExamplePlayList0	 : "<?php echo $appStudioExamplePlayList0 ?>",
-			appStudioExamplePlayList1	 : "<?php echo $appStudioExamplePlayList1 ?>",
 			language	 : "<?php echo (isset($language) ? $language : '') ?>"
 		}
 	}
@@ -147,17 +132,6 @@ else
 	 <ul id="hTabs">
 	    <li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
 	 </ul>
-<?php
-$currentAccount = '';
-if( count($allowedPartners) > 1 ) {
-    foreach( $allowedPartners as $p ) {
-	if($p['id'] == $partner_id) {
-	    $currentAccount = ' &nbsp;|&nbsp; Account: '.  $p['name'] .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
-	    break;
-	}
-    }
-}
-?>
 	 <div id="user">&lt; &nbsp; <?php echo $full_name; ?></div>
 	 <div id="user_links">
 	  <span id="closeMenu">x&nbsp;</span> &nbsp;&nbsp;<span><?php echo $full_name; ?>&nbsp;&nbsp; ( <a id="Logout" href="#logout">Logout</a> )&nbsp;&nbsp; <?php echo $currentAccount; ?> </span>

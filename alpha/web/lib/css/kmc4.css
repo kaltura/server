@@ -26,9 +26,9 @@ body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) re
      /* div#user_links span { float:right; color:#fff;} */
 	 /*div#user_links a { color:#A6E7F6;}
 	 div#user_links a:hover { color:#A6E7F6; text-decoration:underline;}*/
-#mask { z-index: 33; height:32px; width:100%; position:absolute; top:0; left:0; -moz-opacity:0.4; -webkit-opacity:0.4; opacity:0.4; filter:alpha(opacity=40); background:#000;}
-#wrap{ padding-bottom:4px; }
-#kcms {}
+#mask { display: none; z-index: 33; height:32px; width:100%; position:absolute; top:0; left:0; -moz-opacity:0.4; -webkit-opacity:0.4; opacity:0.4; filter:alpha(opacity=40); background:#000;}
+#wrap{ padding-bottom:4px; min-width: 960px; }
+
 table{ border: none; }
 ul, ol, dir, menu { list-style:none; }
 	.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }	/* Controls the BR tag, which makes the WRAPPER float stretch for GECKO */
@@ -45,7 +45,7 @@ img{ border:none; }
 .floatr{ float:right; }
 .clear { clear: both; }
 
-#overlay{ position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background-color:#000; opacity:0.65; filter: alpha(opacity=65); cursor: default; }
+#overlay{ display: none; position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background:#000; -moz-opacity:0.6; -webkit-opacity:0.6; opacity:0.65; filter: alpha(opacity=65); cursor: default; }
 * html #overlay{ position: absolute; background-color:#000; top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(0 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px'); }
 
 fieldset{ border:0 none; position:relative; }
@@ -70,7 +70,7 @@ fieldset{ border:0 none; position:relative; }
 /*--------------------------------
 	main container
 ---------------------------------*/
-#main{ background-color:#F7F7F7;  margin: 0px 0px 0; position:relative; overflow:hidden; bottom:1px; }
+#main{ min-height: 548px; z-index: 44; background-color:#F7F7F7;  margin: 0; position:relative; overflow:hidden; bottom:1px; }
 #main.help_page { background-color:#f4f4f6; }
 	#main ul { height:29px; background:url(../images/kmc/navbar.gif) 0 -29px repeat-x; overflow:hidden; }
 		#main ul li { float:left; width:9em; height:29px; line-height:29px; text-align:center; display:inline; padding:0 5px 0 7px; background:url(../images/kmc/menu_sep.gif) 0 center no-repeat; }
@@ -132,12 +132,20 @@ fieldset{ border:0 none; position:relative; }
 
 #server_wrap { display:none; }
 
+/* modal.css code combind to this file */
+#modalbox{ position: absolute; left: 50%; top:9%; margin:0 0 0 -340px; width: 680px; z-index: 100; }
+#modalbox.locked{ position:absolute; top:15%; left:0; margin:0; border:0; }
+* html #modalbox{ position: absolute; }
+
+#modalbox iframe{ overflow:hidden; }
+
+.kalturaCode{ font-size: 20px; padding: 5px; }
 
 /* for KMC modal*/
 	/* modal.css overide */
 	#mbContent.new { padding:0; border:none; display:table; background:none;}
 
-	#modal { filter:progid:DXImageTransform.Microsoft.Glow(color=#282828, strength=8); -moz-box-shadow: 0 0 22px #000; -webkit-box-shadow: 0 0 22px #000; borderX: solid 3px #222; margin: 0 auto 15px; -moz-border-radius:8px; -webkit-border-radius:8px; background: #f7f7f7; font-size:13px;}
+	#modal { filter:progid:DXImageTransform.Microsoft.Glow(color=#282828, strength=8); -moz-box-shadow: 0 0 22px #000; -webkit-box-shadow: 0 0 22px #000; borderX: solid 3px #222; margin: 0 auto 15px; background: #f7f7f7; -moz-border-radius:8px; -webkit-border-radius:8px; border-radius: 8px; font-size:13px;}
 	 #titlebar { height:19px; padding: 10px 16px 8px; font-weight:bold; color:#EEEEEE; font-size: 15px; -moz-border-radius-topleft:5px;; -moz-border-radius-topright:5px; -webkit-border-top-left-radius:5px; -webkit-border-top-right-radius:5px; background: url(../images/kmc/kmc_sprite.png) repeat-x 0 -115px;}
 	  #titlebar a { width:16px; height:16px; margin:-1px 0 0 5px; float:right; background: url(../images/kmc/kmc_sprite.png) no-repeat -155px -152px;}
 		#titlebar a#help { background-position: -177px -152px;}
@@ -227,13 +235,8 @@ fieldset{ border:0 none; position:relative; }
 /* end jw p&e */
 
 
-	 /* webkit */
-		@media screen and (-webkit-min-device-pixel-ratio:0)
-		{
-		  /*#modal button#select_code { display: inline; }*/
-		}
-	/* end webkit */
-
+#change_account { padding: 10px; }
+#change_account input { width: auto; }
 #change_account span { display: block; margin-bottom: 10px; }
 #change_account label { display: block; margin: 5px; }
 #change_account .container { overflow-x: hidden; height: 110px; margin-bottom: 10px; }
@@ -243,3 +246,15 @@ fieldset{ border:0 none; position:relative; }
   @-moz-document url-prefix() {
       #change_account button span { background: none; padding: 3px 0 0 6px; }
   }
+
+#modal { display: none; position: absolute; z-index: 100; margin: 0 0 20px; padding: 0; min-height: 200px; font-family: arial; }
+#modal .title { height:19px; padding: 10px 16px 8px;  -moz-border-radius-topleft:5px; -moz-border-radius-topright:5px; -webkit-border-top-left-radius:5px; -webkit-border-top-right-radius:5px; background: url(../images/kmc/kmc_sprite.png) repeat-x 0 -115px;}
+#modal .title h2 { float: left; font-weight:bold; color:#EEEEEE; font-size: 15px; margin: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; max-width: 450px; }
+#modal .title .icon { display: block; width:16px; height:16px; margin:-1px 0 0 5px; float:right; background: url(../images/kmc/kmc_sprite.png) no-repeat; cursor: pointer; }
+#modal .title .close { background-position: -155px -152px; }
+#modal .title .help { background-position: -177px -152px;}
+#modal .content { padding: 6px; }
+#modal .flash_only { background: #e1e1e1; padding: 10px;  -moz-border-radius:6px; -webkit-border-radius:6px; border-radius: 6px; }
+#modal .flash_only object { }
+
+#preview_embed { padding: 6px; }
