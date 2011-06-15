@@ -26,7 +26,7 @@ class KalturaUploadedFileTokenResource extends KalturaDataCenterContentResource
 	
 	public function validateEntry(entry $dbEntry)
 	{
-		//parent::validateEntry($dbEntry);
+		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('token');
 	}
 	
