@@ -84,7 +84,8 @@ class sftpMgr extends kFileTransferMgr
 	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
 	{
 		$sftp = $this->getSftpConnection();
-        $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'w');
+		trim($remote_file, '/');
+        $stream = @fopen("ssh2.sftp://$sftp/$remote_file", 'w');
         if (!$stream) {
         	return false;
         }
@@ -102,7 +103,8 @@ class sftpMgr extends kFileTransferMgr
 	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
 	{	
 		$sftp = $this->getSftpConnection();
-        $stream = @fopen("ssh2.sftp://$sftp$remote_file", 'r');
+		trim($remote_file, '/');
+        $stream = @fopen("ssh2.sftp://$sftp/$remote_file", 'r');
         if (!$stream) {
         	return false;
         }
@@ -171,7 +173,8 @@ class sftpMgr extends kFileTransferMgr
 	public function fileGetContents ($remote_file)
 	{	
 		$sftp = $this->getSftpConnection();
-		$uri = "ssh2.sftp://$sftp$remote_file";
+		trim($remote_file, '/');
+		$uri = "ssh2.sftp://$sftp/$remote_file";
         $stream = @fopen($uri, 'r');
         if (!$stream)
         	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
@@ -191,7 +194,8 @@ class sftpMgr extends kFileTransferMgr
 		}
 		
         $sftp = $this->getSftpConnection();
-		$uri = "ssh2.sftp://$sftp$remote_file";
+        trim($remote_file, '/');
+		$uri = "ssh2.sftp://$sftp/$remote_file";
         $stream = @fopen($uri, 'w');
         if (!$stream)
         	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
