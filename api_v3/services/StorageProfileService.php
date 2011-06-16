@@ -12,14 +12,9 @@ class StorageProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		KalturaLog::debug("master_partner_id [" . kCurrentContext::$master_partner_id . "]");
-		KalturaLog::debug("partner_id [" . kCurrentContext::$partner_id . "]");
-		KalturaLog::debug("ks_partner_id [" . kCurrentContext::$ks_partner_id . "]");
-		KalturaLog::debug("getPartnerId [" . $this->getPartnerId() . "]");
-		KalturaLog::debug("getPartner getId [" . $this->getPartner()->getId() . "]");
 		if(kCurrentContext::$master_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
 		{
-			if($this->getPartner()->getEnabledService(PermissionName::FEATURE_REMOTE_STORAGE))
+			if(!$this->getPartner()->getEnabledService(PermissionName::FEATURE_REMOTE_STORAGE))
 				throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 				
 			parent::applyPartnerFilterForClass(new StorageProfilePeer());
