@@ -85,7 +85,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$entry = entryPeer::retrieveByPK($object->getEntryId());
+		$entry = entryPeer::retrieveByPKNoFilter($object->getEntryId());
 		if($entry)
 		{
 			$entry->setUpdatedAt(time());
