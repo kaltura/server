@@ -5,8 +5,7 @@
  */
 class YouTubeDistributionFeedHelper
 {
-    //TODO: cleanup unused function arguments
-    
+
 	/**
 	 * @var DOMDocument
 	 */
@@ -78,9 +77,9 @@ class YouTubeDistributionFeedHelper
 		if (is_null($startTime)) {
 		    $startTime = time() - 24*60*60;  // yesterday, to make the video public by default
 		}
-		$this->setStartTime(date('c', $startTime));
+		$this->setStartTime(date('c', intval($startTime)));
 		
-        $this->setEndTime(date('c', $this->getValueForField(KalturaYouTubeDistributionField::END_TIME)));
+        $this->setEndTime(date('c', intval($this->getValueForField(KalturaYouTubeDistributionField::END_TIME))));
 		
 		
 		$this->setNotificationEmail($this->getValueForField(KalturaYouTubeDistributionField::NOTIFICATION_EMAIL));
