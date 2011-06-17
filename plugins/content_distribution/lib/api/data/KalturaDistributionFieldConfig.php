@@ -28,6 +28,12 @@ class KalturaDistributionFieldConfig extends KalturaObject
     public $entryMrssXslt;
     
     /**
+     * Is the field required to have a value for submission ?
+     * @var bool
+     */
+    public $isRequired;
+    
+    /**
      * Trigger distribution update when this field changes or not ?
      * @var bool
      */
@@ -48,6 +54,7 @@ class KalturaDistributionFieldConfig extends KalturaObject
 		'fieldName',
 		'userFriendlyFieldName',
 		'entryMrssXslt',
+		'isRequired',
 	    'updateOnChange',
 	    'updateParam',
 	 );

@@ -9,6 +9,10 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	
 	protected $fieldConfigArray = null;
 	
+	protected $fieldValues = null;
+	
+	protected $requiredFields = null;
+		
 	
 	/********************************/
 	/* Field config array functions */
@@ -247,24 +251,28 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	
 	public function getAllFieldValues(EntryDistribution $entryDistribution)
 	{
-	    $valuesXmlObj = $this->getFieldValuesXml($entryDistribution);
-	    if (!$valuesXmlObj) {
-	        KalturaLog::err('Error transforming XML for distribution profile ['.$this->getId().'] and entry distribution id ['.$entryDistribution->getId().']');
-	        return null;
-	    }
+		if (is_null($this->fieldValues) || !is_array($this->fieldValues))
+		{
+		    $valuesXmlObj = $this->getFieldValuesXml($entryDistribution);
+		    if (!$valuesXmlObj) {
+		        KalturaLog::err('Error transforming XML for distribution profile ['.$this->getId().'] and entry distribution id ['.$entryDistribution->getId().']');
+		        return null;
+		    }
+		    
+		    $valuesXmlStr = $valuesXmlObj->saveXML();
+		    KalturaLog::debug('All field values result XML: '.$valuesXmlStr);
+		    
+		    $fieldValues = array();
+		    $fieldConfigArray = $this->getFieldConfigArray();
+		    foreach ($fieldConfigArray as $fieldConfig)
+		    {
+		        $fieldName = $fieldConfig->getFieldName();
+		        $fieldValues[$fieldName] = $this->getFieldValueFromXml($fieldName, $valuesXmlObj);
+		    }
+		    $this->fieldValues = $fieldValues;
+		}	    
 	    
-	    $valuesXmlStr = $valuesXmlObj->saveXML();
-	    KalturaLog::debug('All field values result XML: '.$valuesXmlStr);
-	    
-	    $fieldValues = array();
-	    $fieldConfigArray = $this->getFieldConfigArray();
-	    foreach ($fieldConfigArray as $fieldConfig)
-	    {
-	        $fieldName = $fieldConfig->getFieldName();
-	        $fieldValues[$fieldName] = $this->getFieldValueFromXml($fieldName, $valuesXmlObj);
-	    }
-	    
-	    return $fieldValues;
+	    return $this->fieldValues;
 	}
 	
 	public function getFieldValue(EntryDistribution $entryDistribution, $fieldName)
@@ -328,6 +336,40 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	/* Validation helper functions */
     /*******************************/
 	
+	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
+	{	    
+	    $validationErrors = parent::validateForSubmission($entryDistribution, $action);
+	    
+	    //TODO: move entry validation to DistributionProfile ?
+		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
+		if(!$entry)
+		{
+			KalturaLog::err("Entry [" . $entryDistribution->getEntryId() . "] not found");
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'entry', 'entry not found');
+			return $validationErrors;
+		}
+		
+		
+		// verify fields markes as required
+		$fieldConfigArray = $this->getFieldConfigArray();
+		foreach ($fieldConfigArray as $fieldConfig)
+		{
+			if ($fieldConfig->getIsRequired()) {
+				$this->addRequiredFieldForValidation($fieldConfig->getFieldName());
+			}
+		}		
+		
+		$allFieldValues = $this->getAllFieldValues($entryDistribution);
+		if (!$allFieldValues || !is_array($allFieldValues)) {
+		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
+		    return $validationErrors;
+		}
+		
+		$validationErrors = array_merge($validationErrors, $this->validateNotEmpty($this->requiredFields, $allFieldValues, $action));
+						
+		return $validationErrors;
+	}
+	
     
 	protected function validateNotEmpty($fieldArray, $allFieldValues, $action)
 	{
@@ -379,6 +421,18 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		    }
 	    }
 	    return $validationErrors;
+	}
+	
+	protected function addRequiredFieldForValidation($fieldName)
+	{
+		if (is_null($this->requiredFields) || !is_array($this->requiredFields))
+		{
+			$this->requiredFields = array();
+		}
+		
+		if (!in_array($fieldName, $this->requiredFields)) {
+			$this->requiredFields[$fieldName] = $fieldName;
+		}
 	}
 		
 	

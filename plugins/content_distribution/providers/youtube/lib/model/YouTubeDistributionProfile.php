@@ -49,22 +49,14 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{	    
+	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_CATEGORY);
+	    //$this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_CONTENT_URL);
+	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_DESCRIPTION);
+	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_KEYWORDS);
+	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_TITLE);
+	    
 	    $validationErrors = parent::validateForSubmission($entryDistribution, $action);
-		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
-		if(!$entry)
-		{
-			KalturaLog::err("Entry [" . $entryDistribution->getEntryId() . "] not found");
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'entry', 'entry not found');
-			return $validationErrors;
-		}
-		
-		$notEmptyFields = array (
-		    YouTubeDistributionField::MEDIA_CATEGORY,
-		    //YouTubeDistributionField::MEDIA_CONTENT_URL,
-		    YouTubeDistributionField::MEDIA_DESCRIPTION,
-		    YouTubeDistributionField::MEDIA_KEYWORDS,
-		    YouTubeDistributionField::MEDIA_TITLE,
-		);
+			    
 		
 		$maxLengthFields = array (
 		    YouTubeDistributionField::MEDIA_DESCRIPTION => self::MEDIA_DESCRIPTION_MAXIMUM_LENGTH,
@@ -91,7 +83,6 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		    return $validationErrors;
 		}
 		
-		$validationErrors = array_merge($validationErrors, $this->validateNotEmpty($notEmptyFields, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
 

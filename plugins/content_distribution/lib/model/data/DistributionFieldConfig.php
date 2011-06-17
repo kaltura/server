@@ -23,6 +23,12 @@ class DistributionFieldConfig
     private $entryMrssXslt;
     
     /**
+     * Is the field required to have a value for submission ?
+     * @var bool
+     */
+    private $isRequired;
+    
+    /**
      * Trigger distribution update when this field changes or not ?
      * @var bool
      */
@@ -84,6 +90,20 @@ class DistributionFieldConfig
         $this->entryMrssXslt = $entryMrssXslt;
     }
     
+	/**
+	 * @return the $isRequired
+	 */
+	public function getIsRequired() {
+		return $this->isRequired;
+	}
+
+	/**
+	 * @param bool $isRequired
+	 */
+	public function setIsRequired($isRequired) {
+		$this->isRequired = $isRequired;
+	}
+
 	/**
      * @return the $updateOnChange
      */

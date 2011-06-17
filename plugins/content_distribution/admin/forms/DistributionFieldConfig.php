@@ -26,6 +26,11 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
 		));
 		
+		$this->addElement('checkbox', 'isRequired', array(
+			'filters' 		=> array('StringTrim'),
+			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
+		));
+		
 		$this->addElement('checkbox', 'updateOnChange', array(
 			'filters' 		=> array('StringTrim'),
 			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
