@@ -142,6 +142,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					$form->addFlavorParamsFields($flavorParamsResponse);
 					$form->addThumbDimensionsForm();
 				}
+				$action->view->form = $form;
 			}
 		}
 		catch(Exception $e)
