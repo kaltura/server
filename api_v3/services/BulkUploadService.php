@@ -13,6 +13,8 @@ class BulkUploadService extends KalturaBaseService
 	// add listResults action
 	// add listResultsWithEntries action
 	// add listResultsWithImportJobs action
+
+	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
 	
 	/**
 	 * Add new bulk upload batch job
@@ -27,6 +29,9 @@ class BulkUploadService extends KalturaBaseService
 	 */
 	function addAction($conversionProfileId, $fileData, $bulkUploadType = null)
 	{
+		if($conversionProfileId = self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
+			$conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
+			
 		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
 		if(!$conversionProfile)
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
