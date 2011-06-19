@@ -29,7 +29,7 @@ class BulkUploadService extends KalturaBaseService
 	 */
 	function addAction($conversionProfileId, $fileData, $bulkUploadType = null)
 	{
-		if($conversionProfileId = self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
+		if($conversionProfileId == self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
 			$conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
 			
 		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
