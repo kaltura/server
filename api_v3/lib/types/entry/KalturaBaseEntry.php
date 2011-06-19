@@ -351,7 +351,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		if ($this->endDate === -1) // save -1 as null
 			$dbObject->setEndDate(null);
 			
-		if ($this->categoriesIds != "")
+		
+		if ($this->categoriesIds !== null && $this->categories === null)
 		{
 			$catsNames = array ();
 			
@@ -369,12 +370,6 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			}
 			
 			$catNames = implode(",", $catsNames);
-			
-			if (($this->categories != "") && ($this->categories != $catNames))
-			{
-				throw new KalturaAPIException(KalturaErrors::CANT_UPDATE_PARAMETER, $this->categories);
-			}
-			
 			$dbObject->setCategories($catNames);
 		}
 			
