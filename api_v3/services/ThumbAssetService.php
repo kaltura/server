@@ -665,6 +665,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @return KalturaThumbAssetArray
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @deprecated Use thumbAsset.list instead
 	 */
 	public function getByEntryIdAction($entryId)
 	{

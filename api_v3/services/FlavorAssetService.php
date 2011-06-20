@@ -403,6 +403,7 @@ class FlavorAssetService extends KalturaBaseService
 	 * @action getByEntryId
 	 * @param string $entryId
 	 * @return KalturaFlavorAssetArray
+	 * @deprecated Use thumbAsset.list instead
 	 */
 	public function getByEntryIdAction($entryId)
 	{
