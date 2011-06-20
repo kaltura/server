@@ -276,11 +276,13 @@ kmc.utils = {
 		$("#closeMenu").trigger('click');
 	
 		if(arr) {
-			var module_url = kmc.vars.service_url + '/index.php/kmc/kmc4';
-			var arr_len = arr.length;
-			var tabs_html = '';
+			var module_url = kmc.vars.service_url + '/index.php/kmc/kmc4',
+				arr_len = arr.length,
+				tabs_html = '',
+				tab_class;
 			for( var i = 0; i < arr_len; i++ ) {
-				tabs_html += '<li><a id="'+ arr[i].module_name +'" rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'|'+ arr[i].subtab +'"><span>' + arr[i].display_name + '</span></a></li>';
+				tab_class = (arr[i].type == "menu") ? 'class="menu" ' : '';
+				tabs_html += '<li><a id="'+ arr[i].module_name +'" ' + tab_class + ' rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'|'+ arr[i].subtab +'"><span>' + arr[i].display_name + '</span></a></li>';
 			}
 				
 			$('#hTabs').html(tabs_html);
@@ -299,7 +301,6 @@ kmc.utils = {
 					moduleName : tab,
 					subtab : subtab
 				};
-				//alert($("#kcms")[0].id);
 				$("#kcms")[0].gotoPage(go_to);
 				return false;
 					
@@ -309,9 +310,14 @@ kmc.utils = {
 		}
 	},
 		
-	setTab : function(module){
-		$("#kmcHeader ul li a").removeClass("active");
+	setTab : function(module, resetAll){
+		if( resetAll ) { $("#kmcHeader ul li a").removeClass("active"); }
 		$("a#" + module).addClass("active");
+	},
+
+	// Reset active tab
+	resetTab : function(module) {
+		$("a#" + module).removeClass("active");
 	},
 
 	// we should combine the two following functions into one
@@ -854,6 +860,10 @@ $(function() {
 	kmc.layout.init();
 	kmc.utils.handleMenu();
 	kmc.functions.loadSwf();
+
+	// Load kdp player & playlists for preview & embed
+	kmc.preview_embed.updateList(); // Load players
+	kmc.preview_embed.updateList(true); // Load playlists
 });
 
 // When flash finished loading, resize the page
