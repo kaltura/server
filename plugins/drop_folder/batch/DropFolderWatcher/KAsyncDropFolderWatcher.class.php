@@ -147,6 +147,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			if ($physicalFileName === '.' || $physicalFileName === '..') {
 				continue;
 			}
+			KalturaLog::debug("Watch file [$physicalFileName]");
 			
 			$shouldIgnore = false;
 			foreach ($ignorePatterns as $ignorePattern)
@@ -312,8 +313,11 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		}
 		else // file sizes are equal
 		{
+			$time = time();
+			$fileSizeLastSetAt = $dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt;
+			KalturaLog::debug("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
 			// check if fileSizeCheckInterval time has passed since the last file size update	
-			if (time() > $dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt)
+			if ($time > $fileSizeLastSetAt)
 			{
 				// update the file to status PENDING (will raise an event)
 				try {
