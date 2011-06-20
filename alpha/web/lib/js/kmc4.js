@@ -281,7 +281,7 @@ kmc.utils = {
 				tabs_html = '',
 				tab_class;
 			for( var i = 0; i < arr_len; i++ ) {
-				tab_class = (arr[i].type == "menu") ? 'class="menu" ' : '';
+				tab_class = (arr[i].type == "action") ? 'class="menu" ' : '';
 				tabs_html += '<li><a id="'+ arr[i].module_name +'" ' + tab_class + ' rel="'+ arr[i].subtab +'" href="'+ module_url + '#' + arr[i].module_name +'|'+ arr[i].subtab +'"><span>' + arr[i].display_name + '</span></a></li>';
 			}
 				
