@@ -1,7 +1,7 @@
 /* kmc and kmc.vars defined in script block in kmc4success.php */
 
 // For debug enable to true. Debug will show information in the browser console
-kmc.vars.debug = true;
+kmc.vars.debug = false;
 
 // Quickstart guide (should be moved to kmc4success.php)
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf";
@@ -117,6 +117,10 @@ kmc.functions = {
 	},
 	onCloseKcw : function() {
 		kmc.layout.modal.close();
+		$("#kcms")[0].gotoPage({
+			module: "content",
+			subtab: "manage"
+		});
 	},
 	// Should be moved into user object
 	openChangePwd : function(email) {
@@ -311,7 +315,7 @@ kmc.utils = {
 	},
 		
 	setTab : function(module, resetAll){
-		if( resetAll ) { $("#kmcHeader ul li a").removeClass("active"); }
+		if( resetAll ) {$("#kmcHeader ul li a").removeClass("active");}
 		$("a#" + module).addClass("active");
 	},
 
@@ -851,8 +855,8 @@ function openPlayer(emptystring, width, height, uiconf_id, previewOnly) {
 	if (previewOnly==true) $("#kcms")[0].alert('previewOnly from studio');
 	kmc.preview_embed.doPreviewEmbed("multitab_playlist", null, null, previewOnly, true, uiconf_id); 
 }
-function playlistAdded() { kmc.preview_embed.updateList(true); }
-function playerAdded() { kmc.preview_embed.updateList(false); }
+function playlistAdded() {kmc.preview_embed.updateList(true);}
+function playerAdded() {kmc.preview_embed.updateList(false);}
 /*** end old functions ***/
 
 // When page ready initilize KMC
@@ -881,12 +885,12 @@ kmc.layout = {
 		$("body").append('<div id="overlay"></div><div id="modal"><div class="title"><h2></h2><span class="close icon"></span></div><div class="content"></div></div>');
 	},
 	overlay: {
-		show: function() { $("#overlay").show(); },
-		hide: function() { $("#overlay").hide(); }
+		show: function() {$("#overlay").show();},
+		hide: function() {$("#overlay").hide();}
 	},
 	modal: {
-		open: function(data) {
 
+		create: function(data) {
 			// Set defaults
 			var $modal = $("#modal"),
 				$modal_title = $modal.find(".title h2"),
@@ -909,7 +913,7 @@ kmc.layout = {
 			}).attr('class', '');
 
 			// Insert data into modal
-			if( options.title ) { 
+			if( options.title ) {
 				$modal_title.text(options.title).attr('title', options.title).parent().show();
 			} else {
 				$modal_title.parent().hide();
@@ -917,28 +921,40 @@ kmc.layout = {
 			}
 			$modal.find(".help").remove();
 			$modal_title.parent().append( options.help );
-
+			
 			$modal_content.html(options.content);
-
-			kmc.utils.hideFlash(true);
-			kmc.layout.overlay.show();
-			kmc.layout.modal.position();
-			setTimeout( function() {
-				kmc.layout.modal.position();
-			}, 1000);
-			$modal.fadeIn(600).css('display', 'table');
-			if( ($.browser.msie) ) {
-				$modal.css('display', 'block');
-			}
 
 			// Activate close button
 			$modal.find(".close").click( function() {
 				kmc.layout.modal.close();
 			});
+
+			return $modal;
 		},
+
+		show: function() {
+			var $modal = $("#modal");
+
+			kmc.utils.hideFlash(true);
+			kmc.layout.overlay.show();
+			this.position();
+			setTimeout( function() {
+				kmc.layout.modal.position();
+			}, 1000);
+			$modal.fadeIn(600).css('display', 'table');
+			if( $.browser.msie ) {
+				$modal.css('display', 'block');
+			}
+		},
+
+		open: function(data) {
+			this.create(data);
+			this.show();
+		},
+		
 		position: function() {
 
-			var $modal = $("#modal")
+			var $modal = $("#modal");
 			// Calculate Modal Position
 			var mTop = ( ($(window).height() - $modal.height()) / 2 ),
 				mLeft = ( ($(window).width() - $modal.width()) / (2+$(window).scrollLeft()) );
@@ -964,14 +980,28 @@ kmc.layout = {
 kmc.user = {
 
 	openSupport: function(href) {
-		var modal_content = '<iframe id="support" src="' + href + '" width="100%" scrolling="no" frameborder="0"></iframe>';
-		kmc.layout.modal.open( {
+
+		// Show overlay
+		kmc.utils.hideFlash(true);
+		kmc.layout.overlay.show();
+
+		// We want the show the modal only after the iframe is loaded so we use "create" instead of "open"
+	   	var modal_content = '<iframe id="support" src="' + href + '" width="100%" scrolling="no" frameborder="0"></iframe>';
+		kmc.layout.modal.create( {
 			'width' : 550,
 			'title' : 'Support Request',
 			'content' : modal_content
 		} );
+
+		// Wait until iframe loads and then show the modal
 		$("#support").load(function() {
-			$("#support").height($("#support")[0].contentWindow.document.body.scrollHeight);
+			// In order to get the iframe content height the modal must be visible
+			kmc.layout.modal.show();
+			// Get iframe content height & update iframe
+			var iframe_height = $("#support")[0].contentWindow.document.body.scrollHeight;
+			$("#support").height( iframe_height );
+			// Re-position the modal box
+			kmc.layout.modal.position();
 		});
 	},
 
