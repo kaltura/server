@@ -15,7 +15,8 @@
  */
 class PermissionPeer extends BasePermissionPeer
 {
-
+	protected static $allowedPermissions = array();
+	
 	public static function checkValidPermissionsForRole($permissionsStr, $partnerId)
 	{
 		if ($permissionsStr == UserRole::ALL_PARTNER_PERMISSIONS_WILDCARD) {
@@ -132,11 +133,22 @@ class PermissionPeer extends BasePermissionPeer
 	
 	public static function isValidForPartner($permissionName, $partnerId, $checkDependency = true)
 	{
+		if(!isset(self::$allowedPermissions[$partnerId]))
+		{
+			self::$allowedPermissions[$partnerId] = array();
+		}
+		elseif(isset(self::$allowedPermissions[$partnerId][$permissionName]))
+		{
+			return self::$allowedPermissions[$partnerId][$permissionName];
+		}
+			
 		$permission = self::getByNameAndPartner($permissionName, array($partnerId, PartnerPeer::GLOBAL_PARTNER));
 		if (!$permission) {
+			self::$allowedPermissions[$partnerId][$permissionName] = false;
 			return false;
 		}
 		if ($permission->getStatus() != PermissionStatus::ACTIVE) {
+			self::$allowedPermissions[$partnerId][$permissionName] = false;
 			return false;
 		}
 		
@@ -156,9 +168,11 @@ class PermissionPeer extends BasePermissionPeer
 				}
 			}
 			if (!$valid) {
+				self::$allowedPermissions[$partnerId][$permissionName] = false;
 				return false;
 			}
 		}
+		self::$allowedPermissions[$partnerId][$permissionName] = $permission;
 		return $permission;
 	}
 	
