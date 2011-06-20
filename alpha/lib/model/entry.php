@@ -2166,6 +2166,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(entryPeer::STATUS) && $this->getStatus() == entryStatus::DELETED)
@@ -2188,8 +2191,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);
-		
-		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 	
 	/*************** Bulk download functions - start ******************/
