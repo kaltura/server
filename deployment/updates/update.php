@@ -54,15 +54,16 @@ class ScriptsRunner {
 		} else {
 			$cmd = sprintf("mysql -h%s -u%s -p%s -P%s %s < %s", $this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['port'], $this->dbParams['dbname'], $file);
 		}
-		logMessage(L_INFO, "Executing $cmd");
+//		logMessage(L_INFO, "Executing $cmd");
 		@exec($cmd . ' 2>&1', $output, $return_var);
 		if ($return_var === 0) {
-			logMessage(L_INFO, "Command $cmd Executed Successfully");
+//			logMessage(L_INFO, "Command $cmd Executed Successfully");
+			echo "Command ".$cmd." Executed Successfully".PHP_EOL;	
 			return true;
 		} else {
 			echo "Failed to run: ".$cmd." ".PHP_EOL.implode("\n",$output).PHP_EOL;	
-			logMessage(L_INFO, "Failed to run: Failed to run:  $cmd ");
-			logMessage(L_INFO, implode("\n",$output));
+//			logMessage(L_INFO, "Failed to run: Failed to run:  $cmd ");
+//			logMessage(L_INFO, implode("\n",$output));
 			return false;
 		}
 	}
