@@ -83,9 +83,9 @@ $response_obj=new XmlRpcData;
 		}
 		else{
 		;
-			echo "--------------\n";
-			print_r($xml->params[0]);
-			echo "^^^^^^^^^^^^^^\n";
+//			echo "--------------\n";
+//			print_r($xml->params[0]);
+//			echo "^^^^^^^^^^^^^^\n";
 		}
 	}
 	else if($xml->fault[0])
