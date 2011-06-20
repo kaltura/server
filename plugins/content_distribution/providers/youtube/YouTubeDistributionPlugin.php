@@ -219,7 +219,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-	    // append Hulu specific report statistics
+	    // append YouTube specific report statistics
 	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 		$mrss->addChild('allow_comments', $distributionProfile->getAllowComments());
 		$mrss->addChild('allow_responses', $distributionProfile->getAllowResponses());
