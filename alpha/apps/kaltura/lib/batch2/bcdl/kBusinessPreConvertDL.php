@@ -843,6 +843,7 @@ class kBusinessPreConvertDL
 		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
 		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
 
+		$ingestedNeeded = false;
 		foreach($flavors as $index => $flavor)
 		{
 			if(!isset($conversionProfileFlavorParams[$flavor->getId()]))
@@ -869,6 +870,7 @@ class kBusinessPreConvertDL
 			if($conversionProfileFlavorParamsItem->getOrigin() == assetParamsOrigin::INGEST)
 			{
 				unset($flavors[$index]);
+				$ingestedNeeded = true;
 				continue;
 			}
 				
@@ -963,7 +965,7 @@ class kBusinessPreConvertDL
 			kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);
 		}
 		
-		if(!count($flavors))
+		if(!count($flavors) && !$ingestedNeeded)
 			$shouldConvert = false;
 	
 		if(!$shouldConvert)
