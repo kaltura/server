@@ -54,6 +54,7 @@ class ftpMgr extends kFileTransferMgr
 	// upload a file to the server (ftp_mode is irrelevant
 	protected function doPutFile ($remote_file,  $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null)
 	{
+		$remote_file = trim($remote_file,'/');
 		// try to upload file
 		return ftp_put( $this->connection_id ,  $remote_file ,  $local_file ,  $ftp_mode);
 	}
@@ -70,6 +71,7 @@ class ftpMgr extends kFileTransferMgr
 	// create a new directory on the server
 	protected function doMkDir ($remote_path)
 	{
+		$remote_path = trim($remote_path,'/');
 		// try to make the new directory
 		return ftp_mkdir($this->getConnection(), $remote_path);
 	}
@@ -88,6 +90,7 @@ class ftpMgr extends kFileTransferMgr
 	// check if the given file/dir exists on the server
 	protected function doFileExists($remote_file)
 	{
+		$remote_file = trim($remote_file,'/');
 		// check if exists as file
 		if (ftp_size($this->getConnection(), $remote_file) != -1) {
 			return true; // file exists
