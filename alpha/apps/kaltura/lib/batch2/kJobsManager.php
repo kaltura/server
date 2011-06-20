@@ -740,6 +740,7 @@ class kJobsManager
 	 */
 	public static function addConvertProfileJob(BatchJob $parentJob = null, entry $entry, $flavorAssetId, $inputFileSyncLocalPath)
 	{	
+		KalturaLog::debug("Parent job [" . ($parentJob ? $parentJob->getId() : 'none') . "] entry [" . $entry->getId() . "] flavor asset [$flavorAssetId] input file [$inputFileSyncLocalPath]");
 		if($entry->getConversionQuality() == conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$entry->setStatus(entryStatus::PENDING);
@@ -752,6 +753,8 @@ class kJobsManager
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (!file_exists($inputFileSyncLocalPath) || filesize($inputFileSyncLocalPath) == 0)
 		{
+			KalturaLog::debug("Input file [$inputFileSyncLocalPath] does not exist");
+			
 			$partner = $entry->getPartner();
 			if($partner && $partner->getImportRemoteSourceForConvert())
 			{
@@ -804,6 +807,7 @@ class kJobsManager
 						$entry->save();
 					}
 				}
+				KalturaLog::notice("File sync is not URL");
 				return null;
 			}
 			
