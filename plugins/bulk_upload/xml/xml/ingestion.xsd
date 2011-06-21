@@ -526,9 +526,6 @@
 			<!-- 
 			<xs:element ref="xsd:metadata" minOccurs="1" maxOccurs="1"/>
 			-->
-		
-			<xs:element ref="customData-extension" minOccurs="0" maxOccurs="unbounded" />
-			
 		</xs:sequence>
 		<xs:attribute name="metadataProfileId" use="optional" type="xs:int"/>
 		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
@@ -597,5 +594,4 @@
 	<xs:element name="content-extension" />
 	<xs:element name="thumbnail-extension" />
 	<xs:element name="distribution-extension" />
-	<xs:element name="customData-extension" />
 </xs:schema>
