@@ -36,18 +36,16 @@ class getuiconfsAction extends kalturaAction
 		}
 		
 		// default uiconf array
-		$this->kmc_content_version = kConf::get('kmc_content_version');
-		$contentTemplateConfs = kmcUtils::getAllKMCUiconfs('content',   $this->kmc_content_version, $this->templatePartnerId);
-		$contentSystemConfs = kmcUtils::getAllKMCUiconfs('content',   $this->kmc_content_version, 0);
+		$this->kmc_swf_version = kConf::get('kmc_version');
+		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
+		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
 		if($type == 'player')
 		{
-			$silverLightTag = 'slp';
-			$content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($contentTemplateConfs, "content_previewembed", true, $contentSystemConfs);
+			$content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed", true, $kmcGeneralUiConf);
 		}
 		else
 		{
-			$silverLightTag = 'sll';
-			$content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($contentTemplateConfs, "content_previewembed_list", true, $contentSystemConfs);
+			$content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed_list", true, $kmcGeneralUiConf);
 		}
 		foreach($content_uiconfs_previewembed as $uiconf)
 		{
@@ -56,24 +54,17 @@ class getuiconfsAction extends kalturaAction
 			$uiconf_array["name"] = $uiconf->getName();
 			$uiconf_array["width"] = $uiconf->getWidth();
 			$uiconf_array["height"] = $uiconf->getHeight();
-			$uiconf_array["swfUrlVersion"] = $uiconf->getSwfUrlVersion();
+			//$uiconf_array["swfUrlVersion"] = $uiconf->getSwfUrlVersion();
 			$uiconf_array["swf_version"] = "v" . $uiconf->getSwfUrlVersion();
 
 			$default_uiconfs_array[] = $uiconf_array;
 		}
 		
-		$silverlight_uiconfs = array();
-		if($this->partner->getEnableSilverLight())
-		{
-			$silverlight_uiconfs = kmcUtils::getSilverLightPlayerUiConfs($silverLightTag);
-		}
 		$kdp508_uiconfs = array();
 		if($type == 'player' && $this->partner->getEnable508Players())
 		{
 			$kdp508_uiconfs = kmcUtils::getKdp508PlayerUiconfs();
 		}
-		
-		$jw_confs = ($type == 'player')? kmcUtils::getJWPlayerUIConfs(): kmcUtils::getJWPlaylistUIConfs();
 		
 		$merged_list = array();
 		if(count($default_uiconfs_array))
@@ -82,16 +73,10 @@ class getuiconfsAction extends kalturaAction
 		if(count($kdp508_uiconfs))
 			foreach($kdp508_uiconfs as $uiconf)
 				$merged_list[] = $uiconf;
-		if(count($silverlight_uiconfs))
-			foreach($silverlight_uiconfs as $uiconf)
-				$merged_list[] = $uiconf;
 		if(count($partner_uiconfs_array))
 			foreach($partner_uiconfs_array as $uiconf)
 				$merged_list[] = $uiconf;
-		if(count($jw_confs))
-			foreach($jw_confs as $uiconf)
-				$merged_list[] = $uiconf;
-			
+
 		return $this->renderText(json_encode($merged_list));
 	}
 }

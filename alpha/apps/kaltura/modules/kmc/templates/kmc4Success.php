@@ -1,11 +1,7 @@
 <?php
-$jw_swf_name = ($jw_license) ? "licensed" : "non-commercial";
 
-$disableurlhashing = kConf::get('disable_url_hashing');
-if ( !$allow_reports )
-{
-  $first_login = true;
-}
+//$first_login = ( !$allow_reports ) ? true : false;
+
 if ( kConf::get('kmc_display_server_tab') )
 {
 	$support_url = '#support';
@@ -15,78 +11,15 @@ else
 {
 	$support_url = '/index.php/kmc/support?type=' . md5($payingPartner) . '&pid=' . $partner_id . '&email=' . $email;
 }
-?>
-<?php
 
-	$defaultUiconfsArray = array();
-	foreach($content_uiconfs_previewembed_list as $uiconf)
-	{
-		$uiconf_array = array();
-		$uiconf_array["id"] = $uiconf->getId();
-		$uiconf_array["name"] = $uiconf->getName();
-		$uiconf_array["width"] = $uiconf->getWidth();
-		$uiconf_array["height"] = $uiconf->getHeight();
-		$uiconf_array["swf_version"] = "v" . $uiconf->getswfUrlVersion();
-
-		$defaultUiconfsArray[] = $uiconf_array;
-	}
-	$partnerUiconfsArray = array();
-	foreach($content_pne_partners_playlist as $uiconf)
-	{
-		$uiconf_array = array();
-		$uiconf_array["id"] = $uiconf->getId();
-		$uiconf_array["name"] = $uiconf->getName();
-		$uiconf_array["width"] = $uiconf->getWidth();
-		$uiconf_array["height"] = $uiconf->getHeight();
-		$uiconf_array["swf_version"] = "v" . $uiconf->getswfUrlVersion();
-
-		$partnerUiconfsArray[] = $uiconf_array;
-	}
-	$fullPlaylistPreviewEmbedList = array_merge($defaultUiconfsArray, $partnerUiconfsArray);
-	$ui_confs_playlist = json_encode($fullPlaylistPreviewEmbedList);
-
-	$defaultUiconfsArray = array();
-	foreach($content_uiconfs_previewembed as $uiconf)
-	{
-		$uiconf_array = array();
-		$uiconf_array["id"] = $uiconf->getId();
-		$uiconf_array["name"] = $uiconf->getName();
-		$uiconf_array["width"] = $uiconf->getWidth();
-		$uiconf_array["height"] = $uiconf->getHeight();
-		$uiconf_array["swf_version"] = "v" . $uiconf->getswfUrlVersion();
-	
-		$defaultUiconfsArray[] = $uiconf_array;
-	}
-	$partnerUiconfsArray = array();
-	foreach($content_pne_partners_player as $uiconf)
-	{
-		$uiconf_array = array();
-		$uiconf_array["id"] = $uiconf->getId();
-		$uiconf_array["name"] = $uiconf->getName();
-		$uiconf_array["width"] = $uiconf->getWidth();
-		$uiconf_array["height"] = $uiconf->getHeight();
-		$uiconf_array["swf_version"] = "v" . $uiconf->getswfUrlVersion();
-
-		$partnerUiconfsArray[] = $uiconf_array;
-	}
-	if(is_array($kdp508_players) && count($kdp508_players))
-	{
-		$fullPlayerPreviewEmbedList = array_merge($defaultUiconfsArray, $kdp508_players, $partnerUiconfsArray);
-	}
-	else
-	{
-		$fullPlayerPreviewEmbedList = array_merge($defaultUiconfsArray, $partnerUiconfsArray);
-	}
-	$ui_confs_player = json_encode($fullPlayerPreviewEmbedList);
-
-	// Multi Account User
-	$currentAccount = '';
-	if( count($allowedPartners) > 1 ) {
-		$currentAccount = ' &nbsp;|&nbsp; Account: '.  $partner->getName() .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
-	}
+// Multi Account User
+$currentAccount = '';
+if( count($allowedPartners) > 1 ) {
+	$currentAccount = ' &nbsp;|&nbsp; Account: '.  $partner->getName() .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
+}
 ?>
 
-<script type="text/javascript"> // move to kmc_js.php and include ?
+<script type="text/javascript">
 	var kmc = {
 		vars : {
 		  /* --- new vars KMC4 */
@@ -119,8 +52,6 @@ else
 					uiconf_id	: "<?php echo $content_uiconfs_flavorpreview->getId(); ?>",
 					swf_version	: "<?php echo $content_uiconfs_flavorpreview->getswfUrlVersion(); ?>"
 			},
-			players_list		: <?php echo $ui_confs_player; ?>,
-			playlists_list		: <?php echo $ui_confs_playlist; ?>,
 			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
 			language	 : "<?php echo (isset($language) ? $language : '') ?>"
 		}

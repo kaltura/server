@@ -147,6 +147,8 @@ kmc.functions = {
 };
 
 kmc.utils = {
+	// Backward compatability
+	closeModal : function() { kmc.layout.modal.close(); },
 
 	handleMenu : function() {
 
@@ -937,14 +939,13 @@ kmc.layout = {
 
 			kmc.utils.hideFlash(true);
 			kmc.layout.overlay.show();
-			this.position();
-			setTimeout( function() {
-				kmc.layout.modal.position();
-			}, 1000);
+
 			$modal.fadeIn(600).css('display', 'table');
 			if( $.browser.msie ) {
 				$modal.css('display', 'block');
 			}
+			
+			kmc.layout.modal.position();
 		},
 
 		open: function(data) {

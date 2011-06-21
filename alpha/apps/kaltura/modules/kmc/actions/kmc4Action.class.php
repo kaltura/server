@@ -76,14 +76,9 @@ class kmc4Action extends kalturaAction
 	/** END - load partner from DB, and set templatePartnerId **/
 
 	/** set default flags **/
-		$this->allow_reports = false;
 		$this->payingPartner = 'false';
-		$this->embed_code  = "";
-		$this->enable_live_streaming = 'false';
-		$this->kmc_enable_custom_data = 'false';
 		$this->kdp508_players = array();
 		$this->first_login = false;
-		$this->enable_vast = 'false';
 	/** END - set default flags **/
 	
 	/** set values for template **/
@@ -97,18 +92,6 @@ class kmc4Action extends kalturaAction
 	// Decide if to hide akamai delivery type
 	$this->hideAkamaiHDNetwork = $partner->getDisableAkamaiHDNetwork();
 		
-	/** set embed_code value **/
-		if ( $this->partner_id !== null )
-		{
-			$widget = widgetPeer::retrieveByPK( "_" . $this->partner_id );
-			if ( $widget )
-			{
-				$this->embed_code = $widget->getWidgetHtml( "kaltura_player" );
-				
-				$ui_conf = $widget->getuiConf();
-			}
-		}
-	/** END - set embed_code value **/
 
 	/** set payingPartner flag **/
 		if($partner && $partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE)
@@ -116,69 +99,21 @@ class kmc4Action extends kalturaAction
 			$this->payingPartner = 'true';
 		}
 	/** END - set payingPartner flag **/
-		
-	/** set enable_live_streaming flag **/
-		if(kConf::get('kmc_content_enable_live_streaming') && $partner)
-		{
-			if ($partner->getLiveStreamEnabled())
-			{
-				$this->enable_live_streaming = 'true';
-			}
-		}
-	/** END - set enable_live_streaming flag **/
 
 	/** get partner languae **/
 		$this->language = null; 
 		if ($partner->getKMCLanguage())
 			$this->language = $partner->getKMCLanguage();
 	/** END - get partner languae **/		
-		
-	/** set enable_live_streaming flag **/
-		if($partner && $partner->getEnableVast())
-		{
-			$this->enable_vast = 'true';
-		}
-	/** END - set enable_live_streaming flag **/
-		
-	/** set kmc_enable_custom_data flag **/
-		$defaultPlugins = kConf::get('default_plugins');
-		if(is_array($defaultPlugins) && in_array('MetadataPlugin', $defaultPlugins) && $partner)
-		{
-			if ($partner->getPluginEnabled(MetadataPlugin::PLUGIN_NAME) && $partner->getKmcVersion() == self::CURRENT_KMC_VERSION)
-			{
-				$this->kmc_enable_custom_data = 'true';
-			}
-		}
-	/** END - set kmc_enable_custom_data flag **/
-
-	/** set allow_reports flag **/
-		// 2009-08-27 is the date we added ON2 to KMC trial account
-		// TODO - should be depracated
-		if(strtotime($partner->getCreatedAt()) >= strtotime('2009-08-27') ||
-		   $partner->getEnableAnalyticsTab())
-		{
-			$this->allow_reports = true;
-		}
-		if($partner->getEnableAnalyticsTab())
-		{
-			$this->allow_reports = true;
-		}
-		// if the email is empty - it is an indication that the kaltura super user is logged in
-		if ( !$this->email) $this->allow_reports = true;
-	/** END - set allow_reports flag **/
 	
-	/** set first_login and jw_license flags **/
-		if ($partner)
+	/** set first_login flag **/
+		$this->first_login = $partner->getIsFirstLogin();
+		if ($this->first_login === true)
 		{
-			$this->first_login = $partner->getIsFirstLogin();
-			if ($this->first_login === true)
-			{
-				$partner->setIsFirstLogin(false);
-				$partner->save();
-			}
-			$this->jw_license = $partner->getLicensedJWPlayer();
+			$partner->setIsFirstLogin(false);
+			$partner->save();
 		}
-	/** END - set first_login and jw_license flags **/
+	/** END - set first_login flag **/
 		
 	/** partner-specific: change KDP version for partners working with auto-moderaion **/
 		// set content kdp version according to partner id
@@ -190,14 +125,7 @@ class kmc4Action extends kalturaAction
 		}
 	/** END - partner-specific: change KDP version for partners working with auto-moderaion **/
 		
-	/** applications versioning **/
-		/*$this->kmc_content_version 	= kConf::get('kmc_content_version');
-		$this->kmc_account_version 	= kConf::get('kmc_account_version');
-		$this->kmc_appstudio_version 	= kConf::get('kmc_appstudio_version');
-		$this->kmc_rna_version 		= kConf::get('kmc_rna_version');
-		$this->kmc_dashboard_version 	= kConf::get('kmc_dashboard_version');*/
 		$this->kmc_swf_version = kConf::get('kmc_version');
-	/** END - applications versioning **/
 		
 	/** uiconf listing work **/
 		/** fill $this->confs with all uiconf objects for all modules **/
@@ -209,8 +137,8 @@ class kmc4Action extends kalturaAction
 		$this->kmc_general = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kmcgeneral", false, $kmcGeneralUiConf);
 		$this->kmc_permissions = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kmcpermissions", false, $kmcGeneralUiConf);
 		/** P&E players: **/
-		$this->content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed", true, $kmcGeneralUiConf);
-		$this->content_uiconfs_previewembed_list = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed_list", true, $kmcGeneralUiConf);
+		//$this->content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed", true, $kmcGeneralUiConf);
+		//$this->content_uiconfs_previewembed_list = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed_list", true, $kmcGeneralUiConf);
 		$this->content_uiconfs_flavorpreview = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_flavorpreview", false, $kmcGeneralUiConf);
 
 		/* KCW uiconfs */
@@ -221,51 +149,6 @@ class kmc4Action extends kalturaAction
 		//$this->content_uiconfs_upload = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_upload", false, $kmcGeneralUiConf);
 		//$this->simple_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_simpleedit", false, $kmcGeneralUiConf);
 		//$this->advanced_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_advanceedit", false, $kmcGeneralUiConf);
-		
-		/** silverlight uiconfs **/
-		/*
-		$this->silverLightPlayerUiConfs = array();
-		$this->silverLightPlaylistUiConfs = array();
-		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnableSilverLight())
-		{
-			$this->silverLightPlayerUiConfs = kmcUtils::getSilverLightPlayerUiConfs('slp');
-			$this->silverLightPlaylistUiConfs = kmcUtils::getSilverLightPlayerUiConfs('sll');
-		}
-		*/
-		/** jw uiconfs **/
-		/*
-		$this->jw_uiconfs_array = kmcUtils::getJWPlayerUIConfs();
-		$this->jw_uiconf_playlist = kmcUtils::getJWPlaylistUIConfs();
-		*/
-
-		/** 508 uicinfs **/
-		if($partner->getKmcVersion() == self::CURRENT_KMC_VERSION && $partner->getEnable508Players())
-		{
-			$this->kdp508_players = kmcUtils::getKdp508PlayerUiconfs();
-		}
-		
-		/** partner's preview&embed uiconfs **/
-		$this->content_pne_partners_player = kmcUtils::getPartnersUiconfs($this->partner_id, 'player');
-		$this->content_pne_partners_playlist = kmcUtils::getPartnersUiconfs($this->partner_id, 'playlist');
-		
-		/** appstudio: default entry and playlists **/
-		/*
-		$this->appStudioExampleEntry = $partner->getAppStudioExampleEntry();
-		$appStudioExampleEntry = entryPeer::retrieveByPK($this->appStudioExampleEntry);
-		if (!($appStudioExampleEntry && $appStudioExampleEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK && $appStudioExampleEntry->getStatus()== entryStatus::READY &&	$appStudioExampleEntry->getType() == entryType::MEDIA_CLIP ))
-			$this->appStudioExampleEntry = "_KMCLOGO1";
-		
-		$this->appStudioExamplePlayList0 = $partner->getAppStudioExamplePlayList0();
-		$appStudioExamplePlayList0 = entryPeer::retrieveByPK($this->appStudioExamplePlayList0);		
-		if (!($appStudioExamplePlayList0 && $appStudioExamplePlayList0->getStatus()== entryStatus::READY && $appStudioExamplePlayList0->getType() == entryType::PLAYLIST ))
-			$this->appStudioExamplePlayList0 = "_KMCSPL1";
-		
-		$this->appStudioExamplePlayList1 = $partner->getAppStudioExamplePlayList1();
-		$appStudioExamplePlayList1 = entryPeer::retrieveByPK($this->appStudioExamplePlayList1);
-		if (!($appStudioExamplePlayList1 && $appStudioExamplePlayList1->getStatus()== entryStatus::READY && $appStudioExamplePlayList1->getType() == entryType::PLAYLIST ))
-			$this->appStudioExamplePlayList1 = "_KMCSPL2";
-		 */
-		/** END - appstudio: default entry and playlists **/
 		
 	/** END - uiconf listing work **/
 		
@@ -303,91 +186,5 @@ class kmc4Action extends kalturaAction
 		return false;
 	}
     
-	/** TODO - remove Deprecated **/
-	private function DEPRECATED_getAdvancedEditorUiConf()
-	{
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_ADVANCED_EDITOR );
-		$c->addAnd ( uiConfPeer::TAGS, 'andromeda_kae_for_kmc', Criteria::LIKE);
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
-		$uiConf = uiConfPeer::doSelectOne($c);
-		if ($uiConf)
-			return $uiConf->getId();
-		else
-			return -1;
-	}
-	
-	/** TODO - remove Deprecated **/
-	private function DEPRECATED_getSimpleEditorUiConf()
-	{
-		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_EDITOR );
-		$c->addAnd ( uiConfPeer::TAGS, 'andromeda_kse_for_kmc', Criteria::LIKE);
-		$c->addAscendingOrderByColumn(uiConfPeer::ID);
-
-		$uiConf = uiConfPeer::doSelectOne($c);
-		if ($uiConf)
-			return $uiConf->getId();
-		else
-			return -1;
-	}
-
-	private function getCritria ( )
-	{
-		$c = new Criteria();
-		
-		// or belongs to the partner or a template  
-		$criterion = $c->getNewCriterion( uiConfPeer::PARTNER_ID , $this->partner_id ) ; // or belongs to partner
-		$criterion2 = $c->getNewCriterion( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );	// or belongs to kaltura_network == templates
-		
-		$criterion2partnerId = $c->getNewCriterion(uiConfPeer::PARTNER_ID, $this->templatePartnerId);
-		$criterion2->addAnd($criterion2partnerId);  
-		
-		$criterion->addOr ( $criterion2 ) ;
-		$c->addAnd ( $criterion );
-		
-		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );	//	only ones that are of type WIDGET
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY ); 	//	display only ones that are ready - not deleted or in draft mode
-		
-		
-		$order_by = "(" . uiConfPeer::PARTNER_ID . "={$this->partner_id})";  // first take the templates  and then the rest
-		$c->addAscendingOrderByColumn ( $order_by );//, Criteria::CUSTOM );
-
-		return $c;
-	}
-	
-	private function getUiconfList($tag = 'player')
-	{
-		$template_partner_id = (isset($this->templatePartnerId))? $this->templatePartnerId: self::SYSTEM_DEFAULT_PARTNER;
-		$c = new Criteria();
-		$crit_partner = $c->getNewCriterion(uiConfPeer::PARTNER_ID, $this->partner_id);
-		 $crit_default = $c->getNewCriterion(uiConfPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK, Criteria::GREATER_EQUAL);
-		
-		$crit_default_partner_id = $c->getNewCriterion(uiConfPeer::PARTNER_ID, $template_partner_id);
-		$crit_default_swf_url = $c->getNewCriterion(uiConfPeer::SWF_URL, '%/kdp3/%kdp3.swf', Criteria::LIKE);
-		$crit_default->addAnd($crit_default_partner_id);
-		$crit_default->addAnd($crit_default_swf_url);
-		
-		$crit_partner->addOr($crit_default);
-		$c->add($crit_partner);
-		$c->addAnd(uiConfPeer::OBJ_TYPE, array(uiConf::UI_CONF_TYPE_WIDGET, uiConf::UI_CONF_TYPE_KDP3), Criteria::IN);
-		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
-		$c->addAnd ( uiConfPeer::TAGS, '%'.$tag.'%', Criteria::LIKE );
-		$c->addAnd ( uiConfPeer::TAGS, '%jw'.$tag.'%', Criteria::NOT_LIKE );
-		
-		$c->addAnd ( uiConfPeer::ID, array(48501, 48502, 48504, 48505), Criteria::NOT_IN );
-		
-		$order_by = "(" . uiConfPeer::PARTNER_ID . "=".$this->partner_id.")";
-		$c->addAscendingOrderByColumn ( $order_by );
-		$c->addDescendingOrderByColumn(uiConfPeer::CREATED_AT);
-		
-		$confs = uiConfPeer::doSelect($c);
-		return $confs;
-	}	
 }
 ?>
