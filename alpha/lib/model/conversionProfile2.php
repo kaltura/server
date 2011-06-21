@@ -192,6 +192,9 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(conversionProfile2Peer::DELETED_AT) && !is_null($this->getDeletedAt()))
 			$objectDeleted = true;

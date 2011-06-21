@@ -54,6 +54,9 @@ class syndicationFeed extends BasesyndicationFeed
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(BasesyndicationFeedPeer::STATUS) && $this->getStatus() == self::SYNDICATION_DELETED)
 			$objectDeleted = true;

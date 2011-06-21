@@ -133,6 +133,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(uiConfPeer::STATUS) && $this->getStatus() == self::UI_CONF_STATUS_DELETED)
 			$objectDeleted = true;

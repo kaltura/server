@@ -61,6 +61,9 @@ class assetParams extends BaseassetParams
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(flavorParamsPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
 			$objectDeleted = true;

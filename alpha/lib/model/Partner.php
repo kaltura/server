@@ -115,6 +115,8 @@ class Partner extends BasePartner
 	// TODO - this will be called many times - cache with memcache in the best format we find 
 	public function getExtraDataParsed ( $lang = null )
 	{
+		if ( empty ( $lang ) ) $lang = "en";
+		
 		$extra_data_str = $this->getExtraData( $lang );
 		if ( empty (  $extra_data_str ) )
 			return null;
@@ -132,8 +134,6 @@ class Partner extends BasePartner
 	
 	public static function getPartnerContentPath ( )
 	{
-		if ( empty ( $lang ) ) $lang = "en";
-		
 		if ( ! self::$s_content_root )
 		{
 			self::$s_content_root = myContentStorage::getFSContentRootPath(); 
@@ -776,7 +776,9 @@ class Partner extends BasePartner
 	
 	public function postUpdate(PropelPDO $con = null)
 	{
-
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		// update the owner kuser deatils if required
 		$adminNameModified = $this->isColumnModified(PartnerPeer::ADMIN_NAME);
 		$adminEmailModified = $this->isColumnModified(PartnerPeer::ADMIN_EMAIL);
@@ -870,7 +872,7 @@ class Partner extends BasePartner
 	{
 		$adminKuser = kuserPeer::getKuserByPartnerAndUid($this->getId(), $adminUserId);
 		if (!$adminKuser) {
-			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND); // TODO - don't use API objects in core object
 		}
 		$this->setAccountOwnerKuserId($adminKuser->getId());
 	}

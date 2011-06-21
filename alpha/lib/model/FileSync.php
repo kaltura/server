@@ -95,6 +95,9 @@ class FileSync extends BaseFileSync
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(FileSyncPeer::STATUS) && $this->getStatus() == self::FILE_SYNC_STATUS_DELETED)
 			$objectDeleted = true;

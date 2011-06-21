@@ -81,6 +81,9 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if(
 			($this->isColumnModified(flavorAssetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
