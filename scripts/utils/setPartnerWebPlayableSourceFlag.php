@@ -22,8 +22,7 @@ KAutoloader::register();
 $dbConf = kConf::getDB ();
 DbManager::setConfig ( $dbConf );
 DbManager::initialize ();
-//0 1571571
-//0 650722
+
 if ( $argc == 3)
 {	
 	$flavor_param_id = $argv[1];
@@ -34,13 +33,19 @@ else
 	die ( 'usage: php ' . $_SERVER ['SCRIPT_NAME'] . " [flavor_param_id] [conversion profile id]" . PHP_EOL );
 }
 
-$conversion = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavor_param_id, $conversion_profile_id);
-if(!$conversion)
+$conversion_flavor = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavor_param_id, $conversion_profile_id);
+if(!$conversion_flavor)
 {
         die('no such flavor param id and conversion profile id.'.PHP_EOL);
 }
 
-$conversion->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL);
-$conversion->save();
+$conversion = conversionProfile2Peer::retrieveByPK($conversion_profile_id);
+$input_tags_maps = $conversion->getInputTagsMap();
+$input_tags_maps .= ",mbr";
+
+$conversion->setInputTagsMap($input_tags_maps);
+
+$conversion_flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL);
+$conversion_flavor->save();
 
 echo "Done.";
