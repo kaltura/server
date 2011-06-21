@@ -103,13 +103,6 @@ class MediaService extends KalturaEntryService
      */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null)
     {
-		$partner = $this->getPartner();
-		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
-			return;
-		
-		if($dbEntry->getReplacingEntryId())
-			throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
-			
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$resource->validateEntry($dbEntry);
@@ -125,6 +118,13 @@ class MediaService extends KalturaEntryService
 		}
 		else 
 		{
+			$partner = $this->getPartner();
+			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
+				return;
+			
+			if($dbEntry->getReplacingEntryId())
+				throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
+				
 			$tempMediaEntry = new KalturaMediaEntry();
 		 	$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
