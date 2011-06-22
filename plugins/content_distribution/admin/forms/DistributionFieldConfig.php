@@ -3,45 +3,62 @@
 class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 {
 	public function init()
-	{	    
-		$this->addElement('checkbox', 'resetOnSave', array(
-			'filters' 		=> array('StringTrim'),
-			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
+	{
+		$this->setDecorators(array(
+			'FormElements',
+			array('ViewScript', array(
+				'viewScript' => 'distribution-field-config-sub-form.phtml',
+				'placement' => false
+			))
 		));
-	    
-	    $this->addElement('text', 'fieldName', array(
+		
+		$this->addElement('checkbox', 'override', array(
 			'filters' 		=> array('StringTrim'),
-			'readonly'		=> true,
-			'class'			=> 'readonly',
-			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
-		));		
+			'class' 		=> 'override',
+			'decorators'    => array('ViewHelper'),
+		));
+
+		// we add fieldName as 2 fields (1 hidden, 1 disabled text) because 
+		// disabled fields are not sent by the browser when the form is submitted 
+		$this->addElement('text', 'fieldNameForView', array(
+			'filters' 		=> array('StringTrim'),
+			'disabled'		=> true,
+			'class'			=> 'field-name',
+			'decorators'    => array('ViewHelper'),
+		));
+		
+		$this->addElement('hidden', 'fieldName', array(
+			'filters' 		=> array('StringTrim'),
+			'decorators'    => array('ViewHelper'),
+		));
 	
 		$this->addElement('text', 'userFriendlyFieldName', array(
 			'filters' 		=> array('StringTrim'),
-			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
+			'label'			=> 'Name:',
 		));	
 		
 		$this->addElement('text', 'entryMrssXslt', array(
 			'filters' 		=> array('StringTrim'),
-			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
+			'label'			=> 'MRSS XSLT:',
 		));
 		
 		$this->addElement('checkbox', 'isRequired', array(
-			'filters' 		=> array('StringTrim'),
-			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
+			'filters'		=> array('StringTrim'),
+			'label'			=> 'Required:',
 		));
 		
 		$this->addElement('checkbox', 'updateOnChange', array(
-			'filters' 		=> array('StringTrim'),
-			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
+			'filters'		=> array('StringTrim'),
+			'decorators'	=> array('ViewHelper'),
+			'class' 		=> 'update-on-change',
+			'label' 		=> 'Trigger Update:', 
 		));
 		
 		$this->addElement('text', 'updateParam', array(
-			'filters' 		=> array('StringTrim'),
-			'decorators'    => array('ViewHelper', array('HtmlTag', array('tag' => 'td'))),
+			'filters'		=> array('StringTrim'),
+			'class'			=> 'update-param',
+			'decorators'	=> array('ViewHelper'),
 		));
-
-		
 	}
 	
 	public function populateFromObject($object, $add_underscore = true)
@@ -60,6 +77,11 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			}
 			$this->setDefault($prop, $value);
 		}
+		
+		$this->setDefault('fieldNameForView', $object->fieldName);
+		
+		if (!$object->isDefault)
+			$this->setDefault('override', true);
 	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)

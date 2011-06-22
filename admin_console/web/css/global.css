@@ -496,6 +496,16 @@ dd#Algorithm-element { clear: both; }
 #frmDistributionProfileConfig #fieldset-newThumbDimensionsButtonGroup { padding-right: 0; }
 #frmDistributionProfileConfig #frmGenericProviderConfig fieldset { width: 100%; padding-right: 0; }
 
+#frmDistributionProfileConfig .field-config-row { margin: 10px 0; }
+#frmDistributionProfileConfig .field-config-row input[type=checkbox] { margin: 0 5px 0 0;}
+#frmDistributionProfileConfig .field-config-row input[type=text] { width: 390px; }
+#frmDistributionProfileConfig .field-config-row input.field-name { width: 490px; }
+#frmDistributionProfileConfig .field-config-row input.update-param { width: 365px; display: none; }
+#frmDistributionProfileConfig .field-config-row .field-config-edit { padding: 10px 0 0; display: none; }
+#frmDistributionProfileConfig .field-config-row .field-config-edit dt { margin: 0 0 5px; float: left; clear: both; }
+#frmDistributionProfileConfig .field-config-row .field-config-edit dt label { width: 110px; display: block; }
+#frmDistributionProfileConfig .field-config-row .field-config-edit dd { margin: 0 0 5px; }
+
 #fieldset-newThumbDimensionsButtonGroup { background: #fff; border: 0; padding: 0; width: 100%; }
 #fieldset-newThumbDimensions dt { clear: both; float: left; margin: 5px 10px 0 0; width: 120px; }
 #fieldset-newThumbDimensions dd { float: left; margin: 5px 0; }

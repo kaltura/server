@@ -45,6 +45,13 @@ class KalturaDistributionFieldConfig extends KalturaObject
      * @var string
      */
     public $updateParam;
+    
+    /**
+     * Is this field config is the default for the distribution provider?
+     * @var bool
+     * @readonly
+     */
+    public $isDefault;
 	
 	
 	/*
@@ -55,9 +62,10 @@ class KalturaDistributionFieldConfig extends KalturaObject
 		'userFriendlyFieldName',
 		'entryMrssXslt',
 		'isRequired',
-	    'updateOnChange',
-	    'updateParam',
-	 );
+		'updateOnChange',
+		'updateParam',
+		'isDefault',
+	);
 		 
 	public function getMapBetweenObjects()
 	{

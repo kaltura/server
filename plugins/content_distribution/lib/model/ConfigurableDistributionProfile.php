@@ -37,7 +37,10 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	        }
 	        foreach ($tempArray as $tempConfig)
 	        {
+	            if (!$tempConfig instanceof DistributionFieldConfig)
+	            	continue;
 	            $fieldName = $tempConfig->getFieldName();
+	            $tempConfig->setIsDefault(false);
 	            $this->fieldConfigArray[$fieldName] = $tempConfig;
 	        }
 	        
@@ -48,6 +51,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	            $fieldName = $defaultConfig->getFieldName();
 	            if (!array_key_exists($fieldName, $this->fieldConfigArray))
 	            {
+	                $defaultConfig->setIsDefault(true);
 	                $this->fieldConfigArray[$fieldName] = $defaultConfig;
 	            }
 	        }

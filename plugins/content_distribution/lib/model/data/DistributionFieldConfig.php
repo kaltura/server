@@ -41,6 +41,12 @@ class DistributionFieldConfig
      */
     private $updateParam;
     
+    /**
+     * Is this field config is the default for the distribution provider?
+     * @var bool
+     */
+    private $isDefault;
+    
     
 	/**
      * @return the $fieldName
@@ -135,5 +141,27 @@ class DistributionFieldConfig
     {
         $this->updateParam = $updateParam;
     }
+    
+	/**
+	 * @return the $isDefault
+	 */
+	public function getIsDefault() 
+	{
+		return $this->isDefault;
+	}
 
+	/**
+	 * @param bool $isDefault
+	 */
+	public function setIsDefault($isDefault) 
+	{
+		$this->isDefault = $isDefault;
+	}
+	
+	public function __sleep()
+	{
+		$vars = get_class_vars(get_class($this));
+		unset($vars['isDefault']); // isDefault should not be serialized
+		return array_keys($vars);
+	}
 }
