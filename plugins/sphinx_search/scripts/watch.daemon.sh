@@ -18,7 +18,7 @@ while /bin/true ; do
 #    echo "Sleeping 10 seconds ..."
     sleep 10 
     KP=$(pgrep searchd)
-    KF=$(find /usr/local/var/data -type f -name "binlog*" -mmin -3)
+    KF=$(find @LOG_DIR@/sphinx/data -type f -name "binlog*" -mmin -3)
     ##if [[ "X$KP" == "X" || "X$KF" == "X" ]] && [[ ! -f $MAINT ]]
     if [[ "X$KP" == "X" && ! -f $MAINT ]]
       then
