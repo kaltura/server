@@ -42,9 +42,14 @@ if(!$conversion_flavor)
 
 $conversion = conversionProfile2Peer::retrieveByPK($conversion_profile_id);
 $input_tags_maps = $conversion->getInputTagsMap();
-$input_tags_maps .= ",mbr";
 
-$conversion->setInputTagsMap($input_tags_maps);
+if (strpos($input_tags_maps, ",mbr") === false)
+{
+	$input_tags_maps .= ",mbr";
+	
+	$conversion->setInputTagsMap($input_tags_maps);
+	$conversion->save();
+}
 
 $conversion_flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL);
 $conversion_flavor->save();
