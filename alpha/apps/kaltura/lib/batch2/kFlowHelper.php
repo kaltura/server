@@ -20,7 +20,7 @@ class kFlowHelper
 	 */
 	public static function createOriginalFlavorAsset($partnerId, $entryId, &$msg = null)
 	{
-		$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if($flavorAsset)
 		{
 			$flavorAsset->incrementVersion();
@@ -104,7 +104,7 @@ class kFlowHelper
 			$twinData = $twinJob->getData();
 			if($twinData instanceof kImportJobData)
 			{
-				$twinFlavorAsset = flavorAssetPeer::retrieveById($twinData->getFlavorAssetId());
+				$twinFlavorAsset = assetPeer::retrieveById($twinData->getFlavorAssetId());
 				if($twinFlavorAsset)
 				{
 					$twinSyncKey = $twinFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -157,7 +157,7 @@ class kFlowHelper
 			
 			if($flavorAsset->getIsOriginal())
 			{
-				$entryFlavors = flavorAssetPeer::retrieveByEntryId($flavorAsset->getEntryId());
+				$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
 				foreach($entryFlavors as $entryFlavor)
 				{
 					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
@@ -224,7 +224,7 @@ class kFlowHelper
 					if($conversionsCreated)
 					{
 						// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
-						$currentFlavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+						$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 						if($currentFlavorAsset)
 							$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
 					}
@@ -266,7 +266,7 @@ class kFlowHelper
 		$dbBatchJob->save();
 		
 		
-		$flavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 		{
@@ -293,7 +293,7 @@ class kFlowHelper
 		$flavors = $data->getFlavors();
 		foreach($flavors as $flavor)
 		{
-			$flavorAsset = flavorAssetPeer::retrieveById($flavor->getFlavorAssetId());
+			$flavorAsset = assetPeer::retrieveById($flavor->getFlavorAssetId());
 			// verifies that flavor asset exists
 			if(!$flavorAsset)
 			{
@@ -325,7 +325,7 @@ class kFlowHelper
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		$flavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
@@ -508,7 +508,7 @@ class kFlowHelper
 		if(!$data->getThumbAssetId())
 			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
 		
-		$thumbAsset = thumbAssetPeer::retrieveById($data->getThumbAssetId());
+		$thumbAsset = assetPeer::retrieveById($data->getThumbAssetId());
 		// verifies that thumb asset exists
 		if(!$thumbAsset)
 			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
@@ -575,7 +575,7 @@ class kFlowHelper
 			if($syncFile)
 			{
 				// removes the DEFAULT_THUMB tag from all other thumb assets
-				$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+				$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
 				foreach($entryThumbAssets as $entryThumbAsset)
 				{
 					if($entryThumbAsset->getId() == $thumbAsset->getId())
@@ -663,7 +663,7 @@ class kFlowHelper
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		$flavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
@@ -680,7 +680,7 @@ class kFlowHelper
 			{
 				$entryId = $dbBatchJob->getEntryId();
 				$flavorParamsId = $data->getFlavorParamsOutputId();
-				$flavorParamsOutput = flavorParamsOutputPeer::retrieveByPK($flavorParamsId);
+				$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsId);
 				$fileFormat = $flavorParamsOutput->getFileExt();
 				
 				$entry = $dbBatchJob->getEntry();
@@ -742,7 +742,7 @@ class kFlowHelper
 		if(!$data->getThumbAssetId())
 			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
 		
-		$thumbAsset = flavorAssetPeer::retrieveById($data->getThumbAssetId());
+		$thumbAsset = assetPeer::retrieveById($data->getThumbAssetId());
 		// verifies that thumb asset exists
 		if(!$thumbAsset)
 			throw new APIException(APIErrors::INVALID_THUMB_ASSET_ID, $data->getThumbAssetId());
@@ -815,7 +815,7 @@ class kFlowHelper
 			if(!$flavor->getFlavorAssetId())
 				throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 			
-			$flavorAsset = flavorAssetPeer::retrieveById($flavor->getFlavorAssetId());
+			$flavorAsset = assetPeer::retrieveById($flavor->getFlavorAssetId());
 			// verifies that flavor asset exists
 			if(!$flavorAsset)
 				throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavor->getFlavorAssetId());
@@ -849,7 +849,7 @@ class kFlowHelper
 		}
 
 		// adding flavor params ids to the entry
-		$addedFlavorParamsOutputs = flavorParamsOutputPeer::retrieveByPKs($addedFlavorParamsOutputsIds);
+		$addedFlavorParamsOutputs = assetParamsOutputPeer::retrieveByPKs($addedFlavorParamsOutputsIds);
 		foreach($addedFlavorParamsOutputs as $addedFlavorParamsOutput)
 			$entry->addFlavorParamsId($addedFlavorParamsOutput->getFlavorParamsId());
 		
@@ -1002,14 +1002,14 @@ class kFlowHelper
 		$alternateFlavorParamsId = null;
 		if(is_null($srcParamsId))
 		{
-			$flavorParamsObjects = flavorParamsPeer::retrieveByPKs($assetParamsIds);
+			$flavorParamsObjects = assetParamsPeer::retrieveByPKs($assetParamsIds);
 			foreach($flavorParamsObjects as $flavorParams)
 				if($flavorParams->hasTag(flavorParams::TAG_SOURCE))
 					$alternateFlavorParamsId = $flavorParams->getId();
 			
 			if(is_null($alternateFlavorParamsId))
 			{
-				$srcFlavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entryId);
+				$srcFlavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
 				$alternateFlavorParamsId = $srcFlavorAsset->getFlavorParamsId();
 			}
 			
@@ -1022,7 +1022,7 @@ class kFlowHelper
 		
 		// create list of created thumbnails
 		$thumbAssetsList = array();
-		$thumbAssets = thumbAssetPeer::retrieveByEntryId($entryId);
+		$thumbAssets = assetPeer::retrieveThumbnailsByEntryId($entryId);
 		if(count($thumbAssets))
 		{
 			foreach($thumbAssets as $thumbAsset)
@@ -1030,7 +1030,7 @@ class kFlowHelper
 					$thumbAssetsList[$thumbAsset->getFlavorParamsId()] = $thumbAsset;
 		}
 		
-		$thumbParamsObjects = thumbParamsPeer::retrieveByPKs($assetParamsIds);
+		$thumbParamsObjects = assetParamsPeer::retrieveByPKs($assetParamsIds);
 		foreach($thumbParamsObjects as $thumbParams)
 		{
 			// check if this thumbnail already created
@@ -1290,7 +1290,7 @@ class kFlowHelper
 			if($conversionsCreated)
 			{
 				// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
-				$currentFlavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+				$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 				if($currentFlavorAsset)
 					$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
 			}
@@ -1308,7 +1308,7 @@ class kFlowHelper
 		
 		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
 		
-		$originalflavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
+		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
 		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
 		{
 			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
@@ -1323,7 +1323,7 @@ class kFlowHelper
 	{
 		KalturaLog::debug("Convert Profile finished");
 		
-		$originalflavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
+		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
 		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
 		{
 			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
@@ -1368,7 +1368,7 @@ class kFlowHelper
 					// why we don't send the notification in case of image is ready?
 					
 					
-					$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavorParamsId);
+					$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);
 					if ($flavorAsset && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 					{
 						$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -1535,18 +1535,12 @@ class kFlowHelper
 	 */
 	public static function handleUploadCanceled(UploadToken $uploadToken)
 	{
-		$assetTypes = array(
-			assetPeer::OM_CLASS,
-			flavorAssetPeer::OM_CLASS,
-			thumbAssetPeer::OM_CLASS,
-		);
-		
 		$dbEntry = null;
 		
 		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
 			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
 		
-		if(in_array($uploadToken->getObjectType(), $assetTypes))
+		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
 			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
 			if(!$dbAsset)
@@ -1576,13 +1570,7 @@ class kFlowHelper
 	 */
 	public static function handleUploadFinished(UploadToken $uploadToken)
 	{
-		$assetTypes = array(
-			assetPeer::OM_CLASS,
-			flavorAssetPeer::OM_CLASS,
-			thumbAssetPeer::OM_CLASS,
-		);
-		
-		if(!in_array($uploadToken->getObjectType(), $assetTypes) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
+		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
 			return;
 			
 	    $fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
@@ -1596,7 +1584,7 @@ class kFlowHelper
 			kFile::dumpApiRequest($remoteDCHost);
 		}
 			
-		if(in_array($uploadToken->getObjectType(), $assetTypes))
+		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
 			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
 			if(!$dbAsset)

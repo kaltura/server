@@ -54,7 +54,7 @@ class EntryAdminService extends KalturaBaseService
 	 */
 	public function getByFlavorIdAction($flavorId, $version = -1)
 	{
-		$flavorAssetDb = flavorAssetPeer::retrieveById($flavorId);
+		$flavorAssetDb = assetPeer::retrieveById($flavorId);
 		if (!$flavorAssetDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorId);
 			

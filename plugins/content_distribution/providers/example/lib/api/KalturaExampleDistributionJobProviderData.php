@@ -36,7 +36,7 @@ class KalturaExampleDistributionJobProviderData extends KalturaDistributionJobPr
 		$this->videoAssetFilePaths = new KalturaExampleDistributionAssetPathArray();
 		
 		// loads all the flavor assets that should be submitted to the remote destination site
-		$flavorAssets = flavorAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
+		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
 		foreach($flavorAssets as $flavorAsset)
 		{
 			$videoAssetFilePath = new KalturaExampleDistributionAssetPath();
@@ -45,7 +45,7 @@ class KalturaExampleDistributionJobProviderData extends KalturaDistributionJobPr
 			$this->videoAssetFilePaths[] = $videoAssetFilePath;
 		}
 		
-		$thumbAssets = thumbAssetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
+		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		if(count($thumbAssets))
 		{
 			$thumbAsset = reset($thumbAssets);

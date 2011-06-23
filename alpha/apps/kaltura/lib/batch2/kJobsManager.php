@@ -593,10 +593,10 @@ class kJobsManager
 			}
 		}
 		
-		$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		if($createThumb)
 		{
-			$flavorParamsOutput = flavorParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
+			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 			if(!$flavorParamsOutput)
 			{
 				if($flavorAsset)
@@ -758,7 +758,7 @@ class kJobsManager
 			$partner = $entry->getPartner();
 			if($partner && $partner->getImportRemoteSourceForConvert())
 			{
-				$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+				$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 				$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
 				if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
@@ -783,7 +783,7 @@ class kJobsManager
 					
 						if($flavor->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
 						{
-							$siblingFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entry->getId(), $flavor->getFlavorParamsId());
+							$siblingFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $flavor->getFlavorParamsId());
 							if($siblingFlavorAsset)
 							{
 								KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] already ingested");
@@ -813,7 +813,7 @@ class kJobsManager
 			
 			$entry->setStatus(entryStatus::ERROR_CONVERTING);
 			$entry->save();
-			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$flavorAsset->setDescription('Entry of size 0 should not be converted');
 			$flavorAsset->save();

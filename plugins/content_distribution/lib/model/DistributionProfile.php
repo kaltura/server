@@ -269,7 +269,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		
 		$requiredFlavorParamsIds = $this->getRequiredFlavorParamsIdsArray();
 		KalturaLog::log("Required Flavor Params Ids [" . print_r($requiredFlavorParamsIds, true) . "]");
-		$entryFlavorAssets = flavorAssetPeer::retreiveReadyByEntryId($entryDistribution->getEntryId());
+		$entryFlavorAssets = assetPeer::retrieveReadyByEntryId($entryDistribution->getEntryId());
 		
 		$requiredFlavorParamsIdsKeys = array_flip($requiredFlavorParamsIds);
 		foreach($entryFlavorAssets as $entryFlavorAsset)
@@ -284,7 +284,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		
 		$requiredThumbDimensions = $this->getRequiredThumbDimensionsObjects();
 		KalturaLog::log("Required Thumb Dimensions [" . print_r($requiredThumbDimensions, true) . "]");
-		$entryThumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entryDistribution->getEntryId());
+		$entryThumbAssets = assetPeer::retrieveReadyThumbnailsByEntryId($entryDistribution->getEntryId());
 		
 		$requiredThumbDimensionsWithKeys = array();
 		foreach($requiredThumbDimensions as $requiredThumbDimension)

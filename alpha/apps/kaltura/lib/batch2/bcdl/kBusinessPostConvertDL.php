@@ -4,7 +4,7 @@ class kBusinessPostConvertDL
 {
 	public static function getReadyBehavior(flavorAsset $flavorAsset, conversionProfile2 $profile = null)
 	{
-		$targetFlavor = flavorParamsOutputPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+		$targetFlavor = assetParamsOutputPeer::retrieveByAssetId($flavorAsset->getId());
 		if($targetFlavor)
 			return $targetFlavor->getReadyBehavior();
 			
@@ -35,7 +35,7 @@ class kBusinessPostConvertDL
 		if(!$flavorAssetId)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
 	
-		$currentFlavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+		$currentFlavorAsset = assetPeer::retrieveById($flavorAssetId);
 		// verifies that flavor asset exists
 		if(!$currentFlavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
@@ -57,7 +57,7 @@ class kBusinessPostConvertDL
 					
 		$sourceMediaInfo = mediaInfoPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
 		$productMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
-		$targetFlavor = flavorParamsOutputPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
+		$targetFlavor = assetParamsOutputPeer::retrieveByAssetId($currentFlavorAsset->getId());
 		
 		// don't validate in case of bypass, in case target flavor or media info are null 
 		if($dbBatchJob->getJobSubType() != BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_BYPASS && $targetFlavor && $productMediaInfo)
@@ -164,7 +164,7 @@ class kBusinessPostConvertDL
 			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_INHERIT_FLAVOR_PARAMS)
 				$inheritedFlavorParamsIds[] = $flavorParamsConversionProfile->getFlavorParamsId();
 		}
-		$flavorParamsItems = flavorParamsPeer::retrieveByPKs($inheritedFlavorParamsIds);
+		$flavorParamsItems = assetParamsPeer::retrieveByPKs($inheritedFlavorParamsIds);
 		foreach($flavorParamsItems as $flavorParams)
 		{
 			if($flavorParams->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
@@ -175,7 +175,7 @@ class kBusinessPostConvertDL
 		
 		// go over all the flavor assets of the entry
 		$inCompleteFlavorIds = array();
-		$siblingFlavorAssets = flavorAssetPeer::retrieveByEntryId($currentFlavorAsset->getEntryId());
+		$siblingFlavorAssets = assetPeer::retrieveFlavorsByEntryId($currentFlavorAsset->getEntryId());
 		foreach($siblingFlavorAssets as $siblingFlavorAsset)
 		{
 			KalturaLog::debug("sibling flavor asset id [" . $siblingFlavorAsset->getId() . "] flavor params id [" . $siblingFlavorAsset->getFlavorParamsId() . "]");
@@ -308,7 +308,7 @@ class kBusinessPostConvertDL
 			
 		$hasIncomplete = false;
 		$shouldFailProfile = false;
-		$flavorAssets = flavorAssetPeer::retrieveByEntryId($dbBatchJob->getEntryId());
+		$flavorAssets = assetPeer::retrieveFlavorsByEntryId($dbBatchJob->getEntryId());
 		foreach($flavorAssets as $flavorAsset)
 		{
 			if(isset($collectionFlavors[$flavorAsset->getId()]))
@@ -351,7 +351,7 @@ class kBusinessPostConvertDL
 	
 	public static function handleConvertFailed(BatchJob $dbBatchJob, $engineType, $flavorAssetId, $flavorParamsOutputId, $mediaInfoId)
 	{
-		$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);
@@ -427,7 +427,7 @@ class kBusinessPostConvertDL
 					
 			// found child flavor asset that hasn't failed, no need to fail the root job
 			$siblingFlavorAssetId = $siblingJob->getData()->getFlavorAssetId();
-			$siblingFlavorAsset = flavorAssetPeer::retrieveById($siblingFlavorAssetId);
+			$siblingFlavorAsset = assetPeer::retrieveById($siblingFlavorAssetId);
 			if ($siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_ERROR &&
 				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE &&
 				$siblingFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_DELETED)

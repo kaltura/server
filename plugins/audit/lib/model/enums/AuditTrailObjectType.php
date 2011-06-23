@@ -13,10 +13,13 @@ interface AuditTrailObjectType extends BaseEnum
 	const EMAIL_INGESTION_PROFILE = EmailIngestionProfilePeer::OM_CLASS;
 	const ENTRY = entryPeer::OM_CLASS;
 	const FILE_SYNC = FileSyncPeer::OM_CLASS;
-	const FLAVOR_ASSET = flavorAssetPeer::OM_CLASS;
-	const FLAVOR_PARAMS = flavorParamsPeer::OM_CLASS;
+	const FLAVOR_ASSET = assetPeer::FLAVOR_OM_CLASS;
+	const THUMBNAIL_ASSET = assetPeer::THUMBNAIL_OM_CLASS;
+	const FLAVOR_PARAMS = assetParamsPeer::FLAVOR_OM_CLASS;
+	const THUMBNAIL_PARAMS = assetParamsPeer::THUMBNAIL_OM_CLASS;
 	const FLAVOR_PARAMS_CONVERSION_PROFILE = flavorParamsConversionProfilePeer::OM_CLASS;
-	const FLAVOR_PARAMS_OUTPUT = flavorParamsOutputPeer::OM_CLASS;
+	const FLAVOR_PARAMS_OUTPUT = assetParamsOutputPeer::FLAVOR_OM_CLASS;
+	const THUMBNAIL_PARAMS_OUTPUT = assetParamsOutputPeer::THUMBNAIL_OM_CLASS;
 	const KSHOW = kshowPeer::OM_CLASS;
 	const KSHOW_KUSER = KshowKuserPeer::OM_CLASS;
 	const KUSER = kuserPeer::OM_CLASS;

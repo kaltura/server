@@ -2,7 +2,7 @@
 /**
  * @package plugins.document
  */
-class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaEnumerator, IKalturaConfigurator
+class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaServices, IKalturaObjectLoader, IKalturaEventConsumers, IKalturaEnumerator, IKalturaConfigurator, IKalturaTypeExtender
 {
 	const PLUGIN_NAME = 'document';
 	const DOCUMENT_OBJECT_CREATED_HANDLER = 'DocumentCreatedHandler';
@@ -20,11 +20,25 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		return null;
 	}
 
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
+	/* (non-PHPdoc)
+	 * @see IKalturaTypeExtender::getExtendedTypes()
+	 */
+	public static function getExtendedTypes($baseClass, $enumValue)
+	{
+		if($baseClass == assetPeer::OM_CLASS && $enumValue == assetType::FLAVOR)
+		{
+			return array(
+				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF),
+				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::SWF),
+				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT),
+			);
+		}
+		
+		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
@@ -110,11 +124,8 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 		return null;
 	}
 
-	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{

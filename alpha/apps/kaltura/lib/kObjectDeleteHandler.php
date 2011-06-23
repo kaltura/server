@@ -96,9 +96,9 @@ class kObjectDeleteHandler implements kObjectDeletedEventConsumer
 		}
 	
 		$c = new Criteria();
-		$c->add(flavorParamsOutputPeer::ENTRY_ID, $entry->getId());
-		$c->add(flavorParamsOutputPeer::DELETED_AT, null, Criteria::ISNULL);
-		$flavorParamsOutputs = flavorParamsOutputPeer::doSelect($c);
+		$c->add(assetParamsOutputPeer::ENTRY_ID, $entry->getId());
+		$c->add(assetParamsOutputPeer::DELETED_AT, null, Criteria::ISNULL);
+		$flavorParamsOutputs = assetParamsOutputPeer::doSelect($c);
 		foreach($flavorParamsOutputs as $flavorParamsOutput)
 		{
 			$flavorParamsOutput->setDeletedAt(time());

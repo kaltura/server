@@ -438,7 +438,7 @@ class kContentDistributionManager
 		
 			if($validationError->getErrorType() == DistributionErrorType::MISSING_THUMBNAIL && in_array($validationError->getData(), $autoCreateThumbs))
 			{
-				$destThumbParams = thumbParamsPeer::retrieveByPK($validationError->getData());
+				$destThumbParams = assetParamsPeer::retrieveByPK($validationError->getData());
 				if($destThumbParams)
 				{
 					KalturaLog::log("Adding thumbnail [" . $validationError->getData() . "] to entry [" . $entryDistribution->getEntryId() . "]");
@@ -474,14 +474,14 @@ class kContentDistributionManager
 		if($originalList)
 		{
 			$assignedFlavorAssetIds = explode(',', $originalList);
-			$assignedFlavorAssets = flavorAssetPeer::retrieveByIds($assignedFlavorAssetIds);
+			$assignedFlavorAssets = assetPeer::retrieveByIds($assignedFlavorAssetIds);
 			foreach($assignedFlavorAssets as $assignedFlavorAsset)
 				if(in_array($assignedFlavorAsset->getFlavorParamsId(), $flavorParamsIds))
 					$flavorAssetIds[] = $assignedFlavorAsset->getId();
 		}
 		
 		// adds added flavor assets
-		$newFlavorAssetIds = flavorAssetPeer::getReadyIdsByParamsIds($entry->getId(), $flavorParamsIds);
+		$newFlavorAssetIds = assetPeer::getReadyIdsByParamsIds($entry->getId(), $flavorParamsIds);
 		foreach($newFlavorAssetIds as $newFlavorAssetId)
 			$flavorAssetIds[] = $newFlavorAssetId;
 			
@@ -509,7 +509,7 @@ class kContentDistributionManager
 		$assignedThumbAssetIds = $originalList;
 		if($assignedThumbAssetIds)
 		{
-			$assignedThumbAssets = thumbAssetPeer::retrieveByIds(explode(',', $assignedThumbAssetIds));
+			$assignedThumbAssets = assetPeer::retrieveByIds(explode(',', $assignedThumbAssetIds));
 			foreach($assignedThumbAssets as $assignedThumbAsset)
 			{					
 				$key = $assignedThumbAsset->getWidth() . 'x' . $assignedThumbAsset->getHeight();
@@ -523,7 +523,7 @@ class kContentDistributionManager
 		
 		// add new thumb assets
 		$requiredThumbParamsIds = $distributionProfile->getAutoCreateThumbArray();
-		$thumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entry->getId());
+		$thumbAssets = assetPeer::retrieveReadyThumbnailsByEntryId($entry->getId());
 		foreach($thumbAssets as $thumbAsset)
 		{
 			if(in_array($thumbAsset->getFlavorParamsId(), $requiredThumbParamsIds))

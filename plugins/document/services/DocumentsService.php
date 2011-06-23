@@ -203,13 +203,13 @@ class DocumentsService extends KalturaEntryService
 		assetPeer::resetInstanceCriteriaFilter();
 		if(is_null($sourceFlavorParamsId))
 		{
-			$srcFlavorAsset = assetPeer::retreiveOriginalByEntryId($sourceEntryId);
+			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($sourceEntryId);
 			if(!$srcFlavorAsset)
 				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		}
 		else
 		{
-			$srcFlavorAssets = assetPeer::retreiveReadyByEntryIdAndFlavorParams($sourceEntryId, array($sourceFlavorParamsId));
+			$srcFlavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($sourceEntryId, array($sourceFlavorParamsId));
 			if(count($srcFlavorAssets))
 			{
 				$srcFlavorAsset = reset($srcFlavorAssets);

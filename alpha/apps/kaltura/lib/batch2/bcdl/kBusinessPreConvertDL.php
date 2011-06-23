@@ -17,7 +17,7 @@ class kBusinessPreConvertDL
 	 */
 	public static function redecideFlavorConvert($flavorAssetId, $flavorParamsOutputId, $mediaInfoId, BatchJob $parentJob, $lastEngineType)
 	{
-		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($parentJob->getEntryId());
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($parentJob->getEntryId());
 		if (is_null($originalFlavorAsset))
 		{
 			KalturaLog::log('Original flavor asset not found');
@@ -25,7 +25,7 @@ class kBusinessPreConvertDL
 		}
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
-		$flavor = flavorParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
+		$flavor = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 		if (is_null($flavor))
 		{
 			KalturaLog::log("Flavor params output not found [$flavorParamsOutputId]");
@@ -62,13 +62,13 @@ class kBusinessPreConvertDL
 			if(is_null($srcAsset))
 			{
 				KalturaLog::debug("Look for original flavor");
-				$srcAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry->getId());
+				$srcAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
 			}
 					
 			if (is_null($srcAsset) || $srcAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
 				KalturaLog::debug("Look for highest bitrate flavor");
-				$srcAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+				$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
 			}
 		}
 		
@@ -85,7 +85,7 @@ class kBusinessPreConvertDL
 		}
 		$destThumbParamsOutput->setVideoOffset(min($destThumbParamsOutput->getVideoOffset(), $entry->getDuration()));
 		
-		$thumbAsset = thumbAssetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getId());
+		$thumbAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getId());
 		if($thumbAsset)
 		{
 			$description = $thumbAsset->getDescription() . "\n" . $errDescription;
@@ -191,7 +191,7 @@ class kBusinessPreConvertDL
 			if($syncFile)
 			{
 				// removes the DEFAULT_THUMB tag from all other thumb assets
-				$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+				$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
 				foreach($entryThumbAssets as $entryThumbAsset)
 				{
 					if($entryThumbAsset->getId() == $thumbAsset->getId())
@@ -220,7 +220,7 @@ class kBusinessPreConvertDL
 	 */
 	protected static function setIsDefaultThumb(thumbAsset $thumbAsset)
 	{
-		$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
 		
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
@@ -323,7 +323,7 @@ class kBusinessPreConvertDL
 	 */
 	public static function decideFlavorConvert(FileSyncKey $srcSyncKey, $flavorParamsId, &$errDescription, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null)
 	{
-		$flavorParams = flavorParamsPeer::retrieveByPK($flavorParamsId);
+		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
 		$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 		
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
@@ -351,7 +351,7 @@ class kBusinessPreConvertDL
 	{
 		KalturaLog::log("entryId [$entryId], flavorParamsId [$flavorParamsId]");
 		
-		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';
@@ -373,7 +373,7 @@ class kBusinessPreConvertDL
 		if($mediaInfo)
 			$mediaInfoId = $mediaInfo->getId();
 		
-		$flavorParams = flavorParamsPeer::retrieveByPK($flavorParamsId);
+		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 		
 		if (is_null($flavor))
@@ -389,7 +389,7 @@ class kBusinessPreConvertDL
 			
 		
 		$flavorAssetId = null;
-		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavorParamsId);
+		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);
 		if($flavorAsset)
 			$flavorAssetId = $flavorAsset->getId();
 		
@@ -420,20 +420,20 @@ class kBusinessPreConvertDL
 				$dbConvertCollectionJob->save();
 			}
 			
-			$flavorAssets = flavorAssetPeer::retrieveByEntryId($entryId);
-			$flavorAssets = flavorAssetPeer::filterByTag($flavorAssets, $collectionTag);
+			$flavorAssets = assetPeer::retrieveFlavorsByEntryId($entryId);
+			$flavorAssets = assetPeer::filterByTag($flavorAssets, $collectionTag);
 			$flavors = array();
 			foreach($flavorAssets as $tagedFlavorAsset)
 			{
 				if($tagedFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE || $tagedFlavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_DELETED)
 					continue;
 
-				$flavorParamsOutput = flavorParamsOutputPeer::retrieveByFlavorAssetId($tagedFlavorAsset->getId());
+				$flavorParamsOutput = assetParamsOutputPeer::retrieveByAssetId($tagedFlavorAsset->getId());
 				if(is_null($flavorParamsOutput))
 				{
 					KalturaLog::log("Creating flavor params output for asset [" . $tagedFlavorAsset->getId() . "]");
 				
-					$flavorParams = flavorParamsPeer::retrieveByPK($tagedFlavorAsset->getId());
+					$flavorParams = assetParamsPeer::retrieveByPK($tagedFlavorAsset->getId());
 					$flavorParamsOutput = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 					
 					if (is_null($flavorParamsOutput))
@@ -446,7 +446,7 @@ class kBusinessPreConvertDL
 				if($flavorParamsOutput)
 				{
 					KalturaLog::log("Adding Collection flavor [" . $flavorParamsOutput->getId() . "] for asset [" . $tagedFlavorAsset->getId() . "]");
-					$flavors[$tagedFlavorAsset->getId()] = flavorParamsOutputPeer::retrieveByFlavorAssetId($tagedFlavorAsset->getId());
+					$flavors[$tagedFlavorAsset->getId()] = assetParamsOutputPeer::retrieveByAssetId($tagedFlavorAsset->getId());
 				}
 			}
 			if($flavorAssetId)
@@ -777,7 +777,7 @@ class kBusinessPreConvertDL
 			return false;
 		}
 	
-		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';
@@ -840,7 +840,7 @@ class kBusinessPreConvertDL
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
 		
 		$sourceFlavor = null;
-		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
+		$flavors = assetParamsPeer::retrieveByPKs($flavorsIds);
 		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
 
 		$ingestedNeeded = false;
@@ -1001,7 +1001,7 @@ class kBusinessPreConvertDL
 			throw new Exception($errDescription);
 		}
 	
-		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';
@@ -1040,7 +1040,7 @@ class kBusinessPreConvertDL
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
 		
 		// gets the flavor params by the id
-		$flavors = flavorParamsPeer::retrieveByPKs($flavorsIds);
+		$flavors = assetParamsPeer::retrieveByPKs($flavorsIds);
 		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
 		
 		foreach($flavors as $index => $flavor)
@@ -1090,7 +1090,7 @@ class kBusinessPreConvertDL
 	{
 		$entryId = $convertProfileJob->getEntryId();
 		
-		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($originalFlavorAsset))
 		{
 			$errDescription = 'Original flavor asset not found';

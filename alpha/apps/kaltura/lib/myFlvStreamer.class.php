@@ -188,8 +188,8 @@ class myFlvStreamer
 				if ($streamNum == 3 || $num == $streamNum)
 				{
 					$asset_entry = entryPeer::retrieveByPK($asset->getAttribute( "k_id" ));
-					$flavor_asset_edit = flavorAssetPeer::retrieveBestEditByEntryId($asset_entry->getId());
-					$flavor_asset_play = flavorAssetPeer::retrieveBestPlayByEntryId($asset_entry->getId());
+					$flavor_asset_edit = assetPeer::retrieveBestEditByEntryId($asset_entry->getId());
+					$flavor_asset_play = assetPeer::retrieveBestPlayByEntryId($asset_entry->getId());
 					
 					// make sure asset exists before trying to get key or file path
 					if($flavor_asset_edit)
@@ -655,7 +655,7 @@ self::log ( __METHOD__ , "in loop" , $asset_id );
 
   			$file_name = null;
   			//TODO: need to work on only an FLV asset
-			$flavor_asset_play = flavorAssetPeer::retrieveBestPlayByEntryId($entry->getId());
+			$flavor_asset_play = assetPeer::retrieveBestPlayByEntryId($entry->getId());
 			if(!$flavor_asset_play)
 			{
 				KalturaLog::log(__METHOD__.' '.__LINE__.' no play flavor asset for entry '.$entry->getId());
@@ -666,7 +666,7 @@ self::log ( __METHOD__ , "in loop" , $asset_id );
 			}
 			
 			$use_multi_flavor = false;
-			$flavor_asset_edit = flavorAssetPeer::retrieveBestEditByEntryId($entry->getId());
+			$flavor_asset_edit = assetPeer::retrieveBestEditByEntryId($entry->getId());
 			if(!$flavor_asset_edit)
 			{
 				KalturaLog::log(__METHOD__.' '.__LINE__.' no edit flavor asset for entry '.$entry->getId());

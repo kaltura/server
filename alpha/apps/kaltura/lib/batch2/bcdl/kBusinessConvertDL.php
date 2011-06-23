@@ -129,7 +129,7 @@ class kBusinessConvertDL
 		}
 		
 		$originalFlavorParams = array();
-		$dbOriginalFlavorParams = flavorParamsPeer::retrieveByPKs($originalFlavorParamsIds);
+		$dbOriginalFlavorParams = assetParamsPeer::retrieveByPKs($originalFlavorParamsIds);
 		foreach($dbOriginalFlavorParams as $dbFlavorParams)
 			$originalFlavorParams[$dbFlavorParams->getId()] = $dbFlavorParams;
 		

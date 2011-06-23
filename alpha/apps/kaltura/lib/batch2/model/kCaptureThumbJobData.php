@@ -179,7 +179,7 @@ class kCaptureThumbJobData extends kJobData
 	 */
 	public function getReadyBehavior()
 	{
-		$thumbParamsOutput = thumbParamsOutputPeer::retrieveByPK($this->thumbParamsOutputId);
+		$thumbParamsOutput = assetParamsOutputPeer::retrieveByPK($this->thumbParamsOutputId);
 		if($thumbParamsOutput)
 			return $thumbParamsOutput->getReadyBehavior();
 			

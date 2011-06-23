@@ -420,7 +420,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		
 		if(
 				$object instanceof flavorAsset 
-			&&	in_array(flavorAssetPeer::STATUS, $modifiedColumns))
+			&&	in_array(assetPeer::STATUS, $modifiedColumns))
 			return true;
 			
 		return false;		
@@ -454,7 +454,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		
 		if(
 				!($object instanceof flavorAsset) 
-			||	!in_array(flavorAssetPeer::STATUS, $modifiedColumns))
+			||	!in_array(assetPeer::STATUS, $modifiedColumns))
 			return true;
 		
 		$entry = $object->getentry();

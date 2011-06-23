@@ -12,7 +12,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return true;
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(flavorAssetPeer::STATUS, $modifiedColumns) && $object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			return true;
 			
 		return false;		
@@ -35,7 +35,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		
 		// if changed object is flavor asset
-		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(flavorAssetPeer::STATUS, $modifiedColumns) && $object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if($object instanceof flavorAsset && !$object->getIsOriginal() && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 		{
 			$entry = $object->getentry();
 			
@@ -98,13 +98,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIds]");
 		if(is_null($flavorParamsIds) || !strlen(trim($flavorParamsIds)))
 		{
-			$flavorAssets = flavorAssetPeer::retreiveReadyByEntryId($entry->getId());
+			$flavorAssets = assetPeer::retrieveReadyByEntryId($entry->getId());
 		}
 		else
 		{
 			$flavorParamsArr = explode(',', $flavorParamsIds);
 			KalturaLog::log(__METHOD__ . " flavorParamsIds count [" . count($flavorParamsArr) . "]");
-			$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndFlavorParams($entry->getId(), $flavorParamsArr);
+			$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($entry->getId(), $flavorParamsArr);
 		}
 		
 		foreach($flavorAssets as $flavorAsset)
@@ -219,7 +219,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 						)
 					)
 				{
-					$sourceFlavor = flavorAssetPeer::retrieveOriginalReadyByEntryId($dbBatchJob->getEntryId());
+					$sourceFlavor = assetPeer::retrieveOriginalReadyByEntryId($dbBatchJob->getEntryId());
 					if($sourceFlavor)
 						$this->exportFlavorAsset($sourceFlavor, $externalStorage);
 				}

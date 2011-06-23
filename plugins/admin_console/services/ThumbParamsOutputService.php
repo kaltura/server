@@ -41,10 +41,13 @@ class ThumbParamsOutputService extends KalturaBaseService
 		$c = new Criteria();
 		$thumbParamsOutputFilter->attachToCriteria($c);
 		
-		$totalCount = thumbParamsOutputPeer::doCount($c);
+		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetParamsOutputPeer::TYPE, $thumbTypes, Criteria::IN);
+		
+		$totalCount = assetParamsOutputPeer::doCount($c);
 		
 		$pager->attachToCriteria($c);
-		$dbList = thumbParamsOutputPeer::doSelect($c);
+		$dbList = assetParamsOutputPeer::doSelect($c);
 		
 		$list = KalturaThumbParamsOutputArray::fromDbArray($dbList);
 		$response = new KalturaThumbParamsOutputListResponse();

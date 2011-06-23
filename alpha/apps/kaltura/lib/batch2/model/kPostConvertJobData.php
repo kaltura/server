@@ -151,7 +151,7 @@ class kPostConvertJobData extends kConvartableJobData
 		$flavorParamsOutput = $this->getFlavorParamsOutput();
 		
 		if(!$flavorParamsOutput)
-			$flavorParamsOutput = flavorParamsOutputPeer::retrieveByPK($this->getFlavorParamsOutputId());
+			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($this->getFlavorParamsOutputId());
 			
 		if($flavorParamsOutput)
 			return $flavorParamsOutput->getReadyBehavior();

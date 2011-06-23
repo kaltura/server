@@ -15,7 +15,7 @@ class kMultiCentersSynchronizer implements kObjectAddedEventConsumer
 			
 		if($fileSync->getObjectType() == FileSyncObjectType::FLAVOR_ASSET)
 		{
-			$flavor = flavorAssetPeer::retrieveById($fileSync->getObjectId());
+			$flavor = assetPeer::retrieveById($fileSync->getObjectId());
 			if($flavor)
 				return $flavor->getEntryId();
 		}

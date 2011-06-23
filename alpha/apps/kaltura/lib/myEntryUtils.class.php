@@ -17,6 +17,7 @@ class myEntryUtils
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $dbEntry);
 		
+		// TODO - can't use API objects in core
 		$mediaEntry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$mediaEntry->fromObject($dbEntry);
 		
@@ -226,7 +227,7 @@ class myEntryUtils
 			
 		
 		// added by Tan-Tan 12/01/2010 to support falvors copy
-		$sourceFlavorAssets = flavorAssetPeer::retrieveByEntryId($source_entry_id);
+		$sourceFlavorAssets = assetPeer::retrieveByEntryId($source_entry_id);
 		foreach($sourceFlavorAssets as $sourceFlavorAsset)
 			$sourceFlavorAsset->copyToEntry($target->getId(), $target->getPartnerId());
 		
@@ -574,13 +575,13 @@ class myEntryUtils
 		{
 			$flavorAsset = null;
 			if($flavorParamsId)
-				$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($source_entry->getId(), $flavorParamsId);
+				$flavorAsset = assetPeer::retrieveByEntryIdAndParams($source_entry->getId(), $flavorParamsId);
 				
 			if(is_null($flavorAsset) || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-				$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($source_entry->getId());
+				$flavorAsset = assetPeer::retrieveOriginalByEntryId($source_entry->getId());
 				
 			if (is_null($flavorAsset))
-				$flavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($source_entry->getId());
+				$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($source_entry->getId());
 			
 			if (is_null($flavorAsset))
 				throw new Exception("Flavor asset not found");
@@ -744,16 +745,16 @@ class myEntryUtils
 						
 					$cache->put($orig_image_path, true);
 					
-					$flavorAsset = flavorAssetPeer::retrieveOriginalReadyByEntryId($entry->getId());
+					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
 					if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
 					{
 						// try the best playable
-						$flavorAsset = flavorAssetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+						$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
 					}
 					if (is_null($flavorAsset))
 					{
-						// if no READY ORIGINAL entry is available, try to retreive a non-READY ORIGINAL entry
-						$flavorAsset = flavorAssetPeer::retreiveOriginalByEntryId($entry->getId());
+						// if no READY ORIGINAL entry is available, try to retrieve a non-READY ORIGINAL entry
+						$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
 					}	
 					if (is_null($flavorAsset))
 						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
@@ -936,11 +937,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG),
 		);
 		
-		$flavorAssets = flavorAssetPeer::retrieveByEntryId($entry_id);
-		foreach($flavorAssets as $flavorAsset)
+		$assets = assetPeer::retrieveByEntryId($entry_id);
+		foreach($assets as $asset)
 		{
-			$entrySyncKeys[] = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$entrySyncKeys[] = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 		}
 		
 		foreach($entrySyncKeys as $syncKey)
@@ -1103,9 +1104,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		// added by Tan-Tan 12/01/2010 to support falvors copy
-		$sourceFlavorAssets = flavorAssetPeer::retrieveByEntryId($entry->getId());
-		foreach($sourceFlavorAssets as $sourceFlavorAsset)
-			$sourceFlavorAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
+		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
+		foreach($sourceAssets as $sourceAsset)
+			$sourceAsset->copyToEntry($newEntry->getId(), $newEntry->getPartnerId());
 		
  	}
 }

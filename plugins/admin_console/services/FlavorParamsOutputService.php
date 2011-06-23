@@ -41,10 +41,13 @@ class FlavorParamsOutputService extends KalturaBaseService
 		$c = new Criteria();
 		$flavorParamsOutputFilter->attachToCriteria($c);
 		
-		$totalCount = flavorParamsOutputPeer::doCount($c);
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetParamsOutputPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		$totalCount = assetParamsOutputPeer::doCount($c);
 		
 		$pager->attachToCriteria($c);
-		$dbList = flavorParamsOutputPeer::doSelect($c);
+		$dbList = assetParamsOutputPeer::doSelect($c);
 		
 		$list = KalturaFlavorParamsOutputArray::fromDbArray($dbList);
 		$response = new KalturaFlavorParamsOutputListResponse();

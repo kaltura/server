@@ -30,9 +30,9 @@ class kFileSyncObjectManager
 				BatchJobPeer::setUseCriteriaFilter ( true );
 				break;
 			case FileSyncObjectType::FLAVOR_ASSET:
-				flavorAssetPeer::setUseCriteriaFilter ( false );
-				$object = flavorAssetPeer::retrieveById( $objectId );
-				flavorAssetPeer::setUseCriteriaFilter ( true );
+				assetPeer::setUseCriteriaFilter ( false );
+				$object = assetPeer::retrieveById( $objectId );
+				assetPeer::setUseCriteriaFilter ( true );
 				break;
 			case FileSyncObjectType::SYNDICATION_FEED:
 				syndicationFeedPeer::setUseCriteriaFilter ( false );

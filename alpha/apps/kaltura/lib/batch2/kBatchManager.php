@@ -24,10 +24,10 @@ class kBatchManager
 		
 		$flavorAsset = null;
 		if($flavorAssetId)
-			$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		
 		if(!$flavorAsset)
-			$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavor->getFlavorParamsId());
+			$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavor->getFlavorParamsId());
 		
 		if($flavorAsset)
 		{
@@ -104,7 +104,7 @@ class kBatchManager
 	 */
 	public static function createErrorFlavorAsset(flavorParamsOutputWrap $flavor, $partnerId, $entryId, $description)
 	{
-		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavor->getFlavorParamsId());
+		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavor->getFlavorParamsId());
 		
 		if($flavorAsset)
 		{
@@ -152,7 +152,7 @@ class kBatchManager
 		if(!$mediaInfoDb->getFlavorAssetId())
 			return $mediaInfoDb;
 			
-		$flavorAsset = flavorAssetPeer::retrieveById($mediaInfoDb->getFlavorAssetId());
+		$flavorAsset = assetPeer::retrieveById($mediaInfoDb->getFlavorAssetId());
 		if(!$flavorAsset)
 			return $mediaInfoDb;
 
@@ -191,7 +191,7 @@ class kBatchManager
 			KalturaLog::log("Media info is for the destination flavor asset");
 			$tags = null;
 			
-			$flavorParams = flavorParamsPeer::retrieveByPK($flavorAsset->getFlavorParamsId());
+			$flavorParams = assetParamsPeer::retrieveByPK($flavorAsset->getFlavorParamsId());
 			if($flavorParams)
 				$tags = $flavorParams->getTags();
 			KalturaLog::log("Flavor asset tags from flavor params [$tags]");

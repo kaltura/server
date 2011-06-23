@@ -149,7 +149,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					$auditTrail->setRelatedObjectType(AuditTrailObjectType::FLAVOR_ASSET);
 					$auditTrail->setRelatedObjectId($object->getObjectId());
 					
-					$flavorAsset = flavorAssetPeer::retrieveById($object->getObjectId());
+					$flavorAsset = assetPeer::retrieveById($object->getObjectId());
 					if($flavorAsset)
 						$auditTrail->setEntryId($flavorAsset->getEntryId());
 						

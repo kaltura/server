@@ -188,6 +188,71 @@ class kMrssManager
 	}
 	
 	/**
+	 * @param thumbAsset $thumbAsset
+	 * @param SimpleXMLElement $mrss
+	 * @return SimpleXMLElement
+	 */
+	protected static function appendThumbAssetMrss(thumbAsset $thumbAsset, SimpleXMLElement $mrss = null)
+	{
+		if(!$mrss)
+			$mrss = new SimpleXMLElement('<item/>');
+			
+		$thumbnail = $mrss->addChild('thumbnail');
+		$thumbnail->addAttribute('url', self::getAssetUrl($thumbAsset));
+		$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
+		$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');
+		$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
+		$thumbnail->addAttribute('height', $thumbAsset->getHeight());
+		$thumbnail->addAttribute('width', $thumbAsset->getWidth());
+		if($thumbAsset->getFlavorParamsId())
+			$thumbnail->addAttribute('thumbParamsId', $thumbAsset->getFlavorParamsId());
+			
+		$tags = $thumbnail->addChild('tags');
+		foreach(explode(',', $thumbAsset->getTags()) as $tag)
+			$tags->addChild('tag', self::stringToSafeXml($tag));
+	}
+	
+	/**
+	 * @param flavorAsset $flavorAsset
+	 * @param SimpleXMLElement $mrss
+	 * @return SimpleXMLElement
+	 */
+	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null)
+	{
+		if(!$mrss)
+			$mrss = new SimpleXMLElement('<item/>');
+		
+		$content = $mrss->addChild('content');
+		$content->addAttribute('url', self::getAssetUrl($flavorAsset));
+		$content->addAttribute('flavorAssetId', $flavorAsset->getId());
+		$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
+		$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
+		$content->addAttribute('extension', $flavorAsset->getFileExt());
+		
+		if(!is_null($flavorAsset->getFlavorParamsId()))
+		{
+			$content->addAttribute('flavorParamsId', $flavorAsset->getFlavorParamsId());
+			$flavorParams = assetParamsPeer::retrieveByPK($flavorAsset->getFlavorParamsId());
+			if($flavorParams)
+			{
+				$content->addAttribute('flavorParamsName', $flavorParams->getName());
+				$content->addAttribute('format', $flavorParams->getFormat());
+				$content->addAttribute('videoBitrate', $flavorParams->getVideoBitrate());
+				$content->addAttribute('videoCodec', $flavorParams->getVideoCodec());
+				$content->addAttribute('audioBitrate', $flavorParams->getAudioBitrate());
+				$content->addAttribute('audioCodec', $flavorParams->getAudioCodec());
+				$content->addAttribute('frameRate', $flavorParams->getFrameRate());
+				$content->addAttribute('height', $flavorParams->getHeight());
+				$content->addAttribute('width', $flavorParams->getWidth());
+			}
+		}
+			
+		$tags = $content->addChild('tags');
+		foreach(explode(',', $flavorAsset->getTags()) as $tag)
+			$tags->addChild('tag', self::stringToSafeXml($tag));
+	}
+	
+	/**
 	 * @param entry $entry
 	 * @param SimpleXMLElement $mrss
 	 * @param string $link
@@ -197,9 +262,7 @@ class kMrssManager
 	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, $link = null, $fitlerByFlovorParams = null)
 	{
 		if(!$mrss)
-		{
 			$mrss = new SimpleXMLElement('<item/>');
-		}
 		
 		$mrss->addChild('entryId', $entry->getId());
 		$mrss->addChild('referenceID', $entry->getReferenceID());
@@ -267,60 +330,19 @@ class kMrssManager
 				break;
 		}
 			
-		$flavorAssets = flavorAssetPeer::retreiveReadyByEntryId($entry->getId());
-		foreach($flavorAssets as $flavorAsset)
+		$assets = assetPeer::retrieveReadyByEntryId($entry->getId());
+		foreach($assets as $asset)
 		{
-			if (!is_null($fitlerByFlovorParams) && $flavorAsset->getFlavorParamsId() != $fitlerByFlovorParams)
+			if (!is_null($fitlerByFlovorParams) && $asset->getFlavorParamsId() != $fitlerByFlovorParams)
 				continue;
-				 
-			$content = $mrss->addChild('content');
-			$content->addAttribute('url', self::getAssetUrl($flavorAsset));
-			$content->addAttribute('flavorAssetId', $flavorAsset->getId());
-			$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
-			$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
-			$content->addAttribute('extension', $flavorAsset->getFileExt());
-			
-			if(!is_null($flavorAsset->getFlavorParamsId()))
-			{
-				$content->addAttribute('flavorParamsId', $flavorAsset->getFlavorParamsId());
-				$flavorParams = flavorParamsPeer::retrieveByPK($flavorAsset->getFlavorParamsId());
-				if($flavorParams)
-				{
-					$content->addAttribute('flavorParamsName', $flavorParams->getName());
-					$content->addAttribute('format', $flavorParams->getFormat());
-					$content->addAttribute('videoBitrate', $flavorParams->getVideoBitrate());
-					$content->addAttribute('videoCodec', $flavorParams->getVideoCodec());
-					$content->addAttribute('audioBitrate', $flavorParams->getAudioBitrate());
-					$content->addAttribute('audioCodec', $flavorParams->getAudioCodec());
-					$content->addAttribute('frameRate', $flavorParams->getFrameRate());
-					$content->addAttribute('height', $flavorParams->getHeight());
-					$content->addAttribute('width', $flavorParams->getWidth());
-				}
-			}
+
+			if($asset instanceof flavorAsset)
+				self::appendFlavorAssetMrss($asset, $mrss);
 				
-			$tags = $content->addChild('tags');
-			foreach(explode(',', $flavorAsset->getTags()) as $tag)
-				$tags->addChild('tag', self::stringToSafeXml($tag));
+			if($asset instanceof thumbAsset)
+				self::appendThumbAssetMrss($asset, $mrss);
 		}
 			
-		$thumbAssets = thumbAssetPeer::retreiveReadyByEntryId($entry->getId());
-		foreach($thumbAssets as $thumbAsset)
-		{
-			$thumbnail = $mrss->addChild('thumbnail');
-			$thumbnail->addAttribute('url', self::getAssetUrl($thumbAsset));
-			$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
-			$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');
-			$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());
-			$thumbnail->addAttribute('height', $thumbAsset->getHeight());
-			$thumbnail->addAttribute('width', $thumbAsset->getWidth());
-			if($thumbAsset->getFlavorParamsId())
-				$thumbnail->addAttribute('thumbParamsId', $thumbAsset->getFlavorParamsId());
-				
-			$tags = $thumbnail->addChild('tags');
-			foreach(explode(',', $thumbAsset->getTags()) as $tag)
-				$tags->addChild('tag', self::stringToSafeXml($tag));
-		}
-		
 		$mrssContributors = self::getMrssContributors();
 		if(count($mrssContributors))
 			foreach($mrssContributors as $mrssContributor)

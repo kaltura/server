@@ -162,7 +162,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getReadyBehavior()
 	{
-		$flavorParamsOutput = flavorParamsOutputPeer::retrieveByPK($this->flavorParamsOutputId);
+		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($this->flavorParamsOutputId);
 		if($flavorParamsOutput)
 			return $flavorParamsOutput->getReadyBehavior();
 			

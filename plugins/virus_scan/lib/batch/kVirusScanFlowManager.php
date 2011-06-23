@@ -56,7 +56,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 			return true;
 		
 		$flavorAssetId = $object->getObjectId();
-		$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		if (!$flavorAsset || !$flavorAsset->getIsOriginal())
 			return true;
 
@@ -172,7 +172,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	
 	protected function updatedVirusScanFinished(BatchJob $dbBatchJob, kVirusScanJobData $data, BatchJob $twinJob = null)
 	{
-		$flavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		if (!$flavorAsset)
 		{
 			KalturaLog::err('Flavor asset not found with id ['.$data->getFlavorAssetId().']');
@@ -238,7 +238,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 			KalturaLog::err('Entry not found with id ['.$dbBatchJob->getEntryId().']');
 			throw new Exception('Entry not found with id ['.$dbBatchJob->getEntryId().']');
 		}
-		$flavorAsset = flavorAssetPeer::retrieveById($data->getFlavorAssetId());
+		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		if ($flavorAsset)
 		{
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);

@@ -15,15 +15,15 @@ class myConversionProfileUtils
 	 */
 	public static function getFlavorParamsFromFileFormat( $partnerId , $fileFormat, $ignoreSourceTag = true )
 	{
-		$defaultCriteria = flavorParamsPeer::getCriteriaFilter()->getFilter();
-		$defaultCriteria->remove(flavorParamsPeer::PARTNER_ID);
+		$defaultCriteria = assetParamsPeer::getCriteriaFilter()->getFilter();
+		$defaultCriteria->remove(assetParamsPeer::PARTNER_ID);
 		
-//		flavorParamsPeer::allowAccessToPartner0AndPartnerX($partnerId); // the flavor params can be from partner 0 too
+//		assetParamsPeer::allowAccessToPartner0AndPartnerX($partnerId); // the flavor params can be from partner 0 too
 		$c = new Criteria();
-		$c->addAnd ( flavorParamsPeer::PARTNER_ID , array ( $partnerId , 0 ) , Criteria::IN );
-//		$c->add (  flavorParamsPeer::FORMAT , $fileFormat );
-		$possible_flavor_params = flavorParamsPeer::doSelect( $c );
-		flavorParamsPeer::setDefaultCriteriaFilter();
+		$c->addAnd ( assetParamsPeer::PARTNER_ID , array ( $partnerId , 0 ) , Criteria::IN );
+//		$c->add (  assetParamsPeer::FORMAT , $fileFormat );
+		$possible_flavor_params = assetParamsPeer::doSelect( $c );
+		assetParamsPeer::setDefaultCriteriaFilter();
 		
 		$best_fp = null;
 		
