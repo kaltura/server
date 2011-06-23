@@ -45,7 +45,7 @@ foreach($entries as $entry)
 	$keys[] = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
 	$keys[] = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
 	
-	$flavors = flavorAssetPeer::retreiveReadyByEntryId($entry->getId());
+	$flavors = assetPeer::retrieveReadyByEntryId($entry->getId());
 	foreach($flavors as $flavor)
 		$keys[] = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 	

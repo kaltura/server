@@ -58,7 +58,7 @@ $flavorParams = null;
 
 if($flavorParamsId)
 {
-	$flavorParams = flavorParamsPeer::retrieveByPK($flavorParamsId);
+	$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
 	if(!($flavorParams instanceof SwfFlavorParams))
 	{
 		echo "Flavor params id [$flavorParamsId] is not SWF flavor params\n";

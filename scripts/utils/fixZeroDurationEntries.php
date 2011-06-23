@@ -43,16 +43,16 @@ $saved = 0;
 foreach($entries as $entryId)
 {
 	entryPeer::clearInstancePool();
-	flavorAssetPeer::clearInstancePool();
+	assetPeer::clearInstancePool();
 	mediaInfoPeer::clearInstancePool();
 	
 	$flavorAssetCriteria = new Criteria();
-	$flavorAssetCriteria->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+	$flavorAssetCriteria->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 	$flavorAssetCriteria->clearSelectColumns();
-	$flavorAssetCriteria->addSelectColumn(flavorAssetPeer::ID);
-	$flavorAssetCriteria->add(flavorAssetPeer::ENTRY_ID, $entryId);
+	$flavorAssetCriteria->addSelectColumn(assetPeer::ID);
+	$flavorAssetCriteria->add(assetPeer::ENTRY_ID, $entryId);
 	
-	$rs = flavorAssetPeer::doSelectStmt($flavorAssetCriteria, $con);
+	$rs = assetPeer::doSelectStmt($flavorAssetCriteria, $con);
 	$flavorAssets = $rs->fetchAll(PDO::FETCH_COLUMN);;
 	if(!count($flavorAssets))
 		continue;

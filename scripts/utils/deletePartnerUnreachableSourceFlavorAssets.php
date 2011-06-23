@@ -36,12 +36,12 @@ if(!$partner)
 }
 
 $c = new Criteria();
-$c->add(flavorAssetPeer::PARTNER_ID, $partner_id);
-$c->add(flavorAssetPeer::IS_ORIGINAL, true);
-$c->add(flavorAssetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+$c->add(assetPeer::PARTNER_ID, $partner_id);
+$c->add(assetPeer::IS_ORIGINAL, true);
+$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-$flavorAssets = flavorAssetPeer::doSelect($c, $con);
+$flavorAssets = assetPeer::doSelect($c, $con);
 $changedEntriesCounter = 0;
 
 foreach ($flavorAssets as $flavorAsset)

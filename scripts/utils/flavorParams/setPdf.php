@@ -52,7 +52,7 @@ $flavorParams = null;
 
 if($flavorParamsId)
 {
-	$flavorParams = flavorParamsPeer::retrieveByPK($flavorParamsId);
+	$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
 	if(!($flavorParams instanceof PdfFlavorParams))
 	{
 		echo "Flavor params id [$flavorParamsId] is not PDF flavor params\n";
