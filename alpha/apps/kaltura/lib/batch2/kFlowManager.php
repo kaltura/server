@@ -370,7 +370,8 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			
-				kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+				if(kFileSyncUtils::fileSync_exists($syncKey))
+					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 			
 				if($entry->getStatus() == entryStatus::NO_CONTENT)
 				{
