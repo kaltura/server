@@ -775,7 +775,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		{
 			if ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_VIDEO || $this->getMediaType() == self::ENTRY_MEDIA_TYPE_AUDIO)
 			{
-				$flavor_assets = flavorAssetPeer::retrieveBestPlayByEntryId($this->getId()); // uset the format as the extension
+				$flavor_assets = assetPeer::retrieveBestPlayByEntryId($this->getId()); // uset the format as the extension
 				if($flavor_assets)
 					$sync_key = $flavor_assets->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			}
@@ -2209,11 +2209,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		if($this->getType() == entryType::MIX)
 			return false; // always create new flattening job
 			
-		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($this->getId(), $flavorParamsId);
+		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParamsId);
 		if ($flavorAsset && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			return true;
 			
-		if(flavorAssetPeer::retrieveOriginalByEntryId($this->getId()))
+		if(assetPeer::retrieveOriginalByEntryId($this->getId()))
 			return false; // flavor asset should be created
 			
 		// entry file sync should be used (data or download)
@@ -2234,7 +2234,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			// if flavor params == SOURCE, or no format defined for flavor params, default to 'flv'
 			$flattenFormat = null;
 			if($flavorParamsId != 0)
-				$flattenFormat = flavorParamsPeer::retrieveByPK($flavorParamsId)->getFormat();
+				$flattenFormat = assetParamsPeer::retrieveByPK($flavorParamsId)->getFormat();
 			if(!$flattenFormat)
 				$flattenFormat = 'flv';
 			
@@ -2258,11 +2258,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	 */
 	public function getDownloadAssetUrl($flavorParamsId)
 	{
-		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($this->getId(), $flavorParamsId);
+		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParamsId);
 		if ($flavorAsset && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			return $flavorAsset->getDownloadUrl();
 			
-		if(flavorAssetPeer::retrieveOriginalByEntryId($this->getId()))
+		if(assetPeer::retrieveOriginalByEntryId($this->getId()))
 			return null; // flavor asset should be created
 			
 		// entry file sync should be used (data or download)

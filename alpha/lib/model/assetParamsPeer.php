@@ -10,12 +10,25 @@
  */ 
 class assetParamsPeer extends BaseassetParamsPeer
 {
+	const FLAVOR_OM_CLASS = 'flavorParams';
+	const THUMBNAIL_OM_CLASS = 'thumbParams';
+	
 	static protected $filterPartner = null;
+
+	public static function setDefaultCriteriaFilter ()
+	{
+		if(is_null(self::$s_criteria_filter))
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria(); 
+		$c->add(self::DELETED_AT, null, Criteria::ISNULL);
+		self::$s_criteria_filter->setFilter($c);
+	}
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
-		assetType::FLAVOR => flavorParamsPeer::OM_CLASS,
-		assetType::THUMBNAIL => thumbParamsPeer::OM_CLASS,
+		assetType::FLAVOR => assetParamsPeer::FLAVOR_OM_CLASS,
+		assetType::THUMBNAIL => assetParamsPeer::THUMBNAIL_OM_CLASS,
 	);
 
 	public static function excludeId($id)
@@ -106,55 +119,6 @@ class assetParamsPeer extends BaseassetParamsPeer
 	}
 	
 	/**
-	 * @var assetParamsPeer
-	 */
-	protected static $instance = null;
-
-	public static function resetInstanceCriteriaFilter()
-	{
-		self::$instance = null;
-		
-		if ( self::$s_criteria_filter == null )
-			self::$s_criteria_filter = new criteriaFilter ();
-
-		$c = self::$s_criteria_filter->getFilter();
-		if($c)
-		{
-			$c->remove(self::DELETED_AT);
-			$c->remove(self::TYPE);
-		}
-		else
-		{
-			$c = new Criteria();
-		}
-
-		$c->add(self::DELETED_AT, null, Criteria::EQUAL);
-
-		self::$s_criteria_filter->setFilter ( $c );
-	}
-	
-	public function setInstanceCriteriaFilter()
-	{
-		
-	}
-	
-	/**
-	 * Returns the default criteria filter
-	 *
-	 * @return     criteriaFilter The default criteria filter.
-	 */
-	public static function &getCriteriaFilter()
-	{
-		if(self::$s_criteria_filter == null)
-			assetParamsPeer::setDefaultCriteriaFilter();
-			
-		if(self::$instance)
-			self::$instance->setInstanceCriteriaFilter();
-			
-		return self::$s_criteria_filter;
-	}
-	
-	/**
 	 * The returned Class will contain objects of the default type or
 	 * objects that inherit from the default.
 	 *
@@ -202,6 +166,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 		}
 		return true;
 	}
+	
 	public static function filterSelectResults(&$selectResults)
 	{
 		$criteria_filter = assetParamsPeer::getCriteriaFilter();
@@ -253,9 +218,9 @@ class assetParamsPeer extends BaseassetParamsPeer
 		$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
 		
 		$criteria = new Criteria();
-		$criteria->add(flavorParamsPeer::ID, $flavorIds, Criteria::IN);
+		$criteria->add(assetParamsPeer::ID, $flavorIds, Criteria::IN);
 
-		$flavorParams = flavorParamsPeer::doSelect($criteria, $con);
+		$flavorParams = assetParamsPeer::doSelect($criteria, $con);
 		
 		$ret = array();
 		
@@ -276,9 +241,9 @@ class assetParamsPeer extends BaseassetParamsPeer
 		$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileId);
 		
 		$criteria = new Criteria();
-		$criteria->add(flavorParamsPeer::ID, $flavorIds, Criteria::IN);
+		$criteria->add(assetParamsPeer::ID, $flavorIds, Criteria::IN);
 
-		return flavorParamsPeer::doSelect($criteria, $con);
+		return assetParamsPeer::doSelect($criteria, $con);
 	}
 
 	public static function getIds(Criteria $criteria, $con = null)

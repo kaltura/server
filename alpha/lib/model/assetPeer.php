@@ -10,60 +10,25 @@
  */ 
 class assetPeer extends BaseassetPeer
 {
+	const FLAVOR_OM_CLASS = 'flavorAsset';
+	const THUMBNAIL_OM_CLASS = 'thumbAsset';
+	
 	// cache classes by their type
 	protected static $class_types_cache = array(
-		assetType::FLAVOR => flavorAssetPeer::OM_CLASS,
-		assetType::THUMBNAIL => thumbAssetPeer::OM_CLASS,
+		assetType::FLAVOR => self::FLAVOR_OM_CLASS,
+		assetType::THUMBNAIL => self::THUMBNAIL_OM_CLASS,
 	);
-	
-	/**
-	 * @var assetParamsPeer
-	 */
-	protected static $instance = null;
 
-	public static function resetInstanceCriteriaFilter()
+	public static function setDefaultCriteriaFilter ()
 	{
-		self::$instance = null;
+		if(is_null(self::$s_criteria_filter))
+			self::$s_criteria_filter = new criteriaFilter();
 		
-		if ( self::$s_criteria_filter == null )
-			self::$s_criteria_filter = new criteriaFilter ();
-
-		$c = self::$s_criteria_filter->getFilter();
-		if($c)
-		{
-			$c->remove(self::STATUS);
-			$c->remove(self::TYPE);
-		}
-		else
-		{
-			$c = new Criteria();
-		}
-
+		$c = new Criteria(); 
 		$c->add(self::STATUS, asset::FLAVOR_ASSET_STATUS_DELETED, Criteria::NOT_EQUAL);
-
-		self::$s_criteria_filter->setFilter ( $c );
+		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public function setInstanceCriteriaFilter()
-	{
-	}
-	
-	/**
-	 * Returns the default criteria filter
-	 *
-	 * @return     criteriaFilter The default criteria filter.
-	 */
-	public static function &getCriteriaFilter()
-	{
-		if(self::$s_criteria_filter == null)
-			self::setDefaultCriteriaFilter();
-			
-		if(self::$instance)
-			self::$instance->setInstanceCriteriaFilter();
-			
-		return self::$s_criteria_filter;
-	}
-
 	/**
 	 * The returned Class will contain objects of the default type or
 	 * objects that inherit from the default.
@@ -124,19 +89,6 @@ class assetPeer extends BaseassetPeer
 		$c = new Criteria(); 
 		$c->add(assetPeer::ID, $id); 
 		return assetPeer::doSelectOne($c, $con);
-	}
-	
-	/**
-	 * @param string $entryId
-	 * @return asset
-	 */
-	public static function retrieveOriginalByEntryId($entryId)
-	{
-		$c = new Criteria();
-		$c->add(self::ENTRY_ID, $entryId);
-		$c->add(self::IS_ORIGINAL, true);
-		
-		return self::doSelectOne($c);
 	}
 	
 	/**
@@ -219,7 +171,25 @@ class assetPeer extends BaseassetPeer
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
-		$c->add(self::TYPE, assetType::THUMBNAIL, Criteria::NOT_EQUAL);
+		
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		return self::doSelect($c);
+	}
+	
+	/**
+	 * 
+	 * @param string $entryId
+	 * @return array<thumbAsset>
+	 */
+	public static function retrieveThumbnailsByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(self::ENTRY_ID, $entryId);
+		
+		$thumbTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
+		$c->add(assetPeer::TYPE, $thumbTypes, Criteria::IN);
 		
 		return self::doSelect($c);
 	}
@@ -237,8 +207,58 @@ class assetPeer extends BaseassetPeer
 		
 		return self::doCount($c);
 	}
+
+	public static function retrieveReadyByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
+		
+		return self::doSelect($c);
+	}
+
+	public static function retrieveReadyFlavorsByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
+		
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		return self::doSelect($c);
+	}
+
+	public static function retrieveReadyThumbnailsByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
+		
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		return self::doSelect($c);
+	}
 	
-	public static function retreiveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds)
+	/**
+	 * 
+	 * @return flavorAsset
+	 */
+	public static function retrieveOriginalReadyByEntryId($entryId)
+	{
+		$c = new Criteria();
+		$c->add(self::IS_ORIGINAL, true);
+		$c->add(self::ENTRY_ID, $entryId);
+		$c->add(self::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		return self::doSelectOne($c);
+	}
+	
+	public static function retrieveReadyByEntryIdAndFlavorParams($entryId, array $flavorParamsIds)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
@@ -251,17 +271,94 @@ class assetPeer extends BaseassetPeer
 		return assetPeer::doSelect($c);
 	}
 	
+	public static function retrieveReadyByEntryIdAndTag($entryId, $tag)
+	{
+		$flavorAssets = self::retrieveReadyByEntryId($entryId);
+		self::filterByTag($flavorAssets, $tag);
+		return $flavorAssets;
+	}
+	
+	public static function retrieveReadyFlavorsByEntryIdAndTag($entryId, $tag)
+	{
+		$flavorAssets = self::retrieveReadyFlavorsByEntryId($entryId);
+		self::filterByTag($flavorAssets, $tag);
+		return $flavorAssets;
+	}
+	
+	public static function retrieveBestEditByEntryId($entryId)
+	{
+		$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_EDIT);
+		
+		if (count($flavorAssets) > 0)
+			return $flavorAssets[0];
+		else
+			return self::retrieveBestPlayByEntryId($entryId);
+	}
+	
+	public static function retrieveReadyWebByEntryId($entryId)
+	{
+		$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_MBR);
+		// TODO - until now production was searching by tag 'mbr',
+		// until we test this deeper, we keep MBR.
+//		$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_WEB);
+		return $flavorAssets;
+	}
+	
+	/**
+	 * @param string $entryId
+	 * @return flavorAsset|null
+	 */
+	public static function retrieveBestPlayByEntryId($entryId)
+	{
+		$flavorAssets = self::retrieveReadyWebByEntryId($entryId);
+
+		if (count($flavorAssets) > 0)
+			return $flavorAssets[0];
+		else
+			return null;
+	}
+	
 	/**
 	 * @param string $entryId
 	 * @return flavorAsset
 	 */
-	public static function retreiveOriginalByEntryId($entryId)
+	public static function retrieveOriginalByEntryId($entryId)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::IS_ORIGINAL, true);
 		
 		return assetPeer::doSelectOne($c);
+	}
+	
+	/**
+	 * @param string $entryId
+	 * @param string $tag tag filter
+	 * @return flavorAsset
+	 */
+	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		$c->add(assetPeer::TYPE, assetType::FLAVOR);
+		
+		$flavorAssets = self::doSelect($c);
+		if(!count($flavorAssets))
+			return null;
+			
+		if(!is_null($tag))
+			$flavorAssets = self::filterByTag($flavorAssets, $tag);
+		
+		if(!count($flavorAssets))
+			return null;
+			
+		$ret = null;
+		foreach($flavorAssets as $flavorAsset)
+			if(!$ret || $ret->getBitrate() < $flavorAsset->getBitrate())
+				$ret = $flavorAsset;
+				
+		return $ret;
 	}
 	
 	/**

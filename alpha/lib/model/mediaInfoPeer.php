@@ -29,7 +29,7 @@ class mediaInfoPeer extends BasemediaInfoPeer
 	 */
 	public static function retrieveOriginalByEntryId($entryId)
 	{
-		$sourceFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$sourceFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$sourceFlavorAsset)
 			return null;
 					

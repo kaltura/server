@@ -10,60 +10,25 @@
  */ 
 class assetParamsOutputPeer extends BaseassetParamsOutputPeer
 {
+	const FLAVOR_OM_CLASS = 'flavorParamsOutput';
+	const THUMBNAIL_OM_CLASS = 'thumbParamsOutput';
+
+
+	public static function setDefaultCriteriaFilter ()
+	{
+		if(is_null(self::$s_criteria_filter))
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria(); 
+		$c->add(self::DELETED_AT, null, Criteria::ISNULL);
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 	// cache classes by their type
 	protected static $class_types_cache = array(
-		assetType::FLAVOR => flavorParamsOutputPeer::OM_CLASS,
-		assetType::THUMBNAIL => thumbParamsOutputPeer::OM_CLASS,
+		assetType::FLAVOR => assetParamsOutputPeer::FLAVOR_OM_CLASS,
+		assetType::THUMBNAIL => assetParamsOutputPeer::THUMBNAIL_OM_CLASS,
 	);
-	
-	/**
-	 * @var assetParamsPeer
-	 */
-	protected static $instance = null;
-	
-	public static function resetInstanceCriteriaFilter()
-	{
-		self::$instance = null;
-		
-		if ( self::$s_criteria_filter == null )
-			self::$s_criteria_filter = new criteriaFilter ();
-
-		$c = self::$s_criteria_filter->getFilter();
-		if($c)
-		{
-			$c->remove(self::DELETED_AT);
-			$c->remove(self::TYPE);
-		}
-		else
-		{
-			$c = new Criteria();
-		}
-
-		$c->add(self::DELETED_AT, null, Criteria::EQUAL);
-
-		self::$s_criteria_filter->setFilter ( $c );
-	}
-
-	public function setInstanceCriteriaFilter()
-	{
-		
-	}
-	
-	/**
-	 * Returns the default criteria filter
-	 *
-	 * @return     criteriaFilter The default criteria filter.
-	 */
-	public static function &getCriteriaFilter()
-	{
-		if(self::$s_criteria_filter == null)
-			self::setDefaultCriteriaFilter();
-			
-		if(self::$instance)
-			self::$instance->setInstanceCriteriaFilter();
-			
-		return self::$s_criteria_filter;
-	}
 	
 	/**
 	 * @param string $entryId
@@ -75,10 +40,10 @@ class assetParamsOutputPeer extends BaseassetParamsOutputPeer
 	{
 		$criteria = new Criteria();
 
-		$criteria->add(flavorParamsOutputPeer::ENTRY_ID, $entryId);
-		$criteria->addDescendingOrderByColumn(flavorParamsOutputPeer::FLAVOR_ASSET_VERSION);
+		$criteria->add(assetParamsOutputPeer::ENTRY_ID, $entryId);
+		$criteria->addDescendingOrderByColumn(assetParamsOutputPeer::FLAVOR_ASSET_VERSION);
 
-		$flavorParamsOutputs = flavorParamsOutputPeer::doSelect($criteria, $con);
+		$flavorParamsOutputs = assetParamsOutputPeer::doSelect($criteria, $con);
 		
 		$ret = array();
 		
@@ -87,6 +52,43 @@ class assetParamsOutputPeer extends BaseassetParamsOutputPeer
 				$ret[] = $flavorParamsOutput;
 		
 		return $ret;
+	}
+	/**
+	 * 
+	 * @param $assetId
+	 * @param $assetVersion
+	 * @param $con
+	 * 
+	 * @return flavorParamsOutput
+	 */
+	public static function retrieveByAssetId($assetId, $assetVersion = null, $con = null)
+	{
+		$criteria = new Criteria();
+
+		$criteria->add(assetParamsOutputPeer::FLAVOR_ASSET_ID, $assetId);
+		
+		if($assetVersion)
+		{
+			$criteria->add(assetParamsOutputPeer::FLAVOR_ASSET_VERSION, $assetVersion);
+		}
+		else 
+		{
+			$criteria->addDescendingOrderByColumn(assetParamsOutputPeer::FLAVOR_ASSET_VERSION);
+		}
+
+		return assetParamsOutputPeer::doSelectOne($criteria, $con);
+	}
+	
+	/**
+	 * 
+	 * @param asset $asset
+	 * @param $con
+	 * 
+	 * @return flavorParamsOutput
+	 */
+	public static function retrieveByAsset(asset $asset, $con = null)
+	{
+		return self::retrieveByAssetId($asset->getId(), $asset->getVersion(), $con);
 	}
 	
 	/**

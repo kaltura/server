@@ -34,7 +34,7 @@ class asset extends Baseasset implements ISyncableFile
 			$newFlavorAsset->setEntryId($entryId);
 		$newFlavorAsset->save();
 		
-		$flavorParamsOutput = flavorParamsOutputPeer::retrieveByFlavorAssetId($this->getId());
+		$flavorParamsOutput = assetParamsOutputPeer::retrieveByAssetId($this->getId());
 		if($flavorParamsOutput)
 		{
 			$newFlavorParamsOutput = $flavorParamsOutput->copy();
@@ -86,9 +86,9 @@ class asset extends Baseasset implements ISyncableFile
 		
 		$objectDeleted = false;
 		if(
-			($this->isColumnModified(flavorAssetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
+			($this->isColumnModified(assetPeer::STATUS) && $this->getStatus() == self::FLAVOR_ASSET_STATUS_DELETED)
 			||
-			($this->isColumnModified(flavorAssetPeer::DELETED_AT) && !is_null($this->getDeletedAt(null)))
+			($this->isColumnModified(assetPeer::DELETED_AT) && !is_null($this->getDeletedAt(null)))
 		)
 			$objectDeleted = true;
 			
@@ -243,7 +243,7 @@ class asset extends Baseasset implements ISyncableFile
 		for ($i = 0; $i < 10; $i++)
 		{
 			$id = $dc["id"].'_'.kString::generateStringId();
-			$existingObject = flavorAssetPeer::retrieveById($id);
+			$existingObject = assetPeer::retrieveById($id);
 			
 			if ($existingObject)
 				KalturaLog::log(__METHOD__ . ": id [$id] already exists");
@@ -328,7 +328,7 @@ class asset extends Baseasset implements ISyncableFile
 	 */
 	public function getFlavorParamsOutput()
 	{
-		return flavorParamsOutputPeer::retrieveByFlavorAsset($this);
+		return assetParamsOutputPeer::retrieveByAsset($this);
 	}
 	
 	public function getLogFileVersion()

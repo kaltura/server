@@ -50,10 +50,10 @@ class flavorAsset extends asset
 			   $this->collassetParamsOutputs = array();
 			} else {
 
-				$criteria->add(flavorParamsOutputPeer::FLAVOR_ASSET_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::FLAVOR_ASSET_ID, $this->id);
 
-				flavorParamsOutputPeer::addSelectColumns($criteria);
-				$this->collassetParamsOutputs = flavorParamsOutputPeer::doSelect($criteria, $con);
+				assetParamsOutputPeer::addSelectColumns($criteria);
+				$this->collassetParamsOutputs = assetParamsOutputPeer::doSelect($criteria, $con);
 			}
 		} else {
 			// criteria has no effect for a new object
@@ -63,11 +63,11 @@ class flavorAsset extends asset
 				// one, just return the collection.
 
 
-				$criteria->add(flavorParamsOutputPeer::FLAVOR_ASSET_ID, $this->id);
+				$criteria->add(assetParamsOutputPeer::FLAVOR_ASSET_ID, $this->id);
 
-				flavorParamsOutputPeer::addSelectColumns($criteria);
+				assetParamsOutputPeer::addSelectColumns($criteria);
 				if (!isset($this->lastassetParamsOutputCriteria) || !$this->lastassetParamsOutputCriteria->equals($criteria)) {
-					$this->collassetParamsOutputs = flavorParamsOutputPeer::doSelect($criteria, $con);
+					$this->collassetParamsOutputs = assetParamsOutputPeer::doSelect($criteria, $con);
 				}
 			}
 		}
@@ -85,7 +85,7 @@ class flavorAsset extends asset
 	public function getFlavorParams(PropelPDO $con = null)
 	{
 		if ($this->aassetParams === null && ($this->flavor_params_id !== null)) {
-			$this->aassetParams = flavorParamsPeer::retrieveByPk($this->flavor_params_id);
+			$this->aassetParams = assetParamsPeer::retrieveByPk($this->flavor_params_id);
 			/* The following can be used additionally to
 			   guarantee the related object contains a reference
 			   to this object.  This level of coupling may, however, be

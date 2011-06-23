@@ -32,7 +32,7 @@ class FileSyncPeer extends BaseFileSyncPeer
 	 * @param FileSyncKey $key
 	 * @return FileSync
 	 */
-	public static function retreiveByFileSyncKey(FileSyncKey $key)
+	public static function retrieveByFileSyncKey(FileSyncKey $key)
 	{
 		$c = self::getCriteriaForFileSyncKey($key);
 		return self::doSelectOne($c);
@@ -42,7 +42,7 @@ class FileSyncPeer extends BaseFileSyncPeer
 	 * @param FileSyncKey $key
 	 * @return array
 	 */
-	public static function retreiveAllByFileSyncKey(FileSyncKey $key)
+	public static function retrieveAllByFileSyncKey(FileSyncKey $key)
 	{
 		$c = self::getCriteriaForFileSyncKey($key);
 		return self::doSelect($c);

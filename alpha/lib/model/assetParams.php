@@ -65,7 +65,7 @@ class assetParams extends BaseassetParams
 			return parent::postUpdate($con);
 		
 		$objectDeleted = false;
-		if($this->isColumnModified(flavorParamsPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
+		if($this->isColumnModified(assetParamsPeer::DELETED_AT) && !is_null($this->getDeletedAt()))
 			$objectDeleted = true;
 			
 		$ret = parent::postUpdate($con);
