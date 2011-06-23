@@ -50,6 +50,27 @@ class KalturaPluginManager
 	}
 	
 	/**
+	 * Return all enum values that extend the base enum value
+	 * @param string $baseClass
+	 * @param string $enumValue
+	 * @return array
+	 */
+	public static function getExtendedTypes($baseClass, $enumValue)
+	{
+		$values = array($enumValue);
+		$pluginInstances = self::getPluginInstances('IKalturaTypeExtender');
+		foreach($pluginInstances as $pluginName => $pluginInstance)
+		{
+			$pluginValues = $pluginInstance->getExtendedTypes($baseClass, $enumValue);
+			if($pluginValues && count($pluginValues))
+				foreach($pluginValues as $pluginValue)
+					$values[] = $pluginValue;
+		}
+		
+		return $values;
+	}
+	
+	/**
 	 * @param Iterator $srcConfig
 	 * @param Iterator $newConfig
 	 * @param bool $valuesOnly
