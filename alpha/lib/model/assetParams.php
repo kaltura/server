@@ -121,6 +121,17 @@ class assetParams extends BaseassetParams
 		$this->setTags(implode(',', $finalTags));
 	}	
 	
+	public function setDynamicAttributes(array $attributes)
+	{
+		foreach($attributes as $attributeName => $value)
+		{
+			if(is_int($attributeName) && is_array($value))
+				$this->setDynamicAttributes($value);
+			else
+				$this->setDynamicAttribute($attributeName, $value);
+		}
+	}	
+	
 	public function setDynamicAttribute($attributeName, $v)
 	{
 		$this->putInCustomData($attributeName, $v);

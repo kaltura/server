@@ -347,7 +347,7 @@ class kBusinessPreConvertDL
 	 * @param string $flavorAssetId
 	 * @return BatchJob 
 	 */
-	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription)
+	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription, $flavorAssetId = null, array $dynamicAttributes = array())
 	{
 		KalturaLog::log("entryId [$entryId], flavorParamsId [$flavorParamsId]");
 		
@@ -374,6 +374,8 @@ class kBusinessPreConvertDL
 			$mediaInfoId = $mediaInfo->getId();
 		
 		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
+		$flavorParams->setDynamicAttributes($dynamicAttributes);
+			
 		$flavor = self::validateFlavorAndMediaInfo($flavorParams, $mediaInfo, $errDescription);
 		
 		if (is_null($flavor))
@@ -387,11 +389,12 @@ class kBusinessPreConvertDL
 		else
 			$partnerId = $originalFlavorAsset->getPartnerId();
 			
-		
-		$flavorAssetId = null;
-		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);
-		if($flavorAsset)
-			$flavorAssetId = $flavorAsset->getId();
+		if(is_null($flavorAssetId))
+		{
+			$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);
+			if($flavorAsset)
+				$flavorAssetId = $flavorAsset->getId();
+		}
 		
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$flavor->_force = true; // force to convert the flavor, even if none complied

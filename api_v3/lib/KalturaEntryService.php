@@ -6,6 +6,7 @@ class KalturaEntryService extends KalturaBaseService
      * @param kResource $resource
      * @param entry $dbEntry
      * @param asset $asset
+     * @return asset
      * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
      */
     protected function attachResource(kResource $resource, entry $dbEntry, asset $asset = null)
@@ -90,8 +91,11 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if(!$dbAsset)
 		{
-			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-			$dbEntry->save();
+			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
 			
 			return null;
 		}
@@ -125,8 +129,11 @@ class KalturaEntryService extends KalturaBaseService
 				kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
 			}
 			catch (Exception $e) {
-				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-				$dbEntry->save();											
+				if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+				{
+					$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+					$dbEntry->save();
+				}											
 				throw $e;
 			}
 			$dbEntry->setStatus(entryStatus::READY);
@@ -143,7 +150,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
 		
-		if(!$dbAsset)
+		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
 			$dbEntry->save();
@@ -159,8 +166,12 @@ class KalturaEntryService extends KalturaBaseService
 			kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
 		}
 		catch (Exception $e) {
-			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-			$dbEntry->save();
+			
+			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
 			
 			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$dbAsset->save();												
@@ -204,8 +215,11 @@ class KalturaEntryService extends KalturaBaseService
         {
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
 			
-			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-			$dbEntry->save();
+			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
         }
@@ -214,6 +228,39 @@ class KalturaEntryService extends KalturaBaseService
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
 
         if($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+			
+		return $dbAsset;
+    }
+    
+    /**
+     * @param kOperationResource $resource
+     * @param entry $dbEntry
+     * @param asset $dbAsset
+     * @return asset
+     */
+    protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
+    {
+		$isNewAsset = false;
+		if(!$dbAsset)
+		{
+			$isNewAsset = true;
+ 			KalturaLog::debug("Creating original flavor asset");
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+		}
+		
+		if(!$dbAsset && $dbEntry->getStatus() == entryStatus::NO_CONTENT)
+		{
+			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+			$dbEntry->save();
+		}
+		
+		$dbAsset = $this->attachResource($resource->getResource(), $dbEntry, $dbAsset);
+		
+		$errDescription = '';
+		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $resource->getOperationAttributes());
+		
+		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 			
 		return $dbAsset;
@@ -258,8 +305,11 @@ class KalturaEntryService extends KalturaBaseService
         {
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
 			
-			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-			$dbEntry->save();
+			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
         }
@@ -379,14 +429,11 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset = new flavorAsset();
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
-			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 			
 			$dbAsset->setFlavorParamsId($resource->getAssetParamsId());
 			if($assetParams->hasTag(assetParams::TAG_SOURCE))
-			{
 				$dbAsset->setIsOriginal(true);
-				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
-			}
     	}
 		$dbAsset->incrementVersion();
 		$dbAsset->save();
@@ -586,8 +633,11 @@ class KalturaEntryService extends KalturaBaseService
         {
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
 			
-			$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
-			$dbEntry->save();
+			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+				$dbEntry->save();
+			}
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED, $msg);
         }

@@ -188,6 +188,12 @@ class MediaService extends KalturaEntryService
 			case 'kRemoteStorageResource':
 				return $this->attachRemoteStorageResource($resource, $dbEntry, $dbAsset);
 				
+			case 'kOperationResource':
+				if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+					throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($resource));
+					
+				return $this->attachOperationResource($resource, $dbEntry, $dbAsset);
+				
 			default:
 				KalturaLog::err("Resource of type [" . get_class($resource) . "] is not supported");
 				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
