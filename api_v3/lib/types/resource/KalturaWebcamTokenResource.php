@@ -34,7 +34,7 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 	{
 		parent::entryHandled($dbEntry);
 		
-		$originalFlavorAsset = flavorAssetPeer::retreiveOriginalByEntryId($dbEntry->getId());
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($dbEntry->getId());
 		$syncKey = $originalFlavorAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
     	$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
     	

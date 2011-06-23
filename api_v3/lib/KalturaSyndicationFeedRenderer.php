@@ -83,7 +83,7 @@ class KalturaSyndicationFeedRenderer
 		
 		// add partner to default criteria
 		categoryPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
-		flavorAssetPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
+		assetPeer::addPartnerToCriteria($this->syndicationFeed->partnerId, true);
 		
 		
 		$this->baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
@@ -501,7 +501,7 @@ class KalturaSyndicationFeedRenderer
 		if(!$partner)
 			return null;
 	
-		$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($kalturaEntry->id,$this->syndicationFeed->flavorParamId);
+		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($kalturaEntry->id,$this->syndicationFeed->flavorParamId);
 		if (!$flavorAsset)
 			return null;
 					
@@ -611,7 +611,7 @@ class KalturaSyndicationFeedRenderer
 	{
 		if(is_null($this->mimeType))
 		{
-			$flavor = flavorParamsPeer::retrieveByPK($this->syndicationFeed->flavorParamId);
+			$flavor = assetParamsPeer::retrieveByPK($this->syndicationFeed->flavorParamId);
 			if(!$flavor)
 				throw new Exception("flavor not found for id " . $this->syndicationFeed->flavorParamId);
 		

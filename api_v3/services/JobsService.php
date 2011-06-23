@@ -328,7 +328,7 @@ class JobsService extends KalturaBaseService
 		if(!$entry)
 			throw new KalturaAPIException(APIErrors::INVALID_ENTRY_ID, 'entry', $entryId);
 			
-		$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$flavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		

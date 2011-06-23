@@ -14,8 +14,8 @@ class ThumbAssetService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(thumbParamsOutputPeer::getInstance());
-		parent::applyPartnerFilterForClass(thumbAssetPeer::getInstance());
+		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
+		parent::applyPartnerFilterForClass(new assetPeer());
 		
 		$partnerGroup = null;
 		if(
@@ -29,7 +29,7 @@ class ThumbAssetService extends KalturaBaseService
 			)
 			$partnerGroup = $this->partnerGroup . ',0';
 			
-		parent::applyPartnerFilterForClass(thumbParamsPeer::getInstance(), $partnerGroup);
+		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
 	}
 	
     /**
@@ -56,7 +56,7 @@ class ThumbAssetService extends KalturaBaseService
     	
     	if($thumbAsset->thumbParamsId)
     	{
-    		$dbThumbAsset = thumbAssetPeer::retrieveByEntryIdAndParams($entryId, $thumbAsset->thumbParamsId);
+    		$dbThumbAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $thumbAsset->thumbParamsId);
     		if($dbThumbAsset)
     			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ALREADY_EXISTS, $dbThumbAsset->getId(), $thumbAsset->thumbParamsId);
     	}
@@ -91,7 +91,7 @@ class ThumbAssetService extends KalturaBaseService
      */
     function setContentAction($id, KalturaContentResource $contentResource)
     {
-   		$dbThumbAsset = thumbAssetPeer::retrieveById($id);
+   		$dbThumbAsset = assetPeer::retrieveById($id);
    		if(!$dbThumbAsset)
    			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
@@ -154,7 +154,7 @@ class ThumbAssetService extends KalturaBaseService
      */
     function updateAction($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource = null)
     {
-		$dbThumbAsset = thumbAssetPeer::retrieveById($id);
+		$dbThumbAsset = assetPeer::retrieveById($id);
 		if(!$dbThumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
@@ -416,7 +416,7 @@ class ThumbAssetService extends KalturaBaseService
 		if(is_null($thumbParamId))
 			return $this->serveFile($entry, entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB, $fileName);
 		
-		$thumbAsset = thumbAssetPeer::retrieveByEntryIdAndParams($entryId, $thumbParamId);
+		$thumbAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $thumbParamId);
 		if(!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbParamId);
 		
@@ -435,7 +435,7 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function serveAction($thumbAssetId)
 	{
-		$thumbAsset = thumbAssetPeer::retrieveById($thumbAssetId);
+		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 
@@ -458,7 +458,7 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function setAsDefaultAction($thumbAssetId)
 	{
-		$thumbAsset = thumbAssetPeer::retrieveById($thumbAssetId);
+		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
@@ -473,7 +473,7 @@ class ThumbAssetService extends KalturaBaseService
 		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId))  
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
 			
-		$entryThumbAssets = thumbAssetPeer::retrieveByEntryId($thumbAsset->getEntryId());
+		$entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($thumbAsset->getEntryId());
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
 			if($entryThumbAsset->getId() == $thumbAsset->getId())
@@ -534,7 +534,7 @@ class ThumbAssetService extends KalturaBaseService
 		if (!in_array($entry->getStatus(), $validStatuses))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
 			
-		$destThumbParams = thumbParamsPeer::retrieveByPK($destThumbParamsId);
+		$destThumbParams = assetParamsPeer::retrieveByPK($destThumbParamsId);
 		if(!$destThumbParams)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $destThumbParamsId);
 
@@ -607,14 +607,14 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function regenerateAction($thumbAssetId)
 	{
-		$thumbAsset = thumbAssetPeer::retrieveById($thumbAssetId);
+		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
 		if(!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 			
 		if(is_null($thumbAsset->getFlavorParamsId()))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, null);
 			
-		$destThumbParams = thumbParamsPeer::retrieveByPK($thumbAsset->getFlavorParamsId());
+		$destThumbParams = assetParamsPeer::retrieveByPK($thumbAsset->getFlavorParamsId());
 		if(!$destThumbParams)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbAsset->getFlavorParamsId());
 			
@@ -651,7 +651,7 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function getAction($thumbAssetId)
 	{
-		$thumbAssetsDb = thumbAssetPeer::retrieveById($thumbAssetId);
+		$thumbAssetsDb = assetPeer::retrieveById($thumbAssetId);
 		if(!$thumbAssetsDb)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
@@ -676,8 +676,12 @@ class ThumbAssetService extends KalturaBaseService
 			
 		// get the thumb assets for this entry
 		$c = new Criteria();
-		$c->add(thumbAssetPeer::ENTRY_ID, $entryId);
-		$thumbAssetsDb = thumbAssetPeer::doSelect($c);
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		
+		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::THUMBNAIL);
+		$c->add(assetPeer::TYPE, $thumbTypes, Criteria::IN);
+		
+		$thumbAssetsDb = assetPeer::doSelect($c);
 		$thumbAssets = KalturaThumbAssetArray::fromDbArray($thumbAssetsDb);
 		return $thumbAssets;
 	}
@@ -705,10 +709,13 @@ class ThumbAssetService extends KalturaBaseService
 		$c = new Criteria();
 		$thumbAssetFilter->attachToCriteria($c);
 		
-		$totalCount = thumbAssetPeer::doCount($c);
+		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::THUMBNAIL);
+		$c->add(assetPeer::TYPE, $thumbTypes, Criteria::IN);
+		
+		$totalCount = assetPeer::doCount($c);
 		
 		$pager->attachToCriteria($c);
-		$dbList = thumbAssetPeer::doSelect($c);
+		$dbList = assetPeer::doSelect($c);
 		
 		$list = KalturaThumbAssetArray::fromDbArray($dbList);
 		$response = new KalturaThumbAssetListResponse();
@@ -794,7 +801,7 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
 		$dbThumbAsset->save();
 		
-		$dbEntryThumbs = thumbAssetPeer::retrieveByEntryId($entryId);
+		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
     		
  		//If the thums has the default tag or the entry is in no content and this is the first thumb
 		if( $dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || 
@@ -815,7 +822,7 @@ class ThumbAssetService extends KalturaBaseService
 	 */
 	public function deleteAction($thumbAssetId)
 	{
-		$thumbAssetDb = thumbAssetPeer::retrieveById($thumbAssetId);
+		$thumbAssetDb = assetPeer::retrieveById($thumbAssetId);
 		if(!$thumbAssetDb)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 	

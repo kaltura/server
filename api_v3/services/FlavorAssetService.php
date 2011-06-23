@@ -14,8 +14,8 @@ class FlavorAssetService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
-		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
+		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
+		parent::applyPartnerFilterForClass(new assetPeer());
 		
 		$partnerGroup = null;
 		if(
@@ -31,7 +31,7 @@ class FlavorAssetService extends KalturaBaseService
 			)
 			$partnerGroup = $this->partnerGroup . ',0';
 			
-		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance(), $partnerGroup);
+		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
 	}
 
 	// maybe a solution to bug #9798
@@ -65,7 +65,7 @@ class FlavorAssetService extends KalturaBaseService
     	
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
-    		$dbFlavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entryId, $flavorAsset->flavorParamsId);
+    		$dbFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorAsset->flavorParamsId);
     		if($dbFlavorAsset)
     			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS, $dbFlavorAsset->getId(), $flavorAsset->flavorParamsId);
     	}
@@ -75,7 +75,7 @@ class FlavorAssetService extends KalturaBaseService
     	
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
-    		$flavorParams = flavorParamsPeer::retrieveByPK($flavorAsset->flavorParamsId);
+    		$flavorParams = assetParamsPeer::retrieveByPK($flavorAsset->flavorParamsId);
     		if($flavorParams && $flavorParams->hasTag(flavorParams::TAG_SOURCE))
     			$dbFlavorAsset->setIsOriginal(true);
     	}
@@ -101,7 +101,7 @@ class FlavorAssetService extends KalturaBaseService
      */
     function updateAction($id, KalturaFlavorAsset $flavorAsset)
     {
-   		$dbFlavorAsset = flavorAssetPeer::retrieveById($id);
+   		$dbFlavorAsset = assetPeer::retrieveById($id);
    		if(!$dbFlavorAsset)
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
@@ -130,7 +130,7 @@ class FlavorAssetService extends KalturaBaseService
      */
     function setContentAction($id, KalturaContentResource $contentResource)
     {
-   		$dbFlavorAsset = flavorAssetPeer::retrieveById($id);
+   		$dbFlavorAsset = assetPeer::retrieveById($id);
    		if(!$dbFlavorAsset)
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
@@ -389,7 +389,7 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	public function getAction($id)
 	{
-		$flavorAssetDb = flavorAssetPeer::retrieveById($id);
+		$flavorAssetDb = assetPeer::retrieveById($id);
 		if (!$flavorAssetDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
@@ -412,10 +412,7 @@ class FlavorAssetService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		// get the flavor assets for this entry
-		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
-		$flavorAssetsDb = flavorAssetPeer::doSelect($c);
+		$flavorAssetsDb = assetPeer::retrieveFlavorsByEntryId($entryId);
 		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
 		return $flavorAssets;
 	}
@@ -445,10 +442,13 @@ class FlavorAssetService extends KalturaBaseService
 		$c = new Criteria();
 		$flavorAssetFilter->attachToCriteria($c);
 		
-		$totalCount = flavorAssetPeer::doCount($c);
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		$totalCount = assetPeer::doCount($c);
 		
 		$pager->attachToCriteria($c);
-		$dbList = flavorAssetPeer::doSelect($c);
+		$dbList = assetPeer::doSelect($c);
 		
 		$list = KalturaFlavorAssetArray::fromDbArray($dbList);
 		$response = new KalturaFlavorAssetListResponse();
@@ -479,19 +479,19 @@ class FlavorAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		// if the entry does not belong to the partner but "display_in_search = 2"
-		// we want to turn off the criteria over the flavorAssetPeer
+		// we want to turn off the criteria over the assetPeer
 		if($dbEntry->getPartnerId() != $this->getPartnerId() &&
 		   $dbEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK)
 		{
-			flavorAssetPeer::setDefaultCriteriaFilter(null);
+			assetPeer::setUseCriteriaFilter(false);
 		}
-		$flavorAssetsDb = flavorAssetPeer::retrieveReadyWebByEntryId($entryId);
+		$flavorAssetsDb = assetPeer::retrieveReadyWebByEntryId($entryId);
 		if (count($flavorAssetsDb) == 0)
 			throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND);
 		
 		// re-set default criteria to avoid fetching "private" flavors in laetr queries.
 		// this should be also set in baseService, but we better do it anyway.
-		flavorAssetPeer::setDefaultCriteriaFilter();
+		assetPeer::setUseCriteriaFilter(true);
 			
 		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
 		
@@ -511,8 +511,8 @@ class FlavorAssetService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		$flavorParamsDb = flavorParamsPeer::retrieveByPK($flavorParamsId);
-		flavorParamsPeer::setDefaultCriteriaFilter();
+		$flavorParamsDb = assetParamsPeer::retrieveByPK($flavorParamsId);
+		assetParamsPeer::setUseCriteriaFilter(false);
 		if (!$flavorParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);
 				
@@ -525,7 +525,7 @@ class FlavorAssetService extends KalturaBaseService
 		if (!in_array($dbEntry->getStatus(), $validStatuses))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS);
 			
-		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($originalFlavorAsset) || $originalFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 
@@ -541,7 +541,7 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	public function reconvertAction($id)
 	{
-		$flavorAssetDb = flavorAssetPeer::retrieveById($id);
+		$flavorAssetDb = assetPeer::retrieveById($id);
 		if (!$flavorAssetDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
@@ -562,7 +562,7 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	public function deleteAction($id)
 	{
-		$flavorAssetDb = flavorAssetPeer::retrieveById($id);
+		$flavorAssetDb = assetPeer::retrieveById($id);
 		if (!$flavorAssetDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
@@ -588,7 +588,7 @@ class FlavorAssetService extends KalturaBaseService
 	 */
 	public function getDownloadUrlAction($id, $useCdn = false)
 	{
-		$flavorAssetDb = flavorAssetPeer::retrieveById($id);
+		$flavorAssetDb = assetPeer::retrieveById($id);
 		if (!$flavorAssetDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
@@ -612,13 +612,21 @@ class FlavorAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		// get all the flavor params of partner 0 and the current partner (note that partner 0 is defined as partner group in service.ct)
-		$flavorParamsDb = flavorParamsPeer::doSelect(new Criteria());
+		$c = new Criteria();
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		$flavorParamsDb = assetParamsPeer::doSelect($c);
 		
 		// get the flavor assets for this entry
 		$c = new Criteria();
-		$c->add(flavorAssetPeer::ENTRY_ID, $entryId);
-		$c->add(flavorAssetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_TEMP), Criteria::NOT_IN);
-		$flavorAssetsDb = flavorAssetPeer::doSelect($c);
+		
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_TEMP), Criteria::NOT_IN);
+		$flavorAssetsDb = assetPeer::doSelect($c);
 		
 		// find what flavot params are required
 		$requiredFlavorParams = array();
@@ -639,7 +647,7 @@ class FlavorAssetService extends KalturaBaseService
 		// adding missing required flavors params to the list
 		if(count($requiredFlavorParams))
 		{
-			$flavorParamsDb = flavorParamsPeer::retrieveByPKsNoFilter(array_keys($requiredFlavorParams));
+			$flavorParamsDb = assetParamsPeer::retrieveByPKsNoFilter(array_keys($requiredFlavorParams));
 			foreach($flavorParamsDb as $item)
 				$flavorParamsArray[$item->getId()] = $item;
 		}

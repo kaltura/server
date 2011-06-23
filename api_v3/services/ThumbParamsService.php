@@ -14,8 +14,8 @@ class ThumbParamsService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(thumbAssetPeer::getInstance());
-		parent::applyPartnerFilterForClass(thumbParamsOutputPeer::getInstance());
+		parent::applyPartnerFilterForClass(new assetPeer());
+		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
 		
 		$partnerGroup = null;
 		if(
@@ -24,7 +24,7 @@ class ThumbParamsService extends KalturaBaseService
 			)
 			$partnerGroup = $this->partnerGroup . ',0';
 			
-		parent::applyPartnerFilterForClass(thumbParamsPeer::getInstance(), $partnerGroup);
+		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
 	}
 	
 	protected function globalPartnerAllowed($actionName)
@@ -68,7 +68,7 @@ class ThumbParamsService extends KalturaBaseService
 	 */
 	public function getAction($id)
 	{
-		$thumbParamsDb = thumbParamsPeer::retrieveByPK($id);
+		$thumbParamsDb = assetParamsPeer::retrieveByPK($id);
 		
 		if (!$thumbParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
@@ -92,7 +92,7 @@ class ThumbParamsService extends KalturaBaseService
 		if ($thumbParams->name !== null)
 			$thumbParams->validatePropertyMinLength("name", 1);
 			
-		$thumbParamsDb = thumbParamsPeer::retrieveByPK($id);
+		$thumbParamsDb = assetParamsPeer::retrieveByPK($id);
 		if (!$thumbParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
@@ -111,7 +111,7 @@ class ThumbParamsService extends KalturaBaseService
 	 */
 	public function deleteAction($id)
 	{
-		$thumbParamsDb = thumbParamsPeer::retrieveByPK($id);
+		$thumbParamsDb = assetParamsPeer::retrieveByPK($id);
 		if (!$thumbParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
@@ -142,10 +142,14 @@ class ThumbParamsService extends KalturaBaseService
 		$c = new Criteria();
 		$thumbParamsFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
-		$dbList = thumbParamsPeer::doSelect($c);
+		
+		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::THUMBNAIL);
+		$c->add(assetParamsPeer::TYPE, $thumbTypes, Criteria::IN);
+		
+		$dbList = assetParamsPeer::doSelect($c);
 		
 		$c->setLimit(null);
-		$totalCount = thumbParamsPeer::doCount($c);
+		$totalCount = assetParamsPeer::doCount($c);
 
 		$list = KalturaThumbParamsArray::fromDbArray($dbList);
 		$response = new KalturaThumbParamsListResponse();

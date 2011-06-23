@@ -14,8 +14,8 @@ class FlavorParamsService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(flavorAssetPeer::getInstance());
-		parent::applyPartnerFilterForClass(flavorParamsOutputPeer::getInstance());
+		parent::applyPartnerFilterForClass(new assetPeer());
+		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
 		
 		$partnerGroup = null;
 		if(
@@ -24,7 +24,7 @@ class FlavorParamsService extends KalturaBaseService
 			)
 			$partnerGroup = $this->partnerGroup . ',0';
 			
-		parent::applyPartnerFilterForClass(flavorParamsPeer::getInstance(), $partnerGroup);
+		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
 	}
 	
 	protected function globalPartnerAllowed($actionName)
@@ -68,7 +68,7 @@ class FlavorParamsService extends KalturaBaseService
 	 */
 	public function getAction($id)
 	{
-		$flavorParamsDb = flavorParamsPeer::retrieveByPK($id);
+		$flavorParamsDb = assetParamsPeer::retrieveByPK($id);
 		
 		if (!$flavorParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
@@ -92,7 +92,7 @@ class FlavorParamsService extends KalturaBaseService
 		if ($flavorParams->name !== null)
 			$flavorParams->validatePropertyMinLength("name", 1);
 			
-		$flavorParamsDb = flavorParamsPeer::retrieveByPK($id);
+		$flavorParamsDb = assetParamsPeer::retrieveByPK($id);
 		if (!$flavorParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
@@ -111,7 +111,7 @@ class FlavorParamsService extends KalturaBaseService
 	 */
 	public function deleteAction($id)
 	{
-		$flavorParamsDb = flavorParamsPeer::retrieveByPK($id);
+		$flavorParamsDb = assetParamsPeer::retrieveByPK($id);
 		if (!$flavorParamsDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
 			
@@ -143,10 +143,14 @@ class FlavorParamsService extends KalturaBaseService
 		$flavorParamsFilter->attachToCriteria($c);
 		
 		$pager->attachToCriteria($c);
-		$dbList = flavorParamsPeer::doSelect($c);
+		
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetParamsPeer::TYPE, $flavorTypes, Criteria::IN);
+		
+		$dbList = assetParamsPeer::doSelect($c);
 		
 		$c->setLimit(null);
-		$totalCount = flavorParamsPeer::doCount($c);
+		$totalCount = assetParamsPeer::doCount($c);
 
 		$list = KalturaFlavorParamsArray::fromDbArray($dbList);
 		$response = new KalturaFlavorParamsListResponse();

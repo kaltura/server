@@ -29,7 +29,7 @@ class XInternalService extends KalturaBaseService
 		$flavorParamsDb = null;
 		if ($flavorParamsId !== null && $flavorParamsId != "")
 		{
-			$flavorParamsDb = flavorParamsPeer::retrieveByPK($flavorParamsId);
+			$flavorParamsDb = assetParamsPeer::retrieveByPK($flavorParamsId);
 		
 			if (!$flavorParamsDb)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $flavorParamsId);

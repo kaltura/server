@@ -633,7 +633,7 @@ class BatchService extends KalturaBaseService
 			foreach ($jobs as &$job)
 			{
 				$data = $job->getData();
-				$thumbParamsOutput = thumbParamsOutputPeer::retrieveByPK($data->getThumbParamsOutputId());
+				$thumbParamsOutput = assetParamsOutputPeer::retrieveByPK($data->getThumbParamsOutputId());
 				$data->setThumbParamsOutput($thumbParamsOutput);
 				$job->setData($data);
 			}
@@ -742,7 +742,7 @@ class BatchService extends KalturaBaseService
 		
 		if($mediaInfo->flavorAssetId)
 		{
-			$flavorAsset = flavorAssetPeer::retrieveById($mediaInfo->flavorAssetId);
+			$flavorAsset = assetPeer::retrieveById($mediaInfo->flavorAssetId);
 			$mediaInfoDb = mediaInfoPeer::retrieveByFlavorAssetId($mediaInfo->flavorAssetId);
 			
 			if($mediaInfoDb && $mediaInfoDb->getFlavorAssetVersion() == $flavorAsset->getVersion())
@@ -1442,7 +1442,7 @@ class BatchService extends KalturaBaseService
 	 */
 	function logConversionAction($flavorAssetId, $data)
 	{
-		$flavorAsset = flavorAssetPeer::retrieveById($flavorAssetId);
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $flavorAssetId);

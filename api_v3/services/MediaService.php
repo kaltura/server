@@ -530,13 +530,13 @@ class MediaService extends KalturaEntryService
 		$srcFlavorAsset = null;
 		if(is_null($sourceFlavorParamsId))
 		{
-			$srcFlavorAsset = flavorAssetPeer::retreiveOriginalByEntryId($sourceEntryId);
+			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($sourceEntryId);
 			if(!$srcFlavorAsset)
 				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		}
 		else
 		{
-			$srcFlavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndFlavorParams($sourceEntryId, array($sourceFlavorParamsId));
+			$srcFlavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($sourceEntryId, array($sourceFlavorParamsId));
 			if(count($srcFlavorAssets))
 			{
 				$srcFlavorAsset = reset($srcFlavorAssets);
@@ -573,7 +573,7 @@ class MediaService extends KalturaEntryService
     	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
     		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
     		
-		$srcFlavorAsset = flavorAssetPeer::retrieveById($sourceFlavorAssetId);
+		$srcFlavorAsset = assetPeer::retrieveById($sourceFlavorAssetId);
 
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $sourceFlavorAssetId);

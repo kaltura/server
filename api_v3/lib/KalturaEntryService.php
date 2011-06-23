@@ -477,7 +477,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		$srcFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+		$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 		
@@ -510,7 +510,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if($dynamicConversionAttributes)
 		{
-			$flavors = flavorParamsPeer::retrieveByProfile($conversionProfileId);
+			$flavors = assetParamsPeer::retrieveByProfile($conversionProfileId);
 			if(!count($flavors))
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_NOT_FOUND);
 		
