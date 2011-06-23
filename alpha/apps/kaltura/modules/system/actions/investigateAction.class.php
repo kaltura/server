@@ -138,7 +138,7 @@ class investigateAction extends kalturaSystemAction
 		$this->file_syncs = FileSyncPeer::doSelect( $c );
 		
 		$file_sync_links = array();
-		$flavors = flavorAssetPeer::retrieveByEntryId( $entry_id );
+		$flavors = assetPeer::retrieveFlavorsByEntryId($entry_id);
 		$flavor_ids = array();
 		$this->flavors =array();
 		foreach ( $flavors as $f )

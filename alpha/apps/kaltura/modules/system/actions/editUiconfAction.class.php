@@ -97,7 +97,7 @@ class editUiconfAction extends kalturaSystemAction
 		$fileSyncs[] = array("key" => $uiConf->getSyncKey(uiConf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES));
 		foreach($fileSyncs as &$fileSync)
 		{
-			$fileSync["fileSyncs"] = FileSyncPeer::retreiveAllByFileSyncKey($fileSync["key"]);
+			$fileSync["fileSyncs"] = FileSyncPeer::retrieveAllByFileSyncKey($fileSync["key"]);
 		} 
 		$this->fileSyncs = $fileSyncs;
 		$this->widgetsPerPartner = $widgetsPerPartner;

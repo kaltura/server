@@ -129,30 +129,30 @@ class flvclipperAction extends kalturaAction
 			
 		if ($flavor == "edit")
 		{
-			$flavorAsset = flavorAssetPeer::retrieveBestEditByEntryId($entry->getId());
+			$flavorAsset = assetPeer::retrieveBestEditByEntryId($entry->getId());
 		}
 		elseif (!is_null($flavor))
 		{
-			$flavorAsset = flavorAssetPeer::retrieveById($flavor); // when specific asset was request, we don't validate its tags
+			$flavorAsset = assetPeer::retrieveById($flavor); // when specific asset was request, we don't validate its tags
 			if ($flavorAsset && ($flavorAsset->getEntryId() != $entry->getId() || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY))
 				$flavorAsset = null; // we will throw an error later			
 		}
 		elseif (is_null($flavor) && !is_null($flavor_param_id))
 		{
-			$flavorAsset = flavorAssetPeer::retrieveByEntryIdAndFlavorParams($entry->getId(), $flavor_param_id);
+			$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $flavor_param_id);
 			if($flavorAsset && $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				$flavorAsset = null; // we will throw an error later	
 		}
 		else // $flavor is null and $flavor_param_id is null
 		{
 			if ($entry->getSource() == entry::ENTRY_MEDIA_SOURCE_WEBCAM)
-				$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry->getId());
+				$flavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
 			else
-				$flavorAsset = flavorAssetPeer::retrieveBestPlayByEntryId($entry->getId());
+				$flavorAsset = assetPeer::retrieveBestPlayByEntryId($entry->getId());
 
 			if(!$flavorAsset)
 			{
-				$flavorAssets = flavorAssetPeer::retreiveReadyByEntryIdAndTag($entry->getId(), flavorParams::TAG_WEB);
+				$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($entry->getId(), flavorParams::TAG_WEB);
 				if(count($flavorAssets) > 0)
 				{
 					$flavorAsset = $flavorAssets[0];

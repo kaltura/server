@@ -59,13 +59,13 @@ class reconvertAction extends kalturaSystemAction
 			return array ( $entry_id , null , null , $error );	
 		}
 		
-		$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId ( $entry_id );
+		$flavorAsset = assetPeer::retrieveOriginalByEntryId ( $entry_id );
 		if ( ! $flavorAsset )
 		{
-			$flavorAsset = flavorAssetPeer::retrieveReadyWebByEntryId ( $entry_id );
+			$flavorAsset = assetPeer::retrieveReadyWebByEntryId ( $entry_id );
 			if ( ! $flavorAsset )
 			{
-				$flavorAssets = flavorAssetPeer::retrieveByEntryId ( $entry_id );
+				$flavorAssets = assetPeer::retrieveFlavorsByEntryId( $entry_id );
 				if ( ! $flavorAssets )
 				{
 					$error = "Cannot find good enough flavor asset to re-convert from";

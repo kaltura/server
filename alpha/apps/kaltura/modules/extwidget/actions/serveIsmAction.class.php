@@ -49,7 +49,7 @@ class serveIsmAction extends sfAction
 			else
 				$version = null;
 				
-			$flavorAsset = flavorAssetPeer::retrieveById($objectId);
+			$flavorAsset = assetPeer::retrieveById($objectId);
 			if (is_null($flavorAsset))
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 				

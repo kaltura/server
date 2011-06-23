@@ -75,7 +75,7 @@ class adddownloadAction extends defPartnerservices2Action
 		*/
 		
 		$sync_key = null;
-		$originalFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry->getId());
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		if($originalFlavorAsset)
 			$sync_key = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		

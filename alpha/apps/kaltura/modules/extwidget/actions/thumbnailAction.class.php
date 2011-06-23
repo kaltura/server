@@ -231,7 +231,7 @@ class thumbnailAction extends sfAction
 					if($ex->getCode() == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
 					{
 						// get original flavor asset
-						$origFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry_id);
+						$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
 						if($origFlavorAsset)
 						{
 							$syncKey = $origFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -286,7 +286,7 @@ class thumbnailAction extends sfAction
 				if($ex->getCode() == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC)
 				{
 					// get original flavor asset
-					$origFlavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entry_id);
+					$origFlavorAsset = assetPeer::retrieveOriginalByEntryId($entry_id);
 					if($origFlavorAsset)
 					{
 						$syncKey = $origFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

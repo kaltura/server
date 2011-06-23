@@ -31,7 +31,7 @@ class flavorParamsAction extends kalturaSystemAction
 		$this->editFlavorParam = null;
 		if ($this->getRequestParameter("id"))
 		{
-			$this->editFlavorParam = flavorParamsPeer::retrieveByPK($this->getRequestParameter("id"));
+			$this->editFlavorParam = assetParamsPeer::retrieveByPK($this->getRequestParameter("id"));
 			
 			if ($this->getRequestParameter("clone"))
 			{
@@ -100,8 +100,8 @@ class flavorParamsAction extends kalturaSystemAction
 		}
 			
 		$c = new Criteria();
-    	$c->add(flavorParamsPeer::PARTNER_ID, array(0, $this->pid), Criteria::IN);
-		$this->flavorParams = flavorParamsPeer::doSelect($c);
+    	$c->add(assetParamsPeer::PARTNER_ID, array(0, $this->pid), Criteria::IN);
+		$this->flavorParams = assetParamsPeer::doSelect($c);
 		
 		$this->formats = self::getEnumValues("flavorParams", "CONTAINER_FORMAT");
 		$this->videoCodecs = self::getEnumValues("flavorParams", "VIDEO_CODEC");

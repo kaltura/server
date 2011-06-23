@@ -80,7 +80,7 @@ class rawAction extends sfAction
 		if ( $type == "download" && $format && $entry->getType() != entryType::DOCUMENT) // mediaType is not relevant when requesting download with format
 		{
 			// this is a video for a specifc extension - use the proper flavorAsset
-			$flavor_asset = flavorAssetPeer::retrieveByEntryIdAndExtension ( $entry_id , $format );
+			$flavor_asset = assetPeer::retrieveByEntryIdAndExtension ( $entry_id , $format );
 			if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
 				$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true );
@@ -104,11 +104,11 @@ class rawAction extends sfAction
 			// use the fileSync from the entry
 			if($type == "download" && $format)
 			{
-				$flavor_asset = flavorAssetPeer::retrieveByEntryIdAndExtension ( $entry_id , $format );
+				$flavor_asset = assetPeer::retrieveByEntryIdAndExtension ( $entry_id , $format );
 			}
 			else
 			{
-				$flavor_asset = flavorAssetPeer::retrieveOriginalByEntryId ( $entry_id );
+				$flavor_asset = assetPeer::retrieveOriginalByEntryId ( $entry_id );
 			}
 			
 			if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
@@ -174,7 +174,7 @@ class rawAction extends sfAction
 			if ( $type == "download" && $format )
 			{
 				// this is a video for a specifc extension - use the proper flavorAsset
-				$flavor_asset = flavorAssetPeer::retrieveByEntryIdAndExtension ( $entry_id , $format );
+				$flavor_asset = assetPeer::retrieveByEntryIdAndExtension ( $entry_id , $format );
 				if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				{
 					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true );
@@ -190,7 +190,7 @@ class rawAction extends sfAction
 			else
 			{
 				// flavorAsset of the original
-				$flavor_asset = flavorAssetPeer::retrieveOriginalByEntryId( $entry_id );
+				$flavor_asset = assetPeer::retrieveOriginalByEntryId( $entry_id );
 				if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				{
 					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , false ); // NOT strict - if there is no archive, get the data version
@@ -204,7 +204,7 @@ class rawAction extends sfAction
 				{
 					// either no archive asset or no fileSync for archive asset
 					// use fallback flavorAsset
-					$flavor_asset = flavorAssetPeer::retrieveBestPlayByEntryId( $entry_id );
+					$flavor_asset = assetPeer::retrieveBestPlayByEntryId( $entry_id );
 					if(!$flavor_asset)
 					{
 						header('KalturaRaw: no original flavor asset for entry, no best play asset for entry');

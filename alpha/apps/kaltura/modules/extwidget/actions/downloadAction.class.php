@@ -30,7 +30,7 @@ class downloadAction extends sfAction
 		if ($flavorId) 
 		{
 			// get flavor asset
-			$flavorAsset = flavorAssetPeer::retrieveById($flavorId);
+			$flavorAsset = assetPeer::retrieveById($flavorId);
 			if (is_null($flavorAsset) || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 			
@@ -40,13 +40,13 @@ class downloadAction extends sfAction
 		}
 		else // try to find some flavor
 		{
-			$flavorAsset = flavorAssetPeer::retrieveBestPlayByEntryId($entry->getId());
+			$flavorAsset = assetPeer::retrieveBestPlayByEntryId($entry->getId());
 		}
 
 		// Gonen 26-04-2010: in case entry has no flavor with 'mbr' tag - we return the source
 		if(!$flavorAsset && ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO))
 		{
-			$flavorAsset = flavorAssetPeer::retrieveOriginalByEntryId($entryId);
+			$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		}
 		
 		if ($flavorAsset)

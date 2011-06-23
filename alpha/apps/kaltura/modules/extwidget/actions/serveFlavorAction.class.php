@@ -16,7 +16,7 @@ class serveFlavorAction extends kalturaAction
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
 		
-		$flavorAsset = flavorAssetPeer::retrieveById($flavorId);
+		$flavorAsset = assetPeer::retrieveById($flavorId);
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
