@@ -31,6 +31,8 @@ class MultiRequestSubResult:
         if name.startswith('__') or name.endswith('__'):
             raise AttributeError
         return MultiRequestSubResult('%s:%s' % (self.value, name))
+    def __getitem__(self, key):
+        return MultiRequestSubResult('%s:%s' % (self.value, key))
 
 class PluginServicesProxy:
     def addService(self, serviceName, serviceClass):
