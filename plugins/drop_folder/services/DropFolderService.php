@@ -43,6 +43,7 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyNotNull('path');
 		$dropFolder->validatePropertyNotNull('partnerId');
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0, true);
+		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0, true);
 		$dropFolder->validatePropertyNotNull('fileHandlerType');
 		$dropFolder->validatePropertyNotNull('fileHandlerConfig');
 		
