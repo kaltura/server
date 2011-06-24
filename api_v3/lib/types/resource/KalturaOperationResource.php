@@ -13,7 +13,7 @@ class KalturaOperationResource extends KalturaContentResource
 	public $resource;
 	
 	/**
-	 * @var KalturaOperationAttributeArray
+	 * @var KalturaOperationAttributesArray
 	 */
 	public $operationAttributes;
 	
