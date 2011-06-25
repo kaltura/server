@@ -37,9 +37,9 @@ class DistributionFieldConfig
     /**
      * Entry column or metadata xpath that should trigger an update
      * TODO: find a better solution for this
-     * @var string
+     * @var array of string
      */
-    private $updateParam;
+    private $updateParams;
     
     /**
      * Is this field config is the default for the distribution provider?
@@ -127,19 +127,22 @@ class DistributionFieldConfig
     }
 
 	/**
-     * @return the $updateParam
+     * @return the $updateParams
      */
-    public function getUpdateParam ()
+    public function getUpdateParams ()
     {
-        return $this->updateParam;
+        return $this->updateParams;
     }
 
 	/**
-     * @param string $updateParam
+     * @param string $updateParams
      */
-    public function setUpdateParam ($updateParam)
+    public function setUpdateParams ($updateParams)
     {
-        $this->updateParam = $updateParam;
+    	if (!is_array($updateParams)) {
+    		$updateParams = array($updateParams);
+    	}
+        $this->updateParams = $updateParams;
     }
     
 	/**

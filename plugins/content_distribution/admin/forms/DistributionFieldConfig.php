@@ -54,7 +54,7 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			'label' 		=> 'Trigger Update:', 
 		));
 		
-		$this->addElement('text', 'updateParam', array(
+		$this->addElement('text', 'updateParamsArrayString', array(
 			'filters'		=> array('StringTrim'),
 			'class'			=> 'update-param',
 			'decorators'	=> array('ViewHelper'),
@@ -76,6 +76,16 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 				$prop = strtolower(preg_replace($pattern, $replacement, $prop));
 			}
 			$this->setDefault($prop, $value);
+		}
+		
+		$updateParams = $props['updateParams'];
+		if ($updateParams) {
+		    $updateParamsString = '';
+		    foreach ($updateParams as $updateParam) {
+		        $updateParamsString .= $updateParam->value.',';
+		    }
+		    $updateParamsString = trim($updateParamsString, ',');
+			$this->setDefault('updateParamsArrayString', $updateParamsString);		
 		}
 		
 		$this->setDefault('fieldNameForView', $object->fieldName);
@@ -105,6 +115,18 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 				}catch(Exception $e){}
 			}
 		}
+		
+		$updateParamsArray = explode(',',$properties['updateParamsArrayString']);
+		$updateParams = array();
+		foreach ($updateParamsArray as $updateParam)
+		{
+			if (!empty($updateParam)) {
+				$newString = new Kaltura_Client_Type_String();
+				$newString->value = $updateParam;
+				$updateParams[] = $newString;
+			}
+		}
+		$object->updateParams = $updateParams;
 		
 		return $object;
 	}

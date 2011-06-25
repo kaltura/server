@@ -42,9 +42,9 @@ class KalturaDistributionFieldConfig extends KalturaObject
     /**
      * Entry column or metadata xpath that should trigger an update
      * TODO: find a better solution for this
-     * @var string
+     * @var KalturaStringArray
      */
-    public $updateParam;
+    public $updateParams;
     
     /**
      * Is this field config is the default for the distribution provider?
@@ -63,7 +63,6 @@ class KalturaDistributionFieldConfig extends KalturaObject
 		'entryMrssXslt',
 		'isRequired',
 		'updateOnChange',
-		'updateParam',
 		'isDefault',
 	);
 		 
@@ -78,8 +77,24 @@ class KalturaDistributionFieldConfig extends KalturaObject
 			$dbObject = new DistributionFieldConfig();
 			
 		parent::toObject($dbObject, $skip);
+		if ($this->updateParams && count($this->updateParams))
+		{
+			$updateParams = array();
+			foreach ($this->updateParams as $updateParam) {
+			    if (isset($updateParam->value)) {
+				    $updateParams[] = $updateParam->value;
+			    }
+			}
+			$dbObject->setUpdateParams($updateParams);
+		}
 					
 		return $dbObject;
+	}
+	
+	public function fromObject($source_object)
+	{
+		parent::fromObject($source_object);
+		$this->updateParams = KalturaStringArray::fromStringArray($source_object->getUpdateParams());
 	}
 	
 }
