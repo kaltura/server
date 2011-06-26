@@ -1001,7 +1001,7 @@ class kFlowHelper
 		$alternateFlavorParamsId = null;
 		if(is_null($srcParamsId))
 		{
-			$flavorParamsObjects = assetParamsPeer::retrieveByPKs($assetParamsIds);
+			$flavorParamsObjects = assetParamsPeer::retrieveFlavorsByPKs($assetParamsIds);
 			foreach($flavorParamsObjects as $flavorParams)
 				if($flavorParams->hasTag(flavorParams::TAG_SOURCE))
 					$alternateFlavorParamsId = $flavorParams->getId();
@@ -1029,7 +1029,7 @@ class kFlowHelper
 					$thumbAssetsList[$thumbAsset->getFlavorParamsId()] = $thumbAsset;
 		}
 		
-		$thumbParamsObjects = assetParamsPeer::retrieveByPKs($assetParamsIds);
+		$thumbParamsObjects = assetParamsPeer::retrieveThumbnailsByPKs($assetParamsIds);
 		foreach($thumbParamsObjects as $thumbParams)
 		{
 			// check if this thumbnail already created

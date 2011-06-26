@@ -246,6 +246,28 @@ class assetParamsPeer extends BaseassetParamsPeer
 		return assetParamsPeer::doSelect($criteria, $con);
 	}
 
+	public static function retrieveFlavorsByPKs($pks, PropelPDO $con = null)
+	{
+		$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
+		$criteria->add(assetParamsPeer::ID, $pks, Criteria::IN);
+		
+		$types = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::FLAVOR);
+		$criteria->add(assetParamsPeer::TYPE, $types, Criteria::IN);
+		
+		return assetParamsPeer::doSelect($criteria, $con);
+	}
+
+	public static function retrieveThumbnailsByPKs($pks, PropelPDO $con = null)
+	{
+		$criteria = new Criteria(assetParamsPeer::DATABASE_NAME);
+		$criteria->add(assetParamsPeer::ID, $pks, Criteria::IN);
+		
+		$types = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::THUMBNAIL);
+		$criteria->add(assetParamsPeer::TYPE, $types, Criteria::IN);
+		
+		return assetParamsPeer::doSelect($criteria, $con);
+	}
+
 	public static function getIds(Criteria $criteria, $con = null)
 	{
 		$criteria->addSelectColumn(assetParamsPeer::ID);

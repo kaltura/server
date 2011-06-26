@@ -25,7 +25,13 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 	 */
 	public static function getExtendedTypes($baseClass, $enumValue)
 	{
-		if($baseClass == assetPeer::OM_CLASS && $enumValue == assetType::FLAVOR)
+		$supportedBaseClasses = array(
+			assetPeer::OM_CLASS,
+			assetParamsPeer::OM_CLASS,
+			assetParamsOutputPeer::OM_CLASS,
+		);
+		
+		if(in_array($baseClass, $supportedBaseClasses) && $enumValue == assetType::FLAVOR)
 		{
 			return array(
 				DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::PDF),
