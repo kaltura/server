@@ -344,6 +344,7 @@ class kBusinessPreConvertDL
 	 * @param int $flavorParamsId
 	 * @param string $errDescription
 	 * @param string $flavorAssetId
+	 * @param array<kOperationAttributes> $dynamicAttributes
 	 * @return BatchJob 
 	 */
 	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription, $flavorAssetId = null, array $dynamicAttributes = array())
