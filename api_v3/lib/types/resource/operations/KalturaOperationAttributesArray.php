@@ -7,6 +7,6 @@ class KalturaOperationAttributesArray extends KalturaTypedArray
 {
 	public function __construct()
 	{
-		parent::__construct("KalturaOperation");	
+		parent::__construct("KalturaOperationAttributes");	
 	}
 }
