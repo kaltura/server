@@ -149,7 +149,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName('Entry name');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParam(entryPeer::NAME);
+	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
@@ -157,7 +157,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName('Entry description');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(description)" />');
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParam(entryPeer::DESCRIPTION);
+	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION));
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	        
 	    $fieldConfig = new DistributionFieldConfig();
@@ -165,7 +165,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName('Entry tags');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(tags)" />');
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParam(entryPeer::TAGS);
+	    $fieldConfig->setUpdateParams(array(entryPeer::TAGS));
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
@@ -307,7 +307,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName('YouTube playlists');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/YouTubePlaylist" />');
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParam("/*[local-name()='metadata']/*[local-name()='YouTubePlaylist']");
+	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='YouTubePlaylist']"));
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    return $fieldConfigArray;
