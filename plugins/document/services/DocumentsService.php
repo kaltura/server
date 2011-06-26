@@ -9,55 +9,6 @@
  */
 class DocumentsService extends KalturaEntryService
 {
-	
-    /**
-     * Add entry
-     *
-     * action add - not fully implemented yet
-     * @param KalturaDocumentEntry $entry
-     * @param KalturaResource $resource
-     * @return KalturaMediaEntry
-     * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-     * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-     * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-     * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
-     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
-     * @throws KalturaErrors::UPLOAD_ERROR
-     * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
-     * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
-     */
-    function addAction(KalturaDocumentEntry $entry, KalturaResource $resource = null)
-    {
-    	$dbEntry = parent::add($entry, $entry->conversionProfileId);
-    	
-    	if(!$resource)
-    	{
-    		$dbEntry->setStatus(entryStatus::NO_CONTENT);
-    		$dbEntry->save();
-    		
-			$entry->fromObject($dbEntry);
-			return $entry;
-    	}
-    	
-    	$resource->validateEntry($dbEntry);
-    	$kResource = $resource->toObject();
-    	
-    	$this->attachResource($kResource, $dbEntry);
-    	
-		if(!$dbEntry || !$dbEntry->getId())
-			return null;
-			
-    	$resource->entryHandled($dbEntry);
-    		
-    	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
-		
-		$entry = new KalturaMediaEntry();
-		$entry->fromObject($dbEntry);
-		return $entry;
-    }
-    
     /**
      * @param kResource $resource
      * @param entry $dbEntry
