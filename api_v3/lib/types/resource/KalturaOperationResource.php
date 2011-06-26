@@ -57,7 +57,7 @@ class KalturaOperationResource extends KalturaContentResource
 			
 		$operationAttributes = array();
 		foreach($this->operationAttributes as $operationAttributesObject)
-			$operationAttributes[] = $operationAttributesObject->toAttributesArray();
+			$operationAttributes[] = $operationAttributesObject->toObject();
 			
 		$object_to_fill->setOperationAttributes($operationAttributes);
 		$object_to_fill->setResource($this->resource->toObject());
