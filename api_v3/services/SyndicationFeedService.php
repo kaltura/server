@@ -67,7 +67,6 @@ class SyndicationFeedService extends KalturaBaseService
 			$is_exist = flavorParamsConversionProfilePeer::doCount($c);
 			if(!$is_exist || $is_exist === 0)
 			{
-				assetParamsPeer::resetInstanceCriteriaFilter();
 				$assetParams = assetParamsPeer::retrieveByPK($syndicationFeed->flavorParamId);
 				
 				$fpc = new flavorParamsConversionProfile();

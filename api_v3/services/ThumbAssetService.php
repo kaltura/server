@@ -110,7 +110,6 @@ class ThumbAssetService extends KalturaBaseService
     	if($previousStatus == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED && in_array($dbThumbAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbThumbAsset));
    		
-		assetPeer::resetInstanceCriteriaFilter();
 		$thumbAssetsCount = assetPeer::countThumbnailsByEntryId($dbThumbAsset->getEntryId());
 		
 		$dbEntry = $dbThumbAsset->getentry();

@@ -138,7 +138,6 @@ class BaseEntryService extends KalturaEntryService
 		    		$sourceEntry = entryPeer::retrieveByPK($resource->getObjectId());
 		    	if($resource->getFileSyncObjectType() == FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET)
 		    	{
-		    		assetPeer::resetInstanceCriteriaFilter();
 		    		$sourceAsset = assetPeer::retrieveByPK($resource->getObjectId());
 		    		if($sourceAsset)
 		    			$sourceEntry = $sourceAsset->getentry();

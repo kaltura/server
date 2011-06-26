@@ -239,7 +239,6 @@ class ConversionProfileService extends KalturaBaseService
 	{
 		$existingIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfileDb->getId());
 		
-		assetParamsPeer::resetInstanceCriteriaFilter();
 		$assetParamsObjects = assetParamsPeer::retrieveByPKs($flavorParamsIds);
 		foreach($assetParamsObjects as $assetParams)
 		{
