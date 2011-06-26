@@ -737,7 +737,10 @@ class BatchController extends Zend_Controller_Action
 		
 		$flavors = null;
 		try{
-			$flavors = $client->flavorAsset->getByEntryId($entryId);
+			$filter = new Kaltura_Client_Type_AssetFilter();
+			$filter->entryIdEqual = $entryId;
+			$flavorsList = $client->flavorAsset->listAction($filter);
+			$flavors = $flavorsList->objects;
 		}
 		catch(Exception $e){
 			$errors[] = 'Flavors not found: ' . $e->getMessage();
@@ -745,7 +748,10 @@ class BatchController extends Zend_Controller_Action
 		
 		$thumbs = null;
 		try{
-			$thumbs = $client->thumbAsset->getByEntryId($entryId);
+			$filter = new Kaltura_Client_Type_AssetFilter();
+			$filter->entryIdEqual = $entryId;
+			$thumbsList = $client->thumbAsset->listAction($filter);
+			$thumbs = $thumbsList->objects;
 		}
 		catch(Exception $e){
 			$errors[] = 'Thumbs not found: ' . $e->getMessage();
