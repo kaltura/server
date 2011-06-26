@@ -274,8 +274,13 @@ class KalturaEntryService extends KalturaBaseService
 		if($isSource && $internalResource instanceof kFileSyncResource)
 		{
 			$srcEntryId = $internalResource->getEntryId();
-			$srcEntry = entryPeer::retrieveByPKNoFilter($srcEntryId);
-			$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
+			if($srcEntryId)
+			{
+				$srcEntry = entryPeer::retrieveByPKNoFilter($srcEntryId);
+				if($srcEntry)
+					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
+			}
+			
 			$dbEntry->setOfflineMessage($resource->getOperationAttributes());
 			$dbEntry->save();
 		}
