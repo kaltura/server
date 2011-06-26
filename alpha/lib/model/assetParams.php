@@ -125,8 +125,10 @@ class assetParams extends BaseassetParams
 	{
 		foreach($attributes as $attributeName => $value)
 		{
-			if(is_int($attributeName) && is_array($value))
+			if(is_array($value))
 				$this->setDynamicAttributes($value);
+			elseif($value instanceof kOperationAttributes)
+				$this->setDynamicAttributes($value->toArray());
 			else
 				$this->setDynamicAttribute($attributeName, $value);
 		}
