@@ -15,7 +15,7 @@ class kOperationResource extends kContentResource
 	private $resource;
 	
 	/**
-	 * @var array
+	 * @var array<kOperationAttributes>
 	 */
 	private $operationAttributes;
 	

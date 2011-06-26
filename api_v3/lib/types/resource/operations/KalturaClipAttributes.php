@@ -26,4 +26,15 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 			'ClipDuration' => $this->duration,
 		);
 	}
+	
+	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if(is_null($object_to_fill))
+			$object_to_fill = new kClipAttributes();
+			
+		$object_to_fill->setOffset($this->offset);
+		$object_to_fill->setDuration($this->duration);
+		
+		return $object_to_fill;
+	}
 }
