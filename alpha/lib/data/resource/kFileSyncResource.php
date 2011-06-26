@@ -32,6 +32,21 @@ class kFileSyncResource extends kContentResource
 	public $version;
 	
 	/**
+	 * @return string
+	 */
+	public function getEntryId()
+	{
+		$this->fileSyncObjectType == FileSyncObjectType::ENTRY;
+			return $this->objectId;
+			
+		$object = kFileSyncObjectManager::retrieveObject($this->fileSyncObjectType, $this->objectId);
+		if(method_exists($object, 'getEntryId'))
+			return $object->getEntryId();
+		 
+		return null;
+	}
+	
+	/**
 	 * @return the $fileSyncObjectType
 	 */
 	public function getFileSyncObjectType()
