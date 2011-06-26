@@ -1616,6 +1616,12 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if($entryDistribution->getStatus() == EntryDistributionStatus::READY || $entryDistribution->getStatus() == EntryDistributionStatus::ERROR_UPDATING)
 			{
 				$distributionProvider = $distributionProfile->getProvider();
+				if(!$distributionProvider)
+				{
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
+					continue;
+				}
+				
 				if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
 				{
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
