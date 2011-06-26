@@ -5,7 +5,7 @@
  */
 class KalturaOperationAttributesArray extends KalturaTypedArray
 {
-	public static function fromArray(array $arr)
+	public static function fromOperationAttributesArray(array $arr)
 	{
 		$newArr = new KalturaOperationAttributesArray();
 		if(is_null($arr))

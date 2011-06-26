@@ -401,7 +401,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		$this->startDate = $sourceObject->getStartDate(null);
 		$this->endDate = $sourceObject->getEndDate(null);
 		
-		$this->operationAttributes = KalturaOperationAttributesArray::fromArray($sourceObject->getOperationAttributes());
+		$this->operationAttributes = KalturaOperationAttributesArray::fromOperationAttributesArray($sourceObject->getOperationAttributes());
 	}
 	
 	public function validateObjectsExist()
