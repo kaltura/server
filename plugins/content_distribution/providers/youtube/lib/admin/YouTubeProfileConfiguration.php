@@ -68,8 +68,6 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			)
 		));
 		
-		$this->addMetadataProfile();
-		
 		$this->addDisplayGroup(
 			array('username', 'notification_email', 'owner_name', 'target', 'metadata_profile_id'), 
 			'general', 
