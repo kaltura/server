@@ -413,12 +413,10 @@ class KalturaEntryService extends KalturaBaseService
      */
     protected function attachAssetParamsResourceContainer(kAssetParamsResourceContainer $resource, entry $dbEntry, asset $dbAsset = null)
     {
-		assetParamsPeer::resetInstanceCriteriaFilter();
 		$assetParams = assetParamsPeer::retrieveByPK($resource->getAssetParamsId());
 		if(!$assetParams)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $resource->getAssetParamsId());
 			
-    	assetPeer::resetInstanceCriteriaFilter();
     	if(!$dbAsset)
     		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbEntry->getId(), $resource->getAssetParamsId());
     		
