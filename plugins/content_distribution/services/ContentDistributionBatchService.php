@@ -604,7 +604,6 @@ class ContentDistributionBatchService extends BatchService
 	 */
 	function getAssetUrlAction($assetId)
 	{
-		assetPeer::resetInstanceCriteriaFilter();
 		$asset = assetPeer::retrieveById($assetId);
 		if(!$asset)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $assetId);

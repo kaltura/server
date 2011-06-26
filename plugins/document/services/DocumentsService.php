@@ -151,7 +151,6 @@ class DocumentsService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $sourceEntryId);
 		
 		$srcFlavorAsset = null;
-		assetPeer::resetInstanceCriteriaFilter();
 		if(is_null($sourceFlavorParamsId))
 		{
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($sourceEntryId);
@@ -192,7 +191,6 @@ class DocumentsService extends KalturaEntryService
 	 */
 	function addFromFlavorAssetAction($sourceFlavorAssetId, KalturaDocumentEntry $documentEntry = null)
 	{
-		assetPeer::resetInstanceCriteriaFilter();
 		$srcFlavorAsset = assetPeer::retrieveById($sourceFlavorAssetId);
 
 		if (!$srcFlavorAsset)
@@ -344,7 +342,6 @@ class DocumentsService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DOCUMENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		assetPeer::resetInstanceCriteriaFilter();
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if (is_null($flavorAsset) || $flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
@@ -424,7 +421,6 @@ class DocumentsService extends KalturaEntryService
 		$securyEntryHelper->validateForDownload();	
 					
 		$flavorAsset = null;
-		assetPeer::resetInstanceCriteriaFilter();
 		if($flavorAssetId)
 		{
 			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
@@ -473,7 +469,6 @@ class DocumentsService extends KalturaEntryService
 		$securyEntryHelper->validateForDownload();			
 			
 		$flavorAsset = null;
-		assetPeer::resetInstanceCriteriaFilter();
 		if($flavorParamsId)
 		{
 			$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);

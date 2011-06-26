@@ -17,7 +17,6 @@ class DocumentEntry extends entry
 		if(!$flavorParams)
 			return null;
 			
-		assetPeer::resetInstanceCriteriaFilter();
 		$flavorAssets = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParams->getId());
 		if(!$flavorAssets)
 			return null;
