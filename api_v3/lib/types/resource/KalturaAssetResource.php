@@ -24,7 +24,6 @@ class KalturaAssetResource extends KalturaContentResource
 		if(!$object_to_fill)
 			$object_to_fill = new kFileSyncResource();
 			
-		assetPeer::resetInstanceCriteriaFilter();
 		$srcFlavorAsset = assetPeer::retrieveById($this->assetId);
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $resource->assetId);

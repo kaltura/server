@@ -50,7 +50,6 @@ class KalturaEntryResource extends KalturaContentResource
     	}
     	
     	$srcFlavorAsset = null;
-    	assetPeer::resetInstanceCriteriaFilter();
     	if(is_null($this->flavorParamsId))
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
 		else
