@@ -128,7 +128,6 @@ class kConvartableJobData extends kJobData
 		if (is_null($this->flavorParamsOutputId))
 			return null;
 			
-		assetParamsOutputPeer::resetInstanceCriteriaFilter();
 		return assetParamsOutputPeer::retrieveByPK($this->flavorParamsOutputId);
 	}
 

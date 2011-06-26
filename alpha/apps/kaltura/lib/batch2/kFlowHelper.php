@@ -70,7 +70,6 @@ class kFlowHelper
 		$flavorAsset = null;
 		if($data->getFlavorAssetId())
 		{
-			assetPeer::resetInstanceCriteriaFilter();
 			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 			if($flavorAsset)
 			{

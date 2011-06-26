@@ -17,7 +17,6 @@ class kBusinessConvertDL
 			return;
 		}
 		
-		assetPeer::resetInstanceCriteriaFilter();
 		$tempAssets = assetPeer::retrieveByEntryId($tempEntry->getId());
 		$oldAssets = assetPeer::retrieveByEntryId($entry->getId());
 		$newAssets = array();

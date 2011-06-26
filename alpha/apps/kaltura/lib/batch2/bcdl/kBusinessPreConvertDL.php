@@ -46,7 +46,6 @@ class kBusinessPreConvertDL
 	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false)
 	{
 		$srcAsset = null;
-		assetPeer::resetInstanceCriteriaFilter();
 		if($sourceAssetId)
 		{
 			$srcAsset = assetPeer::retrieveById($sourceAssetId);
