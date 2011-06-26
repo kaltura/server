@@ -7,4 +7,5 @@
  */
 abstract class kOperationAttributes 
 {
+	abstract public function toArray();
 }

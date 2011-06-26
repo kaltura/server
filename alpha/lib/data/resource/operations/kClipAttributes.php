@@ -19,6 +19,14 @@ class kClipAttributes extends kOperationAttributes
 	 */
 	private $duration;
 	
+	public function toArray()
+	{
+		return array(
+			'ClipOffset' => $this->offset,
+			'ClipDuration' => $this->duration,
+		);
+	}
+
 	/**
 	 * @return the $offset
 	 */
