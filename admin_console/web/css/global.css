@@ -561,5 +561,5 @@ form#frmCreateDropFolder dt { float: left; }
 #partner-configure-dialog .partnerConfigureFormColumn { float:left; width:50%; }
 #partner-configure-dialog #fieldset-enableDisableFeatures a { color:#00c1ff; }
 
-#partner-configure-dialog #frmConfigure fieldset { width:350px; }
+#partner-configure-dialog #frmPartnerConfigure fieldset { width:350px; }
 
