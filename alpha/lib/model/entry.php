@@ -1588,18 +1588,36 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function setThumbHeight ( $v )		{	$this->putInCustomData ( "thumbHeight" , $v );	}
 	public function getThumbHeight (  )			{	return $this->getFromCustomData( "thumbHeight", null, 0 );	}
 	
+	public function setRootEntryId($v)
+	{
+		$this->putInCustomData("rootEntryId", $v);
+	}
+	
+	public function getRootEntryId($deep = false)
+	{
+		$rootEntryId = $this->getFromCustomData("rootEntryId", null, null);
+		if(is_null($rootEntryId))
+			return $this->getId();
+			
+		if(!$deep)
+			return $rootEntryId;
+			
+		$rootEntry = entryPeer::retrieveByPKNoFilter($rootEntryId);
+		if($rootEntry)
+			$rootEntryId = $rootEntry->getRootEntryId($deep);
+
+		return $rootEntryId;
+	}
+	
 	
 	public function setDynamicFlavorAttributes(array $v)
 	{
 		$this->putInCustomData("dynamicFlavorAttributes", serialize($v));
 	}
 	
-	public function addOperationAttributes(kOperationAttributes $operationAttributes)
+	public function setOperationAttributes(array $operationAttributes)
 	{
-		$arr = $this->getOperationAttributes();
-		$arr[] = $operationAttributes;
-		
-		$this->putInCustomData("operationAttributes", $arr);
+		$this->putInCustomData("operationAttributes", $operationAttributes);
 	}
 	
 	public function getOperationAttributes()

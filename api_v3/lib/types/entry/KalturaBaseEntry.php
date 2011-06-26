@@ -289,6 +289,20 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 */
 	public $conversionProfileId;
 	
+	/**
+	 * ID of source root entry, used for clipped, skipped and cropped entries that created from another entry  
+	 * 
+	 * @var string
+	 */
+	public $rootEntryId;
+	
+	/**
+	 * clipping, skipping and cropping attributes that used to create this entry  
+	 * 
+	 * @var KalturaOperationAttributesArray
+	 */
+	public $operationAttributes;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -328,6 +342,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 	"categories",
 	 	"categoriesIds",
 	 	"conversionProfileId" => "conversionQuality",
+	 	"rootEntryId",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -385,6 +400,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 		
 		$this->startDate = $sourceObject->getStartDate(null);
 		$this->endDate = $sourceObject->getEndDate(null);
+		
+		$this->operationAttributes = KalturaOperationAttributesArray::fromArray($sourceObject->getOperationAttributes());
 	}
 	
 	public function validateObjectsExist()

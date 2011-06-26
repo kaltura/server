@@ -242,9 +242,16 @@ class KalturaEntryService extends KalturaBaseService
     protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
 		$isNewAsset = false;
-		if(!$dbAsset)
+		$isSource = false;
+		if($dbAsset)
+		{
+			if($dbAsset instanceof flavorAsset)
+				$isSource = $dbAsset->getIsOriginal();
+		}
+		else
 		{
 			$isNewAsset = true;
+			$isSource = true;
  			KalturaLog::debug("Creating original flavor asset");
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		}
@@ -255,7 +262,8 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->save();
 		}
 		
-		$dbAsset = $this->attachResource($resource->getResource(), $dbEntry, $dbAsset);
+		$internalResource = $resource->getResource();
+		$dbAsset = $this->attachResource($internalResource, $dbEntry, $dbAsset);
 		
 		$errDescription = '';
 		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $resource->getAssetParamsId(), $errDescription, $dbAsset->getId(), $resource->getOperationAttributes());
@@ -263,6 +271,15 @@ class KalturaEntryService extends KalturaBaseService
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 			
+		if($isSource && $internalResource instanceof kFileSyncResource)
+		{
+			$srcEntryId = $internalResource->getEntryId();
+			$srcEntry = entryPeer::retrieveByPKNoFilter($srcEntryId);
+			$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
+			$dbEntry->setOfflineMessage($resource->getOperationAttributes());
+			$dbEntry->save();
+		}
+		
 		return $dbAsset;
     }
     
