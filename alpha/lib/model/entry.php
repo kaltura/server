@@ -1594,6 +1594,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		$this->putInCustomData("dynamicFlavorAttributes", serialize($v));
 	}
 	
+	public function addOperationAttributes(kOperationAttributes $operationAttributes)
+	{
+		$arr = $this->getOperationAttributes();
+		$arr[] = $operationAttributes;
+		
+		$this->putInCustomData("operationAttributes", $arr);
+	}
+	
+	public function getOperationAttributes()
+	{
+		return $this->getFromCustomData("operationAttributes", null, array());
+	}
+	
 	public function getDynamicFlavorAttributes()
 	{
 		$value = $this->getFromCustomData("dynamicFlavorAttributes");
