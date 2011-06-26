@@ -111,6 +111,50 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $permissions;
 	
+	/**
+	 * @var string
+	 */
+	public $notificationsConfig;
+	
+	/**
+	 * @var bool
+	 */
+	public $allowMultiNotification;
+	
+	/**
+	 * @var int
+	 */
+	public $maxLoginAttempts;
+	
+	/**
+	 * @var int
+	 */
+	public $loginBlockPeriod; 
+	
+	/**
+	 * @var int
+	 */
+	public $numPrevPassToKeep;
+	
+	/**
+	 * @var int
+	 */
+	public $passReplaceFreq;
+	
+	/**
+	 * @var bool
+	 */
+	public $isFirstLogin;
+	
+	/**
+	 * @var int
+	 */
+	//public $partnerGroupType;
+	
+	/**
+	 * @var int
+	 */
+	public $partnerParentId;
 	
 	private static $map_between_objects = array
 	(
@@ -134,6 +178,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"adminSessionRoleId",
 		"alwaysAllowedPermissionNames",
 		"importRemoteSourceForConvert",
+		"notificationsConfig",
+		"allowMultiNotification",
+		"maxLoginAttempts",
+		"loginBlockPeriod",
+		"numPrevPassToKeep",
+		"passReplaceFreq",
+		"isFirstLogin",
+		//"partnerGroupType",
+		"partnerParentId"
+	
 	);
 
 	public function getMapBetweenObjects()

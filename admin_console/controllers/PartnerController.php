@@ -304,6 +304,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		
 		$this->view->form = $form;
+		$this->view->partnerId = $partnerId;
 	}
 	
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)

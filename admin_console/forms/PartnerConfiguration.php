@@ -5,26 +5,27 @@ class Form_PartnerConfiguration extends Infra_Form
 	{
 		// Set the method for the display form to POST
 		$this->setMethod('post');
+		$this->setAttrib('id', 'frmPartnerConfigure');
 
 		$this->setDescription('partner-configure intro text');
 		$this->loadDefaultDecorators();
-		$this->addDecorator('Description', array('placement' => 'prepend'));
-
+		$this->addDecorator('Description', array('placement' => 'prepend'));	
+		
 //		$this->addElement('text', 'account_name', array(
 //			'label' => 'Publisher Name:',
 //			'decorators' 	=> array('Label', 'Description')
 //		));
-		 
+//--------------------------- General Information ---------------------------			
 		$this->addElement('text', 'partner_name', array(
 			'label'			=> 'Publisher Name:',
 			'filters'		=> array('StringTrim'),
 		));
-		 
+				
 		$this->addElement('text', 'description', array(
 			'label'			=> 'Description:',
 			'filters'		=> array('StringTrim'),
 		));
-		
+			
 		// change to read only
 		$this->addElement('text', 'admin_name', array(
 			'label'			=> 'Administrator Name:',
@@ -32,7 +33,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'readonly'		=> true,
 			'ignore' 		=> true,
 			'disable'       => 'disable',
-		));
+		));	
 		
 		// change to read only		 
 		$this->addElement('text', 'admin_email', array(
@@ -42,7 +43,8 @@ class Form_PartnerConfiguration extends Infra_Form
 			'ignore' 		=> true,
 			'disable'       => 'disable',
 		));
-		 
+						
+//--------------------------- Publisher specific Delivery Settings ---------------------------		 
 		$this->addElement('text', 'host', array(
 			'label'			=> 'Publisher Specific Host:',
 			'filters'		=> array('StringTrim'),
@@ -56,75 +58,194 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('text', 'rtmp_url', array(
 			'label'			=> 'RTMP URL:',
 			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'admin_login_users_quota', array(
-			'label'			=> 'Number of KMC admin users:',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('select', 'partner_package', array(
-			'label'			=> 'Usage Package:',
-			'filters'		=> array('StringTrim'),
-		));
-				
-		$this->addElement('text', 'def_thumb_offset', array(
-			'label'	  => 'Default Thumbnail Offset',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
-		));
-				
-		$this->addElement('checkbox', 'monitor_usage', array(
-			'label'	  => 'Monitor Usage',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
-		));
-		
-		$this->addElement('hidden', 'crossLine', array(
-			'lable'			=> 'line',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
-		));
-		
-		$element = new Zend_Form_Element_Hidden('setPublisherFunctionality');
-		$element->setLabel('Set Publisher Functionality');
-		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b', 'class' => 'setPublisherFunctionality'))));
-		
-		$this->addElements(array($element));
-		
-		$moduls = Zend_Registry::get('config')->moduls;
-		if ($moduls)
-		{
-			foreach($moduls as $name => $modul)
-			{
-				$attributes = array(
-					'label'	  => $modul->label,
-					'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => $name)))
-				);
-				if(!$modul->enabled)
-					$attributes['disabled'] = true;
-					
-				$this->addElement('checkbox', $modul->permissionName, $attributes);
-			}
-		}
-		
-		$this->addElement('checkbox', 'moderate_content', array(
-			'label'	  => 'Content Moderation',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'moderate_content')))
-		));
+		));		
+//--------------------------- Remote Storage Account policy ---------------------------				
+		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
+		$storageServP->setLabel('Delivery Policy:');
+		$this->addElements(array($storageServP));	
 		
 		$this->addElement('checkbox', 'storage_delete_from_kaltura', array(
 			'label'	  => 'Delete exported storage from Kaltura',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'storage_delete_from_kaltura')))
 		));
-		
+				
 		$this->addElement('checkbox', 'import_remote_source_for_convert', array(
 			'label'	  => 'Import remote source for convert',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'import_remote_source_for_convert')))
 		));
+	
+//--------------------------- Advanced Notification settings ---------------------------		
+		$this->addElement('text', 'notifications_config', array(
+			'label'			=> 'Notification Configuration:',
+			'filters'		=> array('StringTrim'),
+		));
+			
+		$this->addElement('checkbox', 'allow_multi_notification', array(
+			'label'	  => 'Allow multi-notifications:',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'storage_delete_from_kaltura')))
+		));		
+//--------------------------- Publisher Specific Ingestion Settings ---------------------------	
+		$this->addElement('text', 'def_thumb_offset', array(
+			'label'	  => 'Default Thumbnail Offset',
+			//'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
+		));	
 		
-		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
-		$storageServP->setLabel('Delivery Policy:');
-		$this->addElements(array($storageServP));
+		//TODO: add XML Ingestion- Transformaion XSL (relevant for eagle).		
+//--------------------------- Password Security ---------------------------			
+		$this->addElement('text', 'max_login_attempts', array(
+			'label'			=> 'Maximum login attemps:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'login_block_period', array(
+			'label'			=> 'Login Block Period (seconds):',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'num_prev_pass_to_keep', array(
+			'label'			=> 'Number of recent passwords kept:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'pass_replace_freq', array(
+			'label'			=> 'Password replacement frequency (seconds):',
+			'filters'		=> array('StringTrim'),
+		));				
+//--------------------------- Group Association ---------------------------			
+		//$this->addElement ('select','partner_group_type', array(
+		//	'label'			=> 'Partner Group Type:',
+		//	'filters'		=> array('StringTrim'),
+		//));	
+		//$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
+		//$partnerGroupTypes->setLabel('Partner Group Type:');
+		//$this->addElements(array($partnerGroupTypes));
+		
+		$this->addElement ('text','partner_parent_id', array(
+			'label'			=> 'Partner Parent Id:',
+			'filters'		=> array('StringTrim'),
+		));
+//--------------------------- Account Packages ---------------------------		
+		$this->addElement('select', 'partner_package', array(
+			'label'			=> 'Usage Package:',
+			'filters'		=> array('StringTrim'),
+		));
+//--------------------------- Account Options ---------------------------			
+		$this->addElement('text', 'admin_login_users_quota', array(
+			'label'			=> 'Number of KMC admin users:',
+			'filters'		=> array('StringTrim'),
+		));
+												
+		$this->addElement('checkbox', 'monitor_usage', array(
+			'label'	  => 'Monitor Usage',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
+		));
+		
+		$this->addElement('checkbox', 'is_first_login', array(
+			'label'	  => 'Force first login message',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
+		));		
+//-----------------------------------------------------------------------		
+		$this->addElement('hidden', 'crossLine', array(
+			'lable'			=> 'line',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		));
+			
+	//adding display groups
+	$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email','crossLine'), 'generalInformation', array('legend' => 'General Information'));
+	$this->addDisplayGroup(array('host', 'cdn_host', 'rtmp_url','crossLine'), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));				
+	$this->addDisplayGroup(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert','crossLine'), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Account Policy'));	
+	$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
+	$this->addDisplayGroup(array('def_thumb_offset','crossLine'), 'publisherSpecificIngestionSettings', array('legend' => 'Publisher Specific Ingestion Settings'));
+	$this->addDisplayGroup(array('max_login_attempts', 'login_block_period', 'num_prev_pass_to_keep', 'pass_replace_freq'), 'passwordSecurity', array('legend' => 'Password Security'));
+	
+	$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Group Association'));
+	
+	$this->addDisplayGroup(array('partner_package','crossLine'), 'accountPackages', array('legend' => 'Account Packages'));
+	$this->addDisplayGroup(array('admin_login_users_quota', 'monitor_usage','is_first_login'), 'accountOptions', array('legend' => 'Account Options'));
+	
+//--------------------------- Enable/Disable Features ---------------------------
+	/*
+		$element = new Zend_Form_Element_Hidden('setPublisherFunctionality');
+		$element->setLabel('Set Publisher Functionality');
+		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b', 'class' => 'setPublisherFunctionality'))));		
+		$this->addElements(array($element));
+	*/
+	$moduls = Zend_Registry::get('config')->moduls;
+	if ($moduls)
+	{
+		$permissionNames = array();
+		foreach($moduls as $name => $modul)
+		{
+			$attributes = array(
+				'label'	  => $modul->label,
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => $name)))
+			);
+			if(!$modul->enabled)
+				$attributes['disabled'] = true;
+				
+			$this->addElement('checkbox', $modul->permissionName, $attributes);
+			
+			
+			if ($modul->indexLink != null)
+			{
+				$element = $this->getElement($modul->permissionName);
+				
+				$element->setDescription('<a id=linkToPage href=# onClick=openLink("../'.$modul->indexLink.'")>(config)</a>');
+			
+			    $element->addDecorators(array('ViewHelper',		      
+			        array('Label', array('placement' => 'append')),
+			        array('Description', array('escape' => false, 'tag' => false)),
+			      ));			      
+			}
+			$permissionNames[] = $modul->permissionName;
+		}
 	}
 
+	$this->addElement('checkbox', 'moderate_content', array(
+		'label'	  => 'Content Moderation',
+		'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'moderate_content')))
+	));
+	$permissionNames[] = 'moderate_content';
+	
+	//adding display group to all features
+	$this->addDisplayGroup($permissionNames, 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
+		
+	//removing decorators from display groups
+	$displayGroups = $this->getDisplayGroups();
+	foreach ($displayGroups as $displayGroup)
+	{
+		$displayGroup->removeDecorator ('label');
+  		$displayGroup->removeDecorator('DtDdWrapper');		
+	}
+	//creating divs for left right dividing
+	$this->setDisplayColumn('generalInformation', 'passwordSecurity');
+	$this->setDisplayColumn('groupAssociation', 'enableDisableFeatures');
+		
+}
+
+	/**
+	 * creating a form display in two columns (left and right).	
+	 * $firstColumnElement - the first display group in the column
+	 * $lastColumnElement - the last display group in the column
+	 */
+	public function setDisplayColumn($firstColumnElement, $lastColumnElement)
+	{
+		$openLeftDisplayGroup = $this->getDisplayGroup($firstColumnElement);
+    	$openLeftDisplayGroup->setDecorators(array(
+             'FormElements',
+             'Fieldset',
+             array('HtmlTag',array('tag'=>'div','openOnly'=>true,'class'=>'partnerConfigureFormColumn'))
+    	 ));
+	
+    	$closeLeftDisplayGroup = $this->getDisplayGroup($lastColumnElement);
+    	$closeLeftDisplayGroup->setDecorators(array(
+             'FormElements',
+             'Fieldset',
+              array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
+     	));   
+	} 
+	
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------		
 	/**
 	 * @param Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration $object
 	 * @param bool $add_underscore

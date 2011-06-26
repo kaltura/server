@@ -550,3 +550,16 @@ form#frmCreateDropFolder dt { float: left; }
 #frmKmcUsersResetPassword dt { width:120px; float:left; }
 #frmKmcUsersResetPassword dd input  { width:200px; float:left; height:20px }
 #frmKmcUsersResetPassword button { float:left; margin-left:10px; }
+
+
+#partner-configure-dialog .configureDiv { float:left; width:50%; }
+#partner-configure-dialog .configureDiv #fieldset-enableDisableFeatures input { width: 20px; }
+#partner-configure-dialog .partnerConfigureFormColumn fieldset { border:none; background:none; margin: 0px 0px 10px 21px; }
+#partner-configure-dialog .partnerConfigureFormColumn fieldset legend{ font-weight:bold; }
+
+
+#partner-configure-dialog .partnerConfigureFormColumn { float:left; width:50%; }
+#partner-configure-dialog #fieldset-enableDisableFeatures a { color:#00c1ff; }
+
+#partner-configure-dialog #frmConfigure fieldset { width:350px; }
+
