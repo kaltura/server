@@ -200,13 +200,15 @@ function configure(partnerId) {
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('form').submit();
+				jQuery(this).dialog('close');
+				jQuery('#frmPaginator1').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
 			}
 		},
 		close: function() {
-			jQuery('#frmPaginator1').submit();
+			
 		}	
 	});
 	
