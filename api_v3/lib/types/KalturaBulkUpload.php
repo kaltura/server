@@ -56,6 +56,21 @@ class KalturaBulkUpload extends KalturaObject
 	 */
 	public $results;
 	
+	/**
+	 * @var string
+	 */
+	public $error;
+	
+	/**
+	 * @var KalturaBatchJobErrorTypes
+	 */
+	public $errorType;
+	
+	/**
+	 * @var int
+	 */
+	public $errorNumber;
+	
 	public function fromObject($batchJob)
 	{
 		if($batchJob->getJobType() != BatchJobType::BULKUPLOAD)
