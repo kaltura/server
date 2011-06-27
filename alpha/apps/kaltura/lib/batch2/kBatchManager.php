@@ -33,7 +33,7 @@ class kBatchManager
 		{
 			$description = $flavorAsset->getDescription() . "\n" . $description;
 			$flavorAsset->setDescription($description);
-			$flavorAsset->incrementVersion();
+//			$flavorAsset->incrementVersion();
 		}	
 		else
 		{
@@ -110,7 +110,7 @@ class kBatchManager
 		{
 			$description = $flavorAsset->getDescription() . "\n" . $description;
 			$flavorAsset->setDescription($description);
-			$flavorAsset->incrementVersion();
+//			$flavorAsset->incrementVersion();
 		}	
 		else
 		{

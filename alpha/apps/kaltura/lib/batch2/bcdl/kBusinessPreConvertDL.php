@@ -945,7 +945,7 @@ class kBusinessPreConvertDL
 						KalturaLog::log("Flavor [" . $sourceFlavorOutput->getFlavorParamsId() . "] is valid");
 				}
 					
-				$originalFlavorAsset->incrementVersion();
+//				$originalFlavorAsset->incrementVersion();
 				$originalFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_CONVERTING);
 				$originalFlavorAsset->addTags($sourceFlavor->getTagsArray());
 				$originalFlavorAsset->setFileExt($sourceFlavorOutput->getFileExt());
