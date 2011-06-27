@@ -1640,7 +1640,10 @@ class kFlowHelper
 					
 				if($dbAsset instanceof flavorAsset)
 				{
-					$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+					if($dbAsset->getIsOriginal())
+						$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+					else
+						$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
 				}
 	    	
 				if($dbAsset instanceof thumbAsset)
@@ -1653,8 +1656,6 @@ class kFlowHelper
 				}
 				
 				$dbAsset->save();
-					
-	   			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 	    	}
 	    	
 			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);
