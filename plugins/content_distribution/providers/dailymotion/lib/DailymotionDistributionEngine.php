@@ -15,6 +15,10 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 {
 	protected $tempXmlPath;
 	
+	protected $requestTimeout = 10;
+	
+	protected $connectTimeout = 15;
+	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
@@ -30,6 +34,15 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		{
 			KalturaLog::err("params.tempXmlPath configuration not supplied");
 			$this->tempXmlPath = sys_get_temp_dir();
+		}
+		
+		if (isset($taskConfig->params->dailymotion))
+		{
+			if (isset($taskConfig->params->dailymotion->requestTimeout))
+				$this->requestTimeout = $taskConfig->params->dailymotion->requestTimeout;
+				
+			if (isset($taskConfig->params->dailymotion->connectTimeout))
+				$this->connectTimeout = $taskConfig->params->dailymotion->connectTimeout;
 		}
 	}
 
@@ -109,6 +122,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		if($data->entryDistribution->remoteId)
 		{
 			$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
+			$this->configureTimeouts($dailyMotionImpl);
 			$dailyMotionImpl->update($data->remoteId, $props);
 		
 			$data->remoteId = $data->entryDistribution->remoteId;
@@ -145,6 +159,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		}
 		
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
+		$this->configureTimeouts($dailyMotionImpl);
 		$remoteId = $dailyMotionImpl->upload($videoFilePath);
 		$dailyMotionImpl->update($remoteId, $props);
 	
@@ -163,6 +178,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	{
 		$distributionProfile = $data->distributionProfile;
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
+		$this->configureTimeouts($dailyMotionImpl);
 		
 		$status = $dailyMotionImpl->getStatus($data->remoteId);
 				
@@ -222,6 +238,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$props = $this->getDailymotionProps($entry, $data, $distributionProfile, $enabled);
 	
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
+		$this->configureTimeouts($dailyMotionImpl);
 		$dailyMotionImpl->update($data->remoteId, $props);
 		
 //		$data->sentData = $dailymotionMediaService->request;
@@ -237,6 +254,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	{
 		$distributionProfile = $data->distributionProfile;
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
+		$this->configureTimeouts($dailyMotionImpl);
 		
 		$dailyMotionImpl->delete($data->remoteId);
 		
@@ -249,5 +267,13 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
 		// TODO
+	}
+	
+	protected function configureTimeouts(DailyMotionImpl $dailyMotionImpl)
+	{
+		KalturaLog::info('Setting connection timeout to ' . $this->connectTimeout . ' seconds');
+		$dailyMotionImpl->setOption('connectionTimeout', $this->connectTimeout);
+		KalturaLog::info('Setting request timeout to ' . $this->requestTimeout . ' seconds');
+		$dailyMotionImpl->setOption('timeout', $this->requestTimeout);
 	}
 }

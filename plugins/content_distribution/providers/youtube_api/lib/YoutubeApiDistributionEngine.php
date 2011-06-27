@@ -14,6 +14,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 {
 	protected $tempXmlPath;
 	
+	protected $timeout = 10;
+	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
@@ -30,6 +32,14 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			KalturaLog::err("params.tempXmlPath configuration not supplied");
 			$this->tempXmlPath = sys_get_temp_dir();
 		}
+		
+		if (isset($taskConfig->params->youtubeApi))
+		{
+			if (isset($taskConfig->params->youtubeApi->timeout))
+				$this->timeout = $taskConfig->params->youtubeApi->timeout;
+		}
+		
+		KalturaLog::info('Request timeout was set to ' . $this->timeout . ' seconds');
 	}
 
 	/* (non-PHPdoc)
@@ -125,7 +135,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
 		if($data->entryDistribution->remoteId)
 		{
-			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
+			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
 			$youTubeApiImpl->updateEntry($data->entryDistribution->remoteId, $props, $private);
 		
 			$data->remoteId = $data->entryDistribution->remoteId;
@@ -161,7 +171,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$videoFilePath = $videoFilePathNew;
 		}
 		
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
 		$remoteId = $youTubeApiImpl->uploadVideo($videoFilePath, $videoFilePath, $props, $private);
 	
 		if ($needDel == true)
@@ -178,7 +188,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	public function closeSubmit(KalturaDistributionSubmitJobData $data)
 	{
 		$distributionProfile = $data->distributionProfile;
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
 		
 		$status = $youTubeApiImpl->getStatus($data->remoteId);
 				
@@ -241,7 +251,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
 		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
 	
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
 		$youTubeApiImpl->updateEntry($data->remoteId, $props, $private);
 		
 //		$data->sentData = $youtubeApiMediaService->request;
@@ -256,7 +266,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	public function delete(KalturaDistributionDeleteJobData $data)
 	{
 		$distributionProfile = $data->distributionProfile;
-		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password);
+		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
 		
 		$youTubeApiImpl->deleteEntry($data->remoteId);
 		
@@ -269,5 +279,13 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	public function fetchReport(KalturaDistributionFetchReportJobData $data)
 	{
 		// TODO
+	}
+	
+	/**
+	 * @return array
+	 */
+	protected function getHttpClientConfig()
+	{
+		return array('timeout' => $this->timeout);
 	}
 }

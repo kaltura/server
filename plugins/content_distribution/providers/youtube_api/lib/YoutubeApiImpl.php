@@ -51,7 +51,7 @@ class YouTubeApiImpl
 		'Travel' => 'Travel and Events',
 	);
 	
-	public function __construct($user, $pass)
+	public function __construct($user, $pass, array $config = null)
 	{
 		$this->httpClient = Zend_Gdata_ClientLogin::getHttpClient($username = $user,               
 													$password = $pass,
@@ -61,7 +61,9 @@ class YouTubeApiImpl
 													$loginToken = null,
 													$loginCaptcha = null,
 													$this->authenticationURL);
-													
+
+		if (!is_null($config))
+			$this->httpClient->setConfig($config);
 		$this->yt = new Zend_Gdata_YouTube($this->httpClient, $this->applicationId, $this->clientId, $this->developerKey);
 		$this->yt->setMajorProtocolVersion(2);
 	}
