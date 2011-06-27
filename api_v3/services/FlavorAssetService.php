@@ -325,7 +325,12 @@ class FlavorAssetService extends KalturaBaseService
         $syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->getUrl(), $storageProfile);
 		
-		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		if($flavorAsset->getIsOriginal())
+			$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+		else
+			$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+			
 		$flavorAsset->save();
 		
 		kBusinessPostConvertDL::handleConvertFinished(null, $flavorAsset);

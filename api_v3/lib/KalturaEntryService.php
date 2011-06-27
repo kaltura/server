@@ -352,7 +352,12 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset->setWidth($dbFlavorParams->getWidth());
 			$dbAsset->setTags($dbFlavorParams->getTags());
 		}
-		$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+		
+		if($dbAsset->getIsOriginal())
+			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
+		else
+			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+			
 		$dbAsset->save();
 		
 		return $dbAsset;
