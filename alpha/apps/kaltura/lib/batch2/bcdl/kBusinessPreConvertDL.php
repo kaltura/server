@@ -359,7 +359,7 @@ class kBusinessPreConvertDL
 			return null;
 		}
 	
-		if ($originalFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+		if ($originalFlavorAsset->getId() != $flavorAssetId && $originalFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 		{
 			$errDescription = 'Original flavor asset not ready';
 			KalturaLog::log(__METHOD__." - ".$errDescription);
