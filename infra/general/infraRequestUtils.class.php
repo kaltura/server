@@ -184,7 +184,7 @@ class infraRequestUtils
 		
 		// if still empty .... 
 		if (!$remote_addr)
-			$remote_addr = $_SERVER['REMOTE_ADDR'];
+			$remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
 		
 		return $remote_addr;
 	}
