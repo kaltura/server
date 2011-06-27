@@ -1,7 +1,5 @@
 <?php 
 
-require_once(dirname(__FILE__).'/PartnerConfigurationLimits.php');
-
 class Form_PartnerConfiguration extends Infra_Form
 {
     
