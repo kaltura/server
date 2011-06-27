@@ -238,8 +238,8 @@ class Kaltura_View_Helper_FailReasonTranslate extends Zend_View_Helper_Abstract
 	
 	private static $clientDescriptions = array(
 		Kaltura_Client_Exception::ERROR_UNSERIALIZE_FAILED => 'Failed to unserialize response',
-		Kaltura_Client_Exception::ERROR_FORMAT_NOT_SUPPORTED => 'unsupported format',
-		Kaltura_Client_Exception::ERROR_UPLOAD_NOT_SUPPORTED => 'upload is not supported',
+		Kaltura_Client_Exception::ERROR_FORMAT_NOT_SUPPORTED => 'Unsupported format',
+		Kaltura_Client_Exception::ERROR_UPLOAD_NOT_SUPPORTED => 'Upload is not supported',
 		Kaltura_Client_Exception::ERROR_CONNECTION_FAILED => 'HTTP connection failed',
 		Kaltura_Client_Exception::ERROR_READ_FAILED => 'Response read failed',
 		Kaltura_Client_Exception::ERROR_INVALID_PARTNER_ID => 'Invalid partner ID',
