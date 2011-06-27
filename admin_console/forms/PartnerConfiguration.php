@@ -253,13 +253,14 @@ class Form_PartnerConfiguration extends Infra_Form
 	{
 		parent::populateFromObject($object, $add_underscore);
 		
+		$this->populateLimitsFromObject($object->limits);
+		
 		if(!$object->permissions || !count($object->permissions))
 			return;
 			
 		foreach($object->permissions as $permission)
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
-
-		$this->populateLimitsFromObject($object->limits);
+	
 	}
 	
 	/* (non-PHPdoc)
