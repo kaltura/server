@@ -185,7 +185,12 @@ class FlavorAssetService extends KalturaBaseService
 		}
 		
         if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+        {
+        	if($flavorAsset->getIsOriginal())
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+			else
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+        }
 			
 		$flavorAsset->save();
     }
@@ -281,7 +286,12 @@ class FlavorAssetService extends KalturaBaseService
         $fileSync = kFileSyncUtils::resolve($fileSync);
         
         if($flavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+        {
+        	if($flavorAsset->getIsOriginal())
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+			else
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+        }
 		
 		$flavorAsset->setSize($fileSync->getFileSize());
 		$flavorAsset->save();
