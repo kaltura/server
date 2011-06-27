@@ -27,6 +27,13 @@ class KalturaDocumentFlavorParamsOutputOrderBy
 {
 }
 
+class KalturaDocumentType
+{
+	const DOCUMENT = 11;
+	const SWF = 12;
+	const PDF = 13;
+}
+
 class KalturaPdfFlavorParamsOrderBy
 {
 }
@@ -41,6 +48,64 @@ class KalturaSwfFlavorParamsOrderBy
 
 class KalturaSwfFlavorParamsOutputOrderBy
 {
+}
+
+class KalturaDocumentEntry extends KalturaBaseEntry
+{
+	/**
+	 * The type of the document
+	 *
+	 * @var KalturaDocumentType
+	 * @insertonly
+	 */
+	public $documentType = null;
+
+
+}
+
+abstract class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
+{
+	/**
+	 * 
+	 *
+	 * @var KalturaDocumentType
+	 */
+	public $documentTypeEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $documentTypeIn = null;
+
+
+}
+
+class KalturaDocumentEntryFilter extends KalturaDocumentEntryBaseFilter
+{
+
+}
+
+class KalturaDocumentListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDocumentEntry
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
 }
 
 abstract class KalturaDocumentFlavorParamsBaseFilter extends KalturaFlavorParamsFilter
@@ -155,21 +220,6 @@ class KalturaDocumentsService extends KalturaServiceBase
 		parent::__construct($client);
 	}
 
-	function add(KalturaDocumentEntry $entry, KalturaResource $resource = null)
-	{
-		$kparams = array();
-		$this->client->addParam($kparams, "entry", $entry->toParams());
-		if ($resource !== null)
-			$this->client->addParam($kparams, "resource", $resource->toParams());
-		$this->client->queueServiceActionCall("document_documents", "add", $kparams);
-		if ($this->client->isMultiRequest())
-			return null;
-		$resultObject = $this->client->doQueue();
-		$this->client->throwExceptionIfError($resultObject);
-		$this->client->validateObjectType($resultObject, "KalturaMediaEntry");
-		return $resultObject;
-	}
-
 	function addFromUploadedFile(KalturaDocumentEntry $documentEntry, $uploadTokenId)
 	{
 		$kparams = array();
@@ -184,7 +234,7 @@ class KalturaDocumentsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function addFromEntry($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = "")
+	function addFromEntry($sourceEntryId, KalturaDocumentEntry $documentEntry = null, $sourceFlavorParamsId = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "sourceEntryId", $sourceEntryId);
@@ -215,7 +265,7 @@ class KalturaDocumentsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function convert($entryId, $conversionProfileId = "", array $dynamicConversionAttributes = null)
+	function convert($entryId, $conversionProfileId = null, array $dynamicConversionAttributes = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "entryId", $entryId);
@@ -291,6 +341,20 @@ class KalturaDocumentsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
+	function upload($fileData)
+	{
+		$kparams = array();
+		$kfiles = array();
+		$this->client->addParam($kfiles, "fileData", $fileData);
+		$this->client->queueServiceActionCall("document_documents", "upload", $kparams, $kfiles);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "string");
+		return $resultObject;
+	}
+
 	function convertPptToSwf($entryId)
 	{
 		$kparams = array();
@@ -304,7 +368,7 @@ class KalturaDocumentsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function serve($entryId, $flavorAssetId = "", $forceProxy = false)
+	function serve($entryId, $flavorAssetId = null, $forceProxy = false)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "entryId", $entryId);
@@ -315,7 +379,7 @@ class KalturaDocumentsService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function serveByFlavorParamsId($entryId, $flavorParamsId = "", $forceProxy = false)
+	function serveByFlavorParamsId($entryId, $flavorParamsId = null, $forceProxy = false)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "entryId", $entryId);

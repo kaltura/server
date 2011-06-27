@@ -101,7 +101,7 @@ class KalturaClientBase
 		}
 	}
 
-	public function getServeUrl($service, $action, array $params = null)
+	public function getServeUrl()
 	{
 		if (count($this->callsQueue) != 1)
 			return null;
@@ -411,8 +411,15 @@ class KalturaClientBase
 			return;
 		}
 		
-		foreach($paramValue as $subParamName => $subParamValue)
-			$this->addParam($params, "$paramName:$subParamName", $subParamValue);
+		if ($paramValue)
+		{
+			foreach($paramValue as $subParamName => $subParamValue)
+				$this->addParam($params, "$paramName:$subParamName", $subParamValue);
+		}
+		else
+		{
+			$this->addParam($params, "$paramName:-", "");
+		}
 	}
 	
 	/**

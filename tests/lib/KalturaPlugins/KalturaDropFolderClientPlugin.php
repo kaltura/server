@@ -153,7 +153,7 @@ class KalturaDropFolder extends KalturaObjectBase
 	 *
 	 * @var int
 	 */
-	public $ingestionProfileId = null;
+	public $conversionProfileId = null;
 
 	/**
 	 * 
@@ -217,6 +217,13 @@ class KalturaDropFolder extends KalturaObjectBase
 	 * @var string
 	 */
 	public $tags = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ignoreFileNamePatterns = null;
 
 	/**
 	 * 
@@ -307,14 +314,14 @@ abstract class KalturaDropFolderBaseFilter extends KalturaFilter
 	 *
 	 * @var int
 	 */
-	public $ingestionProfileIdEqual = null;
+	public $conversionProfileIdEqual = null;
 
 	/**
 	 * 
 	 *
 	 * @var string
 	 */
-	public $ingestionProfileIdIn = null;
+	public $conversionProfileIdIn = null;
 
 	/**
 	 * 

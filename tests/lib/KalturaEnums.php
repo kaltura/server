@@ -222,6 +222,8 @@ class KalturaBatchJobType
 	const DISTRIBUTION_UPDATE = "contentDistribution.DistributionUpdate";
 	const DISTRIBUTION_DELETE = "contentDistribution.DistributionDelete";
 	const DISTRIBUTION_FETCH_REPORT = "contentDistribution.DistributionFetchReport";
+	const DISTRIBUTION_ENABLE = "contentDistribution.DistributionEnable";
+	const DISTRIBUTION_DISABLE = "contentDistribution.DistributionDisable";
 	const DISTRIBUTION_SYNC = "contentDistribution.DistributionSync";
 	const DROP_FOLDER_WATCHER = "dropFolder.DropFolderWatcher";
 	const DROP_FOLDER_HANDLER = "dropFolder.DropFolderHandler";
@@ -333,18 +335,6 @@ class KalturaCountryRestrictionType
 	const ALLOW_COUNTRY_LIST = 1;
 }
 
-class KalturaDailymotionDistributionProfileOrderBy
-{
-	const CREATED_AT_ASC = "+createdAt";
-	const CREATED_AT_DESC = "-createdAt";
-	const UPDATED_AT_ASC = "+updatedAt";
-	const UPDATED_AT_DESC = "-updatedAt";
-}
-
-class KalturaDailymotionDistributionProviderOrderBy
-{
-}
-
 class KalturaDataEntryOrderBy
 {
 	const NAME_ASC = "+name";
@@ -365,13 +355,6 @@ class KalturaDirectoryRestrictionType
 {
 	const DONT_DISPLAY = 0;
 	const DISPLAY_WITH_LINK = 1;
-}
-
-class KalturaDocumentType
-{
-	const DOCUMENT = 11;
-	const SWF = 12;
-	const PDF = 13;
 }
 
 class KalturaDurationType
@@ -450,22 +433,6 @@ class KalturaFileSyncObjectType
 	const GENERIC_DISTRIBUTION_ACTION = "contentDistribution.GenericDistributionAction";
 	const ENTRY_DISTRIBUTION = "contentDistribution.EntryDistribution";
 	const DISTRIBUTION_PROFILE = "contentDistribution.DistributionProfile";
-}
-
-class KalturaFileSyncStatus
-{
-	const ERROR = -1;
-	const PENDING = 1;
-	const READY = 2;
-	const DELETED = 3;
-	const PURGED = 4;
-}
-
-class KalturaFileSyncType
-{
-	const FILE = 1;
-	const LINK = 2;
-	const URL = 3;
 }
 
 class KalturaFlavorAssetOrderBy
@@ -836,31 +803,6 @@ class KalturaMediaType
 	const LIVE_STREAM_WINDOWS_MEDIA = 202;
 	const LIVE_STREAM_REAL_MEDIA = 203;
 	const LIVE_STREAM_QUICKTIME = 204;
-}
-
-class KalturaMetadataObjectType
-{
-	const ENTRY = 1;
-}
-
-class KalturaMetadataProfileCreateMode
-{
-	const API = 1;
-	const KMC = 2;
-}
-
-class KalturaMetadataProfileStatus
-{
-	const ACTIVE = 1;
-	const DEPRECATED = 2;
-	const TRANSFORMING = 3;
-}
-
-class KalturaMetadataStatus
-{
-	const VALID = 1;
-	const INVALID = 2;
-	const DELETED = 3;
 }
 
 class KalturaMixEntryOrderBy
@@ -1279,6 +1221,14 @@ class KalturaStatsKmcEventType
 	const REPORTS_AND_ANALYTICS_BANDWIDTH_USAGE_VIEW_YEARLY = 1087;
 }
 
+class KalturaStorageProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
 class KalturaStorageProfileProtocol
 {
 	const KALTURA_DC = 0;
@@ -1292,6 +1242,14 @@ class KalturaStorageProfileStatus
 	const DISABLED = 1;
 	const AUTOMATIC = 2;
 	const MANUAL = 3;
+}
+
+class KalturaStorageServePriority
+{
+	const KALTURA_ONLY = 1;
+	const KALTURA_FIRST = 2;
+	const EXTERNAL_FIRST = 3;
+	const EXTERNAL_ONLY = 4;
 }
 
 class KalturaSyndicationFeedStatus
@@ -1477,6 +1435,7 @@ class KalturaVideoCodec
 	const WMV3 = "wmv3";
 	const WVC1A = "wvc1a";
 	const VP8 = "vp8";
+	const MPEG2 = "mpeg2";
 	const COPY = "copy";
 }
 

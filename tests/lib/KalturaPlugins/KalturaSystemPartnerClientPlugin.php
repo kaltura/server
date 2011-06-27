@@ -3,38 +3,327 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
-class KalturaSystemPartnerLimitType
+class KalturaSystemPartnerUsageFilter extends KalturaFilter
 {
-	const ENTRIES = 1;
-	const STREAM_ENTRIES = 2;
-	const BANDWIDTH = 3;
-	const PUBLISHERS = 4;
-	const ADMIN_USERS = 5;
-	const END_USERS = 6;
+	/**
+	 * Date range from
+	 * 
+	 *
+	 * @var int
+	 */
+	public $fromDate = null;
+
+	/**
+	 * Date range to
+	 * 
+	 *
+	 * @var int
+	 */
+	public $toDate = null;
+
+
 }
 
-class KalturaSystemPartnerLimit extends KalturaObjectBase
+class KalturaSystemPartnerUsageItem extends KalturaObjectBase
+{
+	/**
+	 * Partner ID
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerId = null;
+
+	/**
+	 * Partner name
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerName = null;
+
+	/**
+	 * Partner status
+	 * 
+	 *
+	 * @var KalturaPartnerStatus
+	 */
+	public $partnerStatus = null;
+
+	/**
+	 * Partner package
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackage = null;
+
+	/**
+	 * Partner creation date (Unix timestamp)
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerCreatedAt = null;
+
+	/**
+	 * Number of player loads in the specific date range
+	 * 
+	 *
+	 * @var int
+	 */
+	public $views = null;
+
+	/**
+	 * Number of plays in the specific date range
+	 * 
+	 *
+	 * @var int
+	 */
+	public $plays = null;
+
+	/**
+	 * Number of new entries created during specific date range
+	 * 
+	 *
+	 * @var int
+	 */
+	public $entriesCount = null;
+
+	/**
+	 * Total number of entries
+	 * 
+	 *
+	 * @var int
+	 */
+	public $totalEntriesCount = null;
+
+	/**
+	 * Number of new video entries created during specific date range
+	 * 
+	 *
+	 * @var int
+	 */
+	public $videoEntriesCount = null;
+
+	/**
+	 * Number of new image entries created during specific date range
+	 * 
+	 *
+	 * @var int
+	 */
+	public $imageEntriesCount = null;
+
+	/**
+	 * Number of new audio entries created during specific date range
+	 * 
+	 *
+	 * @var int
+	 */
+	public $audioEntriesCount = null;
+
+	/**
+	 * Number of new mix entries created during specific date range
+	 * 
+	 *
+	 * @var int
+	 */
+	public $mixEntriesCount = null;
+
+	/**
+	 * The total bandwidth usage during the given date range (in MB)
+	 * 
+	 *
+	 * @var float
+	 */
+	public $bandwidth = null;
+
+	/**
+	 * The total storage consumption (in MB)
+	 * 
+	 *
+	 * @var float
+	 */
+	public $totalStorage = null;
+
+	/**
+	 * The change in storage consumption (new uploads) during the given date range (in MB)
+	 * 
+	 *
+	 * @var float
+	 */
+	public $storage = null;
+
+
+}
+
+class KalturaSystemPartnerUsageListResponse extends KalturaObjectBase
 {
 	/**
 	 * 
 	 *
-	 * @var KalturaSystemPartnerLimitType
+	 * @var array of KalturaSystemPartnerUsageItem
 	 */
-	public $type = null;
+	public $objects;
 
 	/**
 	 * 
 	 *
 	 * @var int
 	 */
-	public $max = null;
+	public $totalCount = null;
+
+
+}
+
+class KalturaSystemPartnerConfiguration extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $partnerName = null;
 
 	/**
 	 * 
 	 *
-	 * @var float
+	 * @var string
 	 */
-	public $overagePrice = null;
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $adminEmail = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $host = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $cdnHost = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $maxBulkSize = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerPackage = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $monitorUsage = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $moderateContent = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $rtmpUrl = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $storageDeleteFromKaltura = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaStorageServePriority
+	 */
+	public $storageServePriority = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $kmcVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $defThumbOffset = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $adminLoginUsersQuota = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $userSessionRoleId = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $adminSessionRoleId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $alwaysAllowedPermissionNames = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $importRemoteSourceForConvert = null;
+
+	/**
+	 * 
+	 *
+	 * @var array of KalturaPermission
+	 */
+	public $permissions;
 
 
 }
@@ -127,7 +416,7 @@ class KalturaSystemPartnerService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function getAdminSession($partnerId, $userId = "")
+	function getAdminSession($partnerId, $userId = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "partnerId", $partnerId);
@@ -177,6 +466,21 @@ class KalturaSystemPartnerService extends KalturaServiceBase
 		$resultObject = $this->client->doQueue();
 		$this->client->throwExceptionIfError($resultObject);
 		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function resetUserPassword($userId, $partnerId, $newPassword)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "userId", $userId);
+		$this->client->addParam($kparams, "partnerId", $partnerId);
+		$this->client->addParam($kparams, "newPassword", $newPassword);
+		$this->client->queueServiceActionCall("systempartner_systempartner", "resetUserPassword", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "null");
 		return $resultObject;
 	}
 }

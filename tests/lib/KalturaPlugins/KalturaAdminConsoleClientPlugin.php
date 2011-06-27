@@ -13,6 +13,14 @@ class KalturaTrackEntryEventType
 	const DELETED_ENTRY = 6;
 }
 
+class KalturaUiConfAdminOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
 class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
 {
 	/**
@@ -251,6 +259,16 @@ class KalturaUiConfAdminListResponse extends KalturaObjectBase
 	 */
 	public $totalCount = null;
 
+
+}
+
+abstract class KalturaUiConfAdminBaseFilter extends KalturaUiConfFilter
+{
+
+}
+
+class KalturaUiConfAdminFilter extends KalturaUiConfAdminBaseFilter
+{
 
 }
 

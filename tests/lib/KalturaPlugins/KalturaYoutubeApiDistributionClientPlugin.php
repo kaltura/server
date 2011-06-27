@@ -3,6 +3,38 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+class KalturaYoutubeApiDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaYoutubeApiDistributionProviderOrderBy
+{
+}
+
+abstract class KalturaYoutubeApiDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+{
+
+}
+
+class KalturaYoutubeApiDistributionProfileFilter extends KalturaYoutubeApiDistributionProfileBaseFilter
+{
+
+}
+
+abstract class KalturaYoutubeApiDistributionProviderBaseFilter extends KalturaDistributionProviderFilter
+{
+
+}
+
+class KalturaYoutubeApiDistributionProviderFilter extends KalturaYoutubeApiDistributionProviderBaseFilter
+{
+
+}
+
 class KalturaYoutubeApiDistributionProfile extends KalturaDistributionProfile
 {
 	/**

@@ -350,7 +350,7 @@ class KalturaVirusScanProfileService extends KalturaServiceBase
 		return $resultObject;
 	}
 
-	function scan($flavorAssetId, $virusScanProfileId = "")
+	function scan($flavorAssetId, $virusScanProfileId = null)
 	{
 		$kparams = array();
 		$this->client->addParam($kparams, "flavorAssetId", $flavorAssetId);

@@ -3,6 +3,14 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+class KalturaConfigurableDistributionProfileOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
 class KalturaDistributionAction
 {
 	const SUBMIT = 1;
@@ -58,16 +66,8 @@ class KalturaDistributionProviderType
 {
 	const GENERIC = "1";
 	const SYNDICATION = "2";
-	const MSN = "msnDistribution.MSN";
-	const COMCAST = "comcastDistribution.COMCAST";
-	const YOUTUBE = "youTubeDistribution.YOUTUBE";
 	const YOUTUBE_API = "youtubeApiDistribution.YOUTUBE_API";
-	const SYNACOR = "synacorDistribution.SYNACOR";
-	const IDETIC = "ideticDistribution.IDETIC";
-	const MYSPACE = "myspaceDistribution.MYSPACE";
-	const VERIZON = "verizonDistribution.VERIZON";
 	const DAILYMOTION = "dailymotionDistribution.DAILYMOTION";
-	const FREEWHEEL = "freewheelDistribution.FREEWHEEL";
 }
 
 class KalturaDistributionValidationErrorType
@@ -85,6 +85,8 @@ class KalturaEntryDistributionFlag
 	const SUBMIT_REQUIRED = 1;
 	const DELETE_REQUIRED = 2;
 	const UPDATE_REQUIRED = 3;
+	const ENABLE_REQUIRED = 4;
+	const DISABLE_REQUIRED = 5;
 }
 
 class KalturaEntryDistributionOrderBy
@@ -523,6 +525,14 @@ class KalturaEntryDistribution extends KalturaObjectBase
 	/**
 	 * 
 	 *
+	 * @var KalturaEntryDistributionSunStatus
+	 * @readonly
+	 */
+	public $sunStatus = null;
+
+	/**
+	 * 
+	 *
 	 * @var KalturaEntryDistributionFlag
 	 * @readonly
 	 */
@@ -883,6 +893,13 @@ abstract class KalturaDistributionProvider extends KalturaObjectBase
 	 * @var bool
 	 */
 	public $scheduleUpdateEnabled = null;
+
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $availabilityUpdateEnabled = null;
 
 	/**
 	 * 
@@ -1446,6 +1463,16 @@ class KalturaContentDistributionSearchItem extends KalturaSearchItem
 
 }
 
+abstract class KalturaConfigurableDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
+{
+
+}
+
+class KalturaConfigurableDistributionProfileFilter extends KalturaConfigurableDistributionProfileBaseFilter
+{
+
+}
+
 abstract class KalturaGenericDistributionProfileBaseFilter extends KalturaDistributionProfileFilter
 {
 
@@ -1588,6 +1615,21 @@ class KalturaDistributionDeleteJobData extends KalturaDistributionJobData
 
 }
 
+class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
+{
+
+}
+
+class KalturaDistributionDisableJobData extends KalturaDistributionUpdateJobData
+{
+
+}
+
+class KalturaDistributionEnableJobData extends KalturaDistributionUpdateJobData
+{
+
+}
+
 class KalturaDistributionFetchReportJobData extends KalturaDistributionJobData
 {
 	/**
@@ -1612,8 +1654,73 @@ class KalturaDistributionSubmitJobData extends KalturaDistributionJobData
 
 }
 
-class KalturaDistributionUpdateJobData extends KalturaDistributionJobData
+class KalturaDistributionFieldConfig extends KalturaObjectBase
 {
+	/**
+	 * A value taken from a connector field enum which associates the current configuration to that connector field
+	 * Field enum class should be returned by the provider's getFieldEnumClass function.
+	 *
+	 * @var string
+	 */
+	public $fieldName = null;
+
+	/**
+	 * A string that will be shown to the user as the field name in error messages related to the current field
+	 *
+	 * @var string
+	 */
+	public $userFriendlyFieldName = null;
+
+	/**
+	 * An XSLT string that extracts the right value from the Kaltura entry MRSS XML.
+	 * The value of the current connector field will be the one that is returned from transforming the Kaltura entry MRSS XML using this XSLT string.
+	 *
+	 * @var string
+	 */
+	public $entryMrssXslt = null;
+
+	/**
+	 * Is the field required to have a value for submission ?
+	 *
+	 * @var bool
+	 */
+	public $isRequired = null;
+
+	/**
+	 * Trigger distribution update when this field changes or not ?
+	 *
+	 * @var bool
+	 */
+	public $updateOnChange = null;
+
+	/**
+	 * Entry column or metadata xpath that should trigger an update
+	 * TODO: find a better solution for this
+	 *
+	 * @var string
+	 */
+	public $updateParam = null;
+
+	/**
+	 * Is this field config is the default for the distribution provider?
+	 *
+	 * @var bool
+	 * @readonly
+	 */
+	public $isDefault = null;
+
+
+}
+
+abstract class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaDistributionFieldConfig
+	 */
+	public $fieldConfigArray;
+
 
 }
 
@@ -2552,6 +2659,134 @@ class KalturaContentDistributionBatchService extends KalturaServiceBase
 		if ($filter !== null)
 			$this->client->addParam($kparams, "filter", $filter->toParams());
 		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneDistributionUpdateJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveDistributionEnableJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveDistributionEnableJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveDistributionEnableJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveDistributionEnableJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveDistributionEnableJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveDistributionEnableJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneDistributionEnableJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneDistributionEnableJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function getExclusiveDistributionDisableJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveDistributionDisableJobs", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "array");
+		return $resultObject;
+	}
+
+	function updateExclusiveDistributionDisableJob($id, KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "job", $job->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "updateExclusiveDistributionDisableJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaBatchJob");
+		return $resultObject;
+	}
+
+	function freeExclusiveDistributionDisableJob($id, KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "id", $id);
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "resetExecutionAttempts", $resetExecutionAttempts);
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "freeExclusiveDistributionDisableJob", $kparams);
+		if ($this->client->isMultiRequest())
+			return null;
+		$resultObject = $this->client->doQueue();
+		$this->client->throwExceptionIfError($resultObject);
+		$this->client->validateObjectType($resultObject, "KalturaFreeJobResponse");
+		return $resultObject;
+	}
+
+	function getExclusiveAlmostDoneDistributionDisableJobs(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
+	{
+		$kparams = array();
+		$this->client->addParam($kparams, "lockKey", $lockKey->toParams());
+		$this->client->addParam($kparams, "maxExecutionTime", $maxExecutionTime);
+		$this->client->addParam($kparams, "numberOfJobs", $numberOfJobs);
+		if ($filter !== null)
+			$this->client->addParam($kparams, "filter", $filter->toParams());
+		$this->client->queueServiceActionCall("contentdistribution_contentdistributionbatch", "getExclusiveAlmostDoneDistributionDisableJobs", $kparams);
 		if ($this->client->isMultiRequest())
 			return null;
 		$resultObject = $this->client->doQueue();

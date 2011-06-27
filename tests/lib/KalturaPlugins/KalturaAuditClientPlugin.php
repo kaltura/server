@@ -42,9 +42,12 @@ class KalturaAuditTrailObjectType
 	const ENTRY = "entry";
 	const FILE_SYNC = "FileSync";
 	const FLAVOR_ASSET = "flavorAsset";
+	const THUMBNAIL_ASSET = "thumbAsset";
 	const FLAVOR_PARAMS = "flavorParams";
+	const THUMBNAIL_PARAMS = "thumbParams";
 	const FLAVOR_PARAMS_CONVERSION_PROFILE = "flavorParamsConversionProfile";
 	const FLAVOR_PARAMS_OUTPUT = "flavorParamsOutput";
+	const THUMBNAIL_PARAMS_OUTPUT = "thumbParamsOutput";
 	const KSHOW = "kshow";
 	const KSHOW_KUSER = "KshowKuser";
 	const KUSER = "kuser";
