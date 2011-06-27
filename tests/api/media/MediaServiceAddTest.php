@@ -1068,7 +1068,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PENDING, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
 		
 		$resultUploadToken = $this->client->uploadToken->upload($resource->token, $file);
 		$this->assertType('KalturaUploadToken', $resultUploadToken, 'Uploaded upload token of wrong type');
