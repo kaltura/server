@@ -1179,8 +1179,6 @@ class kFlowHelper
 				{
 					KalturaLog::debug("File sync not created yet");
 				}
-					
-				return true;
 			}
 		}
 		
