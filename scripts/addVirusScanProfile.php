@@ -29,8 +29,6 @@ $actionIfInfected = KalturaVirusFoundAction::CLEAN_DELETE;
 // please enter required parameters for entry filter - only entries that suit the filter will be scanned by this profile
 $entryFilter = new KalturaBaseEntryFilter();
 
-//$entryFilter->typeEqual = KalturaEntryType::MEDIA_CLIP; // FOR EXAMPLE
-
 $entryFilter->typeIn = KalturaEntryType::MEDIA_CLIP . "," . KalturaEntryType::MIX;
 
 /**************************************************
