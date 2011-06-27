@@ -1150,15 +1150,37 @@ class kFlowHelper
 				
 		if($dbBatchJob->getJobSubType() == BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_SOURCE)
 		{
-			try
+			$convertProfileJob = $dbBatchJob->getRootJob();
+			if($convertProfileJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 			{
-				kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+				try
+				{
+					kBusinessPreConvertDL::continueProfileConvert($dbBatchJob);
+				}
+				catch(Exception $e)
+				{
+					KalturaLog::err($e->getMessage());
+					kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+					return $dbBatchJob;
+				}
 			}
-			catch(Exception $e)
+			elseif($currentFlavorAsset)
 			{
-				KalturaLog::err($e->getMessage());
-				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
-				return $dbBatchJob;
+				KalturaLog::log("Root job [" . $convertProfileJob->getId() . "] is not profile conversion");
+				
+				$syncKey = $currentFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				if(kFileSyncUtils::fileSync_exists($syncKey))
+				{
+					KalturaLog::debug("Start conversion");
+					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+					kJobsManager::addConvertProfileJob(null, $dbBatchJob->getEntry(), $currentFlavorAsset->getId(), $path);
+				}
+				else
+				{
+					KalturaLog::debug("File sync not created yet");
+				}
+					
+				return true;
 			}
 		}
 		
