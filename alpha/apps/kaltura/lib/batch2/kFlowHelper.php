@@ -1179,6 +1179,7 @@ class kFlowHelper
 				{
 					KalturaLog::debug("File sync not created yet");
 				}
+				$currentFlavorAsset = null;
 			}
 		}
 		
