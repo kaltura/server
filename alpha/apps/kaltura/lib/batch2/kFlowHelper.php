@@ -1641,20 +1641,9 @@ class kFlowHelper
 				if($dbAsset instanceof flavorAsset)
 				{
 					if($dbAsset->getIsOriginal())
-					{
 						$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
-					
-						$dbEntry = $dbAsset->getentry();
-						if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
-						{
-							$dbEntry->setStatus(entryStatus::PENDING);
-							$dbEntry->save();
-						}
-					}
 					else
-					{
 						$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
-					}
 				}
 	    	
 				if($dbAsset instanceof thumbAsset)
