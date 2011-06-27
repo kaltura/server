@@ -242,7 +242,7 @@ class KalturaObject
 						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						$this->$propertyName = null;
-						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error: '.$e->getMessage());
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
 			}
@@ -271,7 +271,10 @@ class KalturaObject
 				if (is_callable($getter_callback))
             	{
                 	$value = call_user_func($getter_callback);
-                	if ($value === $this->$propertyName) {
+                	if ($value === $this->$propertyName ||
+                		// since propel instansiates database boolean values as integer
+                		// a casting shoud be done for values arriving as bool from the api  
+                		(is_bool($this->$propertyName) && $value === (int)$this->$propertyName)) {
                 		continue;
                 	}
             	}
@@ -288,7 +291,7 @@ class KalturaObject
 						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
 						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
 						$this->$propertyName = null;
-						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.'-error: '.$e->getMessage());
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
 					}
 				}
 			}
