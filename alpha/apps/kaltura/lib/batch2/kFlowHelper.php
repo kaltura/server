@@ -667,8 +667,8 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
-		$flavorAsset->incrementVersion();
-		$flavorAsset->save();
+//		$flavorAsset->incrementVersion();
+//		$flavorAsset->save();
 		
 		$fallbackCreated = kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, $dbBatchJob->getJobSubType(), $data->getFlavorAssetId(), $data->getFlavorParamsOutputId(), $data->getMediaInfoId());
 		
