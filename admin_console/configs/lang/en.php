@@ -147,6 +147,7 @@ return array(
 	'Kaltura_Client_Enum_EntryStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Enum_EntryStatus::MODERATE' => 'Modarated',
 	'Kaltura_Client_Enum_EntryStatus::BLOCKED' => 'Blocked',
+	'Kaltura_Client_Enum_EntryStatus::NO_CONTENT' => 'No content',
 
 	'Kaltura_Client_Enum_EntryType::AUTOMATIC' => 'Automatic',
 	'Kaltura_Client_Enum_EntryType::MEDIA_CLIP' => 'Media Clip',
