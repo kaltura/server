@@ -3,12 +3,14 @@
  * @package plugins.systemPartner
  * @subpackage api.enum
  */
-class KalturaSystemPartnerLimitType extends KalturaEnum
+class KalturaSystemPartnerLimitType extends KalturaStringEnum
 {
-	const ENTRIES = 1;
-	const STREAM_ENTRIES = 2;
-	const BANDWIDTH = 3;
-	const PUBLISHERS = 4;
-	const ADMIN_USERS = 5;
-	const END_USERS = 6;
+	const ENTRIES = 'ENTRIES';
+	const STREAM_ENTRIES = 'STREAM_ENTRIES';
+	const BANDWIDTH = 'BANDWIDTH';
+	const PUBLISHERS = 'PUBLISHERS';
+	const ADMIN_LOGIN_USERS = 'ADMIN_LOGIN_USERS';
+	const LOGIN_USERS = 'LOGIN_USERS';
+	const USER_LOGIN_ATTEMPTS = 'USER_LOGIN_ATTEMPTS';
+	const BULK_SIZE = 'BULK_SIZE';
 }

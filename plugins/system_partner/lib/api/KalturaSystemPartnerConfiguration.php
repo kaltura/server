@@ -38,11 +38,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var int
 	 */
-	public $maxBulkSize;
-	
-	/**
-	 * @var int
-	 */
 	public $partnerPackage;
 	
 	/**
@@ -84,11 +79,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var int
 	 */
-	public $adminLoginUsersQuota;
-	
-	/**
-	 * @var int
-	 */
 	public $userSessionRoleId;
 	
 	/**
@@ -120,12 +110,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $allowMultiNotification;
-	
-	/**
-	 * @var int
-	 */
-	public $maxLoginAttempts;
-	
+		
 	/**
 	 * @var int
 	 */
@@ -156,6 +141,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $partnerParentId;
 	
+	/**
+	 * @var KalturaSystemPartnerLimitArray
+	 */
+	public $limits;
+	
 	private static $map_between_objects = array
 	(
 		"partnerName",
@@ -164,7 +154,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"adminEmail",
 		"host",
 		"cdnHost",
-		"maxBulkSize",
+		//"maxBulkSize",
 		"partnerPackage",
 		"monitorUsage",
 		"moderateContent",
@@ -173,21 +163,20 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"storageServePriority",
 		"kmcVersion",
 		"defThumbOffset",
-		"adminLoginUsersQuota",
+		//"adminLoginUsersQuota",
 		"userSessionRoleId",
 		"adminSessionRoleId",
 		"alwaysAllowedPermissionNames",
 		"importRemoteSourceForConvert",
 		"notificationsConfig",
 		"allowMultiNotification",
-		"maxLoginAttempts",
+		//"maxLoginAttempts",
 		"loginBlockPeriod",
 		"numPrevPassToKeep",
 		"passReplaceFreq",
 		"isFirstLogin",
 		//"partnerGroupType",
 		"partnerParentId"
-	
 	);
 
 	public function getMapBetweenObjects()
@@ -201,11 +190,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		$permissions = PermissionPeer::retrievePartnerLevelPermissions($source_object->getId());
 		$this->permissions = KalturaPermissionArray::fromDbArray($permissions);
+		$this->limits = KalturaSystemPartnerLimitArray::fromPartner($source_object);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
+		if (!$object_to_fill) {
+			KalturaLog::err('Cannot find object to fill');
+			return null;
+		}
 		
 		if(!is_null($this->permissions))
 		{
@@ -226,6 +220,14 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 					$dbPermission = $permission->toInsertableObject($dbPermission);
 				}
 				$dbPermission->save();
+			}
+		}
+		
+		if (!is_null($this->limits))
+		{
+			foreach ($this->limits as $limit)
+			{
+				$limit->apply($object_to_fill);
 			}
 		}
 		

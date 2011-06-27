@@ -1,6 +1,12 @@
 <?php 
+
+require_once(dirname(__FILE__).'/PartnerConfigurationLimits.php');
+
 class Form_PartnerConfiguration extends Infra_Form
 {
+    
+    const LIMITS_ARRAY_NAME = 'limitsArray';
+    
 	public function init()
 	{
 		// Set the method for the display form to POST
@@ -92,10 +98,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		//TODO: add XML Ingestion- Transformaion XSL (relevant for eagle).		
 //--------------------------- Password Security ---------------------------			
-		$this->addElement('text', 'max_login_attempts', array(
-			'label'			=> 'Maximum login attemps:',
-			'filters'		=> array('StringTrim'),
-		));
 		
 		$this->addElement('text', 'login_block_period', array(
 			'label'			=> 'Login Block Period (seconds):',
@@ -130,10 +132,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 //--------------------------- Account Options ---------------------------			
-		$this->addElement('text', 'admin_login_users_quota', array(
-			'label'			=> 'Number of KMC admin users:',
-			'filters'		=> array('StringTrim'),
-		));
 												
 		$this->addElement('checkbox', 'monitor_usage', array(
 			'label'	  => 'Monitor Usage',
@@ -149,6 +147,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
+		
+		$this->addLimitsElements();
+		
 			
 	//adding display groups
 	$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email','crossLine'), 'generalInformation', array('legend' => 'General Information'));
@@ -156,12 +157,12 @@ class Form_PartnerConfiguration extends Infra_Form
 	$this->addDisplayGroup(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert','crossLine'), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Account Policy'));	
 	$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 	$this->addDisplayGroup(array('def_thumb_offset','crossLine'), 'publisherSpecificIngestionSettings', array('legend' => 'Publisher Specific Ingestion Settings'));
-	$this->addDisplayGroup(array('max_login_attempts', 'login_block_period', 'num_prev_pass_to_keep', 'pass_replace_freq'), 'passwordSecurity', array('legend' => 'Password Security'));
+	$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS, 'login_block_period', 'num_prev_pass_to_keep', 'pass_replace_freq'), 'passwordSecurity', array('legend' => 'Password Security'));
 	
 	$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Group Association'));
 	
 	$this->addDisplayGroup(array('partner_package','crossLine'), 'accountPackages', array('legend' => 'Account Packages'));
-	$this->addDisplayGroup(array('admin_login_users_quota', 'monitor_usage','is_first_login'), 'accountOptions', array('legend' => 'Account Options'));
+	$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS, 'monitor_usage','is_first_login'), 'accountOptions', array('legend' => 'Account Options'));
 	
 //--------------------------- Enable/Disable Features ---------------------------
 	/*
@@ -258,7 +259,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			return;
 			
 		foreach($object->permissions as $permission)
-			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));		
+			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
+
+		$this->populateLimitsFromObject($object->limits);
 	}
 	
 	/* (non-PHPdoc)
@@ -291,6 +294,56 @@ class Form_PartnerConfiguration extends Infra_Form
 			}
 		}
 		
+		if (isset($properties[self::LIMITS_ARRAY_NAME]))
+		{
+		    $systemPartnerConfiguration->limits = $this->getLimitsObject($properties[self::LIMITS_ARRAY_NAME]);
+		}
+
 		return $systemPartnerConfiguration;
 	}
+	
+	
+	protected function addLimitsElements()
+	{
+	    $this->addElement('text', Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS, array(
+			'label'			=> 'Maximum login attemps:',
+			'filters'		=> array('StringTrim'),
+		));
+		$this->getElement(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS)->setBelongsTo(self::LIMITS_ARRAY_NAME);
+		
+		$this->addElement('text', Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS, array(
+			'label'			=> 'Number of KMC admin users:',
+			'filters'		=> array('StringTrim'),
+		
+		));
+		$this->getElement(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS)->setBelongsTo(self::LIMITS_ARRAY_NAME);
+	}
+	
+	protected function populateLimitsFromObject($limitsObject)
+	{
+	    if (is_array($limitsObject))
+		{
+			foreach ($limitsObject as $limit)
+			{
+				if ($limit instanceof Kaltura_Client_SystemPartner_Type_SystemPartnerLimit)
+				{
+				    $this->setDefault($limit->type, $limit->max);
+				}
+			}
+		}
+	}
+	
+	protected function getLimitsObject(array $limits)
+	{
+		$limitArray = array();
+		foreach ($limits as $key => $maxValue)
+		{
+			$limit = new Kaltura_Client_SystemPartner_Type_SystemPartnerLimit();
+			$limit->type = $key;
+			$limit->max = $maxValue;
+			$limitArray[] = $limit;
+		}
+		return $limitArray;
+	}
+	
 }

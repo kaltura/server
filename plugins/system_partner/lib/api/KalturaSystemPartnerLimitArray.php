@@ -14,8 +14,11 @@ class KalturaSystemPartnerLimitArray extends KalturaTypedArray
 		$arr = new KalturaSystemPartnerLimitArray();
 		$reflector = KalturaTypeReflectorCacher::get('KalturaSystemPartnerLimitType');
 		$types = $reflector->getConstants();
-		foreach($types as $type)
-			$arr[] = KalturaSystemPartnerLimit::fromPartner($type, $partner);;
+		foreach($types as $typeInfo) {
+		    $typeValue = $typeInfo->getDefaultValue();
+		    $arr[] = KalturaSystemPartnerLimit::fromPartner($typeValue, $partner);
+		}
+			
 			
 		return $arr;
 	} 

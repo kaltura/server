@@ -32,34 +32,44 @@ class KalturaSystemPartnerLimit extends KalturaObject
 		
 		switch($type)
 		{
-			case ENTRIES:
+			case KalturaSystemPartnerLimitType::ENTRIES:
 				$limit->max = $partner->getEntriesQuota();
 				$limit->overagePrice = $partner->getEntriesOveragePrice();
 				break;
 				
-			case STREAM_ENTRIES:
+			case KalturaSystemPartnerLimitType::STREAM_ENTRIES:
 				$limit->max = $partner->getStreamEntriesQuota();
 				$limit->overagePrice = $partner->getStreamEntriesOveragePrice();
 				break;
 				
-			case BANDWIDTH:
+			case KalturaSystemPartnerLimitType::BANDWIDTH:
 				$limit->max = $partner->getBandwidthQuota();
 				$limit->overagePrice = $partner->getBandwidthOveragePrice();
 				break;
 				
-			case PUBLISHERS:
+			case KalturaSystemPartnerLimitType::PUBLISHERS:
 				$limit->max = $partner->getPublishersQuota();
 				$limit->overagePrice = $partner->getPublishersOveragePrice();
 				break;
 				
-			case ADMIN_USERS:
+			case KalturaSystemPartnerLimitType::LOGIN_USERS:
 				$limit->max = $partner->getLoginUsersQuota();
 				$limit->overagePrice = $partner->getLoginUsersOveragePrice();
 				break;
 				
-			case END_USERS:
+			case KalturaSystemPartnerLimitType::ADMIN_LOGIN_USERS:
 				$limit->max = $partner->getAdminLoginUsersQuota();
 				$limit->overagePrice = $partner->getAdminLoginUsersOveragePrice();
+				break;
+				
+			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
+				$limit->max = $partner->getMaxLoginAttempts();
+				$limit->overagePrice = $partner->getMaxLoginAttemptsOveragePrice();
+				break;
+			
+			case KalturaSystemPartnerLimitType::BULK_SIZE:
+				$limit->max = $partner->getMaxBulkSize();
+				$limit->overagePrice = $partner->getMaxBulkSizeOveragePrice();
 				break;
 		}
 		return $limit;
@@ -67,34 +77,44 @@ class KalturaSystemPartnerLimit extends KalturaObject
 
 	public function validate()
 	{
-		switch($limit->type)
+		switch($this->type)
 		{
-			case ENTRIES:
+			case KalturaSystemPartnerLimitType::ENTRIES:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
 				
-			case STREAM_ENTRIES:
+			case KalturaSystemPartnerLimitType::STREAM_ENTRIES:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
 				
-			case BANDWIDTH:
+			case KalturaSystemPartnerLimitType::BANDWIDTH:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
 				
-			case PUBLISHERS:
+			case KalturaSystemPartnerLimitType::PUBLISHERS:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
 				
-			case ADMIN_USERS:
+			case KalturaSystemPartnerLimitType::LOGIN_USERS:
 				$this->validatePropertyMinValue('max', 1, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
 				
-			case END_USERS:
+			case KalturaSystemPartnerLimitType::ADMIN_LOGIN_USERS:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+				
+			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+			
+			case KalturaSystemPartnerLimitType::BULK_SIZE:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
@@ -106,36 +126,46 @@ class KalturaSystemPartnerLimit extends KalturaObject
 	 */
 	public function apply(Partner $partner)
 	{
-		switch($limit->type)
+		switch($this->type)
 		{
-			case ENTRIES:
-				$partner->setEntriesQuota($limit->max);
-				$partner->setEntriesOveragePrice($limit->overagePrice);
+			case KalturaSystemPartnerLimitType::ENTRIES:
+				$partner->setEntriesQuota($this->max);
+				$partner->setEntriesOveragePrice($this->overagePrice);
 				break;
 				
-			case STREAM_ENTRIES:
-				$partner->setStreamEntriesQuota($limit->max);
-				$partner->setStreamEntriesOveragePrice($limit->overagePrice);
+			case KalturaSystemPartnerLimitType::STREAM_ENTRIES:
+				$partner->setStreamEntriesQuota($this->max);
+				$partner->setStreamEntriesOveragePrice($this->overagePrice);
 				break;
 				
-			case BANDWIDTH:
-				$partner->setBandwidthQuota($limit->max);
-				$partner->setBandwidthOveragePrice($limit->overagePrice);
+			case KalturaSystemPartnerLimitType::BANDWIDTH:
+				$partner->setBandwidthQuota($this->max);
+				$partner->setBandwidthOveragePrice($this->overagePrice);
 				break;
 				
-			case PUBLISHERS:
-				$partner->setPublishersQuota($limit->max);
-				$partner->setPublishersOveragePrice($limit->overagePrice);
+			case KalturaSystemPartnerLimitType::PUBLISHERS:
+				$partner->setPublishersQuota($this->max);
+				$partner->setPublishersOveragePrice($this->overagePrice);
 				break;
 				
-			case ADMIN_USERS:
-				$partner->setLoginUsersQuota($limit->max);
-				$partner->setLoginUsersOveragePrice($limit->overagePrice);
+			case KalturaSystemPartnerLimitType::LOGIN_USERS:
+				$partner->setLoginUsersQuota($this->max);
+				$partner->setLoginUsersOveragePrice($this->overagePrice);
 				break;
 				
-			case END_USERS:
-				$partner->setAdminLoginUsersQuota($limit->max);
-				$partner->setAdminLoginUsersOveragePrice($limit->overagePrice);
+			case KalturaSystemPartnerLimitType::ADMIN_LOGIN_USERS:
+				$partner->setAdminLoginUsersQuota($this->max);
+				$partner->setAdminLoginUsersOveragePrice($this->overagePrice);
+				break;
+			
+			case KalturaSystemPartnerLimitType::USER_LOGIN_ATTEMPTS:
+				$partner->setMaxLoginAttempts($this->max);
+				$partner->setMaxLoginAttemptsOveragePrice($this->overagePrice);
+				break;
+			
+			case KalturaSystemPartnerLimitType::BULK_SIZE:
+				$partner->setMaxBulkSize($this->max);
+				$partner->setMaxBulkSizeOveragePrice($this->overagePrice);
 				break;
 		}
 	} 
