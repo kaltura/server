@@ -79,8 +79,10 @@ class YouTubeDistributionFeedHelper
 		}
 		$this->setStartTime(date('c', intval($startTime)));
 		
-        $this->setEndTime(date('c', intval($this->getValueForField(KalturaYouTubeDistributionField::END_TIME))));
-		
+		$endTime = $this->getValueForField(KalturaYouTubeDistributionField::END_TIME);
+		if ($endTime && intval($endTime)) {
+            $this->setEndTime(date('c', $endTime));
+		}		
 		
 		$this->setNotificationEmail($this->getValueForField(KalturaYouTubeDistributionField::NOTIFICATION_EMAIL));
 		$this->setUsername($this->getValueForField(KalturaYouTubeDistributionField::ACCOUNT_USERNAME));
