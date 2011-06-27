@@ -350,7 +350,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof flavorAsset)
+		if($object instanceof flavorAsset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
 			return true;
 		
 		return false;
@@ -373,14 +373,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				if(kFileSyncUtils::fileSync_exists($syncKey))
 					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 			
-				if($entry->getStatus() == entryStatus::NO_CONTENT)
-				{
-					$entry->setStatus(entryStatus::PENDING);
-					$entry->save();
-				}
+			}
+			
+			if($entry->getStatus() == entryStatus::NO_CONTENT)
+			{
+				$entry->setStatus(entryStatus::PENDING);
+				$entry->save();
 			}
 		}
-		elseif($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
+		else
 		{
 			$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
 			$object->save();
