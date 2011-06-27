@@ -34,7 +34,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoUrlResourceNoConvert()
@@ -56,7 +56,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoUrlResourceFromTemplate()
@@ -76,7 +76,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoUrlResourceFromMetadataTemplate()
@@ -96,7 +96,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddImageUrlResourceFromTemplate()
@@ -116,7 +116,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoRemoteStorageResource()
@@ -138,7 +138,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoFileSyncResource()
@@ -161,7 +161,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoLocalFileResource()
@@ -182,7 +182,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoWebcamTokenResource()
@@ -203,7 +203,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoEntryResource()
@@ -225,7 +225,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoAssetResource()
@@ -246,7 +246,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoUploadedFileTokenResource()
@@ -279,7 +279,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 		
 		$resultUploadToken = $this->client->uploadToken->upload($resource->token, $file);
 		$this->assertType('KalturaUploadToken', $resultUploadToken, 'Uploaded upload token of wrong type');
@@ -288,7 +288,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->get($resultEntry->id);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Retrieved entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, 'Retrieved entry of wrong status');
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Retrieved entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoAssetParamsResourceContainer()
@@ -311,7 +311,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoAssetsParamsResourceContainers()
@@ -337,7 +337,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoUrlResourceSourceOnly()
@@ -359,7 +359,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoRemoteStorageResourceSourceOnly()
@@ -382,7 +382,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoFileSyncResourceSourceOnly()
@@ -406,7 +406,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoLocalFileResourceSourceOnly()
@@ -428,7 +428,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoWebcamTokenResourceSourceOnly()
@@ -450,7 +450,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoEntryResourceSourceOnly()
@@ -473,7 +473,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoAssetResourceSourceOnly()
@@ -495,7 +495,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoUploadedFileTokenResourceSourceOnly()
@@ -529,7 +529,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 		
 		$resultUploadToken = $this->client->uploadToken->upload($resource->token, $file);
 		$this->assertType('KalturaUploadToken', $resultUploadToken, 'Uploaded upload token of wrong type');
@@ -538,7 +538,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->get($resultEntry->id);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Retrieved entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, 'Retrieved entry of wrong status');
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Retrieved entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoAssetParamsResourceContainerSourceOnly()
@@ -562,7 +562,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoAssetsParamsResourceContainersSourceOnly()
@@ -589,7 +589,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedOK()
@@ -621,7 +621,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedMissingOptionalIngested()
@@ -653,7 +653,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedMissingRequiredIngested()
@@ -680,7 +680,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedAllIngestedIngested()
@@ -722,7 +722,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedAllIngestedImported()
@@ -764,7 +764,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedAllIngestedRemote()
@@ -810,7 +810,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedAllIngested()
@@ -857,7 +857,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoIngestedMissingRequired()
@@ -884,7 +884,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddImageUrlResource()
@@ -905,7 +905,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddImageRemoteStorageResource()
@@ -927,7 +927,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddImageFileSyncResource()
@@ -950,7 +950,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddImageLocalFileResource()
@@ -971,7 +971,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddImageEntryResource()
@@ -992,7 +992,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddImageUploadedFileTokenResource()
@@ -1025,7 +1025,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 		
 		$resultUploadToken = $this->client->uploadToken->upload($resource->token, $file);
 		$this->assertType('KalturaUploadToken', $resultUploadToken, 'Uploaded upload token of wrong type');
@@ -1062,22 +1062,22 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		$resultUploadToken = $this->client->uploadToken->add($uploadToken);
 		$this->assertType('KalturaUploadToken', $resultUploadToken, 'Created upload token of wrong type');
 		$this->assertNotNull($resultUploadToken->id, 'Created upload token without id');
-		$this->assertEquals(KalturaUploadTokenStatus::PENDING, $resultUploadToken->status, 'Created upload token with wrong status');
+		$this->assertEquals(KalturaUploadTokenStatus::PENDING, $resultUploadToken->status, "Created upload token with wrong status [{$resultUploadToken->status}]");
 		
 		$resource->token = $resultUploadToken->id;
 		
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::IMPORT, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 		
 		$resultUploadToken = $this->client->uploadToken->upload($resource->token, $file);
 		$this->assertType('KalturaUploadToken', $resultUploadToken, 'Uploaded upload token of wrong type');
 		$this->assertNotNull($resultUploadToken->id, 'Uploaded upload token without id');
-		$this->assertEquals(KalturaUploadTokenStatus::CLOSED, $resultUploadToken->status, 'Uploaded upload token with wrong status');
+		$this->assertEquals(KalturaUploadTokenStatus::CLOSED, $resultUploadToken->status, "Uploaded upload token with wrong status [{$resultUploadToken->status}]");
 		
 		$resultEntry = $this->client->media->get($resultEntry->id);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Retrieved entry of wrong type');
-		$this->assertEquals(KalturaEntryStatus::PENDING, $resultEntry->status, 'Retrieved entry of wrong status');
+		$this->assertEquals(KalturaEntryStatus::PENDING, $resultEntry->status, "Retrieved entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 	}	
 	
 	public function testAddVideoFlavorAsset()
@@ -1109,12 +1109,12 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		$resultFlavorAsset = $this->client->flavorAsset->setContent($resultFlavorAsset->id, $contentResource);
 		$this->assertType('KalturaFlavorAsset', $resultFlavorAsset, 'Ingested flavor asset of wrong type');
 		$this->assertNotNull($resultFlavorAsset->id, 'Ingested flavor asset without id');
-		$this->assertEquals(KalturaFlavorAssetStatus::VALIDATING, $resultFlavorAsset->status, "Ingested flavor asset of wrong status [{$resultFlavorAsset->status}]");
+		$this->assertEquals(KalturaFlavorAssetStatus::QUEUED, $resultFlavorAsset->status, "Ingested flavor asset of wrong status [{$resultFlavorAsset->status}]");
 	
 		$resultEntry = $this->client->media->get($resultEntry->id);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
 		$this->assertNotNull($resultEntry->id, 'Ingested entry without id');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry with wrong status [{$resultEntry->status}]");
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry with wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
 		
 		$flavorAsset = new KalturaFlavorAsset();
 		$flavorAsset->flavorParamsId = 3;
@@ -1136,6 +1136,76 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		$resultEntry = $this->client->media->get($resultEntry->id);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
 		$this->assertNotNull($resultEntry->id, 'Ingested entry without id');
-		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry with wrong status [{$resultEntry->status}]");
-	}	
+		$this->assertEquals(KalturaEntryStatus::PRECONVERT, $resultEntry->status, "Ingested entry with wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
+	}
+	
+	public function testAddVideoClip()
+	{
+		$entry							= new KalturaMediaEntry();
+		$entry->mediaType				= KalturaMediaType::VIDEO;
+		$entry->name					= 'VideoOperationClipResource';
+		$entry->description				= 'Expected statuses: no content, converting';
+		$entry->categories				= self::getCategory();
+		
+		$operation1						= new KalturaClipAttributes();
+		$operation1->offset				= 2000;
+		$operation1->duration			= 4000;
+		
+		$resource						= new KalturaOperationResource();
+		$resource->resource				= new KalturaEntryResource();
+		$resource->resource->entryId	= '0_hrq0ye5f';
+		$resource->operationAttributes	= array($operation1);
+
+		$resultEntry = $this->client->media->add($entry);
+		$this->assertType('KalturaMediaEntry', $resultEntry, 'Created entry of wrong type');
+		$this->assertNotNull($resultEntry->id, 'Created entry without id');
+		$this->assertEquals(KalturaEntryStatus::NO_CONTENT, $resultEntry->status, 'Created entry with wrong status');
+		
+		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
+		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
+		$this->assertEquals(KalturaEntryStatus::PENDING, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
+	}
+	
+	public function testAddVideoTrim()
+	{
+		$entry							= new KalturaMediaEntry();
+		$entry->mediaType				= KalturaMediaType::VIDEO;
+		$entry->name					= 'VideoOperationTrimResource';
+		$entry->description				= 'Expected statuses: no content, ready';
+		$entry->categories				= self::getCategory();
+		
+		$resource						= new KalturaWebcamTokenResource();
+		$resource->token				= '191414FD-C27C-A713-C146-E83871C0EF91';
+
+		$resultEntry = $this->client->media->add($entry);
+		$this->assertType('KalturaMediaEntry', $resultEntry, 'Created entry of wrong type');
+		$this->assertNotNull($resultEntry->id, 'Created entry without id');
+		$this->assertEquals(KalturaEntryStatus::NO_CONTENT, $resultEntry->status, 'Created entry with wrong status');
+		
+		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
+		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
+		
+		// replace
+		
+		$operation1						= new KalturaClipAttributes();
+		$operation1->offset				= 2000;
+		$operation1->duration			= 4000;
+		
+		$resource						= new KalturaOperationResource();
+		$resource->resource				= new KalturaEntryResource();
+		$resource->resource->entryId	= $resultEntry->id;
+		$resource->operationAttributes	= array($operation1);
+		
+		$resultEntry = $this->client->media->updateContent($resultEntry->id, $resource);
+		$this->assertType('KalturaMediaEntry', $resultEntry, 'Replaced entry of wrong type');
+		$this->assertEquals(KalturaEntryStatus::READY, $resultEntry->status, "Replaced entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
+		$this->assertNotNull($resultEntry->replacingEntryId, 'Replaced entry without replacing entry id');
+		
+		$tempEntry = $this->client->media->get($resultEntry->replacingEntryId);
+		$this->assertType('KalturaMediaEntry', $tempEntry, 'Temp entry of wrong type');
+		$this->assertEquals(KalturaEntryStatus::PENDING, $tempEntry->status, "Temp entry of wrong status [{$tempEntry->status}]");
+		$this->assertEquals($resultEntry->id, $tempEntry->replacedEntryId, "Temp entry with wrong replaced id [{$tempEntry->replacedEntryId}]");
+	}
 }
+
