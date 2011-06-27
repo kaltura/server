@@ -350,7 +350,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof flavorAsset && $object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
+		if($object instanceof flavorAsset)
 			return true;
 		
 		return false;
@@ -363,28 +363,30 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		$entry = $object->getentry();
 		
-		if($object->getIsOriginal())
+		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
 		{
-			if($entry->getType() == entryType::MEDIA_CLIP)
+			if($object->getIsOriginal())
 			{
-				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			
-				if(kFileSyncUtils::fileSync_exists($syncKey))
-					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
-			
+				if($entry->getType() == entryType::MEDIA_CLIP)
+				{
+					$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				
+					if(kFileSyncUtils::fileSync_exists($syncKey))
+						kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+				}
 			}
-			
-			if($entry->getStatus() == entryStatus::NO_CONTENT)
+			else
 			{
-				$entry->setStatus(entryStatus::PENDING);
-				$entry->save();
+				$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
+				$object->save();
 			}
 		}
-		else
+		
+		if($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)
 		{
-			$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
-			$object->save();
+			$entry->setStatus(entryStatus::PENDING);
+			$entry->save();
 		}
 		
 		return true;
