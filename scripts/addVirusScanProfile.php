@@ -8,14 +8,14 @@ DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
 /**************************************************
- * PLEASE CONFIGURE REQUIRED SETTINGS
- ***************************************************/
+* PLEASE CONFIGURE REQUIRED SETTINGS
+***************************************************/
 
 // partner's ID - must be set!
-$partnerId = null;
+$partnerId = 470781;//585831
 
 // please enter a name for the profile:
-$profileName = null;
+$profileName = 'virusScan';
 
 // please entery profile's status (enabled/disabled):
 $profileStatus = KalturaVirusScanProfileStatus::ENABLED; // can be changed to KalturaVirusScanProfileStatus::DISABLED
@@ -24,20 +24,22 @@ $profileStatus = KalturaVirusScanProfileStatus::ENABLED; // can be changed to Ka
 $engineType = SymantecScanEnginePlugin::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . SymantecScanEngineVirusScanEngineType::SYMANTEC_SCAN_ENGINE; // Value from KalturaVirusScanEngineType
 
 // action if file is found infected:
-$actionIfInfected = KalturaVirusFoundAction::CLEAN_NONE;
+$actionIfInfected = KalturaVirusFoundAction::CLEAN_DELETE;
 
 // please enter required parameters for entry filter - only entries that suit the filter will be scanned by this profile
 $entryFilter = new KalturaBaseEntryFilter();
-$entryFilter->typeEqual = KalturaEntryType::DOCUMENT; // FOR EXAMPLE
 
+//$entryFilter->typeEqual = KalturaEntryType::MEDIA_CLIP; // FOR EXAMPLE
+
+$entryFilter->typeIn = KalturaEntryType::MEDIA_CLIP . "," . KalturaEntryType::MIX;
 
 /**************************************************
- * DON'T TOUCH THE FOLLOWING CODE
- ***************************************************/
+* DON'T TOUCH THE FOLLOWING CODE
+***************************************************/
 
 if (!$partnerId)
 {
-	die('$partnerId cannot be empty');
+      die('$partnerId cannot be empty');
 }
 
 $profile = new KalturaVirusScanProfile();
@@ -53,4 +55,3 @@ $dbProfile->setPartnerId($partnerId);
 $dbProfile->save();
 
 die('Done!');
-
