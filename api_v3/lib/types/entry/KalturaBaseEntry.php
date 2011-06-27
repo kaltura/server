@@ -406,7 +406,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	
 	public function validateObjectsExist()
 	{
-		if(!is_null($this->conversionProfileId))
+		if(!is_null($this->conversionProfileId) && $this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
 			if(!$conversionProfile)
