@@ -132,9 +132,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $isFirstLogin;
 	
 	/**
-	 * @var int
+	 * @var KalturaPartnerGroupType
 	 */
-	//public $partnerGroupType;
+	public $partnerGroupType;
 	
 	/**
 	 * @var int
@@ -175,7 +175,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"numPrevPassToKeep",
 		"passReplaceFreq",
 		"isFirstLogin",
-		//"partnerGroupType",
+		"partnerGroupType",
 		"partnerParentId"
 	);
 

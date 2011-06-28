@@ -218,8 +218,8 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::SCP' => 'SCP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP' => 'SFTP',
 
-	'Kaltura_Client_Enum_StorageServePriority::Kaltura_ONLY' => 'Kaltura Storage Only',
-	'Kaltura_Client_Enum_StorageServePriority::Kaltura_FIRST' => 'Kaltura Storage First',
+	'Kaltura_Client_Enum_StorageServePriority::KALTURA_ONLY' => 'Kaltura Storage Only',
+	'Kaltura_Client_Enum_StorageServePriority::KALTURA_FIRST' => 'Kaltura Storage First',
 	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_ONLY' => 'External Storage Only',
 	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST' => 'External Storage First',
 
@@ -229,6 +229,12 @@ return array(
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
 	'partner not found' => 'Publisher not found',
+
+	//partner group type
+	'Kaltura_Client_Enum_PartnerGroupType::PUBLISHER' => 'Publisher',
+	'Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP' => 'Var',
+	'Kaltura_Client_Enum_PartnerGroupType::GROUP' => 'Group',
+
 
 	// login
 	'login error' => 'Invalid credentials provided',

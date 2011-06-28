@@ -9,11 +9,7 @@
  * @subpackage model
  */ 
 class Partner extends BasePartner
-{
-	const PARTNER_GROUP_TYPE_PUBLISHER = 1;
-	const PARTNER_GROUP_TYPE_VAR = 2;
-	const PARTNER_GROUP_TYPE_GROUP = 3;
-	
+{	
 	const BATCH_PARTNER_ID = -1;
 	const ADMIN_CONSOLE_PARTNER_ID = -2;
 	

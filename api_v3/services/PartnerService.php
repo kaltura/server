@@ -58,8 +58,8 @@ class PartnerService extends KalturaBaseService
 				
 				// only if this partner is a var/grou, allow setting it as parent for the new created partner
 				$parentPartner = PartnerPeer::retrieveByPK( $parentPartnerId );
-				if ( ! ($parentPartner->getPartnerGroupType() == Partner::PARTNER_GROUP_TYPE_VAR ||
-						$parentPartner->getPartnerGroupType() == Partner::PARTNER_GROUP_TYPE_GROUP ) )
+				if ( ! ($parentPartner->getPartnerGroupType() == PartnerGroupType::VAR_GROUP ||
+						$parentPartner->getPartnerGroupType() == PartnerGroupType::GROUP ) )
 				{
 					throw new KalturaAPIException( KalturaErrors::NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD , $parentPartnerId );
 				}

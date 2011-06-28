@@ -91,7 +91,6 @@ class Form_PartnerConfiguration extends Infra_Form
 //--------------------------- Publisher Specific Ingestion Settings ---------------------------	
 		$this->addElement('text', 'def_thumb_offset', array(
 			'label'	  => 'Default Thumbnail Offset',
-			//'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
 		));	
 		
 		//TODO: add XML Ingestion- Transformaion XSL (relevant for eagle).		
@@ -116,9 +115,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		//	'label'			=> 'Partner Group Type:',
 		//	'filters'		=> array('StringTrim'),
 		//));	
-		//$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
-		//$partnerGroupTypes->setLabel('Partner Group Type:');
-		//$this->addElements(array($partnerGroupTypes));
+		
+		$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('partner_group_type', array('enum' => 'Kaltura_Client_Enum_PartnerGroupType'));
+		$partnerGroupTypes->setLabel('Partner Group Type:');
+		$this->addElements(array($partnerGroupTypes));
 		
 		$this->addElement ('text','partner_parent_id', array(
 			'label'			=> 'Partner Parent Id:',
@@ -140,7 +140,13 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Force first login message',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
 		));		
-//-----------------------------------------------------------------------		
+
+//--------------------------- Included Usage ---------------------------	
+		$element = new Zend_Form_Element_Hidden('includedUsageLabel');
+		$element->setLabel('For reporting purposes only. Leave empty for unlimited usage or when not applicable');		
+		$this->addElements(array($element));
+		
+//-----------------------------------------------------------------------	
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
@@ -157,10 +163,13 @@ class Form_PartnerConfiguration extends Infra_Form
 	$this->addDisplayGroup(array('def_thumb_offset','crossLine'), 'publisherSpecificIngestionSettings', array('legend' => 'Publisher Specific Ingestion Settings'));
 	$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS, 'login_block_period', 'num_prev_pass_to_keep', 'pass_replace_freq'), 'passwordSecurity', array('legend' => 'Password Security'));
 	
+	
+	
 	$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Group Association'));
 	
 	$this->addDisplayGroup(array('partner_package','crossLine'), 'accountPackages', array('legend' => 'Account Packages'));
-	$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS, 'monitor_usage','is_first_login'), 'accountOptions', array('legend' => 'Account Options'));
+	$this->addDisplayGroup(array('monitor_usage','is_first_login','crossLine'), 'accountOptions', array('legend' => 'Account Options'));
+	$this->addDisplayGroup(array('includedUsageLabel', Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS,'crossLine'), 'includedUsage', array('legend' => 'Included Usage'));
 	
 //--------------------------- Enable/Disable Features ---------------------------
 	/*

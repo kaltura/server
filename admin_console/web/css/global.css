@@ -554,7 +554,7 @@ form#frmCreateDropFolder dt { float: left; }
 
 #partner-configure-dialog .configureDiv { float:left; width:50%; }
 #partner-configure-dialog .configureDiv #fieldset-enableDisableFeatures input { width: 20px; }
-#partner-configure-dialog .partnerConfigureFormColumn fieldset { border:none; background:none; margin: 0px 0px 10px 21px; }
+#partner-configure-dialog .partnerConfigureFormColumn fieldset { border:none; background:none; margin: 0px 0px 0px 21px; }
 #partner-configure-dialog .partnerConfigureFormColumn fieldset legend{ font-weight:bold; }
 
 
@@ -563,3 +563,4 @@ form#frmCreateDropFolder dt { float: left; }
 
 #partner-configure-dialog #frmPartnerConfigure fieldset { width:350px; }
 
+#partner-configure-dialog #fieldset-includedUsage legend { margin-top:-8px; }
