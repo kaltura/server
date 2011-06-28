@@ -16,7 +16,7 @@ class varpartnerlistAction extends kalturaAction
 		sfView::SUCCESS;
 		
 		$this->me = PartnerPeer::retrieveByPK($this->getP('partner_id', null));
-		if(!$this->me || $this->me->getPartnerGroupType() != Partner::PARTNER_GROUP_TYPE_VAR)
+		if(!$this->me || $this->me->getPartnerGroupType() != PartnerGroupType::VAR_GROUP)
 		{
 			die('You are not an wuthorized VAR. If you are a VAR, Please contact us at support@kaltura.com');
 		}
