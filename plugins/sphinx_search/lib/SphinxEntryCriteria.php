@@ -262,7 +262,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if($filter->is_set('_is_root'))
 		{
 			if($filter->get('_is_root'))
-				$matchOrRoots[] = "!entry";
+				$filter->set('_notin_roots', "entry");
 			else
 				$matchOrRoots[] = "entry";
 				
