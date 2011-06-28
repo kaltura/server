@@ -107,7 +107,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		$this->writeIni("[config]");
 		$this->writeIni("source                                            = xml");
-		$this->writeIni("serviceUrl                                        = http://@SERVICE_URL@/");
+		$this->writeIni("serviceUrl                                        = @SERVICE_URL@");
 		$this->writeIni("partnerId                                         = @TEST_PARTNER_ID@");
 		$this->writeIni("clientTag                                         = unitTest");
 		$this->writeIni("curlTimeout                                       = 90");
@@ -223,7 +223,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("	abstract public function testFinished(\$id);");
 		$this->writeBase("");
 		
-		$serviceName = $serviceReflector->getServiceName();
+		$serviceClass = $serviceReflector->getServiceClass();
+		$serviceClass = ucfirst($serviceClass); //Capital first letter 
 		
 		$this->writeBase("	/**");
 		$this->writeBase("	 * ");
@@ -231,7 +232,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("	 */");
 		$this->writeBase("	public static function suite()");
 		$this->writeBase("	{");
-		$this->writeBase("		return new KalturaTestSuite('$serviceName');");
+		$this->writeBase("		return new KalturaTestSuite('{$serviceClass}Test');");
 		$this->writeBase("	}");
 		$this->writeBase("");
 		
