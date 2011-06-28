@@ -245,6 +245,17 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		$feed->sendFeed($sftpManager);
+		
+		$thumbnailFilePath = $providerData->thumbAssetFilePath;
+		if (file_exists($thumbnailFilePath))
+			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
+			
+		if (file_exists($thumbnailFilePath))
+		{
+			$thumbnailSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
+			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
+		}
+		
 		$feed->setDeliveryComplete($sftpManager);
 		
 		$providerData->sftpDirectory = $feed->getDirectoryName();
@@ -270,7 +281,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		}
 		catch(kFileTransferMgrException $ex) // file is still missing
 		{
-			KalturaLog::info('File doesn\'t exists yet, retry later');
+			KalturaLog::info('File doesn\'t exist yet, retry later');
 			return false;
 		}
 		
