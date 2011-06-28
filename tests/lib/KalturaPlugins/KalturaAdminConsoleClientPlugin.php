@@ -3,6 +3,275 @@ require_once(dirname(__FILE__) . "/../KalturaClientBase.php");
 require_once(dirname(__FILE__) . "/../KalturaEnums.php");
 require_once(dirname(__FILE__) . "/../KalturaTypes.php");
 
+class KalturaTrackEntryEventType
+{
+	const UPLOADED_FILE = 1;
+	const WEBCAM_COMPLETED = 2;
+	const IMPORT_STARTED = 3;
+	const ADD_ENTRY = 4;
+	const UPDATE_ENTRY = 5;
+	const DELETED_ENTRY = 6;
+}
+
+class KalturaUiConfAdminOrderBy
+{
+	const CREATED_AT_ASC = "+createdAt";
+	const CREATED_AT_DESC = "-createdAt";
+	const UPDATED_AT_ASC = "+updatedAt";
+	const UPDATED_AT_DESC = "-updatedAt";
+}
+
+class KalturaFlavorParamsOutputListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaFlavorParamsOutput
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaThumbParamsOutputListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaThumbParamsOutput
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaMediaInfoListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaMediaInfo
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaTrackEntry extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $id = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaTrackEntryEventType
+	 */
+	public $trackEventType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $psVersion = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $context = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $partnerId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $entryId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $hostName = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userId = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $changedProperties = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr1 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr2 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $paramStr3 = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $ks = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $userIp = null;
+
+
+}
+
+class KalturaTrackEntryListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaTrackEntry
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+class KalturaUiConfAdmin extends KalturaUiConf
+{
+	/**
+	 * 
+	 *
+	 * @var bool
+	 */
+	public $isPublic = null;
+
+
+}
+
+class KalturaUiConfAdminListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaUiConfAdmin
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+
+}
+
+abstract class KalturaUiConfAdminBaseFilter extends KalturaUiConfFilter
+{
+
+}
+
+class KalturaUiConfAdminFilter extends KalturaUiConfAdminBaseFilter
+{
+
+}
+
 
 class KalturaFlavorParamsOutputService extends KalturaServiceBase
 {
