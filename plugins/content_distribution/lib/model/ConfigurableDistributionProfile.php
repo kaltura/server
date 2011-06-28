@@ -76,7 +76,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	        if ($config instanceof  DistributionFieldConfig) {
 	            $fieldName = $config->getFieldName();
 	            $defaultRequiredStatus = isset($defaultConfigArray[$fieldName]) ? $defaultConfigArray[$fieldName]->getIsRequired() : null;
-	            if ($defaultRequiredStatus === DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER) {
+	            if ($defaultRequiredStatus == DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER) {
 	            	$config->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	            }
 	            else if ($config->getIsRequired() == DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER) {
