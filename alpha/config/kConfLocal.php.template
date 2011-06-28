@@ -234,11 +234,11 @@ class kConfLocal
 		      array (
 		      	'classname' => 'KalturaPDO',
 		        'phptype' => 'mysql',
-		        'database' => '@DB1_NAME@',
-		        'hostspec' => '@DB1_HOST@',
-		        'user' => '@DB1_USER@',
-		        'password' => '@DB1_PASS@',
-				'dsn' => 'mysql:host=@DB1_HOST@;port=@DB1_PORT@;dbname=@DB1_NAME@;user=@DB1_USER@;password=@DB1_PASS@;',
+		        'database' => '@SPHINX_DB_NAME@',
+		        'hostspec' => '@SPHINX_DB_HOST@',
+		        'user' => '@SPHINX_DB_USER@',
+		        'password' => '@SPHINX_DB_PASS@',
+				'dsn' => 'mysql:host=@SPHINX_DB_HOST@;port=@SPHINX_DB_PORT@;dbname=@SPHINX_DB_NAME@;user=@SPHINX_DB_USER@;password=@SPHINX_DB_PASS@;',
 		      ),
 		    ),
 		    
@@ -250,11 +250,11 @@ class kConfLocal
 		      array (
 		      	'classname' => 'KalturaPDO',
 		        'phptype' => 'mysql',
-		        'database' => '@DB1_NAME@',
-		        'hostspec' => '@DB1_HOST@',
-		        'user' => '@DB1_USER@',
-		        'password' => '@DB1_PASS@',
-				'dsn' => 'mysql:host=@DB1_HOST@;port=@DB1_PORT@;dbname=@DB1_NAME@;user=@DB1_USER@;password=@DB1_PASS@;',
+		        'database' => '@SPHINX_DB_NAME@',
+		        'hostspec' => '@SPHINX_DB_HOST@',
+		        'user' => '@SPHINX_DB_USER@',
+		        'password' => '@SPHINX_DB_PASS@',
+				'dsn' => 'mysql:host=@SPHINX_DB_HOST@;port=@SPHINX_DB_PORT@;dbname=@SPHINX_DB_NAME@;user=@SPHINX_DB_USER@;password=@SPHINX_DB_PASS@;',
 		      ),
 		    ),
 		    
@@ -264,7 +264,7 @@ class kConfLocal
 		      'adapter' => 'mysql',
 		      'connection' => 
 		      array (
-				'dsn' => 'mysql:host=127.0.0.1;port=9312;',
+				'dsn' => 'mysql:host=@SPHINX_DB_HOST@;port=9312;',
 		      ),
 		    ),
 			
