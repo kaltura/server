@@ -1600,7 +1600,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			$ret[] = 'bulk job ' . $this->getBulkUploadId();
 			
 		if($this->getRootEntryId() != $this->getId())
-			$ret[] = 'entry ' . $this->getBulkUploadId();
+			$ret[] = 'entry ' . $this->getRootEntryId();
 		
 		return implode(',', $ret);
 	}
