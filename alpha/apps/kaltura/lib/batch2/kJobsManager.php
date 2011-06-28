@@ -756,68 +756,66 @@ class kJobsManager
 			KalturaLog::debug("Input file [$inputFileSyncLocalPath] does not exist");
 			
 			$partner = $entry->getPartner();
-			if($partner && $partner->getImportRemoteSourceForConvert())
+		
+			$conversionRequired = false;
+			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+			$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
+			KalturaLog::debug("Found flavors [" . count($flavors) . "] in conversion profile [" . $conversionProfile->getId() . "]");
+			foreach($flavors as $flavor)
 			{
-				$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-				$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
-				if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+				if($flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
 				{
-					$conversionRequired = false;
-					$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
-					$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
-					KalturaLog::debug("Found flavors [" . count($flavors) . "] in conversion profile [" . $conversionProfile->getId() . "]");
-					foreach($flavors as $flavor)
+					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] is ingested source");
+					continue;
+				}
+			
+				if($flavor->getOrigin() == assetParamsOrigin::INGEST || $flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
+				{
+					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
+					continue;
+				}
+			
+				if($flavor->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
+				{
+					$siblingFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $flavor->getFlavorParamsId());
+					if($siblingFlavorAsset)
 					{
-						if($flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
-						{
-							KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] is ingested source");
-							continue;
-						}
-					
-						if($flavor->getOrigin() == assetParamsOrigin::INGEST || $flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
-						{
-							KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
-							continue;
-						}
-					
-						if($flavor->getOrigin() == assetParamsOrigin::CONVERT_WHEN_MISSING)
-						{
-							$siblingFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $flavor->getFlavorParamsId());
-							if($siblingFlavorAsset)
-							{
-								KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] already ingested");
-								continue;
-							}
-						}
-						
-						$conversionRequired = true;
-						break;
-					}
-					
-					if($conversionRequired)
-					{
-						KalturaLog::debug("Creates import job for remote file sync");
-						$url = $syncFile->getExternalUrl();
-						kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
-					}
-					else
-					{
-						$entry->setStatus(entryStatus::READY);
-						$entry->save();
+						KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] already ingested");
+						continue;
 					}
 				}
-				KalturaLog::notice("File sync is not URL");
-				return null;
+				
+				$conversionRequired = true;
+				break;
 			}
 			
-			$entry->setStatus(entryStatus::ERROR_CONVERTING);
-			$entry->save();
-			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-			$flavorAsset->setDescription('Entry of size 0 should not be converted');
-			$flavorAsset->save();
-			KalturaLog::err('Entry of size 0 should not be converted');
+			if($conversionRequired)
+			{
+				$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+				if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+				{
+					KalturaLog::debug("Creates import job for remote file sync");
+					$url = $syncFile->getExternalUrl();
+					kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
+				}
+				else
+				{
+					$entry->setStatus(entryStatus::ERROR_CONVERTING);
+					$entry->save();
+					$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+					$flavorAsset->setDescription('Entry of size 0 should not be converted');
+					$flavorAsset->save();
+					KalturaLog::err('Entry of size 0 should not be converted');
+				}
+			}
+			else
+			{
+				$entry->setStatus(entryStatus::READY);
+				$entry->save();
+			}
 			return null;
 		}
 	
