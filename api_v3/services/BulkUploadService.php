@@ -23,11 +23,11 @@ class BulkUploadService extends KalturaBaseService
 	 * 
 	 * @action add
 	 * @param int $conversionProfileId Convertion profile id to use for converting the current bulk (-1 to use partner's default)
-	 * @param file $fileData bullk upload file
+	 * @param file $csvFileData bullk upload file
 	 * @param KalturaBulkUploadType $bulkUploadType
 	 * @return KalturaBulkUpload
 	 */
-	function addAction($conversionProfileId, $fileData, $bulkUploadType = null)
+	function addAction($conversionProfileId, $csvFileData, $bulkUploadType = null)
 	{
 		if($conversionProfileId == self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
 			$conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
@@ -38,7 +38,7 @@ class BulkUploadService extends KalturaBaseService
 		
 		$coreBulkUploadType = kPluginableEnumsManager::apiToCore('BulkUploadType', $bulkUploadType);
 		
-		$dbJob = kJobsManager::addBulkUploadJob($fileData["tmp_name"], $this->getPartner(), $this->getKuser()->getPuserId(), $conversionProfileId, $coreBulkUploadType);
+		$dbJob = kJobsManager::addBulkUploadJob($csvFileData["tmp_name"], $this->getPartner(), $this->getKuser()->getPuserId(), $conversionProfileId, $coreBulkUploadType);
 		
 		$bulkUpload = new KalturaBulkUpload();
 		$bulkUpload->fromObject($dbJob);
