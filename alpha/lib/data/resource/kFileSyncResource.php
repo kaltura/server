@@ -11,32 +11,32 @@ class kFileSyncResource extends kContentResource
 	 * The object type of the file sync object 
 	 * @var int
 	 */
-	public $fileSyncObjectType;
+	private $fileSyncObjectType;
 	
 	/**
 	 * The object sub-type of the file sync object 
 	 * @var int
 	 */
-	public $objectSubType;
+	private $objectSubType;
 	
 	/**
 	 * The object id of the file sync object 
 	 * @var string
 	 */
-	public $objectId;
+	private $objectId;
 	
 	/**
 	 * The version of the file sync object 
 	 * @var string
 	 */
-	public $version;
+	private $version;
 	
 	/**
 	 * @return string
 	 */
 	public function getEntryId()
 	{
-		$this->fileSyncObjectType == FileSyncObjectType::ENTRY;
+		if($this->fileSyncObjectType == FileSyncObjectType::ENTRY)
 			return $this->objectId;
 			
 		$object = kFileSyncObjectManager::retrieveObject($this->fileSyncObjectType, $this->objectId);
