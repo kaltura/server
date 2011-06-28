@@ -152,8 +152,22 @@ class LogMethod
 {
 	public function __toString()
 	{
-		$backtraceIndex = 7;
+		$backtraceIndex = 3;
 		$backtrace = debug_backtrace();
+		
+		while(
+			$backtraceIndex < count($backtrace)
+			&&
+			(
+//				$backtrace[$backtraceIndex]["file"] == __FILE__
+//				||
+				(isset($backtrace[$backtraceIndex]["class"]) && is_int(strpos($backtrace[$backtraceIndex]["class"], 'Log')))
+				||
+				(isset($backtrace[$backtraceIndex]["function"]) && $backtrace[$backtraceIndex]["function"] == 'log')
+			)
+		)
+			$backtraceIndex++;
+			
 		if (isset($backtrace[$backtraceIndex]))
 		{
 			if (isset($backtrace[$backtraceIndex]["class"]))
