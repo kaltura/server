@@ -110,7 +110,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $notify;
 	
 	/**
-	 * @var int
+	 * @var KalturaPartnerStatus
 	 * @readonly
 	 * @filter eq,in,order
 	 */
