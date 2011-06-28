@@ -293,6 +293,8 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * ID of source root entry, used for clipped, skipped and cropped entries that created from another entry  
 	 * 
 	 * @var string
+	 * @filter eq,in
+	 * @readonly
 	 */
 	public $rootEntryId;
 	

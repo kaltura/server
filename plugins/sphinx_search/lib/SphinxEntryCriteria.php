@@ -19,6 +19,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entry.REPLACING_ENTRY_ID' => 'replacing_entry_id',
 		'entry.REPLACED_ENTRY_ID' => 'replaced_entry_id',
 		'entry.SEARCH_TEXT' => '(name,tags,description,entry_id)',
+		'entry.ROOT_ENTRY_ID' => 'roots',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
@@ -87,6 +88,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'replacing_entry_id' => IIndexable::FIELD_TYPE_STRING,
 		'replaced_entry_id' => IIndexable::FIELD_TYPE_STRING,
 		'(name,tags,description,entry_id)' => IIndexable::FIELD_TYPE_STRING,
+		'roots' => IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -242,11 +244,32 @@ class SphinxEntryCriteria extends SphinxCriteria
 				$filter->set ( "_matchor_categories_ids",category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 			$filter->unsetByName('_matchor_categories');
 		}
+		
+		$matchOrRoots = array();
+		if($filter->is_set('_eq_root_entry_id'))
+		{
+			$matchOrRoots[] = "entry " . $filter->get('_eq_root_entry_id');
+		}
+		if($filter->is_set('_in_root_entry_id'))
+		{
+			$roots = explode(baseObjectFilter::IN_SEPARATOR, $filter->get('_in_root_entry_id'));
+			foreach($roots as $root)
+				$matchOrRoots[] = "entry $root";
+		}
+		if($filter->is_set('_is_root'))
+		{
+			if($filter->get('_is_root'))
+				$matchOrRoots[] = "!entry";
+			else
+				$matchOrRoots[] = "entry";
+		}
+		if(count($matchOrRoots))
+			$filter->set('_matchand_roots', $matchOrRoots);
 			
 //		if ($filter->get("_matchor_duration_type") !== null)
 //			$filter->set("_matchor_duration_type", $filter->durationTypesToIndexedStrings($filter->get("_matchor_duration_type")));
 			
-		if ($filter->get(baseObjectFilter::ORDER) === "recent")
+		if($filter->get(baseObjectFilter::ORDER) === "recent")
 		{
 			$filter->set("_lte_available_from", time());
 			$filter->set("_gteornull_end_date", time()); // schedule not finished
@@ -462,6 +485,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			"reference_id",
 			"replacing_entry_id",
 			"replaced_entry_id",
+			"root_entry_id",
 		));
 	}
 }

@@ -8,6 +8,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	private $map_between_objects = array
 	(
 		"freeText" => "_free_text",
+		"isRoot" => "_is_root",
 	);
 
 	public function getMapBetweenObjects()
@@ -19,4 +20,9 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @var string
 	 */
 	public $freeText;
+
+	/**
+	 * @var bool
+	 */
+	public $isRoot;
 }

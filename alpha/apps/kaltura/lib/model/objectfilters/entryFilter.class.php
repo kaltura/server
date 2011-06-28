@@ -123,6 +123,8 @@ class entryFilter extends baseObjectFilter
 			"_lte_partner_sort_value",
 			"_eq_root_entry_id",
 			"_in_root_entry_id",
+			"_is_root",
+			"_matchand_roots",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 

@@ -65,6 +65,8 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 		"replacementStatusIn" => "_in_replacement_status",
 		"partnerSortValueGreaterThanOrEqual" => "_gte_partner_sort_value",
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
+		"rootEntryIdEqual" => "_eq_root_entry_id",
+		"rootEntryIdIn" => "_in_root_entry_id",
 		"tagsNameMultiLikeOr" => "_mlikeor_tags-name",
 		"tagsAdminTagsMultiLikeOr" => "_mlikeor_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeOr" => "_mlikeor_tags-admin_tags-name",
@@ -502,6 +504,20 @@ class KalturaBaseEntryBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $partnerSortValueLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $rootEntryIdEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $rootEntryIdIn;
 
 	/**
 	 * @var string
