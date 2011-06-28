@@ -330,8 +330,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 					
 				$propertyType = $actionParamProperty->getType();
 				$propertyName = $actionParamProperty->getName();
-				
-				if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
+
+				if( $actionParamProperty->isSimpleType() || $actionParamProperty->isEnum() || 
+					$actionParamProperty->isDynamicEnum() || $outputTypeReflector->isDynamicEnum()				   
+				  )
 				{
 					$paramDefaultValue = $actionParamProperty->getDefaultValue();
 					$this->writeIni("test1.reference.$propertyName = " . $paramDefaultValue);
@@ -397,7 +399,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		if($isBase)
 			$validateValues[] = "\$reference";
-		else //Test
+		else //write to TestFile
 			$testValues[] = "\$reference";
 	}
 	
@@ -421,133 +423,117 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			
 		$isParamContainsId = (substr_count($paramName, "id") > 0) || (substr_count($paramName, "Id") > 0); 
 		
-//		if($addId && $isParamContainsId)  
-//		{
-//			//Adds the new param / value to the test params / values
-//			$testParams[] = $testParam;
-//			$testValues[] = "\$$paramName";
-//			
-//			if($paramName == 'type')
-//			{
-//				$this->writeIni("test1.objType.$paramName = dependency");
-//			}
-//			else
-//			{
-//				$this->writeIni("test1.$paramName.type = dependency");
-//			}
-//			
-//			$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = ''/>");
-//		}
-//		else
-//		{
-			if($actionParam->isSimpleType() || $actionParam->isEnum())
+		if($actionParam->isSimpleType() || $actionParam->isEnum() || 
+		   $actionParam->isStringEnum() || $actionParam->isDynamicEnum()
+		   )
+		{
+			$paramDefaultValue = $actionParam->getDefaultValue();
+			$this->writeIni("test1.$paramName = " . $paramDefaultValue );
+			$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = '$paramDefaultValue'/>");
+		}
+		elseif($actionParam->isFile())
+		{
+			$this->writeIni("test1.$paramName.type = file");
+			$this->writeIni("test1.$paramName.path = ");
+			$this->writeXml("		<Input name = '$paramName' type = 'file' key = ''/>");
+		}
+		else
+		{
+			if($paramName == 'type')
 			{
-				$paramDefaultValue = $actionParam->getDefaultValue();
-				$this->writeIni("test1.$paramName = " . $paramDefaultValue );
-				$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = '$paramDefaultValue'/>");
-			}
-			elseif($actionParam->isFile())
-			{
-				$this->writeIni("test1.$paramName.type = file");
-				$this->writeIni("test1.$paramName.path = ");
-				$this->writeXml("		<Input name = '$paramName' type = 'file' key = ''/>");
+				$this->writeIni("test1.objType.$paramName = $paramType");
 			}
 			else
 			{
-				if($paramName == 'type')
+				$this->writeIni("test1.$paramName.type = $paramType");
+			}
+			
+			$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = ''>");
+			
+			$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
+			foreach($actionParamProperties as $actionParamProperty)
+			{
+				if($actionParamProperty->isReadOnly() || $actionParamProperty->isInsertOnly())
+					continue;
+					
+				$propertyType = $actionParamProperty->getType();
+				$propertyName = $actionParamProperty->getName();
+				
+				if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum() ||
+				   $actionParam->isStringEnum() ||$actionParam->isDynamicEnum()
+				   ) 
 				{
-					$this->writeIni("test1.objType.$paramName = $paramType");
+					$defaultValue = $actionParamProperty->getDefaultValue();
+					$this->writeIni("test1.$paramName.$propertyName = " . $defaultValue);
+					$this->writeXml("			<$propertyName>$defaultValue</$propertyName>");
+				}
+				elseif($actionParamProperty->isFile())
+				{
+					$this->writeIni("test1.$paramName.$propertyName.type = file");
+					$this->writeIni("test1.$paramName.$propertyName.path = ");
+					$this->writeXml("			<$propertyName>file not supported yet...</$propertyName>");
 				}
 				else
 				{
-					$this->writeIni("test1.$paramName.type = $paramType");
-				}
-				
-				$this->writeXml("		<Input name = '$paramName' type = '$paramType' key = ''>");
-				
-				$actionParamProperties = $actionParam->getTypeReflector()->getProperties();
-				foreach($actionParamProperties as $actionParamProperty)
-				{
-					if($actionParamProperty->isReadOnly() || $actionParamProperty->isInsertOnly())
-						continue;
-						
-					$propertyType = $actionParamProperty->getType();
-					$propertyName = $actionParamProperty->getName();
-					
-					if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum())
+					if($propertyName == 'type')
 					{
-						$defaultValue = $actionParamProperty->getDefaultValue();
-						$this->writeIni("test1.$paramName.$propertyName = " . $defaultValue);
-						$this->writeXml("			<$propertyName>$defaultValue</$propertyName>");
-					}
-					elseif($actionParamProperty->isFile())
-					{
-						$this->writeIni("test1.$paramName.$propertyName.type = file");
-						$this->writeIni("test1.$paramName.$propertyName.path = ");
-						$this->writeXml("			<$propertyName>file not supported yet...</$propertyName>");
+						$this->writeIni("test1.$paramName.objType.$propertyName = $propertyType");
 					}
 					else
 					{
-						if($propertyName == 'type')
-						{
-							$this->writeIni("test1.$paramName.objType.$propertyName = $propertyType");
-						}
-						else
-						{
-							$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
-						}
-						
-						$this->writeXml("			<$propertyName>$propertyType</$propertyName>");
+						$this->writeIni("test1.$paramName.$propertyName.type = $propertyType");
 					}
-				}
-				$this->writeXml("		</Input>");
-			}
-			
-			$paramDesc = $actionParam->getDescription();
-			
-			$this->write("	 * @param $paramType \$$paramName $paramDesc", $isBase);
-				
-			if(!$actionParam->isComplexType() || //it the param is not: complex
-			   $actionParam->isEnum() || //or it is an enum then we dont print the type 
-			   $actionParam->isStringEnum() || 
-			   $actionParam->isDynamicEnum())
-				$testParam = "\$$paramName";
-			else
-				$testParam = "$paramType \$$paramName";
-				
-			if($actionParam->isOptional())
-			{
-				if ($actionParam->isSimpleType())
-				{
-					$defaultValue = $actionParam->getDefaultValue();
 					
-					if ($defaultValue === "false")
-						$testParam .= " = false";
-					else if ($defaultValue === "true")
-						$testParam .= " = true";
-					else if ($defaultValue === "null")
-						$testParam .= " = null";
-					else if ($paramType == "string")
-						$testParam .= " = \"$defaultValue\"";
-					else if ($paramType == "int")
-					{
-						if ($defaultValue == "")
-							$testParam .= " = \"\""; // hack for partner.getUsage
-						else
-							$testParam .= " = $defaultValue";
-					} 
+					$this->writeXml("			<$propertyName>$propertyType</$propertyName>");
 				}
-				else
-					$testParam .= " = null";
 			}
-				
-			//Adds the new param / value to the test params / values
-			$testParams[] = $testParam;
-			$testValues[] = "\$$paramName";
+			$this->writeXml("		</Input>");
+		}
 			
-			if($isBase)
-				$validateValues[] = "\$$paramName";
-//		}
+		$paramDesc = $actionParam->getDescription();
+		
+		$this->write("	 * @param $paramType \$$paramName $paramDesc", $isBase);
+			
+		if(!$actionParam->isComplexType() || //it the param is not: complex
+		   $actionParam->isEnum() || //or it is an enum then we dont print the type 
+	   	$actionParam->isStringEnum() || 
+	   	$actionParam->isDynamicEnum())
+		$testParam = "\$$paramName";
+		else
+			$testParam = "$paramType \$$paramName";
+			
+		if($actionParam->isOptional())
+		{
+			if ($actionParam->isSimpleType())
+			{
+				$defaultValue = $actionParam->getDefaultValue();
+				
+				if ($defaultValue === "false")
+					$testParam .= " = false";
+				else if ($defaultValue === "true")
+					$testParam .= " = true";
+				else if ($defaultValue === "null")
+					$testParam .= " = null";
+				else if ($paramType == "string")
+					$testParam .= " = \"$defaultValue\"";
+				else if ($paramType == "int")
+				{
+					if ($defaultValue == "")
+						$testParam .= " = \"\""; // hack for partner.getUsage
+					else
+						$testParam .= " = $defaultValue";
+				} 
+			}
+			else
+				$testParam .= " = null";
+		}
+				
+		//Adds the new param / value to the test params / values
+		$testParams[] = $testParam;
+		$testValues[] = "\$$paramName";
+			
+		if($isBase)
+			$validateValues[] = "\$$paramName";
 	}
 	
 	/**
