@@ -249,12 +249,15 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if($filter->is_set('_eq_root_entry_id'))
 		{
 			$matchOrRoots[] = "entry " . $filter->get('_eq_root_entry_id');
+			$filter->unsetByName('_eq_root_entry_id');
 		}
 		if($filter->is_set('_in_root_entry_id'))
 		{
 			$roots = explode(baseObjectFilter::IN_SEPARATOR, $filter->get('_in_root_entry_id'));
 			foreach($roots as $root)
 				$matchOrRoots[] = "entry $root";
+				
+			$filter->unsetByName('_in_root_entry_id');
 		}
 		if($filter->is_set('_is_root'))
 		{
@@ -262,6 +265,8 @@ class SphinxEntryCriteria extends SphinxCriteria
 				$matchOrRoots[] = "!entry";
 			else
 				$matchOrRoots[] = "entry";
+				
+			$filter->unsetByName('_is_root');
 		}
 		if(count($matchOrRoots))
 			$filter->set('_matchand_roots', $matchOrRoots);
