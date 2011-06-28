@@ -8,4 +8,6 @@
 abstract class kOperationAttributes 
 {
 	abstract public function toArray();
+	
+	abstract public function getApiType();
 }

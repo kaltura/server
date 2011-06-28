@@ -26,6 +26,11 @@ class kClipAttributes extends kOperationAttributes
 			'ClipDuration' => $this->duration,
 		);
 	}
+	
+	public function getApiType()
+	{
+		return 'KalturaClipAttributes';
+	}
 
 	/**
 	 * @return the $offset

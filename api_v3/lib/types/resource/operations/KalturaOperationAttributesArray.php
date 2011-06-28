@@ -13,7 +13,8 @@ class KalturaOperationAttributesArray extends KalturaTypedArray
 			
 		foreach($arr as $obj)
 		{
-			$nObj = new KalturaOperationAttributes();
+			$class = $obj->getApiType();
+			$nObj = new $class();
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}
