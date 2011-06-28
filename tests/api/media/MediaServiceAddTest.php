@@ -1141,6 +1141,8 @@ class MediaServiceAddTest extends KalturaApiTestCase
 	
 	public function testAddVideoClip()
 	{
+		$sourceEntryId					= '0_hrq0ye5f';
+		
 		$entry							= new KalturaMediaEntry();
 		$entry->mediaType				= KalturaMediaType::VIDEO;
 		$entry->name					= 'VideoOperationClipResource';
@@ -1153,7 +1155,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		
 		$resource						= new KalturaOperationResource();
 		$resource->resource				= new KalturaEntryResource();
-		$resource->resource->entryId	= '0_hrq0ye5f';
+		$resource->resource->entryId	= $sourceEntryId;
 		$resource->operationAttributes	= array($operation1);
 
 		$resultEntry = $this->client->media->add($entry);
@@ -1164,6 +1166,7 @@ class MediaServiceAddTest extends KalturaApiTestCase
 		$resultEntry = $this->client->media->addContent($resultEntry->id, $resource);
 		$this->assertType('KalturaMediaEntry', $resultEntry, 'Ingested entry of wrong type');
 		$this->assertEquals(KalturaEntryStatus::PENDING, $resultEntry->status, "Ingested entry of wrong status [{$resultEntry->status}] entry id [{$resultEntry->id}]");
+		$this->assertEquals($sourceEntryId, $resultEntry->rootEntryId, "Ingested entry with wrong root entry id [{$resultEntry->rootEntryId}] in entry id [{$resultEntry->id}]");
 	}
 	
 	public function testAddVideoTrim()
