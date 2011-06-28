@@ -1593,6 +1593,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		$this->putInCustomData("rootEntryId", $v);
 	}
 	
+	public function getRoots()
+	{
+		$ret = array();
+		if($this->getBulkUploadId())
+			$ret[] = 'bulk job ' . $this->getBulkUploadId();
+			
+		if($this->getRootEntryId() != $this->getId())
+			$ret[] = 'entry ' . $this->getBulkUploadId();
+		
+		return implode(',', $ret);
+	}
+	
 	public function getRootEntryId($deep = false)
 	{
 		$rootEntryId = $this->getFromCustomData("rootEntryId", null, null);
@@ -2359,6 +2371,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			'reference_id' => 'referenceId',
 			'replacing_entry_id' => 'replacingEntryId',
 			'replaced_entry_id' => 'replacedEntryId',
+			'roots' => 'roots',
 		
 			'kuser_id' => 'kuserId',
 			'entry_status' => 'status',
@@ -2402,6 +2415,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 			'reference_id' => IIndexable::FIELD_TYPE_STRING,
 			'replacing_entry_id' => IIndexable::FIELD_TYPE_STRING,
 			'replaced_entry_id' => IIndexable::FIELD_TYPE_STRING,
+			'roots' => IIndexable::FIELD_TYPE_STRING,
 			
 			'sort_name' => IIndexable::FIELD_TYPE_INTEGER,
 			'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,

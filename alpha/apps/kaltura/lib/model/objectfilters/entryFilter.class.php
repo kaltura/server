@@ -121,6 +121,8 @@ class entryFilter extends baseObjectFilter
 			"_in_replacement_status",
 			"_gte_partner_sort_value",
 			"_lte_partner_sort_value",
+			"_eq_root_entry_id",
+			"_in_root_entry_id",
 			) , NULL );
 
 		$this->allowed_order_fields = array ( "created_at" , "updated_at" , "views", "name", "media_date" , 
@@ -137,6 +139,7 @@ class entryFilter extends baseObjectFilter
 			"replacing_entry_id" => "search_text_discrete", 
 			"replaced_entry_id" => "search_text_discrete",
 			"flavor_params_ids" => "search_text_discrete",
+			"root_entry_id" => "search_text_discrete", 
 		);
 	}
 
@@ -186,7 +189,8 @@ class entryFilter extends baseObjectFilter
 			"duration_type", 
 			"reference_id", 
 			"replacing_entry_id", 
-			"replaced_entry_id",
+			"replaced_entry_id", 
+			"root_entry_id",
 		));
 	}
 	
