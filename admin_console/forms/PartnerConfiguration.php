@@ -111,11 +111,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));				
 //--------------------------- Group Association ---------------------------			
-		//$this->addElement ('select','partner_group_type', array(
-		//	'label'			=> 'Partner Group Type:',
-		//	'filters'		=> array('StringTrim'),
-		//));	
-		
 		$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('partner_group_type', array('enum' => 'Kaltura_Client_Enum_PartnerGroupType'));
 		$partnerGroupTypes->setLabel('Partner Group Type:');
 		$this->addElements(array($partnerGroupTypes));
