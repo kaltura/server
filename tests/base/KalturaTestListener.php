@@ -154,7 +154,9 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 		KalturaLog::debug("In startTestSuite - for suite = {$suite->getName()}");
 
 		//TODO: fix this to use the data provider type check
-		if (preg_match("*::*" ,$suite->getName()) != 0)
+//		if (preg_match("*::*" ,$suite->getName()) != 0)
+		
+		if ($suite instanceof PHPUnit_Framework_TestSuite_DataProvider)
 		{
 			//Get the test procedure name from the suite name which is (testCase::testProcedure)
 			$testNames = explode("::", $suite->getName());
@@ -167,11 +169,16 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			// if it is a dataprovider test suite
 			KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($testName));
 		}
-		else 
+		else
 		{
 			//Check if the test belongs to the same test case failures (by the first test of the suite)
-			$class = get_class($suite->testAt(0));
-				
+			$test = $suite->testAt(0);
+					
+			if($test instanceof PHPUnit_Framework_TestSuite_DataProvider)
+				$test = $test->testAt(0);
+			
+			$class = get_class($test);
+			
 			//if the new test comes from a new file (testCase)
 			if(KalturaTestListener::$currentTestCase != $class)
 			{
@@ -212,12 +219,14 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 		KalturaLog::debug("In endTestSuite");
 
 		//if (preg_match("*::*" ,$suiteName) != 0) TODO: check this
-		if($suite instanceof  PHPUnit_Framework_TestSuite_DataProvider)
+		//if($suite instanceof  PHPUnit_Framework_TestSuite_DataProvider)
+		if (preg_match("*::*" ,$suiteName) != 0)
 		{ // if it is a dataprovider test suite
 			print("A data provider test suite was finished no action taken\n");
 			KalturaLog::debug("A data provider test suite was finished no action taken");
 
 			//TODO: add here logic for multi nested tests
+			
 		}
 		else //real test suite
 		{

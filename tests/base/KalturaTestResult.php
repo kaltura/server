@@ -4,11 +4,21 @@ class KalturaTestResult extends PHPUnit_Framework_TestResult
 {
 	/**
 	 * 
-	 * Enter description here ...
+	 * Creates a new KalturaTestResult object
+	 */
+	public function __construct(PHP_CodeCoverage $codeCoverage = NULL)
+	{
+		if(method_exists($this, '__construct'))
+			parent::__construct($codeCoverage);
+	}
+	
+	/**
+	 * 
+	 * Called when the KalturaTestResult is destructed
 	 */
 	public function __destruct()
 	{
-		print ("KalturaTestResult descructed\n");
+		print ("KalturaTestResult destructed\n");
 	}
 	
 	/**
@@ -18,7 +28,7 @@ class KalturaTestResult extends PHPUnit_Framework_TestResult
 	public function endTest(PHPUnit_Framework_Test $test, $time)
 	{
 		print("In KalturaTestResult::endTest\n");
-		parent::endTest($test, $time);
+		$result = parent::endTest($test, $time);
 		
 		if (!$this->lastTestFailed && $test instanceof PHPUnit_Framework_TestCase) {
             $class = get_class($test);
@@ -29,5 +39,7 @@ class KalturaTestResult extends PHPUnit_Framework_TestResult
             $this->passed[ $class.'::'.$trimmedTestName] = $test->getResult();
             $this->time                                              += $time;
         }
+        
+        return $result; 
 	}
 }

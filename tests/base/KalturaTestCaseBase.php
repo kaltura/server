@@ -381,39 +381,33 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	public function run(PHPUnit_Framework_TestResult $result = null)
 	{
 		print("In KalturaTestCaseBase::run for test [$this->name]\n");
-		if(is_null($result) || !($result instanceof KalturaTestResult))
+			
+		if(is_null($result))
 		{
-			$resultClass = get_class($result);
-
+			print("KalturaTestCaseBase: Result is null!!! creating KalturaTestResult\n");
 			$result = new KalturaTestResult();	
 		}
-		else
+		
+		if(!($result instanceof KalturaTestResult))
 		{
-			KalturaLog::debug("result [" . print_r($result->passed(), true). "]");
+			print("KalturaTestCaseBase: result is not KalturaTestResult creating KalturaTestResult\n");
+//			$newResult = KalturaTestResult::fromTestResult($result);		
+			$newResult = new KalturaTestResult();
 		}
 
-		parent::run($result);
+		$result = parent::run($result);
+		
+		$this->initFramework();
+		
+		return $result; 
 	}
 	
 	/**
-	 * Overrides runTest method for the phpunit framework
-	 * @see PHPUnit_Framework_TestCase::runTest()
+	 * 
+	 * Initializes the framework for all the tests
 	 */
-	public function runTest()
+	protected function initFramework()
 	{
-		KalturaLog::debug("In runTest for test [$this->name]\n");
-		print("In KalturaTestCaseBase::runTest for test [$this->name]\n");
-		
-		foreach ($this->dependencyInput as $index => $value)
-		{
-			KalturaLog::debug("Adding key [$index], value [$value] to the test data\n");
-			$this->data[$index] = $value;
-		}
-	
-		$this->dependencyInput = array();
-		$this->currentFailure = null;
-		
-		//if the fraemwork wasn't initiated we need to init here (caused becasue only here we add our listener )
 		if(KalturaTestCaseBase::$isFrameworkInit == false)
 		{
 			$class = get_class($this);
@@ -437,7 +431,29 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($this->getName(false)));
 			}
 		}
+	}
+	
+	/**
+	 * Overrides runTest method for the phpunit framework
+	 * @see PHPUnit_Framework_TestCase::runTest()
+	 */
+	public function runTest()
+	{
+		KalturaLog::debug("In runTest for test [$this->name]\n");
+		print("In KalturaTestCaseBase::runTest for test [$this->name]\n");
 		
+		foreach ($this->dependencyInput as $index => $value)
+		{
+			KalturaLog::debug("Adding key [$index], value [$value] to the test data\n");
+			$this->data[$index] = $value;
+		}
+	
+		$this->dependencyInput = array();
+		$this->currentFailure = null;
+		
+		//if the fraemwork wasn't initiated we need to init here (caused becasue only here we add our listener )
+		$this->initFramework();
+			
 		$testResult = parent::runTest();
 		
 		return $testResult;
@@ -626,11 +642,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				
 				$inputAsObject = $inputObject->getDataObject();
 				
-				//print("Input As object" . print_r($inputAsObject, true) . "\n");
 				if(is_null($inputAsObject) || empty($inputAsObject)) //No object is available
 				{
 					$inputAsObject = $this->transformToValue($inputObject);
-				//	print("Input As object is NULL new value is " . print_r($inputAsObject, true) . "\n");
 				}
 				else //Object is vaild needs to set it's properties from the global data
 				{
@@ -665,13 +679,10 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			if(!is_null($expectedValue))
 			{
 				$isGlobalData = KalturaGlobalData::isGlobalData($expectedValue);
-	//			print("In compareOnField expectedValue[$expectedValue], isGlobalData[$isGlobalData]\n");
 							
 				if($isGlobalData)
 				{
-					//print("In compareOnField name[$expectedValue]\n");
 					$expectedValue = KalturaGlobalData::getData($expectedValue);
-	//				print("In compareOnField value[$expectedValue]\n");
 				}
 			}
 			$this->$assertToPerform($expectedValue, $actualValue, $this->currentFailure);
@@ -774,7 +785,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
      */
     protected function handleDependencies()
     {
-    	//print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
+    	print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
     	    	    
     	if (!empty($this->dependencies) && !$this->inIsolation) 
     	{
@@ -804,7 +815,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
      */
     protected function createResult()
     {
-    	print("Creating new KalturaTestResult");
     	return new KalturaTestResult();
     }
 }

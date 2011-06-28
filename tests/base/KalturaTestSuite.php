@@ -24,6 +24,7 @@ class KalturaTestSuite extends PHPUnit_Framework_TestSuite
 	 */
 	protected function createResult()
 	{
+		print("In KalturaTestSuite::createResult\n");
 		return new KalturaTestResult();
 	}
 	
