@@ -7,12 +7,14 @@
  */
 class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 {
-//	/**
-//	 * 
-//	 * The test result
-//	 * @var bool
-//	 */
-//	protected $result;
+	/**
+	 * 
+	 * Retruns the test dependency inputs
+	 */
+	public function getDependencyInputs()
+	{
+		return $this->dependencyInput;
+	}
 	
 	/**
 	 * 
@@ -373,21 +375,42 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * (non-PHPdoc)
+	 * @see PHPUnit_Framework_TestCase::run()
+	 */
+	public function run(PHPUnit_Framework_TestResult $result = null)
+	{
+		print("In KalturaTestCaseBase::run for test [$this->name]\n");
+		if(is_null($result) || !($result instanceof KalturaTestResult))
+		{
+			$resultClass = get_class($result);
+
+			$result = new KalturaTestResult();	
+		}
+		else
+		{
+			KalturaLog::debug("result [" . print_r($result->passed(), true). "]");
+		}
+
+		parent::run($result);
+	}
+	
+	/**
 	 * Overrides runTest method for the phpunit framework
 	 * @see PHPUnit_Framework_TestCase::runTest()
 	 */
 	public function runTest()
 	{
-		KalturaLog::debug("In RunTest\n");
-
-		if(property_exists($this, 'dependencyInput'))
+		KalturaLog::debug("In runTest for test [$this->name]\n");
+		print("In KalturaTestCaseBase::runTest for test [$this->name]\n");
+		
+		foreach ($this->dependencyInput as $index => $value)
 		{
-			foreach ($this->dependencyInput as $index => $value)
-				$this->data[$index] = $value;
-			
-			$this->dependencyInput = array();
+			KalturaLog::debug("Adding key [$index], value [$value] to the test data\n");
+			$this->data[$index] = $value;
 		}
-			
+	
+		$this->dependencyInput = array();
 		$this->currentFailure = null;
 		
 		//if the fraemwork wasn't initiated we need to init here (caused becasue only here we add our listener )
@@ -416,6 +439,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		}
 		
 		$testResult = parent::runTest();
+		
 		return $testResult;
 	}
 
@@ -480,20 +504,98 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			}
 		}
 		
-		if($procedureName == "testAdd")
-		{
-		//	print("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
-		}
-		
 		$inputsForTestProcedure = $this->transformToObjects($inputsForTestProcedure);
 		
 		KalturaLog::info("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
-		
-		if($procedureName == "testAdd")
-		{
-			//print("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
-		}
+				
 		return $inputsForTestProcedure; 
+	}
+		
+	/**
+	 * 
+	 * Transforms the the given input object into the right value (including getting from global data)
+	 * @param KalturaTestDataObject $inputObject
+	 */
+	protected function transformToValue($inputObject)
+	{
+	//	print("In transformToValue [" . print_r($inputObject) . "] \n");
+		$inputAsObject =  $inputObject->getValue();
+					
+		$isGlobalData = KalturaGlobalData::isGlobalData($inputAsObject);
+		KalturaLog::debug("isGlobalData [$isGlobalData] \n");
+		if($isGlobalData)
+		{
+			$name = $inputAsObject;
+			$inputAsObject = KalturaGlobalData::getData($name);
+			KalturaLog::debug("inputAsObject global name [$name] value [$inputAsObject]\n");
+
+			//TODO: check if needed
+			if(!$inputAsObject)
+			{
+				//print("inputAsObject is empty setting to [$name]\n");
+				$inputAsObject = $name;
+			}
+		}
+		
+		return $inputAsObject;
+	}
+	
+	/**
+	 * 
+	 * Gets an object and set it's params with the global data 
+	 * @param unknown_type $inputAsObject
+	 */
+	protected function setGlobalData($inputAsObject)
+	{
+		if($inputAsObject instanceof BaseObject)
+		{
+			//Gets the data peer of the object (used to geting all the obejct feilds)
+			$dataPeer = $inputAsObject->getPeer(); 
+			
+			//Gets all object fields
+			$fields = call_user_func(array($dataPeer, "getFieldNames"), BasePeer::TYPE_PHPNAME);
+			
+			//Create the xml elements by all fields and their values
+			foreach ($fields as $field)
+			{
+				$value = $inputAsObject->getByName($field);
+				$isGlobal = KalturaGlobalData::isGlobalData($value);
+				if($isGlobal)
+				{
+					$value = KalturaGlobalData::getData($value);
+				}
+			}
+		}
+		elseif($inputAsObject instanceof KalturaObjectBase)// object is Kaltura object base
+		{
+			$reflector = new ReflectionClass($inputAsObject);
+			$properties = $reflector->getProperties(ReflectionProperty::IS_PUBLIC);
+						
+			foreach ($properties as $property)
+			{
+				$value = $property->getValue($inputAsObject);
+				$propertyName = $property->getName();
+								
+				$isGlobal = KalturaGlobalData::isGlobalData($value);
+				if($isGlobal)
+				{
+					$value = KalturaGlobalData::getData($value);
+					$property->setValue($inputAsObject, $value);
+					
+//					if($value != null)
+//					{
+//						print("In setGlobalData value [" . print_r($value, true) . "]\n");
+//					}
+				}
+			}
+		}
+		else 
+		{
+			KalturaLog::debug("Input as object is not an object returning null!!!");
+			$inputAsObject = null;
+		}
+		
+		return $inputAsObject;
 	}
 	
 	/**
@@ -509,18 +611,35 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		foreach ($inputsForTestProcedure as $inputForTestProcedure)
 		{
 			$inputsAsObjects[] = array();
+			$numOfObjects = count($inputForTestProcedure);
+			
 			foreach ($inputForTestProcedure as $inputObject)
 			{
+				$objectIndex = 0;
+				
+				//TOOD: How to skip the Output Reference more nicely
+				if($objectIndex == $numOfObjects - 1) //The last object is the output reference
+				{
+					$objectIndex++; // Not a must
+					continue;
+				}
+				
 				$inputAsObject = $inputObject->getDataObject();
 				
 				//print("Input As object" . print_r($inputAsObject, true) . "\n");
 				if(is_null($inputAsObject) || empty($inputAsObject)) //No object is available
 				{
-					$inputAsObject =  $inputObject->getValue();
-					//print("Input As object is NULL new value is " . print_r($inputAsObject, true) . "\n");
+					$inputAsObject = $this->transformToValue($inputObject);
+				//	print("Input As object is NULL new value is " . print_r($inputAsObject, true) . "\n");
+				}
+				else //Object is vaild needs to set it's properties from the global data
+				{
+					$inputAsObject = $this->setGlobalData($inputAsObject);
 				}
 				
-				$inputsAsObjects[$currentIndex][] = $inputAsObject; 
+				$inputsAsObjects[$currentIndex][] = $inputAsObject;
+				
+				$objectIndex++; 
 			}
 			
 			$currentIndex++;
@@ -542,6 +661,19 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		try 
 		{
 			$this->currentFailure = new KalturaFailure($fieldName, $actualValue, $expectedValue, $assertToPerform, $message);
+			
+			if(!is_null($expectedValue))
+			{
+				$isGlobalData = KalturaGlobalData::isGlobalData($expectedValue);
+	//			print("In compareOnField expectedValue[$expectedValue], isGlobalData[$isGlobalData]\n");
+							
+				if($isGlobalData)
+				{
+					//print("In compareOnField name[$expectedValue]\n");
+					$expectedValue = KalturaGlobalData::getData($expectedValue);
+	//				print("In compareOnField value[$expectedValue]\n");
+				}
+			}
 			$this->$assertToPerform($expectedValue, $actualValue, $this->currentFailure);
 		}
 		catch (PHPUnit_Framework_AssertionFailedError $e) 
@@ -576,4 +708,103 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
 	}
+	
+	/**
+	 * 
+	 * Handles a given dependency and sets it's dependency input
+	 * @param unknown_type $dependency
+	 * @param array $passed
+	 * @param array $passedKeys
+	 */
+	protected function handleDependency($dependency, array $passed, array $passedKeys)
+	{
+		$className  = get_class($this);
+		
+        if (strpos($dependency, '::') === FALSE) //Sets the test class name if not given
+        	$dependency = $className . '::' . $dependency;
+
+        if (!isset($passedKeys[$dependency])) 
+        {
+        	$this->result->addError($this, 
+				new PHPUnit_Framework_SkippedTestError(	sprintf('This test depends on "%s" to pass.', $dependency)),
+				0);
+           return FALSE;
+        }
+        else 
+        {
+       	        	
+	        if (isset($passed[$dependency])) 
+	        {
+	        	$this->dependencyInput[] = $passed[$dependency]; //return the dependency input
+	        	
+	        	//TODO: add dependency between suites so we can have nested arrays of dependencies
+//	        	if(is_array($passed[$dependency]))
+//	        		$this->dependencyInput[] = $passed[$dependency][0]; // currently returns the first result form the data provider
+	        }
+	        else // we search to see if a test was ended in that test suite 
+	        {
+	        	$trimmedDependency = $this->trimTestInstanceName($dependency);
+	        	if(isset($passed[$trimmedDependency]))
+	        		$this->dependencyInput[] = $passed[$dependency];
+	        	else
+	        		$this->dependencyInput[] = NULL;
+	        }
+        }
+	}
+	
+	/**
+	 * 
+	 * Gets a test name and returns it trimmed name without the instance name 
+	 * @param string $testName
+	 * @return string - the new trimmed test nema
+	 */
+	public static function trimTestInstanceName($testName)
+	{
+		$pos = strpos($testName, ' with data set');
+		
+		if ($pos !== FALSE) {
+			$testName = substr($testName, 0, $pos);
+		}
+		
+		return $testName;
+	}
+	
+	/**
+     * @since Method available since Release 3.5.4
+     */
+    protected function handleDependencies()
+    {
+    	//print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
+    	    	    
+    	if (!empty($this->dependencies) && !$this->inIsolation) 
+    	{
+            $passed     = $this->result->passed();
+            $passedKeys = array_keys($passed);
+            $numKeys    = count($passedKeys);
+        	
+            for ($i = 0; $i < $numKeys; $i++) 
+            {
+            	$passedKeys[$i] = KalturaTestCaseBase::trimTestInstanceName($passedKeys[$i]);
+	        }
+		
+            $passedKeys = array_flip(array_unique($passedKeys));
+
+            foreach ($this->dependencies as $dependency) 
+            {
+            	$this->handleDependency($dependency, $passed, $passedKeys);
+            }
+        }
+
+        return TRUE;
+    }
+            
+    /**
+     * (non-PHPdoc)
+     * @see PHPUnit_Framework_TestCase::createResult()
+     */
+    protected function createResult()
+    {
+    	print("Creating new KalturaTestResult");
+    	return new KalturaTestResult();
+    }
 }

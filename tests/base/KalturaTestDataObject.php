@@ -254,7 +254,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 					
 					if($value != null)
 					{
-						print("value [" . print_r($value, true) . "]\n");
+						//print("value [" . print_r($value, true) . "]\n");
 						$propertyValueType = gettype($value);
 						if($propertyValueType == "NULL") //No such base type (int, string, ...)
 						{
@@ -264,11 +264,11 @@ class KalturaTestDataObject extends KalturaTestDataBase
 							if(class_exists($class))
 							{
 								$propertyValueType = $class;
-							}							
+							}
 						}
 						else 
 						{
-							print("propertyValueType1 [$propertyValueType]\n");
+							//print("propertyValueType [$propertyValueType]\n");
 						}
 					}
 																		
@@ -332,7 +332,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 				
 				if($fieldType != null)
 				{
-					print("type3 [" . $fieldType ."]\n");
+					//print("type3 [" . $fieldType ."]\n");
 					$node->setAttribute("type", $fieldType);
 				}
 				

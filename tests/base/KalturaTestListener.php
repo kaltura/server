@@ -140,9 +140,10 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::addSkippedTest()
 	 */
 	public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
-		print("In addSkippedTest\n");
+		$message = $e->getMessage();
+		$testName = $test->getName(); 
+		print("In addSkippedTest, testName [$testName], message [$message]\n");
 		KalturaLog::debug("In addSkippedTest");
-		
 	}
 
 	/* (non-PHPdoc)
@@ -151,15 +152,16 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	public function startTestSuite(PHPUnit_Framework_TestSuite $suite) {
 		print("In startTestSuite - for suite = {$suite->getName()}\n");
 		KalturaLog::debug("In startTestSuite - for suite = {$suite->getName()}");
-		
+
+		//TODO: fix this to use the data provider type check
 		if (preg_match("*::*" ,$suite->getName()) != 0)
-		{ 
+		{
 			//Get the test procedure name from the suite name which is (testCase::testProcedure)
 			$testNames = explode("::", $suite->getName());
 			$testName = $testNames[0];
 			if(isset($testNames[1]))
 			{
-				$testName = $testNames[1]; 
+				$testName = $testNames[1];
 			}
 			
 			// if it is a dataprovider test suite
@@ -205,12 +207,16 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function endTestSuite(PHPUnit_Framework_TestSuite $suite) 
 	{
-		print("\nIn endTestSuite\n");
+		$suiteName = $suite->getName();
+		print("\nIn endTestSuite for suite [$suiteName]\n");
 		KalturaLog::debug("In endTestSuite");
-		if (preg_match("*::*" ,$suite->getName()) != 0)
+
+		//if (preg_match("*::*" ,$suiteName) != 0) TODO: check this
+		if($suite instanceof  PHPUnit_Framework_TestSuite_DataProvider)
 		{ // if it is a dataprovider test suite
 			print("A data provider test suite was finished no action taken\n");
 			KalturaLog::debug("A data provider test suite was finished no action taken");
+
 			//TODO: add here logic for multi nested tests
 		}
 		else //real test suite
@@ -236,11 +242,15 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function startTest(PHPUnit_Framework_Test $test) 
 	{
-		print("In startTest\n");
-		KalturaLog::debug("In startTest");
+		$testName = $test->getName();
+		print("In startTest for test $testName\n");
+				
+		KalturaLog::debug("In startTest for test $testName");
 
 		if($test instanceof KalturaTestCaseBase)
 		{
+			$testInputs = $test->getInputs();
+			
 			//Add another test case instance failure for this test
 			$testProcedureName = $test->getName(false); 
 			$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testProcedureName);

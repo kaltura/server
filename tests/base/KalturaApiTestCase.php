@@ -16,31 +16,38 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 	 */
 	public function __construct($name = NULL, array $data = array(), $dataName = '')
 	{
-		parent::__construct($name, $data, $dataName);
+		KalturaLog::debug("KalturaApiTestCase::__construct name [$name], data [" . print_r($data, true). "], dataName [$dataName]\n");
 		
+		parent::__construct($name, $data, $dataName);
+				
 		$testConfig = $this->config->get('config');
 		$needSave = false;
-		
+
+		//TODO: add support for getting the values from the global data
 		if(!$testConfig->serviceUrl)
 		{
-			$testConfig->serviceUrl = 'http://www.kaltura.com/';
+			$testConfig->serviceUrl = '@SERVICE_URL@';
 			$needSave = true;
 		}
+		
 		if(!$testConfig->partnerId)
 		{
-			$testConfig->partnerId = 100;
+			$testConfig->partnerId = "@TEST_PARTNER_ID@";
 			$needSave = true;
 		}
+		
 		if(!$testConfig->clientTag)
 		{
 			$testConfig->clientTag = 'unitTest';
 			$needSave = true;
 		}
+		
 		if(!$testConfig->curlTimeout)
 		{
 			$testConfig->curlTimeout = 90;
 			$needSave = true;
 		}	
+		
 		if(!isset($testConfig->startSession))
 		{
 			$testConfig->startSession = false;
@@ -61,7 +68,7 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 			}
 			if(!$testConfig->sessionType)
 			{
-				$testConfig->sessionType = 0;
+				$testConfig->sessionType = 2;
 				$needSave = true;
 			}
 			if(!$testConfig->expiry)
@@ -110,7 +117,7 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 	 * @param KalturaObjectBase $object1
 	 * @param KalturaObjectBase $object2
 	 */
-	public function CompareAPIObjects(KalturaObjectBase $outputReference, KalturaObjectBase $actualResult, $validErrorFields)
+	public function CompareAPIObjects(KalturaObjectBase $outputReference, KalturaObjectBase $actualResult, $validErrorFields = array())
 	{
 		//Use reflection to compare the objects
 		$outputReferenceReflector = new ReflectionClass($outputReference);

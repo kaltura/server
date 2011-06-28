@@ -1,0 +1,4 @@
+@TEST_PARTNER_ID@                                 = 100
+@SERVICE_URL@                                     = http://hudsontest2.kaltura.dev
+@TEST_PARTNER_ADMIN_SECRET@                       = 344482ef42a416ca252fd921693bcd39
+@TEST_PARTNER_SECRET@                             = f1065864ced8d01d1d6c40f5a5439de3
