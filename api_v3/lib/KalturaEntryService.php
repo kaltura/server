@@ -281,7 +281,7 @@ class KalturaEntryService extends KalturaBaseService
 					$dbEntry->setRootEntryId($srcEntry->getRootEntryId(true));
 			}
 			
-			$dbEntry->setOfflineMessage($resource->getOperationAttributes());
+			$dbEntry->setOperationAttributes($resource->getOperationAttributes());
 			$dbEntry->save();
 		}
 		
