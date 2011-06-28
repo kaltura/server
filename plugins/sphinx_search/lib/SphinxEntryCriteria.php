@@ -19,7 +19,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entry.REPLACING_ENTRY_ID' => 'replacing_entry_id',
 		'entry.REPLACED_ENTRY_ID' => 'replaced_entry_id',
 		'entry.SEARCH_TEXT' => '(name,tags,description,entry_id)',
-		'entry.ROOT_ENTRY_ID' => 'roots',
+		'entry.ROOTS' => 'roots',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
 		entryPeer::STATUS => 'entry_status',
