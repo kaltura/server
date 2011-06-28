@@ -29,7 +29,7 @@ class KalturaDistributionFieldConfig extends KalturaObject
     
     /**
      * Is the field required to have a value for submission ?
-     * @var bool
+     * @var KalturaDistributionFieldRequiredStatus
      */
     public $isRequired;
     

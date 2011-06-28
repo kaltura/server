@@ -42,11 +42,11 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			'label'			=> 'MRSS XSLT:',
 		));
 		
-		$this->addElement('checkbox', 'isRequired', array(
-			'filters'		=> array('StringTrim'),
-			'label'			=> 'Required:',
-		));
-		
+		$isRequired = new Kaltura_Form_Element_EnumSelect('isRequired', array('enum' => 'Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus'));
+		$isRequired->setLabel('Required:');
+		$isRequired->setFilters(array('StringTrim'));
+		$this->addElements(array($isRequired));
+				
 		$this->addElement('checkbox', 'updateOnChange', array(
 			'filters'		=> array('StringTrim'),
 			'decorators'	=> array('ViewHelper'),
@@ -78,7 +78,7 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 			$this->setDefault($prop, $value);
 		}
 		
-		$updateParams = $props['updateParams'];
+		$updateParams = isset($props['updateParams']) ? $props['updateParams'] : null;
 		if ($updateParams) {
 		    $updateParamsString = '';
 		    foreach ($updateParams as $updateParam) {
@@ -86,6 +86,11 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 		    }
 		    $updateParamsString = trim($updateParamsString, ',');
 			$this->setDefault('updateParamsArrayString', $updateParamsString);		
+		}
+		
+		$requiredStatus = isset($props['isRequired']) ? $props['isRequired'] : null;
+		if ($requiredStatus == Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER) {
+			$this->getElement('isRequired')->setAttrib('disabled', 'disabled');
 		}
 		
 		$this->setDefault('fieldNameForView', $object->fieldName);

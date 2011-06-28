@@ -20,6 +20,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	
 	/**
 	 * @return array<DistributionFieldConfig> An array of the default DistributionFieldConfig configurations
+	 * The key of each item in the array MUST be the field name!
 	 */
 	abstract protected function getDefaultFieldConfigArray();
 	
@@ -66,12 +67,21 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	{
 	    $this->fieldConfigArray = null;
 	    
+	    $defaultConfigArray = $this->getDefaultFieldConfigArray();
+	    
 	    // turn the given array into an array mapped by field names
 	    $tempArray = array();
 	    foreach ($configArray as $config)
 	    {
 	        if ($config instanceof  DistributionFieldConfig) {
 	            $fieldName = $config->getFieldName();
+	            $defaultRequiredStatus = isset($defaultConfigArray[$fieldName]) ? $defaultConfigArray[$fieldName]->getIsRequired() : null;
+	            if ($defaultRequiredStatus === DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER) {
+	            	$config->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	            }
+	            else if ($config->getIsRequired() == DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER) {
+	            	$config->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PARTNER);
+	            }
 	            if (!empty($fieldName)) {
 	                $tempArray[$fieldName] = $config;
 	            }
@@ -366,7 +376,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		$fieldConfigArray = $this->getFieldConfigArray();
 		foreach ($fieldConfigArray as $fieldConfig)
 		{
-			if ($fieldConfig->getIsRequired()) {
+			if ($fieldConfig->getIsRequired() != DistributionFieldRequiredStatus::NOT_REQUIRED) {
 				$this->addRequiredFieldForValidation($fieldConfig->getFieldName());
 			}
 		}		

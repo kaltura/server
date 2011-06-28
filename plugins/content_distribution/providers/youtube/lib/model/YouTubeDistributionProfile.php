@@ -48,15 +48,8 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	
 		
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
-	{	    
-	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_CATEGORY);
-	    //$this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_CONTENT_URL);
-	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_DESCRIPTION);
-	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_KEYWORDS);
-	    $this->addRequiredFieldForValidation(YouTubeDistributionField::MEDIA_TITLE);
-	    
+	{	    	    
 	    $validationErrors = parent::validateForSubmission($entryDistribution, $action);
-			    
 		
 		$maxLengthFields = array (
 		    YouTubeDistributionField::MEDIA_DESCRIPTION => self::MEDIA_DESCRIPTION_MAXIMUM_LENGTH,
@@ -138,9 +131,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 
 	
 	protected function getDefaultFieldConfigArray()
-	{
-	    //TODO: add update parameters
-	    
+	{	    
 	    $fieldConfigArray = array();
 	      
 	    // media fields
@@ -150,6 +141,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
@@ -158,6 +150,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(description)" />');
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	        
 	    $fieldConfig = new DistributionFieldConfig();
@@ -166,6 +159,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(tags)" />');
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setUpdateParams(array(entryPeer::TAGS));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
@@ -178,6 +172,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(YouTubeDistributionField::MEDIA_CATEGORY);
 	    $fieldConfig->setUserFriendlyFieldName('Media category');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/default_category" />');
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();

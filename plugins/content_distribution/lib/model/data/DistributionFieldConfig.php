@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package plugins.contentDistribution
+ * @subpackage model.data
+ */
 class DistributionFieldConfig
 {
     /**
@@ -24,7 +28,7 @@ class DistributionFieldConfig
     
     /**
      * Is the field required to have a value for submission ?
-     * @var bool
+     * @var DistributionFieldRequiredStatus
      */
     private $isRequired;
     
@@ -104,7 +108,7 @@ class DistributionFieldConfig
 	}
 
 	/**
-	 * @param bool $isRequired
+	 * @param DistributionFieldRequiredStatus $isRequired
 	 */
 	public function setIsRequired($isRequired) {
 		$this->isRequired = $isRequired;
