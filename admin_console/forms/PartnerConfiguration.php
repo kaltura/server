@@ -191,14 +191,24 @@ class Form_PartnerConfiguration extends Infra_Form
 			
 			if ($modul->indexLink != null)
 			{
-				$element = $this->getElement($modul->permissionName);
-				
-				$element->setDescription('<a id=linkToPage href=# onClick=openLink("../'.$modul->indexLink.'")>(config)</a>');
-			
-			    $element->addDecorators(array('ViewHelper',		      
-			        array('Label', array('placement' => 'append')),
-			        array('Description', array('escape' => false, 'tag' => false)),
-			      ));			      
+				//check permission to access the link's page
+				$indexLinkArray = explode('/', $modul->indexLink);
+				$linkAllowed= false;
+				if (($indexLinkArray[0])=='plugin'){
+				 	$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[1], null);
+				}
+				else{
+					$linkAllowed = Infra_AclHelper::isAllowed($indexLinkArray[0], $indexLinkArray[1]);
+				}
+				if ($linkAllowed)
+				{
+					$element = $this->getElement($modul->permissionName);
+					$element->setDescription('<a id=linkToPage href=# onClick=openLink("../'.$modul->indexLink.'")>(config)</a>');
+				    $element->addDecorators(array('ViewHelper',		      
+				        array('Label', array('placement' => 'append')),
+				        array('Description', array('escape' => false, 'tag' => false)),
+				      ));
+				}		      
 			}
 			$permissionNames[] = $modul->permissionName;
 		}

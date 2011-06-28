@@ -90,8 +90,19 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		{
 			if(!($pluginAdminConsolePage instanceof KalturaAdminConsolePlugin))
 				continue;
+			
+			$resource = get_class($pluginAdminConsolePage);
+			
+			$acl = Zend_Registry::get('acl');
+			$acl->addResource(new Zend_Acl_Resource($resource));
+				
 			if(!($pluginAdminConsolePage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
-				continue;		
+			{
+				$acl->deny(Infra_AclHelper::getCurrentRole(), $resource);
+				continue;
+			}
+			
+			$acl->allow(Infra_AclHelper::getCurrentRole(), $resource);				
 			
 			$menuPage = null;
 			

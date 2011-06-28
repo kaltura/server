@@ -15,13 +15,18 @@ function openConfirm(url) {
 		bgiframe: true,
 		modal: true,
 		resizable: false,
-		width: 300,
+		width: 350,
 		title: '<?php echo $this->translate('Are you sure?'); ?>',
 		height: 150,
 		buttons: {
-			'<?php echo $this->translate('Save'); ?>': function() {
+			'<?php echo $this->translate('Save Changes'); ?>': function() {
 				jQuery(this).dialog('close');
-				jQuery('#frmConfigure').submit();
+				jQuery('#frmPartnerConfigure').submit();
+				url += "<?php echo '/'.$this->partnerId; ?>";
+				window.location = url;
+			},
+			'<?php echo $this->translate('Ignore Changes'); ?>': function() {
+				jQuery(this).dialog('close');
 				url += "<?php echo '/'.$this->partnerId; ?>";
 				window.location = url;
 			},
