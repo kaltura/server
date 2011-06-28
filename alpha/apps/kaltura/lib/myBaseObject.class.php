@@ -292,6 +292,14 @@ abstract class myBaseObject implements Iterator
 		return $this->fields[$field_name] ;
 	}
 
+	public function is_set($field_name)
+	{
+		if(!array_key_exists($field_name, $this->fields))
+			return false;
+		
+		return isset($this->fields[$field_name]);
+	}
+
 	public function set ( $field_name , $field_value )
 	{
 		if(is_array($field_value))
