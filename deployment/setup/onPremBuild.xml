@@ -227,12 +227,23 @@
 
 
     <!-- ============================================  -->
-    <!-- Target: Success                               -->
+    <!-- Target: unit tests                            -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey">
-         <echo msg="Done" />
+    <target name="unitTest" depends="setDomain,includeKaltura">
+         <echo msg="creating base data for tests..." />
+         <exec command="php /opt/kaltura/app/tests/scripts/createBaseData.php" dir="/opt/kaltura/app/tests/scripts" />
+         <echo msg="running unit tests..." />
+         <exec command="php /opt/kaltura/app/tests/scripts/runTests.php" dir="/opt/kaltura/app/tests/scripts" />
     </target>
 
+
+
+    <!-- ============================================  -->
+    <!-- Target: Success                               -->
+    <!-- ============================================  -->
+    <target name="seccess" depends="unitTest">
+         <echo msg="Done" />
+    </target>
 
 
 </project>
