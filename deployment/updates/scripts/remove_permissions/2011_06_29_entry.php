@@ -3,8 +3,6 @@
  * @package deployment
  * @subpackage dragonfly.roles_and_permissions
  * 
- * Adds asset permissions
- * 
  * No need to re-run after server code deploy
  */
 
