@@ -311,7 +311,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$paramName = $outputTypeReflector->getName();
 		$this->writeXmlSource("				<OutputReference name = '$paramName' type = '$paramType' key = 'Fill the object key' />");
 		
-		if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum())
+		if($outputTypeReflector->isSimpleType() || $outputTypeReflector->isEnum() || 
+		   $outputTypeReflector->isDynamicEnum() || $outputTypeReflector->isDynamicEnum()				   
+		  )
 		{
 			$defaultValue = $outputTypeReflector->getDefaultValue();
 			
@@ -341,7 +343,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				$propertyName = $actionParamProperty->getName();
 
 				if( $actionParamProperty->isSimpleType() || $actionParamProperty->isEnum() || 
-					$actionParamProperty->isDynamicEnum() || $outputTypeReflector->isDynamicEnum()				   
+					$actionParamProperty->isDynamicEnum() || $actionParamProperty->isDynamicEnum()				   
 				  )
 				{
 					$paramDefaultValue = $actionParamProperty->getDefaultValue();
@@ -469,7 +471,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				$propertyName = $actionParamProperty->getName();
 				
 				if($actionParamProperty->isSimpleType() || $actionParamProperty->isEnum() ||
-				   $actionParam->isStringEnum() ||$actionParam->isDynamicEnum()
+				   $actionParamProperty->isStringEnum() ||$actionParamProperty->isDynamicEnum()
 				   ) 
 				{
 					$defaultValue = $actionParamProperty->getDefaultValue();
@@ -562,14 +564,13 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$isBase = false;
 		$testReturnedType = null;
 		$addId = false;
-		
-		
+				
 		if($action == 'add' || $action == 'update' || $action == 'get' || $action == 'listAction' || $action == 'delete')
 		{
 			$isBase = true;
 		}
 		
-		if($action == 'update' || $action == 'get' || $action == 'list' || $action == 'delete')
+		if($action == 'update' || $action == 'get' || $action == 'listAction' || $action == 'delete')
 		{
 			$addId = true;
 		}
@@ -678,11 +679,11 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if($outputType) //If we have an output then we check it
 		{
 			$this->write("		\$this->assertType('$outputType', \$resultObject);", $isBase);
-			//TODO: create an ignore field array to be populated dynamically
-			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl", "downloadUrl", "rootEntryId");
-			$ignoreFieldsLine = implode(", ", $ignoreFields);
 			
-			$this->write("		\$this->compareApiObjects(\$reference, \$resultObject, array($ignoreFieldsLine));", $isBase);
+			//TODO: create an ignore field array to be populated dynamically (maybe from the service reflector)
+			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl", "downloadUrl", "rootEntryId");
+			$ignoreFieldsLine = implode("', '", $ignoreFields);
+			$this->write("		\$this->compareApiObjects(\$reference, \$resultObject, array('$ignoreFieldsLine'));", $isBase);
 		}
 		
 		if(!$isBase) //If regular test
