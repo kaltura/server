@@ -678,8 +678,11 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		if($outputType) //If we have an output then we check it
 		{
-			$this->write("		\$this->assertType('$outputType', \$resultObject);", $isBase);
-			
+			if(is_object($outputType))
+				$this->write("		\$this->assertInstanceOf('$outputType', \$resultObject);", $isBase);
+			else
+				$this->write("		\$this->assertInternalType('$outputType', \$resultObject);", $isBase);
+								
 			//TODO: create an ignore field array to be populated dynamically (maybe from the service reflector)
 			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl", "downloadUrl", "rootEntryId");
 			$ignoreFieldsLine = implode("', '", $ignoreFields);
