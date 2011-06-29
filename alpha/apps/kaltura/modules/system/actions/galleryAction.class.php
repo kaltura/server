@@ -20,6 +20,7 @@ class galleryAction extends kalturaSystemAction
 	 */
 	public function execute()
 	{
+		    die;
 		$partial = $this->getP ( "partial");
 		$this->widget = null;
 		
