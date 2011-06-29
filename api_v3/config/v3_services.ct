@@ -85,7 +85,7 @@ media.addfrombulk					|			|N		|1	|0		|0		|1		|rw	|		|	|   |
 media.addfromurl					|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 media.addfromsearchresult			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
 media.addfromuploadedfile			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
-media.addfromrecordedwebcam			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_UPLOAD
+media.addfromrecordedwebcam			|			|1		|1	|1		|2		|1		|	|		|	|   |CONTENT_INGEST_WEBCAM
 media.get							|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_BASE
 media.convert						|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_MANAGE_RECONVERT
 media.addfromentry					|			|1		|1	|1		|2		|1		|	|		|1	|   |CONTENT_INGEST_UPLOAD
