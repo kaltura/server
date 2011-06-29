@@ -730,7 +730,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
 	{
 		//We only check for filesize and check sum in local files 
-		if($resource instanceof KalturaServerLocalFileResource)
+		if($resource instanceof KalturaServerFileResource)
 		{
 			$filePath = $resource->localFilePath;
 			
@@ -802,7 +802,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($elementToSearchIn->serverFileContentResource))
 		{
 			KalturaLog::debug("Resource is : serverFileContentResource");
-			$resource = new KalturaServerLocalFileResource();
+			$resource = new KalturaServerFileResource();
 			$localContentResource = $elementToSearchIn->serverFileContentResource;
 			$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
 		}
