@@ -221,8 +221,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("		return \$id;");
 		$this->writeBase("	}");
 		$this->writeBase("");
-		$this->writeBase("}");
-		$this->writeBase("");
+
+		//Close the test file
+		$this->writeTest("}");
+		$this->writeTest("");
 			
 //		$this->writeBase("	/**");
 //		$this->writeBase("	 * Called when all tests are done");
@@ -245,11 +247,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$this->writeBase("	}");
 		$this->writeBase("");
 		
-		
-		
+		//Close the base file
 		$this->writeBase("}");
-		
-		
+				
 		$serviceName = $serviceReflector->getServiceName();
 		$serviceClass = $serviceReflector->getServiceClass();
 		$testPath = realpath(dirname(__FILE__) . '/../') . "/tests/api/$serviceName";
@@ -584,7 +584,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		//TODO:delete this
 		$resgressionTests = array('add', 'get', 'delete', 'update', 'listAction');
 		if(!in_array($action , $resgressionTests ))
-			continue;
+			return;
 				
 		if($action)
 		$actionName = ucfirst($action);
