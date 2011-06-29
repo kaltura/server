@@ -439,11 +439,12 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			if($testCaseFailuresXml != null)
 			{
 				$testCaseFailuresXml->formatOutput = true;
-				fwrite(KalturaTestListener::$failuresFile, $testCaseFailuresXml->saveXML());
+				$failuresAsXml = $testCaseFailuresXml->saveXML();
+				fwrite(KalturaTestListener::$failuresFile, $failuresAsXml);
 				KalturaTestResultUpdater::UpdateResults(KalturaTestListener::$dataFilePath,KalturaTestListener::$failureFilePath);
 				
 				//Write the failures into the global failures file
-				fwrite(KalturaTestListener::$totalFailureFile, $testCaseFailuresXml->saveXML());
+				fwrite(KalturaTestListener::$totalFailureFile, $failuresAsXml);
 			}
 			else
 			{

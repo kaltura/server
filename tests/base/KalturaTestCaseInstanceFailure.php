@@ -234,7 +234,8 @@ class KalturaTestCaseInstanceFailure
 				}
 				elseif ($inputValue instanceof KalturaObjectBase)
 				{
-					$id = $inputValue->id;
+					if(property_exists($inputValue, 'id'))
+						$id = $inputValue->id;
 				}
 								
 				$node->setAttribute($type."Id", $id);

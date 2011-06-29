@@ -319,9 +319,19 @@ class KalturaFailure
 			
 			foreach ($value as $key => $singleValue)
 			{
+				if(!is_string($singleValue))
+				{
+					if(is_object($singleValue))
+					{
+						$singleValue = get_class($singleValue);
+					}
+					else
+						$singleValue = gettype($singleValue);
+				}
+				
 				$node = $xml->createElement($fieldName, $singleValue);
 						
-				$node->setAttribute("key", $key );
+				$node->setAttribute("key", $key);
 				
 				if($fieldType != null)
 				{

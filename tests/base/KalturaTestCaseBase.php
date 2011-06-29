@@ -786,7 +786,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
      */
     protected function handleDependencies()
     {
-    	print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
+    	//print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
     	    	    
     	if (!empty($this->dependencies) && !$this->inIsolation) 
     	{
