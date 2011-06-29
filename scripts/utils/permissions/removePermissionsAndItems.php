@@ -174,7 +174,7 @@ function removeItemFromPermissions(PermissionItem $item, array $permissionNames)
 		$c = new Criteria();
 		$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID, $item->getId());
 		$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_ID, $permission->getId());
-		$permissionToPermissionItem = PermissionPeer::doSelectOne($c);
+		$permissionToPermissionItem = PermissionToPermissionItemPeer::doSelectOne($c);
 		if(!$permissionToPermissionItem)
 			continue;
 		
