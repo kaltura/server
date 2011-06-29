@@ -125,8 +125,11 @@ class DailymotionDistributionProfile extends DistributionProfile
 			{	
 				$tags = implode(',', $values);
 				$tags = explode(',', $tags);
-				$tagsStr = implode(' , ', $tags);
+				foreach($tags as &$temptag)
+					$temptag = trim($temptag);
+				unset($temptag);
 				
+				$tagsStr = implode(' , ', $tags);
 				$validateTags = false;
 			
 				if(strlen($tagsStr) > self::ENTRY_TAGS_MAXIMUM_LENGTH)
@@ -147,9 +150,9 @@ class DailymotionDistributionProfile extends DistributionProfile
 				{
 					if(strlen($tag) < self::ENTRY_TAG_MINIMUM_LENGTH)
 					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tag [$tag] must contain at least ' . self::ENTRY_TAG_MINIMUM_LENGTH . ' characters');
+						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, "Dailymotion tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
 						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-						$validationError->setValidationErrorParam('Dailymotion tag [$tag] must contain at least ' . self::ENTRY_TAG_MINIMUM_LENGTH . ' characters');
+						$validationError->setValidationErrorParam("Dailymotion tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
 						$validationErrors[] = $validationError;
 					}
 				}
@@ -226,6 +229,9 @@ class DailymotionDistributionProfile extends DistributionProfile
 			else
 			{
 				$tags = explode(',', $entry->getTags());
+				foreach($tags as &$temptag)
+					$temptag = trim($temptag);
+				unset($temptag);
 				$tagsStr = implode(' , ', $tags);
 				
 				if(strlen($tagsStr) > self::ENTRY_TAGS_MAXIMUM_LENGTH)
