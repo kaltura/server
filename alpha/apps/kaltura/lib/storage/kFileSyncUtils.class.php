@@ -312,6 +312,9 @@ class kFileSyncUtils
 		if($file->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
 		{
 			$source_file_sync = FileSyncPeer::retrieveByPK($file->getLinkedId());
+			if(!$source_file_sync)
+				return $file;
+				
 			$parent = self::resolve($source_file_sync);
 		}
 		if(!$parent)
