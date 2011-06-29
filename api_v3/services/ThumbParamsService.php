@@ -171,7 +171,7 @@ class ThumbParamsService extends KalturaBaseService
 		if (!$conversionProfileDb)
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
 			
-		$thumbParamsConversionProfilesDb = $conversionProfileDb->getthumbParamsConversionProfilesJointhumbParams();
+		$thumbParamsConversionProfilesDb = $conversionProfileDb->getflavorParamsConversionProfilesJoinflavorParams();
 		$thumbParamsDb = array();
 		foreach($thumbParamsConversionProfilesDb as $item)
 		{
