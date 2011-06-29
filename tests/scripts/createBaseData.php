@@ -1,11 +1,14 @@
 <?php
 require_once dirname(__FILE__) . '/../bootstrap.php';
 
-$param = 
+$serviceUrl = 'http://localhost/'; 
+if(isset($argv[1]))
+	$serviceUrl = $argv[1];
 
 $config = new KalturaConfiguration();
 //$config->serviceUrl = 'http://hudsontest2.kaltura.dev/';
-$config->serviceUrl = 'http://devtests.kaltura.dev/';
+//$config->serviceUrl = 'http://devtests.kaltura.dev/';
+$config->serviceUrl = $serviceUrl;
 $client = new KalturaClient($config);
 $cmsPassword = 'Roni123!';
 $partner = new KalturaPartner();
