@@ -176,5 +176,6 @@ function removeItemFromPermissions(PermissionItem $item, array $permissionNames)
 		
 		KalturaLog::log('Removing permission item id ['.$item->getId().'] from permission id ['.$permission->getId().']');
 		$permission->removePermissionItem($item->getId());
+		$permission->save();
 	}
 }
