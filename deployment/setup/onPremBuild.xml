@@ -229,7 +229,7 @@
     <!-- ============================================  -->
     <!-- Target: unit tests                            -->
     <!-- ============================================  -->
-    <target name="unitTest" depends="setDomain,includeKaltura">
+    <target name="unitTest">
          <echo msg="creating base data for tests..." />
          <exec command="php /opt/kaltura/app/tests/scripts/createBaseData.php" dir="/opt/kaltura/app/tests/scripts" />
          <echo msg="running unit tests..." />
@@ -241,7 +241,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="unitTest">
+    <target name="seccess" depends="setDomain,includeKaltura">
          <echo msg="Done" />
     </target>
 
