@@ -42,7 +42,7 @@ if ($apiTestDir) // Checks if the test API folder is a dir
 		        			$output = array();
 		        			$result = exec("phpunit " . $testFile, $output);
 		        			print("output: " . print_r($output, true ) ."\n");
-		        			print("result: " . print_r($result, true ) ."\n");
+		        			print("result: " . print_r($result, true ) ."\n\n\n");
 		        		}
 		        	}
 	        	}
