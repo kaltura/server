@@ -455,10 +455,13 @@ class KalturaTestDataObject extends KalturaTestDataBase
 	private static function getObjectInstance($objectInstaceType)
 	{
 		$objectInstace = "";
-		
-		if(class_exists($objectInstaceType))
+						
+		if(class_exists($objectInstaceType)) // TODO:handle abstract classes and parameters constructors classes
 		{
-			$objectInstace = new $objectInstaceType;
+			$reflectionClass = new ReflectionClass($objectInstaceType);	
+			$isAbstract = $reflectionClass->isAbstract();
+			if(!$isAbstract)					
+				$objectInstace = new $objectInstaceType;
 		}
 		else  //regular type (string, int, ...)
 		{
@@ -488,11 +491,13 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		}
 		else
 		{
-			//Set the attribute to its right type
-			settype($fieldValue, $fieldValueType);
+			//print("fieldValue [$fieldValue], fieldValueType [$fieldValueType]\n");
+			//TODO: fix this
+			if($fieldValueType) //If field value type is set
+				settype($fieldValue, $fieldValueType);
 			$objectInstace = $fieldValue;
 		}
-	} 
+	}
 
 	/**
 	 * 

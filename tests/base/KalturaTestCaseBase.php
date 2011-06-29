@@ -414,7 +414,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			$classPath = KAutoloader::getClassFilePath($class);
 			KalturaTestListener::setFailureFilePath(dirname($classPath) . "/testsData/{$class}.failures");
 			KalturaTestListener::setDataFilePath(dirname($classPath) . "/testsData/{$class}.data");
-
+			KalturaTestListener::setTotalFailureFilePath(KALTURA_TESTS_PATH . "/common/totalFailures.failures");
+			
 			//add Listener from config with all params such as: when to report
 			$this->result->addListener(new KalturaTestListener());
 			

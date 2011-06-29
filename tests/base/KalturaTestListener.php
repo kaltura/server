@@ -18,6 +18,20 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 
 	/**
 	 * 
+	 * Holds the path of the totla failures file 
+	 * @var string
+	 */
+	private static $totalFailureFilePath;
+
+	/**
+	 * 
+	 * Holds all the failures for all the tests 
+	 * @var unknown_type
+	 */
+	private static $totalFailureFile;
+	
+	/**
+	 * 
 	 * Holds the file for the failures to be written to
 	 * @var unknown_type
 	 */
@@ -45,6 +59,49 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	private static  $currentTestCase = null;
 	
+	/**
+	 * @return the $totalFailureFilePath
+	 */
+	public static function getTotalFailureFilePath() {
+		return KalturaTestListener::$totalFailureFilePath;
+	}
+
+	/**
+	 * @return the $totalFailureFile
+	 */
+	public static function getTotalFailureFile() {
+		return KalturaTestListener::$totalFailureFile;
+	}
+
+	/**
+	 * @return the $failureFilePath
+	 */
+	public static function getFailureFilePath() {
+		return KalturaTestListener::$failureFilePath;
+	}
+
+	/**
+	 * @return the $dataFilePath
+	 */
+	public static function getDataFilePath() {
+		return KalturaTestListener::$dataFilePath;
+	}
+
+	/**
+	 * @param string $totalFailureFilePath
+	 */
+	public static function setTotalFailureFilePath($totalFailureFilePath) {
+		KalturaTestListener::$totalFailureFilePath = $totalFailureFilePath;
+		KalturaTestListener::$totalFailureFile = fopen($totalFailureFilePath, 'w+');		
+	}
+
+	/**
+	 * @param unknown_type $totalFailureFile
+	 */
+	public static function setTotalFailureFile($totalFailureFile) {
+		KalturaTestListener::$totalFailureFile = $totalFailureFile;		
+	}
+
 	/**
 	 * @return the $testCaseFailures
 	 */
@@ -166,6 +223,8 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 				$testName = $testNames[1];
 			}
 			
+			print("testName [" . $testName."]\n");
+			
 			// if it is a dataprovider test suite
 			KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($testName));
 		}
@@ -176,6 +235,8 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 					
 			if($test instanceof PHPUnit_Framework_TestSuite_DataProvider)
 				$test = $test->testAt(0);
+			
+			print("test [" . $test->getName()."]\n");
 			
 			$class = get_class($test);
 			
@@ -292,10 +353,12 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 					$testProcedureName = $test->getName(false);
 					$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testProcedureName);
 
-					$testCaseInstanceName = $test->getName(true);
-				
-					//Clean the test failures from the procedures failures
-					$testProcedureFailures->removeTestCaseInstanceFailure($testCaseInstanceName);
+					if(!is_null($testProcedureFailures))
+					{
+						$testCaseInstanceName = $test->getName(true);
+						//Clean the test failures from the procedures failures
+						$testProcedureFailures->removeTestCaseInstanceFailure($testCaseInstanceName);
+					}
 				}
 			}
 		}
@@ -309,6 +372,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	{
 		$this->cleanEmptyFailures();
 		$this->writeFailuresToFile();
+		$this->writeTotalFailuresToFile();
 	}
 	 
 	/**
@@ -350,7 +414,6 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	{
 		KalturaTestListener::$failureFilePath = $failureFilePath;
 		KalturaTestListener::$failuresFile = fopen($failureFilePath, 'w+');
-		
 	}
 	
 	/**
@@ -362,7 +425,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	{
 		KalturaTestListener::$dataFilePath = $dataFilePath;
 	}
-
+	
 	/**
 	 * 
 	 * Writes the listener failures to the given file
@@ -377,8 +440,10 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			{
 				$testCaseFailuresXml->formatOutput = true;
 				fwrite(KalturaTestListener::$failuresFile, $testCaseFailuresXml->saveXML());
-				
 				KalturaTestResultUpdater::UpdateResults(KalturaTestListener::$dataFilePath,KalturaTestListener::$failureFilePath);
+				
+				//Write the failures into the global failures file
+				fwrite(KalturaTestListener::$totalFailureFile, $testCaseFailuresXml->saveXML());
 			}
 			else
 			{

@@ -15,7 +15,7 @@ class KalturaTestSuite extends PHPUnit_Framework_TestSuite
 			$result = new KalturaTestResult();	
 		}
 		
-		parent::run($result, $filter, $groups, $excludeGroups, $processIsolation);
+		return parent::run($result, $filter, $groups, $excludeGroups, $processIsolation);
 	}
 	
 	/**
@@ -34,13 +34,13 @@ class KalturaTestSuite extends PHPUnit_Framework_TestSuite
 	 */
 	public function runTest(PHPUnit_Framework_Test $test, PHPUnit_Framework_TestResult $result)
 	{
-		print("In KalturaTestSuite::runTest() for test [" . $test->getName() ."]");
+		print("In KalturaTestSuite::runTest() for test [" . $test->getName() ."]\n");
 		if(is_null($result) || !($result instanceof KalturaTestResult))
 		{
 			$resultClass = get_class($result);
 			print("result [$resultClass] - Setting result to be KalturaTestResult\n");
 			$result = new KalturaTestResult();	
 		}
-		parent::runTest($test, $result);
+		return parent::runTest($test, $result);
 	}
 }
