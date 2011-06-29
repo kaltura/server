@@ -14,14 +14,14 @@ if ($apiTestDir) // Checks if the test API folder is a dir
 {
     echo "API Tests Directory handle: " . API_TEST_DIR . "\n";
 
-    /* This is the correct way to loop over the directory. */
+    /* loop over the directory. */
     while (false !== ($serviceDirName = readdir($apiTestDir))) 
     {
     	$isDir = is_dir(API_TEST_DIR . "/" . $serviceDirName);
         
         if($isDir) // Checks if the current service dir is a dir 
         {
-        	$isRunServiceTest = ($testName == null || $testName == $serviceDirName);
+        	$isRunServiceTest = (is_null($testName) || $testName == $serviceDirName);
         	if($isRunServiceTest)
         	{
 	        	print("Testing service: $serviceDirName\n");
@@ -52,7 +52,7 @@ if ($apiTestDir) // Checks if the test API folder is a dir
 }
 else 
 {
-	print("Test Dir [" . API_TEST_DIR . "] is not a dir");
+	print("Test Dir [" . API_TEST_DIR . "] is not a dir\n");
 }
     
-print("Running API tests ended!\n");
+print("\nRunning API tests ended!\n");
