@@ -1133,7 +1133,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allFlavorParams as $flavorParams)
 		{
-			if(!empty($flavorParams->systemName))
+			if($flavorParams->systemName)
 				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId][$flavorParams->systemName] = $flavorParams->assetParamsId;
 			else //NO system name so we add them to a default name
 				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]["NO SYSTEM NAME $flavorParams->assetParamsId"] = $flavorParams->assetParamsId;
@@ -1211,7 +1211,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($allConversionProfile as $conversionProfile)
 		{
 			$systemName = $conversionProfile->systemName;
-			if(!empty($systemName))
+			if($systemName)
 				$this->conversionProfileNameToId[$systemName] = $conversionProfile->id;
 			else //NO system name so we add them to a default name
 				$this->conversionProfileNameToId["No system name " ."{$conversionProfile->id}"] = $conversionProfile->id;
@@ -1234,7 +1234,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allStorageProfiles as $storageProfile)
 		{
-			if(!is_null($storageProfile->systemName))
+			if($storageProfile->systemName)
 				$this->storageProfileNameToId["$storageProfile->systemName"] = $storageProfile->id;
 			else //NO system name so we add them to a default name
 				$this->storageProfileNameToId["No system name " ."{$storageProfile->id}"] = $storageProfile->id;	
