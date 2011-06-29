@@ -679,7 +679,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		{
 			$this->write("		\$this->assertType('$outputType', \$resultObject);", $isBase);
 			//TODO: create an ignore field array to be populated dynamically
-			$ignoreFields = array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId');
+			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl", "downloadUrl", "rootEntryId");
 			$ignoreFieldsLine = implode(", ", $ignoreFields);
 			
 			$this->write("		\$this->compareApiObjects(\$reference, \$resultObject, array($ignoreFieldsLine));", $isBase);
