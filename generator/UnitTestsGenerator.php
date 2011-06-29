@@ -182,6 +182,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				
 		foreach($actions as $action => $actionName)
 		{
+			//KalturaLog::debug("$actionName\n");
+			
 			$actionInfo = $serviceReflector->getActionInfo($action);
 			
 			if($actionInfo->serverOnly || $actionInfo->deprecated)
@@ -189,8 +191,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				
 			if (strpos($actionInfo->clientgenerator, "ignore") !== false)
 				continue;
-				
-			$resgressionTests = array('add', 'get', 'delete', 'update', 'listAction');
+
+			//TODO:delete this
+			$resgressionTests = array('addAction', 'getAction', 'deleteAction', 'updateAction', 'listAction');
 			if(!in_array($actionName , $resgressionTests ))
 				continue;
 			
@@ -206,26 +209,28 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 */
 	protected function writeAfterService(KalturaServiceReflector $serviceReflector)
 	{
-		$this->writeTest("	/**");
-		$this->writeTest("	 * Called when all tests are done");
-		$this->writeTest("	 * @param int \$id");
-		$this->writeTest("	 * @return int");
-		$this->writeTest("	 * @depends {$this->lastDependencyTest} - TODO: replace {$this->lastDependencyTest} with last test function that uses that id");
-		$this->writeTest("	 */");
-		$this->writeTest("	public function testFinished(\$id)");
-		$this->writeTest("	{");
-		$this->writeTest("		return \$id;");
-		$this->writeTest("	}");
-		$this->writeTest("");
-		$this->writeTest("}");
-			
 		$this->writeBase("	/**");
 		$this->writeBase("	 * Called when all tests are done");
 		$this->writeBase("	 * @param int \$id");
 		$this->writeBase("	 * @return int");
+		$this->writeBase("	 * TODO: replace {$this->lastDependencyTest} with last test function that uses that id");
+		$this->writeBase("	 * @depends {$this->lastDependencyTest}");
 		$this->writeBase("	 */");
-		$this->writeBase("	abstract public function testFinished(\$id);");
+		$this->writeBase("	public function testFinished(\$id)");
+		$this->writeBase("	{");
+		$this->writeBase("		return \$id;");
+		$this->writeBase("	}");
 		$this->writeBase("");
+		$this->writeBase("}");
+		$this->writeBase("");
+			
+//		$this->writeBase("	/**");
+//		$this->writeBase("	 * Called when all tests are done");
+//		$this->writeBase("	 * @param int \$id");
+//		$this->writeBase("	 * @return int");
+//		$this->writeBase("	 */");
+//		$this->writeBase("	abstract public function testFinished(\$id);");
+//		$this->writeBase("");
 		
 		$serviceClass = $serviceReflector->getServiceClass();
 		$serviceClass = ucfirst($serviceClass); //Capital first letter 
@@ -423,7 +428,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$paramName = $actionParam->getName();
 		$this->writeXmlSource("				<Input name = '$paramName' type = '$paramType' key = 'Fill object key'/>");
 		
-		KalturaLog::debug("paramName [$paramName] paramType [$paramType]");
+		//KalturaLog::debug("paramName [$paramName] paramType [$paramType]");
 			
 		$isParamContainsId = (substr_count($paramName, "id") > 0) || (substr_count($paramName, "Id") > 0); 
 		
@@ -558,7 +563,8 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$testReturnedType = null;
 		$addId = false;
 		
-		if($action == 'add' || $action == 'update' || $action == 'get' || $action == 'list' || $action == 'delete')
+		
+		if($action == 'add' || $action == 'update' || $action == 'get' || $action == 'listAction' || $action == 'delete')
 		{
 			$isBase = true;
 		}
@@ -575,6 +581,12 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$testReturnedType = "$outputType"; // for the dependency (CRUD)
 		}
 
+		//TODO:delete this
+		$resgressionTests = array('add', 'get', 'delete', 'update', 'listAction');
+		if(!in_array($action , $resgressionTests ))
+			continue;
+				
+		if($action)
 		$actionName = ucfirst($action);
 		
 		$this->writeIni("");
@@ -666,8 +678,11 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if($outputType) //If we have an output then we check it
 		{
 			$this->write("		\$this->assertType('$outputType', \$resultObject);", $isBase);
-			//TODO: create an ignore field array to be populated dynamically 			
-			$this->write("		\$this->compareApiObjects(\$reference, \$resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl'));", $isBase);
+			//TODO: create an ignore field array to be populated dynamically
+			$ignoreFields = array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId');
+			$ignoreFieldsLine = implode(", ", $ignoreFields);
+			
+			$this->write("		\$this->compareApiObjects(\$reference, \$resultObject, array($ignoreFieldsLine));", $isBase);
 		}
 		
 		if(!$isBase) //If regular test
