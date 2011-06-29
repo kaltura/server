@@ -237,7 +237,14 @@ class KalturaTestCaseInstanceFailure
 					if(property_exists($inputValue, 'id'))
 						$id = $inputValue->id;
 				}
-								
+				
+				//Fixes problem where id was object
+				if(!is_string($id))
+				{	
+					$idType = get_class($id);
+					$id = "not a string but $idType";
+				} 
+					
 				$node->setAttribute($type."Id", $id);
 			}
 			$inputsNode->appendChild($node);
