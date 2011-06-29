@@ -184,12 +184,16 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		{
 			$actionInfo = $serviceReflector->getActionInfo($action);
 			
-			if($actionInfo->serverOnly)
+			if($actionInfo->serverOnly || $actionInfo->deprecated)
 				continue;
 				
 			if (strpos($actionInfo->clientgenerator, "ignore") !== false)
 				continue;
 				
+			$resgressionTests = array('add', 'get', 'delete', 'update', 'listAction');
+			if(!in_array($actionName , $resgressionTests ))
+				continue;
+			
 			$outputTypeReflector = $serviceReflector->getActionOutputType($action);
 			$actionParams = $serviceReflector->getActionParams($action);
 			$this->writeServiceAction($serviceId, $serviceName, $actionInfo->action, $actionParams, $outputTypeReflector);				
