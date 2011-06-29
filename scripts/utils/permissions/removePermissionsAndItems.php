@@ -168,14 +168,16 @@ function removeItemFromPermissions(PermissionItem $item, array $permissionNames)
 		$c->addAnd(PermissionPeer::TYPE, array(PermissionType::NORMAL, PermissionType::PARTNER_GROUP), Criteria::IN);
 		$c->addAnd(PermissionPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, $item->getPartnerId(), $partnerId), Criteria::IN);
 		$permission = PermissionPeer::doSelectOne($c);
-		
-		if (!$permission) {
-			KalturaLog::alert('Permission name ['.$permissionName.'] for partner ['.$item->getPartnerId().'] not found in database - skipping!');
+		if(!$permission)
 			continue;
-		}
 		
-		KalturaLog::log('Removing permission item id ['.$item->getId().'] from permission id ['.$permission->getId().']');
-		$permission->removePermissionItem($item->getId());
-		$permission->save();
+		$c = new Criteria();
+		$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_ITEM_ID, $item->getId());
+		$c->addAnd(PermissionToPermissionItemPeer::PERMISSION_ID, $permission->getId());
+		$permissionToPermissionItem = PermissionPeer::doSelectOne($c);
+		if(!$permissionToPermissionItem)
+			continue;
+		
+		$permissionToPermissionItem->delete();
 	}
 }
