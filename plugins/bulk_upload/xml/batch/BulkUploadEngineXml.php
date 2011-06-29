@@ -1156,7 +1156,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach ($allAccessControl as $accessControl)
 		{
-			if(!is_null($accessControl->systemName))
+			if($accessControl->systemName)
 				$this->accessControlNameToId[$accessControl->systemName] = $accessControl->id;
 			else //NO system name so we add them to a default name
 				$this->accessControlNameToId["No system name " ."$accessControl->id"] = $accessControl->id;
