@@ -241,7 +241,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="setDomain,includeKaltura">
+    <target name="seccess" depends="restartServer,genActivationKey">
          <echo msg="Done" />
     </target>
 
