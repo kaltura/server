@@ -25,10 +25,14 @@ class KDLTest extends KalturaServerTestCase
 	/**
 	 * 
 	 * Test the KDL - WrapCDLGenerateTargetFlavors() method
-	 * @dataProvider providerCDLGenerateTargetFlavors
+	 * @dataProvider provideData
 	 */
 	public function testKDLWrapCDLGenerateTargetFlavors(flavorParams $flavorList, mediaInfo $mediaInfo, flavorParamsOutput $flavorParamsOutput)
 	{
+		print("\nin KDL TEst\n");
+		print_r($flavorList, true);
+		print_r($mediaInfo, true);
+		print_r($flavorParamsOutput, true);
 		//returns KDLWrap
 		$result = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, array($flavorList));
 
@@ -43,7 +47,7 @@ class KDLTest extends KalturaServerTestCase
 	 * @param mediaInfo $cdlSourceMediaInfo
 	 * @param flavorParamsOutput $cdlTarget
 	 * @param mediaInfo $cdlProductMediaInfo
-	 * @dataProvider providerCDLValidateProduct
+	 * @dataProvider provideData
 	 */
 	public function testKDLWrapCDLValidateProduct(mediaInfo $cdlSourceMediaInfo, flavorParamsOutput $cdlTarget, mediaInfo $cdlProductMediaInfo)
 	{ 
@@ -52,55 +56,13 @@ class KDLTest extends KalturaServerTestCase
 		//assert that 0 errors were generated
 		$this->assertEquals(0, count($result->_errors));
 	}
-			
-	/**
-	 * 
-	 * The unit test data provider gets the data for the test "testKDLWrapCDLGenerateTargetFlavors"
-	 * @return array<array>();
-	 */
-	public function providerCDLGenerateTargetFlavors()
-	{
-		$inputsAsUnitTestObjects = $this->provider("testKDLWrapCDLGenerateTargetFlavors");
-		
-		//The actual input for the tests
-		$inputsForTest = array();
-		
-		foreach ($inputsAsUnitTestObjects as $input)
-		{
-			$testParameters = array();
-			foreach ($input as $singleParameter)
-			{
-				 $testParameters[] = $singleParameter->getDataObject();
-			}
-			
-			$inputsForTest[] = $testParameters;
-		}
-		
-		return $inputsForTest;
-	}
 
-	/**
-	 * 
-	 * The unit test data provider gets the data for the test "testKDLWrapCDLValidateProduct"
-	 */
-	public function providerCDLValidateProduct()
-	{
-		$inputsAsUnitTestObjects = $this->provider("testKDLWrapCDLValidateProduct");
-		
-		//The actual input for the tests
-		$inputsForTest = array();
-		
-		foreach ($inputsAsUnitTestObjects as $input)
-		{
-			$testParameters = array();
-			foreach ($input as $singleParameter)
-			{
-				 $testParameters[] = $singleParameter->getDataObject();
-			}
-			
-			$inputsForTest[] = $testParameters;
-		}
-		
-		return $inputsForTest; 
-	}
+//	/**
+//	 * 
+//	 * Returns the KalturaTestSuite for the test
+//	 */
+//	public function suite()
+//	{
+//		return new KalturaTestSuite("KDLTest");
+//	}
 }
