@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . '/../../bootstrap/bootstrapServer.php');
  * @author Roni
  *
  */
-class KDLTest extends KalturaServerTestCase
+class KDLUnitTest extends KalturaServerTestCase
 {
 	/**
 	 * 
@@ -17,7 +17,7 @@ class KDLTest extends KalturaServerTestCase
 	 * @param array<unknown_type> $data
 	 * @param string $dataName
 	 */
-	public function __construct($name = "KDLTest", array $data = array(), $dataName ="Default data")
+	public function __construct($name = "KDLUnitTest", array $data = array(), $dataName ="Default data")
 	{
 		parent::__construct($name, $data, $dataName);
 	}
@@ -56,13 +56,4 @@ class KDLTest extends KalturaServerTestCase
 		//assert that 0 errors were generated
 		$this->assertEquals(0, count($result->_errors));
 	}
-
-//	/**
-//	 * 
-//	 * Returns the KalturaTestSuite for the test
-//	 */
-//	public function suite()
-//	{
-//		return new KalturaTestSuite("KDLTest");
-//	}
 }
