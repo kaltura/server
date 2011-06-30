@@ -38,7 +38,13 @@ class KalturaGlobalData extends KalturaTestConfig
 	public static function setData($name, $value)
 	{
 		if(KalturaGlobalData::$dataFile == null)
-			KalturaGlobalData::initDataFile();
+		{
+			$isInit = KalturaGlobalData::initDataFile();
+			if(!$isInit)
+			{
+				return null;
+			}
+		}
 		
 		KalturaGlobalData::$dataFile->$name = $value; 
 		KalturaGlobalData::$dataFile->saveToIniFile();
@@ -51,7 +57,11 @@ class KalturaGlobalData extends KalturaTestConfig
 	public static function getData($name)
 	{
 		if(KalturaGlobalData::$dataFile == null)
-			KalturaGlobalData::initDataFile();
+		{
+			$isInit = KalturaGlobalData::initDataFile();
+			if(!$isInit)
+				return null;
+		}
 			
 		$value = null; 
 		 
@@ -78,8 +88,10 @@ class KalturaGlobalData extends KalturaTestConfig
 			KalturaGlobalData::setDataFilePath(KalturaGlobalData::DEFAULT_DATA_PATH);
 		}
 		
-		
-		KalturaGlobalData::$dataFile = new KalturaTestConfig(KalturaGlobalData::$dataFilePath);
+		if(file_exists(KalturaGlobalData::DEFAULT_DATA_PATH))
+			KalturaGlobalData::$dataFile = new KalturaTestConfig(KalturaGlobalData::$dataFilePath);
+		else 
+			return null;
 	}
 	
 	/**
@@ -107,7 +119,11 @@ class KalturaGlobalData extends KalturaTestConfig
 	public static function isGlobalData($name)
 	{
 		if(KalturaGlobalData::$dataFile == null)
-			KalturaGlobalData::initDataFile();
+		{
+			$isInit = KalturaGlobalData::initDataFile();
+			if(!$isInit)
+				return null;
+		}
 		
 		$value = null;
 		
