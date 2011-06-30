@@ -504,7 +504,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		else
 		{
 			//TODO: Give notice or create the file don't throw an exception
-			throw new Exception("Data file not found");
+			throw new Exception("Data file [$dataFilePath] not found");
 		}
 		
 		$inputsForTestProcedure = array();
