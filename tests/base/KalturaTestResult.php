@@ -22,12 +22,30 @@ class KalturaTestResult extends PHPUnit_Framework_TestResult
 	}
 	
 	/**
+	 * 
+	 * checks if the listener exists
+	 * @param string $listenerType
+	 */
+	public function isListenerExists($listenerType)
+	{
+		foreach ($this->listeners as $listener)
+		{
+			$type = get_class($listener);
+			if($type == $listenerType)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * (non-PHPdoc)
 	 * @see PHPUnit_Framework_TestResult::endTest()
 	 */
 	public function endTest(PHPUnit_Framework_Test $test, $time)
 	{
 		print("In KalturaTestResult::endTest\n");
+		print("result listeners [".print_r($this->listeners,true)."]\n");
 		$result = parent::endTest($test, $time);
 		
 		if (!$this->lastTestFailed && $test instanceof PHPUnit_Framework_TestCase) {

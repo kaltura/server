@@ -280,9 +280,10 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 		KalturaLog::debug("In endTestSuite");
 
 		//if (preg_match("*::*" ,$suiteName) != 0) TODO: check this
-		//if($suite instanceof  PHPUnit_Framework_TestSuite_DataProvider)
-		if (preg_match("*::*" ,$suiteName) != 0)
-		{ // if it is a dataprovider test suite
+		if($suite instanceof  PHPUnit_Framework_TestSuite_DataProvider)
+		//if (preg_match("*::*" ,$suiteName) != 0)
+		{ 
+			// if it is a dataprovider test suite
 			print("A data provider test suite was finished no action taken\n");
 			KalturaLog::debug("A data provider test suite was finished no action taken");
 
@@ -321,17 +322,24 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 		{
 			$testInputs = $test->getInputs();
 			
-			//Add another test case instance failure for this test
-			$testProcedureName = $test->getName(false); 
-			$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testProcedureName);
-			
-			if(is_null($testProcedureFailures))
+			if(is_null(KalturaTestListener::$testCaseFailures))
+				KalturaTestListener::$testCaseFailures = new KalturaTestCaseFailures();
+				
+			if(!is_null(KalturaTestListener::$testCaseFailures))
 			{
-				//Handle when test name includes the test case name
-				$testProcedureFailures = KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure());
+				//TODO: check this probably bug
+				//Add another test case instance failure for this test
+				$testProcedureName = $test->getName(false); 
+				$testProcedureFailures = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testProcedureName);
+				
+				if(is_null($testProcedureFailures))
+				{
+					//Handle when test name includes the test case name
+					$testProcedureFailures = KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure());
+				}
+		
+				$testProcedureFailures->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
 			}
-	
-			$testProcedureFailures->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
 		}
 	}
 

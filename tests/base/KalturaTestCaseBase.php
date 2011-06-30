@@ -380,7 +380,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function run(PHPUnit_Framework_TestResult $result = null)
 	{
-		print("In KalturaTestCaseBase::run for test [$this->name]\n");
+		KalturaLog::debug("In KalturaTestCaseBase::run for test [$this->name]\n");
 			
 		if(is_null($result))
 		{
@@ -395,10 +395,10 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			$newResult = new KalturaTestResult();
 		}
 
+		$this->initFramework($result);
+		
 		$result = parent::run($result);
-		
-		$this->initFramework();
-		
+						
 		return $result; 
 	}
 	
@@ -406,8 +406,25 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 * 
 	 * Initializes the framework for all the tests
 	 */
-	protected function initFramework()
+	protected function initFramework($result = null)
 	{
+		if(!is_null($result))
+		{
+			if($result instanceof KalturaTestResult)
+			{
+				if(!$result->isListenerExists('KalturaTestListener'))
+				{
+					$result->addListener(new KalturaTestListener());
+				}
+			}
+			else 
+			{
+				print("TestResul is not Kaltura!!!!\n");
+			}
+		}
+		
+		print("Init framework");
+		
 		if(KalturaTestCaseBase::$isFrameworkInit == false)
 		{
 			$class = get_class($this);
@@ -416,6 +433,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			KalturaTestListener::setDataFilePath(dirname($classPath) . "/testsData/{$class}.data");
 			KalturaTestListener::setTotalFailureFilePath(KALTURA_TESTS_PATH . "/common/totalFailures.failures");
 			
+			if(is_null($this->result))
+				$this->result = new KalturaTestResult();
+					
 			//add Listener from config with all params such as: when to report
 			$this->result->addListener(new KalturaTestListener());
 			
@@ -441,7 +461,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	public function runTest()
 	{
 		KalturaLog::debug("In runTest for test [$this->name]\n");
-		print("In KalturaTestCaseBase::runTest for test [$this->name]\n");
+		//print("In KalturaTestCaseBase::runTest for test [$this->name]\n");
 		
 		foreach ($this->dependencyInput as $index => $value)
 		{
