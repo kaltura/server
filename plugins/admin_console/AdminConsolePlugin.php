@@ -2,7 +2,7 @@
 /**
  * @package plugins.adminConsole
  */
-class AdminConsolePlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaPermissions, IKalturaServices, IKalturaConfigurator
+class AdminConsolePlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'adminConsole';
 	
