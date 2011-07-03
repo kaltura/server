@@ -22,7 +22,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	public $freeText;
 
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $isRoot;
 }
