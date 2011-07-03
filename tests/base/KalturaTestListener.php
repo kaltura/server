@@ -338,7 +338,12 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 					$testProcedureFailures = KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure());
 				}
 		
-				$testProcedureFailures->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
+				$testCaseInstance = $testProcedureFailures->getTestCaseInstanceFailure($test->getName(true));
+				
+				if(!$testCaseInstance)
+					$testProcedureFailures->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
+				else
+					KalturaLog::alert("Test case [". $test->getName(true) ."] was already added");
 			}
 		}
 	}
