@@ -93,8 +93,13 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'label' => 'SFTP Private Key:'
 		));
 		
+		$this->addElement('text', 'sftp_base_dir', array(
+			'label'			=> 'SFTP Base Directory:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addDisplayGroup(
-			array('sftp_host', 'sftp_login', 'sftp_public_key', 'sftp_private_key'), 
+			array('sftp_host', 'sftp_login', 'sftp_public_key', 'sftp_private_key', 'sftp_base_dir'), 
 			'sftp', 
 			array('legend' => 'SFTP Configuration', 'decorators' => array('FormElements', 'Fieldset'))
 		);

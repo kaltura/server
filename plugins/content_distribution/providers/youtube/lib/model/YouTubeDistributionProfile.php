@@ -12,6 +12,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_SFTP_LOGIN = 'sftpLogin';
 	const CUSTOM_DATA_SFTP_PUBLIC_KEY = 'sftpPublicKey';
 	const CUSTOM_DATA_SFTP_PRIVATE_KEY = 'sftpPrivateKey';
+	const CUSTOM_DATA_SFTP_BASE_DIRECTORY = 'sftpBaseDir';
 	const CUSTOM_DATA_DEFAULT_CATEGORY = 'defaultCategory';
 	const CUSTOM_DATA_ALLOW_COMMENTS = 'allowComments';
 	const CUSTOM_DATA_ALLOW_EMBEDDING = 'allowEmbedding';
@@ -103,6 +104,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function getSftpLogin()				{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_LOGIN);}
 	public function getSftpPublicKey()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY);}
 	public function getSftpPrivateKey()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY);}
+	public function getSftpBaseDir()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_BASE_DIRECTORY);}
 	public function getDefaultCategory()		{return $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY);}
 	public function getAllowComments()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_COMMENTS);}
 	public function getAllowEmbedding()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_EMBEDDING);}
@@ -119,6 +121,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function setSftpLogin($v)			{$this->putInCustomData(self::CUSTOM_DATA_SFTP_LOGIN, $v);}
 	public function setSftpPublicKey($v)		{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY, $v);}
 	public function setSftpPrivateKey($v)		{$this->putInCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY, $v);}
+	public function setSftpBaseDir($v)			{$this->putInCustomData(self::CUSTOM_DATA_SFTP_BASE_DIRECTORY, $v);}
 	public function setDefaultCategory($v)		{$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY, $v);}
 	public function setAllowComments($v)		{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_COMMENTS, $v);}
 	public function setAllowEmbedding($v)		{$this->putInCustomData(self::CUSTOM_DATA_ALLOW_EMBEDDING, $v);}

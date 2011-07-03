@@ -71,6 +71,9 @@ class YouTubeDistributionFeedHelper
 		
 		$this->timestampName = date('Ymd-His') . '_' . time();
 		$this->directoryName = '/' . $this->timestampName;
+		if (!empty($distributionProfile->sftpBaseDir)) {
+			$this->directoryName = '/' . trim($distributionProfile->sftpBaseDir,'/') . $this->directoryName;
+		}
 		$this->metadataTempFileName = 'youtube_' . $this->timestampName . '.xml';
 		
 		$startTime = $this->getValueForField(KalturaYouTubeDistributionField::START_TIME);

@@ -42,6 +42,12 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	 * 
 	 * @var string
 	 */
+	public $sftpBaseDir;
+	
+	/**
+	 * 
+	 * @var string
+	 */
 	public $ownerName;
 	
 	/**
@@ -103,6 +109,7 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 		'sftpLogin',
 		'sftpPublicKey',
 		'sftpPrivateKey',
+		'sftpBaseDir',
 		'ownerName',
 		'defaultCategory',
 		'allowComments',
