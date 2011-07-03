@@ -85,6 +85,9 @@ class Annotation extends BaseAnnotation {
 	
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(AnnotationPeer::STATUS) && $this->getStatus() == AnnotationStatus::ANNOTATION_STATUS_DELETED)
 			$objectDeleted = true;

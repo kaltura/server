@@ -37,6 +37,9 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(MetadataProfilePeer::STATUS) && $this->getStatus() == self::STATUS_DEPRECATED)
 			$objectDeleted = true;

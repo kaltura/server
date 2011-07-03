@@ -374,6 +374,9 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(EntryDistributionPeer::STATUS) && $this->getStatus() == EntryDistributionStatus::DELETED)

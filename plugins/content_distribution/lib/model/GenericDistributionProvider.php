@@ -156,6 +156,9 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+
 		$objectDeleted = false;
 		if($this->isColumnModified(GenericDistributionProviderPeer::STATUS) && $this->getStatus() == GenericDistributionProviderStatus::DELETED)
 			$objectDeleted = true;

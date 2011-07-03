@@ -347,6 +347,9 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
 		$objectDeleted = false;
 		if($this->isColumnModified(DistributionProfilePeer::STATUS) && $this->getStatus() == DistributionProfileStatus::DELETED)
 			$objectDeleted = true;
