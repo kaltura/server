@@ -19,8 +19,12 @@ KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/tests/classMa
 KAutoloader::register();
 
 // Timezone
-date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_York
+$timeZone = kConf::get("date_default_timezone");
 
+$isTimeZone = substr_count($timeZone, '@') == 0; //no @ in a real time zone
+
+if($isTimeZone)
+	date_default_timezone_set($timeZone); // America/New_York
 
 // Logger
 $loggerConfigPath = KALTURA_TESTS_PATH.DIRECTORY_SEPARATOR."base".DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."logger.ini";
