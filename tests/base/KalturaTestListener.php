@@ -221,11 +221,14 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			{
 				$testName = $testNames[1];
 			}
-			
-			print("testName1 [" . $testName."]\n");
-			
-			// if it is a dataprovider test suite
-			KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($testName));
+
+			$testProcedure = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testName);
+
+			//if the test procedure exists
+			if(!$testProcedure)
+				KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($testName));
+			else
+				KalturaLog::alert("Test procedure [$testName] already added");
 		}
 		else
 		{
@@ -235,15 +238,11 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			if($test instanceof PHPUnit_Framework_TestSuite_DataProvider)
 				$test = $test->testAt(0);
 		
-			print("test2 [" . $test->getName()."]\n");
-			
 			$class = get_class($test);
 			
 			//if the new test comes from a new file (testCase)
 			if(KalturaTestListener::$currentTestCase != $class)
 			{
-				print("new Test File found");
-				
 				//Gets the class path for the failure file
 				$classPath = KAutoloader::getClassFilePath($class);
 				

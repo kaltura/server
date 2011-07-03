@@ -439,7 +439,14 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				//Then add the test case failure
 				KalturaTestListener::setTestCaseFailures(new KalturaTestCaseFailures(KalturaTestListener::getCurrentTestCase()));
 				$testCaseFailures = KalturaTestListener::getTestCaseFailures();
-				$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($this->getName(false)));
+				$testProcedureName = $this->getName(false);
+				
+				$testProcedure = $testCaseFailures->getTestProcedureFailure($testProcedureName);
+
+				if(!$testProcedure)
+					$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure());
+				else
+					KalturaLog::alert("Test procedure [$testProcedureName] already exists");
 			}
 		}
 	}
