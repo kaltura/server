@@ -148,7 +148,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::addError()
 	 */
 	public function addError(PHPUnit_Framework_Test $test, Exception $e, $time) {
-		
+		print("KalturaTestListener::addError - " . $e->getMessage() . "\n");
 	}
 
 	/* (non-PHPdoc)
@@ -156,6 +156,8 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time) 
 	{
+		print("KalturaTestListener::addFailure - for test" . $test->getName() . "\n");
+		
 		if($test instanceof KalturaTestCaseBase)
 		{
 			$currentFailure = $test->getCurrentFailure();
@@ -210,9 +212,6 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 		print("In startTestSuite - for suite = {$suite->getName()}\n");
 		KalturaLog::debug("In startTestSuite - for suite = {$suite->getName()}");
 
-		//TODO: fix this to use the data provider type check
-//		if (preg_match("*::*" ,$suite->getName()) != 0)
-		
 		if ($suite instanceof PHPUnit_Framework_TestSuite_DataProvider)
 		{
 			//Get the test procedure name from the suite name which is (testCase::testProcedure)
@@ -223,7 +222,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 				$testName = $testNames[1];
 			}
 			
-			print("testName [" . $testName."]\n");
+			print("testName1 [" . $testName."]\n");
 			
 			// if it is a dataprovider test suite
 			KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($testName));
@@ -235,14 +234,16 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 					
 			if($test instanceof PHPUnit_Framework_TestSuite_DataProvider)
 				$test = $test->testAt(0);
-			
-			print("test [" . $test->getName()."]\n");
+		
+			print("test2 [" . $test->getName()."]\n");
 			
 			$class = get_class($test);
 			
 			//if the new test comes from a new file (testCase)
 			if(KalturaTestListener::$currentTestCase != $class)
 			{
+				print("new Test File found");
+				
 				//Gets the class path for the failure file
 				$classPath = KAutoloader::getClassFilePath($class);
 				
@@ -313,9 +314,8 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function startTest(PHPUnit_Framework_Test $test) 
 	{
-		$testName = $test->getName();
+		$testName = $test->getName(true);
 		print("In startTest for test $testName\n");
-				
 		KalturaLog::debug("In startTest for test $testName");
 
 		if($test instanceof KalturaTestCaseBase)
@@ -348,7 +348,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function endTest(PHPUnit_Framework_Test $test, $time) 
 	{
-		print("In endTest\n");
+		print("\nIn endTest\n");
 		KalturaLog::debug("In endTest");
 
 		if($test instanceof KalturaTestCaseBase)

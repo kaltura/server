@@ -409,12 +409,16 @@ class KalturaTestDataObject extends KalturaTestDataBase
 					if($childKey == "array" || $childKey == "Array")
 					{
 						$arrayValue = array();
+						$arrayKey = $childValue;
 						
 						foreach ($child->children() as $singleElementKey => $singleElementValue)
 						{
+							//print("In loop \n");
 							$key = (string)$singleElementValue["key"];
 							$arrayValue[$key] = (string)$singleElementValue;
+							
 							$arrayKey = $singleElementKey;
+							//print("arrayKey $arrayKey \n");
 							
 							//if dbValue exists
 							if(isset($singleElementValue["dbValue"]))
@@ -423,9 +427,15 @@ class KalturaTestDataObject extends KalturaTestDataBase
 							}
 						}
 						
+						//print(" count(arrayValue) " . count($arrayValue) ."\n");
 						if(count($arrayValue) > 0)
 						{
 							KalturaTestDataObject::setPropertyValue(&$this->dataObject, $arrayKey, $arrayValue, $childValueType);
+						}
+						else
+						{
+							print("setting $arrayKey, " . print_r($arrayValue, true). "\n");
+							KalturaTestDataObject::setPropertyValue(&$this->dataObject, $arrayKey, $arrayValue, 'Array');
 						}
 					}
 	 				else 
@@ -480,6 +490,9 @@ class KalturaTestDataObject extends KalturaTestDataBase
 	 */
 	private static function setPropertyValue(&$objectInstace, $fieldName, $fieldValue, $fieldValueType)
 	{
+		if(!$fieldName)
+			return;
+		
 		//set the object to this value
 		if($objectInstace instanceof BaseObject)
 		{

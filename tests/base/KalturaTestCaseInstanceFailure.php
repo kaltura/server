@@ -235,13 +235,16 @@ class KalturaTestCaseInstanceFailure
 				elseif ($inputValue instanceof KalturaObjectBase)
 				{
 					if(property_exists($inputValue, 'id'))
+					{
 						$id = $inputValue->id;
+					}
 				}
 				
 				//Fixes problem where id was object
-				if(!is_string($id))
+				if(is_object($id))
 				{	
 					$idType = get_class($id);
+					
 					$id = "not a string but $idType";
 				} 
 					

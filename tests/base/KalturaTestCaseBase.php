@@ -6,7 +6,7 @@
  *
  */
 class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
-{
+{	
 	/**
 	 * 
 	 * Retruns the test dependency inputs
@@ -15,6 +15,13 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		return $this->dependencyInput;
 	}
+	
+	/**
+	 * 
+	 * Holds all the test inputs
+	 * @var array()
+	 */
+	protected $inputs = array();
 	
 	/**
 	 * 
@@ -123,6 +130,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		$testFilePath = KAutoloader::getClassFilePath($class);
 		$this->testFolder = dirname($testFilePath);
 			
+		$this->inputs = $data;
+		
 		KalturaLog::info("Loads config file [$testFilePath.ini]");
 		$this->config = new KalturaTestConfig("$testFilePath.ini");
 		$testConfig = $this->config->get('config');
@@ -153,9 +162,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function getInputs()
 	{
-		return $this->data;
+		return $this->inputs;
 	}
-			
+		
 	/**
 	 * @param Zend_Config $testConfig
 	 * @param ReflectionParameter $arg
@@ -380,21 +389,10 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function run(PHPUnit_Framework_TestResult $result = null)
 	{
-		KalturaLog::debug("In KalturaTestCaseBase::run for test [$this->name]\n");
-			
-		if(is_null($result))
-		{
-			print("KalturaTestCaseBase: Result is null!!! creating KalturaTestResult\n");
-			$result = new KalturaTestResult();	
-		}
+		$name = $this->getName(true);
+		KalturaLog::debug("In KalturaTestCaseBase::run for test [$name]\n");
+		print("In KalturaTestCaseBase::run for test [$name]\n");
 		
-		if(!($result instanceof KalturaTestResult))
-		{
-			print("KalturaTestCaseBase: result is not KalturaTestResult creating KalturaTestResult\n");
-//			$newResult = KalturaTestResult::fromTestResult($result);		
-			$newResult = new KalturaTestResult();
-		}
-
 		$this->initFramework($result);
 		
 		$result = parent::run($result);
@@ -406,7 +404,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 * 
 	 * Initializes the framework for all the tests
 	 */
-	protected function initFramework($result = null)
+	protected function initFramework(&$result = null)
 	{
 		if(!is_null($result))
 		{
@@ -414,30 +412,22 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			{
 				if(!$result->isListenerExists('KalturaTestListener'))
 				{
+					print("adding KalturaTestListener to result");
 					$result->addListener(new KalturaTestListener());
 				}
 			}
-			else 
-			{
-				print("TestResul is not Kaltura!!!!\n");
-			}
 		}
-		
-		print("Init framework");
-		
+
 		if(KalturaTestCaseBase::$isFrameworkInit == false)
 		{
+			print("Initing frmaework\n");
 			$class = get_class($this);
 			$classPath = KAutoloader::getClassFilePath($class);
 			KalturaTestListener::setFailureFilePath(dirname($classPath) . "/testsData/{$class}.failures");
 			KalturaTestListener::setDataFilePath(dirname($classPath) . "/testsData/{$class}.data");
 			KalturaTestListener::setTotalFailureFilePath(KALTURA_TESTS_PATH . "/common/totalFailures.failures");
 			
-			if(is_null($this->result))
-				$this->result = new KalturaTestResult();
-					
-			//add Listener from config with all params such as: when to report
-			$this->result->addListener(new KalturaTestListener());
+			$result->addListener(new KalturaTestListener());
 			
 			KalturaTestCaseBase::$isFrameworkInit = true;
 
@@ -460,26 +450,36 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function runTest()
 	{
-		KalturaLog::debug("In runTest for test [$this->name]\n");
-		//print("In KalturaTestCaseBase::runTest for test [$this->name]\n");
+		$name = $this->getName(true);
+		KalturaLog::debug("In runTest for test [$name]\n");
+		print("In KalturaTestCaseBase::runTest for test [$name]\n");
 		
-		foreach ($this->dependencyInput as $index => $value)
+		foreach ($this->getDependencyInputs() as $index => $value)
 		{
 			KalturaLog::debug("Adding key [$index], value [$value] to the test data\n");
+			
+			//TODO: fix access to data
 			$this->data[$index] = $value;
 		}
 	
-		$this->dependencyInput = array();
+
+		//$this->setDependencyInput(array());
 		$this->currentFailure = null;
+		print("passed [" . print_r($this->getTestResultObject()->passed(), true). "]\n");
 		
-		//if the fraemwork wasn't initiated we need to init here (caused becasue only here we add our listener )
-		$this->initFramework();
-			
 		$testResult = parent::runTest();
-		
+		print("Actual Test result [$testResult]\n"); 
+		print("passed [" . print_r($this->getTestResultObject()->passed(), true). "]\n");
 		return $testResult;
 	}
 
+	/**
+	 * 
+	 * The add test result 
+	 * @var mixed
+	 */
+	protected $testAddResult;
+	
 	/**
 	 * 
 	 * The test data provider (gets the data for the different tests)
@@ -489,11 +489,13 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function provider($className, $procedureName)
 	{
+		print("In provider for $className, $procedureName \n");
+		
 		//Gets from the given class the class data file
 		$class = get_class($this);
 		$classFilePath = KAutoloader::getClassFilePath($class);
 		$testClassDir = dirname($classFilePath);
-		$dataFilePath = $testClassDir . DIRECTORY_SEPARATOR . "testsData/{$className}.Data";
+		$dataFilePath = $testClassDir . DIRECTORY_SEPARATOR . "testsData/{$className}.data";
 		
 		KalturaLog::debug("The data file path [" . $dataFilePath . "]");
 		
@@ -523,6 +525,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				foreach ($xmlTestCaseData->Input as $input)
 				{
 					$object = KalturaTestDataObject::generatefromXml($input);
+					
+//					print("object [" . print_r($object, true) ."]\n");
 
 					//Add the new input to the test case instance data
 					$testCaseInstanceInputs[]  = $object;
@@ -544,7 +548,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		$inputsForTestProcedure = $this->transformToObjects($inputsForTestProcedure);
 		
 		KalturaLog::info("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
-				
+		
 		return $inputsForTestProcedure; 
 	}
 		
@@ -711,11 +715,22 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		catch (PHPUnit_Framework_AssertionFailedError $e) 
 		{
 			$this->hasFailures  = true;
-			$this->result->addFailure($this, $e, PHPUnit_Util_Timer::stop());
+			$resultObject = $this->getTestResultObject();
+
+			if($resultObject)
+			{
+				$resultObject->addFailure($this, $e, PHPUnit_Util_Timer::stop());
+			}
+			else
+			{
+				$name = $this->getName(true);
+				print("In add failure Result is NULL for test [$name]\n");
+			}
+			
 		}
 		catch (Exception $e) 
 		{
-			$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
+			$this->getTestResultObject()->addError($this, $e, PHPUnit_Util_Timer::stop());
 		}
 	}
 
@@ -755,17 +770,21 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
         if (strpos($dependency, '::') === FALSE) //Sets the test class name if not given
         	$dependency = $className . '::' . $dependency;
 
-        if (!isset($passedKeys[$dependency])) 
+        $trimmedDependency = $this->trimTestInstanceName($dependency);
+		$fullDependency = $dependency . " with data set #0"; //Checks for the first finish //TODO: fix to support multi data
+	        	
+        if (!isset($passedKeys[$dependency])&& 
+        	!isset($passedKeys[$fullDependency]) && //No dependency found
+        	!isset($passedKeys[$trimmedDependency])) 
         {
-        	$this->result->addError($this, 
+        	$this->getTestResultObject()->addError($this, 
 				new PHPUnit_Framework_SkippedTestError(	sprintf('This test depends on "%s" to pass.', $dependency)),
 				0);
            return FALSE;
         }
         else 
         {
-       	        	
-	        if (isset($passed[$dependency])) 
+			if (isset($passed[$dependency])) 
 	        {
 	        	$this->dependencyInput[] = $passed[$dependency]; //return the dependency input
 	        	
@@ -775,9 +794,10 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	        }
 	        else // we search to see if a test was ended in that test suite 
 	        {
-	        	$trimmedDependency = $this->trimTestInstanceName($dependency);
 	        	if(isset($passed[$trimmedDependency]))
-	        		$this->dependencyInput[] = $passed[$dependency];
+	        		$this->dependencyInput[] = $passed[$trimmedDependency];
+	        	else if(isset($passed[$fullDependency ]))
+	        			$this->dependencyInput[] = $passed[$fullDependency];
 	        	else
 	        		$this->dependencyInput[] = NULL;
 	        }
@@ -806,11 +826,11 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
      */
     protected function handleDependencies()
     {
-    	//print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
+    	print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
     	    	    
     	if (!empty($this->dependencies) && !$this->inIsolation) 
     	{
-            $passed     = $this->result->passed();
+            $passed     = $this->getTestResultObject()->passed();
             $passedKeys = array_keys($passed);
             $numKeys    = count($passedKeys);
         	
@@ -836,6 +856,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
      */
     protected function createResult()
     {
+    	print("In KalturaTestCaseBase::createResult\n");
     	return new KalturaTestResult();
     }
 }
