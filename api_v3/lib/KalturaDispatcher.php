@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package api
+ */
 class KalturaDispatcher 
 {
 	private static $instance = null;

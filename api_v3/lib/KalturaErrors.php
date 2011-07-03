@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package api
+ * @subpackage errors
+ */
 class KalturaErrors extends APIErrors
 {
 	/**

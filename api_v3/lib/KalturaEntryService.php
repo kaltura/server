@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package api
+ * @subpackage services
+ */
 class KalturaEntryService extends KalturaBaseService 
 {
     /**
