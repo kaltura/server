@@ -461,15 +461,10 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			//TODO: fix access to data
 			$this->data[$index] = $value;
 		}
-	
 
-		//$this->setDependencyInput(array());
 		$this->currentFailure = null;
-		print("passed [" . print_r($this->getTestResultObject()->passed(), true). "]\n");
-		
+	
 		$testResult = parent::runTest();
-		print("Actual Test result [$testResult]\n"); 
-		print("passed [" . print_r($this->getTestResultObject()->passed(), true). "]\n");
 		return $testResult;
 	}
 
@@ -526,8 +521,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				{
 					$object = KalturaTestDataObject::generatefromXml($input);
 					
-//					print("object [" . print_r($object, true) ."]\n");
-
 					//Add the new input to the test case instance data
 					$testCaseInstanceInputs[]  = $object;
 				}
@@ -559,7 +552,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	protected function transformToValue($inputObject)
 	{
-	//	print("In transformToValue [" . print_r($inputObject) . "] \n");
 		$inputAsObject =  $inputObject->getValue();
 					
 		$isGlobalData = KalturaGlobalData::isGlobalData($inputAsObject);
@@ -573,7 +565,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			//TODO: check if needed
 			if(!$inputAsObject)
 			{
-				//print("inputAsObject is empty setting to [$name]\n");
 				$inputAsObject = $name;
 			}
 		}
@@ -622,11 +613,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				{
 					$value = KalturaGlobalData::getData($value);
 					$property->setValue($inputAsObject, $value);
-					
-//					if($value != null)
-//					{
-//						print("In setGlobalData value [" . print_r($value, true) . "]\n");
-//					}
 				}
 			}
 		}
@@ -826,8 +812,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
      */
     protected function handleDependencies()
     {
-    	print("current dependencies [" . print_r($this->dependencies, true) ."]\n");
-    	    	    
     	if (!empty($this->dependencies) && !$this->inIsolation) 
     	{
             $passed     = $this->getTestResultObject()->passed();
@@ -856,7 +840,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
      */
     protected function createResult()
     {
-    	print("In KalturaTestCaseBase::createResult\n");
     	return new KalturaTestResult();
     }
 }

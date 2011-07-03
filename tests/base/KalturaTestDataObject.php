@@ -254,7 +254,6 @@ class KalturaTestDataObject extends KalturaTestDataBase
 					
 					if($value != null)
 					{
-						//print("value [" . print_r($value, true) . "]\n");
 						$propertyValueType = gettype($value);
 						if($propertyValueType == "NULL") //No such base type (int, string, ...)
 						{
@@ -265,10 +264,6 @@ class KalturaTestDataObject extends KalturaTestDataBase
 							{
 								$propertyValueType = $class;
 							}
-						}
-						else 
-						{
-							//print("propertyValueType [$propertyValueType]\n");
 						}
 					}
 																		
@@ -430,17 +425,17 @@ class KalturaTestDataObject extends KalturaTestDataBase
 						//print(" count(arrayValue) " . count($arrayValue) ."\n");
 						if(count($arrayValue) > 0)
 						{
-							KalturaTestDataObject::setPropertyValue(&$this->dataObject, $arrayKey, $arrayValue, $childValueType);
+							KalturaTestDataObject::setPropertyValue($this->dataObject, $arrayKey, $arrayValue, $childValueType);
 						}
 						else
 						{
 							print("setting $arrayKey, " . print_r($arrayValue, true). "\n");
-							KalturaTestDataObject::setPropertyValue(&$this->dataObject, $arrayKey, $arrayValue, 'Array');
+							KalturaTestDataObject::setPropertyValue($this->dataObject, $arrayKey, $arrayValue, 'Array');
 						}
 					}
 	 				else 
 	 				{
-	 					KalturaTestDataObject::setPropertyValue(&$this->dataObject, $childKey, $childValue, $childValueType);
+	 					KalturaTestDataObject::setPropertyValue($this->dataObject, $childKey, $childValue, $childValueType);
 	 				}
 				}	
 				catch (Exception $e)

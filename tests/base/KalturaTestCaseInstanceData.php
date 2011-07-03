@@ -206,7 +206,7 @@ class KalturaTestCaseInstanceData
 		{
 			//Create the xml from the object
 			$objectAsDOM = KalturaTestDataObject::toXml($input, "Input");
-	 		kXml::appendDomToElement($objectAsDOM, &$domTestCaseData, $dom);
+	 		kXml::appendDomToElement($objectAsDOM, $domTestCaseData, $dom);
 		}
 		
 		//For each outputReference:
@@ -214,7 +214,7 @@ class KalturaTestCaseInstanceData
 		{
 			//Create the xml from the object
 			$objectAsDOM = KalturaTestDataObject::toXml($outputReference, "OutputReference");
-	 		kXml::appendDomToElement($objectAsDOM, &$domTestCaseData, $dom);
+	 		kXml::appendDomToElement($objectAsDOM, $domTestCaseData, $dom);
 		}
 		
 		return $dom;

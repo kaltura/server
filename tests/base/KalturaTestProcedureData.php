@@ -154,7 +154,7 @@ class KalturaTestProcedureData
 		foreach ($testProcedureData->getTestCasesData() as $testCaseData)
 		{
 			$domTestCaseData = KalturaTestCaseInstanceData::toXml($testCaseData);
-			kXml::appendDomToElement($domTestCaseData, &$testProcedureDataElement, $dom);
+			kXml::appendDomToElement($domTestCaseData, $testProcedureDataElement, $dom);
 		}
 		
 		return $dom;

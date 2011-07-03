@@ -259,7 +259,7 @@ class KalturaTestCaseInstanceFailure
 		{
 			$objectAsDOM = KalturaFailure::toXml($kalturaFailure, "Failure");
 			
-			kXml::appendDomToElement($objectAsDOM, &$failuresNode, $dom);
+			kXml::appendDomToElement($objectAsDOM, $failuresNode, $dom);
 		}
 											
 		$rootNode->appendChild($inputsNode);

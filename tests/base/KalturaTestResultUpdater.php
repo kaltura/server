@@ -94,9 +94,6 @@ class KalturaTestResultUpdater
 					
 					$testProcedureData = $newTestDataFile->getTestProcedureData($testProcedureName);
 	   				$testCaseInstanceData = $testProcedureData->getTestCaseData($testCaseInstanceKey);
- 				
-//	   				print("testProcedureData [" . print_r($testProcedureData, true) . "]\n" );
-//	   				print("testCaseInstanceData [" . print_r($testCaseInstanceData, true) . "]\n" );
 	   				
 					//Gets the first output reference
 					$outputReferenceObject = $testCaseInstanceData->getOutputReference(0);

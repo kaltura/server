@@ -134,7 +134,7 @@ class KalturaTestCaseFailures
 			//Create the xml from the object
 			$objectAsDOM = KalturaTestProcedureFailure::toXml($testProcedureFailure, "TestProcedureFailures");
 		 
-			kXml::appendDomToElement($objectAsDOM, &$testCaseElement, $dom);
+			kXml::appendDomToElement($objectAsDOM, $testCaseElement, $dom);
 		}
 		
 		return $dom;

@@ -44,17 +44,11 @@ class KalturaTestConfig extends Zend_Config_Ini
 	 */
 	public static function fromZendConfig(Zend_Config $config)
 	{
-//		print("In fromZendConfig\n");
-		
 		$newConfig = new KalturaTestConfig();
-		
 		$dataArray = $config->toArray();
-		
-//		print("dataArray [" . print_r($dataArray, true) . "]\n");
 		
 		foreach ($dataArray as $key => $value)
 		{
-//			print("proccessing key [$key] , value [$value]\n");
 			$newConfig->$key = $value;
 		}
 		
@@ -116,8 +110,6 @@ class KalturaTestConfig extends Zend_Config_Ini
 	 */
 	public function get($name, $default = null)
 	{
-//		print("In KalturaTestConfig::get($name) \n");
-		
 		$value = parent::get($name, $default);
 
 		$isGlobal = KalturaGlobalData::isGlobalData($value);
@@ -130,11 +122,8 @@ class KalturaTestConfig extends Zend_Config_Ini
 			{
 				//We transform it to be a test configuration object so we can take global data from it
 				$value = KalturaTestConfig::fromZendConfig($value);
-//				print("value Should be KalturaTestConfig".print_r($value, true) ." \n");
 			}
 		}
-		
-				//print("name [$name], value [ ". print_r($value, true) . "], isGlobal [$isGlobal]\n");
 				
 		return $value;
 	}
