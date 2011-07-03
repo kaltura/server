@@ -36,36 +36,6 @@ class KalturaPodcastDistributionProfile extends KalturaDistributionProfile
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 		
-	/**
-	 * @param PodcastDistributionProfile $object_to_fill
-	 * @param array $props_to_skip
-	 * @return PodcastDistributionProfile
-	 */
-	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
-	{
-		if(is_null($object_to_fill))
-			$object_to_fill = new PodcastDistributionProfile();
-		
-		kSyndicationFeedManager::validateXsl($this->xsl);	
-		
-		return parent::toInsertableObject($object_to_fill, $props_to_skip);
-	}
-	
-	/**
-	 * @param PodcastDistributionProfile $object_to_fill
-	 * @param array $props_to_skip
-	 * @return PodcastDistributionProfile
-	 */
-	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
-	{
-		if(is_null($object_to_fill))
-			$object_to_fill = new PodcastDistributionProfile();
-		
-		kSyndicationFeedManager::validateXsl($this->xsl);
-		
-		return parent::toUpdatableObject($object_to_fill, $props_to_skip );
-	}
-	
 	public function toObject($object = null, $skip = array())
 	{
 		if(is_null($object))

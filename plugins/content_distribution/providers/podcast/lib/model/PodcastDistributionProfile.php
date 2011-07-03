@@ -7,10 +7,12 @@ class PodcastDistributionProfile extends DistributionProfile
 {
 	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';
 	const CUSTOM_DATA_FEED_ID = 'feedId';
-	const METADATA_FIELD_KEYWORDS = 'Keywords';
+	const METADATA_FIELD_KEYWORDS = 'PodcastKeywords';
+	const METADATA_FIELD_DESCRIPTION = 'PodcastDescription';
 
 	const ENTRY_NAME_MINIMUM_LENGTH = 1;
 	const ENTRY_NAME_MAXIMUM_LENGTH = 255;
+	const ENTRY_DESC_MINIMUM_LENGTH = 1;
 	
 	/**
 	 * @var string
@@ -34,6 +36,9 @@ class PodcastDistributionProfile extends DistributionProfile
 
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
+		$missingDesc = false; 
+		$missingTags = false;
+		
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
 		
 		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
@@ -60,48 +65,46 @@ class PodcastDistributionProfile extends DistributionProfile
 			$validationError->setValidationErrorParam(self::ENTRY_NAME_MAXIMUM_LENGTH);
 			$validationErrors[] = $validationError;
 		}
+
+		if(strlen($entry->getDescription()) < self::ENTRY_DESC_MINIMUM_LENGTH)
+			$missingDesc = true;
+		
+		if(strlen($entry->getTags()) < self::ENTRY_DESC_MINIMUM_LENGTH)
+			$missingTags = true;
 		
 		if(!class_exists('MetadataProfile'))
 			return $validationErrors;
 			
 		$metadataFields = array(
 			self::METADATA_FIELD_KEYWORDS,
+			self::METADATA_FIELD_DESCRIPTION,
 		);
 		
 		$metadataProfileId = $this->getMetadataProfileId();
-		if(!$metadataProfileId)
-		{
-			foreach($metadataFields as $metadataField)
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
-			return $validationErrors;
-		}
-		
-		foreach($metadataFields as $index => $metadataField)
-		{
-			$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, $metadataField);
-			if(!$metadataProfileCategoryField)
-			{
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
-				unset($metadataFields[$index]);
-				continue;
-			}
-		}
-				
+
 		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
-		if(!count($metadatas))
-		{
-			foreach($metadataFields as $metadataField)
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
-			return $validationErrors;
-		}
 		
 		foreach($metadataFields as $index => $metadataField)
 		{
 			$values = $this->findMetadataValue($metadatas, $metadataField);
 			
 			if(!count($values))
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField, "");
-				
+			{ 
+				switch($metadataField)
+				{
+					case self::METADATA_FIELD_DESCRIPTION: 
+						if ($missingDesc)
+							$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, entryPeer::DESCRIPTION, "");
+						break;
+					case self::METADATA_FIELD_KEYWORDS:
+						if ($missingTags)
+							$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, entryPeer::TAGS, "");
+						break;
+					default:
+						$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, $metadataField);
+				}
+			}
+			
 			foreach($values as $value)
 			{
 				if(!strlen($value))
