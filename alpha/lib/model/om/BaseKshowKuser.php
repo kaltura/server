@@ -364,7 +364,9 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		KshowKuserPeer::setUseCriteriaFilter(false);
 		$stmt = KshowKuserPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		KshowKuserPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

@@ -634,7 +634,9 @@ abstract class BasePuserRole extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		PuserRolePeer::setUseCriteriaFilter(false);
 		$stmt = PuserRolePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		PuserRolePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

@@ -728,7 +728,9 @@ abstract class BasemoderationFlag extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		moderationFlagPeer::setUseCriteriaFilter(false);
 		$stmt = moderationFlagPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		moderationFlagPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

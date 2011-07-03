@@ -1661,7 +1661,9 @@ abstract class BasemediaInfo extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		mediaInfoPeer::setUseCriteriaFilter(false);
 		$stmt = mediaInfoPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		mediaInfoPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

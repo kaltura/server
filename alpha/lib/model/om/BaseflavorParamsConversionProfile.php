@@ -636,7 +636,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		flavorParamsConversionProfilePeer::setUseCriteriaFilter(false);
 		$stmt = flavorParamsConversionProfilePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		flavorParamsConversionProfilePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

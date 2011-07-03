@@ -1249,7 +1249,9 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		syndicationFeedPeer::setUseCriteriaFilter(false);
 		$stmt = syndicationFeedPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		syndicationFeedPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -1426,8 +1428,6 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		syndicationFeedPeer::setUseCriteriaFilter(false);
-		
 		$this->setCustomDataObj();
     	
 		return parent::preSave($con);
@@ -1442,7 +1442,6 @@ abstract class BasesyndicationFeed extends BaseObject  implements Persistent {
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
     	 
-		syndicationFeedPeer::setUseCriteriaFilter(true); 
 	}
 	
 	/**

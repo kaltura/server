@@ -2039,7 +2039,9 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		PartnerPeer::setUseCriteriaFilter(false);
 		$stmt = PartnerPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		PartnerPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

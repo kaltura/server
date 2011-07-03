@@ -755,7 +755,9 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		EmailIngestionProfilePeer::setUseCriteriaFilter(false);
 		$stmt = EmailIngestionProfilePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		EmailIngestionProfilePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

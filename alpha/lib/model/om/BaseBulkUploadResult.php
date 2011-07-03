@@ -1330,7 +1330,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		BulkUploadResultPeer::setUseCriteriaFilter(false);
 		$stmt = BulkUploadResultPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		BulkUploadResultPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

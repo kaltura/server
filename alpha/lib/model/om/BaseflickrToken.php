@@ -598,7 +598,9 @@ abstract class BaseflickrToken extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		flickrTokenPeer::setUseCriteriaFilter(false);
 		$stmt = flickrTokenPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		flickrTokenPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

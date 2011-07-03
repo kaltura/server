@@ -1099,7 +1099,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		uiConfPeer::setUseCriteriaFilter(false);
 		$stmt = uiConfPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		uiConfPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

@@ -476,7 +476,9 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		KuserToUserRolePeer::setUseCriteriaFilter(false);
 		$stmt = KuserToUserRolePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		KuserToUserRolePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

@@ -885,7 +885,9 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		widgetPeer::setUseCriteriaFilter(false);
 		$stmt = widgetPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		widgetPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -1091,8 +1093,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		widgetPeer::setUseCriteriaFilter(false);
-		
 		$this->setCustomDataObj();
     	
 		return parent::preSave($con);
@@ -1107,7 +1107,6 @@ abstract class Basewidget extends BaseObject  implements Persistent {
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
     	 
-		widgetPeer::setUseCriteriaFilter(true); 
 	}
 	
 	/**

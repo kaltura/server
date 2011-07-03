@@ -904,7 +904,9 @@ abstract class Baseconversion extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		conversionPeer::setUseCriteriaFilter(false);
 		$stmt = conversionPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		conversionPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

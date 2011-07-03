@@ -2633,7 +2633,9 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		kshowPeer::setUseCriteriaFilter(false);
 		$stmt = kshowPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		kshowPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -2900,8 +2902,6 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		kshowPeer::setUseCriteriaFilter(false);
-		
 		$this->setCustomDataObj();
     	
 		return parent::preSave($con);
@@ -2916,7 +2916,6 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
     	 
-		kshowPeer::setUseCriteriaFilter(true); 
 	}
 	
 	/**

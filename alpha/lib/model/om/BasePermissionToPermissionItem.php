@@ -476,7 +476,9 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		PermissionToPermissionItemPeer::setUseCriteriaFilter(false);
 		$stmt = PermissionToPermissionItemPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		PermissionToPermissionItemPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

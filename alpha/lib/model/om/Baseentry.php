@@ -2928,7 +2928,9 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		entryPeer::setUseCriteriaFilter(false);
 		$stmt = entryPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		entryPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -3241,8 +3243,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		entryPeer::setUseCriteriaFilter(false);
-		
 		$this->setCustomDataObj();
     	
 		return parent::preSave($con);
@@ -3257,7 +3257,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
     	 
-		entryPeer::setUseCriteriaFilter(true); 
 	}
 	
 	/**

@@ -540,7 +540,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		KceInstallationErrorPeer::setUseCriteriaFilter(false);
 		$stmt = KceInstallationErrorPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		KceInstallationErrorPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
