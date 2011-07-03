@@ -889,7 +889,9 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		AnnotationPeer::setUseCriteriaFilter(false);
 		$stmt = AnnotationPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		AnnotationPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -1066,8 +1068,6 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		AnnotationPeer::setUseCriteriaFilter(false);
-		
 		$this->setCustomDataObj();
     	
 		return parent::preSave($con);
@@ -1082,7 +1082,6 @@ abstract class BaseAnnotation extends BaseObject  implements Persistent {
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
     	 
-		AnnotationPeer::setUseCriteriaFilter(true); 
 	}
 	
 	/**

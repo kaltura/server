@@ -732,7 +732,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		MetadataProfilePeer::setUseCriteriaFilter(false);
 		$stmt = MetadataProfilePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		MetadataProfilePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

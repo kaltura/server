@@ -1215,7 +1215,9 @@ abstract class BaseAuditTrail extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		AuditTrailPeer::setUseCriteriaFilter(false);
 		$stmt = AuditTrailPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		AuditTrailPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

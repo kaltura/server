@@ -751,7 +751,9 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		ShortLinkPeer::setUseCriteriaFilter(false);
 		$stmt = ShortLinkPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		ShortLinkPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
@@ -928,8 +930,6 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		ShortLinkPeer::setUseCriteriaFilter(false);
-		
 		return parent::preSave($con);
 	}
 
@@ -940,7 +940,6 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	public function postSave(PropelPDO $con = null) 
 	{
 		$this->oldColumnsValues = array(); 
-		ShortLinkPeer::setUseCriteriaFilter(true); 
 	}
 	
 	/**

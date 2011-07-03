@@ -889,7 +889,9 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		GenericDistributionProviderActionPeer::setUseCriteriaFilter(false);
 		$stmt = GenericDistributionProviderActionPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		GenericDistributionProviderActionPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {

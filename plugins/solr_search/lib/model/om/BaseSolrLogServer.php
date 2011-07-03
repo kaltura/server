@@ -504,7 +504,9 @@ abstract class BaseSolrLogServer extends BaseObject  implements Persistent {
 		// We don't need to alter the object instance pool; we're just modifying this instance
 		// already in the pool.
 
+		SolrLogServerPeer::setUseCriteriaFilter(false);
 		$stmt = SolrLogServerPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		SolrLogServerPeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
 		if (!$row) {
