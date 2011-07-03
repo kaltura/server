@@ -87,17 +87,29 @@ class KDistributedFileManager
 			$curlWrapper->close();
 				
 			KalturaLog::debug("Executing curl");
-			$curlWrapper = new KCurlWrapper($remotePath);
-			$res = $curlWrapper->exec($localPath);
-			KalturaLog::debug("Curl results: $res");
-		
-			if(!$res || $curlWrapper->getError())
+
+			// overcome a 32bit issue with curl fetching >=4gb files
+			if (intval("9223372036854775807") == 2147483647 && $fileSize >= 4 * 1024 * 1024 * 1024)
 			{
-				$errDescription = "Error: " . $curlWrapper->getError();
-				$curlWrapper->close();
-				return false;
+				unlink($localPath);
+        		$cmd = "curl -s $remotePath -o $localPath";
+				KalturaLog::debug($cmd);
+        		exec($cmd);
 			}
-			$curlWrapper->close();
+			else
+			{			
+				$curlWrapper = new KCurlWrapper($remotePath);
+				$res = $curlWrapper->exec($localPath);
+				KalturaLog::debug("Curl results: $res");
+			
+				if(!$res || $curlWrapper->getError())
+				{
+					$errDescription = "Error: " . $curlWrapper->getError();
+					$curlWrapper->close();
+					return false;
+				}
+				$curlWrapper->close();
+			}
 			
 			if(!file_exists($localPath))
 			{
