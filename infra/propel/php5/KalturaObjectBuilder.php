@@ -142,6 +142,30 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$this->addSaveHooks($script);
 	}
 	
+	protected function addReload(&$script)
+	{
+		$parentReload = '';
+		parent::addReload($parentReload);
+		
+		// disable default criteria during the call to doSelectStmt
+		$doSelectStmt = "\$stmt = ".$this->getPeerClassname()."::doSelectStmt(\$this->buildPkeyCriteria(), \$con);";
+		$doSelectPos = strpos($parentReload, $doSelectStmt);
+		
+		if ($doSelectPos === false)
+		{
+			throw new EngineException("Unexpected: could not find the call to doSelectStmt in reload function");
+		}
+		
+		$newLine = "\n\t\t";
+		
+		$script .= 
+			substr($parentReload, 0, $doSelectPos) .
+			$this->getPeerClassname() . "::setUseCriteriaFilter(false);" . $newLine . 
+			$doSelectStmt . $newLine . 
+			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
+			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
+	}
+	
 	/**
 	 * Adds the save hook methods.
 	 * @param      string &$script The script will be modified in this method.
@@ -176,12 +200,6 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function preSave(PropelPDO \$con = null)
 	{";
-		if ($reloadOnInsert)
-		{		
-			$script .= "
-		" . $this->getPeerClassname() . "::setUseCriteriaFilter(false);
-		";
-		}
 		if($customDataColumn)
 		$script .= "
 		\$this->setCustomDataObj();
@@ -203,13 +221,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= "
 		\$this->oldCustomDataValues = array();
     	";
-		
-		if ($reloadOnInsert)
-		{		
-			$script .= " 
-		" . $this->getPeerClassname() . "::setUseCriteriaFilter(true);";
-		}
-		
+				
 		$script .= " 
 	}
 	
