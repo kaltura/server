@@ -709,7 +709,13 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$this->write("		\$this->validate{$actionName}($validateValues);", $isBase);
 		
 		if($testReturnedType)
-			$this->write("		return \$resultObject->id;", $isBase);
+		{
+			//Tests who needs the name and not the id
+			if($serviceName == 'permission')
+				$this->write("		return \$resultObject->name;", $isBase);
+			else //The rest use the id 
+				$this->write("		return \$resultObject->id;", $isBase);
+		}
 			
 		$this->write("	}", $isBase);
 		$this->write("", $isBase);
