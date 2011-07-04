@@ -678,7 +678,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		if($outputType) //If we have an output then we check it
 		{
-			if(is_object($outputType))
+			if(is_object($outputType) || class_exists($outputType))
 				$this->write("		\$this->assertInstanceOf('$outputType', \$resultObject);", $isBase);
 			else
 				$this->write("		\$this->assertInternalType('$outputType', \$resultObject);", $isBase);
