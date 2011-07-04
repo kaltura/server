@@ -92,6 +92,12 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	 * @var int
 	 */
 	public $thumbOffset;
+	
+	/**
+	 * @var string
+	 * @filter eq,in
+	 */
+	public $systemName;
 
 	
 	
@@ -111,6 +117,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		"partnerSortValue",
 		"forceStop",
 		"thumbOffset",
+		"systemName",
 	);
 	
 	public function getMapBetweenObjects()
