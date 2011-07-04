@@ -29,15 +29,15 @@ class KDLUnitTest extends KalturaServerTestCase
 	 */
 	public function testKDLWrapCDLGenerateTargetFlavors(flavorParams $flavorList, mediaInfo $mediaInfo, flavorParamsOutput $flavorParamsOutput)
 	{
-		print("\nin KDL TEst\n");
-		print_r($flavorList, true);
-		print_r($mediaInfo, true);
-		print_r($flavorParamsOutput, true);
+		print("\nin KDL Test\n");
+//		print_r($flavorList, true);
+//		print_r($mediaInfo, true);
+//		print_r($flavorParamsOutput, true);
 		//returns KDLWrap
 		$result = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, array($flavorList));
 
 		$validErrorFields = array("CreatedAt", "UpdatedAt", "Id", "PartnerId", "EntryId", "FlavorAssetId", "DeletedAt", "ReadyBehavior", "FlavorAssetVersion", "FlavorParamsVersion", "AudioResolution");
-		
+
 		$newErrors = $this->comparePropelObjectsByFields($flavorParamsOutput, reset($result->_targetList), $validErrorFields);
 	}
 	
