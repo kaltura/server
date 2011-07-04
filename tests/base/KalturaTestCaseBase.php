@@ -391,7 +391,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		$name = $this->getName(true);
 		KalturaLog::debug("In KalturaTestCaseBase::run for test [$name]\n");
-		print("In KalturaTestCaseBase::run for test [$name]\n");
+		//print("In KalturaTestCaseBase::run for test [$name]\n");
 		
 		$this->initFramework($result);
 		
@@ -459,7 +459,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		$name = $this->getName(true);
 		KalturaLog::debug("In runTest for test [$name]\n");
-		print("In KalturaTestCaseBase::runTest for test [$name]\n");
+		//print("In KalturaTestCaseBase::runTest for test [$name]\n");
 		
 		foreach ($this->getDependencyInputs() as $index => $value)
 		{
@@ -491,7 +491,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function provider($className, $procedureName)
 	{
-		print("In provider for $className, $procedureName \n");
+		//print("In provider for $className, $procedureName \n");
 		
 		//Gets from the given class the class data file
 		$class = get_class($this);
@@ -717,7 +717,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			else
 			{
 				$name = $this->getName(true);
-				print("In add failure Result is NULL for test [$name]\n");
+				//print("In add failure Result is NULL for test [$name]\n");
 			}
 			
 		}

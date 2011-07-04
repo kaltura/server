@@ -78,9 +78,6 @@ class KalturaTestResultUpdater
 				//If key wasnt found skip the error
 				if(is_null($testCaseInstanceKey))
 				{
-					print("\nTest case instance wasn't found [" . print_r($testCaseInstanceFailure, true) ."] \n");
-					print("Skipping failure!!!\n");
-					
 					KalturaLog::debug("Test case instance wasn't found [" . print_r($testCaseInstanceFailure, true) ."] ");
 					KalturaLog::debug("Skipping failure!!!");
 					continue;

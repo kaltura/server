@@ -402,7 +402,6 @@ class KalturaTestDataObject extends KalturaTestDataBase
 					if($childKey == "array" || $childKey == "Array")
 					{
 						$arrayValue = array();
-						print($childValue);
 						$arrayKey = $childValue;
 						
 						foreach ($child->children() as $singleElementKey => $singleElementValue)

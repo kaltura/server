@@ -20,7 +20,7 @@ class KalturaTestResult extends PHPUnit_Framework_TestResult
 	 */
 	public function __destruct()
 	{
-		print ("KalturaTestResult destructed\n");
+		KalturaLog::debug("KalturaTestResult destructed\n");
 	}
 	
 	/**

@@ -148,7 +148,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::addError()
 	 */
 	public function addError(PHPUnit_Framework_Test $test, Exception $e, $time) {
-		print("KalturaTestListener::addError - " . $e->getMessage() . "\n");
+		KalturaLog::debug("KalturaTestListener::addError - " . $e->getMessage() . "\n");
 	}
 
 	/* (non-PHPdoc)
@@ -156,7 +156,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time) 
 	{
-		print("KalturaTestListener::addFailure - for test" . $test->getName() . "\n");
+		KalturaLog::debug("KalturaTestListener::addFailure - for test" . $test->getName() . "\n");
 		
 		if($test instanceof KalturaTestCaseBase)
 		{
@@ -190,7 +190,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 * @see PHPUnit_Framework_TestListener::addIncompleteTest()
 	 */
 	public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
-		print("In addIncompleteTest\n");
+//		print("In addIncompleteTest\n");
 		KalturaLog::debug("In addIncompleteTest");
 		
 	}
@@ -201,15 +201,15 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
 		$message = $e->getMessage();
 		$testName = $test->getName(); 
-		print("In addSkippedTest, testName [$testName], message [$message]\n");
-		KalturaLog::debug("In addSkippedTest");
+		//print("In addSkippedTest, testName [$testName], message [$message]\n");
+		KalturaLog::debug("In addSkippedTest, testName [$testName], message [$message]");
 	}
 
 	/* (non-PHPdoc)
 	 * @see PHPUnit_Framework_TestListener::startTestSuite()
 	 */
 	public function startTestSuite(PHPUnit_Framework_TestSuite $suite) {
-		print("In startTestSuite - for suite = {$suite->getName()}\n");
+//		print("In startTestSuite - for suite = {$suite->getName()}\n");
 		KalturaLog::debug("In startTestSuite - for suite = {$suite->getName()}");
 
 		if ($suite instanceof PHPUnit_Framework_TestSuite_DataProvider)
@@ -226,7 +226,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			
 			if(is_null(KalturaTestListener::$testCaseFailures))
 			{
-				print("KalturaTestCaseFailures is null creating empty test case failures for $testCase\n");
+				KalturaLog::debug("KalturaTestCaseFailures is null creating empty test case failures for $testCase\n");
 				KalturaTestListener::$testCaseFailures = new KalturaTestCaseFailures($testName);
 			}
 			
@@ -284,15 +284,14 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	public function endTestSuite(PHPUnit_Framework_TestSuite $suite) 
 	{
 		$suiteName = $suite->getName();
-		print("\nIn endTestSuite for suite [$suiteName]\n");
-		KalturaLog::debug("In endTestSuite");
+//		print("\nIn endTestSuite for suite [$suiteName]\n");
+		KalturaLog::debug("In endTestSuite for suite [$suiteName]");
 
-		//if (preg_match("*::*" ,$suiteName) != 0) TODO: check this
+
 		if($suite instanceof  PHPUnit_Framework_TestSuite_DataProvider)
-		//if (preg_match("*::*" ,$suiteName) != 0)
 		{ 
 			// if it is a dataprovider test suite
-			print("A data provider test suite was finished no action taken\n");
+			//print("A data provider test suite was finished no action taken\n");
 			KalturaLog::debug("A data provider test suite was finished no action taken");
 
 			//TODO: add here logic for multi nested tests
@@ -300,7 +299,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 		}
 		else //real test suite
 		{
-			print("A real test suite was finished printing failures\n");
+			KalturaLog::debug("A real test suite was finished printing failures\n");
 			
 			//1. create the failure file for that suite and output there all the failures for the suite
 			$this->cleanEmptyFailures();
@@ -333,7 +332,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			
 			if(is_null(KalturaTestListener::$testCaseFailures))
 			{
-				print("KalturaTestCaseFailures is null creating empty test case failures for $testName\n");
+				KalturaLog::debug("KalturaTestCaseFailures is null creating empty test case failures for $testName\n");
 				KalturaTestListener::$testCaseFailures = new KalturaTestCaseFailures($testName);
 			}
 				
@@ -365,7 +364,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	 */
 	public function endTest(PHPUnit_Framework_Test $test, $time) 
 	{
-		print("\nIn endTest\n");
+//		print("\nIn endTest\n");
 		KalturaLog::debug("In endTest");
 
 		if($test instanceof KalturaTestCaseBase)
@@ -473,7 +472,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			}
 			else
 			{
-				print("failures XML is null!!!\n");
+//				print("failures XML is null!!!\n");
 				KalturaLog::debug("failures XML is null!!!");
 				var_dump($testCaseFailuresXml);
 			}

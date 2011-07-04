@@ -8,7 +8,7 @@ class KalturaTestSuite extends PHPUnit_Framework_TestSuite
 	public function run(PHPUnit_Framework_TestResult $result = NULL, $filter = FALSE, array $groups = array(), array $excludeGroups = array(), $processIsolation = FALSE)
 	{
 		$name = $this->getName();
-		print("In KalturaTestSuite::run() for suite [$name ]\n");
+		KalturaLog::debug("In KalturaTestSuite::run() for suite [$name ]\n");
 		
 		return parent::run($result, $filter, $groups, $excludeGroups, $processIsolation);
 	}
@@ -28,7 +28,7 @@ class KalturaTestSuite extends PHPUnit_Framework_TestSuite
 	 */
 	public function runTest(PHPUnit_Framework_Test $test, PHPUnit_Framework_TestResult $result)
 	{
-		print("In KalturaTestSuite::runTest() for test [" . $test->getName() ."]\n");
+		KalturaLog::debug("In KalturaTestSuite::runTest() for test [" . $test->getName() ."]\n");
 		
 		return parent::runTest($test, $result);
 	}
