@@ -412,7 +412,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			{
 				if(!$result->isListenerExists('KalturaTestListener'))
 				{
-					print("adding KalturaTestListener to result");
+					KalturaLog::debug("adding KalturaTestListener to result\n");
 					$result->addListener(new KalturaTestListener());
 				}
 			}
@@ -420,7 +420,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 
 		if(KalturaTestCaseBase::$isFrameworkInit == false)
 		{
-			print("Initing frmaework\n");
+			KalturaLog::debug("Initing framework\n");
 			$class = get_class($this);
 			$classPath = KAutoloader::getClassFilePath($class);
 			KalturaTestListener::setFailureFilePath(dirname($classPath) . "/testsData/{$class}.failures");

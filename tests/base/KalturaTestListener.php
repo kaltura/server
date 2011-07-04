@@ -222,6 +222,14 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 				$testName = $testNames[1];
 			}
 
+			$testCase = $testNames[0];
+			
+			if(is_null(KalturaTestListener::$testCaseFailures))
+			{
+				print("KalturaTestCaseFailures is null creating empty test case failures for $testCase\n");
+				KalturaTestListener::$testCaseFailures = new KalturaTestCaseFailures($testName);
+			}
+			
 			$testProcedure = KalturaTestListener::$testCaseFailures->getTestProcedureFailure($testName);
 
 			//if the test procedure exists
@@ -292,6 +300,8 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 		}
 		else //real test suite
 		{
+			print("A real test suite was finished printing failures\n");
+			
 			//1. create the failure file for that suite and output there all the failures for the suite
 			$this->cleanEmptyFailures();
 	
@@ -322,7 +332,10 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			$testInputs = $test->getInputs();
 			
 			if(is_null(KalturaTestListener::$testCaseFailures))
-				KalturaTestListener::$testCaseFailures = new KalturaTestCaseFailures();
+			{
+				print("KalturaTestCaseFailures is null creating empty test case failures for $testName\n");
+				KalturaTestListener::$testCaseFailures = new KalturaTestCaseFailures($testName);
+			}
 				
 			if(!is_null(KalturaTestListener::$testCaseFailures))
 			{

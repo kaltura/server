@@ -46,7 +46,6 @@ class KalturaTestResult extends PHPUnit_Framework_TestResult
 	 */
 	public function endTest(PHPUnit_Framework_Test $test, $time)
 	{
-		print("In KalturaTestResult::endTest\n");
 		$result = parent::endTest($test, $time);
 		
 		if (!$this->lastTestFailed && $test instanceof PHPUnit_Framework_TestCase) {
