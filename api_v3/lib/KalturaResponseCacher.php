@@ -11,32 +11,34 @@ class KalturaResponseCacher
 	protected $_cacheDataFilePath = "";
 	protected $_cacheHeadersFilePath = "";
 	protected $_cacheLogFilePath = "";
+	protected $_cacheExpiryFilePath = "";
 	protected $_ks = "";
+	protected $_defaultExpiry = 600;
 	protected $_expiry = 600;
-	protected $_instanceId = 0;
 	
-	protected static $_useCache = array();		// contains instance ids that will use the cache
-	protected static $_nextInstanceId = 0;
+	protected static $_useCache = true;
 	
 	public function __construct($params = null, $cacheDirectory = null, $expiry = 0)
 	{
-		$this->_instanceId = self::$_nextInstanceId;  
-		self::$_nextInstanceId++;
-		
+		self::$_useCache = kConf::get('enable_cache');
+
 		if ($expiry)
-			$this->_expiry = $expiry;
+			$this->_defaultExpiry = $this->_expiry = $expiry;
 			
 		$this->_cacheDirectory = $cacheDirectory ? $cacheDirectory : 
 			rtrim(kConf::get('response_cache_dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 		
 		$this->_cacheDirectory .= "cache_v3-".$this->_expiry . DIRECTORY_SEPARATOR;
 		
-		if (!kConf::get('enable_cache'))
+		if (!self::$_useCache)
 			return;
 			
 		if (!$params) {
 			$params = requestUtils::getRequestParams();
 		}
+		
+		foreach(kConf::get('v3cache_ignore_params') as $name)
+			unset($params[$name]);
 		
 		// check the clientTag parameter for a cache start time (cache_st:<time>) directive
 		if (isset($params['clientTag']))
@@ -47,6 +49,7 @@ class KalturaResponseCacher
 			{
 				if ($matches[1] > time())
 				{
+					self::$_useCache = false;
 					return;
 				}
 			}
@@ -55,9 +58,10 @@ class KalturaResponseCacher
 		$isAdminLogin = isset($params['service']) && isset($params['action']) && $params['service'] == 'adminuser' && $params['action'] == 'login';
 		if ($isAdminLogin || isset($params['nocache']))
 		{
+			self::$_useCache = false;
 			return;
 		}
-
+		
 		$ks = isset($params['ks']) ? $params['ks'] : '';
 		foreach($params as $key => $value)
 		{
@@ -72,13 +76,8 @@ class KalturaResponseCacher
 		unset($params['kalsig']);
 		unset($params['clientTag']);
 		
-		foreach(kConf::get('v3cache_ignore_params') as $name)
-			unset($params[$name]);
-		
 		$this->_params = $params;
 		$this->setKS($ks);
-
-		self::$_useCache[] = $this->_instanceId;	
 	}
 	
 	public function setKS($ks)
@@ -100,11 +99,12 @@ class KalturaResponseCacher
 		$this->_cacheDataFilePath 		= $pathWithFilePrefix . $this->_cacheKey;
 		$this->_cacheHeadersFilePath 	= $pathWithFilePrefix . $this->_cacheKey . ".headers";
 		$this->_cacheLogFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".log";
+		$this->_cacheExpiryFilePath 		= $pathWithFilePrefix . $this->_cacheKey . ".expiry";
 	}
 	
 	public static function disableCache()
 	{
-		self::$_useCache = array();
+		self::$_useCache = false;
 	}
 	
 	/**
@@ -122,7 +122,7 @@ class KalturaResponseCacher
 	 */	 
 	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
 	{
-		if (!in_array($this->_instanceId, self::$_useCache))
+		if (!self::$_useCache)
 			return false;
 			
 		$startTime = microtime(true);
@@ -143,7 +143,7 @@ class KalturaResponseCacher
 		
 	public function checkOrStart()
 	{
-		if (!in_array($this->_instanceId, self::$_useCache))
+		if (!self::$_useCache)
 			return;
 					
 		$response = $this->checkCache();
@@ -206,6 +206,15 @@ class KalturaResponseCacher
 			$this->createDirForPath($this->_cacheHeadersFilePath);
 			file_put_contents($this->_cacheHeadersFilePath, $contentType);
 		}
+
+		// store specific expiry shorter than the default one
+		if ($this->_expiry != $this->_defaultExpiry)
+			file_put_contents($this->_cacheExpiryFilePath, time() + $this->_expiry);
+	}
+
+	public function setExpiry($expiry)
+	{
+		$this->_expiry = $expiry;
 	}
 	
 	private function createDirForPath($filePath)
@@ -222,24 +231,32 @@ class KalturaResponseCacher
 	{
 		if (file_exists($this->_cacheDataFilePath))
 		{
-			if (filemtime($this->_cacheDataFilePath) + $this->_expiry < time())
+			// check for a specific expiry 
+			$fileExpiry = @file_get_contents($this->_cacheExpiryFilePath);
+			if ($fileExpiry)
 			{
-				@unlink($this->_cacheDataFilePath);
-				@unlink($this->_cacheHeadersFilePath);
-				@unlink($this->_cacheLogFilePath);
-				return false;
+				$useCache = $fileExpiry > time(); 
 			}
-			else
+			else // otherwise check for the "default" expiry
 			{
+				$useCache = filemtime($this->_cacheDataFilePath) + $this->_expiry > time();
+			}
+
+			if($useCache)
 				return true;
-			}
+
+			@unlink($this->_cacheDataFilePath);
+			@unlink($this->_cacheHeadersFilePath);
+			@unlink($this->_cacheLogFilePath);
+			@unlink($this->_cacheExpiryFilePath);
+			return false;
 		}
 		return false;
 	}
 	
 	private function shouldCache()
 	{
-		if (!in_array($this->_instanceId, self::$_useCache))
+		if (!self::$_useCache)
 			return false;
 			
 		$ks = null;
@@ -257,27 +274,22 @@ class KalturaResponseCacher
 		// force caching of actions listed in kConf even if admin ks is used
 		foreach(kConf::get('v3cache_ignore_admin_ks') as $ignoreParams)
 		{
-			$foundRule = true;
+			$matches = 0;
 			
 			foreach($ignoreParams as $key => $value)
 			{
 				if ($key == 'partner_id')
 				{
 					if ($ks->partner_id != $value)
-					{
-						$foundRule = false;
 						break;
-					}
 				}
-				elseif (!isset($this->_params[$key]) || $this->_params[$key] != $value)
-				{
-					$foundRule = false;
+				else if (!isset($this->_params[$key]) || $this->_params[$key] != $value)
 					break;
-				}
+					
+				$matches++;
 			}
 			
-			// if all parameters where matched cache response
-			if ($foundRule && count($ignoreParams))
+			if ($matches == count($ignoreParams))
 				return true;
 		}
         
