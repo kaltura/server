@@ -10,7 +10,7 @@ else
 $config = new KalturaConfiguration();
 $config->serviceUrl = $serviceUrl;
 //$config->serviceUrl = 'http://hudsontest2.kaltura.dev/';
-//$config->serviceUrl = 'http://devtests.kaltura.dev/';
+$config->serviceUrl = 'http://devtests.kaltura.dev/';
 $client = new KalturaClient($config);
 $cmsPassword = 'Roni123!';
 $partner = new KalturaPartner();
@@ -40,3 +40,11 @@ KalturaGlobalData::setData("@UI_CONF_ID@", $uiConfs->objects[0]->id);
 
 $accessControls = $client->accessControl->listAction();
 KalturaGlobalData::setData("@DEFAULT_ACCESS_CONTROL@", $accessControls->objects[0]->id);
+
+$entry = new KalturaMediaEntry();
+$entry->name ="Entry For flavor asset test";
+$entry->type = KalturaEntryType::MEDIA_CLIP;
+$entry->mediaType = KalturaMediaType::VIDEO;
+$defaultEntry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
+
+KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
