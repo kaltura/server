@@ -164,9 +164,9 @@ class KalturaGenericDistributionProfile extends KalturaDistributionProfile
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
-	public function validateForInsert()
+	public function validateForInsert($propertiesToSkip = array())
 	{
-		parent::validateForInsert();
+		parent::validateForInsert($propertiesToSkip);
 		
 		$this->validatePropertyNumeric('genericProviderId');
 	}
