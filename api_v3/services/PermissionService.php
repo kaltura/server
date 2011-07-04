@@ -73,7 +73,7 @@ class PermissionService extends KalturaBaseService
 		catch (kPermissionException $e) {
 			$code = $e->getCode();
 			if ($code === kPermissionException::PERMISSION_ALREADY_EXISTS) {
-				throw new KalturaAPIException(KalturaErrors::PERMISSION_ALREADY_EXISTS, $permission->getName(), $this->getPartnerId());
+				throw new KalturaAPIException(KalturaErrors::PERMISSION_ALREADY_EXISTS, $dbPermission->getName(), $this->getPartnerId());
 			}
 			if ($code === kPermissionException::PERMISSION_ITEM_NOT_FOUND) {
 				throw new KalturaAPIException(KalturaErrors::PERMISSION_ITEM_NOT_FOUND);
