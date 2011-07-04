@@ -95,7 +95,7 @@ class KalturaPartnerBaseFilter extends KalturaFilter
 	/**
 	 * 
 	 * 
-	 * @var int
+	 * @var KalturaPartnerStatus
 	 */
 	public $statusEqual;
 
