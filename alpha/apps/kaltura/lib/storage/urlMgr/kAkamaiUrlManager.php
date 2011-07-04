@@ -114,7 +114,11 @@ class kAkamaiUrlManager extends kUrlManager
 		if($this->protocol==StorageProfile::PLAY_FORMAT_APPLE_HTTP) {
 			if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
 			{
-				$url = "http://".@$this->params['hd_ios']."/i".$url."/master.m3u8";				
+				// we use index_0_av.m3u8 instead of master.m3u8 as temporary solution to overcome
+				// an extra "redirection" done on the part of akamai.
+				// the auto created master.m3u8 file contains a single item playlist to the index_0_av.m3u8 file
+				// this extra "redirection" fails  
+				$url = "http://".@$this->params['hd_ios']."/i".$url."/index_0_av.m3u8";				
 			}
 			else
 				$url .= "/file/playlist.m3u8";
