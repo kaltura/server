@@ -297,8 +297,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	
 	protected function checkAclForNavigation(Zend_Navigation_Container $navigation)
 	{
-		$accessConfig = Zend_Registry::get('config')->access;
+	    $accessConfig = Zend_Registry::get('config')->access;
 		$pages = $navigation->getPages();
+		$firstAllowed = array();
 		foreach($pages as $page)
 		{
 			$controller = $page->get('controller');
@@ -312,6 +313,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			else
 			{
 				$this->checkAclForNavigation($page);
+			}
+			if ($action == 'dynamic_action') {
+			    $localPages = $page->getPages();
+			    $firstPage = reset($localPages);
+			    if ($firstPage) {
+			        $firstPageAction = $firstPage->get('action');
+			        $page->set('action', $firstPageAction);
+			    }
 			}
 		}
 	}

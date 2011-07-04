@@ -3,8 +3,7 @@
 	<accounts>
 		<label>Publishers</label>
 		<controller>partner</controller>
-		<action>list</action>
-
+		<action>dynamic_action</action>
 		<pages>
 			<accounts-management>
 				<label>Publisher Management</label>
@@ -21,12 +20,17 @@
 				<controller>partner-usage</controller>
 				<action>index</action>
 			</account-usage>
+			<external-storages>
+				<label>Publishers’ Remote Storage</label>
+				<controller>partner</controller>
+				<action>external-storages</action>
+			</external-storages>
 		</pages>
 	</accounts>
 	<users>
 		<label>Users</label>
 		<controller>user</controller>
-		<action>index</action>
+		<action>dynamic_action</action>
 
 		<pages>
 			<users-management>
@@ -49,7 +53,7 @@
 	<widgets>
 		<label>Widgets</label>
 		<controller>widget</controller>
-		<action>list</action>
+		<action>dynamic_action</action>
 		<pages>
 			<widgets>
 				<label>Widgets Management</label>
@@ -61,8 +65,7 @@
 	<batch-proccess-control>
 		<label>Batch Process Control</label>
 		<controller>batch</controller>
-		<action>in-progress-tasks</action>
-
+		<action>dynamic_action</action>
 		<pages>
 			<in-progress-tasks>
 				<label>In-Progress Tasks</label>
@@ -94,7 +97,7 @@
 	<monitoring>
 		<label>Monitoring</label>
 		<controller>monitoring</controller>
-		<action>xymon</action>
+		<action>dynamic_action</action>
 
 		<pages>
 			<xymon>
@@ -112,7 +115,7 @@
 	<developer>
 		<label>Developer</label>
 		<controller>index</controller>
-		<action>testme</action>
+		<action>dynamic_action</action>
 
 		<pages>
 			<testme>
