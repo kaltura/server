@@ -127,7 +127,6 @@ class KalturaTestDataBase
 			
 			if($fieldType != null)
 			{
-				//print("type2 [" . $fieldType ."]\n");
 				$node->setAttribute("type", $fieldType);
 			}
 			
@@ -150,7 +149,6 @@ class KalturaTestDataBase
 				
 				if($fieldType != null)
 				{
-					//print("type1 [" . $fieldType ."]\n");
 					$node->setAttribute("type", $fieldType);
 				}
 				

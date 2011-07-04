@@ -19,7 +19,6 @@ class KalturaTestSuite extends PHPUnit_Framework_TestSuite
 	 */
 	protected function createResult()
 	{
-		print("In KalturaTestSuite::createResult\n");
 		return new KalturaTestResult();
 	}
 	
@@ -30,13 +29,6 @@ class KalturaTestSuite extends PHPUnit_Framework_TestSuite
 	public function runTest(PHPUnit_Framework_Test $test, PHPUnit_Framework_TestResult $result)
 	{
 		print("In KalturaTestSuite::runTest() for test [" . $test->getName() ."]\n");
-		
-//		if(is_null($result) || !($result instanceof KalturaTestResult))
-//		{
-//			$resultClass = get_class($result);
-//			//print("result [$resultClass] - Setting result to be KalturaTestResult\n");
-//			//$result = new KalturaTestResult();	
-//		}
 		
 		return parent::runTest($test, $result);
 	}

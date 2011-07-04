@@ -305,7 +305,6 @@ class KalturaTestDataObject extends KalturaTestDataBase
 			
 			if($fieldType !== null)
 			{
-				//print("type3 [" . $fieldType ."]\n");
 				$node->setAttribute("type", $fieldType);
 			}
 			
@@ -327,7 +326,6 @@ class KalturaTestDataObject extends KalturaTestDataBase
 				
 				if($fieldType != null)
 				{
-					//print("type3 [" . $fieldType ."]\n");
 					$node->setAttribute("type", $fieldType);
 				}
 				
@@ -424,14 +422,12 @@ class KalturaTestDataObject extends KalturaTestDataBase
 							}
 						}
 						
-						//print(" count(arrayValue) " . count($arrayValue) ."\n");
 						if(count($arrayValue) > 0)
 						{
 							KalturaTestDataObject::setPropertyValue($this->dataObject, $arrayKey, $arrayValue, $childValueType);
 						}
 						else
 						{
-							print("setting $arrayKey, " . print_r($arrayValue, true). "\n");
 							KalturaTestDataObject::setPropertyValue($this->dataObject, $arrayKey, $arrayValue, 'Array');
 						}
 					}
@@ -501,8 +497,6 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		}
 		else
 		{
-			//print("fieldValue [$fieldValue], fieldValueType [$fieldValueType]\n");
-			//TODO: fix this
 			if($fieldValueType) //If field value type is set
 				settype($fieldValue, $fieldValueType);
 			$objectInstace = $fieldValue;

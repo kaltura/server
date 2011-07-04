@@ -223,7 +223,6 @@ class KalturaTestCaseInstanceFailure
 					}
 				}
 				
-				//print("type [" . $type ."]\n");
 				$node->setAttribute("type", $type);
 				
 				$id = $inputValue;

@@ -11,7 +11,7 @@ class KalturaTestResult extends PHPUnit_Framework_TestResult
 		if(method_exists($this, '__construct'))
 			parent::__construct($codeCoverage);
 		else
-			print("Parent don't have __construct method\n");
+			KalturaLog::alert("Parent don't have __construct method");
 	}
 	
 	/**
