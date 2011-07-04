@@ -29,7 +29,7 @@ class KDLUnitTest extends KalturaServerTestCase
 	 */
 	public function testKDLWrapCDLGenerateTargetFlavors(flavorParams $flavorList, mediaInfo $mediaInfo, flavorParamsOutput $flavorParamsOutput)
 	{
-		print("\nin KDL Test\n");
+		print("\nin KDLUnitTest\n");
 //		print_r($flavorList, true);
 //		print_r($mediaInfo, true);
 //		print_r($flavorParamsOutput, true);
