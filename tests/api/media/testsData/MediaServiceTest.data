@@ -1,0 +1,247 @@
+<?xml version='1.0'?>
+<TestCaseData testCaseName='MediaServiceTest'>
+<TestProcedureData testProcedureName='testAdd'>
+	<TestCaseData testCaseInstanceName='testAdd with data set #0'>
+		<Input name = 'entry' type = 'KalturaMediaEntry' key = ''>
+			<name></name>
+			<description></description>
+			<userId></userId>
+			<tags></tags>
+			<adminTags></adminTags>
+			<categories></categories>
+			<categoriesIds></categoriesIds>
+			<type></type>
+			<groupId></groupId>
+			<partnerData></partnerData>
+			<licenseType></licenseType>
+			<accessControlId></accessControlId>
+			<startDate></startDate>
+			<endDate></endDate>
+			<referenceId></referenceId>
+			<partnerSortValue></partnerSortValue>
+			<conversionProfileId></conversionProfileId>
+			<operationAttributes>KalturaOperationAttributesArray</operationAttributes>
+			<creditUserName></creditUserName>
+			<creditUrl></creditUrl>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaMediaEntry' key = 'object key'>
+			<name></name>
+			<description></description>
+			<userId></userId>
+			<tags></tags>
+			<adminTags></adminTags>
+			<categories></categories>
+			<categoriesIds></categoriesIds>
+			<type></type>
+			<groupId></groupId>
+			<partnerData></partnerData>
+			<licenseType></licenseType>
+			<thumbnailUrl></thumbnailUrl>
+			<accessControlId></accessControlId>
+			<startDate></startDate>
+			<endDate></endDate>
+			<referenceId></referenceId>
+			<partnerSortValue></partnerSortValue>
+			<conversionProfileId></conversionProfileId>
+			<operationAttributes>KalturaOperationAttributesArray</operationAttributes>
+			<mediaType></mediaType>
+			<conversionQuality></conversionQuality>
+			<sourceType></sourceType>
+			<searchProviderType></searchProviderType>
+			<searchProviderId></searchProviderId>
+			<creditUserName></creditUserName>
+			<creditUrl></creditUrl>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testGet'>
+	<TestCaseData testCaseInstanceName='testGet with data set #0'>
+		<Input name = 'entryId' type = 'string' key = ''/>
+		<Input name = 'version' type = 'int' key = '-1'/>
+		<OutputReference name = 'output' type = 'KalturaMediaEntry' key = 'object key'>
+			<name></name>
+			<description></description>
+			<userId></userId>
+			<tags></tags>
+			<adminTags></adminTags>
+			<categories></categories>
+			<categoriesIds></categoriesIds>
+			<type></type>
+			<groupId></groupId>
+			<partnerData></partnerData>
+			<licenseType></licenseType>
+			<thumbnailUrl></thumbnailUrl>
+			<accessControlId></accessControlId>
+			<startDate></startDate>
+			<endDate></endDate>
+			<referenceId></referenceId>
+			<partnerSortValue></partnerSortValue>
+			<conversionProfileId></conversionProfileId>
+			<operationAttributes>KalturaOperationAttributesArray</operationAttributes>
+			<mediaType></mediaType>
+			<conversionQuality></conversionQuality>
+			<sourceType></sourceType>
+			<searchProviderType></searchProviderType>
+			<searchProviderId></searchProviderId>
+			<creditUserName></creditUserName>
+			<creditUrl></creditUrl>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testUpdate'>
+	<TestCaseData testCaseInstanceName='testUpdate with data set #0'>
+		<Input name = 'entryId' type = 'string' key = ''/>
+		<Input name = 'mediaEntry' type = 'KalturaMediaEntry' key = ''>
+			<name></name>
+			<description></description>
+			<userId></userId>
+			<tags></tags>
+			<adminTags></adminTags>
+			<categories></categories>
+			<categoriesIds></categoriesIds>
+			<type></type>
+			<groupId></groupId>
+			<partnerData></partnerData>
+			<licenseType></licenseType>
+			<accessControlId></accessControlId>
+			<startDate></startDate>
+			<endDate></endDate>
+			<referenceId></referenceId>
+			<partnerSortValue></partnerSortValue>
+			<conversionProfileId></conversionProfileId>
+			<operationAttributes>KalturaOperationAttributesArray</operationAttributes>
+			<creditUserName></creditUserName>
+			<creditUrl></creditUrl>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaMediaEntry' key = 'object key'>
+			<name></name>
+			<description></description>
+			<userId></userId>
+			<tags></tags>
+			<adminTags></adminTags>
+			<categories></categories>
+			<categoriesIds></categoriesIds>
+			<type></type>
+			<groupId></groupId>
+			<partnerData></partnerData>
+			<licenseType></licenseType>
+			<thumbnailUrl></thumbnailUrl>
+			<accessControlId></accessControlId>
+			<startDate></startDate>
+			<endDate></endDate>
+			<referenceId></referenceId>
+			<partnerSortValue></partnerSortValue>
+			<conversionProfileId></conversionProfileId>
+			<operationAttributes>KalturaOperationAttributesArray</operationAttributes>
+			<mediaType></mediaType>
+			<conversionQuality></conversionQuality>
+			<sourceType></sourceType>
+			<searchProviderType></searchProviderType>
+			<searchProviderId></searchProviderId>
+			<creditUserName></creditUserName>
+			<creditUrl></creditUrl>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testDelete'>
+	<TestCaseData testCaseInstanceName='testDelete with data set #0'>
+		<Input name = 'entryId' type = 'string' key = ''/>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testListAction'>
+	<TestCaseData testCaseInstanceName='testListAction with data set #0'>
+		<Input name = 'filter' type = 'KalturaMediaEntryFilter' key = ''>
+			<orderBy></orderBy>
+			<advancedSearch>KalturaSearchItem</advancedSearch>
+			<idEqual></idEqual>
+			<idIn></idIn>
+			<idNotIn></idNotIn>
+			<nameLike></nameLike>
+			<nameMultiLikeOr></nameMultiLikeOr>
+			<nameMultiLikeAnd></nameMultiLikeAnd>
+			<nameEqual></nameEqual>
+			<partnerIdEqual></partnerIdEqual>
+			<partnerIdIn></partnerIdIn>
+			<userIdEqual></userIdEqual>
+			<tagsLike></tagsLike>
+			<tagsMultiLikeOr></tagsMultiLikeOr>
+			<tagsMultiLikeAnd></tagsMultiLikeAnd>
+			<adminTagsLike></adminTagsLike>
+			<adminTagsMultiLikeOr></adminTagsMultiLikeOr>
+			<adminTagsMultiLikeAnd></adminTagsMultiLikeAnd>
+			<categoriesMatchAnd></categoriesMatchAnd>
+			<categoriesMatchOr></categoriesMatchOr>
+			<categoriesIdsMatchAnd></categoriesIdsMatchAnd>
+			<categoriesIdsMatchOr></categoriesIdsMatchOr>
+			<statusEqual></statusEqual>
+			<statusNotEqual></statusNotEqual>
+			<statusIn></statusIn>
+			<statusNotIn></statusNotIn>
+			<moderationStatusEqual></moderationStatusEqual>
+			<moderationStatusNotEqual></moderationStatusNotEqual>
+			<moderationStatusIn></moderationStatusIn>
+			<moderationStatusNotIn></moderationStatusNotIn>
+			<typeEqual></typeEqual>
+			<typeIn></typeIn>
+			<createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+			<createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+			<updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+			<updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+			<groupIdEqual></groupIdEqual>
+			<searchTextMatchAnd></searchTextMatchAnd>
+			<searchTextMatchOr></searchTextMatchOr>
+			<accessControlIdEqual></accessControlIdEqual>
+			<accessControlIdIn></accessControlIdIn>
+			<startDateGreaterThanOrEqual></startDateGreaterThanOrEqual>
+			<startDateLessThanOrEqual></startDateLessThanOrEqual>
+			<startDateGreaterThanOrEqualOrNull></startDateGreaterThanOrEqualOrNull>
+			<startDateLessThanOrEqualOrNull></startDateLessThanOrEqualOrNull>
+			<endDateGreaterThanOrEqual></endDateGreaterThanOrEqual>
+			<endDateLessThanOrEqual></endDateLessThanOrEqual>
+			<endDateGreaterThanOrEqualOrNull></endDateGreaterThanOrEqualOrNull>
+			<endDateLessThanOrEqualOrNull></endDateLessThanOrEqualOrNull>
+			<referenceIdEqual></referenceIdEqual>
+			<referenceIdIn></referenceIdIn>
+			<replacingEntryIdEqual></replacingEntryIdEqual>
+			<replacingEntryIdIn></replacingEntryIdIn>
+			<replacedEntryIdEqual></replacedEntryIdEqual>
+			<replacedEntryIdIn></replacedEntryIdIn>
+			<replacementStatusEqual></replacementStatusEqual>
+			<replacementStatusIn></replacementStatusIn>
+			<partnerSortValueGreaterThanOrEqual></partnerSortValueGreaterThanOrEqual>
+			<partnerSortValueLessThanOrEqual></partnerSortValueLessThanOrEqual>
+			<rootEntryIdEqual></rootEntryIdEqual>
+			<rootEntryIdIn></rootEntryIdIn>
+			<tagsNameMultiLikeOr></tagsNameMultiLikeOr>
+			<tagsAdminTagsMultiLikeOr></tagsAdminTagsMultiLikeOr>
+			<tagsAdminTagsNameMultiLikeOr></tagsAdminTagsNameMultiLikeOr>
+			<tagsNameMultiLikeAnd></tagsNameMultiLikeAnd>
+			<tagsAdminTagsMultiLikeAnd></tagsAdminTagsMultiLikeAnd>
+			<tagsAdminTagsNameMultiLikeAnd></tagsAdminTagsNameMultiLikeAnd>
+			<freeText></freeText>
+			<isRoot></isRoot>
+			<durationLessThan></durationLessThan>
+			<durationGreaterThan></durationGreaterThan>
+			<durationLessThanOrEqual></durationLessThanOrEqual>
+			<durationGreaterThanOrEqual></durationGreaterThanOrEqual>
+			<msDurationLessThan></msDurationLessThan>
+			<msDurationGreaterThan></msDurationGreaterThan>
+			<msDurationLessThanOrEqual></msDurationLessThanOrEqual>
+			<msDurationGreaterThanOrEqual></msDurationGreaterThanOrEqual>
+			<durationTypeMatchOr></durationTypeMatchOr>
+			<mediaTypeEqual></mediaTypeEqual>
+			<mediaTypeIn></mediaTypeIn>
+			<mediaDateGreaterThanOrEqual></mediaDateGreaterThanOrEqual>
+			<mediaDateLessThanOrEqual></mediaDateLessThanOrEqual>
+			<flavorParamsIdsMatchOr></flavorParamsIdsMatchOr>
+			<flavorParamsIdsMatchAnd></flavorParamsIdsMatchAnd>
+		</Input>
+		<Input name = 'pager' type = 'KalturaFilterPager' key = ''>
+			<pageSize></pageSize>
+			<pageIndex></pageIndex>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaMediaListResponse' key = 'object key'>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+</TestCaseData>
