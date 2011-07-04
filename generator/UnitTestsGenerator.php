@@ -192,8 +192,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			if (strpos($actionInfo->clientgenerator, "ignore") !== false)
 				continue;
 
-			//TODO:delete this
-			$resgressionTests = array('addAction', 'getAction', 'deleteAction', 'updateAction', 'listAction');
+			//TODO: add support for 'registerAction' The register is for partner service
+			$resgressionTests = array('addAction', 'getAction', 'deleteAction', 'updateAction', 'listAction'); 
+
 			if(!in_array($actionName , $resgressionTests ))
 				continue;
 			
@@ -565,16 +566,19 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		$testReturnedType = null;
 		$addId = false;
 				
+		//Set the tests to be the regression tests
 		if($action == 'add' || $action == 'update' || $action == 'get' || $action == 'listAction' || $action == 'delete')
 		{
 			$isBase = true;
 		}
 		
-		if($action == 'update' || $action == 'get' || $action == 'listAction' || $action == 'delete')
+		//Createds the dependency between the tests to the add tests
+		if($action == 'update' || $action == 'get' || $action == 'delete' ) // || $action == 'listAction' TODO: add list if needed
 		{
 			$addId = true;
 		}
 		
+		//Special care for add method as it needs to return the id to the other tests
 		if($action == 'add')
 		{
 			//TODO: support return type of int
