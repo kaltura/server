@@ -246,7 +246,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$propertiesToSkip[] = 'media';
+		$propertiesToSkip[] = 'type';
 		parent::validateForInsert($propertiesToSkip);
 		
 		$this->validatePropertyNotNull("entryId");
@@ -278,7 +278,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		if($this->endTime !== null)
 			$this->validateEndTime($sourceObject->getId());
 					
-		$propertiesToSkip[] = 'media';
+		$propertiesToSkip[] = 'type';
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
