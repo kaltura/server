@@ -14,8 +14,14 @@
  * @subpackage model
  */
 class CuePointPeer extends BaseCuePointPeer {
+	
 	const MAX_TEXT_LENGTH = 32700;
 	const MAX_TAGS_LENGTH = 255;
+	
+	// the search index column names for additional fields
+	const ROOTS = 'cue_point.ROOTS';
+	const STR_ENTRY_ID = 'cue_point.STR_ENTRY_ID';
+	const STR_CUE_POINT_ID = 'cue_point.STR_CUE_POINT_ID';
 	
 	public static function setDefaultCriteriaFilter()
 	{

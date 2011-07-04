@@ -13,7 +13,7 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-class CuePoint extends BaseCuePoint {
+class CuePoint extends BaseCuePoint implements IIndexable {
 
 	public function getChildren()
 	{
@@ -106,5 +106,108 @@ class CuePoint extends BaseCuePoint {
 			
 		return $ret;
 	}
+
+	public function getRoots()
+	{
+		$ret = array();
+		
+		$parent = null;
+		$roots = array($this->getId());
+		if($this->getParentId())
+		{
+			$ret[] = 'parent ' . $this->getParentId();
+			$parent = CuePointPeer::retrieveByPK($this->getParentId());
+		}
+		
+		while($parent)
+		{
+			$parentId = $parent->getId();
+			if(in_array($parentId, $roots))
+				break;
+				
+			$ret[] = "root $parentId";
+			$roots[] = $parentId;
+			
+			if($parent->getParentId())
+				$parent = CuePointPeer::retrieveByPK($parent->getParentId());
+			else
+				$parent = null;
+		}
+		
+			
+		if($this->getEntryId())
+			$ret[] = 'entry ' . $this->getEntryId();
+		
+		return implode(',', $ret);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::getObjectIndexName()
+	 */
+	public function getObjectIndexName()
+	{
+		return CuePointPeer::TABLE_NAME;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexFieldsMap()
+	 */
+	public function getIndexFieldsMap()
+	{
+		return array(
+			'entry_id' => 'entryId',
+			'name' => 'name',
+			'text' => 'text',
+			'tags' => 'tags',
+			'roots' => 'roots',
+			'cue_point_int_id' => 'intId',
+			'partner_id' => 'partnerId',
+			'start_time' => 'startTime',
+			'end_time' => 'endTime',
+			'cue_point_status' => 'status',
+			'cue_point_type' => 'type',
+			'kuser_id' => 'kuserId',
+			'partner_sort_value' => 'partnerSortValue',
+			'created_at' => 'createdAt',
+			'updated_at' => 'updatedAt',
+			'str_entry_id' => 'entryId',
+			'str_cue_point_id' => 'id',
+		);
+	}
+
+	private static $indexFieldTypes = array(
+		'entry_id' => IIndexable::FIELD_TYPE_STRING,
+		'name' => IIndexable::FIELD_TYPE_STRING,
+		'text' => IIndexable::FIELD_TYPE_STRING,
+		'tags' => IIndexable::FIELD_TYPE_STRING,
+		'roots' => IIndexable::FIELD_TYPE_STRING,
+		'cue_point_int_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'start_time' => IIndexable::FIELD_TYPE_INTEGER,
+		'end_time' => IIndexable::FIELD_TYPE_INTEGER,
+		'cue_point_status' => IIndexable::FIELD_TYPE_INTEGER,
+		'cue_point_type' => IIndexable::FIELD_TYPE_INTEGER,
+		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
+		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
+		'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
+		'str_cue_point_id' => IIndexable::FIELD_TYPE_STRING,
+	);
 	
+	public static function getIndexFieldTypes()
+	{
+		return self::$indexFieldTypes;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IIndexable::getIndexFieldType()
+	 */
+	public function getIndexFieldType($field)
+	{
+		if(isset(self::$indexFieldTypes[$field]))
+			return self::$indexFieldTypes[$field];
+			
+		return null;
+	}
 } // CuePoint
