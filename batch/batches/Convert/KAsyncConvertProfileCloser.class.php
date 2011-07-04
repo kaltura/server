@@ -58,7 +58,7 @@ class KAsyncConvertProfileCloser extends KBatchBase
 	
 	private function checkTimeout(KalturaBatchJob $job)
 	{
-		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+		if($job->queueTime && ($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
 			
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
