@@ -108,7 +108,7 @@ class CuePointService extends KalturaBaseService
 		if(!$created)
 			return null;
 		
-		$cuePoint = new KalturaCuePoint();
+		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
 		$cuePoint->fromObject($dbCuePoint);
 		
 		return $cuePoint;
@@ -157,7 +157,7 @@ class CuePointService extends KalturaBaseService
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
 			
-		$cuePoint = new KalturaCuePoint();
+		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
 		$cuePoint->fromObject($dbCuePoint);
 		
 		return $cuePoint;

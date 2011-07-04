@@ -2,6 +2,7 @@
 /**
  * @package plugins.cuePoint
  * @subpackage api.objects
+ * @abstract
  */
 class KalturaCuePoint extends KalturaObject implements IFilterable 
 {
@@ -278,5 +279,14 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 			$this->validateEndTime($source_object->getId());
 					
 		return parent::validateForUpdate($source_object);
+	}
+
+	/**
+	 * @param int $type
+	 * @return KalturaCuePoint
+	 */
+	public static function getInstance($type)
+	{
+		return KalturaPluginManager::loadObject('KalturaCuePoint', $type);
 	}
 }
