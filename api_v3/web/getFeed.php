@@ -5,7 +5,8 @@ require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
 
 // check cache before loading anything
 require_once("../lib/KalturaResponseCacher.php");
-$cache = new KalturaResponseCacher();
+$expiry = kConf::hasParam("v3cache_getfeed_default_expiry") ? kConf::get("v3cache_getfeed_default_expiry") : 86400;
+$cache = new KalturaResponseCacher(null, kConf::get("global_cache_dir")."feed/", $expiry);
 $cache->checkOrStart();
 
 require_once("../bootstrap.php");
@@ -15,7 +16,6 @@ KalturaLog::setContext("syndicationFeedRenderer");
 KalturaLog::debug(">------------------------------------- syndicationFeedRenderer -------------------------------------");
 KalturaLog::info("syndicationFeedRenderer-start ");
 
-kCurrentContext::$ps_vesion = 'ps3';
 $feedId = $_GET['feedId'];
 $entryId = @$_GET['entryId'];
 try
@@ -32,6 +32,25 @@ catch(Exception $ex)
 {
 	header('KalturaSyndication: '.$ex->getMessage());
 	die;
+}
+
+$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
+if( !$syndicationFeedDB )
+{
+	header('KalturaSyndication: Feed Id not found');
+	die;
+}
+
+$partnerId = $syndicationFeedDB->getPartnerId();
+$expiryArr = kConf::hasParam("v3cache_getfeed_expiry") ? kConf::get("v3cache_getfeed_expiry") : array();
+foreach($expiryArr as $item)
+{
+	if ($item["key"] == "partnerId" && $item["value"] == $partnerId ||
+		$item["key"] == "feedId" && $item["value"] == $feedId)
+	{
+		$cache->setExpiry($item["expiry"]);
+		break;
+	}
 }
 
 $end = microtime(true);
