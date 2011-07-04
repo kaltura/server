@@ -4,7 +4,7 @@
     <TestCaseData testCaseInstanceName="testAdd with data set #0">
       <Input name="userRole" type="KalturaUserRole" key="">
         <id></id>
-        <name></name>
+        <name type="string">"Test User Role"</name>
         <description></description>
         <status></status>
         <partnerId></partnerId>
@@ -15,10 +15,10 @@
       </Input>
       <OutputReference name="output" type="KalturaUserRole" key="object key">
         <id></id>
-        <name></name>
+        <name type="string">"Test User Role"</name>
         <description></description>
-        <status></status>
-        <partnerId></partnerId>
+        <status type="string">1</status>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <permissionNames></permissionNames>
         <tags></tags>
         <createdAt></createdAt>
@@ -31,10 +31,10 @@
       <Input name="userRoleId" type="int" key=""/>
       <OutputReference name="output" type="KalturaUserRole" key="object key">
         <id></id>
-        <name></name>
+        <name type="string">"Test User Role"</name>
         <description></description>
-        <status></status>
-        <partnerId></partnerId>
+        <status type="string">1</status>
+        <partnerId type="string">495804</partnerId>
         <permissionNames></permissionNames>
         <tags></tags>
         <createdAt></createdAt>
@@ -58,10 +58,10 @@
       </Input>
       <OutputReference name="output" type="KalturaUserRole" key="object key">
         <id></id>
-        <name></name>
+        <name type="string">"Test User Role"</name>
         <description></description>
-        <status></status>
-        <partnerId></partnerId>
+        <status type="string">1</status>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <permissionNames></permissionNames>
         <tags></tags>
         <createdAt></createdAt>
@@ -74,10 +74,10 @@
       <Input name="userRoleId" type="int" key=""/>
       <OutputReference name="output" type="KalturaUserRole" key="object key">
         <id></id>
-        <name></name>
+        <name type="string">"Test User Role"</name>
         <description></description>
-        <status></status>
-        <partnerId></partnerId>
+        <status type="string">3</status>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <permissionNames></permissionNames>
         <tags></tags>
         <createdAt></createdAt>
