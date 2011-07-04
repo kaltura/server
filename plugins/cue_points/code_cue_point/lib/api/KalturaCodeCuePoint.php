@@ -14,6 +14,11 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 	 * @var string 
 	 */
 	public $description;
+
+	public function __construct()
+	{
+		$this->type = CodeCuePointPlugin::getApiValue(CodeCuePointType::CODE);
+	}
 	
 	private static $map_between_objects = array
 	(

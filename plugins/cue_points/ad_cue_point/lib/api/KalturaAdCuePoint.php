@@ -32,6 +32,11 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 * @filter gte,lte,order
 	 */
 	public $endTime;
+
+	public function __construct()
+	{
+		$this->type = AdCuePointPlugin::getApiValue(AdCuePointType::AD);
+	}
 	
 	private static $map_between_objects = array
 	(

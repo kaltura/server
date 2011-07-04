@@ -21,6 +21,11 @@ class KalturaAnnotation extends KalturaCuePoint
 	 * @filter gte,lte,order
 	 */
 	public $endTime;
+
+	public function __construct()
+	{
+		$this->type = AnnotationPlugin::getApiValue(AnnotationCuePointType::ANNOTATION);
+	}
 	
 	private static $map_between_objects = array
 	(

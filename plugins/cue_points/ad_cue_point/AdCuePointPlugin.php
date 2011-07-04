@@ -82,4 +82,12 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('CuePointType', $value);
 	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
 }
