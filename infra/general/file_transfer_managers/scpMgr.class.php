@@ -120,7 +120,7 @@ class scpMgr extends kFileTransferMgr
 	// execute the given command on the server
 	private function execCommand($command_str)
 	{
-		$stream = ssh2_exec($this->getConnection(), $command_str, FALSE);
+		$stream = ssh2_exec($this->getConnection(), $command_str);
   		stream_set_blocking($stream, true);
    		$output = stream_get_contents($stream);
    		fclose($stream);
