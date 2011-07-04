@@ -299,7 +299,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 	    $accessConfig = Zend_Registry::get('config')->access;
 		$pages = $navigation->getPages();
-		$firstAllowed = array();
+
 		foreach($pages as $page)
 		{
 			$controller = $page->get('controller');
