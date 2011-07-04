@@ -710,10 +710,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		if($testReturnedType)
 		{
-			//Tests who needs the name and not the id
+			//Tests who needs the name and not the id currently only permission service
 			if($serviceName == 'permission')
 				$this->write("		return \$resultObject->name;", $isBase);
-			else //The rest use the id 
+			else //The rest use the id (currently...)
 				$this->write("		return \$resultObject->id;", $isBase);
 		}
 			
