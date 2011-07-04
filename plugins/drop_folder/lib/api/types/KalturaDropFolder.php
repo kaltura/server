@@ -196,7 +196,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
-		$this->validateForUpdate($object_to_fill); // will check that not updatable properties are not set 
+		$this->validateForUpdate($object_to_fill, $props_to_skip); // will check that not updatable properties are not set 
 		
 		$dbUpdatedHandlerConfig = null;
 		if (!is_null($this->fileHandlerConfig)) {
@@ -214,7 +214,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		$this->validateForInsert(); // will check that not insertable properties are not set
+		$this->validateForInsert($props_to_skip); // will check that not insertable properties are not set
 		$this->fileHandlerConfig->validateForInsert();
 		
 		$result = $this->toObject($object_to_fill, $props_to_skip);

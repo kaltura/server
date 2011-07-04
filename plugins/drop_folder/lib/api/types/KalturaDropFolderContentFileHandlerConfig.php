@@ -46,13 +46,13 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 	}
 	
 
-	public function validateForInsert()
+	public function validateForInsert($propertiesToSkip = array())
 	{
 		if (is_null($this->contentMatchPolicy)) {
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, get_class($this).'::contentMatchPolicy');
 		}
 		
-		return parent::validateForInsert();
+		return parent::validateForInsert($propertiesToSkip);
 	}
 	
 	
@@ -62,7 +62,7 @@ class KalturaDropFolderContentFileHandlerConfig extends KalturaDropFolderFileHan
 			$this->slugRegex = DropFolderContentFileHandler::DEFAULT_SLUG_REGEX;
 		}
 		
-		return $this->toObject($object_to_fill, $props_to_skip);
+		return $this->toInsertableObject($object_to_fill, $props_to_skip);
 	}	
 	
 }
