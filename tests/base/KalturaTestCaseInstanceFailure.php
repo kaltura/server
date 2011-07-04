@@ -246,7 +246,7 @@ class KalturaTestCaseInstanceFailure
 					$idType = get_class($id);
 					
 					$id = "not a string but $idType";
-				} 
+				}
 					
 				$node->setAttribute($type."Id", $id);
 			}
