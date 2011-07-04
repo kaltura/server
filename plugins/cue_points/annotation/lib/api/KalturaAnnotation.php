@@ -70,18 +70,18 @@ class KalturaAnnotation extends KalturaCuePoint
 		}
 	}
 	
-	public function validateForInsert()
+	public function validateForInsert($propertiesToSkip = array())
 	{
-		parent::validateForInsert();
+		parent::validateForInsert($propertiesToSkip);
 		
 		$this->validateParentId();
 	}
 	
-	public function validateForUpdate($source_object)
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		if($this->parentId !== null)
-			$this->validateParentId($source_object->getId());
+			$this->validateParentId($sourceObject->getId());
 			
-		return parent::validateForUpdate($source_object);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
