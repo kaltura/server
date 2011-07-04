@@ -7,19 +7,19 @@
         <parentId></parentId>
         <depth></depth>
         <partnerId></partnerId>
-        <name></name>
+        <name type="string">Test Category</name>
         <fullName></fullName>
         <entriesCount></entriesCount>
         <createdAt></createdAt>
       </Input>
       <OutputReference name="output" type="KalturaCategory" key="object key">
         <id></id>
-        <parentId></parentId>
-        <depth></depth>
-        <partnerId></partnerId>
-        <name></name>
-        <fullName></fullName>
-        <entriesCount></entriesCount>
+        <parentId type="string">0</parentId>
+        <depth type="string">0</depth>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Category</name>
+        <fullName type="string">Test Category</fullName>
+        <entriesCount type="string">0</entriesCount>
         <createdAt></createdAt>
       </OutputReference>
     </TestCaseData>
@@ -29,12 +29,12 @@
       <Input name="id" type="int" key=""/>
       <OutputReference name="output" type="KalturaCategory" key="object key">
         <id></id>
-        <parentId></parentId>
-        <depth></depth>
-        <partnerId></partnerId>
-        <name></name>
-        <fullName></fullName>
-        <entriesCount></entriesCount>
+        <parentId type="string">0</parentId>
+        <depth type="string">0</depth>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Category</name>
+        <fullName type="string">Test Category</fullName>
+        <entriesCount type="string">0</entriesCount>
         <createdAt></createdAt>
       </OutputReference>
     </TestCaseData>
@@ -54,12 +54,12 @@
       </Input>
       <OutputReference name="output" type="KalturaCategory" key="object key">
         <id></id>
-        <parentId></parentId>
-        <depth></depth>
-        <partnerId></partnerId>
-        <name></name>
-        <fullName></fullName>
-        <entriesCount></entriesCount>
+        <parentId type="string">0</parentId>
+        <depth type="string">0</depth>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Category</name>
+        <fullName type="string">Test Category</fullName>
+        <entriesCount type="string">0</entriesCount>
         <createdAt></createdAt>
       </OutputReference>
     </TestCaseData>
