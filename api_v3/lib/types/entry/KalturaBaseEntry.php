@@ -426,26 +426,26 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForInsert()
 	 */
-	public function validateForInsert()
+	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		$this->validateObjectsExist();
-		return parent::validateForInsert();
+		return parent::validateForInsert($propertiesToSkip);
 	}
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUpdate($source_object)
 	 */
-	public function validateForUpdate($source_object)
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
-		if(!is_null($this->conversionProfileId) && $source_object->getStatus() != entryStatus::NO_CONTENT)
-			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $source_object->getStatus());
+		if(!is_null($this->conversionProfileId) && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
 				
 		$this->validateObjectsExist();
 		
-		return parent::validateForUpdate($source_object);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
 	public function getExtraFilters()
