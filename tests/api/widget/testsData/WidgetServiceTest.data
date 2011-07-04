@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="WidgetServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="widget" type="KalturaWidget" key="">
+        <id></id>
+        <sourceWidgetId></sourceWidgetId>
+        <rootWidgetId></rootWidgetId>
+        <partnerId></partnerId>
+        <entryId></entryId>
+        <uiConfId type="string">@UI_CONF_ID@</uiConfId>
+        <securityType></securityType>
+        <securityPolicy></securityPolicy>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <widgetHTML></widgetHTML>
+      </Input>
+      <OutputReference name="output" type="KalturaWidget" key="object key">
+        <id></id>
+        <sourceWidgetId></sourceWidgetId>
+        <rootWidgetId></rootWidgetId>
+        <partnerId type="string">495803</partnerId>
+        <entryId></entryId>
+        <uiConfId type="string">3549195</uiConfId>
+        <securityType></securityType>
+        <securityPolicy></securityPolicy>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <widgetHTML type="string" dbValue="&lt;object name=&quot;kaltura_player_1309783930&quot; id=&quot;kaltura_player_1309783930&quot; type=&quot;application/x-shockwave-flash&quot; allowScriptAccess=&quot;always&quot; allowNetworking=&quot;all&quot; allowFullScreen=&quot;true&quot; height=&quot;335&quot; width=&quot;400&quot; data=&quot;http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_yy0gtshc/uiconf_id/200&quot;&gt;&lt;param name=&quot;allowScriptAccess&quot; value=&quot;always&quot; /&gt;&lt;param name=&quot;allowNetworking&quot; value=&quot;all&quot; /&gt;&lt;param name=&quot;allowFullScreen&quot; value=&quot;true&quot; /&gt;&lt;param name=&quot;bgcolor&quot; value=&quot;#000000&quot; /&gt;&lt;param name=&quot;movie&quot; value=&quot;http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_yy0gtshc/uiconf_id/200&quot;/&gt;&lt;param name=&quot;flashVars&quot; value=&quot;&quot;/&gt;&lt;a href=&quot;http://corp.kaltura.com&quot;&gt;video platform&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/video_platform/video_management&quot;&gt;video management&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/solutions/video_solution&quot;&gt;video solutions&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/video_platform/video_publishing&quot;&gt;video player&lt;/a&gt;&lt;/object&gt;">&lt;object name="kaltura_player_1309783958" id="kaltura_player_1309783958" type="application/x-shockwave-flash" allowScriptAccess="always" allowNetworking="all" allowFullScreen="true" height="335" width="400" data="http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_u3qha9n3/uiconf_id/200"&gt;&lt;param name="allowScriptAccess" value="always" /&gt;&lt;param name="allowNetworking" value="all" /&gt;&lt;param name="allowFullScreen" value="true" /&gt;&lt;param name="bgcolor" value="#000000" /&gt;&lt;param name="movie" value="http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_u3qha9n3/uiconf_id/200"/&gt;&lt;param name="flashVars" value=""/&gt;&lt;a href="http://corp.kaltura.com"&gt;video platform&lt;/a&gt;&lt;a href="http://corp.kaltura.com/video_platform/video_management"&gt;video management&lt;/a&gt;&lt;a href="http://corp.kaltura.com/solutions/video_solution"&gt;video solutions&lt;/a&gt;&lt;a href="http://corp.kaltura.com/video_platform/video_publishing"&gt;video player&lt;/a&gt;&lt;/object&gt;</widgetHTML>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="string" key=""/>
+      <Input name="widget" type="KalturaWidget" key="">
+        <id></id>
+        <sourceWidgetId></sourceWidgetId>
+        <rootWidgetId></rootWidgetId>
+        <partnerId></partnerId>
+        <entryId></entryId>
+        <uiConfId></uiConfId>
+        <securityType></securityType>
+        <securityPolicy></securityPolicy>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <widgetHTML></widgetHTML>
+      </Input>
+      <OutputReference name="output" type="KalturaWidget" key="object key">
+        <id></id>
+        <sourceWidgetId></sourceWidgetId>
+        <rootWidgetId></rootWidgetId>
+        <partnerId type="string" dbValue="495791">495803</partnerId>
+        <entryId></entryId>
+        <uiConfId type="string" dbValue="200">3549195</uiConfId>
+        <securityType></securityType>
+        <securityPolicy></securityPolicy>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <widgetHTML type="string" dbValue="&lt;object name=&quot;kaltura_player_1309784115&quot; id=&quot;kaltura_player_1309784115&quot; type=&quot;application/x-shockwave-flash&quot; allowScriptAccess=&quot;always&quot; allowNetworking=&quot;all&quot; allowFullScreen=&quot;true&quot; height=&quot;335&quot; width=&quot;400&quot; data=&quot;http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ey4evs2b/uiconf_id/200&quot;&gt;&lt;param name=&quot;allowScriptAccess&quot; value=&quot;always&quot; /&gt;&lt;param name=&quot;allowNetworking&quot; value=&quot;all&quot; /&gt;&lt;param name=&quot;allowFullScreen&quot; value=&quot;true&quot; /&gt;&lt;param name=&quot;bgcolor&quot; value=&quot;#000000&quot; /&gt;&lt;param name=&quot;movie&quot; value=&quot;http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ey4evs2b/uiconf_id/200&quot;/&gt;&lt;param name=&quot;flashVars&quot; value=&quot;&quot;/&gt;&lt;a href=&quot;http://corp.kaltura.com&quot;&gt;video platform&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/video_platform/video_management&quot;&gt;video management&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/solutions/video_solution&quot;&gt;video solutions&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/video_platform/video_publishing&quot;&gt;video player&lt;/a&gt;&lt;/object&gt;">&lt;object name="kaltura_player_1309784131" id="kaltura_player_1309784131" type="application/x-shockwave-flash" allowScriptAccess="always" allowNetworking="all" allowFullScreen="true" height="335" width="400" data="http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ldukro01/uiconf_id/200"&gt;&lt;param name="allowScriptAccess" value="always" /&gt;&lt;param name="allowNetworking" value="all" /&gt;&lt;param name="allowFullScreen" value="true" /&gt;&lt;param name="bgcolor" value="#000000" /&gt;&lt;param name="movie" value="http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ldukro01/uiconf_id/200"/&gt;&lt;param name="flashVars" value=""/&gt;&lt;a href="http://corp.kaltura.com"&gt;video platform&lt;/a&gt;&lt;a href="http://corp.kaltura.com/video_platform/video_management"&gt;video management&lt;/a&gt;&lt;a href="http://corp.kaltura.com/solutions/video_solution"&gt;video solutions&lt;/a&gt;&lt;a href="http://corp.kaltura.com/video_platform/video_publishing"&gt;video player&lt;/a&gt;&lt;/object&gt;</widgetHTML>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="id" type="string" key=""/>
+      <OutputReference name="output" type="KalturaWidget" key="object key">
+        <id></id>
+        <sourceWidgetId></sourceWidgetId>
+        <rootWidgetId></rootWidgetId>
+        <partnerId type="string" dbValue="495791">495803</partnerId>
+        <entryId></entryId>
+        <uiConfId type="string" dbValue="200">3549195</uiConfId>
+        <securityType></securityType>
+        <securityPolicy></securityPolicy>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <widgetHTML type="string" dbValue="&lt;object name=&quot;kaltura_player_1309784115&quot; id=&quot;kaltura_player_1309784115&quot; type=&quot;application/x-shockwave-flash&quot; allowScriptAccess=&quot;always&quot; allowNetworking=&quot;all&quot; allowFullScreen=&quot;true&quot; height=&quot;335&quot; width=&quot;400&quot; data=&quot;http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ey4evs2b/uiconf_id/200&quot;&gt;&lt;param name=&quot;allowScriptAccess&quot; value=&quot;always&quot; /&gt;&lt;param name=&quot;allowNetworking&quot; value=&quot;all&quot; /&gt;&lt;param name=&quot;allowFullScreen&quot; value=&quot;true&quot; /&gt;&lt;param name=&quot;bgcolor&quot; value=&quot;#000000&quot; /&gt;&lt;param name=&quot;movie&quot; value=&quot;http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ey4evs2b/uiconf_id/200&quot;/&gt;&lt;param name=&quot;flashVars&quot; value=&quot;&quot;/&gt;&lt;a href=&quot;http://corp.kaltura.com&quot;&gt;video platform&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/video_platform/video_management&quot;&gt;video management&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/solutions/video_solution&quot;&gt;video solutions&lt;/a&gt;&lt;a href=&quot;http://corp.kaltura.com/video_platform/video_publishing&quot;&gt;video player&lt;/a&gt;&lt;/object&gt;">&lt;object name="kaltura_player_1309784131" id="kaltura_player_1309784131" type="application/x-shockwave-flash" allowScriptAccess="always" allowNetworking="all" allowFullScreen="true" height="335" width="400" data="http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ldukro01/uiconf_id/200"&gt;&lt;param name="allowScriptAccess" value="always" /&gt;&lt;param name="allowNetworking" value="all" /&gt;&lt;param name="allowFullScreen" value="true" /&gt;&lt;param name="bgcolor" value="#000000" /&gt;&lt;param name="movie" value="http://devtests.kaltura.co.cc/index.php/kwidget/wid/0_ldukro01/uiconf_id/200"/&gt;&lt;param name="flashVars" value=""/&gt;&lt;a href="http://corp.kaltura.com"&gt;video platform&lt;/a&gt;&lt;a href="http://corp.kaltura.com/video_platform/video_management"&gt;video management&lt;/a&gt;&lt;a href="http://corp.kaltura.com/solutions/video_solution"&gt;video solutions&lt;/a&gt;&lt;a href="http://corp.kaltura.com/video_platform/video_publishing"&gt;video player&lt;/a&gt;&lt;/object&gt;</widgetHTML>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaWidgetFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <sourceWidgetIdEqual></sourceWidgetIdEqual>
+        <rootWidgetIdEqual></rootWidgetIdEqual>
+        <partnerIdEqual></partnerIdEqual>
+        <entryIdEqual></entryIdEqual>
+        <uiConfIdEqual></uiConfIdEqual>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+        <updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+        <partnerDataLike></partnerDataLike>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaWidgetListResponse" key="object key">
+        <Array>
+          <objects type="array" dbValue="KalturaWidget" key="0">KalturaWidget</objects>
+          <objects type="array" dbValue="" key="1">KalturaWidget</objects>
+        </Array>
+        <totalCount type="string" dbValue="1">2</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>
