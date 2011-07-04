@@ -2,7 +2,7 @@
 <TestCaseData testCaseName="FlavorAssetServiceTest">
   <TestProcedureData testProcedureName="testAdd">
     <TestCaseData testCaseInstanceName="testAdd with data set #0">
-      <Input name="entryId" type="string" key=""/>
+      <Input name="entryId" type="string" key="@DEFAULT_ENTRY_ID@"/>
       <Input name="flavorAsset" type="KalturaFlavorAsset" key="">
         <flavorParamsId></flavorParamsId>
         <width></width>
@@ -28,20 +28,20 @@
       </Input>
       <OutputReference name="output" type="KalturaFlavorAsset" key="object key">
         <flavorParamsId></flavorParamsId>
-        <width></width>
-        <height></height>
-        <bitrate></bitrate>
-        <frameRate></frameRate>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <bitrate type="string">0</bitrate>
+        <frameRate type="string">0</frameRate>
         <isOriginal></isOriginal>
         <isWeb></isWeb>
         <containerFormat></containerFormat>
         <videoCodecId></videoCodecId>
         <id></id>
-        <entryId></entryId>
-        <partnerId></partnerId>
-        <status></status>
+        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">0</status>
         <version></version>
-        <size></size>
+        <size type="string">0</size>
         <tags></tags>
         <fileExt></fileExt>
         <createdAt></createdAt>
@@ -78,21 +78,21 @@
         <description></description>
       </Input>
       <OutputReference name="output" type="KalturaFlavorAsset" key="object key">
-        <flavorParamsId></flavorParamsId>
-        <width></width>
-        <height></height>
-        <bitrate></bitrate>
-        <frameRate></frameRate>
+        <flavorParamsId type="string">0</flavorParamsId>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <bitrate type="string">0</bitrate>
+        <frameRate type="string">0</frameRate>
         <isOriginal></isOriginal>
         <isWeb></isWeb>
         <containerFormat></containerFormat>
         <videoCodecId></videoCodecId>
         <id></id>
-        <entryId></entryId>
-        <partnerId></partnerId>
-        <status></status>
+        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">0</status>
         <version></version>
-        <size></size>
+        <size type="string">0</size>
         <tags></tags>
         <fileExt></fileExt>
         <createdAt></createdAt>
@@ -106,21 +106,21 @@
     <TestCaseData testCaseInstanceName="testGet with data set #0">
       <Input name="id" type="string" key=""/>
       <OutputReference name="output" type="KalturaFlavorAsset" key="object key">
-        <flavorParamsId></flavorParamsId>
-        <width></width>
-        <height></height>
-        <bitrate></bitrate>
-        <frameRate></frameRate>
+        <flavorParamsId type="string">0</flavorParamsId>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <bitrate type="string">0</bitrate>
+        <frameRate type="string">0</frameRate>
         <isOriginal></isOriginal>
         <isWeb></isWeb>
         <containerFormat></containerFormat>
         <videoCodecId></videoCodecId>
         <id></id>
-        <entryId></entryId>
-        <partnerId></partnerId>
-        <status></status>
+        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">0</status>
         <version></version>
-        <size></size>
+        <size type="string">0</size>
         <tags></tags>
         <fileExt></fileExt>
         <createdAt></createdAt>
@@ -158,7 +158,7 @@
         <pageIndex></pageIndex>
       </Input>
       <OutputReference name="output" type="KalturaFlavorAssetListResponse" key="object key">
-        <Array/>
+        <objects></objects>
         <totalCount type="string">0</totalCount>
       </OutputReference>
     </TestCaseData>
