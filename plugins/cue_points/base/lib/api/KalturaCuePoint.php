@@ -244,9 +244,10 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 			throw new KalturaAPIException(KalturaCuePointErrors::START_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->startTime, $dbEntry->getLengthInMsecs());
 	}
 	
-	public function validateForInsert()
+	public function validateForInsert($propertiesToSkip = array())
 	{
-		parent::validateForInsert();
+		$propertiesToSkip[] = 'media';
+		parent::validateForInsert($propertiesToSkip);
 		
 		$this->validatePropertyNotNull("entryId");
 		$this->validateEntryId();
@@ -260,7 +261,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 			$this->validatePropertyMaxLength("tags", CuePointPeer::MAX_TAGS_LENGTH);
 	}
 	
-	public function validateForUpdate($source_object)
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		if($this->text !== null)
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
@@ -269,15 +270,16 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 			$this->validatePropertyMaxLength("tags", CuePointPeer::MAX_TAGS_LENGTH);
 		
 		if($this->entryId !== null)
-			$this->validateEntryId($source_object->getId());
+			$this->validateEntryId($sourceObject->getId());
 		
 		if($this->startTime !== null)
-			$this->validateStartTime($source_object->getId());
+			$this->validateStartTime($sourceObject->getId());
 		
 		if($this->endTime !== null)
-			$this->validateEndTime($source_object->getId());
+			$this->validateEndTime($sourceObject->getId());
 					
-		return parent::validateForUpdate($source_object);
+		$propertiesToSkip[] = 'media';
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
 	/**
