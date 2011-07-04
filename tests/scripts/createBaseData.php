@@ -1,9 +1,11 @@
 <?php
 require_once dirname(__FILE__) . '/../bootstrap.php';
 
-$serviceUrl = 'http://localhost/'; 
+$serviceUrl = 'http://localhost/';  //Default url is local host if no prameter is given
 if(isset($argv[1]))
 	$serviceUrl = $argv[1];
+else
+	print("Service url wasn't inserted using default: http://localhost/");
 
 $config = new KalturaConfiguration();
 //$config->serviceUrl = 'http://hudsontest2.kaltura.dev/';
@@ -16,11 +18,23 @@ $partner->name = 'Test Partner';
 $partner->adminName = 'Test admin name'; 
 $partner->adminEmail = "test@mailinator.com";
 $partner->description = "partner for tests";
-$results = $client->partner->register($partner, $cmsPassword);
 
+$newPartner = $client->partner->register($partner, $cmsPassword); //create the new test partner
+
+print("New test partner is: " . print_r($newPartner, true));
+
+//Save the partner id into the global data file
 KalturaGlobalData::setData("@SERVICE_URL@", $config->serviceUrl);
-KalturaGlobalData::setData("@TEST_PARTNER_ID@", $results->id);
-KalturaGlobalData::setData("@TEST_PARTNER_ADMIN_SECRET@", $results->adminSecret);
-KalturaGlobalData::setData("@TEST_PARTNER_SECRET@", $results->secret);
+KalturaGlobalData::setData("@TEST_PARTNER_ID@", $newPartner->id);
+KalturaGlobalData::setData("@TEST_PARTNER_ADMIN_SECRET@", $newPartner->adminSecret);
+KalturaGlobalData::setData("@TEST_PARTNER_SECRET@", $newPartner->secret);
 
-print("Results are: " . print_r($results,true));
+$config->partnerId = $newPartner->id; //Set the new test partner id
+$client = new KalturaClient($config);
+
+$ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType::ADMIN, $newPartner->id, null, null);
+$client->setKs($ks);
+
+$uiConfs = $client->uiConf->listAction();
+KalturaGlobalData::setData("@UI_CONF_ID@", $uiConfs->objects[0]->id);
+
