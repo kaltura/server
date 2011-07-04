@@ -13,8 +13,8 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-class CuePointPeer extends BaseCuePointPeer {
-	
+class CuePointPeer extends BaseCuePointPeer 
+{
 	const MAX_TEXT_LENGTH = 32700;
 	const MAX_TAGS_LENGTH = 255;
 	
@@ -23,6 +23,12 @@ class CuePointPeer extends BaseCuePointPeer {
 	const STR_ENTRY_ID = 'cue_point.STR_ENTRY_ID';
 	const STR_CUE_POINT_ID = 'cue_point.STR_CUE_POINT_ID';
 	
+	// cache classes by their type
+	protected static $class_types_cache = array();
+	
+	/* (non-PHPdoc)
+	 * @see BaseCuePointPeer::setDefaultCriteriaFilter()
+	 */
 	public static function setDefaultCriteriaFilter()
 	{
 		if(self::$s_criteria_filter == null)
@@ -51,5 +57,28 @@ class CuePointPeer extends BaseCuePointPeer {
 		}
 		self::$s_criteria_filter->setFilter($c);
 	}
-	
-} // CuePointPeer
+
+	/* (non-PHPdoc)
+	 * @see BaseCuePointPeer::getOMClass()
+	 */
+	public static function getOMClass($row, $colnum)
+	{
+		if($row)
+		{
+			$colnum += self::translateFieldName(self::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+			$assetType = $row[$colnum];
+			if(isset(self::$class_types_cache[$assetType]))
+				return self::$class_types_cache[$assetType];
+				
+			$extendedCls = KalturaPluginManager::getObjectClass(self::OM_CLASS, $assetType);
+			if($extendedCls)
+			{
+				self::$class_types_cache[$assetType] = $extendedCls;
+				return $extendedCls;
+			}
+			self::$class_types_cache[$assetType] = self::OM_CLASS;
+		}
+			
+		return self::OM_CLASS;
+	}
+}
