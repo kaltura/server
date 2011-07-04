@@ -21,8 +21,6 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	
 	/**
 	 * @var KalturaAdType 
-	 * @insertonly
-	 * @filter eq,in
 	 * @requiresPermission insert,update
 	 */
 	public $adType;
@@ -47,7 +45,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	
 	private static $map_between_objects = array
 	(
-		"providerType",
+		"providerType" => "subType",
 		"sourceUrl",
 		"adType",
 		"title" => "name",
