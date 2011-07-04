@@ -16,7 +16,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	/**
 	 * @var KalturaCuePointType
 	 * @filter eq,in
-	 * @insertonly
+	 * @readonly
 	 */
 	public $type;
 	
