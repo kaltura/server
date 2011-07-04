@@ -34,7 +34,7 @@
         <name type="string">"Test User Role"</name>
         <description></description>
         <status type="string">1</status>
-        <partnerId type="string">495804</partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <permissionNames></permissionNames>
         <tags></tags>
         <createdAt></createdAt>
