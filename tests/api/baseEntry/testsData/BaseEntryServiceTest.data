@@ -4,7 +4,7 @@
     <TestCaseData testCaseInstanceName="testAdd with data set #0">
       <Input name="entry" type="KalturaBaseEntry" key="">
         <id></id>
-        <name></name>
+        <name type="string">"Test Entry</name>
         <description></description>
         <partnerId></partnerId>
         <userId></userId>
@@ -43,9 +43,9 @@
       <Input name="type" type="KalturaEntryType" key="-1"/>
       <OutputReference name="output" type="KalturaBaseEntry" key="object key">
         <id></id>
-        <name type="string" dbValue="495791_1309769332">495791_1309783767</name>
+        <name type="string">"Test Entry</name>
         <description></description>
-        <partnerId type="string">495791</partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
@@ -63,11 +63,11 @@
         <groupId></groupId>
         <partnerData></partnerData>
         <downloadUrl></downloadUrl>
-        <searchText type="string" dbValue="  495791_1309769332 ">  495791_1309783767 </searchText>
+        <searchText type="string">  Test Entry </searchText>
         <licenseType type="string">-1</licenseType>
         <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string">385264</accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
@@ -87,38 +87,38 @@
       <Input name="version" type="int" key="-1"/>
       <OutputReference name="output" type="KalturaBaseEntry" key="object key">
         <id></id>
-        <name></name>
+        <name type="string">"Test Entry</name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
         <categories></categories>
         <categoriesIds></categoriesIds>
-        <status></status>
-        <moderationStatus></moderationStatus>
-        <moderationCount></moderationCount>
+        <status type="string">7</status>
+        <moderationStatus type="string">6</moderationStatus>
+        <moderationCount type="string">0</moderationCount>
         <type></type>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <rank></rank>
-        <totalRank></totalRank>
-        <votes></votes>
+        <rank type="string">0</rank>
+        <totalRank type="string">0</totalRank>
+        <votes type="string">0</votes>
         <groupId></groupId>
         <partnerData></partnerData>
         <downloadUrl></downloadUrl>
-        <searchText></searchText>
-        <licenseType></licenseType>
-        <version></version>
+        <searchText type="string">  Test Entry </searchText>
+        <licenseType type="string">-1</licenseType>
+        <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId></accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
         <replacingEntryId></replacingEntryId>
         <replacedEntryId></replacedEntryId>
-        <replacementStatus></replacementStatus>
-        <partnerSortValue></partnerSortValue>
+        <replacementStatus type="string">0</replacementStatus>
+        <partnerSortValue type="string">0</partnerSortValue>
         <conversionProfileId></conversionProfileId>
         <rootEntryId></rootEntryId>
         <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
@@ -168,38 +168,38 @@
       </Input>
       <OutputReference name="output" type="KalturaBaseEntry" key="object key">
         <id></id>
-        <name></name>
+        <name type="string">"Test Entry</name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
         <categories></categories>
         <categoriesIds></categoriesIds>
-        <status></status>
-        <moderationStatus></moderationStatus>
-        <moderationCount></moderationCount>
+        <status type="string">7</status>
+        <moderationStatus type="string">6</moderationStatus>
+        <moderationCount type="string">0</moderationCount>
         <type></type>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <rank></rank>
-        <totalRank></totalRank>
-        <votes></votes>
+        <rank type="string">0</rank>
+        <totalRank type="string">0</totalRank>
+        <votes type="string">0</votes>
         <groupId></groupId>
         <partnerData></partnerData>
         <downloadUrl></downloadUrl>
-        <searchText></searchText>
-        <licenseType></licenseType>
-        <version></version>
+        <searchText type="string">  Test Entry </searchText>
+        <licenseType type="string">-1</licenseType>
+        <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId></accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
         <replacingEntryId></replacingEntryId>
         <replacedEntryId></replacedEntryId>
-        <replacementStatus></replacementStatus>
-        <partnerSortValue></partnerSortValue>
+        <replacementStatus type="string">0</replacementStatus>
+        <partnerSortValue type="string">0</partnerSortValue>
         <conversionProfileId></conversionProfileId>
         <rootEntryId></rootEntryId>
         <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
