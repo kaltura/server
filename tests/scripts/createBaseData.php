@@ -8,9 +8,9 @@ else
 	print("Service url wasn't inserted using default: http://localhost/");
 
 $config = new KalturaConfiguration();
+$config->serviceUrl = $serviceUrl;
 //$config->serviceUrl = 'http://hudsontest2.kaltura.dev/';
 //$config->serviceUrl = 'http://devtests.kaltura.dev/';
-$config->serviceUrl = $serviceUrl;
 $client = new KalturaClient($config);
 $cmsPassword = 'Roni123!';
 $partner = new KalturaPartner();
@@ -38,3 +38,5 @@ $client->setKs($ks);
 $uiConfs = $client->uiConf->listAction();
 KalturaGlobalData::setData("@UI_CONF_ID@", $uiConfs->objects[0]->id);
 
+$accessControls = $client->accessControl->listAction();
+KalturaGlobalData::setData("@DEFAULT_ACCESS_CONTROL@", $accessControls->objects[0]->id);
