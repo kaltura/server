@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="ConversionProfileServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="conversionProfile" type="KalturaConversionProfile" key="">
+        <id></id>
+        <partnerId></partnerId>
+        <status></status>
+        <name></name>
+        <systemName></systemName>
+        <tags></tags>
+        <description></description>
+        <defaultEntryId></defaultEntryId>
+        <createdAt></createdAt>
+        <flavorParamsIds></flavorParamsIds>
+        <isDefault></isDefault>
+        <isPartnerDefault></isPartnerDefault>
+        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
+        <clipStart></clipStart>
+        <clipDuration></clipDuration>
+        <xslTransformation></xslTransformation>
+        <storageProfileId></storageProfileId>
+      </Input>
+      <OutputReference name="output" type="KalturaConversionProfile" key="object key">
+        <id></id>
+        <partnerId></partnerId>
+        <status></status>
+        <name></name>
+        <systemName></systemName>
+        <tags></tags>
+        <description></description>
+        <defaultEntryId></defaultEntryId>
+        <createdAt></createdAt>
+        <flavorParamsIds></flavorParamsIds>
+        <isDefault></isDefault>
+        <isPartnerDefault></isPartnerDefault>
+        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
+        <clipStart></clipStart>
+        <clipDuration></clipDuration>
+        <xslTransformation></xslTransformation>
+        <storageProfileId></storageProfileId>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="id" type="int" key=""/>
+      <OutputReference name="output" type="KalturaConversionProfile" key="object key">
+        <id></id>
+        <partnerId></partnerId>
+        <status></status>
+        <name></name>
+        <systemName></systemName>
+        <tags></tags>
+        <description></description>
+        <defaultEntryId></defaultEntryId>
+        <createdAt></createdAt>
+        <flavorParamsIds></flavorParamsIds>
+        <isDefault></isDefault>
+        <isPartnerDefault></isPartnerDefault>
+        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
+        <clipStart></clipStart>
+        <clipDuration></clipDuration>
+        <xslTransformation></xslTransformation>
+        <storageProfileId></storageProfileId>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="int" key=""/>
+      <Input name="conversionProfile" type="KalturaConversionProfile" key="">
+        <id></id>
+        <partnerId></partnerId>
+        <status></status>
+        <name></name>
+        <systemName></systemName>
+        <tags></tags>
+        <description></description>
+        <defaultEntryId></defaultEntryId>
+        <createdAt></createdAt>
+        <flavorParamsIds></flavorParamsIds>
+        <isDefault></isDefault>
+        <isPartnerDefault></isPartnerDefault>
+        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
+        <clipStart></clipStart>
+        <clipDuration></clipDuration>
+        <xslTransformation></xslTransformation>
+        <storageProfileId></storageProfileId>
+      </Input>
+      <OutputReference name="output" type="KalturaConversionProfile" key="object key">
+        <id></id>
+        <partnerId></partnerId>
+        <status></status>
+        <name></name>
+        <systemName></systemName>
+        <tags></tags>
+        <description></description>
+        <defaultEntryId></defaultEntryId>
+        <createdAt></createdAt>
+        <flavorParamsIds></flavorParamsIds>
+        <isDefault></isDefault>
+        <isPartnerDefault></isPartnerDefault>
+        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
+        <clipStart></clipStart>
+        <clipDuration></clipDuration>
+        <xslTransformation></xslTransformation>
+        <storageProfileId></storageProfileId>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="id" type="int" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaConversionProfileFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <statusEqual></statusEqual>
+        <statusIn></statusIn>
+        <nameEqual></nameEqual>
+        <systemNameEqual></systemNameEqual>
+        <systemNameIn></systemNameIn>
+        <tagsMultiLikeOr></tagsMultiLikeOr>
+        <tagsMultiLikeAnd></tagsMultiLikeAnd>
+        <defaultEntryIdEqual></defaultEntryIdEqual>
+        <defaultEntryIdIn></defaultEntryIdIn>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaConversionProfileListResponse" key="object key">
+        <Array>
+          <objects type="array" dbValue="KalturaConversionProfile" key="0">KalturaConversionProfile</objects>
+          <objects type="array" dbValue="KalturaConversionProfile" key="1">KalturaConversionProfile</objects>
+          <objects type="array" dbValue="KalturaConversionProfile" key="2">KalturaConversionProfile</objects>
+        </Array>
+        <totalCount type="string">3</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

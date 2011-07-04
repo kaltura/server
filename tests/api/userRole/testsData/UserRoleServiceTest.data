@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="UserRoleServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="userRole" type="KalturaUserRole" key="">
+        <id></id>
+        <name></name>
+        <description></description>
+        <status></status>
+        <partnerId></partnerId>
+        <permissionNames></permissionNames>
+        <tags></tags>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+      </Input>
+      <OutputReference name="output" type="KalturaUserRole" key="object key">
+        <id></id>
+        <name></name>
+        <description></description>
+        <status></status>
+        <partnerId></partnerId>
+        <permissionNames></permissionNames>
+        <tags></tags>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="userRoleId" type="int" key=""/>
+      <OutputReference name="output" type="KalturaUserRole" key="object key">
+        <id></id>
+        <name></name>
+        <description></description>
+        <status></status>
+        <partnerId></partnerId>
+        <permissionNames></permissionNames>
+        <tags></tags>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="userRoleId" type="int" key=""/>
+      <Input name="userRole" type="KalturaUserRole" key="">
+        <id></id>
+        <name></name>
+        <description></description>
+        <status></status>
+        <partnerId></partnerId>
+        <permissionNames></permissionNames>
+        <tags></tags>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+      </Input>
+      <OutputReference name="output" type="KalturaUserRole" key="object key">
+        <id></id>
+        <name></name>
+        <description></description>
+        <status></status>
+        <partnerId></partnerId>
+        <permissionNames></permissionNames>
+        <tags></tags>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="userRoleId" type="int" key=""/>
+      <OutputReference name="output" type="KalturaUserRole" key="object key">
+        <id></id>
+        <name></name>
+        <description></description>
+        <status></status>
+        <partnerId></partnerId>
+        <permissionNames></permissionNames>
+        <tags></tags>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaUserRoleFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <nameEqual></nameEqual>
+        <nameIn></nameIn>
+        <descriptionLike></descriptionLike>
+        <statusEqual></statusEqual>
+        <statusIn></statusIn>
+        <partnerIdEqual></partnerIdEqual>
+        <partnerIdIn></partnerIdIn>
+        <tagsMultiLikeOr></tagsMultiLikeOr>
+        <tagsMultiLikeAnd></tagsMultiLikeAnd>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+        <updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaUserRoleListResponse" key="object key">
+        <Array>
+          <objects type="array" dbValue="KalturaUserRole" key="0">KalturaUserRole</objects>
+          <objects type="array" dbValue="KalturaUserRole" key="1">KalturaUserRole</objects>
+          <objects type="array" dbValue="KalturaUserRole" key="2">KalturaUserRole</objects>
+          <objects type="array" dbValue="KalturaUserRole" key="3">KalturaUserRole</objects>
+          <objects type="array" dbValue="KalturaUserRole" key="4">KalturaUserRole</objects>
+          <objects type="array" dbValue="KalturaUserRole" key="5">KalturaUserRole</objects>
+        </Array>
+        <totalCount type="string">6</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

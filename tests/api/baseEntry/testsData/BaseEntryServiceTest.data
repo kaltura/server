@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="BaseEntryServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="entry" type="KalturaBaseEntry" key="">
+        <id></id>
+        <name></name>
+        <description></description>
+        <partnerId></partnerId>
+        <userId></userId>
+        <tags></tags>
+        <adminTags></adminTags>
+        <categories></categories>
+        <categoriesIds></categoriesIds>
+        <status></status>
+        <moderationStatus></moderationStatus>
+        <moderationCount></moderationCount>
+        <type></type>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <rank></rank>
+        <totalRank></totalRank>
+        <votes></votes>
+        <groupId></groupId>
+        <partnerData></partnerData>
+        <downloadUrl></downloadUrl>
+        <searchText></searchText>
+        <licenseType></licenseType>
+        <version></version>
+        <thumbnailUrl></thumbnailUrl>
+        <accessControlId></accessControlId>
+        <startDate></startDate>
+        <endDate></endDate>
+        <referenceId></referenceId>
+        <replacingEntryId></replacingEntryId>
+        <replacedEntryId></replacedEntryId>
+        <replacementStatus></replacementStatus>
+        <partnerSortValue></partnerSortValue>
+        <conversionProfileId></conversionProfileId>
+        <rootEntryId></rootEntryId>
+        <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
+      </Input>
+      <Input name="type" type="KalturaEntryType" key="-1"/>
+      <OutputReference name="output" type="KalturaBaseEntry" key="object key">
+        <id></id>
+        <name type="string" dbValue="495791_1309769332">495791_1309783767</name>
+        <description></description>
+        <partnerId type="string">495791</partnerId>
+        <userId></userId>
+        <tags></tags>
+        <adminTags></adminTags>
+        <categories></categories>
+        <categoriesIds></categoriesIds>
+        <status type="string">7</status>
+        <moderationStatus type="string">6</moderationStatus>
+        <moderationCount type="string">0</moderationCount>
+        <type></type>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <rank type="string">0</rank>
+        <totalRank type="string">0</totalRank>
+        <votes type="string">0</votes>
+        <groupId></groupId>
+        <partnerData></partnerData>
+        <downloadUrl></downloadUrl>
+        <searchText type="string" dbValue="  495791_1309769332 ">  495791_1309783767 </searchText>
+        <licenseType type="string">-1</licenseType>
+        <version type="string">0</version>
+        <thumbnailUrl></thumbnailUrl>
+        <accessControlId type="string">385264</accessControlId>
+        <startDate></startDate>
+        <endDate></endDate>
+        <referenceId></referenceId>
+        <replacingEntryId></replacingEntryId>
+        <replacedEntryId></replacedEntryId>
+        <replacementStatus type="string">0</replacementStatus>
+        <partnerSortValue type="string">0</partnerSortValue>
+        <conversionProfileId></conversionProfileId>
+        <rootEntryId></rootEntryId>
+        <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="entryId" type="string" key=""/>
+      <Input name="version" type="int" key="-1"/>
+      <OutputReference name="output" type="KalturaBaseEntry" key="object key">
+        <id></id>
+        <name></name>
+        <description></description>
+        <partnerId></partnerId>
+        <userId></userId>
+        <tags></tags>
+        <adminTags></adminTags>
+        <categories></categories>
+        <categoriesIds></categoriesIds>
+        <status></status>
+        <moderationStatus></moderationStatus>
+        <moderationCount></moderationCount>
+        <type></type>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <rank></rank>
+        <totalRank></totalRank>
+        <votes></votes>
+        <groupId></groupId>
+        <partnerData></partnerData>
+        <downloadUrl></downloadUrl>
+        <searchText></searchText>
+        <licenseType></licenseType>
+        <version></version>
+        <thumbnailUrl></thumbnailUrl>
+        <accessControlId></accessControlId>
+        <startDate></startDate>
+        <endDate></endDate>
+        <referenceId></referenceId>
+        <replacingEntryId></replacingEntryId>
+        <replacedEntryId></replacedEntryId>
+        <replacementStatus></replacementStatus>
+        <partnerSortValue></partnerSortValue>
+        <conversionProfileId></conversionProfileId>
+        <rootEntryId></rootEntryId>
+        <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="entryId" type="string" key=""/>
+      <Input name="baseEntry" type="KalturaBaseEntry" key="">
+        <id></id>
+        <name></name>
+        <description></description>
+        <partnerId></partnerId>
+        <userId></userId>
+        <tags></tags>
+        <adminTags></adminTags>
+        <categories></categories>
+        <categoriesIds></categoriesIds>
+        <status></status>
+        <moderationStatus></moderationStatus>
+        <moderationCount></moderationCount>
+        <type></type>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <rank></rank>
+        <totalRank></totalRank>
+        <votes></votes>
+        <groupId></groupId>
+        <partnerData></partnerData>
+        <downloadUrl></downloadUrl>
+        <searchText></searchText>
+        <licenseType></licenseType>
+        <version></version>
+        <thumbnailUrl></thumbnailUrl>
+        <accessControlId></accessControlId>
+        <startDate></startDate>
+        <endDate></endDate>
+        <referenceId></referenceId>
+        <replacingEntryId></replacingEntryId>
+        <replacedEntryId></replacedEntryId>
+        <replacementStatus></replacementStatus>
+        <partnerSortValue></partnerSortValue>
+        <conversionProfileId></conversionProfileId>
+        <rootEntryId></rootEntryId>
+        <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
+      </Input>
+      <OutputReference name="output" type="KalturaBaseEntry" key="object key">
+        <id></id>
+        <name></name>
+        <description></description>
+        <partnerId></partnerId>
+        <userId></userId>
+        <tags></tags>
+        <adminTags></adminTags>
+        <categories></categories>
+        <categoriesIds></categoriesIds>
+        <status></status>
+        <moderationStatus></moderationStatus>
+        <moderationCount></moderationCount>
+        <type></type>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <rank></rank>
+        <totalRank></totalRank>
+        <votes></votes>
+        <groupId></groupId>
+        <partnerData></partnerData>
+        <downloadUrl></downloadUrl>
+        <searchText></searchText>
+        <licenseType></licenseType>
+        <version></version>
+        <thumbnailUrl></thumbnailUrl>
+        <accessControlId></accessControlId>
+        <startDate></startDate>
+        <endDate></endDate>
+        <referenceId></referenceId>
+        <replacingEntryId></replacingEntryId>
+        <replacedEntryId></replacedEntryId>
+        <replacementStatus></replacementStatus>
+        <partnerSortValue></partnerSortValue>
+        <conversionProfileId></conversionProfileId>
+        <rootEntryId></rootEntryId>
+        <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="entryId" type="string" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaBaseEntryFilter" key="">
+        <freeText></freeText>
+        <isRoot></isRoot>
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <idNotIn></idNotIn>
+        <nameLike></nameLike>
+        <nameMultiLikeOr></nameMultiLikeOr>
+        <nameMultiLikeAnd></nameMultiLikeAnd>
+        <nameEqual></nameEqual>
+        <partnerIdEqual></partnerIdEqual>
+        <partnerIdIn></partnerIdIn>
+        <userIdEqual></userIdEqual>
+        <tagsLike></tagsLike>
+        <tagsMultiLikeOr></tagsMultiLikeOr>
+        <tagsMultiLikeAnd></tagsMultiLikeAnd>
+        <adminTagsLike></adminTagsLike>
+        <adminTagsMultiLikeOr></adminTagsMultiLikeOr>
+        <adminTagsMultiLikeAnd></adminTagsMultiLikeAnd>
+        <categoriesMatchAnd></categoriesMatchAnd>
+        <categoriesMatchOr></categoriesMatchOr>
+        <categoriesIdsMatchAnd></categoriesIdsMatchAnd>
+        <categoriesIdsMatchOr></categoriesIdsMatchOr>
+        <statusEqual></statusEqual>
+        <statusNotEqual></statusNotEqual>
+        <statusIn></statusIn>
+        <statusNotIn></statusNotIn>
+        <moderationStatusEqual></moderationStatusEqual>
+        <moderationStatusNotEqual></moderationStatusNotEqual>
+        <moderationStatusIn></moderationStatusIn>
+        <moderationStatusNotIn></moderationStatusNotIn>
+        <typeEqual></typeEqual>
+        <typeIn></typeIn>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+        <updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+        <groupIdEqual></groupIdEqual>
+        <searchTextMatchAnd></searchTextMatchAnd>
+        <searchTextMatchOr></searchTextMatchOr>
+        <accessControlIdEqual></accessControlIdEqual>
+        <accessControlIdIn></accessControlIdIn>
+        <startDateGreaterThanOrEqual></startDateGreaterThanOrEqual>
+        <startDateLessThanOrEqual></startDateLessThanOrEqual>
+        <startDateGreaterThanOrEqualOrNull></startDateGreaterThanOrEqualOrNull>
+        <startDateLessThanOrEqualOrNull></startDateLessThanOrEqualOrNull>
+        <endDateGreaterThanOrEqual></endDateGreaterThanOrEqual>
+        <endDateLessThanOrEqual></endDateLessThanOrEqual>
+        <endDateGreaterThanOrEqualOrNull></endDateGreaterThanOrEqualOrNull>
+        <endDateLessThanOrEqualOrNull></endDateLessThanOrEqualOrNull>
+        <referenceIdEqual></referenceIdEqual>
+        <referenceIdIn></referenceIdIn>
+        <replacingEntryIdEqual></replacingEntryIdEqual>
+        <replacingEntryIdIn></replacingEntryIdIn>
+        <replacedEntryIdEqual></replacedEntryIdEqual>
+        <replacedEntryIdIn></replacedEntryIdIn>
+        <replacementStatusEqual></replacementStatusEqual>
+        <replacementStatusIn></replacementStatusIn>
+        <partnerSortValueGreaterThanOrEqual></partnerSortValueGreaterThanOrEqual>
+        <partnerSortValueLessThanOrEqual></partnerSortValueLessThanOrEqual>
+        <rootEntryIdEqual></rootEntryIdEqual>
+        <rootEntryIdIn></rootEntryIdIn>
+        <tagsNameMultiLikeOr></tagsNameMultiLikeOr>
+        <tagsAdminTagsMultiLikeOr></tagsAdminTagsMultiLikeOr>
+        <tagsAdminTagsNameMultiLikeOr></tagsAdminTagsNameMultiLikeOr>
+        <tagsNameMultiLikeAnd></tagsNameMultiLikeAnd>
+        <tagsAdminTagsMultiLikeAnd></tagsAdminTagsMultiLikeAnd>
+        <tagsAdminTagsNameMultiLikeAnd></tagsAdminTagsNameMultiLikeAnd>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaBaseEntryListResponse" key="object key">
+        <Array>
+          <objects type="array" dbValue="KalturaDataEntry" key="0">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="1">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="2">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="3">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="4">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="5">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="6">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="7">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="8">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="9">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="10">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="11">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="12">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="13">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="14">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="15">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="16">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="17">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="18">KalturaDataEntry</objects>
+          <objects type="array" dbValue="KalturaDataEntry" key="19">KalturaDataEntry</objects>
+          <objects type="array" dbValue="" key="20">KalturaDataEntry</objects>
+        </Array>
+        <totalCount type="string" dbValue="20">21</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

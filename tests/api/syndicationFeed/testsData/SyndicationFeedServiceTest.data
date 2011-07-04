@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="SyndicationFeedServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="syndicationFeed" type="KalturaBaseSyndicationFeed" key=""/>
+      <OutputReference name="output" type="KalturaBaseSyndicationFeed" key="object key"/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="id" type="string" key=""/>
+      <OutputReference name="output" type="KalturaBaseSyndicationFeed" key="object key"/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="string" key=""/>
+      <Input name="syndicationFeed" type="KalturaBaseSyndicationFeed" key=""/>
+      <OutputReference name="output" type="KalturaBaseSyndicationFeed" key="object key"/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="id" type="string" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaBaseSyndicationFeedFilter" key="">
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaBaseSyndicationFeedListResponse" key="object key">
+        <Array/>
+        <totalCount type="string">0</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

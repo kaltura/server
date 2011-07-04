@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="ThumbAssetServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="entryId" type="string" key=""/>
+      <Input name="thumbAsset" type="KalturaThumbAsset" key="">
+        <thumbParamsId></thumbParamsId>
+        <width></width>
+        <height></height>
+        <id></id>
+        <entryId></entryId>
+        <partnerId></partnerId>
+        <status></status>
+        <version></version>
+        <size></size>
+        <tags></tags>
+        <fileExt></fileExt>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <deletedAt></deletedAt>
+        <description></description>
+      </Input>
+      <OutputReference name="output" type="KalturaThumbAsset" key="object key">
+        <thumbParamsId></thumbParamsId>
+        <width></width>
+        <height></height>
+        <id></id>
+        <entryId></entryId>
+        <partnerId></partnerId>
+        <status></status>
+        <version></version>
+        <size></size>
+        <tags></tags>
+        <fileExt></fileExt>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <deletedAt></deletedAt>
+        <description></description>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="string" key=""/>
+      <Input name="thumbAsset" type="KalturaThumbAsset" key="">
+        <thumbParamsId></thumbParamsId>
+        <width></width>
+        <height></height>
+        <id></id>
+        <entryId></entryId>
+        <partnerId></partnerId>
+        <status></status>
+        <version></version>
+        <size></size>
+        <tags></tags>
+        <fileExt></fileExt>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <deletedAt></deletedAt>
+        <description></description>
+      </Input>
+      <Input name="contentResource" type="KalturaContentResource" key=""/>
+      <OutputReference name="output" type="KalturaThumbAsset" key="object key">
+        <thumbParamsId></thumbParamsId>
+        <width></width>
+        <height></height>
+        <id></id>
+        <entryId></entryId>
+        <partnerId></partnerId>
+        <status></status>
+        <version></version>
+        <size></size>
+        <tags></tags>
+        <fileExt></fileExt>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <deletedAt></deletedAt>
+        <description></description>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="thumbAssetId" type="string" key=""/>
+      <OutputReference name="output" type="KalturaThumbAsset" key="object key">
+        <thumbParamsId></thumbParamsId>
+        <width></width>
+        <height></height>
+        <id></id>
+        <entryId></entryId>
+        <partnerId></partnerId>
+        <status></status>
+        <version></version>
+        <size></size>
+        <tags></tags>
+        <fileExt></fileExt>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <deletedAt></deletedAt>
+        <description></description>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaAssetFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <entryIdEqual></entryIdEqual>
+        <entryIdIn></entryIdIn>
+        <partnerIdEqual></partnerIdEqual>
+        <partnerIdIn></partnerIdIn>
+        <statusEqual></statusEqual>
+        <statusIn></statusIn>
+        <statusNotIn></statusNotIn>
+        <sizeGreaterThanOrEqual></sizeGreaterThanOrEqual>
+        <sizeLessThanOrEqual></sizeLessThanOrEqual>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+        <updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+        <deletedAtGreaterThanOrEqual></deletedAtGreaterThanOrEqual>
+        <deletedAtLessThanOrEqual></deletedAtLessThanOrEqual>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaThumbAssetListResponse" key="object key">
+        <Array/>
+        <totalCount type="string">0</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="thumbAssetId" type="string" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>
