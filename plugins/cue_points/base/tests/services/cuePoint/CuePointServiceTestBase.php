@@ -1,9 +1,9 @@
 <?php
 
 /**
- * annotation service base test case.
+ * cuePoint service base test case.
  */
-abstract class AnnotationServiceTestBase extends KalturaApiTestCase
+abstract class CuePointServiceTestBase extends KalturaApiTestCase
 {
 	/**
 	 * Set up the test initial data
@@ -63,7 +63,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	protected function setUpdateActionTestData(){}
 
 	/**
-	 * Tests annotation->listAction action
+	 * Tests cuePoint->listAction action
 	 * @param KalturaCuePointFilter $filter 
 	 * @param KalturaFilterPager $pager 
 	 * @param KalturaCuePointListResponse $reference 
@@ -72,7 +72,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	 */
 	public function testListAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null, KalturaCuePointListResponse $reference)
 	{
-		$resultObject = $this->client->annotation->listAction($filter, $pager);
+		$resultObject = $this->client->cuePoint->listAction($filter, $pager);
 		$this->assertInternalType('KalturaCuePointListResponse', $resultObject);
 		$this->compareApiObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId'));
 		$this->validateListAction($filter, $pager, $reference);
@@ -86,7 +86,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	}
 
 	/**
-	 * Tests annotation->add action
+	 * Tests cuePoint->add action
 	 * @param KalturaCuePoint $cuePoint 
 	 * @param KalturaCuePoint $reference 
 	 * @return KalturaCuePoint
@@ -94,7 +94,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	 */
 	public function testAdd(KalturaCuePoint $cuePoint, KalturaCuePoint $reference)
 	{
-		$resultObject = $this->client->annotation->add($cuePoint);
+		$resultObject = $this->client->cuePoint->add($cuePoint);
 		$this->assertInternalType('KalturaCuePoint', $resultObject);
 		$this->compareApiObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId'));
 		$this->assertNotNull($resultObject->id);
@@ -110,7 +110,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	}
 
 	/**
-	 * Tests annotation->get action
+	 * Tests cuePoint->get action
 	 * @param string $id 
 	 * @param KalturaCuePoint $reference 
 	 * @depends testAdd
@@ -118,7 +118,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	 */
 	public function testGet($id, KalturaCuePoint $reference)
 	{
-		$resultObject = $this->client->annotation->get($id);
+		$resultObject = $this->client->cuePoint->get($id);
 		$this->assertInternalType('KalturaCuePoint', $resultObject);
 		$this->compareApiObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId'));
 		$this->validateGet($id, $reference);
@@ -132,14 +132,14 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	}
 
 	/**
-	 * Tests annotation->delete action
+	 * Tests cuePoint->delete action
 	 * @param string $id 
 	 * @depends testAdd
 	 * @dataProvider provideData
 	 */
 	public function testDelete($id)
 	{
-		$resultObject = $this->client->annotation->delete($id);
+		$resultObject = $this->client->cuePoint->delete($id);
 		$this->validateDelete($id);
 	}
 
@@ -151,7 +151,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	}
 
 	/**
-	 * Tests annotation->update action
+	 * Tests cuePoint->update action
 	 * @param string $id 
 	 * @param KalturaCuePoint $cuePoint 
 	 * @param KalturaCuePoint $reference 
@@ -160,7 +160,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	 */
 	public function testUpdate($id, KalturaCuePoint $cuePoint, KalturaCuePoint $reference)
 	{
-		$resultObject = $this->client->annotation->update($id, $cuePoint);
+		$resultObject = $this->client->cuePoint->update($id, $cuePoint);
 		$this->assertInternalType('KalturaCuePoint', $resultObject);
 		$this->compareApiObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId'));
 		$this->validateUpdate($id, $cuePoint, $reference);
@@ -191,7 +191,7 @@ abstract class AnnotationServiceTestBase extends KalturaApiTestCase
 	 */
 	public static function suite()
 	{
-		return new KalturaTestSuite('AnnotationServiceTest');
+		return new KalturaTestSuite('CuePointServiceTest');
 	}
 
 }

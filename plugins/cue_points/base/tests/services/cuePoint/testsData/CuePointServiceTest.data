@@ -1,0 +1,118 @@
+<?xml version='1.0'?>
+<TestCaseData testCaseName='CuePointServiceTest'>
+<TestProcedureData testProcedureName='testListAction'>
+	<TestCaseData testCaseInstanceName='testListAction with data set #0'>
+		<Input name = 'filter' type = 'KalturaCuePointFilter' key = ''>
+			<orderBy></orderBy>
+			<advancedSearch>KalturaSearchItem</advancedSearch>
+			<idEqual></idEqual>
+			<idIn></idIn>
+			<typeEqual></typeEqual>
+			<typeIn></typeIn>
+			<statusEqual></statusEqual>
+			<statusIn></statusIn>
+			<entryIdEqual></entryIdEqual>
+			<entryIdIn></entryIdIn>
+			<createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+			<createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+			<updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+			<updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+			<startTimeGreaterThanOrEqual></startTimeGreaterThanOrEqual>
+			<startTimeLessThanOrEqual></startTimeLessThanOrEqual>
+			<userIdEqual></userIdEqual>
+			<userIdIn></userIdIn>
+			<partnerSortValueEqual></partnerSortValueEqual>
+			<partnerSortValueIn></partnerSortValueIn>
+			<partnerSortValueGreaterThanOrEqual></partnerSortValueGreaterThanOrEqual>
+			<partnerSortValueLessThanOrEqual></partnerSortValueLessThanOrEqual>
+			<forceStopEqual></forceStopEqual>
+			<forceStopIn></forceStopIn>
+		</Input>
+		<Input name = 'pager' type = 'KalturaFilterPager' key = ''>
+			<pageSize></pageSize>
+			<pageIndex></pageIndex>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaCuePointListResponse' key = 'object key'>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testAdd'>
+	<TestCaseData testCaseInstanceName='testAdd with data set #0'>
+		<Input name = 'cuePoint' type = 'KalturaCuePoint' key = ''>
+			<type></type>
+			<status></status>
+			<entryId></entryId>
+			<tags></tags>
+			<startTime></startTime>
+			<partnerData></partnerData>
+			<partnerSortValue></partnerSortValue>
+			<forceStop></forceStop>
+			<thumbOffset></thumbOffset>
+			<systemName></systemName>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaCuePoint' key = 'object key'>
+			<type></type>
+			<status></status>
+			<entryId></entryId>
+			<tags></tags>
+			<startTime></startTime>
+			<partnerData></partnerData>
+			<partnerSortValue></partnerSortValue>
+			<forceStop></forceStop>
+			<thumbOffset></thumbOffset>
+			<systemName></systemName>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testGet'>
+	<TestCaseData testCaseInstanceName='testGet with data set #0'>
+		<Input name = 'id' type = 'string' key = ''/>
+		<OutputReference name = 'output' type = 'KalturaCuePoint' key = 'object key'>
+			<type></type>
+			<status></status>
+			<entryId></entryId>
+			<tags></tags>
+			<startTime></startTime>
+			<partnerData></partnerData>
+			<partnerSortValue></partnerSortValue>
+			<forceStop></forceStop>
+			<thumbOffset></thumbOffset>
+			<systemName></systemName>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testDelete'>
+	<TestCaseData testCaseInstanceName='testDelete with data set #0'>
+		<Input name = 'id' type = 'string' key = ''/>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testUpdate'>
+	<TestCaseData testCaseInstanceName='testUpdate with data set #0'>
+		<Input name = 'id' type = 'string' key = ''/>
+		<Input name = 'cuePoint' type = 'KalturaCuePoint' key = ''>
+			<type></type>
+			<status></status>
+			<entryId></entryId>
+			<tags></tags>
+			<startTime></startTime>
+			<partnerData></partnerData>
+			<partnerSortValue></partnerSortValue>
+			<forceStop></forceStop>
+			<thumbOffset></thumbOffset>
+			<systemName></systemName>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaCuePoint' key = 'object key'>
+			<type></type>
+			<status></status>
+			<entryId></entryId>
+			<tags></tags>
+			<startTime></startTime>
+			<partnerData></partnerData>
+			<partnerSortValue></partnerSortValue>
+			<forceStop></forceStop>
+			<thumbOffset></thumbOffset>
+			<systemName></systemName>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+</TestCaseData>

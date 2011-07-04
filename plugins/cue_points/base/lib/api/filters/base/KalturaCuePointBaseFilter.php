@@ -30,6 +30,8 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
 		"forceStopEqual" => "_eq_force_stop",
 		"forceStopIn" => "_in_force_stop",
+		"systemNameEqual" => "_eq_system_name",
+		"systemNameIn" => "_in_system_name",
 	);
 
 	private $order_by_map = array
@@ -208,4 +210,18 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $forceStopIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $systemNameIn;
 }
