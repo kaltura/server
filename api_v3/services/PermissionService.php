@@ -48,7 +48,6 @@ class PermissionService extends KalturaBaseService
 	 */
 	public function addAction(KalturaPermission $permission)
 	{
-		$permission->validateForInsert();
 		$permission->validatePropertyNotNull('name');
 		
 		if (strpos($permission->name, ',') !== false) {
@@ -62,7 +61,6 @@ class PermissionService extends KalturaBaseService
 		if (!$permission->status) {
 			$permission->status = KalturaPermissionStatus::ACTIVE;
 		}
-		
 											
 		$dbPermission = $permission->toInsertableObject();
 		

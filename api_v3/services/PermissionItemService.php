@@ -39,7 +39,6 @@ class PermissionItemService extends KalturaBaseService
 	 */
 	public function addAction(KalturaPermissionItem $permissionItem)
 	{
-		$permissionItem->validateForInsert();
 		$permissionItem->validatePropertyNotNull('permissionId');
 		$permissionItem->validatePropertyNotNull('type');
 							

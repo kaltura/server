@@ -45,7 +45,6 @@ class UserRoleService extends KalturaBaseService
 	 */
 	public function addAction(KalturaUserRole $userRole)
 	{
-		$userRole->validateForInsert();
 		$userRole->validatePropertyNotNull('name');
 		
 		if (!$userRole->status) {
