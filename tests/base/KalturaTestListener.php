@@ -334,7 +334,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 				if(is_null($testProcedureFailures))
 				{
 					//Handle when test name includes the test case name
-					$testProcedureFailures = KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure());
+					$testProcedureFailures = KalturaTestListener::$testCaseFailures->addTestProcedureFailure(new KalturaTestProcedureFailure($testProcedureName));
 				}
 		
 				$testCaseInstance = $testProcedureFailures->getTestCaseInstanceFailure($test->getName(true));
