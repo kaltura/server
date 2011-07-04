@@ -160,6 +160,9 @@ class kConf extends kConfLocal
 				"general_cache_dir" => dirname(__FILE__).'/../../cache/general',
                 'response_cache_dir' => dirname(__FILE__).'/../../cache/response/',
                 
+                // should be overidden in kConfLocal with shared storage folder as a unified cache path (used by getFeed service)
+                "global_cache_dir" => dirname(__FILE__).'/../../cache/', 
+                
                 'query_cache_enabled' => false,
 				"query_cache_invalidate_on_change" => false,
                 
