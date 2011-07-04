@@ -6096,7 +6096,9 @@ Tagged date                      : UTC 2010-03-12 18:26:27
         <ConversionEngines dbValue="1,2,99,3"></ConversionEngines>
         <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
         <CustomData></CustomData>
-        <Array/>
+        <Array>
+			<CommandLines/>
+		</Array>
         <FileExt>flv</FileExt>
         <Deinterlice dbValue="0"></Deinterlice>
         <Rotate dbValue="0"></Rotate>
@@ -6421,7 +6423,9 @@ Tagged date                      : UTC 2010-03-03 05:34:49
         <ConversionEngines dbValue="2,99,3,1"></ConversionEngines>
         <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
         <CustomData></CustomData>
-        <Array/>
+        <Array>
+			<CommandLines/>
+		</Array>
         <FileExt>flv</FileExt>
         <Deinterlice dbValue="0"></Deinterlice>
         <Rotate dbValue="0"></Rotate>
@@ -6881,7 +6885,9 @@ Tagged date                      : UTC 2010-03-03 05:34:49
         <ConversionEngines dbValue="2,99,3,1"></ConversionEngines>
         <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
         <CustomData></CustomData>
-        <Array/>
+		<Array>
+			<CommandLines/>
+		</Array>
         <FileExt>flv</FileExt>
         <Deinterlice dbValue="0"></Deinterlice>
         <Rotate dbValue="0"></Rotate>
@@ -7565,7 +7571,9 @@ Language                         : English
         <ConversionEngines dbValue="1,4,2,99,3"></ConversionEngines>
         <ConversionEnginesExtraParams></ConversionEnginesExtraParams>
         <CustomData></CustomData>
-        <Array/>
+        <Array>
+			<CommandLines/>
+		</Array>
         <FileExt dbValue="flv"></FileExt>
         <Deinterlice dbValue="0"></Deinterlice>
         <Rotate dbValue="0"></Rotate>
