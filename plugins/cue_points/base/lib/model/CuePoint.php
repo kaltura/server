@@ -13,8 +13,10 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-class CuePoint extends BaseCuePoint implements IIndexable {
-
+class CuePoint extends BaseCuePoint implements IIndexable 
+{
+	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
+	
 	public function getChildren()
 	{
 		if ($this->isNew())
@@ -210,4 +212,9 @@ class CuePoint extends BaseCuePoint implements IIndexable {
 			
 		return null;
 	}
+	
+	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}	
+
+	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
+	
 } // CuePoint
