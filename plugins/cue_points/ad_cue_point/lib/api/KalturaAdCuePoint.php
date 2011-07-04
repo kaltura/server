@@ -8,7 +8,6 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	/**
 	 * @var KalturaAdCuePointProviderType
 	 * @insertonly
-	 * @filter eq,in
 	 * @requiresPermission insert,update
 	 */
 	public $providerType;
