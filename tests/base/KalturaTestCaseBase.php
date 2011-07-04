@@ -712,7 +712,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 
 			if($resultObject)
 			{
-				$resultObject->addFailure($this, $e, PHPUnit_Util_Timer::stop());
+				$resultObject->addFailure($this, $e, PHP_Timer::stop());
 			}
 			else
 			{
@@ -723,7 +723,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		}
 		catch (Exception $e) 
 		{
-			$this->getTestResultObject()->addError($this, $e, PHPUnit_Util_Timer::stop());
+			$this->getTestResultObject()->addError($this, $e, PHP_Timer::stop());
 		}
 	}
 
@@ -736,7 +736,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		$this->currentFailure = $kalturaFailure;
 		$this->hasFailures  = true;
-		$this->result->addFailure($this, $kalturaFailure, PHPUnit_Util_Timer::stop());
+		$this->result->addFailure($this, $kalturaFailure, PHP_Timer::stop());
 	}
 	
 	/**
@@ -746,7 +746,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	public function addError(Exception $e)
 	{
-		$this->result->addError($this, $e, PHPUnit_Util_Timer::stop());
+		$this->result->addError($this, $e, PHP_Timer::stop());
 	}
 	
 	/**

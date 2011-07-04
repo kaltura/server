@@ -39,7 +39,7 @@ class KalturaServerTestCase extends KalturaTestCaseBase
 		//Create the xml elements by all fields and their values
 		foreach ($fields as $field)
 		{
-			PHPUnit_Util_Timer::start();
+			PHP_Timer::start();
 			
 			//If the field is in the valid failure list then we skip him 
 			if(in_array($field, $validErrorFields))
