@@ -5,7 +5,7 @@
       <Input name="accessControl" type="KalturaAccessControl" key="">
         <id></id>
         <partnerId></partnerId>
-        <name></name>
+        <name type="string">Test Access Control</name>
         <systemName></systemName>
         <description></description>
         <createdAt></createdAt>
@@ -14,13 +14,15 @@
       </Input>
       <OutputReference name="output" type="KalturaAccessControl" key="object key">
         <id></id>
-        <partnerId></partnerId>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Access Control</name>
         <systemName></systemName>
         <description></description>
         <createdAt></createdAt>
         <isDefault></isDefault>
-        <restrictions type="string">KalturaRestrictionArray</restrictions>
+        <Array>
+			<restrictions/>
+		</Array>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -29,13 +31,15 @@
       <Input name="id" type="int" key=""/>
       <OutputReference name="output" type="KalturaAccessControl" key="object key">
         <id></id>
-        <partnerId></partnerId>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Access Control</name>
         <systemName></systemName>
         <description></description>
         <createdAt></createdAt>
         <isDefault></isDefault>
-        <restrictions type="string">KalturaRestrictionArray</restrictions>
+        <Array>
+			<restrictions/>
+		</Array>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -54,13 +58,15 @@
       </Input>
       <OutputReference name="output" type="KalturaAccessControl" key="object key">
         <id></id>
-        <partnerId></partnerId>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Access Control</name>
         <systemName></systemName>
         <description></description>
         <createdAt></createdAt>
         <isDefault></isDefault>
-        <restrictions type="string">KalturaRestrictionArray</restrictions>
+        <Array>
+			<restrictions/>
+		</Array>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
