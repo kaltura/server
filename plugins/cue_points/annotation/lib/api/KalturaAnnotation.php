@@ -8,6 +8,7 @@ class KalturaAnnotation extends KalturaCuePoint
 	/**
 	 * @var string
 	 * @filter eq,in
+	 * @insertonly
 	 */
 	public $parentId;
 	

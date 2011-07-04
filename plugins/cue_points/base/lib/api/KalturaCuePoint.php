@@ -16,26 +16,28 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	/**
 	 * @var KalturaCuePointType
 	 * @filter eq,in
+	 * @insertonly
 	 */
 	public $type;
 	
 	/**
 	 * @var KalturaCuePointStatus
 	 * @filter eq,in
+	 * @readonly
 	 */
 	public $status;
 	
 	/**
 	 * @var string
 	 * @filter eq,in
-	 * 
+	 * @insertonly
 	 */
 	public $entryId;
 	
 	/**
 	 * @var int
 	 * @readonly
-	 * 
+	 * @readonly
 	 */
 	public $partnerId;
 	
@@ -57,7 +59,6 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $tags;
-	
 
 	/**
 	 * @var int 
@@ -68,7 +69,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 * @filter eq,in
-	 * @readonly
+	 * @requiresPermission insert,update
 	 */
 	public $userId;
 	
@@ -99,8 +100,6 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	 * @filter eq,in
 	 */
 	public $systemName;
-
-	
 	
 	private static $map_between_objects = array
 	(

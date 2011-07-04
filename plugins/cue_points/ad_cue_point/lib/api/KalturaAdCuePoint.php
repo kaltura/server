@@ -7,29 +7,36 @@ class KalturaAdCuePoint extends KalturaCuePoint
 {
 	/**
 	 * @var KalturaAdCuePointProviderType
+	 * @insertonly
 	 * @filter eq,in
+	 * @requiresPermission insert,update
 	 */
 	public $providerType;
 	
 	/**
 	 * @var string
+	 * @requiresPermission insert,update
 	 */
 	public $sourceUrl;
 	
 	/**
 	 * @var KalturaAdType 
+	 * @insertonly
 	 * @filter eq,in
+	 * @requiresPermission insert,update
 	 */
 	public $adType;
 	
 	/**
-	 * @var string 
+	 * @var string
+	 * @requiresPermission insert,update
 	 */
 	public $title;
 	
 	/**
 	 * @var int 
 	 * @filter gte,lte,order
+	 * @requiresPermission insert,update
 	 */
 	public $endTime;
 
