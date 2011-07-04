@@ -88,7 +88,7 @@ class KalturaObject
 		}
 	}
 	
-	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		// enables extension with default empty object
 		if(is_null($object_to_fill))
@@ -131,14 +131,14 @@ class KalturaObject
 	
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
-		$this->validateForUpdate($object_to_fill); // will check that not updatable properties are not set 
+		$this->validateForUpdate($object_to_fill, $props_to_skip); // will check that not updatable properties are not set 
 		
 		return $this->toObject($object_to_fill, $props_to_skip);
 	}
 	
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		$this->validateForInsert(); // will check that not insertable properties are not set 
+		$this->validateForInsert($props_to_skip); // will check that not insertable properties are not set 
 		
 		return $this->toObject($object_to_fill, $props_to_skip);
 	}
@@ -216,7 +216,7 @@ class KalturaObject
 		return get_class($this) . "::" . $propertyName;
 	}
 	
-	public function validateForInsert()
+	public function validateForInsert($propertiesToSkip = array())
 	{
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
 		$properties = $reflector->getProperties();
@@ -228,6 +228,10 @@ class KalturaObject
 		foreach($properties as $property)
 		{
 			$propertyName = $property->getName();
+			
+			if (in_array($propertyName, $propertiesToSkip)) 
+				continue;
+			
 			if ($this->$propertyName !== null)
 			{
 				if ($property->isReadOnly())
@@ -249,7 +253,7 @@ class KalturaObject
 		}
 	}
 	
-	public function validateForUpdate($source_object)
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$updatableProperties = array();
 		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
@@ -263,11 +267,14 @@ class KalturaObject
 		{
 			$propertyName = $property->getName();
 			
+			if (in_array($propertyName, $propertiesToSkip)) 
+				continue;
+			
 			if ($this->$propertyName !== null)
 			{
 				// check if property value is being changed - if not, just continue to the next
 				$objectPropertyName = $this->getObjectPropertyName($propertyName);
-				$getter_callback = array ( $source_object ,"get{$objectPropertyName}"  );
+				$getter_callback = array ( $sourceObject ,"get{$objectPropertyName}"  );
 				if (is_callable($getter_callback))
             	{
                 	$value = call_user_func($getter_callback);
