@@ -90,7 +90,7 @@ class CuePoint extends BaseCuePoint implements IIndexable
 		if ($this->isNew())
 			$this->setId($this->calculateId());
 			
-		parent::save($con);
+		return parent::save($con);
 	}
 	
 	public function postUpdate(PropelPDO $con = null)
