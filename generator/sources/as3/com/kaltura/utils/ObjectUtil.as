@@ -160,5 +160,18 @@ package com.kaltura.utils
 			return ob;
 		}
 		
+		/**
+		 * Copy attributes from source object to target object 
+		 * @param source
+		 * @param target
+		 * 
+		 */		
+		public static function copyObject(source:Object, target:Object):void {
+			var atts:Array = getObjectAllKeys(source);
+			for (var i:int = 0; i< atts.length; i++) {
+				target[atts[i]] = source[atts[i]];
+			} 
+		}
+		
 	}
 }
