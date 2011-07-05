@@ -2,27 +2,93 @@
 <TestCaseData testCaseName="PermissionItemServiceTest">
   <TestProcedureData testProcedureName="testAdd">
     <TestCaseData testCaseInstanceName="testAdd with data set #0">
-      <Input name="permissionItem" type="KalturaPermissionItem" key=""/>
-      <OutputReference name="output" type="KalturaPermissionItem" key="object key"/>
+      <Input name="permissionItem" type="KalturaApiActionPermissionItem" key="">
+		<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </Input>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
     </TestCaseData>
   </TestProcedureData>
   <TestProcedureData testProcedureName="testGet">
     <TestCaseData testCaseInstanceName="testGet with data set #0">
       <Input name="permissionItemId" type="int" key=""/>
-      <OutputReference name="output" type="KalturaPermissionItem" key="object key"/>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
     </TestCaseData>
   </TestProcedureData>
   <TestProcedureData testProcedureName="testUpdate">
     <TestCaseData testCaseInstanceName="testUpdate with data set #0">
       <Input name="permissionItemId" type="int" key=""/>
-      <Input name="permissionItem" type="KalturaPermissionItem" key=""/>
-      <OutputReference name="output" type="KalturaPermissionItem" key="object key"/>
+      <Input name="permissionItem" type="KalturaApiActionPermissionItem" key="">
+		<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </Input>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
     </TestCaseData>
   </TestProcedureData>
   <TestProcedureData testProcedureName="testDelete">
     <TestCaseData testCaseInstanceName="testDelete with data set #0">
       <Input name="permissionItemId" type="int" key=""/>
-      <OutputReference name="output" type="KalturaPermissionItem" key="object key"/>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
     </TestCaseData>
   </TestProcedureData>
   <TestProcedureData testProcedureName="testListAction">
