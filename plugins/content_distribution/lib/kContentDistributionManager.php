@@ -481,7 +481,7 @@ class kContentDistributionManager
 		}
 		
 		// adds added flavor assets
-		$newFlavorAssetIds = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId(), $flavorParamsIds);
+		$newFlavorAssetIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entry->getId(), $flavorParamsIds);
 		foreach($newFlavorAssetIds as $newFlavorAssetId)
 			$flavorAssetIds[] = $newFlavorAssetId;
 			

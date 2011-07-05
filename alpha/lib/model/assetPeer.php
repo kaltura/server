@@ -243,6 +243,25 @@ class assetPeer extends BaseassetPeer
 		
 		return self::doSelect($c);
 	}
+	
+	public static function retrieveReadyFlavorsIdsByEntryId($entryId, array $paramsIds = null)
+	{
+		$c = new Criteria();
+		$c->addSelectColumn(assetPeer::ID);
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		if(count($paramsIds))
+			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
+		
+		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
+		
+		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+
+		$stmt = assetPeer::doSelectStmt($c, null);
+		return $stmt->fetchAll(PDO::FETCH_COLUMN);
+	}
 
 	public static function retrieveReadyThumbnailsByEntryId($entryId, array $paramsIds = null)
 	{
