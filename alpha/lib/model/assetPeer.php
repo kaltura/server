@@ -150,14 +150,16 @@ class assetPeer extends BaseassetPeer
 	}
 	
 	/**
-	 * 
 	 * @param string $entryId
+	 * @param array $types
 	 * @return array<flavorAsset>
 	 */
-	public static function retrieveByEntryId($entryId)
+	public static function retrieveByEntryId($entryId, array $types = null)
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
+		if(count($types))
+			$c->add(self::TYPE, $types, Criteria::IN);
 		
 		return self::doSelect($c);
 	}
@@ -185,13 +187,23 @@ class assetPeer extends BaseassetPeer
 	 */
 	public static function retrieveThumbnailsByEntryId($entryId)
 	{
+		$thumbTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
+		return self::retrieveByEntryId($entryId, $thumbTypes);
+	}
+	
+	/**
+	 * @param string $entryId
+	 * @param array $types
+	 * @return array<flavorAsset>
+	 */
+	public static function countByEntryId($entryId, array $types = null)
+	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
+		if(count($types))
+			$c->add(self::TYPE, $types, Criteria::IN);
 		
-		$thumbTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
-		$c->add(assetPeer::TYPE, $thumbTypes, Criteria::IN);
-		
-		return self::doSelect($c);
+		return self::doCount($c);
 	}
 	
 	/**
@@ -201,11 +213,8 @@ class assetPeer extends BaseassetPeer
 	 */
 	public static function countThumbnailsByEntryId($entryId)
 	{
-		$c = new Criteria();
-		$c->add(self::ENTRY_ID, $entryId);
-		$c->add(self::TYPE, assetType::THUMBNAIL);
-		
-		return self::doCount($c);
+		$types = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
+		return self::countByEntryId($entryId, $types);
 	}
 
 	public static function retrieveReadyByEntryId($entryId)
@@ -218,11 +227,15 @@ class assetPeer extends BaseassetPeer
 		return self::doSelect($c);
 	}
 
-	public static function retrieveReadyFlavorsByEntryId($entryId)
+	public static function retrieveReadyFlavorsByEntryId($entryId, array $paramsIds = null)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		if(count($paramsIds))
+			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
+		
 		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
 		
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
@@ -231,11 +244,15 @@ class assetPeer extends BaseassetPeer
 		return self::doSelect($c);
 	}
 
-	public static function retrieveReadyThumbnailsByEntryId($entryId)
+	public static function retrieveReadyThumbnailsByEntryId($entryId, array $paramsIds = null)
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
+		
+		if(count($paramsIds))
+			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
+			
 		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
 		
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
@@ -399,7 +416,6 @@ class assetPeer extends BaseassetPeer
 		$stmt = assetPeer::doSelectStmt($criteria, $con);
 		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
-
 
 	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
 	{
