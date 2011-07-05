@@ -6,16 +6,16 @@
         <id></id>
         <partnerId></partnerId>
         <status></status>
-        <name></name>
+        <name type="string">Test Conversion Profile</name>
         <systemName></systemName>
         <tags></tags>
         <description></description>
         <defaultEntryId></defaultEntryId>
         <createdAt></createdAt>
-        <flavorParamsIds></flavorParamsIds>
+        <flavorParamsIds type="string">0</flavorParamsIds>
         <isDefault></isDefault>
         <isPartnerDefault></isPartnerDefault>
-        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
+        <cropDimensions></cropDimensions>
         <clipStart></clipStart>
         <clipDuration></clipDuration>
         <xslTransformation></xslTransformation>
@@ -23,20 +23,20 @@
       </Input>
       <OutputReference name="output" type="KalturaConversionProfile" key="object key">
         <id></id>
-        <partnerId></partnerId>
-        <status></status>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">2</status>
+        <name type="string">Test Conversion Profile</name>
         <systemName></systemName>
         <tags></tags>
         <description></description>
         <defaultEntryId></defaultEntryId>
         <createdAt></createdAt>
-        <flavorParamsIds></flavorParamsIds>
+        <flavorParamsIds type="string">0</flavorParamsIds>
         <isDefault></isDefault>
         <isPartnerDefault></isPartnerDefault>
-        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
-        <clipStart></clipStart>
-        <clipDuration></clipDuration>
+        <cropDimensions type="string" dbValue="KalturaCropDimensions">KalturaCropDimensions</cropDimensions>
+        <clipStart type="string">-1</clipStart>
+        <clipDuration type="string">-1</clipDuration>
         <xslTransformation></xslTransformation>
         <storageProfileId></storageProfileId>
       </OutputReference>
@@ -47,20 +47,20 @@
       <Input name="id" type="int" key=""/>
       <OutputReference name="output" type="KalturaConversionProfile" key="object key">
         <id></id>
-        <partnerId></partnerId>
-        <status></status>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">2</status>
+        <name type="string">Test Conversion Profile</name>
         <systemName></systemName>
         <tags></tags>
         <description></description>
         <defaultEntryId></defaultEntryId>
         <createdAt></createdAt>
-        <flavorParamsIds></flavorParamsIds>
+        <flavorParamsIds type="string">0</flavorParamsIds>
         <isDefault></isDefault>
         <isPartnerDefault></isPartnerDefault>
         <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
-        <clipStart></clipStart>
-        <clipDuration></clipDuration>
+        <clipStart type="string">-1</clipStart>
+        <clipDuration type="string">-1</clipDuration>
         <xslTransformation></xslTransformation>
         <storageProfileId></storageProfileId>
       </OutputReference>
@@ -90,20 +90,20 @@
       </Input>
       <OutputReference name="output" type="KalturaConversionProfile" key="object key">
         <id></id>
-        <partnerId></partnerId>
-        <status></status>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">2</status>
+        <name type="string">Test Conversion Profile</name>
         <systemName></systemName>
         <tags></tags>
         <description></description>
         <defaultEntryId></defaultEntryId>
         <createdAt></createdAt>
-        <flavorParamsIds></flavorParamsIds>
+        <flavorParamsIds type="string">0</flavorParamsIds>
         <isDefault></isDefault>
         <isPartnerDefault></isPartnerDefault>
         <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
-        <clipStart></clipStart>
-        <clipDuration></clipDuration>
+        <clipStart type="string">-1</clipStart>
+        <clipDuration type="string">-1</clipDuration>
         <xslTransformation></xslTransformation>
         <storageProfileId></storageProfileId>
       </OutputReference>
