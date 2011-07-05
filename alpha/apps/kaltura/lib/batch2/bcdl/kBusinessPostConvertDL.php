@@ -264,7 +264,7 @@ class kBusinessPostConvertDL
 		
 		KalturaLog::debug('Convert Finished - has In-Complete flavors [' . print_r($inCompleteFlavorIds, true) . ']');
 	
-		if($rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
+		if(!$rootBatchJob || $rootBatchJob->getJobType() != BatchJobType::CONVERT_PROFILE)
 			return $dbBatchJob;
 			
 		$childJobs = $rootBatchJob->getChildJobs();
