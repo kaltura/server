@@ -1597,7 +1597,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() == EntryDistributionStatus::PENDING)
 			{
 				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-				$listChanged = ($listChanged || kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
+				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
 				
 				if(!$listChanged)
 					continue;
@@ -1629,7 +1629,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				}
 				
 				$listChanged = kContentDistributionManager::assignFlavorAssets($entryDistribution, $entry, $distributionProfile);
-				$listChanged = ($listChanged || kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
+				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
 				
 				if(!$listChanged)
 					continue;
