@@ -2,7 +2,7 @@
 <TestCaseData testCaseName="ThumbAssetServiceTest">
   <TestProcedureData testProcedureName="testAdd">
     <TestCaseData testCaseInstanceName="testAdd with data set #0">
-      <Input name="entryId" type="string" key=""/>
+      <Input name="entryId" type="string" key="@DEFAULT_ENTRY_ID@"/>
       <Input name="thumbAsset" type="KalturaThumbAsset" key="">
         <thumbParamsId></thumbParamsId>
         <width></width>
@@ -22,16 +22,16 @@
       </Input>
       <OutputReference name="output" type="KalturaThumbAsset" key="object key">
         <thumbParamsId></thumbParamsId>
-        <width></width>
-        <height></height>
+        <width type="string">0</width>
+        <height type="string">0</height>
         <id></id>
-        <entryId></entryId>
-        <partnerId></partnerId>
-        <status></status>
+        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">0</status>
         <version></version>
-        <size></size>
+        <size type="string">0</size>
         <tags></tags>
-        <fileExt></fileExt>
+        <fileExt type="string">jpg</fileExt>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <deletedAt></deletedAt>
@@ -61,17 +61,17 @@
       </Input>
       <Input name="contentResource" type="KalturaContentResource" key=""/>
       <OutputReference name="output" type="KalturaThumbAsset" key="object key">
-        <thumbParamsId></thumbParamsId>
-        <width></width>
-        <height></height>
+        <thumbParamsId type="string">0</thumbParamsId>
+        <width type="string">0</width>
+        <height type="string">0</height>
         <id></id>
-        <entryId></entryId>
-        <partnerId></partnerId>
-        <status></status>
+        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">0</status>
         <version></version>
-        <size></size>
+        <size type="string">0</size>
         <tags></tags>
-        <fileExt></fileExt>
+        <fileExt type="string">jpg</fileExt>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <deletedAt></deletedAt>
@@ -83,17 +83,17 @@
     <TestCaseData testCaseInstanceName="testGet with data set #0">
       <Input name="thumbAssetId" type="string" key=""/>
       <OutputReference name="output" type="KalturaThumbAsset" key="object key">
-        <thumbParamsId></thumbParamsId>
-        <width></width>
-        <height></height>
+        <thumbParamsId type="string">0</thumbParamsId>
+        <width type="string">0</width>
+        <height type="string">0</height>
         <id></id>
-        <entryId></entryId>
-        <partnerId></partnerId>
-        <status></status>
+        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <status type="string">0</status>
         <version></version>
-        <size></size>
+        <size type="string">0</size>
         <tags></tags>
-        <fileExt></fileExt>
+        <fileExt type="string">jpg</fileExt>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <deletedAt></deletedAt>
@@ -129,7 +129,7 @@
         <pageIndex></pageIndex>
       </Input>
       <OutputReference name="output" type="KalturaThumbAssetListResponse" key="object key">
-        <Array/>
+        <objects></objects>
         <totalCount type="string">0</totalCount>
       </OutputReference>
     </TestCaseData>
