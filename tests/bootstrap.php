@@ -12,6 +12,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "base", "*"
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "lib", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "api", "*"));
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "common", "*"));
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_TESTS_PATH, "unitTests", "*"));
 
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/tests/classMap.cache');
 //KAutoloader::dumpExtra();
