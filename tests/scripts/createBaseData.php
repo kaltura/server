@@ -48,3 +48,6 @@ $entry->mediaType = KalturaMediaType::VIDEO;
 $defaultEntry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
 
 KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
+
+$flavorAssest = $client->flavorParams->listAction();
+KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
