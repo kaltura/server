@@ -72,8 +72,10 @@
          <echo msg="delete before unzip..." />
          <exec command="rm -rf Kaltura-TM-v4.0.0" dir="${installationLoc}" />
          <exec command="rm -rf Kaltura-TM-v5.0.0" dir="${installationLoc}" />
+         <exec command="rm -rf Kaltura-TM-v0.0.0" dir="${installationLoc}" />
          <exec command="rm -rf Kaltura-CM-v4.0.0" dir="${installationLoc}" />
          <exec command="rm -rf Kaltura-CM-v5.0.0" dir="${installationLoc}" />
+         <exec command="rm -rf Kaltura-CM-v0.0.0" dir="${installationLoc}" />
 
          <echo msg="unzip..." />
          <exec command="unzip ${installationLoc}${installationZip}" dir="${installationLoc}" />
