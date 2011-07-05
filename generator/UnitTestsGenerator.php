@@ -39,6 +39,10 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		foreach($this->_services as $serviceReflector)
 		{
+			//TODO: maybe we should test deprecated services?
+			if($serviceReflector->isDeprecated())
+				continue;
+
 			$this->writeBeforeService($serviceReflector);
 			$this->writeService($serviceReflector);
 			$this->writeAfterService($serviceReflector);
@@ -690,7 +694,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			//TODO: create an ignore field array to be populated dynamically (maybe from the service reflector)
 			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl", 
 								  "downloadUrl", "rootEntryId", "operationAttributes",
-								  "deletedAt", "statusUpdatedAt", "widgetHTML", "totalCount", "objects");
+								  "deletedAt", "statusUpdatedAt", "widgetHTML", "totalCount", "objects", "cropDimensions");
 			
 			$ignoreFieldsLine = implode("', '", $ignoreFields);
 			
