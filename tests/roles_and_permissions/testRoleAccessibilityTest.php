@@ -448,7 +448,7 @@ class testRoleAccessibilityTest extends KalturaApiTestCase
 		//For each user roles ids
 		foreach($roleIds as $roleId)
 		{
-			$this->addPermissionsFromRole($roleId, &$permissionItems, $client);
+			$this->addPermissionsFromRole($roleId, $permissionItems, $client);
 		}
 
 		return $permissionItems;
@@ -461,7 +461,7 @@ class testRoleAccessibilityTest extends KalturaApiTestCase
 	 * @param unknown_type $permissionItems
 	 * @param unknown_type $client
 	 */
-	private function addPermissionsFromRole($roleId, $permissionItems, $client)
+	private function addPermissionsFromRole($roleId, &$permissionItems, $client)
 	{
 		//We get all the role's permission names
 		$role = $client->userRole->get($roleId);
