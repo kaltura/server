@@ -60,6 +60,7 @@ class assetTableMap extends TableMap {
 		$this->addColumn('VIDEO_CODEC_ID', 'VideoCodecId', 'VARCHAR', false, 127, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 0);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('PARTNER_DATA', 'PartnerData', 'VARCHAR', false, 4096, null);
 		// validators
 	} // initialize()
 
