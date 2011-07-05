@@ -5,7 +5,7 @@ require_once(dirname(__FILE__) . '/../../bootstrap.php');
 /**
  * media service test case.
  */
-class MediaServiceTest extends MediaServiceBaseTest
+class MediaServiceUnitTest extends MediaServiceBaseTest
 {
 	/**
 	 * Tests media->add action
