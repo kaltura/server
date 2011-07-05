@@ -102,6 +102,12 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	 */
 	public $description;
 	
+	
+	/**
+	 * @var string
+	 */
+	public $partnerData;
+	
 		
 	private static $map_between_objects = array
 	(
@@ -117,6 +123,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 		"updatedAt",
 		"deletedAt",
 		"description",
+		"partnerData",
 	);
 	
 	public function getMapBetweenObjects ( )
