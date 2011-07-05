@@ -4,7 +4,7 @@
     <TestCaseData testCaseInstanceName="testAdd with data set #0">
       <Input name="mixEntry" type="KalturaMixEntry" key="">
         <hasRealThumbnail></hasRealThumbnail>
-        <editorType></editorType>
+        <editorType type="string">1</editorType>
         <dataContent></dataContent>
         <plays></plays>
         <views></views>
@@ -14,7 +14,7 @@
         <msDuration></msDuration>
         <durationType></durationType>
         <id></id>
-        <name></name>
+        <name type="string">Test Mix Entry</name>
         <description></description>
         <partnerId></partnerId>
         <userId></userId>
@@ -51,49 +51,62 @@
         <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
       </Input>
       <OutputReference name="output" type="KalturaMixEntry" key="object key">
-        <hasRealThumbnail></hasRealThumbnail>
-        <editorType></editorType>
-        <dataContent></dataContent>
-        <plays></plays>
-        <views></views>
+        <hasRealThumbnail type="string">"1"</hasRealThumbnail>
+        <editorType type="string">1</editorType>
+        <dataContent type="string">&lt;xml&gt;&#xD;
+  &lt;MetaData&gt;&#xD;
+    &lt;Publish&gt;&#xD;
+      &lt;Application&gt;'QuickEdit'&lt;/Application&gt;&#xD;
+    &lt;/Publish&gt;&#xD;
+    &lt;SeqDuration&gt;0&lt;/SeqDuration&gt;&#xD;
+    &lt;ShowVersion&gt;-1&lt;/ShowVersion&gt;&#xD;
+  &lt;/MetaData&gt;&#xD;
+  &lt;VideoAssets/&gt;&#xD;
+  &lt;AudioAssets/&gt;&#xD;
+  &lt;VoiceAssets/&gt;&#xD;
+  &lt;Plugins/&gt;&#xD;
+&lt;/xml&gt;&#xD;
+</dataContent>
+        <plays type="string">0</plays>
+        <views type="string">0</views>
         <width></width>
         <height></height>
-        <duration></duration>
-        <msDuration></msDuration>
+        <duration type="string">0</duration>
+        <msDuration type="string">0</msDuration>
         <durationType></durationType>
         <id></id>
-        <name></name>
+        <name type="string">Test Mix Entry</name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
         <categories></categories>
         <categoriesIds></categoriesIds>
-        <status></status>
-        <moderationStatus></moderationStatus>
-        <moderationCount></moderationCount>
-        <type></type>
+        <status type="string">2</status>
+        <moderationStatus type="string">6</moderationStatus>
+        <moderationCount type="string">0</moderationCount>
+        <type type="string">2</type>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <rank></rank>
-        <totalRank></totalRank>
-        <votes></votes>
+        <rank type="string">0</rank>
+        <totalRank type="string">0</totalRank>
+        <votes type="string">0</votes>
         <groupId></groupId>
         <partnerData></partnerData>
         <downloadUrl></downloadUrl>
-        <searchText></searchText>
-        <licenseType></licenseType>
-        <version></version>
+        <searchText type="string">  Test Mix Entry </searchText>
+        <licenseType type="string">-1</licenseType>
+        <version type="string">100000</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId></accessControlId>
+        <accessControlId type="string" dbValue="385294">4</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
         <replacingEntryId></replacingEntryId>
         <replacedEntryId></replacedEntryId>
-        <replacementStatus></replacementStatus>
-        <partnerSortValue></partnerSortValue>
+        <replacementStatus type="string">0</replacementStatus>
+        <partnerSortValue type="string">0</partnerSortValue>
         <conversionProfileId></conversionProfileId>
         <rootEntryId></rootEntryId>
         <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
@@ -105,49 +118,62 @@
       <Input name="entryId" type="string" key=""/>
       <Input name="version" type="int" key="-1"/>
       <OutputReference name="output" type="KalturaMixEntry" key="object key">
-        <hasRealThumbnail></hasRealThumbnail>
-        <editorType></editorType>
-        <dataContent></dataContent>
-        <plays></plays>
-        <views></views>
+        <hasRealThumbnail type="string">"1"</hasRealThumbnail>
+        <editorType type="string">1</editorType>
+        <dataContent type="string">&lt;xml&gt;&#xD;
+  &lt;MetaData&gt;&#xD;
+    &lt;Publish&gt;&#xD;
+      &lt;Application&gt;'QuickEdit'&lt;/Application&gt;&#xD;
+    &lt;/Publish&gt;&#xD;
+    &lt;SeqDuration&gt;0&lt;/SeqDuration&gt;&#xD;
+    &lt;ShowVersion&gt;-1&lt;/ShowVersion&gt;&#xD;
+  &lt;/MetaData&gt;&#xD;
+  &lt;VideoAssets/&gt;&#xD;
+  &lt;AudioAssets/&gt;&#xD;
+  &lt;VoiceAssets/&gt;&#xD;
+  &lt;Plugins/&gt;&#xD;
+&lt;/xml&gt;&#xD;
+</dataContent>
+        <plays type="string">0</plays>
+        <views type="string">0</views>
         <width></width>
         <height></height>
-        <duration></duration>
-        <msDuration></msDuration>
+        <duration type="string">0</duration>
+        <msDuration type="string">0</msDuration>
         <durationType></durationType>
         <id></id>
-        <name></name>
+        <name type="string">Test Mix Entry</name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
         <categories></categories>
         <categoriesIds></categoriesIds>
-        <status></status>
-        <moderationStatus></moderationStatus>
-        <moderationCount></moderationCount>
-        <type></type>
+        <status type="string">2</status>
+        <moderationStatus type="string">6</moderationStatus>
+        <moderationCount type="string">0</moderationCount>
+        <type type="string">2</type>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <rank></rank>
-        <totalRank></totalRank>
-        <votes></votes>
+        <rank type="string">0</rank>
+        <totalRank type="string">0</totalRank>
+        <votes type="string">0</votes>
         <groupId></groupId>
         <partnerData></partnerData>
         <downloadUrl></downloadUrl>
-        <searchText></searchText>
-        <licenseType></licenseType>
-        <version></version>
+        <searchText type="string">  Test Mix Entry </searchText>
+        <licenseType type="string">-1</licenseType>
+        <version type="string">100000</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId></accessControlId>
+        <accessControlId type="string" dbValue="385294">4</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
         <replacingEntryId></replacingEntryId>
         <replacedEntryId></replacedEntryId>
-        <replacementStatus></replacementStatus>
-        <partnerSortValue></partnerSortValue>
+        <replacementStatus type="string">0</replacementStatus>
+        <partnerSortValue type="string">0</partnerSortValue>
         <conversionProfileId></conversionProfileId>
         <rootEntryId></rootEntryId>
         <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
@@ -193,7 +219,7 @@
         <licenseType></licenseType>
         <version></version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId></accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
@@ -206,49 +232,62 @@
         <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
       </Input>
       <OutputReference name="output" type="KalturaMixEntry" key="object key">
-        <hasRealThumbnail></hasRealThumbnail>
-        <editorType></editorType>
-        <dataContent></dataContent>
-        <plays></plays>
-        <views></views>
+        <hasRealThumbnail type="string">"1"</hasRealThumbnail>
+        <editorType type="string">1</editorType>
+        <dataContent type="string">&lt;xml&gt;&#xD;
+  &lt;MetaData&gt;&#xD;
+    &lt;Publish&gt;&#xD;
+      &lt;Application&gt;'QuickEdit'&lt;/Application&gt;&#xD;
+    &lt;/Publish&gt;&#xD;
+    &lt;SeqDuration&gt;0&lt;/SeqDuration&gt;&#xD;
+    &lt;ShowVersion&gt;-1&lt;/ShowVersion&gt;&#xD;
+  &lt;/MetaData&gt;&#xD;
+  &lt;VideoAssets/&gt;&#xD;
+  &lt;AudioAssets/&gt;&#xD;
+  &lt;VoiceAssets/&gt;&#xD;
+  &lt;Plugins/&gt;&#xD;
+&lt;/xml&gt;&#xD;
+</dataContent>
+        <plays type="string">0</plays>
+        <views type="string">0</views>
         <width></width>
         <height></height>
-        <duration></duration>
-        <msDuration></msDuration>
+        <duration type="string">0</duration>
+        <msDuration type="string">0</msDuration>
         <durationType></durationType>
         <id></id>
-        <name></name>
+        <name type="string">Test Mix Entry</name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
         <categories></categories>
         <categoriesIds></categoriesIds>
-        <status></status>
-        <moderationStatus></moderationStatus>
-        <moderationCount></moderationCount>
-        <type></type>
+        <status type="string">2</status>
+        <moderationStatus type="string">6</moderationStatus>
+        <moderationCount type="string">0</moderationCount>
+        <type type="string">2</type>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <rank></rank>
-        <totalRank></totalRank>
-        <votes></votes>
+        <rank type="string">0</rank>
+        <totalRank type="string">0</totalRank>
+        <votes type="string">0</votes>
         <groupId></groupId>
         <partnerData></partnerData>
         <downloadUrl></downloadUrl>
-        <searchText></searchText>
-        <licenseType></licenseType>
-        <version></version>
+        <searchText type="string">  Test Mix Entry </searchText>
+        <licenseType type="string">-1</licenseType>
+        <version type="string">100000</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId></accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
         <replacingEntryId></replacingEntryId>
         <replacedEntryId></replacedEntryId>
-        <replacementStatus></replacementStatus>
-        <partnerSortValue></partnerSortValue>
+        <replacementStatus type="string">0</replacementStatus>
+        <partnerSortValue type="string">0</partnerSortValue>
         <conversionProfileId></conversionProfileId>
         <rootEntryId></rootEntryId>
         <operationAttributes type="string">KalturaOperationAttributesArray</operationAttributes>
@@ -347,7 +386,7 @@
         <pageIndex></pageIndex>
       </Input>
       <OutputReference name="output" type="KalturaMixListResponse" key="object key">
-        <Array/>
+        <objects></objects>
         <totalCount type="string">0</totalCount>
       </OutputReference>
     </TestCaseData>
