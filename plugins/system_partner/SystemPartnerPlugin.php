@@ -2,7 +2,7 @@
 /**
  * @package plugins.systemPartner
  */
-class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaConfigurator
+class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaConfigurator, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'systemPartner';
 	
@@ -44,5 +44,19 @@ class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, 
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
 			
 		return null;
+	}
+	
+	/**
+	 * @return array<string> list of enum classes names that extend the base enum name
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('SystemPartnerPermissionName');
+			
+		if($baseEnumName == 'PermissionName')
+			return array('SystemPartnerPermissionName');
+			
+		return array();
 	}
 }
