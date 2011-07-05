@@ -48,7 +48,7 @@
         <id></id>
         <name></name>
         <description></description>
-        <partnerId type="string">495791</partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
@@ -70,7 +70,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string">385264</accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
@@ -94,7 +94,7 @@
         <id></id>
         <name></name>
         <description></description>
-        <partnerId type="string">495791</partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
@@ -116,7 +116,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string">385264</accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
@@ -179,7 +179,7 @@
         <id></id>
         <name></name>
         <description></description>
-        <partnerId type="string">495791</partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
@@ -201,7 +201,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string">385264</accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
