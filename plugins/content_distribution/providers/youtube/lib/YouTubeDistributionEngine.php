@@ -243,12 +243,12 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed->setMetadataFromEntry();
 		$newPlaylists = $feed->setPlaylists($providerData->currentPlaylists);
 		
-		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$feed->sendFeed($sftpManager);
-		
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 		if (file_exists($thumbnailFilePath))
 			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
+		
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		$feed->sendFeed($sftpManager);
 			
 		if (file_exists($thumbnailFilePath))
 		{
