@@ -22,7 +22,7 @@
         <engineVersion></engineVersion>
         <id></id>
         <partnerId></partnerId>
-        <name></name>
+        <name type="string">Test Flavor Params</name>
         <systemName></systemName>
         <description></description>
         <createdAt></createdAt>
@@ -32,16 +32,16 @@
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
       </Input>
       <OutputReference name="output" type="KalturaFlavorParams" key="object key">
-        <videoCodec type="string">KalturaVideoCodec</videoCodec>
-        <videoBitrate></videoBitrate>
-        <audioCodec type="string">KalturaAudioCodec</audioCodec>
-        <audioBitrate></audioBitrate>
-        <audioChannels></audioChannels>
-        <audioSampleRate></audioSampleRate>
-        <width></width>
-        <height></height>
-        <frameRate></frameRate>
-        <gopSize></gopSize>
+        <videoCodec></videoCodec>
+        <videoBitrate type="string">0</videoBitrate>
+        <audioCodec></audioCodec>
+        <audioBitrate type="string">0</audioBitrate>
+        <audioChannels type="string">0</audioChannels>
+        <audioSampleRate type="string">0</audioSampleRate>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <frameRate type="string">0</frameRate>
+        <gopSize type="string">0</gopSize>
         <conversionEngines></conversionEngines>
         <conversionEnginesExtraParams></conversionEnginesExtraParams>
         <twoPass></twoPass>
@@ -50,15 +50,15 @@
         <operators></operators>
         <engineVersion></engineVersion>
         <id></id>
-        <partnerId></partnerId>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Flavor Params</name>
         <systemName></systemName>
         <description></description>
         <createdAt></createdAt>
-        <isSystemDefault></isSystemDefault>
+        <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format type="string">KalturaContainerFormat</format>
-        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <format></format>
+        <requiredPermissions></requiredPermissions>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -66,9 +66,9 @@
     <TestCaseData testCaseInstanceName="testGet with data set #0">
       <Input name="id" type="int" key=""/>
       <OutputReference name="output" type="KalturaFlavorParams" key="object key">
-        <videoCodec dbValue="KalturaVideoCodec"></videoCodec>
+        <videoCodec></videoCodec>
         <videoBitrate type="string">0</videoBitrate>
-        <audioCodec dbValue="KalturaAudioCodec"></audioCodec>
+        <audioCodec></audioCodec>
         <audioBitrate type="string">0</audioBitrate>
         <audioChannels type="string">0</audioChannels>
         <audioSampleRate type="string">0</audioSampleRate>
@@ -84,15 +84,15 @@
         <operators></operators>
         <engineVersion></engineVersion>
         <id></id>
-        <partnerId type="string">0</partnerId>
-        <name type="string">Source</name>
-        <systemName type="string">Source</systemName>
-        <description type="string">Maintains the original format and settings of the file - duplicate of the source file</description>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Flavor Params</name>
+        <systemName></systemName>
+        <description></description>
         <createdAt></createdAt>
-        <isSystemDefault type="string">1</isSystemDefault>
-        <tags type="string">source</tags>
-        <format dbValue="KalturaContainerFormat"></format>
-        <Array/>
+        <isSystemDefault type="string">0</isSystemDefault>
+        <tags></tags>
+        <format></format>
+        <requiredPermissions></requiredPermissions>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -129,32 +129,32 @@
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
       </Input>
       <OutputReference name="output" type="KalturaFlavorParams" key="object key">
-        <videoCodec type="string">KalturaVideoCodec</videoCodec>
-        <videoBitrate></videoBitrate>
-        <audioCodec type="string">KalturaAudioCodec</audioCodec>
-        <audioBitrate></audioBitrate>
-        <audioChannels></audioChannels>
-        <audioSampleRate></audioSampleRate>
-        <width></width>
-        <height></height>
-        <frameRate></frameRate>
-        <gopSize></gopSize>
+        <videoCodec></videoCodec>
+        <videoBitrate type="string">0</videoBitrate>
+        <audioCodec></audioCodec>
+        <audioBitrate type="string">0</audioBitrate>
+        <audioChannels type="string">0</audioChannels>
+        <audioSampleRate type="string">0</audioSampleRate>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <frameRate type="string">0</frameRate>
+        <gopSize type="string">0</gopSize>
         <conversionEngines></conversionEngines>
         <conversionEnginesExtraParams></conversionEnginesExtraParams>
         <twoPass></twoPass>
-        <deinterlice></deinterlice>
-        <rotate></rotate>
+        <deinterlice type="string">0</deinterlice>
+        <rotate type="string">0</rotate>
         <operators></operators>
         <engineVersion></engineVersion>
         <id></id>
-        <partnerId></partnerId>
-        <name></name>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Flavor Params</name>
         <systemName></systemName>
         <description></description>
         <createdAt></createdAt>
-        <isSystemDefault></isSystemDefault>
+        <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format type="string">KalturaContainerFormat</format>
+        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
       </OutputReference>
     </TestCaseData>
