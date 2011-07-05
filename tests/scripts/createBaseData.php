@@ -5,12 +5,12 @@ $serviceUrl = 'http://localhost/';  //Default url is local host if no prameter i
 if(isset($argv[1]))
 	$serviceUrl = $argv[1];
 else
-	print("Service url wasn't inserted using default: http://localhost/");
+	print("Service url wasn't inserted using default: http://localhost/ \n");
 
 $config = new KalturaConfiguration();
 $config->serviceUrl = $serviceUrl;
 //$config->serviceUrl = 'http://hudsontest2.kaltura.dev/';
-//$config->serviceUrl = 'http://devtests.kaltura.dev/';
+$config->serviceUrl = 'http://devtests.kaltura.dev/';
 $client = new KalturaClient($config);
 $cmsPassword = 'Roni123!';
 $partner = new KalturaPartner();
