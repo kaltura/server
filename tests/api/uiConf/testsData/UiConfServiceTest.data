@@ -22,29 +22,29 @@
         <swfUrlVersion></swfUrlVersion>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <creationMode></creationMode>
+        <creationMode type="string">2</creationMode>
       </Input>
       <OutputReference name="output" type="KalturaUiConf" key="object key">
         <id></id>
         <name></name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <objType></objType>
-        <objTypeAsString></objTypeAsString>
+        <objTypeAsString type="string">Widget</objTypeAsString>
         <width></width>
         <height></height>
         <htmlParams></htmlParams>
         <swfUrl></swfUrl>
-        <confFilePath></confFilePath>
+        <confFilePath type="string"></confFilePath>
         <confFile></confFile>
         <confFileFeatures></confFileFeatures>
         <confVars></confVars>
-        <useCdn></useCdn>
+        <useCdn type="string">1</useCdn>
         <tags></tags>
         <swfUrlVersion></swfUrlVersion>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <creationMode></creationMode>
+        <creationMode type="string">2</creationMode>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -77,9 +77,9 @@
         <id></id>
         <name></name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <objType></objType>
-        <objTypeAsString></objTypeAsString>
+        <objTypeAsString type="string">Widget</objTypeAsString>
         <width></width>
         <height></height>
         <htmlParams></htmlParams>
@@ -88,12 +88,12 @@
         <confFile></confFile>
         <confFileFeatures></confFileFeatures>
         <confVars></confVars>
-        <useCdn></useCdn>
+        <useCdn type="string">1</useCdn>
         <tags></tags>
         <swfUrlVersion></swfUrlVersion>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <creationMode></creationMode>
+        <creationMode type="string">2</creationMode>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -104,9 +104,9 @@
         <id></id>
         <name></name>
         <description></description>
-        <partnerId></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <objType></objType>
-        <objTypeAsString></objTypeAsString>
+        <objTypeAsString type="string">Widget</objTypeAsString>
         <width></width>
         <height></height>
         <htmlParams></htmlParams>
@@ -115,12 +115,12 @@
         <confFile></confFile>
         <confFileFeatures></confFileFeatures>
         <confVars></confVars>
-        <useCdn></useCdn>
+        <useCdn type="string">1</useCdn>
         <tags></tags>
         <swfUrlVersion></swfUrlVersion>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
-        <creationMode></creationMode>
+        <creationMode type="string">2</creationMode>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
