@@ -694,7 +694,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			//TODO: create an ignore field array to be populated dynamically (maybe from the service reflector)
 			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl", 
 								  "downloadUrl", "rootEntryId", "operationAttributes",
-								  "deletedAt", "statusUpdatedAt", "widgetHTML", "totalCount", "objects", "cropDimensions");
+								  "deletedAt", "statusUpdatedAt", "widgetHTML", "totalCount", "objects", "cropDimensions", "dataUrl");
 			
 			$ignoreFieldsLine = implode("', '", $ignoreFields);
 			
