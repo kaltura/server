@@ -544,11 +544,11 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				$inputsForTestProcedure[] = $testCaseInstanceInputs;	
 			}
 		}
-		
+	
 		$inputsForTestProcedure = $this->transformToObjects($inputsForTestProcedure);
 		
 		KalturaLog::info("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
-		
+	
 		return $inputsForTestProcedure; 
 	}
 		
@@ -654,7 +654,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				//TOOD: How to skip the Output Reference more nicely
 				if($objectIndex == $numOfObjects - 1) //The last object is the output reference
 				{
-					$objectIndex++; // Not a must
+					$objectIndex++; // Not a must becuase the for leaves the function
 					continue;
 				}
 				
@@ -668,10 +668,15 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				{
 					$inputAsObject = $this->setGlobalData($inputAsObject);
 				}
+
+				//If we have an empty object we set it to be null instead of empty string
+				$objectType = $inputObject->getType();
+				if(class_exists($objectType) && empty($inputAsObject))
+					$inputAsObject = null;	
 				
 				$inputsAsObjects[$currentIndex][] = $inputAsObject;
 				
-				$objectIndex++; 
+				$objectIndex++;
 			}
 			
 			$currentIndex++;

@@ -180,7 +180,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 				{
 					$testCaseInstanceFailures = $testProcedureFailure->addTestCaseInstanceFailure(new KalturaTestCaseInstanceFailure($test->getName(true), $test->getInputs()));
 				}
-								
+						
 				$testCaseInstanceFailures->addFailure($currentFailure);
 			}
 		}

@@ -155,7 +155,7 @@ class KalturaFailure
 
 	/**
 	 * 
-	 * Returns a well formatted string witht 
+	 * Returns a well formatted string with
 	 */
 	public function __toString()
 	{
@@ -304,11 +304,20 @@ class KalturaFailure
 	private static function setElementValue(DOMDocument &$xml, DomElement &$rootNode, $value, $fieldName = null, $fieldType = null)
 	{
 		//If the value is not an array then we just create the element and sets it's value
-		if(!is_array($value ))
+		if(!is_array($value))
 		{
-			$rootNode->nodeValue = $value;
-			if($fieldType != null)
+			if(!is_object($value))
 			{
+				$rootNode->nodeValue = $value;
+				if($fieldType != null)
+				{
+					$rootNode->setAttribute("type", $fieldType);
+				}
+			}
+			else
+			{
+				//TODO: add support for objects
+				$rootNode->nodeValue = get_class($value);
 				$rootNode->setAttribute("type", $fieldType);
 			}
 		}

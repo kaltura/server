@@ -462,8 +462,11 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		{
 			$reflectionClass = new ReflectionClass($objectInstaceType);	
 			$isAbstract = $reflectionClass->isAbstract();
-			if(!$isAbstract)					
+			$isInstantiable = $reflectionClass->isInstantiable();
+			if(!$isAbstract && $isInstantiable)
+			{
 				$objectInstace = new $objectInstaceType;
+			}
 		}
 		else  //regular type (string, int, ...)
 		{
