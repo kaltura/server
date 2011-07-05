@@ -44,7 +44,10 @@ class CuePointPeer extends BaseCuePointPeer
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
 		
-		$c = new Criteria();
+		$c = self::$s_criteria_filter->getFilter();
+		if(!$c)
+			$c = new Criteria();
+			
 		$puserId = kCurrentContext::$ks_uid;
 		$partnerId = kCurrentContext::$ks_partner_id;
 		if ($puserId && $partnerId)
