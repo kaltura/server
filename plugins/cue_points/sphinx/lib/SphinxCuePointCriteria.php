@@ -20,6 +20,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		CuePointPeer::UPDATED_AT => 'updated_at',
 		CuePointPeer::STR_ENTRY_ID => 'str_entry_id',
 		CuePointPeer::STR_CUE_POINT_ID => 'str_cue_point_id',
+		CuePointPeer::FORCE_STOP => 'force_stop',
 	);
 	
 	public static $sphinxOrderFields = array(

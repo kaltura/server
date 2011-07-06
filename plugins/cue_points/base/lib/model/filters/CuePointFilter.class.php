@@ -54,7 +54,7 @@ class CuePointFilter extends baseObjectFilter
 	public function getFieldNameFromPeer ( $field_name )
 	{
 		if($field_name == 'force_stop')
-			return 'cue_point.FORCE_STOP';
+			return CuePointPeer::FORCE_STOP;
 			
 		return CuePointPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
 	}
