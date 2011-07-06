@@ -10,7 +10,7 @@ else
 $config = new KalturaConfiguration();
 $config->serviceUrl = $serviceUrl;
 //$config->serviceUrl = 'http://hudsontest2.kaltura.dev/';
-$config->serviceUrl = 'http://devtests.kaltura.dev/';
+//$config->serviceUrl = 'http://devtests.kaltura.dev/';
 $client = new KalturaClient($config);
 $cmsPassword = 'Roni123!';
 $partner = new KalturaPartner();
