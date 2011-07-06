@@ -44,4 +44,14 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaCuePoint::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		
+		$this->validatePropertyNotNull("code");
+	}
 }

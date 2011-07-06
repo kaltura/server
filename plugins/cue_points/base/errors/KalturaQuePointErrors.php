@@ -12,4 +12,7 @@ class KalturaCuePointErrors extends KalturaErrors
 	const END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME = "END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME,end time of the cue point [%s] cannot be bigger than entry end time [%s]";
 	const START_TIME_CANNOT_BE_LESS_THAN_0 = "START_TIME_CANNOT_BE_LESS_THAN_0,start time cannot be less than 0";
 	const CANNOT_UPDATE_ENTRY_ID = "CANNOT_UPDATE_ENTRY_ID,cannot update cue point's entry id";
+	const PARENT_ANNOTATION_NOT_FOUND = "PARENT_ANNOTATION_NOT_FOUND,Parent annotation id \"%s\" not found";
+	const PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY = "PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY,parent annotation does not belong to current annotation";
+	const PARENT_ANNOTATION_IS_DESCENDANT = "PARENT_ANNOTATION_IS_DESCENDANT,parent annotation [%s] is a child or a sub child of this annotation [%s] and therefor cannot be a parent";
 }

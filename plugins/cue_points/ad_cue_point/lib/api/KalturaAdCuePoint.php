@@ -65,8 +65,29 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if(is_null($object_to_fill))
-			$object_to_fill = new CodeCuePoint();
+			$object_to_fill = new AdCuePoint();
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaCuePoint::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+			
+		$this->validateEndTime();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaCuePoint::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if($this->endTime !== null)
+			$this->validateEndTime($sourceObject->getId());
+			
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

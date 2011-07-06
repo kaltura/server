@@ -43,36 +43,6 @@ class KalturaAnnotation extends KalturaCuePoint
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 	
-	/*
-	 * @param string $cuePointId
-	 * @throw KalturaAPIException - when parent annotation doesn't belong to the same entry, or parent annotation
-	 * doesn't belong to the same entry
-	 */
-	public function validateParentId($cuePointId = null)
-	{
-		if ($this->parentId === null || $this->parentId === "" || $this->parentId === "0")
-			$this->parentId = 0;
-			
-		if ($this->parentId !== 0)
-		{
-			$dbParentCuePoint = CuePointPeer::retrieveByPK($this->parentId);
-			if (!$dbParentCuePoint)
-				throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_NOT_FOUND, $this->parentId);
-			
-			if($cuePointId !== null){ // update
-				$dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
-				if(!$dbCuePoint)
-					throw new KalturaAPIException(KalturaAnnotationErrors::INVALID_OBJECT_ID, $cuePointId);
-				 
-				if($dbCuePoint->isDescendant($this->parentId))
-					throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_IS_DESCENDANT, $this->parentId, $dbCuePoint->getId());
-			}
-			
-			if ($dbParentCuePoint->getEntryId() != $this->entryId)
-				throw new KalturaAPIException(KalturaAnnotationErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
-		}
-	}
-	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toInsertableObject()
 	 */
@@ -91,6 +61,10 @@ class KalturaAnnotation extends KalturaCuePoint
 	{
 		parent::validateForInsert($propertiesToSkip);
 		
+		if($this->text != null)
+			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
+			
+		$this->validateEndTime();
 		$this->validateParentId();
 	}
 	
@@ -101,6 +75,12 @@ class KalturaAnnotation extends KalturaCuePoint
 	{
 		if($this->parentId !== null)
 			$this->validateParentId($sourceObject->getId());
+			
+		if($this->text !== null)
+			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
+		
+		if($this->endTime !== null)
+			$this->validateEndTime($sourceObject->getId());
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
