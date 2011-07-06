@@ -115,7 +115,7 @@
 			}
 		]]></adhoc-task>
 	
-		<generate password=${adminPassword}/> 
+		<generate password="${adminPassword}"/> 
 		
 	</target>
 	
