@@ -357,14 +357,39 @@ class kJobsManager
 	{
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		
+		if(!$fileSync)
+		{
+			kBatchManager::updateEntry($flavorAsset->getEntryId(), entryStatus::ERROR_CONVERTING);
+			
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$flavorAsset->setDescription("Source file sync not found: $srcSyncKey");
+			$flavorAsset->save();
+			
+			KalturaLog::err("Source file sync not found: $srcSyncKey");
+			return null;
+		}
+		
+		if(!$local && $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+		{
+			KalturaLog::debug("Creates import job for remote file sync");
+			
+			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
+			$flavorAsset->setDescription("Source file sync is importing: $srcSyncKey");
+			$flavorAsset->save();
+			
+			$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
+			$url = $fileSync->getExternalUrl();
+			return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $originalFlavorAsset);
+		}
+		
 		$localPath = null;
 		$remoteUrl = null;
-		if($fileSync)
-		{
-			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
-				$localPath = $fileSync->getFullPath();
-			$remoteUrl = $fileSync->getExternalUrl();
-		}
+		if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
+			$localPath = $fileSync->getFullPath();
+		$remoteUrl = $fileSync->getExternalUrl();
 		
 		// creates convert data
 		$convertData = new kConvertJobData();
@@ -802,8 +827,8 @@ class kJobsManager
 				}
 				else
 				{
-					$entry->setStatus(entryStatus::ERROR_CONVERTING);
-					$entry->save();
+					kBatchManager::updateEntry($entry->getId(), entryStatus::ERROR_CONVERTING);
+					
 					$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 					$flavorAsset->setDescription('Entry of size 0 should not be converted');
