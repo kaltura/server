@@ -38,6 +38,9 @@ class UserRolePeer extends BaseUserRolePeer
 	 */
 	public static function testValidRolesForUser($idsString, $partnerId)
 	{
+		if(!$idsString)
+			return true;
+			
 		$ids = explode(',', trim($idsString));
 		
 		if (count($ids) > 1)
