@@ -69,7 +69,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 * @filter eq,in
-	 * @requiresPermission insert,update
+	 * @readonly
 	 */
 	public $userId;
 	
