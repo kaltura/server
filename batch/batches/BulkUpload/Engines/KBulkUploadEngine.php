@@ -306,7 +306,9 @@ abstract class KBulkUploadEngine
 	protected function getStartIndex()
 	{
 		try{
-			return (int)$this->kClient->batch->getBulkUploadLastResult($this->job->id)->lineIndex;
+			$result = $this->kClient->batch->getBulkUploadLastResult($this->job->id);
+			if($result)
+				return $result->lineIndex;
 		}
 		catch(Exception $e){
 			KalturaLog::notice("getBulkUploadLastResult: " . $e->getMessage());
