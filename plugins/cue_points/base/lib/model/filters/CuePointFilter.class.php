@@ -35,7 +35,13 @@ class CuePointFilter extends baseObjectFilter
 				"_in_parent_id",
 			) , NULL );
 
-		$this->allowed_order_fields = array ("created_at" , "updated_at");
+		$this->allowed_order_fields = array (
+			"created_at", 
+			"updated_at", 
+			"start_time", 
+			"end_time", 
+			"partner_sort_value",
+		);
 			
 		$this->aliases = array ( 
 			"user_id" => "kuser_id",
