@@ -13,7 +13,7 @@
  * @package plugins.cuePoint
  * @subpackage model
  */
-class CuePoint extends BaseCuePoint implements IIndexable 
+abstract class CuePoint extends BaseCuePoint implements IIndexable 
 {
 	const CUSTOM_DATA_FIELD_FORCE_STOP = 'forceStop';
 	
