@@ -115,14 +115,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'end_date' => IIndexable::FIELD_TYPE_DATETIME,
 		'available_from' => IIndexable::FIELD_TYPE_DATETIME,
 	);
-	
-	/**
-	 * Array of specific ids that could be returned
-	 * Used for _in_id and _eq_id filter fields 
-	 * The form is array[$operator] = array($entryId1 => $entryCrc1, $entryId2 => $entryCrc2)
-	 * @var array
-	 */
-	protected $entryIds = array();
 
 	/**
 	 * @return criteriaFilter
@@ -155,24 +147,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		}
 		
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
-		
-		if(count($this->entryIds))
-		{
-			foreach($this->entryIds as $comparison => $entryIds)
-			{
-				// keeps only ids that appears in both arrays
-				if($comparison == Criteria::IN)
-				{
-					$ids = array_intersect($ids, array_keys($entryIds));
-				}
-				
-				// removes ids that appears in the comparison array
-				if($comparison == Criteria::NOT_IN)
-				{
-					$ids = array_diff($ids, array_keys($entryIds));
-				}
-			}
-		}
+		$ids = $this->applyIds($ids);
 		KalturaLog::debug("Found " . count($ids) . " ids");
 		
 		foreach($this->keyToRemove as $key)
@@ -433,11 +408,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return $this->add($nc);
 	}
 	
-	public function setEntryIds($comparison, $entryIds)
-	{
-		$this->entryIds[$comparison] = $entryIds;
-	}
-	
 	public function hasSphinxFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)
@@ -492,5 +462,10 @@ class SphinxEntryCriteria extends SphinxCriteria
 			"replaced_entry_id",
 			"roots",
 		));
+	}
+
+	public function getIdField()
+	{
+		return entryPeer::ID;
 	}
 }

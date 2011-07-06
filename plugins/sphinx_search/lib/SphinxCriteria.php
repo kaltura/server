@@ -25,6 +25,41 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 * @var int
 	 */
 	protected $criteriasLeft;
+	
+	/**
+	 * Array of specific ids that could be returned
+	 * Used for _in_id and _eq_id filter fields 
+	 * The form is array[$operator] = array($entryId1 => $entryCrc1, $entryId2 => $entryCrc2)
+	 * @var array
+	 */
+	protected $ids = array();
+	
+	protected function applyIds(array $ids)
+	{
+		if(!count($this->ids))
+			return $ids;
+			
+		foreach($this->ids as $comparison => $theIds)
+		{
+			// keeps only ids that appears in both arrays
+			if($comparison == Criteria::IN)
+			{
+				$ids = array_intersect($ids, array_keys($theIds));
+			}
+			
+			// removes ids that appears in the comparison array
+			if($comparison == Criteria::NOT_IN)
+			{
+				$ids = array_diff($ids, array_keys($theIds));
+			}
+		}
+		return $ids;
+	}
+	
+	public function setIds($comparison, $ids)
+	{
+		$this->ids[$comparison] = $ids;
+	}
 
 	/**
 	 * @return criteriaFilter

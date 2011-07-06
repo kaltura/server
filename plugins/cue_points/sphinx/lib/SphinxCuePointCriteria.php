@@ -3,6 +3,7 @@
 class SphinxCuePointCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(
+		CuePointPeer::ID => 'int_cue_point_id',
 		CuePointPeer::ENTRY_ID => 'entry_id',
 		CuePointPeer::NAME => 'name',
 		CuePointPeer::TEXT => 'text',
@@ -57,7 +58,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 	 */
 	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit)
 	{
-		$sql = "SELECT cue_point_int_id FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
+		$sql = "SELECT str_cue_point_id FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
 		
 		//debug query
 		//echo $sql."\n"; die;
@@ -70,6 +71,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		}
 		
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
+		$ids = $this->applyIds($ids);
 		KalturaLog::log("Found " . count($ids) . " ids");
 		
 		foreach($this->keyToRemove as $key)
@@ -78,7 +80,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 			$this->remove($key);
 		}
 		
-		$this->addAnd(CuePointPeer::INT_ID, $ids, Criteria::IN);
+		$this->addAnd(CuePointPeer::ID, $ids, Criteria::IN);
 		
 		$this->recordsCount = 0;
 		
@@ -192,5 +194,10 @@ class SphinxCuePointCriteria extends SphinxCriteria
 			'tags',  
 			'roots', 
 		));
+	}
+
+	public function getIdField()
+	{
+		return CuePointPeer::ID;
 	}
 }

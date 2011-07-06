@@ -70,7 +70,7 @@ class SphinxCriterion extends KalturaCriterion
 		$sphinxField	= $this->criteria->getSphinxFieldName($field);
 		$type			= $this->criteria->getSphinxFieldType($sphinxField);
 		
-		if($field == entryPeer::ID)
+		if($field == $this->criteria->getIdField())
 		{
 			if($comparison == Criteria::EQUAL)
 				$comparison = Criteria::IN;
@@ -80,12 +80,12 @@ class SphinxCriterion extends KalturaCriterion
 			if(!is_array($value))
 				$value = explode(',', $value);
 				
-			$entryIds = array();
+			$ids = array();
 			foreach($value as $val)
-				$entryIds[$val] = crc32($val);
+				$ids[$val] = crc32($val);
 				
-			$value = $entryIds;
-			$this->criteria->setEntryIds($comparison, $entryIds);
+			$value = $ids;
+			$this->criteria->setIds($comparison, $ids);
 		}
 		
 		$valStr = print_r($value, true);

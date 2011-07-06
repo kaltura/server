@@ -27,6 +27,11 @@ class KalturaCriteria extends Criteria
 		return $this->recordsCount;
 	}
 	
+	public function getIdField()
+	{
+		return null;
+	}
+	
 	/**
 	 * @param int $recordsCount
 	 */

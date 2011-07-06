@@ -181,6 +181,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			'text' => 'text',
 			'tags' => 'tags',
 			'roots' => 'roots',
+			'int_cue_point_id' => 'indexId',
 			'cue_point_int_id' => 'intId',
 			'partner_id' => 'partnerId',
 			'start_time' => 'startTime',
@@ -203,6 +204,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		'text' => IIndexable::FIELD_TYPE_STRING,
 		'tags' => IIndexable::FIELD_TYPE_STRING,
 		'roots' => IIndexable::FIELD_TYPE_STRING,
+		'int_cue_point_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'cue_point_int_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'start_time' => IIndexable::FIELD_TYPE_INTEGER,
@@ -217,6 +219,14 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
 		'str_cue_point_id' => IIndexable::FIELD_TYPE_STRING,
 	);
+	
+	/**
+	 * @return int
+	 */
+	public function getIndexedId()
+	{
+		return crc32($this->getId());
+	}
 	
 	public static function getIndexFieldTypes()
 	{
