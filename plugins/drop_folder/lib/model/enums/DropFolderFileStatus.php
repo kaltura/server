@@ -15,4 +15,6 @@ interface DropFolderFileStatus extends BaseEnum
 	const NO_MATCH          = 8;  // no match found for the file
 	const ERROR_HANDLING    = 9;  // error - file handling cannot continue
 	const ERROR_DELETING	= 10; // error occured while trying to delete the file
+	const DOWNLOADING       = 11; // file is being downloaded to the local storage
+	const ERROR_DOWNLOADING = 12; // error while downloading file to local storage
 }
