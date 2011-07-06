@@ -93,18 +93,37 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		return parent::save($con);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BaseCuePoint::postInsert()
+	 */
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+	}
+	
+	
+	/* (non-PHPdoc)
+	 * @see BaseCuePoint::postUpdate()
+	 */
 	public function postUpdate(PropelPDO $con = null)
 	{
 		if ($this->alreadyInSave)
 			return parent::postUpdate($con);
 		
+		$objectUpdated = $this->isModified();
 		$objectDeleted = false;
 		if($this->isColumnModified(CuePointPeer::STATUS) && $this->getStatus() == CuePointStatus::DELETED)
 			$objectDeleted = true;
 			
 		$ret = parent::postUpdate($con);
+		
 		if($objectDeleted)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+			
+		if($objectUpdated)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
 			
 		return $ret;
 	}
