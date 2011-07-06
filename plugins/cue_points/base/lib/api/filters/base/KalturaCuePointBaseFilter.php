@@ -29,7 +29,6 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 		"partnerSortValueGreaterThanOrEqual" => "_gte_partner_sort_value",
 		"partnerSortValueLessThanOrEqual" => "_lte_partner_sort_value",
 		"forceStopEqual" => "_eq_force_stop",
-		"forceStopIn" => "_in_force_stop",
 		"systemNameEqual" => "_eq_system_name",
 		"systemNameIn" => "_in_system_name",
 	);
@@ -203,13 +202,6 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 	 * @var KalturaNullableBoolean
 	 */
 	public $forceStopEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $forceStopIn;
 
 	/**
 	 * 
