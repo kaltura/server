@@ -400,6 +400,14 @@ class kBusinessPreConvertDL
 		$flavor->_force = true; // force to convert the flavor, even if none complied
 		$flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE); // should not be taken in completion rules check
 		
+		$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
+		if($conversionProfile)
+		{
+			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($flavor->getFlavorParamsId(), $conversionProfile->getId());
+			if($flavorParamsConversionProfile)
+				$flavor->setReadyBehavior($flavorParamsConversionProfile->getReadyBehavior());
+		}
+		
 		$flavorAsset = kBatchManager::createFlavorAsset($flavor, $partnerId, $entryId, $flavorAssetId);
 		if (!$flavorAsset)
 		{
