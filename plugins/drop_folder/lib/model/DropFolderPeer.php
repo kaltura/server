@@ -15,6 +15,11 @@
  */
 class DropFolderPeer extends BaseDropFolderPeer
 {
+    
+    // cache classes by their type
+	protected static $class_types_cache = array(
+	    DropFolderType::LOCAL => parent::OM_CLASS,
+	);
 	
 	public static function setDefaultCriteriaFilter ()
 	{
