@@ -86,7 +86,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaNullableBoolean
-	 * @filter eq,in
+	 * @filter eq
 	 */
 	public $forceStop;
 	
