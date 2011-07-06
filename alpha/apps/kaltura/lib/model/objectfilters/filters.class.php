@@ -741,7 +741,6 @@ abstract class baseObjectFilter extends myBaseObject
 		if ( empty ( $order_string )) return;
 
 		$order_arr = explode ( "," , $order_string );
-		$allowed_order_fields;
 		foreach ( $order_arr as $order )
 		{
 			list ( $field_name , $ascending ) = self::getFieldAndDirection ( $order );
