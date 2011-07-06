@@ -145,19 +145,6 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		}
 	}
 	
-	/**
-	 * @param CuePoint $dbCuePoint
-	 * @param array $propsToSkip
-	 * @return CuePoint
-	 */
-	public function toInsertableObject($dbCuePoint = null, $propsToSkip = array())
-	{
-		if(is_null($dbCuePoint))
-			$dbCuePoint = new CuePoint();
-			
-		return parent::toInsertableObject($dbCuePoint, $propsToSkip);
-	}
-	
 	/*
 	 * @param string $cuePointId
 	 * @throw KalturaAPIException
