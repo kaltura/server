@@ -6,7 +6,7 @@ class Form_ContentFileHandlerConfig extends Infra_Form
 		$fileDeletePolicies = new Kaltura_Form_Element_EnumSelect('contentMatchPolicy', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderContentFileHandlerMatchPolicy'));
 		$fileDeletePolicies->setLabel('Content Match Policy:');
 		$fileDeletePolicies->setRequired(true);
-		$this->addElements(array($fileDeletePolicies));
+		$this->addElement($fileDeletePolicies);
 		
 		$this->addElement('text', 'slugRegex', array(
 			'label' 		=> 'Slug Regex:',

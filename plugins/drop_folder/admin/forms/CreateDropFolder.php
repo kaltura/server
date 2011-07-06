@@ -13,13 +13,18 @@ class Form_CreateDropFolder extends Zend_Form
 		$this->addElement('text', 'newPartnerId', array(
 			'label'			=> 'Publisher ID:',
 			'filters'		=> array('StringTrim'),
-		));		
+		));	
+
+		$newDropFolderType = new Kaltura_Form_Element_EnumSelect('newDropFolderType', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderType'));
+		$newDropFolderType->setLabel('Type:');
+		$newDropFolderType->setRequired(true);
+		$this->addElement($newDropFolderType);
 				
 		// submit button
 		$this->addElement('button', 'submit', array(
 			'ignore'	=> true,
 			'label'		=> 'Create New',
-			'onclick'		=> "newDropFolder($('#newPartnerId').val())",
+			'onclick'		=> "newDropFolder($('#newPartnerId').val(), $('#newDropFolderType').val())",
 			'decorators'	=> array('ViewHelper'),
 		));
 	}

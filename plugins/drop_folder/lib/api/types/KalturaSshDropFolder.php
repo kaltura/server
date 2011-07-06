@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.dropFolder
  * @subpackage api.objects
@@ -57,6 +58,9 @@ class KalturaSshDropFolder extends KalturaDropFolder
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+	
+	//TODO: add toInsertableObject & toUpdatableObject
+	
 	
 }
 

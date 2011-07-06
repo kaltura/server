@@ -1,5 +1,9 @@
 <?php
 
+/**
+* @package plugins.dropFolder
+* @subpackage model
+*/
 class SftpDropFolder extends SshDropFolder
 {
     

@@ -2,10 +2,14 @@
 class Form_DropFolderConfigure extends Infra_Form
 {
 	protected $newPartnerId;
+	protected $dropFolderType;
 	
-	public function __construct($partnerId)
+	const EXTENSION_SUBFORM_NAME = 'extensionSubForm';
+	
+	public function __construct($partnerId, $type)
 	{
 		$this->newPartnerId = $partnerId;
+		$this->dropFolderType = $type;
 		
 		parent::__construct();
 	}
@@ -19,7 +23,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$titleElement = new Zend_Form_Element_Hidden('generalTitle');
 		$titleElement->setLabel('General');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElements(array($titleElement));
+		$this->addElement($titleElement);
 		
 		$this->addElement('text', 'id', array(
 			'label'			=> 'ID:',
@@ -49,8 +53,21 @@ class Form_DropFolderConfigure extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$typeForView = new Kaltura_Form_Element_EnumSelect('typeForView', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderType'));
+		$typeForView->setLabel('Type:');
+		$typeForView->setAttrib('readonly', true);
+		$typeForView->setAttrib('disabled', 'disabled');
+		$typeForView->setValue($this->dropFolderType);
+		$this->addElement($typeForView);
+		
+		$this->addElement('hidden', 'type', array(
+			'filters' 		=> array('StringTrim'),
+			'decorators'    => array('ViewHelper'),
+		    'value'			=> $this->dropFolderType,
+		));
+		
 		$this->addElement('text', 'tags', array(
-			'label' 		=> 'Tags:',
+			'label' 		=> 'Tags: (used by batch workers)',
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
@@ -64,7 +81,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$titleElement = new Zend_Form_Element_Hidden('ingestionSettingsTitle');
 		$titleElement->setLabel('Ingestion Settings');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElements(array($titleElement));
+		$this->addElement($titleElement);
 		
 		$this->addConversionProfiles();
 		
@@ -83,7 +100,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$fileHandlerTypes->setLabel('Ingestion Source:');
 		$fileHandlerTypes->setRequired(true);
 		$fileHandlerTypes->setAttrib('onchange', 'handlerTypeChanged()');
-		$this->addElements(array($fileHandlerTypes));
+		$this->addElement($fileHandlerTypes);
 		
 		$handlerConfigForm = new Form_ContentFileHandlerConfig();
 		$this->addSubForm($handlerConfigForm, 'contentHandlerConfig'); 
@@ -95,9 +112,9 @@ class Form_DropFolderConfigure extends Infra_Form
 		// --------------------------------
 		
 		$titleElement = new Zend_Form_Element_Hidden('locationTitle');
-		$titleElement->setLabel('Folder Location');
+		$titleElement->setLabel('Local Storage Folder Location');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElements(array($titleElement));
+		$this->addElement($titleElement);
 		
 		$this->addElement('text', 'dc', array(
 			'label' 		=> 'Data Center:',
@@ -120,7 +137,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$titleElement = new Zend_Form_Element_Hidden('policiesTitle');
 		$titleElement->setLabel('Folder Policies');
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
-		$this->addElements(array($titleElement));
+		$this->addElement($titleElement);
 		
 		$this->addElement('text', 'fileSizeCheckInterval', array(
 			'label' 		=> 'Check file size every (seconds):',
@@ -131,13 +148,31 @@ class Form_DropFolderConfigure extends Infra_Form
 		$fileDeletePolicies = new Kaltura_Form_Element_EnumSelect('fileDeletePolicy', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy'));
 		$fileDeletePolicies->setLabel('File Deletion Policy:');
 		$fileDeletePolicies->setRequired(true);
-		$this->addElements(array($fileDeletePolicies));
+		$this->addElement($fileDeletePolicies);
 		
 		$this->addElement('text', 'autoFileDeleteDays', array(
 			'label' 		=> 'Auto delete files after (days):',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
+		
+		// --------------------------------
+		
+		$extendTypeSubForm = KalturaPluginManager::loadObject('Form_DropFolderConfigureExtend_SubForm', $this->dropFolderType);
+		if ($extendTypeSubForm) {
+    		$this->addElement('hidden', 'crossLine4', array(
+				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		    ));
+		    $extendTypeSubFormTitle = new Zend_Form_Element_Hidden(self::EXTENSION_SUBFORM_NAME.'_title');
+    		$extendTypeSubFormTitle->setLabel($extendTypeSubForm->getTitle());
+    		$extendTypeSubFormTitle->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+    		$this->addElement($extendTypeSubFormTitle);
+    		$extendTypeSubForm->setDecorators(array(
+    	        'FormElements',
+    	        array('HtmlTag', array('tag' => 'span', 'id' => 'frmContentFileHandlerConfig')),
+            ));
+		    $this->addSubForm($extendTypeSubForm, self::EXTENSION_SUBFORM_NAME);
+		}
 	}
 	
 	
@@ -163,17 +198,34 @@ class Form_DropFolderConfigure extends Infra_Form
 				$element->setValue(array($props[$elementName]));
 			}
 		}
+		
+		$this->setDefault('typeForView', $object->type);
+		
+		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);
+		if ($extendTypeSubForm) {
+		    $extendTypeSubForm::populateFromObject($object, $add_underscore);
+		}
 	}
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
-		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		if (isset($properties[self::EXTENSION_SUBFORM_NAME])) {
+		    $properties = array_merge($properties[self::EXTENSION_SUBFORM_NAME], $properties);
+		}
+	    $objectType = KalturaPluginManager::getObjectClass($objectType, $properties['type']);
+	    $object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT) {
 			$object->fileHandlerConfig = $this->getSubForm('contentHandlerConfig')->getObject('Kaltura_Client_DropFolder_Type_DropFolderContentFileHandlerConfig', $properties, $add_underscore, $include_empty_fields);
 		}
 		else if ($object->fileHandlerType === Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML){
 			$object->fileHandlerConfig = new Kaltura_Client_DropFolderXmlBulkUpload_Type_DropFolderXmlBulkUploadFileHandlerConfig();
 		}
+		
+		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);
+		if ($extendTypeSubForm) {
+		    $object =  $extendTypeSubForm::getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
+		}
+		
 		return $object;
 	}
 	

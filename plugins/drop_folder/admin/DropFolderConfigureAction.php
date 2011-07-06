@@ -20,6 +20,7 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 		$request = $action->getRequest();
 		$dropFolderId = $this->_getParam('drop_folder_id');
 		$partnerId = $this->_getParam('new_partner_id');
+		$dropFolderType = $this->_getParam('new_drop_folder_type');
 		$dropFolderForm = null;
 		
 		try
@@ -27,7 +28,8 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 			if ($request->isPost())
 			{
 				$partnerId = $this->_getParam('partnerId');
-				$dropFolderForm = new Form_DropFolderConfigure($partnerId);
+				$dropFolderType = $this->_getParam('type');
+				$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
 				$this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
 			}
 			else
@@ -38,12 +40,13 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 					$dropFolderPluginClient = Kaltura_Client_DropFolder_Plugin::get($client);
 					$dropFolder = $dropFolderPluginClient->dropFolder->get($dropFolderId);
 					$partnerId = $dropFolder->partnerId;
-					$dropFolderForm = new Form_DropFolderConfigure($partnerId);
+					$dropFolderType = $dropFolder->type;
+					$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
 					$dropFolderForm->populateFromObject($dropFolder, false);
 				}
 				else
 				{
-					$dropFolderForm = new Form_DropFolderConfigure($partnerId);
+					$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
 					$dropFolderForm->getElement('partnerId')->setValue($partnerId);
 				}
 			}
@@ -69,7 +72,6 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 			
 			if (is_null($dropFolderId)) {
 				$dropFolder->status = Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED;
-				$dropFolder->type = Kaltura_Client_DropFolder_Enum_DropFolderType::LOCAL;
 				$responseDropFolder = $dropFolderPluginClient->dropFolder->add($dropFolder);
 			}
 			else {

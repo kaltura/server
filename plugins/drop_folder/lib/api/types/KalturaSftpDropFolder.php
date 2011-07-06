@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package plugins.dropFolder
+ * @subpackage api.objects
+ */
 class KalturaSftpDropFolder extends KalturaSshDropFolder
 {
 	public function toObject($dbObject = null, $skip = array())

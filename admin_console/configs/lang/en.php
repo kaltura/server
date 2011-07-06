@@ -941,6 +941,9 @@ return array(
 	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED' => 'Enabled',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderType::LOCAL' => 'Local',
+    'Kaltura_Client_DropFolder_Enum_DropFolderType::FTP' => 'FTP',
+    'Kaltura_Client_DropFolder_Enum_DropFolderType::SFTP' => 'SFTP',
+    'Kaltura_Client_DropFolder_Enum_DropFolderType::SCP' => 'SCP',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',

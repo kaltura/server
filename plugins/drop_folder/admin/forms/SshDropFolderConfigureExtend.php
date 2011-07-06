@@ -1,0 +1,72 @@
+<?php
+
+abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureExtend_SubForm
+{
+	public function init()
+	{
+        $this->addElement('text', 'host', array(
+			'label'			=> 'Host:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+	    $this->addElement('text', 'port', array(
+			'label'			=> 'Port:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'username', array(
+			'label'			=> 'Username:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'password', array(
+			'label'			=> 'Password:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('file', 'sshPublicKey', array(
+			'label' => 'SFTP Public Key:'
+		));
+		
+		$this->addElement('file', 'sshPrivateKey', array(
+			'label' => 'SFTP Private Key:'
+		));		
+		
+		$this->addElement('text', 'remoteFolderPath', array(
+			'label'			=> 'Remote Path:',
+			'filters'		=> array('StringTrim'),
+		));
+	}
+	
+	
+	public function getObject($object, $objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
+	{
+        if ($object instanceof Kaltura_Client_DropFolder_Type_SshDropFolder)
+		{
+			$upload = new Zend_File_Transfer_Adapter_Http();
+			$files = $upload->getFileInfo();
+         
+			if(isset($files['sshPublicKey']))
+			{
+				$file = $files['sshPublicKey'];
+				if ($file['size'])
+				{
+					$content = file_get_contents($file['tmp_name']);
+					$object->publicKey = $content;
+				}
+			}
+			
+			if(isset($files['sshPrivateKey']))
+			{
+				$file = $files['sshPrivateKey'];
+				if ($file['size'])
+				{
+					$content = file_get_contents($file['tmp_name']);
+					$object->privateKey = $content;
+				}
+			}
+		}
+		return $object;
+	}
+	
+}

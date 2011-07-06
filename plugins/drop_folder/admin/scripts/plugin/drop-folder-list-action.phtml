@@ -143,16 +143,21 @@ function changeStatus(folderId, status, callback)
 }
 
 
-function newDropFolder(partnerId)
+function newDropFolder(partnerId, dropFolderType)
 {
 	if(!partnerId.length || isNaN(partnerId)){
 		alert('<?php echo $this->translate('Publisher ID not supplied'); ?>');
 		return;
 	}
 
-	partnerIdStr = '/new_partner_id/' + partnerId;
+	if(!dropFolderType.length || isNaN(dropFolderType)){
+		alert('<?php echo $this->translate('Drop folder type not supplied'); ?>');
+		return;
+	}
 
-	loadDropFolder(partnerIdStr);
+	paramsStr = '/new_partner_id/' + partnerId + '/new_drop_folder_type/' + dropFolderType;
+
+	loadDropFolder(paramsStr);
 }
 
 function configureDropFolder(folderId)

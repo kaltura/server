@@ -55,5 +55,7 @@ class KalturaFtpDropFolder extends KalturaDropFolder
 		return $dbObject;
 	}
 	
+	//TODO: add toInsertableObject & toUpdatableObject
+	
 }
 
