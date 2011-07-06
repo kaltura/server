@@ -46,5 +46,29 @@ class DropFolderPeer extends BaseDropFolderPeer
 		return $dropFolder;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see BaseCuePointPeer::getOMClass()
+	 */
+	public static function getOMClass($row, $colnum)
+	{
+		if($row)
+		{
+			$colnum += self::translateFieldName(self::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+			$assetType = $row[$colnum];
+			if(isset(self::$class_types_cache[$assetType]))
+				return self::$class_types_cache[$assetType];
+				
+			$extendedCls = KalturaPluginManager::getObjectClass(self::OM_CLASS, $assetType);
+			if($extendedCls)
+			{
+				self::$class_types_cache[$assetType] = $extendedCls;
+				return $extendedCls;
+			}
+			self::$class_types_cache[$assetType] = self::OM_CLASS;
+		}
+			
+		return self::OM_CLASS;
+	}
+	
 
 } // DropFolderPeer
