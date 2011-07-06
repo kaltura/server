@@ -86,9 +86,9 @@
 		]]></adhoc-task>
 	
 		<generate name="admin console (partner -2)"/>
-		<generate name="admin console admin (partner -2")/>
+		<generate name="admin console admin (partner -2)"/>
 		<generate name="partner 0"/>
-		<generate name="partner 0 admin "/>
+		<generate name="partner 0 admin"/>
 		<generate name="batch (partner -1)"/>
 		<generate name="batch (partner -1)"/>
 		
