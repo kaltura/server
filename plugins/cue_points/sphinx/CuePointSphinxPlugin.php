@@ -4,7 +4,7 @@
  */
 class CuePointSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration
 {
-	const PLUGIN_NAME = 'cuePoint';
+	const PLUGIN_NAME = 'cuePointSphinx';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
