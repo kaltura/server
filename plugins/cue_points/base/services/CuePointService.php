@@ -20,7 +20,7 @@ class CuePointService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		myPartnerUtils::addPartnerToCriteria(new CuePointPeer(), $this->getPartnerId());
+		myPartnerUtils::addPartnerToCriteria(new CuePointPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 
 		// when session is not admin, allow access to user entries only
 		if (!$this->getKs() || !$this->getKs()->isAdmin())
