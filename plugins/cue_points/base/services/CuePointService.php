@@ -51,15 +51,14 @@ class CuePointService extends KalturaBaseService
 		$filter->toObject($cuePointFilter);
 		
 		$cuePointFilter->attachToCriteria($c);
-		$count = CuePointPeer::doCount($c);
-		
 		if ($pager)
 			$pager->attachToCriteria($c);
+			
 		$list = CuePointPeer::doSelect($c);
 		
 		$response = new KalturaCuePointListResponse();
 		$response->objects = KalturaCuePointArray::fromDbArray($list);
-		$response->totalCount = $count;
+		$response->totalCount = $c->getRecordsCount();
 	
 		return $response;
 	}
