@@ -181,7 +181,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			'text' => 'text',
 			'tags' => 'tags',
 			'roots' => 'roots',
-			'int_cue_point_id' => 'indexId',
+			'int_cue_point_id' => 'indexedId',
 			'cue_point_int_id' => 'intId',
 			'partner_id' => 'partnerId',
 			'start_time' => 'startTime',
