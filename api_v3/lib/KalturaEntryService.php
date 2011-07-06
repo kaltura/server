@@ -495,7 +495,7 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry = $entry->toInsertableObject($dbEntry);
 //		KalturaLog::debug("Inserted entry id [" . $dbEntry->getId() . "] data [" . print_r($dbEntry->toArray(), true) . "]");
 
-		$this->checkAndSetValidUser($entry, $dbEntry);
+		$this->checkAndSetValidUserInsert($entry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($entry);
 		$this->validateAccessControlId($entry);
 		$this->validateEntryScheduleDates($entry);
@@ -777,73 +777,96 @@ class KalturaEntryService extends KalturaBaseService
 		
 		return $totalCount;
 	}
+	
+	/*
+	 	The following table shows the behavior of the checkAndSetValidUser functions:
+	 	
+	 	 otheruser - any user that is not the user specified in the ks
+	  
+	 	Input	 	 											Result	 
+		Action			API entry user		DB entry user		Admin KS			User KS
+		----------------------------------------------------------------------------------------
+		entry.add		null / ksuser		N/A					ksuser				ksuser
+ 						otheruser			N/A					otheruser			exception
+		entry.update	null / ksuser		ksuser				stays ksuser		stays ksuser
+ 						otheruser			ksuser				otheruser			exception
+ 						ksuser				otheruser			ksuser				exception
+ 						null / otheruser	otheruser			stays otheruser		if has edit privilege on entry => stays otheruser (checked by checkIfUserAllowedToUpdateEntry), 
+ 																					otherwise exception
+	 */
     
-	/**
+   	/**
    	 * Sets the valid user for the entry 
    	 * Throws an error if the session user is trying to add entry to another user and not using an admin session 
    	 *
    	 * @param KalturaBaseEntry $entry
    	 * @param entry $dbEntry
    	 */
-	protected function checkAndSetValidUser(KalturaBaseEntry $entry, entry $dbEntry)
+	protected function checkAndSetValidUserInsert(KalturaBaseEntry $entry, entry $dbEntry)
 	{
-		$entryPuserId = $entry->userId;
-		$dbEntryPuserId = $dbEntry->getPuserId();
-		$dbEntryKuser = $dbEntry->getKuserId();
-		$isAdminKs = $this->getKs()->isAdmin(); //maybe use this? kCurrentContext::$ks_object->isAdmin();
-					
-		KalturaLog::debug("entryPuserId [$entryPuserId], dbEntryPuserId [$dbEntryPuserId ]");
-		KalturaLog::debug("dbEntryKuser [$dbEntryKuser ], isAdminKs [$isAdminKs]");
-		
-		$kuser = null;
-		
-		//Question: maybe use ===
-		if($entryPuserId == $dbEntryPuserId) //No user change / Add
+		KalturaLog::debug("Entry puser id [" . $entry->userId . "]");
+
+		// for new entry, puser ID is null - set it from service scope
+		if ($entry->userId === null)
 		{
-			if(!$dbEntryPuserId) //if the entry has no user
-			{
-				$ksKuser = $this->getKuser(); //we take from the ks
-				$puserId = $ksKuser->getPuserId();
-			}
-			else //we take from the entry
-			{
-				$puserId = $entryPuserId;
-			}
-			
-			if($isAdminKs || $puserId == $entryPuserId) //If admin or the user is me
-			{
-				$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $puserId);
-			}
-			else
+			KalturaLog::debug("Set kuser id [" . $this->getKuser()->getId() . "] line [" . __LINE__ . "]");
+			$dbEntry->setPuserId($this->getKuser()->getPuserId());
+			$dbEntry->setKuserId($this->getKuser()->getId());
+			return;
+		}
+		
+		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
+		{
+			// non admin cannot specify a different user on the entry other than himself
+			$ksPuser = $this->getKuser()->getPuserId();
+			if ($entry->userId != $ksPuser)
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
 		}
-		else  // We must update the user (as it is not as the Db entry user)
+		
+		// need to create kuser if this is an admin creating the entry on a different user
+		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entry->userId); 
+
+		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+		$dbEntry->setKuserId($kuser->getId());
+	}
+	
+   	/**
+   	 * Sets the valid user for the entry 
+   	 * Throws an error if the session user is trying to update entry to another user and not using an admin session 
+   	 *
+   	 * @param KalturaBaseEntry $entry
+   	 * @param entry $dbEntry
+   	 */
+	protected function checkAndSetValidUserUpdate(KalturaBaseEntry $entry, entry $dbEntry)
+	{
+		KalturaLog::debug("DB puser id [" . $dbEntry->getPuserId() . "] kuser id [" . $dbEntry->getKuserId() . "]");
+
+		// user id not being changed
+		if ($entry->userId === null)
 		{
-			//From here we have a must user update (add was handled above)
-			if($isAdminKs) //if this is admin KS we can change and set a different user
+			KalturaLog::debug("entry->userId is null, not changing user");
+			return;
+		}
+		
+		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
+		{
+			$entryPuserId = $dbEntry->getPuserId();
+			
+			// non admin cannot change the owner of an existing entry
+			if ($entry->userId != $entryPuserId)
 			{
-				if(!is_null($entryPuserId)) //If there is a user on the entry we get / create it
-					$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $entryPuserId);
-				else 
-					$kuser = $this->getKuser(); //else we get / create from KS 
-			}
-			else //No admin KS only allowes when both users on the entries are the same (no update user)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));				
+				KalturaLog::debug('API entry userId ['.$entry->userId.'], DB entry userId ['.$entryPuserId.'] - change required but KS is not admin');
+				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
 		}
 		
-		$finalKuserId = $kuser->getId();
-		$finalPuserId = $dbEntry->getPuserId();
-		
-		$dbEntry->setkuser($kuser);
-		
-		KalturaLog::debug("Setting entry kuserId [$finalKuserId], psuerId [$finalPuserId]");
-		
-		
-		return;
+		// need to create kuser if this is an admin changing the owner of the entry to a different user
+		$kuser = kuserPeer::createKuserForPartner($dbEntry->getPartnerId(), $entry->userId); 
+
+		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
+		$dbEntry->setKuserId($kuser->getId());
 	}
 	
 	/**
@@ -1010,7 +1033,7 @@ class KalturaEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
 		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
-		$this->checkAndSetValidUser($entry, $dbEntry);
+		$this->checkAndSetValidUserUpdate($entry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($entry);
 		$this->validateAccessControlId($entry);
 		$this->validateEntryScheduleDates($entry);
