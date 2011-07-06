@@ -88,7 +88,7 @@ class DropFolderService extends KalturaBaseService
 		$dbDropFolder->save();
 		
 		// return the saved object
-		$dropFolder = new KalturaDropFolder();
+		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
 		$dropFolder->fromObject($dbDropFolder);
 		return $dropFolder;
 		
@@ -111,7 +111,7 @@ class DropFolderService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
 		}
 			
-		$dropFolder = new KalturaDropFolder();
+		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
 		$dropFolder->fromObject($dbDropFolder);
 		
 		return $dropFolder;
@@ -164,7 +164,7 @@ class DropFolderService extends KalturaBaseService
 		$dbDropFolder = $dropFolder->toUpdatableObject($dbDropFolder);
 		$dbDropFolder->save();
 	
-		$dropFolder = new KalturaDropFolder();
+		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
 		$dropFolder->fromObject($dbDropFolder);
 		
 		return $dropFolder;
@@ -190,7 +190,7 @@ class DropFolderService extends KalturaBaseService
 		$dbDropFolder->setStatus(DropFolderStatus::DELETED);
 		$dbDropFolder->save();
 			
-		$dropFolder = new KalturaDropFolder();
+		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
 		$dropFolder->fromObject($dbDropFolder);
 		
 		return $dropFolder;

@@ -46,27 +46,21 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{			
-		if ($baseClass == 'DropFolderFileHandler')
-		{
-			if ($enumValue == KalturaDropFolderFileHandlerType::CONTENT)
-			{
-				return new DropFolderContentFileHandler();
-			}
-		}
+		$objectClass = self::getObjectClass($baseClass, $enumValue);
 		
-		// drop folder does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
+		if (is_null($objectClass)) {
 			return null;
-		
-		if ($baseClass == 'KalturaDropFolderFileHandlerConfig')
-		{
-			if ($enumValue == KalturaDropFolderFileHandlerType::CONTENT)
-			{
-				return new KalturaDropFolderContentFileHandlerConfig();
-			}
 		}
-			
-		return null;
+		
+		if (!is_null($constructorArgs))
+		{
+			$reflect = new ReflectionClass($objectClass);
+			return $reflect->newInstanceArgs($constructorArgs);
+		}
+		else
+		{
+			return new $objectClass();
+		}
 	}
 	
 	/**
@@ -84,6 +78,22 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			}
 		}
 		
+		if ($baseClass == 'DropFolder')
+		{
+			if ($enumValue == KalturaDropFolderType::FTP)
+			{
+				return 'FtpDropFolder';
+			}
+			if ($enumValue == KalturaDropFolderType::SCP)
+			{
+				return 'ScpDropFolder';
+			}
+			if ($enumValue == KalturaDropFolderType::SFTP)
+			{
+				return 'SftpDropFolder';
+			}
+		}
+		
 		// drop folder does not work in partner services 2 context because it uses dynamic enums
 		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
 			return null;
@@ -94,7 +104,23 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			{
 				return 'KalturaDropFolderContentFileHandlerConfig';
 			}
-		}		
+		}
+
+		if ($baseClass == 'KalturaDropFolder')
+		{
+			if ($enumValue == KalturaDropFolderType::FTP)
+			{
+				return 'KalturaFtpDropFolder';
+			}
+			if ($enumValue == KalturaDropFolderType::SCP)
+			{
+				return 'KalturaScpDropFolder';
+			}
+			if ($enumValue == KalturaDropFolderType::SFTP)
+			{
+				return 'KalturaSftpDropFolder';
+			}
+		}
 		
 		return null;
 	}

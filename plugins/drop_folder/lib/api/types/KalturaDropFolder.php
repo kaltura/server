@@ -226,4 +226,36 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		return $result;
 	}
 	
+	/**
+	 * @param int $type
+	 * @return KalturaDropFolder
+	 */
+	static function getInstanceByType ($type)
+	{
+		switch ($type) 
+		{
+			case KalturaDropFolderType::LOCAL:
+			    $obj = new KalturaDropFolder();
+				break;
+		    
+		    case KalturaDropFolderType::FTP:
+				$obj = new KalturaFtpDropFolder();
+				break;
+				
+			case KalturaDropFolderType::SFTP:
+			    $obj = new KalturaSftpDropFolder();
+				break;
+			    
+			case KalturaDropFolderType::SCP:
+			    $obj = new KalturaScpDropFolder();
+				break;
+			    
+			default:
+				$obj = KalturaPluginManager::loadObject('KalturaDropFolder', $type);
+				break;
+		}
+		
+		return $obj;
+	}
+	
 }
