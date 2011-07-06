@@ -47,8 +47,7 @@ class CuePointService extends KalturaBaseService
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
 		
-		$cuePointFilter = new CuePointFilter();
-		$filter->toObject($cuePointFilter);
+		$cuePointFilter = $filter->toObject();
 		
 		$cuePointFilter->attachToCriteria($c);
 		if ($pager)
@@ -79,9 +78,7 @@ class CuePointService extends KalturaBaseService
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
 		
-		$cuePointFilter = new CuePointFilter();
-		$filter->toObject($cuePointFilter);
-		
+		$cuePointFilter = $filter->toObject();
 		$cuePointFilter->attachToCriteria($c);
 		
 		$c->applyFilters();
