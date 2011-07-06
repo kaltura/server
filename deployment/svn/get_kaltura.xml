@@ -67,7 +67,7 @@
 		<adhoc-task name="generate"><![CDATA[
 			class Secret extends Task {
 			
-				private &name;
+				private $name;
 
 				function setName($name) {
 					$this->name = $name;
@@ -80,7 +80,7 @@
 					$length = mt_rand (5, 10);
 					$key = "";
 					for ($i=0; $i<$length; $i++) $key .= $charset[(mt_rand(0,(strlen($charset)-1)))];
-					echo $this->name.' secret: '. md5($key);
+					echo $this->name.' secret: '. md5($key).PHP_EOL;
 				}
 			}
 		]]></adhoc-task>
@@ -97,25 +97,25 @@
 	<target name="generateSha1Salt"
         description="==>generate sha1 and salt values based on admin console password ">
 		
-		<adhoc-task name="generate"><![CDATA[
-			class Secret extends Task {
+		<adhoc-task name="generates"><![CDATA[
+			class Sha1Salt extends Task {
 			
-				private &password;
+				private $password;
 
 				function setPassword($password) {
 					$this->password = $password;
 				}
 				
 				function main() {
-					$salt = md5(rand(100000, 999999).$password); 
-					$sha1 = sha1($salt.$password);  
-					echo 'salt for admin console passwword:'.$salt;
-					echo 'sha1 for admin console passwword:'.$sha1;
+					$salt = md5(rand(100000, 999999).$this->password); 
+					$sha1 = sha1($salt.$this->password);  
+					echo 'salt for admin console passwword: '.$salt.PHP_EOL;
+					echo 'sha1 for admin console passwword: '.$sha1.PHP_EOL;
 				}
 			}
 		]]></adhoc-task>
 	
-		<generate password="${adminPassword}"/> 
+		<generates password="${adminPassword}"/> 
 		
 	</target>
 	
