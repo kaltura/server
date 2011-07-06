@@ -16,11 +16,11 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		CuePointPeer::TYPE => 'cue_point_type',
 		CuePointPeer::KUSER_ID => 'kuser_id',
 		CuePointPeer::PARTNER_SORT_VALUE => 'partner_sort_value',
+		CuePointPeer::FORCE_STOP => 'force_stop',
 		CuePointPeer::CREATED_AT => 'created_at',
 		CuePointPeer::UPDATED_AT => 'updated_at',
 		CuePointPeer::STR_ENTRY_ID => 'str_entry_id',
 		CuePointPeer::STR_CUE_POINT_ID => 'str_cue_point_id',
-		CuePointPeer::FORCE_STOP => 'force_stop',
 	);
 	
 	public static $sphinxOrderFields = array(
