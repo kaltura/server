@@ -43,7 +43,7 @@ class CuePointService extends KalturaBaseService
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
 			
-		$c = new Criteria();
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
 		
@@ -75,8 +75,8 @@ class CuePointService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaCuePointFilter();
-			
-		$c = new Criteria();
+						
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
 		if($this->getCuePointType())
 			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
 		
@@ -84,7 +84,9 @@ class CuePointService extends KalturaBaseService
 		$filter->toObject($cuePointFilter);
 		
 		$cuePointFilter->attachToCriteria($c);
-		return CuePointPeer::doCount($c);
+		
+		$c->applyFilters();
+		return $c->getRecordsCount();
 	}
 	
 	/**
