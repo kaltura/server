@@ -68,7 +68,6 @@ class KalturaGlobalData extends KalturaTestConfig
 		if(is_string($name) || is_integer($name))
 		{
 			$value = KalturaGlobalData::$dataFile->get($name);
-//			print("KalturaGlobalData::getData name[$name] value [ " . print_r($value, true) . "] \n");
 		}
 			
 		if(empty($value)) //Empty value equals null
@@ -130,7 +129,7 @@ class KalturaGlobalData extends KalturaTestConfig
 		if(is_string($name) || is_integer($name))
 		{
 			$value = KalturaGlobalData::getData($name);
-			KalturaLog::debug("Name [$name] Value [$value]\n");
+			KalturaLog::debug("Name [" . print_r($name,true). "] Value [" . print_r($value, true) . "]");
 		}
 		
 		if(is_null($value))
