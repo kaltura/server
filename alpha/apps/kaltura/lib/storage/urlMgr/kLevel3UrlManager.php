@@ -16,7 +16,8 @@ class kLevel3UrlManager extends kUrlManager
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
 	
-		$url = "$partnerPath/serveFlavor/v/$flavorAssetVersion/flavorId/$flavorAssetId";
+		$versionString = ($flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		
 		if($this->clipTo)
 			$url .= "/clipTo/$this->clipTo";

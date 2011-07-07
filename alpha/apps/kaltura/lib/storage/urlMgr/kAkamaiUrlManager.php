@@ -109,7 +109,8 @@ class kAkamaiUrlManager extends kUrlManager
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$this->setContainerFormat($flavorAsset->getContainerFormat());	
 
-		$url = "$partnerPath/serveFlavor/v/$flavorAssetVersion/flavorId/$flavorAssetId";
+		$versionString = ($flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		
 		if($this->protocol==StorageProfile::PLAY_FORMAT_APPLE_HTTP) {
 			if (strpos($flavorAsset->getTags(), flavorParams::TAG_APPLEMBR) === FALSE)
