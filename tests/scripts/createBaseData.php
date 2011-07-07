@@ -13,11 +13,7 @@ $config->serviceUrl = $serviceUrl;
 //$config->serviceUrl = 'http://devtests.kaltura.dev/';
 $client = new KalturaClient($config);
 $cmsPassword = 'Roni123!';
-$partner = new KalturaPartner();
-$partner->name = 'Test Partner';
-$partner->adminName = 'Test admin name'; 
-$partner->adminEmail = "test@mailinator.com";
-$partner->description = "partner for tests";
+$partner = KalturaTestDeploymentHelper::createTestPartner();
 
 $newPartner = $client->partner->register($partner, $cmsPassword); //create the new test partner
 
@@ -30,24 +26,115 @@ KalturaGlobalData::setData("@TEST_PARTNER_ADMIN_SECRET@", $newPartner->adminSecr
 KalturaGlobalData::setData("@TEST_PARTNER_SECRET@", $newPartner->secret);
 
 $config->partnerId = $newPartner->id; //Set the new test partner id
-$client = new KalturaClient($config);
+$client = new KalturaClient($config); // create a client for the new partner
 
 $ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType::ADMIN, $newPartner->id, null, null);
 $client->setKs($ks);
 
-$uiConfs = $client->uiConf->listAction();
-KalturaGlobalData::setData("@UI_CONF_ID@", $uiConfs->objects[0]->id);
+KalturaTestDeploymentHelper::addBaseData($client);
 
-$accessControls = $client->accessControl->listAction();
-KalturaGlobalData::setData("@DEFAULT_ACCESS_CONTROL@", $accessControls->objects[0]->id);
+KalturaTestDeploymentHelper::addPermissions($client);
 
-$entry = new KalturaMediaEntry();
-$entry->name ="Entry For flavor asset test";
-$entry->type = KalturaEntryType::MEDIA_CLIP;
-$entry->mediaType = KalturaMediaType::VIDEO;
-$defaultEntry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
+/**
+ * 
+ * Helper class for the test deployment
+ * @author Roni
+ *
+ */
+class KalturaTestDeploymentHelper
+{
+	/**
+	 * 
+	 * Creates a default test partner
+	 * @return KalturaPartner - The test partner
+	 */
+	public static function createTestPartner()
+	{
+		$partner = new KalturaPartner();
+		$partner->name = 'Test Partner';
+		$partner->adminName = 'Test admin name'; 
+		$partner->adminEmail = "test@mailinator.com";
+		$partner->description = "partner for tests";
+		return $partner;
+	}
 
-KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
+	/**
+	 * 
+	 * Adds the permissions for the test partner
+	 * @param $client - KalturaClient
+	 */
+	public static function addPermissions(KalturaClient $client)
+	{
+		$partnerId = $client->getConfig()->partnerId;
+		
+		//Get the admin partner id and secret from the application.ini
+		$adminConsoleIniPath = KALTURA_ROOT_PATH . "/admin_console/configs/application.ini";
+		$adminIni = new Zend_Config_Ini($adminConsoleIniPath);
+		$adminProductionSettings = $adminIni->get('production');
+		$adminConsolePartnerId = $adminProductionSettings->settings->partnerId;
+		$adminConsolePartnerSecret = $adminProductionSettings->settings->secret;
+	
+		$adminConfig = new KalturaConfiguration($adminConsolePartnerId);
+		$adminConfig->serviceUrl = $client->getConfig()->serviceUrl; //The same service url of the test partner client		 
+		$adminClient = new KalturaClient($adminConfig);
 
-$flavorAssest = $client->flavorParams->listAction();
-KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
+		//TODO: get this from the installation or outside input
+		$ks = $adminClient->user->loginByLoginId('admin@kaltura.com', 'admin'); 
+		$adminClient->setKs($ks);
+		
+		$addedPermissions = array();
+		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
+		$addedPermissions[] = $adminClient->permission->get("AUDIT_PLUGIN_PERMISSION");
+//		$addedPermissions[] = $adminClient->permission->get("CONTENTDISTRIBUTION_PLUGIN_PERMISSION");
+				
+		$systemPartnerPlugin = KalturaSystemPartnerClientPlugin::get($adminClient);
+		$partner = $systemPartnerPlugin->systemPartner->get($partnerId);
+		$partnerConfig = $systemPartnerPlugin->systemPartner->getConfiguration($partnerId);
+
+		$partnerConfig->storageServePriority = KalturaStorageServePriority::KALTURA_ONLY;
+		
+		$newConfig = new KalturaSystemPartnerConfiguration();
+		
+		foreach ($addedPermissions as $permission)
+		{
+			$newConfig->permissions[] = $permission;
+		} 
+
+		//Clean the id from the permissions
+		foreach ($newConfig->permissions as &$permission)
+		{
+			$permission->id = null;	
+			$permission->partnerId = null;
+			$permission->createdAt = null;
+			$permission->updatedAt = null;
+			$permission->status = KalturaPermissionStatus::ACTIVE;
+		}
+
+		$result = $systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $newConfig);
+	}
+
+	/**
+	 * 
+	 * Adds the base data for the test partner
+	 * @param $client KalturaClientBase
+	 */
+	public static function addBaseData($client)
+	{
+		$uiConfs = $client->uiConf->listAction();
+		KalturaGlobalData::setData("@UI_CONF_ID@", $uiConfs->objects[0]->id);
+		
+		$accessControls = $client->accessControl->listAction();
+		KalturaGlobalData::setData("@DEFAULT_ACCESS_CONTROL@", $accessControls->objects[0]->id);
+		
+		$entry = new KalturaMediaEntry();
+		$entry->name ="Entry For flavor asset test";
+		$entry->type = KalturaEntryType::MEDIA_CLIP;
+		$entry->mediaType = KalturaMediaType::VIDEO;
+		$defaultEntry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
+		
+		KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
+		
+		$flavorAssest = $client->flavorParams->listAction();
+		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
+	}
+}
