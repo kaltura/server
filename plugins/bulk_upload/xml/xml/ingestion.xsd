@@ -390,7 +390,7 @@
 			<xs:element name="storageProfileId" type="xs:int" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="storageProfile" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:choice>
-		<xs:attribute ref="url" use="required"/>
+		<xs:attribute name="url" type="xs:string" use="required"/>
 	</xs:complexType>
 	
 	<xs:complexType name="T_entryContentResource">
