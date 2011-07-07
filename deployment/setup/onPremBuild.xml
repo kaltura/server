@@ -226,10 +226,25 @@
 
     </target>
 
+	<!-- ============================================  -->
+    <!-- Target: change log level                      -->
+    <!-- ============================================  -->
+    <target name="changeLogLevel">
+         <echo msg="changing log level..." />
+         <copy file="/opt/kaltura/app/api_v3/config/logger.ini" tofile="/opt/kaltura/app/api_v3/config/logger.ini.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="writers.stream.filters.priority.priority = (\w+)" replace="writers.stream.filters.priority.priority = 7"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/opt/kaltura/app/api_v3/config/logger.ini.1" tofile="/opt/kaltura/app/api_v3/config/logger.ini" overwrite="true"/>
+    </target>
 
 
     <!-- ============================================  -->
-    <!-- Target: unit tests                            -->
+    <!-- Target: unit tests (not running)              -->
     <!-- ============================================  -->
     <target name="unitTest">
          <echo msg="creating base data for tests..." />
