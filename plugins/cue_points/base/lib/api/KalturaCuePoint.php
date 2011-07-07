@@ -188,10 +188,15 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 				 
 				if($dbCuePoint->isDescendant($this->parentId))
 					throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_IS_DESCENDANT, $this->parentId, $dbCuePoint->getId());
+					
+				if ($dbParentCuePoint->getEntryId() != $dbCuePoint->getEntryId())
+					throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
 			}
-			
-			if ($dbParentCuePoint->getEntryId() != $this->entryId)
-				throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
+			else
+			{
+				if ($dbParentCuePoint->getEntryId() != $this->entryId)
+					throw new KalturaAPIException(KalturaCuePointErrors::PARENT_ANNOTATION_DO_NOT_BELONG_TO_THE_SAME_ENTRY);
+			}
 		}
 	}
 	
