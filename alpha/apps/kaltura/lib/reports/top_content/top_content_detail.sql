@@ -8,7 +8,7 @@ SELECT
 	SUM(count_loads) count_loads,
 	( SUM(count_plays) / SUM(count_loads) ) load_play_ratio
 FROM 
-	dwh_hourly_events_entry ev ,kalturadw.dwh_dim_entries en
+	dwh_hourly_events_entry ev USE INDEX (PRIMARY),kalturadw.dwh_dim_entries en
 WHERE
 	en.entry_id=ev.entry_id
 	AND {OBJ_ID_CLAUSE}
