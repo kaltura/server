@@ -18,6 +18,7 @@ KalturaLog::info("syndicationFeedRenderer-start ");
 
 $feedId = $_GET['feedId'];
 $entryId = @$_GET['entryId'];
+$limit = $_GET['limit'];
 try
 {
 	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId);
@@ -26,7 +27,7 @@ try
 	if (isset($entryId))
 		$syndicationFeedRenderer->addEntryAttachedFilter($entryId);
 		
-	$syndicationFeedRenderer->execute();
+	$syndicationFeedRenderer->execute($limit);
 }
 catch(Exception $ex)
 {
@@ -39,6 +40,16 @@ if( !$syndicationFeedDB )
 {
 	header('KalturaSyndication: Feed Id not found');
 	die;
+}
+
+// small feeds will have a short 
+if ($limit)
+{
+	$short_limit = kConf::hasParam("v3cache_getfeed_short_limit") ? kConf::get("v3cache_getfeed_short_limit") : 50;
+	if ($limit < $short_limit)
+	{
+		$cache->setExpiry(kConf::hasParam("v3cache_getfeed_short_expiry") ? kConf::get("v3cache_getfeed_short_expiry") : 900);
+	}
 }
 
 $partnerId = $syndicationFeedDB->getPartnerId();
