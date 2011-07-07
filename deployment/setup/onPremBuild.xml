@@ -258,7 +258,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel">
          <echo msg="Done" />
     </target>
 
