@@ -1253,22 +1253,28 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Create the new media entry and set basic values
 		$entry = $this->getEntryInstanceByType($item->type);
 
-		$entry->name = (string)$item->name;
-		$entry->description = (string)$item->description;
-		$entry->tags = $this->implodeChildElements($item->tags);
-		$entry->categories = $this->implodeChildElements($item->categories);
-		$entry->userId = (string)$item->userId;;
-		$entry->licenseType = (string)$item->licenseType;
-		$entry->accessControlId =  $this->getAccessControlId($item);
-		$entry->startDate = self::parseFormatedDate((string)$item->startDate);
-		if(!$entry->startDate) //if start date is not set we will use now
-		{
-			$entry->startDate = date('YmdTHis');
-		}
-		
-		$entry->endDate = self::parseFormatedDate((string)$item->endDate);
 		$entry->type = (int)$item->type;
-		$entry->conversionProfileId = $this->getConversionProfileId($item);
+		
+		if(isset($item->name))
+			$entry->name = (string)$item->name;
+		if(isset($item->description))
+			$entry->description = (string)$item->description;
+		if(isset($item->tags))
+			$entry->tags = $this->implodeChildElements($item->tags);
+		if(isset($item->categories))
+			$entry->categories = $this->implodeChildElements($item->categories);
+		if(isset($item->userId))
+			$entry->userId = (string)$item->userId;;
+		if(isset($item->licenseType))
+			$entry->licenseType = (string)$item->licenseType;
+		if(isset($item->accessControlId))
+			$entry->accessControlId =  $this->getAccessControlId($item);
+		if(isset($item->startDate))
+			$entry->startDate = self::parseFormatedDate((string)$item->startDate);
+		if(isset($item->endDate))
+			$entry->endDate = self::parseFormatedDate((string)$item->endDate);
+		if(isset($item->conversionProfileId))
+			$entry->conversionProfileId = $this->getConversionProfileId($item);
 		
 		return $entry;
 	}
