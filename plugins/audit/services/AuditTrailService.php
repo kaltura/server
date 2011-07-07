@@ -21,38 +21,6 @@ class AuditTrailService extends KalturaBaseService
 	}
 	
 	/**
-	 * List audit trail objects by filter and pager
-	 * 
-	 * @action list
-	 * @param KalturaAuditTrailFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaAuditTrailListResponse
-	 */
-	function listAction(KalturaAuditTrailFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		if (!$filter)
-			$filter = new KalturaAuditTrailFilter;
-			
-		$auditTrailFilter = $filter->toObject();
-		
-		$c = new Criteria();
-		$auditTrailFilter->attachToCriteria($c);
-		$count = AuditTrailPeer::doCount($c);
-		
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$pager->attachToCriteria($c);
-		$list = AuditTrailPeer::doSelect($c);
-		
-		$response = new KalturaAuditTrailListResponse();
-		$response->objects = KalturaAuditTrailArray::fromDbArray($list);
-		$response->totalCount = $count;
-		
-		return $response;
-	}
-	
-	/**
 	 * Allows you to add an audit trail object and audit trail content associated with Kaltura object
 	 * 
 	 * @action add
@@ -62,7 +30,7 @@ class AuditTrailService extends KalturaBaseService
 	 */
 	function addAction(KalturaAuditTrail $auditTrail)
 	{
-		$auditTrail->validatePropertyNotNull("objectType");
+		$auditTrail->validatePropertyNotNull("auditObjectType");
 		$auditTrail->validatePropertyNotNull("objectId");
 		$auditTrail->validatePropertyNotNull("action");
 		$auditTrail->validatePropertyMaxLength("description", 1000);
@@ -105,5 +73,37 @@ class AuditTrailService extends KalturaBaseService
 		$auditTrail->fromObject($dbAuditTrail);
 		
 		return $auditTrail;
+	}
+
+		/**
+	 * List audit trail objects by filter and pager
+	 * 
+	 * @action list
+	 * @param KalturaAuditTrailFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaAuditTrailListResponse
+	 */
+	function listAction(KalturaAuditTrailFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaAuditTrailFilter;
+			
+		$auditTrailFilter = $filter->toObject();
+		
+		$c = new Criteria();
+		$auditTrailFilter->attachToCriteria($c);
+		$count = AuditTrailPeer::doCount($c);
+		
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+			
+		$pager->attachToCriteria($c);
+		$list = AuditTrailPeer::doSelect($c);
+		
+		$response = new KalturaAuditTrailListResponse();
+		$response->objects = KalturaAuditTrailArray::fromDbArray($list);
+		$response->totalCount = $count;
+		
+		return $response;
 	}
 }
