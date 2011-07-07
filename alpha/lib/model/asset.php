@@ -61,7 +61,7 @@ class asset extends Baseasset implements ISyncableFile
 		if(kFileSyncUtils::fileSync_exists($assetSyncKey))
 			kFileSyncUtils::softCopy($assetSyncKey, $newAssetSyncKey);
 
-		if(kFileSyncUtils::fileSync_exists($assetSyncKey))
+		if(kFileSyncUtils::fileSync_exists($convertLogSyncKey))
 			kFileSyncUtils::softCopy($convertLogSyncKey, $newConvertLogSyncKey);
 		
 		return $newFlavorAsset;
