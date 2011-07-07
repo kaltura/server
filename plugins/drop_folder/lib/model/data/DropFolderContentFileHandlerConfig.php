@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package plugin.dropFolder
+ * @subpackage model.data
+ */
 class DropFolderContentFileHandlerConfig extends DropFolderFileHandlerConfig
 {
 		

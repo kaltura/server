@@ -1,9 +1,8 @@
 <?php
 
 /**
- * Enter description here ...
- * @author Dor
- *
+ * @package plugin.dropFolder
+ * @subpackage model.data
  */
 class DropFolderFileHandlerConfig
 {
