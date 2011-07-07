@@ -58,12 +58,10 @@ class asset extends Baseasset implements ISyncableFile
 		$newAssetSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$newConvertLogSyncKey = $newFlavorAsset->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 		
-//		May be remote storage file sync
-//		if(kFileSyncUtils::file_exists($assetSyncKey, true))
+		if(kFileSyncUtils::fileSync_exists($assetSyncKey))
 			kFileSyncUtils::softCopy($assetSyncKey, $newAssetSyncKey);
 
-//		May be remote storage file sync		
-//		if(kFileSyncUtils::file_exists($convertLogSyncKey, true))
+		if(kFileSyncUtils::fileSync_exists($assetSyncKey))
 			kFileSyncUtils::softCopy($convertLogSyncKey, $newConvertLogSyncKey);
 		
 		return $newFlavorAsset;
