@@ -142,7 +142,7 @@ kmc.functions = {
 	},
 	getAddPanelPosition : function() {
 		var el = $("#add").parent();
-		return (el.position().left + el.width());
+		return (el.position().left + el.width() - 10);
 	}
 };
 
@@ -911,7 +911,7 @@ kmc.layout = {
 			// Set width & height
 			$modal.css( {
 				'width' : options.width,
-				'min-height' : options.height
+				'height' : options.height
 			}).attr('class', '');
 
 			// Insert data into modal
@@ -968,6 +968,7 @@ kmc.layout = {
 		},
 		close: function() {
 			$("#modal").fadeOut(300, function() {
+				$("#modal").find(".content").html('');
 				kmc.layout.overlay.hide();
 				kmc.utils.hideFlash();
 			});

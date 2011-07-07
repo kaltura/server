@@ -10,12 +10,15 @@ body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) re
    #kmcHeader ul { height:29px; margin: -4px 0 0 50px; float:left;}
     #kmcHeader li { float:left;}
      #kmcHeader li a { _width:0; height:32px; padding:  0 24px 0 0 ; display:block; font: bold 11px arial,sans-serif; color:#e3e3e3;}
-      #kmcHeader li a span { display:block; padding: 11px 0 9px 25px;}
+      #kmcHeader li a span { display:block; padding: 11px 8px 9px 25px;}
       #kmcHeader li a:hover { color:#A6E7F6;}
       #kmcHeader li a.active { padding-right:24px; background: url(../images/kmc/kmc_sprite.png) right -62px; color:#222;}
       #kmcHeader li a.active span { background: url(../images/kmc/kmc_sprite.png) 0 -62px;}
-	  #kmcHeader li a.active.menu { background: #c2c2c2; }
-	  #kmcHeader li a.active.menu span { background: #c2c2c2; }
+	  #kmcHeader li a.active.menu { background: url(../images/kmc/kmc_sprite.png) repeat-x scroll -23px -292px transparent; }
+	  #kmcHeader li a.active.menu span { background: url(../images/kmc/kmc_sprite.png) repeat-x scroll -23px -292px transparent; }
+	  #kmcHeader li a.menu { background: url("../images/kmc/kmc_sprite.png") repeat-x scroll -23px -208px transparent; margin-right: 10px; }
+	  #kmcHeader li a.menu:hover { background: url("../images/kmc/kmc_sprite.png") repeat-x scroll -23px -249px transparent; }
+	  #kmcHeader li a.active.menu:hover { background: url(../images/kmc/kmc_sprite.png) repeat-x scroll -23px -292px transparent; }
     #loading { color: #fff; font-weight: bold; font-size: 12px; padding: 0; margin: 0; }
       #loading img { margin: 11px 10px 0 0; border: 0; }
       #loading span { display: block; margin: -15px 0 0 25px; font: bold 11px arial,sans-serif; }
