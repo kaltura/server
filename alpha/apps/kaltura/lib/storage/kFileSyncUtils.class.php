@@ -827,27 +827,30 @@ class kFileSyncUtils
 			$source_file_syncs[$file_sync->getDc()] = $file_sync;
 		}
 		
-		// create records for all other DCs with status READY
-		// link is always ready since no one is going to fetch it.
-		$other_dcs = kDataCenterMgr::getAllDcs( );
-		foreach ( $other_dcs as $remote_dc )
+		foreach ( $source_file_syncs as $remote_dc_id => $source_file_sync )
 		{
-			// TODO - maybe we should create the file sync
-			if(!isset($source_file_syncs[$remote_dc["id"]]))
-				continue;
-				
 			$remote_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
-			$remote_dc_file_sync->setDc( $remote_dc["id"] );
+			$remote_dc_file_sync->setDc( $remote_dc_id );
 			$remote_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
 			$remote_dc_file_sync->setOriginal ( 0 );
-			$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
+			
+			if($source_file_sync->getType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			{
+				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
+				$remote_dc_file_sync->setFileRoot ( $source_file_sync->getFileRoot() );
+				$remote_dc_file_sync->setFilePath ( $source_file_sync->getFilePath() );				
+			}
+			else
+			{
+				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
+				$remote_dc_file_sync->setLinkedId ( $source_file_sync->getId() );
+			}
 			$remote_dc_file_sync->setReadyAt ( time() );
 			$remote_dc_file_sync->setPartnerID ( $target_key->partner_id );
-			$remote_dc_file_sync->setLinkedId ( $source_file_syncs[$remote_dc["id"]]->getId() );
 			$remote_dc_file_sync->save();
 			
 			// increment link_cont for remote DCs sources
-			self::incrementLinkCountForFileSync($source_file_syncs[$remote_dc["id"]]);
+			self::incrementLinkCountForFileSync($source_file_sync);
 			
 			kEventsManager::raiseEvent(new kObjectAddedEvent($remote_dc_file_sync));
 		}
