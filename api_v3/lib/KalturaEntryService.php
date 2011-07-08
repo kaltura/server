@@ -199,7 +199,7 @@ class KalturaEntryService extends KalturaBaseService
     	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     	{
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-       		kFileSyncUtils::createSyncFileLinkForKey($syncKey, $srcSyncKey, false);
+       		kFileSyncUtils::createSyncFileLinkForKey($syncKey, $srcSyncKey);
        		
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();	
@@ -228,7 +228,7 @@ class KalturaEntryService extends KalturaBaseService
         }
                 
         $newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 
         if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
@@ -672,7 +672,7 @@ class KalturaEntryService extends KalturaBaseService
                 
         $srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
         $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
 				

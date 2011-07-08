@@ -254,7 +254,7 @@ class CaptionAssetService extends KalturaBaseService
 		$captionAsset->save();
 		
         $newSyncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
                 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);

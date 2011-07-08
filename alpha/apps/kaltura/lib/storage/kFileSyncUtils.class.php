@@ -336,7 +336,7 @@ class kFileSyncUtils
 	{
 		# create new rows in table - type FILE_SYNC_FILE_TYPE_LINK , links to existing objects in table
 		# each row links to the source in the same DC
-		self::createSyncFileLinkForKey( $target_key, $source_key );
+		self::createSyncFileLinkForKey($target_key, $source_key);
 	}
 	
 	/**
@@ -783,20 +783,19 @@ class kFileSyncUtils
 	 * @param FileSyncKey $key
 	 * @param $file_root
 	 * @param $real_path
-	 * @param $strict
 	 * @return SyncFile
 	 */
-	public static function createSyncFileLinkForKey ( FileSyncKey $target_key , FileSyncKey $source_key , $strict = true )
+	public static function createSyncFileLinkForKey ( FileSyncKey $target_key , FileSyncKey $source_key )
 	{
 		KalturaLog::log(__METHOD__." - target_key [$target_key], source_key [$source_key]");
 		// TODO - see that if in strict mode - there are no duplicate keys -> update existing records AND set the other DC's records to PENDING
 		$dc = kDataCenterMgr::getCurrentDc();
 		$dc_id = $dc["id"];
 
-		$sourceFile = self::getLocalFileSyncForKey($source_key , $strict );
+		list($sourceFile, $local) = self::getReadyFileSyncForKey($source_key, true, false);
 		if (!$sourceFile)
 		{
-			KalturaLog::log(__METHOD__." - Warning: no source but NOT strict. target_key [$target_key], source_key [$source_key] ");
+			KalturaLog::log(__METHOD__." - Warning: no source. target_key [$target_key], source_key [$source_key] ");
 			return null;
 		}
 		
@@ -829,12 +828,15 @@ class kFileSyncUtils
 		
 		foreach ( $source_file_syncs as $remote_dc_id => $source_file_sync )
 		{
+			if($source_file_sync->getDc() == $current_dc_file_sync->getDc())
+				continue;
+				
 			$remote_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
 			$remote_dc_file_sync->setDc( $remote_dc_id );
 			$remote_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
 			$remote_dc_file_sync->setOriginal ( 0 );
 			
-			if($source_file_sync->getType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			if($source_file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
 				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
 				$remote_dc_file_sync->setFileRoot ( $source_file_sync->getFileRoot() );
@@ -850,7 +852,8 @@ class kFileSyncUtils
 			$remote_dc_file_sync->save();
 			
 			// increment link_cont for remote DCs sources
-			self::incrementLinkCountForFileSync($source_file_sync);
+			if($source_file_sync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
+				self::incrementLinkCountForFileSync($source_file_sync);
 			
 			kEventsManager::raiseEvent(new kObjectAddedEvent($remote_dc_file_sync));
 		}

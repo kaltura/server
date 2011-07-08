@@ -569,7 +569,7 @@ class kFlowHelper
 			$entry->setCreateThumb(false);
 			$entry->save();
 			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey, false);
+			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey);
 		
 			if($syncFile)
 			{

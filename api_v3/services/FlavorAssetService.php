@@ -275,7 +275,7 @@ class FlavorAssetService extends KalturaBaseService
 		$flavorAsset->save();
 		
         $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
                 
         $fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
         $fileSync = kFileSyncUtils::resolve($fileSync);

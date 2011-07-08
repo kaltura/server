@@ -336,7 +336,7 @@ class MetadataProfileService extends KalturaBaseService
 			$metadata->save();
 			
 			$key = $metadata->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-			$fileSync = kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey, false);
+			$fileSync = kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey);
 			if(!$fileSync)
 				continue;
 			

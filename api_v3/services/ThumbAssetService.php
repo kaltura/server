@@ -297,7 +297,7 @@ class ThumbAssetService extends KalturaBaseService
 		$thumbAsset->save();
 		
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey, false);
+        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
                 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
 		list($width, $height, $type, $attr) = getimagesize($finalPath);
@@ -497,7 +497,7 @@ class ThumbAssetService extends KalturaBaseService
 		
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey, false);
+		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
 	}
 
 	/**

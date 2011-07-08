@@ -42,8 +42,7 @@ class kContentDistributionObjectCopiedHandler implements kObjectCopiedEventConsu
  			
  			kFileSyncUtils::createSyncFileLinkForKey(
  				$newDistributionProfile->getSyncKey(DistributionProfile::FILE_SYNC_DISTRIBUTION_PROFILE_CONFIG),
- 				$distributionProfile->getSyncKey(DistributionProfile::FILE_SYNC_DISTRIBUTION_PROFILE_CONFIG),
- 				false
+ 				$distributionProfile->getSyncKey(DistributionProfile::FILE_SYNC_DISTRIBUTION_PROFILE_CONFIG)
  			);
  		}
 	}

@@ -71,8 +71,7 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
  			
  			kFileSyncUtils::createSyncFileLinkForKey(
  				$newMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA),
- 				$metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA),
- 				false
+ 				$metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA)
  			);
  		}
 	}
@@ -97,14 +96,12 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
  			
  			kFileSyncUtils::createSyncFileLinkForKey(
  				$newMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION),
- 				$metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION),
- 				false
+ 				$metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION)
  			);
  			
  			kFileSyncUtils::createSyncFileLinkForKey(
  				$newMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS),
- 				$metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS),
- 				false
+ 				$metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS)
  			);
  			
  			$metadataProfileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfile->getId());

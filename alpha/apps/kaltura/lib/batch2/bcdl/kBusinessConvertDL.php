@@ -48,7 +48,7 @@ class kBusinessConvertDL
 				$oldFileSync = $oldAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				$newFileSync = $newAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				
-				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync, false);
+				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);
 				
 				unset($newAssets[$oldAsset->getFlavorParamsId()]);
 			}	
