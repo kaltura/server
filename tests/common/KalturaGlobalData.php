@@ -78,7 +78,8 @@ class KalturaGlobalData extends KalturaTestConfig
 	
 	/**
 	 * 
-	 * Inits the global data file 
+	 * Inits the global data file
+	 * @return true - If global exists or was created, null other wise 
 	 */
 	private static function initDataFile()
 	{
@@ -89,8 +90,10 @@ class KalturaGlobalData extends KalturaTestConfig
 		
 		if(file_exists(KalturaGlobalData::DEFAULT_DATA_PATH))
 			KalturaGlobalData::$dataFile = new KalturaTestConfig(KalturaGlobalData::$dataFilePath);
-		else 
+		else
 			return null;
+			
+		return true;
 	}
 	
 	/**
