@@ -947,7 +947,7 @@ kmc.layout = {
 			if( $.browser.msie ) {
 				//$modal.css('display', 'block');
 			}
-			
+			debugService.trace('call modal position');
 			this.position();
 			debugService.trace('end show modal');
 		},
