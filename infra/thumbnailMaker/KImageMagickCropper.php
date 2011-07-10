@@ -150,25 +150,31 @@ class KImageMagickCropper extends KBaseCropper
 							$this->srcHeight = $cropHeight;
 						if ($cropWidth)
 							$this->srcWidth = $cropWidth;
-						
-						if($width < $height)
+												
+						if($width * $this->srcHeight < $height * $this->srcWidth)
 						{
 							$w = $width;
 							$h = ceil($this->srcHeight * ($width / $this->srcWidth));
 							$borderHeight = ceil(($height - $h) / 2);
+							if ($borderHeight * 2 + $h > $height)
+							{
+								$h--;
+							}
 						}
 						else 
 						{
 							$h = $height;
 							$w = ceil($this->srcWidth * ($height / $this->srcHeight));
 							$borderWidth = ceil(($width - $w) / 2);
+							if ($borderWidth * 2 + $w > $width)
+							{
+								$w--;
+							}
 						}
 						
-						$bgcolor = dechex($bgcolor);
+						$bgcolor = sprintf('%06x', $bgcolor);
 						$attributes[] = "-bordercolor \"#{$bgcolor}\"";
 						$attributes[] = "-resize {$w}x{$h}";
-						$borderWidth = ($cropX ? $cropX : $cropWidth);
-						$borderHeight = ($cropY ? $cropY : $cropHeight);
 						$attributes[] = "-border {$borderWidth}x{$borderHeight} -gravity Center";
 					}
 					else 
