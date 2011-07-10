@@ -31,61 +31,6 @@ class CuePointService extends KalturaBaseService
 	}
 	
 	/**
-	 * List cue point objects by filter and pager
-	 * 
-	 * @action list
-	 * @param KalturaCuePointFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaCuePointListResponse
-	 */
-	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		if (!$filter)
-			$filter = new KalturaCuePointFilter();
-			
-		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
-		if($this->getCuePointType())
-			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
-		
-		$cuePointFilter = $filter->toObject();
-		
-		$cuePointFilter->attachToCriteria($c);
-		if ($pager)
-			$pager->attachToCriteria($c);
-			
-		$list = CuePointPeer::doSelect($c);
-		
-		$response = new KalturaCuePointListResponse();
-		$response->objects = KalturaCuePointArray::fromDbArray($list);
-		$response->totalCount = $c->getRecordsCount();
-	
-		return $response;
-	}
-	
-	/**
-	 * count cue point objects by filter
-	 * 
-	 * @action count
-	 * @param KalturaCuePointFilter $filter
-	 * @return int
-	 */
-	function countAction(KalturaCuePointFilter $filter = null)
-	{
-		if (!$filter)
-			$filter = new KalturaCuePointFilter();
-						
-		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
-		if($this->getCuePointType())
-			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
-		
-		$cuePointFilter = $filter->toObject();
-		$cuePointFilter->attachToCriteria($c);
-		
-		$c->applyFilters();
-		return $c->getRecordsCount();
-	}
-	
-	/**
 	 * Allows you to add an cue point object associated with an entry
 	 * 
 	 * @action add
@@ -162,24 +107,58 @@ class CuePointService extends KalturaBaseService
 	}
 	
 	/**
-	 * delete cue point by id, and delete all children cue points
+	 * List cue point objects by filter and pager
 	 * 
-	 * @action delete
-	 * @param string $id 
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
-	 */		
-	function deleteAction($id)
+	 * @action list
+	 * @param KalturaCuePointFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaCuePointListResponse
+	 */
+	function listAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		$dbCuePoint = CuePointPeer::retrieveByPK( $id );
-		
-		if(!$dbCuePoint)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		if (!$filter)
+			$filter = new KalturaCuePointFilter();
 			
-		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		if($this->getCuePointType())
+			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
 		
-		$dbCuePoint->setStatus(CuePointStatus::DELETED);
-		$dbCuePoint->save();
+		$cuePointFilter = $filter->toObject();
+		
+		$cuePointFilter->attachToCriteria($c);
+		if ($pager)
+			$pager->attachToCriteria($c);
+			
+		$list = CuePointPeer::doSelect($c);
+		
+		$response = new KalturaCuePointListResponse();
+		$response->objects = KalturaCuePointArray::fromDbArray($list);
+		$response->totalCount = $c->getRecordsCount();
+	
+		return $response;
+	}
+	
+	/**
+	 * count cue point objects by filter
+	 * 
+	 * @action count
+	 * @param KalturaCuePointFilter $filter
+	 * @return int
+	 */
+	function countAction(KalturaCuePointFilter $filter = null)
+	{
+		if (!$filter)
+			$filter = new KalturaCuePointFilter();
+						
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		if($this->getCuePointType())
+			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
+		
+		$cuePointFilter = $filter->toObject();
+		$cuePointFilter->attachToCriteria($c);
+		
+		$c->applyFilters();
+		return $c->getRecordsCount();
 	}
 	
 	/**
@@ -207,5 +186,26 @@ class CuePointService extends KalturaBaseService
 		
 		$cuePoint->fromObject($dbCuePoint);
 		return $cuePoint;
+	}
+	
+	/**
+	 * delete cue point by id, and delete all children cue points
+	 * 
+	 * @action delete
+	 * @param string $id 
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */		
+	function deleteAction($id)
+	{
+		$dbCuePoint = CuePointPeer::retrieveByPK( $id );
+		
+		if(!$dbCuePoint)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			
+		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		$dbCuePoint->setStatus(CuePointStatus::DELETED);
+		$dbCuePoint->save();
 	}
 }
