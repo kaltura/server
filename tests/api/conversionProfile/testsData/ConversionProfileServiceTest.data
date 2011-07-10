@@ -34,7 +34,7 @@
         <flavorParamsIds type="string">0</flavorParamsIds>
         <isDefault></isDefault>
         <isPartnerDefault></isPartnerDefault>
-        <cropDimensions type="string" dbValue="KalturaCropDimensions">KalturaCropDimensions</cropDimensions>
+        <cropDimensions type="string">KalturaCropDimensions</cropDimensions>
         <clipStart type="string">-1</clipStart>
         <clipDuration type="string">-1</clipDuration>
         <xslTransformation></xslTransformation>

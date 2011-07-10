@@ -66,7 +66,7 @@
         <creditUserName></creditUserName>
         <creditUrl></creditUrl>
         <mediaDate></mediaDate>
-        <dataUrl type="string" dbValue="http://devtests.kaltura.co.cc/p/495810/sp/49581000/flvclipper/entry_id/0_q1yz4npm/version/0">http://devtests.kaltura.co.cc/p/495810/sp/49581000/flvclipper/entry_id/0_1l07pxto/version/0</dataUrl>
+        <dataUrl type="string"></dataUrl>
         <flavorParamsIds></flavorParamsIds>
         <plays type="string">0</plays>
         <views type="string">0</views>

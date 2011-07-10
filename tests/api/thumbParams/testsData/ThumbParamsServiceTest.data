@@ -49,7 +49,7 @@
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format dbValue="KalturaContainerFormat"></format>
+        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
       </OutputReference>
     </TestCaseData>
@@ -79,7 +79,7 @@
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format dbValue="KalturaContainerFormat"></format>
+        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
       </OutputReference>
     </TestCaseData>
@@ -134,7 +134,7 @@
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format dbValue="KalturaContainerFormat"></format>
+        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
       </OutputReference>
     </TestCaseData>

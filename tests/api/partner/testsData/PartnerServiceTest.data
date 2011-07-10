@@ -62,13 +62,13 @@
         <defConversionProfileType type="string">1001</defConversionProfileType>
         <notify type="string">0</notify>
         <status type="string">1</status>
-        <allowQuickEdit type="string" dbValue="1">'1'</allowQuickEdit>
+        <allowQuickEdit type="string">'1'</allowQuickEdit>
         <mergeEntryLists></mergeEntryLists>
         <notificationsConfig></notificationsConfig>
         <maxUploadSize type="string">150</maxUploadSize>
         <partnerPackage type="string">1</partnerPackage>
-        <secret type="string" dbValue="068c78e1d3b9eeaff970ad5a2c4f7bdc">101c6bbc05b29b509ec1e4c9e6735b37</secret>
-        <adminSecret type="string" dbValue="5296ea68fb94a60244b3e6b2090c27bd">5bf4f30d0d858d0015ad7699b56e51c2</adminSecret>
+        <secret type="string">101c6bbc05b29b509ec1e4c9e6735b37</secret>
+        <adminSecret type="string">5bf4f30d0d858d0015ad7699b56e51c2</adminSecret>
         <cmsPassword></cmsPassword>
         <allowMultiNotification></allowMultiNotification>
         <adminLoginUsersQuota type="string">3</adminLoginUsersQuota>
