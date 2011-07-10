@@ -332,8 +332,7 @@ class Form_PartnerConfiguration extends Infra_Form
 					
 				$systemPartnerConfiguration->permissions[] = $permission;
 			}
-		}
-		
+		}		
 		foreach ($this->limitSubForms as $subForm)
 		{
 			if ($subForm instanceof Form_PartnerConfigurationLimitSubForm)
@@ -343,7 +342,6 @@ class Form_PartnerConfiguration extends Infra_Form
 				$systemPartnerConfiguration->limits[] = $limit;			
 			}
 		}		
-
 		return $systemPartnerConfiguration;
 	}
 		

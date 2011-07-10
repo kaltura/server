@@ -42,8 +42,7 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 	              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatLeft')),
 			));
 		}
-		
-		
+
 		$form->addElement('text',  $this->limitType.'_overagePrice', array(
 			'label'			=> 'Overage Fee:',
 			'filters'		=> array('StringTrim'),
