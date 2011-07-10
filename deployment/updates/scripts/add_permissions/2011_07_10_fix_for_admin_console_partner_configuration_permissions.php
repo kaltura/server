@@ -2,8 +2,6 @@
 
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
-PermissionPeer::clearInstancePool();
-
 $permissionsToChange = array(
     'systemPartner.'.SystemPartnerPermissionName::SYSTEM_ADMIN_PUBLISHER_CONFIG_ACCOUNT_INFO,
     'systemPartner.'.SystemPartnerPermissionName::SYSTEM_ADMIN_PUBLISHER_CONFIG_GROUP_OPTIONS,
