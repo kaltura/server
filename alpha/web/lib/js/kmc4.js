@@ -118,7 +118,7 @@ kmc.functions = {
 	onCloseKcw : function() {
 		kmc.layout.modal.close();
 		$("#kcms")[0].gotoPage({
-			module: "content",
+			moduleName: "content",
 			subtab: "manage"
 		});
 	},
