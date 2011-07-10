@@ -931,6 +931,8 @@ kmc.layout = {
 				kmc.layout.modal.close();
 			});
 
+			debugService.trace('end create modal');
+
 			return $modal;
 		},
 
@@ -946,10 +948,11 @@ kmc.layout = {
 			}
 			
 			kmc.layout.modal.position();
+			debugService.trace('end show modal');
 		},
 
 		open: function(data) {
-			debugService.trace('bla');
+			debugService.trace('openModal');
 			this.create(data);
 			this.show();
 		},
