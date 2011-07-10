@@ -552,7 +552,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	 * (non-PHPdoc)
 	 * @see ClientGeneratorFromPhp::writeServiceAction()
 	 */
-	protected function writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector = null)
+	protected function writeServiceAction($serviceId, $serviceName, $action, $actionParams, $outputTypeReflector)
 	{
 		if($outputTypeReflector && $outputTypeReflector->isFile())
 			return;
