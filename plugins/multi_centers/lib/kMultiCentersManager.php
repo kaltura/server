@@ -10,7 +10,7 @@ class kMultiCentersManager
 	 * @param string $sourceFileUrl
 	 * @return BatchJob
 	 */
-	public static function addFileSyncImportJob($entryId, FileSync $fileSync, $sourceFileUrl, BatchJob $parnetJob = null)
+	public static function addFileSyncImportJob($entryId, FileSync $fileSync, $sourceFileUrl, BatchJob $parentJob = null)
 	{
 		$partnerId = $fileSync->getPartnerId();
 		$fileSyncId = $fileSync->getId();
@@ -24,7 +24,7 @@ class kMultiCentersManager
 		// tmpFilePath and destFilePath will be set later during get exlusive call on the target data center 
 		
 		$batchJob = null;
-		if($parnetJob)
+		if($parentJob)
 		{
 			$batchJob = $parentJob->createChild(true, $dc);
 		}
