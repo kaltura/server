@@ -942,13 +942,13 @@ kmc.layout = {
 
 			kmc.utils.hideFlash(true);
 			kmc.layout.overlay.show();
-
+			debugService.trace('before fade modal');
 			$modal.fadeIn(600).css('display', 'table');
 			if( $.browser.msie ) {
 				//$modal.css('display', 'block');
 			}
 			
-			kmc.layout.modal.position();
+			this.position();
 			debugService.trace('end show modal');
 		},
 
