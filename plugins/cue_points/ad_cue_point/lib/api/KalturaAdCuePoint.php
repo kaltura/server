@@ -47,7 +47,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 
 	public function __construct()
 	{
-		$this->type = AdCuePointPlugin::getApiValue(AdCuePointType::AD);
+		$this->type = AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD);
 	}
 	
 	private static $map_between_objects = array
