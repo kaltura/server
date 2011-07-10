@@ -50,6 +50,7 @@ class scpMgr extends kFileTransferMgr
 	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
 	{
 		// try to upload file
+		$remote_file = trim($remote_file, '/');
 		return ssh2_scp_send ($this->getConnection() , $local_file, $remote_file);
 	}
 	
@@ -58,12 +59,14 @@ class scpMgr extends kFileTransferMgr
 	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
 	{	
 		// try to download file
+		$remote_file = trim($remote_file, '/');
 		return ssh2_scp_recv($this->getConnection(), $remote_file, $local_file);
 	}
 	
 	// create a new directory
 	protected function doMkDir ($remote_path)
 	{
+	    $remote_path = trim($remote_path, '/');
 		$mkdir_cmd = 'mkdir -p ' . $remote_path;
 		$exec_output = $this->execCommand($mkdir_cmd);
 		return (trim($exec_output) == ''); // empty output means the command passed ok
@@ -72,6 +75,7 @@ class scpMgr extends kFileTransferMgr
 	// chmod the given remote file
 	protected function doChmod ($remote_file, $chmod_code)
 	{
+	    $remote_file = trim($remote_file, '/');
 		$chmod_cmd = 'chmod ' . $chmod_code . ' ' . $remote_file;
 		$exec_output = $this->execCommand($chmod_cmd);
 		return (trim($exec_output) == ''); // empty output means the command passed ok
@@ -80,6 +84,7 @@ class scpMgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
+	    $remote_file = trim($remote_file, '/');
 		$exists_cmd = 'test -e ' . $remote_file . ' && echo EXISTS';
 		$exec_output = $this->execCommand($exists_cmd);
 		return (trim($exec_output) == 'EXISTS');
@@ -93,28 +98,31 @@ class scpMgr extends kFileTransferMgr
 		return $this->execCommand($pwd_cmd);
 	}
 
-        // delete a file and return true/false according to success
-        protected function doDelFile ($remote_file)
-        {
-                $delfile_cmd = 'rm ' . $remote_file;
-                $exec_output = $this->execCommand($delfile_cmd);
-                return (trim($exec_output) == ''); // empty output means the command passed ok
-        }
+    // delete a file and return true/false according to success
+    protected function doDelFile ($remote_file)
+    {
+            $remote_file = trim($remote_file, '/');
+            $delfile_cmd = 'rm ' . $remote_file;
+            $exec_output = $this->execCommand($delfile_cmd);
+            return (trim($exec_output) == ''); // empty output means the command passed ok
+    }
 
-         // delete a directory and return true/false according to success
-        protected function doDelDir ($remote_path)
-        {
-                $deldir_cmd = 'rm -r ' . $remote_path;
-                $exec_output = $this->execCommand($deldir_cmd);
-                return (trim($exec_output) == ''); // empty output means the command passed ok
-        }
+     // delete a directory and return true/false according to success
+    protected function doDelDir ($remote_path)
+    {
+            $remote_path = trim($remote_path, '/');
+            $deldir_cmd = 'rm -r ' . $remote_path;
+            $exec_output = $this->execCommand($deldir_cmd);
+            return (trim($exec_output) == ''); // empty output means the command passed ok
+    }
 	
 
 	protected function doList ($remote_path)
 	{
-               $lsdir_cmd = 'ls ' . $remote_path;
-               $exec_output = $this->execCommand($lsdir_cmd);
-                return $exec_output;
+        $remote_path = trim($remote_path, '/');
+        $lsdir_cmd = 'ls ' . $remote_path;
+        $exec_output = $this->execCommand($lsdir_cmd);
+        return $exec_output;
 	}	
 	
 	// execute the given command on the server
