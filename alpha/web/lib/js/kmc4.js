@@ -931,29 +931,22 @@ kmc.layout = {
 				kmc.layout.modal.close();
 			});
 
-			debugService.trace('end create modal');
-
 			return $modal;
 		},
 
 		show: function() {
-			debugService.trace('start show modal');
 			var $modal = $("#modal");
 
 			kmc.utils.hideFlash(true);
 			kmc.layout.overlay.show();
-			debugService.trace('before fade modal');
 			$modal.fadeIn(600);
 			if( ! $.browser.msie ) {
 				$modal.css('display', 'table');
 			}
-			debugService.trace('call modal position');
 			this.position();
-			debugService.trace('end show modal');
 		},
 
 		open: function(data) {
-			debugService.trace('openModal');
 			this.create(data);
 			this.show();
 		},
@@ -970,9 +963,7 @@ kmc.layout = {
 				'top' : mTop + "px",
 				'left' : mLeft + "px"
 			});
-
-			debugService.trace('Top: ' + mTop);
-			debugService.trace('Left: ' + mLeft);
+			
 		},
 		close: function() {
 			$("#modal").fadeOut(300, function() {
