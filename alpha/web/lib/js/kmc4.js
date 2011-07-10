@@ -1,7 +1,7 @@
 /* kmc and kmc.vars defined in script block in kmc4success.php */
 
 // For debug enable to true. Debug will show information in the browser console
-kmc.vars.debug = true;
+kmc.vars.debug = false;
 
 // Quickstart guide (should be moved to kmc4success.php)
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf";
@@ -11,8 +11,6 @@ kmc.log = function(msg) {
 	if(kmc.vars.debug) {
 		if( typeof console !='undefined' && console.log){
 			console.log(arguments);
-		} else {
-			debugService.trace(msg);
 		}
 	}
 };
@@ -968,8 +966,8 @@ kmc.layout = {
 				'left' : mLeft + "px"
 			});
 
-			kmc.log('Top: ' + mTop);
-			kmc.log('Left: ' + mLeft);
+			debugService.trace('Top: ' + mTop);
+			debugService.trace('Left: ' + mLeft);
 		},
 		close: function() {
 			$("#modal").fadeOut(300, function() {
