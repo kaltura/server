@@ -39,7 +39,7 @@
       </Input>
       <OutputReference name="output" type="KalturaUser" key="object key">
         <id></id>
-        <partnerId type="string">495811</partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <screenName type="string">Test User</screenName>
         <fullName type="string">Test User Test User</fullName>
         <email type="string">TestUser@mailinator.com</email>
@@ -80,9 +80,9 @@
       <Input name="user" type="KalturaUser" key="">
         <id></id>
         <partnerId></partnerId>
-        <screenName></screenName>
-        <fullName></fullName>
-        <email></email>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
         <dateOfBirth></dateOfBirth>
         <country></country>
         <state></state>
@@ -115,9 +115,9 @@
       <OutputReference name="output" type="KalturaUser" key="object key">
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
-        <screenName type="string">Test User</screenName>
-        <fullName type="string">Test User Test User</fullName>
-        <email type="string">TestUser@mailinator.com</email>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
         <dateOfBirth></dateOfBirth>
         <country></country>
         <state></state>
@@ -136,7 +136,7 @@
         <indexedPartnerDataString></indexedPartnerDataString>
         <storageSize type="string">0</storageSize>
         <password></password>
-        <firstName type="string">Test User</firstName>
+        <firstName type="string">Updated</firstName>
         <lastName type="string">Test User</lastName>
         <isAdmin type="string">"1"</isAdmin>
         <lastLoginTime></lastLoginTime>
@@ -155,9 +155,9 @@
       <OutputReference name="output" type="KalturaUser" key="object key">
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
-        <screenName type="string">Test User</screenName>
-        <fullName type="string">Test User Test User</fullName>
-        <email type="string">TestUser@mailinator.com</email>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
         <dateOfBirth></dateOfBirth>
         <country></country>
         <state></state>
@@ -176,7 +176,7 @@
         <indexedPartnerDataString></indexedPartnerDataString>
         <storageSize type="string">0</storageSize>
         <password></password>
-        <firstName type="string">Test User</firstName>
+        <firstName type="string">Updated</firstName>
         <lastName type="string">Test User</lastName>
         <isAdmin type="string">"1"</isAdmin>
         <lastLoginTime></lastLoginTime>
@@ -195,9 +195,9 @@
       <OutputReference name="output" type="KalturaUser" key="object key">
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
-        <screenName type="string">Test User</screenName>
-        <fullName type="string">Test User Test User</fullName>
-        <email type="string">TestUser@mailinator.com</email>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
         <dateOfBirth></dateOfBirth>
         <country></country>
         <state></state>
@@ -216,7 +216,7 @@
         <indexedPartnerDataString></indexedPartnerDataString>
         <storageSize type="string">0</storageSize>
         <password></password>
-        <firstName type="string">Test User</firstName>
+        <firstName type="string">Updated</firstName>
         <lastName type="string">Test User</lastName>
         <isAdmin type="string">"1"</isAdmin>
         <lastLoginTime></lastLoginTime>
