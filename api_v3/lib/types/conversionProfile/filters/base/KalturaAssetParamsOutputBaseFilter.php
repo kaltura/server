@@ -12,6 +12,7 @@ class KalturaAssetParamsOutputBaseFilter extends KalturaAssetParamsFilter
 		"assetParamsVersionEqual" => "_eq_asset_params_version",
 		"assetIdEqual" => "_eq_asset_id",
 		"assetVersionEqual" => "_eq_asset_version",
+		"formatEqual" => "_eq_format",
 	);
 
 	private $order_by_map = array
@@ -55,4 +56,11 @@ class KalturaAssetParamsOutputBaseFilter extends KalturaAssetParamsFilter
 	 * @var string
 	 */
 	public $assetVersionEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaContainerFormat
+	 */
+	public $formatEqual;
 }

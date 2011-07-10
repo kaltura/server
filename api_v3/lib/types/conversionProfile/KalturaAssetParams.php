@@ -67,14 +67,6 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	public $tags;
 
 	/**
-	 * The container format of the Flavor Params
-	 *  
-	 * @var KalturaContainerFormat
-	 * @filter eq
-	 */
-	public $format;
-
-	/**
 	 * Array of partner permisison names that required for using this asset params
 	 *  
 	 * @var KalturaStringArray
@@ -91,7 +83,6 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"createdAt",
 		"isSystemDefault" => "isDefault",
 		"tags",
-		"format",
 	);
 	
 	/* (non-PHPdoc)

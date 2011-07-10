@@ -113,6 +113,14 @@ class KalturaFlavorParams extends KalturaAssetParams
 	 * @var int
 	 */
 	public $engineVersion;
+
+	/**
+	 * The container format of the Flavor Params
+	 *  
+	 * @var KalturaContainerFormat
+	 * @filter eq
+	 */
+	public $format;
 	
 	private static $map_between_objects = array
 	(
@@ -133,6 +141,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"rotate",
 		"operators",
 		"engineVersion",
+		"format",
 	);
 	
 	public function getMapBetweenObjects()

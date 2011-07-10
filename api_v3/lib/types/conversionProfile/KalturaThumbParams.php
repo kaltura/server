@@ -71,6 +71,14 @@ class KalturaThumbParams extends KalturaAssetParams
 	 * @var int
 	 */
 	public $sourceParamsId = 0;
+
+	/**
+	 * The container format of the Flavor Params
+	 *  
+	 * @var KalturaContainerFormat
+	 * @filter eq
+	 */
+	public $format;
 	
 	
 //	Maybe support will be added in the future
@@ -101,6 +109,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		"scaleHeight",
 		"backgroundColor",
 		"sourceParamsId",
+		"format",
 	
 //		Maybe support will be added in the future
 //		"cropProvider",

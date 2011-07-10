@@ -33,6 +33,14 @@ class KalturaAssetParamsOutput extends KalturaAssetParams
 	 * @var int
 	 */
 	public $readyBehavior;
+
+	/**
+	 * The container format of the Flavor Params
+	 *  
+	 * @var KalturaContainerFormat
+	 * @filter eq
+	 */
+	public $format;
 	
 	private static $map_between_objects = array
 	(
@@ -41,6 +49,7 @@ class KalturaAssetParamsOutput extends KalturaAssetParams
 		"assetId",
 		"assetVersion",
 		"readyBehavior",
+		"format",
 	);
 	
 	public function getMapBetweenObjects()

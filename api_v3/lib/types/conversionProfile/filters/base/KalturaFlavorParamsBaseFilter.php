@@ -8,6 +8,7 @@ class KalturaFlavorParamsBaseFilter extends KalturaAssetParamsFilter
 {
 	private $map_between_objects = array
 	(
+		"formatEqual" => "_eq_format",
 	);
 
 	private $order_by_map = array
@@ -23,4 +24,11 @@ class KalturaFlavorParamsBaseFilter extends KalturaAssetParamsFilter
 	{
 		return array_merge(parent::getOrderByMap(), $this->order_by_map);
 	}
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaContainerFormat
+	 */
+	public $formatEqual;
 }
