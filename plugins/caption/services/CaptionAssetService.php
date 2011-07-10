@@ -391,6 +391,26 @@ class CaptionAssetService extends KalturaBaseService
 		
 		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
+	
+	/**
+	 * Get download URL for the caption Asset
+	 * 
+	 * @action getDownloadUrl
+	 * @param string $id
+	 * @param bool $useCdn
+	 * @return string
+	 */
+	public function getDownloadUrlAction($id, $useCdn = false)
+	{
+		$captionAssetDb = assetPeer::retrieveById($id);
+		if (!$captionAssetDb)
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
+
+		if ($captionAssetDb->getStatus() != CaptionAsset::FLAVOR_ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+
+		return $captionAssetDb->getDownloadUrl($useCdn);
+	}
 
 	/**
 	 * Serves caption by its id
