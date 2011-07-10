@@ -89,14 +89,16 @@ class KalturaTestDeploymentHelper
 		
 		$addedPermissions = array();
 
-		try {
-		$addedPermissions[] = $adminClient->permission->get("CUEPOINT_PLUGIN_PERMISSION");
-		$addedPermissions[] = $adminClient->permission->get("CODECUEPOINT_PLUGIN_PERMISSION");
-		$addedPermissions[] = $adminClient->permission->get("ADCUEPOINT_PLUGIN_PERMISSION");
-		$addedPermissions[] = $adminClient->permission->get("ANNOTATION_PLUGIN_PERMISSION");
-		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
-//		$addedPermissions[] = $adminClient->permission->get("CONTENTDISTRIBUTION_PLUGIN_PERMISSION");
-		}catch (Exception $e)
+		try 
+		{
+			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("CUEPOINT_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
+			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("CODECUEPOINT_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
+			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("ADCUEPOINT_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
+			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("ANNOTATION_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
+			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("DROPFOLDER_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
+			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("CONTENTDISTRIBUTION_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
+		}
+		catch (Exception $e)
 		{
 			print("Exception was raised during permission adding: " . $e->getMessage() . "\n");
 		}
@@ -130,6 +132,20 @@ class KalturaTestDeploymentHelper
 		$result = $systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $newConfig);
 	}
 
+	/**
+	 * 
+	 * creates permission for the given permission name
+	 * @param string $permissionName
+	 * @param KalturaPermissionType $permissionType
+	 */
+	public static function createPermission($permissionName, $permissionType = null)
+	{
+		$permission = new KalturaPermission();
+		$permission->name = $permissionName;
+		$permission->type = $permissionType;
+		return $permission;
+	}
+	
 	/**
 	 * 
 	 * Adds the base data for the test partner
