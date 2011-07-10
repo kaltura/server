@@ -54,4 +54,32 @@ class kLevel3UrlManager extends kUrlManager
 		$url = str_replace('\\', '/', $url);
 		return $url;
 	}
+	
+	/**
+	 * @param FileSync $fileSync
+	 * @return string
+	 */
+	public function getFileSyncUrl(FileSync $fileSync)
+	{
+	    // get params
+		$tokenized = isset($this->params['level3_tokenized']) ? $this->params['level3_tokenized'] : false;
+		$level3Id  = isset($this->params['level3_id']) ? $this->params['level3_id'] : false;
+		$secret    = isset($this->params['level3_secret']) ? $this->params['level3_secret'] : false;
+	    
+		// get url from parent
+	    $url = parent::getFileSyncUrl($fileSync);
+	    
+	    // if level3 tokenized url is used, generated token string
+	    if($tokenized && $level3Id && $secret)
+		{
+    		$url = '/'.$level3Id.'/'.$url;
+            $url = str_replace('//', '/', $url);
+    		
+            $token = "0" . substr(hash_hmac('sha1', $url, $secret), 0, 20);
+    	
+            $url = $url.'token='.$token;
+		}
+
+		return $url;
+	}
 }
