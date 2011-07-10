@@ -34,7 +34,7 @@ class KalturaAnnotation extends KalturaCuePoint
 
 	public function __construct()
 	{
-		$this->type = AnnotationPlugin::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION);
+		$this->cuePointType = AnnotationPlugin::getApiValue(AnnotationCuePointType::ANNOTATION);
 	}
 	
 	private static $map_between_objects = array

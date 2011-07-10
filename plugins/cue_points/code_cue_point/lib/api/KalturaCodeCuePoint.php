@@ -17,7 +17,7 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 
 	public function __construct()
 	{
-		$this->type = CodeCuePointPlugin::getCuePointTypeCoreValue(CodeCuePointType::CODE);
+		$this->cuePointType = CodeCuePointPlugin::getApiValue(CodeCuePointType::CODE);
 	}
 	
 	private static $map_between_objects = array
