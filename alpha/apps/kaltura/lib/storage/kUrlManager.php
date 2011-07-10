@@ -70,13 +70,17 @@ class kUrlManager
 	public static function getUrlManagerByStorageProfile($storageProfileId)
 	{
 		$class = 'kUrlManager';
+		$params = null;
 		
 		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 		if($storageProfile && $storageProfile->getUrlManagerClass() && class_exists($storageProfile->getUrlManagerClass()))
+		{
 			$class = $storageProfile->getUrlManagerClass();
+		    $params = $storageProfile->getUrlManagerParams();
+		}
 			
 		KalturaLog::log("Uses url manager [$class]");
-		return new $class($storageProfileId);
+		return new $class($storageProfileId, $params);
 	}
 	
 	public function __construct($storageProfileId = null, $params = null)
