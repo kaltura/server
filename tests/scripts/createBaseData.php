@@ -93,9 +93,8 @@ class KalturaTestDeploymentHelper
 		$addedPermissions[] = $adminClient->permission->get("CUEPOINT_PLUGIN_PERMISSION");
 		$addedPermissions[] = $adminClient->permission->get("CODECUEPOINT_PLUGIN_PERMISSION");
 		$addedPermissions[] = $adminClient->permission->get("ADCUEPOINT_PLUGIN_PERMISSION");
-		
-//		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
-//		$addedPermissions[] = $adminClient->permission->get("AUDIT_PLUGIN_PERMISSION");
+		$addedPermissions[] = $adminClient->permission->get("ANNOTATION_PLUGIN_PERMISSION");
+		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
 //		$addedPermissions[] = $adminClient->permission->get("CONTENTDISTRIBUTION_PLUGIN_PERMISSION");
 		}catch (Exception $e)
 		{
