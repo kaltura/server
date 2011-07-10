@@ -207,14 +207,15 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	 */
 	public function validateEndTime($cuePointId = null)
 	{
-		if(is_null($this->duration))
-			return;
-			
-		if(is_null($this->startTime))
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
+		if(($this->startTime === null) && ($this->endTime !== null))
+				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
 		
-		$this->validatePropertyMinValue('duration', 0, true);		
-				
+		if ($this->endTime === null)
+			$this->endTime = $this->startTime;
+			
+		if($this->endTime < $this->startTime)
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
+		
 		if($cuePointId !== null)
 		{
 			$dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
@@ -232,8 +233,8 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		
-		if($dbEntry->getLengthInMsecs() < $this->duration)
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->duration, $dbEntry->getLengthInMsecs());	
+		if($dbEntry->getLengthInMsecs() < $this->endTime)
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->endTime, $dbEntry->getLengthInMsecs());	
 	}
 	
 	/*
