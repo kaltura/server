@@ -37,12 +37,12 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				$limit->overagePrice = $partner->getEntriesOveragePrice();
 				break;
 				
-			case KalturaSystemPartnerLimitType::STREAM_ENTRIES:
+			case KalturaSystemPartnerLimitType::MONTHLY_STREAM_ENTRIES:
 				$limit->max = $partner->getStreamEntriesQuota();
 				$limit->overagePrice = $partner->getStreamEntriesOveragePrice();
 				break;
 				
-			case KalturaSystemPartnerLimitType::BANDWIDTH:
+			case KalturaSystemPartnerLimitType::MONTHLY_BANDWIDTH:
 				$limit->max = $partner->getBandwidthQuota();
 				$limit->overagePrice = $partner->getBandwidthOveragePrice();
 				break;
@@ -71,6 +71,23 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				$limit->max = $partner->getMaxBulkSize();
 				$limit->overagePrice = $partner->getMaxBulkSizeOveragePrice();
 				break;
+				
+			case KalturaSystemPartnerLimitType::MONTHLY_STORAGE:
+				$limit->max = $partner->getMonthlyStorage();
+				$limit->overagePrice = $partner->getMonthlyStorageOveragePrice();
+				break;
+				
+			case KalturaSystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH:
+				$limit->max = $partner->getMonthlyStorageAndBandwidth();
+				$limit->overagePrice = $partner->getMonthlyStorageAndBandwidthOveragePrice();
+				break;	
+
+			case KalturaSystemPartnerLimitType::END_USERS:
+				$limit->max = $partner->getEndUsers();
+				$limit->overagePrice = $partner->getEndUsersOveragePrice();
+				break;		
+				
+				
 		}
 		return $limit;
 	} 
@@ -84,12 +101,12 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
 				
-			case KalturaSystemPartnerLimitType::STREAM_ENTRIES:
+			case KalturaSystemPartnerLimitType::MONTHLY_STREAM_ENTRIES:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
 				
-			case KalturaSystemPartnerLimitType::BANDWIDTH:
+			case KalturaSystemPartnerLimitType::MONTHLY_BANDWIDTH:
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
@@ -118,6 +135,22 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				$this->validatePropertyMinValue('max', 0, true);
 				$this->validatePropertyMinValue('overagePrice', 0, true);
 				break;
+
+			case KalturaSystemPartnerLimitType::MONTHLY_STORAGE:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+
+			case KalturaSystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;
+				
+			case KalturaSystemPartnerLimitType::END_USERS:
+				$this->validatePropertyMinValue('max', 0, true);
+				$this->validatePropertyMinValue('overagePrice', 0, true);
+				break;	
+				
 		}
 	}
 	
@@ -133,12 +166,12 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				$partner->setEntriesOveragePrice($this->overagePrice);
 				break;
 				
-			case KalturaSystemPartnerLimitType::STREAM_ENTRIES:
+			case KalturaSystemPartnerLimitType::MONTHLY_STREAM_ENTRIES:
 				$partner->setStreamEntriesQuota($this->max);
 				$partner->setStreamEntriesOveragePrice($this->overagePrice);
 				break;
 				
-			case KalturaSystemPartnerLimitType::BANDWIDTH:
+			case KalturaSystemPartnerLimitType::MONTHLY_BANDWIDTH:
 				$partner->setBandwidthQuota($this->max);
 				$partner->setBandwidthOveragePrice($this->overagePrice);
 				break;
@@ -167,6 +200,22 @@ class KalturaSystemPartnerLimit extends KalturaObject
 				$partner->setMaxBulkSize($this->max);
 				$partner->setMaxBulkSizeOveragePrice($this->overagePrice);
 				break;
+				
+			case KalturaSystemPartnerLimitType::MONTHLY_STORAGE:
+				$partner->setMonthlyStorage($this->max);
+				$partner->setMonthlyStorageOveragePrice($this->overagePrice);
+				break;
+				
+			case KalturaSystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH:
+				$partner->setMonthlyStorageAndBandwidth($this->max);
+				$partner->setMonthlyStorageAndBandwidthOveragePrice($this->overagePrice);
+				break;	
+
+			case KalturaSystemPartnerLimitType::END_USERS:
+				$partner->setEndUsers($this->max);
+				$partner->setEndUsersOveragePrice($this->overagePrice);
+				break;	
+				
 		}
 	} 
 }

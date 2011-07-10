@@ -557,10 +557,17 @@ form#frmCreateDropFolder dt { float: left; }
 #partner-configure-dialog .partnerConfigureFormColumn fieldset { border:none; background:none; margin: 0px 0px 0px 21px; }
 #partner-configure-dialog .partnerConfigureFormColumn fieldset legend{ font-weight:bold; }
 
-
 #partner-configure-dialog .partnerConfigureFormColumn { float:left; width:50%; }
-#partner-configure-dialog #fieldset-enableDisableFeatures a { color:#00c1ff; }
-
-#partner-configure-dialog #frmPartnerConfigure fieldset { width:350px; }
-
+#partner-configure-dialog #fieldset-enableDisableFeatures .linkToPage { color:#00c1ff; }
+#partner-configure-dialog #frmPartnerConfigure fieldset { width:400px; }
 #partner-configure-dialog #fieldset-includedUsage legend { margin-top:-8px; }
+
+#partner-configure-dialog #frmPartnerConfigure .includeUsage input{ width:60px; }
+#partner-configure-dialog #frmPartnerConfigure .includeUsage label{ min-width:80px; }
+
+
+#partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft { width:205px; float:left; height:50px; margin-top:3px; }
+#partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight { width:180px; float:right; height:50px; margin-top:3px; }
+#partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft input,label { width:180px; }
+#partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight input,label { width:180px; }
+

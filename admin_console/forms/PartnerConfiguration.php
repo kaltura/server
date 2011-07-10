@@ -3,7 +3,8 @@
 class Form_PartnerConfiguration extends Infra_Form
 {
     
-    const LIMITS_ARRAY_NAME = 'limitsArray';
+    //const LIMITS_ARRAY_NAME = 'limitsArray';
+    protected $limitSubForms = array();
     
 	public function init()
 	{
@@ -92,8 +93,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('text', 'def_thumb_offset', array(
 			'label'	  => 'Default Thumbnail Offset',
 		));	
-		
-		//TODO: add XML Ingestion- Transformaion XSL (relevant for eagle).		
+			
 //--------------------------- Password Security ---------------------------			
 		
 		$this->addElement('text', 'login_block_period', array(
@@ -120,9 +120,10 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 //--------------------------- Account Packages ---------------------------		
-		$this->addElement('select', 'partner_package', array(
-			'label'			=> 'Usage Package:',
+		$this->addElement('select', 'partner_package', array(		
+			'label'			=> 'Publisher Package:',
 			'filters'		=> array('StringTrim'),
+			'onChange'		=> 'openChangeServicePackageAlertBox()',
 		));
 //--------------------------- Account Options ---------------------------			
 												
@@ -147,32 +148,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
 		));
 		
-		$this->addLimitsElements();
-		
-			
-	//adding display groups
-	$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email','crossLine'), 'generalInformation', array('legend' => 'General Information'));
-	$this->addDisplayGroup(array('host', 'cdn_host', 'rtmp_url','crossLine'), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));				
-	$this->addDisplayGroup(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert','crossLine'), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Account Policy'));	
-	$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
-	$this->addDisplayGroup(array('def_thumb_offset','crossLine'), 'publisherSpecificIngestionSettings', array('legend' => 'Publisher Specific Ingestion Settings'));
-	$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS, 'login_block_period', 'num_prev_pass_to_keep', 'pass_replace_freq'), 'passwordSecurity', array('legend' => 'Password Security'));
-	
-	
-	
-	$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Group Association'));
-	
-	$this->addDisplayGroup(array('partner_package','crossLine'), 'accountPackages', array('legend' => 'Account Packages'));
-	$this->addDisplayGroup(array('monitor_usage','is_first_login','crossLine'), 'accountOptions', array('legend' => 'Account Options'));
-	$this->addDisplayGroup(array('includedUsageLabel', Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS,'crossLine'), 'includedUsage', array('legend' => 'Included Usage'));
-	
-//--------------------------- Enable/Disable Features ---------------------------
-	/*
-		$element = new Zend_Form_Element_Hidden('setPublisherFunctionality');
-		$element->setLabel('Set Publisher Functionality');
-		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b', 'class' => 'setPublisherFunctionality'))));		
-		$this->addElements(array($element));
-	*/
+		$this->addLimitsElements();	
+		$this->addDisplayGroups();
+	//--------------------------- Enable/Disable Features ---------------------------
 	$moduls = Zend_Registry::get('config')->moduls;
 	if ($moduls)
 	{
@@ -184,11 +162,8 @@ class Form_PartnerConfiguration extends Infra_Form
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => $name)))
 			);
 			if(!$modul->enabled)
-				$attributes['disabled'] = true;
-				
+				$attributes['disabled'] = true;	
 			$this->addElement('checkbox', $modul->permissionName, $attributes);
-			
-			
 			if ($modul->indexLink != null)
 			{
 				//check permission to access the link's page
@@ -203,8 +178,8 @@ class Form_PartnerConfiguration extends Infra_Form
 				if ($linkAllowed)
 				{
 					$element = $this->getElement($modul->permissionName);
-					$element->setDescription('<a id=linkToPage href=# onClick=openLink("../'.$modul->indexLink.'")>(config)</a>');
-				    $element->addDecorators(array('ViewHelper',		      
+					$element->setDescription('<a class=linkToPage href=# onClick=openLink("../'.$modul->indexLink.'")>(config)</a>');
+					$element->addDecorators(array('ViewHelper',		      
 				        array('Label', array('placement' => 'append')),
 				        array('Description', array('escape' => false, 'tag' => false)),
 				      ));
@@ -233,9 +208,10 @@ class Form_PartnerConfiguration extends Infra_Form
 	//creating divs for left right dividing
 	$this->setDisplayColumn('generalInformation', 'passwordSecurity');
 	$this->setDisplayColumn('groupAssociation', 'enableDisableFeatures');
-		
+			
+	//---------------- Display DisplayGroups according to Permissions ---------------	
+	$this->handlePermissions();
 }
-
 	/**
 	 * creating a form display in two columns (left and right).	
 	 * $firstColumnElement - the first display group in the column
@@ -256,8 +232,50 @@ class Form_PartnerConfiguration extends Infra_Form
              'Fieldset',
               array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
      	));   
-	} 
+	}
 	
+	/**
+	 * make permission group elements readonly and disabled.
+	 * @param unknown_type $dispalyGroupNames
+	 */
+	private function setPermissionGroupElementsToReadOnly($permissionGroupName)
+	{
+		foreach ($permissionGroupName as $dispalyGroupName)
+		{
+			$displayGroupElements = $this->getDisplayGroup($dispalyGroupName)->getElements();
+			foreach ($displayGroupElements as $el)
+			{
+				$el->setAttrib('readonly', true);				
+				$el->setAttrib('disable', 'disable');
+				//disable links
+				if ($dispalyGroupName == 'enableDisableFeatures'){
+					$el->setDescription('<a class=linkToPage href=# onClick="return false;">(config)</a>');
+				}
+			}
+		}
+	}
+	
+	public function handlePermissions()
+	{
+		//permissions groups
+		$configureAccountsGroup = array('groupAssociation');
+		$configureAccountsOptions = array('generalInformation','accountPackages','accountOptions',
+				'includedUsage','enableDisableFeatures');
+		$configureAccountsTechData = array('publisherSpecificDeliverySettings', 'remoteStorageAccountPolicy',
+				'advancedNotificationSettings', 'publisherSpecificIngestionSettings', 'passwordSecurity'); 
+		
+		//according to current permissin call to setPermissionGroupElementsToReadOnly		
+		//with the correct group array as parameter
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-tech-data'))){
+			$this->setPermissionGroupElementsToReadOnly($configureAccountsTechData);
+		}
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-group-options'))){
+			$this->setPermissionGroupElementsToReadOnly($configureAccountsGroup);
+		}
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-info'))){
+			$this->setPermissionGroupElementsToReadOnly($configureAccountsOptions);
+		}
+	}
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------		
 	/**
 	 * @param Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration $object
@@ -267,8 +285,17 @@ class Form_PartnerConfiguration extends Infra_Form
 	{
 		parent::populateFromObject($object, $add_underscore);
 		
-		$this->populateLimitsFromObject($object->limits);
-		
+		if (is_array($object->limits))
+		{
+			foreach ($object->limits as $limit)
+			{
+				if (isset($this->limitSubForms[$limit->type]))
+				{
+					$subFormObject = $this->limitSubForms[$limit->type];
+					$subFormObject->populateFromObject($this, $limit, false);
+				}
+			}			
+		}
 		if(!$object->permissions || !count($object->permissions))
 			return;
 			
@@ -307,56 +334,98 @@ class Form_PartnerConfiguration extends Infra_Form
 			}
 		}
 		
-		if (isset($properties[self::LIMITS_ARRAY_NAME]))
+		foreach ($this->limitSubForms as $subForm)
 		{
-		    $systemPartnerConfiguration->limits = $this->getLimitsObject($properties[self::LIMITS_ARRAY_NAME]);
-		}
+			if ($subForm instanceof Form_PartnerConfigurationLimitSubForm)
+			{
+				$limitType = $subForm->getName();
+				$limit = $subForm->getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerLimit', $properties[$limitType], false, $include_empty_fields);
+				$systemPartnerConfiguration->limits[] = $limit;			
+			}
+		}		
 
 		return $systemPartnerConfiguration;
 	}
-	
-	
+		
 	protected function addLimitsElements()
 	{
-	    $this->addElement('text', Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS, array(
-			'label'			=> 'Maximum login attemps:',
-			'filters'		=> array('StringTrim'),
-		));
-		$this->getElement(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS)->setBelongsTo(self::LIMITS_ARRAY_NAME);
+		$userLoginAttempsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS, 'Maximum login attemps:');
+		$this->addLimitSubForm($userLoginAttempsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS);
+		//removing overage_price for this element
+		$this->removeElement(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice');		
 		
-		$this->addElement('text', Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS, array(
-			'label'			=> 'Number of KMC admin users:',
-			'filters'		=> array('StringTrim'),
+		$adminLoginUsersSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS, 'Number of KMC admin users:');
+		$this->addLimitSubForm($adminLoginUsersSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS);
 		
-		));
-		$this->getElement(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS)->setBelongsTo(self::LIMITS_ARRAY_NAME);
+		$numberOfPublishersSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS, 'Number of Publishers:');
+		$this->addLimitSubForm($numberOfPublishersSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS);
+		
+		$monthlyStreamsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES, 'Monthly Streams:');
+		$this->addLimitSubForm($monthlyStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES);
+		
+		$monthlyBandwidthSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH, 'Monthly Bandwidth:');
+		$this->addLimitSubForm($monthlyBandwidthSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH);
+		
+		$monthlyStorageSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE, 'Monthly Storage:');
+		$this->addLimitSubForm($monthlyStorageSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE);
+		
+		$monthlyStorageAndBandwidthSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH, 'Monthly Storage + Bandwidth:');
+		$this->addLimitSubForm($monthlyStorageAndBandwidthSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH);
+
+		$numberOfEndUsersSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS, 'Number of End-Users:');
+		$this->addLimitSubForm($numberOfEndUsersSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS);
+		
+		$numberOfEntriesSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES, 'Number of Entries:');
+		$this->addLimitSubForm($numberOfEntriesSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES);		
 	}
-	
-	protected function populateLimitsFromObject($limitsObject)
+	/**
+	 * split the form elements into different display groups
+	 */
+	public function addDisplayGroups()
 	{
-	    if (is_array($limitsObject))
-		{
-			foreach ($limitsObject as $limit)
-			{
-				if ($limit instanceof Kaltura_Client_SystemPartner_Type_SystemPartnerLimit)
-				{
-				    $this->setDefault($limit->type, $limit->max);
-				}
-			}
-		}
+		//adding display groups
+		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email','crossLine'), 'generalInformation', array('legend' => 'General Information'));
+		
+		$this->addDisplayGroup(array('host', 'cdn_host', 'rtmp_url','crossLine'), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));				
+		$this->addDisplayGroup(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert','crossLine'), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Account Policy'));	
+		$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
+		$this->addDisplayGroup(array('def_thumb_offset','crossLine'), 'publisherSpecificIngestionSettings', array('legend' => 'Publisher Specific Ingestion Settings'));
+		$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
+									 Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
+									 'login_block_period',
+									 'num_prev_pass_to_keep',
+									 'pass_replace_freq'),
+									 'passwordSecurity', array('legend' => 'Password Security'));
+		
+		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Group Association'));
+		
+		$this->addDisplayGroup(array('partner_package','crossLine'), 'accountPackages', array('legend' => 'Account Packages'));
+		$this->addDisplayGroup(array('monitor_usage','is_first_login','crossLine'), 'accountOptions', array('legend' => 'Account Options'));
+		$this->addDisplayGroup(array('includedUsageLabel', 
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overagePrice',
+									'crossLine'), 'includedUsage', array('legend' => 'Included Usage'));	
 	}
 	
-	protected function getLimitsObject(array $limits)
+	protected function addLimitSubForm($subForm, $subFormName)
 	{
-		$limitArray = array();
-		foreach ($limits as $key => $maxValue)
-		{
-			$limit = new Kaltura_Client_SystemPartner_Type_SystemPartnerLimit();
-			$limit->type = $key;
-			$limit->max = $maxValue;
-			$limitArray[] = $limit;
-		}
-		return $limitArray;
+		$subForm->setName($subFormName);
+		$this->limitSubForms[$subFormName] = $subForm;
+		$subForm->addElementsToForm($this);
 	}
-	
+			
 }

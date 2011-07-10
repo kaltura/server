@@ -3,6 +3,7 @@
 
 <?php echo $this->form; ?>
 
+
 <script>
 
 function openLink (url){
@@ -39,5 +40,21 @@ function openConfirm(url) {
 		}
 	});
 }
-
+function openChangeServicePackageAlertBox(){
+	var dialogDiv = jQuery('<div id="confirmation-div"><?php echo $this->translate('Please enable/disable features according to the new agreement.'); ?></div>').appendTo('body');
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 350,
+		title: '<?php echo $this->translate('Change in service package'); ?>',
+		height: 150,
+		buttons: {			
+			'<?php echo $this->translate('OK'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {}
+	});
+}
 </script>

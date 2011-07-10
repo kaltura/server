@@ -619,6 +619,10 @@ class Partner extends BasePartner
 	public function setBandwidthQuota($v)				{$this->putInCustomData('bandwidth_quota', $v);}
 	public function setStreamEntriesQuota($v)			{$this->putInCustomData('stream_entries_quota', $v);}
 	public function setEntriesQuota($v)					{$this->putInCustomData('entries_quota', $v);}
+	public function setMonthlyStorage($v)				{$this->putInCustomData('monthly_storage', $v);}
+	public function setMonthlyStorageAndBandwidth($v)	{$this->putInCustomData('monthly_storage_and_bandwidth', $v);}
+	public function setEndUsers($v)						{$this->putInCustomData('end_users', $v);}
+	
 	public function setLoginUsersOveragePrice($v)		{$this->putInCustomData('login_users_overage_price', $v);}
 	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
 	public function setPublishersOveragePrice($v)		{$this->putInCustomData('publishers_overage_price', $v);}
@@ -627,7 +631,9 @@ class Partner extends BasePartner
 	public function setEntriesOveragePrice($v)			{$this->putInCustomData('entries_overage_price', $v);}
 	public function setMaxLoginAttemptsOveragePrice($v)	{$this->putInCustomData('login_attempts_overage_price', $v);}
 	public function setMaxBulkSizeOveragePrice($v)		{$this->putInCustomData('bulk_size_overage_price', $v);}
-
+	public function setMonthlyStorageOveragePrice($v)	{$this->putInCustomData('monthly_storage_overage_price', $v);}
+	public function setMonthlyStorageAndBandwidthOveragePrice($v)	{$this->putInCustomData('monthly_storage_and_bandwidth_overage_price', $v);}
+	public function setEndUsersOveragePrice($v)			{$this->putInCustomData('end_users_overage_price', $v);}
 	
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota');}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota');}
@@ -635,6 +641,10 @@ class Partner extends BasePartner
 	public function getBandwidthQuota()					{return $this->getFromCustomData('bandwidth_quota');}
 	public function getStreamEntriesQuota()				{return $this->getFromCustomData('stream_entries_quota');}
 	public function getEntriesQuota()					{return $this->getFromCustomData('entries_quota');}
+	public function getMonthlyStorage()					{return $this->getFromCustomData('monthly_storage');}
+	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
+	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
+	
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
 	public function getPublishersOveragePrice()			{return $this->getFromCustomData('publishers_overage_price');}
@@ -643,7 +653,9 @@ class Partner extends BasePartner
 	public function getEntriesOveragePrice()			{return $this->getFromCustomData('entries_overage_price');}
 	public function getMaxLoginAttemptsOveragePrice()	{return $this->getFromCustomData('login_attempts_overage_price');}
 	public function getMaxBulkSizeOveragePrice()		{return $this->getFromCustomData('bulk_size_overage_price');}
-	
+	public function getMonthlyStorageOveragePrice()		{return $this->getFromCustomData('monthly_storage_overage_price');}
+	public function getMonthlyStorageAndBandwidthOveragePrice()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_price');}
+	public function getEndUsersOveragePrice()			{return $this->getFromCustomData('end_users_overage_price');}
 	
 		
 	public function getAdminLoginUsersNumber()
