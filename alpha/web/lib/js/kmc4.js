@@ -1,16 +1,18 @@
 /* kmc and kmc.vars defined in script block in kmc4success.php */
 
 // For debug enable to true. Debug will show information in the browser console
-kmc.vars.debug = false;
+kmc.vars.debug = true;
 
 // Quickstart guide (should be moved to kmc4success.php)
 kmc.vars.quickstart_guide = "/content/docs/pdf/KMC3_Quick_Start_Guide.pdf";
 
 // Log function
-kmc.log = function() {
+kmc.log = function(msg) {
 	if(kmc.vars.debug) {
 		if( typeof console !='undefined' && console.log){
 			console.log(arguments);
+		} else {
+			debugService.trace(msg);
 		}
 	}
 };
@@ -942,7 +944,7 @@ kmc.layout = {
 
 			$modal.fadeIn(600).css('display', 'table');
 			if( $.browser.msie ) {
-				$modal.css('display', 'block');
+				//$modal.css('display', 'block');
 			}
 			
 			kmc.layout.modal.position();
@@ -965,6 +967,9 @@ kmc.layout = {
 				'top' : mTop + "px",
 				'left' : mLeft + "px"
 			});
+
+			kmc.log('Top: ' + mTop);
+			kmc.log('Left: ' + mLeft);
 		},
 		close: function() {
 			$("#modal").fadeOut(300, function() {
