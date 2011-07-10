@@ -132,6 +132,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	public $urlManagerClass;
 	
 	/**
+	 * @var KalturaKeyValueArray
+	 */
+	public $urlManagerParams;
+	
+	/**
 	 * No need to create enum for temp field
 	 * 
 	 * @var int
@@ -190,8 +195,31 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	{
 		if(is_null($object_to_fill))
 			$object_to_fill = new StorageProfile();
-			
-		return parent::toObject($object_to_fill, $props_to_skip);
+		
+		// url manager params
+		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
+		$dbUrlManagerParams = $object_to_fill->getUrlManagerParams();
+		
+		if (!is_null($this->urlManagerParams) && count($this->urlManagerParams) > 0)
+		{
+    		foreach ($this->urlManagerParams as $param)
+    		{
+    		    $dbUrlManagerParams[$param->key] = $param->value;
+    		}
+		}
+		
+		$object_to_fill->setUrlManagerParams($dbUrlManagerParams);
+		
+		return $object_to_fill;
+	}
+	
+	public function fromObject ( $source_object  )
+	{
+	    parent::fromObject($source_object);
+	    
+	    // url manager params
+	    $urlManagerParams = $source_object->getUrlManagerParams();
+	    $this->urlManagerParams = KalturaKeyValueArray::fromKeyValueArray($urlManagerParams);
 	}
 	
 	public function getExtraFilters()

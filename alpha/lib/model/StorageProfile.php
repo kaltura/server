@@ -32,6 +32,8 @@ class StorageProfile extends BaseStorageProfile
 	const STORAGE_DEFAULT_KALTURA_PATH_MANAGER = 'kPathManager';
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';
 	
+	const CUSTOM_DATA_URL_MANAGER_PARAMS = 'url_manager_params';
+	
 	/**
 	 * @return kPathManager
 	 */
@@ -69,5 +71,22 @@ class StorageProfile extends BaseStorageProfile
 	public function getPathFormat() { return $this->getFromCustomData('path_format', null);}
 	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
+	
+	/* URL Manager Params */
+	
+	public function setUrlManagerParams($params)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_URL_MANAGER_PARAMS, serialize($params));
+	}
+	
+	public function getUrlManagerParams()
+	{
+	    $params = $this->getFromCustomData(self::CUSTOM_DATA_URL_MANAGER_PARAMS);
+	    $params = unserialize($params);
+	    if (!$params) {
+	        return array();
+	    }
+	    return $params;
+	}
 	
 }
