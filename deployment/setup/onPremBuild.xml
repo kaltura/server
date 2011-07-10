@@ -241,6 +241,22 @@
 
          <copy file="/opt/kaltura/app/api_v3/config/logger.ini.1" tofile="/opt/kaltura/app/api_v3/config/logger.ini" overwrite="true"/>
     </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: change memory limit                   -->
+    <!-- ============================================  -->
+    <target name="changeMemoryLimit">
+         <echo msg="changing memory limit..." />
+         <copy file="/opt/kaltura/app/configurations/apache/my_kaltura.conf" tofile="/opt/kaltura/app/configurations/apache/my_kaltura.conf.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="php_value memory_limit (\w+)" replace="php_value memory_limit 128M"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/opt/kaltura/app/configurations/apache/my_kaltura.conf.1" tofile="/opt/kaltura/app/configurations/apache/my_kaltura.conf" overwrite="true"/>
+    </target>
 
 
     <!-- ============================================  -->
@@ -258,7 +274,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
          <echo msg="Done" />
     </target>
 
