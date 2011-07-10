@@ -685,7 +685,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			$ignoreFields = array("createdAt", "updatedAt", "id", "thumbnailUrl", 
 								  "downloadUrl", "rootEntryId", "operationAttributes",
 								  "deletedAt", "statusUpdatedAt", "widgetHTML", "totalCount", "objects", 
-								  "cropDimensions", "dataUrl", "requiredPermissions", "confFilePath");
+								  "cropDimensions", "dataUrl", "requiredPermissions", "confFilePath", "feedUrl");
 			
 			$ignoreFieldsLine = implode("', '", $ignoreFields);
 			
