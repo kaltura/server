@@ -88,14 +88,20 @@ class KalturaTestDeploymentHelper
 		$adminClient->setKs($ks);
 		
 		$addedPermissions = array();
-//		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
-	//	$addedPermissions[] = $adminClient->permission->get("AUDIT_PLUGIN_PERMISSION");
-//		$addedPermissions[] = $adminClient->permission->get("CONTENTDISTRIBUTION_PLUGIN_PERMISSION");
 
+		try {
 		$addedPermissions[] = $adminClient->permission->get("CUEPOINT_PLUGIN_PERMISSION");
 		$addedPermissions[] = $adminClient->permission->get("CODECUEPOINT_PLUGIN_PERMISSION");
 		$addedPermissions[] = $adminClient->permission->get("ADCUEPOINT_PLUGIN_PERMISSION");
-			
+		
+//		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
+//		$addedPermissions[] = $adminClient->permission->get("AUDIT_PLUGIN_PERMISSION");
+//		$addedPermissions[] = $adminClient->permission->get("CONTENTDISTRIBUTION_PLUGIN_PERMISSION");
+		}catch (Exception $e)
+		{
+			print("Exception was raised during permission adding: " . $e->getMessage() . "\n");
+		}
+		
 		$systemPartnerPlugin = KalturaSystemPartnerClientPlugin::get($adminClient);
 		$partner = $systemPartnerPlugin->systemPartner->get($partnerId);
 		$partnerConfig = $systemPartnerPlugin->systemPartner->getConfiguration($partnerId);
