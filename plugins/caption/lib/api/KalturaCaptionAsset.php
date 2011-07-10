@@ -48,7 +48,7 @@ class KalturaCaptionAsset extends KalturaAsset
 	(
 		"captionParamsId" => "flavorParamsId",
 		"language",
-		"isDefault",
+		"isDefault" => "default",
 		"label",
 		"format" => "containerFormat",
 	);
