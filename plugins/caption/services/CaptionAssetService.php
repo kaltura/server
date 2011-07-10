@@ -21,11 +21,7 @@ class CaptionAssetService extends KalturaBaseService
 		if(
 			$actionName == 'get' ||
 			$actionName == 'list' ||
-			$actionName == 'getByEntryId' ||
-			$actionName == 'getDownloadUrl' ||
-			$actionName == 'getWebPlayableByEntryId' ||
-			$actionName == 'generateByEntryId' ||
-			$actionName == 'regenerate'
+			$actionName == 'getDownloadUrl'
 			)
 			$partnerGroup = $this->partnerGroup . ',0';
 			
