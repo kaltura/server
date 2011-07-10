@@ -2,21 +2,111 @@
 <TestCaseData testCaseName="SyndicationFeedServiceTest">
   <TestProcedureData testProcedureName="testAdd">
     <TestCaseData testCaseInstanceName="testAdd with data set #0">
-      <Input name="syndicationFeed" type="KalturaBaseSyndicationFeed" key=""/>
-      <OutputReference name="output" type="KalturaBaseSyndicationFeed" key="object key"/>
+      <Input name="syndicationFeed" type="KalturaGenericSyndicationFeed" key="">
+        <feedDescription></feedDescription>
+        <feedLandingPage></feedLandingPage>
+        <id></id>
+        <feedUrl></feedUrl>
+        <partnerId></partnerId>
+        <playlistId></playlistId>
+        <name></name>
+        <status></status>
+        <type></type>
+        <landingPage></landingPage>
+        <createdAt></createdAt>
+        <allowEmbed></allowEmbed>
+        <playerUiconfId></playerUiconfId>
+        <flavorParamId></flavorParamId>
+        <transcodeExistingContent></transcodeExistingContent>
+        <addToDefaultConversionProfile></addToDefaultConversionProfile>
+        <categories></categories>
+      </Input>
+      <OutputReference name="output" type="KalturaGenericSyndicationFeed" key="object key">
+        <feedDescription></feedDescription>
+        <feedLandingPage></feedLandingPage>
+        <id></id>
+        <feedUrl type="string"></feedUrl>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <playlistId></playlistId>
+        <name></name>
+        <status type="string">1</status>
+        <type type="string">5</type>
+        <landingPage></landingPage>
+        <createdAt></createdAt>
+        <allowEmbed type="string">"1"</allowEmbed>
+        <playerUiconfId></playerUiconfId>
+        <flavorParamId></flavorParamId>
+        <transcodeExistingContent></transcodeExistingContent>
+        <addToDefaultConversionProfile></addToDefaultConversionProfile>
+        <categories></categories>
+      </OutputReference>
     </TestCaseData>
   </TestProcedureData>
   <TestProcedureData testProcedureName="testGet">
     <TestCaseData testCaseInstanceName="testGet with data set #0">
       <Input name="id" type="string" key=""/>
-      <OutputReference name="output" type="KalturaBaseSyndicationFeed" key="object key"/>
+      <OutputReference name="output" type="KalturaGenericSyndicationFeed" key="object key">
+        <feedDescription></feedDescription>
+        <feedLandingPage></feedLandingPage>
+        <id></id>
+        <feedUrl></feedUrl>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <playlistId></playlistId>
+        <name></name>
+        <status type="string">1</status>
+        <type type="string">5</type>
+        <landingPage></landingPage>
+        <createdAt></createdAt>
+        <allowEmbed type="string">"1"</allowEmbed>
+        <playerUiconfId></playerUiconfId>
+        <flavorParamId></flavorParamId>
+        <transcodeExistingContent></transcodeExistingContent>
+        <addToDefaultConversionProfile></addToDefaultConversionProfile>
+        <categories></categories>
+      </OutputReference>
     </TestCaseData>
   </TestProcedureData>
   <TestProcedureData testProcedureName="testUpdate">
     <TestCaseData testCaseInstanceName="testUpdate with data set #0">
       <Input name="id" type="string" key=""/>
-      <Input name="syndicationFeed" type="KalturaBaseSyndicationFeed" key=""/>
-      <OutputReference name="output" type="KalturaBaseSyndicationFeed" key="object key"/>
+      <Input name="syndicationFeed" type="KalturaGenericSyndicationFeed" key="">
+        <feedDescription></feedDescription>
+        <feedLandingPage></feedLandingPage>
+        <id></id>
+        <feedUrl></feedUrl>
+        <partnerId></partnerId>
+        <playlistId></playlistId>
+        <name></name>
+        <status></status>
+        <type></type>
+        <landingPage></landingPage>
+        <createdAt></createdAt>
+        <allowEmbed></allowEmbed>
+        <playerUiconfId></playerUiconfId>
+        <flavorParamId></flavorParamId>
+        <transcodeExistingContent></transcodeExistingContent>
+        <addToDefaultConversionProfile></addToDefaultConversionProfile>
+        <categories></categories>
+      </Input>
+      <OutputReference name="output" type="KalturaGenericSyndicationFeed" key="object key">
+        <feedDescription></feedDescription>
+        <feedLandingPage></feedLandingPage>
+        <id></id>
+        <feedUrl></feedUrl>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <playlistId></playlistId>
+        <name></name>
+        <status type="string">1</status>
+        <type type="string">5</type>
+        <landingPage></landingPage>
+        <createdAt></createdAt>
+        <allowEmbed type="string">"1"</allowEmbed>
+        <playerUiconfId></playerUiconfId>
+        <flavorParamId></flavorParamId>
+        <transcodeExistingContent></transcodeExistingContent>
+        <addToDefaultConversionProfile></addToDefaultConversionProfile>
+        <categories></categories>
+      </OutputReference>
     </TestCaseData>
   </TestProcedureData>
   <TestProcedureData testProcedureName="testDelete">
@@ -35,7 +125,7 @@
         <pageIndex></pageIndex>
       </Input>
       <OutputReference name="output" type="KalturaBaseSyndicationFeedListResponse" key="object key">
-        <Array/>
+        <objects></objects>
         <totalCount type="string">0</totalCount>
       </OutputReference>
     </TestCaseData>
