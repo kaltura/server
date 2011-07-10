@@ -1,5 +1,5 @@
 <?php
-class UnitTestsGenerator extends ClientGeneratorFromPhp 
+class UnitTestsGenerator extends ClientGeneratorFromPhp
 {
 	/**
 	* The files that we write to
@@ -64,17 +64,12 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		if($serviceReflector->isFromPlugin())
 		{
-			$serviceClass = $serviceReflector->getServiceClass();
-			$servicePath = KAutoloader::getClassFilePath($serviceClass);
-			$currentFolder = realpath(dirname($servicePath));
-			$rootPath = realpath(dirname(__FILE__) . '/../');
-			$upCounter = 4;
-			while($currentFolder && $currentFolder != $rootPath)
-			{
-				$currentFolder = realpath("$currentFolder/../");
-				$upCounter++;
-			}
-			$bootstrapPath = str_repeat('/..', $upCounter) . '/tests/bootstrap.php';
+//			$serviceClass = $serviceReflector->getServiceClass();
+//			$servicePath = KAutoloader::getClassFilePath($serviceClass);
+//			$currentFolder = realpath(dirname($servicePath));
+//			$rootPath = realpath(dirname(__FILE__) . '/../');
+			$upCounter = 3;
+			$bootstrapPath = str_repeat('/..', $upCounter) . '/bootstrap.php';
 		}
 		
 		$this->_txtBase = '';
@@ -261,8 +256,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		
 		if($serviceReflector->isFromPlugin())
 		{
-			$servicePath = KAutoloader::getClassFilePath($serviceClass);
-			$testPath = realpath(dirname($servicePath) . '/../') . "/tests/services/$serviceName";
+//			$servicePath = KAutoloader::getClassFilePath($serviceClass);
+//			$testPath = realpath(dirname($servicePath) . '/../') . "/tests/services/$serviceName";
+			$testPath = realpath(dirname(__FILE__) . '/../') . "/tests/api/KalturaPlugins/{$serviceClass}_{$serviceName}";
 		}
 
 		$this->writeXml("</TestCaseData>"); // Close the XML tag for the test case
@@ -629,12 +625,6 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	
 		$this->writeXmlSource("			</TestCaseData>");
 		$this->writeXmlSource("		</TestProcedureData>");
-	
-//		if($addId)
-//		{
-//			$this->write("	 * @param int id - returned from testAdd", $isBase);
-//			$testParams[] = '$id';
-//		}
 			
 		$testParams = implode(', ', $testParams);
 		$testValues = implode(', ', $testValues);
