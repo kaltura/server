@@ -233,7 +233,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		
-		if($dbEntry->getLengthInMsecs() < $this->endTime)
+		if(!$dbEntry->getLengthInMsecs() || $dbEntry->getLengthInMsecs() < $this->endTime)
 			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->endTime, $dbEntry->getLengthInMsecs());	
 	}
 	
@@ -263,7 +263,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		}
 		
-		if($dbEntry->getLengthInMsecs() < $this->startTime)
+		if(!$dbEntry->getLengthInMsecs() || $dbEntry->getLengthInMsecs() < $this->startTime)
 			throw new KalturaAPIException(KalturaCuePointErrors::START_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->startTime, $dbEntry->getLengthInMsecs());
 	}
 	
