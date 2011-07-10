@@ -937,6 +937,7 @@ kmc.layout = {
 		},
 
 		show: function() {
+			debugService.trace('start show modal');
 			var $modal = $("#modal");
 
 			kmc.utils.hideFlash(true);
