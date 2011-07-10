@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -67,5 +67,18 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	public static function cleanMemory()
 	{
 	    CuePointPeer::clearInstancePool();
+	}
+
+	/**
+	 * 
+	 * Gets the config for the different config names
+	 * @param string $configName
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }
