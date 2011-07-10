@@ -91,7 +91,11 @@ class KalturaTestDeploymentHelper
 //		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
 	//	$addedPermissions[] = $adminClient->permission->get("AUDIT_PLUGIN_PERMISSION");
 //		$addedPermissions[] = $adminClient->permission->get("CONTENTDISTRIBUTION_PLUGIN_PERMISSION");
-				
+
+		$addedPermissions[] = $adminClient->permission->get("CUEPOINT_PLUGIN_PERMISSION");
+		$addedPermissions[] = $adminClient->permission->get("CODECUEPOINT_PLUGIN_PERMISSION");
+		$addedPermissions[] = $adminClient->permission->get("ADCUEPOINT_PLUGIN_PERMISSION");
+			
 		$systemPartnerPlugin = KalturaSystemPartnerClientPlugin::get($adminClient);
 		$partner = $systemPartnerPlugin->systemPartner->get($partnerId);
 		$partnerConfig = $systemPartnerPlugin->systemPartner->getConfiguration($partnerId);
@@ -105,14 +109,17 @@ class KalturaTestDeploymentHelper
 			$newConfig->permissions[] = $permission;
 		} 
 
-		//Clean the id from the permissions
-		foreach ($newConfig->permissions as &$permission)
+		if($newConfig->permissions && count($newConfig->permissions))
 		{
-			$permission->id = null;	
-			$permission->partnerId = null;
-			$permission->createdAt = null;
-			$permission->updatedAt = null;
-			$permission->status = KalturaPermissionStatus::ACTIVE;
+			//Clean the id from the permissions
+			foreach ($newConfig->permissions as &$permission)
+			{
+				$permission->id = null;	
+				$permission->partnerId = null;
+				$permission->createdAt = null;
+				$permission->updatedAt = null;
+				$permission->status = KalturaPermissionStatus::ACTIVE;
+			}
 		}
 
 		$result = $systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $newConfig);
@@ -121,7 +128,7 @@ class KalturaTestDeploymentHelper
 	/**
 	 * 
 	 * Adds the base data for the test partner
-	 * @param $client KalturaClientBase
+	 * @param $client KalturaClient
 	 */
 	public static function addBaseData($client)
 	{
@@ -137,6 +144,10 @@ class KalturaTestDeploymentHelper
 		$entry->mediaType = KalturaMediaType::VIDEO;
 		$defaultEntry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
 		
+		$contentResource = new KalturaUrlResource();
+		$contentResource->url = "http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv";
+		$client->media->addContent($defaultEntry->id, $contentResource);
+				
 		KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
 		
 		$flavorAssest = $client->flavorParams->listAction();
