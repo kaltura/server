@@ -944,8 +944,8 @@ kmc.layout = {
 			kmc.layout.overlay.show();
 			debugService.trace('before fade modal');
 			$modal.fadeIn(600);
-			if( $.browser.msie ) {
-				//$modal.css('display', 'block');
+			if( ! $.browser.msie ) {
+				$modal.css('display', 'table');
 			}
 			debugService.trace('call modal position');
 			this.position();
