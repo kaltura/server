@@ -140,35 +140,17 @@ class ThumbAssetService extends KalturaBaseService
      * @action update
      * @param string $id
      * @param KalturaThumbAsset $thumbAsset
-     * @param KalturaContentResource $contentResource
      * @return KalturaThumbAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-     * @throws KalturaErrors::THUMB_ASSET_ALREADY_EXISTS
-	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
-	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
-    function updateAction($id, KalturaThumbAsset $thumbAsset, KalturaContentResource $contentResource = null)
+    function updateAction($id, KalturaThumbAsset $thumbAsset)
     {
 		$dbThumbAsset = assetPeer::retrieveById($id);
 		if(!$dbThumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
     	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
-    	
-    	if($contentResource)
-    	{
-			$contentResource->validateEntry($dbThumbAsset->getentry());
-			$kContentResource = $contentResource->toObject();
-	    	$this->attachContentResource($dbThumbAsset, $kContentResource);
-    	}
-    	else 
-    	{
-    		$dbThumbAsset->save();
-    	}
+   		$dbThumbAsset->save();
 		
 		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			$this->setAsDefaultAction($dbThumbAsset->getId());

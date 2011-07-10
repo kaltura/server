@@ -117,35 +117,17 @@ class CaptionAssetService extends KalturaBaseService
      * @action update
      * @param string $id
      * @param KalturaCaptionAsset $captionAsset
-     * @param KalturaContentResource $contentResource
      * @return KalturaCaptionAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-     * @throws KalturaCaptionErrors::CAPTION_ASSET_ALREADY_EXISTS
-	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
-	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
-	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
      */
-    function updateAction($id, KalturaCaptionAsset $captionAsset, KalturaContentResource $contentResource = null)
+    function updateAction($id, KalturaCaptionAsset $captionAsset)
     {
 		$dbCaptionAsset = assetPeer::retrieveById($id);
 		if(!$dbCaptionAsset)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
     	
     	$dbCaptionAsset = $captionAsset->toUpdatableObject($dbCaptionAsset);
-    	
-    	if($contentResource)
-    	{
-			$contentResource->validateEntry($dbCaptionAsset->getentry());
-			$kContentResource = $contentResource->toObject();
-	    	$this->attachContentResource($dbCaptionAsset, $kContentResource);
-    	}
-    	else 
-    	{
-    		$dbCaptionAsset->save();
-    	}
+    	$dbCaptionAsset->save();
 		
 		if($dbCaptionAsset->getDefault())
 			$this->setAsDefaultAction($dbCaptionAsset->getId());
