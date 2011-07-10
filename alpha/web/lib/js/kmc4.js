@@ -949,6 +949,7 @@ kmc.layout = {
 		},
 
 		open: function(data) {
+			debugService.trace('bla');
 			this.create(data);
 			this.show();
 		},
