@@ -6,7 +6,7 @@ SELECT
 	SUM(count_download) count_download,
 	SUM(count_report) count_report
 FROM 
-	dwh_hourly_events_entry ev USE INDEX (PRIMARY), dwh_dim_entries en
+	dwh_hourly_events_entry ev, dwh_dim_entries en
 WHERE
 	ev.entry_id = en.entry_id
 	AND {OBJ_ID_CLAUSE}

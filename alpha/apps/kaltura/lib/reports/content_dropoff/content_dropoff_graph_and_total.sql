@@ -6,7 +6,7 @@ SELECT
 	SUM(count_plays_100) count_plays_100,
 	( SUM(count_plays_100) / SUM(count_plays) ) play_through_ratio
 FROM 
-	dwh_hourly_events_entry ev USE INDEX (PRIMARY), dwh_dim_entries en
+	dwh_hourly_events_entry ev, dwh_dim_entries en
 WHERE
 	ev.entry_id = en.entry_id 	
 	AND {OBJ_ID_CLAUSE}

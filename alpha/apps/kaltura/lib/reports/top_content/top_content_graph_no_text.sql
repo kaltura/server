@@ -7,7 +7,7 @@ SELECT
 	SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
 	SUM(count_loads) count_loads
 FROM 
-	dwh_hourly_events_entry ev USE INDEX (PRIMARY)
+	dwh_hourly_events_entry ev
 WHERE 	{OBJ_ID_CLAUSE}
 AND partner_id =  {PARTNER_ID} # PARTNER_ID
 AND date_id BETWEEN IF({TIME_SHIFT}>0,(DATE({FROM_DATE_ID}) - INTERVAL 1 DAY)*1, {FROM_DATE_ID})  

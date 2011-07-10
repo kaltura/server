@@ -6,7 +6,7 @@ SELECT
 	SUM(sum_time_viewed)/SUM(count_plays) avg_time_viewed,
 	SUM(count_loads) count_loads
 FROM 
-	dwh_hourly_events_entry ev USE INDEX (PRIMARY), kalturadw.dwh_dim_entries en
+	dwh_hourly_events_entry ev, kalturadw.dwh_dim_entries en
 WHERE 	
 	en.entry_id=ev.entry_id
 	AND {OBJ_ID_CLAUSE}

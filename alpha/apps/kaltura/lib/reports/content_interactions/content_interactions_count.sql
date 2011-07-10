@@ -2,7 +2,7 @@ SELECT
 	COUNT(DISTINCT a.entry_id) count_all
 FROM (
 	SELECT ev.entry_id
-		FROM	kalturadw.dwh_hourly_events_entry  ev USE INDEX (PRIMARY), kalturadw.dwh_dim_entries en
+		FROM	kalturadw.dwh_hourly_events_entry  ev , kalturadw.dwh_dim_entries en
 	WHERE
 	en.entry_id=ev.entry_id
 	AND {OBJ_ID_CLAUSE}
