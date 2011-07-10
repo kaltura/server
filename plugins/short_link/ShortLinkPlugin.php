@@ -2,7 +2,7 @@
 /**
  * @package plugins.shortLink
  */
-class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaMemoryCleaner
+class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'shortLink';
 	const SHORT_LINK_FLOW_MANAGER_CLASS = 'kShortLinkFlowManager';
@@ -44,5 +44,16 @@ class ShortLinkPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 	public static function cleanMemory()
 	{
 	    ShortLinkPeer::clearInstancePool();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }

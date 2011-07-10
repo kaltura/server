@@ -2,7 +2,7 @@
 /**
  * @package plugins.audit
  */
-class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaMemoryCleaner
+class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'audit';
 	const AUDIT_TRAIL_MANAGER = 'kAuditTrailManager';
@@ -52,5 +52,18 @@ class AuditPlugin extends KalturaPlugin implements IKalturaPermissions, IKaltura
 	    AuditTrailPeer::clearInstancePool();
 	    AuditTrailConfigPeer::clearInstancePool();
 //	    AuditTrailDataPeer::clearInstancePool();
+	}
+	
+	/**
+	 * 
+	 * Gets the config for the different config names
+	 * @param string $configName
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }
