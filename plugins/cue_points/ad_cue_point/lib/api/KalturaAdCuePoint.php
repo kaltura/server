@@ -31,11 +31,20 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	public $title;
 	
 	/**
+	 * End time in milliseconds
+	 * @var int 
+	 * @filter gte,lte,order
+	 * @readonly
+	 */
+	public $endTime;
+	
+	/**
+	 * Duration in milliseconds
 	 * @var int 
 	 * @filter gte,lte,order
 	 * @requiresPermission insert,update
 	 */
-	public $endTime;
+	public $duration;
 
 	public function __construct()
 	{
@@ -49,6 +58,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 		"adType",
 		"title" => "name",
 		"endTime",
+		"duration",
 	);
 	
 	/* (non-PHPdoc)
@@ -85,8 +95,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if($this->endTime !== null)
-			$this->validateEndTime($sourceObject->getId());
+		$this->validateEndTime($sourceObject->getId());
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

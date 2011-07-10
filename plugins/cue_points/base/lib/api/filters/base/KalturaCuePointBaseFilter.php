@@ -10,8 +10,8 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
-		"typeEqual" => "_eq_type",
-		"typeIn" => "_in_type",
+		"cuePointTypeEqual" => "_eq_cue_point_type",
+		"cuePointTypeIn" => "_in_cue_point_type",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"entryIdEqual" => "_eq_entry_id",
@@ -74,7 +74,7 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 	 * 
 	 * @var KalturaCuePointType
 	 */
-	public $typeEqual;
+	public $cuePointTypeEqual;
 
 	/**
 	 * 
@@ -82,7 +82,7 @@ class KalturaCuePointBaseFilter extends KalturaFilter
 	 * @dynamicType KalturaCuePointType
 	 * @var string
 	 */
-	public $typeIn;
+	public $cuePointTypeIn;
 
 	/**
 	 * 

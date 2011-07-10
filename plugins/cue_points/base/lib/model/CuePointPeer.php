@@ -23,6 +23,7 @@ class CuePointPeer extends BaseCuePointPeer
 	const STR_ENTRY_ID = 'cue_point.STR_ENTRY_ID';
 	const STR_CUE_POINT_ID = 'cue_point.STR_CUE_POINT_ID';
 	const FORCE_STOP = 'cue_point.FORCE_STOP';
+	const DURATION = 'cue_point.DURATION';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array();

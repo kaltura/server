@@ -186,6 +186,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			'partner_id' => 'partnerId',
 			'start_time' => 'startTime',
 			'end_time' => 'endTime',
+			'duration' => 'duration',
 			'cue_point_status' => 'status',
 			'cue_point_type' => 'type',
 			'kuser_id' => 'kuserId',
@@ -209,6 +210,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'start_time' => IIndexable::FIELD_TYPE_INTEGER,
 		'end_time' => IIndexable::FIELD_TYPE_INTEGER,
+		'duration' => IIndexable::FIELD_TYPE_INTEGER,
 		'cue_point_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'cue_point_type' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -243,6 +245,40 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			
 		return null;
 	}
+
+	/**
+	 * Get the [duration] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDuration()
+	{
+		$end_time = $this->getEndTime();
+		if(is_null($end_time))
+			return null;
+			
+		return $end_time - $this->getStartTime();
+	}
+	
+	/**
+	 * Set the value of [duration] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     CuePoint The current object (for fluent API support)
+	 */
+	public function setDuration($v)
+	{
+		if(is_null($v))
+			return $this->setEndTime(null);
+			
+		if(is_null($this->getStartTime()))
+			throw new Exception("Start time must be set before setting duration");
+			
+		$v = (int) $v;
+		return $this->setEndTime($this->getStartTime() + $v);
+		
+	} // setDuration()
+	
 	
 	public function getForceStop()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP);}	
 

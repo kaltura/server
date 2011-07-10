@@ -13,6 +13,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		CuePointPeer::PARTNER_ID => 'partner_id',
 		CuePointPeer::START_TIME => 'start_time',
 		CuePointPeer::END_TIME => 'end_time',
+		CuePointPeer::DURATION => 'duration',
 		CuePointPeer::STATUS => 'cue_point_status',
 		CuePointPeer::TYPE => 'cue_point_type',
 		CuePointPeer::KUSER_ID => 'kuser_id',
@@ -27,6 +28,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 	public static $sphinxOrderFields = array(
 		CuePointPeer::START_TIME => 'start_time',
 		CuePointPeer::END_TIME => 'end_time',
+		CuePointPeer::DURATION => 'duration',
 		CuePointPeer::PARTNER_SORT_VALUE => 'partner_sort_value',
 		CuePointPeer::CREATED_AT => 'created_at',
 		CuePointPeer::UPDATED_AT => 'updated_at',

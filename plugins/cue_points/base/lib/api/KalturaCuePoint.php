@@ -18,7 +18,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	 * @filter eq,in
 	 * @readonly
 	 */
-	public $type;
+	public $cuePointType;
 	
 	/**
 	 * @var KalturaCuePointStatus
@@ -61,6 +61,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	public $tags;
 
 	/**
+	 * Start tim ein milliseconds
 	 * @var int 
 	 * @filter gte,lte,order
 	 */
@@ -104,7 +105,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	private static $map_between_objects = array
 	(
 		"id",
-		"type",
+		"cuePointType" => "type",
 		"status",
 		"entryId",
 		"partnerId",
@@ -206,15 +207,14 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	 */
 	public function validateEndTime($cuePointId = null)
 	{
-		if(($this->startTime === null) && ($this->endTime !== null))
-				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
-		
-		if ($this->endTime === null)
-			$this->endTime = $this->startTime;
+		if(is_null($this->duration))
+			return;
 			
-		if($this->endTime < $this->startTime)
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
+		if(is_null($this->startTime))
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_WITHOUT_START_TIME);
 		
+		$this->validatePropertyMinValue('duration', 0, true);		
+				
 		if($cuePointId !== null)
 		{
 			$dbCuePoint = CuePointPeer::retrieveByPK($cuePointId);
@@ -232,8 +232,8 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		
-		if($dbEntry->getLengthInMsecs() < $this->endTime)
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->endTime, $dbEntry->getLengthInMsecs());	
+		if($dbEntry->getLengthInMsecs() < $this->duration)
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->duration, $dbEntry->getLengthInMsecs());	
 	}
 	
 	/*
@@ -268,7 +268,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$propertiesToSkip[] = 'type';
+		$propertiesToSkip[] = 'cuePointType';
 		parent::validateForInsert($propertiesToSkip);
 		
 		$this->validatePropertyNotNull("entryId");
@@ -290,7 +290,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		if($this->startTime !== null)
 			$this->validateStartTime($sourceObject->getId());
 					
-		$propertiesToSkip[] = 'type';
+		$propertiesToSkip[] = 'cuePointType';
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 

@@ -31,6 +31,8 @@ class CuePointFilter extends baseObjectFilter
 				"_in_system_name",
 				"_gte_end_time",
 				"_lte_end_time",
+				"_gte_duration",
+				"_lte_duration",
 				"_eq_parent_id",
 				"_in_parent_id",
 			) , NULL );
@@ -40,6 +42,7 @@ class CuePointFilter extends baseObjectFilter
 			"updated_at", 
 			"start_time", 
 			"end_time", 
+			"duration", 
 			"partner_sort_value",
 		);
 			
@@ -61,6 +64,9 @@ class CuePointFilter extends baseObjectFilter
 	{
 		if($field_name == 'force_stop')
 			return CuePointPeer::FORCE_STOP;
+			
+		if($field_name == 'duration')
+			return CuePointPeer::DURATION;
 			
 		return CuePointPeer::translateFieldName( $field_name , $this->field_name_translation_type , BasePeer::TYPE_COLNAME );
 	}

@@ -18,10 +18,20 @@ class KalturaAnnotation extends KalturaCuePoint
 	public $text;
 	
 	/**
+	 * End time in milliseconds
 	 * @var int 
 	 * @filter gte,lte,order
+	 * @readonly
 	 */
 	public $endTime;
+	
+	/**
+	 * Duration in milliseconds
+	 * @var int 
+	 * @filter gte,lte,order
+	 * @requiresPermission insert,update
+	 */
+	public $duration;
 
 	public function __construct()
 	{
@@ -33,6 +43,7 @@ class KalturaAnnotation extends KalturaCuePoint
 		"parentId",
 		"text",
 		"endTime",
+		"duration",
 	);
 	
 	/* (non-PHPdoc)
@@ -79,8 +90,7 @@ class KalturaAnnotation extends KalturaCuePoint
 		if($this->text !== null)
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
 		
-		if($this->endTime !== null)
-			$this->validateEndTime($sourceObject->getId());
+		$this->validateEndTime($sourceObject->getId());
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
