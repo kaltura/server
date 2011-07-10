@@ -34,7 +34,7 @@ class MixingService extends KalturaEntryService
 		
 		$dbEntry = $mixEntry->toObject(new entry());
 		
-		$this->checkAndSetValidUser($mixEntry, $dbEntry);
+		$this->checkAndSetValidUserInsert($mixEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($mixEntry);
 		$this->validateAccessControlId($mixEntry);
 		$this->validateEntryScheduleDates($mixEntry);
@@ -106,7 +106,7 @@ class MixingService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
-		$this->checkAndSetValidUser($mixEntry, $dbEntry);
+		$this->checkAndSetValidUserUpdate($mixEntry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($mixEntry);
 		$this->validateAccessControlId($mixEntry);
 		$this->validateEntryScheduleDates($mixEntry);

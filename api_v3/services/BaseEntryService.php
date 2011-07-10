@@ -228,7 +228,7 @@ class BaseEntryService extends KalturaEntryService
 	    $dbEntry->setType($type);
 	    $dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC);
 	        
-	    $this->checkAndSetValidUser($entry, $dbEntry);
+	    $this->checkAndSetValidUserInsert($entry, $dbEntry);
 	    $this->checkAdminOnlyInsertProperties($entry);
 	    $this->validateAccessControlId($entry);
 	    $this->validateEntryScheduleDates($entry);

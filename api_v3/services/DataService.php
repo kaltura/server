@@ -30,7 +30,7 @@ class DataService extends KalturaEntryService
 	{
 		$dbEntry = $dataEntry->toObject(new entry());
 		
-		$this->checkAndSetValidUser($dataEntry, $dbEntry);
+		$this->checkAndSetValidUserInsert($dataEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($dataEntry);
 		$this->validateAccessControlId($dataEntry);
 		$this->validateEntryScheduleDates($dataEntry);

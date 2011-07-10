@@ -192,7 +192,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 			$dbEntry->setType(KalturaEntryType::MEDIA_CLIP);
 			$dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC);
 	
-			$this->checkAndSetValidUser($mediaEntry, $dbEntry);
+			$this->checkAndSetValidUserInsert($mediaEntry, $dbEntry);
 			$this->checkAdminOnlyInsertProperties($mediaEntry);
 			$this->validateAccessControlId($mediaEntry);
 			$this->validateEntryScheduleDates($mediaEntry);

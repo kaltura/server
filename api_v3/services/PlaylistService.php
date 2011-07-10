@@ -60,7 +60,7 @@ class PlaylistService extends KalturaEntryService
 	{
 		$dbPlaylist = $playlist->toObject();
 		
-		$this->checkAndSetValidUser($playlist, $dbPlaylist);
+		$this->checkAndSetValidUserInsert($playlist, $dbPlaylist);
 		$this->checkAdminOnlyInsertProperties($playlist);
 		$this->validateAccessControlId($playlist);
 		$this->validateEntryScheduleDates($playlist);
@@ -148,7 +148,7 @@ class PlaylistService extends KalturaEntryService
 
 		
 		$this->checkIfUserAllowedToUpdateEntry($playlistUpdate);
-		$this->checkAndSetValidUser($playlist, $playlistUpdate);
+		$this->checkAndSetValidUserUpdate($playlist, $playlistUpdate);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
 		$this->validateEntryScheduleDates($playlist);

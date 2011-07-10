@@ -192,7 +192,7 @@ class LiveStreamService extends KalturaEntryService
 		// first copy all the properties to the db entry, then we'll check for security stuff
 		$dbEntry = $liveStreamEntry->toObject(new entry());
 
-		$this->checkAndSetValidUser($liveStreamEntry, $dbEntry);
+		$this->checkAndSetValidUserInsert($liveStreamEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($liveStreamEntry);
 		$this->validateAccessControlId($liveStreamEntry);
 		$this->validateEntryScheduleDates($liveStreamEntry);
