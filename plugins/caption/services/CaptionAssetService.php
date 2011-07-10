@@ -367,7 +367,7 @@ class CaptionAssetService extends KalturaBaseService
 		$captionAsset = null;
 		if(is_null($captionParamId))
 		{
-			$captionAssets = assetPeer::retrieveByEntryId($entryId, array(self::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+			$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 			foreach($captionAssets as $checkCaptionAsset)
 			{
 				if($checkCaptionAsset->getDefault())
@@ -456,7 +456,7 @@ class CaptionAssetService extends KalturaBaseService
 		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId))  
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
 			
-		$entryCaptionAssets = assetPeer::retrieveByEntryId($captionAsset->getEntryId(), array(self::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		$entryCaptionAssets = assetPeer::retrieveByEntryId($captionAsset->getEntryId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 		foreach($entryCaptionAssets as $entryCaptionAsset)
 		{
 			if($entryCaptionAsset->getId() == $captionAsset->getId())
@@ -509,7 +509,7 @@ class CaptionAssetService extends KalturaBaseService
 		$c = new Criteria();
 		$captionAssetFilter->attachToCriteria($c);
 		
-		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, self::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 		$c->add(assetPeer::TYPE, $types, Criteria::IN);
 		
 		$totalCount = assetPeer::doCount($c);
