@@ -22,34 +22,25 @@ class StorageProfileService extends KalturaBaseService
 	}
 	
 	/**
-	 * @action list
-	 * @param KalturaStorageProfileFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaStorageProfileListResponse
+	 * Adds a storage profile to the Kaltura DB.
+	 *
+	 * @action add
+	 * @param KalturaStorageProfile $storageProfile 
+	 * @return KalturaStorageProfile
 	 */
-	public function listAction(KalturaStorageProfileFilter $filter = null, KalturaFilterPager $pager = null)
+	function addAction(KalturaStorageProfile $storageProfile)
 	{
-		$c = new Criteria();
-		
-		if (!$filter)
-			$filter = new KalturaStorageProfileFilter();
-		
-		$storageProfileFilter = new StorageProfileFilter();
-		$filter->toObject($storageProfileFilter);
-		$storageProfileFilter->attachToCriteria($c);
-		$list = StorageProfilePeer::doSelect($c);
+		if(!$storageProfile->status)
+			$storageProfile->status = KalturaStorageProfileStatus::DISABLED;
 			
-		if (!$pager)
-			$pager = new KalturaFilterPager();
-			
-		$pager->attachToCriteria($c);
+		$dbStorageProfile = $storageProfile->toInsertableObject();
+		$dbStorageProfile->setPartnerId($this->impersonatedPartnerId);
+		$dbStorageProfile->save();
 		
-		$response = new KalturaStorageProfileListResponse();
-		$response->totalCount = StorageProfilePeer::doCount($c);
-		$response->objects = KalturaStorageProfileArray::fromStorageProfileArray($list);
-		return $response;
+		$storageProfile->fromObject($dbStorageProfile);
+		return $storageProfile;
 	}
-	
+		
 	/**
 	 * @action updateStatus
 	 * @param int $storageId
@@ -103,25 +94,33 @@ class StorageProfileService extends KalturaBaseService
 		$storageProfile->fromObject($dbStorageProfile);
 		return $storageProfile;
 	}
-
-
-	/**
-	 * Adds a storage profile to the Kaltura DB.
-	 *
-	 * @action add
-	 * @param KalturaStorageProfile $storageProfile 
-	 * @return KalturaStorageProfile
+	
+	/**	
+	 * @action list
+	 * @param KalturaStorageProfileFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaStorageProfileListResponse
 	 */
-	function addAction(KalturaStorageProfile $storageProfile)
+	public function listAction(KalturaStorageProfileFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if(!$storageProfile->status)
-			$storageProfile->status = KalturaStorageProfileStatus::DISABLED;
-			
-		$dbStorageProfile = $storageProfile->toInsertableObject();
-		$dbStorageProfile->setPartnerId($this->impersonatedPartnerId);
-		$dbStorageProfile->save();
+		$c = new Criteria();
 		
-		$storageProfile->fromObject($dbStorageProfile);
-		return $storageProfile;
+		if (!$filter)
+			$filter = new KalturaStorageProfileFilter();
+		
+		$storageProfileFilter = new StorageProfileFilter();
+		$filter->toObject($storageProfileFilter);
+		$storageProfileFilter->attachToCriteria($c);
+		$list = StorageProfilePeer::doSelect($c);
+			
+		if (!$pager)
+			$pager = new KalturaFilterPager();
+			
+		$pager->attachToCriteria($c);
+		
+		$response = new KalturaStorageProfileListResponse();
+		$response->totalCount = StorageProfilePeer::doCount($c);
+		$response->objects = KalturaStorageProfileArray::fromStorageProfileArray($list);
+		return $response;
 	}
 }
