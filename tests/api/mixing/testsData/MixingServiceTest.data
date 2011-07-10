@@ -99,7 +99,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">100000</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string" dbValue="385294">4</accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
@@ -166,7 +166,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">100000</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string" dbValue="385294">4</accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
