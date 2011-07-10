@@ -88,8 +88,8 @@ class KalturaTestDeploymentHelper
 		$adminClient->setKs($ks);
 		
 		$addedPermissions = array();
-		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
-		$addedPermissions[] = $adminClient->permission->get("AUDIT_PLUGIN_PERMISSION");
+//		$addedPermissions[] = $adminClient->permission->get("DROPFOLDER_PLUGIN_PERMISSION");
+	//	$addedPermissions[] = $adminClient->permission->get("AUDIT_PLUGIN_PERMISSION");
 //		$addedPermissions[] = $adminClient->permission->get("CONTENTDISTRIBUTION_PLUGIN_PERMISSION");
 				
 		$systemPartnerPlugin = KalturaSystemPartnerClientPlugin::get($adminClient);
