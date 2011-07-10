@@ -21,7 +21,6 @@ class KalturaAnnotation extends KalturaCuePoint
 	 * End time in milliseconds
 	 * @var int 
 	 * @filter gte,lte,order
-	 * @readonly
 	 */
 	public $endTime;
 	
@@ -29,7 +28,7 @@ class KalturaAnnotation extends KalturaCuePoint
 	 * Duration in milliseconds
 	 * @var int 
 	 * @filter gte,lte,order
-	 * @requiresPermission insert,update
+	 * @readonly
 	 */
 	public $duration;
 
@@ -90,7 +89,8 @@ class KalturaAnnotation extends KalturaCuePoint
 		if($this->text !== null)
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
 		
-		$this->validateEndTime($sourceObject->getId());
+		if($this->endTime !== null)
+			$this->validateEndTime($sourceObject->getId());
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
