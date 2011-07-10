@@ -403,7 +403,7 @@ class CaptionAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
 
 		if ($captionAssetDb->getStatus() != CaptionAsset::FLAVOR_ASSET_STATUS_READY)
-			throw new KalturaAPIEXception(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 
 		return $captionAssetDb->getDownloadUrl($useCdn);
 	}
