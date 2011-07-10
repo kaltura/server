@@ -1,6 +1,6 @@
 <?php
 /**
- * @package 
+ * @package plugins.caption
  * @subpackage api.filters
  */
 class KalturaCaptionAssetFilter extends KalturaCaptionAssetBaseFilter
