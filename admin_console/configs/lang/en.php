@@ -232,7 +232,7 @@ return array(
 
 	//partner group type
 	'Kaltura_Client_Enum_PartnerGroupType::PUBLISHER' => 'Publisher',
-	'Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP' => 'Var',
+	'Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP' => 'VAR',
 	'Kaltura_Client_Enum_PartnerGroupType::GROUP' => 'Group',
 
 
