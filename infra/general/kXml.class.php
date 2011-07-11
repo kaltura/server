@@ -5,6 +5,14 @@
  */
 class kXml
 {
+	
+		//check if the prop's value is valid for xml encoding.
+	public static function isXMLValidContent($value) {
+		if (preg_match ( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', $value ))
+			return false;
+		return true;
+	}	
+	
 	public static function getLibXmlErrorDescription($xml)
 	{
 		$errors = libxml_get_errors();

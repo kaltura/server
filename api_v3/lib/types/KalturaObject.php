@@ -118,6 +118,8 @@ class KalturaObject
 				
 				if ($value !== null)
 				{
+					if (! kXml::isXMLValidContent($value) )
+						throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
 					$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
 					if (is_callable($setter_callback))
 				 	    call_user_func_array( $setter_callback , array ($value ) );

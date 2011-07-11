@@ -25,6 +25,9 @@ class KalturaErrors extends APIErrors
 	// %s - service name
 	const SERVICE_DOES_NOT_EXISTS = "SERVICE_DOES_NOT_EXISTS,Service \"%s\" does not exists";
 	
+	// %s - xml field  
+	const INVALID_PARAMETER_CHAR= "INVALID_PARAMETER_CHAR,Invalid char in \"%s\" field";
+	
 	//
 	const ACTION_NOT_SPECIFIED = "ACTION_NOT_SPECIFIED,Action name was not specified, please specify one";
 	
