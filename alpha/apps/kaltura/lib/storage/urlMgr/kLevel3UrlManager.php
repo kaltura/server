@@ -1,6 +1,10 @@
 <?php
 class kLevel3UrlManager extends kUrlManager
 {
+    const TOKENIZED_RTMP_PARAM = 'level3_tokenized_rtmp';
+    const LEVEL3_ID_PARAM = 'level3_id';
+    const LEVEL3_SECRET_PARAM = 'level3_secret';    
+    
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return string
@@ -62,22 +66,23 @@ class kLevel3UrlManager extends kUrlManager
 	public function getFileSyncUrl(FileSync $fileSync)
 	{
 	    // get params
-		$tokenizedRtmp = isset($this->params['level3_tokenized']) ? $this->params['level3_tokenized_rtmp'] : false;
-		$level3Id      = isset($this->params['level3_id']) ? $this->params['level3_id'] : false;
-		$secret        = isset($this->params['level3_secret']) ? $this->params['level3_secret'] : false;
+		$tokenizedRtmp = isset($this->params[self::TOKENIZED_RTMP_PARAM]) ? $this->params[self::TOKENIZED_RTMP_PARAM] : false;
+		$level3Id      = isset($this->params[self::LEVEL3_ID_PARAM]) ? $this->params[self::LEVEL3_ID_PARAM] : false;
+		$secret        = isset($this->params[self::LEVEL3_SECRET_PARAM]) ? $this->params[self::LEVEL3_SECRET_PARAM] : false;
 	    
 		// get url from parent
 	    $url = parent::getFileSyncUrl($fileSync);
 	    
 	    // if level3 tokenized url is used for rtmp, generated token string
-	    if($this->protocol != StorageProfile::PLAY_FORMAT_RTMP)
+	    if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 		{	
+		    
     	    if($tokenizedRtmp && $level3Id && $secret)
     		{
         		$urlToTokenize = '/'.$level3Id.'/'.$url;
                 $urlToTokenize = str_replace('//', '/', $url);
         		
-                $token = "0" . substr(hash_hmac('sha1', $url, $secret), 0, 20);
+                $token = "0" . substr(hash_hmac('sha1', $urlToTokenize, $secret), 0, 20);
         	
                 $url = $url.'?token='.$token;
     		}
