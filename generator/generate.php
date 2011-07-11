@@ -47,7 +47,7 @@ ini_set( "memory_limit","512M" );
 require_once("bootstrap.php");
 
 $root = myContentStorage::getFSContentRootPath();
-$outputPathBase = "$root/content/generator/output";
+$outputPathBase = "$root/content/clientlibs";
 kFile::fullMkdir($outputPathBase);
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
