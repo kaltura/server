@@ -23,7 +23,7 @@
 		if(isset($_REQUEST['config']))
 			$configSection = $_REQUEST['config'];
 			
-		$config = new Zend_Config_Ini("../../config/testme.ini", array('allowModifications' => true));
+		$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
 		$config = KalturaPluginManager::mergeConfigs($config, 'testme');
 		$indexConfig = $config->get($configSection);
 		
