@@ -33,9 +33,12 @@ class extloginAction extends kalturaAction
 		$ks = $this->getP ( "ks" );
 		$requestedPartnerId = $this->getP ( "partner_id" );
 		
+		$expired = $this->getP ( "exp" );
+
 		$ksObj = kSessionUtils::crackKs($ks);
 		$ksPartnerId = $ksObj->partner_id;
 		
+
 		if (!$requestedPartnerId) {
 			$requestedPartnerId = $ksPartnerId; 
 		}
@@ -95,6 +98,8 @@ class extloginAction extends kalturaAction
 			$screen_name = $this->getP ( "screen_name" );
 		}
 		
+		$exp = (isset($expired) && is_numeric($expired)) ? time() + $expired: 0;
+		
 		$noUserInKs = is_null($ksObj->user) || $ksObj->user === '';
 		if ( ($ksPartnerId != $partner_id) || ($partner->getKmcVersion() >= 4 && $noUserInKs) )
 		{
@@ -102,8 +107,8 @@ class extloginAction extends kalturaAction
 			$sessionType = $adminKuser->getIsAdmin() ? SessionType::ADMIN : SessionType::USER;
 			kSessionUtils::createKSessionNoValidations ( $partner_id ,  $admin_puser_id , $ks , 30 * 86400 , $sessionType , "" , "*" );
 		}
-					
-		$exp = 0;
+		
+		
 		$path = "/";
 		
 		$this->getResponse()->setCookie("pid", $partner_id, $exp, $path);
