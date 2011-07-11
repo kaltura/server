@@ -10,7 +10,7 @@
 		return strcmp($obj1->getServiceName(), $obj2->getServiceName());
 	}
 
-	$config = new Zend_Config_Ini("../../config/testme.ini");
+	$config = new Zend_Config_Ini("../../config/testme.ini", array('allowModifications' => true));
 	$config = KalturaPluginManager::mergeConfigs($config, 'testme');
 	$indexConfig = $config->get('testmedoc');
 	
