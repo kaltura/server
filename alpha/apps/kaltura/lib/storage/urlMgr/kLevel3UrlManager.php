@@ -75,12 +75,11 @@ class kLevel3UrlManager extends kUrlManager
 	    
 	    // if level3 tokenized url is used for rtmp, generated token string
 	    if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
-		{	
-		    
+		{
     	    if($tokenizedRtmp && $level3Id && $secret)
     		{
-        		$urlToTokenize = '/'.$level3Id.'/'.$url;
-                $urlToTokenize = str_replace('//', '/', $url);
+        		$urlToTokenize = str_replace('mp4:', '', $url);
+        		$urlToTokenize = '/'.$level3Id.'/'.trim($urlToTokenize, '/').'.'.$this->extention;
         		
                 $token = "0" . substr(hash_hmac('sha1', $urlToTokenize, $secret), 0, 20);
         	
