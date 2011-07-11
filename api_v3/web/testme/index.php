@@ -24,6 +24,7 @@
 			$configSection = $_REQUEST['config'];
 			
 		$config = new Zend_Config_Ini("../../config/testme.ini");
+		$config = KalturaPluginManager::mergeConfigs($config, 'testme');
 		$indexConfig = $config->get($configSection);
 		
 		$include = $indexConfig->get("include");
