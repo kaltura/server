@@ -145,7 +145,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		foreach( $xdoc->channel as $channel)
 		{
-			KalturaLog::debug("Handling channel");
+//			KalturaLog::debug("Handling channel");
 			$this->handleChannel($channel);
 			if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 				return;
@@ -178,10 +178,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->currentItem++; //move to the next item (first item is 1)
 			try
 			{
-				KalturaLog::debug("Validating item [{$item->name}]");
+//				KalturaLog::debug("Validating item [{$item->name}]");
 				$this->validateItem($item);
 				
-				KalturaLog::debug("Handling item [{$item->name}]");
+//				KalturaLog::debug("Handling item [{$item->name}]");
 				$this->handleItem($item);
 			}
 			catch (KalturaBulkUploadXmlException $e)
@@ -1129,7 +1129,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allFlavorParams = $this->kClient->conversionProfileAssetParams->listAction($conversionProfileFilter);
 		$allFlavorParams = $allFlavorParams->objects;
 		
-		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
+//		KalturaLog::debug("allFlavorParams [" . print_r($allFlavorParams, true). "]");
 		
 		foreach ($allFlavorParams as $flavorParams)
 		{
@@ -1139,7 +1139,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->assetParamsNameToIdPerConversionProfile[$conversionProfileId]["NO SYSTEM NAME $flavorParams->assetParamsId"] = $flavorParams->assetParamsId;
 		}
 		
-		KalturaLog::debug("new assetParamsNameToIdPerConversionProfile [" . print_r($this->assetParamsNameToIdPerConversionProfile, true). "]");
+//		KalturaLog::debug("new assetParamsNameToIdPerConversionProfile [" . print_r($this->assetParamsNameToIdPerConversionProfile, true). "]");
 	}
 	
 	/**
@@ -1152,7 +1152,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allAccessControl = $this->kClient->accessControl->listAction(null, null);
 		$allAccessControl = $allAccessControl->objects;
 		
-		KalturaLog::debug("allAccessControl [" . print_r($allAccessControl, true). "]");
+//		KalturaLog::debug("allAccessControl [" . print_r($allAccessControl, true). "]");
 		
 		foreach ($allAccessControl as $accessControl)
 		{
@@ -1163,7 +1163,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 		}
 		
-		KalturaLog::debug("new accessControlNameToId [" . print_r($this->accessControlNameToId, true). "]");
+//		KalturaLog::debug("new accessControlNameToId [" . print_r($this->accessControlNameToId, true). "]");
 	}
 
 	/**
@@ -1178,8 +1178,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allFlavorAssets = $this->kClient->flavorAsset->getByEntryId($entryId);
 		$allThumbAssets = $this->kClient->thumbAsset->getByEntryId($entryId);
 						
-		KalturaLog::debug("allFlavorAssets [" . print_r($allFlavorAssets, true). "]");
-		KalturaLog::debug("allThumbAssets [" . print_r($allThumbAssets, true). "]");
+//		KalturaLog::debug("allFlavorAssets [" . print_r($allFlavorAssets, true). "]");
+//		KalturaLog::debug("allThumbAssets [" . print_r($allThumbAssets, true). "]");
 		
 		foreach ($allFlavorAssets as $flavorAsset)
 		{
@@ -1193,7 +1193,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->assetIdToAssetParamsId[$entryId][$thumbAsset->id] = $thumbAsset->thumbParamsId;
 		}
 		
-		KalturaLog::debug("new assetIdToAssetParamsId [" . print_r($this->assetIdToAssetParamsId, true). "]");
+//		KalturaLog::debug("new assetIdToAssetParamsId [" . print_r($this->assetIdToAssetParamsId, true). "]");
 	}
 	
 	/**
@@ -1206,7 +1206,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allConversionProfile = $this->kClient->conversionProfile->listAction(null, null);
 		$allConversionProfile = $allConversionProfile->objects;
 		
-		KalturaLog::debug("allConversionProfile [" . print_r($allConversionProfile,true) ." ]");
+//		KalturaLog::debug("allConversionProfile [" . print_r($allConversionProfile,true) ." ]");
 		
 		foreach ($allConversionProfile as $conversionProfile)
 		{
@@ -1217,7 +1217,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->conversionProfileNameToId["No system name " ."{$conversionProfile->id}"] = $conversionProfile->id;
 		}
 		
-		KalturaLog::debug("new conversionProfileNameToId [" . print_r($this->conversionProfileNameToId, true). "]");
+//		KalturaLog::debug("new conversionProfileNameToId [" . print_r($this->conversionProfileNameToId, true). "]");
 	}
 
 	/**
@@ -1230,7 +1230,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$allStorageProfiles = $this->kClient->storageProfile->listAction(null, null);
 		$allStorageProfiles = $allStorageProfiles->objects;
 		
-		KalturaLog::debug("allStorageProfiles [" . print_r($allStorageProfiles,true) ." ]");
+//		KalturaLog::debug("allStorageProfiles [" . print_r($allStorageProfiles,true) ." ]");
 		
 		foreach ($allStorageProfiles as $storageProfile)
 		{
@@ -1240,7 +1240,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->storageProfileNameToId["No system name " ."{$storageProfile->id}"] = $storageProfile->id;	
 		}
 		
-		KalturaLog::debug("new storageProfileNameToId [" . print_r($this->storageProfileNameToId, true). "]");
+//		KalturaLog::debug("new storageProfileNameToId [" . print_r($this->storageProfileNameToId, true). "]");
 	}
 		
 	/**
@@ -1551,7 +1551,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		//TODO: What should we write in the bulk upload result for update? 
 		//only the changed parameters or just the one theat was changed
-		KalturaLog::debug("Creating upload result");
+//		KalturaLog::debug("Creating upload result");
 		KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
 					
 		$bulkUploadResult = new KalturaBulkUploadResult();
