@@ -560,7 +560,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 		if(in_array($action, array("list", "clone", "goto")))
 			$action = "{$action}Action";
 		
-		KalturaLog::info("Generates action [$serviceName.$action]");
+		//KalturaLog::info("Generates action [$serviceName.$action]");
 		
 		$isBase = false;
 		$testReturnedType = null;
@@ -795,7 +795,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	{
 		if(file_exists($fileName) && !$overwrite)
 		{
-			KalturaLog::info("File [$fileName] already exists");
+			KalturaLog::info("File [$fileName] already exists not writing data");
 			return;
 		}
 			
