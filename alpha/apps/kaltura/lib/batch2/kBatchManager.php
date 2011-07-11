@@ -209,7 +209,10 @@ class kBatchManager
 					unset($tagsArray[$key]);
 				}
 				
-				$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfoDb, $tagsArray);
+				$finalTagsArray = $tagsArray;
+//				bypass, KDLWrap::CDLMediaInfo2Tags doesn't support destination flavors and mobile tags
+//				$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfoDb, $tagsArray);
+
 				$finalTags = join(',', array_unique($finalTagsArray));
 				KalturaLog::log("Flavor asset tags from KDL [$finalTags]");
 				$flavorAsset->setTags($finalTags);
