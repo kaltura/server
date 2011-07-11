@@ -18,7 +18,7 @@ KalturaLog::info("syndicationFeedRenderer-start ");
 
 $feedId = $_GET['feedId'];
 $entryId = @$_GET['entryId'];
-$limit = $_GET['limit'];
+$limit = @$_GET['limit'];
 try
 {
 	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId);
