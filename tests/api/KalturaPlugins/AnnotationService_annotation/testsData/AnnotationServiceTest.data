@@ -5,7 +5,7 @@
       <Input name="cuePoint" type="KalturaAnnotation" key="">
         <parentId></parentId>
         <text></text>
-        <endTime type="string">10</endTime>
+        <endTime type="string">0</endTime>
         <duration></duration>
         <id></id>
         <cuePointType></cuePointType>
@@ -15,7 +15,7 @@
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">1</startTime>
+        <startTime type="string">0</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -26,8 +26,8 @@
       <OutputReference name="output" type="KalturaAnnotation" key="object key">
         <parentId type="string">0</parentId>
         <text></text>
-        <endTime type="string">10</endTime>
-        <duration type="string">9</duration>
+        <endTime type="string">0</endTime>
+        <duration type="string">0</duration>
         <id></id>
         <cuePointType type="string">annotation.Annotation</cuePointType>
         <status type="string">1</status>
@@ -36,7 +36,7 @@
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">1</startTime>
+        <startTime type="string">0</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -52,8 +52,8 @@
       <OutputReference name="output" type="KalturaAnnotation" key="object key">
         <parentId type="string">0</parentId>
         <text></text>
-        <endTime type="string">10</endTime>
-        <duration type="string">9</duration>
+        <endTime type="string">0</endTime>
+        <duration type="string">0</duration>
         <id></id>
         <cuePointType type="string">annotation.Annotation</cuePointType>
         <status type="string">1</status>
@@ -62,7 +62,7 @@
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">1</startTime>
+        <startTime type="string">0</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -138,8 +138,8 @@
       <OutputReference name="output" type="KalturaAnnotation" key="object key">
         <parentId type="string">0</parentId>
         <text></text>
-        <endTime type="string">10</endTime>
-        <duration type="string">9</duration>
+        <endTime type="string">0</endTime>
+        <duration type="string">0</duration>
         <id></id>
         <cuePointType type="string">annotation.Annotation</cuePointType>
         <status type="string">1</status>
@@ -148,7 +148,7 @@
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">1</startTime>
+        <startTime type="string">0</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
