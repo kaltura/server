@@ -4,9 +4,9 @@
 		$('input.override').change(function() {
 			var $editSection = $(this).parents('.field-config-row').find('.field-config-edit');
 			if ($(this).is(':checked'))
-				$editSection.slideDown(2000);
+				$editSection.show(0);
 			else
-				$editSection.slideUp();
+				$editSection.hide();
 		});
 
 		$('input.update-on-change').change(function() {
