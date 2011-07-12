@@ -168,9 +168,20 @@ class KalturaTestDeploymentHelper
 		$contentResource = new KalturaUrlResource();
 		$contentResource->url = "http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv";
 		$client->media->addContent($defaultEntry->id, $contentResource);
-				
+			
 		KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
+
+		//Add entry with duration from the dedault entries of the new partner
+		$filter = new KalturaMediaEntryFilter();
+		$filter->durationGreaterThan = 10;
+		$filter->typeEqual = KalturaEntryType::MEDIA_CLIP;
+		$results = $client->media->listAction($filter);
 		
+		if($results->totalCount)
+			KalturaGlobalData::setData("@ENTRY_WITH_DURATION@", $results->objects[0]->id); //Saves the first object in the response
+		else
+			throw new Exception("No entries with duration were found, EXITING!");
+			
 		$flavorAssest = $client->flavorParams->listAction();
 		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
 	}
