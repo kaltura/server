@@ -795,7 +795,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 	{
 		if(file_exists($fileName) && !$overwrite)
 		{
-			KalturaLog::info("File [$fileName] already exists not writing data");
+			//KalturaLog::info("File [$fileName] already exists not writing data");
 			return;
 		}
 			
