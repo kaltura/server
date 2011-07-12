@@ -7,17 +7,17 @@
         <sourceUrl></sourceUrl>
         <adType></adType>
         <title></title>
-        <endTime type="string">0</endTime>
+        <endTime type="string">10</endTime>
         <duration></duration>
         <id></id>
         <cuePointType></cuePointType>
         <status></status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId></partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">1</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -30,17 +30,17 @@
         <sourceUrl></sourceUrl>
         <adType></adType>
         <title></title>
-        <endTime type="string">0</endTime>
-        <duration type="string">0</duration>
+        <endTime type="string">10</endTime>
+        <duration type="string">9</duration>
         <id></id>
         <cuePointType type="string">adCuePoint.Ad</cuePointType>
         <status type="string">1</status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">1</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -58,17 +58,17 @@
         <sourceUrl></sourceUrl>
         <adType></adType>
         <title></title>
-        <endTime type="string">0</endTime>
-        <duration type="string">0</duration>
+        <endTime type="string">10</endTime>
+        <duration type="string">9</duration>
         <id></id>
         <cuePointType type="string">adCuePoint.Ad</cuePointType>
         <status type="string">1</status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">1</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -125,7 +125,7 @@
         <sourceUrl></sourceUrl>
         <adType></adType>
         <title></title>
-        <endTime type="string">0</endTime>
+        <endTime type="string">14</endTime>
         <duration></duration>
         <id></id>
         <cuePointType></cuePointType>
@@ -135,7 +135,7 @@
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">3</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -148,17 +148,17 @@
         <sourceUrl></sourceUrl>
         <adType></adType>
         <title></title>
-        <endTime type="string">0</endTime>
-        <duration type="string">0</duration>
+        <endTime type="string">14</endTime>
+        <duration type="string">11</duration>
         <id></id>
         <cuePointType type="string">adCuePoint.Ad</cuePointType>
         <status type="string">1</status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">3</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
