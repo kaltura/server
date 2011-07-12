@@ -95,4 +95,45 @@ class BulkUploadService extends KalturaBaseService
 		
 		return $response;
 	}
+	
+	
+	
+	
+	/**
+	 * serve action returan the original file.
+	 * 
+	 * @action serve
+	 * @param int $id job id
+	 * @return file
+	 * 
+	 */
+	function serveAction($id)
+	{
+		$c = new Criteria();
+		$c->addAnd(BatchJobPeer::ID, $id);
+		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		$batchJob = BatchJobPeer::doSelectOne($c);
+		
+		if (!$batchJob)	
+			KalturaLog::info("File not found for jobid". $id);
+		else 
+			KalturaLog::info("File found for jobid". $id);
+		
+		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+
+		if($local)
+		{
+			$filePath = $fileSync->getFullPath();
+			$mimeType = kFile::mimeType($filePath);
+			kFile::dumpFile($filePath, $mimeType);
+		}
+		else
+		{
+			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+			KalturaLog::info("Redirecting to [$remoteUrl]");
+			header("Location: $remoteUrl");
+		}	
+	}
 }
