@@ -59,7 +59,6 @@
         <deletedAt></deletedAt>
         <description></description>
       </Input>
-      <Input name="contentResource" type="KalturaContentResource" key=""/>
       <OutputReference name="output" type="KalturaThumbAsset" key="object key">
         <thumbParamsId type="string">0</thumbParamsId>
         <width type="string">0</width>
