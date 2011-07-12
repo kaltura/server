@@ -35,10 +35,10 @@ class TVComService extends KalturaBaseService
 
 		// "Creates advanced filter on distribution profile
 		$distributionAdvancedSearch = new ContentDistributionSearchFilter();
-		//$distributionAdvancedSearch->setDistributionProfileId($profile->getId());
-		//$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
-		//$distributionAdvancedSearch->setEntryDistributionStatus(EntryDistributionStatus::READY);
-		//$distributionAdvancedSearch->setEntryDistributionFlag(EntryDistributionDirtyStatus::NONE);
+		$distributionAdvancedSearch->setDistributionProfileId($profile->getId());
+		$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
+		$distributionAdvancedSearch->setEntryDistributionStatus(EntryDistributionStatus::READY);
+		$distributionAdvancedSearch->setEntryDistributionFlag(EntryDistributionDirtyStatus::NONE);
 			
 		//Creates entry filter with advanced filter
 		$entryFilter = new entryFilter();
