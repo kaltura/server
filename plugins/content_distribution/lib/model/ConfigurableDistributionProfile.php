@@ -302,6 +302,11 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	    return $this->getFieldValueFromXml($fieldName, $valuesXmlObj);
 	}
 	
+	public function clearFieldValues()
+	{
+		$this->fieldValues = null;
+	}
+	
 	
 	/*****************************************/
 	/* Update required entry/metadata fields */
