@@ -89,12 +89,15 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			{
 				if ($request->isPost())
 				{
-					$form->populate($request->getPost());
-					$distributionProfile = $form->getObject($profileClass, $request->getPost());
-					$form->resetUnUpdatebleAttributes($distributionProfile);
-					$distributionProfile = $contentDistributionPlugin->distributionProfile->update($profileId, $distributionProfile);
-					$form->saveProviderAdditionalObjects($distributionProfile);
-					$form->setAttrib('class', 'valid');
+					if ($form->isValid($request->getPost()))
+					{
+						$form->populate($request->getPost());
+						$distributionProfile = $form->getObject($profileClass, $request->getPost());
+						$form->resetUnUpdatebleAttributes($distributionProfile);
+						$distributionProfile = $contentDistributionPlugin->distributionProfile->update($profileId, $distributionProfile);
+						$form->saveProviderAdditionalObjects($distributionProfile);
+						$form->setAttrib('class', 'valid');
+					}
 				}
 				else
 				{

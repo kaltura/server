@@ -220,7 +220,7 @@ function newDistributionProfileSuccess(html) {
 	}
 	else
 	{
-		jQuery('#frmDistributionProfileConfig').replaceWith(html);
+		jQuery('#frmDistributionProfileConfig').parent().empty().append(html);
 		jQuery('#frmDistributionProfileConfig').ajaxForm(newDistributionProfileSuccess);
 	}
 }
