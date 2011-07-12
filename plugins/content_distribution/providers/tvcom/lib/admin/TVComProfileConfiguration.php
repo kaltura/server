@@ -12,9 +12,21 @@ class Form_TVComProfileConfiguration extends Form_ConfigurableProfileConfigurati
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElement($element);
 		
-		$this->addElement('Text', 'feed_title', array('label' => 'Feed title:'));
-		$this->addElement('Text', 'feed_link', array('label' => 'Feed link:'));
-		$this->addElement('Text', 'feed_description', array('label' => 'Feed description:'));
+		$element = new Zend_Form_Element_Text('feed_title');
+		$element->setLabel('Feed title:');
+		$element->addValidator(new Zend_Validate_StringLength(0, 128));
+		$this->addElement($element);
+		
+		$element = new Zend_Form_Element_Text('feed_link');
+		$element->setLabel('Feed link:');
+		$element->addValidator(new Zend_Validate_StringLength(0, 255));
+		$this->addElement($element);
+		
+		$element = new Zend_Form_Element_Text('feed_description');
+		$element->setLabel('Feed description:');
+		$element->addValidator(new Zend_Validate_StringLength(0, 255));
+		$this->addElement($element);
+		
 		$this->addElement('Text', 'feed_language', array('label' => 'Feed language:', 'value' => 'en-us'));
 		$this->addElement('Text', 'feed_copyright', array('label' => 'Feed copyright:'));
 		$this->addElement('Text', 'feed_image_title', array('label' => 'Feed image title:'));
