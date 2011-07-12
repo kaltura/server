@@ -89,7 +89,7 @@ class KalturaAnnotation extends KalturaCuePoint
 		if($this->text !== null)
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
 		
-		if($this->endTime !== null)
+		if(!is_null($this->startTime) || !is_null($this->endTime))
 			$this->validateEndTime($sourceObject->getId());
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);

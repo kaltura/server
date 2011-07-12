@@ -94,7 +94,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if($this->endTime !== null)
+		if(!is_null($this->startTime) || !is_null($this->endTime))
 			$this->validateEndTime($sourceObject->getId());
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
