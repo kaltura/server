@@ -1,0 +1,47 @@
+<?php
+
+
+class ComcastWMRMSignatureKeys extends SoapObject
+{				
+	public function getType()
+	{
+		return 'urn:theplatform-com:v4/rights/value/:WMRMSignatureKeys';
+	}
+					
+	protected function getAttributeType($attributeName)
+	{
+		switch($attributeName)
+		{	
+			default:
+				return parent::getAttributeType($attributeName);
+		}
+	}
+					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
+	/**
+	 * @var string
+	 **/
+	public $licenseServerCertificate;
+				
+	/**
+	 * @var string
+	 **/
+	public $rootCertificate;
+				
+	/**
+	 * @var string
+	 **/
+	public $privateKey;
+				
+	/**
+	 * @var string
+	 **/
+	public $signedPublicKey;
+				
+}
+
+

@@ -1,0 +1,41 @@
+<?php
+
+
+class ComcastCustomFieldTemplate extends SoapObject
+{				
+	public function getType()
+	{
+		return 'urn:theplatform-com:v4/admin/template/:CustomFieldTemplate';
+	}
+					
+	protected function getAttributeType($attributeName)
+	{
+		switch($attributeName)
+		{	
+			case 'fields':
+				return 'ComcastArrayOfCustomFieldField';
+			case 'customFields':
+				return 'ComcastArrayOfstring';
+			default:
+				return parent::getAttributeType($attributeName);
+		}
+	}
+					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
+	/**
+	 * @var ComcastArrayOfCustomFieldField
+	 **/
+	public $fields;
+				
+	/**
+	 * @var ComcastArrayOfstring
+	 **/
+	public $customFields;
+				
+}
+
+

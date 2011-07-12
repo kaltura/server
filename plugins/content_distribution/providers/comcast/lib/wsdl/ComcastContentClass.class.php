@@ -1,0 +1,31 @@
+<?php
+
+
+class ComcastContentClass extends SoapObject
+{				
+	const _MEDIA = 'Media';
+					
+	const _PLAYLIST = 'Playlist';
+					
+	public function getType()
+	{
+		return 'urn:theplatform-com:v4/content/enum/:ContentClass';
+	}
+					
+	protected function getAttributeType($attributeName)
+	{
+		switch($attributeName)
+		{	
+			default:
+				return parent::getAttributeType($attributeName);
+		}
+	}
+					
+	public function __toString()
+	{
+		return print_r($this, true);	
+	}
+				
+}
+
+
