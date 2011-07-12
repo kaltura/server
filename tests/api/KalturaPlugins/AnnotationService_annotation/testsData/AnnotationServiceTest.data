@@ -5,17 +5,17 @@
       <Input name="cuePoint" type="KalturaAnnotation" key="">
         <parentId></parentId>
         <text></text>
-        <endTime type="string">0</endTime>
+        <endTime type="string">10</endTime>
         <duration></duration>
         <id></id>
         <cuePointType></cuePointType>
         <status></status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId></partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">1</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -26,12 +26,12 @@
       <OutputReference name="output" type="KalturaAnnotation" key="object key">
         <parentId type="string">0</parentId>
         <text></text>
-        <endTime type="string">0</endTime>
-        <duration type="string">0</duration>
+        <endTime type="string">10</endTime>
+        <duration type="string">1</duration>
         <id></id>
         <cuePointType type="string">annotation.Annotation</cuePointType>
         <status type="string">1</status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
@@ -52,17 +52,17 @@
       <OutputReference name="output" type="KalturaAnnotation" key="object key">
         <parentId type="string">0</parentId>
         <text></text>
-        <endTime type="string">0</endTime>
-        <duration type="string">0</duration>
+        <endTime type="string">10</endTime>
+        <duration type="string">9</duration>
         <id></id>
         <cuePointType type="string">annotation.Annotation</cuePointType>
         <status type="string">1</status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">1</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -117,17 +117,17 @@
       <Input name="cuePoint" type="KalturaAnnotation" key="">
         <parentId></parentId>
         <text></text>
-        <endTime></endTime>
+        <endTime>13</endTime>
         <duration></duration>
         <id></id>
         <cuePointType></cuePointType>
         <status></status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION@_ID</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime></startTime>
+        <startTime>3</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
@@ -138,17 +138,17 @@
       <OutputReference name="output" type="KalturaAnnotation" key="object key">
         <parentId type="string">0</parentId>
         <text></text>
-        <endTime type="string">0</endTime>
-        <duration type="string">0</duration>
+        <endTime type="string">13</endTime>
+        <duration type="string">10</duration>
         <id></id>
         <cuePointType type="string">annotation.Annotation</cuePointType>
         <status type="string">1</status>
-        <entryId type="string">@DEFAULT_ENTRY_ID@</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <tags></tags>
-        <startTime type="string">0</startTime>
+        <startTime type="string">3</startTime>
         <userId></userId>
         <partnerData></partnerData>
         <partnerSortValue></partnerSortValue>
