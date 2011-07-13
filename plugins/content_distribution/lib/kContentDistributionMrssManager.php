@@ -39,7 +39,7 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 	
 	/**
 	 * @param EntryDistribution $entryDistribution
-	 * @param SimpleXMLElement $xmlElement
+	 * @param SimpleXMLElement $mrss
 	 * @return SimpleXMLElement
 	 */
 	public function contributeDistribution(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
