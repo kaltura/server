@@ -53,7 +53,7 @@ class SchemaService extends KalturaBaseService
 		}
 		elseif ($name == self::CORE_SCHEMA_NAME)
 		{
-			$coreXsd = file_get_contents(kConf::get("{$type}_core_xsd"));
+			$coreXsd = file_get_contents(kConf::get("{$type}_core_xsd_path"));
 			$coreXsdElement = new SimpleXMLElement($coreXsd);
 			$xsd->appendChild($coreXsdElement);
 		}
