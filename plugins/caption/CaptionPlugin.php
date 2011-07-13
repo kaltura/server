@@ -104,7 +104,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	 */
 	public static function isContributingToSchema($type)
 	{
-		return ($type == SchemaType::SYNDICATION);
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		return ($coreType == SchemaType::SYNDICATION);
 	}
 	
 	/* (non-PHPdoc)
@@ -112,7 +113,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	 */
 	public static function contributeToSchema($type, SimpleXMLElement $xsd)
 	{
-		if($type != SchemaType::SYNDICATION)
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		if($coreType != SchemaType::SYNDICATION)
 			return;
 			
 		$import = $xsd->addChild('import');
@@ -124,7 +126,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	 */
 	public static function getPluginSchema($type)
 	{
-		if($type != SchemaType::SYNDICATION)
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		if($coreType != SchemaType::SYNDICATION)
 			return null;
 			
 		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";

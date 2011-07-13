@@ -88,12 +88,13 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	 */
 	public static function isContributingToSchema($type)
 	{
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		return (
-			$type == SchemaType::SYNDICATION
+			$coreType == SchemaType::SYNDICATION
 			||
-			$type == self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			$coreType == self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 			||
-			$type == self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType == self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 		);
 	}
 	
@@ -102,12 +103,13 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	 */
 	public static function contributeToSchema($type, SimpleXMLElement $xsd)
 	{
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
-			$type != SchemaType::SYNDICATION
+			$coreType != SchemaType::SYNDICATION
 			&&
-			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			$coreType != self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 			&&
-			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType != self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 		)
 			return;
 			
@@ -120,12 +122,13 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	 */
 	public static function getPluginSchema($type)
 	{
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
-			$type != SchemaType::SYNDICATION
+			$coreType != SchemaType::SYNDICATION
 			&&
-			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			$coreType != self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 			&&
-			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType != self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 		)
 			return null;
 			

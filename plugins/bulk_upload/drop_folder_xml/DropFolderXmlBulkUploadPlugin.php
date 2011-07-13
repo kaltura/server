@@ -109,7 +109,8 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	 */
 	public static function isContributingToSchema($type)
 	{
-		return ($type == self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML)); 
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		return ($coreType == self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML)); 
 	}
 	
 	/* (non-PHPdoc)
@@ -117,7 +118,8 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	 */
 	public static function contributeToSchema($type, SimpleXMLElement $xsd)
 	{
-		if($type != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		if($coreType != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
 			return;
 			
 		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
@@ -133,7 +135,8 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	 */
 	public static function getPluginSchema($type)
 	{
-		if($type != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		if($coreType != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
 			return null;
 			
 		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";

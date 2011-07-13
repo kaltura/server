@@ -79,12 +79,13 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, I
 	 */
 	public static function isContributingToSchema($type)
 	{
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		return (
-			$type == SchemaType::SYNDICATION
+			$coreType == SchemaType::SYNDICATION
 			||
-			$type == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 			||
-			$type == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 		);
 	}
 	
@@ -93,12 +94,13 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, I
 	 */
 	public static function contributeToSchema($type, SimpleXMLElement $xsd)
 	{
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
-			$type != SchemaType::SYNDICATION
+			$coreType != SchemaType::SYNDICATION
 			&&
-			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 			&&
-			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 		)
 			return;
 			
@@ -111,12 +113,13 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, I
 	 */
 	public static function getPluginSchema($type)
 	{
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
-			$type != SchemaType::SYNDICATION
+			$coreType != SchemaType::SYNDICATION
 			&&
-			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 			&&
-			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 		)
 			return null;
 			

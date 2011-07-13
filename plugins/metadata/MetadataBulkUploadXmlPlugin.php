@@ -32,7 +32,8 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	 */
 	public static function isContributingToSchema($type)
 	{
-		return ($type == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML));  
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		return ($coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML));  
 	}
 	
 	/* (non-PHPdoc)
@@ -40,7 +41,8 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	 */
 	public static function contributeToSchema($type, SimpleXMLElement $xsd)
 	{
-		if($type != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
 			return;
 			
 		$import = $xsd->addChild('import');
@@ -52,7 +54,8 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	 */
 	public static function getPluginSchema($type)
 	{
-		if($type != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
 			return null;
 	
 		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";

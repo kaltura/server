@@ -8,7 +8,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	/**
 	 * @var KalturaAdProtocolType
 	 * @insertonly
-	 * @requiresPermission insert,update
+	 * @requiresPermission insert
 	 */
 	public $protocolType;
 	
