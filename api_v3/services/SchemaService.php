@@ -8,9 +8,20 @@
  */
 class SchemaService extends KalturaBaseService 
 {
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerRequired()
+	 */
 	protected function partnerRequired($actionName)
 	{
 		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::isPermitted()
+	 */
+	protected function isPermitted(&$allowPrivatePartnerData)
+	{
+		return true;
 	}
 	
 	/**
