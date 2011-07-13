@@ -2,15 +2,15 @@
 /**
  * @package plugins.dropFolderXmlBulkUpload
  */
-class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending
+class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'dropFolderXmlBulkUpload';
 	const XML_BULK_UPLOAD_PLUGIN_VERSION_MAJOR = 1;
 	const XML_BULK_UPLOAD_PLUGIN_VERSION_MINOR = 1;
 	const XML_BULK_UPLOAD_PLUGIN_VERSION_BUILD = 0;
 	
-	/**
-	 * Returns the plugin name
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPluginName()
 	 */
 	public static function getPluginName()
 	{
@@ -32,14 +32,14 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		
 		return array($bulkUploadXmlDependency, $dropFolderDependency);
 	}
-		
-	/**
-	 * @return array<string> list of enum classes names that extend the base enum name
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('DropFolderXmlBulkUploadType', 'DropFolderXmlFileHandlerType', 'DropFolderXmlBulkUploadErrorCode');
+			return array('DropFolderXmlBulkUploadType', 'DropFolderXmlFileHandlerType', 'DropFolderXmlBulkUploadErrorCode', 'DropFolderXmlSchemaType');
 		
 		if($baseEnumName == 'BulkUploadType')
 			return array('DropFolderXmlBulkUploadType');
@@ -50,14 +50,14 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		if($baseEnumName == 'DropFolderFileErrorCode')
 			return array('DropFolderXmlBulkUploadErrorCode');
 			
+		if($baseEnumName == 'SchemaType')
+			return array('DropFolderXmlSchemaType');
+			
 		return array();
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
@@ -87,24 +87,79 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		}
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		return null;
 	}
 	
-	/**
-	 * Returns the correct file extension for bulk upload type
-	 * @param int $enumValue code API value
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUpload::getFileExtension()
 	 */
 	public static function getFileExtension($enumValue)
 	{
 		if($enumValue == self::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML))
 			return 'xml';
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::isContributingToSchema()
+	 */
+	public static function isContributingToSchema($type)
+	{
+		return ($type == self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML)); 
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	{
+		if($type != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
+			return;
+			
+		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
+		foreach($schemaContributors as $schemaContributor)
+			$schemaContributor->contributeToSchema(BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML), $xsd);
+			
+		$import = $xsd->addChild('import');
+		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function getPluginSchema($type)
+	{
+		if($type != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
+			return null;
+			
+		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
+		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
+		
+		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
+			<xs:schema 
+				xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns="' . $xmlnsPlugin . '" 
+				xmlns:core="' . $xmlnsBase . '" 
+				targetNamespace="' . $xmlnsPlugin . '"
+			>
+				
+				<xs:complexType name="T_serverFileContentResource">
+					<xs:complexContent>
+						<xs:extension base="T_serverFileContentResource">
+							<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+				
+				<xs:element name="dropFolderFileContentResource" type="T_serverFileContentResource" substitutionGroup="core:serverFileContentResource" />
+			</xs:schema>
+		';
+		
+		return new SimpleXMLElement($xsd);
 	}
 		
 	/**
@@ -114,6 +169,15 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BulkUploadType', $value);
+	}
+		
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getSchemaTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('SchemaType', $value);
 	}
 		
 	/**

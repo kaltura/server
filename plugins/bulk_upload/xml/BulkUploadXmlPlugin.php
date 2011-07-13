@@ -9,16 +9,16 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	const PLUGIN_VERSION_MINOR = 1;
 	const PLUGIN_VERSION_BUILD = 0;
 	
-	/**
-	 * Returns the plugin name
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPluginName()
 	 */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
 	}
 	
-	/**
-	 * @return KalturaVersion
+	/* (non-PHPdoc)
+	 * @see IKalturaVersion::getVersion()
 	 */
 	public static function getVersion()
 	{
@@ -29,25 +29,25 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		);
 	}
 		
-	/**
-	 * @return array<string> list of enum classes names that extend the base enum name
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('BulkUploadXmlType');
+			return array('BulkUploadXmlType', 'XmlSchemaType');
 		
 		if($baseEnumName == 'BulkUploadType')
 			return array('BulkUploadXmlType');
 			
+		if($baseEnumName == 'SchemaType')
+			return array('XmlSchemaType');
+			
 		return array();
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
@@ -67,19 +67,16 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		}
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		return null;
 	}
 	
-	/**
-	 * Returns the correct file extension for bulk upload type
-	 * @param int $enumValue code API value
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUpload::getFileExtension()
 	 */
 	public static function getFileExtension($enumValue)
 	{
@@ -94,6 +91,15 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('BulkUploadType', $value);
+	}
+		
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getSchemaTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('SchemaType', $value);
 	}
 	
 	/**

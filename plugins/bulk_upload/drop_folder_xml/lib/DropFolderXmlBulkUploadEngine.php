@@ -5,20 +5,16 @@
  */
 class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 {
-	/**
-	 * The engine xsd file path
-	 * @var string
-	 */
-	const DROP_FOLDER_XSD_PATH = "/../xml/ingestion.xsd";
-	
-	
-	/**
-	 * @param KSchedularTaskConfig $taskConfig
+	/* (non-PHPdoc)
+	 * @see BulkUploadEngineXml::__construct()
 	 */
 	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
 	{
 		parent::__construct($taskConfig, $kClient, $job);
-		$this->setXsdFilePath(dirname(__FILE__) . self::DROP_FOLDER_XSD_PATH);
+		
+		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . KalturaSchemaType::DROP_FOLDER_XML . '/name/core';
+		if($taskConfig->params->xsdFilePath) 
+			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
 	}
 	
 	/* (non-PHPdoc)

@@ -8,49 +8,42 @@
 class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	/**
-	 * 
 	 * The add action (default) string
 	 * @var string
 	 */
 	const ADD_ACTION_STRING = 'add';
 
 	/**
-	 * 
 	 * tnhe delete action string
 	 * @var string
 	 */
 	const DELETE_ACTION_STRING = 'delete';
 	
 	/**
-	 * 
 	 * The defalut thumbnail tag
 	 * @var string
 	 */
 	const DEFAULT_THUMB_TAG = 'default_thumb';
 	
 	/**
-	 * 
 	 * The default ingestion profile id
 	 * @var int
 	 */
 	private $defaultConversionProfileId = null;
 	
 	/**
-	 * 
 	 * Holds the number of the current proccessed item
 	 * @var int
 	 */
 	private $currentItem = 0;
 	
 	/**
-	 * 
 	 * The engine xsd file path
 	 * @var string
 	 */
-	private $xsdFilePath = "/../xml/ingestion.xsd";
+	protected $xsdFilePath = null;
 	
 	/**
-	 * 
 	 * Maps the flavor params name to id
 	 * @var array()
 	 */
@@ -63,21 +56,18 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	private $assetIdToAssetParamsId = null;
 	
 	/**
-	 * 
 	 * Maps the access control name to id
 	 * @var array()
 	 */
 	private $accessControlNameToId = null;
 	
 	/**
-	 * 
 	 * Maps the converstion profile name to id
 	 * @var array()
 	 */
 	private $conversionProfileNameToId = array();
 	
 	/**
-	 * 
 	 * Maps the storage profile name to id
 	 * @var array()
 	 */
@@ -85,17 +75,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
+	 * @param KalturaClient $kClient
+	 * @param KalturaBatchJob $job
 	 */
 	public function __construct( KSchedularTaskConfig $taskConfig, KalturaClient $kClient, KalturaBatchJob $job)
 	{
 		parent::__construct($taskConfig, $kClient, $job);
 		
-		if($taskConfig->params->xsdFilePath) {
-			$this->xsdFilePath = dirname(__FILE__).$taskConfig->params->xsdFilePath;
-		}
-		else {
-			$this->xsdFilePath = dirname(__FILE__).$this->xsdFilePath;
-		}
+		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . KalturaSchemaType::BULK_UPLOAD_XML . '/name/core';
+		if($taskConfig->params->xsdFilePath) 
+			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
 	}
 	
 	/* (non-PHPdoc)
@@ -108,7 +97,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Validates that the xml is valid using the XSD
 	 *@return bool - if the validation is ok
 	 */
@@ -136,7 +124,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Parses the Xml file lines and creates the right actions in the system
 	 */
 	protected function parse()
@@ -153,7 +140,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Gets and handles a channel from the mrss
 	 * @param SimpleXMLElement $channel 
 	 */
@@ -196,7 +182,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Validates the given item so it's valid (some validation can't be enforced in the schema)
 	 * @param SimpleXMLElement $item
 	 */
@@ -207,7 +192,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}		
 	
 	/**
-	 * 
 	 * Gets and handles an item from the channel
 	 * @param SimpleXMLElement $item
 	 */
@@ -237,7 +221,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Gets the flavor params from the given flavor asset
 	 * @param string $assetId
 	 */
@@ -259,7 +242,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Removes all non updatble fields from the entry
 	 * @param KalturaBaseEntry $entry
 	 */
@@ -270,7 +252,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Handles xml bulk upload update
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaException
@@ -406,7 +387,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Sends the data using a multi requsest according to the given data
 	 * @param int $entryID
 	 * @param KalturaBaseEntry $entry
@@ -467,7 +447,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Handles xml bulk upload delete
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaException
@@ -488,7 +467,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Gets an item and insert it into the system
 	 * @param SimpleXMLElement $item
 	 */
@@ -579,7 +557,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Sends the data using a multi requsest according to the given data
 	 * @param KalturaBaseEntry $entry
 	 * @param KalturaAssetsParamsResourceContainers $resource
@@ -638,7 +615,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Handles the adding od additional data to the preciously created flavors and thumbs 
 	 * @param int $createdEntryId
 	 * @param array $flavorAssets
@@ -687,7 +663,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * returns a flavor asset form the current content element
 	 * @param SimpleXMLElement $contentElement
 	 * @return KalturaFlavorAsset
@@ -702,7 +677,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * returns a thumbnail asset form the current thumbnail element
 	 * @param SimpleXMLElement $thumbElement
 	 * @param int $conversionProfileId - The converrsion profile id 
@@ -722,7 +696,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Validates if the resource is valid
 	 * @param KalturaResource $resource
 	 * @param SimpleXMLElement $elementToSearchIn
@@ -774,7 +747,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Gets an item and returns the resource
 	 * @param SimpleXMLElement $elementToSearchIn
 	 * @param int $conversionProfileId
@@ -789,7 +761,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Returns the right resource instance for the source content of the item
 	 * @param SimpleXMLElement $elementToSearchIn
 	 * @param int $conversionProfileId
@@ -841,7 +812,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Gets the flavor params id from the given element
 	 * @param $elementToSearchIn - The element to search in
 	 * @param $conversionProfileId - The conversion profile on the item
@@ -853,7 +823,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Validates a given asset params id for the current partner
 	 * @param int $assetParamsId - The asset id
 	 * @param string $assetType - The asset type (flavor or thumb)
@@ -874,7 +843,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Gets the flavor params id from the given element
 	 * @param SimpleXMLElement $elementToSearchIn - The element to search in
 	 * @param int $conversionProfileId - The conversion profile on the item
@@ -924,7 +892,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Gets the ingestion profile id in this order: 
 	 * 1.from the element 2.from the data of the bulk 3.use default)
 	 * @param SimpleXMLElement $elementToSearchIn
@@ -960,7 +927,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Validates a given conversion profile id for the current partner
 	 * @param int $converionProfileId
 	 * @throws KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED
@@ -979,7 +945,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Validates a given storage profile id for the current partner
 	 * @param int $storageProfileId
 	 * @throws KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED
@@ -998,7 +963,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Gets the coversion profile id from the given element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the ingestion profile params
@@ -1026,7 +990,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 		
 	/**
-	 * 
 	 * Gets the thumb params id from the given element
 	 * @param $elementToSearchIn - The element to search in
 	 * @param $conversionProfileId - The conversion profile id
@@ -1039,7 +1002,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 		
 	/**
-	 * 
 	 * Validates a given access control id for the current partner
 	 * @param int $accessControlId
 	 * @throws KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED
@@ -1058,7 +1020,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Gets the flavor params id from the source content element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the flavor params
@@ -1086,8 +1047,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 		
 	/**
-	 * 
-	 * 
 	 * Gets the storage profile id from the source content element
 	 * @param $elementToSearchIn - The element to search in
 	 * @return int - The id of the storage profile
@@ -1115,7 +1074,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Inits the array of flavor params name to Id (with all given flavor params)
 	 * @param $coversionProfileId - The conversion profile for which we ini the arrays for
 	 */
@@ -1143,7 +1101,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Inits the array of access control name to Id (with all given flavor params)
 	 */
 	protected function initAccessControlNameToId()
@@ -1167,7 +1124,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
  	 * Inits the array of access control name to Id (with all given flavor params)
  	 * @param $entryId - the entry id to take the flavor assets from
 	 */
@@ -1197,7 +1153,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Inits the array of conversion profile name to Id (with all given flavor params)
 	 */
 	protected function initConversionProfileNameToId()
@@ -1221,7 +1176,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Inits the array of storage profile to Id (with all given flavor params)
 	 */
 	protected function initStorageProfileNameToId()
@@ -1280,7 +1234,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Returns the right entry instace by the given item type
 	 * @param int $item
 	 * @return KalturaBaseEntry 
@@ -1307,7 +1260,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Handles the type additional data for the given item
 	 * @param KalturaBaseEntry $media
 	 * @param SimpleXMLElement $item
@@ -1348,7 +1300,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Check if the item type and the type element are matching
 	 * @param SimpleXMLElement $item
 	 * @throws KalturaBatchException - KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED ; 
@@ -1378,7 +1329,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Sets the media values in the media entry according to the given item node
 	 * @param KalturaMediaEntry $media 
 	 * @param SimpleXMLElement $itemElement
@@ -1391,7 +1341,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Sets the playlist values in the live stream entry according to the given item node
 	 * @param KalturaPlaylist $playlistEntry 
 	 * @param SimpleXMLElement $itemElement
@@ -1404,7 +1353,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Sets the live stream values in the live stream entry according to the given item node
 	 * @param KalturaLiveStreamEntry $liveStreamEntry 
 	 * @param SimpleXMLElement $itemElement
@@ -1420,7 +1368,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Sets the data values in the data entry according to the given item node
 	 * @param KalturaDataEntry $dataEntry 
 	 * @param SimpleXMLElement $itemElement
@@ -1433,7 +1380,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Sets the mix values in the mix entry according to the given item node
 	 * @param KalturaMixEntry $mix 
 	 * @param SimpleXMLElement $itemElement
@@ -1447,7 +1393,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 		
 	/**
-	 * 
 	 * Sets the document values in the media entry according to the given media node
 	 * @param KalturaDocumentEntry $media 
 	 * @param SimpleXMLElement $itemElement
@@ -1459,7 +1404,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Checks if the media type and the type are valid
 	 * @param KalturaMediaType $mediaType
 	 */
@@ -1485,7 +1429,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Adds the given media entry to the given playlists in the element
 	 * @param SimpleXMLElement $playlistsElement
 	 */
@@ -1499,7 +1442,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 	
 	/**
-	 * 
 	 * Returns a comma seperated string with the values of the child nodes of the given element 
 	 * @param SimpleXMLElement $element
 	 */
@@ -1528,7 +1470,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
-	 * 
 	 * Gets the entry status from the given item
 	 * @param unknown_type $item
 	 * @return KalturaEntryStatus - the new entry status
@@ -1543,7 +1484,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 		
 	/**
-	 * 
 	 * Creates a new upload result object from the given SimpleXMLElement item
 	 * @param SimpleXMLElement $item
 	 */
@@ -1598,15 +1538,5 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$bulkUploadResult->scheduleEndDate = self::parseFormatedDate((string)$item->endDate);
 		
 		return $bulkUploadResult;
-	}
-	
-	protected function getXsdFilePath()
-	{
-		return $this->xsdFilePath;
-	}
-	
-	protected function setXsdFilePath($filePath)
-	{
-		$this->xsdFilePath = $filePath;
 	}
 }

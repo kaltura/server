@@ -134,19 +134,11 @@
 				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
 				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
 			</xs:choice>
-			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
-				<xs:annotation>
-					<xs:documentation>
-						If not specified NOW will be used as start date.
-						Will be used as default for all distributions.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
+			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
 			<xs:element name="endDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
 						If not specified the entry will be available forever.
-						Will be used as default for all distributions.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -162,11 +154,6 @@
 			
 			<xs:element ref="content" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element ref="thumbnail" minOccurs="0" maxOccurs="unbounded" />
-			
-			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element ref="distribution" />
-				<xs:element ref="customData" />
-			</xs:choice>
 			
 			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
 			
@@ -476,61 +463,6 @@
 		</xs:attribute>
 	</xs:complexType>
 	
-	<xs:complexType name="T_distribution">
-		<xs:sequence>
-			<xs:choice minOccurs="1" maxOccurs="1">
-				<xs:element name="distributionProvider" minOccurs="1" maxOccurs="1" type="xs:string" />
-				<xs:element name="distributionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
-				<xs:element name="distributionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
-			</xs:choice>
-			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:dateTime">
-				<xs:annotation>
-					<xs:documentation>
-						Taken from the entry if not specified.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:dateTime">
-				<xs:annotation>
-					<xs:documentation>
-						Taken from the entry if not specified.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						List of existing flavor asset ids to be used in this distribution destination.
-						Could be used only on existing entry.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						List of existing thumbnail asset ids to be used in this distribution destination.
-						Could be used only on existing entry.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		
-			<xs:element ref="distribution-extension" minOccurs="0" maxOccurs="unbounded" />
-			
-		</xs:sequence>
-		<xs:attribute name="submitWhenReady" use="optional" type="xs:boolean" default="false" />
-	</xs:complexType>
-	
-	<xs:complexType name="T_customData">
-		<xs:sequence>
-			<xs:any namespace="##local" processContents="skip"/>			
-			<!-- 
-			<xs:element ref="xsd:metadata" minOccurs="1" maxOccurs="1"/>
-			-->
-		</xs:sequence>
-		<xs:attribute name="metadataProfileId" use="optional" type="xs:int"/>
-		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
-	</xs:complexType>
-	
 	<xs:simpleType name="T_url">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="((https?)|(ftp))://?(([0-9a-zA-Z_!~*'().&amp;=+$%-]+:)?[0-9a-zA-Z_!~*'().&amp;=+$%-]+@)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-zA-Z_!~*'()-]+\.)*([0-9a-zA-Z][0-9a-zA-Z-]{0,61})?[0-9a-zA-Z]\.[a-zA-Z]{2,6})(.[a-zA-Z]{2,6})+(:[0-9]{1,4})?((/?)|(/[0-9a-zA-Z_!~*'().;?:@&amp;=+$,%#-]+)+)"/>
@@ -579,9 +511,6 @@
 	<xs:element name="tags" type="T_tags" />
 	<xs:element name="categories" type="T_categories" />
 	
-	<xs:element name="distribution" type="T_distribution" />
-	<xs:element name="customData" type="T_customData" />
-	
 	<xs:element name="mrss-extension" />
 	<xs:element name="channel-extension" />
 	<xs:element name="item-extension" />
@@ -593,5 +522,4 @@
 	<xs:element name="document-extension" />
 	<xs:element name="content-extension" />
 	<xs:element name="thumbnail-extension" />
-	<xs:element name="distribution-extension" />
 </xs:schema>
