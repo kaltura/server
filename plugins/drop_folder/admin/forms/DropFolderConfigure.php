@@ -88,6 +88,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		$this->addElement('text', 'fileNamePatterns', array(
 			'label' 		=> 'Source File Name Patterns (to handle):',
 			'required'		=> true,
+		    'value'			=> '*.*',
 			'filters'		=> array('StringTrim'),
 		));
 		
