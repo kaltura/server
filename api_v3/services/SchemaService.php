@@ -8,6 +8,11 @@
  */
 class SchemaService extends KalturaBaseService 
 {
+	protected function partnerRequired($actionName)
+	{
+		return false;
+	}
+	
 	/**
 	 * Serves the requested XSD according to the type and name. 
 	 * 
