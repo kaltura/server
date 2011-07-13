@@ -57,9 +57,25 @@ class SchemaService extends KalturaBaseService
 		}
 		elseif ($name == self::CORE_SCHEMA_NAME)
 		{
-			$xsd .= file_get_contents(kConf::get("{$type}_core_xsd_path"));
-			$xsd .= '</xs:schema>';
-			$xsdElement = new SimpleXMLElement($xsd);
+			if($type == SchemaType::SYNDICATION)
+			{
+				$xsd .= file_get_contents(kConf::get("syndication_core_xsd_path"));
+				$xsd .= '</xs:schema>';
+				$xsdElement = new SimpleXMLElement($xsd);
+			}
+			else
+			{
+				$plugin = kPluginableEnumsManager::getPlugin($type);
+				if($plugin instanceof IKalturaSchemaContributor)
+				{
+					$xsdElement = $plugin->getPluginSchema($type);
+				}
+				else
+				{
+					$xsd .= '</xs:schema>';
+					$xsdElement = new SimpleXMLElement($xsd);
+				}
+			}
 		}
 		else 
 		{
