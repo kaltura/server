@@ -282,6 +282,16 @@ return array(
 	'Kaltura_Client_Enum_UiConfObjType::SIMPLE_EDITOR' => 'Simple Editor',
 	'Kaltura_Client_Enum_UiConfObjType::ADVANCED_EDITOR' => 'Advanced Editor',
 	'Kaltura_Client_Enum_UiConfObjType::CONTRIBUTION_WIZARD' => 'Contribution Wizard',
+	'Kaltura_Client_Enum_UiConfObjType::PLAYLIST' => 'Playlist',
+	'Kaltura_Client_Enum_UiConfObjType::APP_STUDIO' => 'App Studio',
+	'Kaltura_Client_Enum_UiConfObjType::KRECORD' => 'kRecord',
+	'Kaltura_Client_Enum_UiConfObjType::KMC_ACCOUNT' => 'KMC Account',
+	'Kaltura_Client_Enum_UiConfObjType::KMC_ANALYTICS' => 'KMC Analytics',
+	'Kaltura_Client_Enum_UiConfObjType::KMC_CONTENT' => 'KMC Content',
+	'Kaltura_Client_Enum_UiConfObjType::KMC_DASHBOARD' => 'KMC Dashboard',
+	'Kaltura_Client_Enum_UiConfObjType::KMC_LOGIN' => 'KMC Login',
+	'Kaltura_Client_Enum_UiConfObjType::KMC_GENERAL' => 'KMC General',
+	'Kaltura_Client_Enum_UiConfObjType::KMC_ROLES_AND_PERMISSIONS' => 'KMC Roles and Permissions',
 
 
 	//batch index
