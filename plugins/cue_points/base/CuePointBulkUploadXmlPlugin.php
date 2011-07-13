@@ -80,12 +80,12 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 						<xs:element name="tags" minOccurs="1" maxOccurs="1" type="core:tags" />
 				
 						<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
-					</sequence>
+					</xs:sequence>
 					
 					<xs:attribute name="sceneId" use="required" type="xs:int" />
 					<xs:attribute name="systemName" use="optional" type="xs:string" />
 					
-				</complexType>
+				</xs:complexType>
 				
 				<xs:element name="scenes" type="T_scenes" substitutionGroup="core:item-extension" />
 				<xs:element name="scene" type="T_scene" />
