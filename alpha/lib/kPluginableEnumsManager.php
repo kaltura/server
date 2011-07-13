@@ -149,4 +149,22 @@ class kPluginableEnumsManager
 		
 		return $dynamicEnum->getId();
 	}
+
+	/**
+	 * @param string $value
+	 * @return IKalturaEnumerator
+	 */
+	public static function getPlugin($value)
+	{
+		$split = explode(IKalturaEnumerator::PLUGIN_VALUE_DELIMITER, $value, 2);
+		if(count($split) == 1)
+			return null;
+			
+		list($pluginName, $valueName) = $split;
+		$plugin = KalturaPluginManager::getPluginInstance($pluginName);
+		if($plugin && $plugin instanceof IKalturaEnumerator)
+			return $plugin;
+			
+		return null;
+	}
 }
