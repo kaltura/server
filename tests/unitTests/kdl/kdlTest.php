@@ -17,7 +17,7 @@ class kdlTest extends KalturaServerTestCase
 	 * @param array<unknown_type> $data
 	 * @param string $dataName
 	 */
-	public function __construct($name = "KDLUnitTest", array $data = array(), $dataName ="Default data")
+	public function __construct($name = "KDLTest", array $data = array(), $dataName ="Default data")
 	{
 		parent::__construct($name, $data, $dataName);
 	}
@@ -29,7 +29,7 @@ class kdlTest extends KalturaServerTestCase
 	 */
 	public function testKDLWrapCDLGenerateTargetFlavors(flavorParams $flavorList, mediaInfo $mediaInfo, flavorParamsOutput $flavorParamsOutput)
 	{
-		print("\nin KDLUnitTest\n");
+		print("\nin KDLTest\n");
 //		print_r($flavorList, true);
 //		print_r($mediaInfo, true);
 //		print_r($flavorParamsOutput, true);
