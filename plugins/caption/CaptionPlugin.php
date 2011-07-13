@@ -131,6 +131,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			return null;
 			
 		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
+		$xmlnsEnum = "http://" . kConf::get('www_host') . "/$type/enum";
 		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
 		
 		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
@@ -138,6 +139,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				xmlns:xs="http://www.w3.org/2001/XMLSchema"
 				xmlns="' . $xmlnsPlugin . '" 
 				xmlns:core="' . $xmlnsBase . '" 
+				xmlns:enum="' . $xmlnsEnum . '" 
 				targetNamespace="' . $xmlnsPlugin . '"
 			>
 			
