@@ -120,13 +120,13 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 				$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 			)
 			{
-				$xsd = '
+				$xsd .= '
 				<xs:element name="customData" type="T_customData" substitutionGroup="cuePoint:scene-extension" />
 				';
 			}
 			elseif($coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
 			{
-				$xsd = '
+				$xsd .= '
 				<xs:element name="customData" type="T_customData" substitutionGroup="adCuePointBulkUploadXml:scene-extension" />
 				';
 			}
@@ -135,7 +135,7 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 				return null;
 			}
 			
-			$xsd = '
+			$xsd .= '
 			</xs:schema>
 		';
 		
