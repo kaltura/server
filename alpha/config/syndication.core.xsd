@@ -1,8 +1,8 @@
-	<xs:complexType name="T_mrss">
+	<xs:complexType name="T_rss">
 		<xs:sequence>
 			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1"/>
 			
-			<xs:element ref="mrss-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="rss-extension" minOccurs="0" maxOccurs="unbounded" />
 			
 		</xs:sequence>
 	</xs:complexType>
@@ -478,7 +478,7 @@
 		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:element name="mrss" type="T_mrss" />
+	<xs:element name="rss" type="T_rss" />
 	<xs:element name="channel" type="T_channel" />
 	<xs:element name="item" type="T_item" />
 	
@@ -508,7 +508,7 @@
 	<xs:element name="tags" type="T_tags" />
 	<xs:element name="categories" type="T_categories" />
 	
-	<xs:element name="mrss-extension" />
+	<xs:element name="rss-extension" />
 	<xs:element name="channel-extension" />
 	<xs:element name="item-extension" />
 	<xs:element name="media-extension" />

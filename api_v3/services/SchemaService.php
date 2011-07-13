@@ -63,7 +63,16 @@ class SchemaService extends KalturaBaseService
 		}
 		else 
 		{
-			
+			$plugin = KalturaPluginManager::getPluginInstance($name);
+			if($plugin && $plugin instanceof IKalturaSchemaContributor)
+			{
+				$xsdElement = $plugin->getPluginSchema($type);
+			}
+			else 
+			{
+				$xsd .= '</xs:schema>';
+				$xsdElement = new SimpleXMLElement($xsd);
+			}			
 		}
 				
 		header("Content-Type: text/plain; charset=UTF-8");
