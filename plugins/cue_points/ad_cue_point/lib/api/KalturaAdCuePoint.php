@@ -6,11 +6,11 @@
 class KalturaAdCuePoint extends KalturaCuePoint
 {
 	/**
-	 * @var KalturaAdCuePointProviderType
+	 * @var KalturaAdProtocolType
 	 * @insertonly
 	 * @requiresPermission insert,update
 	 */
-	public $providerType;
+	public $protocolType;
 	
 	/**
 	 * @var string
@@ -52,7 +52,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	
 	private static $map_between_objects = array
 	(
-		"providerType" => "subType",
+		"protocolType" => "subType",
 		"sourceUrl",
 		"adType",
 		"title" => "name",

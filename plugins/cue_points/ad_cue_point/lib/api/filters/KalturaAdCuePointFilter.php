@@ -7,8 +7,8 @@ class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
 {
 	private $map_between_objects = array
 	(
-		"providerTypeEqual" => "_eq_sub_type",
-		"providerTypeIn" => "_in_sub_type",
+		"protocolTypeEqual" => "_eq_sub_type",
+		"protocolTypeIn" => "_in_sub_type",
 	);
 
 	public function getMapBetweenObjects()
@@ -19,15 +19,15 @@ class KalturaAdCuePointFilter extends KalturaAdCuePointBaseFilter
 	/**
 	 * 
 	 * 
-	 * @var KalturaAdCuePointProviderType
+	 * @var KalturaAdProtocolType
 	 */
-	public $providerTypeEqual;
+	public $protocolTypeEqual;
 
 	/**
 	 * 
 	 * 
-	 * @dynamicType KalturaAdCuePointProviderType
+	 * @dynamicType KalturaAdProtocolType
 	 * @var string
 	 */
-	public $providerTypeIn;
+	public $protocolTypeIn;
 }
