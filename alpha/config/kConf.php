@@ -226,6 +226,8 @@ class kConf extends kConfLocal
 					'getkshowaction',
 					'registerpartneraction',
 				),
+				
+				'syndication_core_xsd_path' => dirname(__FILE__) . '/syndication.core.xsd',
 			)
 		);
 		

@@ -8,6 +8,8 @@
  */
 class SchemaService extends KalturaBaseService 
 {
+	const CORE_SCHEMA_NAME = 'core';
+	
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerRequired()
 	 */
@@ -37,20 +39,28 @@ class SchemaService extends KalturaBaseService
 		$ns = 'http://' . kConf::get('www_host') . "/$type";
 		if($name)
 			$ns .= "/$name";
+						
+		$xsd = new SimpleXMLElement('<xs:schema targetNamespace="' . $ns . '" xmlns:xs="http://www.w3.org/2001/XMLSchema" />');
 			
-		$xsd = new SimpleXMLElement('<schema/>', null, null, 'http://www.w3.org/2001/XMLSchema');
-		$xsd->addAttribute('targetNamespace', $ns);
-		$xsd->addAttribute('xmlns:xs', 'http://www.w3.org/2001/XMLSchema');
-		
 		if(!$name)
 		{
 			$redefine = $xsd->addChild('redefine');
-			$redefine->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/core");
-		}
+			$redefine->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::CORE_SCHEMA_NAME);
 		
-		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
-		foreach($schemaContributors as $key => $schemaContributor)
-			$schemaContributor->contributeToSchema($type, $xsd);
+			$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
+			foreach($schemaContributors as $key => $schemaContributor)
+				$schemaContributor->contributeToSchema($type, $xsd);
+		}
+		elseif ($name == self::CORE_SCHEMA_NAME)
+		{
+			$coreXsd = file_get_contents(kConf::get("{$type}_core_xsd"));
+			$coreXsdElement = new SimpleXMLElement($coreXsd);
+			$xsd->appendChild($coreXsdElement);
+		}
+		else 
+		{
+			
+		}
 				
 		header("Content-Type: text/plain; charset=UTF-8");
 		echo $xsd->saveXML();
