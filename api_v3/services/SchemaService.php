@@ -36,7 +36,9 @@ class SchemaService extends KalturaBaseService
 		foreach($schemaContributors as $key => $schemaContributor)
 			$schemaContributor->contributeToSchema($type, $xsd);
 				
+		header("Content-Type: text/plain; charset=UTF-8");
 		echo $xsd->saveXML();
+		kFile::closeDbConnections();
 		exit;
 	}
 }
