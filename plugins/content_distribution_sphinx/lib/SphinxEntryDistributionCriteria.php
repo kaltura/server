@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.contentDistribution
+ * @subpackage DB
+ */
 class SphinxEntryDistributionCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(

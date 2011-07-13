@@ -1,6 +1,6 @@
 <?php
 /**
- * Enable time based cue point objects management on entry objects
+ * Enable custom metadata on ad cue point objects
  * @package plugins.adCuePoint
  */
 class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaEnumerator

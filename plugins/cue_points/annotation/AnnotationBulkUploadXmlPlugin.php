@@ -1,6 +1,6 @@
 <?php
 /**
- * Enable time based cue point objects management on entry objects
+ * Enable annotation ingestion from XML bulk upload
  * @package plugins.annotation
  */
 class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor

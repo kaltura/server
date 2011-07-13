@@ -1,6 +1,7 @@
 <?php
 /**
- * @package plugins.contentDistributionSphinx
+ * Enable indexing and searching cue point objects in sphinx
+ * @package plugins.contentDistribution
  */
 class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration
 {

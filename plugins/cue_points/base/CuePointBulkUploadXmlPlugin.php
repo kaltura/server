@@ -1,9 +1,9 @@
 <?php
 /**
- * Enable time based cue point objects management on entry objects
+ * Enable cue point ingestion from XML bulk upload
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor
+class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'cuePointBulkUploadXml';
 	const BULK_UPLOAD_XML_PLUGIN_NAME = 'bulkUploadXml';

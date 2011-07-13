@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable entry content distribution ingestion from XML bulk upload
  * @package plugins.contentDistribution
  */
 class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor

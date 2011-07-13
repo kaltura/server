@@ -1,6 +1,6 @@
 <?php
 /**
- * Enable time based cue point objects management on entry objects
+ * Enable entry caption asset ingestion from XML bulk upload
  * @package plugins.caption
  */
 class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor

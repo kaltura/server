@@ -1,6 +1,6 @@
 <?php
 /**
- * Enable time based cue point objects management on entry objects
+ * Enable custom metadata on annotation objects
  * @package plugins.annotation
  */
 class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaEnumerator

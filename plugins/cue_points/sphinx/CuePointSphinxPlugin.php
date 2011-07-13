@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable indexing and searching cue point objects in sphinx
  * @package plugins.cuePoint
  */
 class CuePointSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration

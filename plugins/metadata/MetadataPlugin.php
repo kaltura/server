@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable adding custom metadata objects that releate to core objects
  * @package plugins.metadata
  */
 class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor

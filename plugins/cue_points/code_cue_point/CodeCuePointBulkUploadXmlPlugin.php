@@ -1,6 +1,6 @@
 <?php
 /**
- * Enable time based cue point objects management on entry objects
+ * Enable code cue point ingestion from XML bulk upload
  * @package plugins.codeCuePoint
  */
 class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor

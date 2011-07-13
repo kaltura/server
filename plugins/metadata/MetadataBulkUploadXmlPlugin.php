@@ -1,5 +1,6 @@
 <?php
 /**
+ * Enable custom metadata ingestion from XML bulk upload
  * @package plugins.metadata
  */
 class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor
