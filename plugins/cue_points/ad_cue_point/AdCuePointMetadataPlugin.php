@@ -93,16 +93,6 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 	public static function getPluginSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if(
-			$coreType != SchemaType::SYNDICATION
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
-			&&
-			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
-		)
-			return null;
 	
 		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
 		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
@@ -120,8 +110,32 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 						<xs:extension base="metadata:T_customData" />
 					</xs:complexContent>
 				</xs:complexType>
-				
+			';
+		
+			if(
+				$coreType == SchemaType::SYNDICATION
+				&&
+				$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+				&&
+				$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			)
+			{
+				$xsd = '
 				<xs:element name="customData" type="T_customData" substitutionGroup="cuePoint:scene-extension" />
+				';
+			}
+			elseif($coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+			{
+				$xsd = '
+				<xs:element name="customData" type="T_customData" substitutionGroup="adCuePointBulkUploadXml:scene-extension" />
+				';
+			}
+			else
+			{
+				return null;
+			}
+			
+			$xsd = '
 			</xs:schema>
 		';
 		
