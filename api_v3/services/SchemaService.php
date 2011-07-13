@@ -68,6 +68,7 @@ class SchemaService extends KalturaBaseService
 				$plugin = kPluginableEnumsManager::getPlugin($type);
 				if($plugin instanceof IKalturaSchemaContributor)
 				{
+					KalturaLog::debug("Found plugin [" . get_class($plugin) . "]");
 					$xsdElement = $plugin->getPluginSchema($type);
 				}
 				else
