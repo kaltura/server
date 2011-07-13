@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . '/../../bootstrap/bootstrapServer.php');
  * @author Roni
  *
  */
-class KDLUnitTest extends KalturaServerTestCase
+class kdlTest extends KalturaServerTestCase
 {
 	/**
 	 * 
