@@ -15,7 +15,7 @@ class KalturaGlobalData extends KalturaTestConfig
 	 * The default location for the global data file
 	 * @var string
 	 */
-	const DEFAULT_DATA_PATH = "/opt/kaltura/app/tests/common/global.data";
+	const DEFAULT_DATA_PATH = "global.data";
 		
 	/**
 	 * 
@@ -85,13 +85,18 @@ class KalturaGlobalData extends KalturaTestConfig
 	{
 		if(is_null(KalturaGlobalData::$dataFilePath))
 		{
-			KalturaGlobalData::setDataFilePath(KalturaGlobalData::DEFAULT_DATA_PATH);
+			$classFilePath = KAutoloader::getClassFilePath("KalturaGlobalData");
+			$dir = dirname($classFilePath);
+			KalturaGlobalData::setDataFilePath($dir ."/" . KalturaGlobalData::DEFAULT_DATA_PATH);
 		}
 		
-		if(file_exists(KalturaGlobalData::DEFAULT_DATA_PATH))
+		if(file_exists(KalturaGlobalData::$dataFilePath))
 			KalturaGlobalData::$dataFile = new KalturaTestConfig(KalturaGlobalData::$dataFilePath);
 		else
+		{
+			print("Global file no found at: " . KalturaGlobalData::$dataFilePath . "\n");
 			return null;
+		}
 			
 		return true;
 	}
