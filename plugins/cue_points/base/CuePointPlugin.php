@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -68,11 +68,138 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	{
 	    CuePointPeer::clearInstancePool();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if(is_null($baseEnumName))
+			return array('CuePointSchemaType');
+		
+		if($baseEnumName == 'SchemaType')
+			return array('CuePointSchemaType');
+			
+		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::isContributingToSchema()
+	 */
+	public static function isContributingToSchema($type)
+	{
+		return (
+			$type == SchemaType::SYNDICATION
+			||
+			$type == self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			||
+			$type == self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	{
+		if(
+			$type != SchemaType::SYNDICATION
+			&&
+			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			&&
+			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+		)
+			return;
+			
+		$import = $xsd->addChild('import');
+		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function getPluginSchema($type)
+	{
+		if(
+			$type != SchemaType::SYNDICATION
+			&&
+			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			&&
+			$type != self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+		)
+			return null;
+			
+		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
+		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
+		
+		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
+			<xs:schema 
+				xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns="' . $xmlnsPlugin . '" 
+				xmlns:core="' . $xmlnsBase . '" 
+				targetNamespace="' . $xmlnsPlugin . '"
+			>
+				<xs:complexType name="T_scenes">
+					<xs:sequence>
+						<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>	
+		';
+		
+		switch($type)
+		{
+			case SchemaType::SYNDICATION:
+			case self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API):
+				
+				$xsd .= '
+					<xs:complexType name="T_scene">
+						<xs:sequence>
+							<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time" />
+							<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
+							<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
+							<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string" />
+							<xs:element name="tags" minOccurs="1" maxOccurs="1" type="core:tags" />
+					
+							<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
+						</sequence>
+						
+						<xs:attribute name="sceneId" use="required" type="xs:int" />
+						<xs:attribute name="systemName" use="optional" type="xs:string" />
+						
+					</complexType>
+				';
+				break;
+				
+			case self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API):
+				$xsd .= '
+					<xs:complexType name="T_scene">
+						<xs:sequence>
+							<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time" />
+							<xs:element name="tags" minOccurs="1" maxOccurs="1" type="core:tags" />
+					
+							<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
+						</sequence>
+						
+						<xs:attribute name="sceneId" use="required" type="xs:int" />
+						<xs:attribute name="systemName" use="optional" type="xs:string" />
+						
+					</complexType>
+				';
+				break;
+		}
+		
+		$xsd .= '
+				<xs:element name="scenes" type="T_scenes" substitutionGroup="core:item-extension" />
+				<xs:element name="scene" type="T_scene" />
+				<xs:element name="scene-extension" />
+			</xs:schema>
+		';
+		
+		return new SimpleXMLElement($xsd);
+	}
 
-	/**
-	 * 
-	 * Gets the config for the different config names
-	 * @param string $configName
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
 	 */
 	public static function getConfig($configName)
 	{
@@ -80,5 +207,22 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
 			
 		return null;
+	}
+		
+	/**
+	 * @return int id of dynamic enum in the DB.
+	 */
+	public static function getSchemaTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('SchemaType', $value);
+	}
+	
+	/**
+	 * @return string external API value of dynamic enum.
+	 */
+	public static function getApiValue($valueName)
+	{
+		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }

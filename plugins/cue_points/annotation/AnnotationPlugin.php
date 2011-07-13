@@ -3,7 +3,7 @@
  * Enable annotation cue point objects management on entry objects
  * @package plugins.annotation
  */
-class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader
+class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'annotation';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -83,6 +83,82 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	{
 		if($baseClass == 'CuePoint' && $enumValue == self::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION))
 			return 'Annotation';
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::isContributingToSchema()
+	 */
+	public static function isContributingToSchema($type)
+	{
+		return (
+			$type == SchemaType::SYNDICATION
+			||
+			$type == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			||
+			$type == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	{
+		if(
+			$type != SchemaType::SYNDICATION
+			&&
+			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			&&
+			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+		)
+			return;
+			
+		$import = $xsd->addChild('import');
+		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function getPluginSchema($type)
+	{
+		if(
+			$type != SchemaType::SYNDICATION
+			&&
+			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			&&
+			$type != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+		)
+			return null;
+			
+		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
+		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
+		
+		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
+			<xs:schema 
+				xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns="' . $xmlnsPlugin . '" 
+				xmlns:core="' . $xmlnsBase . '" 
+				targetNamespace="' . $xmlnsPlugin . '"
+			>
+			
+				<xs:complexType name="T_scene">
+					<xs:complexContent>
+						<xs:extension base="cuePoint:T_scene">
+							<xs:sequence>
+								<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
+								<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string" />
+								<xs:element name="parentId" minOccurs="0" maxOccurs="1" type="xs:string" />
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+				
+				<xs:element name="scene" type="T_scene" substitutionGroup="cuePoint:scene" />
+			</xs:schema>
+		';
+		
+		return new SimpleXMLElement($xsd);
 	}
 	
 	/**
