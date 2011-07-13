@@ -178,12 +178,12 @@ class KalturaTestDeploymentHelper
 		$results = $client->media->listAction($filter);
 		
 		if($results->totalCount)
-			KalturaGlobalData::setData("@ENTRY_WITH_DURATION@", $results->objects[0]->id); //Saves the first object in the response
+			KalturaGlobalData::setData("@ENTRY_WITH_DURATION_ID@", $results->objects[0]->id); //Saves the first object in the response
 		else
 		{
-			KalturaGlobalData::setData("@ENTRY_WITH_DURATION@", $defaultEntry->id); //Saves the default entry id
+			KalturaGlobalData::setData("@ENTRY_WITH_DURATION_ID@", $defaultEntry->id); //Saves the default entry id
 			//throw new Exception("No entries with duration were found, EXITING!");
-			print("No entries with duration were found! \n");
+			print("No entries with duration were found! using the default entry id\n");
 		}
 			
 		$flavorAssest = $client->flavorParams->listAction();
