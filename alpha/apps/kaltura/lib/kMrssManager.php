@@ -1,7 +1,15 @@
 <?php
 class kMrssManager
 {
+	/**
+	 * @var array<IKalturaMrssContributor>
+	 */
 	private static $mrssContributors = null;
+	
+	/**
+	 * @var array<IKalturaSchemaContributor>
+	 */
+	private static $schemaContributors = null;
 	
 	/**
 	 * @param string $string
@@ -29,6 +37,23 @@ class kMrssManager
 	}
 	
 	/**
+	 * @return array<IKalturaSchemaContributor>
+	 */
+	public static function getSchemaContributors()
+	{
+		if(self::$schemaContributors)
+			return self::$schemaContributors;
+			
+		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
+		foreach($schemaContributors as $key => $schemaContributor)
+			if(!$schemaContributor->isContributingToSchema(SchemaType::SYNDICATION))
+				unset($schemaContributors[$key]);
+				
+		self::$schemaContributors = $schemaContributors;
+		return self::$schemaContributors;
+	}
+	
+	/**
 	 * @param string $title
 	 * @param string $link
 	 * @param string $description
@@ -50,7 +75,16 @@ class kMrssManager
 	{
 		$mrss = new SimpleXMLElement('<rss/>');
 		$mrss->addAttribute('version', '2.0');
-		$mrss->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
+		$mrss->addAttribute('xmlns', 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION);
+		$mrss->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+		
+		$schemaContributors = self::getSchemaContributors();
+		if(count($schemaContributors))
+			foreach($schemaContributors as $schemaContributor)
+				$mrss->addAttribute('xmlns:' . $schemaContributor->getPluginName(), 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION . '/' . $schemaContributor->getPluginName());
+				
+		$mrss->addAttribute('xsi:noNamespaceSchemaLocation', 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . SchemaType::SYNDICATION);
+//		$mrss->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
 		
 		$channel = $mrss->addChild('channel');
 		$channel->addChild('title', self::stringToSafeXml($title));
@@ -150,7 +184,7 @@ class kMrssManager
 	 * @param asset $asset
 	 * @return string
 	 */
-	protected static function getAssetUrl(asset $asset)
+	public static function getAssetUrl(asset $asset)
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
