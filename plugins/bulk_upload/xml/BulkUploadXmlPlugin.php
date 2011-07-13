@@ -130,11 +130,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
 		
 		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
-			<xs:schema 
-				xmlns:xs="http://www.w3.org/2001/XMLSchema"
-				xmlns="' . $xmlnsPlugin . '" 
-				xmlns:core="' . $xmlnsBase . '" 
-				targetNamespace="' . $xmlnsPlugin . '"
+			<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 			>';
 		
 		$xsd .= file_get_contents(dirname(__FILE__) . '/xml/ingestion.xsd');
