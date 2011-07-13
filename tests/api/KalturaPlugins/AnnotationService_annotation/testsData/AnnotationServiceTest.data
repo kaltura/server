@@ -122,7 +122,7 @@
         <id></id>
         <cuePointType></cuePointType>
         <status></status>
-        <entryId type="string">@ENTRY_WITH_DURATION@_ID</entryId>
+        <entryId type="string">@ENTRY_WITH_DURATION_ID@</entryId>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
