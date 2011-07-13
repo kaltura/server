@@ -48,12 +48,12 @@ class SchemaService extends KalturaBaseService
 			$xsd .= '</xs:schema>';
 			$xsdElement = new SimpleXMLElement($xsd);
 		
-			$redefine = $xsd->addChild('redefine');
+			$redefine = $xsdElement->addChild('redefine');
 			$redefine->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::CORE_SCHEMA_NAME);
 		
 			$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
 			foreach($schemaContributors as $key => $schemaContributor)
-				$schemaContributor->contributeToSchema($type, $xsd);
+				$schemaContributor->contributeToSchema($type, $xsdElement);
 		}
 		elseif ($name == self::CORE_SCHEMA_NAME)
 		{
