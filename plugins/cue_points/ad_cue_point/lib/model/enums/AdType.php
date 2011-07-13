@@ -5,6 +5,6 @@
  */
 interface AdType extends BaseEnum
 {
-	const MIDROLL = 1;
+	const VIDEO = 1;
 	const OVERLAY = 2;
 }
