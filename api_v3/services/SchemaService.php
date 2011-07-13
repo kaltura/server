@@ -101,7 +101,7 @@ class SchemaService extends KalturaBaseService
 						$contants = $classTypeReflector->getConstants();
 						foreach($contants as $contant)
 						{
-							$xsd .= '<xs:enumeration value="' . $contant->getDefaultValue() . '"><xs:annotation><xs:documentation>' . $contant->getName() . '</xs:documentation></xs:annotation>';
+							$xsd .= '<xs:enumeration value="' . $contant->getDefaultValue() . '"><xs:annotation><xs:documentation>' . $contant->getName() . '</xs:documentation></xs:annotation></xs:enumeration?';
 						}
 						
 									
