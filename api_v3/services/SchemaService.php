@@ -40,10 +40,14 @@ class SchemaService extends KalturaBaseService
 		if($name)
 			$ns .= "/$name";
 						
-		$xsd = new SimpleXMLElement('<xs:schema targetNamespace="' . $ns . '" xmlns:xs="http://www.w3.org/2001/XMLSchema" />');
+		$xsdElement = null;		
+		$xsd = '<xs:schema targetNamespace="' . $ns . '" xmlns:xs="http://www.w3.org/2001/XMLSchema">';
 			
 		if(!$name)
 		{
+			$xsd .= '</xs:schema>';
+			$xsdElement = new SimpleXMLElement($xsd);
+		
 			$redefine = $xsd->addChild('redefine');
 			$redefine->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::CORE_SCHEMA_NAME);
 		
@@ -53,9 +57,9 @@ class SchemaService extends KalturaBaseService
 		}
 		elseif ($name == self::CORE_SCHEMA_NAME)
 		{
-			$coreXsd = file_get_contents(kConf::get("{$type}_core_xsd_path"));
-			$coreXsdElement = new SimpleXMLElement($coreXsd);
-			$xsd->appendChild($coreXsdElement);
+			$xsd .= file_get_contents(kConf::get("{$type}_core_xsd_path"));
+			$xsd .= '</xs:schema>';
+			$xsdElement = new SimpleXMLElement($xsd);
 		}
 		else 
 		{
@@ -63,7 +67,7 @@ class SchemaService extends KalturaBaseService
 		}
 				
 		header("Content-Type: text/plain; charset=UTF-8");
-		echo $xsd->saveXML();
+		echo $xsdElement->saveXML();
 		kFile::closeDbConnections();
 		exit;
 	}
