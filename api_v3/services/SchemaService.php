@@ -51,7 +51,7 @@ class SchemaService extends KalturaBaseService
 			$redefine = $xsdElement->addChild('redefine');
 			$redefine->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::CORE_SCHEMA_NAME);
 		
-			$import = $xsd->addChild('import');
+			$import = $xsdElement->addChild('import');
 			$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/enum");
 			
 			$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
