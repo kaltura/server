@@ -17,17 +17,17 @@
 		</xs:sequence>
 	</xs:complexType>
 		
+	<xs:simpleType name="T_action">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="add" />
+			<xs:enumeration value="update" />
+			<xs:enumeration value="delete" />
+		</xs:restriction>
+	</xs:simpleType>
+	
 	<xs:complexType name="T_item">
 		<xs:sequence>
-			<xs:element name="action" minOccurs="0" maxOccurs="1" default="add">
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="add"/>
-						<xs:enumeration value="update"/>
-						<xs:enumeration value="delete"/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
+			<xs:element ref="action" minOccurs="0" maxOccurs="1" />
 			<xs:choice>
 				<xs:sequence>
 					<xs:element name="type" minOccurs="1" maxOccurs="1">
@@ -302,15 +302,7 @@
 			<xs:element name="playlist" minOccurs="1" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="action" minOccurs="0" maxOccurs="1">
-							<xs:simpleType>
-								<xs:restriction base="xs:string">
-									<xs:enumeration value="new"/>
-									<xs:enumeration value="add"/>
-									<xs:enumeration value="remove"/>
-								</xs:restriction>
-							</xs:simpleType>
-						</xs:element>
+						<xs:element ref="action" minOccurs="0" maxOccurs="1" />
 						<xs:element name="name" minOccurs="0" maxOccurs="1">
 							<xs:simpleType>
 								<xs:restriction base="xs:string">
@@ -482,6 +474,8 @@
 	<xs:element name="mrss" type="T_mrss" />
 	<xs:element name="channel" type="T_channel" />
 	<xs:element name="item" type="T_item" />
+	
+	<xs:element name="action" type="T_action" />
 	
 	<xs:element name="media" type="T_media" />
 	<xs:element name="mix" type="T_mix" />
