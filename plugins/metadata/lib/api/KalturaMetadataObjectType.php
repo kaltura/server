@@ -3,7 +3,10 @@
  * @package plugins.metadata
  * @subpackage api.enum
  */
-class KalturaMetadataObjectType extends KalturaEnum 
+class KalturaMetadataObjectType extends KalturaDynamicEnum implements MetadataObjectType
 {
-	const ENTRY = 1;
+	public static function getEnumClass()
+	{
+		return 'MetadataObjectType';
+	}
 }

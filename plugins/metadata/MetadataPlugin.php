@@ -2,9 +2,13 @@
 /**
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator
+class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor
 {
 	const PLUGIN_NAME = 'metadata';
+	const PLUGIN_VERSION_MAJOR = 2;
+	const PLUGIN_VERSION_MINOR = 0;
+	const PLUGIN_VERSION_BUILD = 0;
+	
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
 	const METADATA_COPY_HANDLER_CLASS = 'kMetadataObjectCopiedHandler';
 	const METADATA_DELETE_HANDLER_CLASS = 'kMetadataObjectDeletedHandler';
@@ -17,6 +21,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 
+	/* (non-PHPdoc)
+	 * @see KalturaPlugin::getInstance()
+	 */
 	public function getInstance($interface)
 	{
 		if($this instanceof $interface)
@@ -28,11 +35,29 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		return null;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaPlugin::getPluginName()
+	 */
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IKalturaVersion::getVersion()
+	 */
+	public static function getVersion()
+	{
+		return new KalturaVersion(
+			self::PLUGIN_VERSION_MAJOR,
+			self::PLUGIN_VERSION_MINOR,
+			self::PLUGIN_VERSION_BUILD
+		);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaPermissions::isAllowedPartner()
+	 */
 	public static function isAllowedPartner($partnerId)
 	{
 		if($partnerId == Partner::BATCH_PARTNER_ID)
@@ -45,8 +70,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
 	
-	/**
-	 * @return array<string,string> in the form array[serviceName] = serviceClass
+	/* (non-PHPdoc)
+	 * @see IKalturaServices::getServicesMap()
 	 */
 	public static function getServicesMap()
 	{
@@ -58,16 +83,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		return $map;
 	}
 	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/metadata.ct');
-	}
-
-	/**
-	 * @return array
+	/* (non-PHPdoc)
+	 * @see IKalturaEventConsumers::getEventConsumers()
 	 */
 	public static function getEventConsumers()
 	{
@@ -78,11 +95,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		);
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @param array $constructorArgs
-	 * @return object
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
@@ -133,10 +147,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		return null;
 	}
 	
-	/**
-	 * @param string $baseClass
-	 * @param string $enumValue
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
@@ -289,10 +301,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		KalturaLog::debug("Formated Date [null]");
 		return null;
 	}
-		
-	/**
-	 * @param string $entryId the new created entry
-	 * @param array $data key => value pairs
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadHandler::handleBulkUploadData()
 	 */
 	public static function handleBulkUploadData($entryId, array $data)
 	{
@@ -503,11 +514,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		}
 	}
 	
-	/**
-	 * Return textual search data to be associated with the object
-	 * 
-	 * @param BaseObject $object
-	 * @return string
+	/* (non-PHPdoc)
+	 * @see IKalturaSearchDataContributor::getSearchData()
 	 */
 	public static function getSearchData(BaseObject $object)
 	{
@@ -520,6 +528,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 		return null;
 	}
 
+	/* (non-PHPdoc)
+	 * @see IKalturaMemoryCleaner::cleanMemory()
+	 */
 	public static function cleanMemory()
 	{
 	    MetadataProfilePeer::clearInstancePool();
@@ -539,5 +550,65 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaPermissions, IKalt
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
 			
 		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::isContributingToSchema()
+	 */
+	public static function isContributingToSchema($type)
+	{
+		return ($type == SchemaType::SYNDICATION);  
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	{
+		if($type != SchemaType::SYNDICATION)
+			return;
+			
+		$import = $xsd->addChild('import');
+		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function getPluginSchema($type)
+	{
+		if($type != SchemaType::SYNDICATION)
+			return null;
+			
+		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
+		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
+		
+		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
+			<xs:schema 
+				xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns="' . $xmlnsPlugin . '" 
+				xmlns:core="' . $xmlnsBase . '" 
+				targetNamespace="' . $xmlnsPlugin . '"
+			>
+				
+				<xs:complexType name="T_customData">
+					<xs:sequence>
+						<xs:any namespace="##local" processContents="skip"/>			
+					</xs:sequence>
+					
+					<attribute name="metadataId" use="required" type="int"/>
+					<attribute name="metadataVersion" use="required" type="int"/>
+					<attribute name="metadataProfile" use="optional" type="string"/>
+					<attribute name="metadataProfileId" use="required" type="int"/>
+					<attribute name="metadataProfileName" use="optional" type="int"/>
+					<attribute name="metadataProfileVersion" use="required" type="int"/>
+					
+				</xs:complexType>
+				
+				<xs:element name="customData" type="T_customData" substitutionGroup="core:item-extension" />
+			</xs:schema>
+		';
+		
+		return new SimpleXMLElement($xsd);
 	}
 }
