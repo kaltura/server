@@ -524,6 +524,8 @@ class kFile
 	
 	public static function dumpApiRequest($host)
 	{
+		self::closeDbConnections();
+		
 		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
 		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
 			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
