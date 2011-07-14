@@ -47,7 +47,7 @@ class SchemaService extends KalturaBaseService
 		$namespace = 'http://' . kConf::get('www_host') . "/$type";
 		fwrite($xsdFile, '<xs:schema targetNamespace="' . $namespace . '" xmlns:xs="http://www.w3.org/2001/XMLSchema">');
 	
-		$baseXsdElement = null;
+		$baseXsdElement = new SimpleXMLElement('<xs:schema/>');
 		if($type == SchemaType::SYNDICATION)
 		{
 			$baseXsdElement = new SimpleXMLElement(kConf::get("syndication_core_xsd_path"), null, true);
@@ -62,14 +62,11 @@ class SchemaService extends KalturaBaseService
 			}
 		}
 	
-		if($baseXsdElement)
+		foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
 		{
-			foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
-			{
-				/* @var $element SimpleXMLElement */
-				fwrite($xsdFile, '
+			/* @var $element SimpleXMLElement */
+			fwrite($xsdFile, '
 	' . $element->asXML());
-			}
 		}
 		
 		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
@@ -104,11 +101,11 @@ class SchemaService extends KalturaBaseService
 				if(strpos($path, 'api') === false) // class must be under any api folder
 					continue;
 					
-				if(!is_subclass_of($class, 'KalturaEnum')) // class must be enum
-					continue;
-						
 				$classTypeReflector = KalturaTypeReflectorCacher::get($class);
 					
+				if(!$classTypeReflector->isEnum() && !$classTypeReflector->isStringEnum()) // class must be enum
+					continue;
+						
 				$xsdType = 'int';
 				if($classTypeReflector->isStringEnum())
 					$xsdType = 'string';
