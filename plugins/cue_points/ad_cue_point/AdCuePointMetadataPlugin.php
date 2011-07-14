@@ -3,7 +3,7 @@
  * Enable custom metadata on ad cue point objects
  * @package plugins.adCuePoint
  */
-class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaEnumerator
+class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'adCuePointMetadata';
 	const METADATA_PLUGIN_NAME = 'metadata';
@@ -47,41 +47,5 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			return array('AdCuePointMetadataObjectType');
 			
 		return array();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
-	public static function contributeToSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		
-		if(
-			$coreType == SchemaType::SYNDICATION
-			&&
-			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
-			&&
-			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
-		)
-		{
-			return '
-		
-	<!-- ' . self::getPluginName() . ' -->
-	
-	<xs:element name="customData" type="T_customData" substitutionGroup="cuePoint:scene-extension" />
-			';
-		}
-		
-		if($coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
-		{
-			return  '
-		
-	<!-- ' . self::getPluginName() . ' -->
-	
-	<xs:element name="customData" type="T_customData" substitutionGroup="adCuePointBulkUploadXml:scene-extension" />
-				';
-		}
-		
-		return null;
 	}
 }

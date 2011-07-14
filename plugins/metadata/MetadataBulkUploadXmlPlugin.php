@@ -45,13 +45,13 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 			<xs:any namespace="##local" processContents="skip"/>			
 		</xs:sequence>
 		
-		<attribute name="metadataId" use="optional" type="int"/>
-		<attribute name="metadataProfile" use="optional" type="string"/>
-		<attribute name="metadataProfileId" use="optional" type="int"/>
+		<xs:attribute name="metadataId" use="optional" type="xs:int"/>
+		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
+		<xs:attribute name="metadataProfileId" use="optional" type="xs:int"/>
 		
 	</xs:complexType>
 	
-	<xs:element name="customData" type="T_customData" substitutionGroup="core:item-extension" />
+	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension" />
 		';
 		
 		return $xsd;

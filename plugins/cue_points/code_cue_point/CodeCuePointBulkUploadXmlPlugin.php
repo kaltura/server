@@ -43,9 +43,9 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
-	<xs:complexType name="T_scene">
+	<xs:complexType name="T_scene_codeCuePointBulkUploadXml">
 		<xs:complexContent>
-			<xs:extension base="cuePoint:T_scene">
+			<xs:extension base="T_scene">
 				<xs:sequence>
 					<xs:element name="code" minOccurs="0" maxOccurs="1" type="xs:string" />
 					<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string" />
@@ -54,7 +54,7 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene" type="T_scene" substitutionGroup="scene" />
+	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePointBulkUploadXml" substitutionGroup="scene" />
 		';
 		
 		return $xsd;

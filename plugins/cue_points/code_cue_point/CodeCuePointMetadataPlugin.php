@@ -3,7 +3,7 @@
  * Enable custom metadata on code cue point objects
  * @package plugins.codeCuePoint
  */
-class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaEnumerator
+class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'codeCuePointMetadata';
 	const METADATA_PLUGIN_NAME = 'metadata';
@@ -47,38 +47,5 @@ class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPendin
 			return array('CodeCuePointMetadataObjectType');
 			
 		return array();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
-	public static function contributeToSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if(
-			$coreType != SchemaType::SYNDICATION
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
-			&&
-			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
-		)
-			return null;
-	
-		$xsd = '
-		
-	<!-- ' . self::getPluginName() . ' -->
-	
-	<xs:complexType name="T_customData">
-		<xs:complexContent>
-			<xs:extension base="T_customData" />
-		</xs:complexContent>
-	</xs:complexType>
-	
-	<xs:element name="customData" type="T_customData" substitutionGroup="scene-extension" />
-		';
-		
-		return $xsd;
 	}
 }

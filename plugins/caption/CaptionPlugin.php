@@ -114,7 +114,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			
 	<xs:complexType name="T_subTitle">
 		<xs:sequence>
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="tags" />
+			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
 			<xs:element ref="subtitle-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		
@@ -122,8 +122,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		<xs:attribute name="captionParams" type="xs:string" use="optional" />
 		<xs:attribute name="captionAssetId" type="xs:string" use="optional" />
 		<xs:attribute name="isDefault" type="xs:boolean" use="optional" />
-		<xs:attribute name="format" type="enums:KalturaCaptionType" use="optional" />
-		<xs:attribute name="lang" type="enums:KalturaLanguage" use="optional" />
+		<xs:attribute name="format" type="KalturaCaptionType" use="optional" />
+		<xs:attribute name="lang" type="KalturaLanguage" use="optional" />
 		<xs:attribute name="href" type="xs:string" use="optional" />
 						
 	</xs:complexType>

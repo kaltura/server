@@ -44,10 +44,9 @@ class SchemaService extends KalturaBaseService
 		
 		$xsdFile = fopen($cacheXsdFile, 'w');
 		
-		$namespace = 'http://' . kConf::get('www_host') . "/$type";
-		fwrite($xsdFile, '<xs:schema targetNamespace="' . $namespace . '" xmlns:xs="http://www.w3.org/2001/XMLSchema">');
+		fwrite($xsdFile, '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">');
 	
-		$baseXsdElement = new SimpleXMLElement('<xs:schema targetNamespace="' . $namespace . '" xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
+		$baseXsdElement = new SimpleXMLElement('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 		if($type == SchemaType::SYNDICATION)
 		{
 			$baseXsdElement = new SimpleXMLElement(kConf::get("syndication_core_xsd_path"), null, true);

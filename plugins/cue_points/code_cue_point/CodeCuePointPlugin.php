@@ -93,7 +93,7 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, I
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
-	<xs:complexType name="T_scene">
+	<xs:complexType name="T_scene_codeCuePoint">
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
@@ -104,7 +104,7 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, I
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene" type="T_scene" substitutionGroup="scene" />
+	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePoint" substitutionGroup="scene" />
 		';
 		
 		return $xsd;

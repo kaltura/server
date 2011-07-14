@@ -40,9 +40,9 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
-	<xs:complexType name="T_scene">
+	<xs:complexType name="T_scene_annotationBulkUploadXml">
 		<xs:complexContent>
-			<xs:extension base="cuePoint:T_scene">
+			<xs:extension base="T_scene">
 				<xs:sequence>
 					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
 					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string" />
@@ -52,7 +52,7 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene" type="T_scene" substitutionGroup="cuePoint:scene" />
+	<xs:element name="scene-annotation" type="T_scene_annotationBulkUploadXml" substitutionGroup="scene" />
 		';
 		
 		return $xsd;

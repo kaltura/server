@@ -42,13 +42,13 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	
 	<xs:complexType name="T_subTitle">
 		<xs:sequence>
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="tags" />
+			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
 			<xs:choice minOccurs="1" maxOccurs="1">
-				<xs:element ref="core:serverFileContentResource" minOccurs="1" maxOccurs="1" />
-				<xs:element ref="core:urlContentResource" minOccurs="1" maxOccurs="1" />
-				<xs:element ref="core:remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
-				<xs:element ref="core:entryContentResource" minOccurs="1" maxOccurs="1" />
-				<xs:element ref="core:assetContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 			<xs:element ref="subtitle-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
@@ -57,8 +57,8 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		<xs:attribute name="captionParams" type="xs:string" use="optional" />
 		<xs:attribute name="captionAssetId" type="xs:string" use="optional" />
 		<xs:attribute name="isDefault" type="xs:boolean" use="optional" />
-		<xs:attribute name="format" type="enums:KalturaCaptionType" use="optional" />
-		<xs:attribute name="lang" type="enums:KalturaLanguage" use="optional" />
+		<xs:attribute name="format" type="KalturaCaptionType" use="optional" />
+		<xs:attribute name="lang" type="KalturaLanguage" use="optional" />
 		<xs:attribute name="href" type="xs:string" use="optional" />
 						
 	</xs:complexType>

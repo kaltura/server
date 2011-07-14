@@ -104,7 +104,7 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
-	<xs:complexType name="T_scene">
+	<xs:complexType name="T_scene_annotation">
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
@@ -116,7 +116,7 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene" type="T_scene" substitutionGroup="scene" />
+	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene" />
 		';
 		
 		return $xsd;

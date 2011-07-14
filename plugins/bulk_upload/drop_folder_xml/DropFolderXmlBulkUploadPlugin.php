@@ -131,7 +131,7 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 					</xs:complexContent>
 				</xs:complexType>
 				
-				<xs:element name="dropFolderFileContentResource" type="T_serverFileContentResource" substitutionGroup="core:serverFileContentResource" />
+				<xs:element name="dropFolderFileContentResource" type="T_serverFileContentResource" substitutionGroup="serverFileContentResource" />
 			</xs:schema>
 		';
 		

@@ -3,7 +3,7 @@
  * Enable custom metadata on annotation objects
  * @package plugins.annotation
  */
-class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaEnumerator
+class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'annotationMetadata';
 	const METADATA_PLUGIN_NAME = 'metadata';
@@ -47,41 +47,5 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			return array('AnnotationMetadataObjectType');
 			
 		return array();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
-	public static function contributeToSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if(
-			$coreType != SchemaType::SYNDICATION
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
-			&&
-			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
-		)
-			return null;
-	
-		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
-		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
-		
-		$xsd = '	
-		
-	<!-- ' . self::getPluginName() . ' -->
-			
-	<xs:complexType name="T_customData">
-		<xs:complexContent>
-			<xs:extension base="T_customData" />
-		</xs:complexContent>
-	</xs:complexType>
-	
-	<xs:element name="customData" type="T_customData" substitutionGroup="scene-extension" />
-		';
-		
-		return $xsd;
 	}
 }

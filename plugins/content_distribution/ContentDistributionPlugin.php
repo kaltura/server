@@ -392,13 +392,13 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
 			<xs:element name="submittedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
 			<xs:element name="lastReport" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-			<xs:element name="dirtyStatus" minOccurs="0" maxOccurs="1" type="enums:KalturaEntryDistributionFlag" />
-			<xs:element name="status" minOccurs="1" maxOccurs="1" type="enums:KalturaEntryDistributionStatus" />
-			<xs:element name="sunStatus" minOccurs="1" maxOccurs="1" type="enums:KalturaEntryDistributionSunStatus" />
+			<xs:element name="dirtyStatus" minOccurs="0" maxOccurs="1" type="KalturaEntryDistributionFlag" />
+			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionStatus" />
+			<xs:element name="sunStatus" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionSunStatus" />
 			<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int" />
 			<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int" />
 			<xs:element name="errorNumber" minOccurs="0" maxOccurs="1" type="xs:int" />
-			<xs:element name="errorType" minOccurs="0" maxOccurs="1" type="enums:KalturaBatchJobErrorTypes" />
+			<xs:element name="errorType" minOccurs="0" maxOccurs="1" type="KalturaBatchJobErrorTypes" />
 		
 			<xs:element ref="distribution-extension" minOccurs="0" maxOccurs="unbounded" />
 			
