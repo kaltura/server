@@ -62,24 +62,30 @@ class SchemaService extends KalturaBaseService
 			}
 		}
 	
-		foreach($baseXsdElement as $element)
+		if($baseXsdElement)
 		{
-			/* @var $element SimpleXMLElement */
-			fwrite($xsdFile, $element->asXML());
+			foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
+			{
+				/* @var $element SimpleXMLElement */
+				fwrite($xsdFile, '
+	' . $element->asXML());
+			}
 		}
 		
-//		if($baseXsdElement)
-//		{
-//			$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
-//			foreach($schemaContributors as $key => $schemaContributor)
-//				$schemaContributor->getPluginSchema($type, $baseXsdElement);
-//				
-//			foreach($baseXsdElement as $element)
-//			{
-//				/* @var $element SimpleXMLElement */
-//				fwrite($xsdFile, $element->asXML());
-//			}
-//		}
+		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
+		foreach($schemaContributors as $key => $schemaContributor)
+		{
+			$pluginXsdElement = $schemaContributor->getPluginSchema($type);
+			if(!$pluginXsdElement)
+				continue;
+		
+			foreach($pluginXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
+			{
+				/* @var $element SimpleXMLElement */
+				fwrite($xsdFile, '
+	' . $element->asXML());
+			}
+		}
 		
 		$cacheEnumFile = kConf::get("cache_root_path") . '/api_v3/enum.xsd';
 		if(file_exists($cacheEnumFile))
@@ -137,7 +143,9 @@ class SchemaService extends KalturaBaseService
 			fclose($enumFile);
 		}
 		
-		fwrite($xsdFile, '</xs:schema>');
+		fwrite($xsdFile, '
+</xs:schema>');
+		
 		fclose($xsdFile);
 		
 		kFile::dumpFile($cacheXsdFile);
