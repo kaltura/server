@@ -245,6 +245,14 @@ foreach($config as $name => $item)
 		}
 
 		file_put_contents($filePath, $data);
+
+		if ($file == "KalturaClient.xml")
+		{
+			# save the schema also in a filename containing the generation date
+			# KalturaClient.xml will always contain the most recent schema so that it can be served by api_schema.php
+			$filePath = realpath($outputPath).DIRECTORY_SEPARATOR."KalturaClient_$generatedDate.xml";
+			file_put_contents($filePath, $data);
+		}
 	}
 	
 	//delete the api services xml schema file
