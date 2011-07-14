@@ -30,7 +30,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
-	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
