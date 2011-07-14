@@ -88,7 +88,7 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
-	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
