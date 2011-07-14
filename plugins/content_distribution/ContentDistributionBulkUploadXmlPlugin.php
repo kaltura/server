@@ -30,7 +30,7 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
-	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
@@ -88,6 +88,6 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 	<xs:element name="distribution-extension" />
 		';
 		
-		return new SimpleXMLElement($xsd);
+		return $xsd;
 	}
 }
