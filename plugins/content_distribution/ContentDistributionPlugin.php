@@ -409,6 +409,6 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	<xs:element name="distribution-extension" />
 		';
 		
-		return new SimpleXMLElement($xsd);
+		return $xsd;
 	}
 }
