@@ -55,7 +55,7 @@ class SchemaService extends KalturaBaseService
 		else
 		{
 			$plugin = kPluginableEnumsManager::getPlugin($type);
-			if($plugin instanceof IKalturaSchemaContributor)
+			if($plugin instanceof IKalturaSchemaDefiner)
 			{
 				KalturaLog::debug("Found plugin [" . get_class($plugin) . "]");
 				$baseXsdElement = $plugin->getPluginSchema($type);
@@ -75,16 +75,10 @@ class SchemaService extends KalturaBaseService
 		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
 		foreach($schemaContributors as $key => $schemaContributor)
 		{
-			$pluginXsdElement = $schemaContributor->getPluginSchema($type);
-			if(!$pluginXsdElement)
-				continue;
-		
-			foreach($pluginXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
-			{
-				/* @var $element SimpleXMLElement */
-				fwrite($xsdFile, '
-	' . $element->asXML());
-			}
+			/* @var $schemaContributor IKalturaSchemaContributor */
+			$elements = $schemaContributor->contributeToSchema($type);
+			if($elements)
+				fwrite($xsdFile, $elements);
 		}
 		
 		$cacheEnumFile = kConf::get("cache_root_path") . '/api_v3/enum.xsd';

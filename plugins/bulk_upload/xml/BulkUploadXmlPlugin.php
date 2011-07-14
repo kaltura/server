@@ -2,7 +2,7 @@
 /**
  * @package plugins.bulkUploadXml
  */
-class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaVersion, IKalturaConfigurator, IKalturaSchemaContributor
+class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaVersion, IKalturaConfigurator, IKalturaSchemaDefiner
 {
 	const PLUGIN_NAME = 'bulkUploadXml';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -93,28 +93,6 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
 			
 		return null;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::isContributingToSchema()
-	 */
-	public static function isContributingToSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		return ($coreType == self::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML));
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
-	public static function contributeToSchema($type, SimpleXMLElement $xsd)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != self::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
-			return;
-			
-		$import = $xsd->addChild('import');
-		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
 	}
 	
 	/* (non-PHPdoc)

@@ -28,62 +28,29 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::isContributingToSchema()
-	 */
-	public static function isContributingToSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		return ($coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML));  
-	}
-	
-	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
 	public static function contributeToSchema($type, SimpleXMLElement $xsd)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
-			return;
-			
-		$import = $xsd->addChild('import');
-		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
-	public static function getPluginSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
 			return null;
 	
-		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
-		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
+		$xsd = '
+	<xs:complexType name="T_customData">
+		<xs:sequence>
+			<xs:any namespace="##local" processContents="skip"/>			
+		</xs:sequence>
 		
-		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
-			<xs:schema 
-				xmlns:xs="http://www.w3.org/2001/XMLSchema"
-				xmlns="' . $xmlnsPlugin . '" 
-				xmlns:core="' . $xmlnsBase . '" 
-				targetNamespace="' . $xmlnsPlugin . '"
-			>
-				
-				<xs:complexType name="T_customData">
-					<xs:sequence>
-						<xs:any namespace="##local" processContents="skip"/>			
-					</xs:sequence>
-					
-					<attribute name="metadataId" use="optional" type="int"/>
-					<attribute name="metadataProfile" use="optional" type="string"/>
-					<attribute name="metadataProfileId" use="optional" type="int"/>
-					
-				</xs:complexType>
-				
-				<xs:element name="customData" type="T_customData" substitutionGroup="core:item-extension" />
-			</xs:schema>
+		<attribute name="metadataId" use="optional" type="int"/>
+		<attribute name="metadataProfile" use="optional" type="string"/>
+		<attribute name="metadataProfileId" use="optional" type="int"/>
+		
+	</xs:complexType>
+	
+	<xs:element name="customData" type="T_customData" substitutionGroup="core:item-extension" />
 		';
 		
-		return new SimpleXMLElement($xsd);
+		return $xsd;
 	}
 }

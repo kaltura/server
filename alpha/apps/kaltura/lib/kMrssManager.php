@@ -7,11 +7,6 @@ class kMrssManager
 	private static $mrssContributors = null;
 	
 	/**
-	 * @var array<IKalturaSchemaContributor>
-	 */
-	private static $schemaContributors = null;
-	
-	/**
 	 * @param string $string
 	 * @return string
 	 */
@@ -34,23 +29,6 @@ class kMrssManager
 			
 		self::$mrssContributors = KalturaPluginManager::getPluginInstances('IKalturaMrssContributor');
 		return self::$mrssContributors;
-	}
-	
-	/**
-	 * @return array<IKalturaSchemaContributor>
-	 */
-	public static function getSchemaContributors()
-	{
-		if(self::$schemaContributors)
-			return self::$schemaContributors;
-			
-		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
-		foreach($schemaContributors as $key => $schemaContributor)
-			if(!$schemaContributor->isContributingToSchema(SchemaType::SYNDICATION))
-				unset($schemaContributors[$key]);
-				
-		self::$schemaContributors = $schemaContributors;
-		return self::$schemaContributors;
 	}
 	
 	/**
@@ -77,12 +55,6 @@ class kMrssManager
 		$mrss->addAttribute('version', '2.0');
 		$mrss->addAttribute('xmlns', 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION);
 		$mrss->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-		
-		$schemaContributors = self::getSchemaContributors();
-		if(count($schemaContributors))
-			foreach($schemaContributors as $schemaContributor)
-				$mrss->addAttribute('xmlns:' . $schemaContributor->getPluginName(), 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION . '/' . $schemaContributor->getPluginName());
-				
 		$mrss->addAttribute('xsi:noNamespaceSchemaLocation', 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . SchemaType::SYNDICATION);
 //		$mrss->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
 		

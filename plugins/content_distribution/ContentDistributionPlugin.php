@@ -351,95 +351,62 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::isContributingToSchema()
-	 */
-	public static function isContributingToSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		return ($coreType == SchemaType::SYNDICATION);  
-	}
-	
-	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
-	public static function contributeToSchema($type, SimpleXMLElement $xsd)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != SchemaType::SYNDICATION)
-			return;
-			
-		$import = $xsd->addChild('import');
-		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
-	public static function getPluginSchema($type)
+	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType != SchemaType::SYNDICATION)
 			return null;
 			
-		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
-		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
+		$xsd = '
+	<xs:complexType name="T_distribution">
+		<xs:sequence>
+			<xs:element name="distributionProvider" minOccurs="1" maxOccurs="1" type="KalturaDistributionProviderType" />
+			<xs:element name="distributionProviderId" minOccurs="0" maxOccurs="1" type="xs:int" />
+			<xs:element name="distributionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
+			<xs:element name="distributionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
+			<xs:element name="distributionProfileName" minOccurs="0" maxOccurs="1" type="xs:string" />
+			<xs:element name="remoteId" minOccurs="1" maxOccurs="1" type="xs:string" />
+			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
+			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
+			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						List of existing flavor asset ids to be used in this distribution destination.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						List of existing thumbnail asset ids to be used in this distribution destination.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string" />
+			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
+			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
+			<xs:element name="submittedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
+			<xs:element name="lastReport" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
+			<xs:element name="dirtyStatus" minOccurs="0" maxOccurs="1" type="enums:KalturaEntryDistributionFlag" />
+			<xs:element name="status" minOccurs="1" maxOccurs="1" type="enums:KalturaEntryDistributionStatus" />
+			<xs:element name="sunStatus" minOccurs="1" maxOccurs="1" type="enums:KalturaEntryDistributionSunStatus" />
+			<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int" />
+			<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int" />
+			<xs:element name="errorNumber" minOccurs="0" maxOccurs="1" type="xs:int" />
+			<xs:element name="errorType" minOccurs="0" maxOccurs="1" type="enums:KalturaBatchJobErrorTypes" />
 		
-		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
-			<xs:schema 
-				xmlns:xs="http://www.w3.org/2001/XMLSchema"
-				xmlns="' . $xmlnsPlugin . '" 
-				xmlns:core="' . $xmlnsBase . '" 
-				targetNamespace="' . $xmlnsPlugin . '"
-			>
-				
-				<xs:complexType name="T_distribution">
-					<xs:sequence>
-						<xs:element name="distributionProvider" minOccurs="1" maxOccurs="1" type="enums:KalturaDistributionProviderType" />
-						<xs:element name="distributionProviderId" minOccurs="0" maxOccurs="1" type="xs:int" />
-						<xs:element name="distributionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
-						<xs:element name="distributionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
-						<xs:element name="distributionProfileName" minOccurs="0" maxOccurs="1" type="xs:string" />
-						<xs:element name="remoteId" minOccurs="1" maxOccurs="1" type="xs:string" />
-						<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-						<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-						<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>
-									List of existing flavor asset ids to be used in this distribution destination.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
-							<xs:annotation>
-								<xs:documentation>
-									List of existing thumbnail asset ids to be used in this distribution destination.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string" />
-						<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
-						<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
-						<xs:element name="submittedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-						<xs:element name="lastReport" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-						<xs:element name="dirtyStatus" minOccurs="0" maxOccurs="1" type="enums:KalturaEntryDistributionFlag" />
-						<xs:element name="status" minOccurs="1" maxOccurs="1" type="enums:KalturaEntryDistributionStatus" />
-						<xs:element name="sunStatus" minOccurs="1" maxOccurs="1" type="enums:KalturaEntryDistributionSunStatus" />
-						<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int" />
-						<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int" />
-						<xs:element name="errorNumber" minOccurs="0" maxOccurs="1" type="xs:int" />
-						<xs:element name="errorType" minOccurs="0" maxOccurs="1" type="enums:KalturaBatchJobErrorTypes" />
-					
-						<xs:element ref="distribution-extension" minOccurs="0" maxOccurs="unbounded" />
-						
-					</xs:sequence>
-					
-					<xs:attribute name="entryDistributionId" use="required" type="xs:int" />
-					
-				</xs:complexType>
-				
-				<xs:element name="distribution" type="T_distribution" substitutionGroup="core:item-extension" />
-				<xs:element name="distribution-extension" />
-			</xs:schema>
+			<xs:element ref="distribution-extension" minOccurs="0" maxOccurs="unbounded" />
+			
+		</xs:sequence>
+		
+		<xs:attribute name="entryDistributionId" use="required" type="xs:int" />
+		
+	</xs:complexType>
+	
+	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension" />
+	<xs:element name="distribution-extension" />
 		';
 		
 		return new SimpleXMLElement($xsd);

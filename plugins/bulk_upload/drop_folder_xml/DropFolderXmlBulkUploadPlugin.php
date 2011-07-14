@@ -2,7 +2,7 @@
 /**
  * @package plugins.dropFolderXmlBulkUpload
  */
-class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending, IKalturaSchemaContributor
+class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBulkUpload, IKalturaPending, IKalturaSchemaDefiner
 {
 	const PLUGIN_NAME = 'dropFolderXmlBulkUpload';
 	const XML_BULK_UPLOAD_PLUGIN_VERSION_MAJOR = 1;
@@ -105,32 +105,6 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::isContributingToSchema()
-	 */
-	public static function isContributingToSchema($type)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		return ($coreType == self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML)); 
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
-	public static function contributeToSchema($type, SimpleXMLElement $xsd)
-	{
-		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
-			return;
-			
-		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
-		foreach($schemaContributors as $schemaContributor)
-			$schemaContributor->contributeToSchema(BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML), $xsd);
-			
-		$import = $xsd->addChild('import');
-		$import->addAttribute('schemaLocation', 'http://' . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$type/name/" . self::getPluginName());
-	}
-	
-	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
 	public static function getPluginSchema($type)
@@ -146,7 +120,6 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 			<xs:schema 
 				xmlns:xs="http://www.w3.org/2001/XMLSchema"
 				xmlns="' . $xmlnsPlugin . '" 
-				xmlns:core="' . $xmlnsBase . '" 
 				targetNamespace="' . $xmlnsPlugin . '"
 			>
 				
