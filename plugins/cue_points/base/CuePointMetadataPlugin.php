@@ -43,23 +43,21 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		
 		if(
-			$coreType == SchemaType::SYNDICATION
+			$coreType != SchemaType::SYNDICATION
 			&&
-			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
+			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 			&&
-			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
 			&&
-			$coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
 		)
-		{
-			return '
+			return null;
+			
+		return '
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension" />
 			';
-		}
-		
-		return null;
 	}
 }
