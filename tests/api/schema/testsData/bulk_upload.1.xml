@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mrss 
+	xmlns="http://devtests.kaltura.co.cc/bulkUploadXml.bulkUploadXML"
+	xmlns:cuePointBulkUploadXml="http://devtests.kaltura.co.cc/bulkUploadXml.bulkUploadXML/cuePointBulkUploadXml"
+	>
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>-1</licenseType>
+			<userId>test1</userId>
+			<name>bulk_upload 1</name>
+			<description>bulk_upload 1</description>
+			<tags>
+				<tag>test</tag>
+				<tag>bulk_upload</tag>
+			</tags>
+			<categories>
+				<category>tests</category>
+				<category>bulk_upload</category>
+			</categories>
+			<partnerData>my partner data</partnerData>
+			<accessControlId>123</accessControlId>
+			<ingestionProfileId>456</ingestionProfileId>
+			<media>
+				<mediaType>1</mediaType> 
+			</media>
+			<content id="content1" flavorParamsId="5">
+				<localFileContentResource filePath="/web/content/Oleg/video.flv"> 
+					<fileSize>1325404</fileSize>
+				</localFileContentResource>
+			</content>
+			<content id="content2" flavorParamsId="7">
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/kaltura1_vp6.flv"/>
+			</content>
+			<content id="content3" flavorParamsId="9">
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/nice_Flv.flv"/>
+			</content>
+		</item>
+	</channel>
+</mrss>
