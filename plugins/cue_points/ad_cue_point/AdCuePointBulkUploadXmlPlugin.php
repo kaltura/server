@@ -57,6 +57,6 @@ class AdCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	<xs:element name="scene" type="T_scene" substitutionGroup="scene" />
 		';
 		
-		return new SimpleXMLElement($xsd);
+		return $xsd;
 	}
 }

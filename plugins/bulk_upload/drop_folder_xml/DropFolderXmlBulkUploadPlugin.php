@@ -135,7 +135,7 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 			</xs:schema>
 		';
 		
-		return new SimpleXMLElement($xsd);
+		return $xsd;
 	}
 		
 	/**
