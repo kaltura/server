@@ -1,3 +1,5 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
 	<xs:complexType name="T_rss">
 		<xs:sequence>
 			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1"/>
@@ -519,3 +521,5 @@
 	<xs:element name="document-extension" />
 	<xs:element name="content-extension" />
 	<xs:element name="thumbnail-extension" />
+
+</xs:schema>
