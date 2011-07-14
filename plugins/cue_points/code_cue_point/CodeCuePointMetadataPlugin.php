@@ -67,6 +67,9 @@ class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPendin
 			return null;
 	
 		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_customData">
 		<xs:complexContent>
 			<xs:extension base="T_customData" />

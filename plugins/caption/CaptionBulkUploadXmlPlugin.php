@@ -36,7 +36,10 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
 			return null;
 	
-		$xsd = '			
+		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_subTitle">
 		<xs:sequence>
 			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="tags" />

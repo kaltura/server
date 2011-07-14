@@ -105,7 +105,7 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 * @see IKalturaSchemaContributor::getPluginSchema()
 	 */
 	public static function getPluginSchema($type)
 	{

@@ -108,7 +108,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		if($coreType != SchemaType::SYNDICATION)
 			return null;
 			
-		$xsd = '			
+		$xsd = '	
+		
+	<!-- ' . self::getPluginName() . ' -->
+			
 	<xs:complexType name="T_subTitle">
 		<xs:sequence>
 			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="tags" />

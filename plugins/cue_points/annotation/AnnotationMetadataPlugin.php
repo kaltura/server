@@ -69,7 +69,10 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
 		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
 		
-		$xsd = '			
+		$xsd = '	
+		
+	<!-- ' . self::getPluginName() . ' -->
+			
 	<xs:complexType name="T_customData">
 		<xs:complexContent>
 			<xs:extension base="T_customData" />

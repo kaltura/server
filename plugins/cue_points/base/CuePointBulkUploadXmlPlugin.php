@@ -37,6 +37,9 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 			return null;
 	
 		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_scenes">
 		<xs:sequence>
 			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded" />

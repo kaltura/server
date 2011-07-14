@@ -37,6 +37,9 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 			return null;
 	
 		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_distribution">
 		<xs:sequence>
 			<xs:choice minOccurs="1" maxOccurs="1">

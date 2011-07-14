@@ -89,7 +89,10 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 		)
 			return null;
 			
-		$xsd = '			
+		$xsd = '		
+		
+	<!-- ' . self::getPluginName() . ' -->
+		
 	<xs:complexType name="T_scene">
 		<xs:complexContent>
 			<xs:extension base="cuePoint:T_scene">

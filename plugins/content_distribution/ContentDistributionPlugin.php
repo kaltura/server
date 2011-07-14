@@ -360,6 +360,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			return null;
 			
 		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_distribution">
 		<xs:sequence>
 			<xs:element name="distributionProvider" minOccurs="1" maxOccurs="1" type="KalturaDistributionProviderType" />

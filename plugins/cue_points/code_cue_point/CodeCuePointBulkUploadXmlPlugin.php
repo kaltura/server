@@ -40,6 +40,9 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
 		
 		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_scene">
 		<xs:complexContent>
 			<xs:extension base="cuePoint:T_scene">

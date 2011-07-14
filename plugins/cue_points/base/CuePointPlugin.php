@@ -100,6 +100,9 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			
 		
 		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_scenes">
 		<xs:sequence>
 			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded" />
@@ -122,12 +125,12 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="core:tags" />
 	
 			<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
-		</sequence>
+		</xs:sequence>
 		
 		<xs:attribute name="sceneId" use="required" type="xs:int" />
 		<xs:attribute name="systemName" use="optional" type="xs:string" />
 		
-	</complexType>
+	</xs:complexType>
 				';
 				break;
 				
@@ -139,12 +142,12 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="core:tags" />
 	
 			<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
-		</sequence>
+		</xs:sequence>
 		
 		<xs:attribute name="sceneId" use="required" type="xs:int" />
 		<xs:attribute name="systemName" use="optional" type="xs:string" />
 		
-	</complexType>
+	</xs:complexType>
 				';
 				break;
 		}

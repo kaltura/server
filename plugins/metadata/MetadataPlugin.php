@@ -563,6 +563,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			return null;
 			
 		$xsd = '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
 	<xs:complexType name="T_customData">
 		<xs:sequence>
 			<xs:any namespace="##local" processContents="skip"/>			
