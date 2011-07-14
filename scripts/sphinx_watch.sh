@@ -19,7 +19,7 @@ start() {
     echo
     
     echo -n "Starting Sphinx populateFromLog watch: "
-        pgrep watch.daemon.sh  2>&1>/dev/null
+        pgrep -f populateFromLog.php
         if [ $? -eq  0 ]; then
                  echo_failure
                  echo

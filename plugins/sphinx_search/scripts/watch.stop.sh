@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 		echo -n "Stopping Sphinx Watch Daemon: "
         #Kills the watch.dameon
 		KP=$(pgrep watch.daemon.sh)
