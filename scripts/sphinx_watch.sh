@@ -1,7 +1,7 @@
 #!/bin/bash
 
-COMMAND="/opt/kaltura/app/plugins/sphinx_search/scripts/watch.daemon.sh -u root"
-POP_COMMAND="/opt/kaltura/app/plugins/sphinx_search/scripts/watch.populate.sh"
+COMMAND="@APP_DIR@/plugins/sphinx_search/scripts/watch.daemon.sh -u root"
+POP_COMMAND="@APP_DIR@/plugins/sphinx_search/scripts/watch.populate.sh"
 
 # Source function library
 . /etc/rc.d/init.d/functions
