@@ -62,18 +62,24 @@ class SchemaService extends KalturaBaseService
 			}
 		}
 	
-		if($baseXsdElement)
+		foreach($baseXsdElement as $element)
 		{
-			$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
-			foreach($schemaContributors as $key => $schemaContributor)
-				$schemaContributor->getPluginSchema($type, $baseXsdElement);
-				
-			foreach($baseXsdElement as $element)
-			{
-				/* @var $element SimpleXMLElement */
-				fwrite($xsdFile, $element->asXML());
-			}
+			/* @var $element SimpleXMLElement */
+			fwrite($xsdFile, $element->asXML());
 		}
+		
+//		if($baseXsdElement)
+//		{
+//			$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
+//			foreach($schemaContributors as $key => $schemaContributor)
+//				$schemaContributor->getPluginSchema($type, $baseXsdElement);
+//				
+//			foreach($baseXsdElement as $element)
+//			{
+//				/* @var $element SimpleXMLElement */
+//				fwrite($xsdFile, $element->asXML());
+//			}
+//		}
 		
 		$cacheEnumFile = kConf::get("cache_root_path") . '/api_v3/enum.xsd';
 		if(file_exists($cacheEnumFile))
@@ -108,19 +114,21 @@ class SchemaService extends KalturaBaseService
 					$xsdType = 'string';
 				
 				$xsd = '
-					<xs:simpleType name="' . $class . '">
-						<xs:annotation><xs:documentation>http://' . kConf::get('www_host') . '/api_v3/testmeDoc/index.php?object=' . $class . '</xs:documentation></xs:annotation>
-						<xs:restriction base="xs:' . $xsdType . '">';
+	<xs:simpleType name="' . $class . '">
+		<xs:annotation><xs:documentation>http://' . kConf::get('www_host') . '/api_v3/testmeDoc/index.php?object=' . $class . '</xs:documentation></xs:annotation>
+		<xs:restriction base="xs:' . $xsdType . '">';
 			
 				$contants = $classTypeReflector->getConstants();
 				foreach($contants as $contant)
 				{
-					$xsd .= '<xs:enumeration value="' . $contant->getDefaultValue() . '"><xs:annotation><xs:documentation>' . $contant->getName() . '</xs:documentation></xs:annotation></xs:enumeration>';
+					$xsd .= '
+			<xs:enumeration value="' . $contant->getDefaultValue() . '"><xs:annotation><xs:documentation>' . $contant->getName() . '</xs:documentation></xs:annotation></xs:enumeration>';
 				}
 				
 							
-				$xsd .= '</xs:restriction>
-					</xs:simpleType>
+				$xsd .= '
+		</xs:restriction>
+	</xs:simpleType>
 				';
 				
 				fwrite($xsdFile, $xsd);
