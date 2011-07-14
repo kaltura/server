@@ -2,7 +2,7 @@
 /**
  * @package plugins.contentDistributionBulkUploadXml
  */
-class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
+class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'contentDistributionBulkUploadXml';
 	

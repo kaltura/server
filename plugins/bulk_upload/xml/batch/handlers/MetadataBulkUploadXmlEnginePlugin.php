@@ -2,7 +2,7 @@
 /**
  * @package plugins.metadataBulkUploadXml
  */
-class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
+class MetadataBulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPending, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'metadataBulkUploadXml';
 	
