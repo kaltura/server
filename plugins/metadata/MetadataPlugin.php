@@ -556,7 +556,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
-	public static function contributeToSchema($type, SimpleXMLElement $xsd)
+	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType != SchemaType::SYNDICATION)
