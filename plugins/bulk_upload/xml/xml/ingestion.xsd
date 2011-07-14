@@ -31,8 +31,8 @@
 			<xs:element ref="action" minOccurs="0" maxOccurs="1" />
 			<xs:choice>
 				<xs:sequence>
-					<xs:element name="type" minOccurs="1" maxOccurs="1" type="enum:KalturaEntryType"/>
-					<xs:element name="licenseType" minOccurs="0" maxOccurs="1" type="enum:KalturaLicenseType"/>
+					<xs:element name="type" minOccurs="1" maxOccurs="1" type="KalturaEntryType"/>
+					<xs:element name="licenseType" minOccurs="0" maxOccurs="1" type="KalturaLicenseType"/>
 				</xs:sequence>
 				<xs:sequence>
 					<xs:element name="entryId" minOccurs="1" maxOccurs="1" nillable="false">
@@ -93,7 +93,7 @@
 
 	<xs:complexType name="T_media">
 		<xs:sequence>
-			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="enum:KalturaMediaType"/>
+			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="KalturaMediaType"/>
 			<xs:element ref="playlists" minOccurs="0" maxOccurs="1" >
 				<xs:annotation>
 					<xs:documentation>Used to define the playlists of the media, currently not supported</xs:documentation>
@@ -107,7 +107,7 @@
 
 	<xs:complexType name="T_mix">
 		<xs:sequence>
-			<xs:element name="editorType" minOccurs="1" maxOccurs="1" type="enum:KalturaEditorType"/>
+			<xs:element name="editorType" minOccurs="1" maxOccurs="1" type="KalturaEditorType"/>
 			<xs:element name="dataContent" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
@@ -128,7 +128,7 @@
 
 	<xs:complexType name="T_playlist">
 		<xs:sequence>
-			<xs:element name="playlistType" minOccurs="1" maxOccurs="1" type="enum:KalturaPlaylistType"/>
+			<xs:element name="playlistType" minOccurs="1" maxOccurs="1" type="KalturaPlaylistType"/>
 			<xs:element name="playlistContent" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
@@ -173,7 +173,7 @@
 
 	<xs:complexType name="T_document">
 		<xs:sequence>
-			<xs:element name="documentType" minOccurs="1" maxOccurs="1" type="enum:KalturaDocumentType"/>
+			<xs:element name="documentType" minOccurs="1" maxOccurs="1" type="KalturaDocumentType"/>
 			
 			<xs:element ref="document-extension" minOccurs="0" maxOccurs="unbounded" />
 		
