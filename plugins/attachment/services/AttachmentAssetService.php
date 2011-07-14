@@ -25,7 +25,6 @@ class AttachmentAssetService extends KalturaBaseService
      * @param KalturaAttachmentAsset $attachmentAsset
      * @return KalturaAttachmentAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
-     * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ALREADY_EXISTS
 	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
 	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
 	 * @throws KalturaErrors::RECORDED_WEBCAM_FILE_NOT_FOUND
