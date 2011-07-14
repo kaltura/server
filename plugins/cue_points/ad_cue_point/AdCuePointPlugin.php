@@ -100,8 +100,8 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
 					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1" type="xs:string" />
 					<xs:element name="sourceUrl" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="adType" minOccurs="0" maxOccurs="1" type="enum:KalturaAdType" />
-					<xs:element name="protocolType" minOccurs="0" maxOccurs="1" type="enum:KalturaAdProtocolType" />
+					<xs:element name="adType" minOccurs="0" maxOccurs="1" type="KalturaAdType" />
+					<xs:element name="protocolType" minOccurs="0" maxOccurs="1" type="KalturaAdProtocolType" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
