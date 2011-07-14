@@ -6,30 +6,25 @@
 class KalturaAttachmentAsset extends KalturaAsset  
 {
 	/**
-	/**
 	 * The filename of the attachment asset content
-	 * 
-	 * @var KalturaFilename
+	 * @var string
 	 */
 	public $filename;
 	
 	/**
 	 * Attachment asset title
-	 * 
 	 * @var string
 	 */
 	public $title;
 	
 	/**
 	 * Friendly description
-	 * 
 	 * @var string
 	 */
 	public $description;
 	
 	/**
 	 * The attachment format
-	 * 
 	 * @var KalturaAttachmentType
 	 * @filter eq,in
 	 * @insertonly
