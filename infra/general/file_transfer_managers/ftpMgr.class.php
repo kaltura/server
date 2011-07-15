@@ -139,6 +139,11 @@ class ftpMgr extends kFileTransferMgr
 	{
 		return ftp_nlist($this->getConnection(), $remoteDir);
 	}
+	
+	protected function doFileSize($remote_file)
+	{
+	    return ftp_size($this->getConnection(), $remote_file);
+	}
 
 
 	/*******************/

@@ -101,19 +101,19 @@ class scpMgr extends kFileTransferMgr
     // delete a file and return true/false according to success
     protected function doDelFile ($remote_file)
     {
-            $remote_file = trim($remote_file, '/');
-            $delfile_cmd = 'rm ' . $remote_file;
-            $exec_output = $this->execCommand($delfile_cmd);
-            return (trim($exec_output) == ''); // empty output means the command passed ok
+        $remote_file = trim($remote_file, '/');
+        $delfile_cmd = 'rm ' . $remote_file;
+        $exec_output = $this->execCommand($delfile_cmd);
+        return (trim($exec_output) == ''); // empty output means the command passed ok
     }
 
      // delete a directory and return true/false according to success
     protected function doDelDir ($remote_path)
     {
-            $remote_path = trim($remote_path, '/');
-            $deldir_cmd = 'rm -r ' . $remote_path;
-            $exec_output = $this->execCommand($deldir_cmd);
-            return (trim($exec_output) == ''); // empty output means the command passed ok
+        $remote_path = trim($remote_path, '/');
+        $deldir_cmd = 'rm -r ' . $remote_path;
+        $exec_output = $this->execCommand($deldir_cmd);
+        return (trim($exec_output) == ''); // empty output means the command passed ok
     }
 	
 
@@ -123,8 +123,24 @@ class scpMgr extends kFileTransferMgr
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
         return $exec_output;
-	}	
+	}
 	
+	protected function doFileSize($remote_file)
+	{
+	    $remote_file = trim($remote_file, '/');
+		$exists_cmd = 'du -b ' . $remote_file;
+		$exec_output = $this->execCommand($exists_cmd);
+		$matches = array();
+		$regex = '/(?P<fileSize>\w+)(\s)+('.$remote_file.')/';
+		$match = preg_match($regex, $exec_output, $matches);
+		if ($match && isset($matches['fileSize'])) {
+		    return $matches['fileSize'];
+		}
+		else {
+		    return null;
+		}
+	}
+
 	// execute the given command on the server
 	private function execCommand($command_str)
 	{

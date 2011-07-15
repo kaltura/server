@@ -10,6 +10,7 @@
  */
 class kFileTransferMgrType
 {
+    const UNKNOWN = 0;
 	const FTP  = 1; // FTP Protocol
 	const SCP  = 2; // SCP Protocol
 	const SFTP = 3; // SFTP Protocol
@@ -199,6 +200,17 @@ abstract class kFileTransferMgr
 	 */
 
 	abstract protected function doList ($remote_path);
+	
+	
+	/**
+	 * Should return the size of the given remote file
+	 *
+	 * @param $remote_file
+	 *
+	 * @return int size of file
+	 */
+	abstract protected function doFileSize($remote_file);
+	
 
 
 	/********************/
@@ -638,6 +650,42 @@ abstract class kFileTransferMgr
 		// try to delete directory
 		$res = @($this->doList($remote_path));
 
+		return $res;
+	}
+	
+	/**
+	 * Return size of remote file
+	 *
+	 * @param $remote_file path to remote file or directory
+	 *
+	 * @throws kFileTransferMgrException
+	 *
+	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR	 *
+	 */
+	public function fileSize($remote_file)
+	{
+		$remote_file = trim($remote_file);
+		
+		KalturaLog::debug("Checking for size of file [$remote_file]");
+				
+		// parameter checks
+		if (!$this->connection_id) {
+			throw new kFileTransferMgrException("No connection established yet.", kFileTransferMgrException::notYetConnected);
+		}
+
+		$remote_file = $this->fixPathString($remote_file);
+
+		// check if file exists
+		$res = @($this->doFileSize($remote_file));
+		
+		if(is_null($res) || $res < -1 )
+		{
+			KalturaLog::debug("Cannot find size of [$remote_file]");
+			throw new kFileTransferMgrException("Error finding file size.", kFileTransferMgrException::otherError);
+		}
+		
+		KalturaLog::debug("File size [$res] found for [$remote_file]");
+		
 		return $res;
 	}
 	
