@@ -69,7 +69,7 @@ class KAsyncProvisionDelete extends KBatchBase
 		
 		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, 1);
 	
-		$engine = KProvisionEngine::getInstance( $job->jobSubType , $this->taskConfig );
+		$engine = KProvisionEngine::getInstance( $job->jobSubType , $this->taskConfig, $data);
 		
 		if ( $engine == null )
 		{

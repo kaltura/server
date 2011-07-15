@@ -193,8 +193,25 @@ class kJobsManager
 	
 	public static function addProvisionProvideJob(BatchJob $parentJob = null, entry $entry)
 	{
-		
- 		$jobData = new kProvisionJobData();
+		$subType = $entry->getSource();
+		if ($subType == entry::ENTRY_MEDIA_SOURCE_AKAMAI_LIVE)
+		{
+			$partner = $entry->getPartner();
+			if (!is_null($partner))
+			{
+				$jobData = new kAkamaiProvisionJobData();	
+				$jobData->setWsdlUsername($partner->getAkamaiLiveWsdlUsername());
+				$jobData->setWsdlPassword($partner->getAkamaiLiveWsdlPassword());
+				$jobData->setCpcode($partner->getAkamaiLiveCpcode());
+				$jobData->setEmailId($partner->getAkamaiLiveEmailId());
+				$jobData->setPrimaryContact($partner->getAkamaiLivePrimaryContact());
+				$jobData->setSecondaryContact($partner->getAkamaiLiveSecondaryContact());
+			}
+		}
+		else
+		{
+			$jobData = new kProvisionJobData();
+		}
  		$jobData->setEncoderIP($entry->getEncodingIP1());
  		$jobData->setBackupEncoderIP($entry->getEncodingIP2());
  		$jobData->setEncoderPassword($entry->getStreamPassword());
@@ -213,8 +230,7 @@ class kJobsManager
 			$batchJob->setEntryId($entry->getId());
 			$batchJob->setPartnerId($entry->getPartnerId());
 		}
-		
-		$subType = $entry->getSource();		
+				
 		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_PROVIDE, $subType);
 	}
 

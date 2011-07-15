@@ -59,7 +59,7 @@ class KalturaBatchJobFilter extends KalturaBatchJobBaseFilter
 				break;
 				
 			case KalturaBatchJobType::PROVISION_PROVIDE:
-			case KalturaBatchJobType::PROVISION_DELETE:
+			case KalturaBatchJobType::PROVISION_DELETE:	
 				$data = new KalturaProvisionJobData();
 				break;
 				

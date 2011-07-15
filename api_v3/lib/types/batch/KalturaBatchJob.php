@@ -296,10 +296,14 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 			case 'kFlattenJobData':
 				$this->data = new KalturaFlattenJobData();
 				break;
-				
+			
 			case 'kProvisionJobData':
 				$this->data = new KalturaProvisionJobData();
 				break;
+				
+			case 'kAkamaiProvisionJobData':
+				$this->data = new KalturaAkamaiProvisionJobData();
+				break;				
 				
 			case 'kConvertCollectionJobData':
 				$this->data = new KalturaConvertCollectionJobData();
@@ -428,9 +432,19 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				
 			case KalturaBatchJobType::PROVISION_PROVIDE:
 			case KalturaBatchJobType::PROVISION_DELETE:
-				$dbData = new kProvisionJobData();
-				if(is_null($this->data))
-					$this->data = new KalturaProvisionJobData();
+				$jobSubType = $dbBatchJob->getJobSubType();
+				if  ($jobSubType == KalturaSourceType::AKAMAI_LIVE)
+				{
+					$dbData = new kAkamaiProvisionJobData();
+					if(is_null($this->data))
+						$this->data = new KalturaAkamaiProvisionJobData();
+				}
+				else
+				{
+					$dbData = new kProvisionJobData();
+					if(is_null($this->data))
+						$this->data = new KalturaProvisionJobData();
+				}
 				break;
 				
 			case KalturaBatchJobType::CONVERT_COLLECTION:

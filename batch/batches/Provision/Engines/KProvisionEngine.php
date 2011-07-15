@@ -21,14 +21,14 @@ abstract class KProvisionEngine
 	 * @param KSchedularTaskConfig $taskConfig
 	 * @return KProvisionEngine
 	 */
-	public static function getInstance ( $provider , KSchedularTaskConfig $taskConfig )
+	public static function getInstance ( $provider , KSchedularTaskConfig $taskConfig , $data = null)
 	{
 		$engine =  null;
 		
 		switch ($provider )
 		{
 			case KalturaSourceType::AKAMAI_LIVE:
-				$engine = new KProvisionEngineAkamai( $taskConfig );
+				$engine = new KProvisionEngineAkamai( $taskConfig , $data);
 				break;
 			
 			default:

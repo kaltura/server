@@ -23,12 +23,28 @@ class KProvisionEngineAkamai extends KProvisionEngine
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig )
+	protected function __construct( KSchedularTaskConfig $taskConfig , $data = null)
 	{
 		parent::__construct($taskConfig);
 		
-		$username = $this->taskConfig->params->wsdlUsername;
-		$password = $this->taskConfig->params->wsdlPassword;
+		$username = null;
+		$password = null;
+		
+		if (!is_null($data) && $data instanceof KalturaAkamaiProvisionJobData)
+		{
+			//all fields are set and are not empty string
+			if ($data->wsdlUsername && $data->wsdlPassword && $data->cpcode && $data->emailId && $data->primaryContact)
+			{
+				$username = $data->wsdlUsername;
+				$password = $data->wsdlPassword;
+			}
+		}
+		//if one of the params was not set, use the taskConfig data	
+		if (!$username || !$password )
+		{
+			$username = $this->taskConfig->params->wsdlUsername;
+			$password = $this->taskConfig->params->wsdlPassword;
+		}
 		
 		KalturaLog::debug("Connecting to Akamai(username: $username, password: $password)");
 		$this->streamClient = new AkamaiStreamsClient($username, $password);
@@ -39,11 +55,24 @@ class KProvisionEngineAkamai extends KProvisionEngine
 	 */
 	public function provide( KalturaBatchJob $job, KalturaProvisionJobData $data )
 	{
-		
-		$cpcode = $this->taskConfig->params->cpcode;
-		$emailId = $this->taskConfig->params->emailId;
-		$primaryContact = $this->taskConfig->params->primaryContact;
-		$secondaryContact = $this->taskConfig->params->secondaryContact;
+		if ($data instanceof KalturaAkamaiProvisionJobData)
+		{
+			if ($data->wsdlUsername && $data->wsdlPassword)
+			{
+				$cpcode = $data->cpcode;
+				$emailId = $data->emailId;
+				$primaryContact = $data->primaryContact;
+				$secondaryContact = $data->secondaryContact ? $data->secondaryContact : $data->primaryContact;
+			}
+		}
+		//if one of the params was not set, use the taskConfig data		
+		if (!$cpcode || !$emailId || !$primaryContact || !$secondaryContact)
+		{
+			$cpcode = $this->taskConfig->params->cpcode;
+			$emailId = $this->taskConfig->params->emailId;
+			$primaryContact = $this->taskConfig->params->primaryContact;
+			$secondaryContact = $this->taskConfig->params->secondaryContact;
+		}
 		
 		$name = $job->entryId;
 		$encoderIP = $data->encoderIP;

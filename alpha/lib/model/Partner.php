@@ -657,7 +657,25 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidthOveragePrice()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_price');}
 	public function getEndUsersOveragePrice()			{return $this->getFromCustomData('end_users_overage_price');}
 	
-		
+
+	//Akamai live params
+	//getters
+	public function getAkamaiLiveWsdlUsername()				{return $this->getFromCustomData('akamai_live_wsdl_user_name');}
+	public function getAkamaiLiveWsdlPassword()				{return $this->getFromCustomData('akamai_live_wsdl_password');}
+	public function getAkamaiLiveCpcode()					{return $this->getFromCustomData('akamai_live_cp_code');}	
+	public function getAkamaiLiveEmailId()					{return $this->getFromCustomData('akamai_live_email_id');}
+	public function getAkamaiLivePrimaryContact()			{return $this->getFromCustomData('akamai_live_primary_contact');}
+	public function getAkamaiLiveSecondaryContact()			{return $this->getFromCustomData('akamai_live_secondary_contact');}
+	
+	//setters
+	public function setAkamaiLiveWsdlUsername($v)			{$this->putInCustomData('akamai_live_wsdl_user_name', $v);}
+	public function setAkamaiLiveWsdlPassword($v)			{$this->putInCustomData('akamai_live_wsdl_password', $v);}
+	public function setAkamaiLiveCpcode($v)					{$this->putInCustomData('akamai_live_cp_code', $v);}	
+	public function setAkamaiLiveEmailId($v)				{$this->putInCustomData('akamai_live_email_id', $v);}
+	public function setAkamaiLivePrimaryContact($v)			{$this->putInCustomData('akamai_live_primary_contact', $v);}
+	public function setAkamaiLiveSecondaryContact($v)		{$this->putInCustomData('akamai_live_secondary_contact', $v);}
+	
+	
 	public function getAdminLoginUsersNumber()
 	{
 		$c = new Criteria();
