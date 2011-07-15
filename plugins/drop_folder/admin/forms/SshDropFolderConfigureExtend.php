@@ -30,11 +30,6 @@ abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolder
 		
 		$this->addElement('file', 'sshPrivateKey', array(
 			'label' => 'SFTP Private Key:'
-		));		
-		
-		$this->addElement('text', 'remoteFolderPath', array(
-			'label'			=> 'Remote Path:',
-			'filters'		=> array('StringTrim'),
 		));
 	}
 	

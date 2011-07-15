@@ -28,11 +28,6 @@ class Form_FtpDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigure
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
 		));
-		
-		$this->addElement('text', 'remoteFolderPath', array(
-			'label'			=> 'Remote Path:',
-			'filters'		=> array('StringTrim'),
-		));
 	}
 	
 }
