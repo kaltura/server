@@ -137,7 +137,16 @@ class ftpMgr extends kFileTransferMgr
 
 	protected function doList ($remoteDir)
 	{
-		return ftp_nlist($this->getConnection(), $remoteDir);
+		$tempList = ftp_nlist($this->getConnection(), $remoteDir);
+		$fileList = array();
+		foreach ($tempList as $tempFile)
+		{
+		    $tempFile = trim($tempFile, '/');
+		    $remoteDir = trim($remoteDir, '/');
+		    $fileName = preg_replace('/^'.$remoteDir.'/', '', $tempFile);
+		    $fileList[] = ltrim($fileName, '/');
+		}
+		return $fileList;		
 	}
 	
 	protected function doFileSize($remote_file)
