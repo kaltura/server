@@ -647,7 +647,7 @@ abstract class kFileTransferMgr
 
 		$remote_path = $this->fixPathString($remote_path);
 
-		// try to delete directory
+		// list files in directory
 		$res = @($this->doList($remote_path));
 
 		return $res;
