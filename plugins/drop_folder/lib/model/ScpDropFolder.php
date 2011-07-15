@@ -17,6 +17,6 @@ class ScpDropFolder extends SshDropFolder
 	        $url .= '@';
 	    }
 	    $url .= $this->getSshHost();
-	    $url .= '/'.$this->getSshFolderPath();
+	    $url .= '/'.$this->getPath();
 	}
 }

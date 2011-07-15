@@ -26,18 +26,12 @@ class KalturaFtpDropFolder extends KalturaDropFolder
 	 */
 	public $password;
 	
-	/**
-	 * @var string
-	 */
-	public $remoteFolderPath;
-	
 	
 	private static $map_between_objects = array(
 		'host' => 'ftpHost',
     	'port' => 'ftpPort',
     	'username' => 'ftpUsername',
     	'password' => 'ftpPassword',
-        'remoteFolderPath' => ' ftpFolderPath', 
 	 );
 		 
 	public function getMapBetweenObjects()

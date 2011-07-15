@@ -15,7 +15,6 @@ class FtpDropFolder extends DropFolder
     const CUSTOM_DATA_FTP_PORT = 'ftp_port';
     const CUSTOM_DATA_FTP_USERNAME = 'ftp_username';
     const CUSTOM_DATA_FTP_PASSWORD = 'ftp_password';
-    const CUSTOM_DATA_FTP_FOLDER_PATH = 'ftp_folder_path';
     
 	/**
 	 * @return string
@@ -81,22 +80,6 @@ class FtpDropFolder extends DropFolder
 		$this->putInCustomData(self::CUSTOM_DATA_FTP_PASSWORD, $ftpPassword);
 	}
 	
-	/**
-	 * @return string
-	 */
-	public function getFtpFolderPath()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FTP_FOLDER_PATH);
-	}
-	
-	/**
-	 * @param string $ftpFolderPath
-	 */
-	public function setFtpFolderPath($ftpFolderPath)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_FTP_FOLDER_PATH, $ftpFolderPath);
-	}
-	
 	public function getFolderUrl()
 	{
 	    $url = 'ftp://';
@@ -108,7 +91,7 @@ class FtpDropFolder extends DropFolder
 	        $url .= '@';
 	    }
 	    $url .= $this->getFtpHost();
-	    $url .= '/'.$this->getFtpFolderPath();
+	    $url .= '/'.$this->getPath();
 	}
     
 }
