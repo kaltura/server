@@ -14,6 +14,11 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 */
 	protected $dropFolderPlugin = null;
 	
+	/**
+	 * @var kFileTransferMgr
+	 */
+	private $fileTransferMgr = null;
+	
 	public static function getType()
 	{
 		return KalturaBatchJobType::DROP_FOLDER_WATCHER;
@@ -91,6 +96,15 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	{
 		KalturaLog::debug('Watching folder ['.$folder->id.']');
 		
+		// if remote folder -> login to server and set fileTransferManager
+		try {
+		    $this->fileTransferMgr = DropFolderBatchUtils::getFileTransferManager($folder);
+		}
+	    catch (Exception $e) {
+			KalturaLog::err('Cannot initialize file transfer manager for folder ['.$folder->id.'] - '.$e->getMessage());
+			return; // skipping to next folder
+		}
+		
 		// get list of DropFolderFile objects from the current $folder
 		$dropFolderFiles = null;
 		$deletedDropFolderFiles = null;
@@ -106,7 +120,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		// get a list of physical files from the folder's path
 		$physicalFiles = null;
 		try {
-			$physicalFiles = self::getPhysicalFileList($folder);
+			$physicalFiles = $this->getPhysicalFileList($folder);
 		}
 		catch (Exception $e) {
 			$physicalFiles = null;
@@ -165,25 +179,27 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			}
 			
 			// translate file name to path+name on the shared location
-			$sharedPhysicalFilePath = self::getRealPath($folder->path, $physicalFileName);
+			$fullPath = $folder->path.'/'.$physicalFileName;
 			
 			// skip non-accessible files
-			if (!$sharedPhysicalFilePath || !file_exists($sharedPhysicalFilePath))
+			if (!$fullPath || !$this->fileTransferMgr->fileExists($fullPath))
 			{
-				KalturaLog::err("Cannot access physical file in path [$sharedPhysicalFilePath]");
+				KalturaLog::err("Cannot access physical file in path [$fullPath]");
 				continue;
 			}
 			
 			// skip directories
-			if (is_dir($sharedPhysicalFilePath)) {
-				KalturaLog::log("Path [$physicalFileName] is a directory - skipped");
+			/*
+			if (is_dir($fullPath)) {
+				KalturaLog::log("Path [$fullPath] is a directory - skipped");
 				continue;
 			}
+			*/
 
 			// purge file marked as deleted
 			if (array_key_exists($physicalFileName, $deletedDropFolderFileMapByName))
 			{
-				$this->purgeFile($deletedDropFolderFileMapByName[$physicalFileName], $sharedPhysicalFilePath);
+				$this->purgeFile($deletedDropFolderFileMapByName[$physicalFileName], $fullPath);
 				continue;
 			}
 			
@@ -191,7 +207,8 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			if (!array_key_exists($physicalFileName, $dropFolderFileMapByName))
 			{
 				// new physical file found in folder - add new drop folder file object with status UPLOADING
-				$this->addNewDropFolderFile($folder->id, $physicalFileName, filesize($sharedPhysicalFilePath));	
+				$filesize = $this->fileTransferMgr->fileSize($fullPath);
+				$this->addNewDropFolderFile($folder->id, $physicalFileName, $filesize);	
 			}
 			else
 			{
@@ -199,11 +216,11 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				$currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
 				if ($currentDropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
 				{
-					$this->updateDropFolderFile($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
+					$this->updateDropFolderFile($folder, $currentDropFolderFile, $fullPath);
 				}
 				else if	($currentDropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
 				{
-					$this->purgeHandledFileIfNeeded($folder, $currentDropFolderFile, $sharedPhysicalFilePath);
+					$this->purgeHandledFileIfNeeded($folder, $currentDropFolderFile, $fullPath);
 				}
 			}
 		}
@@ -235,21 +252,18 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolder $folder
 	 * @return array of file names in the given $folder's path
 	 */
-	private static function getPhysicalFileList(KalturaDropFolder $folder)
-	{
-		$fileList = @scandir($folder->path, 0);
-		return $fileList;
+	private function getPhysicalFileList(KalturaDropFolder $folder)
+	{	    
+	   return $this->fileTransferMgr->listDir($folder->path);
 	}
 	
 	/**
 	 * @param string $filePath
 	 * @return int file size of the given $filePath
 	 */
-	private static function getFileSize($filePath)
+	private function getFileSize($filePath)
 	{
-		clearstatcache();
-		$fileSize = @filesize($filePath);
-		return $fileSize;
+	    return $this->fileTransferMgr->fileSize($filePath);
 	}
 	
 	/**
@@ -284,7 +298,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 */
 	private function updateDropFolderFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
 	{
-		$physicalFileSize = self::getFileSize($sharedPhysicalFilePath);
+		$physicalFileSize = $this->getFileSize($sharedPhysicalFilePath);
 		
 		if (!$physicalFileSize) {
 			$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, "Cannot get file size for path [$sharedPhysicalFilePath]");
@@ -371,12 +385,12 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolderFile $dropFolderFile
 	 * @param string $sharedPhysicalFilePath
 	 */
-	private function purgeFile(KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
+	private function purgeFile(KalturaDropFolderFile $dropFolderFile, $physicalFilePath)
 	{
 		// physicaly delete the file
-		$delResult = @unlink($sharedPhysicalFilePath);
+		$delResult = $this->fileTransferMgr->delFile($physicalFilePath);
 		if (!$delResult) {
-			KalturaLog::err("Cannot delete physical file at path [$sharedPhysicalFilePath]");
+			KalturaLog::err("Cannot delete physical file at path [$physicalFilePath]");
 			try {
 				$updateDropFolderFile = new KalturaDropFolderFile();
 				$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_DELETING;
