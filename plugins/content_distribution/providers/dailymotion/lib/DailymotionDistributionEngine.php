@@ -81,7 +81,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$props['title'] = $entry->name;
 		$props['channel'] = $this->getCategory($metadataObjects);
 		$props['description'] = $description;
-		$props['date'] = time();
+		//$props['date'] = time();
 		$props['language'] = 'en';
 		$props['published']= true;
 		
