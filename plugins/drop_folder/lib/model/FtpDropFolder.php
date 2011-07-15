@@ -96,18 +96,19 @@ class FtpDropFolder extends DropFolder
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FTP_FOLDER_PATH, $ftpFolderPath);
 	}
-    
-    
-    // ------------------------------------------
-	// -- File Transfer Manager -----------------
-	// ------------------------------------------
-    
-    /**
-	 * @return kFileTransferMgr
-	 */
-	public function getFileTransferManager()
+	
+	public function getFolderUrl()
 	{
-	    return kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+	    $url = 'ftp://';
+	    if ($this->getFtpUsername()) {
+	        $url .= $this->getFtpUsername();
+	        if ($this->getFtpPassword()) {
+	            $url .= ':'.$this->getFtpPassword();
+	        }
+	        $url .= '@';
+	    }
+	    $url .= $this->getFtpHost();
+	    $url .= '/'.$this->getFtpFolderPath();
 	}
     
 }

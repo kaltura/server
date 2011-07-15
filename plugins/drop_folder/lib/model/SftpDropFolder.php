@@ -7,16 +7,18 @@
 class SftpDropFolder extends SshDropFolder
 {
     
-    // ------------------------------------------
-	// -- File Transfer Manager -----------------
-	// ------------------------------------------
-    
-    /**
-	 * @return kFileTransferMgr
-	 */
-	public function getFileTransferManager()
+	public function getFolderUrl()
 	{
-	    return kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+	    $url = 'sftp://';
+	    if ($this->getSshUsername()) {
+	        $url .= $this->getSshUsername();
+	        if ($this->getSshPassword()) {
+	            $url .= ':'.$this->getSshPassword();
+	        }
+	        $url .= '@';
+	    }
+	    $url .= $this->getSshHost();
+	    $url .= '/'.$this->getSshFolderPath();
 	}
-    
+        
 }
