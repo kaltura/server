@@ -31,6 +31,7 @@ class TVComDistributionProfile extends ConfigurableDistributionProfile
 	protected $inListOrNullValidation = array (
 		TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE => array('clip', 'full', 'interview'),
 		TVComDistributionField::MEDIA_RESTRICTION_TYPE => array('allow', 'deny'),
+		TVComDistributionField::MEDIA_RATING => array('adult', 'nonadult'),
 	);
 	
 	/* (non-PHPdoc)

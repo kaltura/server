@@ -39,6 +39,7 @@ class TVComService extends KalturaBaseService
 		$distributionAdvancedSearch->setDistributionSunStatus(EntryDistributionSunStatus::AFTER_SUNRISE);
 		$distributionAdvancedSearch->setEntryDistributionStatus(EntryDistributionStatus::READY);
 		$distributionAdvancedSearch->setEntryDistributionFlag(EntryDistributionDirtyStatus::NONE);
+		$distributionAdvancedSearch->setHasEntryDistributionValidationErrors(false);
 			
 		//Creates entry filter with advanced filter
 		$entryFilter = new entryFilter();
