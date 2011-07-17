@@ -393,7 +393,13 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$crit = $c->getNewCriterion(BatchJobPeer::ROOT_JOB_ID, $this->id);
 		$crit->addOr($c->getNewCriterion(BatchJobPeer::PARENT_JOB_ID, $this->id));
 		$c->addAnd($crit);
-		return BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+		
+		// remove partner id filter in order to force an optimized query. Otherwise mysql may use the partner id key which is
+		// far from optimal for this direct query using ROOT_JOB_ID and PARENT_JOB_ID keys.
+		BatchJobPeer::setUseCriteriaFilter(false);
+		$result = BatchJobPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2) );
+		BatchJobPeer::setUseCriteriaFilter(true);
+		return $result;
 	}
 	
 	public function getDirectChildJobs()
