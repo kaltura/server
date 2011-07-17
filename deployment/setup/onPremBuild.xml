@@ -257,6 +257,23 @@
 
          <copy file="/opt/kaltura/app/configurations/apache/my_kaltura.conf.1" tofile="/opt/kaltura/app/configurations/apache/my_kaltura.conf" overwrite="true"/>
     </target>
+    
+    
+    <!-- ============================================  -->
+    <!-- Target: check for sphinx log dir              -->
+    <!-- ============================================  -->
+    <target name="sphinxLogDir">
+         <property name="properties.sphinxdir"  value="null" override="false" />
+         <available file="/usr/local/var/data" type="dir" property="properties.sphinxdir" />
+
+         <if>
+              <equals arg1="${properties.unins}" arg2="false" />
+         <then>
+              <echo msg="creating sphinx log dir..." />
+              <exec command="mkdir -p /usr/local/var/data" dir="/" />
+         </then>
+         </if>
+    </target>
 
 
     <!-- ============================================  -->
@@ -270,11 +287,10 @@
     </target>
 
 
-
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit,sphinxLogDir">
          <echo msg="Done" />
     </target>
 
