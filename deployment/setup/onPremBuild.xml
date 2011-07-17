@@ -165,7 +165,7 @@
               <filterchain>
                    <replaceregexp>
                         <regexp pattern="127.0.0.1" replace="xxxchangexxx127.0.0.1"/>
-                        <regexp pattern="127.0.0.1(.+)" replace="\1 hudsontest1.kaltura.dev"/>
+                        <regexp pattern="127.0.0.1(.+)" replace="\1 ${server}"/>
                         <regexp pattern="xxxchangexxx" replace="127.0.0.1"/>
                    </replaceregexp>
               </filterchain>
