@@ -43,14 +43,5 @@ class DropFolderFile extends BaseDropFolderFile
 		return null;
 	}
 	
-	public function setHandleBatchJobId($id)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_HANDLE_BATCH_JOB_ID, $id);
-	}
-	
-	public function getHandleBatchJobId()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_HANDLE_BATCH_JOB_ID);
-	}
 		
 } // DropFolderFile
