@@ -140,7 +140,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const UR = 'Urdu';
 	const UZ = 'Uzbek';
 	const VI = 'Vietnamese';
-	const VO = 'Volap?k';
+	const VO = 'Volapuk';
 	const CY = 'Welsh';
 	const WO = 'Wolof';
 	const XH = 'Xhosa';
