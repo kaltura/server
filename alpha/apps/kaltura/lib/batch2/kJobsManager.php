@@ -209,15 +209,7 @@ class kJobsManager
 					$jobData->setEmailId($akamaiLiveParams->akamaiLiveEmailId);
 					$jobData->setPrimaryContact($akamaiLiveParams->akamaiLivePrimaryContact);
 					$jobData->setSecondaryContact($akamaiLiveParams->akamaiLiveSecondaryContact);		
-				}
-				/*
-				$jobData->setWsdlUsername($partner->getAkamaiLiveWsdlUsername());
-				$jobData->setWsdlPassword($partner->getAkamaiLiveWsdlPassword());
-				$jobData->setCpcode($partner->getAkamaiLiveCpcode());
-				$jobData->setEmailId($partner->getAkamaiLiveEmailId());
-				$jobData->setPrimaryContact($partner->getAkamaiLivePrimaryContact());
-				$jobData->setSecondaryContact($partner->getAkamaiLiveSecondaryContact());	
-				*/			
+				}		
 			}
 		}
 		else
@@ -715,12 +707,14 @@ class kJobsManager
 		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $jobSubType);
 	}
 	
-	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null)
+	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null)
 	{
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)):\//', '$1://', $entryUrl);
 		
- 		$jobData = new kImportJobData();
+		if (!$jobData) {
+ 		    $jobData = new kImportJobData();
+		}
  		$jobData->setSrcFileUrl($entryUrl);
  		
  		if($asset)
@@ -760,7 +754,7 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT);
+		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
 	}
 	
 	public static function addBulkDownloadJob($partnerId, $puserId, $entryIds, $flavorParamsId)
