@@ -70,6 +70,13 @@ class playManifestAction extends kalturaAction
 		$durationXml = ($duration ? "<duration>$duration</duration>" : '');
 		$baseUrlXml = ($baseUrl ? "<baseURL>$baseUrl</baseURL>" : '');
 		$flvaorsXml = '';
+		
+		$deliveryCodeStr = '';
+		if ($streamType == self::PLAY_STREAM_TYPE_LIVE && $this->deliveryCode)
+		{
+			$deliveryCodeStr = '?deliveryCode='.$this->deliveryCode;
+		}
+		
 		foreach($flavors as $flavor)
 		{
 			$url = $flavor['url'];
@@ -77,9 +84,11 @@ class playManifestAction extends kalturaAction
 			$width		= isset($flavor['width'])	? $flavor['width']		: 0;
 			$height		= isset($flavor['height'])	? $flavor['height']		: 0;
 			
+						
 			$url = htmlspecialchars($url);
+			$url .= $deliveryCodeStr;
 			$flvaorsXml .= "<media url=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"/>";
-		}
+		}		
 		
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 				<manifest xmlns=\"http://ns.adobe.com/f4m/1.0\">
