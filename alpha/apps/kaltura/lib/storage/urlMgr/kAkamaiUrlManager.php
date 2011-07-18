@@ -257,7 +257,10 @@ class kAkamaiUrlManager extends kUrlManager
 	 */
 	public function identifyRequest()
 	{
-		$delivery = @$_SERVER['HTTP_HOST'];
+		// if the request is proxied get the HOST from the HTTP_X_FORWARDED_HOST header
+		$delivery = @$_SERVER['HTTP_X_FORWARDED_HOST'];
+		if (!$delivery)
+	        $delivery = @$_SERVER['HTTP_HOST'];		
 		if ($delivery != @$this->params["http_header_host"])
 			return false;
 		
