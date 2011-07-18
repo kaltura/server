@@ -142,12 +142,29 @@
          <echo msg="upgrading Mysql..." />
          <exec command="mysql_upgrade" dir="${installationLoc}" />
     </target>
+    
+    
+    <!-- ============================================  -->
+    <!-- Target: check for sphinx log dir              -->
+    <!-- ============================================  -->
+    <target name="sphinxLogDir">
+         <property name="properties.sphinxdir"  value="null" override="false" />
+         <available file="/usr/local/var/data" type="dir" property="properties.sphinxdir" />
+
+         <if>
+              <equals arg1="${properties.unins}" arg2="false" />
+         <then>
+              <echo msg="creating sphinx log dir..." />
+              <exec command="mkdir -p /usr/local/var/data" dir="/" />
+         </then>
+         </if>
+    </target>
 
 
     <!-- ============================================  -->
     <!-- Target: Installation                          -->
     <!-- ============================================  -->
-    <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade">
+    <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade,sphinxLogDir">
          <echo msg="install..." />
          <exec command="php install.php -s;" dir="${installationLoc}${installationDir}" />
          <echo msg="Done" />
@@ -258,24 +275,6 @@
          <copy file="/opt/kaltura/app/configurations/apache/my_kaltura.conf.1" tofile="/opt/kaltura/app/configurations/apache/my_kaltura.conf" overwrite="true"/>
     </target>
     
-    
-    <!-- ============================================  -->
-    <!-- Target: check for sphinx log dir              -->
-    <!-- ============================================  -->
-    <target name="sphinxLogDir">
-         <property name="properties.sphinxdir"  value="null" override="false" />
-         <available file="/usr/local/var/data" type="dir" property="properties.sphinxdir" />
-
-         <if>
-              <equals arg1="${properties.unins}" arg2="false" />
-         <then>
-              <echo msg="creating sphinx log dir..." />
-              <exec command="mkdir -p /usr/local/var/data" dir="/" />
-         </then>
-         </if>
-    </target>
-
-
     <!-- ============================================  -->
     <!-- Target: unit tests (not running)              -->
     <!-- ============================================  -->
@@ -290,7 +289,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit,sphinxLogDir">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
          <echo msg="Done" />
     </target>
 
