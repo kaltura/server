@@ -16,8 +16,7 @@ class KalturaCaptionAsset extends KalturaAsset
 	/**
 	 * The language of the caption asset content
 	 * 
-	 * @var KalturaLanguage
-	 * @insertonly
+	 * @var string
 	 */
 	public $language;
 	
