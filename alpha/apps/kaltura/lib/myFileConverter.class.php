@@ -158,16 +158,17 @@ class myFileConverter
 			
 		$temp_flv = null;
 		
-		if ($frame_count == 1 && $position > 10 && pathinfo($source_file, PATHINFO_EXTENSION) == "flv") 
-		{
-			$timestamp = $position * 1000;
-			$temp_flv = myContentStorage::getFSUploadsPath()."capture_".microtime(true).rand().".flv";
-			$first_timestamp = myFlvStaticHandler::clipToNewFile($source_file, $temp_flv, $timestamp, $timestamp + 1);
-			$source_file = $temp_flv;
-			$position = floor(($timestamp -  $first_timestamp) / 1000);
-			if ($position < 0)
-				$position = 0;
-		}
+//		***remove if statement because myFlvStaticHandler::clipToNewFile is not making a valid flv
+//		if ($frame_count == 1 && $position > 10 && pathinfo($source_file, PATHINFO_EXTENSION) == "flv") 
+//		{
+//			$timestamp = $position * 1000;
+//			$temp_flv = myContentStorage::getFSUploadsPath()."capture_".microtime(true).rand().".flv";
+//			$first_timestamp = myFlvStaticHandler::clipToNewFile($source_file, $temp_flv, $timestamp, $timestamp + 1);
+//			$source_file = $temp_flv;
+//			$position = floor(($timestamp -  $first_timestamp) / 1000);
+//			if ($position < 0)
+//				$position = 0;
+//		}
 		
 		//$duration = 0.01;
 
