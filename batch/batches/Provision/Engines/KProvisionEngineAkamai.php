@@ -55,6 +55,11 @@ class KProvisionEngineAkamai extends KProvisionEngine
 	 */
 	public function provide( KalturaBatchJob $job, KalturaProvisionJobData $data )
 	{
+		$cpcode = null;
+		$emailId = null;
+		$primaryContact = null;
+		$secondaryContact = null;
+		
 		if ($data instanceof KalturaAkamaiProvisionJobData)
 		{
 			if ($data->wsdlUsername && $data->wsdlPassword)

@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../bootstrap.php');
 
 
 /*partner Id*/
-$partnerId = null;
+$partnerId = '100';//null;
 
 /*partner's akamai live params*/
 $akamaiLiveWsdlUsername = null;
@@ -13,6 +13,7 @@ $akamaiLiveCpCode = null;
 $akamaiLiveEmailId = null;
 $akamaiLivePrimaryContact = null;
 $akamaiLiveSecondaryContact = null;
+
 
 // don't add to database if one of the parameters is missing or is an empty string
 if (!($partnerId) || !($akamaiLiveWsdlUsername) || !($akamaiLiveWsdlPassword) || !($akamaiLiveCpCode)
@@ -28,12 +29,14 @@ if(!$partner)
     die("No such partner with id [$partnerId].".PHP_EOL);
 }
 //setting custom data fields of the partner
-$partner->setAkamaiLiveCpcode($akamaiLiveCpCode);
-$partner->setAkamaiLiveEmailId($akamaiLiveEmailId);
-$partner->setAkamaiLivePrimaryContact($akamaiLivePrimaryContact);
-$partner->setAkamaiLiveSecondaryContact($akamaiLiveSecondaryContact);
-$partner->setAkamaiLiveWsdlPassword($akamaiLiveWsdlPassword);
-$partner->setAkamaiLiveWsdlUsername($akamaiLiveWsdlUsername);
+$akamaiLiveParams = new akamaiLiveParams();
+$akamaiLiveParams->akamaiLiveWsdlUsername = $akamaiLiveWsdlUsername;
+$akamaiLiveParams->akamaiLiveWsdlPassword = $akamaiLiveWsdlPassword;
+$akamaiLiveParams->akamaiLiveCpcode = $akamaiLiveCpCode;
+$akamaiLiveParams->akamaiLiveEmailId = $akamaiLiveEmailId;
+$akamaiLiveParams->akamaiLivePrimaryContact = $akamaiLivePrimaryContact;
+$akamaiLiveParams->akamaiLiveSecondaryContact = $akamaiLiveSecondaryContact;
+$partner->setAkamaiLiveParams($akamaiLiveParams);
 $partner->save();	
 
 echo "Done.";

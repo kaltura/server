@@ -199,13 +199,25 @@ class kJobsManager
 			$partner = $entry->getPartner();
 			if (!is_null($partner))
 			{
-				$jobData = new kAkamaiProvisionJobData();	
+				$jobData = new kAkamaiProvisionJobData();
+				$akamaiLiveParams = $partner->getAkamaiLiveParams();
+				if ($akamaiLiveParams)
+				{
+					$jobData->setWsdlUsername($akamaiLiveParams->akamaiLiveWsdlUsername);
+					$jobData->setWsdlPassword($akamaiLiveParams->akamaiLiveWsdlPassword);
+					$jobData->setCpcode($akamaiLiveParams->akamaiLiveCpcode);
+					$jobData->setEmailId($akamaiLiveParams->akamaiLiveEmailId);
+					$jobData->setPrimaryContact($akamaiLiveParams->akamaiLivePrimaryContact);
+					$jobData->setSecondaryContact($akamaiLiveParams->akamaiLiveSecondaryContact);		
+				}
+				/*
 				$jobData->setWsdlUsername($partner->getAkamaiLiveWsdlUsername());
 				$jobData->setWsdlPassword($partner->getAkamaiLiveWsdlPassword());
 				$jobData->setCpcode($partner->getAkamaiLiveCpcode());
 				$jobData->setEmailId($partner->getAkamaiLiveEmailId());
 				$jobData->setPrimaryContact($partner->getAkamaiLivePrimaryContact());
-				$jobData->setSecondaryContact($partner->getAkamaiLiveSecondaryContact());
+				$jobData->setSecondaryContact($partner->getAkamaiLiveSecondaryContact());	
+				*/			
 			}
 		}
 		else
