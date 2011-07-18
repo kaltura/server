@@ -316,8 +316,14 @@ class playManifestAction extends kalturaAction
 		$urlManager->setDomain($this->cdnHost);
 		$urlManager->setProtocol($this->format);
 
-	    $url = $urlManager->getFlavorAssetUrl($flavorAsset);		
-
+	    $url = $urlManager->getFlavorAssetUrl($flavorAsset);
+	    		
+		if ($this->format == StorageProfile::PLAY_FORMAT_RTSP)
+		{
+			echo '<html><head><meta http-equiv="refresh" content="0;url='.$url.'"></head></html>';
+			die;			
+		}
+		
 		if (strpos($url, "/") === 0)
 			$url = $this->cdnHost . $url;
 			
@@ -806,6 +812,10 @@ class playManifestAction extends kalturaAction
 				$this->format = "http"; // build url for an http delivery
 				return $this->serveUrl();
 				break;
+				
+			case "rtsp":
+				return $this->serveUrl();
+				break;				
 				
 			case "hdnetworksmil":
 				$xml = $this->serveHDNetwork();
