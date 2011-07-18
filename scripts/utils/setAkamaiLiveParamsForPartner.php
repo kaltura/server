@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../bootstrap.php');
 
 
 /*partner Id*/
-$partnerId = '100';//null;
+$partnerId = null;
 
 /*partner's akamai live params*/
 $akamaiLiveWsdlUsername = null;
