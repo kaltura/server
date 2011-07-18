@@ -38,6 +38,11 @@ class KalturaSshDropFolder extends KalturaDropFolder
 	 */
 	public $publicKey;
 	
+	/**
+	 * @var string
+	 */
+	public $passPhrase;
+	
 	
 	private static $map_between_objects = array(
 		'host' => 'sshHost',
@@ -46,6 +51,7 @@ class KalturaSshDropFolder extends KalturaDropFolder
     	'password' => 'sshPassword',
     	'privateKey' => 'sshPrivateKey',
     	'publicKey' => 'sshPublicKey',
+		'passPhrase' => 'sshPassPhrase',
 	 );
 		 
 	public function getMapBetweenObjects()

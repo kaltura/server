@@ -16,6 +16,7 @@ abstract class SshDropFolder extends DropFolder
     const CUSTOM_DATA_SSH_PASSWORD = 'ssh_password';
     const CUSTOM_DATA_SSH_PRIVATE_KEY = 'ssh_private_key';
     const CUSTOM_DATA_SSH_PUBLIC_KEY = 'ssh_public_key';
+    const CUSTOM_DATA_SSH_PASS_PHRASE = 'ssh_pass_phrase';
     
 	/**
 	 * @return string
@@ -112,5 +113,22 @@ abstract class SshDropFolder extends DropFolder
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_SSH_PUBLIC_KEY, $sshPublicKey);
 	}
+	
+	/**
+	 * @return string
+	 */
+	public function geteSshPassPhras()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SSH_PASS_PHRASE);
+	}
+	
+	/**
+	 * @param string $sshPublicKey
+	 */
+	public function setSshPassPhras($sshSshPassPhras)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SSH_PASS_PHRASE, $sshSshPassPhras);
+	}
+	
     
 }
