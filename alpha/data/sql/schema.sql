@@ -1129,6 +1129,7 @@ CREATE TABLE `ui_conf`
 	`display_in_search` TINYINT,
 	`creation_mode` TINYINT,
 	`version` VARCHAR(10),
+	`html5_url` VARCHAR(256),
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `partner_id_creation_mode_index`(`partner_id`, `creation_mode`)

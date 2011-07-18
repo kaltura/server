@@ -26,7 +26,7 @@ abstract class BaseuiConfPeer {
 	const TM_CLASS = 'uiConfTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 21;
+	const NUM_COLUMNS = 22;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -94,6 +94,9 @@ abstract class BaseuiConfPeer {
 	/** the column name for the VERSION field */
 	const VERSION = 'ui_conf.VERSION';
 
+	/** the column name for the HTML5_URL field */
+	const HTML5_URL = 'ui_conf.HTML5_URL';
+
 	/**
 	 * An identiy map to hold any loaded instances of uiConf objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -110,11 +113,11 @@ abstract class BaseuiConfPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'ObjType', 'PartnerId', 'SubpId', 'ConfFilePath', 'Name', 'Width', 'Height', 'HtmlParams', 'SwfUrl', 'CreatedAt', 'UpdatedAt', 'ConfVars', 'UseCdn', 'Tags', 'CustomData', 'Status', 'Description', 'DisplayInSearch', 'CreationMode', 'Version', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'objType', 'partnerId', 'subpId', 'confFilePath', 'name', 'width', 'height', 'htmlParams', 'swfUrl', 'createdAt', 'updatedAt', 'confVars', 'useCdn', 'tags', 'customData', 'status', 'description', 'displayInSearch', 'creationMode', 'version', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::OBJ_TYPE, self::PARTNER_ID, self::SUBP_ID, self::CONF_FILE_PATH, self::NAME, self::WIDTH, self::HEIGHT, self::HTML_PARAMS, self::SWF_URL, self::CREATED_AT, self::UPDATED_AT, self::CONF_VARS, self::USE_CDN, self::TAGS, self::CUSTOM_DATA, self::STATUS, self::DESCRIPTION, self::DISPLAY_IN_SEARCH, self::CREATION_MODE, self::VERSION, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'obj_type', 'partner_id', 'subp_id', 'conf_file_path', 'name', 'width', 'height', 'html_params', 'swf_url', 'created_at', 'updated_at', 'conf_vars', 'use_cdn', 'tags', 'custom_data', 'status', 'description', 'display_in_search', 'creation_mode', 'version', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ObjType', 'PartnerId', 'SubpId', 'ConfFilePath', 'Name', 'Width', 'Height', 'HtmlParams', 'SwfUrl', 'CreatedAt', 'UpdatedAt', 'ConfVars', 'UseCdn', 'Tags', 'CustomData', 'Status', 'Description', 'DisplayInSearch', 'CreationMode', 'Version', 'Html5Url', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'objType', 'partnerId', 'subpId', 'confFilePath', 'name', 'width', 'height', 'htmlParams', 'swfUrl', 'createdAt', 'updatedAt', 'confVars', 'useCdn', 'tags', 'customData', 'status', 'description', 'displayInSearch', 'creationMode', 'version', 'html5Url', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::OBJ_TYPE, self::PARTNER_ID, self::SUBP_ID, self::CONF_FILE_PATH, self::NAME, self::WIDTH, self::HEIGHT, self::HTML_PARAMS, self::SWF_URL, self::CREATED_AT, self::UPDATED_AT, self::CONF_VARS, self::USE_CDN, self::TAGS, self::CUSTOM_DATA, self::STATUS, self::DESCRIPTION, self::DISPLAY_IN_SEARCH, self::CREATION_MODE, self::VERSION, self::HTML5_URL, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'obj_type', 'partner_id', 'subp_id', 'conf_file_path', 'name', 'width', 'height', 'html_params', 'swf_url', 'created_at', 'updated_at', 'conf_vars', 'use_cdn', 'tags', 'custom_data', 'status', 'description', 'display_in_search', 'creation_mode', 'version', 'html5_url', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
 	);
 
 	/**
@@ -124,11 +127,11 @@ abstract class BaseuiConfPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ObjType' => 1, 'PartnerId' => 2, 'SubpId' => 3, 'ConfFilePath' => 4, 'Name' => 5, 'Width' => 6, 'Height' => 7, 'HtmlParams' => 8, 'SwfUrl' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'ConfVars' => 12, 'UseCdn' => 13, 'Tags' => 14, 'CustomData' => 15, 'Status' => 16, 'Description' => 17, 'DisplayInSearch' => 18, 'CreationMode' => 19, 'Version' => 20, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'objType' => 1, 'partnerId' => 2, 'subpId' => 3, 'confFilePath' => 4, 'name' => 5, 'width' => 6, 'height' => 7, 'htmlParams' => 8, 'swfUrl' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'confVars' => 12, 'useCdn' => 13, 'tags' => 14, 'customData' => 15, 'status' => 16, 'description' => 17, 'displayInSearch' => 18, 'creationMode' => 19, 'version' => 20, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::OBJ_TYPE => 1, self::PARTNER_ID => 2, self::SUBP_ID => 3, self::CONF_FILE_PATH => 4, self::NAME => 5, self::WIDTH => 6, self::HEIGHT => 7, self::HTML_PARAMS => 8, self::SWF_URL => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::CONF_VARS => 12, self::USE_CDN => 13, self::TAGS => 14, self::CUSTOM_DATA => 15, self::STATUS => 16, self::DESCRIPTION => 17, self::DISPLAY_IN_SEARCH => 18, self::CREATION_MODE => 19, self::VERSION => 20, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'obj_type' => 1, 'partner_id' => 2, 'subp_id' => 3, 'conf_file_path' => 4, 'name' => 5, 'width' => 6, 'height' => 7, 'html_params' => 8, 'swf_url' => 9, 'created_at' => 10, 'updated_at' => 11, 'conf_vars' => 12, 'use_cdn' => 13, 'tags' => 14, 'custom_data' => 15, 'status' => 16, 'description' => 17, 'display_in_search' => 18, 'creation_mode' => 19, 'version' => 20, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ObjType' => 1, 'PartnerId' => 2, 'SubpId' => 3, 'ConfFilePath' => 4, 'Name' => 5, 'Width' => 6, 'Height' => 7, 'HtmlParams' => 8, 'SwfUrl' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, 'ConfVars' => 12, 'UseCdn' => 13, 'Tags' => 14, 'CustomData' => 15, 'Status' => 16, 'Description' => 17, 'DisplayInSearch' => 18, 'CreationMode' => 19, 'Version' => 20, 'Html5Url' => 21, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'objType' => 1, 'partnerId' => 2, 'subpId' => 3, 'confFilePath' => 4, 'name' => 5, 'width' => 6, 'height' => 7, 'htmlParams' => 8, 'swfUrl' => 9, 'createdAt' => 10, 'updatedAt' => 11, 'confVars' => 12, 'useCdn' => 13, 'tags' => 14, 'customData' => 15, 'status' => 16, 'description' => 17, 'displayInSearch' => 18, 'creationMode' => 19, 'version' => 20, 'html5Url' => 21, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::OBJ_TYPE => 1, self::PARTNER_ID => 2, self::SUBP_ID => 3, self::CONF_FILE_PATH => 4, self::NAME => 5, self::WIDTH => 6, self::HEIGHT => 7, self::HTML_PARAMS => 8, self::SWF_URL => 9, self::CREATED_AT => 10, self::UPDATED_AT => 11, self::CONF_VARS => 12, self::USE_CDN => 13, self::TAGS => 14, self::CUSTOM_DATA => 15, self::STATUS => 16, self::DESCRIPTION => 17, self::DISPLAY_IN_SEARCH => 18, self::CREATION_MODE => 19, self::VERSION => 20, self::HTML5_URL => 21, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'obj_type' => 1, 'partner_id' => 2, 'subp_id' => 3, 'conf_file_path' => 4, 'name' => 5, 'width' => 6, 'height' => 7, 'html_params' => 8, 'swf_url' => 9, 'created_at' => 10, 'updated_at' => 11, 'conf_vars' => 12, 'use_cdn' => 13, 'tags' => 14, 'custom_data' => 15, 'status' => 16, 'description' => 17, 'display_in_search' => 18, 'creation_mode' => 19, 'version' => 20, 'html5_url' => 21, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
 	);
 
 	/**
@@ -219,6 +222,7 @@ abstract class BaseuiConfPeer {
 		$criteria->addSelectColumn(uiConfPeer::DISPLAY_IN_SEARCH);
 		$criteria->addSelectColumn(uiConfPeer::CREATION_MODE);
 		$criteria->addSelectColumn(uiConfPeer::VERSION);
+		$criteria->addSelectColumn(uiConfPeer::HTML5_URL);
 	}
 
 	/**

@@ -146,6 +146,12 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	protected $version;
 
 	/**
+	 * The value for the html5_url field.
+	 * @var        string
+	 */
+	protected $html5_url;
+
+	/**
 	 * @var        array widget[] Collection to store aggregation of widget objects.
 	 */
 	protected $collwidgets;
@@ -451,6 +457,16 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function getVersion()
 	{
 		return $this->version;
+	}
+
+	/**
+	 * Get the [html5_url] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getHtml5Url()
+	{
+		return $this->html5_url;
 	}
 
 	/**
@@ -986,6 +1002,29 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	} // setVersion()
 
 	/**
+	 * Set the value of [html5_url] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     uiConf The current object (for fluent API support)
+	 */
+	public function setHtml5Url($v)
+	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::HTML5_URL]))
+			$this->oldColumnsValues[uiConfPeer::HTML5_URL] = $this->html5_url;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->html5_url !== $v) {
+			$this->html5_url = $v;
+			$this->modifiedColumns[] = uiConfPeer::HTML5_URL;
+		}
+
+		return $this;
+	} // setHtml5Url()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1038,6 +1077,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			$this->display_in_search = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
 			$this->creation_mode = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
 			$this->version = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->html5_url = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1047,7 +1087,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 21; // 21 = uiConfPeer::NUM_COLUMNS - uiConfPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 22; // 22 = uiConfPeer::NUM_COLUMNS - uiConfPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating uiConf object", $e);
@@ -1567,6 +1607,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			case 20:
 				return $this->getVersion();
 				break;
+			case 21:
+				return $this->getHtml5Url();
+				break;
 			default:
 				return null;
 				break;
@@ -1609,6 +1652,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			$keys[18] => $this->getDisplayInSearch(),
 			$keys[19] => $this->getCreationMode(),
 			$keys[20] => $this->getVersion(),
+			$keys[21] => $this->getHtml5Url(),
 		);
 		return $result;
 	}
@@ -1703,6 +1747,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			case 20:
 				$this->setVersion($value);
 				break;
+			case 21:
+				$this->setHtml5Url($value);
+				break;
 		} // switch()
 	}
 
@@ -1748,6 +1795,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[18], $arr)) $this->setDisplayInSearch($arr[$keys[18]]);
 		if (array_key_exists($keys[19], $arr)) $this->setCreationMode($arr[$keys[19]]);
 		if (array_key_exists($keys[20], $arr)) $this->setVersion($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setHtml5Url($arr[$keys[21]]);
 	}
 
 	/**
@@ -1780,6 +1828,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(uiConfPeer::DISPLAY_IN_SEARCH)) $criteria->add(uiConfPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 		if ($this->isColumnModified(uiConfPeer::CREATION_MODE)) $criteria->add(uiConfPeer::CREATION_MODE, $this->creation_mode);
 		if ($this->isColumnModified(uiConfPeer::VERSION)) $criteria->add(uiConfPeer::VERSION, $this->version);
+		if ($this->isColumnModified(uiConfPeer::HTML5_URL)) $criteria->add(uiConfPeer::HTML5_URL, $this->html5_url);
 
 		return $criteria;
 	}
@@ -1873,6 +1922,8 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		$copyObj->setCreationMode($this->creation_mode);
 
 		$copyObj->setVersion($this->version);
+
+		$copyObj->setHtml5Url($this->html5_url);
 
 
 		if ($deepCopy) {

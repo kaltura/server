@@ -1024,6 +1024,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="creation_mode" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="varchar" size="10" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="html5_url" type="varchar" size="256" />
 		<index name="partner_id_index">
 			<index-column name="partner_id" />
 		</index>
