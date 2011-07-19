@@ -623,6 +623,14 @@ class kFile
 		}
 		
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $sendHeaders);
+
+		// when proxying request to other datacenter we may be already in a proxied request (from one of the internal proxy servers)
+		// we need to ensure the original HOST is sent in order to allow restirctions checks
+		
+		if (isset($_SERVER["HTTP_X_FORWARDED_HOST"]))
+		{
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array("HOST:".$_SERVER["HTTP_X_FORWARDED_HOST"]));
+		}		
 		
 		if($_SERVER['REQUEST_METHOD'] == 'HEAD')
 		{
