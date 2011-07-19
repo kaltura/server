@@ -124,12 +124,15 @@ class siteRestriction extends baseRestriction
 		//$referrerDomain = preg_replace("/http[s]?\:\/\/([a-z0-9\-\.]*)\//", "\${1}", $accessControlScope->getReferrer());
 		
 		$referrerDomain = $this->extractDomainFromReferrer($referrerDomain);
-		
-		if(kConf::hasParam("global_whitelisted_domains"))
+
+		if (strpos($accessControlScope->getReferrer(), "kwidget") == FALSE)
 		{
-			$globalWhitelistedDomains = kConf::get("global_whitelisted_domains");
-			if ($globalWhitelistedDomains && $this->isReferrerOnSameDomain($referrerDomain, $globalWhitelistedDomains))
-				return true;
+			if(kConf::hasParam("global_whitelisted_domains"))
+			{
+				$globalWhitelistedDomains = kConf::get("global_whitelisted_domains");
+				if ($globalWhitelistedDomains && $this->isReferrerOnSameDomain($referrerDomain, $globalWhitelistedDomains))
+					return true;
+			}
 		} 
 		
 		// extract site list from restriction object
