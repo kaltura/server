@@ -170,7 +170,6 @@ class Form_DropFolderConfigure extends Infra_Form
     		$this->addElement($extendTypeSubFormTitle);
     		$extendTypeSubForm->setDecorators(array(
     	        'FormElements',
-    	        array('HtmlTag', array('tag' => 'span', 'id' => 'frmContentFileHandlerConfig')),
             ));
 		    $this->addSubForm($extendTypeSubForm, self::EXTENSION_SUBFORM_NAME);
 		}
