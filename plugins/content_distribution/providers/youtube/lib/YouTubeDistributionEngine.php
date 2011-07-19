@@ -248,7 +248,6 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 		
 		$sftpManager = $this->getSFTPManager($distributionProfile);
-		$feed->sendFeed($sftpManager);
 			
 		if (file_exists($thumbnailFilePath))
 		{
@@ -256,6 +255,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
 		}
 		
+		$feed->sendFeed($sftpManager);
 		$feed->setDeliveryComplete($sftpManager);
 		
 		$providerData->sftpDirectory = $feed->getDirectoryName();
