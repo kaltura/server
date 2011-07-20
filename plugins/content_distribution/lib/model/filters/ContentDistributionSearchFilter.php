@@ -182,11 +182,11 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		return $this->condition;
 	}
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$orderByClause)
 	{
 		$condition = $this->getCondition();
 		if($condition && strlen($condition))
-			$matchClause[] = "@plugins_data $condition";
+			$matchClause[] = '@' . ContentDistributionPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPENDER_FILED_DATA) . $condition;
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
