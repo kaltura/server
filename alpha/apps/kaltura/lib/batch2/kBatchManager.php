@@ -338,37 +338,69 @@ class kBatchManager
 		$filter->attachToCriteria($c);
 		return kBatchExclusiveLock::getExclusiveAlmostDoneJobs($c, $lockKey, $maxExecutionTime, $numberOfJobs, $priority, $jobType);
 	}
-	
+
+	private static function getNextJobPriorityFromCache($jobType)
+	{
+		$priority = apc_fetch("getNextJobPriority:$jobType:priority");
+		if ($priority !== false) // found priority in cache
+		{
+			$cacheExpiry = kConf::hasParam("get_next_job_priority_default_expiry") ? kConf::get("get_next_job_priority_default_expiry") : 2;
+			$cachedTime = apc_fetch("getNextJobPriority:$jobType:time");
+
+			if ($cachedTime === false || $cachedTime + $cacheExpiry < time()) // cache expired
+			$priority = false;
+		}
+
+		KalturaLog::debug("getNextJobPriorityFromCache jobType:$jobType $priority:$priority ".($priority === false ? "nocache" : "cache"));
+
+		return $priority;
+	}
+
+
+	private static function saveNextJobPriorityInCache($jobType, $priority)
+	{
+		apc_store("getNextJobPriority:$jobType:priority", $priority);
+		apc_store("getNextJobPriority:$jobType:time", time());
+
+		KalturaLog::debug("saveNextJobPriorityInCache jobType:$jobType $priority:$priority time:".time());
+
+		return $priority;
+	}
+
+
 	/*
 	 * Find what is the priority that should be used for next task
 	 */
 	public static function getNextJobPriority($jobType)
 	{
+		$priority = self::getNextJobPriorityFromCache($jobType);
+		if ($priority !== false)
+		return $priority;
+
 		//$priorities = array(1 => 33, 2 => 27, 3 => 20, 4 => 13, 5 => 7);
 		$priorities = kConf::get('priority_percent');
-		
-		$createdAt = time() - kConf::get('priority_time_range');		
-//		$createdAt = kConf::get('priority_time_range');
-		
+
+		$createdAt = time() - kConf::get('priority_time_range');
+
 		$c = new Criteria();
 		$c->add(BatchJobPeer::CREATED_AT, $createdAt, Criteria::GREATER_THAN);
 		$c->add(BatchJobPeer::JOB_TYPE, $jobType);
 		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_PENDING);
 		$c->clearSelectColumns();
 		$c->addSelectColumn('MAX(' . BatchJobPeer::PRIORITY . ')');
-		$stmt = BatchJobPeer::doSelectStmt($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		$stmt = BatchJobPeer::doSelectStmt($c, myDbHelper::getConnection    (myDbHelper::DB_HELPER_CONN_PROPEL2));
 		$maxPriority = $stmt->fetchColumn();
-		
+
 		// gets the current queues
 		$c = new Criteria();
 		$c->add(BatchJobPeer::CREATED_AT, $createdAt, Criteria::GREATER_THAN);
 		$c->add(BatchJobPeer::JOB_TYPE, $jobType);
 		$c->add(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_PENDING, Criteria::GREATER_THAN);
 		$c->addGroupByColumn(BatchJobPeer::PRIORITY);
-		
+
 		// To prevent stress on the master DB - use the slave for checking the queue sizes
-		$queues = BatchJobPeer::doCountGroupBy($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-		
+		$queues = BatchJobPeer::doCountGroupBy($c, myDbHelper::getConnection    (myDbHelper::DB_HELPER_CONN_PROPEL2));
+
 		// copy the queues and calcs the total
 		$total = 0;
 		$queues_size = array();
@@ -377,23 +409,31 @@ class kBatchManager
 			$queues_size[$queue['PRIORITY']] = $queue[BatchJobPeer::COUNT];
 			$total += $queue[BatchJobPeer::COUNT];
 		}
-		
+
+		$result = 1;
+
 		// go over the priorities and see if its percent not used
 		foreach($priorities as $priority => $top_percent)
 		{
 			if($priority > $maxPriority)
-				continue;
-				
+			continue;
+
 			if(! isset($queues_size[$priority]))
-				return $priority;
-			
+			{
+				$result = $priority;
+				break;
+			}
+
 			$percent = $queues_size[$priority] / ($total / 100);
 			if($percent < $top_percent)
-				return $priority;
+			{
+				$result = $priority;
+				break;
+			}
 		}
-		
-		return 1;
-	}
+
+		return self::saveNextJobPriorityInCache($jobType, $result);
+    }
 	
 	public static function updateEntry($entryId, $status)
 	{
