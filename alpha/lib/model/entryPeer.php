@@ -436,6 +436,23 @@ class entryPeer extends BaseentryPeer
 		return parent::doSelectJoinkuser($c, $con, $join_behavior);
 	}
 
+	/**
+	 * @param Criteria $criteria
+	 * @param PropelPDO $con
+	 */
+	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+		
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+			$criteria->setRecordsCount($c->getRecordsCount());
+		}
+			
+		return parent::doSelect($c, $con);
+	}
+	
 	public static function getDurationType($duration)
 	{
 		if ($duration >= 0 && $duration <= 4*60)
