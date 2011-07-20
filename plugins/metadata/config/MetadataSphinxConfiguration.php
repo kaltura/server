@@ -12,7 +12,7 @@ class MetadataSphinxConfiguration{
 		for ($i=0; $i < $numOfIntFields; $i++)
 			$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_BIGINT;
 		
-		$kalturaEntry[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)] = SphinxFieldType::RT_FIELD;
+		$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)] = SphinxFieldType::RT_FIELD;
 		//TODO - change to be taken using kSphinxManager::getSphinxIndexName('entry::table_name')
 		$sphinxSchema[kSphinxSearchManager::getSphinxIndexName('entry')]['fields'] = $kalturaEntryFields;
 		return $sphinxSchema;
