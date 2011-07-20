@@ -3,9 +3,18 @@
  * Enable adding custom metadata objects that releate to core objects
  * @package plugins.metadata
  */
-class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor
+class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaPermissions, IKalturaServices, IKalturaEventConsumers, IKalturaObjectLoader, IKalturaBulkUploadHandler, IKalturaSearchDataContributor, IKalturaMemoryCleaner, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaSphinxConfiguration
 {
+
+	const SPHINX_DEFAULT_NUMBER_OF_DATE_FIELDS = 10;
+	const SPHINX_DEFAULT_NUMBER_OF_INT_FIELDS = 10;
+	
 	const PLUGIN_NAME = 'metadata';
+	
+	const SPHINX_EXPENDER_FIELD_DATA = 'data';
+	const SPHINX_EXPENDER_FIELD_DATE = 'date_'; 
+	const SPHINX_EXPENDER_FIELD_INT = 'int_';
+	
 	const PLUGIN_VERSION_MAJOR = 2;
 	const PLUGIN_VERSION_MINOR = 0;
 	const PLUGIN_VERSION_BUILD = 0;
@@ -528,7 +537,33 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			
 		return null;
 	}
+		
+	/* (non-PHPdoc)
+	 * @see IKalturaSphinxConfiguration::getSphinxSchema()
+	 */
+	public static function getSphinxSchema(){
+		return MetadataSphinxConfiguration::getConfiguration();
+	}
+	
 
+	/**
+	 * 
+	 * return number of fields in kaltura_entry index (in sphinx) for given type
+	 * @param int $type
+	 */
+	public static function getSphinxLimitField($type){
+		$numOfDateFields = kConf::hasParam('metadata_sphinx_num_of_date_fields') ? kConf::get('metadata_sphinx_num_of_date_fields') : self::SPHINX_DEFAULT_NUMBER_OF_DATE_FIELDS;
+		$numOfIntFields = kConf::hasParam('metadata_sphinx_num_of_int_fields') ? kConf::get('metadata_sphinx_num_of_int_fields') : self::SPHINX_DEFAULT_NUMBER_OF_INT_FIELDS;
+		
+		if ($type == self::SPHINX_EXPENDER_FIELD_DATE || MetadataSearchFilter::KMC_FIELD_TYPE_DATE)
+			return $numOfDateFields;
+			
+		if ($type == self::SPHINX_EXPENDER_FIELD_INT || MetadataSearchFilter::KMC_FIELD_TYPE_INT)
+			return $numOfIntFields;
+			
+		return 0;
+		
+	}
 	/* (non-PHPdoc)
 	 * @see IKalturaMemoryCleaner::cleanMemory()
 	 */
@@ -584,5 +619,14 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		';
 		
 		return $xsd;
+	}
+	
+	/**
+	 * 
+	 * return field name as appears in sphinx schema
+	 * @param string $fieldName
+	 */
+	public static function getSphinxFieldName($fieldName){
+		return self::PLUGIN_NAME . '_' . $fieldName;
 	}
 }
