@@ -222,19 +222,24 @@ class httpMgr extends kFileTransferMgr
 	// delete a file and return true/false according to success
 	protected function doDelFile ($remote_file)
 	{
-		return false;
+		return false; // not supported
 	}
 
 	// delete a directory and return true/false according to success
 	protected function doDelDir ($remote_path)
 	{
-		return false;
+		return false; // not supported
 	}
 
 	protected function doList ($remoteDir)
 	{
-		return false;
-	}	
+		return false; // not supported
+	}
+	
+	protected function doFileSize($remote_file)
+	{
+	    return false; // not supported
+	}
 
 	/*******************/
 	/* Other functions */
