@@ -10,7 +10,7 @@ interface IKalturaSearchDataContributor extends IKalturaBase
 	 * Return textual search data to be associated with the object
 	 * 
 	 * @param BaseObject $object
-	 * @return string
+	 * @return ArrayObject
 	 */
 	public static function getSearchData(BaseObject $object);
 }
