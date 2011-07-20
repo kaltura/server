@@ -14,7 +14,7 @@ SELECT
 	aggr_p.count_mix "count mix",
 	FLOOR(aggr_p.count_bandwidth / 1024) "count bandwidth mb",
 	aggr_p.count_storage "count storage mb",
-	kalturadw.calc_partner_storage_data_time_range({FROM_DATE_ID}, {TO_DATE_ID}, aggr_p.partner_id) "storage all time mb"
+	IFNULL(kalturadw.calc_partner_storage_data_time_range({FROM_DATE_ID}, {TO_DATE_ID}, aggr_p.partner_id), 0) "storage all time mb"
 FROM
 (
 	SELECT	partner_status_id STATUS,
@@ -22,30 +22,33 @@ FROM
     	created_at,
     	partner_package,
     	dim_partner.partner_id partner_id,	
-	SUM(count_loads) count_loads,
-	SUM(count_plays) count_plays,
-	SUM(count_video) count_video,
-	SUM(count_audio) count_audio,
-	SUM(count_mix) count_mix,
-	SUM(count_image) count_image,
-	SUM(ifnull(count_bandwidth, 0) + ifnull(count_streaming, 0)/1024) count_bandwidth,
-	SUM(count_storage) count_storage
-	FROM kalturadw.dwh_hourly_partner aggr_partner RIGHT JOIN kalturadw.dwh_dim_partners dim_partner
-	ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
-	WHERE  {OBJ_ID_CLAUSE} AND
+		IFNULL(SUM(count_loads), 0) count_loads,
+		IFNULL(SUM(count_plays), 0) count_plays,
+		IFNULL(SUM(count_video), 0) count_video,
+		IFNULL(SUM(count_audio), 0) count_audio,
+		IFNULL(SUM(count_mix), 0) count_mix,
+		IFNULL(SUM(count_image), 0) count_image,
+		IFNULL(SUM(count_bandwidth_kb), 0) count_bandwidth,
+		IFNULL(SUM(count_storage_mb), 0) count_storage
+	FROM kalturadw.dwh_dim_partners dim_partner 
+		LEFT JOIN kalturadw.dwh_hourly_partner aggr_partner  
+		ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
+		LEFT JOIN kalturadw.dwh_hourly_partner_usage hourly_partner_usage 
+		ON (hourly_partner_usage.partner_id = dim_partner.partner_id AND hourly_partner_usage.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
+	WHERE   {OBJ_ID_CLAUSE} AND
 	dim_partner.created_date_id <= {TO_DATE_ID}
 	GROUP BY dim_partner.partner_id
 	ORDER BY dim_partner.partner_id
 	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
-) aggr_p,
+	) aggr_p,
 (
-	SELECT	aggr_partner.partner_id, 
-		SUM(count_video + count_audio + count_image) count_media_all_time
-	FROM kalturadw.dwh_hourly_partner aggr_partner inner join kalturadw.dwh_dim_partners dim_partner on (aggr_partner.partner_id = dim_partner.partner_id)
+	SELECT	dim_partner.partner_id, 
+		SUM(IFNULL(count_video, 0) + IFNULL(count_audio, 0) + IFNULL(count_image, 0)) count_media_all_time
+	FROM kalturadw.dwh_hourly_partner aggr_partner RIGHT JOIN kalturadw.dwh_dim_partners dim_partner ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id <= 20110101)
 	WHERE {OBJ_ID_CLAUSE} AND
-	aggr_partner.date_id <= {TO_DATE_ID}
-	GROUP BY aggr_partner.partner_id
-	ORDER BY aggr_partner.partner_id
+	dim_partner.created_date_id <= {TO_DATE_ID}
+	GROUP BY dim_partner.partner_id
+	ORDER BY dim_partner.partner_id
 	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) all_time_aggr
 WHERE aggr_p.partner_id = all_time_aggr.partner_id;
