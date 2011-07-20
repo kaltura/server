@@ -129,14 +129,25 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 				continue;
 			}
 			
-			if($sphinxPluginData)
-			{
+			if($sphinxPluginData){
 				KalturaLog::debug("Sphinx data for $pluginName [$sphinxPluginData]");
-				$sphinxPluginsData[] = $sphinxPluginData;
+				$sphinxPluginsData = array_merge($sphinxPluginsData, $sphinxPluginData);
+			}			
+
+		}
+
+		foreach ($sphinxPluginsData as $key => $value){
+			$search=array("\\","\0","\n","\r","\x1a","'",'"');
+			$replace=array("\\\\","\\0","\\n","\\r","\\Z","\\'",'\"');
+			
+			if (!is_numeric($value)){
+				$value = str_replace($search, $replace, $value);
+				$data[$key] = "'$value'";
+			}else{
+				$value = (int)$value;
+				$data[$key] = $value;
 			}
 		}
-		if(count($sphinxPluginsData))
-			$dataStrings['plugins_data'] = implode(',', $sphinxPluginsData);
 		
 		foreach($dataStrings as $key => $value)
 		{
