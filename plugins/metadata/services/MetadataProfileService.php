@@ -84,6 +84,7 @@ class MetadataProfileService extends KalturaBaseService
 	 */
 	function addAction(KalturaMetadataProfile $metadataProfile, $xsdData, $viewsData = null)
 	{
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData);
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
 		$dbMetadataProfile->setPartnerId($this->getPartnerId());
@@ -99,7 +100,7 @@ class MetadataProfileService extends KalturaBaseService
 			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
 			kFileSyncUtils::file_put_contents($key, $viewsData);
 		}
-		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
+		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile);
@@ -123,7 +124,8 @@ class MetadataProfileService extends KalturaBaseService
 		$filePath = $xsdFile['tmp_name'];
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsdFile['name']);
-			
+		
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdFile);
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
 		$dbMetadataProfile->setPartnerId($this->getPartnerId());
@@ -141,7 +143,7 @@ class MetadataProfileService extends KalturaBaseService
 			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
 			kFileSyncUtils::moveFromFile($filePath, $key);
 		}
-		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
+		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile);
@@ -278,7 +280,7 @@ class MetadataProfileService extends KalturaBaseService
 			kFileSyncUtils::file_put_contents($key, $viewsData);
 		}
 	
-		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
+		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile->fromObject($dbMetadataProfile);
 		return $metadataProfile;
@@ -315,7 +317,7 @@ class MetadataProfileService extends KalturaBaseService
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey);
 		
-		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
+		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadatas = MetadataPeer::retrieveByProfile($id, $toVersion);
@@ -397,7 +399,7 @@ class MetadataProfileService extends KalturaBaseService
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		kFileSyncUtils::moveFromFile($filePath, $key);
 		
-		kMetadataManager::parseProfileSearchFields($dbMetadataProfile);
+		kMetadataManager::parseProfileSearchFields($this->getPartnerId(), $dbMetadataProfile);
 		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->fromObject($dbMetadataProfile);
