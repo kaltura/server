@@ -26,8 +26,8 @@ class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaC
 		return null;
 	}
 	
-	/**
-	 * @return array of sphinx index schema
+	/* (non-PHPdoc)
+	 * @see IKalturaSphinxConfiguration::getSphinxSchema()
 	 */
 	public static function getSphinxSchema(){
 		return ContentDistributionSphinxConfiguration::getConfiguration();
