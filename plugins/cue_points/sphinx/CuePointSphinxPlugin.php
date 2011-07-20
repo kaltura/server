@@ -27,10 +27,9 @@ class CuePointSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFact
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaSphinxConfiguration::getSphinxConfigPath()
+	 * @see IKalturaSphinxConfiguration::getSphinxSchema()
 	 */
-	public static function getSphinxConfigPath()
-	{
-		return dirname(__FILE__) . '/config/sphinx.conf'; 
+	public static function getSphinxSchema(){
+		return CuePointSphinxConfiguration::getConfiguration();
 	}
 }
