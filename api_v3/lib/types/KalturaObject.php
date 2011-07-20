@@ -109,17 +109,28 @@ class KalturaObject
 				{
 		            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
 				}
-				else if ($propertyInfo->isDynamicEnum())
+				else if (!($value instanceof KalturaNullField))
 				{
-					$propertyType = $propertyInfo->getType();
-					$enumType = call_user_func(array($propertyType, 'getEnumClass'));
-					$value = kPluginableEnumsManager::apiToCore($enumType, $value);
+					if ($propertyInfo->isDynamicEnum())
+					{
+						$propertyType = $propertyInfo->getType();
+						$enumType = call_user_func(array($propertyType, 'getEnumClass'));
+						$value = kPluginableEnumsManager::apiToCore($enumType, $value);
+					}
 				}
 				
 				if ($value !== null)
 				{
-					if (! kXml::isXMLValidContent($value) )
-						throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
+					if ($value instanceof KalturaNullField)
+					{
+						$value = null;
+					}
+					else
+					{
+						if (! kXml::isXMLValidContent($value) )
+							throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
+					}
+					
 					$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
 					if (is_callable($setter_callback))
 				 	    call_user_func_array( $setter_callback , array ($value ) );

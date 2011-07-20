@@ -175,6 +175,12 @@ class KalturaRequestDeserializer
 			
 			if ($property->isSimpleType() || $property->isEnum() || $property->isStringEnum())
 			{
+				if (array_key_exists($name . '__null', $params))
+				{
+					$obj->$name = new KalturaNullField;
+					continue;
+				}
+				
 				if (!array_key_exists($name, $params))
 				{
 					// missing parameters should be null or default propery value
