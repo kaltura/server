@@ -259,6 +259,9 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		
 		\$queryResult = ".$this->getPeerClassname()."::populateObjects(".$this->basePeerClassname."::doSelect(\$criteria, \$con));
 		
+		if(\$criteria instanceof KalturaCriteria)
+			\$criteria->sortOrderBy(\$queryResult);
+		
 		if (\$cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults(\$cacheKey, \$queryResult);
