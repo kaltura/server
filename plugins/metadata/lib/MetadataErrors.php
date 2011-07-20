@@ -14,4 +14,8 @@ class MetadataErrors extends KalturaErrors
 	const METADATA_UNABLE_TO_TRANSFORM = "METADATA_UNABLE_TO_TRANSFORM,Unable to transform metadata [%s]";
 	
 	const METADATA_ALREADY_EXISTS = "METADATA_ALREADY_EXISTS,Metadata already exists id [%s]";
+	
+	const EXCEEDED_LIMIT_SEARCHABLE_DATES = "EXCEEDED_LIMIT_SEARCHABLE_DATES,exceeded number of searchable dates fields";
+	
+	const EXCEEDED_LIMIT_SEARCHABLE_INTS = "EXCEEDED_LIMIT_SEARCHABLE_INTS,exceeded number of searchable int fields";
 }
