@@ -10,9 +10,9 @@ class AdvancedSearchFilterItem
 	 */
 	protected $kalturaClass;
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$orderByClause)
 	{
-		$matchClause[] = $this->getCondition();
+		$matchClause[] = $this->applyCondition($whereClause);
 	}
 	
 	public function getFreeTextConditions($freeTexts)
@@ -20,7 +20,14 @@ class AdvancedSearchFilterItem
 		return array();	
 	}
 	
-	public function getCondition()
+	/**
+	 * 
+	 * apply condition on whereClause and return array of strings for match clause
+	 * @param Criteria $criteria
+	 * @param array $whereClause
+	 * return array
+	 */
+	public function applyCondition(array &$whereClause)
 	{
 		return null;
 	}
