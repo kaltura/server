@@ -36,4 +36,6 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	
 	const THUMBNAIL_NOT_CREATED = 91;
 	
+	const MISSING_PARAMETERS = 92;
+	
 }
