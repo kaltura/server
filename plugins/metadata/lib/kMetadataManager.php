@@ -212,7 +212,7 @@ class kMetadataManager
 		
 		$data = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA);
 		$searchValues = array();
-		$searchValues[$data] = '';
+		$searchValues[$data] = array();
 		
 		foreach($metadatas as $metadata)
 			$searchValues = self::getDataSearchValues($metadata, $searchValues);
@@ -234,7 +234,7 @@ class kMetadataManager
 	public static function getDataSearchValues(Metadata $metadata, $searchValues = array())
 	{
 		KalturaLog::debug("Parsing metadata [" . $metadata->getId() . "] search values");
-		$searchTexts = $searchValues[MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA];
+		$searchTexts = $searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)];
 		
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
