@@ -87,4 +87,13 @@ class KalturaCriteria extends Criteria
 			
 		return new KalturaCriteria();
 	}
+	
+	/**
+	 * 
+	 * sort array orderby from this criteria
+	 * @param array $queryResult
+	 */
+	public function sortOrderBy(array &$queryResult){
+		return;
+	}
 }
