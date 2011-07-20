@@ -176,11 +176,4 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 				
 		return $dataCondition;
 	}
-	
-	protected function appendToWhereClause($whereClause, $prefix, $condition)
-	{	
-		$whereClause[] = $prefix . '_' . $condition;
-				
-		return $whereClause;
-	}
 }
