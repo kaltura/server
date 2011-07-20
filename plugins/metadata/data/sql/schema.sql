@@ -48,6 +48,7 @@ CREATE TABLE `metadata_profile_field`
 	`type` VARCHAR(127),
 	`xpath` VARCHAR(255),
 	`status` TINYINT,
+	`search_index` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`),
 	KEY `profile_id_and_version`(`metadata_profile_id`, `metadata_profile_version`)
