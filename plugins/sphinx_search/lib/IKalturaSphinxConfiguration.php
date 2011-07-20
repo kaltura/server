@@ -5,9 +5,9 @@
  * @subpackage lib
  */
 interface IKalturaSphinxConfiguration extends IKalturaBase
-{
+{	
 	/**
-	 * @return string path to configuration file
+	 * @return array of sphinx index schema to expand
 	 */
-	public static function getSphinxConfigPath();
+	public static function getSphinxSchema();
 }
