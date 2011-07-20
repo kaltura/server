@@ -1,8 +1,9 @@
 <?php
+$baseDir = '@BASE_DIR@';
 $baseConfigurationIndexs = 
 	array( 'kaltura_entry' => array(	
 		'type'					=> 'rt',
-		'path'					=> '@BASE_DIR@/sphinx/kaltura_rt',
+		'path'					=> '/sphinx/kaltura_rt',
 		
 		'fields' => array( 
 			'entry_id'					=> SphinxFieldType::RT_FIELD,
@@ -101,7 +102,7 @@ $baseConfigurationIndexs =
 		
 $baseConfigurations = array ('searchd' => array(
 		'log'				=> '@LOG_DIR@/sphinx/kaltura_sphinx_searchd.log',
-		'query_log'			=> '@LOG_DIR@/sphinx/kaltura_sphinx_query.log,
+		'query_log'			=> '@LOG_DIR@/sphinx/kaltura_sphinx_query.log',
 		'read_timeout'		=> '5',
 		'max_children'		=> '30',
 		'pid_file'			=> '@BASE_DIR@/sphinx/searchd.pid',
