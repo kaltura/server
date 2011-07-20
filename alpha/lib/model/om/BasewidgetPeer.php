@@ -370,6 +370,9 @@ abstract class BasewidgetPeer {
 		
 		$queryResult = widgetPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->sortOrderBy($queryResult);
+		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);

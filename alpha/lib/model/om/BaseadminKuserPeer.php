@@ -362,6 +362,9 @@ abstract class BaseadminKuserPeer {
 		
 		$queryResult = adminKuserPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->sortOrderBy($queryResult);
+		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);

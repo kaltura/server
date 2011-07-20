@@ -366,6 +366,9 @@ abstract class BaseSystemUserPeer {
 		
 		$queryResult = SystemUserPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->sortOrderBy($queryResult);
+		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);

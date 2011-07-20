@@ -386,6 +386,9 @@ abstract class BaseFileSyncPeer {
 		
 		$queryResult = FileSyncPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->sortOrderBy($queryResult);
+		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
