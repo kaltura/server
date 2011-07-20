@@ -21,6 +21,12 @@ abstract class SphinxCriteria extends KalturaCriteria
 	protected $matchClause = array();
 	
 	/**
+	 * Sphinx orderby clauses
+	 * @var array
+	 */
+	protected $orderByClause = array();
+	
+	/**
 	 * Counts how many criterions couldn't be handled
 	 * @var int
 	 */
@@ -33,6 +39,12 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 * @var array
 	 */
 	protected $ids = array();
+	
+	/**
+	 * Array of ids that were retured from the sphinxExecute 
+	 * @var array
+	 */
+	protected $fetchedIds = array();
 	
 	protected function applyIds(array $ids)
 	{
@@ -170,12 +182,13 @@ abstract class SphinxCriteria extends KalturaCriteria
 		$orderByColumns = array_unique($orderByColumns);
 		
 		$setLimit = true;
+		$orders = array();
 		if(count($orderByColumns))
 		{
 			$replace = $this->getSphinxOrderFields();
 			$search = array_keys($replace);
 			
-			$orders = array();
+			
 			foreach($orderByColumns as $orderByColumn)
 			{
 				$arr = explode(' ', $orderByColumn);
@@ -192,10 +205,15 @@ abstract class SphinxCriteria extends KalturaCriteria
 					$setLimit = false;
 				}
 			}
-				
-			if(count($orders))
-				$orderBy = 'ORDER BY ' . implode(',', $orders);
 		}
+		
+		foreach ($this->orderByClause as $orderByClause){
+			$orders[] = $orderByClause;
+			$setLimit = false;
+		}
+		
+		if(count($orders))
+			$orderBy = 'ORDER BY ' . implode(',', $orders);
 			
 		$index = $this->getSphinxIndexName();
 		$maxMatches = kSphinxSearchManager::SPHINX_MAX_RECORDS;
@@ -223,7 +241,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 	protected function applyFilterFields(baseObjectFilter $filter)
 	{
 		foreach($filter->fields as $field => $val)
-		{	
+		{
 			if(is_null($val) || !strlen($val)) 
 			{
 //				KalturaLog::debug("Skip field[$field] value is null");
@@ -383,7 +401,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		{
 			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
 			if($advancedSearch instanceof AdvancedSearchFilterItem)
-				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause);
+				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause, $this->orderByClause);
 		}
 		else
 		{
@@ -394,5 +412,43 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		// attach all unhandled fields
 		$filter->attachToFinalCriteria($this);
+	}
+	
+	/**
+	 * 
+	 * return fetchedIds
+	 */
+	public function getFetchedIds()
+	{
+		return $this->fetchedIds;
+	}
+	
+	/**
+	 * 
+	 * set fetchedIds
+	 * @param array $fetchedIds
+	 */
+	public function setFetchedIds($fetchedIds)
+	{
+		$this->fetchedIds = $fetchedIds;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see KalturaCriteria::sortOrderBy()
+	 */
+	public function sortOrderBy(array &$objects){
+		if (!count($this->orderByClause))
+			return;
+		
+		$sortedResult = array();
+		
+		foreach ($objects as $object)
+			$sortedResult[$object->getId()] = $object; 
+		
+		$objects = array();
+		foreach ($this->fetchedIds as $fetchedId)
+			$objects[] = $sortedResult[$fetchedId];
+		
 	}
 }
