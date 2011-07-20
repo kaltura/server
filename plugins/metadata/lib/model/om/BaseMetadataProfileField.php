@@ -86,6 +86,12 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	protected $status;
 
 	/**
+	 * The value for the search_index field.
+	 * @var        int
+	 */
+	protected $search_index;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -281,6 +287,16 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	public function getStatus()
 	{
 		return $this->status;
+	}
+
+	/**
+	 * Get the [search_index] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getSearchIndex()
+	{
+		return $this->search_index;
 	}
 
 	/**
@@ -589,6 +605,29 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	} // setStatus()
 
 	/**
+	 * Set the value of [search_index] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     MetadataProfileField The current object (for fluent API support)
+	 */
+	public function setSearchIndex($v)
+	{
+		if(!isset($this->oldColumnsValues[MetadataProfileFieldPeer::SEARCH_INDEX]))
+			$this->oldColumnsValues[MetadataProfileFieldPeer::SEARCH_INDEX] = $this->search_index;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->search_index !== $v) {
+			$this->search_index = $v;
+			$this->modifiedColumns[] = MetadataProfileFieldPeer::SEARCH_INDEX;
+		}
+
+		return $this;
+	} // setSearchIndex()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -631,6 +670,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			$this->type = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->xpath = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+			$this->search_index = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -640,7 +680,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = MetadataProfileFieldPeer::NUM_COLUMNS - MetadataProfileFieldPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = MetadataProfileFieldPeer::NUM_COLUMNS - MetadataProfileFieldPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating MetadataProfileField object", $e);
@@ -1107,6 +1147,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			case 10:
 				return $this->getStatus();
 				break;
+			case 11:
+				return $this->getSearchIndex();
+				break;
 			default:
 				return null;
 				break;
@@ -1139,6 +1182,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			$keys[8] => $this->getType(),
 			$keys[9] => $this->getXpath(),
 			$keys[10] => $this->getStatus(),
+			$keys[11] => $this->getSearchIndex(),
 		);
 		return $result;
 	}
@@ -1203,6 +1247,9 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			case 10:
 				$this->setStatus($value);
 				break;
+			case 11:
+				$this->setSearchIndex($value);
+				break;
 		} // switch()
 	}
 
@@ -1238,6 +1285,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		if (array_key_exists($keys[8], $arr)) $this->setType($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setXpath($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setStatus($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setSearchIndex($arr[$keys[11]]);
 	}
 
 	/**
@@ -1260,6 +1308,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		if ($this->isColumnModified(MetadataProfileFieldPeer::TYPE)) $criteria->add(MetadataProfileFieldPeer::TYPE, $this->type);
 		if ($this->isColumnModified(MetadataProfileFieldPeer::XPATH)) $criteria->add(MetadataProfileFieldPeer::XPATH, $this->xpath);
 		if ($this->isColumnModified(MetadataProfileFieldPeer::STATUS)) $criteria->add(MetadataProfileFieldPeer::STATUS, $this->status);
+		if ($this->isColumnModified(MetadataProfileFieldPeer::SEARCH_INDEX)) $criteria->add(MetadataProfileFieldPeer::SEARCH_INDEX, $this->search_index);
 
 		return $criteria;
 	}
@@ -1333,6 +1382,8 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		$copyObj->setXpath($this->xpath);
 
 		$copyObj->setStatus($this->status);
+
+		$copyObj->setSearchIndex($this->search_index);
 
 
 		$copyObj->setNew(true);
