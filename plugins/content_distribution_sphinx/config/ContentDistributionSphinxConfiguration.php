@@ -9,7 +9,7 @@ class ContentDistributionSphinxConfiguration{
 		),
 		kSphinxSearchManager::getSphinxIndexName('entry_distribution') => array (	
 			'type'					=> 'rt',
-			'path'					=> '@BASE_DIR@/sphinx/kaltura_distribution_rt',
+			'path'					=> '/sphinx/kaltura_distribution_rt',
 			
 			'fields' => array (
 				'entry_id' => SphinxFieldType::RT_FIELD,
