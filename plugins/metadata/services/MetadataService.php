@@ -267,6 +267,8 @@ class MetadataService extends KalturaBaseService
 		
 		$dbMetadata->setStatus(KalturaMetadataStatus::DELETED);
 		$dbMetadata->save();
+		
+		kEventsManager::raiseEvent(new kObjectDeletedEvent($dbMetadata));
 	}
 
 	
