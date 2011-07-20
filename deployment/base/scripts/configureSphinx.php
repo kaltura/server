@@ -61,6 +61,9 @@ foreach ($sphinxConfigurationIndexs as $sphinxIndexName => $sphinxIndexValues){
 				fwrite($sphinxConfigHandler, "\t" . $fieldName . "\t" . ' = ' . $fieldValue . PHP_EOL);	
 			}
 		}else{
+			if ($key == 'path'){
+				$value = $baseDir . $value;
+			}
 			fwrite($sphinxConfigHandler, "\t" . $key . "\t" . ' = ' . $value . PHP_EOL);
 		}
 	
