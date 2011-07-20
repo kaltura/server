@@ -12,27 +12,67 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/deploy/classMap.cache');
 KAutoloader::register();
 
+require_once(SPHINX_CONFIG_DIR . '/SphinxBaseConfiguration.php');
 
-$sphinxBase = SPHINX_CONFIG_DIR . 'base.conf';
-$sphinxConfig = SPHINX_CONFIG_DIR . 'kaltura.conf';
+$sphinxConfigHandler = fopen(SPHINX_CONFIG_DIR . 'kaltura.conf', 'w') or die("can't open configuration file");
 
-if(!file_exists($sphinxBase))
-{
-	echo "Sphinx base file [$sphinxBase] not found\n";
-	exit;
-}
 
-copy($sphinxBase, $sphinxConfig);
+if (!$baseConfigurations || !count($baseConfigurations))
+	die ('missing sphinx base configuration');
+
+$sphinxConfigurations = $baseConfigurations;
+$sphinxConfigurationIndexs = $baseConfigurationIndexs;
+
 
 $pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaSphinxConfiguration');
-foreach($pluginInstances as $pluginInstance)
-{
-	$filePath = $pluginInstance->getSphinxConfigPath();
-	if($filePath && file_exists($filePath))
+foreach($pluginInstances as $pluginName => $pluginInstance)
+{ 	/*@var $pluginInstance IKalturaSphinxConfiguration */
+	$pluginSchema = $pluginInstance->getSphinxSchema();
+	echo 'build schema for: '. $pluginName . PHP_EOL;
+	
+	foreach ($pluginSchema as $index => $schemaFields)
 	{
-		echo "Appending config file [$filePath]\n";
-		$config = file_get_contents($filePath);
-		file_put_contents($sphinxConfig, $config, FILE_APPEND);
+		if (!isset($sphinxConfigurationIndexs[$index]))
+			$sphinxConfigurationIndexs[$index] = array();
+		
+		foreach($schemaFields as $schemaFieldName => $schemaFieldValue){
+				if($schemaFieldName != 'fields'){
+					if (isset($sphinxConfigurationIndexs[$index][$schemaFieldName]))
+						throw new Exception('duplicated fields ' . $schemaFieldName . ' for index ' . $index);
+				
+					$sphinxConfigurationIndexs[$index][$schemaFieldName] = $schemaFieldValue;
+				}elseif ($schemaFieldName == 'fields'){
+					foreach($schemaFieldValue as $schemaSubFieldName => $schemaSubFieldValue){						
+						if (isset($sphinxConfigurationIndexs[$index][$schemaFieldName][$schemaSubFieldName]))
+							throw new Exception('duplicated fields ' . $schemaFieldName . ' for index ' . $index);
+						
+						$sphinxConfigurationIndexs[$index][$schemaFieldName][$schemaSubFieldName] = $schemaSubFieldValue;
+					}
+				}
+		}
 	}
 }
 
+foreach ($sphinxConfigurationIndexs as $sphinxIndexName => $sphinxIndexValues){
+	fwrite($sphinxConfigHandler, 'index ' . $sphinxIndexName . PHP_EOL . '{' . PHP_EOL);
+	foreach ($sphinxIndexValues as $key => $value)
+		if ($key == 'fields'){
+			foreach ($value as $fieldValue => $fieldName){
+				fwrite($sphinxConfigHandler, "\t" . $fieldName . "\t" . ' = ' . $fieldValue . PHP_EOL);	
+			}
+		}else{
+			fwrite($sphinxConfigHandler, "\t" . $key . "\t" . ' = ' . $value . PHP_EOL);
+		}
+	
+	fwrite($sphinxConfigHandler, '}' . PHP_EOL);
+}
+
+foreach ($sphinxConfigurations as $sphinxConfigurationName => $sphinxConfigurationValues){
+		fwrite($sphinxConfigHandler, $sphinxConfigurationName . PHP_EOL . '{' . PHP_EOL);
+		foreach ($sphinxConfigurationValues as $key => $value)
+			fwrite($sphinxConfigHandler, "\t" . $key . ' = ' . $value . PHP_EOL);
+			
+		fwrite($sphinxConfigHandler, '}'. PHP_EOL);
+}
+
+fclose($sphinxConfigHandler);
