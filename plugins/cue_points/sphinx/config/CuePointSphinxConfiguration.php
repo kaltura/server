@@ -4,7 +4,7 @@ class CuePointSphinxConfiguration{
 		return array(
 		kSphinxSearchManager::getSphinxIndexName('cue_point') => array (	
 			'type'					=> 'rt',
-			'path'					=> '@BASE_DIR@/sphinx/kaltura_cue_point_rt',
+			'path'					=> '/sphinx/kaltura_cue_point_rt',
 			
 			'fields' => array (
 				'entry_id' => SphinxFieldType::RT_FIELD,
