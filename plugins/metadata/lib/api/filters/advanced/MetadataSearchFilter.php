@@ -8,12 +8,18 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	const KMC_FIELD_TYPE_TEXT = 'textType';
 	const KMC_FIELD_TYPE_LIST = 'listType';
 	const KMC_FIELD_TYPE_DATE = 'dateType';
+	const KMC_FIELD_TYPE_INT = 'intType';
 	const KMC_FIELD_TYPE_OBJECT = 'objectType';
 	 
 	/**
 	 * @var string
 	 */
 	protected $condition = null;
+	
+	/**
+	 * @var string
+	 */
+	protected $orderBy = null;
 	
 	/**
 	 * @var int
@@ -30,12 +36,23 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $this->metadataProfileId;
 	}
 	
-	public function getCondition()
+	public function setOrderBy($orderBy)
 	{
-		return $this->doGetCondition();
+		$this->orderBy = $orderBy;
 	}
 	
-	public function doGetCondition($xPaths = null)
+	public function getOrderBy()
+	{
+		return $this->orderBy;
+	}
+	
+/*	public function getCondition()
+	{
+		throw new Exception("get condition is not in use!");
+		return $this->doGetCondition();
+	}
+	*/
+	public function applyCondition(array &$whereClause, $xPaths = null)
 	{
 		if($this->condition)
 			return $this->condition;
@@ -45,52 +62,153 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$xPaths = array();
 			$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($this->metadataProfileId);
 			foreach($profileFields as $profileField)
-				$xPaths[$profileField->getXpath()] = $profileField->getId();
+				$xPaths[$profileField->getXpath()] = $profileField;
 		}
-		
-		$conditions = array();
+
+		$dataConditions = array();
+		$subConditions = array();
 		$pluginName = MetadataPlugin::PLUGIN_NAME;
 		
 		if(count($this->items))
 		{
 			foreach($this->items as $item)
 			{
-				$condition = null;
+				$dataCondition = null;
 				
-				if($item instanceof AdvancedSearchFilterCondition)
+				if ($item instanceof AdvancedSearchFilterComparableCondition){
+					/* @var $item AdvancedSearchFilterComparableCondition  */
+					$field = $item->getField();
+					if(!isset($xPaths[$field])){
+						KalturaLog::ERR("Missing field: $field in xpath array: " . print_r($xPaths,true));
+						continue;
+					}
+						
+					switch ($item->getComparison()){
+						case KalturaSearchConditionComparison::EQUEL:
+							$comparison = ' = ';
+							break;
+						case KalturaSearchConditionComparison::GREATER_THAN:
+							$comparison = ' > ';
+							break;
+						case KalturaSearchConditionComparison::GREATER_THAN_OR_EQUEL:
+							$comparison = ' >= ';
+							break;
+						case KalturaSearchConditionComparison::LESS_THAN:
+							$comparison = " < ";
+							break;
+						case KalturaSearchConditionComparison::LESS_THAN_OR_EQUEL:
+							$comparison = " <= ";
+							break;
+						default:
+							KalturaLog::ERR("Missing comparison type");
+							continue;
+					}
+										
+					$metadataField = $this->getMetadataSearchField($field, $xPaths);
+					if (!$metadataField){
+						KalturaLog::ERR("Missing metadataField for $field in xpath array: " . print_r($xPaths,true));
+						continue;
+					}
+									
+					$whereClause[] = $metadataField . $comparison . $item->getValue();
+				}
+				elseif ($item instanceof AdvancedSearchFilterCondition)
 				{
 					$field = $item->getField();
-					if(isset($xPaths[$field]))
-					{
-						$value = $item->getValue();
-						$value = SphinxUtils::escapeString($value);
-						$fieldId = $xPaths[$field];
-						$condition = "\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "\"";
+					if(!isset($xPaths[$field])){
+						KalturaLog::ERR("Missing field: $field in xpath array: " . print_r($xPaths,true));
+						continue;
 					}
+					
+					$value = $item->getValue();
+					$value = SphinxUtils::escapeString($value);
+					$fieldId = $xPaths[$field]->getId();
+					$dataCondition = "{$pluginName}_{$fieldId} << $value << " . kMetadataManager::SEARCH_TEXT_SUFFIX;
+					kalturalog::debug("add $dataCondition");
+					$dataConditions[] = "($dataCondition)";
 				}
 				elseif($item instanceof MetadataSearchFilter)
 				{
-					$condition = $item->doGetCondition($xPaths);
-				}
-					
-				KalturaLog::debug("Append item [" . get_class($item) . "] condition [$condition]");
-				
-				if($condition)
-					$conditions[] = "($condition)";
+					$subConditions[] = $item->applyCondition($whereClause, $xPaths);
+				}					
 			}
-		}
-
-		if(!count($conditions))
-			return null;
+		}	
 			
-		$glue = ($this->type == MetadataSearchFilter::SEARCH_AND ? ' & ' : ' | ');
-		$this->condition = implode($glue, $conditions);
+		if (count($dataConditions)){
+			$metadataConditions = array();
+			$glue = ($this->type == MetadataSearchFilter::SEARCH_AND ? ' & ' : ' | ');
+			$metadataConditions['@'. $this->getMetadataSearchField()] = implode($glue, $dataConditions);
+			$this->condition = $this->appendToDataCondition($this->condition, $metadataConditions, $this->type);
+		}
+		
+		if(count($subConditions)){
+			kalturalog::debug("append conditions:". print_r($subConditions,true));
+			foreach ($subConditions as $subCondition)
+				$this->condition = $this->appendToDataCondition($this->condition, $subCondition, $this->type);
+		}
+		
+	//	if(!count($this->condition))
+	//		return null;
 		
 		return $this->condition;
 	}
 	
+	/**
+	 * 
+	 * @param string $field - xPath (metadataProfileField)
+	 */
+	public function getMetadataSearchField($field = null, $xPaths = array()){
+		if(!$field)
+			return MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA);
+		
+		if (!count($xPaths)){
+			$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($this->metadataProfileId);
+			foreach($profileFields as $profileField)
+				$xPaths[$profileField->getXpath()] = $profileField;
+		}
+
+		if(!isset($xPaths[$field])){
+			KalturaLog::ERR("Missing field: " . $field);
+			return null;
+		}
+			
+		switch ($xPaths[$field]->getType()){
+			case MetadataSearchFilter::KMC_FIELD_TYPE_DATE:
+				$metadataField = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE) . $xPaths[$field]->getSearchIndex();
+				break;
+			case MetadataSearchFilter::KMC_FIELD_TYPE_INT:
+				$metadataField = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $xPaths[$field]->getSearchIndex();
+				break;
+			default:
+				KalturaLog::ERR("Missing field type: ". $xPaths[$field]->getType());
+				return null;
+		}
+		
+		return $metadataField;
+	}
+	
+	public function applyOrderBy(array &$orderByClause){
+		KalturaLog::debug("apply order by: ". $this->orderBy);
+		if (!isset($this->orderBy))
+			return;
+		
+		$orderByField = substr($this->orderBy,1);
+		$orderByAscending = $this->orderBy[0] == '+' ? true : false;
+		
+		$metadataField = $this->getMetadataSearchField($orderByField);
+		if (!$metadataField)
+			return;
+		
+		if ($orderByAscending){
+			$orderByClause[] = $metadataField . ' ' . Criteria::ASC;
+		}else{
+			$orderByClause[] = $metadataField . ' ' . Criteria::DESC;
+		}				
+	}
+	
 	public function getFreeTextConditions($freeTexts)
 	{
+		KalturaLog::debug("freeText [$freeTexts]");
 		$additionalConditions = array();
 		
 		if(preg_match('/^"[^"]+"$/', $freeTexts))
@@ -100,7 +218,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$freeText = "^$freeText$";
 			
 //			$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-			$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts";
+			$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts";
 			
 			return $additionalConditions;
 		}
@@ -117,7 +235,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			foreach($freeTextsArr as $freeText)
 			{
 //				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-				$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText";
+				$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText";
 			}
 			return $additionalConditions;
 		}
@@ -129,16 +247,22 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 //		$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
-		$additionalConditions[] = '@plugins_data ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr";
+		$additionalConditions[] = '@'. MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr";
 		return $additionalConditions;
 	}
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)
+	
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$orderByClause)
 	{
-		$condition = $this->getCondition();
-		if($condition && strlen($condition))
-			$matchClause[] = "@plugins_data $condition";
-			
+		$this->applyOrderBy($orderByClause);
+		$conditions = $this->applyCondition($whereClause);
+		KalturaLog::debug("apply matchClause: ". $conditions);
+
+		if (count($conditions))
+			foreach ($conditions as $key => $value)
+				$matchClause[] = $key . ' ' . $value;
+		
+		
 //		$filter->unsetByName('_free_text');
 	}
 	
