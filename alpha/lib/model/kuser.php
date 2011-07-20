@@ -976,11 +976,16 @@ class kuser extends Basekuser
 		{
 			$this->roleIds = '';
 			$c = new Criteria();
-			$c->addSelectColumn(KuserToUserRolePeer::USER_ROLE_ID);
 			$c->addAnd(KuserToUserRolePeer::KUSER_ID, $this->getId(), Criteria::EQUAL);
-			$stmt = KuserToUserRolePeer::doSelectStmt($c);
-			$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
-			$this->roleIds = implode(',', $ids);
+			$selectResults = KuserToUserRolePeer::doSelect($c);
+			foreach ($selectResults as $selectResult)
+			{
+				if ($this->roleIds != '')
+				{
+					$this->roleIds .= ',';
+				}
+				$this->roleIds .= $selectResult->getUserRoleId();
+			}  
 		}
 		return $this->roleIds;
 	}
