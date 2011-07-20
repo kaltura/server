@@ -27,10 +27,20 @@ class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaC
 	}
 	
 	/**
-	 * @return string path to configuration file
+	 * @return array of sphinx index schema
 	 */
-	public static function getSphinxConfigPath()
-	{
-		return dirname(__FILE__) . '/config/sphinx.conf'; 
+	public static function getSphinxSchema(){
+		return ContentDistributionSphinxConfiguration::getConfiguration();
 	}
+	
+	/**
+	 * 
+	 * return field name as appears in sphinx schema
+	 * @param string $fieldName
+	 */
+	public static function getSphinxFieldName($fieldName){
+		return self::PLUGIN_NAME . '_' . $fieldName;
+	}
+	
+
 }
