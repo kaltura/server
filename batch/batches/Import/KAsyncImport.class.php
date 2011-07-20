@@ -65,6 +65,12 @@ class KAsyncImport extends KBatchBase
 	{
 		KalturaLog::debug("fetchFile($job->id)");
 		
+		if ($data instanceof KalturaSshImportJobData)
+		{
+		    // use SSH file transfer manager for SFTP/SCP
+            return $this->fetchFileSsh($job, $data);
+		}
+		
 		try
 		{
 			$sourceUrl = $data->srcFileUrl;
@@ -116,31 +122,9 @@ class KAsyncImport extends KBatchBase
 			}
 			else
 			{
-				// creates a temp file path 
-				$rootPath = $this->taskConfig->params->localTempPath;
-				
-				$res = self::createDir( $rootPath );
-				if ( !$res ) 
-				{
-					KalturaLog::err( "Cannot continue import without temp directory");
-					die(); 
-				}
-				
-				$uniqid = uniqid('import_');
-				$destFile = realpath($rootPath) . "/$uniqid";
+				// creates a temp file path 					
+				$destFile = $this->getTempFilePath($sourceUrl);			
 				KalturaLog::debug("destFile [$destFile]");
-				
-				// in case the url has added arguments, remove them (and reveal the real URL path)
-				// in order to find the file extension
-				$urlPathEndIndex = strpos($sourceUrl, "?");
-				if ($urlPathEndIndex !== false)
-					$sourceUrlPath = substr($sourceUrl, 0, $urlPathEndIndex);
-				else
-					$sourceUrlPath = $sourceUrl;
-				$ext = pathinfo($sourceUrlPath, PATHINFO_EXTENSION);
-				if(strlen($ext))
-					$destFile .= ".$ext";
-								
 				$data->destFileLocalPath = $destFile;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, 2, $data);
 			}
@@ -194,6 +178,122 @@ class KAsyncImport extends KBatchBase
 				}
 			}
 			
+			
+			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED, 90);
+			
+			$job = $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+		}
+		catch(Exception $ex)
+		{
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+		return $job;
+	}
+	
+	
+	/*
+	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile 
+	 */
+	private function fetchFileSsh(KalturaBatchJob $job, KalturaSshImportJobData $data)
+	{
+		KalturaLog::debug("fetchFile($job->id)");
+		
+		try
+		{
+			$sourceUrl = $data->srcFileUrl;
+			KalturaLog::debug("sourceUrl [$sourceUrl]");
+			
+            // extract information from URL and job data
+			$parsedUrl = parse_url($sourceUrl);
+			
+			$host = isset($parsedUrl['host']) ? $parsedUrl['host'] : null;
+			$remotePath = isset($parsedUrl['path']) ? $parsedUrl['path'] : null;
+			$username = isset($data->username) ? $data->username : null;
+			if (empty($username) && isset($parsedUrl['user'])) {
+			    $username = $parsedUrl['user'];
+			}
+			$password = isset($data->password) ? $data->password : null;
+		    if (empty($password) && isset($parsedUrl['password'])) {
+			    $password = $parsedUrl['password'];
+			}
+			$privateKey = isset($data->privateKey) ? $data->privateKey : null;
+			$publicKey  = isset($data->publicKey) ? $data->publicKey : null;
+			$passPhrase = isset($data->passPhrase) ? $data->passPhrase : null;
+			
+			KalturaLog::debug("host [$host] remotePath [$remotePath] username [$username] password [$password]");
+			if ($privateKey || $publicKey) {
+			    KalturaLog::debug("Private Key: $privateKey");
+			    KalturaLog::debug("Public Key: $publicKey");
+			}
+			
+			if (!$host) {
+			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing host', KalturaBatchJobStatus::FAILED);
+			    return $job;
+			}
+			if (!$remotePath) {
+			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing host', KalturaBatchJobStatus::FAILED);
+			    return $job;
+			}
+			
+			// create suitable file transfer manager object
+			$subType = $job->jobSubType;
+			$fileTransferMgr = kFileTransferMgr::getInstance($subType);
+			
+			if (!$fileTransferMgr) {
+			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Error: file transfer manager not found for type [$subType]", KalturaBatchJobStatus::FAILED);
+			    return $job;
+			}
+			
+			// login to server
+			if (!$privateKey || !$publicKey) {
+			    $fileTransferMgr->login($host, $username, $password);
+			}
+			else {
+			    $privateKeyFile = $this->getFileLocationForSshKey($privateKey, 'privateKey');
+			    $publicKeyFile = $this->getFileLocationForSshKey($publicKeyFile, 'publicKey');
+			    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase);
+			}
+			
+			// check if file exists
+			$fileExists = $fileTransferMgr->fileExists($remotePath);
+			if (!$fileExists) {
+			    $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, "Error: remote file [$remotePath] does not exist", KalturaBatchJobStatus::FAILED);
+			    return $job;
+			}
+			
+			// get file size
+			$fileSize = $fileTransferMgr->fileSize($remotePath);
+			
+            // create a temp file path 				
+			$destFile = $this->getTempFilePath($remotePath);				
+			$data->destFileLocalPath = $destFile;
+			KalturaLog::debug("destFile [$destFile]");
+			
+			// download file - overwrite local if exists
+			$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, 2, $data);
+			KalturaLog::debug("Downloading remote file [$remotePath] to local path [$destFile]");
+			$res = $fileTransferMgr->getFile($remotePath, $destFile);
+			
+			if(!file_exists($data->destFileLocalPath))
+			{
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, "Error: output file doesn't exist", KalturaBatchJobStatus::RETRY);
+				return $job;
+			}
+				
+			// check the file size only if its first or second retry
+			// in case it failed few times, taks the file as is
+			if($fileSize)
+			{
+				clearstatcache();
+				$actualFileSize = filesize($data->destFileLocalPath);
+				if($actualFileSize < $fileSize)
+				{
+					$percent = floor($actualFileSize * 100 / $fileSize);
+					$job = $this->updateJob($job, "Downloaded size: $actualFileSize($percent%)", KalturaBatchJobStatus::PROCESSING, $percent, $data);
+					$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
+					return $job;
+				}
+			}
 			
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED, 90);
 			
@@ -297,6 +397,51 @@ class KAsyncImport extends KBatchBase
 		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
 		
 		return $response->job;
+	}
+	
+	/*
+	 * Lazy saving of the key to a temporary path, the key will exist in this location until the temp files are purged 
+	 */
+	protected function getFileLocationForSshKey($keyContent, $prefix = 'key') 
+	{
+		$tempDirectory = sys_get_temp_dir();
+		$fileLocation = tempnam($tempDirectory, $prefix);
+		while (file_exists($fileLocation)) {
+		    $fileLocation += '_'.time();
+		}
+		
+		file_put_contents($fileLocation, $keyContent);
+		
+		return $fileLocation;
+	}
+	
+	
+	protected function getTempFilePath($remotePath)
+	{
+	    // create a temp file path 
+		$rootPath = $this->taskConfig->params->localTempPath;
+			
+		$res = self::createDir( $rootPath );
+		if ( !$res ) 
+		{
+			KalturaLog::err( "Cannot continue import without temp directory");
+			die(); 
+		}
+			
+		$uniqid = uniqid('import_');
+		$destFile = realpath($rootPath) . "/$uniqid";
+		
+		// in case the url has added arguments, remove them (and reveal the real URL path)
+		// in order to find the file extension
+		$urlPathEndIndex = strpos($remotePath, "?");
+		if ($urlPathEndIndex !== false)
+			$remotePath = substr($remotePath, 0, $urlPathEndIndex);
+			
+		$ext = pathinfo($remotePath, PATHINFO_EXTENSION);
+		if(strlen($ext))
+			$destFile .= ".$ext";
+			
+		return $destFile;
 	}
 }
 ?>
