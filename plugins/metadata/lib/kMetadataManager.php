@@ -47,10 +47,11 @@ class kMetadataManager
 	 * Parse the XSD and update the list of search fields
 	 * 
 	 * @param MetadataProfile $metadataProfile
+	 * @param partnerId
 	 * 
 	 * @return TBD
 	 */
-	public static function parseProfileSearchFields(MetadataProfile $metadataProfile)
+	public static function parseProfileSearchFields($partnerId, MetadataProfile $metadataProfile)
 	{
 		$key = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($key);
@@ -84,10 +85,12 @@ class kMetadataManager
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
 			$profileField->save();
+			
 			unset($xPaths[$xPath]);
 		}
 		
 		// add new searchable fields
+		
 		foreach($xPaths as $xPath => $xPathData)
 		{
 			$profileField = new MetadataProfileField();
@@ -102,9 +105,19 @@ class kMetadataManager
 			if(isset($xPathData['label']))
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
+			{
 				$profileField->setType($xPathData['type']);
 				
-			$profileField->save();
+				if (($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE) || ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT)){
+					$availableSearchIndex = self::getAvailableSearchIndex($partnerId, $xPathData['type']);
+					if (!isset($availableSearchIndex))
+						throw new Exception('could not find available search index for type: ' . $xPathData['type']);
+										
+					$profileField->setSearchIndex($availableSearchIndex);
+				}
+				
+				$profileField->save();
+			}
 		}
 	
 		// set none searchable existing fields
@@ -152,6 +165,39 @@ class kMetadataManager
 	}
 	
 	/**
+	 * Return search index by type
+	 *
+	 * @param int $partnerId
+	 * @param int $kmcType
+	 *
+	 * @return int
+	 */
+	public static function getAvailableSearchIndex($partnerId, $type)
+	{
+		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
+		$profileFields = MetadataProfileFieldPeer::retrieveByPartner($partnerId);
+		MetadataProfileFieldPeer::setUseCriteriaFilter(true);
+	
+		
+		$occupiedIndexes = array();	
+		foreach($profileFields as $profileField)
+			$occupiedIndexes[$profileField->getType()][$profileField->getSearchIndex()] = true;
+			
+		$fieldsLimit =  MetadataPlugin::getSphinxLimitField($type);
+		
+		for ($i = 0; $i < $fieldsLimit; $i++)
+		{
+			if(!isset($occupiedIndexes[$type]))
+				return $i;
+			
+			if(!isset($occupiedIndexes[$type][$i]))
+				return $i;
+		}
+		
+		throw new Exception('could not find available search index for type: ' . $type);
+	}
+	
+	/**
 	 * Return search texts per object id
 	 * 
 	 * @param int $objectType
@@ -164,26 +210,32 @@ class kMetadataManager
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::debug("Found " . count($metadatas) . " metadata object");
 		
-		$searchTexts = array();
+		$data = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA);
+		$searchValues = array();
+		$searchValues[$data] = '';
+		
 		foreach($metadatas as $metadata)
-			$searchTexts = self::getSearchValues($metadata, $searchTexts);
-			
-		if(!count($searchTexts))
-			return null;
-			
-		return implode(',', $searchTexts);
+			$searchValues = self::getDataSearchValues($metadata, $searchValues);
+		
+		if(count($searchValues[$data]))
+			$searchValues[$data] = implode(',', $searchValues[$data]);
+		
+		return $searchValues;
 	}
 	
 	/**
 	 * Parse the XML and update the list of search values
 	 * 
 	 * @param Metadata $metadata
+	 * @param array $searchValues
 	 * 
 	 * @return array
 	 */
-	public static function getSearchValues(Metadata $metadata, $searchTexts = array())
+	public static function getDataSearchValues(Metadata $metadata, $searchValues = array())
 	{
 		KalturaLog::debug("Parsing metadata [" . $metadata->getId() . "] search values");
+		$searchTexts = $searchValues[MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA];
+		
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
 		
@@ -192,25 +244,39 @@ class kMetadataManager
 		$xPath = new DOMXPath($xml);
 		
 		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
-		KalturaLog::debug("Metadata fields [" . count($profileFields) . "] found");
+	
 		$searchItems = array();
 		$textItems = array();
 		foreach($profileFields as $profileField)
 		{
+			/* @var  $profileField MetadataProfileField */
 			$nodes = $xPath->query($profileField->getXpath());
 			if(!$nodes->length)
 				continue;
-				
-			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE)
+
+			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE){
+				foreach($nodes as $node){
+					$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE) . $profileField->getSearchIndex()] = $node->nodeValue;
+					break;
+				}
 				continue;
-				
+			}
+
+			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
+				foreach($nodes as $node){
+					$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $profileField->getSearchIndex()] = $node->nodeValue;
+					break;
+				}
+				continue;
+			}
+
 			$searchItemValues = array();
 			foreach($nodes as $node)
 				$searchItemValues[] = $node->nodeValue;
 				
 			if(!count($searchItemValues))
 				continue;
-				
+
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT)
 			{
 				$textItem = implode(' ', $searchItemValues);
@@ -235,10 +301,9 @@ class kMetadataManager
 				$searchTexts['text'] = MetadataPlugin::PLUGIN_NAME . '_text';
 				 
 			$searchTexts['text'] .= ' ' . implode(' ', $textItems);
+			$searchTexts['text'] .= ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX;
 		}
-		$searchTexts['text'] .= ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX;
 		
-//		KalturaLog::debug('Search Texts: ' . print_r($searchTexts, true));
 		
 		$ret = array();
 		foreach($searchTexts as $index => $value)
@@ -247,8 +312,10 @@ class kMetadataManager
 		
 		if(isset($searchTexts['text']))
 			$ret['text'] = $searchTexts['text'];
-			
-		return $ret;
+		
+		$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)] = $ret;
+		
+		return $searchValues;
 	}
 	
 	/**
@@ -409,5 +476,46 @@ class kMetadataManager
 		$data->setDestVersion($destVersion);
 		
 		return kJobsManager::addJob($job, $data, BatchJobType::METADATA_TRANSFORM);
+	}
+	
+	/*
+	 * validate metadataProfile xsd
+	 * @param int partner id
+	 * @param string $xsdData XSD metadata definition
+	 * @param boolean isPath - for xsdPath or actual content
+	 */
+	public static function validateMetadataProfileField( $partnerId, $xsdData, $isPath  = false){
+		$intFieldsCounter = 0;
+		$dateFieldsCounter = 0;
+		
+		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
+		$profileFields = MetadataProfileFieldPeer::retrieveByPartner($partnerId);
+		MetadataProfileFieldPeer::setUseCriteriaFilter(true);
+		
+		foreach($profileFields as $profileField)
+		{		
+			$type = $profileField->getType();
+			if($type == MetadataSearchFilter::KMC_FIELD_TYPE_DATE)
+				$dateFieldsCounter++;
+				
+			if($type == MetadataSearchFilter::KMC_FIELD_TYPE_INT)
+				$intFieldsCounter++;
+		}
+
+		$xPaths = kXsd::findXpathsByAppInfo($xsdData , kMetadataManager::APP_INFO_SEARCH, 'true', $isPath);
+		foreach($xPaths as $xPath => $xPathData)
+		{		
+			if(isset($xPathData['type']) && ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_DATE))
+				$dateFieldsCounter++;
+				
+			if(isset($xPathData['type']) && ($xPathData['type'] == MetadataSearchFilter::KMC_FIELD_TYPE_INT))
+				$intFieldsCounter++;
+		}
+		
+		if ($dateFieldsCounter > MetadataPlugin::getSphinxLimitField(MetadataSearchFilter::KMC_FIELD_TYPE_DATE))
+			throw new APIException(MetadataErrors::EXCEEDED_LIMIT_SEARCHABLE_DATES);
+			
+		if ($intFieldsCounter > MetadataPlugin::getSphinxLimitField(MetadataSearchFilter::KMC_FIELD_TYPE_INT))
+			throw new APIException(MetadataErrors::EXCEEDED_LIMIT_SEARCHABLE_INTS);
 	}
 }
