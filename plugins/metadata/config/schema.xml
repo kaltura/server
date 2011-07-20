@@ -29,6 +29,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="type" type="varchar" size="127" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="xpath" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="search_index" type="integer" />
 		<index name="partner_id">
 			<index-column name="partner_id" />
 		</index>
