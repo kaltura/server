@@ -51,8 +51,10 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 	 */
 	protected $condition = null;
 	
-	public function getCondition()
+	public function applyCondition(array &$whereClause)
 	{
+		//throw new Exception("get condition is not in use!");
+		KalturaLog::debug("advanced: getCondition");
 		if($this->condition)
 			return $this->condition;
 			
@@ -62,21 +64,22 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		{
 			foreach($this->items as $item)
 			{
+				KalturaLog::debug("item type: " . get_class($item));
 				if($item instanceof AdvancedSearchFilterItem)
 				{
-					$condition = $item->getCondition();
-					KalturaLog::debug("Append item [" . get_class($item) . "] condition [$condition]");
+					$condition = $item->applyCondition($whereClause);
+					KalturaLog::debug("Append item [" . get_class($item) . "] condition [".print_r($condition,true)."]");
 					if($condition)
-						$conditions[] = "($condition)";
+						$conditions[] = $condition;
 				}
 			}
 		}
 
 		if(!count($conditions))
 			return null;
-			
-		$glue = ($this->type == MetadataSearchFilter::SEARCH_AND ? ' & ' : ' | ');
-		$this->condition = implode($glue, $conditions);
+		
+		foreach ($conditions as $condition)
+			$this->condition = $this->appendToDataCondition($this->condition, $condition, $this->type);
 		
 		return $this->condition;
 	}
@@ -102,13 +105,15 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		return $additionalConditions;
 	}
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause)
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$orderByClause)
 	{
 		KalturaLog::debug("apply from [" . get_class($filter) . "]");
 		
-		$condition = $this->getCondition();
-		if($condition && strlen($condition))
-			$matchClause[] = "@plugins_data $condition";
+		$conditions = $this->applyCondition($whereClause);
+		if($conditions){
+			foreach ($conditions as $key => $value)
+				$matchClause[] = $key . ' ' . $value;
+		}
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
@@ -149,5 +154,33 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 			$item->fillObjectFromXml($child);
 			$this->items[] = $item;
 		}
+	}
+	
+	protected function appendToDataCondition($dataCondition, $dataConditionsToAdd, $type)
+	{	
+		if (!count($dataCondition))
+			$dataCondition = array();
+		
+		if (!count($dataConditionsToAdd))
+			return $dataCondition;
+				
+		foreach ($dataConditionsToAdd as $key => $value)
+		{
+			if (!isset($dataCondition[$key])){
+				$dataCondition[$key] = $value;
+			}else{
+				$glue = ($type == MetadataSearchFilter::SEARCH_AND ? ' & ' : ' | ');
+				$dataCondition[$key] = $dataCondition[$key] . $glue . $value ; 
+			}
+		}
+				
+		return $dataCondition;
+	}
+	
+	protected function appendToWhereClause($whereClause, $prefix, $condition)
+	{	
+		$whereClause[] = $prefix . '_' . $condition;
+				
+		return $whereClause;
 	}
 }
