@@ -78,7 +78,7 @@
          <exec command="rm -rf Kaltura-CM-v0.0.0" dir="${installationLoc}" />
 
          <echo msg="unzip..." />
-         <exec command="unzip ${installationLoc}${installationZip}" dir="${installationLoc}" />
+         <exec command="unzip -q ${installationLoc}${installationZip}" dir="${installationLoc}" />
     </target>
 
 
