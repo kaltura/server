@@ -324,7 +324,7 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 			default:			
 				if($dbData instanceof kBulkUploadJobData)
 					$this->data = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', $dbBatchJob->getJobSubType());
-				if($dbData instanceof kImportJobData)
+				else if($dbData instanceof kImportJobData)
 					$this->data = KalturaPluginManager::loadObject('KalturaImportJobData', get_class($dbData));
 				else
 					$this->data = KalturaPluginManager::loadObject('KalturaJobData', $this->jobType);
