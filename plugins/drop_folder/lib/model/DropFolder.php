@@ -20,6 +20,11 @@ class DropFolder extends BaseDropFolder
 	const FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minutes
 	const FILE_NAME_PATTERNS_DEFAULT_VALUE = '*';
 	
+	public function getLocalPath()
+	{
+	    return $this->getPath();
+	}
+	
 	
 	// -------------------------------------
 	// -- Default values -------------------

@@ -3,6 +3,6 @@
  * @package plugins.dropFolder
  * @subpackage api.filters.enum
  */
-class KalturaFtpDropFolderOrderBy extends KalturaDropFolderOrderBy
+class KalturaFtpDropFolderOrderBy extends KalturaRemoteDropFolderOrderBy
 {
 }

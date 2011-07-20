@@ -12,6 +12,19 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 	 * @var int
 	 */
 	public $dropFolderFileId;
+	
+	/*
+	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
+	 */
+	private static $map_between_objects = array(
+		'dropFolderFileId',
+	 );
+		 
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}	
+	
 
 	public function getDc()
 	{
@@ -35,20 +48,33 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		if(!$object_to_fill)
-			$object_to_fill = new kLocalFileResource();
+			$object_to_fill = new kDropFolderFileResource();
+			
+		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
 
 		$dropFolderFile = DropFolderFilePeer::retrieveByPK($this->dropFolderFileId);
-		if(!$dropFolderFile)
+		if(!$dropFolderFile) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->dropFolderFileId);
-		
-		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
-		if(!$dropFolder)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFile->getDropFolderId());
+		}
 			
-		$localFilePath = $dropFolder->getPath() . '/' . $dropFolderFile->getFileName();
+		$dropFolder = DropFolderPeer::retrieveByPK($dropFolderFile->getDropFolderId());
+		if(!$dropFolder) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFile->getDropFolderId());
+		}
 		
+		$object_to_fill->setDropFolderFileId($dropFolderFile->getId());
+					
+		$localFilePath = $dropFolderFile->getLocalFullPath();
 		$object_to_fill->setLocalFilePath($localFilePath);
-		$object_to_fill->setKeepOriginalFile(true);
+		
+		$keepOriginalFile = $dropFolder->getType() == DropFolderType::LOCAL ? true : false;
+		$object_to_fill->setKeepOriginalFile($keepOriginalFile);
+		
+		if ($dropFolder instanceof RemoteDropFolder)
+		{
+			$object_to_fill->setIsReady(false);
+		}
+		
 		return $object_to_fill;
 	}
 	
@@ -61,7 +87,10 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 		if (is_null($dropFolderFile))
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->dropFolderFileId);
 		
-		$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
-		$dropFolderFile->save();
+		if ($dropFolderFile->getStatus() != DropFolderFileStatus::DOWNLOADING)
+		{
+    		$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
+    		$dropFolderFile->save();
+		}
 	}
 }

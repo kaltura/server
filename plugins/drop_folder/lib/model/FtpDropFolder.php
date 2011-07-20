@@ -4,7 +4,7 @@
 * @package plugins.dropFolder
 * @subpackage model
 */
-class FtpDropFolder extends DropFolder
+class FtpDropFolder extends RemoteDropFolder
 {
     
     // ------------------------------------------
@@ -80,6 +80,10 @@ class FtpDropFolder extends DropFolder
 		$this->putInCustomData(self::CUSTOM_DATA_FTP_PASSWORD, $ftpPassword);
 	}
 	
+	// ------------------------------------------
+	// -- File Transfer params-------------------
+	// ------------------------------------------
+	
 	public function getFolderUrl()
 	{
 	    $url = 'ftp://';
@@ -92,6 +96,26 @@ class FtpDropFolder extends DropFolder
 	    }
 	    $url .= $this->getFtpHost();
 	    $url .= '/'.$this->getPath();
+	    return $url;
+	}
+		
+	/**
+	 * @return kDropFolderImportJobData
+	 */
+	public function getImportJobData()
+	{
+	    $jobData = new kDropFolderImportJobData();
+	    $jobData->setUsername($this->getFtpUsername());
+	    $jobData->setPassword($this->getFtpPassword());
+	    $jobData->setPrivateKey(null);
+	    $jobData->setPublicKey(null);
+	    $jobData->setPassPhrase(null);
+	    return $jobData;	    
+	}
+	
+	public function getFileTransferMgrType()
+	{
+	    return kFileTransferMgrType::FTP;
 	}
     
 }

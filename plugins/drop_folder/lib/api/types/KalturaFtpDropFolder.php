@@ -3,7 +3,7 @@
  * @package plugins.dropFolder
  * @subpackage api.objects
  */
-class KalturaFtpDropFolder extends KalturaDropFolder
+class KalturaFtpDropFolder extends KalturaRemoteDropFolder
 {
 
     /**
@@ -48,8 +48,6 @@ class KalturaFtpDropFolder extends KalturaDropFolder
 					
 		return $dbObject;
 	}
-	
-	//TODO: add toInsertableObject & toUpdatableObject
 	
 }
 

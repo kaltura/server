@@ -12,7 +12,16 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	const DROP_FOLDER_RESOURCE_FILE_SIZE_PARAM = 'fileSize';
 	const DROP_FOLDER_RESOURCE_FILE_CHECKSUM_PARAM = 'fileChecksum';
 	
+	/**
+	 * @var string
+	 */
 	private $tempDirectory = null;
+	
+	/**
+	 * @var kFileTransferMgr
+	 */
+	private $fileTransferMgr = null;
+	
 	
 	public function getType() 
 	{
@@ -34,7 +43,17 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 			return false;
 		}
 		
-		$xmlPath = realpath($this->dropFolder->path.'/'.$this->dropFolderFile->fileName);
+		$this->fileTransferMgr =  DropFolderBatchUtils::getFileTransferManager($this->dropFolder);
+		if (!$this->fileTransferMgr) {
+		    $this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::INTERNAL_ERROR;
+			$this->dropFolderFile->errorDescription = 'Internal server error - cannot initiate file transfer manager';
+			KalturaLog::err($this->dropFolderFile->errorDescription);
+			$this->updateDropFolderFile();
+			return false;
+		}
+		$xmlPath = $this->getLocalXmlFilePath();
+		
 		if (!$xmlPath) {
 			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_READING_FILE;
@@ -181,13 +200,16 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	
 	private function verifyLocalResource(DOMElement $localResource)
 	{
-		clearstatcache();
-		
 		$filePath = $localResource->getAttribute(self::DROP_FOLDER_RESOURCE_PATH_ATTRIBUTE);
-		$localPath = realpath($this->dropFolder->path.'/'.$filePath);
-		if (!$localPath) {
+		$dropFolderPath = $this->dropFolder->path.'/'.$filePath;
+		
+		if ($this->dropFolder->type == KalturaDropFolderType::LOCAL) {
+	        $dropFolderPath = realpath($dropFolderPath);
+	    }
+	    
+		if (!$dropFolderPath) {
 			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::ERROR_READING_FILE;
-			$this->dropFolderFile->errorDescription = "Cannot find file at [$localPath]";
+			$this->dropFolderFile->errorDescription = "Cannot find file at [$dropFolderPath]";
 			return false;	
 		}
 		
@@ -195,10 +217,10 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		$fileSize = ($fileSize->length > 0) ? $fileSize->item(0)->nodeValue : null;
 		if (!is_null($fileSize))
 		{
-			$localSize = filesize($localPath);
-			if ($fileSize != $localSize) {
+		    $realSize = $this->fileTransferMgr->fileSize($dropFolderPath);
+			if ($fileSize != $realSize) {
 				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::LOCAL_FILE_WRONG_SIZE;
-				$this->dropFolderFile->errorDescription = "Wrong filesize [$localSize] for file [$localPath]";
+				$this->dropFolderFile->errorDescription = "Wrong filesize [$realSize] for file [$dropFolderPath]";
 				return false;
 			}
 			KalturaLog::debug("Filesize [$fileSize] verified for local resource [$filePath]");
@@ -207,22 +229,30 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		$fileChecksumTags = $localResource->getElementsByTagName(self::DROP_FOLDER_RESOURCE_FILE_CHECKSUM_PARAM);
 		$fileChecksum = ($fileChecksumTags->length > 0) ? (string)$fileChecksumTags->item(0)->nodeValue : null;
 		
-		if (!is_null($fileChecksum))
+		if ($this->dropFolder->type != KalturaDropFolderType::LOCAL)
 		{
-			$checksumType = $fileChecksumTags->item(0)->getAttribute('type');
-			
-			if ($checksumType == 'sha1') {
-				$localChecksum = sha1_file($localPath);
-			}
-			else {
-				$localChecksum = md5_file($localPath);
-			}
-			if ($fileChecksum != $localChecksum) {
-				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::LOCAL_FILE_WRONG_CHECKSUM;
-				$this->dropFolderFile->errorDescription = "Wrong checksum [$localChecksum] for file [$localPath]";
-				return false;
-			}
-			KalturaLog::debug("Checksum [$fileChecksum] verified for local resource [$filePath]");
+		    //TODO: ok not to support for remote drop folders ?
+		    KalturaLog::debug('Checksum verification is only supported for local drop folders');
+		}
+		else
+		{
+    		if (!is_null($fileChecksum))
+    		{
+    			$checksumType = $fileChecksumTags->item(0)->getAttribute('type');
+    			
+    			if ($checksumType == 'sha1') {
+    				$localChecksum = sha1_file($dropFolderPath);
+    			}
+    			else {
+    				$localChecksum = md5_file($dropFolderPath);
+    			}
+    			if ($fileChecksum != $localChecksum) {
+    				$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::LOCAL_FILE_WRONG_CHECKSUM;
+    				$this->dropFolderFile->errorDescription = "Wrong checksum [$localChecksum] for file [$dropFolderPath]";
+    				return false;
+    			}
+    			KalturaLog::debug("Checksum [$fileChecksum] verified for local resource [$filePath]");
+    		}
 		}
 
 		return true;
@@ -251,4 +281,23 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		$this->kClient->doMultiRequest();		
 	}
 	
+	
+	private function getLocalXmlFilePath()
+	{
+	    $dropFolderFilePath = $this->dropFolder->path.'/'.$this->dropFolderFile->fileName;
+	    
+	    // local drop folder
+	    if ($this->dropFolder->type == KalturaDropFolderType::LOCAL) {
+	        $dropFolderFilePath = realpath($dropFolderFilePath);
+	        return $dropFolderFilePath;
+	    }
+	    
+	    // remote drop folder	    
+		$tempFilePath = tempnam($this->tempDirectory, 'dropFolderFileId_'.$this->dropFolderFile->id.'_');
+		
+		$this->fileTransferMgr->getFile($dropFolderFilePath, $tempFilePath);
+
+		return $tempFilePath;	    
+	}	
+
 }

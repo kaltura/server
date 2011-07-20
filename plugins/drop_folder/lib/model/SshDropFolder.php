@@ -4,9 +4,9 @@
 * @package plugins.dropFolder
 * @subpackage model
 */
-abstract class SshDropFolder extends DropFolder
+abstract class SshDropFolder extends RemoteDropFolder
 {
-   // ------------------------------------------
+    // ------------------------------------------
 	// -- Custom data columns -------------------
 	// ------------------------------------------
     
@@ -117,18 +117,35 @@ abstract class SshDropFolder extends DropFolder
 	/**
 	 * @return string
 	 */
-	public function geteSshPassPhras()
+	public function getSshPassPhrase()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_SSH_PASS_PHRASE);
 	}
 	
 	/**
-	 * @param string $sshPublicKey
+	 * @param string $sshSshPassPhrase
 	 */
-	public function setSshPassPhras($sshSshPassPhras)
+	public function setSshPassPhrase($sshSshPassPhrase)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_SSH_PASS_PHRASE, $sshSshPassPhras);
+		$this->putInCustomData(self::CUSTOM_DATA_SSH_PASS_PHRASE, $sshSshPassPhrase);
 	}
 	
+	// ------------------------------------------
+	// -- File Transfer params-------------------
+	// ------------------------------------------
+	
+	/**
+	 * @return kDropFolderImportJobData
+	 */
+	public function getImportJobData()
+	{
+	    $jobData = new kDropFolderImportJobData();
+	    $jobData->setUsername($this->getSshUsername());
+	    $jobData->setPassword($this->getSshPassword());
+	    $jobData->setPrivateKey($this->getSshPrivateKey());
+	    $jobData->setPublicKey($this->getSshPublicKey());
+	    $jobData->setPassPhrase($this->getSshPassPhrase());
+	    return $jobData;	    
+	}	
     
 }

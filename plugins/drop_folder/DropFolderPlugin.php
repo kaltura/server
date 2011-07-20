@@ -155,7 +155,15 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			{
 				return 'KalturaSftpDropFolder';
 			}
-		}	
+		}
+		
+		if ($baseClass == 'KalturaImportJobData')
+		{
+		    if ($enumValue == 'kDropFolderImportJobData')
+			{
+				return 'KalturaDropFolderImportJobData';
+			}
+		}
 		
 		return null;
 	}

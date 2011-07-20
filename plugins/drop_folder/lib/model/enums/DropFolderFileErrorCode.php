@@ -11,5 +11,6 @@ interface DropFolderFileErrorCode extends BaseEnum
 	const FLAVOR_MISSING_IN_FILE_NAME = 4;
 	const SLUG_REGEX_NO_MATCH = 5;
 	const ERROR_READING_FILE = 6;
+	const ERROR_DOWNLOADING_FILE = 7;
 }
 

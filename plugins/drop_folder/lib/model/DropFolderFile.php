@@ -30,15 +30,16 @@ class DropFolderFile extends BaseDropFolderFile
 	}
 	
 	/**
-	 * @return string full path to file (drop folder path + file name)
+	 * @return string full local path to file (drop folder path + file name)
 	 */
-	public function getFullPath()
+	public function getLocalFullPath()
 	{
 		$dropFolder = DropFolderPeer::retrieveByPK($this->getDropFolderId());
-		if ($dropFolder && strlen($dropFolder->getPath()) > 0)
+		
+		if ($dropFolder && strlen($dropFolder->getLocalPath()) > 0)
 		{
-			$fullPath = $dropFolder->getPath().'/'.$this->getFileName();
-			return $fullPath;
+			$fullLocalPath = $dropFolder->getLocalPath().'/'.$this->getFileName();
+			return $fullLocalPath;
 		}
 		return null;
 	}

@@ -18,5 +18,11 @@ class ScpDropFolder extends SshDropFolder
 	    }
 	    $url .= $this->getSshHost();
 	    $url .= '/'.$this->getPath();
+	    return $url;
+	}
+	
+	public function getFileTransferMgrType()
+	{
+	    return kFileTransferMgrType::SCP;
 	}
 }

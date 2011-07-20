@@ -19,6 +19,12 @@ class SftpDropFolder extends SshDropFolder
 	    }
 	    $url .= $this->getSshHost();
 	    $url .= '/'.$this->getPath();
+	    return $url;
+	}
+	
+	public function getFileTransferMgrType()
+	{
+	    return kFileTransferMgrType::SFTP;
 	}
         
 }

@@ -5,7 +5,7 @@
  * @subpackage api.objects
  * @abstract
  */
-class KalturaSshDropFolder extends KalturaDropFolder
+class KalturaSshDropFolder extends KalturaRemoteDropFolder
 {
 
     /**
@@ -58,9 +58,6 @@ class KalturaSshDropFolder extends KalturaDropFolder
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
-	//TODO: add toInsertableObject & toUpdatableObject
-	
 	
 }
 
