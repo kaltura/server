@@ -148,6 +148,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
 		$ids = $this->applyIds($ids);
+		$this->setFetchedIds($ids);
 		KalturaLog::debug("Found " . count($ids) . " ids");
 		
 		foreach($this->keyToRemove as $key)
@@ -420,7 +421,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	}
 	
 	public function getSphinxOrderFields()
-	{
+	{			
 		return self::$sphinxOrderFields;
 	}
 	
