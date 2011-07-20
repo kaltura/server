@@ -54,7 +54,7 @@ class ftpMgr extends kFileTransferMgr
 	// upload a file to the server (ftp_mode is irrelevant
 	protected function doPutFile ($remote_file,  $local_file, $ftp_mode, $http_field_name = null, $http_file_name = null)
 	{
-		$remote_file = trim($remote_file,'/');
+		$remote_file = ltrim($remote_file,'/');
 		// try to upload file
 		return ftp_put( $this->connection_id ,  $remote_file ,  $local_file ,  $ftp_mode);
 	}
@@ -64,6 +64,7 @@ class ftpMgr extends kFileTransferMgr
 	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
 	{
 		// try to download file
+		$remote_file = ltrim($remote_file,'/');
 		return ftp_get($this->getConnection(), $local_file, $remote_file, $ftp_mode);
 	}
 
@@ -71,7 +72,7 @@ class ftpMgr extends kFileTransferMgr
 	// create a new directory on the server
 	protected function doMkDir ($remote_path)
 	{
-		$remote_path = trim($remote_path,'/');
+		$remote_path = ltrim($remote_path,'/');
 		// try to make the new directory
 		return ftp_mkdir($this->getConnection(), $remote_path);
 	}
@@ -81,6 +82,7 @@ class ftpMgr extends kFileTransferMgr
 	protected function doChmod ($remote_file, $chmod_code)
 	{
 		// try to chmod
+		$remote_file = ltrim($remote_file,'/');
 		$chmod_code = octdec ( str_pad ( $chmod_code, 4, '0', STR_PAD_LEFT ) );
 		$chmod_code = (int) $chmod_code;
 		return ftp_chmod($this->getConnection(), $chmod_code, $remote_file);
@@ -90,7 +92,7 @@ class ftpMgr extends kFileTransferMgr
 	// check if the given file/dir exists on the server
 	protected function doFileExists($remote_file)
 	{
-		$remote_file = trim($remote_file,'/');
+		$remote_file = ltrim($remote_file,'/');
 		// check if exists as file
 		if (ftp_size($this->getConnection(), $remote_file) != -1) {
 			return true; // file exists
@@ -116,12 +118,14 @@ class ftpMgr extends kFileTransferMgr
 	// delete a file and return true/false according to success
 	protected function doDelFile ($remote_file)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 		return ftp_delete($this->getConnection(), $remote_file);
 	}
 
 	// delete a directory and return true/false according to success
 	protected function doDelDir ($remote_path)
 	{
+	    $remote_path = ltrim($remote_path,'/');
 		$handle = $this->getConnection();
 		if (!(ftp_rmdir($handle, $remote_path) || ftp_delete($handle, $remote_path))) {
 			$list = ftp_nlist($handle, $remote_path);
@@ -137,6 +141,7 @@ class ftpMgr extends kFileTransferMgr
 
 	protected function doList ($remoteDir)
 	{
+	    $remoteDir = ltrim($remoteDir,'/');
 		$tempList = ftp_nlist($this->getConnection(), $remoteDir);
 		$fileList = array();
 		foreach ($tempList as $tempFile)
@@ -151,6 +156,7 @@ class ftpMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 	    return ftp_size($this->getConnection(), $remote_file);
 	}
 

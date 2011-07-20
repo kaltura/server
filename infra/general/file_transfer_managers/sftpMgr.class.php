@@ -84,7 +84,7 @@ class sftpMgr extends kFileTransferMgr
 	protected function doPutFile ($remote_file , $local_file , $ftp_mode, $http_field_name = null, $http_file_name = null)
 	{
 		$sftp = $this->getSftpConnection();
-		trim($remote_file, '/');
+		$remote_file = ltrim($remote_file,'/');
         $stream = @fopen("ssh2.sftp://$sftp/$remote_file", 'w');
         if (!$stream) {
         	return false;
@@ -103,7 +103,7 @@ class sftpMgr extends kFileTransferMgr
 	protected function doGetFile ($remote_file, $local_file, $ftp_mode)
 	{	
 		$sftp = $this->getSftpConnection();
-		trim($remote_file, '/');
+		$remote_file = ltrim($remote_file,'/');
         $stream = @fopen("ssh2.sftp://$sftp/$remote_file", 'r');
         if (!$stream) {
         	return false;
@@ -121,12 +121,14 @@ class sftpMgr extends kFileTransferMgr
 	// create a new directory
 	protected function doMkDir ($remote_path)
 	{
+	    $remote_path = ltrim($remote_path,'/');
 		return ssh2_sftp_mkdir($this->getSftpConnection(), $remote_path);
 	}
 	
 	// chmod the given remote file
 	protected function doChmod ($remote_file, $chmod_code)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 		$chmod_cmd = 'chmod ' . $chmod_code . ' ' . $remote_file;
 		$exec_output = $this->execCommand($chmod_cmd);
 		return (trim($exec_output) == ''); // empty output means the command passed ok
@@ -135,6 +137,7 @@ class sftpMgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 		$sftp = $this->getSftpConnection();
 		$stats = @ssh2_sftp_stat($sftp, $remote_file);
 		return ($stats !== false);
@@ -147,33 +150,36 @@ class sftpMgr extends kFileTransferMgr
 		return $this->execCommand($pwd_cmd);
 	}
 
-        // delete a file and return true/false according to success
-        protected function doDelFile ($remote_file)
-        {
-        	return ssh2_sftp_unlink($this->getSftpConnection(), $remote_file); 
-        }
+    // delete a file and return true/false according to success
+    protected function doDelFile ($remote_file)
+    {
+        $remote_file = ltrim($remote_file,'/');
+    	return ssh2_sftp_unlink($this->getSftpConnection(), $remote_file); 
+    }
 
-         // delete a directory and return true/false according to success
-        protected function doDelDir ($remote_path)
-        {
-            //return ssh2_sftp_rmdir($this->getSftpConnection(), $remote_path);
-             $deldir_cmd = 'rm -r ' . $remote_path;
-             $exec_output = $this->execCommand($deldir_cmd);
-             return (trim($exec_output) == ''); // empty output means the command passed ok
-        }
+     // delete a directory and return true/false according to success
+    protected function doDelDir ($remote_path)
+    {
+        //return ssh2_sftp_rmdir($this->getSftpConnection(), $remote_path);
+         $remote_path = ltrim($remote_path,'/');
+         $deldir_cmd = 'rm -r ' . $remote_path;
+         $exec_output = $this->execCommand($deldir_cmd);
+         return (trim($exec_output) == ''); // empty output means the command passed ok
+    }
 
 	protected function doList ($remote_path)
 	{
-               $lsdir_cmd = 'ls ' . $remote_path;
-               $exec_output = $this->execCommand($lsdir_cmd);
-                return $exec_output;
+	    $remote_path = ltrim($remote_path,'/');
+        $lsdir_cmd = 'ls ' . $remote_path;
+        $exec_output = $this->execCommand($lsdir_cmd);
+        return $exec_output;
 	}	
 	
 	// download a file from the server
 	public function fileGetContents ($remote_file)
-	{	
+	{
+	    $remote_file = ltrim($remote_file,'/');
 		$sftp = $this->getSftpConnection();
-		trim($remote_file, '/');
 		$uri = "ssh2.sftp://$sftp/$remote_file";
         $stream = @fopen($uri, 'r');
         if (!$stream)
@@ -194,7 +200,7 @@ class sftpMgr extends kFileTransferMgr
 		}
 		
         $sftp = $this->getSftpConnection();
-        trim($remote_file, '/');
+        $remote_file = ltrim($remote_file,'/');
 		$uri = "ssh2.sftp://$sftp/$remote_file";
         $stream = @fopen($uri, 'w');
         if (!$stream)
@@ -209,6 +215,7 @@ class sftpMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
 	    $filesize = isset($statinfo['size']) ? $statinfo['size'] : null;
 	    return $filesize;
