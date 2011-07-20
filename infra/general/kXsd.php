@@ -510,10 +510,16 @@ class kXsd
 	 * @param string $appInfoValue
 	 * @return array of xPaths
 	 */
-	public static function findXpathsByAppInfo($xsdPath, $appInfoField, $appInfoValue)
+	public static function findXpathsByAppInfo($xsdPath, $appInfoField, $appInfoValue, $isPath = true)
 	{
 		$xsd = new DOMDocument();
-		$xsd->load($xsdPath);
+		
+		if ($isPath){
+			$xsd->load($xsdPath);
+		}else{
+			$xsd->loadXML($xsdPath);
+		}
+		
 		
 		$xPaths = array();
 		
