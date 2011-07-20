@@ -521,7 +521,7 @@ abstract class BaseentryPeer {
 			entryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
-		
+
 		$con = entryPeer::alternativeCon($con);
 		
 		$queryResult = entryPeer::populateObjects(BasePeer::doSelect($criteria, $con));
@@ -598,7 +598,6 @@ abstract class BaseentryPeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
-		KalturaLog::debug("in attachCriteriaFilter");
 		entryPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
