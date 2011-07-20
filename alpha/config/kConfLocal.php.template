@@ -119,6 +119,7 @@ class kConfLocal
 				"usage_tracking_optin" => "@USAGE_TRACKING_OPTIN@",
 				"installation_id" => "@INSTALLATION_UID@",
                 		// end of ce only settings
+                
 				"metadata_sphinx_num_of_date_fields" => 10,
 				"metadata_sphinx_num_of_int_fields" => 10,
 			)
