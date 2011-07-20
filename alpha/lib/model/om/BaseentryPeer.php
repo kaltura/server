@@ -521,10 +521,13 @@ abstract class BaseentryPeer {
 			entryPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
-
+		
 		$con = entryPeer::alternativeCon($con);
 		
 		$queryResult = entryPeer::populateObjects(BasePeer::doSelect($criteria, $con));
+		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->sortOrderBy($queryResult);
 		
 		if ($cacheKey !== null)
 		{
@@ -595,6 +598,7 @@ abstract class BaseentryPeer {
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
+		KalturaLog::debug("in attachCriteriaFilter");
 		entryPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
 	
