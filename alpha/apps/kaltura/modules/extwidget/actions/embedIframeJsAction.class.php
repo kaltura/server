@@ -21,13 +21,23 @@ class embedIframeJsAction extends sfAction
 		$partner_host = myPartnerUtils::getHost($partner_id);
 		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
 		
-		$html5_version = kConf::get('html5_version');
-
 		$use_cdn = $uiConf->getUseCdn();
 		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
-		
-		$url =  $host;
-		$url .=  "/html5/html5lib/v{$html5_version}/mwEmbedLoader.php";
+
+		$ui_conf_html5_url = $uiConf->getHtml5Url();
+		if( kString::beginsWith( $ui_conf_html5_url , "http") )
+		{
+			$url = $ui_conf_html5_url; // absolute URL
+		}
+		else if ($ui_conf_html5_url)
+		{
+			$ui_conf_html5_url =  $host . $ui_conf_html5_url;
+		}
+		else
+		{
+			$html5_version = kConf::get('html5_version');
+			$url =  "$host/html5/html5lib/v{$html5_version}/mwEmbedLoader.php";
+		}
 		
 		$this->redirect($url);
 	}
