@@ -10,9 +10,15 @@ class KalturaMetadataSearchItem extends KalturaSearchOperator
 	 */
 	public $metadataProfileId;
 	
+	/**
+	 * @var string
+	 */
+	public $orderBy;
+	
 	private static $map_between_objects = array
 	(
-		"metadataProfileId"
+		"metadataProfileId",
+		"orderBy"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -22,7 +28,6 @@ class KalturaMetadataSearchItem extends KalturaSearchOperator
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		KalturaLog::debug("To object: metadataProfileId [$this->metadataProfileId]");
 		if(!$object_to_fill)
 			$object_to_fill = new MetadataSearchFilter();
 			
