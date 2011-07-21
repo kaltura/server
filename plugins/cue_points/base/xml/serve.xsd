@@ -16,6 +16,7 @@
 		
 		<xs:attribute name="sceneId" use="required" type="xs:int" />
 		<xs:attribute name="systemName" use="optional" type="xs:string" />
+		<xs:attribute name="entryId" use="required" type="xs:string" />
 		
 	</xs:complexType>
 	
