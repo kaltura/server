@@ -3,7 +3,7 @@
  * Enable custom metadata on annotation objects
  * @package plugins.annotation
  */
-class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator
+class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'annotationMetadata';
 	const METADATA_PLUGIN_NAME = 'metadata';
@@ -31,8 +31,9 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			
 		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME, $metadataVersion);
 		$annotationDependency = new KalturaDependency(AnnotationPlugin::getPluginName());
+		$annotationMetadataDependency = new KalturaDependency(AnnotationMetadataPlugin::getPluginName());
 		
-		return array($metadataDependency, $annotationDependency);
+		return array($metadataDependency, $annotationDependency, $annotationMetadataDependency);
 	}
 
 	/* (non-PHPdoc)
@@ -47,5 +48,23 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			return array('AnnotationMetadataObjectType');
 			
 		return array();
+	}
+	
+	public static function getMetadataObjectTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('MetadataObjectType', $value);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if(is_null($cuePoint) || $scene->getName() != 'scene-annotation' || !($cuePoint instanceof Annotation))
+			return $cuePoint;
+			
+		$objectType = self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION);
+		return CuePointMetadataPlugin::parseXml($objectType, $scene, $partnerId, $cuePoint);
 	}
 }

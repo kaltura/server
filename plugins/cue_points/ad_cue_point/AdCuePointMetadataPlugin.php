@@ -3,7 +3,7 @@
  * Enable custom metadata on ad cue point objects
  * @package plugins.adCuePoint
  */
-class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator
+class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'adCuePointMetadata';
 	const METADATA_PLUGIN_NAME = 'metadata';
@@ -31,8 +31,9 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			
 		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME, $metadataVersion);
 		$adCuePointDependency = new KalturaDependency(AdCuePointPlugin::getPluginName());
+		$adCuePointMetadataDependency = new KalturaDependency(AdCuePointMetadataPlugin::getPluginName());
 		
-		return array($metadataDependency, $adCuePointDependency);
+		return array($metadataDependency, $adCuePointDependency, $adCuePointMetadataDependency);
 	}
 
 	/* (non-PHPdoc)
@@ -47,5 +48,23 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			return array('AdCuePointMetadataObjectType');
 			
 		return array();
+	}
+	
+	public static function getMetadataObjectTypeCoreValue($valueName)
+	{
+		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+		return kPluginableEnumsManager::apiToCore('MetadataObjectType', $value);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if(is_null($cuePoint) || $scene->getName() != 'scene-ad-cue-point' || !($cuePoint instanceof AdCuePoint))
+			return $cuePoint;
+			
+		$objectType = self::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT);
+		return CuePointMetadataPlugin::parseXml($objectType, $scene, $partnerId, $cuePoint);
 	}
 }

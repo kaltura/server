@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -89,13 +89,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if(
-			$coreType != SchemaType::SYNDICATION
-			&&
-			$coreType != self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
-			&&
-			$coreType != self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
-		)
+		if($coreType != SchemaType::SYNDICATION)
 			return null;
 			
 		
@@ -108,14 +102,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>	
-		';
-		
-		switch($type)
-		{
-			case SchemaType::SYNDICATION:
-			case self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API):
-				
-				$xsd .= '
+	
 	<xs:complexType name="T_scene">
 		<xs:sequence>
 			<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time" />
@@ -131,34 +118,29 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		<xs:attribute name="systemName" use="optional" type="xs:string" />
 		
 	</xs:complexType>
-				';
-				break;
-				
-			case self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API):
-				$xsd .= '
-	<xs:complexType name="T_scene">
-		<xs:sequence>
-			<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time" />
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
 	
-			<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
-		</xs:sequence>
-		
-		<xs:attribute name="sceneId" use="required" type="xs:int" />
-		<xs:attribute name="systemName" use="optional" type="xs:string" />
-		
-	</xs:complexType>
-				';
-				break;
-		}
-		
-		$xsd .= '
 	<xs:element name="scenes" type="T_scenes" substitutionGroup="item-extension" />
 	<xs:element name="scene" type="T_scene" />
 	<xs:element name="scene-extension" />
 		';
 		
 		return $xsd;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 */
+	public static function getPluginSchema($type)
+	{
+		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		
+		if($coreType == self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API))
+			return new SimpleXMLElement(dirname(__FILE__) . '/xml/ingestion.xsd', null, true);
+			
+		if($coreType == self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API))
+			return new SimpleXMLElement(dirname(__FILE__) . '/xml/serve.xsd', null, true);
+			
+		return null;
 	}
 
 	/* (non-PHPdoc)

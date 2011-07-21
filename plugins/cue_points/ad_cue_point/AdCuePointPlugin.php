@@ -3,7 +3,7 @@
  * Enable ad cue point objects management on entry objects
  * @package plugins.adCuePoint
  */
-class AdCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaSchemaContributor
+class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 {
 	const PLUGIN_NAME = 'adCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -113,8 +113,8 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 		return $xsd;
 	}
 	
-	/**
-	 * @return int id of dynamic enum in the DB.
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getCuePointTypeCoreValue()
 	 */
 	public static function getCuePointTypeCoreValue($valueName)
 	{
@@ -122,11 +122,38 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, IKa
 		return kPluginableEnumsManager::apiToCore('CuePointType', $value);
 	}
 	
-	/**
-	 * @return string external API value of dynamic enum.
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getApiValue()
 	 */
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if($scene->getName() != 'scene-ad-cue-point')
+			return $cuePoint;
+			
+		if(!$cuePoint)
+			$cuePoint = kCuePointManager::parseXml($scene, $partnerId, new AdCuePoint());
+			
+		if(!($cuePoint instanceof AdCuePoint))
+			return null;
+		
+		$cuePoint->setEndTime(kXml::timeToInteger($scene->sceneEndTime));
+		if(isset($scene->sceneTitle))
+			$cuePoint->setName($scene->sceneTitle);
+		if(isset($scene->sourceUrl))
+			$cuePoint->setSourceUrl($scene->sourceUrl);
+		if(isset($scene->adType))
+			$cuePoint->setAdType($scene->adType);
+		if(isset($scene->protocolType))
+			$cuePoint->setSubType($scene->protocolType);
+		
+		return $cuePoint;
 	}
 }

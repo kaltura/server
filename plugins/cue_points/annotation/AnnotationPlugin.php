@@ -3,7 +3,7 @@
  * Enable annotation cue point objects management on entry objects
  * @package plugins.annotation
  */
-class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaSchemaContributor
+class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKalturaCuePoint
 {
 	const PLUGIN_NAME = 'annotation';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -122,8 +122,8 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		return $xsd;
 	}
 	
-	/**
-	 * @return int id of dynamic enum in the DB.
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getCuePointTypeCoreValue()
 	 */
 	public static function getCuePointTypeCoreValue($valueName)
 	{
@@ -131,11 +131,34 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		return kPluginableEnumsManager::apiToCore('CuePointType', $value);
 	}
 	
-	/**
-	 * @return string external API value of dynamic enum.
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getApiValue()
 	 */
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if($scene->getName() != 'scene-annotation')
+			return $cuePoint;
+			
+		if(!$cuePoint)
+			$cuePoint = kCuePointManager::parseXml($scene, $partnerId, new Annotation());
+			
+		if(!($cuePoint instanceof Annotation))
+			return null;
+		
+		$cuePoint->setEndTime(kXml::timeToInteger($scene->sceneEndTime));
+		if(isset($scene->sceneText))
+			$cuePoint->setText($scene->sceneText);
+		if(isset($scene->parentId))
+			$cuePoint->setParentId($scene->parentId);
+		
+		return $cuePoint;
 	}
 }

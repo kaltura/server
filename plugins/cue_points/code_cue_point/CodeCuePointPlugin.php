@@ -3,7 +3,7 @@
  * Enable code cue point objects management on entry objects
  * @package plugins.codeCuePoint
  */
-class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaSchemaContributor
+class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 {
 	const PLUGIN_NAME = 'codeCuePoint';
 	const CUE_POINT_VERSION_MAJOR = 1;
@@ -110,8 +110,8 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, I
 		return $xsd;
 	}
 	
-	/**
-	 * @return int id of dynamic enum in the DB.
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getCuePointTypeCoreValue()
 	 */
 	public static function getCuePointTypeCoreValue($valueName)
 	{
@@ -119,11 +119,33 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaPermissions, I
 		return kPluginableEnumsManager::apiToCore('CuePointType', $value);
 	}
 	
-	/**
-	 * @return string external API value of dynamic enum.
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePoint::getApiValue()
 	 */
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
+	{
+		if($scene->getName() != 'scene-code-cue-point')
+			return $cuePoint;
+			
+		if(!$cuePoint)
+			$cuePoint = kCuePointManager::parseXml($scene, $partnerId, new CodeCuePoint());
+			
+		if(!($cuePoint instanceof CodeCuePoint))
+			return null;
+		
+		if(isset($scene->code))
+			$cuePoint->setName($scene->code);
+		if(isset($scene->description))
+			$cuePoint->setText($scene->description);
+		
+		return $cuePoint;
 	}
 }

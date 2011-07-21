@@ -43,21 +43,116 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		
 		if(
-			$coreType != SchemaType::SYNDICATION
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
-			&&
-			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			$coreType == SchemaType::SYNDICATION
+			||
+			$coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
 		)
-			return null;
-			
 		return '
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension" />
 			';
+		
+		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API))
+		return '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
+	<xs:complexType name="T_customData">
+		<xs:sequence>
+			<xs:any namespace="##local" processContents="skip"/>			
+		</xs:sequence>
+		
+		<xs:attribute name="metadataId" use="required" type="xs:int"/>
+		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
+		<xs:attribute name="metadataProfileId" use="required" type="xs:int"/>
+		
+	</xs:complexType>
+	
+	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension" />
+			';
+		
+		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API))
+		return '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
+	<xs:complexType name="T_customData">
+		<xs:sequence>
+			<xs:any namespace="##local" processContents="skip"/>			
+		</xs:sequence>
+		
+		<xs:attribute name="metadataId" use="required" type="xs:int"/>
+		<xs:attribute name="metadataVersion" use="required" type="xs:int"/>
+		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
+		<xs:attribute name="metadataProfileId" use="required" type="xs:int"/>
+		<xs:attribute name="metadataProfileName" use="optional" type="xs:int"/>
+		<xs:attribute name="metadataProfileVersion" use="required" type="xs:int"/>
+		
+	</xs:complexType>
+	
+	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension" />
+			';
+		
+		return null;
+	}
+	
+	public static function parseXml($objectType, SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint)
+	{
+		$metadataElements = $scene->xpath('scene-customData');
+		if(!count($metadataElements))
+			return $cuePoint;
+			
+		foreach($metadataElements as $metadataElement)
+		{
+			$metadata = null;
+			$metadataProfile = null;
+			
+			if(isset($metadataElement['metadataId']))
+				$metadata = MetadataPeer::retrieveByPK($metadataElement['metadataId']);
+
+			if($metadata)
+			{
+				$metadataProfile = $metadata->getMetadataProfile();
+			}
+			else
+			{
+				if(isset($metadataElement['metadataProfileId']))
+					$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataElement['metadataProfileId']);
+				elseif(isset($metadataElement['metadataProfile']))
+					$metadataProfile = MetadataProfilePeer::retrieveBySystemName($metadataElement['metadataProfile']);
+					
+				if($metadataProfile)
+					$metadata = MetadataPeer::retrieveByObject($metadataProfile->getId(), $objectType, $cuePoint->getId());
+			}
+			
+			if(!$metadataProfile)
+				continue;
+		
+			if(!$metadata)
+			{
+				$metadata = new Metadata();
+				$metadata->setPartnerId($partnerId);
+				$metadata->setMetadataProfileId($metadataProfile->getId());
+				$metadata->setMetadataProfileVersion($metadataProfile->getVersion());
+				$metadata->setObjectType($objectType);
+				$metadata->setObjectId($cuePoint->getId());
+				$metadata->setStatus(KalturaMetadataStatus::INVALID);
+				$metadata->save();
+				
+				$metadataContent = reset($metadataElement);
+				$xmlData = $metadataContent->asXML();
+				$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+				kFileSyncUtils::file_put_contents($key, $xmlData);
+				
+				$errorMessage = '';
+				$status = kMetadataManager::validateMetadata($metadata, $errorMessage);
+				if($status == KalturaMetadataStatus::VALID)
+					kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata));
+			}
+		}
+		
+		return $cuePoint;
 	}
 }
