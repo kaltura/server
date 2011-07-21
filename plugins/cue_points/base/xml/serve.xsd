@@ -1,0 +1,32 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:complexType name="T_scenes">
+		<xs:sequence>
+			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>	
+		
+	<xs:complexType name="T_scene">
+		<xs:sequence>
+			<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time" />
+			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
+	
+			<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		
+		<xs:attribute name="sceneId" use="required" type="xs:int" />
+		<xs:attribute name="systemName" use="optional" type="xs:string" />
+		
+	</xs:complexType>
+	
+	<xs:complexType name="T_tags">
+		<xs:sequence>
+			<xs:element name="tag" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="scenes" type="T_scenes" />
+	<xs:element name="scene" type="T_scene" />
+	<xs:element name="scene-extension" />
+	
+</xs:schema>
