@@ -97,6 +97,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	
 	/**
+	 * System description, error message, warnings and failure cause.
 	 * @var string
 	 * @readonly
 	 */
@@ -104,9 +105,16 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	
 	
 	/**
+	 * Partner private data
 	 * @var string
 	 */
 	public $partnerData;
+	
+	/**
+	 * Partner friendly description
+	 * @var string
+	 */
+	public $partnerDescription;
 	
 		
 	private static $map_between_objects = array
@@ -124,6 +132,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 		"deletedAt",
 		"description",
 		"partnerData",
+		"partnerDescription",
 	);
 	
 	public function getMapBetweenObjects ( )
