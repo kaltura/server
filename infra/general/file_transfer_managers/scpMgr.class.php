@@ -84,7 +84,6 @@ class scpMgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
-	    $remote_file = ltrim($remote_file, '/');
 		$exists_cmd = 'test -e ' . $remote_file . ' && echo EXISTS';
 		$exec_output = $this->execCommand($exists_cmd);
 		return (trim($exec_output) == 'EXISTS');
