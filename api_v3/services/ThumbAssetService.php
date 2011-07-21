@@ -232,30 +232,6 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param KalturaSearchResultsResource $contentResource
-	 */
-	protected function KalturaSearchResultsResource(thumbAsset $thumbAsset, KalturaSearchResultsResource $contentResource)
-	{
-    	$contentResource->validatePropertyNotNull('result');
-     	$contentResource->result->validatePropertyNotNull("searchSource");
-     	
-		if ($contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_PARTNER_KSHOW ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_KSHOW ||
-			$contentResource->result->searchSource == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS)
-		{
-			$srcThumbAsset = assetPeer::retrieveOriginalByEntryId($contentResource->result->id); 
-			$this->attachAsset($thumbAsset, $srcThumbAsset);
-		}
-		else
-		{
-			$this->attachUrl($thumbAsset, $contentResource->result->url);
-		}
-    }
-    
-	/**
-	 * @param thumbAsset $thumbAsset
 	 * @param kLocalFileResource $contentResource
 	 */
 	protected function attachLocalFileResource(thumbAsset $thumbAsset, kLocalFileResource $contentResource)
