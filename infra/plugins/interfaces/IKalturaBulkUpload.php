@@ -14,4 +14,11 @@ interface IKalturaBulkUpload extends IKalturaBase, IKalturaEnumerator, IKalturaO
 	 * @param int $enumValue code API value
 	 */
 	public static function getFileExtension($enumValue);
+	
+	
+	/**
+	 * Returns the log file for bulk upload job
+	 * @param BatchJob $batchJob bulk upload batchjob
+	 */
+	public static function writeBulkUploadLogFile($batchJob);
 }

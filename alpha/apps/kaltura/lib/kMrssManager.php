@@ -275,7 +275,8 @@ class kMrssManager
 		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
 		$mrss->addChild('updatedAt', $entry->getUpdatedAt(null));
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
-		$mrss->addChild('link', $link . $entry->getId());
+		if(!is_null($link))
+			$mrss->addChild('link', $link . $entry->getId());
 		$mrss->addChild('type', $entry->getType());
 		$mrss->addChild('licenseType', $entry->getLicenseType());
 		$mrss->addChild('userId', $entry->getPuserId(true));

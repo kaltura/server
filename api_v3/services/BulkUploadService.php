@@ -122,18 +122,54 @@ class BulkUploadService extends KalturaBaseService
 		
 		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		
+		header("Content-Type: text/plain; charset=UTF-8");
 
 		if($local)
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
 			kFile::dumpFile($filePath, $mimeType);
+			kFile::closeDbConnections();
 		}
 		else
 		{
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			KalturaLog::info("Redirecting to [$remoteUrl]");
 			header("Location: $remoteUrl");
+		}	
+	}
+	
+	
+	/**
+	 * serveLog action returan the original file.
+	 * 
+	 * @action serveLog
+	 * @param int $id job id
+	 * @return file
+	 * 
+	 */
+	function serveLogAction($id)
+	{
+		$c = new Criteria();
+		$c->addAnd(BatchJobPeer::ID, $id);
+		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		$batchJob = BatchJobPeer::doSelectOne($c);
+		
+		if (!$batchJob)	
+			KalturaLog::info("File not found for jobid ". $id);
+		else 
+			KalturaLog::info("File found for jobid ". $id);
+			
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUpload');
+		foreach($pluginInstances as $pluginInstance)
+		{
+			/* @var $pluginInstance IKalturaBulkUpload */
+			$hasResalt = $pluginInstance->writeBulkUploadLogFile($batchJob);
+//			if($hasResalt){
+//				break;
+//			}
 		}	
 	}
 }
