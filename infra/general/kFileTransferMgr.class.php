@@ -736,9 +736,11 @@ abstract class kFileTransferMgr
 			return false;
 		} 
 		
-		while (!feof($fileToReadHandle)) 
+		$keepReading = true;
+		while (!feof($fileToReadHandle) && $keepReading) 
 		{ 
 			$content = fread($fileToReadHandle, $chunkSize);
+			$keepReading = !empty($content);
 			if($content === false)
 			{
 				return false;

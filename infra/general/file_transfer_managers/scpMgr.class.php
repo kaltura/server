@@ -119,7 +119,6 @@ class scpMgr extends kFileTransferMgr
 
 	protected function doList ($remote_path)
 	{
-        $remote_path = ltrim($remote_path, '/');
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
         return array_map('trim', explode("\n", $exec_output));
@@ -127,7 +126,6 @@ class scpMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
-	    $remote_file = ltrim($remote_file, '/');
 		$exists_cmd = 'du -b ' . $remote_file;
 		$exec_output = $this->execCommand($exists_cmd);
 		$matches = array();
