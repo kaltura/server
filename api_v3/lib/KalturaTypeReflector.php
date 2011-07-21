@@ -41,6 +41,11 @@ class KalturaTypeReflector
 	private $_constants;
 	
 	/**
+	 * @var array<string>
+	 */
+	private $_constantsValues;
+	
+	/**
 	 * @var bool
 	 */
 	private $_isEnum;
@@ -287,59 +292,134 @@ class KalturaTypeReflector
 	}
 	
 	/**
+	 * returns the name of the constant according to its value 
+	 *
+	 * @param mixed $value
+	 * @return string
+	 */
+	public function getConstantName($value)
+	{
+		if (!$this->isEnum())
+			return false;
+			
+		$this->getConstantsValues();
+		
+		return array_search($value, $this->_constantsValues, false);
+	}
+	
+	/**
+	 * returns the value of the constant according to its name 
+	 *
+	 * @param string $name
+	 * @return mixed
+	 */
+	public function getConstantValue($name)
+	{
+		if (!$this->isEnum())
+			return false;
+			
+		$this->getConstantsValues();
+		
+		return (isset($this->_constantsValues[$name]) ? $this->_constantsValues[$name] : null);
+	}
+	
+	/**
 	 * Returns the enum constants
 	 *
-	 * @return array
+	 * @return array<string>
+	 */
+	public function getConstantsValues()
+	{
+		if (!is_null($this->_constantsValues))
+			return $this->_constantsValues;
+			
+		$this->_constantsValues = array();
+			
+		if ($this->isEnum() || $this->isStringEnum())
+		{
+			$reflectClass = new ReflectionClass($this->_type);
+			$this->_constantsValues = $reflectClass->getConstants();
+		}
+		
+		if($this->isDynamicEnum())
+		{
+			$type = $this->getType();
+			// TODO remove call_user_func after moving to php 5.3
+			$baseEnumName = call_user_func(array($type, 'getEnumClass'));
+//			$baseEnumName = $type::getEnumClass();
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
+			foreach($pluginInstances as $pluginInstance)
+			{
+				$pluginName = $pluginInstance->getPluginName();
+				$enums = $pluginInstance->getEnums($baseEnumName);
+				foreach($enums as $enum)
+				{
+					// TODO remove call_user_func after moving to php 5.3
+					$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
+//					$enumConstans = $enum::getAdditionalValues();
+					foreach($enumConstans as $name => $value)
+						$this->_constantsValues[$name] = $value;
+				}
+			}
+		}
+		
+		return $this->_constantsValues;
+	}
+	
+	/**
+	 * Returns the enum constants
+	 *
+	 * @return array<KalturaPropertyInfo>
 	 */
 	public function getConstants()
 	{
-		if ($this->_constants === null)
+		if (!is_null($this->_constants))
+			return $this->_constants;
+			
+		$this->_constants = array();
+			
+		if ($this->isEnum() || $this->isStringEnum())
 		{
-			$this->_constants = array();
-			
-			if ($this->isEnum() || $this->isStringEnum())
+			$reflectClass = new ReflectionClass($this->_type);
+			$constantsDescription = array();
+			if ($reflectClass->hasMethod("getDescription"))
+				$constantsDescription = $reflectClass->getMethod("getDescription")->invoke($this->_instance);
+			$contants = $reflectClass->getConstants();
+			foreach($contants as $enum => $value)
 			{
-				$reflectClass = new ReflectionClass($this->_type);
-				$constantsDescription = array();
-				if ($reflectClass->hasMethod("getDescription"))
-					$constantsDescription = $reflectClass->getMethod("getDescription")->invoke($this->_instance);
-				$contants = $reflectClass->getConstants();
-				foreach($contants as $enum => $value)
-				{
-					if ($this->isEnum())
-						$prop = new KalturaPropertyInfo("int", $enum);
-					else
-						$prop = new KalturaPropertyInfo("string", $enum);
-						
-					if (array_key_exists($value, $constantsDescription))
-						$prop->setDescription($constantsDescription[$value]);
-					$prop->setDefaultValue($value);
-					$this->_constants[] = $prop;
-				}
+				if ($this->isEnum())
+					$prop = new KalturaPropertyInfo("int", $enum);
+				else
+					$prop = new KalturaPropertyInfo("string", $enum);
+					
+				if (array_key_exists($value, $constantsDescription))
+					$prop->setDescription($constantsDescription[$value]);
+				$prop->setDefaultValue($value);
+				$this->_constants[] = $prop;
 			}
-			
-			if($this->isDynamicEnum())
+		}
+		
+		if($this->isDynamicEnum())
+		{
+			$type = $this->getType();
+			// TODO remove call_user_func after moving to php 5.3
+			$baseEnumName = call_user_func(array($type, 'getEnumClass'));
+//			$baseEnumName = $type::getEnumClass();
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
+			foreach($pluginInstances as $pluginInstance)
 			{
-				$type = $this->getType();
-				// TODO remove call_user_func after moving to php 5.3
-				$baseEnumName = call_user_func(array($type, 'getEnumClass'));
-//				$baseEnumName = $type::getEnumClass();
-				$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaEnumerator');
-				foreach($pluginInstances as $pluginInstance)
+				$pluginName = $pluginInstance->getPluginName();
+				$enums = $pluginInstance->getEnums($baseEnumName);
+				foreach($enums as $enum)
 				{
-					$pluginName = $pluginInstance->getPluginName();
-					$enums = $pluginInstance->getEnums($baseEnumName);
-					foreach($enums as $enum)
+					// TODO remove call_user_func after moving to php 5.3
+					$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
+//					$enumConstans = $enum::getAdditionalValues();
+					foreach($enumConstans as $name => $value)
 					{
-						// TODO remove call_user_func after moving to php 5.3
-						$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
-//						$enumConstans = $enum::getAdditionalValues();
-						foreach($enumConstans as $name => $value)
-						{
-							$prop = new KalturaPropertyInfo("string", $name);
-							$prop->setDefaultValue($pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value);
-							$this->_constants[] = $prop;
-						}
+						$prop = new KalturaPropertyInfo("string", $name);
+						$prop->setDefaultValue($pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value);
+						$this->_constants[] = $prop;
 					}
 				}
 			}
@@ -486,16 +566,8 @@ class KalturaTypeReflector
 		if (!$this->isEnum())
 			return false;
 			
-		$this->getConstants();
-		
-		foreach($this->_constants as $constValue)
-		{
-			if ((int)$constValue->getDefaultValue() === (int)$value)
-			{
-				return true;
-			}
-		}
-		return false;
+		$this->getConstantsValues();
+		return in_array($value, $this->_constantsValues);
 	}
 	
 	/**
@@ -509,47 +581,7 @@ class KalturaTypeReflector
 		if (!$this->isStringEnum())
 			return false;
 			
-		$this->getConstants();
-		
-		foreach($this->_constants as $constValue)
-		{
-			if ((string)$constValue->getDefaultValue() === (string)$value)
-			{
-				return true;
-			}
-		}
-		
-		if($this->isDynamicEnum())
-		{
-			$split = explode(IKalturaEnumerator::PLUGIN_VALUE_DELIMITER, $value, 2);
-			if(count($split) == 1)
-				return false;
-				
-			list($pluginName, $valueName) = $split;
-			
-			$type = $this->getType();
-			
-			// TODO remove call_user_func after moving to php 5.3
-			$baseEnumName = call_user_func(array($type, 'getEnumClass'));
-	//		$baseEnumName = $type::getEnumClass();
-	 
-			$pluginInstance = KalturaPluginManager::getPluginInstance($pluginName);
-			if (!$pluginInstance)
-				return false;
-
-			$enums = $pluginInstance->getEnums($baseEnumName);
-			
-			foreach($enums as $enum)
-			{		
-				// TODO remove call_user_func after moving to php 5.3
-				$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
-	//			$enumConstans = $enum::getAdditionalValues();
-				if(in_array($valueName, $enumConstans))
-					return true;
-			}
-		}
-		
-		return false;
+		return $this->checkEnumValue($value);
 	}
 	
 	/**
