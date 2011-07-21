@@ -581,7 +581,8 @@ class KalturaTypeReflector
 		if (!$this->isStringEnum())
 			return false;
 			
-		return $this->checkEnumValue($value);
+		$this->getConstantsValues();
+		return in_array($value, $this->_constantsValues);
 	}
 	
 	/**
