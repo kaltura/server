@@ -38,9 +38,19 @@ class SchemaService extends KalturaBaseService
 	{
 		header("Content-Type: text/plain; charset=UTF-8");
 		
+		$cacheXsdFile = self::getSchemaPath($type);
+		kFile::dumpFile($cacheXsdFile);
+	}
+	
+	/**
+	 * @param KalturaSchemaType $type  
+	 * @return string filePath 
+	 */
+	public static function getSchemaPath($type)
+	{
 		$cacheXsdFile = kConf::get("cache_root_path") . "/$type.xsd";
 		if(file_exists($cacheXsdFile))
-			kFile::dumpFile($cacheXsdFile);
+			return $cacheXsdFile;
 		
 		$xsdFile = fopen($cacheXsdFile, 'w');
 		
@@ -138,6 +148,6 @@ class SchemaService extends KalturaBaseService
 		
 		fclose($xsdFile);
 		
-		kFile::dumpFile($cacheXsdFile);
+		return $cacheXsdFile;
 	}
 }
