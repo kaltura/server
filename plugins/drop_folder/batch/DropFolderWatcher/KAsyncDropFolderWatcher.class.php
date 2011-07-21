@@ -158,7 +158,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 		// sync between physical file list and drop folder file objects
 		foreach ($physicalFiles as $physicalFileName)
 		{
-			if ($physicalFileName === '.' || $physicalFileName === '..') {
+			if (empty($physicalFileName) || $physicalFileName === '.' || $physicalFileName === '..') {
 				continue;
 			}
 			KalturaLog::debug("Watch file [$physicalFileName]");
