@@ -75,6 +75,84 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		return null;
 	}
 	
+
+	/**
+	 * Returns the log file for bulk upload job
+	 * @param BatchJob $batchJob bulk upload batchjob
+	 */
+	public static function writeBulkUploadLogFile($batchJob)
+	{
+		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($batchJob->getId());
+		if(!count($bulkUploadResults)){
+			echo "Log file is not ready";
+			KalturaLog::info("Log file is not ready");
+			return;
+		}
+
+		KalturaLog::info("generating xml");
+			
+		$data = $batchJob->getData();
+	
+		
+		$xmlElement = new SimpleXMLElement('<bulkUploadLog/>');
+		$xmlElement->addAttribute('version', '2.0');
+		$xmlElement->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
+		
+		$channel = $xmlElement->addChild('channel');
+		
+//		insert all entries to instance pool
+		$pks = array();
+		foreach($bulkUploadResults as $bulkUploadResult){
+			/* @var $bulkUploadResult BulkUploadResult */
+			$pks[] = $bulkUploadResult->getEntryId();
+		}
+		entryPeer::retrieveByPKs($pks);
+		
+		foreach($bulkUploadResults as $bulkUploadResult){
+			/* @var $bulkUploadResult BulkUploadResult */
+			$item = $channel->addChild('item');
+			
+			if($data instanceof kBulkUploadCsvJobData && $data->getCsvVersion() > 1){
+				$item->addChild('conversionProfileId', self::stringToSafeXml($bulkUploadResult->getConversionProfileId()));
+				$item->addChild('accessControlId', self::stringToSafeXml($bulkUploadResult->getAccessControlProfileId()));
+				$item->addChild('startDate', self::stringToSafeXml($bulkUploadResult->getScheduleStartDate('Y-m-d\TH:i:s')));
+				$item->addChild('endDate', self::stringToSafeXml($bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s')));
+				$item->addChild('partnerData', self::stringToSafeXml($bulkUploadResult->getPartnerData()));
+			}
+			$result = $item->addChild('result');
+			$result->addChild('errorDescription', self::stringToSafeXml($bulkUploadResult->getErrorDescription()));
+			$result->addChild('entryStatus', self::stringToSafeXml($bulkUploadResult->getEntryStatus()));
+//			$result->addChild('entryStatusName', self::stringToSafeXml($title));
+			$result->addChild('entryId', self::stringToSafeXml($bulkUploadResult->getEntryId()));
+			
+			$item->addChild('action', self::stringToSafeXml($title));
+			
+			$entry = $bulkUploadResult->getEntry();
+			if(!$entry)
+				continue;
+				
+			kMrssManager::getEntryMrssXml($entry, $item);
+		}
+		
+		echo $xmlElement->asXML();
+		KalturaLog::info($xmlElement->asXML());
+		exit;
+		
+	}
+	
+    /**
+	 * @param string $string
+	 * @return string
+	 */
+	private static function stringToSafeXml($string)
+	{
+		$string = @iconv('utf-8', 'utf-8', $string);
+		$partially_safe = kString::xmlEncode($string);
+		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
+		
+		return $safe;
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUpload::getFileExtension()
 	 */
