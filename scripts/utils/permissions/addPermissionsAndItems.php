@@ -84,7 +84,10 @@ function addPermission($permissionCfg)
 	// add to database
 	KalturaLog::log('Adding new permission with name ['.$permission->getName().'] to partner id ['.$permission->getPartnerId().']');
 	try {
-		PermissionPeer::addToPartner($permission, $permission->getPartnerId());
+		if($permission->getId())
+			$permission->save();
+		else
+			PermissionPeer::addToPartner($permission, $permission->getPartnerId());
 	}
 	catch (kPermissionException $e)	{
 		if ($e->getCode() === kPermissionException::PERMISSION_ALREADY_EXISTS) {
