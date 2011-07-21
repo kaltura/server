@@ -128,7 +128,6 @@ class sftpMgr extends kFileTransferMgr
 	// chmod the given remote file
 	protected function doChmod ($remote_file, $chmod_code)
 	{
-	    $remote_file = ltrim($remote_file,'/');
 		$chmod_cmd = 'chmod ' . $chmod_code . ' ' . $remote_file;
 		$exec_output = $this->execCommand($chmod_cmd);
 		return (trim($exec_output) == ''); // empty output means the command passed ok
@@ -161,7 +160,6 @@ class sftpMgr extends kFileTransferMgr
     protected function doDelDir ($remote_path)
     {
         //return ssh2_sftp_rmdir($this->getSftpConnection(), $remote_path);
-         $remote_path = ltrim($remote_path,'/');
          $deldir_cmd = 'rm -r ' . $remote_path;
          $exec_output = $this->execCommand($deldir_cmd);
          return (trim($exec_output) == ''); // empty output means the command passed ok
@@ -169,7 +167,6 @@ class sftpMgr extends kFileTransferMgr
 
 	protected function doList ($remote_path)
 	{
-	    $remote_path = ltrim($remote_path,'/');
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
         return $exec_output;
