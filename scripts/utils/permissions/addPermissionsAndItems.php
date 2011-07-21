@@ -63,7 +63,10 @@ function addPermission($permissionCfg)
 	}
 	
 	// init new db permission object
-	$permission = new Permission();	
+	$permission = PermissionPeer::getByNameAndPartner($permissionCfg->name, $permissionCfg->partnerId);
+	if(!$permission)	
+		$permission = new Permission();
+			
 	foreach ($permissionCfg as $key => $value)
 	{
 		$setterCallback = array ( $permission ,"set{$key}");	
