@@ -75,6 +75,16 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			return 'csv';
 	}
 	
+	
+	/**
+	 * Returns the log file for bulk upload job
+	 * @param BatchJob $batchJob bulk upload batchjob
+	 */
+	public static function writeBulkUploadLogFile($batchJob)
+	{
+		// TODO
+	}
+	
 	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
