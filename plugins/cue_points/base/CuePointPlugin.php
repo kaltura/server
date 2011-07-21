@@ -134,7 +134,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		
-		if($coreType == self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API))
+		if($coreType == self::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API))
 			return new SimpleXMLElement(dirname(__FILE__) . '/xml/ingestion.xsd', null, true);
 			
 		if($coreType == self::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API))
