@@ -358,7 +358,7 @@ class KalturaTypeReflector
 					$enumConstans = call_user_func(array($enum, 'getAdditionalValues'));
 //					$enumConstans = $enum::getAdditionalValues();
 					foreach($enumConstans as $name => $value)
-						$this->_constantsValues[$name] = $value;
+						$this->_constantsValues[$name] = $pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
 				}
 			}
 		}
