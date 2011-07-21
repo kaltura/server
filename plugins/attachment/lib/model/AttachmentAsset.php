@@ -9,7 +9,6 @@ class AttachmentAsset extends asset
 {
 	const CUSTOM_DATA_FIELD_FILENAME = "filename";
 	const CUSTOM_DATA_FIELD_TITLE = "title";
-	const CUSTOM_DATA_FIELD_DESCRIPTION = "description";
 
 	/* (non-PHPdoc)
 	 * @see Baseasset::applyDefaultValues()
@@ -22,11 +21,9 @@ class AttachmentAsset extends asset
 
 	public function getFilename()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FILENAME);}
 	public function getTitle()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TITLE);}
-	public function getDescription()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DESCRIPTION);}
 
 	public function setFilename($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_FILENAME, $v);}
 	public function setTitle($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_TITLE, $v);}
-	public function setDescription($v)	{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DESCRIPTION, $v);}
 	
 	public function getDownloadUrlWithExpiry($expiry, $useCdn = false)
 	{

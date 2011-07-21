@@ -18,12 +18,6 @@ class KalturaAttachmentAsset extends KalturaAsset
 	public $title;
 	
 	/**
-	 * Friendly description
-	 * @var string
-	 */
-	public $description;
-	
-	/**
 	 * The attachment format
 	 * @var KalturaAttachmentType
 	 * @filter eq,in

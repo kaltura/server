@@ -24,6 +24,8 @@ class asset extends Baseasset implements ISyncableFile
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET = 1;
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG = 2;
 	
+	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
+	
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{
 		$newFlavorAsset = $this->copy();
@@ -345,4 +347,9 @@ class asset extends Baseasset implements ISyncableFile
 	{
 		return array("flavorAsset:entryId=".$this->getEntryId());
 	}
+	
+	public function getPartnerDescription()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION);}
+
+	public function setPartnerDescription($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION, $v);}
+	
 }
