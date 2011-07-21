@@ -259,4 +259,33 @@ class kXml
 //			throw new Exception("The dom to append document element was null : " . $domToAppend);
 		}
 	}
+	
+	/**
+	 * @param string $time hh:mm:ss
+	 * @return int milliseconds
+	 */
+	public static function timeToInteger($time)
+	{
+		$parts = explode(':', $time);
+		if(!isset($parts[0]) || !is_numeric($parts[0]))
+			return null;
+			
+		$ret = intval($parts[0]) * (60 * 60 * 1000);  // hours im milliseconds
+		
+		if(!isset($parts[1]))
+			return $ret;
+		if(!is_numeric($parts[1]))
+			return null;
+			
+		$ret += intval($parts[1]) * (60 * 1000);  // minutes im milliseconds
+		
+		if(!isset($parts[2]))
+			return $ret;
+		if(!is_numeric($parts[2]))
+			return null;
+			
+		$ret += floatval($parts[2]) * 1000;  // seconds im milliseconds
+		
+		return round($ret);
+	}
 }
