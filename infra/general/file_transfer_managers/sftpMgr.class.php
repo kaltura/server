@@ -121,7 +121,6 @@ class sftpMgr extends kFileTransferMgr
 	// create a new directory
 	protected function doMkDir ($remote_path)
 	{
-	    $remote_path = ltrim($remote_path,'/');
 		return ssh2_sftp_mkdir($this->getSftpConnection(), $remote_path);
 	}
 	
@@ -136,7 +135,6 @@ class sftpMgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
-	    $remote_file = ltrim($remote_file,'/');
 		$sftp = $this->getSftpConnection();
 		$stats = @ssh2_sftp_stat($sftp, $remote_file);
 		return ($stats !== false);
@@ -152,7 +150,6 @@ class sftpMgr extends kFileTransferMgr
     // delete a file and return true/false according to success
     protected function doDelFile ($remote_file)
     {
-        $remote_file = ltrim($remote_file,'/');
     	return ssh2_sftp_unlink($this->getSftpConnection(), $remote_file); 
     }
 
@@ -212,7 +209,6 @@ class sftpMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
-	    $remote_file = ltrim($remote_file,'/');
 	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
 	    $filesize = isset($statinfo['size']) ? $statinfo['size'] : null;
 	    return $filesize;
