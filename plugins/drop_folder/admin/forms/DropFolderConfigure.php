@@ -223,7 +223,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		
 		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);
 		if ($extendTypeSubForm) {
-		    $object =  $extendTypeSubForm::getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
+		    $object =  $extendTypeSubForm->getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
 		}
 		
 		return $object;
