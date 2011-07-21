@@ -84,6 +84,7 @@ class scpMgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
+	    $remote_file = ltrim($remote_file, '/');
 		$exists_cmd = 'test -e ' . $remote_file . ' && echo EXISTS';
 		$exec_output = $this->execCommand($exists_cmd);
 		return (trim($exec_output) == 'EXISTS');
@@ -118,6 +119,7 @@ class scpMgr extends kFileTransferMgr
 
 	protected function doList ($remote_path)
 	{
+        $remote_path = ltrim($remote_path, '/');
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
         return array_map('trim', explode("\n", $exec_output));
@@ -125,6 +127,7 @@ class scpMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
+	    $remote_file = ltrim($remote_file, '/');
 		$exists_cmd = 'du -b ' . $remote_file;
 		$exec_output = $this->execCommand($exists_cmd);
 		$matches = array();

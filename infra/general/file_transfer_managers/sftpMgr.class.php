@@ -121,12 +121,14 @@ class sftpMgr extends kFileTransferMgr
 	// create a new directory
 	protected function doMkDir ($remote_path)
 	{
+	    $remote_path = ltrim($remote_path,'/');
 		return ssh2_sftp_mkdir($this->getSftpConnection(), $remote_path);
 	}
 	
 	// chmod the given remote file
 	protected function doChmod ($remote_file, $chmod_code)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 		$chmod_cmd = 'chmod ' . $chmod_code . ' ' . $remote_file;
 		$exec_output = $this->execCommand($chmod_cmd);
 		return (trim($exec_output) == ''); // empty output means the command passed ok
@@ -135,6 +137,7 @@ class sftpMgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 		$sftp = $this->getSftpConnection();
 		$stats = @ssh2_sftp_stat($sftp, $remote_file);
 		return ($stats !== false);
@@ -150,6 +153,7 @@ class sftpMgr extends kFileTransferMgr
     // delete a file and return true/false according to success
     protected function doDelFile ($remote_file)
     {
+        $remote_file = ltrim($remote_file,'/');
     	return ssh2_sftp_unlink($this->getSftpConnection(), $remote_file); 
     }
 
@@ -157,13 +161,15 @@ class sftpMgr extends kFileTransferMgr
     protected function doDelDir ($remote_path)
     {
         //return ssh2_sftp_rmdir($this->getSftpConnection(), $remote_path);
-         $deldir_cmd = 'rm -r ' . $remote_path;
-         $exec_output = $this->execCommand($deldir_cmd);
-         return (trim($exec_output) == ''); // empty output means the command passed ok
+        $remote_path = ltrim($remote_path,'/'); 
+        $deldir_cmd = 'rm -r ' . $remote_path;
+        $exec_output = $this->execCommand($deldir_cmd);
+        return (trim($exec_output) == ''); // empty output means the command passed ok
     }
 
 	protected function doList ($remote_path)
 	{
+	    $remote_path = ltrim($remote_path,'/');
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
         return array_map('trim', explode("\n", $exec_output));
@@ -209,6 +215,7 @@ class sftpMgr extends kFileTransferMgr
 	
 	protected function doFileSize($remote_file)
 	{
+	    $remote_file = ltrim($remote_file,'/');
 	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
 	    $filesize = isset($statinfo['size']) ? $statinfo['size'] : null;
 	    return $filesize;
