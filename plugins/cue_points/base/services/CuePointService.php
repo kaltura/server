@@ -69,6 +69,13 @@ class CuePointService extends KalturaBaseService
 	 */
 	function addFromBulkAction($fileData)
 	{
+		$list = kCuePointManager::addFromXml($fileData['tmp_name'], $this->getPartnerId());
+		
+		$response = new KalturaCuePointListResponse();
+		$response->objects = KalturaCuePointArray::fromDbArray($list);
+		$response->totalCount = count($list);
+	
+		return $response;
 	}
 	
 	/**
