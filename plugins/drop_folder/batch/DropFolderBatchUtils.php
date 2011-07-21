@@ -30,6 +30,13 @@ class DropFolderBatchUtils
 	            break;
 	        case KalturaDropFolderType::SFTP:
 	            $fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+	            $host = $folder->host;
+	            $port = $folder->port;
+	            $username = $folder->username;
+	            $password = $folder->password;
+	            $privateKey = isset($folder->privateKey) ? $folder->privateKey : null;
+	            $publicKey = isset($folder->publicKey) ? $folder->publicKey : null;
+	            break;
 	        case KalturaDropFolderType::SCP:
 	            $fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::SCP);
 	            $host = $folder->host;
