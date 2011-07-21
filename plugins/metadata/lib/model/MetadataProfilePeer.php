@@ -45,6 +45,21 @@ class MetadataProfilePeer extends BaseMetadataProfilePeer
 	}
 	
 	/**
+	 * Retrieve a single object by system name.
+	 *
+	 * @param      int $systemName the system name
+	 * @param      PropelPDO $con the connection to use
+	 * @return     MetadataProfile
+	 */
+	public static function retrieveBySystemName($systemName, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(MetadataProfilePeer::SYSTEM_NAME, $systemName);
+		
+		return MetadataProfilePeer::doSelectOne($criteria, $con);
+	}
+	
+	/**
 	 * @param      int $partnerId the partner id
 	 * @param      PropelPDO $con the connection to use
 	 * @return     array<MetadataProfile>
