@@ -95,6 +95,15 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		return null;
 	}
 	
+	/**
+	 * Returns the log file for bulk upload job
+	 * @param BatchJob $batchJob bulk upload batchjob
+	 */
+	public static function writeBulkUploadLogFile($batchJob)
+	{
+		
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUpload::getFileExtension()
 	 */
