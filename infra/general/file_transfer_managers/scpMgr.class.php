@@ -116,7 +116,7 @@ class scpMgr extends kFileTransferMgr
 	{
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
-        return $exec_output;
+        return explode(' ', $exec_output);
 	}
 	
 	protected function doFileSize($remote_file)

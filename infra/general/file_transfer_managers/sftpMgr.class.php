@@ -169,7 +169,7 @@ class sftpMgr extends kFileTransferMgr
 	{
         $lsdir_cmd = 'ls ' . $remote_path;
         $exec_output = $this->execCommand($lsdir_cmd);
-        return $exec_output;
+        return explode(' ', $exec_output);
 	}	
 	
 	// download a file from the server
