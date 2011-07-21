@@ -31,7 +31,7 @@ class embedIframeJsAction extends sfAction
 		}
 		else if ($ui_conf_html5_url)
 		{
-			$ui_conf_html5_url =  $host . $ui_conf_html5_url;
+			$url =  $host . $ui_conf_html5_url;
 		}
 		else
 		{
