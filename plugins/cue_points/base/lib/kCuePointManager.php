@@ -1,7 +1,6 @@
 <?php
 /**
  * @package plugins.cuePoint
- * @subpackage events
  */
 class kCuePointManager implements kObjectDeletedEventConsumer
 {
@@ -74,5 +73,90 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		foreach($cuePoints as $cuePoint)
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($cuePoint));
 	}
+	
+	/**
+	 * @param SimpleXMLElement $scene
+	 * @param int $partnerId
+	 * @param CuePoint $newCuePoint
+	 * @return CuePoint
+	 */
+	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $newCuePoint = null)
+	{
+		$cuePoint = null;
+		
+		if(isset($scene['sceneId']) && $scene['sceneId'])
+			$cuePoint = CuePointPeer::retrieveByPK($scene['sceneId']);
+			
+		if(!$cuePoint && isset($scene['systemName']) && $scene['systemName'])
+			$cuePoint = CuePointPeer::retrieveBySystemName($scene['systemName']);
+			
+		if(!$cuePoint)
+			$cuePoint = $newCuePoint;
+		
+		$cuePoint->setPartnerId($partnerId);
+		$cuePoint->setStartTime(kXml::timeToInteger($scene->sceneStartTime));
+	
+		$tags = array();
+		foreach ($scene->tags as $tag)
+		{
+			$value = "$tag";
+			if($value)
+				$tags[] = $value;
+		}
+		$cuePoint->setTags(implode(',', $tags));
+		
+		if(isset($cuePoint->userId))
+			$cuePoint->setPuserId($scene->userId);
+			
+		return $cuePoint;
+	}
 
+	/**
+	 * @param string $xmlPath
+	 * @param int $partnerId
+	 * @return array<CuePoint>
+	 */
+	public static function addFromXml($xmlPath, $partnerId)
+	{
+		if(!file_exists($xmlPath))
+			throw new kCuePointException("XML file [$xmlPath] not found", kCuePointException::XML_FILE_NOT_FOUND);
+			
+		$xml = new DOMDocument();
+		libxml_use_internal_errors(true);
+		libxml_clear_errors();
+		if(!$xml->load($xmlPath))
+		{
+			$errors = libxml_get_errors();
+			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlPath));
+			throw new kCuePointException("XML [$xmlPath] is invalid:\n{$errorMessage}", kCuePointException::XML_INVALID);
+		}
+		
+		$xsdPath = SchemaService::getSchemaPath(CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API));
+		libxml_clear_errors();
+		if(!$xml->schemaValidate($xsdPath))
+		{
+			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlPath));
+			throw new kCuePointException("XML [$xmlPath] is invalid:\n{$errorMessage}", kCuePointException::XML_INVALID);
+		}
+		
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePointXmlParser');
+		$scenes = new SimpleXMLElement($xmlPath, null, true);
+		$cuePoints = array();
+		
+		foreach($scenes as $scene)
+		{
+			$cuePoint = null;
+			foreach($pluginInstances as $pluginInstance)
+			{
+				$cuePoint = $pluginInstance->parseXml($scene, $partnerId, $cuePoint);
+				if($cuePoint)
+					$cuePoint->save();
+			}
+			
+			if($cuePoint)
+				$cuePoints[] = $cuePoint;
+		}
+		
+		return $cuePoints;
+	}
 }
