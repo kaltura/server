@@ -22,8 +22,9 @@ class KProvisionEngineAkamai extends KProvisionEngine
 	
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
+	 * @param KalturaProvisionJobData $data
 	 */
-	protected function __construct( KSchedularTaskConfig $taskConfig , $data = null)
+	protected function __construct( KSchedularTaskConfig $taskConfig , KalturaProvisionJobData $data = null)
 	{
 		parent::__construct($taskConfig);
 		

@@ -19,9 +19,10 @@ abstract class KProvisionEngine
 	 *
 	 * @param int $provider
 	 * @param KSchedularTaskConfig $taskConfig
+	 * @param KalturaProvisionJobData $data
 	 * @return KProvisionEngine
 	 */
-	public static function getInstance ( $provider , KSchedularTaskConfig $taskConfig , $data = null)
+	public static function getInstance ( $provider , KSchedularTaskConfig $taskConfig , KalturaProvisionJobData $data = null)
 	{
 		$engine =  null;
 		

@@ -658,7 +658,7 @@ class Partner extends BasePartner
 	public function getEndUsersOveragePrice()			{return $this->getFromCustomData('end_users_overage_price');}
 	
 	/**
-	 * @return akamaiLiveParams
+	 * @return kAkamaiLiveParams
 	 */
 	public function getAkamaiLiveParams()
 	{
