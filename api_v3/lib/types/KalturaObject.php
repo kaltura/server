@@ -102,42 +102,35 @@ class KalturaObject
 			if (in_array($this_prop, $props_to_skip)) continue;
 			
 			$value = $this->$this_prop;
-			if ($value !== null)
-			{
-				$propertyInfo = $typeReflector->getProperty($this_prop);
-				if (!$propertyInfo)
-				{
-		            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
-				}
-				else if (!($value instanceof KalturaNullField))
-				{
-					if ($propertyInfo->isDynamicEnum())
-					{
-						$propertyType = $propertyInfo->getType();
-						$enumType = call_user_func(array($propertyType, 'getEnumClass'));
-						$value = kPluginableEnumsManager::apiToCore($enumType, $value);
-					}
-				}
+			if (is_null($value)) continue;
 				
-				if ($value !== null)
-				{
-					if ($value instanceof KalturaNullField)
-					{
-						$value = null;
-					}
-					else
-					{
-						if (! kXml::isXMLValidContent($value) )
-							throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
-					}
-					
-					$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
-					if (is_callable($setter_callback))
-				 	    call_user_func_array( $setter_callback , array ($value ) );
-			 	    else 
-		            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "]");
-				}
+			$propertyInfo = $typeReflector->getProperty($this_prop);
+			if (!$propertyInfo)
+			{
+	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+	            continue;
 			}
+			
+			if ($value instanceof KalturaNullField)
+			{
+				$value = null;
+			}
+			elseif ($propertyInfo->isDynamicEnum())
+			{
+				$propertyType = $propertyInfo->getType();
+				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
+				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
+			}
+			elseif (! kXml::isXMLValidContent($value) )
+			{
+				throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
+			}
+			
+			$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
+			if (is_callable($setter_callback))
+		 	    call_user_func_array( $setter_callback , array ($value ) );
+	 	    else 
+            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "]");
 		}
 		return $object_to_fill;		
 	}
