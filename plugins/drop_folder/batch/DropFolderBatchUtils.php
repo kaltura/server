@@ -18,7 +18,7 @@ class DropFolderBatchUtils
 	    switch ($folder->type)
 	    {
 	        case KalturaDropFolderType::LOCAL:
-	            $fileTransferMgr = new localMgr();
+	            $fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::);
 	            $host = $port = $username = $password = true;
                 break;
             case KalturaDropFolderType::FTP:
