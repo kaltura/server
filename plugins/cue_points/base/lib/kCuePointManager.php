@@ -97,7 +97,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		$cuePoint->setStartTime(kXml::timeToInteger($scene->sceneStartTime));
 	
 		$tags = array();
-		foreach ($scene->tags as $tag)
+		foreach ($scene->tags->children() as $tag)
 		{
 			$value = "$tag";
 			if($value)
@@ -105,8 +105,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		}
 		$cuePoint->setTags(implode(',', $tags));
 		
-		if(isset($cuePoint->userId))
-			$cuePoint->setPuserId($scene->userId);
+		$cuePoint->setEntryId($cuePoint['entryId']);
+		if(isset($cuePoint['systemName']))
+			$cuePoint->setSystemName($cuePoint['systemName']);
 			
 		return $cuePoint;
 	}
