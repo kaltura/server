@@ -124,7 +124,7 @@ class BaseEntryService extends KalturaEntryService
     protected function setEntryTypeByResource(entry $dbEntry, kResource $resource)
     {
     	$fullPath = null;
-    	switch(get_class($resource))
+    	switch($resource->getType())
     	{
     		case 'kAssetParamsResourceContainer':
     			return $this->setEntryTypeByResource($dbEntry, $resource->getResource());
