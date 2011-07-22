@@ -105,23 +105,23 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		
 	<!-- ' . self::getPluginName() . ' -->
 			
-	<xs:complexType name="T_subTitle">
+	<xs:complexType name="T_attachment">
 		<xs:sequence>
 			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
 			<xs:element name="filename" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="title" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element ref="subtitle-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="attachment-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		
 		<xs:attribute name="attachmentAssetId" type="xs:string" use="optional" />
 		<xs:attribute name="format" type="KalturaAttachmentType" use="optional" />
-		<xs:attribute name="href" type="xs:string" use="optional" />
+		<xs:attribute name="url" type="xs:string" use="optional" />
 						
 	</xs:complexType>
 	
-	<xs:element name="subtitle-extension" />
-	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension" />
+	<xs:element name="attachment-extension" />
+	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension" />
 		';
 		
 		return $xsd;
@@ -146,16 +146,16 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	 */
 	public function contributeAttachmentAssets(AttachmentAsset $attachmentAsset, SimpleXMLElement $mrss)
 	{
-		$subTitle = $mrss->addChild('subTitle');
-		$subTitle->addAttribute('href', kMrssManager::getAssetUrl($attachmentAsset));
-		$subTitle->addAttribute('attachmentAssetId', $attachmentAsset->getId());
-		$subTitle->addChild('filename', $attachmentAsset->getFilename());
-		$subTitle->addChild('title', $attachmentAsset->getTitle());
-		$subTitle->addChild('description', $attachmentAsset->getDescription());
+		$attachment = $mrss->addChild('attachment');
+		$attachment->addAttribute('url', kMrssManager::getAssetUrl($attachmentAsset));
+		$attachment->addAttribute('attachmentAssetId', $attachmentAsset->getId());
+		$attachment->addChild('filename', $attachmentAsset->getFilename());
+		$attachment->addChild('title', $attachmentAsset->getTitle());
+		$attachment->addChild('description', $attachmentAsset->getDescription());
 		
-		$subTitle->addAttribute('format', $attachmentAsset->getContainerFormat());
+		$attachment->addAttribute('format', $attachmentAsset->getContainerFormat());
 			
-		$tags = $subTitle->addChild('tags');
+		$tags = $attachment->addChild('tags');
 		foreach(explode(',', $attachmentAsset->getTags()) as $tag)
 			$tags->addChild('tag', self::stringToSafeXml($tag));
 	}
