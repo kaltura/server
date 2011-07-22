@@ -50,7 +50,7 @@ class SchemaService extends KalturaBaseService
 	{
 		$cacheXsdFile = kConf::get("cache_root_path") . "/$type.xsd";
 		if(file_exists($cacheXsdFile))
-			return $cacheXsdFile;
+			return realpath($cacheXsdFile);
 		
 		$xsdFile = fopen($cacheXsdFile, 'w');
 		
@@ -151,6 +151,6 @@ class SchemaService extends KalturaBaseService
 		
 		fclose($xsdFile);
 		
-		return $cacheXsdFile;
+		return realpath($cacheXsdFile);
 	}
 }
