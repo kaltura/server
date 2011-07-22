@@ -51,11 +51,11 @@ class kMrssManager
 	 */
 	public static function getMrssXml($title, $link = null, $description = null)
 	{
-		$mrss = new SimpleXMLElement('<rss/>');
-		$mrss->addAttribute('version', '2.0');
-		$mrss->addAttribute('xmlns', 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION);
-		$mrss->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-		$mrss->addAttribute('xsi:noNamespaceSchemaLocation', 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . SchemaType::SYNDICATION);
+		$mrss = new SimpleXMLElement('<rss 
+			version="2.0"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . SchemaType::SYNDICATION . '"
+		/>');
 //		$mrss->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
 		
 		$channel = $mrss->addChild('channel');
