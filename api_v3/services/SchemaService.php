@@ -70,6 +70,9 @@ class SchemaService extends KalturaBaseService
 				$baseXsdElement = $plugin->getPluginSchema($type);
 			}
 		}
+		
+		if(!($baseXsdElement instanceof SimpleXMLElement))
+			$baseXsdElement = new SimpleXMLElement('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 	
 		foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
 		{
