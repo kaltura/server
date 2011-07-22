@@ -105,8 +105,6 @@ class FtpDropFolder extends RemoteDropFolder
 	public function getImportJobData()
 	{
 	    $jobData = new kDropFolderImportJobData();
-	    $jobData->setUsername($this->getFtpUsername());
-	    $jobData->setPassword($this->getFtpPassword());
 	    $jobData->setPrivateKey(null);
 	    $jobData->setPublicKey(null);
 	    $jobData->setPassPhrase(null);

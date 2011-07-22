@@ -5,17 +5,7 @@
  * @subpackage model.data
  */
 class kSshImportJobData extends kImportJobData
-{
-	/**
-	 * @var string
-	 */
-	private $username;
-	
-	/**
-	 * @var string
-	 */
-	private $password;	
-	
+{	
 	/**
 	 * @var string
 	 */
@@ -32,38 +22,6 @@ class kSshImportJobData extends kImportJobData
 	private $passPhrase;
 	
 	
-	/**
-     * @return the $username
-     */
-    public function getUsername ()
-    {
-        return $this->username;
-    }
-
-	/**
-     * @param string $username
-     */
-    public function setUsername ($username)
-    {
-        $this->username = $username;
-    }
-
-	/**
-     * @return the $password
-     */
-    public function getPassword ()
-    {
-        return $this->password;
-    }
-
-	/**
-     * @param string $password
-     */
-    public function setPassword ($password)
-    {
-        $this->password = $password;
-    }
-
 	/**
      * @return the $privateKey
      */

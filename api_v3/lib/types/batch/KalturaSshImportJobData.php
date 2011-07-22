@@ -5,17 +5,7 @@
  * @subpackage objects
  */
 class KalturaSshImportJobData extends KalturaImportJobData
-{
-    /**
-	 * @var string
-	 */
-	public $username;
-	
-	/**
-	 * @var string
-	 */
-	public $password;	
-    
+{    
 	/**
 	 * @var string
 	 */
@@ -34,8 +24,6 @@ class KalturaSshImportJobData extends KalturaImportJobData
 	
 	private static $map_between_objects = array
 	(
-		"username",
-    	"password",
     	"privateKey",
     	"publicKey",
 	    "passPhrase",

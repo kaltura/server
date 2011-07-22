@@ -49,7 +49,7 @@ class kDropFolderFileResource extends kLocalFileResource
     	    }
     	    else if ($object instanceof entry)
     	    {
-    	        $entryId = $object->getId;
+    	        $entryId = $object->getId();
     	        $asset = null;
     	    }
     	    else {

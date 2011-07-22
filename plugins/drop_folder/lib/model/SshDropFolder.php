@@ -140,8 +140,6 @@ abstract class SshDropFolder extends RemoteDropFolder
 	public function getImportJobData()
 	{
 	    $jobData = new kDropFolderImportJobData();
-	    $jobData->setUsername($this->getSshUsername());
-	    $jobData->setPassword($this->getSshPassword());
 	    $jobData->setPrivateKey($this->getSshPrivateKey());
 	    $jobData->setPublicKey($this->getSshPublicKey());
 	    $jobData->setPassPhrase($this->getSshPassPhrase());
