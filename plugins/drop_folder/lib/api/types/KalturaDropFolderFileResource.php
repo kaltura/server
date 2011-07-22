@@ -63,15 +63,16 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 		}
 		
 		$object_to_fill->setDropFolderFileId($dropFolderFile->getId());
-					
+
+		$fullPath = $dropFolder->getPath().'/'.$dropFolderFile->getFileName();
+		$object_to_fill->setLocalFilePath($fullPath);
+		
 		if ($dropFolder->getType() == DropFolderType::LOCAL)
 		{
 		    $object_to_fill->setKeepOriginalFile(true);
-		    $fullLocalPath = $dropFolder->getPath().'/'.$this->getFileName();
-		    $object_to_fill->setLocalFilePath($fullLocalPath);
 		    $object_to_fill->setIsReady(true);
 		}
-		else if ($dropFolder instanceof RemoteDropFolder)
+		else /* ($dropFolder instanceof RemoteDropFolder) */
 		{
 		    $object_to_fill->setKeepOriginalFile(false);
 			$object_to_fill->setIsReady(false);
