@@ -200,7 +200,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		
 		$dbUpdatedHandlerConfig = null;
 		if (!is_null($this->fileHandlerConfig)) {
-			$dbOldHanlderConfig = $object_to_fill->getFileHandlerConfig();
 			$dbUpdatedHandlerConfig = $this->fileHandlerConfig->toUpdatableObject($dbOldHanlderConfig);
 		}
 		
