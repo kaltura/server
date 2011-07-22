@@ -261,6 +261,21 @@ class kXml
 	}
 	
 	/**
+	 * @param int $int milliseconds 
+	 * @return string hh:mm:ss
+	 */
+	public static function integerToTime($int)
+	{
+		$ret = array(
+			round($int / (60 * 60 * 1000)),
+			round($int / (60 * 1000)),
+			round($int / (1000), 1),
+		);
+		
+		return implode(':', $ret);
+	}
+	
+	/**
 	 * @param string $time hh:mm:ss
 	 * @return int milliseconds
 	 */
