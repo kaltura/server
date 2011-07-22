@@ -136,7 +136,7 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		$attachmentAssets = assetPeer::retrieveByEntryId($entry->getId(), $types);
 		
 		foreach($attachmentAssets as $attachmentAsset)
-			$this->contributeAttachmentAssets($attachmentAssets, $mrss);
+			$this->contributeAttachmentAssets($attachmentAsset, $mrss);
 	}
 
 	/**
