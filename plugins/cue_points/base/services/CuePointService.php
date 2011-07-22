@@ -65,11 +65,19 @@ class CuePointService extends KalturaBaseService
 	 * @action addFromBulk
 	 * @param file $fileData
 	 * @return KalturaCuePointListResponse
-	 * @todo
+	 * @throws KalturaCuePointErrors::XML_FILE_NOT_FOUND
+	 * @throws KalturaCuePointErrors::XML_INVALID
 	 */
 	function addFromBulkAction($fileData)
 	{
-		$list = kCuePointManager::addFromXml($fileData['tmp_name'], $this->getPartnerId());
+		try
+		{
+			$list = kCuePointManager::addFromXml($fileData['tmp_name'], $this->getPartnerId());
+		}
+		catch (kCoreException $e)
+		{
+			throw new KalturaAPIException($e->getCode());
+		}
 		
 		$response = new KalturaCuePointListResponse();
 		$response->objects = KalturaCuePointArray::fromDbArray($list);
