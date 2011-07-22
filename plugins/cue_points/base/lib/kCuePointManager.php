@@ -121,6 +121,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		if(!file_exists($xmlPath))
 			throw new kCuePointException("XML file [$xmlPath] not found", kCuePointException::XML_FILE_NOT_FOUND);
 			
+		KalturaLog::debug('xml [' . file_get_contents($xmlPath) . ']');
 		$xml = new DOMDocument();
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
@@ -132,6 +133,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		}
 		
 		$xsdPath = SchemaService::getSchemaPath(CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API));
+		KalturaLog::debug("xsd path [$xsdPath]");
 		libxml_clear_errors();
 		if(!$xml->schemaValidate($xsdPath))
 		{
