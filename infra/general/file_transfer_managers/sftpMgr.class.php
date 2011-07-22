@@ -85,7 +85,8 @@ class sftpMgr extends kFileTransferMgr
 	{
 		$sftp = $this->getSftpConnection();
 		$remote_file = ltrim($remote_file,'/');
-        $stream = @fopen("ssh2.sftp://$sftp/$remote_file", 'w');
+		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
+        $stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'w');
         if (!$stream) {
         	return false;
         }
@@ -104,7 +105,8 @@ class sftpMgr extends kFileTransferMgr
 	{	
 		$sftp = $this->getSftpConnection();
 		$remote_file = ltrim($remote_file,'/');
-        $stream = @fopen("ssh2.sftp://$sftp/$remote_file", 'r');
+		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
+        $stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'r');
         if (!$stream) {
         	return false;
         }
