@@ -105,9 +105,9 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		}
 		$cuePoint->setTags(implode(',', $tags));
 		
-		$cuePoint->setEntryId($cuePoint['entryId']);
-		if(isset($cuePoint['systemName']))
-			$cuePoint->setSystemName($cuePoint['systemName']);
+		$cuePoint->setEntryId($scene['entryId']);
+		if(isset($scene['systemName']))
+			$cuePoint->setSystemName($scene['systemName']);
 			
 		return $cuePoint;
 	}
