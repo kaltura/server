@@ -10,12 +10,12 @@
 		<xs:sequence>
 			<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time" />
 			<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
+			<xs:element name="tags" minOccurs="0" maxOccurs="1" type="T_tags" />
 	
 			<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		
-		<xs:attribute name="sceneId" use="required" type="xs:int" />
+		<xs:attribute name="sceneId" use="required" type="xs:string" />
 		<xs:attribute name="systemName" use="optional" type="xs:string" />
 		<xs:attribute name="entryId" use="required" type="xs:string" />
 		
