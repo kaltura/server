@@ -160,7 +160,7 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		if(!$scene)
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-code-cue-point'));
 			
-		$scene->addChild('code', kXml::integerToTime($cuePoint->getName()));
+		$scene->addChild('code', kMrssManager::stringToSafeXml($cuePoint->getName()));
 		if($cuePoint->getText())
 			$scene->addChild('description', kMrssManager::stringToSafeXml($cuePoint->getText()));
 			
