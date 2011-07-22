@@ -40,7 +40,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
-	<xs:complexType name="T_subTitle">
+	<xs:complexType name="T_attachment">
 		<xs:sequence>
 			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
 			<xs:choice minOccurs="1" maxOccurs="1">
@@ -53,7 +53,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 			<xs:element name="filename" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="title" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element ref="subtitle-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="attachment-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		
 		<xs:attribute name="attachmentAssetId" type="xs:string" use="optional" />
@@ -62,8 +62,8 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 						
 	</xs:complexType>
 	
-	<xs:element name="subtitle-extension" />
-	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension" />
+	<xs:element name="attachment-extension" />
+	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension" />
 		';
 		
 		return $xsd;
