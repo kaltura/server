@@ -155,8 +155,11 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 					$cuePoint->save();
 			}
 			
-			if($cuePoint)
+			if($cuePoint && $cuePoint instanceof CuePoint)
+			{
+				KalturaLog::debug("cue point [" . get_class($cuePoint->getId()) . "] created [" . $cuePoint->getId() . "]");
 				$cuePoints[] = $cuePoint;
+			}
 		}
 		
 		return $cuePoints;
