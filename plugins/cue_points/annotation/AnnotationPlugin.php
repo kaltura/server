@@ -94,7 +94,7 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		
 		if(
 			$coreType == SchemaType::SYNDICATION
-			&&
+			||
 			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 		)
 			return '
