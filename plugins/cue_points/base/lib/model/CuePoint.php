@@ -44,9 +44,9 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	 */
 	public function setPuserId($v, $isAdmin)
 	{
-		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $v);
+		$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $v, $isAdmin);
 	    if(!$kuser)
-			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $v, $isAdmin);
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 			
 		return $this->setKuserId($kuser->getId());
 	} 
