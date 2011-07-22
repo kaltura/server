@@ -157,7 +157,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 			
 			if($cuePoint && $cuePoint instanceof CuePoint)
 			{
-				KalturaLog::debug("cue point [" . get_class($cuePoint->getId()) . "] created [" . $cuePoint->getId() . "]");
+				KalturaLog::debug("cue point [" . get_class($cuePoint) . "] created [" . $cuePoint->getId() . "]");
 				$cuePoints[] = $cuePoint;
 			}
 		}
