@@ -266,10 +266,11 @@ class kXml
 	 */
 	public static function integerToTime($int)
 	{
+		$lastDigit = round($int / 100);
 		$ret = array(
-			round($int / (60 * 60 * 1000)),
-			round($int / (60 * 1000)),
-			round($int / (1000), 1),
+			str_pad(round($int / (60 * 60 * 1000)), 2, 0, STR_PAD_LEFT),
+			str_pad(round($int / (60 * 1000)), 2, 0, STR_PAD_LEFT),
+			str_pad(round($int / 1000), 2, 0, STR_PAD_LEFT) . ($lastDigit ? ".$lastDigit" : ''),			
 		);
 		
 		return implode(':', $ret);
