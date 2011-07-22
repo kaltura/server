@@ -195,7 +195,9 @@ class Form_DropFolderConfigure extends Infra_Form
 			if ($element instanceof Kaltura_Form_Element_EnumSelect)
 			{
 				$elementName = $element->getName();
-				$element->setValue(array($props[$elementName]));
+				if (isset($props[$elementName])) {
+				    $element->setValue(array($props[$elementName]));
+				}
 			}
 		}
 		
