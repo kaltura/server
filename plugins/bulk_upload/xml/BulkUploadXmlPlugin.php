@@ -125,7 +125,13 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 //			$result->addChild('entryStatusName', self::stringToSafeXml($title));
 			$result->addChild('entryId', self::stringToSafeXml($bulkUploadResult->getEntryId()));
 			
-			$item->addChild('action', self::stringToSafeXml($title));
+//			TODO - add action column to the bulk_upload_result table
+//			maybe also...
+//			 - add custom_data and bulk_upload_type
+//			 - and change the entry_id to object_id and add object_type
+//			 - and change the line_index to item_index
+//			
+//			$item->addChild('action', self::stringToSafeXml($title));
 			
 			$entry = $bulkUploadResult->getEntry();
 			if(!$entry)
