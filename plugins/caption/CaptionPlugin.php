@@ -144,7 +144,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), $types);
 		
 		foreach($captionAssets as $captionAsset)
-			$this->contributeCaptionAssets($captionAssets, $mrss);
+			$this->contributeCaptionAssets($captionAsset, $mrss);
 	}
 
 	/**
