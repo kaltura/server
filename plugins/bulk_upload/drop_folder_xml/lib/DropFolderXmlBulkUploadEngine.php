@@ -12,7 +12,7 @@ class DropFolderXmlBulkUploadEngine extends BulkUploadEngineXml
 	{
 		parent::__construct($taskConfig, $kClient, $job);
 		
-		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . KalturaSchemaType::DROP_FOLDER_XML . '/name/core';
+		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . KalturaSchemaType::DROP_FOLDER_XML;
 		if($taskConfig->params->xsdFilePath) 
 			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
 	}
