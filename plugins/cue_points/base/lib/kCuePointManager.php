@@ -128,7 +128,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		$scene->addChild('userId', kMrssManager::stringToSafeXml($cuePoint->getPuserId()));
 		
 		$tags = $scene->addChild('tags');
-		if($cuePoint->getTags())
+		if(trim($cuePoint->getTags(), " \r\n\t"))
 			foreach(explode(',', $cuePoint->getTags()) as $tag)
 				$tags->addChild('tag', kMrssManager::stringToSafeXml($tag));
 			
