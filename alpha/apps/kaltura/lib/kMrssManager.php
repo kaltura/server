@@ -10,7 +10,7 @@ class kMrssManager
 	 * @param string $string
 	 * @return string
 	 */
-	private static function stringToSafeXml($string)
+	public static function stringToSafeXml($string)
 	{
 		$string = @iconv('utf-8', 'utf-8', $string);
 		$partially_safe = kString::xmlEncode($string);
