@@ -209,7 +209,7 @@ class KAsyncImport extends KBatchBase
 			$host = isset($parsedUrl['host']) ? $parsedUrl['host'] : null;
 			$remotePath = isset($parsedUrl['path']) ? $parsedUrl['path'] : null;
 			$username = isset($parsedUrl['user']) ? $parsedUrl['user'] : null;
-			$password = isset($parsedUrl['password']) ? $parsedUrl['password'] : null;
+			$password = isset($parsedUrl['pass']) ? $parsedUrl['pass'] : null;
 			
 			$privateKey = isset($data->privateKey) ? $data->privateKey : null;
 			$publicKey  = isset($data->publicKey) ? $data->publicKey : null;
