@@ -4,15 +4,15 @@ require_once(dirname(__FILE__).'/../bootstrap.php');
 
 
 /*partner Id*/
-$partnerId = '100';
+$partnerId = null;
 
 /*partner's akamai live params*/
-$akamaiLiveWsdlUsername = 'kaltura.admin.production@ibsys.com';//null;
-$akamaiLiveWsdlPassword = 'f99asp';//null;
-$akamaiLiveCpCode = '126787';//null;
-$akamaiLiveEmailId = 'kaltura.admin.production@ibsys.com';//null;
-$akamaiLivePrimaryContact = 'tj@ibsys.com';//null;
-$akamaiLiveSecondaryContact = 'mottaz@ibsys.com';//null;
+$akamaiLiveWsdlUsername = null;
+$akamaiLiveWsdlPassword = null;
+$akamaiLiveCpCode = null;
+$akamaiLiveEmailId = null;
+$akamaiLivePrimaryContact = null;
+$akamaiLiveSecondaryContact = null;
 
 
 // don't add to database if one of the parameters is missing or is an empty string
