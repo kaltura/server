@@ -88,7 +88,12 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	public function save(PropelPDO $con = null)
 	{
 		if ($this->isNew())
+		{
+			if(is_null($this->getKuserId()))
+				$this->setPuserId(kCurrentContext::$uid);
+				
 			$this->setId($this->calculateId());
+		}
 			
 		return parent::save($con);
 	}
