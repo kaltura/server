@@ -92,10 +92,29 @@ class CuePointService extends KalturaBaseService
 	 * @param KalturaCuePointFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return file
-	 * @todo
 	 */
 	function serveBulkAction(KalturaCuePointFilter $filter = null, KalturaFilterPager $pager = null)
 	{
+		if (!$filter)
+			$filter = new KalturaCuePointFilter();
+			
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		if($this->getCuePointType())
+			$c->add(CuePointPeer::TYPE, $this->getCuePointType());
+		
+		$cuePointFilter = $filter->toObject();
+		
+		$cuePointFilter->attachToCriteria($c);
+		if ($pager)
+			$pager->attachToCriteria($c);
+			
+		$list = CuePointPeer::doSelect($c);
+		$xml = kCuePointManager::generateXml($list);
+		
+		header("Content-Type: text/xml; charset=UTF-8");
+		echo $xml;
+		kFile::closeDbConnections();
+		exit(0);
 	}
 	
 	/**

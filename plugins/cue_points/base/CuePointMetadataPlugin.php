@@ -155,4 +155,39 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 		
 		return $cuePoint;
 	}
+	
+	public static function generateCuePointXml(SimpleXMLElement $scene, $objectType, $cuePointId)
+	{
+		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $cuePointId);
+		
+		foreach($metadatas as $metadata)
+		{
+			/* @var $metadata Metadata */
+			$metadataElement = $scene->addChild('scene-customData');
+			$metadataElement->addAttribute('metadataId', $metadata->getId());
+			$metadataElement->addAttribute('metadataVersion', $metadata->getVersion());
+			$metadataElement->addAttribute('metadataProfileId', $metadata->getMetadataProfileId());
+			$metadataElement->addAttribute('metadataProfileVersion', $metadata->getMetadataProfileVersion());
+			
+			$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+			$xml = kFileSyncUtils::file_get_contents($key, true, false);
+			if($xml)
+			{
+				$xmlElement = new SimpleXMLElement($xml);
+				$xmlElementName = $xmlElement->getName();
+				$metadataElement->$xmlElementName = $xmlElement;
+			}
+			
+			$metadataProfile = $metadata->getMetadataProfile();
+			if(!$metadataProfile)
+				continue;
+			
+			if($metadataProfile->getSystemName())
+				$metadataElement->addAttribute('metadataProfile', $metadataProfile->getSystemName());
+			if($metadataProfile->getName())
+				$metadataElement->addAttribute('metadataProfileName', $metadataProfile->getName());
+		}
+
+		return $scene;
+	}
 }

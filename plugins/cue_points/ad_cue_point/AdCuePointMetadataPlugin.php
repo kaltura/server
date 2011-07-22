@@ -67,4 +67,16 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 		$objectType = self::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT);
 		return CuePointMetadataPlugin::parseXml($objectType, $scene, $partnerId, $cuePoint);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::generateXml()
+	 */
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(is_null($scene) || $scene->getName() != 'scene-ad-cue-point' || !($cuePoint instanceof AdCuePoint))
+			return $scene;
+			
+		$objectType = self::getMetadataObjectTypeCoreValue(AdCuePointMetadataObjectType::AD_CUE_POINT);
+		return CuePointMetadataPlugin::generateCuePointXml($scene, $objectType, $cuePoint->getId());
+	}
 }

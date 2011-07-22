@@ -148,4 +148,22 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		
 		return $cuePoint;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::generateXml()
+	 */
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!($cuePoint instanceof CodeCuePoint))
+			return $scene;
+			
+		if(!$scene)
+			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-code-cue-point'));
+			
+		$scene->addChild('code', kXml::integerToTime($cuePoint->getName()));
+		if($cuePoint->getText())
+			$scene->addChild('description', kMrssManager::stringToSafeXml($cuePoint->getText()));
+			
+		return $scene;
+	}
 }

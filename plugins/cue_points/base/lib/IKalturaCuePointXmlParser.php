@@ -12,4 +12,12 @@ interface IKalturaCuePointXmlParser extends IKalturaBase
 	 * @return CuePoint
 	 */
 	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null);
+	
+	/**
+	 * @param CuePoint $cuePoint
+	 * @param SimpleXMLElement $scenes the parent node
+	 * @param SimpleXMLElement $scene the node
+	 * @return SimpleXMLElement the created node
+	 */
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null);
 }

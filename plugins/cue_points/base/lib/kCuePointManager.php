@@ -111,6 +111,28 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 			
 		return $cuePoint;
 	}
+	
+	/**
+	 * @param CuePoint $cuePoint
+	 * @param SimpleXMLElement $scene
+	 * @return SimpleXMLElement the created scene
+	 */
+	public static function generateCuePointXml(CuePoint $cuePoint, SimpleXMLElement $scene)
+	{
+		$scene->addAttribute('sceneId', $cuePoint->getId());
+		$scene->addAttribute('entryId', $cuePoint->getEntryId());
+		if($cuePoint->getSystemName())
+			$scene->addAttribute('systemName', kMrssManager::stringToSafeXml($cuePoint->getSystemName()));
+		
+		$scene->addChild('sceneStartTime', kXml::integerToTime($cuePoint->getStartTime()));
+		$scene->addChild('userId', kMrssManager::stringToSafeXml($cuePoint->getPuserId()));
+		
+		$tags = $scene->addChild('tags');
+		foreach(explode(',', $cuePoint->getTags()) as $tag)
+			$tags->addChild('tag', kMrssManager::stringToSafeXml($tag));
+			
+		return $scene;
+	}
 
 	/**
 	 * @param string $xmlPath
@@ -165,4 +187,53 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		
 		return $cuePoints;
 	}
+
+	/**
+	 * @param array<CuePoint> $cuePoints
+	 * @return string xml
+	 */
+	public static function generateXml(array $cuePoints)
+	{
+		$schemaType = CuePointPlugin::getApiValue(CuePointSchemaType::SERVE_API);
+		$xsdUrl = "http://" . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$schemaType";
+		
+		$scenes = new SimpleXMLElement('<scenes/>');
+		$scenes->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+		$scenes->addAttribute('xsi:noNamespaceSchemaLocation', $xsdUrl);
+	
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePointXmlParser');
+		
+		foreach($cuePoints as $cuePoint)
+		{
+			$scene = null;
+			foreach($pluginInstances as $pluginInstance)
+			{
+				$scene = $pluginInstance->generateXml($cuePoint, $scenes, $scene);
+			}
+		}
+		
+		$xmlContent = $scenes->asXML();
+	
+		KalturaLog::debug("xml [$xmlContent]");
+		$xml = new DOMDocument();
+		libxml_use_internal_errors(true);
+		libxml_clear_errors();
+		if(!$xml->loadXML($xmlContent))
+		{
+			$errors = libxml_get_errors();
+			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
+			throw new kCuePointException("XML is invalid:\n{$errorMessage}", kCuePointException::XML_INVALID);
+		}
+		
+		$xsdPath = SchemaService::getSchemaPath($schemaType);
+		KalturaLog::debug("xsd path [$xsdPath]");
+		libxml_clear_errors();
+		if(!$xml->schemaValidate($xsdPath))
+		{
+			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
+			throw new kCuePointException("XML is invalid:\n{$errorMessage}", kCuePointException::XML_INVALID);
+		}
+		
+		return $xmlContent;
+	}	
 }

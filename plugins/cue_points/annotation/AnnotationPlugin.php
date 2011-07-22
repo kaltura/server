@@ -91,16 +91,34 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
+		
 		if(
-			$coreType != SchemaType::SYNDICATION
+			$coreType == SchemaType::SYNDICATION
 			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
-			&&
-			$coreType != CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API)
+			$coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API)
 		)
-			return null;
-			
-		$xsd = '
+			return '
+		
+	<!-- ' . self::getPluginName() . ' -->
+	
+	<xs:complexType name="T_scene_annotation">
+		<xs:complexContent>
+			<xs:extension base="T_scene">
+				<xs:sequence>
+					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
+					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string" />
+					<xs:element name="parent" minOccurs="0" maxOccurs="1" type="xs:string" />
+					<xs:element name="parentId" minOccurs="0" maxOccurs="1" type="xs:string" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene" />
+		';
+		
+		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API))
+			return '
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
@@ -122,7 +140,7 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene" />
 		';
 		
-		return $xsd;
+		return null;
 	}
 	
 	/* (non-PHPdoc)
@@ -169,5 +187,33 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			$cuePoint->setParentId($parentCuePoint->getId());
 		
 		return $cuePoint;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::generateXml()
+	 */
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!($cuePoint instanceof Annotation))
+			return $scene;
+			
+		if(!$scene)
+			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-annotation'));
+			
+		$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
+		if($cuePoint->getText())
+			$scene->addChild('sceneText', kMrssManager::stringToSafeXml($cuePoint->getText()));
+		if($cuePoint->getParentId())
+		{
+			$parentCuePoint = CuePointPeer::retrieveByPK($cuePoint->getParentId());
+			if($parentCuePoint)
+			{
+				$scene->addChild('parentId', $parentCuePoint->getId());
+				if($parentCuePoint->getSystemName())
+					$scene->addChild('parent', kMrssManager::stringToSafeXml($parentCuePoint->getSystemName()));
+			}
+		}
+			
+		return $scene;
 	}
 }

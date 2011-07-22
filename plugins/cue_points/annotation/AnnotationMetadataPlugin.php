@@ -67,4 +67,16 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 		$objectType = self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION);
 		return CuePointMetadataPlugin::parseXml($objectType, $scene, $partnerId, $cuePoint);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::generateXml()
+	 */
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(is_null($scene) || $scene->getName() != 'scene-annotation' || !($cuePoint instanceof Annotation))
+			return $scene;
+			
+		$objectType = self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION);
+		return CuePointMetadataPlugin::generateCuePointXml($scene, $objectType, $cuePoint->getId());
+	}
 }

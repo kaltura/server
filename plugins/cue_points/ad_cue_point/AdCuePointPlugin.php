@@ -156,4 +156,28 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		
 		return $cuePoint;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::generateXml()
+	 */
+	public static function generateXml(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!($cuePoint instanceof AdCuePoint))
+			return $scene;
+			
+		if(!$scene)
+			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-ad-cue-point'));
+			
+		$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
+		if($cuePoint->getName())
+			$scene->addChild('sceneTitle', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		if($cuePoint->getSourceUrl())
+			$scene->addChild('sourceUrl', kMrssManager::stringToSafeXml($cuePoint->getSourceUrl()));
+		if($cuePoint->getAdType())
+			$scene->addChild('adType', $cuePoint->getAdType());
+		if($cuePoint->getSubType())
+			$scene->addChild('protocolType', $cuePoint->getSubType());
+			
+		return $scene;
+	}
 }
