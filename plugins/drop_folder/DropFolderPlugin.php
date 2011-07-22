@@ -80,6 +80,10 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		
 		if ($baseClass == 'DropFolder')
 		{
+		    if ($enumValue == KalturaDropFolderType::LOCAL)
+			{
+				return 'DropFolder';
+			}
 			if ($enumValue == KalturaDropFolderType::FTP)
 			{
 				return 'FtpDropFolder';
@@ -98,7 +102,11 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		{
 			if ($baseClass == 'Kaltura_Client_DropFolder_Type_DropFolder')
     		{
-    			if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::FTP)
+    		    if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::LOCAL)
+    			{
+    				return 'Kaltura_Client_DropFolder_Type_DropFolder';
+    			}    		    
+    		    if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::FTP)
     			{
     				return 'Kaltura_Client_DropFolder_Type_FtpDropFolder';
     			}
@@ -114,7 +122,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
     		
     		if ($baseClass == 'Form_DropFolderConfigureExtend_SubForm')
     		{
-    			if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::FTP)
+    		    if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::FTP)
     			{
     				return 'Form_FtpDropFolderConfigureExtend_SubForm';
     			}
@@ -143,7 +151,11 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 
 		if ($baseClass == 'KalturaDropFolder')
 		{
-			if ($enumValue == KalturaDropFolderType::FTP)
+		    if ($enumValue == KalturaDropFolderType::LOCAL)
+			{
+				return 'KalturaDropFolder';
+			}
+		    if ($enumValue == KalturaDropFolderType::FTP)
 			{
 				return 'KalturaFtpDropFolder';
 			}
