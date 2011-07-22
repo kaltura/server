@@ -10,6 +10,22 @@ class AdCuePoint extends CuePoint
 	const CUSTOM_DATA_FIELD_SOURCE_URL = 'sourceUrl';
 	const CUSTOM_DATA_FIELD_AD_TYPE = 'adType';
 
+	public function __construct() 
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
+	}
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or equivalent initialization method).
+	 * @see __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->setType(AdCuePointPlugin::getCuePointTypeCoreValue(AdCuePointType::AD));
+	}
+	
 	public function getSourceUrl()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SOURCE_URL);}
 	public function getAdType()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_AD_TYPE);}	
 
