@@ -132,7 +132,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 			throw new kCuePointException("XML [$xmlPath] is invalid:\n{$errorMessage}", kCuePointException::XML_INVALID);
 		}
 		
-		$xsdPath = SchemaService::getSchemaPath(CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API));
+		$xsdPath = SchemaService::getSchemaPath(CuePointPlugin::getApiValue(CuePointSchemaType::INGEST_API));
 		KalturaLog::debug("xsd path [$xsdPath]");
 		libxml_clear_errors();
 		if(!$xml->schemaValidate($xsdPath))
