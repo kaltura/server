@@ -7,11 +7,6 @@
 abstract class RemoteDropFolder extends DropFolder
 {
 	
-	public function getLocalPath()
-	{
-	    return $this->getTempLocalPath();
-	}
-	
 	/**
 	 * @return kFileTransferMgrType
 	 */

@@ -27,22 +27,6 @@ class DropFolderFile extends BaseDropFolderFile
 	public function getFileSizeLastSetAt($format = null)
 	{
 		return parent::getFileSizeLastSetAt($format);
-	}
-	
-	/**
-	 * @return string full local path to file (drop folder path + file name)
-	 */
-	public function getLocalFullPath()
-	{
-		$dropFolder = DropFolderPeer::retrieveByPK($this->getDropFolderId());
-		
-		if ($dropFolder && strlen($dropFolder->getLocalPath()) > 0)
-		{
-			$fullLocalPath = $dropFolder->getLocalPath().'/'.$this->getFileName();
-			return $fullLocalPath;
-		}
-		return null;
-	}
-	
+	}	
 		
 } // DropFolderFile
