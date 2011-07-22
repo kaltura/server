@@ -114,7 +114,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		
-		<xs:attribute name="sceneId" use="required" type="xs:int" />
+		<xs:attribute name="sceneId" use="required" type="xs:string" />
 		<xs:attribute name="systemName" use="optional" type="xs:string" />
 		
 	</xs:complexType>
