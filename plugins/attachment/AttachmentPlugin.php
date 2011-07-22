@@ -157,7 +157,7 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			
 		$tags = $attachment->addChild('tags');
 		foreach(explode(',', $attachmentAsset->getTags()) as $tag)
-			$tags->addChild('tag', self::stringToSafeXml($tag));
+			$tags->addChild('tag', kMrssManager::stringToSafeXml($tag));
 	}
 	
 	/**
