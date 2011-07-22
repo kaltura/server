@@ -110,7 +110,10 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 				<xs:sequence>
 					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
 					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="parentId" minOccurs="0" maxOccurs="1" type="xs:string" />
+					<xs:choice minOccurs="0" maxOccurs="1">
+						<xs:element name="parent" minOccurs="1" maxOccurs="1" type="xs:string" />
+						<xs:element name="parentId" minOccurs="1" maxOccurs="1" type="xs:string" />
+					</xs:choice>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -156,8 +159,14 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		$cuePoint->setEndTime(kXml::timeToInteger($scene->sceneEndTime));
 		if(isset($scene->sceneText))
 			$cuePoint->setText($scene->sceneText);
+			
+		$parentCuePoint = null;
 		if(isset($scene->parentId))
-			$cuePoint->setParentId($scene->parentId);
+			$parentCuePoint = CuePointPeer::retrieveByPK($scene->parentId);
+		elseif(isset($scene->parent))
+			$parentCuePoint = CuePointPeer::retrieveBySystemName($scene->parent);
+		if($parentCuePoint)
+			$cuePoint->setParentId($parentCuePoint->getId());
 		
 		return $cuePoint;
 	}
