@@ -208,9 +208,9 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			$parentCuePoint = CuePointPeer::retrieveByPK($cuePoint->getParentId());
 			if($parentCuePoint)
 			{
-				$scene->addChild('parentId', $parentCuePoint->getId());
 				if($parentCuePoint->getSystemName())
 					$scene->addChild('parent', kMrssManager::stringToSafeXml($parentCuePoint->getSystemName()));
+				$scene->addChild('parentId', $parentCuePoint->getId());
 			}
 		}
 			
