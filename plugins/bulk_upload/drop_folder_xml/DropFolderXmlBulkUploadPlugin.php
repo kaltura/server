@@ -122,29 +122,35 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		if($coreType != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
 			return null;
 			
-		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
-		$xmlnsPlugin = "http://" . kConf::get('www_host') . "/$type/" . self::getPluginName();
+		$baseXsdElement = BulkUploadXmlPlugin::getPluginSchema(BulkUploadXmlPlugin::getApiValue(XmlSchemaType::BULK_UPLOAD_XML));
+			
+		$xsd = '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">';
+	
+		foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
+		{
+			/* @var $element SimpleXMLElement */
+			$xsd .= '
+	
+	' . $element->asXML();
+		}
 		
-		$xsd = '<?xml version="1.0" encoding="UTF-8"?>
-			<xs:schema 
-				xmlns:xs="http://www.w3.org/2001/XMLSchema"
-				xmlns="' . $xmlnsPlugin . '" 
-				targetNamespace="' . $xmlnsPlugin . '"
-			>
+		$xsd .= '
 				
-				<xs:complexType name="T_serverFileContentResource">
-					<xs:complexContent>
-						<xs:extension base="T_serverFileContentResource">
-							<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
-						</xs:extension>
-					</xs:complexContent>
-				</xs:complexType>
+	<xs:complexType name="T_serverFileContentResource">
+		<xs:complexContent>
+			<xs:extension base="T_serverFileContentResource">
+				<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 				
-				<xs:element name="dropFolderFileContentResource" type="T_serverFileContentResource" substitutionGroup="serverFileContentResource" />
-			</xs:schema>
-		';
+	<xs:element name="dropFolderFileContentResource" type="T_serverFileContentResource" substitutionGroup="serverFileContentResource" />
+	';
 		
-		return $xsd;
+		$xsd = '
+</xs:schema>';
+		
+		return new SimpleXMLElement($xsd);
 	}
 		
 	/**
