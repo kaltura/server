@@ -710,7 +710,7 @@ class kJobsManager
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null)
 	{
 		$entryUrl = str_replace('//', '/', $entryUrl);
-		$entryUrl = preg_replace('/^((https?)|(ftp)):\//', '$1://', $entryUrl);
+		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
 		
 		if (!$jobData) {
  		    $jobData = new kImportJobData();
