@@ -165,7 +165,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			
 		$tags = $subTitle->addChild('tags');
 		foreach(explode(',', $captionAsset->getTags()) as $tag)
-			$tags->addChild('tag', self::stringToSafeXml($tag));
+			$tags->addChild('tag', kMrssManager::stringToSafeXml($tag));
 	}
 	
 	/**
