@@ -80,7 +80,6 @@
 				<xs:element ref="playlist" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="data" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="liveStream" minOccurs="1" maxOccurs="1" />
-				<xs:element ref="document" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 			
 			<xs:element ref="content" minOccurs="0" maxOccurs="unbounded" />
@@ -169,15 +168,6 @@
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:complexType name="T_document">
-		<xs:sequence>
-			<xs:element name="documentType" minOccurs="1" maxOccurs="1" type="KalturaDocumentType"/>
-			
-			<xs:element ref="document-extension" minOccurs="0" maxOccurs="unbounded" />
-		
-		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="T_playlists">
@@ -365,7 +355,6 @@
 	<xs:element name="playlist" type="T_playlist" />
 	<xs:element name="data" type="T_data" />
 	<xs:element name="liveStream" type="T_liveStream" />
-	<xs:element name="document" type="T_document" />
 	
 	<xs:element name="playlists" type="T_playlists" />
 	

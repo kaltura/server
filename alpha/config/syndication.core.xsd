@@ -148,7 +148,6 @@
 				<xs:element ref="playlist" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="data" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="liveStream" minOccurs="1" maxOccurs="1" />
-				<xs:element ref="document" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 			
 			<xs:element ref="content" minOccurs="0" maxOccurs="unbounded" />
@@ -276,26 +275,6 @@
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:complexType name="T_document">
-		<xs:sequence>
-			<xs:element name="documentType" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaDocumentType</xs:documentation>
-				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:int">
-						<xs:enumeration value="11"><xs:annotation><xs:documentation>DOCUMENT</xs:documentation></xs:annotation></xs:enumeration>
-						<xs:enumeration value="12"><xs:annotation><xs:documentation>SWF</xs:documentation></xs:annotation></xs:enumeration>
-						<xs:enumeration value="13"><xs:annotation><xs:documentation>PDF</xs:documentation></xs:annotation></xs:enumeration>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-			
-			<xs:element ref="document-extension" minOccurs="0" maxOccurs="unbounded" />
-		
-		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="T_playlists">
@@ -489,7 +468,6 @@
 	<xs:element name="playlist" type="T_playlist" />
 	<xs:element name="data" type="T_data" />
 	<xs:element name="liveStream" type="T_liveStream" />
-	<xs:element name="document" type="T_document" />
 	
 	<xs:element name="playlists" type="T_playlists" />
 	
