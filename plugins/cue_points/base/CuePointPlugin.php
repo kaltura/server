@@ -109,7 +109,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
 			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
 			<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
+			<xs:element name="tags" minOccurs="0" maxOccurs="1" type="T_tags" />
 	
 			<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
