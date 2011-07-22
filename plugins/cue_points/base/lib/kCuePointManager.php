@@ -197,9 +197,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		$schemaType = CuePointPlugin::getApiValue(CuePointSchemaType::SERVE_API);
 		$xsdUrl = "http://" . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$schemaType";
 		
-		$scenes = new SimpleXMLElement('<scenes/>');
-		$scenes->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-		$scenes->addAttribute('xsi:noNamespaceSchemaLocation', $xsdUrl);
+		$scenes = new SimpleXMLElement('<scenes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="' . $xsdUrl . '" />');
 	
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePointXmlParser');
 		
