@@ -113,7 +113,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xdoc = new DomDocument;
 		$xdoc->Load($this->data->filePath);
 		//Validate the XML file against the schema
-		if(!$xdoc->schemaValidate(realpath($this->xsdFilePath))) 
+		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
 		{
 			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($this->data->filePath));
 			KalturaLog::debug("XML is invalid:\n$errorMessage");
