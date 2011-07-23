@@ -2,9 +2,10 @@
 /**
  * @package plugins.dropFolder
  */
-class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator
+class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKalturaMemoryCleaner, IKalturaPermissions, IKalturaObjectLoader, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaConfigurator, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'dropFolder';
+	const DROP_FOLDER_EVENTS_CONSUMER = 'kDropFolderEventsConsumer';
 	
 	public static function getPluginName()
 	{
@@ -216,5 +217,15 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
 			
 		return null;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::DROP_FOLDER_EVENTS_CONSUMER,
+		);
 	}
 }

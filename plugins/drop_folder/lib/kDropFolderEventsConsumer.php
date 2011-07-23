@@ -24,7 +24,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer
 		return true;
 	}
 		
-	protected function updatedImport(BatchJob $dbBatchJob, kVirusScanJobData $data, BatchJob $twinJob = null)
+	protected function updatedImport(BatchJob $dbBatchJob, kDropFolderImportJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
 		{
