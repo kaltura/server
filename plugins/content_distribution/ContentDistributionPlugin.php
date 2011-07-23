@@ -366,14 +366,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	
 	<xs:complexType name="T_distribution">
 		<xs:sequence>
-			<xs:element name="distributionProvider" minOccurs="1" maxOccurs="1" type="KalturaDistributionProviderType" />
-			<xs:element name="distributionProviderId" minOccurs="0" maxOccurs="1" type="xs:int" />
-			<xs:element name="distributionProfileId" minOccurs="1" maxOccurs="1" type="xs:int" />
-			<xs:element name="distributionProfile" minOccurs="1" maxOccurs="1" type="xs:string" />
-			<xs:element name="distributionProfileName" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="remoteId" minOccurs="1" maxOccurs="1" type="xs:string" />
-			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
+			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:int" />
+			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:int" />
 			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
@@ -406,6 +401,13 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		</xs:sequence>
 		
 		<xs:attribute name="entryDistributionId" use="required" type="xs:int" />
+		<xs:attribute name="lastReport" use="optional" type="xs:int" />
+		<xs:attribute name="provider" use="required" type="xs:string" />
+		<xs:attribute name="distributionProviderId" use="optional" type="xs:int" />
+		<xs:attribute name="feedId" use="optional" type="xs:string" />
+		<xs:attribute name="distributionProfileId" use="required" type="xs:int" />
+		<xs:attribute name="distributionProfile" use="optional" type="xs:string" />
+		<xs:attribute name="distributionProfileName" use="optional" type="xs:string" />
 		
 	</xs:complexType>
 	

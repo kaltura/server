@@ -51,7 +51,6 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		
 		$distribution = $mrss->addChild('distribution');
 		$distribution->addAttribute('entryDistributionId', $entryDistribution->getId());
-		$distribution->addAttribute('lastReport', $entryDistribution->getLastReport(null));
 		$distribution->addAttribute('distributionProfileId', $entryDistribution->getDistributionProfileId());
 		if($distributionsProfile)
 			$distribution->addAttribute('distributionProfileName', $distributionsProfile->getName());
@@ -95,6 +94,28 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		$thumbAssetIdsNode = $distribution->addChild('thumbAssetIds');
 		foreach($thumbAssetIds as $thumbAssetId)
 			$thumbAssetIdsNode->addChild('thumbAssetId', $thumbAssetId);
+			
+		if($entryDistribution->getErrorDescription())
+			$distribution->addChild('errorDescription', kMrssManager::stringToSafeXml($entryDistribution->getErrorDescription()));
+			
+		$distribution->addChild('createdAt', $entryDistribution->getCreatedAt(kMrssManager::FORMAT_DATETIME));	
+		$distribution->addChild('updatedAt', $entryDistribution->getUpdatedAt(kMrssManager::FORMAT_DATETIME));	
+		if($entryDistribution->getSubmittedAt(null))
+			$distribution->addChild('submittedAt', $entryDistribution->getSubmittedAt(kMrssManager::FORMAT_DATETIME));
+		if($entryDistribution->getLastReport(null))
+			$distribution->addChild('lastReport', $entryDistribution->getLastReport(kMrssManager::FORMAT_DATETIME));
+		if($entryDistribution->getDirtyStatus())
+			$distribution->addChild('dirtyStatus', $entryDistribution->getDirtyStatus());
+		$distribution->addChild('status', $entryDistribution->getStatus());
+		$distribution->addChild('sunStatus', $entryDistribution->getSunStatus());
+		if($entryDistribution->getPlays())
+			$distribution->addChild('plays', $entryDistribution->getPlays());
+		if($entryDistribution->getViews())
+			$distribution->addChild('views', $entryDistribution->getViews());
+		if($entryDistribution->getErrorNumber())
+			$distribution->addChild('errorNumber', $entryDistribution->getErrorNumber());
+		if($entryDistribution->getErrorType())
+			$distribution->addChild('errorType', $entryDistribution->getErrorType());
 	}
 
 	/* (non-PHPdoc)
