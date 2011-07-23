@@ -366,7 +366,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	
 	<xs:complexType name="T_distribution">
 		<xs:sequence>
-			<xs:element name="remoteId" minOccurs="1" maxOccurs="1" type="xs:string" />
+			<xs:element name="remoteId" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:int" />
 			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:int" />
 			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1">

@@ -309,8 +309,10 @@ class kMrssManager
 		}
 		
 		$mrss->addChild('partnerData', self::stringToSafeXml($entry->getPartnerData()));
-		$mrss->addChild('accessControlId', $entry->getAccessControlId());
-		$mrss->addChild('conversionProfileId', $entry->getConversionProfileId());
+		if($entry->getAccessControlId())
+			$mrss->addChild('accessControlId', $entry->getAccessControlId());
+		if($entry->getConversionProfileId())
+			$mrss->addChild('conversionProfileId', $entry->getConversionProfileId());
 		
 		if($entry->getStartDate(null))
 			$mrss->addChild('startDate', $entry->getStartDate(kMrssManager::FORMAT_DATETIME));
