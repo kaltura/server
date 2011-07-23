@@ -79,7 +79,7 @@ class kSyndicationFeedManager
 		$uiconfId = (!is_null($syndicationFeed->getPlayerUiconfId()))? '/ui_conf_id/'.$syndicationFeed->getPlayerUiconfId(): '';
 		$playerUrl = 'http://'.kConf::get('www_host').
 						'/kwidget/wid/_'.$entry->getPartnerId().
-						'/entry_id/'.$entry->getId().'/ui_conf/'.$uiconfId;
+						'/entry_id/'.$entry->getId().'/ui_conf' . ($uiconfId ? "/$uiconfId" : '');
 
 		$player = $mrss->addChild('player');
 		$player->addAttribute('url', $playerUrl);
