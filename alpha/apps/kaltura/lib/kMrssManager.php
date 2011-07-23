@@ -295,9 +295,6 @@ class kMrssManager
 				$tags->addChild('tag', self::stringToSafeXml($tag));
 		}
 			
-		$mrss->addChild('partnerData', self::stringToSafeXml($entry->getPartnerData()));
-		$mrss->addChild('accessControlId', $entry->getAccessControlId());
-		
 		$categories = explode(',', $entry->getCategories());
 		foreach($categories as $category)
 		{
@@ -311,6 +308,9 @@ class kMrssManager
 					$categoryNode->addAttribute('name', self::stringToSafeXml($category));
 			}
 		}
+		
+		$mrss->addChild('partnerData', self::stringToSafeXml($entry->getPartnerData()));
+		$mrss->addChild('accessControlId', $entry->getAccessControlId());
 		
 		if($entry->getStartDate(null))
 			$mrss->addChild('startDate', $entry->getStartDate(null));
