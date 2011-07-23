@@ -233,7 +233,8 @@ class kUrlManager
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$this->setContainerFormat($flavorAsset->getContainerFormat());
 	
-		$url = "$partnerPath/serveFlavor/v/$flavorAssetVersion/flavorId/$flavorAssetId";
+		$versionString = (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		if($this->seekFromTime)
 			$url .= "/seekFrom/$this->seekFromTime";
 			

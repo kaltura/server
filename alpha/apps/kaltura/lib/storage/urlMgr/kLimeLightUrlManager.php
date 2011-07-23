@@ -20,7 +20,7 @@ class kLimeLightUrlManager extends kUrlManager
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		
 		$this->setFileExtension($flavorAsset->getFileExt());
-		$versionString = ($flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$versionString = (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
 		$url = "/s$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		
 		if($this->clipTo)

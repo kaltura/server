@@ -110,7 +110,7 @@ class kAkamaiUrlManager extends kUrlManager
 		$this->setFileExtension($flavorAsset->getFileExt());
 		$this->setContainerFormat($flavorAsset->getContainerFormat());	
 
-		$versionString = ($flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
+		$versionString = (!$flavorAssetVersion || $flavorAssetVersion == 1 ? '' : "/v/$flavorAssetVersion");
 		$url = "$partnerPath/serveFlavor{$versionString}/flavorId/$flavorAssetId";
 		if($this->protocol==StorageProfile::PLAY_FORMAT_RTSP) {
 			$url = Akamaizer::generateARL($this->params["rtsp_host"].$url."/a.mov", $this->params["rtsp_cpcode"], 0, 0, true);
