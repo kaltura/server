@@ -87,8 +87,8 @@
 				<xs:element ref="content" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="thumbnail" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
-			<xs:element ref="player" minOccurs="0" maxOccurs="1" />
 			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="player" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="T_media">
