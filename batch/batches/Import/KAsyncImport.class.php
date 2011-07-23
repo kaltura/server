@@ -65,7 +65,8 @@ class KAsyncImport extends KBatchBase
 	{
 		KalturaLog::debug("fetchFile($job->id)");
 		
-		if ($data instanceof KalturaSshImportJobData)
+		$jobSubType = $job->jobSubType;
+		if (in_array($jobSubType, array(kFileTransferMgrType::SCP, kFileTransferMgrType::SFTP)))
 		{
 		    // use SSH file transfer manager for SFTP/SCP
             return $this->fetchFileSsh($job, $data);
