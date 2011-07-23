@@ -1,7 +1,7 @@
 <?php
 class kMrssManager
 {
-	const FORMAT_DATETIME = 'Y-m-dTH:i:s';
+	const FORMAT_DATETIME = 'Y-m-d\TH:i:s';
 	
 	/**
 	 * @var array<IKalturaMrssContributor>
