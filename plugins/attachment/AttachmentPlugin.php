@@ -147,17 +147,17 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	public function contributeAttachmentAssets(AttachmentAsset $attachmentAsset, SimpleXMLElement $mrss)
 	{
 		$attachment = $mrss->addChild('attachment');
-		$attachment->addAttribute('url', kMrssManager::getAssetUrl($attachmentAsset));
+		$attachment->addAttribute('url', $attachmentAsset->getDownloadUrl(true));
 		$attachment->addAttribute('attachmentAssetId', $attachmentAsset->getId());
-		$attachment->addChild('filename', $attachmentAsset->getFilename());
-		$attachment->addChild('title', $attachmentAsset->getTitle());
-		$attachment->addChild('description', $attachmentAsset->getDescription());
-		
 		$attachment->addAttribute('format', $attachmentAsset->getContainerFormat());
-			
+		
 		$tags = $attachment->addChild('tags');
 		foreach(explode(',', $attachmentAsset->getTags()) as $tag)
 			$tags->addChild('tag', kMrssManager::stringToSafeXml($tag));
+			
+		$attachment->addChild('filename', $attachmentAsset->getFilename());
+		$attachment->addChild('title', $attachmentAsset->getTitle());
+		$attachment->addChild('description', $attachmentAsset->getDescription());
 	}
 	
 	/**

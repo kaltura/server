@@ -30,8 +30,8 @@
 				</xs:simpleType>
 			</xs:element>
 			<xs:element name="referenceID" minOccurs="0" maxOccurs="1" type="xs:string"/>
-			<xs:element name="createdAt" minOccurs="0" maxOccurs="1" type="xs:int"/>
-			<xs:element name="updatedAt" minOccurs="0" maxOccurs="1" type="xs:int"/>
+			<xs:element name="createdAt" minOccurs="0" maxOccurs="1" type="xs:dateTime"/>
+			<xs:element name="updatedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime"/>
 			<xs:element name="title" minOccurs="0" maxOccurs="1">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -60,14 +60,8 @@
 			<xs:element ref="category" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="partnerData" minOccurs="0" maxOccurs="1" type="xs:string"/>
 			<xs:element name="partnerSortData" minOccurs="0" maxOccurs="1" type="xs:int"/>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element name="accessControlId" minOccurs="1" maxOccurs="1" type="xs:int"/>
-				<xs:element name="accessControl" minOccurs="1" maxOccurs="1" type="xs:string"/>
-			</xs:choice>
-			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int"/>
-				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1" type="xs:string"/>
-			</xs:choice>
+			<xs:element name="accessControlId" minOccurs="0" maxOccurs="1" type="xs:int"/>
+			<xs:element name="conversionProfileId" minOccurs="0" maxOccurs="1" type="xs:int"/>
 			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime"/>
 			<xs:element name="endDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
@@ -95,7 +89,6 @@
 		<xs:sequence>
 			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="KalturaMediaType"/>
 			<xs:element name="duration" minOccurs="1" maxOccurs="1" type="xs:int"/>
-			<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int"/>
 			<xs:element name="flavorParamsIds" minOccurs="1" maxOccurs="1" type="xs:string"/>
 			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>

@@ -155,7 +155,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	public function contributeCaptionAssets(CaptionAsset $captionAsset, SimpleXMLElement $mrss)
 	{
 		$subTitle = $mrss->addChild('subTitle');
-		$subTitle->addAttribute('href', kMrssManager::getAssetUrl($captionAsset));
+		$subTitle->addAttribute('href', $captionAsset->getDownloadUrl(true));
 		$subTitle->addAttribute('captionAssetId', $captionAsset->getId());
 		$subTitle->addAttribute('isDefault', $captionAsset->getDefault());
 		$subTitle->addAttribute('format', $captionAsset->getContainerFormat());

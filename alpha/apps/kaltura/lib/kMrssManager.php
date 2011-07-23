@@ -77,7 +77,6 @@ class kMrssManager
 		$media = $mrss->addChild('media');
 		$media->addChild('mediaType', $entry->getMediaType());
 		$media->addChild('duration', $entry->getLengthInMsecs());
-		$media->addChild('conversionProfileId', $entry->getConversionProfileId());
 		$media->addChild('flavorParamsIds', $entry->getFlavorParamsIds());
 	}
 	
@@ -275,8 +274,8 @@ class kMrssManager
 		$mrss->addChild('entryId', $entry->getId());
 		if($entry->getReferenceID())
 			$mrss->addChild('referenceID', $entry->getReferenceID());
-		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
-		$mrss->addChild('updatedAt', $entry->getUpdatedAt(null));
+		$mrss->addChild('createdAt', $entry->getCreatedAt(kMrssManager::FORMAT_DATETIME));
+		$mrss->addChild('updatedAt', $entry->getUpdatedAt(kMrssManager::FORMAT_DATETIME));
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
 		if(!is_null($link))
 			$mrss->addChild('link', $link . $entry->getId());
@@ -311,12 +310,13 @@ class kMrssManager
 		
 		$mrss->addChild('partnerData', self::stringToSafeXml($entry->getPartnerData()));
 		$mrss->addChild('accessControlId', $entry->getAccessControlId());
+		$mrss->addChild('conversionProfileId', $entry->getConversionProfileId());
 		
 		if($entry->getStartDate(null))
-			$mrss->addChild('startDate', $entry->getStartDate(null));
+			$mrss->addChild('startDate', $entry->getStartDate(kMrssManager::FORMAT_DATETIME));
 		
 		if($entry->getEndDate(null))
-			$mrss->addChild('endDate', $entry->getEndDate(null));
+			$mrss->addChild('endDate', $entry->getEndDate(kMrssManager::FORMAT_DATETIME));
 		
 		switch($entry->getType())
 		{
