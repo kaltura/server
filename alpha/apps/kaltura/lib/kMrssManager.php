@@ -1,6 +1,8 @@
 <?php
 class kMrssManager
 {
+	const FORMAT_DATETIME = 'Y-m-dTH:i:s';
+	
 	/**
 	 * @var array<IKalturaMrssContributor>
 	 */
@@ -271,7 +273,8 @@ class kMrssManager
 			$mrss = new SimpleXMLElement('<item/>');
 		
 		$mrss->addChild('entryId', $entry->getId());
-		$mrss->addChild('referenceID', $entry->getReferenceID());
+		if($entry->getReferenceID())
+			$mrss->addChild('referenceID', $entry->getReferenceID());
 		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
 		$mrss->addChild('updatedAt', $entry->getUpdatedAt(null));
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
@@ -281,12 +284,16 @@ class kMrssManager
 		$mrss->addChild('licenseType', $entry->getLicenseType());
 		$mrss->addChild('userId', $entry->getPuserId(true));
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
-		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
+		if($entry->getDescription())
+			$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
 		$thumbnailUrl = $mrss->addChild('thumbnailUrl');
 		$thumbnailUrl->addAttribute('url', $entry->getThumbnailUrl());
-		$tags = $mrss->addChild('tags');
-		foreach(explode(',', $entry->getTags()) as $tag)
-			$tags->addChild('tag', self::stringToSafeXml($tag));
+		if(trim($entry->getTags(), " \r\n\t"))
+		{
+			$tags = $mrss->addChild('tags');
+			foreach(explode(',', $entry->getTags()) as $tag)
+				$tags->addChild('tag', self::stringToSafeXml($tag));
+		}
 			
 		$mrss->addChild('partnerData', self::stringToSafeXml($entry->getPartnerData()));
 		$mrss->addChild('accessControlId', $entry->getAccessControlId());
