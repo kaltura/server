@@ -369,19 +369,19 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			<xs:element name="remoteId" minOccurs="1" maxOccurs="1" type="xs:string" />
 			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:int" />
 			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:int" />
-			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						List of existing flavor asset ids to be used in this distribution destination.
-					</xs:documentation>
-				</xs:annotation>
+			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="flavorAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
-			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						List of existing thumbnail asset ids to be used in this distribution destination.
-					</xs:documentation>
-				</xs:annotation>
+			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="thumbAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
 			<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string" />
 			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
@@ -402,7 +402,7 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		
 		<xs:attribute name="entryDistributionId" use="required" type="xs:int" />
 		<xs:attribute name="lastReport" use="optional" type="xs:int" />
-		<xs:attribute name="provider" use="required" type="xs:string" />
+		<xs:attribute name="provider" use="optional" type="xs:string" />
 		<xs:attribute name="distributionProviderId" use="optional" type="xs:int" />
 		<xs:attribute name="feedId" use="optional" type="xs:string" />
 		<xs:attribute name="distributionProfileId" use="required" type="xs:int" />
