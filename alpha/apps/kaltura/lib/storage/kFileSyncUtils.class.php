@@ -15,9 +15,11 @@ class kFileSyncUtils
 			$file_sync = self::resolve($file_sync);
 		}
 		
+		$startTime = microtime(true);
+
 		$file_exists = file_exists ( $file_sync->getFullPath() );
 		
-		KalturaLog::log(__METHOD__." - file_exists? [$file_exists]");
+		KalturaLog::log(__METHOD__." - file_exists? [$file_exists] fe took [".(microtime(true)-$startTime)."] path [".$file_sync->getFullPath()."]");
 		
 		return $file_exists;
 	}
@@ -41,8 +43,11 @@ class kFileSyncUtils
 			$real_path = realpath( $file_sync->getFullPath() );
 			if ( file_exists ( $real_path ) )
 			{
-				KalturaLog::log(__METHOD__." - file was found locally at [$real_path]");
-				return file_get_contents( $real_path);
+				$startTime = microtime(true);
+				$contents = file_get_contents( $real_path);
+				KalturaLog::log(__METHOD__." - file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
+
+				return $contents;
 			}
 			else
 			{
