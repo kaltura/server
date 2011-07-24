@@ -49,7 +49,10 @@ class ComcastMrssFeed
 	{
 		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
 		$this->doc = new DOMDocument();
+		$this->doc->formatOutput = true;
+		$this->doc->preserveWhiteSpace = false;
 		$this->doc->load($xmlTemplate);
+		
 		
 		$this->xpath = new DOMXPath($this->doc);
 		$this->xpath->registerNamespace('media', 'http://search.yahoo.com/mrss/');
@@ -166,14 +169,9 @@ class ComcastMrssFeed
 
 		if (is_array($flavorAssets))
 			$this->setFlavorAssets($item, $flavorAssets);
-		
-		
-		/*if ($thumbAsset)
-		{
-			$this->setNodeValue('media:group/media:thumbnail/@url', $this->getAssetUrl($thumbAsset), $item);
-			$this->setNodeValue('media:group/media:thumbnail/@width', $thumbAsset->getWidth(), $item);
-			$this->setNodeValue('media:group/media:thumbnail/@height', $thumbAsset->getHeight(), $item);
-		}*/
+			
+		if (is_array($thumbAssets))
+			$this->setThumbAssets($item, $thumbAssets);
 	}
 	
 	public function getAssetUrl(asset $asset)
@@ -202,7 +200,8 @@ class ComcastMrssFeed
 		{
 			/* @var $flavorAsset flavorAsset */
 			$content = $this->content->cloneNode(true);
-			$item->appendChild($content);
+			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
+			$mediaGroup->appendChild($content);
 			$url = $this->getAssetUrl($flavorAsset);
 			$type = $this->getContentTypeFromUrl($url);
 			
@@ -213,6 +212,25 @@ class ComcastMrssFeed
 			$this->setNodeValue('@width', $flavorAsset->getWidth(), $content);
 			$this->setNodeValue('@height', $flavorAsset->getHeight(), $content);
 			$this->setNodeValue('@bitrate', $flavorAsset->getBitrate(), $content);
+		}
+	}
+	
+	/**
+	 * @param array $flavorAssets
+	 */
+	public function setThumbAssets(DOMElement $item, array $thumbAssets)
+	{
+		foreach($thumbAssets as $thumbAsset) 
+		{
+			/* @var $flavorAsset flavorAsset */
+			$content = $this->thumbnail->cloneNode(true);
+			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
+			$mediaGroup->appendChild($content);
+			$url = $this->getAssetUrl($thumbAsset);
+			
+			$this->setNodeValue('@url', $url, $content);
+			$this->setNodeValue('@width', $thumbAsset->getWidth(), $content);
+			$this->setNodeValue('@height', $thumbAsset->getHeight(), $content);
 		}
 	}
 	

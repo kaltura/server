@@ -15,7 +15,6 @@ interface ComcastMrssDistributionField extends BaseEnum
 	const LAST_BUILD_DATE				= 'LAST_BUILD_DATE';
 	const MEDIA_RATING					= 'MEDIA_RATING';
 	const MEDIA_KEYWORDS				= 'MEDIA_KEYWORDS';
-	const MEDIA_CATEGORIES				= 'MEDIA_CATEGORIES'; // FIXME - remove
 	const MEDIA_CATEGORY				= 'MEDIA_CATEGORY';
 	const COMCAST_TV_SERIES				= 'COMCAST_TV_SERIES';
 }

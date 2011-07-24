@@ -21,7 +21,34 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 	);
 	
 	protected $inListOrNullValidation = array (
-		ComcastMrssDistributionField::MEDIA_RATING => array('PG', 'PG-13', 'R', 'TV-14', 'TV-AO', 'TV-G', 'TV-MA', 'TV-PG', 'TV-Y', 'TV-Y7', 'TV-Y7-FV', 'X'),
+		ComcastMrssDistributionField::MEDIA_RATING => array(
+			'PG', 
+			'PG-13', 
+			'R', 
+			'TV-14', 
+			'TV-AO', 
+			'TV-G', 
+			'TV-MA', 
+			'TV-PG', 
+			'TV-Y', 
+			'TV-Y7', 
+			'TV-Y7-FV', 
+			'X',
+		),
+		ComcastMrssDistributionField::MEDIA_CATEGORY => array(
+			'TV Preview',
+			'TV Interview',
+			'TV News',
+			'TV Featurette',
+			'TV Sneak Peek',
+			'TV Full Episode',
+			'MOVIE Trailer',
+			'MOVIE Interview',
+			'MOVIE News',
+			'MOVIE Featurette',
+			'MOVIE Sneak Peek',
+			'MOVIE Full Feature',
+		),
 	);
 	
 	/* (non-PHPdoc)
@@ -99,13 +126,6 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setFieldName(ComcastMrssDistributionField::MEDIA_KEYWORDS);
 		$fieldConfig->setUserFriendlyFieldName('Entry keywords');
 		$tagsXslt = '<xsl:for-each select="tags/tag"><xsl:if test="position() &gt; 1"><xsl:value-of select="\',\'" /></xsl:if><xsl:value-of select="." /></xsl:for-each>';
-		$fieldConfig->setEntryMrssXslt($tagsXslt);
-		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-		
-		$fieldConfig = new DistributionFieldConfig();
-		$fieldConfig->setFieldName(ComcastMrssDistributionField::MEDIA_CATEGORIES);
-		$fieldConfig->setUserFriendlyFieldName('Entry categories');
-		$tagsXslt = '<xsl:for-each select="category"><xsl:if test="position() &gt; 1"><xsl:value-of select="\',\'" /></xsl:if><xsl:value-of select="." /></xsl:for-each>';
 		$fieldConfig->setEntryMrssXslt($tagsXslt);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		

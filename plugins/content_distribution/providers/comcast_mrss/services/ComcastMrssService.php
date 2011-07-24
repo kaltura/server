@@ -17,6 +17,7 @@ class ComcastMrssService extends KalturaBaseService
 	 * @action getFeed
 	 * @param int $distributionProfileId
 	 * @param string $hash
+	 * @return file
 	 */
 	public function getFeedAction($distributionProfileId, $hash)
 	{
@@ -70,6 +71,7 @@ class ComcastMrssService extends KalturaBaseService
 			$feed->addItem($fields, $flavorAssets, $thumbAssets);
 		}
 		
+		header('Content-Type: text/xml');
 		echo $feed->getXml();
 		die;
 	}
