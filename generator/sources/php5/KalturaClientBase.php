@@ -430,7 +430,7 @@ class KalturaClientBase
 		
 		if(!is_array($paramValue))
 		{
-			$params[$paramName] = $paramValue;
+			$params[$paramName] = (string)$paramValue;
 			return;
 		}
 		
