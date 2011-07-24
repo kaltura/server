@@ -67,4 +67,28 @@ class Form_TVComProfileConfiguration extends Form_ConfigurableProfileConfigurati
 		else
 			return '<a href="'.$url.'" target="_blank">Feed URL</a>';
 	}
+	
+	public function render(Zend_View_Interface $view = null)
+	{
+		$this->disableTriggerUpdateFieldConfig();
+		
+		return parent::render($view);
+	}
+	
+	public function disableTriggerUpdateFieldConfig()
+	{
+		$subForm = $this->getSubForm('fieldConfigArray');
+		if ($subForm)
+		{
+			$fieldsSubForms = $subForm->getSubForms();
+			foreach($fieldsSubForms as $fieldSubForm)
+			{
+				$updateOnChange = $fieldSubForm->getElement('updateOnChange');
+				if ($updateOnChange)
+				{
+					$updateOnChange->setAttrib('disabled', 'disabled');
+				}
+			}
+		}
+	}
 }
