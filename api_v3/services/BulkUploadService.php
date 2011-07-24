@@ -130,7 +130,6 @@ class BulkUploadService extends KalturaBaseService
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
 			kFile::dumpFile($filePath, $mimeType);
-			kFile::closeDbConnections();
 		}
 		else
 		{
