@@ -63,7 +63,9 @@ function addPermission($permissionCfg)
 	}
 	
 	// init new db permission object
+	PermissionPeer::setUseCriteriaFilter(false);
 	$permission = PermissionPeer::getByNameAndPartner($permissionCfg->name, $permissionCfg->partnerId);
+	PermissionPeer::setUseCriteriaFilter(true);
 	if(!$permission)	
 		$permission = new Permission();
 			
@@ -73,13 +75,10 @@ function addPermission($permissionCfg)
 		call_user_func_array( $setterCallback , array ($value ) );
 	}
 	
-	if (!$permission->getFriendlyName()) {
+	if (!$permission->getFriendlyName())
 		$permission->setFriendlyName($permission->getName());
-	}
 		
-	if (!$permission->getStatus()) {
-		$permission->setStatus(PermissionStatus::ACTIVE);
-	}
+	$permission->setStatus(PermissionStatus::ACTIVE);
 	
 	// add to database
 	KalturaLog::log('Adding new permission with name ['.$permission->getName().'] to partner id ['.$permission->getPartnerId().']');
