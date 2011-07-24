@@ -23,7 +23,7 @@
 				<media:title><![CDATA[]]></media:title>
 				<media:copyright><![CDATA[]]></media:copyright>
 				<media:rating></media:rating>
-				<media:content url="" type="" fileSize="" expression="clip" duration=""></media:content>
+				<media:content url="" type="" fileSize="" expression="" duration=""></media:content>
 				<media:restriction relationship="" type="country"></media:restriction>
 				<media:category scheme="urn:tvcom:show-tmsid" label=""></media:category>
 				<media:category scheme="urn:tvcom:episode-tmsid" label=""></media:category>

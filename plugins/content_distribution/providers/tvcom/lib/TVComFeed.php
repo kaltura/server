@@ -145,6 +145,7 @@ class TVComFeed
 			} 
 			$node = $this->setNodeValue('media:group/media:content/@type', $type, $item);
 			$node = $this->setNodeValue('media:group/media:content/@fileSize', $flavorAsset->getSize(), $item);
+			$node = $this->setNodeValue('media:group/media:content/@expression', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE], $item);
 			$node = $this->setNodeValue('media:group/media:content/@duration', date('i:s', (int)$flavorAsset->getentry()->getDuration()), $item);
 		}
 		

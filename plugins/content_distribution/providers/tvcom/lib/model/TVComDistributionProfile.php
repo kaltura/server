@@ -153,7 +153,7 @@ class TVComDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setFieldName(TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE);
 		$fieldConfig->setUserFriendlyFieldName('TVComEpisodeType');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TVComEpisodeType" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
