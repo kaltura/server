@@ -152,6 +152,11 @@ class ComcastMrssDistributionPlugin extends KalturaPlugin implements IKalturaPer
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
+		// append comcast mrss specific configuration
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+		/* @var $distributionProfile ComcastMrssDistributionProfile */ 
+		$mrss->addChild('feed_link', $distributionProfile->getFeedLink());
+		$mrss->addChild('item_link', $distributionProfile->getItemLink());
 	}
 
 	/**

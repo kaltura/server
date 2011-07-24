@@ -11,6 +11,7 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_FEED_LINK = 'feedLink';
 	const CUSTOM_DATA_FEED_DESCRIPTION = 'feedDescription';
 	const CUSTOM_DATA_FEED_LAST_BUILD_DATE = 'feedLastBuildDate';
+	const CUSTOM_DATA_ITEM_LINK = 'itemLink';
 	const CUSTOM_DATA_C_PLATFORM_TV_SERIES = 'cPlatformTVSeries';
 	const CUSTOM_DATA_C_PLATFORM_TV_SERIES_FIELD = 'cPlatformTVSeriesField';
 	
@@ -143,6 +144,20 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(ComcastMrssDistributionField::COMCAST_LINK);
+		$fieldConfig->setUserFriendlyFieldName('ComcastLink');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/ComcastLink" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(ComcastMrssDistributionField::COMCAST_BRAND);
+		$fieldConfig->setUserFriendlyFieldName('ComcastBrand');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/ComcastBrand" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(ComcastMrssDistributionField::START_TIME);
 		$fieldConfig->setUserFriendlyFieldName('Distribution start date');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
@@ -211,4 +226,7 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 	
 	public function getCPlatformTvSeriesField()		{return $this->getFromCustomData(self::CUSTOM_DATA_C_PLATFORM_TV_SERIES_FIELD);}
 	public function setCPlatformTvSeriesField($v)	{$this->putInCustomData(self::CUSTOM_DATA_C_PLATFORM_TV_SERIES_FIELD, $v);}
+	
+	public function getItemLink()					{return $this->getFromCustomData(self::CUSTOM_DATA_ITEM_LINK);}
+	public function setItemLink($v)					{$this->putInCustomData(self::CUSTOM_DATA_ITEM_LINK, $v);}
 }

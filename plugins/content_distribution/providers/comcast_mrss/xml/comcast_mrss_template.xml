@@ -23,6 +23,8 @@
 			<cim:tvSeries name="" id="" idType="cPlatform"/>
 			<dcterms:valid></dcterms:valid>
 			<cim:partnerType>External</cim:partnerType>
+			<cim:link></cim:link>
+			<cim:brand></cim:brand>
 		</item>
 	</channel>
 </rss>

@@ -145,6 +145,8 @@ class ComcastMrssFeed
 		$this->setNodeValue('guid', $values[ComcastMrssDistributionField::GUID_ID], $item);
 		$this->setNodeValue('media:group/media:rating', $values[ComcastMrssDistributionField::MEDIA_RATING], $item);
 		$this->setNodeValue('media:group/media:keywords', $values[ComcastMrssDistributionField::MEDIA_KEYWORDS], $item);
+		$this->setNodeValue('cim:link', $values[ComcastMrssDistributionField::COMCAST_LINK], $item);
+		$this->setNodeValue('cim:brand', $values[ComcastMrssDistributionField::COMCAST_BRAND], $item);
 		
 		/*
 		$categories = explode(',', $values[ComcastMrssDistributionField::MEDIA_CATEGORIES]);

@@ -35,6 +35,11 @@ class KalturaComcastMrssDistributionProfile extends KalturaConfigurableDistribut
 	 * @var string
 	 */
 	public $feedLastBuildDate;
+	
+	/**
+	 * @var string
+	 */
+	public $itemLink;
 
 	/**
 	 * @var KalturaKeyValueArray
@@ -57,6 +62,7 @@ class KalturaComcastMrssDistributionProfile extends KalturaConfigurableDistribut
 		'feedLink',
 		'feedDescription',
 		'feedLastBuildDate',
+		'itemLink',
 		'cPlatformTvSeries',
 		'cPlatformTvSeriesField',
 	);
