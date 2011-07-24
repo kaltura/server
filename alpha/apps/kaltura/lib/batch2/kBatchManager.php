@@ -341,6 +341,9 @@ class kBatchManager
 
 	private static function getNextJobPriorityFromCache($jobType)
 	{
+		if (!function_exists('apc_fetch'))
+			return false;
+			
 		$priority = apc_fetch("getNextJobPriority:$jobType:priority");
 		if ($priority !== false) // found priority in cache
 		{
@@ -359,10 +362,13 @@ class kBatchManager
 
 	private static function saveNextJobPriorityInCache($jobType, $priority)
 	{
-		apc_store("getNextJobPriority:$jobType:priority", $priority);
-		apc_store("getNextJobPriority:$jobType:time", time());
-
-		KalturaLog::debug("saveNextJobPriorityInCache jobType:$jobType $priority:$priority time:".time());
+		if (function_exists('apc_store'))
+		{
+			apc_store("getNextJobPriority:$jobType:priority", $priority);
+			apc_store("getNextJobPriority:$jobType:time", time());
+	
+			KalturaLog::debug("saveNextJobPriorityInCache jobType:$jobType $priority:$priority time:".time());
+		}
 
 		return $priority;
 	}
@@ -375,7 +381,7 @@ class kBatchManager
 	{
 		$priority = self::getNextJobPriorityFromCache($jobType);
 		if ($priority !== false)
-		return $priority;
+			return $priority;
 
 		//$priorities = array(1 => 33, 2 => 27, 3 => 20, 4 => 13, 5 => 7);
 		$priorities = kConf::get('priority_percent');
