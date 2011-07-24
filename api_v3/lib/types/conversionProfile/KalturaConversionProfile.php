@@ -197,6 +197,44 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		}
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (!is_null($this->name) && !($this->name instanceof KalturaNullField))
+			$this->validatePropertyMinLength("name", 1);
+		
+		if (!is_null($this->flavorParamsIds) && !($this->flavorParamsIds instanceof KalturaNullField)) 
+			$this->validateFlavorParamsIds();
+		
+		$this->validateDefaultEntry();
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyMinLength("name", 1);
+		$this->validateFlavorParamsIds();
+		$this->validateDefaultEntry();
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	public function validateDefaultEntry()
+	{
+		if(is_null($this->defaultEntryId) || $this->defaultEntryId instanceof KalturaNullField)
+			return;
+			
+		$entry = entryPeer::retrieveByPK($this->defaultEntryId);
+		if(!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->defaultEntryId);
+	}
+	
 	public function validateFlavorParamsIds()
 	{
 		$flavorParamsIds = $this->getFlavorParamsAsArray();

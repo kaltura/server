@@ -72,11 +72,7 @@ class ConversionProfileService extends KalturaBaseService
 	 */
 	public function addAction(KalturaConversionProfile $conversionProfile)
 	{
-		$conversionProfile->validatePropertyMinLength("name", 1);
-		$conversionProfile->validateFlavorParamsIds();
-		
-		$conversionProfileDb = new conversionProfile2();
-		$conversionProfile->toObject($conversionProfileDb);
+		$conversionProfileDb = $conversionProfile->toInsertableObject(new conversionProfile2());
 
 		$conversionProfileDb->setInputTagsMap(flavorParams::TAG_WEB . ',' . flavorParams::TAG_SLWEB);
 		$conversionProfileDb->setPartnerId($this->getPartnerId());
@@ -133,12 +129,6 @@ class ConversionProfileService extends KalturaBaseService
 	 */
 	public function updateAction($id, KalturaConversionProfile $conversionProfile)
 	{
-		if ($conversionProfile->name !== null)
-			$conversionProfile->validatePropertyMinLength("name", 1);
-		
-		if ($conversionProfile->flavorParamsIds !== null) 
-			$conversionProfile->validateFlavorParamsIds();
-		
 		$conversionProfileDb = conversionProfile2Peer::retrieveByPK($id);
 		if (!$conversionProfileDb)
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $id);
