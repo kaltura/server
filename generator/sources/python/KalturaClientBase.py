@@ -57,8 +57,11 @@ class KalturaParams:
     def get(self):
         return self.params
 
-    def put(self, key, value):
-        self.params[key] = str(value)
+    def put(self, key, value = None):
+        if value == None:
+            self.params[key + '__null'] = ''
+        else:
+            self.params[key] = str(value)
 
     def update(self, props):
         self.params.update(props.get())
@@ -67,54 +70,70 @@ class KalturaParams:
         for (curKey, curValue) in objectProps.items():
             self.put('%s:%s' % (key, curKey), curValue)
 
-    def addObjectIfNotNone(self, key, obj):
+    def addObjectIfDefined(self, key, obj):
+        if obj == NotImplemented:
+            return
         if obj == None:
+            self.put(key)
             return
         self.add(key, obj.toParams().get())
 
-    def addArrayIfNotNone(self, key, array):
+    def addArrayIfDefined(self, key, array):
+        if array == NotImplemented:
+            return
         if array == None:
+            self.put(key)
             return
         if len(array) == 0:
             self.put('%s:-' % key, '')
         else:
             for curIndex in xrange(len(array)):
-                self.addObjectIfNotNone('%s:%s' % (key, curIndex), array[curIndex])
+                self.addObjectIfDefined('%s:%s' % (key, curIndex), array[curIndex])
 
-    def addStringIfNotNone(self, key, value):
-        if value != None:
+    def addStringIfDefined(self, key, value):
+        if value != NotImplemented:
             self.put(key, value)
 
-    def addIntIfNotNone(self, key, value):
-        if value != None:
+    def addIntIfDefined(self, key, value):
+        if value != NotImplemented:
             self.put(key, value)
 
-    def addStringEnumIfNotNone(self, key, value):
+    def addStringEnumIfDefined(self, key, value):
+        if value == NotImplemented:
+            return
         if value == None:
+            self.put(key)
             return
         if type(value) == str:
-            self.addStringIfNotNone(key, value)
+            self.addStringIfDefined(key, value)
         else:
-            self.addStringIfNotNone(key, value.getValue())
+            self.addStringIfDefined(key, value.getValue())
 
-    def addIntEnumIfNotNone(self, key, value):
+    def addIntEnumIfDefined(self, key, value):
+        if value == NotImplemented:
+            return
         if value == None:
+            self.put(key)
             return
         if type(value) == int:
-            self.addIntIfNotNone(key, value)
+            self.addIntIfDefined(key, value)
         else:
-            self.addIntIfNotNone(key, value.getValue())
+            self.addIntIfDefined(key, value.getValue())
 
-    def addFloatIfNotNone(self, key, value):
-        if value != None:
+    def addFloatIfDefined(self, key, value):
+        if value != NotImplemented:
             self.put(key, value)
 
-    def addBoolIfNotNone(self, key, value):
-        if value != None:
-            if value:
-                self.put(key, '1')
-            else:
-                self.put(key, '0')
+    def addBoolIfDefined(self, key, value):
+        if value == NotImplemented:
+            return
+        if value == None:
+            self.put(key)
+            return
+        if value:
+            self.put(key, '1')
+        else:
+            self.put(key, '0')
 
     def signature(self):
         params = self.params.items()

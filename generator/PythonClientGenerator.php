@@ -320,7 +320,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		else
 			$base = "KalturaObjectBase";
 
-		$initParams = $this->getCtorArguments($classNode, ",\n            ", "=None");
+		$initParams = $this->getCtorArguments($classNode, ",\n            ", "=NotImplemented");
 		$baseInitParams = $this->getCtorArguments($this->getParentClassNode($classNode), ",\n            ");
 			
 		$this->appendLine("    def __init__($initParams):");
@@ -488,30 +488,30 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 				case "int" :
 					if ($isEnum)
 					{
-						$this->appendLine ( "        kparams.addIntEnumIfNotNone(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addIntEnumIfDefined(\"$propName\", self.$propName)" );
 					}
 					else
-						$this->appendLine ( "        kparams.addIntIfNotNone(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addIntIfDefined(\"$propName\", self.$propName)" );
 					break;
 				case "string" :
 					if ($isEnum)
 					{
-						$this->appendLine ( "        kparams.addStringEnumIfNotNone(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addStringEnumIfDefined(\"$propName\", self.$propName)" );
 					}
 					else
-						$this->appendLine ( "        kparams.addStringIfNotNone(\"$propName\", self.$propName)" );
+						$this->appendLine ( "        kparams.addStringIfDefined(\"$propName\", self.$propName)" );
 					break;
 				case "bool" :
-					$this->appendLine ( "        kparams.addBoolIfNotNone(\"$propName\", self.$propName)" );
+					$this->appendLine ( "        kparams.addBoolIfDefined(\"$propName\", self.$propName)" );
 					break;
 				case "float" :
-					$this->appendLine ( "        kparams.addFloatIfNotNone(\"$propName\", self.$propName)" );
+					$this->appendLine ( "        kparams.addFloatIfDefined(\"$propName\", self.$propName)" );
 					break;
 				case "array":
-					$this->appendLine("        kparams.addArrayIfNotNone(\"$propName\", self.$propName)");
+					$this->appendLine("        kparams.addArrayIfDefined(\"$propName\", self.$propName)");
 					break;
 				default :
-					$this->appendLine ( "        kparams.addObjectIfNotNone(\"$propName\", self.$propName)" );
+					$this->appendLine ( "        kparams.addObjectIfDefined(\"$propName\", self.$propName)" );
 					break;
 			}
 		}
@@ -591,25 +591,25 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			switch ($paramType) 
 			{
 				case "string" :
-					$this->appendLine ( "        kparams.addStringIfNotNone(\"$paramName\", " . $paramName . ")" );
+					$this->appendLine ( "        kparams.addStringIfDefined(\"$paramName\", " . $paramName . ")" );
 					break;
 				case "float" :
-					$this->appendLine ( "        kparams.addFloatIfNotNone(\"$paramName\", " . $paramName . ")" );
+					$this->appendLine ( "        kparams.addFloatIfDefined(\"$paramName\", " . $paramName . ")" );
 					break;
 				case "int" :
-					$this->appendLine ( "        kparams.addIntIfNotNone(\"$paramName\", " . $paramName . ");" );
+					$this->appendLine ( "        kparams.addIntIfDefined(\"$paramName\", " . $paramName . ");" );
 					break;
 				case "bool" :
-					$this->appendLine ( "        kparams.addBoolIfNotNone(\"$paramName\", " . $paramName . ");" );
+					$this->appendLine ( "        kparams.addBoolIfDefined(\"$paramName\", " . $paramName . ");" );
 					break;
 				case "array" :
-					$this->appendLine("        kparams.addArrayIfNotNone(\"$paramName\", $paramName)");
+					$this->appendLine("        kparams.addArrayIfDefined(\"$paramName\", $paramName)");
 					break;
 				case "file" :
 					$this->appendLine ( "        kfiles.put(\"$paramName\", " . $paramName . ");" );
 					break;
 				default : // for objects
-					$this->appendLine("        kparams.addObjectIfNotNone(\"$paramName\", $paramName)");
+					$this->appendLine("        kparams.addObjectIfDefined(\"$paramName\", $paramName)");
 					break;
 			}
 		}
@@ -677,7 +677,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 					else if ($defaultValue === "true")
 						$signature .= " = True";
 					else if ($defaultValue === "null")
-						$signature .= " = None";
+						$signature .= " = NotImplemented";
 					else if ($paramType == "string")
 						$signature .= " = \"$defaultValue\"";
 					else if ($paramType == "int")
@@ -689,7 +689,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 					} 
 				}
 				else
-					$signature .= " = None";
+					$signature .= " = NotImplemented";
 			}
 				
 			$signature .= ", ";

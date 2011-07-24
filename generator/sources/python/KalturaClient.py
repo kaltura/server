@@ -42,7 +42,7 @@ class KalturaClient:
     def __init__(self, config):
         self.apiVersion = API_VERSION
         self.config = None
-        self.ks = None
+        self.ks = NotImplemented
         self.shouldLog = False
         self.multiRequest = False
         self.callsQueue = []
@@ -120,7 +120,7 @@ class KalturaClient:
         # in start session partner id is optional (default -1). if partner id was not set, use the one in the config
         if not params.get().has_key("partnerId") or params.get()["partnerId"] == -1:
             params.put("partnerId", self.config.partnerId)
-        params.addStringIfNotNone("ks", self.ks)
+        params.addStringIfDefined("ks", self.ks)
         call = KalturaServiceActionCall(service, action, params, files)
         self.callsQueue.append(call)
 
