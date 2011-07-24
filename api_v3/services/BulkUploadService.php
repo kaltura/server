@@ -171,4 +171,29 @@ class BulkUploadService extends KalturaBaseService
 //			}
 		}	
 	}
+	
+	/**
+	 * Aborts the bulk upload and all its child jobs
+	 * 
+	 * @action abort
+	 * @param int $id job id
+	 * @return KalturaBulkUpload
+	 */
+	function abortAction($id)
+	{
+	    $c = new Criteria();
+	    $c->addAnd(BatchJobPeer::ID, $id);
+		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
+		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
+		$batchJob = BatchJobPeer::doSelectOne($c);
+		
+		if (!$batchJob)
+		    throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
+		    
+		kJobsManager::abortJob($id, BatchJobType::BULKUPLOAD);
+		
+		$ret = new KalturaBulkUpload();
+		$ret->fromObject($batchJob);
+		return $ret;
+	}
 }
