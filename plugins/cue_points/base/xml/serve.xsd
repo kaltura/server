@@ -2,7 +2,7 @@
 	
 	<xs:complexType name="T_scenes">
 		<xs:sequence>
-			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded" />
+			<xs:element ref="scene" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>	
 		
