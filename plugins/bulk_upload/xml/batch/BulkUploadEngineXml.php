@@ -423,15 +423,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
-			$this->kClient->flavorAsset->add($updatedEntryId, $flavorAsset, $flavorResource);
+			$flavor = $this->kClient->flavorAsset->add($updatedEntryId, $flavorAsset);
+			$this->kClient->flavorAsset->setContent($this->kClient->getMultiRequestResult()->id, $flavorResource);		// TODO: use flavor instead of getMultiRequestResult
 		}
 
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			$thumbResource = $noParamsThumbResources[$index];
-			$this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset, $thumbResource);
+			$thumb = $this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset);
+			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);		// TODO: use thumb instead of getMultiRequestResult
 		}
-
+		
 		$requestResults = $this->kClient->doMultiRequest();;
 			
 		//TODO: handle the update array
@@ -576,22 +578,24 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource = null;
 			
 		$this->kClient->baseEntry->add($entry); //Adds the entry 
-		$newEntryId = "{1:result:id}";
+		$newEntryId = $this->kClient->getMultiRequestResult()->id;							// TODO: use the return value of add instead of getMultiRequestResult
 		
 		$this->kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
 			$flavorResource = $noParamsFlavorResources[$index];
-			$this->kClient->flavorAsset->add($newEntryId, $flavorAsset, $flavorResource);
+			$flavor = $this->kClient->flavorAsset->add($newEntryId, $flavorAsset);
+			$this->kClient->flavorAsset->setContent($this->kClient->getMultiRequestResult()->id, $flavorResource);			// TODO: use flavor instead of getMultiRequestResult
 		}
 	
 		foreach($noParamsThumbAssets as $index => $thumbAsset) //Adds the entry thumb assests
 		{
 			$thumbResource = $noParamsThumbResources[$index];
-			$this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
+			$thumb = $this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
+			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
 		}
-				
+								
 		$requestResults = $this->kClient->doMultiRequest();;
 		
 		$createdEntry = reset($requestResults);
