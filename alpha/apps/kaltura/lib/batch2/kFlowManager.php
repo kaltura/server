@@ -350,7 +350,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof flavorAsset)
+		if($object instanceof asset)
 			return true;
 		
 		return false;
@@ -365,6 +365,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		
 		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
 		{
+			if(!($object instanceof flavorAsset))
+			{
+				$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+				$object->save();
+				return true;
+			}
+			
 			if($object->getIsOriginal())
 			{
 				if($entry->getType() == entryType::MEDIA_CLIP)
