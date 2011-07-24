@@ -7,6 +7,7 @@ require_once(dirname(__FILE__) . '/../../bootstrap/bootstrapServer.php');
  * tests if decision layer makes a right decision about converting and validating files 
  * @author Roni
  *
+ * TODO: change the file name to be caps
  */
 class KDLTest extends KalturaServerTestCase
 {
