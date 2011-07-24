@@ -1,4 +1,27 @@
 <?php
+
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
+class MultiRequestSubResult
+{
+    function __construct($value)
+	{
+        $this->value = $value;
+	}
+	
+    function __toString()
+	{
+        return '{' . $this->value . '}';
+	}
+
+    function __get($name)
+	{
+        return new MultiRequestSubResult($this->value . ':' . $name);
+	}
+}
+
 /**
  * @package Kaltura
  * @subpackage Client
@@ -478,11 +501,16 @@ class KalturaClientBase
 	{
 		return $this->isMultiRequest;	
 	}
-	
+		
 	public function getMultiRequestQueueSize()
 	{
 		return count($this->callsQueue);	
 	}
+	
+    public function getMultiRequestResult()
+	{
+        return new MultiRequestSubResult($this->getMultiRequestQueueSize() . ':result');
+	}	
 	
 	/**
 	 * @param string $msg

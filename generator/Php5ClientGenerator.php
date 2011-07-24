@@ -448,7 +448,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			else
 				$this->appendLine("		\$this->client->queueServiceActionCall(\"".strtolower($serviceId)."\", \"$action\", \$kparams);");
 			$this->appendLine("		if (\$this->client->isMultiRequest())");
-			$this->appendLine("			return null;");
+			$this->appendLine("			return \$this->client->getMultiRequestResult();");
 			$this->appendLine("		\$resultObject = \$this->client->doQueue();");
 			$this->appendLine("		\$this->client->throwExceptionIfError(\$resultObject);");
 			
