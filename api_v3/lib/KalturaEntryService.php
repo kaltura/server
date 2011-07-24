@@ -552,6 +552,8 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
+		$this->checkIfUserAllowedToUpdateEntry($entry);
+			
 		$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
@@ -867,38 +869,6 @@ class KalturaEntryService extends KalturaBaseService
 
 		KalturaLog::debug("Set kuser id [" . $kuser->getId() . "] line [" . __LINE__ . "]");
 		$dbEntry->setKuserId($kuser->getId());
-	}
-	
-	/**
-	 * Throws an error if the user is trying to update entry that doesn't belong to him and the session is not admin
-	 *
-	 * @param entry $dbEntry
-	 */
-	protected function checkIfUserAllowedToUpdateEntry(entry $dbEntry)
-	{
-		// if session is not admin, but privileges are
-		// edit:* or edit:ENTRY_ID or editplaylist:PLAYLIST_ID
-		// edit is allowed
-		if (!$this->getKs() || !$this->getKs()->isAdmin() )
-		{
-			// check if wildcard on 'edit'
-			if ($this->getKs()->verifyPrivileges(ks::PRIVILEGE_EDIT, ks::PRIVILEGE_WILDCARD))
-				return;
-				
-			// check if entryID on 'edit'
-			if ($this->getKs()->verifyPrivileges(ks::PRIVILEGE_EDIT, $dbEntry->getId()))
-				return;
-
-			//
-			if ($this->getKs()->verifyPlaylistPrivileges(ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST, $dbEntry->getId(), $this->getPartnerId()))
-				return;
-		}
-		
-		// if user is not the entry owner, and the KS is user type - do not allow update
-		if ($dbEntry->getKuserId() != $this->getKuser()->getId() && (!$this->getKs() || !$this->getKs()->isAdmin()))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-		}
 	}
 	
 	/**

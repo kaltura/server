@@ -16,8 +16,11 @@ class FlavorAssetService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
 		parent::applyPartnerFilterForClass(new assetPeer());
-		
-		$partnerGroup = null;
+		parent::applyPartnerFilterForClass(new assetParamsPeer());
+	}
+
+	protected function kalturaNetworkAllowed($actionName)
+	{
 		if(
 			$actionName == 'add' ||
 			$actionName == 'get' ||
@@ -29,24 +32,11 @@ class FlavorAssetService extends KalturaBaseService
 			$actionName == 'convert' ||
 			$actionName == 'reconvert'
 			)
-			$partnerGroup = $this->partnerGroup . ',0';
+			return true;
 			
-		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
+		return parent::kalturaNetworkAllowed($actionName);
 	}
-
-	// maybe a solution to bug #9798
-//	/* (non-PHPdoc)
-//	 * @see KalturaBaseService::kalturaNetworkAllowed()
-//	 */
-//	protected function kalturaNetworkAllowed($actionName)
-//	{
-//		if( $actionName == 'getWebPlayableByEntryId')
-//			return true;
-//		else
-//			return false;
-//	}
 	
-
     /**
      * Add flavor asset
      *
@@ -63,6 +53,8 @@ class FlavorAssetService extends KalturaBaseService
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
     		$dbFlavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorAsset->flavorParamsId);
@@ -105,6 +97,12 @@ class FlavorAssetService extends KalturaBaseService
    		if(!$dbFlavorAsset)
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
+		$dbEntry = $dbFlavorAsset->getentry();
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbFlavorAsset->getEntryId());
+			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
    		$dbFlavorAsset->save();
 		
@@ -134,6 +132,12 @@ class FlavorAssetService extends KalturaBaseService
    		if(!$dbFlavorAsset)
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
+		$dbEntry = $dbFlavorAsset->getentry();
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbFlavorAsset->getEntryId());
+			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
    		$previousStatus = $dbFlavorAsset->getStatus();
 		$contentResource->validateEntry($dbFlavorAsset->getentry());
 		$kContentResource = $contentResource->toObject();
@@ -516,6 +520,8 @@ class FlavorAssetService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$flavorParamsDb = assetParamsPeer::retrieveByPK($flavorParamsId);
 		assetParamsPeer::setUseCriteriaFilter(false);
 		if (!$flavorParamsDb)
@@ -571,16 +577,18 @@ class FlavorAssetService extends KalturaBaseService
 		if (!$flavorAssetDb)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
+		$entry = $flavorAssetDb->getEntry();
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $flavorAssetDb->getEntryId());
+			
+		$this->checkIfUserAllowedToUpdateEntry($entry);
+		
 		$flavorAssetDb->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$flavorAssetDb->setDeletedAt(time());
 		$flavorAssetDb->save();
 		
-		$entry = $flavorAssetDb->getEntry();
-		if ($entry)
-		{
-			$entry->removeFlavorParamsId($flavorAssetDb->getFlavorParamsId());
-			$entry->save();
-		}
+		$entry->removeFlavorParamsId($flavorAssetDb->getFlavorParamsId());
+		$entry->save();
 	}
 	
 	/**

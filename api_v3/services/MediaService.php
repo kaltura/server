@@ -23,6 +23,12 @@ class MediaService extends KalturaEntryService
 		if ($actionName === 'addFromFlavorAsset') {
 			return true;
 		}
+		if ($actionName === 'addContent') {
+			return true;
+		}
+		if ($actionName === 'updateContent') {
+			return true;
+		}
 		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
@@ -76,6 +82,8 @@ class MediaService extends KalturaEntryService
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
 			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
     	$resource->validateEntry($dbEntry);
     	$kResource = $resource->toObject();
     	$this->attachResource($kResource, $dbEntry);
@@ -672,6 +680,8 @@ class MediaService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
 				
 		return $this->getEntry($entryId);

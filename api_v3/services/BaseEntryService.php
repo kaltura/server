@@ -64,6 +64,8 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$kResource = $resource->toObject();
     	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
     		$this->setEntryTypeByResource($dbEntry, $kResource);
@@ -327,6 +329,8 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$baseEntry = new KalturaBaseEntry();
 		$baseEntry->fromObject($dbEntry);
 		

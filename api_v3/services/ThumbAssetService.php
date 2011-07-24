@@ -16,8 +16,11 @@ class ThumbAssetService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
 		parent::applyPartnerFilterForClass(new assetPeer());
-		
-		$partnerGroup = null;
+		parent::applyPartnerFilterForClass(new assetParamsPeer());
+	}
+
+	protected function kalturaNetworkAllowed($actionName)
+	{
 		if(
 			$actionName == 'get' ||
 			$actionName == 'list' ||
@@ -27,9 +30,9 @@ class ThumbAssetService extends KalturaBaseService
 			$actionName == 'generateByEntryId' ||
 			$actionName == 'regenerate'
 			)
-			$partnerGroup = $this->partnerGroup . ',0';
+			return true;
 			
-		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
+		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
     /**
@@ -54,6 +57,8 @@ class ThumbAssetService extends KalturaBaseService
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
     	if($thumbAsset->thumbParamsId)
     	{
     		$dbThumbAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $thumbAsset->thumbParamsId);
@@ -95,6 +100,12 @@ class ThumbAssetService extends KalturaBaseService
    		if(!$dbThumbAsset)
    			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
+		$dbEntry = $dbThumbAsset->getentry();
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbThumbAsset->getEntryId());
+			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
    		$previousStatus = $dbThumbAsset->getStatus();
 		$contentResource->validateEntry($dbThumbAsset->getentry());
 		$kContentResource = $contentResource->toObject();
@@ -112,7 +123,6 @@ class ThumbAssetService extends KalturaBaseService
    		
 		$thumbAssetsCount = assetPeer::countThumbnailsByEntryId($dbThumbAsset->getEntryId());
 		
-		$dbEntry = $dbThumbAsset->getentry();
 		$defaultThumbKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
     		
  		//If the thums has the default tag or the entry is in no content and this is the first thumb
@@ -149,6 +159,12 @@ class ThumbAssetService extends KalturaBaseService
 		if(!$dbThumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
+		$dbEntry = $dbThumbAsset->getentry();
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbThumbAsset->getEntryId());
+			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
     	$dbThumbAsset = $thumbAsset->toUpdatableObject($dbThumbAsset);
    		$dbThumbAsset->save();
 		
@@ -420,7 +436,11 @@ class ThumbAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
 		$entry = $thumbAsset->getentry();
-						
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAsset->getEntryId());
+									
+		$this->checkIfUserAllowedToUpdateEntry($entry);
+		
 		$entryKuserId = $entry->getKuserId();
 		$thisKuserId = $this->getKuser()->getId();
 		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
@@ -481,6 +501,8 @@ class ThumbAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
+						
+		$this->checkIfUserAllowedToUpdateEntry($entry);
 			
 		$validStatuses = array(
 			entryStatus::ERROR_CONVERTING,
@@ -530,6 +552,8 @@ class ThumbAssetService extends KalturaBaseService
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
 			
+		$this->checkIfUserAllowedToUpdateEntry($entry);
+		
 		$validStatuses = array(
 			entryStatus::ERROR_CONVERTING,
 			entryStatus::PRECONVERT,
@@ -580,6 +604,8 @@ class ThumbAssetService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $entry->getType());
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED, $entry->getMediaType());
+						
+		$this->checkIfUserAllowedToUpdateEntry($entry);
 			
 		$validStatuses = array(
 			entryStatus::ERROR_CONVERTING,
@@ -695,6 +721,8 @@ class ThumbAssetService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
 		
 		$dbThumbAsset = new thumbAsset();
@@ -736,6 +764,8 @@ class ThumbAssetService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
+		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		
 		$dbThumbAsset = new thumbAsset();
@@ -785,6 +815,12 @@ class ThumbAssetService extends KalturaBaseService
 	
 		if($thumbAssetDb->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_DEFAULT, $thumbAssetId);
+		
+		$entry = $thumbAssetDb->getEntry();
+		if (!$entry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $thumbAssetDb->getEntryId());
+			
+		$this->checkIfUserAllowedToUpdateEntry($entry);
 		
 		$thumbAssetDb->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$thumbAssetDb->setDeletedAt(time());
