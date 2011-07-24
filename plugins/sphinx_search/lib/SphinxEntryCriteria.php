@@ -18,7 +18,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entry.REFERENCE_ID' => 'reference_id',
 		'entry.REPLACING_ENTRY_ID' => 'replacing_entry_id',
 		'entry.REPLACED_ENTRY_ID' => 'replaced_entry_id',
-		'entry.SEARCH_TEXT' => '(name,tags,description,entry_id)',
+		'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id)',
 		'entry.ROOTS' => 'roots',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
@@ -87,7 +87,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'reference_id' => IIndexable::FIELD_TYPE_STRING,
 		'replacing_entry_id' => IIndexable::FIELD_TYPE_STRING,
 		'replaced_entry_id' => IIndexable::FIELD_TYPE_STRING,
-		'(name,tags,description,entry_id)' => IIndexable::FIELD_TYPE_STRING,
+		'(name,tags,description,entry_id,reference_id)' => IIndexable::FIELD_TYPE_STRING,
 		'roots' => IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
