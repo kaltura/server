@@ -454,10 +454,11 @@ class KalturaEntryService extends KalturaBaseService
     	if(!$dbAsset)
     	{
     		$isNewAsset = true;
-			$dbAsset = new flavorAsset();
+			$dbAsset = new asset();
+			$dbAsset->setType($assetParams->getType());
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
-			$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 			
 			$dbAsset->setFlavorParamsId($resource->getAssetParamsId());
 			if($assetParams->hasTag(assetParams::TAG_SOURCE))
