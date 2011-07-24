@@ -35,6 +35,11 @@ class Form_TVComProfileConfiguration extends Form_ConfigurableProfileConfigurati
 		$this->addElement('Text', 'feed_image_width', array('label' => 'Feed image width:'));
 		$this->addElement('Text', 'feed_image_height', array('label' => 'Feed image height:'));
 		
+		$element = new Zend_Form_Element_Hidden('feed_url');
+		$element->clearDecorators();
+		$element->addDecorator('Callback', array('callback' => array($this, 'renderFeedUrl')));
+		$this->addElement($element);
+		
 		$this->addDisplayGroup(
 			array('feed_title', 'feed_link', 'feed_description', 'feed_language', 'feed_copyright'), 
 			'feed', 
@@ -43,17 +48,23 @@ class Form_TVComProfileConfiguration extends Form_ConfigurableProfileConfigurati
 		
 		$this->addDisplayGroup(
 			array('feed_image_title', 'feed_image_url', 'feed_image_link', 'feed_image_width', 'feed_image_height'), 
-			'fedd_image', 
+			'feed_image', 
 			array('legend' => 'Feed Image Configuration', 'decorators' => array('FormElements', 'Fieldset'))
 		);
 		
-		$element = new Zend_Form_Element_Hidden('feed_url');
-		$element->addDecorator('Callback', array('callback' => array($this, 'renderFeedUrl')));
-		$this->addElement($element);
+		$this->addDisplayGroup(
+			array('feed_url'), 
+			'feed_url_group', 
+			array('legend' => '', 'decorators' => array('FormElements', 'Fieldset'))
+		);
 	}
 	
 	public function renderFeedUrl($content)
 	{
-		return '<a href="'.$this->getValue('feed_url').'" target="_blank">Feed URL</a>';
+		$url = $this->getValue('feed_url');
+		if (!$url)
+			return 'Feed URL will be generated once the feed is saved';
+		else
+			return '<a href="'.$url.'" target="_blank">Feed URL</a>';
 	}
 }
