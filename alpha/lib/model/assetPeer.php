@@ -57,6 +57,33 @@ class assetPeer extends BaseassetPeer
 			
 		return parent::OM_CLASS;
 	}
+	
+	/**
+	 * @param int $assetType enum from assetType
+	 * @return asset
+	 */
+	public static function getNewAsset($assetType)
+	{
+		$class = null;
+		
+		if(isset(self::$class_types_cache[$assetType]))
+			$class = self::$class_types_cache[$assetType];
+			
+		if(!$class)
+		{
+			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $assetType);
+			if($extendedCls)
+			{
+				self::$class_types_cache[$assetType] = $extendedCls;
+				$class = $extendedCls;
+			}
+		}
+		
+		if(!$class)
+			throw new kCoreException("Unable to instatiate asset of type [$assetType]", kCoreException::OBJECT_TYPE_NOT_FOUND);
+				
+		return new $class();
+	}
 
 	/**
 	 * 
