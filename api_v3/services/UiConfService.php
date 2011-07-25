@@ -253,8 +253,20 @@ class UiConfService extends KalturaBaseService
 			$typesInfo->filename = isset($swfNames[$objType]) ? $swfNames[$objType] : '';
 			$versions = array();
 			$path = $flashPath . '/' . $dir . '/';
+			if(!file_exists($path) || !is_dir($path))
+			{
+				KalturaLog::err("Path [$path] does not exist");
+				continue;
+			}
+				
 			$path = realpath($path);
 			$files = scandir($path);
+			if(!$files)
+			{
+				KalturaLog::err("Could not scan directory [$path]");
+				continue;
+			}
+				
 			foreach($files as $file)
 			{
 				if (is_dir(realpath($path . '/' . $file)) && strpos($file, 'v') === 0)
@@ -276,4 +288,3 @@ class UiConfService extends KalturaBaseService
 		return $typesInfoArray;
 	}
 }
-?>
