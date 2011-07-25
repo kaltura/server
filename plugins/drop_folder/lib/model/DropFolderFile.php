@@ -16,7 +16,7 @@
 class DropFolderFile extends BaseDropFolderFile
 {
 
-	const CUSTOM_DATA_HANDLE_BATCH_JOB_ID  = 'handle_batch_job_id';
+	const CUSTOM_DATA_LAST_MODIFICATION_TIME = 'last_modification_time';
 	
 	public function setFileSize($size)
 	{
@@ -27,6 +27,19 @@ class DropFolderFile extends BaseDropFolderFile
 	public function getFileSizeLastSetAt($format = null)
 	{
 		return parent::getFileSizeLastSetAt($format);
-	}	
+	}
+	
+	
+	public function getLastModificationTime()
+	{
+	    return $this->getFromCustomData(self::CUSTOM_DATA_LAST_MODIFICATION_TIME);
+	}
+	
+	public function setLastModificationTime($time)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_LAST_MODIFICATION_TIME, $time);
+	}
+	
+	
 		
 } // DropFolderFile

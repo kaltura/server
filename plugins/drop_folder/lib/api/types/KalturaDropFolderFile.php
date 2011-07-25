@@ -75,6 +75,11 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	 */
 	public $errorDescription;
 	
+	/**
+	 * @var string
+	 */
+	public $lastModificationTime;
+	
 	
 	/**
 	 * @var int
@@ -107,6 +112,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 		'parsedFlavor',
 		'errorCode',
 		'errorDescription',
+	    'lastModificationTime',
 		'createdAt',
 		'updatedAt',
 	 );

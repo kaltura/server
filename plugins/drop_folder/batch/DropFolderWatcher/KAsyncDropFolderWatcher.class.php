@@ -132,22 +132,17 @@ class KAsyncDropFolderWatcher extends KBatchBase
 
 		
 		$dropFolderFileMapByName = array();
-		$deletedDropFolderFileMapByName = array();
 		
 		foreach ($dropFolderFiles as $dropFolderFile)
 		{
-			if ($dropFolderFile->status !== KalturaDropFolderFileStatus::PURGED) {
-				if ($dropFolderFile->status === KalturaDropFolderFileStatus::UPLOADING && !in_array($dropFolderFile->fileName, $physicalFiles))
+			if ($dropFolderFile->status !== KalturaDropFolderFileStatus::PURGED)
+			{
+				if (!in_array($dropFolderFile->fileName, $physicalFiles))
 				{
 					$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 'Cannot find file with name ['.$dropFolderFile->fileName.']');
 					continue;
 				}				
-				if ($dropFolderFile->status === KalturaDropFolderFileStatus::DELETED) {
-					$deletedDropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
-				}
-				else {
-					$dropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
-				}
+				$dropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
 			}			
 		}		
 		
@@ -195,32 +190,41 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				continue;
 			}
 			*/
-
-			// purge file marked as deleted
-			if (array_key_exists($physicalFileName, $deletedDropFolderFileMapByName))
-			{
-				$this->purgeFile($deletedDropFolderFileMapByName[$physicalFileName], $fullPath);
-				continue;
-			}
 			
 			// check if file is already in the list of drop folder files
 			if (!array_key_exists($physicalFileName, $dropFolderFileMapByName))
 			{
 				// new physical file found in folder - add new drop folder file object with status UPLOADING
-				$filesize = $this->fileTransferMgr->fileSize($fullPath);
-				$this->addNewDropFolderFile($folder->id, $physicalFileName, $filesize);	
+				$this->addNewDropFolderFile($folder->id, $physicalFileName, $fullPath);	
 			}
 			else
 			{
-				// update existing drop folder file object according to current physical file size
-				$currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
+			    $currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
+			    
+			    $lastModificationTime = $this->getModificationTime($fullPath);
+			    if ($lastModificationTime > $currentDropFolderFile->lastModificationTime && 
+			        $currentDropFolderFile->status != KalturaDropFolderFileStatus::UPLOADING)
+			    {
+			        // file has been replaced by a new file with the same name
+			        $this->setFileAsPurged($currentDropFolderFile);
+			        $this->addNewDropFolderFile($folder->id, $physicalFileName, $fullPath);
+			        continue; // continue to next file
+			    }			    
+			    
+				// update existing drop folder file object according to current physical file
 				if ($currentDropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
 				{
-					$this->updateDropFolderFile($folder, $currentDropFolderFile, $fullPath);
+					$this->updateDropFolderFile($folder, $currentDropFolderFile, $fullPath, $lastModificationTime);
 				}
 				else if	($currentDropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
 				{
 					$this->purgeHandledFileIfNeeded($folder, $currentDropFolderFile, $fullPath);
+				}
+			    else if	($currentDropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
+				{
+				    // purge file marked as deleted
+					$this->purgeFile($dropFolderFileMapByName[$physicalFileName], $fullPath);
+    				continue;
 				}
 			}
 		}
@@ -267,17 +271,27 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	}
 	
 	/**
+	 * @param string $filePath
+	 * @return int last modification time for the given $filePath
+	 */
+	private function getModificationTime($filePath)
+	{
+	    return $this->fileTransferMgr->modificationTime($filePath);
+	}
+	
+	/**
 	 * Add a new drop folder file in status KalturaDropFolderFileStatus::UPLOADING
 	 * @param int $folderId
 	 * @param string $fileName
-	 * @param size $fileSize
+	 * @param string $fullPath
 	 */
-	private function addNewDropFolderFile($folderId, $fileName, $fileSize)
+	private function addNewDropFolderFile($folderId, $fileName, $fullPath)
 	{
 		$newDropFolderFile = new KalturaDropFolderFile();
 		$newDropFolderFile->dropFolderId = $folderId;
 		$newDropFolderFile->fileName = $fileName;
-		$newDropFolderFile->fileSize = $fileSize;
+		$newDropFolderFile->fileSize = $this->getFileSize($fullPath);
+		$newDropFolderFile->lastModificationTime = $this->getModificationTime($fullPath);
 		$newDropFolderFile->status = KalturaDropFolderFileStatus::UPLOADING;
 		
 		try {	
@@ -295,11 +309,12 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param KalturaDropFolder $dropFolder
 	 * @param KalturaDropFolderFile $dropFolderFile
 	 * @param string $sharedPhysicalFilePath
+	 * @param int $lastModificationTime
 	 */
-	private function updateDropFolderFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath)
+	private function updateDropFolderFile(KalturaDropFolder $dropFolder, KalturaDropFolderFile $dropFolderFile, $sharedPhysicalFilePath, $lastModificationTime)
 	{
 		$physicalFileSize = $this->getFileSize($sharedPhysicalFilePath);
-		
+
 		if (!$physicalFileSize) {
 			$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, "Cannot get file size for path [$sharedPhysicalFilePath]");
 			KalturaLog::err("Cannot get file size for path [$sharedPhysicalFilePath]");
@@ -316,6 +331,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			try {
 				$updateDropFolderFile = new KalturaDropFolderFile();
 				$updateDropFolderFile->fileSize = $physicalFileSize;
+				$updateDropFolderFile->lastModificationTime = $lastModificationTime;
 				$this->impersonate($dropFolderFile->partnerId);
 				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 				$this->unimpersonate();				
@@ -337,6 +353,7 @@ class KAsyncDropFolderWatcher extends KBatchBase
 				try {
 					$updateDropFolderFile = new KalturaDropFolderFile();
 					$updateDropFolderFile->status = KalturaDropFolderFileStatus::PENDING;
+					$updateDropFolderFile->lastModificationTime = $lastModificationTime;
 					$this->impersonate($dropFolderFile->partnerId);
 					$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 					$this->unimpersonate();
@@ -404,6 +421,18 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			return false;
 		}
 		
+		// change status to PURGED
+		return $this->setFileAsPurged($dropFolderFile);
+	}
+	
+	
+	/**
+	 * 
+	 * Set file to status KalturaDropFolderStatus::PURGED
+	 * @param KalturaDropFolderFile $dropFolderFile
+	 */
+	private function setFileAsPurged(KalturaDropFolderFile $dropFolderFile)
+	{
 		// change status to PURGED
 		try {
 			$updateDropFolderFile = new KalturaDropFolderFile();
