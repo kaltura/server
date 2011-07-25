@@ -13,7 +13,7 @@ class DropFolderBatchUtils
 	public static function getFileTransferManager(KalturaDropFolder $folder)
 	{
 	    $fileTransferMgr = null;
-	    $host = $port = $username = $password = $privateKey = $publicKey = null;
+	    $host = $port = $username = $password = $privateKey = $publicKey = $passPhrase = null;
 	    
 	    switch ($folder->type)
 	    {
@@ -36,6 +36,7 @@ class DropFolderBatchUtils
 	            $password = $folder->password;
 	            $privateKey = isset($folder->privateKey) ? $folder->privateKey : null;
 	            $publicKey = isset($folder->publicKey) ? $folder->publicKey : null;
+	            $passPhrase = isset($folder->passPhrase) ? $folder->passPhrase : null;
 	            break;
 	        case KalturaDropFolderType::SCP:
 	            $fileTransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::SCP);
@@ -45,6 +46,7 @@ class DropFolderBatchUtils
 	            $password = $folder->password;
 	            $privateKey = isset($folder->privateKey) ? $folder->privateKey : null;
 	            $publicKey = isset($folder->publicKey) ? $folder->publicKey : null;
+	            $passPhrase = isset($folder->passPhrase) ? $folder->passPhrase : null;
 	            break;
 	            
 	        default:
@@ -58,8 +60,8 @@ class DropFolderBatchUtils
         	}
         	else {
         	    $privateKeyFile = self::getTempFileWithContent($privateKey, 'privateKey');
-        	    $publicKeyFile = self::getTempFileWithContent($publicKeyFile, 'publicKey');
-        	    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, null, $port);
+        	    $publicKeyFile = self::getTempFileWithContent($publicKey, 'publicKey');
+        	    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);
         	}
 	    }
 	    catch (Exception $e)
@@ -79,13 +81,8 @@ class DropFolderBatchUtils
 	protected static function getTempFileWithContent($fileContent, $prefix = '') 
 	{
 		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, $prefix);
-		while (file_exists($fileLocation)) {
-		    $fileLocation += '_'.time();
-		}
-		
+		$fileLocation = tempnam($tempDirectory, $prefix);		
 		file_put_contents($fileLocation, $fileContent);
-		
 		return $fileLocation;
 	}
 	
