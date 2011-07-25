@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package dropFolder 
+ * @package plugins.dropFolder 
  * @subpackage Scheduler.fileHandlers
  */
 abstract class DropFolderFileHandler

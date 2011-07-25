@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugin.dropFolder
+ * @package plugins.dropFolder
  * @subpackage model.data
  */
 class DropFolderFileHandlerConfig

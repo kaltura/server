@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugin.dropFolder
+ * @package plugins.dropFolder
  * @subpackage model.enum
  */ 
 interface DropFolderContentFileHandlerMatchPolicy extends BaseEnum
