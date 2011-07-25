@@ -243,7 +243,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(YouTubeDistributionField::POLICY_UGC);
 	    $fieldConfig->setUserFriendlyFieldName('UGC policy');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/commerical_policy" />');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/ugc_policy" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
