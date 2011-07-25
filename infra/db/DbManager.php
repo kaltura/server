@@ -15,7 +15,7 @@ class DbManager
 	/**
 	 * @var array
 	 */
-	protected static $sphinxConection = null;
+	protected static $sphinxConnection = null;
 	
 	public static function setConfig(array $config)
 	{
