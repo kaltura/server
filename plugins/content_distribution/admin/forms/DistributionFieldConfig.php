@@ -92,6 +92,11 @@ class Form_DistributionFieldConfig_SubForm extends Zend_Form_SubForm
 		if ($requiredStatus == Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER) {
 			$this->getElement('isRequired')->setAttrib('disabled', 'disabled');
 		}
+		else 
+		{
+			// required by provider shouldn't be selectable by the user
+			$this->getElement('isRequired')->removeMultiOption(Kaltura_Client_ContentDistribution_Enum_DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		}
 		
 		$this->setDefault('fieldNameForView', $object->fieldName);
 		
