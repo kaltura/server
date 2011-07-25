@@ -299,7 +299,7 @@ class KalturaTypeReflector
 	 */
 	public function getConstantName($value)
 	{
-		if (!$this->isEnum())
+		if (!$this->isEnum() && !$this->isStringEnum())
 			return false;
 			
 		$this->getConstantsValues();
@@ -315,7 +315,7 @@ class KalturaTypeReflector
 	 */
 	public function getConstantValue($name)
 	{
-		if (!$this->isEnum())
+		if (!$this->isEnum() && !$this->isStringEnum())
 			return false;
 			
 		$this->getConstantsValues();
