@@ -68,7 +68,7 @@ class DbManager
 	public static function getSphinxConnection()
 	{
 		if(self::$sphinxConnection)
-			return self::$sphinxConection;
+			return self::$sphinxConnection;
 
 		$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
 		$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 300;
