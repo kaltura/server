@@ -46,6 +46,12 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 	 * @filter eq,in
 	 */
 	public $systemName;
+
+	/**
+	 * Starts conversion even if the decision layer reduced the configuration to comply with the source
+	 * @var KalturaNullableBoolean
+	 */
+	protected $forceNoneComplied;
 	
 	private static $map_between_objects = array
 	(
@@ -54,6 +60,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 		'readyBehavior',
 		'origin',
 		'systemName',
+		'forceNoneComplied',
 	);
 	
 	public function getMapBetweenObjects ( )
