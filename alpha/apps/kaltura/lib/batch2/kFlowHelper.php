@@ -67,6 +67,31 @@ class kFlowHelper
 				throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 		}
 		
+		// get entry
+		$entryId = $dbBatchJob->getEntryId();
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		
+		// IMAGE media entries
+		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
+		    $syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			try
+			{
+				kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true);
+			}
+			catch (Exception $e) {
+				if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
+				{
+					$dbEntry->setStatus(entryStatus::ERROR_CONVERTING);
+					$dbEntry->save();
+				}											
+				throw $e;
+			}
+			$dbEntry->setStatus(entryStatus::READY);
+			$dbEntry->save();
+			return $dbBatchJob;
+		}
+		
 		$flavorAsset = null;
 		if($data->getFlavorAssetId())
 		{
