@@ -883,6 +883,20 @@ window.onbeforeunload = kmc.functions.checkForOngoingProcess;
 
 kmc.layout = {
 	init: function() {
+		// Close open menu if user click anywhere
+		$("#kmcHeader").bind( 'click', function() { 
+			$("#hTabs a").each(function(inx, tab) {
+				var $tab = $(tab);
+				if( $tab.hasClass('menu') && $tab.hasClass('active') ){
+					$("#kcms")[0].gotoPage({
+						moduleName: $tab.attr('id'),
+						subtab: $tab.attr('rel')
+					});
+				} else {
+					return true;
+				}
+			});
+		} );
 		// Add Modal & Overlay divs when page loads
 		$("body").append('<div id="overlay"></div><div id="modal"><div class="title"><h2></h2><span class="close icon"></span></div><div class="content"></div></div>');
 	},
