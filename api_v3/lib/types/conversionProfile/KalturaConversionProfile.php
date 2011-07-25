@@ -176,25 +176,29 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	
 	public function toObject($objectToFill = null , $propsToSkip = array())
 	{
-		parent::toObject($objectToFill, $propsToSkip);
+		$ret = parent::toObject($objectToFill, $propsToSkip);
 		
 		if ($this->cropDimensions !== null)
 		{
-			$this->cropDimensions->toObject($objectToFill);
+			$this->cropDimensions->toObject($ret);
 		}
 		
 		if ($this->isDefault === KalturaNullableBoolean::NULL_VALUE) // like null
 			$this->isDefault = null;
+			
+		return $ret;
 	}
 	
 	public function toUpdatableObject($objectToFill , $propsToSkip = array())
 	{
-		parent::toUpdatableObject($objectToFill, $propsToSkip);
+		$ret = parent::toUpdatableObject($objectToFill, $propsToSkip);
 		
 		if ($this->cropDimensions !== null)
 		{
-			$this->cropDimensions->toUpdatableObject($objectToFill);
+			$this->cropDimensions->toUpdatableObject($ret);
 		}
+		
+		return $ret;
 	}
 	
 	/* (non-PHPdoc)
