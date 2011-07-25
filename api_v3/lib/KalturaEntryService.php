@@ -454,7 +454,7 @@ class KalturaEntryService extends KalturaBaseService
     	if(!$dbAsset)
     	{
     		$isNewAsset = true;
-			$dbAsset = KalturaPluginManager::loadObject(assetPeer::OM_CLASS, $assetParams->getType());
+			$dbAsset = assetPeer::getNewAsset($assetParams->getType());
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
 			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
