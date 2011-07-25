@@ -236,6 +236,7 @@
 		const AAC = "aac";
 		const WMA = "wma";
 		const VORBIS = "vorbis";
+		const AMRNB = "amrnb";
 		const COPY = "copy";
 	};
 	
