@@ -105,6 +105,16 @@ class localMgr extends kFileTransferMgr
 	    clearstatcache();
 	    return @filesize($remote_file);
 	}
+	
+    protected function doModificationTime($remote_file)
+	{
+	    clearstatcache();
+	    $modificationTime = @filemtime($remote_file);
+	    if (!$modificationTime) {
+	        return null;
+	    }
+	    return $modificationTime;
+	}	
 
 }
 ?>

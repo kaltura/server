@@ -240,6 +240,11 @@ class httpMgr extends kFileTransferMgr
 	{
 	    return false; // not supported
 	}
+	
+	protected function doModificationTime($remote_file)
+	{
+	    return false; // not supported
+	}
 
 	/*******************/
 	/* Other functions */

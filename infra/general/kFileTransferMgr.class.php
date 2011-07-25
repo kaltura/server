@@ -693,6 +693,42 @@ abstract class kFileTransferMgr
 		return $res;
 	}
 	
+	/**
+	 * Return last file modification time as a unix timestamp
+	 *
+	 * @param $remote_file path to remote file or directory
+	 *
+	 * @throws kFileTransferMgrException
+	 *
+	 * @return FILETRANSFERMGR_RES_OK / FILETRANSFERMGR_RES_ERR	 *
+	 */
+	public function modificationTime($remote_file)
+	{
+		$remote_file = trim($remote_file);
+		
+		KalturaLog::debug("Checking for size of file [$remote_file]");
+				
+		// parameter checks
+		if (!$this->connection_id) {
+			throw new kFileTransferMgrException("No connection established yet.", kFileTransferMgrException::notYetConnected);
+		}
+
+		$remote_file = $this->fixPathString($remote_file);
+
+		// check if file exists
+		$res = @($this->doModificationTime($remote_file));
+		
+		if(is_null($res) || $res < -1 )
+		{
+			KalturaLog::debug("Cannot find modification time of [$remote_file]");
+			throw new kFileTransferMgrException("Error finding modification time.", kFileTransferMgrException::otherError);
+		}
+		
+		KalturaLog::debug("File modification time [$res] found for [$remote_file]");
+		
+		return $res;
+	}
+	
 
 	/***************************/
 	/* Other private functions */

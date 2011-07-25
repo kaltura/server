@@ -130,11 +130,24 @@ class scpMgr extends kFileTransferMgr
 	    $remote_file = ltrim($remote_file, '/');
 		$exists_cmd = 'du -b ' . $remote_file;
 		$exec_output = $this->execCommand($exists_cmd);
-		$matches = array();
-		$regex = '/(?P<fileSize>\w+)(\s)+('.$remote_file.')/';
-		$match = preg_match($regex, $exec_output, $matches);
-		if ($match && isset($matches['fileSize'])) {
-		    return $matches['fileSize'];
+		$output_array = explode("\t", $exec_output);
+		if (isset($output_array[0]) && is_numeric($output_array[0])) {
+		    return $output_array[0];
+		}
+		else {
+		    return null;
+		}
+	}
+	
+	protected function doModificationTime($remote_file)
+	{
+	    $remote_file = ltrim($remote_file, '/');
+		$exists_cmd = 'du --time --time-style=full-iso ' . $remote_file;
+		$exec_output = $this->execCommand($exists_cmd);
+		$output_array = explode("\t", $exec_output);
+		if (isset($output_array[1])) {
+		    $modifStr = trim($output_array[1]);
+		    return strtotime($modifStr);
 		}
 		else {
 		    return null;

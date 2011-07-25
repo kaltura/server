@@ -159,6 +159,16 @@ class ftpMgr extends kFileTransferMgr
 	    $remote_file = ltrim($remote_file,'/');
 	    return ftp_size($this->getConnection(), $remote_file);
 	}
+	
+	protected function doModificationTime($remote_file)
+	{
+	    $remote_file = ltrim($remote_file,'/');
+	    $modificationTime = ftp_mdtm($this->getConnection(), $remote_file);
+	    if ($modificationTime < 0) {
+	        return null;
+	    }
+	    return $modificationTime;
+	}	
 
 
 	/*******************/

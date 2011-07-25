@@ -223,6 +223,14 @@ class sftpMgr extends kFileTransferMgr
 	    return $filesize;
 	}
 	
+	protected function doModificationTime($remote_file)
+	{
+	    $remote_file = ltrim($remote_file,'/');
+	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
+	    $filesize = isset($statinfo['mtime']) ? $statinfo['mtime'] : null;
+	}
+	
+	
 	// execute the given command on the server
 	private function execCommand($command_str)
 	{
