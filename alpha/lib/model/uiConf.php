@@ -28,6 +28,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 	const UI_CONF_CLIENTSIDE_ENCODER = 15;
 	const UI_CONF_KMC_GENERAL = 16;
 	const UI_CONF_KMC_ROLES_AND_PERMISSIONS = 17;
+	const UI_CONF_CLIPPER = 18;
 
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
@@ -90,6 +91,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		self::UI_CONF_CLIENTSIDE_ENCODER => "expressUploader",
 		self::UI_CONF_KMC_GENERAL => "kmc",
 		self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "",
+		self::UI_CONF_CLIPPER => "kclip",
 	);
 	
 	public function save(PropelPDO $con = null, $isClone = false)
