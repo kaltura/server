@@ -152,6 +152,10 @@ class TVComDistributionPlugin extends KalturaPlugin implements IKalturaPermissio
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
+		// append comcast mrss specific configuration
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+		/* @var $distributionProfile TVComDistributionProfile */ 
+		$mrss->addChild('feed_copyright', $distributionProfile->getFeedCopyright());
 	}
 
 	/**
