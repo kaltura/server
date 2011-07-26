@@ -31,15 +31,6 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	public $partnerId;
 	
 	/**
-	 * The status of the Flavor Asset
-	 * 
-	 * @var KalturaFlavorAssetStatus
-	 * @readonly 
-	 * @filter eq,in,notin
-	 */
-	public $status;
-	
-	/**
 	 * The version of the Flavor Asset
 	 * 
 	 * @var int
@@ -122,7 +113,6 @@ class KalturaAsset extends KalturaObject implements IFilterable
 		"id",
 		"entryId",
 		"partnerId",
-		"status",
 		"version",
 		"size",
 		"tags",

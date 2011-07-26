@@ -77,6 +77,15 @@ class KalturaFlavorAsset extends KalturaAsset
 	 */
 	public $videoCodecId;
 	
+	/**
+	 * The status of the Flavor Asset
+	 * 
+	 * @var KalturaFlavorAssetStatus
+	 * @readonly 
+	 * @filter eq,in,notin
+	 */
+	public $status;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -89,6 +98,7 @@ class KalturaFlavorAsset extends KalturaAsset
 		"isWeb",
 		"containerFormat",
 		"videoCodecId",
+		"status",
 	);
 	
 	public function getMapBetweenObjects ( )

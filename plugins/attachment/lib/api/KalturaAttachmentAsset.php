@@ -25,12 +25,22 @@ class KalturaAttachmentAsset extends KalturaAsset
 	 */
 	public $format;
 	
+	/**
+	 * The status of the asset
+	 * 
+	 * @var KalturaAttachmentAssetStatus
+	 * @readonly 
+	 * @filter eq,in,notin
+	 */
+	public $status;
+	
 	private static $map_between_objects = array
 	(
 		"filename",
 		"title",
 		"description",
 		"format" => "containerFormat",
+		"status",
 	);
 	
 	public function getMapBetweenObjects ( )

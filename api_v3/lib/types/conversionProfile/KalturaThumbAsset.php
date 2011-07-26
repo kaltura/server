@@ -29,11 +29,21 @@ class KalturaThumbAsset extends KalturaAsset
 	 */
 	public $height;
 	
+	/**
+	 * The status of the asset
+	 * 
+	 * @var KalturaThumbAssetStatus
+	 * @readonly 
+	 * @filter eq,in,notin
+	 */
+	public $status;
+	
 	private static $map_between_objects = array
 	(
 		"thumbParamsId" => "flavorParamsId",
 		"width",
 		"height",
+		"status",
 	);
 	
 	public function getMapBetweenObjects ( )
