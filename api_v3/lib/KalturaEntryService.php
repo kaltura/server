@@ -386,6 +386,25 @@ class KalturaEntryService extends KalturaBaseService
 			
 			return null;
     	}
+    
+    	if($dbAsset && !($dbAsset instanceof flavorAsset))
+    	{
+			$ext = pathinfo($url, PATHINFO_EXTENSION);
+    		$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
+			if (kFile::downloadUrlToFile($url, $entryFullPath))
+			{
+				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+				$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+				$dbAsset->save();
+				return $dbAsset;
+			}
+			
+			KalturaLog::err("Failed downloading file[$url]");
+			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+			$dbAsset->save();
+			
+			return null;
+    	}
     	
 		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset);
 		
@@ -400,8 +419,11 @@ class KalturaEntryService extends KalturaBaseService
      */
     protected function attachUrlResource(kUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
-		$dbEntry->setSource(KalturaSourceType::URL);
-		$dbEntry->save();
+    	if($dbAsset instanceof flavorAsset)
+    	{
+			$dbEntry->setSource(KalturaSourceType::URL);
+			$dbEntry->save();
+    	}
     	
     	return $this->attachUrl($resource->getUrl(), $dbEntry, $dbAsset);
     }
