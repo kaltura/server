@@ -111,7 +111,7 @@ class DbManager
 				{
 					KalturaLog::debug("getSphinxConnection: failed to connect to $key");
 					if (function_exists('apc_store'))
-						apc_store($cacheKey, 1, $cacheDuration);
+						apc_store($cacheKey, 1, $cacheExpiry);
 				}
 			}
 		}
