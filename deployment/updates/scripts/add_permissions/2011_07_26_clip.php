@@ -9,5 +9,5 @@
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
-$config = realpath(dirname(__FILE__)) . '/configs/clip_and_trim.ini';
+$config = realpath(dirname(__FILE__)) . '/configs/clip.ini';
 passthru("php $script $config");
