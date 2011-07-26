@@ -706,7 +706,7 @@ abstract class kFileTransferMgr
 	{
 		$remote_file = trim($remote_file);
 		
-		KalturaLog::debug("Checking for size of file [$remote_file]");
+		KalturaLog::debug("Checking for modification time of file [$remote_file]");
 				
 		// parameter checks
 		if (!$this->connection_id) {
