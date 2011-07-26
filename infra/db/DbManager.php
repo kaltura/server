@@ -104,7 +104,7 @@ class DbManager
 					$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
 					self::$sphinxConnection = new KalturaPDO($dataSource);
 
-					KalturaLog::debug("getSphinxConnection: connecteed to $key");
+					KalturaLog::debug("getSphinxConnection: connected to $key");
 					return self::$sphinxConnection;
 				}
 				catch(Exception $ex)
