@@ -97,6 +97,10 @@ class SchemaService extends KalturaBaseService
 			}
 		}
 		
+		fwrite($xsdFile, '
+	<!-- Kaltura enum types -->
+	');
+		
 		$enumClasses = array();
 		$matches = null;
 		if(preg_match_all('/type="(Kaltura[^"]+)"/', $elementsXSD, $matches))
