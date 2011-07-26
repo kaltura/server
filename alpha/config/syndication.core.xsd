@@ -71,11 +71,14 @@
 				</xs:annotation>
 			</xs:element>
 			<xs:choice minOccurs="0" maxOccurs="1">
-				<xs:element ref="media" minOccurs="1" maxOccurs="1"/>
+				<xs:element ref="media" minOccurs="1" maxOccurs="1"/>	
+				<!--
+				Not yet supported
 				<xs:element ref="mix" minOccurs="1" maxOccurs="1"/>
 				<xs:element ref="playlist" minOccurs="1" maxOccurs="1"/>
 				<xs:element ref="data" minOccurs="1" maxOccurs="1"/>
 				<xs:element ref="liveStream" minOccurs="1" maxOccurs="1"/>
+				-->
 			</xs:choice>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
 				<xs:element ref="content" minOccurs="1" maxOccurs="1"/>
@@ -93,6 +96,9 @@
 			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
+	
+	<!--
+	Not yet supported
 	<xs:complexType name="T_mix">
 		<xs:sequence>
 			<xs:element name="editorType" minOccurs="1" maxOccurs="1" type="KalturaEditorType"/>
@@ -111,6 +117,10 @@
 			<xs:element ref="mix-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
+	 -->
+	 	
+	<!--
+	Not yet supported
 	<xs:complexType name="T_playlist">
 		<xs:sequence>
 			<xs:element name="playlistType" minOccurs="1" maxOccurs="1" type="KalturaPlaylistType"/>
@@ -127,6 +137,10 @@
 			<xs:element ref="playlist-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
+	-->
+		
+	<!--
+	Not yet supported
 	<xs:complexType name="T_data">
 		<xs:sequence>
 			<xs:element name="dataContent" minOccurs="0" maxOccurs="1" type="xs:string"/>
@@ -134,6 +148,10 @@
 			<xs:element ref="data-extension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
+	-->
+		
+	<!--
+	Not yet supported
 	<xs:complexType name="T_liveStream">
 		<xs:complexContent>
 			<xs:extension base="T_media">
@@ -147,6 +165,10 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	-->
+		
+	<!--
+	Not yet supported
 	<xs:complexType name="T_playlists">
 		<xs:sequence>
 			<xs:element name="playlist" minOccurs="1" maxOccurs="unbounded">
@@ -180,28 +202,8 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="T_serverFileContentResource">
-		<xs:choice minOccurs="0" maxOccurs="1">
-			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="xs:string">
-							<xs:attribute name="type" use="optional" default="md5">				
-								<xs:simpleType>
-									<xs:restriction base="xs:string">
-										<xs:enumeration value="md5"/>
-										<xs:enumeration value="sha1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:attribute>
-						</xs:extension>
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
-		</xs:choice>
-		<xs:attribute name="filePath" type="xs:string" use="required"/>
-	</xs:complexType>
+	-->
+
 	<xs:complexType name="T_bitrate">
 		<xs:attribute name="bitrate" use="required" type="xs:int"/>
 		<xs:attribute name="width" use="required" type="xs:int"/>
@@ -211,26 +213,6 @@
 		<xs:sequence>
 			<xs:element ref="bitrate" minOccurs="1" maxOccurs="3"/>
 		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="T_urlContentResource">
-		<xs:attribute ref="url" use="required"/>
-	</xs:complexType>
-	<xs:complexType name="T_remoteStorageContentResource">
-		<xs:choice minOccurs="1" maxOccurs="1">
-			<xs:element name="storageProfileId" type="xs:int" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="storageProfile" type="xs:string" minOccurs="1" maxOccurs="1"/>
-		</xs:choice>
-		<xs:attribute name="url" type="xs:string" use="required"/>
-	</xs:complexType>
-	<xs:complexType name="T_entryContentResource">
-		<xs:choice minOccurs="0" maxOccurs="1">
-			<xs:element name="flavorParamsId" type="xs:int" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="flavorParams" type="xs:string" minOccurs="1" maxOccurs="1"/>
-		</xs:choice>
-		<xs:attribute name="entryId" type="xs:string" use="required"/>
-	</xs:complexType>
-	<xs:complexType name="T_assetContentResource">
-		<xs:attribute name="assetId" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="T_content">
 		<xs:sequence>
@@ -300,23 +282,21 @@
 	<xs:element name="channel" type="T_channel"/>
 	<xs:element name="items" type="T_items"/>
 	<xs:element name="item" type="T_item"/>
-	<xs:element name="media" type="T_media"/>
+	<xs:element name="media" type="T_media"/>	
+	<!--
+	Not yet supported
 	<xs:element name="mix" type="T_mix"/>
 	<xs:element name="playlist" type="T_playlist"/>
 	<xs:element name="data" type="T_data"/>
 	<xs:element name="liveStream" type="T_liveStream"/>
 	<xs:element name="playlists" type="T_playlists"/>
+	-->
 	<xs:element name="content" type="T_content"/>
 	<xs:element name="thumbnail" type="T_thumbnail"/>
 	<xs:element name="player" type="T_player"/>
 	<xs:element name="bitrate" type="T_bitrate"/>
 	<xs:element name="bitrates" type="T_bitrates"/>
 	<xs:attribute name="url" type="T_url"/>
-	<xs:element name="serverFileContentResource" type="T_serverFileContentResource"/>
-	<xs:element name="urlContentResource" type="T_urlContentResource"/>
-	<xs:element name="remoteStorageContentResource" type="T_remoteStorageContentResource"/>
-	<xs:element name="entryContentResource" type="T_entryContentResource"/>
-	<xs:element name="assetContentResource" type="T_assetContentResource"/>
 	<xs:element name="tags" type="T_tags"/>
 	<xs:element name="category" type="T_category"/>
 	<xs:element name="rss-extension"/>
