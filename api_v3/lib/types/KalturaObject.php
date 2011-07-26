@@ -90,6 +90,8 @@ class KalturaObject
 	
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
+		$this->validateForUsage($object_to_fill, $props_to_skip); // will check that not useable properties are not set 
+		
 		// enables extension with default empty object
 		if(is_null($object_to_fill))
 			return null;
@@ -311,6 +313,57 @@ class KalturaObject
 		}
 		
 		return $updatableProperties;
+	}
+	
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		$useableProperties = array();
+		$reflector = KalturaTypeReflectorCacher::get(get_class($this));
+		$properties = $reflector->getProperties();
+		
+		if ($reflector->requiresUsagePermission() && !kPermissionManager::getUsagePermitted(get_class($this), kApiParameterPermissionItem::ALL_VALUES_IDENTIFIER)) {
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_USAGE_PERMISSION, get_class($this));
+		}
+		
+		foreach($properties as $property)
+		{
+			/* @var $property KalturaPropertyInfo */
+			$propertyName = $property->getName();
+			
+			if (in_array($propertyName, $propertiesToSkip)) 
+				continue;
+			
+			if ($this->$propertyName !== null)
+			{
+				// check if property value is being changed - if not, just continue to the next
+				$objectPropertyName = $this->getObjectPropertyName($propertyName);
+				$getter_callback = array ( $sourceObject ,"get{$objectPropertyName}"  );
+				if (is_callable($getter_callback))
+            	{
+                	$value = call_user_func($getter_callback);
+                	if ($value === $this->$propertyName ||
+                		// since propel instansiates database boolean values as integer
+                		// a casting shoud be done for values arriving as bool from the api  
+                		(is_bool($this->$propertyName) && $value === (int)$this->$propertyName)) {
+                		continue;
+                	}
+            	}
+				
+				// property requires update permissions, verify that the current user has it
+				if ($property->requiresUsagePermission())
+				{				
+					if (!kPermissionManager::getUsagePermitted($this->getDeclaringClassName($propertyName), $propertyName)) {
+						//throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_UPDATE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+						//TODO: not throwing exception to not break clients that sends -1 as null for integer values (etc...)
+						$e = new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_USAGE_PERMISSION, $this->getFormattedPropertyNameWithClassName($propertyName));
+						$this->$propertyName = null;
+						header($this->getDeclaringClassName($propertyName).'-'.$propertyName.' error: '.$e->getMessage());
+					}
+				}
+			}
+		}
+		
+		return $useableProperties;
 	}
 	
 	private function getObjectPropertyName($propertyName)

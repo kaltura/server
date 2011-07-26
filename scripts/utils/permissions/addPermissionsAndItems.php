@@ -170,7 +170,7 @@ function addParameterPermissionItem($itemCfg)
 	if (is_null($itemCfg->partnerId) || $itemCfg->partnerId === '') {
 		throw new Exception('Permission item partner id must be set');
 	}
-	if (!in_array($itemCfg->action, array(ApiParameterPermissionItemAction::INSERT, ApiParameterPermissionItemAction::READ, ApiParameterPermissionItemAction::UPDATE)))
+	if (!in_array($itemCfg->action, array(ApiParameterPermissionItemAction::INSERT, ApiParameterPermissionItemAction::READ, ApiParameterPermissionItemAction::UPDATE, ApiParameterPermissionItemAction::USEAGE)))
 	{
 		throw new Exception("Action type [$itemCfg->action] unknown");
 	}

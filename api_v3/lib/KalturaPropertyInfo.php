@@ -22,7 +22,8 @@ class KalturaPropertyInfo
 	
 	const READ_PERMISSION_NAME = 'read';
 	const UPDATE_PERMISSION_NAME = 'update';
-	const INSERT_PERMISSION_NAME = 'insert';	
+	const INSERT_PERMISSION_NAME = 'insert';
+	const ALL_PERMISSION_NAME = 'all';	
 	
 	public function KalturaPropertyInfo($type, $name = '')
 	{
@@ -267,6 +268,11 @@ class KalturaPropertyInfo
 	public function requiresInsertPermission()
 	{
 		return in_array(self::INSERT_PERMISSION_NAME, $this->_permissions);
+	}
+	
+	public function requiresUsagePermission()
+	{
+		return in_array(self::ALL_PERMISSION_NAME, $this->_permissions);
 	}
 
 	public function toArray($withSubTypes = false)

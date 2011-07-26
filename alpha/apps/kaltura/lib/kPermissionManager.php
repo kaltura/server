@@ -731,6 +731,16 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	/**
+	 * Returns an array of parameter that belong to the object of type $object_name and are useable for the current user.
+	 * @param string $object_name
+	 * @return array parameter names
+	 */
+	public static function getUsagePermitted($object_name, $param_name)
+	{
+		return self::getParamPermitted(ApiParameterPermissionItemAction::USEAGE, $object_name, $param_name);
+	}
+	
+	/**
 	 * @param string $service
 	 * @param string $action
 	 * @return allowed partner group for the given service and action for the current user

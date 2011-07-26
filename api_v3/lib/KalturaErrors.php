@@ -289,8 +289,10 @@ class KalturaErrors extends APIErrors
 	
 	const USER_LOGIN_ALREADY_DISABLED = 'USER_LOGIN_ALREADY_DISABLED,User is already not allowed to login';
 	
+	const PROPERTY_VALIDATION_NO_USAGE_PERMISSION = "PROPERTY_VALIDATION_NO_USAGE_PERMISSION,Current user does not have permission to use property \"%s\"";
+	
 	const PROPERTY_VALIDATION_NO_UPDATE_PERMISSION = "PROPERTY_VALIDATION_NO_UPDATE_PERMISSION,Current user does not have permission to update property \"%s\"";
-
+	
 	const PROPERTY_VALIDATION_NO_INSERT_PERMISSION = "PROPERTY_VALIDATION_NO_INSERT_PERMISSION,Current user does not have permission to insert property \"%s\"";
 	
 	const USER_NOT_ADMIN = "USER_NOT_ADMIN,User [%s] is not admin";
