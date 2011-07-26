@@ -10,6 +10,7 @@ class KalturaServerFileResource extends KalturaDataCenterContentResource
 	/**
 	 * Full path to the local file 
 	 * @var string
+	 * @requiresPermission all
 	 */
 	public $localFilePath;
 
