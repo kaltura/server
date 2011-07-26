@@ -2079,7 +2079,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	public function setUpdatedAt($v)
 	{
 		parent::setUpdatedAt($v);
-		if(!in_array(entryPeer::UPDATED_AT, $this->modifiedColumns, false));
+		if(!in_array(entryPeer::UPDATED_AT, $this->modifiedColumns, false))
 			$this->modifiedColumns[] = entryPeer::UPDATED_AT;
 			
 		return $this;
