@@ -1118,11 +1118,11 @@ class JobsService extends KalturaBaseService
 	 * list Batch Jobs 
 	 * 
 	 * @action listBatchJobs
-	 * @param KalturaBatchJobFilterExt $filter
+	 * @param KalturaBatchJobFilter $filter
 	 * @param KalturaFilterPager $pager  
 	 * @return KalturaBatchJobListResponse
 	 */
-	function listBatchJobsAction(KalturaBatchJobFilterExt $filter = null, KalturaFilterPager $pager = null)
+	function listBatchJobsAction(KalturaBatchJobFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaBatchJobFilter();
