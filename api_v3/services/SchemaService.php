@@ -53,6 +53,7 @@ class SchemaService extends KalturaBaseService
 			return realpath($cacheXsdFile);
 		
 		$xsdFile = fopen($cacheXsdFile, 'w');
+		$elementsXSD = '';
 		
 		fwrite($xsdFile, '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">');
 	
@@ -77,8 +78,11 @@ class SchemaService extends KalturaBaseService
 		foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
 		{
 			/* @var $element SimpleXMLElement */
+			$xsd = $element->asXML();
+			$elementsXSD .= $xsd;
+			
 			fwrite($xsdFile, '
-	' . $element->asXML());
+	' . $xsd);
 		}
 		
 		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
@@ -87,63 +91,53 @@ class SchemaService extends KalturaBaseService
 			/* @var $schemaContributor IKalturaSchemaContributor */
 			$elements = $schemaContributor->contributeToSchema($type);
 			if($elements)
+			{
+				$elementsXSD .= $elements;
 				fwrite($xsdFile, $elements);
+			}
 		}
 		
-		$cacheEnumFile = kConf::get("cache_root_path") . '/api_v3/enum.xsd';
-		if(file_exists($cacheEnumFile))
+		$enumClasses = array();
+		$matches = null;
+		if(preg_match_all('/type="(Kaltura[^"]+)"/', $elementsXSD, $matches))
+			$enumClasses = $matches[1];
+		
+		$enumTypes = array();
+		foreach($enumClasses as $class)
 		{
-			fwrite($xsdFile, file_get_contents($cacheEnumFile));
+			$classTypeReflector = KalturaTypeReflectorCacher::get($class);
+			if($classTypeReflector)
+				self::loadClassRecursively($classTypeReflector, $enumTypes);
 		}
-		else
+		
+		foreach($enumTypes as $class => $classTypeReflector)
 		{
-			$enumFile = fopen($cacheEnumFile, 'w');
-			
-			$classMapFileLcoation = KAutoloader::getClassMapFilePath();
-			$classMap = unserialize(file_get_contents($classMapFileLcoation));
-			
-			foreach($classMap as $class => $path)
-			{
-				if (strpos($class, 'Kaltura') !== 0) // class should start with 'Kaltura...'
-					continue;
-
-				if (strpos($class, '_') !== false) // class shouldn't contain underscore like in Zend standard
-					continue;
-					
-				if(strpos($path, 'api') === false) // class must be under any api folder
-					continue;
-					
-				if(!is_subclass_of($class, 'KalturaEnum') && !is_subclass_of($class, 'KalturaStringEnum')) // class must be enum
-					continue;
-					
-				$classTypeReflector = KalturaTypeReflectorCacher::get($class);
-						
-				$xsdType = 'int';
-				if($classTypeReflector->isStringEnum())
-					$xsdType = 'string';
+			if(!is_subclass_of($class, 'KalturaEnum') && !is_subclass_of($class, 'KalturaStringEnum')) // class must be enum
+				continue;
 				
-				$xsd = '
+			$xsdType = 'int';
+			if($classTypeReflector->isStringEnum())
+				$xsdType = 'string';
+			
+			$xsd = '
 	<xs:simpleType name="' . $class . '">
 		<xs:annotation><xs:documentation>http://' . kConf::get('www_host') . '/api_v3/testmeDoc/index.php?object=' . $class . '</xs:documentation></xs:annotation>
 		<xs:restriction base="xs:' . $xsdType . '">';
-			
-				$contants = $classTypeReflector->getConstants();
-				foreach($contants as $contant)
-				{
-					$xsd .= '
-			<xs:enumeration value="' . $contant->getDefaultValue() . '"><xs:annotation><xs:documentation>' . $contant->getName() . '</xs:documentation></xs:annotation></xs:enumeration>';
-				}
-				
-							
+		
+			$contants = $classTypeReflector->getConstants();
+			foreach($contants as $contant)
+			{
 				$xsd .= '
+			<xs:enumeration value="' . $contant->getDefaultValue() . '"><xs:annotation><xs:documentation>' . $contant->getName() . '</xs:documentation></xs:annotation></xs:enumeration>';
+			}
+			
+						
+			$xsd .= '
 		</xs:restriction>
 	</xs:simpleType>
-				';
-				
-				fwrite($xsdFile, $xsd);
-				fwrite($enumFile, $xsd);
-			}
-			fclose($enumFile);
+			';
+			
+			fwrite($xsdFile, $xsd);
 		}
 		
 		fwrite($xsdFile, '
@@ -152,5 +146,23 @@ class SchemaService extends KalturaBaseService
 		fclose($xsdFile);
 		
 		return realpath($cacheXsdFile);
+	}
+	
+	private static function loadClassRecursively(KalturaTypeReflector $classTypeReflector, &$enumClasses)
+	{
+		$class = $classTypeReflector->getType();
+		if(
+			$class == 'KalturaEnum'
+			||
+			$class == 'KalturaStringEnum'
+			||
+			$class == 'KalturaObject'
+		)
+			return;
+			
+		$enumClasses[$class] = $classTypeReflector;
+		$parentClassTypeReflector = $classTypeReflector->getParentTypeReflector();
+		if($parentClassTypeReflector)
+			self::loadClassRecursively($classTypeReflector, &$enumClasses);
 	}
 }
