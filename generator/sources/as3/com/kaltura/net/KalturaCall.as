@@ -5,6 +5,7 @@ package com.kaltura.net {
 	import com.kaltura.errors.KalturaError;
 	import com.kaltura.events.KalturaEvent;
 	import com.kaltura.utils.ObjectUtil;
+	import com.kaltura.KalturaClient;
 	
 	import flash.events.EventDispatcher;
 	import flash.net.URLRequestMethod;
@@ -45,10 +46,20 @@ package com.kaltura.net {
 		public function execute():void {}
 		
 		public function setRequestArgument(name:String, value:Object):void {
-			if (value is Number && isNaN(value as Number)) { return; }
-			if ( value is int && value == int.MIN_VALUE ) { return; }
+			if (value is Number)
+			{
+				if (value == Number.NEGATIVE_INFINITY ) { return; }
+				if (value == KalturaClient.NULL_NUMBER ) { this.args[name + '__null'] = '';  return; }
+			}
+			if ( value is int)
+			{
+				if (value == int.MIN_VALUE ) { return; }
+				if (value == KalturaClient.NULL_INT ) { this.args[name + '__null'] = '';  return; }
+			}
+			if (value == undefined) {	return;	 }
+			if (value == null) {	this.args[name + '__null'] = '';  return;	 }
 				
-			if (name && value != null ) { //&& String(value).length > 0
+			if (name) { //&& String(value).length > 0
 				this.args[name] = value;
 			}
 		}

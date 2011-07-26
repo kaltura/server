@@ -107,8 +107,8 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$type = "*";
 			switch($child->attributes()->type)
 			{
-				case "string" : $type = "String"; break;
-				case "float" : $type = "Number = NaN"; break;
+				case "string" : $type = "String = undefined"; break;
+				case "float" : $type = "Number = Number.NEGATIVE_INFINITY"; break;
 				case "int" : $type = "int = int.MIN_VALUE"; break;
 				case "bool" : $type = "Boolean"; break;
 				case "array" : $type = "Array = new Array()"; break;
@@ -231,7 +231,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 								if($prop->attributes()->default != 'null')
 									$const_props .= "='" . $prop->attributes()->default . "'";
 								else
-									$const_props .= " = null";
+									$const_props .= " = undefined";
 							}
 							$const_props .= ",";			
 							
@@ -249,7 +249,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 									if($prop->attributes()->default != "null")
 										$const_props .= "=" . $prop->attributes()->default;
 									else
-										$const_props .= "=NaN";	
+										$const_props .= "=Number.NEGATIVE_INFINITY";	
 								}
 							}	
 							$const_props .= ",";	
@@ -263,10 +263,10 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 							$const_props .= $prop->attributes()->name . " : int";	
 							if($prop->attributes()->optional == "1")
 							{	
-								if($prop->attributes()->default != "null")
+								if($prop->attributes()->default != "null" && $prop->attributes()->default != "")
 									$const_props .= "=" . $prop->attributes()->default;
 								else
-									$const_props .= "=undefined";	
+									$const_props .= "=int.MIN_VALUE";	
 							}
 							$const_props .= ",";	
 
