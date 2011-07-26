@@ -137,14 +137,31 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		$xsd .= '
 				
 	<xs:complexType name="T_dropFolderFileContentResource">
-		<xs:complexContent>
-			<xs:extension base="T_serverFileContentResource">
-				<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
-			</xs:extension>
-		</xs:complexContent>
+		<xs:choice minOccurs="0" maxOccurs="1">
+			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="type" use="optional" default="md5">				
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="md5"/>
+										<xs:enumeration value="sha1"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="filePath" type="xs:string" use="required"/>
+		<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
 	</xs:complexType>
-				
-	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" substitutionGroup="serverFileContentResource" />
+
+	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" substitutionGroup="contentResource" />
+	
 	';
 		
 		$xsd .= '

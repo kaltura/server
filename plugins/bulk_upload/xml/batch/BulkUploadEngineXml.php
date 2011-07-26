@@ -44,6 +44,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected $xsdFilePath = null;
 	
 	/**
+	 * Allows the usage of server content resource
+	 * @var bool
+	 */
+	protected $allowServerResource = false;
+	
+	/**
 	 * Maps the flavor params name to id
 	 * @var array()
 	 */
@@ -85,6 +91,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . KalturaSchemaType::BULK_UPLOAD_XML;
 		if($taskConfig->params->xsdFilePath) 
 			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
+			
+		if($taskConfig->params->allowServerResource) 
+			$this->allowServerResource = (bool) $taskConfig->params->allowServerResource;
 	}
 	
 	/* (non-PHPdoc)
@@ -292,6 +301,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 							
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->conversionProfileId);
 			$flavorAssetResource = $this->getResource($contentElement, $entry->conversionProfileId);
+			if(!$flavorAssetResource)
+				continue;
 			
 			$assetParamsId = $flavorAsset->flavorParamsId;
 
@@ -330,6 +341,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 						
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->conversionProfileId);
 			$thumbAssetResource = $this->getResource($thumbElement, $entry->conversionProfileId);
+			if(!$thumbAssetResource)
+				continue;
 									
 			$assetParamsId = $thumbAsset->thumbParamsId;
 
@@ -493,6 +506,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($item->content as $contentElement)
 		{
 			$assetResource = $this->getResource($contentElement, $entry->conversionProfileId);
+			if(!$assetResource)
+				continue;
+				
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
 			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->conversionProfileId);
 			
@@ -516,6 +532,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($item->thumbnail as $thumbElement)
 		{
 			$assetResource = $this->getResource($thumbElement, $entry->conversionProfileId);
+			if(!$assetResource)
+				continue;
+				
 			$assetResourceContainer = new KalturaAssetParamsResourceContainer();
 			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->conversionProfileId);
 			
@@ -759,7 +778,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function getResource(SimpleXMLElement $elementToSearchIn, $conversionProfileId)
 	{
 		$resource = $this->getResourceInstance($elementToSearchIn, $conversionProfileId);
-		$this->validateResource($resource, $elementToSearchIn);
+		if($resource)
+			$this->validateResource($resource, $elementToSearchIn);
 										
 		return $resource;
 	}
@@ -776,10 +796,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 		if(isset($elementToSearchIn->serverFileContentResource))
 		{
-			KalturaLog::debug("Resource is : serverFileContentResource");
-			$resource = new KalturaServerFileResource();
-			$localContentResource = $elementToSearchIn->serverFileContentResource;
-			$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
+			if($this->allowServerResource)
+			{
+				KalturaLog::debug("Resource is : serverFileContentResource");
+				$resource = new KalturaServerFileResource();
+				$localContentResource = $elementToSearchIn->serverFileContentResource;
+				$resource->localFilePath = kXml::getXmlAttributeAsString($localContentResource, "filePath");
+			}
+			else
+			{
+				KalturaLog::err("serverFileContentResource is not allowed");
+			}
 		}
 		elseif(isset($elementToSearchIn->urlContentResource))
 		{
