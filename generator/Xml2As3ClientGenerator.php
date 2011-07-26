@@ -107,7 +107,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			$type = "*";
 			switch($child->attributes()->type)
 			{
-				case "string" : $type = "String = undefined"; break;
+				case "string" : $type = "String = null"; break;
 				case "float" : $type = "Number = Number.NEGATIVE_INFINITY"; break;
 				case "int" : $type = "int = int.MIN_VALUE"; break;
 				case "bool" : $type = "Boolean"; break;
@@ -231,7 +231,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 								if($prop->attributes()->default != 'null')
 									$const_props .= "='" . $prop->attributes()->default . "'";
 								else
-									$const_props .= " = undefined";
+									$const_props .= " = null";
 							}
 							$const_props .= ",";			
 							

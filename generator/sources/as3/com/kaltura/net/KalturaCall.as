@@ -1,11 +1,11 @@
 package com.kaltura.net {
 	
+	import com.kaltura.KalturaClient;
 	import com.kaltura.config.KalturaConfig;
 	import com.kaltura.delegates.IKalturaCallDelegate;
 	import com.kaltura.errors.KalturaError;
 	import com.kaltura.events.KalturaEvent;
 	import com.kaltura.utils.ObjectUtil;
-	import com.kaltura.KalturaClient;
 	
 	import flash.events.EventDispatcher;
 	import flash.net.URLRequestMethod;
@@ -44,8 +44,8 @@ package com.kaltura.net {
 		 * OVERRIDE this function to make init the right delegate action
 		 * */
 		public function execute():void {}
-		
-		public function setRequestArgument(name:String, value:Object):void {
+		 
+		public function setRequestArgument(name:String, value:*):void {
 			if (value is Number)
 			{
 				if (value == Number.NEGATIVE_INFINITY ) { return; }
@@ -56,11 +56,11 @@ package com.kaltura.net {
 				if (value == int.MIN_VALUE ) { return; }
 				if (value == KalturaClient.NULL_INT ) { this.args[name + '__null'] = '';  return; }
 			}
-			if (value == undefined) {	return;	 }
-			if (value == null) {	this.args[name + '__null'] = '';  return;	 }
+			if (value === null) {	return;	 }
+			if (value === KalturaClient.NULL_STRING) {	this.args[name + '__null'] = '';  return;	 }
 				
 			if (name) { //&& String(value).length > 0
-				this.args[name] = value;
+				this.args[name] = value; 
 			}
 		}
 		
@@ -116,24 +116,31 @@ package com.kaltura.net {
 			var j:int=0;
 			for (var i:int=0; i<objKeys.length; i++)
 			{
-				if(obj[objKeys[i].toString()] is String || obj[objKeys[i].toString()] is Number || obj[objKeys[i].toString()] is Boolean || obj[objKeys[i].toString()] is int)
+				var value : * = obj[objKeys[i].toString()];
+				
+				if(value === undefined)
+				{
+					continue;
+				}
+				
+				if(value is String || value is Number || value is Boolean || value is int || value === null)
 				{
 					keyArray[j] = prefix + ":" + objKeys[i];
-					valArray[j] = obj[objKeys[i].toString()];
+					valArray[j] = value;
 					++j;
 				}
-				else if( obj[objKeys[i].toString()] is Array)
+				else if( value is Array)
 				{
-					var arr : Array = extractArray( obj[objKeys[i].toString()] , prefix + ":" + objKeys[i]);
+					var arr : Array = extractArray( value , prefix + ":" + objKeys[i]);
 					keyArray = keyArray.concat( arr[0] );
 					valArray = valArray.concat( arr[1] );
 					j = valArray.length;
 				}
-				else if( obj[objKeys[i].toString()] != null ) //must be a Kaltura Object
+				else //must be a Kaltura Object
 				{
-					objArr= getQualifiedClassName(obj[objKeys[i].toString()]).split("::");
+					objArr= getQualifiedClassName(value).split("::");
 					var tempPrefix : String = objKeys[i].toString();
-					var tempKeyValArr : Array = kalturaObject2Arrays( obj[objKeys[i].toString()] , prefix + ":" + tempPrefix );
+					var tempKeyValArr : Array = kalturaObject2Arrays( value , prefix + ":" + tempPrefix );
 					keyArray = keyArray.concat(tempKeyValArr[0]);
 					valArray = valArray.concat(tempKeyValArr[1]);
 					j = valArray.length;

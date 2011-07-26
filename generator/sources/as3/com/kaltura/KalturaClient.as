@@ -17,6 +17,7 @@ package com.kaltura {
 
 		public static const NULL_INT:int = int.MAX_VALUE; 
 		public static const NULL_NUMBER:Number = Number.POSITIVE_INFINITY; 
+		public static const NULL_STRING:String = "__null_string__"; 
 		
 		
 		protected var _currentConfig:KalturaConfig;
