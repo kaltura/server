@@ -14,9 +14,6 @@ class KalturaAssetBaseFilter extends KalturaFilter
 		"entryIdIn" => "_in_entry_id",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
-		"statusEqual" => "_eq_status",
-		"statusIn" => "_in_status",
-		"statusNotIn" => "_notin_status",
 		"sizeGreaterThanOrEqual" => "_gte_size",
 		"sizeLessThanOrEqual" => "_lte_size",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -90,27 +87,6 @@ class KalturaAssetBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerIdIn;
-
-	/**
-	 * 
-	 * 
-	 * @var KalturaFlavorAssetStatus
-	 */
-	public $statusEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $statusIn;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $statusNotIn;
 
 	/**
 	 * 

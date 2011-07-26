@@ -10,6 +10,9 @@ class KalturaAttachmentAssetBaseFilter extends KalturaAssetFilter
 	(
 		"formatEqual" => "_eq_format",
 		"formatIn" => "_in_format",
+		"statusEqual" => "_eq_status",
+		"statusIn" => "_in_status",
+		"statusNotIn" => "_notin_status",
 	);
 
 	private $order_by_map = array
@@ -40,4 +43,25 @@ class KalturaAttachmentAssetBaseFilter extends KalturaAssetFilter
 	 * @var string
 	 */
 	public $formatIn;
+
+	/**
+	 * 
+	 * 
+	 * @var KalturaAttachmentAssetStatus
+	 */
+	public $statusEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $statusIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $statusNotIn;
 }
