@@ -201,14 +201,21 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			{
 			    $currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
 			    
-			    $lastModificationTime = $this->getModificationTime($fullPath);
+			    try {
+			        $lastModificationTime = $this->getModificationTime($fullPath);
+			    }
+			    catch (Exception $e) {
+			        KalturaLog::err('Cannot get modification time for file in path ['.$fullPath.'] - '.$e->getMessage());
+			        continue; // skipping to next file
+			    }
+			    
 			    $knownLastModificationTime = $currentDropFolderFile->lastModificationTime;
 			    if ($knownLastModificationTime && ($lastModificationTime > $knownLastModificationTime) && 
 			        ($currentDropFolderFile->status != KalturaDropFolderFileStatus::UPLOADING))
 			    {
 			        // file has been replaced by a new file with the same name
 			        $this->setFileAsPurged($currentDropFolderFile);
-			        $this->addNewDropFolderFile($folder->id, $physicalFileName, $fullPath);
+			        $this->addNewDropFolderFile($folder->id, $physicalFileName, $fullPath, $lastModificationTime);
 			        continue; // continue to next file
 			    }			    
 			    
@@ -285,14 +292,15 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 * @param int $folderId
 	 * @param string $fileName
 	 * @param string $fullPath
+	 * @param int $lastModificationTime
 	 */
-	private function addNewDropFolderFile($folderId, $fileName, $fullPath)
+	private function addNewDropFolderFile($folderId, $fileName, $fullPath, $lastModificationTime = null)
 	{
 		$newDropFolderFile = new KalturaDropFolderFile();
 		$newDropFolderFile->dropFolderId = $folderId;
 		$newDropFolderFile->fileName = $fileName;
 		$newDropFolderFile->fileSize = $this->getFileSize($fullPath);
-		$newDropFolderFile->lastModificationTime = $this->getModificationTime($fullPath);
+		$newDropFolderFile->lastModificationTime = $lastModificationTime ? $lastModificationTime : $this->getModificationTime($fullPath);
 		$newDropFolderFile->status = KalturaDropFolderFileStatus::UPLOADING;
 		
 		try {	
