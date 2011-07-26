@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package plugins.dropFolder
+ * @subpackage api.objects
+ */
 class KalturaDropFolderImportJobData extends KalturaSshImportJobData
 {
 	/**
