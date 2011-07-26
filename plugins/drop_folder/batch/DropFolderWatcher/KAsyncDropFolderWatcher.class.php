@@ -296,14 +296,14 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 */
 	private function addNewDropFolderFile($folderId, $fileName, $fullPath, $lastModificationTime = null)
 	{
-		$newDropFolderFile = new KalturaDropFolderFile();
-		$newDropFolderFile->dropFolderId = $folderId;
-		$newDropFolderFile->fileName = $fileName;
-		$newDropFolderFile->fileSize = $this->getFileSize($fullPath);
-		$newDropFolderFile->lastModificationTime = $lastModificationTime ? $lastModificationTime : $this->getModificationTime($fullPath);
-		$newDropFolderFile->status = KalturaDropFolderFileStatus::UPLOADING;
-		
-		try {	
+	    try
+	    {
+    	    $newDropFolderFile = new KalturaDropFolderFile();
+    		$newDropFolderFile->dropFolderId = $folderId;
+    		$newDropFolderFile->fileName = $fileName;
+    		$newDropFolderFile->fileSize = $this->getFileSize($fullPath);
+    		$newDropFolderFile->lastModificationTime = $lastModificationTime ? $lastModificationTime : $this->getModificationTime($fullPath);
+    		$newDropFolderFile->status = KalturaDropFolderFileStatus::UPLOADING;
 			$this->dropFolderPlugin->dropFolderFile->add($newDropFolderFile);
 		}
 		catch (Exception $e) {
