@@ -144,8 +144,13 @@ class scpMgr extends kFileTransferMgr
 	    $remote_file = ltrim($remote_file, '/');
 		$exists_cmd = 'stat -c %Y ' . $remote_file;
 		$exec_output = $this->execCommand($exists_cmd);
-		if (is_numeric($exec_output)) {
-		    return $exec_output;
+		$digitsRegex = '/[0-9]*/';
+		$matches = array();
+		if (preg_match($digitsRegex, $exec_output, $matches)) {
+		    $match = reset($matches);
+		    if (is_numeric($match)) {
+		        return $match;
+		    }
 		}
 		return null;
 	}
