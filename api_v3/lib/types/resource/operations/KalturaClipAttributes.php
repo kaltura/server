@@ -10,12 +10,14 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 	/**
 	 * Offset in milliseconds
 	 * @var int
+	 * @requiresPermission all
 	 */
 	public $offset;
 	
 	/**
 	 * Duration in milliseconds
 	 * @var int
+	 * @requiresPermission all
 	 */
 	public $duration;
 
