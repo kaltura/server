@@ -10,6 +10,9 @@ class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 	(
 		"parentIdEqual" => "_eq_parent_id",
 		"parentIdIn" => "_in_parent_id",
+		"textLike" => "_like_text",
+		"textMultiLikeOr" => "_mlikeor_text",
+		"textMultiLikeAnd" => "_mlikeand_text",
 		"endTimeGreaterThanOrEqual" => "_gte_end_time",
 		"endTimeLessThanOrEqual" => "_lte_end_time",
 		"durationGreaterThanOrEqual" => "_gte_duration",
@@ -47,6 +50,27 @@ class KalturaAnnotationBaseFilter extends KalturaCuePointFilter
 	 * @var string
 	 */
 	public $parentIdIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $textLike;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $textMultiLikeOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $textMultiLikeAnd;
 
 	/**
 	 * 

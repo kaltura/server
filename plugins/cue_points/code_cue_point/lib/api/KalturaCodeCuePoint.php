@@ -7,11 +7,13 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 {
 	/**
 	 * @var string
+	 * @filter like,mlikeor,mlikeand,eq,in
 	 */
 	public $code;
 	
 	/**
-	 * @var string 
+	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $description;
 

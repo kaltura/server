@@ -7,6 +7,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 {
 	/**
 	 * @var KalturaAdProtocolType
+	 * @filter eq,in
 	 * @insertonly
 	 * @requiresPermission insert
 	 */
@@ -26,6 +27,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	
 	/**
 	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 * @requiresPermission insert,update
 	 */
 	public $title;

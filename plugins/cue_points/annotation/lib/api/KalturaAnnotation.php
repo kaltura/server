@@ -14,6 +14,7 @@ class KalturaAnnotation extends KalturaCuePoint
 	
 	/**
 	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $text;
 	

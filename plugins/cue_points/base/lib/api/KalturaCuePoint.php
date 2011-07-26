@@ -57,6 +57,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $tags;
 
