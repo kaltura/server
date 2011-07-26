@@ -51,7 +51,7 @@ class KalturaConversionProfileAssetParams extends KalturaObject implements IFilt
 	 * Starts conversion even if the decision layer reduced the configuration to comply with the source
 	 * @var KalturaNullableBoolean
 	 */
-	protected $forceNoneComplied;
+	public $forceNoneComplied;
 	
 	private static $map_between_objects = array
 	(
