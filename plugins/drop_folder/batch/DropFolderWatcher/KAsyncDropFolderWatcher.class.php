@@ -202,8 +202,9 @@ class KAsyncDropFolderWatcher extends KBatchBase
 			    $currentDropFolderFile = $dropFolderFileMapByName[$physicalFileName];
 			    
 			    $lastModificationTime = $this->getModificationTime($fullPath);
-			    if ($lastModificationTime > $currentDropFolderFile->lastModificationTime && 
-			        $currentDropFolderFile->status != KalturaDropFolderFileStatus::UPLOADING)
+			    $knownLastModificationTime = $currentDropFolderFile->lastModificationTime;
+			    if ($knownLastModificationTime && ($lastModificationTime > $knownLastModificationTime) && 
+			        ($currentDropFolderFile->status != KalturaDropFolderFileStatus::UPLOADING))
 			    {
 			        // file has been replaced by a new file with the same name
 			        $this->setFileAsPurged($currentDropFolderFile);
