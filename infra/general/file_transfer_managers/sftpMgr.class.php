@@ -227,7 +227,8 @@ class sftpMgr extends kFileTransferMgr
 	{
 	    $remote_file = ltrim($remote_file,'/');
 	    $statinfo = ssh2_sftp_stat($this->getSftpConnection(), $remote_file);
-	    $filesize = isset($statinfo['mtime']) ? $statinfo['mtime'] : null;
+	    $modificationTime = isset($statinfo['mtime']) ? $statinfo['mtime'] : null;
+	    return $modificationTime;
 	}
 	
 	
