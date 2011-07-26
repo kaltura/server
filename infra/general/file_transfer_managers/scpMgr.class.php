@@ -142,16 +142,12 @@ class scpMgr extends kFileTransferMgr
 	protected function doModificationTime($remote_file)
 	{
 	    $remote_file = ltrim($remote_file, '/');
-		$exists_cmd = 'du --time --time-style=full-iso ' . $remote_file;
+		$exists_cmd = 'stat -c %Y ' . $remote_file;
 		$exec_output = $this->execCommand($exists_cmd);
-		$output_array = explode("\t", $exec_output);
-		if (isset($output_array[1])) {
-		    $modifStr = trim($output_array[1]);
-		    return strtotime($modifStr);
+		if (is_numeric($exec_output)) {
+		    return $exec_output;
 		}
-		else {
-		    return null;
-		}
+		return null;
 	}
 
 	// execute the given command on the server
