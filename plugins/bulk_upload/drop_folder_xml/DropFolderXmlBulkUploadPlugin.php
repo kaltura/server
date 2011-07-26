@@ -101,7 +101,19 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	 */
 	public static function writeBulkUploadLogFile($batchJob)
 	{
+		if($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(DropFolderXmlBulkUploadType::DROP_FOLDER_XML)){
+			KalturaLog::info("pluging DropFolderXmlBulkUploadPlugin supports only drop folder xml files. JobSubType is ".$JobSubType);
+			return;
+		}
 		
+		$xmlElement = kMrssManager::getBulkUploadMrssXml($batchJob);
+		if(is_null($xmlElement)){
+			echo "Log file is not ready no bulkUploadResults";
+			exit;
+		}
+		echo $xmlElement->asXML();
+		KalturaLog::info($xmlElement->asXML());
+		exit;
 	}
 	
 	/* (non-PHPdoc)

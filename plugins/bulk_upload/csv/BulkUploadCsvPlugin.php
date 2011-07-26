@@ -82,7 +82,32 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 */
 	public static function writeBulkUploadLogFile($batchJob)
 	{
-		// TODO
+		if($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)){
+			KalturaLog::info("pluging BulkUploadCsvPlugin supports only csv files. JobSubType is ".$JobSubType);
+			return;
+		}
+		
+		$xmlElement = kMrssManager::getBulkUploadMrssXml($batchJob);
+		if(is_null($xmlElement)){
+			echo "Log file is not ready no bulkUploadResults";
+			exit;
+		}
+		echo $xmlElement->asXML();
+		KalturaLog::info($xmlElement->asXML());
+		exit;
+	}
+	
+	/**
+	 * @param string $string
+	 * @return string
+	 */
+	private static function stringToSafeXml($string)
+	{
+		$string = @iconv('utf-8', 'utf-8', $string);
+		$partially_safe = kString::xmlEncode($string);
+		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
+		
+		return $safe;
 	}
 	
 	/**
