@@ -1595,7 +1595,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	
 	public function getRoots()
 	{
-		$ret = array();
+		// the prefix required becaue combined sphinx match is rrequired, 
+		// only negative expression won't work such as '@roots -entry', 
+		// the prefix will enable '@roots prefix -entry'
+		$ret = array('prefix');
+		 
 		if($this->getBulkUploadId())
 			$ret[] = 'bulk job ' . $this->getBulkUploadId();
 			
