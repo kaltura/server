@@ -167,6 +167,6 @@ class SchemaService extends KalturaBaseService
 		$enumClasses[$class] = $classTypeReflector;
 		$parentClassTypeReflector = $classTypeReflector->getParentTypeReflector();
 		if($parentClassTypeReflector)
-			self::loadClassRecursively($classTypeReflector, $enumClasses);
+			self::loadClassRecursively($parentClassTypeReflector, $enumClasses);
 	}
 }
