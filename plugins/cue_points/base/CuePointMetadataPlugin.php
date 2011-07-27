@@ -152,7 +152,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 					if($status == KalturaMetadataStatus::VALID)
 						kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata));
 						
-					return $cuePoint;
+					break;
 				}
 			}
 		}
