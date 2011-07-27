@@ -169,7 +169,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 			if (!isset($dataCondition[$key])){
 				$dataCondition[$key] = $value;
 			}else{
-				$glue = ($type == MetadataSearchFilter::SEARCH_AND ? ' & ' : ' | ');
+				$glue = ($type == MetadataSearchFilter::SEARCH_AND ? ' ' : ' | ');
 				$dataCondition[$key] = $dataCondition[$key] . $glue . $value ; 
 			}
 		}
