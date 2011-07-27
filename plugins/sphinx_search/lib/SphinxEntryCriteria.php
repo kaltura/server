@@ -307,15 +307,17 @@ class SphinxEntryCriteria extends SphinxCriteria
 							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
 					}
 							
+					$freeTextsArr = array_unique($freeTextsArr);
 					$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 					$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
 				}
 			}
 			if(count($additionalConditions))
 			{	
+				$additionalConditions = array_unique($additionalConditions);
 				$matches = reset($additionalConditions);
 				if(count($additionalConditions) > 1)
-					$matches = '(' . implode(') | (', $additionalConditions) . ')';
+					$matches = '( ' . implode(' ) | ( ', $additionalConditions) . ' )';
 					
 				$this->matchClause[] = $matches;
 			}
