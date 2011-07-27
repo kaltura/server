@@ -77,7 +77,7 @@ class AdCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene-ad-cue_point" type="T_scene_adCuePointBulkUploadXml" substitutionGroup="scene" />
+	<xs:element name="scene-ad-cue-point" type="T_scene_adCuePointBulkUploadXml" substitutionGroup="scene" />
 		';
 		
 		return $xsd;
