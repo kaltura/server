@@ -141,15 +141,19 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 				$metadata->setStatus(KalturaMetadataStatus::INVALID);
 				$metadata->save();
 				
-				$metadataContent = reset($metadataElement);
-				$xmlData = $metadataContent->asXML();
-				$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-				kFileSyncUtils::file_put_contents($key, $xmlData);
-				
-				$errorMessage = '';
-				$status = kMetadataManager::validateMetadata($metadata, $errorMessage);
-				if($status == KalturaMetadataStatus::VALID)
-					kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata));
+				foreach($metadataElement->children() as $metadataContent)
+				{
+					$xmlData = $metadataContent->asXML();
+					$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+					kFileSyncUtils::file_put_contents($key, $xmlData);
+					
+					$errorMessage = '';
+					$status = kMetadataManager::validateMetadata($metadata, $errorMessage);
+					if($status == KalturaMetadataStatus::VALID)
+						kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata));
+						
+					return $cuePoint;
+				}
 			}
 		}
 		
