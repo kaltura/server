@@ -45,13 +45,13 @@ class AdCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 		if(isset($scene->sceneEndTime))
 			$cuePoint->endTime = kXml::timeToInteger($scene->sceneEndTime);
 		if(isset($scene->sceneTitle))
-			$cuePoint->title = $scene->sceneTitle;
+			$cuePoint->title = "$scene->sceneTitle";
 		if(isset($scene->sourceUrl))
-			$cuePoint->sourceUrl = $scene->sourceUrl;
+			$cuePoint->sourceUrl = "$scene->sourceUrl";
 		if(isset($scene->adType))
-			$cuePoint->adType = $scene->adType;
+			$cuePoint->adType = "$scene->adType";
 		if(isset($scene->protocolType))
-			$cuePoint->protocolType = $scene->protocolType;
+			$cuePoint->protocolType = "$scene->protocolType";
 			
 		return $cuePoint;
 	}

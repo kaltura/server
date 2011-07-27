@@ -45,10 +45,10 @@ class AnnotationBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 		if(isset($scene->sceneEndTime))
 			$cuePoint->endTime = kXml::timeToInteger($scene->sceneEndTime);
 		if(isset($scene->sceneText))
-			$cuePoint->text = $scene->sceneText;
+			$cuePoint->text = "$scene->sceneText";
 			
 		if(isset($scene->parentId))
-			$cuePoint->parentId = $scene->parentId;
+			$cuePoint->parentId = "$scene->parentId";
 		elseif(isset($scene->parent))
 			$cuePoint->parentId = $this->getCuePointId("$scene->parent");
 			

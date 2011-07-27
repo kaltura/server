@@ -43,9 +43,9 @@ class CodeCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			return null;
 		
 		if(isset($scene->code))
-			$cuePoint->code = $scene->code;
+			$cuePoint->code = "$scene->code";
 		if(isset($scene->description))
-			$cuePoint->description = $scene->description;
+			$cuePoint->description = "$scene->description";
 			
 		return $cuePoint;
 	}

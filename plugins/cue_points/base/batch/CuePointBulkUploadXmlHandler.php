@@ -123,7 +123,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		$cuePoint = $this->getNewInstance();
 		
 		if(isset($scene['systemName']) && $scene['systemName'])
-			$cuePoint->systemName = $scene['systemName'];
+			$cuePoint->systemName = $scene['systemName'] . '';
 			
 		$cuePoint->startTime = kXml::timeToInteger($scene->sceneStartTime);
 	
@@ -149,9 +149,9 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			return;
 			
 		$cuePoint->entryId = $this->entryId;
-		$ingested = $this->cuePointPlugin->cuePoint->add($cuePoint);
+		$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);
 		if($cuePoint->systemName)
-			$this->ingested[$cuePoint->systemName] = $ingested;
+			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;
 	}
 
 	/**
@@ -166,15 +166,15 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		if(isset($scene['sceneId']) && $scene['sceneId'])
 		{
 			$cuePointId = $scene['sceneId'];
-			$ingested = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
+			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
 		}
 		else 
 		{
 			$cuePoint->entryId = $this->entryId;
-			$ingested = $this->cuePointPlugin->cuePoint->add($cuePoint);
+			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);
 		}
 		if($cuePoint->systemName)
-			$this->ingested[$cuePoint->systemName] = $ingested;
+			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;
 	}
 	
 	/**
@@ -183,6 +183,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	 */
 	protected function getCuePointId($systemName)
 	{
+		var_dump($this->ingested);
 		if(isset($this->ingested[$systemName]))
 		{
 			$id = $this->ingested[$systemName]->id;
