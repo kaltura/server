@@ -503,7 +503,7 @@ class ContentDistributionBatchService extends BatchService
 		// serach all records that their sun status changed to after sunrise
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::BEFORE_SUNRISE);
-		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::GREATER_THAN);
+		$criteria->add(EntryDistributionPeer::SUNRISE, time(), Criteria::LESS_THAN);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
 		foreach($entryDistributions as $entryDistribution) // raise the updated events to trigger index in search engine (sphinx)
 			kEventsManager::raiseEvent(new kObjectUpdatedEvent($entryDistribution));
