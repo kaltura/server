@@ -64,9 +64,9 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 			<xs:any namespace="##local" processContents="skip"/>			
 		</xs:sequence>
 		
-		<xs:attribute name="metadataId" use="required" type="xs:int"/>
+		<xs:attribute name="metadataId" use="optional" type="xs:int"/>
 		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
-		<xs:attribute name="metadataProfileId" use="required" type="xs:int"/>
+		<xs:attribute name="metadataProfileId" use="optional" type="xs:int"/>
 		
 	</xs:complexType>
 	
