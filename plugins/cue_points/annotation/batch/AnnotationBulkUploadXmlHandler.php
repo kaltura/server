@@ -50,7 +50,7 @@ class AnnotationBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 		if(isset($scene->parentId))
 			$cuePoint->parentId = $scene->parentId;
 		elseif(isset($scene->parent))
-			$cuePoint->parentId = $this->getCuePointId($scene->parent);
+			$cuePoint->parentId = $this->getCuePointId("$scene->parent");
 			
 		return $cuePoint;
 	}

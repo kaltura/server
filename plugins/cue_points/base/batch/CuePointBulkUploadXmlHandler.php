@@ -166,13 +166,15 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		if(isset($scene['sceneId']) && $scene['sceneId'])
 		{
 			$cuePointId = $scene['sceneId'];
-			$this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
+			$ingested = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
 		}
 		else 
 		{
 			$cuePoint->entryId = $this->entryId;
-			$this->cuePointPlugin->cuePoint->add($cuePoint);
+			$ingested = $this->cuePointPlugin->cuePoint->add($cuePoint);
 		}
+		if($cuePoint->systemName)
+			$this->ingested[$cuePoint->systemName] = $ingested;
 	}
 	
 	/**
@@ -182,7 +184,10 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	protected function getCuePointId($systemName)
 	{
 		if(isset($this->ingested[$systemName]))
-			return $this->ingested[$systemName]->id;
+		{
+			$id = $this->ingested[$systemName]->id;
+			return "$id";
+		}
 	
 		$filter = new KalturaAnnotationFilter();
 		$filter->entryIdEqual = $this->entryId;
