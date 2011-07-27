@@ -124,7 +124,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	 * @param SimpleXMLElement $scene
 	 * @return KalturaCuePoint
 	 */
-	protected static function parseCuePoint(SimpleXMLElement $scene)
+	protected function parseCuePoint(SimpleXMLElement $scene)
 	{
 		$cuePoint = $this->getNewInstance();
 		
