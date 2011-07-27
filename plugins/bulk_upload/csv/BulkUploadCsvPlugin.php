@@ -83,17 +83,47 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	public static function writeBulkUploadLogFile($batchJob)
 	{
 		if($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)){
-			KalturaLog::info("pluging BulkUploadCsvPlugin supports only csv files. JobSubType is ".$JobSubType);
 			return;
 		}
 		
-		$xmlElement = kMrssManager::getBulkUploadMrssXml($batchJob);
-		if(is_null($xmlElement)){
-			echo "Log file is not ready no bulkUploadResults";
-			exit;
+		header("Content-Type: text/plain; charset=UTF-8");
+
+		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($batchJob->getId());
+		if(!count($bulkUploadResults))
+			die("Log file is not ready");
+			
+		$STDOUT = fopen('php://output', 'w');
+		$data = $batchJob->getData();
+			
+		foreach($bulkUploadResults as $bulkUploadResult)
+		{
+			$values = array(
+				$bulkUploadResult->getTitle(),
+				$bulkUploadResult->getDescription(),
+				$bulkUploadResult->getTags(),
+				$bulkUploadResult->getUrl(),
+				$bulkUploadResult->getContentType(),
+			);
+				
+			if($data instanceof kBulkUploadCsvJobData && $data->getCsvVersion() > 1)
+			{
+				$values[] = $bulkUploadResult->getConversionProfileId();
+				$values[] = $bulkUploadResult->getAccessControlProfileId();
+				$values[] = $bulkUploadResult->getCategory();
+				$values[] = $bulkUploadResult->getScheduleStartDate('Y-m-d\TH:i:s');
+				$values[] = $bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s');
+				$values[] = $bulkUploadResult->getThumbnailUrl();
+				$values[] = $bulkUploadResult->getPartnerData();
+			}
+			$values[] = $bulkUploadResult->getEntryId();
+			$values[] = $bulkUploadResult->getEntryStatus();
+			$values[] = $bulkUploadResult->getErrorDescription();
+				
+			fputcsv($STDOUT, $values);
 		}
-		echo $xmlElement->asXML();
-		KalturaLog::info($xmlElement->asXML());
+		fclose($STDOUT);
+		
+		kFile::closeDbConnections;
 		exit;
 	}
 	

@@ -83,19 +83,80 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	public static function writeBulkUploadLogFile($batchJob)
 	{
 		if($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadXmlType::XML)){
-			KalturaLog::info("pluging BulkUploadXmlPlugin supports only xml files. JobSubType is ".$JobSubType);
 			return;
 		}
 		
-		$xmlElement = kMrssManager::getBulkUploadMrssXml($batchJob);
+		$xmlElement = self::getBulkUploadMrssXml($batchJob);
 		if(is_null($xmlElement)){
-			echo "Log file is not ready no bulkUploadResults";
+			echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <mrss><result>Log file is not ready</result></mrss>";
+			kFile::closeDbConnections;
 			exit;
 		}
 		echo $xmlElement->asXML();
 		KalturaLog::info($xmlElement->asXML());
+		kFile::closeDbConnections;
 		exit;
 		
+	}
+	
+	/**
+	 * Returns the log file for bulk upload job 
+	 * @param BatchJob $batchJob bulk upload batchjob
+	 * @return SimpleXMLElement
+	 */
+	public static function getBulkUploadMrssXml($batchJob){
+		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($batchJob->getId());
+		if(!count($bulkUploadResults)){
+			return;
+		}
+
+		$data = $batchJob->getData();
+	
+		
+		
+		$xmlElement = new SimpleXMLElement('<mrss/>');
+		$xmlElement->addAttribute('version', '2.0');
+		$xmlElement->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+//		$xmlElement->addAttribute('xmlns:content', 'http://www.w3.org/2001/XMLSchema-instance');
+//		$xmlElement->addAttribute('xmlns', 'http://' . kConf::get('www_host') . '/' . SchemaType::SYNDICATION);
+//		$xmlElement->addAttribute('xsi:noNamespaceSchemaLocation', 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . SchemaType::SYNDICATION);
+		
+		$channel = $xmlElement->addChild('channel');
+		
+//		insert all entries to instance pool
+		$pks = array();
+		foreach($bulkUploadResults as $bulkUploadResult){
+			/* @var $bulkUploadResult BulkUploadResult */
+			$pks[] = $bulkUploadResult->getEntryId();
+		}
+		entryPeer::retrieveByPKs($pks);
+		
+		foreach($bulkUploadResults as $bulkUploadResult){
+			/* @var $bulkUploadResult BulkUploadResult */
+			$item = $channel->addChild('item');
+			
+			
+			$result = $item->addChild('result');
+			$result->addChild('errorDescription', self::stringToSafeXml($bulkUploadResult->getErrorDescription()));
+			$result->addChild('entryStatus', self::stringToSafeXml($bulkUploadResult->getEntryStatus()));
+//			$result->addChild('entryStatusName', self::stringToSafeXml($title));
+			$result->addChild('entryId', self::stringToSafeXml($bulkUploadResult->getEntryId()));
+			
+//			$item->addChild('action', self::stringToSafeXml($title));
+			$item->addChild('conversionProfileId', self::stringToSafeXml($bulkUploadResult->getConversionProfileId()));
+			$item->addChild('accessControlId', self::stringToSafeXml($bulkUploadResult->getAccessControlProfileId()));
+			$item->addChild('startDate', self::stringToSafeXml($bulkUploadResult->getScheduleStartDate('Y-m-d\TH:i:s')));
+			$item->addChild('endDate', self::stringToSafeXml($bulkUploadResult->getScheduleEndDate('Y-m-d\TH:i:s')));
+			$item->addChild('partnerData', self::stringToSafeXml($bulkUploadResult->getPartnerData()));
+			
+			$entry = $bulkUploadResult->getEntry();
+			if(!$entry)
+				continue;
+				
+			kMrssManager::getEntryMrssXml($entry, $item);
+		}
+		
+		return $xmlElement;
 	}
 	
     /**
