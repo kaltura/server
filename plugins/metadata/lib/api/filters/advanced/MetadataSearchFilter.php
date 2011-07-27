@@ -136,12 +136,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			
 		if (count($dataConditions)){
 			$metadataConditions = array();
-			$glue = ' ';
-			if($this->type == MetadataSearchFilter::SEARCH_OR)
-			{
-				$glue = ' | ';
-				$dataConditions = array_unique($dataConditions);
-			}
+			$glue = ($this->type == MetadataSearchFilter::SEARCH_AND ? ' ' : ' | ');
+			$dataConditions = array_unique($dataConditions);
 			$metadataConditions['@'. $this->getMetadataSearchField()] = implode($glue, $dataConditions);
 			$this->condition = $this->appendToDataCondition($this->condition, $metadataConditions, $this->type);
 		}
@@ -250,6 +246,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			if(!is_numeric($valValue) && strlen($valValue) <= 1)
 				unset($freeTextsArr[$valIndex]);
 				
+		$freeTextsArr = array_unique($freeTextsArr);
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 //		$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
 		$additionalConditions[] = '@'. MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr";
