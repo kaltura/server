@@ -9,7 +9,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	
 	protected $fieldConfigArray = null;
 	
-	protected $fieldValues = null;
+	protected $fieldValuesByEntryDistributionId = null;
 	
 	protected $requiredFields = null;
 		
@@ -267,7 +267,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	
 	public function getAllFieldValues(EntryDistribution $entryDistribution)
 	{
-		if (is_null($this->fieldValues) || !is_array($this->fieldValues))
+		if (is_null($this->fieldValuesByEntryDistributionId) || !is_array($this->fieldValuesByEntryDistributionId) || !isset($this->fieldValuesByEntryDistributionId[$entryDistribution->getId()]))
 		{
 		    $valuesXmlObj = $this->getFieldValuesXml($entryDistribution);
 		    if (!$valuesXmlObj) {
@@ -285,10 +285,10 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		        $fieldName = $fieldConfig->getFieldName();
 		        $fieldValues[$fieldName] = $this->getFieldValueFromXml($fieldName, $valuesXmlObj);
 		    }
-		    $this->fieldValues = $fieldValues;
+		    $this->fieldValuesByEntryDistributionId[$entryDistribution->getId()] = $fieldValues;
 		}	    
 	    
-	    return $this->fieldValues;
+	    return $this->fieldValuesByEntryDistributionId[$entryDistribution->getId()];
 	}
 	
 	public function getFieldValue(EntryDistribution $entryDistribution, $fieldName)
@@ -304,7 +304,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	
 	public function clearFieldValues()
 	{
-		$this->fieldValues = null;
+		$this->fieldValuesByEntryDistributionId = null;
 	}
 	
 	
