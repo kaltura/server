@@ -27,16 +27,12 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	protected $entryId = null;
 	
 	/**
-	 * @var int
+	 * @var array ingested cue points
 	 */
-	private $useMultiRequest = true;
+	protected $ingested = array();
 	
-	/**
-	 * @param bool $useMultiRequest
-	 */
-	protected function __construct($useMultiRequest = true)
+	protected function __construct()
 	{
-		$this->useMultiRequest = $useMultiRequest;
 	}
 	
 	protected function impersonate()
@@ -70,14 +66,12 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($client);
 		
 		$this->impersonate();
-		if($this->useMultiRequest)
-			$this->client->startMultiRequest();
+		$this->client->startMultiRequest();
 		
 		foreach($item->scenes->children() as $scene)
 			$this->addCuePoint($scene);
 			
-		if($this->useMultiRequest)
-			$this->client->doMultiRequest();
+		$this->client->doMultiRequest();
 		$this->unimpersonate();
 	}
 
@@ -155,7 +149,9 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			return;
 			
 		$cuePoint->entryId = $this->entryId;
-		$this->cuePointPlugin->cuePoint->add($cuePoint);
+		$ingested = $this->cuePointPlugin->cuePoint->add($cuePoint);
+		if($cuePoint->systemName)
+			$this->ingested[$cuePoint->systemName] = $ingested;
 	}
 
 	/**
@@ -177,5 +173,36 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			$cuePoint->entryId = $this->entryId;
 			$this->cuePointPlugin->cuePoint->add($cuePoint);
 		}
+	}
+	
+	/**
+	 * @param string $cuePointSystemName
+	 * @return string
+	 */
+	protected function getCuePointId($systemName)
+	{
+		if(isset($this->ingested[$systemName]))
+			return $this->ingested[$systemName]->id;
+	
+		$filter = new KalturaAnnotationFilter();
+		$filter->entryIdEqual = $this->entryId;
+		$filter->systemNameEqual = $systemName;
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1;
+		
+		try
+		{
+			$cuePointListResponce = $this->cuePointPlugin->cuePoint->listAction($filter, $pager);
+		}
+		catch(Exception $e)
+		{
+			return null;
+		}
+		
+		if($cuePointListResponce->totalCount && $cuePointListResponce->objects[0] instanceof KalturaAnnotation)
+			return $cuePointListResponce->objects[0]->id;
+			
+		return null;
 	}
 }

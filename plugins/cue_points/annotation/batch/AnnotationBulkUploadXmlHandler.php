@@ -17,7 +17,7 @@ class AnnotationBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 	public static function get()
 	{
 		if(!self::$instance)
-			self::$instance = new AnnotationBulkUploadXmlHandler(false);
+			self::$instance = new AnnotationBulkUploadXmlHandler();
 			
 		return self::$instance;
 	}
@@ -53,33 +53,5 @@ class AnnotationBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			$cuePoint->parentId = $this->getCuePointId($scene->parent);
 			
 		return $cuePoint;
-	}
-	
-	/**
-	 * @param string $cuePointSystemName
-	 * @return string
-	 */
-	private function getCuePointId($systemName)
-	{
-		$filter = new KalturaAnnotationFilter();
-		$filter->entryIdEqual = $this->entryId;
-		$filter->systemNameEqual = $systemName;
-		
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 1;
-		
-		try
-		{
-			$cuePointListResponce = $this->cuePointPlugin->cuePoint->listAction($filter, $pager);
-		}
-		catch(Exception $e)
-		{
-			return null;
-		}
-		
-		if($cuePointListResponce->totalCount && $cuePointListResponce->objects[0] instanceof KalturaAnnotation)
-			return $cuePointListResponce->objects[0]->id;
-			
-		return null;
 	}
 }
