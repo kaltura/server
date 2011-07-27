@@ -128,7 +128,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 
 	protected function handleResults(array $results, array $items)
 	{
-		if(count($results) != count($this->operations) != count($items))
+		if(count($results) != count($this->operations) || count($this->operations) != count($items))
 			return;
 			
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
