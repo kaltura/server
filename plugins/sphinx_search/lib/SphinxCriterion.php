@@ -129,7 +129,7 @@ class SphinxCriterion extends KalturaCriterion
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = '!' . implode(' & !', $vals);
+						$val = $this->criteria->getPositiveMatch($sphinxField) .  ' !' . implode(' !', $vals);
 						$matchClause[] = "@$sphinxField $val";
 					}
 					break;

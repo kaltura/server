@@ -449,7 +449,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	
 	public function getPositiveMatch($field)
 	{
-		if($field == '_notin_roots')
+		if($field == 'roots')
 			return 'prefix';
 			
 		return parent::getPositiveMatch($field);

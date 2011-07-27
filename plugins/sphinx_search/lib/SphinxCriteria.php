@@ -173,7 +173,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		{
 			$matches = reset($this->matchClause);
 			if(count($this->matchClause) > 1)
-				$matches = '(' . implode(') & (', $this->matchClause) . ')';
+				$matches = '( ' . implode(' ) ( ', $this->matchClause) . ' )';
 				
 			$this->whereClause[] = "MATCH('$matches')";
 		}
@@ -328,7 +328,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = $this->getPositiveMatch($field) . ' !' . implode(' !', $vals);
+						$val = $this->getPositiveMatch($sphinxField) . ' !' . implode(' !', $vals);
 						$this->matchClause[] = "@$sphinxField $val";
 						$filter->unsetByName($field);
 					}
@@ -382,7 +382,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 							
 					if(count($vals))
 					{
-						$val = implode(' & ', $vals);
+						$val = implode(' ', $vals);
 						$this->matchClause[] = "@$sphinxField $val";
 						$filter->unsetByName($field);
 					}
