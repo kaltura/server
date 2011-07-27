@@ -103,31 +103,31 @@ class KalturaTestCaseDataFile
 			
 			foreach ($xmlTestProcedure->TestCaseData as $xmlTestCaseInstanceData)
 			{
-				$testCaseInstanceData = new KalturaTestCaseInstanceData();
-				$testDataInput = array();
-				$testDataOutputReference = array();
+				$testCaseInstanceName = "";
+				
+				if(isset($xmlTestCaseInstanceData["testCaseInstanceName"]))
+					$testCaseInstanceName = $xmlTestCaseInstanceData["testCaseInstanceName"];
+				
+				$testCaseInstanceData = new KalturaTestCaseInstanceData($testCaseInstanceName);
 				
 				foreach ($xmlUnitTestData->Input as $input)
 				{
 					$testObjectIdentifier = new KalturaTestDataObject(((string)$input["type"]), ((string)$input["key"]));
-					
-					$testDataInput[] = $testObjectIdentifier;
+					print("Input " . print_r($testObjectIdentifier, true) . "\n");
+					$testCaseInstanceData->addInput($testObjectIdentifier);
 				}
 								
 				foreach ($xmlUnitTestData->OutputReference as $outputReference)
 				{
 					$testObjectIdentifier = new KalturaTestDataObject(((string)$outputReference["type"]), ((string)$outputReference["key"]));
-					$testCaseOutputReference = $testObjectIdentifier;		
+					$testCaseInstanceData->addOutputReference($testObjectIdentifier);
 				}
 				
-				$testCaseInstanceData->setInput($testDataInput);
-				$testCaseInstanceData->setOutputReference($testCaseOutputReference);
 				$testProcedure->addTestCaseInstance($testCaseInstanceData);
 			}
 						
-			$this->testProceduresData[] = $testProcedure;
+			$this->addTestProcedureData($testProcedure);
 		}
-		
 	}
 
 	/**

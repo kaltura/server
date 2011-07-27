@@ -48,7 +48,7 @@ class KalturaTestCaseInstanceData
 	 * @param string $testCaseInstanceName
 	 */
 	public function setTestCaseInstanceName($testCaseInstanceName) {
-		$this->testCaseInstanceName = $testCaseInstanceName;
+		$this->testCaseInstanceName = "$testCaseInstanceName";
 	}
 
 	/**
@@ -61,7 +61,7 @@ class KalturaTestCaseInstanceData
 	 */
 	public function __construct($testCaseInstanceName = "", array $testCaseInstanceInput = array(), array $testCaseInstanceOutputReference = array(), $testCaseInstanceConfiguration = null)
 	{
-		$this->testCaseInstanceName = $testCaseInstanceName;
+		$this->testCaseInstanceName = "$testCaseInstanceName";
 		$this->input = $testCaseInstanceInput;
 		$this->outputReference = $testCaseInstanceOutputReference;
 		$this->testCaseDataConfiguration = $testCaseInstanceConfiguration;
@@ -121,6 +121,8 @@ class KalturaTestCaseInstanceData
 		{
 			$this->input = array();
 		}
+		
+		print("Adding input " . print_r($input->getUniqueKey(), true) . "\n");
 		
 		//TODO: maybe Unique key is not so uniqe....
 		$this->input[$input->getUniqueKey()] = $input;

@@ -17,7 +17,7 @@ class KalturaTestProcedureData
 	 */
 	public function __construct($testProcedureName = "", array $testCasesData = array())
 	{
-		$this->procedureName = $testProcedureName;
+		$this->procedureName = "$testProcedureName";
 		$this->testCasesData = $testCasesData;
 	}
 	
@@ -95,7 +95,7 @@ class KalturaTestProcedureData
 	 * @param string $procedureName
 	 */
 	public function setProcedureName($procedureName) {
-		$this->procedureName = $procedureName;
+		$this->procedureName = "$procedureName";
 	}
 
 	/**

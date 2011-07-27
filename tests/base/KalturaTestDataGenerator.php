@@ -99,7 +99,7 @@ class KalturaTestDataGenerator
 	   	}
 	   		
 	   	//we retrive the object by his id
-   		 $kalturaObject = $peer->retrieveByPK($objectId);
+   		$kalturaObject = $peer->retrieveByPK($objectId);
    		 
    		 return $kalturaObject;
 	}
@@ -124,26 +124,21 @@ class KalturaTestDataGenerator
 		   	foreach ($testProcedureData->getTestCasesData() as $testCaseData)
 			{
 				$newTestCaseData = new KalturaTestCaseInstanceData($testCaseData->getTestCaseInstanceName());
-			 
-				//1. Create the input and output reference objects
-				$inputObjects = array();
-				$outputReferenceObjects = array();
-					
+	 
 				//2. Foreach input - Get the object from kaltura DB and add it to the inputObjects array
 				foreach ($testCaseData->getInput() as $inputIdentifier)
 				{
-					$inputObjects[] = $this->getTestDataObject($inputIdentifier);
+					$inputObject = $this->getTestDataObject($inputIdentifier);
+					$newTestCaseData->addInput($inputObject);
 				}
 	
 				//3. Foreach outputReference - Get the object from kaltura DB and add it to the outputReferenceObjects array
-				foreach ($testCaseData->getOutputReference() as $outputReferenceIdentifier)
+				foreach ($testCaseData->getOutputReferences() as $outputReferenceIdentifier)
 				{
-					$outputReferenceObjects[] = $this->getTestDataObject($outputReferenceIdentifier);
+					$outputReferenceObject = $this->getTestDataObject($outputReferenceIdentifier);
+					$newTestCaseData->addOutputReference($outputReferenceObject);
 				}
 					
-				//4. Create the new test data with the new objects 
-				$newTestCaseData->setInput($inputObjects);
-				$newTestCaseData->setOutputReference($outputReferenceObjects);
 									
 				//5. Add the new unit test data to the Data file
 				$newTestProcedureData->addTestCaseInstance($newTestCaseData);
@@ -205,7 +200,6 @@ class KalturaTestDataGenerator
    		{
    			//For unknown types we just copy the xml row as is
    			//TODO: add support for fileData object... create it from the file path given...
-   			
    		}
    		
    		return $dataObject; 

@@ -8,6 +8,12 @@
 class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 {	
 	/**
+	 * The test nothing method (so we won't get warnings for empty tests)
+	 * @var string
+	 */
+	const TEST_NOTHING_TEST_NAME = "testNothing";
+	
+	/**
 	 * 
 	 * Retruns the test dependency inputs
 	 */
@@ -393,7 +399,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		KalturaLog::debug("In KalturaTestCaseBase::run for test [$name]\n");
 		//print("In KalturaTestCaseBase::run for test [$name]\n");
 		
-		$this->initFramework($result);
+		if($name != KalturaTestCaseBase::TEST_NOTHING_TEST_NAME) //we init the framework for all tests but hte test nothing test
+			$this->initFramework($result);
 		
 		$result = parent::run($result);
 						
@@ -406,7 +413,19 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	protected function initFramework(&$result = null)
 	{
-		if(!is_null($result))
+		//TODO:Add the code coverage filter for API_v3
+		//if we got codeCoverage then we add the rest of the server folders
+//		$codeCoverageFilter = PHP_CodeCoverage_Filter::getInstance();
+		
+//		if($codeCoverageFilter)
+//		{
+//			$testsBaseDir = dirname(__FILE__);
+			
+//			//print("Adding" . $testsBaseDir . "/../../api_v3" . "to the CodeCoverage filter\n");
+//			$codeCoverageFilter->addDirectoryToWhitelist($testsBaseDir . "/../../api_v3");
+//		}
+		
+		if($result)
 		{
 			if($result instanceof KalturaTestResult)
 			{
@@ -854,4 +873,10 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
     {
     	return new KalturaTestResult();
     }
+
+    /**
+	 * Just a test function so this "test" will have tests as well 
+     */
+    public function testNothing()
+    {return;}
 }

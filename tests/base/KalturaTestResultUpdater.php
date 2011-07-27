@@ -149,7 +149,7 @@ class KalturaTestResultUpdater
 			foreach ($testProcedureData->getTestCasesData() as $key => $unitTestData)
 			{
 				$isAllInputsFound = KalturaTestResultUpdater::isAllFound($unitTestData->getInput(), $failuresInputs);
-				$isAllOutputReferencesFound = KalturaTestResultUpdater::isAllFound($unitTestData->getOutputReference(), $failuresInputs);
+				$isAllOutputReferencesFound = KalturaTestResultUpdater::isAllFound($unitTestData->getOutputReferences(), $failuresInputs);
 								
 				if($isAllInputsFound && $isAllOutputReferencesFound)
 				{

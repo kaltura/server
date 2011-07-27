@@ -24,21 +24,21 @@ class KalturaTestDataBase
 	 * the test data type
 	 * @var mixed
 	 */
-	private $type;
+	protected $type;
 	
 	/**
 	 * 
 	 * The test data id
 	 * @var mixed
 	 */
-	private $id;
+	protected $id;
 	
 	/**
 	 * 
 	 * The test data value (single value data)
 	 * @var mixed
 	 */
-	private $value;
+	protected $value;
 	
 	/**
 	 * @param field_type $type
@@ -254,6 +254,8 @@ class KalturaTestDataBase
 	 */
 	public function getUniqueKey()
 	{
+		print($this->type . "\n");
 		$uniqueKey = "{$this->id}_{$this->type}_{$this->value}";
+		return $uniqueKey;
 	}
 }

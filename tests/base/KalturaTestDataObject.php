@@ -24,11 +24,6 @@ class KalturaTestDataObject extends KalturaTestDataBase
 	}
 	
 	/**
-	 * the kaltura object type
-	 */
-	private $type;
-	
-	/**
 	 * 
 	 * Additional data for the object identifier (such as key, partnerId, secret, value)
 	 * @var array<key => value>
@@ -299,7 +294,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 	private static function createFieldElement(DOMDocument $xml, DomElement $rootNode, $value, $fieldName, $fieldType = null, $fieldDbValue = null)
 	{
 		//If the value is not an array then we just create the element and sets it's value
-		if(!is_array($value ))
+		if(!is_array($value))
 		{
 			$node = $xml->createElement($fieldName, $value);
 			
@@ -343,7 +338,14 @@ class KalturaTestDataObject extends KalturaTestDataBase
 				$node->setAttribute("key", $key );
 				$arrayNode->appendChild($node);
 			}
-								
+			
+			if(!$arrayNode->hasChildNodes()) //if there are no child nodes
+			{
+				//we add the name of the property
+				$node = $xml->createElement($fieldName, "");
+				$arrayNode->appendChild($node);
+			}
+			
 			$rootNode->appendChild($arrayNode);
 		}
 	}
@@ -382,7 +384,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 				//if dbValue exists
 				if(isset($child["dbValue"]))
 				{
-					$this->comments[$childKey] = (string)$child["dbValue"];					
+					$this->comments[$childKey] = $child['dbValue'];
 				}
 												
 				if(strlen($child) != 0)
@@ -417,7 +419,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 							//if dbValue exists
 							if(isset($singleElementValue["dbValue"]))
 							{
-								$this->comments[$singleElementKey][$key] = (string)$singleElementValue["dbValue"];
+								$this->comments[$singleElementKey][$key] = $singleElementValue["dbValue"];
 							}
 						}
 						
@@ -449,7 +451,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 
 	/**
 	 * 
-	 * Returns an objetct instance from the given type 
+	 * Returns an object instance from the given type 
 	 * @param unknown_type $objectInstace
 	 * @param $fieldName
 	 * @param unknown_type $fieldValue
