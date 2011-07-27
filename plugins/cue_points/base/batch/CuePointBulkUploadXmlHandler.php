@@ -74,7 +74,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			$this->client->startMultiRequest();
 		
 		foreach($item->scenes as $scene)
-			$this->addCuePoint($object->id, $scene);
+			$this->addCuePoint($scene);
 			
 		if($this->useMultiRequest)
 			$this->client->doMultiRequest();
@@ -101,7 +101,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		$this->client->startMultiRequest();
 		
 		foreach($item->scenes as $scene)
-			$this->updateCuePoint($object->id, $scene);
+			$this->updateCuePoint($scene);
 			
 		$this->client->doMultiRequest();
 		$this->unimpersonate();
