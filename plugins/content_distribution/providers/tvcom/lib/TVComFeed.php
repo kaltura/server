@@ -86,7 +86,7 @@ class TVComFeed
 		$this->distributionProfile = $profile;
 		
 		$this->setNodeValue('/rss/channel/title', $profile->getFeedTitle());
-		$this->setNodeValue('/rss/channel/link', $profile->getFeedLink());
+		$this->setNodeValue('/rss/channel/link', htmlentities($profile->getFeedLink()));
 		$this->setNodeValue('/rss/channel/description', $profile->getFeedDescription());
 		$this->setNodeValue('/rss/channel/language', $profile->getFeedLanguage());
 		$this->setNodeValue('/rss/channel/copyright', $profile->getFeedCopyright());
