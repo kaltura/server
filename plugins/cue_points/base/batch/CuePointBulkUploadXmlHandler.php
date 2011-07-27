@@ -75,10 +75,8 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	
 		$items = array();
 		foreach($item->scenes->children() as $scene)
-		{
-			$items[] = $scene;
-			$this->addCuePoint($scene);
-		}
+			if($this->addCuePoint($scene))
+				$items[] = $scene;
 			
 		$results = $this->client->doMultiRequest();
 		$this->unimpersonate();
@@ -107,10 +105,8 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		
 		$items = array();
 		foreach($item->scenes->children() as $scene)
-		{
-			$items[] = $scene;
-			$this->updateCuePoint($scene);
-		}
+			if($this->updateCuePoint($scene))
+				$items[] = $scene;
 			
 		$results = $this->client->doMultiRequest();
 		$this->unimpersonate();
@@ -186,13 +182,15 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	{
 		$cuePoint = $this->parseCuePoint($scene);
 		if(!$cuePoint)
-			return;
+			return false;
 			
 		$cuePoint->entryId = $this->entryId;
 		$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);
 		$this->operations[] = BulkUploadEngineXml::ADD_ACTION_STRING;
 		if($cuePoint->systemName)
 			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;
+			
+		return true;
 	}
 
 	/**
@@ -202,7 +200,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	{
 		$cuePoint = $this->parseCuePoint($scene);
 		if(!$cuePoint)
-			return;
+			return false;
 			
 		if(isset($scene['sceneId']) && $scene['sceneId'])
 		{
@@ -218,6 +216,8 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		}
 		if($cuePoint->systemName)
 			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;
+			
+		return true;
 	}
 	
 	/**
