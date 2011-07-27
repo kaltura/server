@@ -14,6 +14,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	const ADD_ACTION_STRING = 'add';
 
 	/**
+	 * The update action string
+	 * @var string
+	 */
+	const UPDATE_ACTION_STRING = 'update';
+
+	/**
 	 * tnhe delete action string
 	 * @var string
 	 */
