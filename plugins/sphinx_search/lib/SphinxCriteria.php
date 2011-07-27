@@ -171,6 +171,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		if(count($this->matchClause))
 		{
+			$this->matchClause = array_unique($this->matchClause);
 			$matches = reset($this->matchClause);
 			if(count($this->matchClause) > 1)
 				$matches = '( ' . implode(' ) ( ', $this->matchClause) . ' )';
@@ -179,6 +180,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		}
 		
 		$wheres = '';
+		$this->whereClause = array_unique($this->whereClause);
 		if(count($this->whereClause))
 			$wheres = 'WHERE ' . implode(' AND ', $this->whereClause);
 
@@ -218,7 +220,10 @@ abstract class SphinxCriteria extends KalturaCriteria
 		}
 		
 		if(count($orders))
+		{
+			$orders = array_unique($orders);
 			$orderBy = 'ORDER BY ' . implode(',', $orders);
+		}
 			
 		$index = $this->getSphinxIndexName();
 		$maxMatches = kSphinxSearchManager::SPHINX_MAX_RECORDS;
