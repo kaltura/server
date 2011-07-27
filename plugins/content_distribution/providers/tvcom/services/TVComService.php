@@ -64,7 +64,6 @@ class TVComService extends KalturaBaseService
 				continue;
 			}
 			
-			$profile->clearFieldValues();
 			$fields = $profile->getAllFieldValues($entryDistribution);
 			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
