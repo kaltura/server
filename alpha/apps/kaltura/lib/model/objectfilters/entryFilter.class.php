@@ -5,7 +5,7 @@
  */ 
 class entryFilter extends baseObjectFilter
 {
-	const FREE_TEXT_FIELDS = 'name,tags,description,entry_id';
+	const FREE_TEXT_FIELDS = 'name,tags,description,entry_id,reference_id';
 	
 	// allow only 256 charaters when creation a MATCH-AGAINST caluse
 	const MAX_SAERCH_TEXT_SIZE = 256;
