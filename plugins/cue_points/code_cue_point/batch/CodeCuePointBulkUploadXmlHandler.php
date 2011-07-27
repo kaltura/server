@@ -43,7 +43,7 @@ class CodeCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			return null;
 		
 		if(isset($scene->code))
-			$cuePoint->code = kXml::timeToInteger($scene->code);
+			$cuePoint->code = $scene->code;
 		if(isset($scene->description))
 			$cuePoint->description = $scene->description;
 			
