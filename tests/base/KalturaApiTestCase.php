@@ -1,5 +1,6 @@
 <?php
 
+
 class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 {
 	/**
@@ -179,4 +180,16 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 
 		return $client;
 	}
+	
+	/**
+	 * 
+	 * return the file output for a given url.
+	 * used for api actions that return file.
+	 * @param string $url url from which the answer is given.
+	 */
+	protected function getApiFileFromUrl($url)
+	{
+		$curlWrapper = new KCurlWrapper($url);
+		return $curlWrapper->exec();
+	} 
 }
