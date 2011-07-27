@@ -181,6 +181,8 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 		return $client;
 	}
 	
+	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
+	
 	/**
 	 * 
 	 * return the file output for a given url.
@@ -189,7 +191,17 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 	 */
 	protected function getApiFileFromUrl($url)
 	{
-		$curlWrapper = new KCurlWrapper($url);
-		return $curlWrapper->exec();
+		$url = trim($url);
+		$url = str_replace(array(' ', '[', ']'), array('%20', '%5B', '%5D'), $url);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_USERAGENT, self::HTTP_USER_AGENT);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_NOSIGNAL, true);
+		curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_NOBODY, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		return curl_exec($ch);
 	} 
 }
