@@ -7,8 +7,10 @@ class CuePointSphinxConfiguration{
 			'path'					=> '/sphinx/kaltura_cue_point_rt',
 			
 			'fields' => array (
+				'parent_id' => SphinxFieldType::RT_FIELD,
 				'entry_id' => SphinxFieldType::RT_FIELD,
 				'name' => SphinxFieldType::RT_FIELD,
+				'system_name' => SphinxFieldType::RT_FIELD,
 				'text' => SphinxFieldType::RT_FIELD,
 				'tags' => SphinxFieldType::RT_FIELD,
 				'roots' => SphinxFieldType::RT_FIELD,
@@ -21,6 +23,7 @@ class CuePointSphinxConfiguration{
 				'duration' => SphinxFieldType::RT_ATTR_BIGINT,
 				'cue_point_status' => SphinxFieldType::RT_ATTR_BIGINT,
 				'cue_point_type' => SphinxFieldType::RT_ATTR_BIGINT,
+				'sub_type' => SphinxFieldType::RT_ATTR_BIGINT,
 				'kuser_id' => SphinxFieldType::RT_ATTR_BIGINT,
 				'partner_sort_value' => SphinxFieldType::RT_ATTR_BIGINT,
 				'force_stop' => SphinxFieldType::RT_ATTR_UINT,

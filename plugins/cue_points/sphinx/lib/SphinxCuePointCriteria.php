@@ -4,8 +4,10 @@ class SphinxCuePointCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(
 		CuePointPeer::ID => 'int_cue_point_id',
+		CuePointPeer::PARENT_ID => 'parent_id',
 		CuePointPeer::ENTRY_ID => 'entry_id',
 		CuePointPeer::NAME => 'name',
+		CuePointPeer::SYSTEM_NAME => 'system_name',
 		CuePointPeer::TEXT => 'text',
 		CuePointPeer::TAGS => 'tags',
 		CuePointPeer::ROOTS => 'roots',
@@ -16,6 +18,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		CuePointPeer::DURATION => 'duration',
 		CuePointPeer::STATUS => 'cue_point_status',
 		CuePointPeer::TYPE => 'cue_point_type',
+		CuePointPeer::SUB_TYPE => 'sub_type',
 		CuePointPeer::KUSER_ID => 'kuser_id',
 		CuePointPeer::PARTNER_SORT_VALUE => 'partner_sort_value',
 		CuePointPeer::FORCE_STOP => 'force_stop',
@@ -190,8 +193,10 @@ class SphinxCuePointCriteria extends SphinxCriteria
 	public function hasMatchableField($fieldName)
 	{
 		return in_array($fieldName, array(
+			'parent_id',
 			'entry_id', 
 			'name', 
+			'system_name',
 			'text', 
 			'tags',  
 			'roots', 
