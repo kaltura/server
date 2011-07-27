@@ -186,8 +186,10 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	public function getIndexFieldsMap()
 	{
 		return array(
+			'parent_id' => 'parentId',
 			'entry_id' => 'entryId',
 			'name' => 'name',
+			'system_name' => 'systemName',
 			'text' => 'text',
 			'tags' => 'tags',
 			'roots' => 'roots',
@@ -199,6 +201,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 			'duration' => 'duration',
 			'cue_point_status' => 'status',
 			'cue_point_type' => 'type',
+			'sub_type' => 'subType',
 			'kuser_id' => 'kuserId',
 			'partner_sort_value' => 'partnerSortValue',
 			'force_stop' => 'forceStop',
@@ -210,8 +213,10 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	}
 
 	private static $indexFieldTypes = array(
+		'parent_id' => IIndexable::FIELD_TYPE_STRING,
 		'entry_id' => IIndexable::FIELD_TYPE_STRING,
 		'name' => IIndexable::FIELD_TYPE_STRING,
+		'system_name' => IIndexable::FIELD_TYPE_STRING,
 		'text' => IIndexable::FIELD_TYPE_STRING,
 		'tags' => IIndexable::FIELD_TYPE_STRING,
 		'roots' => IIndexable::FIELD_TYPE_STRING,
@@ -223,6 +228,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		'duration' => IIndexable::FIELD_TYPE_INTEGER,
 		'cue_point_status' => IIndexable::FIELD_TYPE_INTEGER,
 		'cue_point_type' => IIndexable::FIELD_TYPE_INTEGER,
+		'sub_type' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_sort_value' => IIndexable::FIELD_TYPE_INTEGER,
 		'force_stop' => IIndexable::FIELD_TYPE_INTEGER,
