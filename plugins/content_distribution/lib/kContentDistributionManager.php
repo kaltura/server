@@ -627,11 +627,10 @@ class kContentDistributionManager
 	
 	public static function getSearchStringDistributionHasNoValidationError($distributionProfileId = null)
 	{
-		$ret = "contentDistProfile";
 		if($distributionProfileId)
-			$ret = "\"contentDistProfile $distributionProfileId\"";
+			return "-\"entryDistHasErr $distributionProfileId\"";
 			
-		return "$ret -entryDistHasErr";
+		return "-entryDistHasErr";
 	}
 	
 	public static function getEntrySearchValues(entry $entry)
