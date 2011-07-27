@@ -5,6 +5,17 @@
  */
 class KalturaCuePointFilter extends KalturaCuePointBaseFilter
 {
+	private $map_between_objects = array
+	(
+		"cuePointTypeEqual" => "_eq_type",
+		"cuePointTypeIn" => "_in_type",
+	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), $this->map_between_objects);
+	}
+
 	/**
 	 * @param CuePointFilter $cuePointFilter
 	 * @param array $propsToSkip
