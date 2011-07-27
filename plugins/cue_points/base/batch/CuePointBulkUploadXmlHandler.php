@@ -183,7 +183,6 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	 */
 	protected function getCuePointId($systemName)
 	{
-		var_dump($this->ingested);
 		if(isset($this->ingested[$systemName]))
 		{
 			$id = $this->ingested[$systemName]->id;
