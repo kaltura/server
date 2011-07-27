@@ -76,6 +76,9 @@ class KAsyncNotifierSender
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_USERAGENT, '');
 			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			
+			//causes cURL to blindly accept any server certificate.use for https URLs
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			//			curl_setopt($ch, CURLOPT_HEADER , true );
 			
 
