@@ -53,7 +53,6 @@ class KalturaRequestDeserializer
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
-			$found = false;
 			$type = $actionParam->getType();
 			$name = $actionParam->getName();
 			
@@ -62,92 +61,95 @@ class KalturaRequestDeserializer
 				if (array_key_exists($name, $this->paramsGrouped))
 				{
 					$serviceArguments[] = $this->castSimpleType($type, $this->paramsGrouped[$name]);
-					$found = true;
+					continue;
 				}
-				else if ($actionParam->isOptional())
-				{
+				
+				if ($actionParam->isOptional())
 					$serviceArguments[] = $this->castSimpleType($type, $actionParam->getDefaultValue());
-					$found = true;
-				}
+					
+				continue;
 			}
-			else if ($actionParam->isFile())
+			
+			if ($actionParam->isFile())
 			{
 				if (isset($_FILES[$name])) // FIXME: KalturaRequestDeserializer doesn't depend on $_POST or $_GET, so its a not a good idea to access $_FILES here 
 				{
 					$serviceArguments[]	= $_FILES[$name];
-					$found = true;
+					continue;
 				}
-				else if ($actionParam->isOptional()) 
-				{
+				
+				if ($actionParam->isOptional()) 
 					$serviceArguments[] = null;
-					$found = true; 	
-				}
+					
+				continue; 	
 			}
-			else
+			
+			if ($actionParam->isEnum()) // enum
 			{
-				if ($actionParam->isEnum()) // enum
+				if (array_key_exists($name, $this->paramsGrouped))
 				{
-					if (array_key_exists($name, $this->paramsGrouped))
-					{
-						$enumValue = $this->paramsGrouped[$name];
-						if (!$actionParam->getTypeReflector()->checkEnumValue($enumValue))
-							throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $enumValue, $name, $actionParam->getType());
+					$enumValue = $this->paramsGrouped[$name];
+					if (!$actionParam->getTypeReflector()->checkEnumValue($enumValue))
+						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $enumValue, $name, $actionParam->getType());
+					
+					if($type == 'KalturaNullableBoolean')
+						$enumValue = KalturaNullableBoolean::toBoolean($enumValue);
 						
-						$serviceArguments[] = $this->castSimpleType("int", $enumValue);
-						$found = true;
-					}
-					else if ($actionParam->isOptional())
-					{
-						$serviceArguments[] = $this->castSimpleType("int", $actionParam->getDefaultValue());
-						$found = true;
-					}
+					$serviceArguments[] = $this->castSimpleType("int", $enumValue);
+					continue;
 				}
-				else if ($actionParam->isStringEnum()) // string enum or dynamic
+				
+				if ($actionParam->isOptional())
+					$serviceArguments[] = $this->castSimpleType("int", $actionParam->getDefaultValue());
+				
+				continue;
+			}
+			
+			if ($actionParam->isStringEnum()) // string enum or dynamic
+			{
+				if (array_key_exists($name, $this->paramsGrouped))
 				{
-					if (array_key_exists($name, $this->paramsGrouped))
-					{
-						$enumValue = $this->paramsGrouped[$name];
-						if (!$actionParam->getTypeReflector()->checkStringEnumValue($enumValue))
-							throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $enumValue, $name, $actionParam->getType());
-						
-						$serviceArguments[] = $enumValue;
-						$found = true;
-					}
-					else if ($actionParam->isOptional())
-					{
-						$serviceArguments[] = $actionParam->getDefaultValue();
-						$found = true;
-					}
+					$enumValue = $this->paramsGrouped[$name];
+					if (!$actionParam->getTypeReflector()->checkStringEnumValue($enumValue))
+						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $enumValue, $name, $actionParam->getType());
+					
+					$serviceArguments[] = $enumValue;
+					continue;
 				}
-				else if ($actionParam->isArray()) // array
+				
+				if ($actionParam->isOptional())
+					$serviceArguments[] = $actionParam->getDefaultValue();
+					
+				continue;
+			}
+			
+			if ($actionParam->isArray()) // array
+			{
+				$arrayObj = new $type();
+				if (isset($this->paramsGrouped[$name]) && is_array($this->paramsGrouped[$name]))
 				{
-					$arrayObj = new $type();
-					if (isset($this->paramsGrouped[$name]) && is_array($this->paramsGrouped[$name]))
+					foreach($this->paramsGrouped[$name] as $arrayItemParams)
 					{
-						foreach($this->paramsGrouped[$name] as $arrayItemParams)
-						{
-							$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
-						}
+						$arrayObj[] = $this->buildObject($actionParam->getArrayTypeReflector(), $arrayItemParams, $name);
 					}
-					$serviceArguments[] = $arrayObj;
-					$found = true;
 				}
-				else if (isset($this->paramsGrouped[$name])) // object 
-				{
-					$serviceArguments[] = $this->buildObject($actionParam->getTypeReflector(), $this->paramsGrouped[$name], $name);
-					$found = true;
-				}
-				else if ($actionParam->isOptional()) // object that is optional
-				{
-					$serviceArguments[] = null;
-					$found = true;
-				}
+				$serviceArguments[] = $arrayObj;
+				continue;
+			}
+			
+			if (isset($this->paramsGrouped[$name])) // object 
+			{
+				$serviceArguments[] = $this->buildObject($actionParam->getTypeReflector(), $this->paramsGrouped[$name], $name);
+				continue;
+			}
+			
+			if ($actionParam->isOptional()) // object that is optional
+			{
+				$serviceArguments[] = null;
+				continue;
 			}
 
-			if (!$found)
-			{
-				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $name);
-			}
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $name);
 		}
 		return $serviceArguments;
 	}

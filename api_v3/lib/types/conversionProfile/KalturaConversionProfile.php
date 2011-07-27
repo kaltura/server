@@ -182,9 +182,6 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		{
 			$this->cropDimensions->toObject($ret);
 		}
-		
-		if ($this->isDefault === KalturaNullableBoolean::NULL_VALUE) // like null
-			$this->isDefault = null;
 			
 		return $ret;
 	}
