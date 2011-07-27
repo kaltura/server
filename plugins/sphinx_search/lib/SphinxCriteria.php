@@ -72,7 +72,12 @@ abstract class SphinxCriteria extends KalturaCriteria
 	{
 		$this->ids[$comparison] = $ids;
 	}
-
+	
+	public function getPositiveMatch($field)
+	{
+		return '';
+	}
+	
 	/**
 	 * @return criteriaFilter
 	 */
@@ -323,7 +328,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 					if(count($vals))
 					{
 						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = '!' . implode(' & !', $vals);
+						$val = $this->getPositiveMatch($field) . ' !' . implode(' !', $vals);
 						$this->matchClause[] = "@$sphinxField $val";
 						$filter->unsetByName($field);
 					}

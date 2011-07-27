@@ -238,7 +238,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if($filter->is_set('_is_root'))
 		{
 			if($filter->get('_is_root'))
-				$matchOrRoots[] = "prefix -entry";
+				$filter->set('_notin_roots', 'entry');
 			else
 				$matchOrRoots[] = "entry";
 				
@@ -445,6 +445,14 @@ class SphinxEntryCriteria extends SphinxCriteria
 			return null;
 			
 		return self::$sphinxTypes[$fieldName];
+	}
+	
+	public function getPositiveMatch($field)
+	{
+		if($field == '_notin_roots')
+			return 'prefix';
+			
+		return parent::getPositiveMatch($field);
 	}
 	
 	public function hasMatchableField ( $field_name )
