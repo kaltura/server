@@ -93,8 +93,11 @@ class KalturaRequestDeserializer
 						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $enumValue, $name, $actionParam->getType());
 					
 					if($type == 'KalturaNullableBoolean')
-						$enumValue = KalturaNullableBoolean::toBoolean($enumValue);
-						
+					{
+						$serviceArguments[] = KalturaNullableBoolean::toBoolean($enumValue);
+						continue;
+					}
+					
 					$serviceArguments[] = $this->castSimpleType("int", $enumValue);
 					continue;
 				}
@@ -193,23 +196,35 @@ class KalturaRequestDeserializer
 				if ($property->isSimpleType())
 				{
 					$obj->$name = $this->castSimpleType($type, $value);
+					continue;
 				}
-				else if ($property->isEnum())
+				
+				if ($property->isEnum())
 				{
 					if (!$property->getTypeReflector()->checkEnumValue($value))
 						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
-						
+				
+					if($type == 'KalturaNullableBoolean')
+					{
+						$obj->$name = KalturaNullableBoolean::toBoolean($value);
+						continue;
+					}
+					
 					$obj->$name = $this->castSimpleType("int", $value);
+					continue;
 				}
-				else if ($property->isStringEnum())
+				
+				if ($property->isStringEnum())
 				{
 					if (!$property->getTypeReflector()->checkStringEnumValue($value))
 						throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
 						
 					$obj->$name = $this->castSimpleType("string", $value);
+					continue;
 				}
 			}
-			else if ($property->isArray())
+			
+			if ($property->isArray())
 			{
 				if (isset($params[$name]) && is_array($params[$name]))
 				{
@@ -220,20 +235,25 @@ class KalturaRequestDeserializer
 					}
 					$obj->$name = $arrayObj;
 				}
+				continue;
 			}
-			else if ($property->isComplexType())
+			
+			if ($property->isComplexType())
 			{
 				if (isset($params[$name]) && is_array($params[$name]))
 				{
 					$obj->$name = $this->buildObject($property->getTypeReflector(), $params[$name], "{$objectName}:$name");
 				}
+				continue;
 			}
-			else if ($property->isFile())
+			
+			if ($property->isFile())
 			{
 				if (isset($_FILES["{$objectName}:$name"])) 
 				{
 					$obj->$name = $_FILES["{$objectName}:$name"];
 				}
+				continue;
 			}
 		}
 		return $obj;
