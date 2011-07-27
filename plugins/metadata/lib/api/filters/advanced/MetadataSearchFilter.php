@@ -125,7 +125,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					$fieldId = $xPaths[$field]->getId();
 					$dataCondition = "{$pluginName}_{$fieldId} << $value << " . kMetadataManager::SEARCH_TEXT_SUFFIX;
 					kalturalog::debug("add $dataCondition");
-					$dataConditions[] = "($dataCondition)";
+					$dataConditions[] = "( $dataCondition )";
 				}
 				elseif($item instanceof MetadataSearchFilter)
 				{
@@ -136,7 +136,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			
 		if (count($dataConditions)){
 			$metadataConditions = array();
-			$glue = ($this->type == MetadataSearchFilter::SEARCH_AND ? ' & ' : ' | ');
+			$glue = ' ';
+			if($this->type == MetadataSearchFilter::SEARCH_OR)
+			{
+				$glue = ' | ';
+				$dataConditions = array_unique($dataConditions);
+			}
 			$metadataConditions['@'. $this->getMetadataSearchField()] = implode($glue, $dataConditions);
 			$this->condition = $this->appendToDataCondition($this->condition, $metadataConditions, $this->type);
 		}
