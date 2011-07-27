@@ -31,6 +31,11 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	 */
 	protected $ingested = array();
 	
+	/**
+	 * @var array each item operation
+	 */
+	protected $operations = array();
+	
 	protected function __construct()
 	{
 	}
@@ -67,12 +72,18 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		
 		$this->impersonate();
 		$this->client->startMultiRequest();
-		
+	
+		$items = array();
 		foreach($item->scenes->children() as $scene)
+		{
+			$items[] = $scene;
 			$this->addCuePoint($scene);
+		}
 			
-		$this->client->doMultiRequest();
+		$results = $this->client->doMultiRequest();
 		$this->unimpersonate();
+		
+		$this->handleResults($results, $items);
 	}
 
 	/* (non-PHPdoc)
@@ -94,11 +105,17 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		$this->impersonate();
 		$this->client->startMultiRequest();
 		
-		foreach($item->scenes as $scene)
+		$items = array();
+		foreach($item->scenes->children() as $scene)
+		{
+			$items[] = $scene;
 			$this->updateCuePoint($scene);
+		}
 			
-		$this->client->doMultiRequest();
+		$results = $this->client->doMultiRequest();
 		$this->unimpersonate();
+		
+		$this->handleResults($results, $items);
 	}
 
 	/* (non-PHPdoc)
@@ -107,6 +124,29 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	public function handleItemDeleted(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		// No handling required
+	}
+
+	protected function handleResults(array $results, array $items)
+	{
+		if(count($results) != count($this->operations) != count($items))
+			return;
+			
+		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
+		
+		foreach($results as $index => $cuePoint)
+		{
+			foreach($pluginsInstances as $pluginsInstance)
+			{
+				/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
+				
+				if($this->operations[$index] == BulkUploadEngineXml::ADD_ACTION_STRING)
+					$pluginsInstance->handleItemAdded($this->client, $cuePoint, $items[$index]);
+				elseif($this->operations[$index] == BulkUploadEngineXml::UPDATE_ACTION_STRING)
+					$pluginsInstance->handleItemUpdated($this->client, $cuePoint, $items[$index]);
+				elseif($this->operations[$index] == BulkUploadEngineXml::DELETE_ACTION_STRING)
+					$pluginsInstance->handleItemDeleted($this->client, $cuePoint, $items[$index]);
+			}
+		}
 	}
 
 	/**
@@ -150,6 +190,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			
 		$cuePoint->entryId = $this->entryId;
 		$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);
+		$this->operations[] = BulkUploadEngineXml::ADD_ACTION_STRING;
 		if($cuePoint->systemName)
 			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;
 	}
@@ -167,11 +208,13 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		{
 			$cuePointId = $scene['sceneId'];
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
+			$this->operations[] = BulkUploadEngineXml::UPDATE_ACTION_STRING;
 		}
 		else 
 		{
 			$cuePoint->entryId = $this->entryId;
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);
+			$this->operations[] = BulkUploadEngineXml::ADD_ACTION_STRING;
 		}
 		if($cuePoint->systemName)
 			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;
@@ -188,26 +231,29 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			$id = $this->ingested[$systemName]->id;
 			return "$id";
 		}
-	
-		$filter = new KalturaAnnotationFilter();
-		$filter->entryIdEqual = $this->entryId;
-		$filter->systemNameEqual = $systemName;
-		
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 1;
-		
-		try
-		{
-			$cuePointListResponce = $this->cuePointPlugin->cuePoint->listAction($filter, $pager);
-		}
-		catch(Exception $e)
-		{
-			return null;
-		}
-		
-		if($cuePointListResponce->totalCount && $cuePointListResponce->objects[0] instanceof KalturaAnnotation)
-			return $cuePointListResponce->objects[0]->id;
-			
 		return null;
+	
+//		Won't work in the middle of multi request
+//		
+//		$filter = new KalturaAnnotationFilter();
+//		$filter->entryIdEqual = $this->entryId;
+//		$filter->systemNameEqual = $systemName;
+//		
+//		$pager = new KalturaFilterPager();
+//		$pager->pageSize = 1;
+//		
+//		try
+//		{
+//			$cuePointListResponce = $this->cuePointPlugin->cuePoint->listAction($filter, $pager);
+//		}
+//		catch(Exception $e)
+//		{
+//			return null;
+//		}
+//		
+//		if($cuePointListResponce->totalCount && $cuePointListResponce->objects[0] instanceof KalturaAnnotation)
+//			return $cuePointListResponce->objects[0]->id;
+//			
+//		return null;
 	}
 }
