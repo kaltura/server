@@ -16,6 +16,8 @@ class kOperator
 		$this->extra = isset($opr->extra) ? $opr->extra : null;
 		$this->command = isset($opr->command) ? $opr->command : null;
 		$this->config = isset($opr->config) ? $opr->config : null;
+		$this->params = isset($opr->params) ? $opr->params : null;
+		$this->className = isset($opr->className) ? $opr->className : null;
 	}
 	
 	/**
@@ -48,5 +50,15 @@ class kOperator
 	 */
 	public $thumbEnabled=1;
 	
-	
+	/**
+	 * Operator params to override the 'global' flavor params settings.
+	 * Initaly used for MAC 'pre-conversion'.
+	 * @var string
+	 */
+	public $params;
+
+	/**
+	 * @var string
+	 */
+	public $className;
 }
