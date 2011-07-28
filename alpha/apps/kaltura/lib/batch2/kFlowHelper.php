@@ -1670,14 +1670,16 @@ class kFlowHelper
 					else
 						$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
 				}
-	    	
+	    		else
+				{
+					$dbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+				}
+				
 				if($dbAsset instanceof thumbAsset)
 				{
 					list($width, $height, $type, $attr) = getimagesize($finalPath);
-					
 					$dbAsset->setWidth($width);
-					$dbAsset->setHeight($height);
-					$dbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+					$dbAsset->setHeight($height);					
 				}
 				
 				$dbAsset->save();
