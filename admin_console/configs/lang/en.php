@@ -989,6 +989,11 @@ return array(
 	'reset users password second notification' => "This action will override user's existing password, and for security reason will <b>NOT</b> send the new password to the KMC user via email.",
 	'reset users password third notification' => "<b>You will not be able to view the password outside of this window, so please make sure to copy it before closing the window.</b> You should pass the new password to the KMC user in a secured way.",
 
+	//Idetic distribution
+	// partner-configure
+	'indetic-distribution-note' => 'NOTE: You should choose one of the following flavors: mp4, mov, mpg, wmv, avi. ',
+
+	
 );
 
 

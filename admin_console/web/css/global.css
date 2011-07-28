@@ -572,3 +572,6 @@ form#frmCreateDropFolder dt { float: left; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft input,label { width:220px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight input,label { width:90px; }
 
+/* Idetic Distribution */
+#provider-configure-dialog .hint { color: #FF3200; }
+
