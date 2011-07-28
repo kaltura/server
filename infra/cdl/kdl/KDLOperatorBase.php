@@ -154,11 +154,22 @@ abstract class KDLOperatorBase {
 	 * KDLOperationParams
 	 */
 class KDLOperationParams {
-	public function KDLOperationParams($id,$ex=null, $cmd=null, $cfg=null){
+	public function Set($id,$ex=null, $cmd=null, $cfg=null){
 		$this->_id=$id;
 		$this->_extra=$ex;
 		$this->_cmd=$cmd;
 		$this->_cfg=$cfg;
+	}
+	public function __construct($opr=null){
+		if(is_null($opr)){
+			return;
+		}
+		$this->_id = $opr->id;
+		$this->_extra = isset($opr->extra) ? $opr->extra : null;
+		$this->_cmd = isset($opr->command) ? $opr->command : null;
+		$this->_cfg = isset($opr->config) ? $opr->config : null;
+		$this->_params = isset($opr->params) ? $opr->params : null;
+		$this->_className = isset($opr->className) ? $opr->className : null;
 	}
 	public $_id=null;
 	public $_extra=null;
@@ -167,6 +178,7 @@ class KDLOperationParams {
 	public $_engine=null;
 	public $_extractmediaEnabled=null;
 	public $_thumbEnabled=null;
+	public $_params = null;
 	
 		/* ---------------------------
 		 * ToString
@@ -200,6 +212,111 @@ class KDLOperationParams {
 		}
 		return null;
 	}
+	
+		/* ---------------------------
+		 * GenerateCommandAndConfig($trId, array $transObjArr)
+		 */
+	public function GenerateCommandAndConfig(KDLFlavor $design, KDLFlavor $target)
+	{
+		$this->UpdateTarget($target);
+		$this->_cmd = $this->_engine->GenerateCommandLine($design, $target, $this->_extra);
+		$this->_cfg = $this->_engine->GenerateConfigData($design, $target);
+		return $this;
+	}
+
+	/* ---------------------------
+	 * 
+	 */
+	public function UpdateTarget(KDLFlavor $target)
+	{
+		/*
+		 * Following code block is a 'dirty' short cut to overload the qt_tools 
+		 * target params to H264/AAC.
+		 * Other engines will not be effected.
+		 * The correct solution is to add additional param fields to engin's JSOn record 
+		 */
+		$paramsMap = $this->parseParamStr2Map();
+		if(!isset($paramsMap)){
+			return;
+		}
+		foreach($paramsMap as $key=>$param){
+			if($target->_video) {
+				$mdObj = $target->_video;
+				switch($key){
+					case 'video_codec':
+						$mdObj->_id = $param;
+						break;
+					case 'video_bitrate':
+						$mdObj->_bitRate = $param;
+						break;
+					case 'gop':
+						$mdObj->_gop = $param;
+						break;
+					case 'frame_rate':
+						$mdObj->_frameRate = $param;
+						break;
+					case 'width':
+						$mdObj->_width = $param;
+						break;
+					case 'height':
+						$mdObj->_height = $param;
+						break;
+					default:
+						break;
+				}
+			}
+			if($target->_audio) {
+				$mdObj = $target->_audio;
+				switch($key){
+					case 'audio_codec':
+						$mdObj->_id = $param;
+						break;
+					case 'audio_bitrate':
+						$mdObj->_bitRate = $param;
+						break;
+					case 'sample_rate':
+						$mdObj->_sampleRate = $param;
+						break;
+					case 'channels':
+						$mdObj->_channels = $param;
+						break;
+					default:
+						break;
+				}
+			}
+			if($target->_container) {
+				switch($key){
+					case 'format':
+						$mdObj->_id = $param;
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	}
+	
+	/* ---------------------------
+	 * parseParamStr2Map
+	 */
+	private function parseParamStr2Map()
+	{
+	$paramsMap = array();
+		if(isset($this->_params)) {
+			$paramsInArr=explode(",",$this->_params);
+			foreach ($paramsInArr as $paramStr) {
+				$pair=explode("=",$paramStr);
+				$paramsMap[$pair[0]]=$pair[1];
+			}
+		}
+		if(count($paramsMap)==0) {
+			return null;
+		}
+		else {
+			return $paramsMap;
+		}
+	}
+	
 	
 };
 
