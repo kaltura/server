@@ -12,20 +12,6 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	const METADATA_PLUGIN_VERSION_BUILD = 0;
 	
 	/* (non-PHPdoc)
-	 * @see KalturaPlugin::getInstance()
-	 */
-	public function getInstance($interface)
-	{
-		if($this instanceof $interface)
-			return $this;
-			
-		if($interface == 'IKalturaBulkUploadXmlHandler')
-			return CuePointMetadataBulkUploadXmlHandler::get();
-			
-		return null;
-	}
-	
-	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
 	 */
 	public static function getPluginName()

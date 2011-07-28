@@ -6,10 +6,21 @@
 class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'annotationMetadata';
-	const METADATA_PLUGIN_NAME = 'metadata';
-	const METADATA_PLUGIN_VERSION_MAJOR = 2;
-	const METADATA_PLUGIN_VERSION_MINOR = 0;
-	const METADATA_PLUGIN_VERSION_BUILD = 0;
+	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';
+	
+	/* (non-PHPdoc)
+	 * @see KalturaPlugin::getInstance()
+	 */
+	public function getInstance($interface)
+	{
+		if($this instanceof $interface)
+			return $this;
+			
+		if($interface == 'IKalturaBulkUploadXmlHandler')
+			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::ANNOTATION, 'KalturaAnnotation');
+			
+		return null;
+	}
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -24,16 +35,10 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 	 */
 	public static function dependsOn()
 	{
-		$metadataVersion = new KalturaVersion(
-			self::METADATA_PLUGIN_VERSION_MAJOR,
-			self::METADATA_PLUGIN_VERSION_MINOR,
-			self::METADATA_PLUGIN_VERSION_BUILD);
-			
-		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME, $metadataVersion);
-		$annotationDependency = new KalturaDependency(AnnotationPlugin::getPluginName());
-		$annotationMetadataDependency = new KalturaDependency(AnnotationMetadataPlugin::getPluginName());
+		$cuePointMetadataDependency = new KalturaDependency(CuePointMetadataPlugin::getPluginName());
+		$metadataBulkUploadXmlDependency = new KalturaDependency(self::METADATA_BULK_UPLOAD_XML_PLUGIN_NAME);
 		
-		return array($metadataDependency, $annotationDependency, $annotationMetadataDependency);
+		return array($cuePointMetadataDependency, $metadataBulkUploadXmlDependency);
 	}
 
 	/* (non-PHPdoc)
