@@ -27,7 +27,9 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 
 		if($target->_video)
 			$cmdLineGenerator->_vidBr = $target->_video->_bitRate;
-		$params = new KDLOperationParams($this->_id, $extra);
+		
+		$params = new KDLOperationParams();
+		$params->Set($this->_id, $extra);
 		return $cmdLineGenerator->Generate($params, $predesign->_video->_bitRate);
 	}
 	
@@ -260,6 +262,10 @@ $acodec = "libmp3lam";
 					break;
 				case KDLAudioTarget::WMA:
 					$acodec = "wmav2";
+					break;
+				case KDLAudioTarget::AMRNB:
+					// common settings - -ab 12.2k -ar 8000 -ac 1
+					$acodec = "libopencore_amrnb";
 					break;
 				case KDLAudioTarget::COPY:
 					$acodec = "copy";
