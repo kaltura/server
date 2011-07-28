@@ -107,13 +107,12 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		
 		$xmlElement = BulkUploadXmlPlugin::getBulkUploadMrssXml($batchJob);
 		if(is_null($xmlElement)){
-			echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <mrss><result>Log file is not ready</result></mrss>";
-			kFile::closeDbConnections;
+			echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mrss><error>Log file is not ready</error></mrss>";
+			kFile::closeDbConnections();
 			exit;
 		}
 		echo $xmlElement->asXML();
-		KalturaLog::info($xmlElement->asXML());
-		kFile::closeDbConnections;
+		kFile::closeDbConnections();
 		exit;
 	}
 	
