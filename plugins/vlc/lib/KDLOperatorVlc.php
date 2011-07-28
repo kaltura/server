@@ -38,10 +38,10 @@ $format = "fl";
 $acodec = "libmp3lam";
 
 		if(isset($target->_inFileName)){
-			$cmdStr .= " \"".$target->_inFileName."\"";
+			$cmdStr .= " ".$target->_inFileName;
 		}
 		else {
-			$cmdStr .= " \"".KDLCmdlinePlaceholders::InFileName."\"";
+			$cmdStr .= " ".KDLCmdlinePlaceholders::InFileName;
 		}
 		if(isset($target->_clipStart) && $target->_clipStart>0){
 			$cmdStr .= " --start-time=".$target->_clipStart/1000;
@@ -52,11 +52,11 @@ $acodec = "libmp3lam";
 		}
 
 $transcodeStr;
-		$transcodeStr = " --sout=\"#transcode{";
+		$transcodeStr = " --sout=#transcode{";
 		
 $vid = $target->_video;
 //$vid->_id="none";
-		if($vid->_id!="none"){
+		if(isset($vid) && $vid->_id!="none"){
 			if($vid->_rotation) {
 				$transcodeStr .= "vfilter=rotate{angle=-".$vid->_rotation."},";
 			}
@@ -118,7 +118,7 @@ $vid = $target->_video;
 		}
 		
 $aud = $target->_audio;
-		if($aud->_id!="none") {
+		if(isset($aud) && $aud->_id!="none") {
 			switch($aud->_id){
 				case KDLAudioTarget::MP3:
 					$transcodeStr .= ",aenc=ffmpeg,acodec=mp3";
@@ -154,7 +154,7 @@ $aud = $target->_audio;
 		
 		$cmdStr .= ":standard{access=file";
 $con = $target->_container;
-		if($con->_id!="none") {
+		if(isset($con) && $con->_id!="none") {
 			switch($con->_id){
 				case KDLContainerTarget::FLV:
 					$format = ",mux=flv";
@@ -190,10 +190,10 @@ $con = $target->_container;
 		}
 		
 		if(isset($target->_outFileName)){
-			$cmdStr .= ",dst=\"".$target->_outFileName."\"}\"";
+			$cmdStr .= ",dst=".$target->_outFileName."}";
 		}
 		else {
-			$cmdStr .= ",dst=\"".KDLCmdlinePlaceholders::OutFileName."\"}\"";
+			$cmdStr .= ",dst=".KDLCmdlinePlaceholders::OutFileName."}";
 		}
 		if($extra)
 			$cmdStr .= " ".$extra;
