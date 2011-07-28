@@ -24,17 +24,14 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	 */
 	public static function dependsOn()
 	{
-		$metadataVersion = new KalturaVersion(
-			self::METADATA_PLUGIN_VERSION_MAJOR,
-			self::METADATA_PLUGIN_VERSION_MINOR,
-			self::METADATA_PLUGIN_VERSION_BUILD);
-			
+		$metadataVersion = new KalturaVersion(self::METADATA_PLUGIN_VERSION_MAJOR, self::METADATA_PLUGIN_VERSION_MINOR, self::METADATA_PLUGIN_VERSION_BUILD);
+		
 		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME, $metadataVersion);
 		$cuePointDependency = new KalturaDependency(CuePointPlugin::getPluginName());
 		
 		return array($metadataDependency, $cuePointDependency);
 	}
-
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
@@ -42,12 +39,8 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		
-		if(
-			$coreType == SchemaType::SYNDICATION
-			||
-			$coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
-		)
-		return '
+		if($coreType == SchemaType::SYNDICATION || $coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+			return '
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
@@ -55,7 +48,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 			';
 		
 		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API))
-		return '
+			return '
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
@@ -74,7 +67,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 			';
 		
 		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API))
-		return '
+			return '
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
@@ -101,9 +94,9 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	public static function parseXml($objectType, SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint)
 	{
 		$metadataElements = $scene->xpath('scene-customData');
-		if(!count($metadataElements))
+		if(! count($metadataElements))
 			return $cuePoint;
-			
+		
 		foreach($metadataElements as $metadataElement)
 		{
 			$metadata = null;
@@ -111,7 +104,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 			
 			if(isset($metadataElement['metadataId']))
 				$metadata = MetadataPeer::retrieveByPK($metadataElement['metadataId']);
-
+			
 			if($metadata)
 			{
 				$metadataProfile = $metadata->getMetadataProfile();
@@ -122,15 +115,15 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 					$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataElement['metadataProfileId']);
 				elseif(isset($metadataElement['metadataProfile']))
 					$metadataProfile = MetadataProfilePeer::retrieveBySystemName($metadataElement['metadataProfile']);
-					
+				
 				if($metadataProfile)
 					$metadata = MetadataPeer::retrieveByObject($metadataProfile->getId(), $objectType, $cuePoint->getId());
 			}
 			
-			if(!$metadataProfile)
+			if(! $metadataProfile)
 				continue;
-		
-			if(!$metadata)
+			
+			if(! $metadata)
 			{
 				$metadata = new Metadata();
 				$metadata->setPartnerId($partnerId);
@@ -151,13 +144,41 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 					$status = kMetadataManager::validateMetadata($metadata, $errorMessage);
 					if($status == KalturaMetadataStatus::VALID)
 						kEventsManager::raiseEvent(new kObjectDataChangedEvent($metadata));
-						
+					
 					break;
 				}
 			}
 		}
 		
 		return $cuePoint;
+	}
+	
+	/**
+	 * @param SimpleXMLElement $parent
+	 * @param SimpleXMLElement $append
+	 */
+	public static function appendXML(SimpleXMLElement $parent, SimpleXMLElement $append)
+	{
+		if(!$append)
+			return;
+			
+		if(strlen(trim("$append")) == 0)
+		{
+			$xml = $parent->addChild($append->getName());
+			foreach($append->children() as $child)
+			{
+				self::appendXML($xml, $child);
+			}
+		}
+		else
+		{
+			$xml = $parent->addChild($append->getName(), "$append");
+		}
+		
+		foreach($append->attributes() as $n => $v)
+		{
+			$xml->addAttribute($n, $v);
+		}
 	}
 	
 	public static function generateCuePointXml(SimpleXMLElement $scene, $objectType, $cuePointId)
@@ -178,12 +199,11 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 			if($xml)
 			{
 				$xmlElement = new SimpleXMLElement($xml);
-				$xmlElementName = $xmlElement->getName();
-				$metadataElement->$xmlElementName = $xmlElement;
+				self::appendXML($metadataElement, $xmlElement);
 			}
 			
 			$metadataProfile = $metadata->getMetadataProfile();
-			if(!$metadataProfile)
+			if(! $metadataProfile)
 				continue;
 			
 			if($metadataProfile->getSystemName())
@@ -191,7 +211,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 			if($metadataProfile->getName())
 				$metadataElement->addAttribute('metadataProfileName', $metadataProfile->getName());
 		}
-
+		
 		return $scene;
 	}
 }
