@@ -67,6 +67,8 @@ class MetadataService extends KalturaBaseService
 	 */
 	protected function addMetadata($metadataProfileId, $objectType, $objectId)
 	{
+		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
+		
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());
@@ -111,6 +113,8 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
+		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
+	
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());
@@ -179,6 +183,8 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromFileAction($metadataProfileId, $objectType, $objectId, $xmlFile)
 	{
+		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
+	
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());
@@ -223,6 +229,8 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromUrlAction($metadataProfileId, $objectType, $objectId, $url)
 	{
+		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
+	
 		$dbMetadata = $this->addMetadata($metadataProfileId, $objectType, $objectId);
 		
 		kMetadataManager::addImportMetadataJob($dbMetadata->getPartnerId(), $dbMetadata->getId(), $url);
