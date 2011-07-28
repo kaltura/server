@@ -513,14 +513,14 @@ KalturaLog::log(__METHOD__."\noperatorSets==>\n".print_r($oprSets,true));
 			if(count($oprSet)==1) {
 				$opr = $oprSet[0];
 KalturaLog::log(__METHOD__."\n1==>\n".print_r($oprSet,true));
-				$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command, $opr->config);
+				$kdlOpr = new KDLOperationParams($opr);
 				$transObjArr[] = $kdlOpr;
 			}
 			else {
 				$auxArr = array();
 				foreach ($oprSet as $opr) {
 KalturaLog::log(__METHOD__."\n2==>\n".print_r($oprSet,true));
-					$kdlOpr = new KDLOperationParams($opr->id, $opr->extra, $opr->command, $opr->config);
+					$kdlOpr = new KDLOperationParams($opr);
 					$auxArr[] = $kdlOpr;
 				}
 				$transObjArr[] = $auxArr;
@@ -627,7 +627,21 @@ function transcoderSetFuncWrap($oprObj, $transDictionary, $param2)
 //	$oprObj->_engine = KDLWrap::GetEngineObject($oprObj->_id);
 	$id = $oprObj->_id;
 KalturaLog::log(__METHOD__.":operators id=$id :");
-	switch($id){
+	$engine=null;
+	if(isset($oprObj->_className) && class_exists($oprObj->_className)){
+		try {
+			$engine = new $oprObj->_className($id);
+		}
+		catch(Exception $e){
+			$engine=null;
+		}
+	}
+	
+	if(isset($engine)) {
+		KalturaLog::log(__METHOD__.": the engine was successfully overloaded with $oprObj->_className");
+	}
+	else {
+		switch($id){
 		case KDLTranscoders::KALTURA:
 		case KDLTranscoders::ON2:
 		case KDLTranscoders::FFMPEG:
@@ -636,49 +650,26 @@ KalturaLog::log(__METHOD__.":operators id=$id :");
 		case KDLTranscoders::FFMPEG_AUX:
 		case KDLTranscoders::FFMPEG_VP8:
 		case KDLTranscoders::EE3:
-			$oprObj->_engine = new KDLOperatorWrapper($id);
-			return;
+			$engine = new KDLOperatorWrapper($id);
+			break;
 		case KDLTranscoders::QUICK_TIME_PLAYER_TOOLS:
-			$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "quickTimeTools.QuickTimeTools");
+			$engine = KalturaPluginManager::loadObject('KDLOperatorBase', "quickTimeTools.QuickTimeTools");
 			break;
 		default:
 //		KalturaLog::log("in default :operators id=$id :");
-			$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', $id);
+			$engine = KalturaPluginManager::loadObject('KDLOperatorBase', $id);
 			break;
+		}
 	}
-/*
-	if($id==KDLTranscoders::QUICK_TIME_PLAYER_TOOLS) {
-		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "quickTimeTools.QuickTimeTools");
-	}
-	else if($id=="fastStart.FastStart") {
-		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', $id);
-	}
-//	else if($id==KDLTranscoders::EXPRESSION_ENCODER) {
-//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "expressionEncoder.ExpressionEncoder");
-//	}
-//	else if($id==KDLTranscoders::QT_FASTSTART) {
-//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', "fastStart.FastStart");
-//	}
-//	else if($id==KDLTranscoders::AVIDEMUX) {
-//		$oprObj->_engine = KalturaPluginManager::loadObject(KalturaPluginManager::OBJECT_TYPE_KDL_ENGINE, "avidemux.Avidemux");
-//	}
-//	else if($id==KDLTranscoders::PDF_CREATOR) {
-//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', conversionEngineType::PDF_CREATOR);
-//	}
-//	else if($id==KDLTranscoders::PDF2SWF) {
-//		$oprObj->_engine = KalturaPluginManager::loadObject('KDLOperatorBase', conversionEngineType::PDF2SWF);
-//	}
-	else {
-		$oprObj->_engine = new KDLOperatorWrapper($id);
-		return;
-	}
-*/
-	if(is_null($oprObj->_engine)) {
+
+	if(is_null($engine)) {
 		KalturaLog::log(__METHOD__.":ERROR - plugin manager returned with null");
 	}
 	else {
+		$oprObj->_engine = $engine;
 		KalturaLog::log(__METHOD__."Engine object from plugin mgr==>\n".print_r($oprObj->_engine,true));
 	}
+	
 	return;
 }
 
