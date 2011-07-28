@@ -158,7 +158,8 @@ $parsed = array();
 				if(!is_null($transDictionary) && array_key_exists($trId, $transDictionary)){
 					$trId = $transDictionary[$trId];
 				}
-				$trPrm = new KDLOperationParams($trId, $trEx);
+				$trPrm = new KDLOperationParams();
+				$trPrm->Set($trId, $trEx);
 				$trPrmArr[$key] = $trPrm;
 			}
 		}
