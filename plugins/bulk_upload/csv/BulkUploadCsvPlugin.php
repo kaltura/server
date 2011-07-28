@@ -105,7 +105,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 				$bulkUploadResult->getContentType(),
 			);
 				
-			if($data instanceof kBulkUploadCsvJobData && $data->getCsvVersion() > 1)
+			if($data->getCsvVersion() > 1)
 			{
 				$values[] = $bulkUploadResult->getConversionProfileId();
 				$values[] = $bulkUploadResult->getAccessControlProfileId();
@@ -123,7 +123,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		}
 		fclose($STDOUT);
 		
-		kFile::closeDbConnections;
+		kFile::closeDbConnections();
 		exit;
 	}
 	
