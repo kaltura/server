@@ -45,7 +45,7 @@ class KDLMediaDataSet  {
 			if($this->_video->_bitRate=="" && $this->_container
 			&& $this->_container->_duration>0){
 				$br = round($this->_container->_fileSize*8*1024/$this->_container->_duration);
-				if($this->_audio->_bitRate!=="")
+				if(isset($this->_audio) && $this->_audio->_bitRate!=="")
 					$br = $br - $this->_audio->_bitRate;
 				if($br>0)
 					$this->_video->_bitRate = $br;
