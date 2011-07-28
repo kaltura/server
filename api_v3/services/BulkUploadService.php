@@ -150,8 +150,6 @@ class BulkUploadService extends KalturaBaseService
 	 */
 	function serveLogAction($id)
 	{
-	header("Content-Type: text/xml; charset=UTF-8");
-		
 		$c = new Criteria();
 		$c->addAnd(BatchJobPeer::ID, $id);
 		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
@@ -159,13 +157,10 @@ class BulkUploadService extends KalturaBaseService
 		$batchJob = BatchJobPeer::doSelectOne($c);
 		
 		if (!$batchJob){
-			KalturaLog::info("File not found for jobid ". $id);
-			echo "File not found for jobid ". $id;
-			kFile::closeDbConnections;
-			exit;
+			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
 		}
 		else 
-			KalturaLog::info("File found for jobid ". $id . " batch type ". $batchJob->getJobSubType());
+			KalturaLog::info("Batch job found for jobid ". $id . " batch type ". $batchJob->getJobSubType());
 			
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUpload');
 		foreach($pluginInstances as $pluginInstance)
