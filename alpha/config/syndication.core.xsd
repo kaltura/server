@@ -50,6 +50,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
+			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryStatus"/>
 			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string"/>
 			<xs:element name="thumbnailUrl" minOccurs="0" maxOccurs="1">
 				<xs:complexType>
