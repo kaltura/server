@@ -128,11 +128,16 @@ class MediaService extends KalturaEntryService
 		{
 			$partner = $this->getPartner();
 			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
+			{
+				KalturaLog::notice("Replacement is not allowed to the partner permission [FEATURE_ENTRY_REPLACEMENT] is needed");
 				return;
+			}
 			
 			if($dbEntry->getReplacingEntryId())
 				throw new KalturaAPIException(KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS);
 				
+			$resource->validateEntry($dbEntry);
+			
 			$tempMediaEntry = new KalturaMediaEntry();
 		 	$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
@@ -147,14 +152,14 @@ class MediaService extends KalturaEntryService
 			$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 			$tempDbEntry->save();
 			
-			$resource->validateEntry($dbEntry);
-			$kResource = $resource->toObject();
-			$this->attachResource($kResource, $tempDbEntry);
-			
 			$dbEntry->setReplacingEntryId($tempDbEntry->getId());
 			$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
 			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
 				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+				
+			$kResource = $resource->toObject();
+			$this->attachResource($kResource, $tempDbEntry);
+			
 			$dbEntry->save();
 		}
     	$resource->entryHandled($dbEntry);
