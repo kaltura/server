@@ -109,6 +109,8 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string" />
 					<xs:element name="parent" minOccurs="0" maxOccurs="1" type="xs:string" />
 					<xs:element name="parentId" minOccurs="0" maxOccurs="1" type="xs:string" />
+					
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -132,6 +134,8 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 						<xs:element name="parent" minOccurs="1" maxOccurs="1" type="xs:string" />
 						<xs:element name="parentId" minOccurs="1" maxOccurs="1" type="xs:string" />
 					</xs:choice>
+					
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>

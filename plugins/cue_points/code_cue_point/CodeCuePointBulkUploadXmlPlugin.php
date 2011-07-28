@@ -72,6 +72,8 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 				<xs:sequence>
 					<xs:element name="code" minOccurs="0" maxOccurs="1" type="xs:string" />
 					<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string" />
+					
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>

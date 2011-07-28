@@ -72,6 +72,8 @@ class AdCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 					<xs:element name="sourceUrl" minOccurs="0" maxOccurs="1" type="xs:string" />
 					<xs:element name="adType" minOccurs="0" maxOccurs="1" type="KalturaAdType" />
 					<xs:element name="protocolType" minOccurs="0" maxOccurs="1" type="KalturaAdProtocolType" />
+					
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>

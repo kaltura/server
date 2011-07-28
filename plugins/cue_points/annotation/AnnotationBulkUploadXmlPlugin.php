@@ -73,6 +73,8 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 						<xs:element name="parent" minOccurs="1" maxOccurs="1" type="xs:string" />
 						<xs:element name="parentId" minOccurs="1" maxOccurs="1" type="xs:string" />
 					</xs:choice>
+					
+					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
