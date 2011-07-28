@@ -125,7 +125,7 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(ComcastMrssDistributionField::MEDIA_KEYWORDS);
-		$fieldConfig->setUserFriendlyFieldName('Entry keywords');
+		$fieldConfig->setUserFriendlyFieldName('Entry tags');
 		$tagsXslt = '<xsl:for-each select="tags/tag"><xsl:if test="position() &gt; 1"><xsl:value-of select="\',\'" /></xsl:if><xsl:value-of select="." /></xsl:for-each>';
 		$fieldConfig->setEntryMrssXslt($tagsXslt);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;

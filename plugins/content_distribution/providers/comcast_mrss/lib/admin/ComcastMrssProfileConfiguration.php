@@ -168,13 +168,24 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		);
 		
 		$element = new Zend_Form_Element_Hidden('feed_url');
+		$element->clearDecorators();
 		$element->addDecorator('Callback', array('callback' => array($this, 'renderFeedUrl')));
 		$this->addElement($element);
+		
+		$this->addDisplayGroup(
+			array('feed_url'), 
+			'feed_url_group', 
+			array('legend' => '', 'decorators' => array('FormElements', 'Fieldset'))
+		);
 	}
 	
 	public function renderFeedUrl($content)
 	{
-		return '<a href="'.$this->getValue('feed_url').'" target="_blank">Feed URL</a>';
+		$url = $this->getValue('feed_url');
+		if (!$url)
+			return 'Feed URL will be generated once the feed is saved';
+		else
+			return '<a href="'.$url.'" target="_blank">Feed URL</a>';
 	}
 	
 	public function addMetadataFieldsAsValues($elementName)
@@ -200,5 +211,29 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		Infra_ClientHelper::unimpersonate();
 		$this->getElement($elementName)->addMultiOptions(array('' => ''));
 		$this->getElement($elementName)->addMultiOptions($metadataFields);
+	}
+	
+	public function render(Zend_View_Interface $view = null)
+	{
+		$this->disableTriggerUpdateFieldConfig();
+		
+		return parent::render($view);
+	}
+	
+	public function disableTriggerUpdateFieldConfig()
+	{
+		$subForm = $this->getSubForm('fieldConfigArray');
+		if ($subForm)
+		{
+			$fieldsSubForms = $subForm->getSubForms();
+			foreach($fieldsSubForms as $fieldSubForm)
+			{
+				$updateOnChange = $fieldSubForm->getElement('updateOnChange');
+				if ($updateOnChange)
+				{
+					$updateOnChange->setAttrib('disabled', 'disabled');
+				}
+			}
+		}
 	}
 }

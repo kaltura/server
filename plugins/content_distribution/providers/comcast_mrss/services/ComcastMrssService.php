@@ -64,7 +64,6 @@ class ComcastMrssService extends KalturaBaseService
 				KalturaLog::err('Entry distribution was not found for entry ['.$entry->getId().'] and profile [' . $profile->getId() . ']');
 				continue;
 			}
-			$profile->clearFieldValues();
 			$fields = $profile->getAllFieldValues($entryDistribution);
 			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
