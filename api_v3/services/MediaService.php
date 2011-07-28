@@ -156,11 +156,10 @@ class MediaService extends KalturaEntryService
 			$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
 			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL))
 				$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
+			$dbEntry->save();
 				
 			$kResource = $resource->toObject();
 			$this->attachResource($kResource, $tempDbEntry);
-			
-			$dbEntry->save();
 		}
     	$resource->entryHandled($dbEntry);
     }
