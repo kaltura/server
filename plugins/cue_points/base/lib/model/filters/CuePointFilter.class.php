@@ -9,6 +9,8 @@ class CuePointFilter extends baseObjectFilter
 				"_in_id",
 				"_eq_type",
 				"_in_type",
+				"_eq_sub_type",
+				"_in_sub_type",
 				"_eq_status",
 				"_in_status",
 				"_eq_entry_id",
