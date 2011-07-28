@@ -181,14 +181,36 @@ class WidgetController extends Zend_Controller_Action
 		$typesConfig = Zend_Registry::get('config')->settings->uiConfTypes;
 		if ($typesConfig) 
 		{
+			if ($typesConfig === "*")
+				return $this->getAllUiConfTypes();
+				
 			foreach($typesConfig as $config)
 			{
 				if (is_string($config))
 				{
-					$value = eval('return ' . $config . ';');
-					$types[$value] = $config;
+					if ($config === "*")
+					{
+						return $this->getAllUiConfTypes();
+					}
+					else
+					{
+						$value = eval('return ' . $config . ';');
+						$types[$value] = $config;
+					}
 				}
 			}
+		}
+		return $types;
+	}
+	
+	protected function getAllUiConfTypes()
+	{
+		$types = array();
+		$reflectionClass = new ReflectionClass('Kaltura_Client_Enum_UiConfObjType');
+		$constants = $reflectionClass->getConstants();
+		foreach($constants as $name => $value)
+		{
+			$types[$value] = 'Kaltura_Client_Enum_UiConfObjType::' . $name;
 		}
 		return $types;
 	}
