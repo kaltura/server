@@ -159,8 +159,9 @@ class KDLFlavor extends KDLMediaDataSet {
 				$this->generateOperationSetCommandLines($target, $trPrmObj);
 			}
 			else{
-				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $target, $trPrmObj->_extra);
-				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $target);
+//				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $target, $trPrmObj->_extra);
+//				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $target);
+				$transcoders[$key] = $trPrmObj->GenerateCommandAndConfig($this, $target);
 			}
 		}
 	}
@@ -176,43 +177,33 @@ KalturaLog::log(__METHOD__."==>\n");
 		foreach($transcoders as $key=>$trPrmObj) {
 			$auxTrg = new KDLFlavor();
 			$auxTrg = clone $target;
-			/*
-			 * Following code block is a 'dirty' short cut to overload the qt_tools 
-			 * target params to H264/AAC.
-			 * Other engines will not be effected.
-			 * The correct solution is to add additional param fields to engin's JSOn record 
-			 */
-			if($trPrmObj->_id==KDLTranscoders::QUICK_TIME_PLAYER_TOOLS){
-				if($i>1) {		// Do deinterlace only once
-					if($auxTrg->_video && $auxTrg->_video->_scanType==1) {
-						$auxTrg->_video->_scanType=0;
-					}
-				}
-								// to preserve the quality 
-								// force mp4/h264/aac/same frame/larger br
-								// for the intermediate products
-				if($i<$cnt) {
-					$auxTrg->_container->_id=KDLContainerTarget::MP4;
-					if($auxTrg->_video){
-						$auxTrg->_video->_id=KDLVideoTarget::H264;
-						$auxTrg->_video->_bitRate = $auxTrg->_video->_bitRate*1.5;
-						$auxTrg->_video->_width = 0;
-						$auxTrg->_video->_height = 0;
-						$auxTrg->_video->_frameRate = 0;
-						$auxTrg->_video->_gop = 300;
-					}
-					if($auxTrg->_audio){
-						$auxTrg->_audio->_id=KDLAudioTarget::AAC;
-					}
-				}
-			}
-//			if(!is_null($trPrmObj->_engine))
-				$transcoders[$key]->_cmd = $trPrmObj->_engine->GenerateCommandLine($this, $auxTrg, $trPrmObj->_extra);
-				$transcoders[$key]->_cfg = $trPrmObj->_engine->GenerateConfigData($this, $auxTrg);
+			$transcoders[$key] = $trPrmObj->GenerateCommandAndConfig($this, $auxTrg);
 			$i++;
+			continue;
 		}
 	}
-
+	
+	/* ---------------------------
+	 * parseOperatorParamStr2Map
+	 */
+	private function parseOperatorParamStr2Map($paramsArrStr)
+	{
+	$paramsMap = array();
+		if(isset($paramsArrStr)) {
+			$paramsInArr=explode(",",$paramsArrStr);
+			foreach ($paramsInArr as $paramStr) {
+				$pair=explode("=",$paramStr);
+				$paramsMap[$pair[0]]=$pair[1];
+			}
+		}
+		if(count($paramsMap)==0) {
+			return null;
+		}
+		else {
+			return $paramsMap;
+		}
+	}
+	
 	/* ---------------------------
 	 * ValidateProduct
 	 */
@@ -742,11 +733,15 @@ $target->_video = null;
 
 				/* ---------------
 				 * Channels (ch):
+				 * - AMRNB: ch 1
 				 * - MP3: if not defined - set 2, else keep the definition
 				 * - else (ch defined): make it minimum between the source ch cnt 
 				 * and the required ch cnt
 				 */
-		if($targetAud->_channels==0 && $targetAud->_id!=KDLAudioTarget::AAC){
+		if ($targetAud->_id==KDLAudioTarget::AMRNB){
+			$targetAud->_channels=1;
+		}
+		else if($targetAud->_channels==0 && $targetAud->_id!=KDLAudioTarget::AAC){
 			$targetAud->_channels=KDLConstants::DefaultAudioChannels;
 		}
 		else {
@@ -755,7 +750,8 @@ $target->_video = null;
 
 				/* ----------------
 				 * Normalize sample rate - 
-				 * - FLV/MP3: on auto get sr from the source. Follow the spec valid values - 11025,22050,44100.  
+				 * - FLV/MP3: on auto get sr from the source. Follow the spec valid values - 11025,22050,44100.
+				 * - AMRNB - br <=12.2, sr <= 8000
 				 * - AAC or MP3/non flv: on auto use source sr (if available). Truncate to valid range(11025-48000) 
 				 */
 		if(($target->_container!=null && $target->_container->_id==KDLContainerTarget::FLV) 
@@ -771,6 +767,12 @@ $target->_video = null;
 			if($targetAud->_sampleRate<22050)
 				$trgSr=11025;
 			$targetAud->_sampleRate = $trgSr;
+		}
+		else if($targetAud->_id==KDLAudioTarget::AMRNB) { 
+			if ($targetAud->_sampleRate==0 || $targetAud->_sampleRate>8000)
+				$targetAud->_sampleRate=8000;
+			if ($targetAud->_bitRate==0 || $targetAud->_bitRate>12.2)
+				$targetAud->_bitRate=12.2;
 		}
 		else {
 			if($targetAud->_sampleRate==0){
