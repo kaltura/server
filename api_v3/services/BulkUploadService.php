@@ -115,10 +115,10 @@ class BulkUploadService extends KalturaBaseService
 		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
 		$batchJob = BatchJobPeer::doSelectOne($c);
 		
-		if (!$batchJob)	
-			KalturaLog::info("File not found for jobid". $id);
-		else 
-			KalturaLog::info("File found for jobid". $id);
+		if (!$batchJob)
+			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
+			 
+		KalturaLog::info("Batch job found for jobid [$id] bulk upload type [". $batchJob->getJobSubType() . "]");
 		
 		$syncKey = $batchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
@@ -156,11 +156,10 @@ class BulkUploadService extends KalturaBaseService
 		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
 		$batchJob = BatchJobPeer::doSelectOne($c);
 		
-		if (!$batchJob){
+		if (!$batchJob)
 			throw new KalturaAPIException(KalturaErrors::BULK_UPLOAD_NOT_FOUND, $id);
-		}
-		else 
-			KalturaLog::info("Batch job found for jobid ". $id . " batch type ". $batchJob->getJobSubType());
+			 
+		KalturaLog::info("Batch job found for jobid [$id] bulk upload type [". $batchJob->getJobSubType() . "]");
 			
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUpload');
 		foreach($pluginInstances as $pluginInstance)
