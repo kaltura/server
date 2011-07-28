@@ -16,6 +16,11 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	private $objectClass = 'KalturaBaseEntry';
 	
 	/**
+	 * @var string XML node name
+	 */
+	private $nodeName = 'customData';
+	
+	/**
 	 * @var array<string, int> of metadata profiles by their system name
 	 */
 	private static $metadataProfiles = null;
@@ -25,10 +30,11 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	 */
 	private $client = null;
 	
-	public function __construct($objectType, $objectClass)
+	public function __construct($objectType, $objectClass, $nodeName = 'customData')
 	{
 		$this->objectType = $objectType;
 		$this->objectClass = $objectClass;
+		$this->nodeName = $nodeName;
 	} 
 	
 	public function getMetadataProfileId($systemName)
@@ -60,11 +66,14 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		if(!is_a($object, $this->objectClass))
 			return;
 			
-		if(empty($item->customData)) // if there is no costum data then we exit
+		$nodeName = $this->nodeName;
+		if(empty($item->$nodeName)) // if there is no costum data then we exit
 			return;
 			
+		KalturaLog::debug("Handles custom metadata for object type [$this->objectType] class [$this->objectClass] id [$object->id]");
+			
 		$this->client = $client;
-		foreach($item->customData as $customData)
+		foreach($item->$nodeName as $customData)
 			$this->handleCustomData($object->id, $customData);
 	}
 	
@@ -112,9 +121,6 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	 */
 	public function handleItemUpdated(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
 	{
-		if(empty($item->customData)) // if there is no costum data then we exit
-			return;
-			
 		$this->handleItemAdded($client, $object, $item);
 	}
 
