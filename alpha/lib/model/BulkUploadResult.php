@@ -32,6 +32,21 @@ class BulkUploadResult extends BaseBulkUploadResult
 		
 		return $this->getEntryStatus();
 	}
+	
+	public function getEntryId()
+	{
+		if($this->getObjectType() == BulkUploadResultObjectType::ENTRY)
+			return $this->getObjectId();
+			
+		return null;
+	}
+	
+	public function setEntryId($v)
+	{
+		$this->setObjectType(BulkUploadResultObjectType::ENTRY);
+		return $this->setObjectId($v);
+	}
+	
 
 	/**
 	 * Get the [plugins_data] column value.

@@ -40,10 +40,30 @@ class KalturaBulkUploadResult extends KalturaObject
 
 	
 	/**
+     * @var KalturaBulkUploadAction
+     */
+    public $action;
+
+
+	
+	/**
      * @var string
      */
     public $entryId;
 
+
+	
+	/**
+     * @var string
+     */
+    public $objectId;
+
+
+	
+	/**
+     * @var KalturaBulkUploadResultObjectType
+     */
+    public $bulkUploadResultObjectType;
 
 	
 	/**
@@ -172,6 +192,9 @@ class KalturaBulkUploadResult extends KalturaObject
 	    "lineIndex",
 	    "partnerId",
 	    "entryId",
+		"action",
+		"objectId",
+		"bulkUploadResultObjectType" => "objectType",
 		"entryStatus",
 	    "rowData",
 	    "title",

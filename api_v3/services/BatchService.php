@@ -161,6 +161,9 @@ class BatchService extends KalturaBaseService
 	 */
 	function addBulkUploadResultAction(KalturaBulkUploadResult $bulkUploadResult, KalturaBulkUploadPluginDataArray $pluginDataArray = null)
 	{
+		if(is_null($bulkUploadResult->action))
+			$bulkUploadResult->action = KalturaBulkUploadAction::ADD;
+			
 		$bulkUploadResult->pluginsData = $pluginDataArray;
 		$dbBulkUploadResult = $bulkUploadResult->toInsertableObject();
 		$dbBulkUploadResult->save();

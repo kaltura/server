@@ -653,7 +653,9 @@ CREATE TABLE `bulk_upload_result`
 	`bulk_upload_job_id` INTEGER,
 	`line_index` INTEGER,
 	`partner_id` INTEGER,
-	`entry_id` VARCHAR(20),
+	`object_id` VARCHAR(20),
+	`object_type` INTEGER,
+	`action` INTEGER,
 	`entry_status` INTEGER,
 	`row_data` VARCHAR(1023),
 	`title` VARCHAR(127),
@@ -671,6 +673,7 @@ CREATE TABLE `bulk_upload_result`
 	`partner_data` VARCHAR(4096),
 	`error_description` VARCHAR(255),
 	`plugins_data` VARCHAR(9182),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `entry_id_index_id`(`entry_id`, `id`)
 )Type=MyISAM;

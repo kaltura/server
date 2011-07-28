@@ -8,24 +8,6 @@
 class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	/**
-	 * The add action (default) string
-	 * @var string
-	 */
-	const ADD_ACTION_STRING = 'add';
-
-	/**
-	 * The update action string
-	 * @var string
-	 */
-	const UPDATE_ACTION_STRING = 'update';
-
-	/**
-	 * tnhe delete action string
-	 * @var string
-	 */
-	const DELETE_ACTION_STRING = 'delete';
-	
-	/**
 	 * The defalut thumbnail tag
 	 * @var string
 	 */
@@ -181,14 +163,37 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 //				KalturaLog::debug("Validating item [{$item->name}]");
 				$this->validateItem($item);
+			
+				$this->checkAborted();
 				
-//				KalturaLog::debug("Handling item [{$item->name}]");
-				$this->handleItem($item);
+				$actionToPerform = self::$actionsMap[KalturaBulkUploadAction::ADD];
+						
+				$action = KalturaBulkUploadAction::ADD;
+				if(isset($item->action))
+					$actionToPerform = strtolower($item->action);
+				
+				switch($actionToPerform)
+				{
+					case self::$actionsMap[KalturaBulkUploadAction::ADD]:
+						$this->handleItemAdd($item);
+						$action = KalturaBulkUploadAction::ADD;
+						break;
+					case self::$actionsMap[KalturaBulkUploadAction::UPDATE]:
+						$this->handleItemUpdate($item);
+						$action = KalturaBulkUploadAction::UPDATE;
+						break;
+					case self::$actionsMap[KalturaBulkUploadAction::DELETE]:
+						$this->handleItemDelete($item);
+						$action = KalturaBulkUploadAction::DELETE;
+						break;
+					default :
+						throw new KalturaBatchException("Action: {$actionToPerform} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+				}
 			}
 			catch (KalturaBulkUploadXmlException $e)
 			{
 				KalturaLog::err("Item failed because excpetion was raised': " . $e->getMessage());
-				$bulkUploadResult = $this->createUploadResult($item);
+				$bulkUploadResult = $this->createUploadResult($item, $action);
 				$bulkUploadResult->errorDescription = $e->getMessage();
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$this->addBulkUploadResult($bulkUploadResult);
@@ -206,35 +211,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->validateTypeToTypedElement($item);
 	}		
 	
-	/**
-	 * Gets and handles an item from the channel
-	 * @param SimpleXMLElement $item
-	 */
-	protected function handleItem(SimpleXMLElement $item)
-	{
-		$this->checkAborted();
-		
-		$actionToPerform = self::ADD_ACTION_STRING;
-				
-		if(isset($item->action))
-			$actionToPerform = strtolower($item->action);
-		
-		switch($actionToPerform)
-		{
-			case "add":
-				$this->handleItemAdd($item);
-				break;
-			case "update":
-				$this->handleItemUpdate($item);
-				break;
-			case "delete":
-				$this->handleItemDelete($item);
-				break;
-			default :
-				throw new KalturaBatchException("Action: {$actionToPerform} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
-		}
-	}
-
 	/**
 	 * Gets the flavor params from the given flavor asset
 	 * @param string $assetId
@@ -388,7 +364,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$pluginsInstance->handleItemUpdated($this->kClient, $updatedEntry, $item);
 	
 		//Throw exception in case of max proccessed items and handle all exceptions there
-		$updatedEntryBulkUploadResult = $this->createUploadResult($item); 
+		$updatedEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::UPDATE);
 		
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($updatedEntry), array($updatedEntryBulkUploadResult));
@@ -482,7 +458,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$result = $this->kClient->baseEntry->delete($entryId);
 		
-		$bulkUploadResult = $this->createUploadResult($item);
+		$bulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::DELETE);
 		$bulkUploadResult->entryId = $entryId;
 		$this->addBulkUploadResult($bulkUploadResult);
 	}
@@ -561,7 +537,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		//Throw exception in case of  max proccessed items and handle all exceptions there
-		$createdEntryBulkUploadResult = $this->createUploadResult($item);
+		$createdEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::ADD);
 
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 			return;
@@ -1514,7 +1490,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function getEntryStatusFromItem(SimpleXMLElement $item)
 	{
 		$status = KalturaEntryStatus::IMPORT;
-		if($item->action == self::DELETE_ACTION_STRING)
+		if($item->action == self::$actionsMap[KalturaBulkUploadAction::ADD])
 			$status = KalturaEntryStatus::DELETED;
 		
 		return $status;
@@ -1523,8 +1499,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * Creates a new upload result object from the given SimpleXMLElement item
 	 * @param SimpleXMLElement $item
+	 * @param KalturaBulkUploadAction $action
+	 * @return KalturaBulkUploadResult
 	 */
-	protected function createUploadResult(SimpleXMLElement $item)
+	protected function createUploadResult(SimpleXMLElement $item, $action)
 	{
 		//TODO: What should we write in the bulk upload result for update? 
 		//only the changed parameters or just the one theat was changed
@@ -1532,6 +1510,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("this->handledRecordsThisRun [$this->handledRecordsThisRun], this->maxRecordsEachRun [$this->maxRecordsEachRun]");
 					
 		$bulkUploadResult = new KalturaBulkUploadResult();
+		$bulkUploadResult->action = $action;
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		
 		$bulkUploadResult->lineIndex = $this->currentItem;

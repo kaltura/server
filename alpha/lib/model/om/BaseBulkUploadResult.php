@@ -56,10 +56,22 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	protected $partner_id;
 
 	/**
-	 * The value for the entry_id field.
+	 * The value for the object_id field.
 	 * @var        string
 	 */
-	protected $entry_id;
+	protected $object_id;
+
+	/**
+	 * The value for the object_type field.
+	 * @var        int
+	 */
+	protected $object_type;
+
+	/**
+	 * The value for the action field.
+	 * @var        int
+	 */
+	protected $action;
 
 	/**
 	 * The value for the entry_status field.
@@ -162,6 +174,12 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $plugins_data;
+
+	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -312,13 +330,33 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [entry_id] column value.
+	 * Get the [object_id] column value.
 	 * 
 	 * @return     string
 	 */
-	public function getEntryId()
+	public function getObjectId()
 	{
-		return $this->entry_id;
+		return $this->object_id;
+	}
+
+	/**
+	 * Get the [object_type] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getObjectType()
+	{
+		return $this->object_type;
+	}
+
+	/**
+	 * Get the [action] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getAction()
+	{
+		return $this->action;
 	}
 
 	/**
@@ -552,6 +590,16 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
+	}
+
+	/**
 	 * Set the value of [id] column.
 	 * 
 	 * @param      int $v new value
@@ -742,27 +790,73 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	} // setPartnerId()
 
 	/**
-	 * Set the value of [entry_id] column.
+	 * Set the value of [object_id] column.
 	 * 
 	 * @param      string $v new value
 	 * @return     BulkUploadResult The current object (for fluent API support)
 	 */
-	public function setEntryId($v)
+	public function setObjectId($v)
 	{
-		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ENTRY_ID]))
-			$this->oldColumnsValues[BulkUploadResultPeer::ENTRY_ID] = $this->entry_id;
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::OBJECT_ID]))
+			$this->oldColumnsValues[BulkUploadResultPeer::OBJECT_ID] = $this->object_id;
 
 		if ($v !== null) {
 			$v = (string) $v;
 		}
 
-		if ($this->entry_id !== $v) {
-			$this->entry_id = $v;
-			$this->modifiedColumns[] = BulkUploadResultPeer::ENTRY_ID;
+		if ($this->object_id !== $v) {
+			$this->object_id = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::OBJECT_ID;
 		}
 
 		return $this;
-	} // setEntryId()
+	} // setObjectId()
+
+	/**
+	 * Set the value of [object_type] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BulkUploadResult The current object (for fluent API support)
+	 */
+	public function setObjectType($v)
+	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::OBJECT_TYPE]))
+			$this->oldColumnsValues[BulkUploadResultPeer::OBJECT_TYPE] = $this->object_type;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->object_type !== $v) {
+			$this->object_type = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::OBJECT_TYPE;
+		}
+
+		return $this;
+	} // setObjectType()
+
+	/**
+	 * Set the value of [action] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     BulkUploadResult The current object (for fluent API support)
+	 */
+	public function setAction($v)
+	{
+		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ACTION]))
+			$this->oldColumnsValues[BulkUploadResultPeer::ACTION] = $this->action;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->action !== $v) {
+			$this->action = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::ACTION;
+		}
+
+		return $this;
+	} // setAction()
 
 	/**
 	 * Set the value of [entry_status] column.
@@ -1214,6 +1308,26 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	} // setPluginsData()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     BulkUploadResult The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = BulkUploadResultPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1251,24 +1365,27 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			$this->bulk_upload_job_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->line_index = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->partner_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-			$this->entry_id = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->entry_status = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-			$this->row_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->title = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-			$this->description = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->tags = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-			$this->url = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-			$this->content_type = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-			$this->conversion_profile_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
-			$this->access_control_profile_id = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-			$this->category = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-			$this->schedule_start_date = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-			$this->schedule_end_date = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->thumbnail_url = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->thumbnail_saved = ($row[$startcol + 20] !== null) ? (boolean) $row[$startcol + 20] : null;
-			$this->partner_data = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-			$this->error_description = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->plugins_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->object_id = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->object_type = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->action = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+			$this->entry_status = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->row_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->title = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->description = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+			$this->tags = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+			$this->url = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+			$this->content_type = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+			$this->conversion_profile_id = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+			$this->access_control_profile_id = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+			$this->category = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+			$this->schedule_start_date = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+			$this->schedule_end_date = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+			$this->thumbnail_url = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+			$this->thumbnail_saved = ($row[$startcol + 22] !== null) ? (boolean) $row[$startcol + 22] : null;
+			$this->partner_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+			$this->error_description = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+			$this->plugins_data = ($row[$startcol + 25] !== null) ? (string) $row[$startcol + 25] : null;
+			$this->custom_data = ($row[$startcol + 26] !== null) ? (string) $row[$startcol + 26] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1278,7 +1395,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 24; // 24 = BulkUploadResultPeer::NUM_COLUMNS - BulkUploadResultPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 27; // 27 = BulkUploadResultPeer::NUM_COLUMNS - BulkUploadResultPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating BulkUploadResult object", $e);
@@ -1499,6 +1616,8 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -1508,7 +1627,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 	}
 	
 	/**
@@ -1731,58 +1852,67 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 				return $this->getPartnerId();
 				break;
 			case 6:
-				return $this->getEntryId();
+				return $this->getObjectId();
 				break;
 			case 7:
-				return $this->getEntryStatus();
+				return $this->getObjectType();
 				break;
 			case 8:
-				return $this->getRowData();
+				return $this->getAction();
 				break;
 			case 9:
-				return $this->getTitle();
+				return $this->getEntryStatus();
 				break;
 			case 10:
-				return $this->getDescription();
+				return $this->getRowData();
 				break;
 			case 11:
-				return $this->getTags();
+				return $this->getTitle();
 				break;
 			case 12:
-				return $this->getUrl();
+				return $this->getDescription();
 				break;
 			case 13:
-				return $this->getContentType();
+				return $this->getTags();
 				break;
 			case 14:
-				return $this->getConversionProfileId();
+				return $this->getUrl();
 				break;
 			case 15:
-				return $this->getAccessControlProfileId();
+				return $this->getContentType();
 				break;
 			case 16:
-				return $this->getCategory();
+				return $this->getConversionProfileId();
 				break;
 			case 17:
-				return $this->getScheduleStartDate();
+				return $this->getAccessControlProfileId();
 				break;
 			case 18:
-				return $this->getScheduleEndDate();
+				return $this->getCategory();
 				break;
 			case 19:
-				return $this->getThumbnailUrl();
+				return $this->getScheduleStartDate();
 				break;
 			case 20:
-				return $this->getThumbnailSaved();
+				return $this->getScheduleEndDate();
 				break;
 			case 21:
-				return $this->getPartnerData();
+				return $this->getThumbnailUrl();
 				break;
 			case 22:
-				return $this->getErrorDescription();
+				return $this->getThumbnailSaved();
 				break;
 			case 23:
+				return $this->getPartnerData();
+				break;
+			case 24:
+				return $this->getErrorDescription();
+				break;
+			case 25:
 				return $this->getPluginsData();
+				break;
+			case 26:
+				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -1811,24 +1941,27 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 			$keys[3] => $this->getBulkUploadJobId(),
 			$keys[4] => $this->getLineIndex(),
 			$keys[5] => $this->getPartnerId(),
-			$keys[6] => $this->getEntryId(),
-			$keys[7] => $this->getEntryStatus(),
-			$keys[8] => $this->getRowData(),
-			$keys[9] => $this->getTitle(),
-			$keys[10] => $this->getDescription(),
-			$keys[11] => $this->getTags(),
-			$keys[12] => $this->getUrl(),
-			$keys[13] => $this->getContentType(),
-			$keys[14] => $this->getConversionProfileId(),
-			$keys[15] => $this->getAccessControlProfileId(),
-			$keys[16] => $this->getCategory(),
-			$keys[17] => $this->getScheduleStartDate(),
-			$keys[18] => $this->getScheduleEndDate(),
-			$keys[19] => $this->getThumbnailUrl(),
-			$keys[20] => $this->getThumbnailSaved(),
-			$keys[21] => $this->getPartnerData(),
-			$keys[22] => $this->getErrorDescription(),
-			$keys[23] => $this->getPluginsData(),
+			$keys[6] => $this->getObjectId(),
+			$keys[7] => $this->getObjectType(),
+			$keys[8] => $this->getAction(),
+			$keys[9] => $this->getEntryStatus(),
+			$keys[10] => $this->getRowData(),
+			$keys[11] => $this->getTitle(),
+			$keys[12] => $this->getDescription(),
+			$keys[13] => $this->getTags(),
+			$keys[14] => $this->getUrl(),
+			$keys[15] => $this->getContentType(),
+			$keys[16] => $this->getConversionProfileId(),
+			$keys[17] => $this->getAccessControlProfileId(),
+			$keys[18] => $this->getCategory(),
+			$keys[19] => $this->getScheduleStartDate(),
+			$keys[20] => $this->getScheduleEndDate(),
+			$keys[21] => $this->getThumbnailUrl(),
+			$keys[22] => $this->getThumbnailSaved(),
+			$keys[23] => $this->getPartnerData(),
+			$keys[24] => $this->getErrorDescription(),
+			$keys[25] => $this->getPluginsData(),
+			$keys[26] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1879,58 +2012,67 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 				$this->setPartnerId($value);
 				break;
 			case 6:
-				$this->setEntryId($value);
+				$this->setObjectId($value);
 				break;
 			case 7:
-				$this->setEntryStatus($value);
+				$this->setObjectType($value);
 				break;
 			case 8:
-				$this->setRowData($value);
+				$this->setAction($value);
 				break;
 			case 9:
-				$this->setTitle($value);
+				$this->setEntryStatus($value);
 				break;
 			case 10:
-				$this->setDescription($value);
+				$this->setRowData($value);
 				break;
 			case 11:
-				$this->setTags($value);
+				$this->setTitle($value);
 				break;
 			case 12:
-				$this->setUrl($value);
+				$this->setDescription($value);
 				break;
 			case 13:
-				$this->setContentType($value);
+				$this->setTags($value);
 				break;
 			case 14:
-				$this->setConversionProfileId($value);
+				$this->setUrl($value);
 				break;
 			case 15:
-				$this->setAccessControlProfileId($value);
+				$this->setContentType($value);
 				break;
 			case 16:
-				$this->setCategory($value);
+				$this->setConversionProfileId($value);
 				break;
 			case 17:
-				$this->setScheduleStartDate($value);
+				$this->setAccessControlProfileId($value);
 				break;
 			case 18:
-				$this->setScheduleEndDate($value);
+				$this->setCategory($value);
 				break;
 			case 19:
-				$this->setThumbnailUrl($value);
+				$this->setScheduleStartDate($value);
 				break;
 			case 20:
-				$this->setThumbnailSaved($value);
+				$this->setScheduleEndDate($value);
 				break;
 			case 21:
-				$this->setPartnerData($value);
+				$this->setThumbnailUrl($value);
 				break;
 			case 22:
-				$this->setErrorDescription($value);
+				$this->setThumbnailSaved($value);
 				break;
 			case 23:
+				$this->setPartnerData($value);
+				break;
+			case 24:
+				$this->setErrorDescription($value);
+				break;
+			case 25:
 				$this->setPluginsData($value);
+				break;
+			case 26:
+				$this->setCustomData($value);
 				break;
 		} // switch()
 	}
@@ -1962,24 +2104,27 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setBulkUploadJobId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setLineIndex($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setPartnerId($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setEntryId($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setEntryStatus($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setRowData($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setTitle($arr[$keys[9]]);
-		if (array_key_exists($keys[10], $arr)) $this->setDescription($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setTags($arr[$keys[11]]);
-		if (array_key_exists($keys[12], $arr)) $this->setUrl($arr[$keys[12]]);
-		if (array_key_exists($keys[13], $arr)) $this->setContentType($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setConversionProfileId($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setAccessControlProfileId($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setCategory($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setScheduleStartDate($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setScheduleEndDate($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setThumbnailUrl($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setThumbnailSaved($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setPartnerData($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setErrorDescription($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setPluginsData($arr[$keys[23]]);
+		if (array_key_exists($keys[6], $arr)) $this->setObjectId($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setObjectType($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setAction($arr[$keys[8]]);
+		if (array_key_exists($keys[9], $arr)) $this->setEntryStatus($arr[$keys[9]]);
+		if (array_key_exists($keys[10], $arr)) $this->setRowData($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setTitle($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setDescription($arr[$keys[12]]);
+		if (array_key_exists($keys[13], $arr)) $this->setTags($arr[$keys[13]]);
+		if (array_key_exists($keys[14], $arr)) $this->setUrl($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setContentType($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setConversionProfileId($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setAccessControlProfileId($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setCategory($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setScheduleStartDate($arr[$keys[19]]);
+		if (array_key_exists($keys[20], $arr)) $this->setScheduleEndDate($arr[$keys[20]]);
+		if (array_key_exists($keys[21], $arr)) $this->setThumbnailUrl($arr[$keys[21]]);
+		if (array_key_exists($keys[22], $arr)) $this->setThumbnailSaved($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setPartnerData($arr[$keys[23]]);
+		if (array_key_exists($keys[24], $arr)) $this->setErrorDescription($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setPluginsData($arr[$keys[25]]);
+		if (array_key_exists($keys[26], $arr)) $this->setCustomData($arr[$keys[26]]);
 	}
 
 	/**
@@ -1997,7 +2142,9 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID)) $criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $this->bulk_upload_job_id);
 		if ($this->isColumnModified(BulkUploadResultPeer::LINE_INDEX)) $criteria->add(BulkUploadResultPeer::LINE_INDEX, $this->line_index);
 		if ($this->isColumnModified(BulkUploadResultPeer::PARTNER_ID)) $criteria->add(BulkUploadResultPeer::PARTNER_ID, $this->partner_id);
-		if ($this->isColumnModified(BulkUploadResultPeer::ENTRY_ID)) $criteria->add(BulkUploadResultPeer::ENTRY_ID, $this->entry_id);
+		if ($this->isColumnModified(BulkUploadResultPeer::OBJECT_ID)) $criteria->add(BulkUploadResultPeer::OBJECT_ID, $this->object_id);
+		if ($this->isColumnModified(BulkUploadResultPeer::OBJECT_TYPE)) $criteria->add(BulkUploadResultPeer::OBJECT_TYPE, $this->object_type);
+		if ($this->isColumnModified(BulkUploadResultPeer::ACTION)) $criteria->add(BulkUploadResultPeer::ACTION, $this->action);
 		if ($this->isColumnModified(BulkUploadResultPeer::ENTRY_STATUS)) $criteria->add(BulkUploadResultPeer::ENTRY_STATUS, $this->entry_status);
 		if ($this->isColumnModified(BulkUploadResultPeer::ROW_DATA)) $criteria->add(BulkUploadResultPeer::ROW_DATA, $this->row_data);
 		if ($this->isColumnModified(BulkUploadResultPeer::TITLE)) $criteria->add(BulkUploadResultPeer::TITLE, $this->title);
@@ -2015,6 +2162,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(BulkUploadResultPeer::PARTNER_DATA)) $criteria->add(BulkUploadResultPeer::PARTNER_DATA, $this->partner_data);
 		if ($this->isColumnModified(BulkUploadResultPeer::ERROR_DESCRIPTION)) $criteria->add(BulkUploadResultPeer::ERROR_DESCRIPTION, $this->error_description);
 		if ($this->isColumnModified(BulkUploadResultPeer::PLUGINS_DATA)) $criteria->add(BulkUploadResultPeer::PLUGINS_DATA, $this->plugins_data);
+		if ($this->isColumnModified(BulkUploadResultPeer::CUSTOM_DATA)) $criteria->add(BulkUploadResultPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -2079,7 +2227,11 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
 		$copyObj->setPartnerId($this->partner_id);
 
-		$copyObj->setEntryId($this->entry_id);
+		$copyObj->setObjectId($this->object_id);
+
+		$copyObj->setObjectType($this->object_type);
+
+		$copyObj->setAction($this->action);
 
 		$copyObj->setEntryStatus($this->entry_status);
 
@@ -2114,6 +2266,8 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 		$copyObj->setErrorDescription($this->error_description);
 
 		$copyObj->setPluginsData($this->plugins_data);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -2194,4 +2348,121 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseBulkUploadResult

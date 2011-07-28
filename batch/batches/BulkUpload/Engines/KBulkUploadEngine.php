@@ -8,6 +8,12 @@
  */
 abstract class KBulkUploadEngine
 {
+	protected static $actionsMap = array(
+		KalturaBulkUploadAction::ADD => 'add',
+		KalturaBulkUploadAction::UPDATE => 'update',
+		KalturaBulkUploadAction::DELETE => 'delete',
+	);
+	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 
 	/**

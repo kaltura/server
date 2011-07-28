@@ -138,11 +138,11 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			{
 				/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
 				
-				if($this->operations[$index] == BulkUploadEngineXml::ADD_ACTION_STRING)
+				if($this->operations[$index] == KalturaBulkUploadAction::ADD)
 					$pluginsInstance->handleItemAdded($this->client, $cuePoint, $items[$index]);
-				elseif($this->operations[$index] == BulkUploadEngineXml::UPDATE_ACTION_STRING)
+				elseif($this->operations[$index] == KalturaBulkUploadAction::UPDATE)
 					$pluginsInstance->handleItemUpdated($this->client, $cuePoint, $items[$index]);
-				elseif($this->operations[$index] == BulkUploadEngineXml::DELETE_ACTION_STRING)
+				elseif($this->operations[$index] == KalturaBulkUploadAction::DELETE)
 					$pluginsInstance->handleItemDeleted($this->client, $cuePoint, $items[$index]);
 			}
 		}
@@ -189,7 +189,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			
 		$cuePoint->entryId = $this->entryId;
 		$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);
-		$this->operations[] = BulkUploadEngineXml::ADD_ACTION_STRING;
+		$this->operations[] = KalturaBulkUploadAction::ADD;
 		if($cuePoint->systemName)
 			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;
 			
@@ -209,13 +209,13 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		{
 			$cuePointId = $scene['sceneId'];
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
-			$this->operations[] = BulkUploadEngineXml::UPDATE_ACTION_STRING;
+			$this->operations[] = KalturaBulkUploadAction::UPDATE;
 		}
 		else 
 		{
 			$cuePoint->entryId = $this->entryId;
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);
-			$this->operations[] = BulkUploadEngineXml::ADD_ACTION_STRING;
+			$this->operations[] = KalturaBulkUploadAction::ADD;
 		}
 		if($cuePoint->systemName)
 			$this->ingested[$cuePoint->systemName] = $ingestedCuePoint;

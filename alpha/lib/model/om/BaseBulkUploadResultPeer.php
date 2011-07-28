@@ -26,7 +26,7 @@ abstract class BaseBulkUploadResultPeer {
 	const TM_CLASS = 'BulkUploadResultTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 24;
+	const NUM_COLUMNS = 27;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -49,8 +49,14 @@ abstract class BaseBulkUploadResultPeer {
 	/** the column name for the PARTNER_ID field */
 	const PARTNER_ID = 'bulk_upload_result.PARTNER_ID';
 
-	/** the column name for the ENTRY_ID field */
-	const ENTRY_ID = 'bulk_upload_result.ENTRY_ID';
+	/** the column name for the OBJECT_ID field */
+	const OBJECT_ID = 'bulk_upload_result.OBJECT_ID';
+
+	/** the column name for the OBJECT_TYPE field */
+	const OBJECT_TYPE = 'bulk_upload_result.OBJECT_TYPE';
+
+	/** the column name for the ACTION field */
+	const ACTION = 'bulk_upload_result.ACTION';
 
 	/** the column name for the ENTRY_STATUS field */
 	const ENTRY_STATUS = 'bulk_upload_result.ENTRY_STATUS';
@@ -103,6 +109,9 @@ abstract class BaseBulkUploadResultPeer {
 	/** the column name for the PLUGINS_DATA field */
 	const PLUGINS_DATA = 'bulk_upload_result.PLUGINS_DATA';
 
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'bulk_upload_result.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of BulkUploadResult objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -119,11 +128,11 @@ abstract class BaseBulkUploadResultPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'BulkUploadJobId', 'LineIndex', 'PartnerId', 'EntryId', 'EntryStatus', 'RowData', 'Title', 'Description', 'Tags', 'Url', 'ContentType', 'ConversionProfileId', 'AccessControlProfileId', 'Category', 'ScheduleStartDate', 'ScheduleEndDate', 'ThumbnailUrl', 'ThumbnailSaved', 'PartnerData', 'ErrorDescription', 'PluginsData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'bulkUploadJobId', 'lineIndex', 'partnerId', 'entryId', 'entryStatus', 'rowData', 'title', 'description', 'tags', 'url', 'contentType', 'conversionProfileId', 'accessControlProfileId', 'category', 'scheduleStartDate', 'scheduleEndDate', 'thumbnailUrl', 'thumbnailSaved', 'partnerData', 'errorDescription', 'pluginsData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::BULK_UPLOAD_JOB_ID, self::LINE_INDEX, self::PARTNER_ID, self::ENTRY_ID, self::ENTRY_STATUS, self::ROW_DATA, self::TITLE, self::DESCRIPTION, self::TAGS, self::URL, self::CONTENT_TYPE, self::CONVERSION_PROFILE_ID, self::ACCESS_CONTROL_PROFILE_ID, self::CATEGORY, self::SCHEDULE_START_DATE, self::SCHEDULE_END_DATE, self::THUMBNAIL_URL, self::THUMBNAIL_SAVED, self::PARTNER_DATA, self::ERROR_DESCRIPTION, self::PLUGINS_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'bulk_upload_job_id', 'line_index', 'partner_id', 'entry_id', 'entry_status', 'row_data', 'title', 'description', 'tags', 'url', 'content_type', 'conversion_profile_id', 'access_control_profile_id', 'category', 'schedule_start_date', 'schedule_end_date', 'thumbnail_url', 'thumbnail_saved', 'partner_data', 'error_description', 'plugins_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'BulkUploadJobId', 'LineIndex', 'PartnerId', 'ObjectId', 'ObjectType', 'Action', 'EntryStatus', 'RowData', 'Title', 'Description', 'Tags', 'Url', 'ContentType', 'ConversionProfileId', 'AccessControlProfileId', 'Category', 'ScheduleStartDate', 'ScheduleEndDate', 'ThumbnailUrl', 'ThumbnailSaved', 'PartnerData', 'ErrorDescription', 'PluginsData', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'bulkUploadJobId', 'lineIndex', 'partnerId', 'objectId', 'objectType', 'action', 'entryStatus', 'rowData', 'title', 'description', 'tags', 'url', 'contentType', 'conversionProfileId', 'accessControlProfileId', 'category', 'scheduleStartDate', 'scheduleEndDate', 'thumbnailUrl', 'thumbnailSaved', 'partnerData', 'errorDescription', 'pluginsData', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::BULK_UPLOAD_JOB_ID, self::LINE_INDEX, self::PARTNER_ID, self::OBJECT_ID, self::OBJECT_TYPE, self::ACTION, self::ENTRY_STATUS, self::ROW_DATA, self::TITLE, self::DESCRIPTION, self::TAGS, self::URL, self::CONTENT_TYPE, self::CONVERSION_PROFILE_ID, self::ACCESS_CONTROL_PROFILE_ID, self::CATEGORY, self::SCHEDULE_START_DATE, self::SCHEDULE_END_DATE, self::THUMBNAIL_URL, self::THUMBNAIL_SAVED, self::PARTNER_DATA, self::ERROR_DESCRIPTION, self::PLUGINS_DATA, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'bulk_upload_job_id', 'line_index', 'partner_id', 'object_id', 'object_type', 'action', 'entry_status', 'row_data', 'title', 'description', 'tags', 'url', 'content_type', 'conversion_profile_id', 'access_control_profile_id', 'category', 'schedule_start_date', 'schedule_end_date', 'thumbnail_url', 'thumbnail_saved', 'partner_data', 'error_description', 'plugins_data', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, )
 	);
 
 	/**
@@ -133,11 +142,11 @@ abstract class BaseBulkUploadResultPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'BulkUploadJobId' => 3, 'LineIndex' => 4, 'PartnerId' => 5, 'EntryId' => 6, 'EntryStatus' => 7, 'RowData' => 8, 'Title' => 9, 'Description' => 10, 'Tags' => 11, 'Url' => 12, 'ContentType' => 13, 'ConversionProfileId' => 14, 'AccessControlProfileId' => 15, 'Category' => 16, 'ScheduleStartDate' => 17, 'ScheduleEndDate' => 18, 'ThumbnailUrl' => 19, 'ThumbnailSaved' => 20, 'PartnerData' => 21, 'ErrorDescription' => 22, 'PluginsData' => 23, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'bulkUploadJobId' => 3, 'lineIndex' => 4, 'partnerId' => 5, 'entryId' => 6, 'entryStatus' => 7, 'rowData' => 8, 'title' => 9, 'description' => 10, 'tags' => 11, 'url' => 12, 'contentType' => 13, 'conversionProfileId' => 14, 'accessControlProfileId' => 15, 'category' => 16, 'scheduleStartDate' => 17, 'scheduleEndDate' => 18, 'thumbnailUrl' => 19, 'thumbnailSaved' => 20, 'partnerData' => 21, 'errorDescription' => 22, 'pluginsData' => 23, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::BULK_UPLOAD_JOB_ID => 3, self::LINE_INDEX => 4, self::PARTNER_ID => 5, self::ENTRY_ID => 6, self::ENTRY_STATUS => 7, self::ROW_DATA => 8, self::TITLE => 9, self::DESCRIPTION => 10, self::TAGS => 11, self::URL => 12, self::CONTENT_TYPE => 13, self::CONVERSION_PROFILE_ID => 14, self::ACCESS_CONTROL_PROFILE_ID => 15, self::CATEGORY => 16, self::SCHEDULE_START_DATE => 17, self::SCHEDULE_END_DATE => 18, self::THUMBNAIL_URL => 19, self::THUMBNAIL_SAVED => 20, self::PARTNER_DATA => 21, self::ERROR_DESCRIPTION => 22, self::PLUGINS_DATA => 23, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'bulk_upload_job_id' => 3, 'line_index' => 4, 'partner_id' => 5, 'entry_id' => 6, 'entry_status' => 7, 'row_data' => 8, 'title' => 9, 'description' => 10, 'tags' => 11, 'url' => 12, 'content_type' => 13, 'conversion_profile_id' => 14, 'access_control_profile_id' => 15, 'category' => 16, 'schedule_start_date' => 17, 'schedule_end_date' => 18, 'thumbnail_url' => 19, 'thumbnail_saved' => 20, 'partner_data' => 21, 'error_description' => 22, 'plugins_data' => 23, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'BulkUploadJobId' => 3, 'LineIndex' => 4, 'PartnerId' => 5, 'ObjectId' => 6, 'ObjectType' => 7, 'Action' => 8, 'EntryStatus' => 9, 'RowData' => 10, 'Title' => 11, 'Description' => 12, 'Tags' => 13, 'Url' => 14, 'ContentType' => 15, 'ConversionProfileId' => 16, 'AccessControlProfileId' => 17, 'Category' => 18, 'ScheduleStartDate' => 19, 'ScheduleEndDate' => 20, 'ThumbnailUrl' => 21, 'ThumbnailSaved' => 22, 'PartnerData' => 23, 'ErrorDescription' => 24, 'PluginsData' => 25, 'CustomData' => 26, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'bulkUploadJobId' => 3, 'lineIndex' => 4, 'partnerId' => 5, 'objectId' => 6, 'objectType' => 7, 'action' => 8, 'entryStatus' => 9, 'rowData' => 10, 'title' => 11, 'description' => 12, 'tags' => 13, 'url' => 14, 'contentType' => 15, 'conversionProfileId' => 16, 'accessControlProfileId' => 17, 'category' => 18, 'scheduleStartDate' => 19, 'scheduleEndDate' => 20, 'thumbnailUrl' => 21, 'thumbnailSaved' => 22, 'partnerData' => 23, 'errorDescription' => 24, 'pluginsData' => 25, 'customData' => 26, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::BULK_UPLOAD_JOB_ID => 3, self::LINE_INDEX => 4, self::PARTNER_ID => 5, self::OBJECT_ID => 6, self::OBJECT_TYPE => 7, self::ACTION => 8, self::ENTRY_STATUS => 9, self::ROW_DATA => 10, self::TITLE => 11, self::DESCRIPTION => 12, self::TAGS => 13, self::URL => 14, self::CONTENT_TYPE => 15, self::CONVERSION_PROFILE_ID => 16, self::ACCESS_CONTROL_PROFILE_ID => 17, self::CATEGORY => 18, self::SCHEDULE_START_DATE => 19, self::SCHEDULE_END_DATE => 20, self::THUMBNAIL_URL => 21, self::THUMBNAIL_SAVED => 22, self::PARTNER_DATA => 23, self::ERROR_DESCRIPTION => 24, self::PLUGINS_DATA => 25, self::CUSTOM_DATA => 26, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'bulk_upload_job_id' => 3, 'line_index' => 4, 'partner_id' => 5, 'object_id' => 6, 'object_type' => 7, 'action' => 8, 'entry_status' => 9, 'row_data' => 10, 'title' => 11, 'description' => 12, 'tags' => 13, 'url' => 14, 'content_type' => 15, 'conversion_profile_id' => 16, 'access_control_profile_id' => 17, 'category' => 18, 'schedule_start_date' => 19, 'schedule_end_date' => 20, 'thumbnail_url' => 21, 'thumbnail_saved' => 22, 'partner_data' => 23, 'error_description' => 24, 'plugins_data' => 25, 'custom_data' => 26, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, )
 	);
 
 	/**
@@ -213,7 +222,9 @@ abstract class BaseBulkUploadResultPeer {
 		$criteria->addSelectColumn(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID);
 		$criteria->addSelectColumn(BulkUploadResultPeer::LINE_INDEX);
 		$criteria->addSelectColumn(BulkUploadResultPeer::PARTNER_ID);
-		$criteria->addSelectColumn(BulkUploadResultPeer::ENTRY_ID);
+		$criteria->addSelectColumn(BulkUploadResultPeer::OBJECT_ID);
+		$criteria->addSelectColumn(BulkUploadResultPeer::OBJECT_TYPE);
+		$criteria->addSelectColumn(BulkUploadResultPeer::ACTION);
 		$criteria->addSelectColumn(BulkUploadResultPeer::ENTRY_STATUS);
 		$criteria->addSelectColumn(BulkUploadResultPeer::ROW_DATA);
 		$criteria->addSelectColumn(BulkUploadResultPeer::TITLE);
@@ -231,6 +242,7 @@ abstract class BaseBulkUploadResultPeer {
 		$criteria->addSelectColumn(BulkUploadResultPeer::PARTNER_DATA);
 		$criteria->addSelectColumn(BulkUploadResultPeer::ERROR_DESCRIPTION);
 		$criteria->addSelectColumn(BulkUploadResultPeer::PLUGINS_DATA);
+		$criteria->addSelectColumn(BulkUploadResultPeer::CUSTOM_DATA);
 	}
 
 	/**

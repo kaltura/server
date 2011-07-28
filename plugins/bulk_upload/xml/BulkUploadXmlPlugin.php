@@ -104,6 +104,13 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 * @return SimpleXMLElement
 	 */
 	public static function getBulkUploadMrssXml($batchJob){
+		
+		$actionsMap = array(
+			BulkUploadAction::ADD => 'add',
+			BulkUploadAction::UPDATE => 'update',
+			BulkUploadAction::DELETE => 'delete',
+		);
+		
 		$bulkUploadResults = BulkUploadResultPeer::retrieveByBulkUploadId($batchJob->getId());
 		if(!count($bulkUploadResults)){
 			return null;
@@ -138,7 +145,9 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			$result->addChild('errorDescription', self::stringToSafeXml($bulkUploadResult->getErrorDescription()));
 //			$result->addChild('entryStatus', self::stringToSafeXml($bulkUploadResult->getEntryStatus()));
 //			$result->addChild('entryStatusName', self::stringToSafeXml($title));
-//			$item->addChild('action', self::stringToSafeXml($title));
+
+			$action = (isset($actionsMap[$bulkUploadResult->getAction()]) ? $actionsMap[$bulkUploadResult->getAction()] : $actionsMap[BulkUploadAction::ADD]);
+			$item->addChild('action', $action);
 			
 			$entry = $bulkUploadResult->getEntry();
 			if(!$entry)

@@ -43,7 +43,9 @@ class BulkUploadResultTableMap extends TableMap {
 		$this->addColumn('BULK_UPLOAD_JOB_ID', 'BulkUploadJobId', 'INTEGER', false, null, null);
 		$this->addColumn('LINE_INDEX', 'LineIndex', 'INTEGER', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
-		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', false, 20, null);
+		$this->addColumn('OBJECT_ID', 'ObjectId', 'VARCHAR', false, 20, null);
+		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
+		$this->addColumn('ACTION', 'Action', 'INTEGER', false, null, null);
 		$this->addColumn('ENTRY_STATUS', 'EntryStatus', 'INTEGER', false, null, null);
 		$this->addColumn('ROW_DATA', 'RowData', 'VARCHAR', false, 1023, null);
 		$this->addColumn('TITLE', 'Title', 'VARCHAR', false, 127, null);
@@ -61,6 +63,7 @@ class BulkUploadResultTableMap extends TableMap {
 		$this->addColumn('PARTNER_DATA', 'PartnerData', 'VARCHAR', false, 4096, null);
 		$this->addColumn('ERROR_DESCRIPTION', 'ErrorDescription', 'VARCHAR', false, 255, null);
 		$this->addColumn('PLUGINS_DATA', 'PluginsData', 'VARCHAR', false, 9182, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 
