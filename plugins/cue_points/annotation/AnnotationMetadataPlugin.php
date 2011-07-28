@@ -17,7 +17,7 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			return $this;
 			
 		if($interface == 'IKalturaBulkUploadXmlHandler')
-			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::ANNOTATION, 'KalturaAnnotation');
+			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::ANNOTATION, 'KalturaAnnotation', 'scene-customData');
 			
 		return null;
 	}

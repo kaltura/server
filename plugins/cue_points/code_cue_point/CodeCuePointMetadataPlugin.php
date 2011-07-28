@@ -17,7 +17,7 @@ class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPendin
 			return $this;
 			
 		if($interface == 'IKalturaBulkUploadXmlHandler')
-			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::CODE_CUE_POINT, 'KalturaCodeCuePoint');
+			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::CODE_CUE_POINT, 'KalturaCodeCuePoint', 'scene-customData');
 			
 		return null;
 	}

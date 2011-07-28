@@ -17,7 +17,7 @@ class AdCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			return $this;
 			
 		if($interface == 'IKalturaBulkUploadXmlHandler')
-			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::AD_CUE_POINT, 'KalturaAdCuePoint');
+			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::AD_CUE_POINT, 'KalturaAdCuePoint', 'scene-customData');
 			
 		return null;
 	}
