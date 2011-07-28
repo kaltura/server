@@ -77,7 +77,7 @@ class IdeticDistributionProfile extends ConfigurableDistributionProfile
 	{
 	    $validationErrors = array();
     	$value = isset($allFieldValues[$fieldName]) ? $allFieldValues[$fieldName] : null;
-    	if (!is_null($value) && strlen($value) > 0 && !is_int($value))
+    	if (!is_null($value) && strlen($value) > 0 && !preg_match('/^([0-9])*$/', $value))
 		{		        
 		    $errorMsg = $this->getUserFriendlyFieldName($fieldName).' value must be an integer';
     		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));
