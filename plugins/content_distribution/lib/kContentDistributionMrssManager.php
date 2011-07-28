@@ -25,14 +25,15 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 		return self::$instance;
 	}
 	
-	/**
-	 * @param entry $entry
-	 * @param SimpleXMLElement $mrss
-	 * @return SimpleXMLElement
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::contributeToSchema()
 	 */
-	public function contribute(entry $entry, SimpleXMLElement $mrss)
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
 	{
-		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($entry->getId());
+		if(!($object instanceof entry))
+			return;
+			
+		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($object->getId());
 		foreach($entryDistributions as $entryDistribution)
 			$this->contributeDistribution($entryDistribution, $mrss);
 	}

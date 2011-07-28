@@ -21,14 +21,32 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 		return self::$instance;
 	}
 	
-	/**
-	 * @param entry $entry
-	 * @param SimpleXMLElement $mrss
-	 * @return SimpleXMLElement
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::contributeToSchema()
 	 */
-	public function contribute(entry $entry, SimpleXMLElement $mrss)
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
 	{
-		$metadatas = MetadataPeer::retrieveAllByObject(Metadata::TYPE_ENTRY, $entry->getId());
+		$objectType = null;
+		
+		if($object instanceof entry)
+		{
+			$objectType = Metadata::TYPE_ENTRY;
+		}
+		else
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
+			foreach($pluginInstances as $pluginInstance)
+			{
+				/* @var $pluginInstance IKalturaMetadataObjects */
+				$objectType = $pluginInstance->getObjectType(get_class($object));
+				if($objectType)
+					break;
+			}
+			if(!$objectType)
+				return;
+		}
+			
+		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $object->getId());
 		foreach($metadatas as $metadata)
 			$this->contributeMetadata($metadata, $mrss);
 	}

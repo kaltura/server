@@ -130,10 +130,13 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	/* (non-PHPdoc)
 	 * @see IKalturaMrssContributor::contributeToSchema()
 	 */
-	public function contribute(entry $entry, SimpleXMLElement $mrss)
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
 	{
+		if(!($object instanceof entry))
+			return;
+			
 		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, AttachmentPlugin::getAssetTypeCoreValue(AttachmentAssetType::ATTACHMENT));
-		$attachmentAssets = assetPeer::retrieveByEntryId($entry->getId(), $types);
+		$attachmentAssets = assetPeer::retrieveByEntryId($object->getId(), $types);
 		
 		foreach($attachmentAssets as $attachmentAsset)
 			$this->contributeAttachmentAssets($attachmentAsset, $mrss);

@@ -18,12 +18,17 @@ class kMetadataManager
 	 */
 	public static function getObjectPeer($objectType)
 	{
-		switch($objectType)
-		{
-			case Metadata::TYPE_ENTRY:
-				return new MetadataEntryPeer();
-		}
+		if($objectType == Metadata::TYPE_ENTRY)
+			return new MetadataEntryPeer();
 		
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
+		foreach($pluginInstances as $pluginInstance)
+		{
+			/* @var $pluginInstance IKalturaMetadataObjects */
+			$peer = $pluginInstance->getObjectPeer($objectType);
+			if($peer)
+				return $peer;
+		}
 		return null;
 	}
 	
@@ -417,6 +422,18 @@ class kMetadataManager
 		if(isset(self::$objectTypeNames[$objectType]))
 			return self::$objectTypeNames[$objectType];
 			
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaMetadataObjects');
+		foreach($pluginInstances as $pluginInstance)
+		{
+			/* @var $pluginInstance IKalturaMetadataObjects */
+			$className = $pluginInstance->getObjectClassName($objectType);
+			if($className)
+			{
+				self::$objectTypeNames[$objectType] = $className;
+				return $className;
+			}
+		}
+		
 		return null;
 	}
 	

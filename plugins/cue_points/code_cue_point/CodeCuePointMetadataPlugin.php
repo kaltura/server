@@ -3,7 +3,7 @@
  * Enable custom metadata on code cue point objects
  * @package plugins.codeCuePoint
  */
-class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaCuePointXmlParser
+class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaMetadataObjects, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'codeCuePointMetadata';
 	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';
@@ -53,6 +53,41 @@ class CodeCuePointMetadataPlugin extends KalturaPlugin implements IKalturaPendin
 			return array('CodeCuePointMetadataObjectType');
 			
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMetadataObjects::getObjectType()
+	 */
+	public static function getObjectType($className)
+	{
+		if(is_subclass_of($className, 'CodeCuePoint'))
+			return self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT);
+			
+		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMetadataObjects::getObjectClassName()
+	 */
+	public static function getObjectClassName($type)
+	{
+		$type = kPluginableEnumsManager::apiToCore('MetadataObjectType', $type);
+		if($type == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
+			return 'CodeCuePoint';
+			
+		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMetadataObjects::getObjectPeer()
+	 */
+	public static function getObjectPeer($type)
+	{
+		$type = kPluginableEnumsManager::apiToCore('MetadataObjectType', $type);
+		if($type == self::getMetadataObjectTypeCoreValue(CodeCuePointMetadataObjectType::CODE_CUE_POINT))
+			return new CuePointPeer();
+			
+		return null;
 	}
 	
 	public static function getMetadataObjectTypeCoreValue($valueName)

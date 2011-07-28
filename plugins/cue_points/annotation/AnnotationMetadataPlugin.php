@@ -3,7 +3,7 @@
  * Enable custom metadata on annotation objects
  * @package plugins.annotation
  */
-class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaCuePointXmlParser
+class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending, IKalturaMetadataObjects, IKalturaCuePointXmlParser
 {
 	const PLUGIN_NAME = 'annotationMetadata';
 	const METADATA_BULK_UPLOAD_XML_PLUGIN_NAME = 'metadataBulkUploadXml';
@@ -53,6 +53,41 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			return array('AnnotationMetadataObjectType');
 			
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMetadataObjects::getObjectType()
+	 */
+	public static function getObjectType($className)
+	{
+		if(is_subclass_of($className, 'Annotation'))
+			return self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION);
+			
+		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMetadataObjects::getObjectClassName()
+	 */
+	public static function getObjectClassName($type)
+	{
+		$type = kPluginableEnumsManager::apiToCore('MetadataObjectType', $type);
+		if($type == self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION))
+			return 'Annotation';
+			
+		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaMetadataObjects::getObjectPeer()
+	 */
+	public static function getObjectPeer($type)
+	{
+		$type = kPluginableEnumsManager::apiToCore('MetadataObjectType', $type);
+		if($type == self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION))
+			return new CuePointPeer();
+			
+		return null;
 	}
 	
 	public static function getMetadataObjectTypeCoreValue($valueName)

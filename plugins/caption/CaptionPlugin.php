@@ -138,10 +138,13 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	/* (non-PHPdoc)
 	 * @see IKalturaMrssContributor::contributeToSchema()
 	 */
-	public function contribute(entry $entry, SimpleXMLElement $mrss)
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
 	{
+		if(!($object instanceof entry))
+			return;
+			
 		$types = KalturaPluginManager::getExtendedTypes(assetPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), $types);
+		$captionAssets = assetPeer::retrieveByEntryId($object->getId(), $types);
 		
 		foreach($captionAssets as $captionAsset)
 			$this->contributeCaptionAssets($captionAsset, $mrss);
