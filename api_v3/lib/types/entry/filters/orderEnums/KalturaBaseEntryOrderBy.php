@@ -15,6 +15,10 @@ class KalturaBaseEntryOrderBy extends KalturaStringEnum
 	const UPDATED_AT_DESC = "-updatedAt";
 	const RANK_ASC = "+rank";
 	const RANK_DESC = "-rank";
+	const START_DATE_ASC = "+startDate";
+	const START_DATE_DESC = "-startDate";
+	const END_DATE_ASC = "+endDate";
+	const END_DATE_DESC = "-endDate";
 	const PARTNER_SORT_VALUE_ASC = "+partnerSortValue";
 	const PARTNER_SORT_VALUE_DESC = "-partnerSortValue";
 }
