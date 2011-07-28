@@ -283,6 +283,7 @@ class kMrssManager
 		$mrss->addChild('licenseType', $entry->getLicenseType());
 		$mrss->addChild('userId', $entry->getPuserId(true));
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
+		$mrss->addChild('status', self::stringToSafeXml($entry->getStatus()));
 		if($entry->getDescription())
 			$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
 		$thumbnailUrl = $mrss->addChild('thumbnailUrl');
