@@ -392,7 +392,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param array $noParamsThumbResources - Holds the no flavor params thumb resources
 	 * @return $requestResults - the multi request result
 	 */
-	protected function sendItemUpdateData($entryId, KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, 
+	protected function sendItemUpdateData($entryId, KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource = null, 
 										array $noParamsFlavorAssets, array $noParamsFlavorResources, 
 										array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
@@ -413,7 +413,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$updatedEntryId = $updatedEntry->replacingEntryId;
 		}
 					
-		$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource);
+		if($resource)
+			$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource);
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
@@ -569,7 +570,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param array $noParamsThumbResources
 	 * @return $requestResults - the multi request result
 	 */
-	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
+	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource = null, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
 		$this->startMultiRequest(true);
 		
@@ -581,7 +582,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->kClient->baseEntry->add($entry); //Adds the entry 
 		$newEntryId = $this->kClient->getMultiRequestResult()->id;							// TODO: use the return value of add instead of getMultiRequestResult
 		
-		$this->kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
+		if($resource)
+			$this->kClient->baseEntry->addContent($newEntryId, $resource); // adds the entry resources
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
@@ -705,8 +707,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @param KalturaResource $resource
 	 * @param SimpleXMLElement $elementToSearchIn
 	 */
-	protected function validateResource(KalturaResource $resource, SimpleXMLElement $elementToSearchIn)
+	protected function validateResource(KalturaResource $resource = null, SimpleXMLElement $elementToSearchIn)
 	{
+		if(!$resource)
+			return;
+			
 		//We only check for filesize and check sum in local files 
 		if($resource instanceof KalturaServerFileResource)
 		{
