@@ -52,6 +52,11 @@ if( count($allowedPartners) > 1 ) {
 					uiconf_id	: "<?php echo $content_uiconfs_flavorpreview->getId(); ?>",
 					swf_version	: "<?php echo $content_uiconfs_flavorpreview->getswfUrlVersion(); ?>"
 			},
+			clipapp : {
+				version	: "<?php echo kConf::get("clipapp_version"); ?>",
+				kdp		: "<?php echo $content_uiconds_clipapp_kdp->getId(); ?>",
+				kclip	: "<?php echo $content_uiconds_clipapp_kclip->getId(); ?>"
+			},
 			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
 			language	 : "<?php echo (isset($language) ? $language : '') ?>"
 		}

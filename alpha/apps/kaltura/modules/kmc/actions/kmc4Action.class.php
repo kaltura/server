@@ -145,6 +145,9 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconfs_upload_webcam = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_uploadWebCam", false, $kmcGeneralUiConf);
 		$this->content_uiconfs_upload_import = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_uploadImport", false, $kmcGeneralUiConf);
 
+		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
+		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
+
 		/** content KCW,KSE,KAE **/
 		//$this->content_uiconfs_upload = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_upload", false, $kmcGeneralUiConf);
 		//$this->simple_editor = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_simpleedit", false, $kmcGeneralUiConf);

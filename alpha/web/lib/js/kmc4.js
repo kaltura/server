@@ -143,6 +143,19 @@ kmc.functions = {
 	getAddPanelPosition : function() {
 		var el = $("#add").parent();
 		return (el.position().left + el.width() - 10);
+	},
+	openClipApp : function( entry_id, mode ) {
+		
+		var iframe_url = 'http://' + window.location.hostname + '/apps/clipapp/' + kmc.vars.clipapp.version;
+			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
+			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
+
+		kmc.layout.modal.open( {
+			'width' : 950,
+			'height' : 600,
+			'title'	: 'Clipping Application',
+			'content' : '<iframe src="' + iframe_url + '" width="100%" height="600"></iframe>'
+		} );
 	}
 };
 
@@ -465,9 +478,10 @@ kmc.mediator =  {
 
 kmc.preview_embed = {
 	// Should be changed to accept object with parameters
-	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors, html5_compatible) {
+	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, html5_compatible) {
 		kmc.log('doPreviewEmbed', arguments);
-		
+
+		var has_mobile_flavors = kmc.preview_embed.hasMobileFlavors( entry_flavors );
 		// default value for html5_compatible
 		html5_compatible = (html5_compatible) ? html5_compatible : false;
 		html5_compatible = (previewOnly) ? false : html5_compatible;
@@ -770,6 +784,31 @@ kmc.preview_embed = {
 			
 		var html = '<a href="' + url + '" target="_blank">' + url_text + '</a>';
 		$(".preview_url").html(html);
+	},
+	hasMobileFlavors : function( entry_flavors ) {
+		for(var i=0; i<entry_flavors.length; i++) {
+			var asset = entry_flavors[i];
+			// Add iPad Akamai flavor to iPad flavor Ids list
+			if( asset.fileExt == 'mp4' && asset.tags.indexOf('ipadnew') != -1 ){
+				return true;
+			}
+
+			// Add iPhone Akamai flavor to iPad&iPhone flavor Ids list
+			if( asset.fileExt == 'mp4' && asset.tags.indexOf('iphonenew') != -1 ){
+				return true;
+			}
+
+			// Check the tags to read what type of mp4 source
+			if( asset.fileExt == 'mp4' && asset.tags.indexOf('ipad') != -1 ){
+				return true;
+			}
+
+			// Check for iPhone src
+			if( asset.fileExt == 'mp4' && asset.tags.indexOf('iphone') != -1 ){
+				return true;
+			}
+		}
+		return false;
 	}
 };
 
@@ -1021,6 +1060,8 @@ kmc.user = {
 	},
 
 	logout: function() {
+		var message = kmc.functions.checkForOngoingProcess();
+		if( message ) { alert('message'); return false; }
 		var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
 		expiry = expiry.toGMTString();
 		document.cookie = "pid=; expires=" + expiry + "; path=/";
