@@ -69,7 +69,7 @@ function checkCache()
 				header("Content-Type: application/x-shockwave-flash");
 				header("Cache-Control: private, max-age=$max_age max-stale=0");
 				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+				header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
 				header("Content-Length: ".strlen($cachedResponse));
 				echo $cachedResponse;
 				die;
