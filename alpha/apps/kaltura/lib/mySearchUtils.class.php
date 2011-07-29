@@ -6,6 +6,7 @@ class mySearchUtils
 	const MODE_KSHOW = "KSHOW";
 	const MODE_ALL = "ALL";
 
+	const DISPLAY_IN_SEARCH_SYSTEM = -1;
 	const DISPLAY_IN_SEARCH_NONE = 0;
 	const DISPLAY_IN_SEARCH_PARTNER_ONLY = 1;
 	const DISPLAY_IN_SEARCH_KALTURA_NETWORK = 2;
