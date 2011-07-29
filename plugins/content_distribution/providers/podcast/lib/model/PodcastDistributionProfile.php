@@ -132,7 +132,7 @@ class PodcastDistributionProfile extends DistributionProfile
 		$podcastFeed = new genericSyndicationFeed();
 		$podcastFeed->setPartnerId($this->getPartnerId());
 		$podcastFeed->setStatus(SyndicationFeed::SYNDICATION_ACTIVE);
-		$podcastFeed->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
+		$podcastFeed->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$podcastFeed->setAllowEmbed(false);
 		$podcastFeed->setType(syndicationFeedType::KALTURA);
 		$podcastFeed->save();
@@ -179,7 +179,7 @@ class PodcastDistributionProfile extends DistributionProfile
 		// creates playlist based on the filter XML
 		$playlist = new entry();
 		$playlist->setKuserId(kCurrentContext::$uid);
-		$playlist->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
+		$playlist->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$playlist->setPartnerId($this->getPartnerId());
 		$playlist->setStatus(entryStatus::READY);
 		$playlist->setKshowId(null);

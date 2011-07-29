@@ -771,6 +771,8 @@ class KalturaEntryService extends KalturaBaseService
 			$pager->attachToCriteria($c);
 			
 		$entryFilter->attachToCriteria($c);
+		
+		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 			
 		return $c;
 	}
@@ -783,7 +785,6 @@ class KalturaEntryService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 		
 		$c = $this->prepareEntriesCriteriaFilter($filter, $pager, $partnerIdForScope);
-		//$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_NONE, Criteria::NOT_EQUAL);
 		
 		$list = entryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();

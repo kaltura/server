@@ -1474,7 +1474,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if(!$feed)
 			return;
 			
-		if($feed->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_NONE)
+		if($feed->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM)
 		{
 			$feed->setStatus(syndicationFeed::SYNDICATION_DELETED);
 			$feed->save();
@@ -1482,7 +1482,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		// deletes the playlist
 		$playlist = entryPeer::retrieveByPK($feed->getPlaylistId());
-		if($playlist && $playlist->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_NONE)
+		if($playlist && $playlist->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM)
 		{
 			$playlist->setStatus(entryStatus::DELETED);
 			$playlist->save();

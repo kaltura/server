@@ -147,7 +147,7 @@ class MediaService extends KalturaEntryService
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
 			
 			$tempDbEntry = $this->prepareEntryForInsert($tempMediaEntry);
-			$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_NONE);
+			$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 			$tempDbEntry->setPartnerId($dbEntry->getPartnerId());
 			$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 			$tempDbEntry->save();
