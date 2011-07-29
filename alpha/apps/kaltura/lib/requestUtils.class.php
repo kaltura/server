@@ -344,7 +344,7 @@ class requestUtils
 		return array($start, $end, $length);
 	}                  
 	
-	public static function sendCdnHeaders($ext, $content_length, $max_age = 8640000 , $mime = null, $private = false)
+	public static function sendCdnHeaders($ext, $content_length, $max_age = 8640000 , $mime = null, $private = false, $last_modified = null)
 	{
 		if ( $max_age === null ) $max_age = 8640000;
 		while(FALSE !== ob_get_clean());
@@ -383,7 +383,10 @@ class requestUtils
 			$cache_scope = $private ? "private" : "public";
 			header("Cache-Control: $cache_scope, max-age=$max_age max-stale=0");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-			header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+			if ($last_modified)
+				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . 'GMT');
+			else
+				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
 		}
 		else
 		{
