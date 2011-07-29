@@ -47,6 +47,7 @@ class IdeticDistributionProfile extends ConfigurableDistributionProfile
 			$allowedExts = explode(',', self::FLAVOR_VALID_FORMATS);
 			if (!in_array($fileExt, $allowedExts))
 			{
+				KalturaLog::debug('flavor asset id ['.$flavorAsset->getId().'] does not have a valid extension ['.$fileExt.']');
 				$errorMsg = 'Flavor format must be one of ['.self::FLAVOR_VALID_FORMATS.']';
 	    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);
 	    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);

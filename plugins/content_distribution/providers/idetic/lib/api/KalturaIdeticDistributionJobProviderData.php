@@ -46,13 +46,11 @@ class KalturaIdeticDistributionJobProviderData extends KalturaConfigurableDistri
 			
 		if(!($distributionJobData->distributionProfile instanceof KalturaIdeticDistributionProfile))
 			return;
-		
+			
+		$flavorAsset=null;
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
 		if(count($flavorAssets)) // if we have specific flavor assets for this distribution, grab the first one
 			$flavorAsset = reset($flavorAssets);
-		else // take the source asset
-			$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($distributionJobData->entryDistribution->entryId);
-		
 		if($flavorAsset) 
 		{
 			$this->flavorAssetUrl = $flavorAsset->getDownloadUrl();
