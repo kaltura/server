@@ -7,6 +7,7 @@
     <property name="installationZip"  value="TM-v5.0.0-beta.zip" override="true" />
     <property name="installationDir"  value="Kaltura-TM-v5.0.0" override="true" />
     <property name="installationLoc"  value="/web/content/kaltura_packages/drops/" override="true" />
+    <property name="phpMemLimit"  value="128M" override="true" />
     <property name="server"  value="hudsontest2.kaltura.dev" override="true" />
 
 
@@ -267,7 +268,7 @@
          <copy file="/opt/kaltura/app/configurations/apache/my_kaltura.conf" tofile="/opt/kaltura/app/configurations/apache/my_kaltura.conf.1" overwrite="true">
               <filterchain>
                    <replaceregexp>
-                       <regexp pattern="php_value memory_limit (\w+)" replace="php_value memory_limit 128M"/>
+                       <regexp pattern="php_value memory_limit (\w+)" replace="php_value memory_limit ${phpMemLimit}"/>
                    </replaceregexp>
               </filterchain>
          </copy>
