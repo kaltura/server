@@ -1239,13 +1239,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$entry->userId = (string)$item->userId;;
 		if(isset($item->licenseType))
 			$entry->licenseType = (string)$item->licenseType;
-		if(isset($item->accessControlId))
+		if(isset($item->accessControlId) || isset($item->accessControl))
 			$entry->accessControlId =  $this->getAccessControlId($item);
 		if(isset($item->startDate))
 			$entry->startDate = self::parseFormatedDate((string)$item->startDate);
 		if(isset($item->endDate))
 			$entry->endDate = self::parseFormatedDate((string)$item->endDate);
-		if(isset($item->conversionProfileId))
+		if(isset($item->conversionProfileId) || isset($item->conversionProfile))
 			$entry->conversionProfileId = $this->getConversionProfileId($item);
 		
 		return $entry;
