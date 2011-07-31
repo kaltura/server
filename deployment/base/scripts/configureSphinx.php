@@ -54,6 +54,10 @@ foreach($pluginInstances as $pluginName => $pluginInstance)
 }
 
 foreach ($sphinxConfigurationIndexs as $sphinxIndexName => $sphinxIndexValues){
+	
+	// applies default values
+	$sphinxIndexValues = kSphinxSearchManager::getSphinxDefaultConfig($sphinxIndexValues);
+	
 	fwrite($sphinxConfigHandler, 'index ' . $sphinxIndexName . PHP_EOL . '{' . PHP_EOL);
 	foreach ($sphinxIndexValues as $key => $value)
 		if ($key == 'fields'){
