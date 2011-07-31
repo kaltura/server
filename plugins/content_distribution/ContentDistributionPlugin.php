@@ -119,8 +119,9 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	 */
 	public static function getSearchData(BaseObject $object)
 	{
-		if($object instanceof entry)
-			return array (self::getSphinxFieldName(self::SPHINX_EXPENDER_FIELD_DATA) => kContentDistributionManager::getEntrySearchValues($object));
+		if(class_exists('ContentDistributionSphinxPlugin'))
+			if($object instanceof entry)
+				return array (ContentDistributionSphinxPlugin::getSphinxFieldName(self::SPHINX_EXPENDER_FIELD_DATA) => kContentDistributionManager::getEntrySearchValues($object));
 			
 		return null;
 	}
@@ -416,14 +417,5 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		';
 		
 		return $xsd;
-	}
-	
-	/**
-	 * 
-	 * return field name as appears in sphinx schema
-	 * @param string $fieldName
-	 */
-	public static function getSphinxFieldName($fieldName){
-		return self::PLUGIN_NAME . '_' . $fieldName;
 	}
 }
