@@ -342,9 +342,6 @@ class KalturaEntryService extends KalturaBaseService
         $syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $resource->getUrl(), $storageProfile);
 
-        if($isNewAsset)
-			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
-			
 		$dbFlavorParams = assetParamsPeer::retrieveByPK($dbAsset->getFlavorParamsId());
 		if($dbFlavorParams)
 		{
@@ -356,13 +353,14 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset->setTags($dbFlavorParams->getTags());
 		}
 		
-		if($dbAsset->getIsOriginal())
-			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
-		else
+		if(!$dbAsset->getIsOriginal())
 			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 			
 		$dbAsset->save();
 		
+        if($isNewAsset)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+			
 		return $dbAsset;
     }
     

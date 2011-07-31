@@ -805,6 +805,7 @@ class kJobsManager
 			$partner = $entry->getPartner();
 		
 			$conversionRequired = false;
+			$sourceIncludedInProfile = false;
 			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
 			$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
@@ -814,10 +815,11 @@ class kJobsManager
 				if($flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
 				{
 					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] is ingested source");
+					$sourceIncludedInProfile = true;
 					continue;
 				}
 			
-				if($flavor->getOrigin() == assetParamsOrigin::INGEST || $flavor->getFlavorParamsId() == $flavorAsset->getFlavorParamsId())
+				if($flavor->getOrigin() == assetParamsOrigin::INGEST)
 				{
 					KalturaLog::debug("Flavor [" . $flavor->getFlavorParamsId() . "] should be ingested");
 					continue;
@@ -860,6 +862,16 @@ class kJobsManager
 			}
 			else
 			{
+				if($flavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
+				{
+					if($sourceIncludedInProfile)
+						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+					else
+						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_DELETED);
+						
+					$flavorAsset->save();
+				}
+				
 				$entry->setStatus(entryStatus::READY);
 				$entry->save();
 			}
