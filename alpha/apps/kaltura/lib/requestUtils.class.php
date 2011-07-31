@@ -419,9 +419,17 @@ class requestUtils
 		}
 			
 		$remote_addr = null;
-		if ( isset ( $_SERVER['HTTP_X_REAL_IP'] ))
+
+		// support passing ip when proxying through apache. check the proxying server is indeed an internal server
+		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+		 	isset($_SERVER['HTTP_X_FORWARDED_SERVER']) &&
+		 	kConf::hasParam('remote_addr_header_server') &&
+		 	$_SERVER['HTTP_X_FORWARDED_SERVER'] == kConf::get('remote_addr_header_server') )
 		{
-			$remote_addr = @$_SERVER['HTTP_X_REAL_IP'];
+			// pick the last ip
+		 	$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
+			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
+			KalturaLog::log("getRemoteAddress [".@$_SERVER['HTTP_X_FORWARDED_FOR']."] [".$_SERVER['HTTP_X_FORWARDED_SERVER']."] [$remote_addr]");
 		}
 			
 		if (!$remote_addr && isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'] ) )
