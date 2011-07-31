@@ -5,7 +5,17 @@
  */
 class KalturaStatement extends PDOStatement
 {
+	protected static $dryRun = false;
+	
 	protected $values = array();
+	
+	/**
+	 * @param bool $dryRun
+	 */
+	public static function setDryRun($dryRun)
+	{
+		self::$dryRun = $dryRun;
+	}
 	
 	public function bindValue ($parameter, $value, $data_type = null)
 	{
@@ -41,8 +51,15 @@ class KalturaStatement extends PDOStatement
 		KalturaLog::debug($sql);
 		
 		$sqlStart = microtime(true);
-		parent::execute($input_parameters);
-		KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+		if(self::$dryRun)
+		{
+			KalturaLog::debug("Sql dry run - " . (microtime(true) - $sqlStart) . " seconds");
+		}
+		else
+		{
+			parent::execute($input_parameters);
+			KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
+		}
 	}
 	
 }
