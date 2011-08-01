@@ -17,6 +17,10 @@ class KalturaPDO extends PropelPDO
 		return parent::exec($sql);
 	}
 
+	/**
+	 * @see PDO::query()
+	 * @return KalturaStatement
+	 */
 	public function query()
 	{
 		$args	= func_get_args();
