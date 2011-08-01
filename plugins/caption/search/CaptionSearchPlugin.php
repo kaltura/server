@@ -124,9 +124,9 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		return null;
 	}
 	
-	public function getCaptionSearchData(entry $entry)
+	public static function getCaptionSearchData(entry $entry)
 	{
-		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(self::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 		if(!$captionAssets || !count($captionAssets))
 			return null;
 			
