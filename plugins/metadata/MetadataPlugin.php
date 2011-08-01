@@ -410,6 +410,14 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 							
 						$fieldValue = $value;
 					}
+					
+					if($metadataProfileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT && !is_numeric($fieldValue))
+					{
+						$errorMessage = "Could not parse int format [$fieldValue] for field [$key]";
+						KalturaLog::debug($errorMessage);
+						self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
+						continue;
+					}
 						
 					self::addXpath($xml, $metadataProfileField->getXpath(), $fieldValue);
 				}
