@@ -21,9 +21,14 @@ class accessControlScope
 	protected $ks;
 	
 	/**
-	 * @var strign
+	 * @var string
 	 */
 	protected $entryId;
+	
+	/**
+	 * @var string
+	 */
+	protected $userAgent;
 	
 	/**
 	 * @param string $v
@@ -58,6 +63,13 @@ class accessControlScope
 	}
 	
 	/**
+	 * @param string $userAgent
+	 */
+	public function setUserAgent($userAgent) {
+		$this->userAgent = $userAgent;
+	}
+	
+	/**
 	 * @return string
 	 */
 	public function getReferrer()
@@ -87,8 +99,15 @@ class accessControlScope
 	public function getEntryId()
 	{
 		return $this->entryId;
-	}
+	}	
 	
+	/**
+	 * @return string the $userAgent
+	 */
+	public function getUserAgent() {
+		return $this->userAgent;
+	}
+
 	/**
 	 * @return accessControlScope
 	 */
@@ -97,6 +116,9 @@ class accessControlScope
 		$scope = new accessControlScope();
 		$scope->setIp(requestUtils::getRemoteAddress());
 		$scope->setReferrer(isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : null);
+		$scope->setUserAgent(isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null);
 		return $scope;
 	}
+	
+	
 }

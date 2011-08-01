@@ -24,6 +24,9 @@ class KalturaRestrictionFactory
 			case "ipAddressRestriction":
 				$obj = new KalturaIpAddressRestriction();
 				break;
+			case "userAgentRestriction":
+				$obj = new KalturaUserAgentRestriction();
+				break;
 			default:
 				$obj = new KalturaBaseRestriction();
 				break;
@@ -55,6 +58,9 @@ class KalturaRestrictionFactory
 				break;
 			case "KalturaIpAddressRestriction":
 				$obj = new ipAddressRestriction();
+				break;
+			case "KalturaUserAgentRestriction":
+				$obj = new userAgentRestriction();
 				break;
 		}
 		return $obj;

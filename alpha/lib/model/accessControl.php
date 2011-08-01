@@ -24,6 +24,7 @@ class accessControl extends BaseaccessControl
 	
 	
 	const IP_ADDRESS_RESTRICTION_COLUMN_NAME = 'ip_address_restriction';
+	const USER_AGENT_RESTRICTION_COLUMN_NAME = 'user_agent_restriction';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -135,7 +136,8 @@ class accessControl extends BaseaccessControl
 			$this->hasSessionRestriction() ||
 			$this->hasPreviewRestriction() ||
 			$this->hasDirectoryRestriction() ||
-			$this->hasIpAddressRestriction()
+			$this->hasIpAddressRestriction() ||
+			$this->hasUserAgentRestriction()
 		);
 	}
 	
@@ -165,6 +167,9 @@ class accessControl extends BaseaccessControl
 			
 		if ($this->hasIpAddressRestriction())
 			$restrictions[] = $this->getIpAddressRestriction();
+			
+		if ($this->hasUserAgentRestriction())
+			$restrictions[] = $this->getUserAgentRestriction();
 			
 		return $restrictions;
 	}
@@ -200,6 +205,7 @@ class accessControl extends BaseaccessControl
 		parent::setPrvRestrictLength(null);
 		parent::setKdirRestrictType(null);
 		$this->setIpAddressRestriction(null);
+		$this->setUserAgentRestriction(null);
 	}
 	
 	/**
@@ -229,6 +235,9 @@ class accessControl extends BaseaccessControl
 				break;
 			case "ipAddressRestriction":
 				$this->setIpAddressRestriction($restriction);
+				break;
+			case "userAgentRestriction":
+				$this->setUserAgentRestriction($restriction);
 				break;
 		}
 	}
@@ -372,6 +381,7 @@ class accessControl extends BaseaccessControl
 		parent::setKdirRestrictType($restrinction->getType());
 	}
 	
+	/* IP restriction */
 	
 	public function getIpAddressRestriction()
 	{
@@ -392,6 +402,29 @@ class accessControl extends BaseaccessControl
 	{
 		$restrictionString = is_null($restriction) ? null : $restriction->toString();
 		$this->putInCustomData(self::IP_ADDRESS_RESTRICTION_COLUMN_NAME, $restrictionString);
+	}
+	
+	/* User agent restriction */
+	
+	public function getUserAgentRestriction()
+	{
+		if (!$this->hasUserAgentRestriction())
+			return null;
+					
+		$restriction = new userAgentRestriction($this);
+		$restriction->populateFromString($this->getFromCustomData(self::USER_AGENT_RESTRICTION_COLUMN_NAME));
+		return $restriction;
+	}
+	
+	public function hasUserAgentRestriction()
+	{
+		return $this->getFromCustomData(self::USER_AGENT_RESTRICTION_COLUMN_NAME) !== null;
+	}
+	
+	public function setUserAgentRestriction(userAgentRestriction $restriction = null)
+	{
+		$restrictionString = is_null($restriction) ? null : $restriction->toString();
+		$this->putInCustomData(self::USER_AGENT_RESTRICTION_COLUMN_NAME, $restrictionString);
 	}
 	
 	
