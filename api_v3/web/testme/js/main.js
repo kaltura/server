@@ -42,7 +42,9 @@ KTestMe.prototype = {
 	codeGenerator: null,
 	
 	actionInfo: null,
-		
+
+	loadedTypes: {},
+			
 	bindToElements: function() {
 		this.jqActions = jQuery("select[name=action]");
 		this.jqServices = jQuery("select[name=service]");
@@ -119,8 +121,10 @@ KTestMe.prototype = {
 					this.addEnumField(this.jqActionParams, param);
 				else if (param.isArray)
 					this.addArrayField(this.jqActionParams, param);
-				else 
+				else{
+					param.level = 0;
 					this.addObjectField(this.jqActionParams, param);
+				}
 			}
 			else if (param.isFile)
 			{
@@ -243,6 +247,10 @@ KTestMe.prototype = {
 	},
 	
 	addObjectField: function(/*jQuery*/ container, param, inArray) {
+
+		param.level++;
+		if(param.level > 3)
+			return;
 		
 		var jqObjectType = jQuery("<select id=\"object-type-" + param.name.replace(/:/g, "_") + "\" class=\"object-type\">");
 		jqObjectType.append("<option>" + param.type + "</option>");
@@ -258,14 +266,16 @@ KTestMe.prototype = {
 			
 			if (property.isReadOnly)
 				return;
-
+			
 			property.name = param.name + ":" + property.name;
 			if (property.isEnum || property.isStringEnum)
 				scope.addEnumField(jqObjectProperties, property);
 			else if (property.isArray)
 				scope.addArrayField(jqObjectProperties, property);
-			else if (property.isComplexType)
+			else if (property.isComplexType){
+				property.level = param.level;
 				scope.addObjectField(jqObjectProperties, property);
+			}
 			else if (property.isFile)
 				scope.addFileField(jqObjectProperties, property);
 			else
@@ -345,43 +355,56 @@ KTestMe.prototype = {
 		
 		jqObject.append(jqObjectTitle);
 		container.append(jqObject);
+		
+		if(scope.loadedTypes[param.type]){
+			scope.onSubTypesLoaded(scope.loadedTypes[param.type], param, jqObjectType, objectTypesProps);
+		}
+		else{
+			jQuery.getJSON(
+				"ajax-get-type-subclasses.php",
+				{ "type": param.type },
+				delegate(this, function(subTypes){
+					scope.loadedTypes[param.type] = subTypes;
+					scope.onSubTypesLoaded(subTypes, param, jqObjectType, objectTypesProps);
+				})
+			);
+		}
+	},
+		
+	onSubTypesLoaded: function(subTypes, param, jqObjectType, objectTypesProps) {
 
-		jQuery.getJSON(
-			"ajax-get-type-subclasses.php",
-			{ "type": param.type },
-			delegate(this, function(subTypes){
+		for(var i = 0; i < subTypes.length; i++)
+		{
+			var subType = subTypes[i];
+			jqObjectType.append("<option>" + subType.type + "</option>");
+
+
+			var jqObjectProperties = jQuery("<div class=\"object-properties\">");
+			jqObjectProperties.attr("id", "object-props-" + param.name + "-" + subType.type);
+			objectTypesProps[subType.type] = jqObjectProperties;
+
+			var scope = this;
+			jQuery.each(subType.properties, delegate(this, function (i, property) {
 				
-				for(var i = 0; i < subTypes.length; i++)
-				{
-					var subType = subTypes[i];
-					jqObjectType.append("<option>" + subType.type + "</option>");
+				if (property.isReadOnly)
+					return;
 
-
-					var jqObjectProperties = jQuery("<div class=\"object-properties\">");
-					jqObjectProperties.attr("id", "object-props-" + param.name + "-" + subType.type);
-					objectTypesProps[subType.type] = jqObjectProperties;
-
-					jQuery.each(subType.properties, delegate(this, function (i, property) {
-						
-						if (property.isReadOnly)
-							return;
-
-						property.name = param.name + ":" + property.name;
-						
-						if (property.isEnum || property.isStringEnum)
-							scope.addEnumField(jqObjectProperties, property);
-						else if (property.isArray)
-							scope.addArrayField(jqObjectProperties, property);
-						else if (property.isComplexType)
-							scope.addObjectField(jqObjectProperties, property);
-						else if (property.isFile)
-							scope.addFileField(jqObjectProperties, property);
-						else
-							scope.addSimpleField(jqObjectProperties, property);
-					}));
+				property.name = param.name + ":" + property.name;
+				
+				if (property.isEnum || property.isStringEnum)
+					scope.addEnumField(jqObjectProperties, property);
+				else if (property.isArray)
+					scope.addArrayField(jqObjectProperties, property);
+				else if (property.isComplexType){
+					property.level = param.level;
+					scope.addObjectField(jqObjectProperties, property);
 				}
-			})
-		);
+				else if (property.isFile)
+					scope.addFileField(jqObjectProperties, property);
+				else
+					scope.addSimpleField(jqObjectProperties, property);
+			}));
+		}
 	},
 	
 	addEnumField: function(/*jQuery*/ container, param) {
@@ -451,6 +474,7 @@ KTestMe.prototype = {
 		jqAdd.click(delegate(this, function(e){
 			var theParam = $.evalJSON($.toJSON(param.arrayType)); // clone
 			theParam.name = param.name + ":" + index;
+			theParam.level = 0;
 			scope.addObjectField(jqArray, theParam, true);
 			index++;
 		}));
