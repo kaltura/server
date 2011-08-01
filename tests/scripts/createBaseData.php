@@ -197,9 +197,9 @@ class KalturaTestDeploymentHelper
 			$kmc_general = KalturaTestDeploymentHelper::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcgeneral", false, $kmcGeneralUiConf);
 			$kmc_permissions = KalturaTestDeploymentHelper::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcpermissions", false, $kmcGeneralUiConf);
 
-			KalturaGlobalData::setData("@TEST_PARTNER_KMC_UI_CONF@", $kmc_general->id);
-			KalturaGlobalData::setData("@TEST_PARTNER_PERMISSIONS_UI_CONF@", $kmc_permissions->id);
-			KalturaGlobalData::setData("@TEST_PARTNER_DASHBOARD_UI_CONF@", $kmc_general->id); // TODO: fix this and see what is the real uiConf needed here
+			KalturaGlobalData::setData("@TEST_PARTNER_KMC_UI_CONF@", $kmc_general->getId());
+			KalturaGlobalData::setData("@TEST_PARTNER_PERMISSIONS_UI_CONF@", $kmc_permissions->getId());
+			KalturaGlobalData::setData("@TEST_PARTNER_DASHBOARD_UI_CONF@", $kmc_general->getId()); // TODO: fix this and see what is the real uiConf needed here
 			KalturaGlobalData::setData("@TEST_PARTNER_USER_ID@", KalturaTestDeploymentHelper::$partner->adminUserId);
 		}
 		
