@@ -185,16 +185,17 @@ class KalturaTestDeploymentHelper
 		//if we are on local host then we can fins the KMC ui Confs (through the server side)
 		if($client->getConfig()->serviceUrl == "http://localhost/") 
 		{
+			//WE need to get the 
 			$kmc_swf_version = kConf::get('kmc_version');
 		
 			/** uiconf listing work **/
 			/** fill $this->confs with all uiconf objects for all modules **/
-			$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc', $kmc_swf_version , self::SYSTEM_DEFAULT_PARTNER);
+			$kmcGeneralUiConf = KalturaTestDeploymentHelper::getAllKMCUiconfs('kmc', $kmc_swf_version , self::SYSTEM_DEFAULT_PARTNER);
 			
 			/** for each module, create separated lists of its uiconf, for each need **/
 			/** kmc general uiconfs **/
-			$kmc_general = kmcUtils::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcgeneral", false, $kmcGeneralUiConf);
-			$kmc_permissions = kmcUtils::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcpermissions", false, $kmcGeneralUiConf);
+			$kmc_general = KalturaTestDeploymentHelper::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcgeneral", false, $kmcGeneralUiConf);
+			$kmc_permissions = KalturaTestDeploymentHelper::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcpermissions", false, $kmcGeneralUiConf);
 
 			KalturaGlobalData::setData("@TEST_PARTNER_KMC_UI_CONF@", $kmc_general->id);
 			KalturaGlobalData::setData("@TEST_PARTNER_PERMISSIONS_UI_CONF@", $kmc_permissions->id);
@@ -234,5 +235,73 @@ class KalturaTestDeploymentHelper
 			
 		$flavorAssest = $client->flavorParams->listAction();
 		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
+	}
+	
+	/**
+	 * 
+	 * Gets all the kmc ui confs
+	 * @param string $module_tag
+	 * @param string $module_version
+	 * @param int $template_partner_id
+	 */
+	public static function getAllKMCUiconfs($module_tag, $module_version, $template_partner_id)
+	{
+		$c = new Criteria();
+		$c->addAnd(uiConfPeer::PARTNER_ID, $template_partner_id);
+		$c->addAnd(uiConfPeer::TAGS, "%".$module_tag."\_".$module_version."%", Criteria::LIKE);
+		$c->addAnd(uiConfPeer::TAGS, "%autodeploy%", Criteria::LIKE);
+		return uiConfPeer::doSelect($c);
+	}
+	
+	/**
+	 * 
+	 * Finds the ui confs by theie usage tag 
+	 * @param array $confs
+	 * @param unknown_type $tag
+	 * @param bool $allow_array
+	 * @param array $alternateConfs
+	 */
+	public static function find_confs_by_usage_tag($confs, $tag, $allow_array = false, $alternateConfs = array())
+	{
+	  $uiconfs = array();
+	  foreach($confs as $uiconf)
+	  {
+	    $tags = explode(",", $uiconf->getTags());
+	    $trimmed_tags = kmcUtils::TrimArray($tags);
+	    if(in_array($tag, $trimmed_tags))
+	    {
+		if($allow_array)
+		{
+			$uiconfs[] = $uiconf;
+		}
+		else
+		{
+			return $uiconf;
+		}
+	    }
+	  }
+	  
+	  if($allow_array)
+	  {
+		// if we didnt find uiconfs and we have alternate uiconf list -
+		// 	call myself with the alternate uiconfs, return whatever was returned.
+		if(!count($uiconfs) && count($alternateConfs))
+		{
+			return self::find_confs_by_usage_tag($alternateConfs, $tag, $allow_array);
+		}
+		// we either found uiconfs from the template or we didn't find but we don't have alternate
+		return $uiconfs;
+	  }
+	  
+	  // requested single and not array, and no valid uiconf found. try calling myself with alternate
+	  if(!count($alternateConfs))
+	  {
+		return new uiConf();
+		
+	  }
+	  else
+	  {
+		return self::find_confs_by_usage_tag($alternateConfs, $tag, $allow_array);
+	  }
 	}
 }
