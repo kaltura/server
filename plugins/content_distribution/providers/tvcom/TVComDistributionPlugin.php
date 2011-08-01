@@ -2,7 +2,7 @@
 /**
  * @package plugins.tvComDistribution
  */
-class TVComDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices
+class TVComDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'tvComDistribution';
 	const TVCOM_EVENT_CONSUMER = "kTVComFlowManager";
@@ -193,5 +193,19 @@ class TVComDistributionPlugin extends KalturaPlugin implements IKalturaPermissio
 		return array(
 			'tvCom' => 'TVComService'
 		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+	
+		if($configName == 'testme')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
+			
+		return null;
 	}
 }
