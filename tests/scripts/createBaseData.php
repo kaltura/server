@@ -36,6 +36,8 @@ $client = new KalturaClient($config); // create a client for the new partner
 $ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType::ADMIN, $newPartner->id, null, null);
 $client->setKs($ks);
 
+KalturaTestDeploymentHelper::setPartner($newPartner);
+
 KalturaTestDeploymentHelper::addBaseData($client);
 
 KalturaTestDeploymentHelper::addPermissions($client);
@@ -48,6 +50,31 @@ KalturaTestDeploymentHelper::addPermissions($client);
  */
 class KalturaTestDeploymentHelper
 {
+	/**
+	 * 
+	 * The deployment new created partner
+	 * @var KalturaPartner
+	 */
+	private static $partner = null;
+	
+	/**
+	 * 
+	 * The system default partner
+	 * @var int
+	 */
+	const SYSTEM_DEFAULT_PARTNER = 0;
+	
+	/**
+	 * 
+	 * Sets the deploymenr helper partner
+	 * @param KalturaPartner - The test partner
+	 */
+	public static function setPartner($partner)
+	{
+		KalturaTestDeploymentHelper::$partner = $partner;
+		
+	}
+	
 	/**
 	 * 
 	 * Creates a default test partner
@@ -153,8 +180,27 @@ class KalturaTestDeploymentHelper
 	 */
 	public static function addBaseData($client)
 	{
-		$uiConfs = $client->uiConf->listAction();
-		KalturaGlobalData::setData("@UI_CONF_ID@", $uiConfs->objects[0]->id);
+		$partnerId = KalturaTestDeploymentHelper::$partner->id;
+		
+		//if we are on local host then we can fins the KMC ui Confs (through the server side)
+		if($client->getConfig()->serviceUrl == "http://localhost/") 
+		{
+			$kmc_swf_version = kConf::get('kmc_version');
+		
+			/** uiconf listing work **/
+			/** fill $this->confs with all uiconf objects for all modules **/
+			$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc', $kmc_swf_version , self::SYSTEM_DEFAULT_PARTNER);
+			
+			/** for each module, create separated lists of its uiconf, for each need **/
+			/** kmc general uiconfs **/
+			$kmc_general = kmcUtils::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcgeneral", false, $kmcGeneralUiConf);
+			$kmc_permissions = kmcUtils::find_confs_by_usage_tag($kmcGeneralUiConf, "kmc_kmcpermissions", false, $kmcGeneralUiConf);
+
+			KalturaGlobalData::setData("@TEST_PARTNER_KMC_UI_CONF@", $kmc_general->id);
+			KalturaGlobalData::setData("@TEST_PARTNER_PERMISSIONS_UI_CONF@", $kmc_permissions->id);
+			KalturaGlobalData::setData("@TEST_PARTNER_DASHBOARD_UI_CONF@", $kmc_general->id); // TODO: fix this and see what is the real uiConf needed here
+			KalturaGlobalData::setData("@TEST_PARTNER_USER_ID@", KalturaTestDeploymentHelper::$partner->adminUserId);
+		}
 		
 		$accessControls = $client->accessControl->listAction();
 		KalturaGlobalData::setData("@DEFAULT_ACCESS_CONTROL@", $accessControls->objects[0]->id);
