@@ -391,7 +391,7 @@ abstract class BaseconversionProfile2Peer {
 		$queryResult = conversionProfile2Peer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
 		if($criteria instanceof KalturaCriteria)
-			$criteria->sortOrderBy($queryResult);
+			$criteria->applyResultsSort($queryResult);
 		
 		if ($cacheKey !== null)
 		{

@@ -327,7 +327,7 @@ abstract class BaseDynamicEnumPeer {
 		$queryResult = DynamicEnumPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
 		if($criteria instanceof KalturaCriteria)
-			$criteria->sortOrderBy($queryResult);
+			$criteria->applyResultsSort($queryResult);
 		
 		if ($cacheKey !== null)
 		{

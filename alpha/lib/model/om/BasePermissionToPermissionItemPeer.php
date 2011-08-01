@@ -331,7 +331,7 @@ abstract class BasePermissionToPermissionItemPeer {
 		$queryResult = PermissionToPermissionItemPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
 		if($criteria instanceof KalturaCriteria)
-			$criteria->sortOrderBy($queryResult);
+			$criteria->applyResultsSort($queryResult);
 		
 		if ($cacheKey !== null)
 		{

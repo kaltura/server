@@ -359,7 +359,7 @@ abstract class BaseSchedulerStatusPeer {
 		$queryResult = SchedulerStatusPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
 		if($criteria instanceof KalturaCriteria)
-			$criteria->sortOrderBy($queryResult);
+			$criteria->applyResultsSort($queryResult);
 		
 		if ($cacheKey !== null)
 		{
