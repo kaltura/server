@@ -260,7 +260,7 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		\$queryResult = ".$this->getPeerClassname()."::populateObjects(".$this->basePeerClassname."::doSelect(\$criteria, \$con));
 		
 		if(\$criteria instanceof KalturaCriteria)
-			\$criteria->sortOrderBy(\$queryResult);
+			\$criteria->applyResultsSort(\$queryResult);
 		
 		if (\$cacheKey !== null)
 		{
