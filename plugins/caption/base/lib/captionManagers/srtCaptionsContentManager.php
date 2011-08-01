@@ -10,7 +10,16 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	 */
 	public function parse($content)
 	{
-		
+		// TODO
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kCaptionsContentManager::getContent()
+	 */
+	public function getContent($content)
+	{
+		// TODO remove time by regex
+		return $content;
 	}
 	
 	/**

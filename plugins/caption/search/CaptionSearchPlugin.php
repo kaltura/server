@@ -137,6 +137,11 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			if(!$content)
 				continue;
 				
+	    	$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getFormat());
+	    	$content = $captionsContentManager->getContent($content);
+	    	if(!$content)
+	    		continue;
+	    	
 			$data[] = $captionAsset->getId() . " ca_prefix $content ca_sufix";
 		}
 		

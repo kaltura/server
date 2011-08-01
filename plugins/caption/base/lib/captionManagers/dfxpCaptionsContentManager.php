@@ -49,6 +49,24 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		return $itemsData;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see kCaptionsContentManager::getContent()
+	 */
+	public function getContent($content)
+	{
+		$xml = new DOMDocument();
+		try{
+			$xml->loadXML($content);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return null;
+		}
+		
+		return $xml->textContent;
+	}
+	
 	/**
 	 * @return dfxpCaptionsContentManager
 	 */
