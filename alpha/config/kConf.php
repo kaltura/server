@@ -91,7 +91,8 @@ class kConf extends kConfLocal
 			
 				/* kmc tabs rules */
 				
-				"kmc_display_account_tab" => true, 
+				"kmc_display_account_tab" => true,
+				"kmc_display_customize_tab" => true, // DONT REMOVE  REQUIRED FOR KMC1 
 				"kmc_content_enable_commercial_transcoding" => true, 
 				"kmc_content_enable_live_streaming" => true,
 				"kmc_login_show_signup_link" => false,
