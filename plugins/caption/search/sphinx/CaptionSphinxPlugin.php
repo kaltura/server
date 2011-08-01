@@ -1,27 +1,33 @@
 <?php
 /**
  * Enable indexing and searching caption asset objects in sphinx
- * @package plugins.contentDistribution
+ * @package plugins.captionSphinx
  */
-class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFactory, IKalturaSphinxConfiguration
+class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKalturaCriteriaFactory, IKalturaSphinxConfiguration
 {
 	const PLUGIN_NAME = 'captionSphinx';
-	const INDEX_NAME = 'caption_item';
 	
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
 	}
 	
-	/**
-	 * Creates a new KalturaCriteria for the given object name
-	 * 
-	 * @param string $objectType object type to create Criteria for.
-	 * @return KalturaCriteria derived object
+	/* (non-PHPdoc)
+	 * @see IKalturaPending::dependsOn()
+	 */
+	public static function dependsOn()
+	{
+		$captionSearchDependency = new KalturaDependency(CaptionSearchPlugin::getPluginName());
+		
+		return array($captionSearchDependency);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCriteriaFactory::getKalturaCriteria()
 	 */
 	public static function getKalturaCriteria($objectType)
 	{
-		if ($objectType == "CaptionAssetItem")
+		if ($objectType == CaptionAssetItemPeer::OM_CLASS)
 			return new SphinxCaptionAssetItemCriteria();
 			
 		return null;
@@ -67,21 +73,13 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaCriteriaFacto
 		return array(
 			kSphinxSearchManager::getSphinxIndexName('entry') => array (
 				'fields' => array(
-					CaptionSphinxPlugin::getSphinxFieldName(CaptionPlugin::SEARCH_FIELD_DATA) => SphinxFieldType::RT_FIELD,
+					CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA) => SphinxFieldType::RT_FIELD,
 				)
 			),
-			kSphinxSearchManager::getSphinxIndexName(CaptionSphinxPlugin::INDEX_NAME) => array (	
+			kSphinxSearchManager::getSphinxIndexName(CaptionSearchPlugin::INDEX_NAME) => array (	
 				'path'		=> '/sphinx/kaltura_caption_item_rt',
 				'fields'	=> self::getSphinxSchemaFields(),
 			)
 		);
-	}
-	
-	/**
-	 * return field name as appears in sphinx schema
-	 * @param string $fieldName
-	 */
-	public static function getSphinxFieldName($fieldName){
-		return CaptionPlugin::getPluginName() . '_' . $fieldName;
 	}
 }

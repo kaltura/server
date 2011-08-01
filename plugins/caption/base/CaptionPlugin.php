@@ -6,7 +6,6 @@
 class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaAdminConsoleEntryInvestigate, IKalturaConfigurator, IKalturaSchemaContributor, IKalturaMrssContributor
 {
 	const PLUGIN_NAME = 'caption';
-	const SEARCH_FIELD_DATA = 'data';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()

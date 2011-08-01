@@ -16,16 +16,19 @@ class CaptionAssetService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
 		parent::applyPartnerFilterForClass(new assetPeer());
-		
-		$partnerGroup = null;
+		parent::applyPartnerFilterForClass(new assetParamsPeer());
+	}
+
+	protected function kalturaNetworkAllowed($actionName)
+	{
 		if(
 			$actionName == 'get' ||
 			$actionName == 'list' ||
 			$actionName == 'getDownloadUrl'
 			)
-			$partnerGroup = $this->partnerGroup . ',0';
+			return true;
 			
-		parent::applyPartnerFilterForClass(new assetParamsPeer(), $partnerGroup);
+		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
     /**
