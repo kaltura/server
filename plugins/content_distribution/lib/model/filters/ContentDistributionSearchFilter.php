@@ -187,7 +187,7 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		$condition = $this->getCondition();
 		if(class_exists('ContentDistributionSphinxPlugin'))
 			if($condition && strlen($condition))
-				$matchClause[] = '@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPENDER_FILED_DATA) . $condition;
+				$matchClause[] = '@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPENDER_FIELD_DATA) . $condition;
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
