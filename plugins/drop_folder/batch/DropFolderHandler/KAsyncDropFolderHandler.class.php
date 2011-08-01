@@ -9,11 +9,31 @@ require_once("bootstrap.php");
  */
 class KAsyncDropFolderHandler extends KBatchBase
 {
-
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
+	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::DROP_FOLDER_HANDLER;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return self::getType();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return null;
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	protected function init()
 	{ /* non-relevant abstract function */ }

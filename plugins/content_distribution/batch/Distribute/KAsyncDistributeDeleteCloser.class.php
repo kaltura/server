@@ -8,13 +8,23 @@ require_once("bootstrap.php");
  */
 class KAsyncDistributeDeleteCloser extends KAsyncDistributeCloser
 {
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::DISTRIBUTION_DELETE;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return self::getType();
+	}
+	
+	// TODO remove every thing but the type and execute
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::init()

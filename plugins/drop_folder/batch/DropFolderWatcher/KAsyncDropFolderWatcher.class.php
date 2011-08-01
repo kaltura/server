@@ -19,10 +19,31 @@ class KAsyncDropFolderWatcher extends KBatchBase
 	 */
 	private $fileTransferMgr = null;
 	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
+	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::DROP_FOLDER_WATCHER;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return self::getType();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return null;
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	protected function init()
 	{ /* non-relevant abstract function */ }

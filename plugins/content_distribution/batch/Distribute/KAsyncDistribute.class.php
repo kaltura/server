@@ -14,6 +14,16 @@ abstract class KAsyncDistribute extends KBatchBase
 	 */
 	protected $engine;
 	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return null;
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
+	
 	/**
 	 * @return array<KalturaBatchJob>
 	 */

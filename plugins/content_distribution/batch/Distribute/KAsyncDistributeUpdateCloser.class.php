@@ -8,8 +8,8 @@ require_once("bootstrap.php");
  */
 class KAsyncDistributeUpdateCloser extends KAsyncDistributeCloser
 {
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
@@ -17,12 +17,14 @@ class KAsyncDistributeUpdateCloser extends KAsyncDistributeCloser
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::init()
+	 * @see KBatchBase::getJobType()
 	 */
-	protected function init()
+	public function getJobType()
 	{
-		$this->saveQueueFilter(self::getType());
+		return self::getType();
 	}
+	
+	// TODO remove every thing but the type and execute
 	
 	/* (non-PHPdoc)
 	 * @see KAsyncDistribute::saveEmptyQueue()
