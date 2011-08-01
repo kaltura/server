@@ -40,7 +40,7 @@ class CaptionAssetItemService extends KalturaBaseService
 		if(!$content)
 			return;
 			
-    	$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getFormat());
+    	$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
     	$itemsData = $captionsContentManager->parse($content);
     	foreach($itemsData as $itemData)
     	{
