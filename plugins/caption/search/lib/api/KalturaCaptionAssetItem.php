@@ -19,14 +19,26 @@ class KalturaCaptionAssetItem extends KalturaObject
 	 */
 	public $entry;
 	
+	/**
+	 * @var int
+	 */
+	public $startTime;
+	
+	/**
+	 * @var int
+	 */
+	public $endTime;
+	
+	/**
+	 * @var string
+	 */
+	public $content;
+	
 	private static $map_between_objects = array
 	(
-		"captionParamsId" => "flavorParamsId",
-		"language",
-		"isDefault" => "default",
-		"label",
-		"format" => "containerFormat",
-		"status",
+		"startTime",
+		"endTime",
+		"content",
 	);
 	
 	public function getMapBetweenObjects ( )
