@@ -32,6 +32,9 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	 */
 	public static function isAllowedPartner($partnerId)
 	{
+		if($partnerId == Partner::BATCH_PARTNER_ID)
+			return true;
+			
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
 	}
