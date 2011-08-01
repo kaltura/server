@@ -14,7 +14,21 @@ class AttachmentAssetService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		
 		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
+		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
 		parent::applyPartnerFilterForClass(new assetPeer());
+		parent::applyPartnerFilterForClass(new assetParamsPeer());
+	}
+
+	protected function kalturaNetworkAllowed($actionName)
+	{
+		if(
+			$actionName == 'get' ||
+			$actionName == 'list' ||
+			$actionName == 'getDownloadUrl'
+			)
+			return true;
+			
+		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
     /**
