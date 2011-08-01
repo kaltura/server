@@ -119,6 +119,22 @@ class assetPeer extends BaseassetPeer
 	}
 	
 	/**
+	 * Retrieve by ID instead of INT_ID
+	 * @param int $id
+	 * @param $con
+	 * @return asset
+	 */
+	public static function retrieveByIdNoFilter($id, $con = null)
+	{
+		$c = new Criteria(); 
+		$c->add(assetPeer::ID, $id); 
+		
+		self::setUseCriteriaFilter(false);
+		return assetPeer::doSelectOne($c, $con);
+		self::setUseCriteriaFilter(true);
+	}
+	
+	/**
 	 * Retrieve by IDs instead of INT_ID
 	 * @param $ids
 	 * @param $con

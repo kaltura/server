@@ -28,7 +28,7 @@ class CaptionAssetItemService extends KalturaBaseService
      */
     function parseAction($captionAssetId)
     {
-		$captionAsset = assetPeer::retrieveById($captionAssetId);
+		$captionAsset = assetPeer::retrieveByIdNoFilter($captionAssetId);
 		if(!$captionAsset)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
