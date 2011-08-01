@@ -64,7 +64,7 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 			return null;
 		}
 		
-		return preg_replace('/\s{2,}/', ' ', $xml->textContent);
+		return trim(preg_replace('/\s+/', ' ', $xml->textContent));
 	}
 	
 	/**
