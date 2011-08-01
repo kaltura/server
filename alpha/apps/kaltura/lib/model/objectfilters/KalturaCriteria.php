@@ -93,7 +93,7 @@ class KalturaCriteria extends Criteria
 	 * sort array orderby from this criteria
 	 * @param array $queryResult
 	 */
-	public function sortOrderBy(array &$queryResult){
+	public function applyResultsSort(array &$queryResult){
 		return;
 	}
 }
