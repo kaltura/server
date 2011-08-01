@@ -111,6 +111,7 @@ class ThumbAssetService extends KalturaBaseService
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbThumbAsset, $kContentResource);
 		$contentResource->entryHandled($dbThumbAsset->getentry());
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbThumbAsset));
 		
     	$newStatuses = array(
     		thumbAsset::FLAVOR_ASSET_STATUS_READY,

@@ -143,6 +143,7 @@ class FlavorAssetService extends KalturaBaseService
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbFlavorAsset, $kContentResource);
 		$contentResource->entryHandled($dbFlavorAsset->getentry());
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbFlavorAsset));
 		
     	$newStatuses = array(
     		flavorAsset::FLAVOR_ASSET_STATUS_READY,

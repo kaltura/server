@@ -98,6 +98,7 @@ class AttachmentAssetService extends KalturaBaseService
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbAttachmentAsset, $kContentResource);
 		$contentResource->entryHandled($dbAttachmentAsset->getentry());
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAttachmentAsset));
 		
     	$newStatuses = array(
     		AttachmentAsset::FLAVOR_ASSET_STATUS_READY,

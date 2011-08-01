@@ -183,6 +183,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
 		return $dbAsset;
     }
@@ -232,6 +233,7 @@ class KalturaEntryService extends KalturaBaseService
 
         if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
 		return $dbAsset;
     }
@@ -273,6 +275,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
 		if($isSource && $internalResource instanceof kFileSyncResource)
 		{
@@ -360,6 +363,7 @@ class KalturaEntryService extends KalturaBaseService
 		
         if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
 		return $dbAsset;
     }

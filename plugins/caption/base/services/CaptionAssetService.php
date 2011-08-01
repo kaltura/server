@@ -106,6 +106,7 @@ class CaptionAssetService extends KalturaBaseService
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbCaptionAsset, $kContentResource);
 		$contentResource->entryHandled($dbCaptionAsset->getentry());
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
 		
     	$newStatuses = array(
     		CaptionAsset::FLAVOR_ASSET_STATUS_READY,
