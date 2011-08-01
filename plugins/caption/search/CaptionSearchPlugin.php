@@ -141,6 +141,12 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				continue;
 				
 	    	$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getFormat());
+	    	if(!$captionsContentManager)
+	    	{
+	    		KalturaLog::err("Captions content manager not found for format [" . $captionAsset->getFormat() . "]");
+	    		continue;
+	    	}
+	    		
 	    	$content = $captionsContentManager->getContent($content);
 	    	if(!$content)
 	    		continue;
