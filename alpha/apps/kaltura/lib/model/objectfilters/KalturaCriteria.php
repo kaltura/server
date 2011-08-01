@@ -9,6 +9,12 @@ class KalturaCriteria extends Criteria
 	protected $recordsCount = 0;
 	
 	/**
+	 * Array of ids that were retured from the execution 
+	 * @var array
+	 */
+	protected $fetchedIds = array();
+	
+	/**
 	 * @var array<baseObjectFilter>
 	 */
 	protected $filters = array();
@@ -25,6 +31,25 @@ class KalturaCriteria extends Criteria
 	public function getRecordsCount() 
 	{
 		return $this->recordsCount;
+	}
+	
+	/**
+	 * 
+	 * return fetchedIds
+	 */
+	public function getFetchedIds()
+	{
+		return $this->fetchedIds;
+	}
+	
+	/**
+	 * 
+	 * set fetchedIds
+	 * @param array $fetchedIds
+	 */
+	public function setFetchedIds($fetchedIds)
+	{
+		$this->fetchedIds = $fetchedIds;
 	}
 	
 	public function getIdField()

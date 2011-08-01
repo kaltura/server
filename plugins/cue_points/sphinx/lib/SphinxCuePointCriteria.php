@@ -77,6 +77,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
 		$ids = $this->applyIds($ids);
+		$this->setFetchedIds($ids);
 		KalturaLog::log("Found " . count($ids) . " ids");
 		
 		foreach($this->keyToRemove as $key)

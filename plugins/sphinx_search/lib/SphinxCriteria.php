@@ -40,12 +40,6 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 */
 	protected $ids = array();
 	
-	/**
-	 * Array of ids that were retured from the sphinxExecute 
-	 * @var array
-	 */
-	protected $fetchedIds = array();
-	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
@@ -422,25 +416,6 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		// attach all unhandled fields
 		$filter->attachToFinalCriteria($this);
-	}
-	
-	/**
-	 * 
-	 * return fetchedIds
-	 */
-	public function getFetchedIds()
-	{
-		return $this->fetchedIds;
-	}
-	
-	/**
-	 * 
-	 * set fetchedIds
-	 * @param array $fetchedIds
-	 */
-	public function setFetchedIds($fetchedIds)
-	{
-		$this->fetchedIds = $fetchedIds;
 	}
 	
 	/**

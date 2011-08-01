@@ -104,6 +104,7 @@ class SphinxEntryDistributionCriteria extends SphinxCriteria
 		}
 		
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
+		$this->setFetchedIds($ids);
 		KalturaLog::log("Found " . count($ids) . " ids");
 		
 		foreach($this->keyToRemove as $key)
