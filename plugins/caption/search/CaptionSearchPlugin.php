@@ -62,6 +62,9 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
+		if(is_null($baseEnumName))
+			return array('CaptionSearchBatchJobType');
+			
 		if($baseEnumName == 'BatchJobType')
 			return array('CaptionSearchBatchJobType');
 			
