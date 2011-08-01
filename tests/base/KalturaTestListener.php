@@ -323,7 +323,7 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 	public function startTest(PHPUnit_Framework_Test $test) 
 	{
 		$testName = $test->getName(true);
-		print("In startTest for test $testName\n");
+//		print("In startTest for test $testName\n");
 		KalturaLog::debug("In startTest for test $testName");
 
 		if($test instanceof KalturaTestCaseBase)
