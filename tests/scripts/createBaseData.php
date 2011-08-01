@@ -255,7 +255,7 @@ class KalturaTestDeploymentHelper
 	
 	/**
 	 * 
-	 * Finds the ui confs by theie usage tag 
+	 * Finds the ui confs by their usage tag
 	 * @param array $confs
 	 * @param unknown_type $tag
 	 * @param bool $allow_array

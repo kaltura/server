@@ -474,7 +474,6 @@ class KalturaTestListener implements PHPUnit_Framework_TestListener
 			{
 //				print("failures XML is null!!!\n");
 				KalturaLog::debug("failures XML is null!!!");
-				var_dump($testCaseFailuresXml);
 			}
 		}
 	}
