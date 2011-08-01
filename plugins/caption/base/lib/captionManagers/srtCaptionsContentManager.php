@@ -19,7 +19,7 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	public function getContent($content)
 	{
 		// TODO remove time by regex
-		return $content;
+		return preg_replace('/\s{2,}/', ' ', $content);
 	}
 	
 	/**
