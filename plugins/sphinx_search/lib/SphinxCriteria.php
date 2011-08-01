@@ -445,9 +445,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 	
 	/**
 	 * (non-PHPdoc)
-	 * @see KalturaCriteria::sortOrderBy()
+	 * @see KalturaCriteria::applyResultsSort()
 	 */
-	public function sortOrderBy(array &$objects){
+	public function applyResultsSort(array &$objects){
 		if (!count($this->orderByClause))
 			return;
 		
