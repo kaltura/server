@@ -33,7 +33,7 @@ KalturaGlobalData::setData("@TEST_PARTNER_SECRET@", $newPartner->secret);
 $config->partnerId = $newPartner->id; //Set the new test partner id
 $client = new KalturaClient($config); // create a client for the new partner
 
-$ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType::ADMIN, $newPartner->id, null, null);
+$ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType::ADMIN, $newPartner->id, 86400, null);
 $client->setKs($ks);
 
 KalturaTestDeploymentHelper::setPartner($newPartner);
@@ -248,7 +248,7 @@ class KalturaTestDeploymentHelper
 	{
 		$c = new Criteria();
 		$c->addAnd(uiConfPeer::PARTNER_ID, $template_partner_id);
-		$c->addAnd(uiConfPeer::TAGS, "%".$module_tag."\_".$module_version."%", Criteria::LIKE);
+//		$c->addAnd(uiConfPeer::TAGS, "%".$module_tag."\_".$module_version."%", Criteria::LIKE); // no need to check for the kmc version
 		$c->addAnd(uiConfPeer::TAGS, "%autodeploy%", Criteria::LIKE);
 		return uiConfPeer::doSelect($c);
 	}
@@ -267,17 +267,17 @@ class KalturaTestDeploymentHelper
 	  foreach($confs as $uiconf)
 	  {
 	    $tags = explode(",", $uiconf->getTags());
-	    $trimmed_tags = kmcUtils::TrimArray($tags);
+	    $trimmed_tags = KalturaTestDeploymentHelper::TrimArray($tags);
 	    if(in_array($tag, $trimmed_tags))
 	    {
-		if($allow_array)
-		{
-			$uiconfs[] = $uiconf;
-		}
-		else
-		{
-			return $uiconf;
-		}
+			if($allow_array)
+			{
+				$uiconfs[] = $uiconf;
+			}
+			else
+			{
+				return $uiconf;
+			}
 	    }
 	  }
 	  
@@ -303,5 +303,24 @@ class KalturaTestDeploymentHelper
 	  {
 		return self::find_confs_by_usage_tag($alternateConfs, $tag, $allow_array);
 	  }
+	}
+	
+	/**
+	 * 
+	 * Trims the given array
+	 * @param mixed $arr
+	 */
+	public static function TrimArray($arr){
+	    if (!is_array($arr)){ return $arr; }
+	
+	    while (list($key, $value) = each($arr)){
+		if (is_array($value)){
+		    $arr[$key] = KalturaTestDeploymentHelper::TrimArray($value);
+		}
+		else {
+		    $arr[$key] = trim($value);
+		}
+	    }
+	    return $arr;
 	}
 }
