@@ -16,18 +16,33 @@ setlocale ( LC_ALL, 'en_US.UTF-8' );
  * @package Scheduler
  * @subpackage Bulk-Upload
  */
-class KAsyncBulkUpload extends KBatchBase {
-	
-	/**
-	 * @return number
+class KAsyncBulkUpload extends KBatchBase 
+{
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
-	public static function getType() {
+	public static function getType()
+	{
 		return KalturaBatchJobType::BULKUPLOAD;
 	}
 	
-	protected function init() {
-		$this->saveQueueFilter ( self::getType () );
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return KalturaBatchJobType::BULKUPLOAD;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return $this->startBulkUpload($job);
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	public function run() {
 		KalturaLog::info ( "Bulk upload batch is running" );

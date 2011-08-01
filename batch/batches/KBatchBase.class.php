@@ -30,19 +30,74 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	 * @var resource
 	 */
 	protected $monitorHandle = null;
+
+	/**
+	 * @return KalturaBatchJobType
+	 */
+	protected abstract function getJobType();
+
+	/**
+	 * @param KalturaBatchJob $job
+	 * @return KalturaBatchJob
+	 */
+	protected abstract function exec(KalturaBatchJob $job);
 	
-	protected abstract function init();
+	protected function init()
+	{
+		$this->saveQueueFilter($this->getJobType());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KRunableClass::run()
+	 */
+	public function run($jobs = null)
+	{
+		KalturaLog::info("Batch is running");
+		
+		if($this->taskConfig->isInitOnly())
+			return $this->init();
+		
+		if(is_null($jobs))
+			$jobs = $this->kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter(), $this->getJobType());
+		
+		KalturaLog::info(count($jobs) . " jobs to perform");
+		
+		if(! count($jobs) > 0)
+		{
+			KalturaLog::info("Queue size: 0 sent to scheduler");
+			$this->saveSchedulerQueue($this->getJobType());
+			return null;
+		}
+		
+		foreach($jobs as &$job)
+			$job = $this->exec($job, $job->data);
+			
+		return $jobs;
+	}
 	
 	/**
 	 * @param int $jobId
 	 * @param KalturaBatchJob $job
+	 * @return KalturaBatchJob
 	 */
-	protected abstract function updateExclusiveJob($jobId, KalturaBatchJob $job);
+	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
+	{
+		return $this->kClient->batch->updateExclusiveJob($jobId, $this->getExclusiveLockKey(), $job);
+	}
 	
 	/**
 	 * @param KalturaBatchJob $job
+	 * @return KalturaBatchJob
 	 */
-	protected abstract function freeExclusiveJob(KalturaBatchJob $job);
+	protected function freeExclusiveJob(KalturaBatchJob $job)
+	{
+		$response = $this->kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType(), false);
+		
+		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
+		$this->saveSchedulerQueue($this->getJobType(), $response->queueSize);
+		
+		return $response->job;
+	}
 	
 	/**
 	 * @return int

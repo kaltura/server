@@ -20,18 +20,31 @@ require_once("bootstrap.php");
  */
 class KAsyncImport extends KBatchBase
 {
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::IMPORT;
 	}
 	
-	protected function init()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
 	{
-		$this->saveQueueFilter(self::getType());
+		return self::getType();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return $this->fetchFile($job, $job->data);
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	public function run($jobs = null)
 	{

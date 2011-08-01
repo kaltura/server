@@ -21,18 +21,31 @@ require_once ("bootstrap.php");
  */
 class KAsyncCaptureThumb extends KBatchBase
 {
-	/**
-	 * @return int
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::CAPTURE_THUMB;
 	}
 	
-	protected function init()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
 	{
-		$this->saveQueueFilter(self::getType());
+		return KalturaBatchJobType::CAPTURE_THUMB;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return $this->captureThumb($job, $job->data);
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	public function run($jobs = null)
 	{

@@ -18,13 +18,31 @@ require_once("bootstrap.php");
  */
 class KAsyncBulkUploadCloser extends KBatchBase
 {
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::BULKUPLOAD;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return KalturaBatchJobType::BULKUPLOAD;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return $this->fetchStatus($job);
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	protected function init()
 	{

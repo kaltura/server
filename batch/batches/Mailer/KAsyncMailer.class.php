@@ -19,18 +19,31 @@ require_once("bootstrap.php");
  */
 class KAsyncMailer extends KBatchBase
 {
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::MAIL;
 	}
 	
-	protected function init()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
 	{
-		$this->saveQueueFilter(self::getType());		
+		return self::getType();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return null;
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	protected function updateExclusiveJob($jobId, KalturaBatchJob $job){}
 	protected function freeExclusiveJob(KalturaBatchJob $job){}

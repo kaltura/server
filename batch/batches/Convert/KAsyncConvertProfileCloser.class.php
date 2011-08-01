@@ -19,13 +19,31 @@ require_once("bootstrap.php");
  */
 class KAsyncConvertProfileCloser extends KBatchBase
 {
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::CONVERT_PROFILE;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return self::getType();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return $this->checkTimeout($job);
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	protected function init()
 	{

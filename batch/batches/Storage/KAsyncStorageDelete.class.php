@@ -13,18 +13,31 @@ require_once("bootstrap.php");
  */
 class KAsyncStorageDelete extends KBatchBase
 {
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::STORAGE_DELETE;
 	}
 	
-	protected function init()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
 	{
-		$this->saveQueueFilter(self::getType());
+		return self::getType();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return $this->delete($job, $job->data);
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	protected function getFilter()
 	{

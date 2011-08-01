@@ -22,13 +22,31 @@ class KAsyncConvertCollectionCloser extends KBatchBase
 	private $localTempPath;
 	private $sharedTempPath;
 	
-	/**
-	 * @return number
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::CONVERT_COLLECTION;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return self::getType();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return $this->closeConvert($job, $job->data);
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	protected function init()
 	{

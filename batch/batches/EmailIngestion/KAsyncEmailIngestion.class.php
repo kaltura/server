@@ -41,14 +41,31 @@ class KAsyncEmailIngestion extends KBatchBase {
 	/* Implementation of parent ABSTRACT functions */
 	/***********************************************/
 
-	/**
-	 * @return <number> batch type
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
 		return KalturaBatchJobType::EMAIL_INGESTION;
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
+	{
+		return self::getType();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::exec()
+	 */
+	protected function exec(KalturaBatchJob $job)
+	{
+		return null;
+	}
+	
+	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 
 	/**
 	 * Batch is done running
