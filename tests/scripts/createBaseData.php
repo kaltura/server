@@ -310,17 +310,25 @@ class KalturaTestDeploymentHelper
 	 * Trims the given array
 	 * @param mixed $arr
 	 */
-	public static function TrimArray($arr){
-	    if (!is_array($arr)){ return $arr; }
-	
-	    while (list($key, $value) = each($arr)){
-		if (is_array($value)){
-		    $arr[$key] = KalturaTestDeploymentHelper::TrimArray($value);
-		}
-		else {
-		    $arr[$key] = trim($value);
-		}
+	public static function TrimArray($arr)
+	{
+	    if (!is_array($arr))
+	    {
+	    	return $arr; 
 	    }
+	
+	    while (list($key, $value) = each($arr))
+	    {
+			if (is_array($value))
+			{
+			    $arr[$key] = KalturaTestDeploymentHelper::TrimArray($value);
+			}
+			else 
+			{
+			    $arr[$key] = trim($value);
+			}
+	    }
+	    
 	    return $arr;
 	}
 }
