@@ -15,7 +15,7 @@ class DailymotionDistributionProfile extends DistributionProfile
 	const METADATA_FIELD_TAGS = 'DailymotionKeywords';
 
 	const ENTRY_NAME_MINIMUM_LENGTH = 1;
-	const ENTRY_NAME_MAXIMUM_LENGTH = 60;
+	const ENTRY_NAME_MAXIMUM_LENGTH = 255;
 	const ENTRY_DESCRIPTION_MINIMUM_LENGTH = 1;
 	const ENTRY_DESCRIPTION_MAXIMUM_LENGTH = 2000;
 	const ENTRY_TAGS_MINIMUM_COUNT = 2;

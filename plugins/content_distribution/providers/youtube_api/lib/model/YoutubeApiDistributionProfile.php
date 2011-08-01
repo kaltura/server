@@ -21,7 +21,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 	const METADATA_FIELD_PLAYLISTS = 'YouTubePlaylists';
 	
 	const ENTRY_NAME_MINIMUM_LENGTH = 1;
-	const ENTRY_NAME_MAXIMUM_LENGTH = 60;
+	const ENTRY_NAME_MAXIMUM_LENGTH = 100;
 	const ENTRY_DESCRIPTION_MINIMUM_LENGTH = 1;
 	const ENTRY_DESCRIPTION_MAXIMUM_LENGTH = 715;
 	const ENTRY_TAGS_MINIMUM_LENGTH = 1;
@@ -169,7 +169,7 @@ class YoutubeApiDistributionProfile extends DistributionProfile
 			$validationErrors[] = $validationError;
 		}
 		
-		// validate entry name maximum length of 60 characters
+		// validate entry name maximum length of 100 characters
 		if(strlen($entry->getName()) > self::ENTRY_NAME_MAXIMUM_LENGTH)
 		{
 			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, '');
