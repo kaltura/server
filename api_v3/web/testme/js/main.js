@@ -356,19 +356,14 @@ KTestMe.prototype = {
 		jqObject.append(jqObjectTitle);
 		container.append(jqObject);
 		
-		if(scope.loadedTypes[param.type]){
-			scope.onSubTypesLoaded(scope.loadedTypes[param.type], param, jqObjectType, objectTypesProps);
-		}
-		else{
-			jQuery.getJSON(
-				"ajax-get-type-subclasses.php",
-				{ "type": param.type },
-				delegate(this, function(subTypes){
-					scope.loadedTypes[param.type] = subTypes;
-					scope.onSubTypesLoaded(subTypes, param, jqObjectType, objectTypesProps);
-				})
-			);
-		}
+		jQuery.getJSON(
+			"ajax-get-type-subclasses.php",
+			{ "type": param.type },
+			delegate(this, function(subTypes){
+				scope.loadedTypes[param.type] = subTypes;
+				scope.onSubTypesLoaded(subTypes, param, jqObjectType, objectTypesProps);
+			})
+		);
 	},
 		
 	onSubTypesLoaded: function(subTypes, param, jqObjectType, objectTypesProps) {
