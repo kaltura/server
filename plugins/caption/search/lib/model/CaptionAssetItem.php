@@ -3,7 +3,7 @@
  * @package plugins.captionSearch
  * @subpackage model
  */ 
-class CaptionAssetItem implements IIndexable
+class CaptionAssetItem extends BaseObject implements IIndexable
 {
 	/**
 	 * @var CaptionAsset
@@ -21,6 +21,7 @@ class CaptionAssetItem implements IIndexable
 	protected $endTime;
 	
 	/**
+	 * 
 	 * @var string
 	 */
 	protected $content;
