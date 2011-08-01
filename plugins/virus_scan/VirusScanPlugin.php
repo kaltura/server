@@ -29,14 +29,6 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 		);
 		return $map;
 	}
-	
-	/**
-	 * @return string - the path to services.ct
-	 */
-	public static function getServiceConfig()
-	{
-		return realpath(dirname(__FILE__).'/config/virus_scan.ct');
-	}
 
 	/**
 	 * @return array
