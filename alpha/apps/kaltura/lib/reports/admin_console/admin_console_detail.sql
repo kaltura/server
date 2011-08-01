@@ -33,8 +33,9 @@ FROM
 	FROM kalturadw.dwh_dim_partners dim_partner 
 		LEFT JOIN kalturadw.dwh_hourly_partner aggr_partner  
 		ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
-		LEFT JOIN kalturadw.dwh_hourly_partner_usage hourly_partner_usage 
-		ON (hourly_partner_usage.partner_id = dim_partner.partner_id AND hourly_partner_usage.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
+		LEFT JOIN (SELECT date_id, partner_id, SUM(count_bandwidth_kb) count_bandwidth_kb, SUM(count_storage_mb) count_storage_mb FROM kalturadw.dwh_hourly_partner_usage 
+		WHERE date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID} GROUP BY date_id, partner_id) hourly_partner_usage 
+		ON (hourly_partner_usage.partner_id = dim_partner.partner_id)
 	WHERE   {OBJ_ID_CLAUSE} AND
 	dim_partner.created_date_id <= {TO_DATE_ID}
 	GROUP BY dim_partner.partner_id
