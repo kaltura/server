@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<title></title>
+		<link></link>
+		<description></description>
+		<item>
+			<title></title>
+			<link></link>
+			<media:content duration="" fileSize="" width="" height="" type="" url="">
+				<media:player url="" />
+				<media:rating></media:rating>
+				<media:title></media:title>
+				<media:description></media:description>
+				<media:thumbnail url="" />
+			</media:content>
+		</item>
+	</channel>
+</rss>
