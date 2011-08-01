@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage lib
+ */
 class kMetadataMrssManager implements IKalturaMrssContributor
 {
 	/**

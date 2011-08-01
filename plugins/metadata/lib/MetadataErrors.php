@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage errors
+ */
 class MetadataErrors extends KalturaErrors
 {
 	const INVALID_METADATA_PROFILE = "INVALID_METADATA_PROFILE,invalid metadata profile [%s]";

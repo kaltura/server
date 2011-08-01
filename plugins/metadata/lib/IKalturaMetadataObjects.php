@@ -1,8 +1,7 @@
 <?php
 /**
- * Enable the plugin to define new objects to support custom metadata
- * @package infra
- * @subpackage Plugins
+ * @package plugins.metadata
+ * @subpackage lib.plugins
  */
 interface IKalturaMetadataObjects extends IKalturaBase, IKalturaEnumerator
 {

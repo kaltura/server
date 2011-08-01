@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage lib
+ */
 class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 {
 	/* (non-PHPdoc)

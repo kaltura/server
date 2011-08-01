@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage lib
+ */
 class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataChangedEventConsumer
 {
 	/* (non-PHPdoc)
@@ -114,9 +118,6 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 	 */
 	public function objectDataChanged(BaseObject $object, $previousVersion = null, BatchJob $raisedJob = null)
 	{
-		if(!class_exists('Metadata') || !($object instanceof Metadata))
-			return true;
-
 		// updated in the indexing server (sphinx)
 		$relatedObject = kMetadataManager::getObjectFromPeer($object);
 		if($relatedObject && $relatedObject instanceof IIndexable)

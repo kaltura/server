@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage lib
+ */
 class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
 {
 	/* (non-PHPdoc)

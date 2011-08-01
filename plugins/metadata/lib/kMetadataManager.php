@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.metadata
+ * @subpackage lib
+ */
 class kMetadataManager 
 {
 	const APP_INFO_SEARCH = 'searchable';
