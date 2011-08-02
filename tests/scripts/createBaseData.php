@@ -180,6 +180,9 @@ class KalturaTestDeploymentHelper
 	 */
 	public static function addBaseData($client)
 	{
+		$uiConfs = $client->uiConf->listAction();
+		KalturaGlobalData::setData("@UI_CONF_ID@", $uiConfs->objects[0]->id);
+		
 		$partnerId = KalturaTestDeploymentHelper::$partner->id;
 		
 		//if we are on local host then we can fins the KMC ui Confs (through the server side)
