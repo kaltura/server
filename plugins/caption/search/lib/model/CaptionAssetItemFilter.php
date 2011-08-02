@@ -87,7 +87,7 @@ class CaptionAssetItemFilter extends baseObjectFilter
 
 	public function getIdFromPeer()
 	{
-		return entryPeer::ID;
+		return CaptionAssetItemPeer::ID;
 	}
 	
 		

@@ -40,7 +40,7 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 	 */
 	protected function getDefaultCriteriaFilter()
 	{
-		return assetPeer::getCriteriaFilter();
+		return CaptionAssetItemPeer::getCriteriaFilter();
 	}
 	
 	public function getSphinxOrderFields()
