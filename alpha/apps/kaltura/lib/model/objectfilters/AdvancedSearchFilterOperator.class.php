@@ -53,8 +53,6 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 	
 	public function applyCondition(array &$whereClause)
 	{
-		//throw new Exception("get condition is not in use!");
-		KalturaLog::debug("advanced: getCondition");
 		if($this->condition)
 			return $this->condition;
 			
