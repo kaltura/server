@@ -68,7 +68,7 @@ class kLevel3UrlManager extends kUrlManager
 		$gen = isset($this->params['rtmp_auth_gen']) ? $this->params['rtmp_auth_gen'] : false;
 		if ($name && $key && $gen)
 		{
-			$url .= "?$name=$gen" . substr(self::hmac('sha1', $key, $url), 0, 20);
+			$url .= "?$name=$gen" . substr(self::hmac('sha1', $key, str_replace('mp4:', '', $url)), 0, 20);
 		}
 
 		return $url;
@@ -86,10 +86,6 @@ class kLevel3UrlManager extends kUrlManager
 		// if level3 tokenized url is used for rtmp, generated token string
 		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 			$url = $this->tokenizeUrl($url);
-
-		if($this->extention && strtolower($this->extention) != 'flv' ||
-		       $this->containerFormat && strtolower($this->containerFormat) != 'flash video')
-       			$url = "mp4:$url";
 
 		return $url;
 	}
