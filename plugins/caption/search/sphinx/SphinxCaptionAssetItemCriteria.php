@@ -24,7 +24,7 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 		CaptionAssetItemPeer::START_TIME => 'start_time',
 		CaptionAssetItemPeer::END_TIME => 'end_time',
 		
-		CaptionAssetItemPeer::CREATED_AT => 'created_at',
+		assetPeer::CREATED_AT => 'created_at',
 		assetPeer::UPDATED_AT => 'updated_at',
 	);
 	
@@ -33,7 +33,7 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 		CaptionAssetItemPeer::START_TIME => 'start_time',
 		CaptionAssetItemPeer::END_TIME => 'end_time',
 		
-		CaptionAssetItemPeer::CREATED_AT => 'created_at',
+		assetPeer::CREATED_AT => 'created_at',
 		assetPeer::UPDATED_AT => 'updated_at',
 	);
 	
