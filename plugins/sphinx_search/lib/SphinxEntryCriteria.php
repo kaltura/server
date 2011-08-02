@@ -132,9 +132,13 @@ class SphinxEntryCriteria extends SphinxCriteria
 		return kSphinxSearchManager::getSphinxIndexName(entryPeer::TABLE_NAME);;
 	}
 	
-	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit)
+	/**
+	 * (non-PHPdoc)
+	 * @see SphinxCriteria::executeSphinx()
+	 */
+	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
 	{
-		$sql = "SELECT str_entry_id FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
+		$sql = "SELECT str_entry_id $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
 		
 		//debug query
 		//echo $sql."\n"; die;

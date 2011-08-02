@@ -21,6 +21,12 @@ abstract class SphinxCriteria extends KalturaCriteria
 	protected $matchClause = array();
 	
 	/**
+	 * Sphinx condition clauses
+	 * @var array
+	 */
+	protected $conditionClause = array();
+	
+	/**
 	 * Sphinx orderby clauses
 	 * @var array
 	 */
@@ -118,8 +124,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 * @param string $limit
 	 * @param int $maxMatches
 	 * @param bool $setLimit
+	 * @param string $conditions
 	 */
-	abstract protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit);
+	abstract protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '');
 	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria#applyFilters()
@@ -149,7 +156,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 				continue;
 			}
 			
-			if($criterion->apply($this->whereClause, $this->matchClause))
+			if($criterion->apply($this->whereClause, $this->matchClause, $this->conditionClause))
 			{
 				KalturaLog::debug("Criterion [" . $criterion->getColumn() . "] attached");
 				$this->keyToRemove[] = $field;
@@ -171,6 +178,16 @@ abstract class SphinxCriteria extends KalturaCriteria
 				$matches = '( ' . implode(' ) ( ', $this->matchClause) . ' )';
 				
 			$this->whereClause[] = "MATCH('$matches')";
+		}
+		
+		$conditions = '';
+		$i = 0;
+		foreach ($this->conditionClause as $conditionClause)
+		{
+			$conditions .=	', (' . $this->conditionClause[$i] . ') as cnd' . $i . ' ';
+			$this->whereClause[] = 'cnd' . $i . ' > 0';
+			
+			$i++; 
 		}
 		
 		$wheres = '';
@@ -234,7 +251,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 				$limit = $this->getOffset() . ", $limit";
 		}
 		
-		$this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit);
+		$this->executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions);
 	}
 	
 	/**
@@ -405,7 +422,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		{
 			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
 			if($advancedSearch instanceof AdvancedSearchFilterItem)
-				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause, $this->orderByClause);
+				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause, $this->conditionClause, $this->orderByClause);
 		}
 		else
 		{

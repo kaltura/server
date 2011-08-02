@@ -9,14 +9,28 @@ class SphinxCriterion extends KalturaCriterion
 	 */
 	protected $hasOr = false;
 	
-	public function apply(array &$whereClause, array &$matchClause)
+	/**
+	 * 
+	 * local whereClause
+	 * @var array
+	 */
+	protected $whereClause = array();
+	
+	/**
+	 * 
+	 * local conditionClause
+	 * @var array
+	 */
+	protected $conditionClause = array();
+	
+	public function apply(array &$whereClause, array &$matchClause, array &$conditionClause)
 	{
 		$field = $this->getTable() . '.' . $this->getColumn();
 		
 		if($this->hasOr)
 		{
-			KalturaLog::debug("Can't apply criterion [$field] has OR");
-			return false;
+			KalturaLog::debug("criterion has OR");
+			//return false;
 		}
 			
 		KalturaLog::debug("Applies criterion [$field]");
@@ -31,8 +45,8 @@ class SphinxCriterion extends KalturaCriterion
 					KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Kaltura criteria");
 					return false;
 				}
-					
-				if(!$clause->apply($whereClause, $matchClause))
+				
+				if(!$clause->apply($this->whereClause, $matchClause, $this->conditionClause))
 				{
 					KalturaLog::debug("Failed to apply clause [" . $clause->getColumn() . "]");
 					return false;
@@ -78,6 +92,13 @@ class SphinxCriterion extends KalturaCriterion
 		
 		$valStr = print_r($value, true);
 		KalturaLog::debug("Attach criterion[$field] as sphinx field[$sphinxField] of type [$type] and comparison[$comparison] for value[$valStr]");
+		
+		if (is_null($value)){
+			if ($comparison == Criteria::EQUAL)
+				$comparison = Criteria::ISNULL;
+			elseif ($comparison == Criteria::NOT_EQUAL)
+				$comparison = Criteria::ISNOTNULL;
+		}
 		
 		if (is_string($value)) { // needed since otherwise the switch statement doesn't work as expected otherwise
 			switch($value)
@@ -161,7 +182,7 @@ class SphinxCriterion extends KalturaCriterion
 
 				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 				$values = implode(',', $value);
-				$whereClause[] = "$sphinxField in($values)";
+				$this->whereClause[] = "$sphinxField in($values)";
 				break;
 				
 			case Criteria::NOT_IN:
@@ -170,22 +191,40 @@ class SphinxCriterion extends KalturaCriterion
 				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 				
 				foreach($value as $val)
-					$whereClause[] = "$sphinxField != $val";
+					$this->whereClause[] = "$sphinxField <> $val";
 				break;
 				
 			case Criteria::ISNULL:
-				$whereClause[] = "$sphinxField = 0";
+				$this->whereClause[] = "$sphinxField = 0";
 				break;
 				
 			case Criteria::LESS_THAN:
 			case Criteria::LESS_EQUAL:
 				if($value > 0)
-					$whereClause[] = "$sphinxField != 0";
+					$this->whereClause[] = "$sphinxField <> 0";
+				// fallthrough
 				
 			default:
-				$whereClause[] = "$sphinxField $comparison $value";
+				$this->whereClause[] = "$sphinxField $comparison $value";
 				break;
 		}
+		
+		$this->whereClause = array_unique($this->whereClause);
+		if(!count($this->whereClause))
+			return true;
+			
+		if (!count($this->getConjunctions()) || in_array(Criterion::UND, $this->getConjunctions()))
+		{
+			$whereClause[] = implode(' AND ', $this->whereClause);
+			foreach ($this->conditionClause as $eachConditionClause)
+				$conditionClause[] = $eachConditionClause;
+		}
+		elseif (in_array(Criterion::ODER, $this->getConjunctions()))
+		{
+			$conditionClause[] = implode(' OR ', $this->whereClause);
+		}
+			
+		
 		return true;
 	}
 
