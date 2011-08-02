@@ -50,7 +50,7 @@ img{ border:none; }
 .floatr{ float:right; }
 .clear { clear: both; }
 
-#overlay{ display: none; position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background:#000; -moz-opacity:0.6; -webkit-opacity:0.6; opacity:0.65; filter: alpha(opacity=65); cursor: default; }
+#overlay{ display: none; position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background:#000; -moz-opacity:0.5; -webkit-opacity:0.5; opacity:0.5; filter: alpha(opacity=5); cursor: default; }
 * html #overlay{ position: absolute; background-color:#000; top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(0 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px'); }
 
 fieldset{ border:0 none; position:relative; }
@@ -259,6 +259,7 @@ fieldset{ border:0 none; position:relative; }
 #modal .title .close { background-position: -155px -152px; }
 #modal .title .help { background-position: -177px -152px;}
 #modal .content { padding: 6px; }
+#modal.iframe .content { padding: 0; }
 #modal .flash_only { background: #e1e1e1; padding: 10px;  -moz-border-radius:6px; -webkit-border-radius:6px; border-radius: 6px; }
 #modal .flash_only object { }
 

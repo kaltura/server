@@ -152,9 +152,10 @@ kmc.functions = {
 
 		kmc.layout.modal.open( {
 			'width' : 950,
-			'height' : 580,
+			'height' : 606,
 			'title'	: 'Clipping Application',
-			'content' : '<iframe src="' + iframe_url + '" width="100%" height="550"></iframe>'
+			'content' : '<iframe src="' + iframe_url + '" width="100%" height="576" frameborder="0"></iframe>',
+			'style'	: 'iframe'
 		} );
 	}
 };
@@ -956,7 +957,8 @@ kmc.layout = {
 					content : '',
 					help : '',
 					width : 680,
-					height : 'auto'
+					height : 'auto',
+					style : ''
 				};
 			// Overwrite defaults with data
 			$.extend(options, data);
@@ -965,7 +967,7 @@ kmc.layout = {
 			$modal.css( {
 				'width' : options.width,
 				'height' : options.height
-			}).attr('class', '');
+			}).attr('class', options.style);
 
 			// Insert data into modal
 			if( options.title ) {
