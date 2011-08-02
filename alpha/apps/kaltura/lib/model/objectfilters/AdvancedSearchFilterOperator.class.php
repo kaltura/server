@@ -105,7 +105,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 		return $additionalConditions;
 	}
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$orderByClause)
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
 	{
 		KalturaLog::debug("apply from [" . get_class($filter) . "]");
 		

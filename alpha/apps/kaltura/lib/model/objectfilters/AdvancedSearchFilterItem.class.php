@@ -10,7 +10,7 @@ class AdvancedSearchFilterItem
 	 */
 	protected $kalturaClass;
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$orderByClause)
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
 	{
 		$matchClause[] = $this->applyCondition($whereClause);
 	}
