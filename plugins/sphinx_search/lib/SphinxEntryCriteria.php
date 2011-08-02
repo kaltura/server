@@ -361,56 +361,6 @@ class SphinxEntryCriteria extends SphinxCriteria
 		parent::applyFilter($filter);
 	}
 
-	/* (non-PHPdoc)
-	 * @see propel/util/Criteria#getNewCriterion()
-	 */
-	public function getNewCriterion($column, $value, $comparison = null)
-	{
-		return new SphinxCriterion('SphinxEntryCriteria', $this, $column, $value, $comparison);
-	}
-
-	/* (non-PHPdoc)
-	 * @see propel/util/Criteria#add()
-	 */
-	public function add($p1, $value = null, $comparison = null)
-	{
-		if ($p1 instanceof Criterion)
-		{
-			$oc = $this->getCriterion($p1->getColumn());
-			if(!is_null($oc) && $oc->getValue() == $p1->getValue() && $oc->getComparison() != $p1->getComparison())
-				return $this;
-				
-			return parent::add($p1);
-		}
-		
-		$nc = new SphinxCriterion('SphinxEntryCriteria', $this, $p1, $value, $comparison);
-		return parent::add($nc);
-	}
-
-	/* (non-PHPdoc)
-	 * @see propel/util/Criteria#addAnd()
-	 */
-	public function addAnd($p1, $p2 = null, $p3 = null)
-	{
-		if (is_null($p3)) 
-			return parent::addAnd($p1, $p2, $p3);
-			
-		// addAnd(column, value, comparison)
-		$nc = new SphinxCriterion('SphinxEntryCriteria', $this, $p1, $p2, $p3);
-		$oc = $this->getCriterion($p1);
-		
-		if ( !is_null($oc) )
-		{
-			// no need to add again
-			if($oc->getValue() != $p2 || $oc->getComparison() != $p3)
-				$oc->addAnd($nc);
-				
-			return $this;
-		}
-			
-		return $this->add($nc);
-	}
-	
 	public function hasSphinxFieldName($fieldName)
 	{
 		if(strpos($fieldName, '.') === false)

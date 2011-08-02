@@ -9,18 +9,6 @@ class SphinxCriterion extends KalturaCriterion
 	 */
 	protected $hasOr = false;
 	
-	/**
-	 * @var string Criteria class name
-	 */
-	protected $criteriaClass = false;
-	
-	public function __construct($criteriaClass, Criteria $criteria, $column, $value, $comparison = null)
-	{
-		$this->criteriaClass = $criteriaClass;
-		
-		parent::__construct($criteria, $column, $value, $comparison);
-	}
-	
 	public function apply(array &$whereClause, array &$matchClause)
 	{
 		$field = $this->getTable() . '.' . $this->getColumn();

@@ -121,4 +121,94 @@ class KalturaCriteria extends Criteria
 	public function applyResultsSort(array &$queryResult){
 		return;
 	}
+
+	/* (non-PHPdoc)
+	 * @see Criteria::getNewCriterion()
+	 */
+	public function getNewCriterion($column, $value, $comparison = null)
+	{
+		return new Criterion($this, $column, $value, $comparison);
+	}
+
+	/* (non-PHPdoc)
+	 * @see Criteria::add()
+	 */
+	public function add($p1, $value = null, $comparison = null)
+	{
+		if ($p1 instanceof Criterion) {
+			$this->map[$p1->getTable() . '.' . $p1->getColumn()] = $p1;
+		} else {
+			$this->map[$p1] = $this->getNewCriterion($this, $p1, $value, $comparison);
+		}
+		return $this;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see Criteria::addAnd()
+	 */
+	public function addAnd($p1, $p2 = null, $p3 = null)
+	{
+		if ($p3 !== null) {
+			// addAnd(column, value, comparison)
+			$oc = $this->getCriterion($p1);
+			$nc = $this->getNewCriterion($this, $p1, $p2, $p3);
+			if ( $oc === null) {
+				$this->map[$p1] = $nc;
+			} else {
+				$oc->addAnd($nc);
+			}
+		} elseif ($p2 !== null) {
+			// addAnd(column, value)
+			$this->addAnd($p1, $p2, self::EQUAL);
+		} elseif ($p1 instanceof Criterion) {
+			// addAnd(Criterion)
+			$oc = $this->getCriterion($p1->getTable() . '.' . $p1->getColumn());
+			if ($oc === null) {
+				$this->add($p1);
+			} else {
+				$oc->addAnd($p1);
+			}
+		} elseif ($p2 === null && $p3 === null) {
+			// client has not specified $p3 (comparison)
+			// which means Criteria::EQUAL but has also specified $p2 == null
+			// which is a valid combination we should handle by creating "IS NULL"
+			$this->addAnd($p1, $p2, self::EQUAL);
+		}
+		return $this;
+	}
+
+	/* (non-PHPdoc)
+	 * @see Criteria::addOr()
+	 */
+	public function addOr($p1, $p2 = null, $p3 = null)
+	{
+		if ($p3 !== null) {
+			// addOr(column, value, comparison)
+			$nc = $this->getNewCriterion($this, $p1, $p2, $p3);
+			$oc = $this->getCriterion($p1);
+			if ($oc === null) {
+				$this->map[$p1] = $nc;
+			} else {
+				$oc->addOr($nc);
+			}
+		} elseif ($p2 !== null) {
+			// addOr(column, value)
+			$this->addOr($p1, $p2, self::EQUAL);
+		} elseif ($p1 instanceof Criterion) {
+			// addOr(Criterion)
+			$oc = $this->getCriterion($p1->getTable() . '.' . $p1->getColumn());
+			if ($oc === null) {
+				$this->add($p1);
+			} else {
+				$oc->addOr($p1);
+			}
+		} elseif ($p2 === null && $p3 === null) {
+			// client has not specified $p3 (comparison)
+			// which means Criteria::EQUAL but has also specified $p2 == null
+			// which is a valid combination we should handle by creating "IS NULL"
+			$this->addOr($p1, $p2, self::EQUAL);
+		}
+
+		return $this;
+	}
 }

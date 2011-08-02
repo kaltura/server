@@ -436,4 +436,12 @@ abstract class SphinxCriteria extends KalturaCriteria
 			$objects[] = $sortedResult[$fetchedId];
 		
 	}
+	
+	/* (non-PHPdoc)
+	 * @see Criteria::getNewCriterion()
+	 */
+	public function getNewCriterion($column, $value, $comparison = null)
+	{
+		return new SphinxCriterion($this, $column, $value, $comparison);
+	}
 }
