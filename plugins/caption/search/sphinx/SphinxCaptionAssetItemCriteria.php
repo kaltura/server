@@ -56,7 +56,7 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 	 */
 	protected function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(CaptionSphinxPlugin::INDEX_NAME);
+		return kSphinxSearchManager::getSphinxIndexName(CaptionSearchPlugin::INDEX_NAME);
 	}
 
 	/* (non-PHPdoc)
