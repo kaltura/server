@@ -50,7 +50,7 @@ class DropFolderBatchUtils
 	            break;
 	            
 	        default:
-	            throw new Exception('Unsupported drop folder type ['.$folder->type.']', null, null);
+	            throw new Exception('Unsupported drop folder type ['.$folder->type.']');
 	    }
 	    try
 	    {
