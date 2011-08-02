@@ -30,13 +30,12 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 	);
 	
 	public static $sphinxOrderFields = array(
-		assetPeer::SIZE => 'size',
-		assetPeer::START_TIME => 'start_time',
-		assetPeer::END_TIME => 'end_time',
+		CaptionAssetItemPeer::SIZE => 'size',
+		CaptionAssetItemPeer::START_TIME => 'start_time',
+		CaptionAssetItemPeer::END_TIME => 'end_time',
 		
-		assetPeer::CREATED_AT => 'created_at',
-		assetPeer::UPDATED_AT => 'updated_at',
-		assetPeer::DELETED_AT => 'deleted_at',
+		CaptionAssetItemPeer::CREATED_AT => 'created_at',
+		CaptionAssetItemPeer::UPDATED_AT => 'updated_at',
 	);
 	
 	/**
