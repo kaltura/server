@@ -138,7 +138,7 @@ class KalturaCriteria extends Criteria
 		if ($p1 instanceof Criterion) {
 			$this->map[$p1->getTable() . '.' . $p1->getColumn()] = $p1;
 		} else {
-			$this->map[$p1] = $this->getNewCriterion($this, $p1, $value, $comparison);
+			$this->map[$p1] = $this->getNewCriterion($p1, $value, $comparison);
 		}
 		return $this;
 	}
@@ -151,7 +151,7 @@ class KalturaCriteria extends Criteria
 		if ($p3 !== null) {
 			// addAnd(column, value, comparison)
 			$oc = $this->getCriterion($p1);
-			$nc = $this->getNewCriterion($this, $p1, $p2, $p3);
+			$nc = $this->getNewCriterion($p1, $p2, $p3);
 			if ( $oc === null) {
 				$this->map[$p1] = $nc;
 			} else {
@@ -184,7 +184,7 @@ class KalturaCriteria extends Criteria
 	{
 		if ($p3 !== null) {
 			// addOr(column, value, comparison)
-			$nc = $this->getNewCriterion($this, $p1, $p2, $p3);
+			$nc = $this->getNewCriterion($p1, $p2, $p3);
 			$oc = $this->getCriterion($p1);
 			if ($oc === null) {
 				$this->map[$p1] = $nc;
