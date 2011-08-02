@@ -15,17 +15,7 @@
  */
 class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 
-	const INT_ID = self::ID;
-	const TAGS = assetPeer::TAGS;
-	const UPDATED_AT = assetPeer::UPDATED_AT;
-	const DELETED_AT = assetPeer::DELETED_AT;
-	const FLAVOR_PARAMS_ID = assetPeer::FLAVOR_PARAMS_ID;
-	const STATUS = assetPeer::STATUS;
-	const VERSION = assetPeer::VERSION;
-	const SIZE = assetPeer::SIZE;
-	const CONTAINER_FORMAT = assetPeer::CONTAINER_FORMAT;
-	
-	const IS_DEFAULT = 'caption_asset.IS_DEFAULT';
+	const TAGS = 'caption_asset_item.TAGS';
 	const PARTNER_DESCRIPTION = 'caption_asset_item.PARTNER_DESCRIPTION';
 	const LANGUAGE = 'caption_asset_item.LANGUAGE';
 	const LABEL = 'caption_asset_item.LABEL';
