@@ -15,6 +15,7 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 		CaptionAssetItemPeer::LABEL => 'label',
 		assetPeer::CONTAINER_FORMAT => 'format',
 		
+		CaptionAssetItemPeer::PARTNER_ID => 'partner_id',
 		CaptionAssetItemPeer::STATUS => 'caption_asset_status',
 		CaptionAssetItemPeer::SIZE => 'size',
 		CaptionAssetItemPeer::START_TIME => 'start_time',
