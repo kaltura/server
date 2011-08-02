@@ -29,8 +29,7 @@ FROM
 		  count_plays > 0 OR
 		  count_loads > 0 )
 	GROUP BY entry_id
-	
 	ORDER BY {SORT_FIELD}
-	LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
 ) AS ev_stats, dwh_dim_entries en
 WHERE ev_stats.entry_id = en.entry_id
+LIMIT {PAGINATION_FIRST},{PAGINATION_SIZE}  /* pagination  */
