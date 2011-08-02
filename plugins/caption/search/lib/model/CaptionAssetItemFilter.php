@@ -65,9 +65,28 @@ class CaptionAssetItemFilter extends baseObjectFilter
 		);
 	}
 
+	/**
+	 * holds an array of keys for quick access to the fieldnames array
+	 *
+	 * first dimension keys are the type constants
+	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
+	 */
+	private static $fieldKeys = array (
+		BasePeer::TYPE_PHPNAME => array ('PartnerDescription' => -1, 'Language' => -2, 'Label' => -3, 'Status' => -4, 'Size' => -5, 'UpdatedAt' => -6),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('partnerDescription' => -1, 'language' => -2, 'label' => -3, 'status' => -4, 'size' => -5, 'updatedAt' => -6),
+		BasePeer::TYPE_COLNAME => array (self::PARTNER_DESCRIPTION => -1, self::LANGUAGE => -2, self::LABEL => -3, self::STATUS => -4, self::SIZE => -5, self::UPDATED_AT => -6),
+		BasePeer::TYPE_FIELDNAME => array ('partner_description' => -1, 'language' => -2, 'label' => -3, 'status' => -4, 'size' => -5, 'updated_at' => -6),
+		BasePeer::TYPE_NUM => array (-1, -2, -3, -4, -5, -6)
+	);
+	
 	public function getFieldNameFromPeer ( $field_name )
 	{
-		return CaptionAssetItemPeer::translateFieldName( $field_name , BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME );
+		$toNames = self::getFieldNames(BasePeer::TYPE_COLNAME);
+		$key = isset(self::$fieldKeys[BasePeer::TYPE_FIELDNAME][$field_name]) ? self::$fieldKeys[BasePeer::TYPE_FIELDNAME][$field_name] : null;
+		if ($key === null)
+			return CaptionAssetItemPeer::translateFieldName($field_name, BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME);
+			
+		return $toNames[$key];
 	}
 
 	public function getIdFromPeer()
