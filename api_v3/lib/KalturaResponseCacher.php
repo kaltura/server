@@ -15,6 +15,7 @@ class KalturaResponseCacher
 	protected $_ks = "";
 	protected $_defaultExpiry = 600;
 	protected $_expiry = 600;
+	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
 	
 	protected static $_useCache = true;
 	
@@ -154,9 +155,21 @@ class KalturaResponseCacher
 			if ($contentTypeHdr) {
 				header($contentTypeHdr, true);
 			}	
-			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
-			header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
-			header("Pragma: no-cache", true);
+
+			// for GET requests with kalsig (signature of call params) return cdn/browser caching headers
+			if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_REQUEST["kalsig"]))
+			{
+				$max_age = $this->_cacheHeadersExpiry;
+				header("Cache-Control: private, max-age=$max_age max-stale=0");
+				header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+				header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
+			}
+			else
+			{
+				header("Expires: Sun, 19 Nov 2000 08:52:00 GMT", true);
+				header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
+				header("Pragma: no-cache", true);
+			}
 			
 			echo $response;
 			die;
@@ -179,7 +192,7 @@ class KalturaResponseCacher
 		foreach($headers as $headerStr)
 		{
 			$header = explode(":", $headerStr);
-			if (isset($header[0]) && $header[0] == "Content-Type")
+			if (isset($header[0]) && strtolower($header[0]) == "content-type")
 			{
 				$contentType = $headerStr;
 				break;	
