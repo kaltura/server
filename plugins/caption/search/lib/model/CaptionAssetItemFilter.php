@@ -14,6 +14,8 @@ class CaptionAssetItemFilter extends baseObjectFilter
 			"_in_entry_id",
 			"_eq_partner_id",
 			"_in_partner_id",
+			"_eq_format",
+			"_in_format",
 			"_eq_status",
 			"_in_status",
 			"_notin_status",
