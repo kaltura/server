@@ -32,8 +32,12 @@ class CaptionAssetItemService extends KalturaBaseService
 		if(!$captionAsset)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
-			
-		// TODO delete all old records from sphinx
+		$captionAssetItems = CaptionAssetItemPeer::retrieveByAssetId($captionAssetId);
+		foreach($captionAssetItems as $captionAssetItem)
+		{
+			/* @var $captionAssetItem CaptionAssetItem */
+			$captionAssetItem->delete();
+		}
 		
 		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
@@ -44,8 +48,12 @@ class CaptionAssetItemService extends KalturaBaseService
     	$itemsData = $captionsContentManager->parse($content);
     	foreach($itemsData as $itemData)
     	{
-    		$item = new CaptionAssetItem($captionAsset, $itemData['startTime'], $itemData['endTime'], $itemData['content']);
-    		$item->index();
+    		$item = new CaptionAssetItem();
+    		$item->setCaptionAssetId($captionAsset->getId());
+    		$item->setStartTime($itemData['startTime']);
+    		$item->setEndTime($itemData['endTime']);
+    		$item->setContent($itemData['content']);
+    		$item->save();
     	}
     }
 	

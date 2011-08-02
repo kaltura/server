@@ -286,6 +286,21 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		
 	/**
 	 * @param IIndexable $object
+	 * @return bool
+	 */
+	public function deleteFromSphinx(IIndexable $object)
+	{
+		$id = $object->getIntId();
+		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
+		
+		KalturaLog::debug('Deleting sphinx document for object [' . get_class($object) . '] [' . $object->getId() . ']');
+		$sql = "delete from $index where id = $id";
+		
+		return $this->execSphinx($sql, $object);
+	}
+		
+	/**
+	 * @param IIndexable $object
 	 * @param bool $isInsert
 	 * @param bool $force 
 	 * TODO remove $force after replace bug solved

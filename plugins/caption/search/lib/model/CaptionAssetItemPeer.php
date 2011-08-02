@@ -69,5 +69,13 @@ class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 			
 		return parent::doSelect($c, $con);
 	}
+
+	public static function retrieveByAssetId($assetId, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(CaptionAssetItemPeer::CAPTION_ASSET_ID, $assetId);
+
+		return CaptionAssetItemPeer::doSelect($criteria, $con);
+	}
 	
 } // CaptionAssetItemPeer
