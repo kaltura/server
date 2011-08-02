@@ -152,9 +152,9 @@ kmc.functions = {
 
 		kmc.layout.modal.open( {
 			'width' : 950,
-			'height' : 600,
+			'height' : 580,
 			'title'	: 'Clipping Application',
-			'content' : '<iframe src="' + iframe_url + '" width="100%" height="600"></iframe>'
+			'content' : '<iframe src="' + iframe_url + '" width="100%" height="550"></iframe>'
 		} );
 	}
 };
@@ -538,10 +538,10 @@ kmc.preview_embed = {
 
 		$("#delivery_type").change(function(){
 			kmc.vars.embed_code_delivery_type = this.value;
-			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, has_mobile_flavors, html5_compatible);
+			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, html5_compatible);
 		});
 		$("#player_select").change(function(){
-			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates, has_mobile_flavors, html5_compatible);
+			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates, entry_flavors, html5_compatible);
 		});
 			
 		$("#html5_support").change(function(){
