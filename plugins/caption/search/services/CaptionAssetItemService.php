@@ -13,7 +13,11 @@ class CaptionAssetItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		parent::applyPartnerFilterForClass(new assetPeer());
+		if($actionName != 'parse')
+		{
+			parent::applyPartnerFilterForClass(new assetPeer());
+			parent::applyPartnerFilterForClass(new CaptionAssetItemPeer());
+		}
 		
 		if(!CaptionSearchPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
@@ -28,7 +32,7 @@ class CaptionAssetItemService extends KalturaBaseService
      */
     function parseAction($captionAssetId)
     {
-		$captionAsset = assetPeer::retrieveByIdNoFilter($captionAssetId);
+		$captionAsset = assetPeer::retrieveById($captionAssetId);
 		if(!$captionAsset)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
@@ -50,6 +54,8 @@ class CaptionAssetItemService extends KalturaBaseService
     	{
     		$item = new CaptionAssetItem();
     		$item->setCaptionAssetId($captionAsset->getId());
+    		$item->setEntryId($captionAsset->getEntryId());
+    		$item->setPartnerId($captionAsset->getPartnerId());
     		$item->setStartTime($itemData['startTime']);
     		$item->setEndTime($itemData['endTime']);
     		$item->setContent($itemData['content']);
