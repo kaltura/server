@@ -95,7 +95,6 @@ class KalturaCaptionAssetItemFilter extends KalturaCaptionAssetFilter
 	public $languageEqual;
 
 	/**
-	 * @dynamicType KalturaLanguage
 	 * @var string
 	 */
 	public $languageIn;
