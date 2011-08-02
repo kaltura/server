@@ -50,14 +50,16 @@ class KalturaYouTubeDistributionJobProviderData extends KalturaConfigurableDistr
 		if($flavorAsset) 
 		{
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			if(kFileSyncUtils::fileSync_exists($syncKey))
+			    $this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
 		}
 		
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		if(count($thumbAssets))
 		{
 			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			if(kFileSyncUtils::fileSync_exists($syncKey))
+			    $this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
 		}
 		
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
