@@ -1,11 +1,6 @@
 <?php
 class kLimeLightUrlManager extends kUrlManager
 {
-	protected function getMediaVault()
-	{
-		return kConf::get("limelight_madiavault_password");
-	}
-	
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return string
@@ -36,9 +31,9 @@ class kLimeLightUrlManager extends kUrlManager
 			$url .= '?novar=0';
 			$url .= '&e=' . (time() + 120);
 			
-			$secret = $this->getMediaVault();
+			$key = $this->params['http_auth_key'];
 			$fullUrl = $this->protocol . '://' . $this->domain . $url;
-			$url .= '&h=' . md5($secret . $fullUrl);
+			$url .= '&h=' . md5($key . $fullUrl);
 			
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			$seekFromBytes = $this->getSeekFromBytes(kFileSyncUtils::getLocalFilePathForKey($syncKey));
@@ -47,7 +42,9 @@ class kLimeLightUrlManager extends kUrlManager
 		}
 		else
 		{
-			$url .= '/forceproxy/true';
+        		if($this->extention && strtolower($this->extention) != 'flv' ||
+		                $this->containerFormat && strtolower($this->containerFormat) != 'flash video')
+		                $url = "mp4:$url";
 		}
 		
 		return $url;

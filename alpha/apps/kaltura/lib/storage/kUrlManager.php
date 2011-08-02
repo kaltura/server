@@ -202,7 +202,15 @@ class kUrlManager
 		
 		return $url;
 	}
-	
+
+	/**
+	 * @param string baseUrl
+	 * @param array $flavorUrls
+	 */
+	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
+	{
+	}	
+
 	/**
 	 * @param asset $asset
 	 * @return string

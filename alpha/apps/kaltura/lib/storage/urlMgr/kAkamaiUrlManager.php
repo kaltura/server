@@ -95,6 +95,81 @@ class kAkamaiUrlManager extends kUrlManager
 	}
 
 	/**
+	 * @param string baseUrl
+	 * @param array $flavorUrls
+	 */
+	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
+	{
+		if (!count($flavorsUrls))
+			return;
+
+		if ($this->protocol == StorageProfile::PLAY_FORMAT_RTMP && @$this->params['rtmp_auth_salt'])
+		{
+			$profile = $this->params['rtmp_auth_profile'];
+			$type = $this->params['rtmp_auth_type'];
+			$salt = $this->params['rtmp_auth_salt'];
+			$window = $this->params['rtmp_auth_seconds'];
+			$aifp = $this->params['rtmp_auth_aifp'];
+			$usePrefix = @$this->params['rtmp_auth_slist_find_prefix'];
+
+			if ($usePrefix)
+			{
+				$urls = array();
+				$minLen = 1024;
+
+				foreach($flavorsUrls as $flavor)
+				{
+					$url = $flavor["url"];
+					if (substr($url, 0, 4) == "mp4:")
+						$url = substr($url, 4);
+					$urls[] = $url;
+
+					$minLen = min($minLen, strlen($url));
+				}
+
+				$url = array_pop($urls);
+
+				$scan = true;
+				for($i = 0; $i < $minLen && $scan; $i++)
+				{
+					$c = substr($url, $i, 1);
+					foreach($urls as $url)
+					{
+						if ($c != substr($url, $i, 1))
+						{
+							$scan = false;
+							break;
+						}
+					}
+				}
+	
+				$prefix = substr($url, 0, $i - 1);
+			}
+			else
+			{
+				$prefix = "";
+				foreach($flavorsUrls as $flavor)
+				{
+					$url = $flavor["url"];
+					if (substr($url, 0, 4) == "mp4:")
+						$url = substr($url, 4);
+					$prefix = $prefix . $url . ";";
+				}
+			}
+
+			$factory = new StreamTokenFactory;
+			$token = $factory->getToken($type, $prefix, null, $profile, $salt, null, $window, null, null, null);
+			$auth = "?auth=".$token->getToken()."&aifp=$aifp&slist=$prefix";
+			$baseUrl .= $auth;
+			foreach($flavorsUrls as &$flavor)
+			{
+        			$url = $flavor["url"];
+        			$flavor["url"] = $url.$auth;
+			}
+		}
+	}
+
+	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return string
 	 */
@@ -139,6 +214,7 @@ class kAkamaiUrlManager extends kUrlManager
 			if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 			{
 				$url .= '/forceproxy/true';
+				$url = trim($url, "/");
 				if($this->extention && strtolower($this->extention) != 'flv' ||
 					$this->containerFormat && strtolower($this->containerFormat) != 'flash video')
 					$url = "mp4:$url";
@@ -257,10 +333,9 @@ class kAkamaiUrlManager extends kUrlManager
 	 */
 	public function identifyRequest()
 	{
-		// if the request is proxied get the HOST from the HTTP_X_FORWARDED_HOST header
 		$delivery = @$_SERVER['HTTP_X_FORWARDED_HOST'];
 		if (!$delivery)
-	        $delivery = @$_SERVER['HTTP_HOST'];		
+			$delivery = @$_SERVER['HTTP_HOST'];
 		if ($delivery != @$this->params["http_header_host"])
 			return false;
 		
