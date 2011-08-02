@@ -6,29 +6,27 @@
 class SphinxCaptionAssetItemCriteria extends SphinxCriteria 
 {
 	public static $sphinxFields = array(
-		assetPeer::ID => 'entry_distribution_id',
-		assetPeer::ENTRY_ID => 'entry_id',
-		assetPeer::ID => 'caption_asset_id',
-		assetPeer::TAGS => 'tags',
-		assetPeer::CONTENT => 'content',
-		assetPeer::PARTNER_DESCRIPTION => 'partner_description',
-		assetPeer::LANGUAGE => 'language',
-		assetPeer::LABEL => 'label',
-		assetPeer::CONTAINER_FORMAT => 'format',
+		CaptionAssetItemPeer::ENTRY_ID => 'entry_id',
+		CaptionAssetItemPeer::ID => 'caption_asset_id',
+		CaptionAssetItemPeer::TAGS => 'tags',
+		CaptionAssetItemPeer::CONTENT => 'content',
+		CaptionAssetItemPeer::PARTNER_DESCRIPTION => 'partner_description',
+		CaptionAssetItemPeer::LANGUAGE => 'language',
+		CaptionAssetItemPeer::LABEL => 'label',
+		CaptionAssetItemPeer::CONTAINER_FORMAT => 'format',
 		
-		assetPeer::INT_ID => 'int_caption_asset_id',
-		assetPeer::FLAVOR_PARAMS_ID => 'caption_params_id',
-		assetPeer::PARTNER_ID => 'partner_id',
-		assetPeer::VERSION => 'version',
-		assetPeer::STATUS => 'caption_asset_status',
-		assetPeer::SIZE => 'size',
-		assetPeer::IS_DEFAULT => 'is_default',
-		assetPeer::START_TIME => 'start_time',
-		assetPeer::END_TIME => 'end_time',
+		CaptionAssetItemPeer::INT_ID => 'int_caption_asset_id',
+		CaptionAssetItemPeer::FLAVOR_PARAMS_ID => 'caption_params_id',
+		CaptionAssetItemPeer::PARTNER_ID => 'partner_id',
+		CaptionAssetItemPeer::VERSION => 'version',
+		CaptionAssetItemPeer::STATUS => 'caption_asset_status',
+		CaptionAssetItemPeer::SIZE => 'size',
+		CaptionAssetItemPeer::IS_DEFAULT => 'is_default',
+		CaptionAssetItemPeer::START_TIME => 'start_time',
+		CaptionAssetItemPeer::END_TIME => 'end_time',
 		
-		assetPeer::CREATED_AT => 'created_at',
-		assetPeer::UPDATED_AT => 'updated_at',
-		assetPeer::DELETED_AT => 'deleted_at',
+		CaptionAssetItemPeer::CREATED_AT => 'created_at',
+		CaptionAssetItemPeer::UPDATED_AT => 'updated_at',
 	);
 	
 	public static $sphinxOrderFields = array(

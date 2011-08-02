@@ -25,6 +25,7 @@ class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 	const SIZE = assetPeer::SIZE;
 	const CONTAINER_FORMAT = assetPeer::CONTAINER_FORMAT;
 	
+	const IS_DEFAULT = 'caption_asset.IS_DEFAULT';
 	const PARTNER_DESCRIPTION = 'caption_asset_item.PARTNER_DESCRIPTION';
 	const LANGUAGE = 'caption_asset_item.LANGUAGE';
 	const LABEL = 'caption_asset_item.LABEL';
