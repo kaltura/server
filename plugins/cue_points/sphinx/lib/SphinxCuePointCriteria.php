@@ -61,7 +61,7 @@ class SphinxCuePointCriteria extends SphinxCriteria
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::executeSphinx()
 	 */
-	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit)
+	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
 	{
 		$sql = "SELECT str_cue_point_id FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
 		
