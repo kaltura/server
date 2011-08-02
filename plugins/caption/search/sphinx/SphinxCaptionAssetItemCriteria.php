@@ -3,13 +3,8 @@
  * @package plugins.captionSphinx
  * @subpackage DB
  */
-class SphinxCaptionAssetItemCriteria extends SphinxCriteria implements ICaptionAssetItemCriteria 
+class SphinxCaptionAssetItemCriteria extends SphinxCriteria 
 {
-	/**
-	 * @var array<CaptionAssetItem>
-	 */
-	protected $captionAssetItems = array();
-	
 	public static $sphinxFields = array(
 		assetPeer::ID => 'entry_distribution_id',
 		assetPeer::ENTRY_ID => 'entry_id',
@@ -67,15 +62,6 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria implements ICaptionA
 		return kSphinxSearchManager::getSphinxIndexName(CaptionSphinxPlugin::INDEX_NAME);
 	}
 
-	/* (non-PHPdoc)
-	 * @see ICaptionAssetItemCriteria::getCaptionAssetItems()
-	 */
-	public function getCaptionAssetItems()
-	{
-		$this->applyFilters();
-		return $this->captionAssetItems;
-	}
-	
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria::executeSphinx()
 	 */
