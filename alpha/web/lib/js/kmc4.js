@@ -622,14 +622,14 @@ kmc.preview_embed = {
 		'<dt>Size (KB):</dt><dd>&nbsp;' + flavor_details.sizeKB + '</dd>' +
 		'<dt>Status:</dt><dd>&nbsp;' + flavor_details.status + '</dd>' +
 		'</dl>';
-
+		debugService.trace('doFlavorPreview');
 		kmc.layout.modal.open( {
 			'width' : parseInt(kmc.vars.default_kdp.width) + 20,
 			'height' : parseInt(kmc.vars.default_kdp.height) + 200,
 			'title' : 'Flavor Preview',
 			'content' : '<div id="preview_embed">' + modal_content + '</div>'
 		} );
-
+		debugService.trace('endFlavorPreview');
 	},
 
 	// eventually replace with <? php echo $embedCodeTemplate; ?>  ;  (variables used: HEIGHT WIDTH HOST CACHE_ST UICONF_ID PARTNER_ID PLAYLIST_ID ENTRY_ID) + {VER}, {SILVERLIGHT}, {INIT_PARAMS} for Silverlight + NAME, DESCRIPTION
@@ -960,7 +960,7 @@ kmc.layout = {
 				};
 			// Overwrite defaults with data
 			$.extend(options, data);
-
+			debugService.trace('width: ' + options.width + ', height: ' + options.height );
 			// Set width & height
 			$modal.css( {
 				'width' : options.width,
@@ -990,17 +990,17 @@ kmc.layout = {
 		show: function() {
 			var $modal = $("#modal");
 
-			kmc.utils.hideFlash(true);
-			kmc.layout.overlay.show();
-			$modal.fadeIn(600);
+			kmc.utils.hideFlash(true);debugService.trace('hideFlash');
+			kmc.layout.overlay.show();debugService.trace('showOverlay');
+			$modal.fadeIn(600);debugService.trace('fadeIn');
 			if( ! $.browser.msie ) {
-				$modal.css('display', 'table');
+				$modal.css('display', 'table');debugService.trace('display: table');
 			}
-			this.position();
+			this.position();debugService.trace('position the modal');
 		},
 
 		open: function(data) {
-			this.create(data);
+			this.create(data);debugService.trace('created modal, now display it');
 			this.show();
 		},
 		
@@ -1016,7 +1016,7 @@ kmc.layout = {
 				'top' : mTop + "px",
 				'left' : mLeft + "px"
 			});
-			
+			debugService.trace('top: '+mTop +', left: '+ mLeft);
 		},
 		close: function() {
 			$("#modal").fadeOut(300, function() {
