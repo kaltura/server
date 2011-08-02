@@ -3,7 +3,7 @@
  * Enable indexing and searching caption asset objects in sphinx
  * @package plugins.captionSphinx
  */
-class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers, kObjectDeletedEventConsumer
+class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKalturaCriteriaFactory, IKalturaSphinxConfiguration, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'captionSphinx';
 	
@@ -27,29 +27,7 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	 */
 	public static function getEventConsumers()
 	{
-		return array('CaptionSphinxPlugin');
-	}
-	
-	/* (non-PHPdoc)
-	 * @see kObjectDeletedEventConsumer::objectDeleted()
-	 */
-	public function shouldConsumeDeletedEvent(BaseObject $object)
-	{
-		if($object instanceof CaptionAssetItem)
-			return true;
-			
-		return false;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see kObjectDeletedEventConsumer::objectDeleted()
-	 */
-	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
-	{
-		$sphinxSearchManager = new kSphinxSearchManager();
-		$sphinxSearchManager->deleteFromSphinx($object);
-		
-		return true;
+		return array('kSphinxCaptionAssetFlowManager');
 	}
 	
 	/* (non-PHPdoc)
