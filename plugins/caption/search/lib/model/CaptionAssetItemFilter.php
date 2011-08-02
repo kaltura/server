@@ -65,28 +65,22 @@ class CaptionAssetItemFilter extends baseObjectFilter
 		);
 	}
 
-	/**
-	 * holds an array of keys for quick access to the fieldnames array
-	 *
-	 * first dimension keys are the type constants
-	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
-	 */
-	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('PartnerDescription' => 0, 'Language' => 1, 'Label' => 2, 'Status' => 3, 'Size' => 4, 'UpdatedAt' => 5),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('partnerDescription' => 0, 'language' => 1, 'label' => 2, 'status' => 3, 'size' => 4, 'updatedAt' => 5),
-		BasePeer::TYPE_COLNAME => array (CaptionAssetItemPeer::PARTNER_DESCRIPTION => 0, CaptionAssetItemPeer::LANGUAGE => 1, CaptionAssetItemPeer::LABEL => 2, CaptionAssetItemPeer::STATUS => 3, CaptionAssetItemPeer::SIZE => 4, CaptionAssetItemPeer::UPDATED_AT => 5),
-		BasePeer::TYPE_FIELDNAME => array ('partner_description' => 0, 'language' => 1, 'label' => 2, 'status' => 3, 'size' => 4, 'updated_at' => 5),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5)
-	);
-	
 	public function getFieldNameFromPeer ( $field_name )
 	{
-		$toNames = self::getFieldNames(BasePeer::TYPE_COLNAME);
-		$key = isset(self::$fieldKeys[BasePeer::TYPE_FIELDNAME][$field_name]) ? self::$fieldKeys[BasePeer::TYPE_FIELDNAME][$field_name] : null;
-		if ($key === null)
-			return CaptionAssetItemPeer::translateFieldName($field_name, BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME);
+		if($field_name == 'partner_description')
+			return CaptionAssetItemPeer::PARTNER_DESCRIPTION;
+		if($field_name == 'language')
+			return CaptionAssetItemPeer::LANGUAGE;
+		if($field_name == 'label')
+			return CaptionAssetItemPeer::LABEL;
+		if($field_name == 'status')
+			return CaptionAssetItemPeer::STATUS;
+		if($field_name == 'size')
+			return CaptionAssetItemPeer::SIZE;
+		if($field_name == 'updated_at')
+			return CaptionAssetItemPeer::UPDATED_AT;
 			
-		return $toNames[$key];
+		return CaptionAssetItemPeer::translateFieldName($field_name, BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME);
 	}
 
 	public function getIdFromPeer()
