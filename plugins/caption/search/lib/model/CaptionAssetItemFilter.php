@@ -8,8 +8,8 @@ class CaptionAssetItemFilter extends baseObjectFilter
 	public function init ()
 	{
 		$this->fields = kArray::makeAssociativeDefaultValue(array(
-			"_eq_id",
-			"_in_id",
+			"_eq_caption_asset_id",
+			"_in_caption_asset_id",
 			"_eq_entry_id",
 			"_in_entry_id",
 			"_eq_partner_id",
@@ -52,7 +52,8 @@ class CaptionAssetItemFilter extends baseObjectFilter
 			"end_time",
 		);
 
-		$this->aliases = array();
+		$this->aliases = array(
+		);
 	}
 
 	public function describe()

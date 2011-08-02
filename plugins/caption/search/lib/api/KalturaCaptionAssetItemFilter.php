@@ -7,6 +7,8 @@ class KalturaCaptionAssetItemFilter extends KalturaCaptionAssetFilter
 {
 	private $map_between_objects = array
 	(
+		"idEqual" => "_eq_caption_asset_id",
+		"idIn" => "_in_caption_asset_id",
 		"startTimeGreaterThanOrEqual" => "_gte_start_time",
 		"startTimeLessThanOrEqual" => "_lte_start_time",
 		"endTimeGreaterThanOrEqual" => "_gte_end_time",
