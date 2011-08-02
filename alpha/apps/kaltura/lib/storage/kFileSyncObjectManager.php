@@ -39,6 +39,11 @@ class kFileSyncObjectManager
 				$object = syndicationFeedPeer::retrieveByPK( $objectId );
 				syndicationFeedPeer::setUseCriteriaFilter ( true );
 				break;
+			case FileSyncObjectType::CONVERSION_PROFILE:
+				conversionProfile2Peer::setUseCriteriaFilter ( false );
+				$object = conversionProfile2Peer::retrieveByPK( $objectId );
+				conversionProfile2Peer::setUseCriteriaFilter ( true );
+				break;
 		}
 		
 		if ( $object == null )
