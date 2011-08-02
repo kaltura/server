@@ -39,7 +39,7 @@ class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 		$toNames = self::getFieldNames($toType);
 		$key = isset(self::$fieldKeys[$fromType][$name]) ? self::$fieldKeys[$fromType][$name] : null;
 		if ($key === null)
-			return assetPeer::translateFieldName($name, $fromType, $toType);
+			return parent::translateFieldName($name, $fromType, $toType);
 			
 		return $toNames[$key];
 	}
