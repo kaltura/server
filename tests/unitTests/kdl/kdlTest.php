@@ -30,7 +30,7 @@ class KDLTest extends KalturaServerTestCase
 	 */
 	public function testKDLWrapCDLGenerateTargetFlavors(flavorParams $flavorList, mediaInfo $mediaInfo, flavorParamsOutput $flavorParamsOutput)
 	{
-		print("\nin KDLTest\n");
+//		print("\nin KDLTest\n");
 //		print_r($flavorList, true);
 //		print_r($mediaInfo, true);
 //		print_r($flavorParamsOutput, true);
