@@ -72,11 +72,11 @@ class CaptionAssetItemFilter extends baseObjectFilter
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('PartnerDescription' => -1, 'Language' => -2, 'Label' => -3, 'Status' => -4, 'Size' => -5, 'UpdatedAt' => -6),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('partnerDescription' => -1, 'language' => -2, 'label' => -3, 'status' => -4, 'size' => -5, 'updatedAt' => -6),
-		BasePeer::TYPE_COLNAME => array (CaptionAssetItemPeer::PARTNER_DESCRIPTION => -1, CaptionAssetItemPeer::LANGUAGE => -2, CaptionAssetItemPeer::LABEL => -3, CaptionAssetItemPeer::STATUS => -4, CaptionAssetItemPeer::SIZE => -5, CaptionAssetItemPeer::UPDATED_AT => -6),
-		BasePeer::TYPE_FIELDNAME => array ('partner_description' => -1, 'language' => -2, 'label' => -3, 'status' => -4, 'size' => -5, 'updated_at' => -6),
-		BasePeer::TYPE_NUM => array (-1, -2, -3, -4, -5, -6)
+		BasePeer::TYPE_PHPNAME => array ('PartnerDescription' => 0, 'Language' => 1, 'Label' => 2, 'Status' => 3, 'Size' => 4, 'UpdatedAt' => 5),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('partnerDescription' => 0, 'language' => 1, 'label' => 2, 'status' => 3, 'size' => 4, 'updatedAt' => 5),
+		BasePeer::TYPE_COLNAME => array (CaptionAssetItemPeer::PARTNER_DESCRIPTION => 0, CaptionAssetItemPeer::LANGUAGE => 1, CaptionAssetItemPeer::LABEL => 2, CaptionAssetItemPeer::STATUS => 3, CaptionAssetItemPeer::SIZE => 4, CaptionAssetItemPeer::UPDATED_AT => 5),
+		BasePeer::TYPE_FIELDNAME => array ('partner_description' => 0, 'language' => 1, 'label' => 2, 'status' => 3, 'size' => 4, 'updated_at' => 5),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5)
 	);
 	
 	public function getFieldNameFromPeer ( $field_name )
