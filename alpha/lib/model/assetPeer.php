@@ -13,12 +13,48 @@ class assetPeer extends BaseassetPeer
 	const FLAVOR_OM_CLASS = 'flavorAsset';
 	const THUMBNAIL_OM_CLASS = 'thumbAsset';
 	
+	/**
+	 * Map that holds the assets according to their ids
+	 * @var array<id, asset>
+	 */
+	public static $assetInstancesById = array();
+	
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		assetType::FLAVOR => self::FLAVOR_OM_CLASS,
 		assetType::THUMBNAIL => self::THUMBNAIL_OM_CLASS,
 	);
 
+	public static function addInstanceToPool(asset $obj, $key = null)
+	{
+		parent::addInstanceToPool($obj, $key);
+		
+		if (Propel::isInstancePoolingEnabled())
+			self::$assetInstancesById[$obj->getId()] = $obj;
+	}
+	
+	public static function removeInstanceFromPool($value)
+	{
+		parent::removeInstanceFromPool($value);
+		
+		if (is_object($value) && $value instanceof asset)
+			unset(self::$assetInstancesById[$value->getId()]);
+	}
+
+	public static function getInstanceFromIdPool($key)
+	{
+		if (Propel::isInstancePoolingEnabled() && isset(self::$assetInstancesById[$key]))
+			return self::$assetInstancesById[$key];
+			
+		return null;
+	}
+
+	public static function clearInstancePool()
+	{
+		parent::clearInstancePool();			
+		self::$assetInstancesById = array();
+	}
+	
 	public static function setDefaultCriteriaFilter ()
 	{
 		if(is_null(self::$s_criteria_filter))
@@ -113,6 +149,9 @@ class assetPeer extends BaseassetPeer
 	 */
 	public static function retrieveById($id, $con = null)
 	{
+		if (null !== ($obj = assetPeer::getInstanceFromIdPool($id)))
+			return $obj;
+		
 		$c = new Criteria(); 
 		$c->add(assetPeer::ID, $id); 
 		return assetPeer::doSelectOne($c, $con);
@@ -126,12 +165,11 @@ class assetPeer extends BaseassetPeer
 	 */
 	public static function retrieveByIdNoFilter($id, $con = null)
 	{
-		$c = new Criteria(); 
-		$c->add(assetPeer::ID, $id); 
-		
 		self::setUseCriteriaFilter(false);
-		return assetPeer::doSelectOne($c, $con);
+		$asset = self::retrieveById($id, $con);
 		self::setUseCriteriaFilter(true);
+		
+		return $asset;
 	}
 	
 	/**
