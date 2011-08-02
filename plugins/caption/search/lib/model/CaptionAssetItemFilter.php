@@ -38,18 +38,18 @@ class CaptionAssetItemFilter extends baseObjectFilter
 			"_in_language",
 			"_eq_label",
 			"_in_label",
-			"_lte_start_date",
-			"_gte_start_date",
-			"_lte_end_date",
-			"_gte_end_date",
+			"_gte_start_time",
+			"_lte_start_time",
+			"_gte_end_time",
+			"_lte_end_time",
 		), null);
 
 		$this->allowed_order_fields = array(
 			"created_at",
 			"updated_at",
 			"size",
-			"start_date",
-			"end_date",
+			"start_time",
+			"end_time",
 		);
 
 		$this->aliases = array();
