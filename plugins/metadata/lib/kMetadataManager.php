@@ -219,15 +219,14 @@ class kMetadataManager
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::debug("Found " . count($metadatas) . " metadata object");
 		
-		$data = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA);
-		$searchValues = array();
-		$searchValues[$data] = array();
+		$dataFieldName = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA);
 		
+		$searchValues = array();
 		foreach($metadatas as $metadata)
 			$searchValues = self::getDataSearchValues($metadata, $searchValues);
 		
-		if(count($searchValues) && (count($searchValues[$data])))
-			$searchValues[$data] = implode(',', $searchValues[$data]);
+		if(count($searchValues) && count($searchValues[$dataFieldName]))
+			$searchValues[$dataFieldName] = implode(',', $searchValues[$dataFieldName]);
 		
 		return $searchValues;
 	}
