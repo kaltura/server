@@ -890,7 +890,7 @@ class myPartnerUtils
 			/* prepare mail job, and set EightyPercentWarning() to true/date */
 			$partner->setEightyPercentWarning(time());
 			$partner->setUsageLimitWarning(0);
-			$body_params = array ( $partner->getAdminName(), $partnerPackage['cycle_bw'], $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash , $email_link_hash_adOpt);
+			$body_params = array ( $partner->getAdminName(), $partnerPackage['cycle_bw'], $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
 			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_EIGHTY_PERCENT_WARNING, $partner, $body_params);
 		}
 		elseif ($percent >= 80 &&
@@ -918,7 +918,7 @@ class myPartnerUtils
 			$partner->setUsageLimitWarning(time());
 			// if ($partnerPackage['cycle_fee'] == 0) - script always works on free partners anyway
 			{
-				$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash , $email_link_hash_adOpt);
+				$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
 				myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_LIMIT_WARNING_1, $partner, $body_params);
 			}
 		}
@@ -932,7 +932,7 @@ class myPartnerUtils
 			TRACE("partner ". $partner->getId() ." reached 100% $blocking_days_grace days ago - sending block email and blocking partner");
 				
 			/* send block email and block partner */
-			$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash , $email_link_hash_adOpt);
+			$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
 			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_LIMIT_WARNING_2, $partner, $body_params);
 			if($should_block_delete_partner)
 			{
