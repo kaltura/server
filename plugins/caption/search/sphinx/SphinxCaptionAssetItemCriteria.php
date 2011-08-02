@@ -8,7 +8,6 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 	public static $sphinxFields = array(
 		CaptionAssetItemPeer::ENTRY_ID => 'entry_id',
 		CaptionAssetItemPeer::CAPTION_ASSET_ID => 'caption_asset_id',
-		assetPeer::ID => 'caption_asset_id',
 		CaptionAssetItemPeer::TAGS => 'tags',
 		CaptionAssetItemPeer::CONTENT => 'content',
 		CaptionAssetItemPeer::PARTNER_DESCRIPTION => 'partner_description',
@@ -16,25 +15,22 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 		CaptionAssetItemPeer::LABEL => 'label',
 		assetPeer::CONTAINER_FORMAT => 'format',
 		
-		assetPeer::FLAVOR_PARAMS_ID => 'caption_params_id',
-		assetPeer::PARTNER_ID => 'partner_id',
-		assetPeer::VERSION => 'version',
-		assetPeer::STATUS => 'caption_asset_status',
-		assetPeer::SIZE => 'size',
+		CaptionAssetItemPeer::STATUS => 'caption_asset_status',
+		CaptionAssetItemPeer::SIZE => 'size',
 		CaptionAssetItemPeer::START_TIME => 'start_time',
 		CaptionAssetItemPeer::END_TIME => 'end_time',
 		
-		assetPeer::CREATED_AT => 'created_at',
-		assetPeer::UPDATED_AT => 'updated_at',
+		CaptionAssetItemPeer::CREATED_AT => 'created_at',
+		CaptionAssetItemPeer::UPDATED_AT => 'updated_at',
 	);
 	
 	public static $sphinxOrderFields = array(
-		assetPeer::SIZE => 'size',
+		CaptionAssetItemPeer::SIZE => 'size',
 		CaptionAssetItemPeer::START_TIME => 'start_time',
 		CaptionAssetItemPeer::END_TIME => 'end_time',
 		
-		assetPeer::CREATED_AT => 'created_at',
-		assetPeer::UPDATED_AT => 'updated_at',
+		CaptionAssetItemPeer::CREATED_AT => 'created_at',
+		CaptionAssetItemPeer::UPDATED_AT => 'updated_at',
 	);
 	
 	/**

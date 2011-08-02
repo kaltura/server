@@ -19,6 +19,9 @@ class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 	const PARTNER_DESCRIPTION = 'caption_asset_item.PARTNER_DESCRIPTION';
 	const LANGUAGE = 'caption_asset_item.LANGUAGE';
 	const LABEL = 'caption_asset_item.LABEL';
+	const STATUS = 'caption_asset_item.STATUS';
+	const SIZE = 'caption_asset_item.SIZE';
+	const UPDATED_AT = 'caption_asset_item.UPDATED_AT';
 
 	/**
 	 * holds an array of keys for quick access to the fieldnames array
@@ -27,10 +30,10 @@ class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('PartnerDescription' => 0, 'Language' => 1, 'Label' => 2),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('partnerDescription' => 0, 'language' => 1, 'label' => 2),
-		BasePeer::TYPE_COLNAME => array (self::PARTNER_DESCRIPTION => 0, self::LANGUAGE => 1, self::LABEL => 2),
-		BasePeer::TYPE_FIELDNAME => array ('partner_description' => 0, 'language' => 1, 'label' => 2),
+		BasePeer::TYPE_PHPNAME => array ('PartnerDescription' => 0, 'Language' => 1, 'Label' => 2, 'Status' => 3, 'Size' => 4, 'UpdatedAt' => 5),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('partnerDescription' => 0, 'language' => 1, 'label' => 2, 'status' => 3, 'size' => 4, 'updated_at' => 5),
+		BasePeer::TYPE_COLNAME => array (self::PARTNER_DESCRIPTION => 0, self::LANGUAGE => 1, self::LABEL => 2, self::STATUS => 3, self::SIZE => 4, self::UPDATED_AT => 5),
+		BasePeer::TYPE_FIELDNAME => array ('partner_description' => 0, 'language' => 1, 'label' => 2, 'status' => 3, 'size' => 4, 'updated_at' => 5),
 		BasePeer::TYPE_NUM => array (0, 1, 2)
 	);
 	
