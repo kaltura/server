@@ -416,8 +416,13 @@ $format = "fl";
 				$cmdStr = $cmdStr.",scale=".$this->_vidWid.":".$this->_vidHgt;
 			if($this->_vidScanType!==null && $this->_vidScanType>0) // ScanType 0:progressive, 1:interlaced
 				$cmdStr = $cmdStr.",yadif=3,mcdeint,framestep=2";
-			if($this->_vidRotation)
-				$cmdStr = $cmdStr.",rotate=1";
+			if(isset($this->_vidRotation)) {
+				if($this->_vidRotation==180)
+					$cmdStr = $cmdStr.",flip";
+				else
+					$cmdStr = $cmdStr.",rotate=1";
+				
+			}
 		}
 		else {
 			$cmdStr = $cmdStr." -novideo";
@@ -526,10 +531,10 @@ $format = "fl";
 			if($this->_vidGop!==null && $this->_vidGop>0) 
 				$cmdStr = $cmdStr." -k ".$this->_vidGop;
 			if($this->_vidWid && $this->_vidHgt){
-				if($this->_vidRotation)
-					$cmdStr = $cmdStr." -h ".$this->_vidWid." -w ".$this->_vidHgt;
-				else
+				if(is_null($this->_vidRotation) || $this->_vidRotation==0  || $this->_vidRotation==180)
 					$cmdStr = $cmdStr." -w ".$this->_vidWid." -h ".$this->_vidHgt;
+				else
+					$cmdStr = $cmdStr." -h ".$this->_vidWid." -w ".$this->_vidHgt;
 			}
 			if($this->_vidScanType!==null && $this->_vidScanType>0){ // ScanType 0:progressive, 1:interlaced
 				$cmdStr .= " --deinterlace=1";
