@@ -7,7 +7,8 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 {
 	public static $sphinxFields = array(
 		CaptionAssetItemPeer::ENTRY_ID => 'entry_id',
-		CaptionAssetItemPeer::ID => 'caption_asset_id',
+		CaptionAssetItemPeer::CAPTION_ASSET_ID => 'caption_asset_id',
+		assetPeer::ID => 'caption_asset_id',
 		CaptionAssetItemPeer::TAGS => 'tags',
 		CaptionAssetItemPeer::CONTENT => 'content',
 		CaptionAssetItemPeer::PARTNER_DESCRIPTION => 'partner_description',
@@ -15,7 +16,6 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 		CaptionAssetItemPeer::LABEL => 'label',
 		assetPeer::CONTAINER_FORMAT => 'format',
 		
-		assetPeer::INT_ID => 'int_caption_asset_id',
 		assetPeer::FLAVOR_PARAMS_ID => 'caption_params_id',
 		assetPeer::PARTNER_ID => 'partner_id',
 		assetPeer::VERSION => 'version',
