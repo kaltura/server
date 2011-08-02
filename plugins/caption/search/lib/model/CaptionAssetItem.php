@@ -1,51 +1,39 @@
 <?php
+
+
 /**
+ * Skeleton subclass for representing a row from the 'caption_asset_item' table.
+ *
+ * 
+ *
+ * You should add additional methods to this class to meet the
+ * application requirements.  This class will only be generated as
+ * long as it does not already exist in the output directory.
+ *
  * @package plugins.captionSearch
  * @subpackage model
- */ 
-class CaptionAssetItem extends BaseObject implements IIndexable
+ */
+class CaptionAssetItem extends BaseCaptionAssetItem implements IIndexable
 {
 	/**
 	 * @var CaptionAsset
 	 */
-	protected $asset;
+	protected $aAsset = null;
 	
 	/**
-	 * @var int
+	 * @var entry
 	 */
-	protected $startTime;
-	
-	/**
-	 * @var int
-	 */
-	protected $endTime;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	protected $content;
-	
-	/**
-	 * @param CaptionAsset $asset
-	 * @param int $startTime
-	 * @param int $endTime
-	 * @param string $content
-	 */
-	public function __construct(CaptionAsset $asset, $startTime, $endTime, $content)
-	{
-		$this->asset = $asset;
-		$this->startTime = $startTime;
-		$this->endTime = $endTime;
-		$this->content = $content;
-	}
+	protected $aEntry = null;
 	
 	/**
 	 * @return CaptionAsset
 	 */
 	public function getAsset()
 	{
-		return $this->asset();
+		if(!$this->aAsset && $this->getCaptionAssetId())
+			$this->aAsset = assetPeer::retrieveById($this->getCaptionAssetId());
+			
+		return $this->aAsset;
 	}
 	
 	/**
@@ -53,47 +41,26 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getEntry()
 	{
-		return $this->asset->getentry();
+		if(!$this->aEntry && $this->getEntryId())
+			$this->aEntry = entryPeer::retrieveByPK($this->getEntryId());
+			
+		return $this->aEntry;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see IIndexable::getId()
-	 */
-	public function getId()
-	{
-		return $this->asset->getId();
-	}
-
 	/* (non-PHPdoc)
 	 * @see IIndexable::getIntId()
 	 */
 	public function getIntId()
 	{
-		return $this->asset->getIntId();
+		return $this->getId();
 	}
 
-	/* (non-PHPdoc)
-	 * @see IIndexable::getEntryId()
-	 */
-	public function getEntryId()
-	{
-		return $this->asset->getEntryId();
-	}
-	
 	/**
 	 * @return string
 	 */
 	public function getTags()
 	{
-		return $this->asset->getTags();
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getContent()
-	{
-		return $this->content;
+		return $this->getAsset()->getTags();
 	}
 	
 	/**
@@ -101,7 +68,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getPartnerDescription()
 	{
-		return $this->asset->getPartnerDescription();
+		return $this->getAsset()->getPartnerDescription();
 	}
 	
 	/**
@@ -109,7 +76,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getLanguage()
 	{
-		return $this->asset->getLanguage();
+		return $this->getAsset()->getLanguage();
 	}
 	
 	/**
@@ -117,7 +84,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getLabel()
 	{
-		return $this->asset->getLabel();
+		return $this->getAsset()->getLabel();
 	}
 	
 	/**
@@ -125,7 +92,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getFormat()
 	{
-		return $this->asset->getContainerFormat();
+		return $this->getAsset()->getContainerFormat();
 	}
 	
 	/**
@@ -133,7 +100,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getCaptionParamsId()
 	{
-		return $this->asset->getFlavorParamsId();
+		return $this->getAsset()->getFlavorParamsId();
 	}
 	
 	/**
@@ -141,7 +108,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getVersion()
 	{
-		return $this->asset->getVersion();
+		return $this->getAsset()->getVersion();
 	}
 	
 	/**
@@ -149,7 +116,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getStatus()
 	{
-		return $this->asset->getStatus();
+		return $this->getAsset()->getStatus();
 	}
 	
 	/**
@@ -157,7 +124,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getSize()
 	{
-		return $this->asset->getSize();
+		return $this->getAsset()->getSize();
 	}
 	
 	/**
@@ -165,34 +132,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getDefault()
 	{
-		return $this->asset->getDefault();
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function getStartTime()
-	{
-		return $this->startTime;
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function getEndTime()
-	{
-		return $this->endTime;
-	}
-	
-	/**
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
-	 */
-	public function getCreatedAt($format = 'Y-m-d H:i:s')
-	{
-		return $this->asset->getCreatedAt($format);
+		return $this->getAsset()->getDefault();
 	}
 	
 	/**
@@ -203,7 +143,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getUpdatedAt($format = 'Y-m-d H:i:s')
 	{
-		return $this->asset->getUpdatedAt($format);
+		return $this->getAsset()->getUpdatedAt($format);
 	}
 	
 	/**
@@ -214,7 +154,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function getDeletedAt($format = 'Y-m-d H:i:s')
 	{
-		return $this->asset->getDeletedAt($format);
+		return $this->getAsset()->getDeletedAt($format);
 	}
 
 	/* (non-PHPdoc)
@@ -232,7 +172,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	{
 		return array(
 			'entry_id' => 'entryId',
-			'caption_asset_id' => 'id',
+			'caption_asset_id' => 'captionAssetId',
 			'tags' => 'tags',
 			'content' => 'content',
 			'partner_description' => 'partnerDescription',
@@ -240,7 +180,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 			'label' => 'label',
 			'format' => 'format',
 			
-			'int_caption_asset_id' => 'intId',
+			'int_id' => 'intId',
 			'caption_params_id' => 'captionParamsId',
 			'partner_id' => 'partnerId',
 			'version' => 'version',
@@ -252,11 +192,9 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 			
 			'created_at' => 'createdAt',
 			'updated_at' => 'updatedAt',
-			'deleted_at' => 'deletedAt',
 			
 			'str_entry_id' => 'entryId',
 			'str_caption_asset_id' => 'id',
-			'str_content' => 'content',
 		);
 	}
 
@@ -270,7 +208,7 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 		'label' => IIndexable::FIELD_TYPE_STRING,
 		'format' => IIndexable::FIELD_TYPE_STRING,
 		
-		'int_caption_asset_id' => IIndexable::FIELD_TYPE_INTEGER,
+		'int_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'caption_params_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'partner_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'version' => IIndexable::FIELD_TYPE_INTEGER,
@@ -282,11 +220,9 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 		
 		'created_at' => IIndexable::FIELD_TYPE_DATETIME,
 		'updated_at' => IIndexable::FIELD_TYPE_DATETIME,
-		'deleted_at' => IIndexable::FIELD_TYPE_DATETIME,
 		
 		'str_entry_id' => IIndexable::FIELD_TYPE_STRING,
 		'str_caption_asset_id' => IIndexable::FIELD_TYPE_STRING,
-		'str_content' => IIndexable::FIELD_TYPE_STRING,
 	);
 	
 	/* (non-PHPdoc)
@@ -305,22 +241,44 @@ class CaptionAssetItem extends BaseObject implements IIndexable
 	 */
 	public function setUpdatedAt($time)
 	{
-		return $this->asset->setUpdatedAt($time);
+		return $this; // updates nothing
 	}
 
 	/* (non-PHPdoc)
-	 * @see IBaseObject::getPartnerId()
+	 * @see lib/model/om/Baseentry#postInsert()
 	 */
-	public function getPartnerId()
+	public function postInsert(PropelPDO $con = null)
 	{
-		return $this->asset->getPartnerId();
+		parent::postInsert($con);
+	
+		if (!$this->alreadyInSave)
+			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
 	}
 
-	/**
-	 * Save the object to the index
+	/* (non-PHPdoc)
+	 * @see lib/model/om/Baseentry#postUpdate()
 	 */
-	public function index()
+	public function postUpdate(PropelPDO $con = null)
 	{
-		kEventsManager::raiseEvent(new kObjectAddedEvent($this));
+		if ($this->alreadyInSave)
+			return parent::postUpdate($con);
+		
+		$objectUpdated = $this->isModified();
+			
+		$ret = parent::postUpdate($con);
+					
+		if($objectUpdated)
+			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
+			
+		return $ret;
 	}
-}
+	
+	/* (non-PHPdoc)
+	 * @see BaseObject::postDelete()
+	 */
+	public function postDelete(PropelPDO $con = null)
+	{
+		kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
+	}
+	
+} // CaptionAssetItem

@@ -45,7 +45,7 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			'label' => SphinxFieldType::RT_FIELD,
 			'format' => SphinxFieldType::RT_FIELD,
 			
-			'int_caption_asset_id' => SphinxFieldType::RT_ATTR_BIGINT,
+			'int_id' => SphinxFieldType::RT_ATTR_BIGINT,
 			'caption_params_id' => SphinxFieldType::RT_ATTR_BIGINT,
 			'partner_id' => SphinxFieldType::RT_ATTR_BIGINT,
 			'version' => SphinxFieldType::RT_ATTR_BIGINT,
@@ -57,11 +57,9 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			
 			'created_at' => SphinxFieldType::RT_ATTR_TIMESTAMP,
 			'updated_at' => SphinxFieldType::RT_ATTR_TIMESTAMP,
-			'deleted_at' => SphinxFieldType::RT_ATTR_TIMESTAMP,
 			
 			'str_entry_id' => SphinxFieldType::RT_ATTR_STRING,
 			'str_caption_asset_id' => SphinxFieldType::RT_ATTR_STRING,
-			'str_content' => SphinxFieldType::RT_ATTR_STRING,
 		);
 	}
 	

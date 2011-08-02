@@ -81,18 +81,8 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria implements ICaptionA
 	 */
 	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit)
 	{
-		$fields = array(
-			'str_entry_id',
-			'str_caption_asset_id',
-			'int_caption_asset_id',
-			'start_time',
-			'end_time',
-			'str_content',
-		);
-		$fields = implode(',', $fields);
-		
-		$sql = "SELECT $fields FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
-		
+		$sql = "SELECT int_id FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
+	
 		//debug query
 		//echo $sql."\n"; die;
 		$pdo = DbManager::getSphinxConnection();
@@ -103,45 +93,47 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria implements ICaptionA
 			return;
 		}
 		
-		$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		KalturaLog::log("Found " . count($items) . " items");
+		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
+		$ids = $this->applyIds($ids);
+		$this->setFetchedIds($ids);
+		KalturaLog::log("Found " . count($ids) . " ids");
 		
-		$entryPKs = array();
-		$assetPKs = array();
-		foreach($items as $item)
+		foreach($this->keyToRemove as $key)
 		{
-			$entryPKs[] = $item['entry_id'];
-			$assetPKs[] = $item['int_caption_asset_id'];
+			KalturaLog::log("Removing key [$key] from criteria");
+			$this->remove($key);
 		}
 		
-		// Load all entry and asset objects to the instance pool
-		entryPeer::retrieveByPKs($entryPKs);
-		assetPeer::retrieveByPKs($assetPKs);
-		
-		$this->captionAssetItems = array();
-		foreach($items as $item)
-		{
-			$asset = assetPeer::retrieveByPK($item['int_caption_asset_id']);
-			$this->captionAssetItems[] = new CaptionAssetItem($asset, $item['start_time'], $item['end_time'], $item['str_content']);
-		}
+		$this->addAnd(CaptionAssetItemPeer::ID, $ids, Criteria::IN);
 		
 		$this->recordsCount = 0;
-		if(!$this->doCount || !$setLimit)
+		
+		if(!$this->doCount)
 			return;
 			
-		$this->setOffset(0);
-		
-		$sql = "show meta";
-		$stmt = $pdo->query($sql);
-		$meta = $stmt->fetchAll(PDO::FETCH_NAMED);
-		if(count($meta))
+		if($setLimit)
 		{
-			foreach($meta as $metaItem)
+			$this->setOffset(0);
+			
+			$sql = "show meta";
+			$stmt = $pdo->query($sql);
+			$meta = $stmt->fetchAll(PDO::FETCH_NAMED);
+			if(count($meta))
 			{
-				KalturaLog::log("Sphinx query " . $metaItem['Variable_name'] . ': ' . $metaItem['Value']);
-				if($metaItem['Variable_name'] == 'total_found')
-					$this->recordsCount = (int)$metaItem['Value'];
+				foreach($meta as $metaItem)
+				{
+					KalturaLog::log("Sphinx query " . $metaItem['Variable_name'] . ': ' . $metaItem['Value']);
+					if($metaItem['Variable_name'] == 'total_found')
+						$this->recordsCount = (int)$metaItem['Value'];
+				}
 			}
+		}
+		else
+		{
+			$c = clone $this;
+			$c->setLimit(null);
+			$c->setOffset(null);
+			$this->recordsCount = CaptionAssetItemPeer::doCount($c);
 		}
 	}
 
