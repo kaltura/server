@@ -622,7 +622,7 @@ kmc.preview_embed = {
 		'<dt>Size (KB):</dt><dd>&nbsp;' + flavor_details.sizeKB + '</dd>' +
 		'<dt>Status:</dt><dd>&nbsp;' + flavor_details.status + '</dd>' +
 		'</dl>';
-		debugService.trace('doFlavorPreview');
+		debugService.trace('doFlavorPreview (width: '+kmc.vars.default_kdp.width+', height:' + kmc.vars.default_kdp.height + ')');
 		kmc.layout.modal.open( {
 			'width' : parseInt(kmc.vars.default_kdp.width) + 20,
 			'height' : parseInt(kmc.vars.default_kdp.height) + 200,
