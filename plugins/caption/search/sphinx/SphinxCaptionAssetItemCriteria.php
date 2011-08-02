@@ -13,9 +13,10 @@ class SphinxCaptionAssetItemCriteria extends SphinxCriteria
 		CaptionAssetItemPeer::PARTNER_DESCRIPTION => 'partner_description',
 		CaptionAssetItemPeer::LANGUAGE => 'language',
 		CaptionAssetItemPeer::LABEL => 'label',
-		assetPeer::CONTAINER_FORMAT => 'format',
+		CaptionAssetItemPeer::FORMAT => 'format',
 		
 		CaptionAssetItemPeer::PARTNER_ID => 'partner_id',
+		CaptionAssetItemPeer::STATUS => 'caption_asset_status',
 		CaptionAssetItemPeer::STATUS => 'caption_asset_status',
 		CaptionAssetItemPeer::SIZE => 'size',
 		CaptionAssetItemPeer::START_TIME => 'start_time',

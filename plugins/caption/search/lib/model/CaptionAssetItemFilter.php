@@ -79,6 +79,8 @@ class CaptionAssetItemFilter extends baseObjectFilter
 			return CaptionAssetItemPeer::SIZE;
 		if($field_name == 'updated_at')
 			return CaptionAssetItemPeer::UPDATED_AT;
+		if($field_name == 'format')
+			return CaptionAssetItemPeer::FORMAT;
 			
 		return CaptionAssetItemPeer::translateFieldName($field_name, BasePeer::TYPE_FIELDNAME , BasePeer::TYPE_COLNAME);
 	}

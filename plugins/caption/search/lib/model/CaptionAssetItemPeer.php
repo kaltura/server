@@ -22,6 +22,7 @@ class CaptionAssetItemPeer extends BaseCaptionAssetItemPeer {
 	const STATUS = 'caption_asset_item.STATUS';
 	const SIZE = 'caption_asset_item.SIZE';
 	const UPDATED_AT = 'caption_asset_item.UPDATED_AT';
+	const FORMAT = 'caption_asset_item.FORMAT';
 
 	/**
 	 * @param Criteria $criteria
