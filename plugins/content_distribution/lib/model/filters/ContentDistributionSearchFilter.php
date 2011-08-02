@@ -182,7 +182,7 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		return $this->condition;
 	}
 	
-	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$orderByClause)
+	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
 	{
 		$condition = $this->getCondition();
 		if(class_exists('ContentDistributionSphinxPlugin'))
