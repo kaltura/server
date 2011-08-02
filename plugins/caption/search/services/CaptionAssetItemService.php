@@ -74,29 +74,29 @@ class CaptionAssetItemService extends KalturaBaseService
 	 */
 	function searchAction(KalturaBaseEntryFilter $entryFilter = null, KalturaCaptionAssetItemFilter $captionAssetItemFilter = null, KalturaFilterPager $captionAssetItemPager = null)
 	{
-		if (!$entryFilter)
-			$entryFilter = new KalturaBaseEntryFilter();
-
 		if (!$captionAssetItemPager)
 			$captionAssetItemPager = new KalturaFilterPager();
 			
 		if (!$captionAssetItemFilter)
 			$captionAssetItemFilter = new KalturaCaptionAssetItemFilter();
 			
-		$entryCoreFilter = new entryFilter();
-		$entryFilter->toObject($entryCoreFilter);
-
-		$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$entryCoreFilter->attachToCriteria($entryCriteria);
-		$entryCriteria->applyFilters();
-		
-		$entryIds = $entryCriteria->getFetchedIds();
-		
-		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
-		
 		$captionAssetItemCoreFilter = new CaptionAssetItemFilter();
 		$captionAssetItemFilter->toObject($captionAssetItemCoreFilter);
-		$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
+		
+		if ($entryFilter)
+		{
+			$entryCoreFilter = new entryFilter();
+			$entryFilter->toObject($entryCoreFilter);
+				
+			$entryCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+			$entryCoreFilter->attachToCriteria($entryCriteria);
+			$entryCriteria->applyFilters();
+			
+			$entryIds = $entryCriteria->getFetchedIds();
+			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
+		}
+		
+		$captionAssetItemCriteria = KalturaCriteria::create(CaptionAssetItemPeer::OM_CLASS);
 		
 		$captionAssetItemCoreFilter->attachToCriteria($captionAssetItemCriteria);
 		$captionAssetItemPager->attachToCriteria($captionAssetItemCriteria);
