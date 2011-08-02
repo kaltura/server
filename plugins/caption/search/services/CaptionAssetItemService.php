@@ -103,8 +103,8 @@ class CaptionAssetItemService extends KalturaBaseService
 		
 		$dbList = CaptionAssetItemPeer::doSelect($captionAssetItemCriteria);
 		
-		$list = KalturaCaptionAssetArray::fromDbArray($dbList);
-		$response = new KalturaCaptionAssetListResponse();
+		$list = KalturaCaptionAssetItemArray::fromDbArray($dbList);
+		$response = new KalturaCaptionAssetItemListResponse();
 		$response->objects = $list;
 		$response->totalCount = $captionAssetItemCriteria->getRecordsCount();
 		return $response;    
