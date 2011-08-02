@@ -30,17 +30,12 @@ class KMCTest extends KalturaApiTestCase
 	 * @param array<unknown_type> $results
 	 * @dataProvider provideData
 	 */
-	public function testKMCAction($uiConfId, $uiConf2Id, $uiConf3Id, $userId, $results)
+	public function testKMCAction($kmcUiConfId, $permissionsUiConf2Id, $dashboardUiConf3Id, $userId, $results)
 	{
-		print("\nin KMCTest\n");
-		
-		//Starting multirequest
+		//Starting multirequest - ui conf
 		$this->client->startMultiRequest();
-//		$userId = 'noga@mailinator.com';
-//		$uiConfId = 3550492;
-//		$uiConf2Id = 3550491;
-		$uiConf = $this->client->uiConf->get($uiConfId);
-		$uiConf2 = $this->client->uiConf->get($uiConf2Id);
+		$kmcUiConf = $this->client->uiConf->get($kmcUiConfId);
+		$permissionsUiConf2 = $this->client->uiConf->get($permissionsUiConf2Id);
 		$user = $this->client->user->get($userId);
 		$userRole = $this->client->userRole->get($user->roleId);
 		$filter = new KalturaPermissionFilter();
@@ -49,10 +44,9 @@ class KMCTest extends KalturaApiTestCase
 		$permissions = $this->client->permission->listAction($filter);
 		$results = $this->client->doMultiRequest();
 
-		//Dashboard ui conf
-//		$uiConf3Id = 3550477;		
-		$uiConf3 = $this->client->uiConf->get($uiConf3Id);
-		
+		//Dashboard ui Conf
+		$uiConf3 = $this->client->uiConf->get($dashboardUiConf3Id);
+
 		//Dashboard tab
 		$this->client->startMultiRequest();
 		$usage = $this->client->partner->getUsage();
