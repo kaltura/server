@@ -42,7 +42,7 @@ class KalturaEntryResource extends KalturaContentResource
     	
     	if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
     	{
-			$object_to_fill->setFileSyncObjectType(FileSync::FILE_SYNC_OBJECT_TYPE_ENTRY);
+			$object_to_fill->setFileSyncObjectType(FileSyncObjectType::ENTRY);
 			$object_to_fill->setObjectSubType(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			$object_to_fill->setObjectId($srcEntry->getId());
 			
@@ -58,7 +58,7 @@ class KalturaEntryResource extends KalturaContentResource
 		if (!$srcFlavorAsset)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $this->assetId);
 			
-		$object_to_fill->setFileSyncObjectType(FileSync::FILE_SYNC_OBJECT_TYPE_FLAVOR_ASSET);
+		$object_to_fill->setFileSyncObjectType(FileSyncObjectType::FLAVOR_ASSET);
 		$object_to_fill->setObjectSubType(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$object_to_fill->setObjectId($srcFlavorAsset->getId());
 		
