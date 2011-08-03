@@ -30,7 +30,10 @@ class ThumbAssetService extends KalturaBaseService
 			$actionName == 'generateByEntryId' ||
 			$actionName == 'regenerate'
 			)
+		{
+			$this->partnerGroup .= ',0';
 			return true;
+		}
 			
 		return parent::kalturaNetworkAllowed($actionName);
 	}

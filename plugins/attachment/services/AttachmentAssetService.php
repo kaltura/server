@@ -26,7 +26,10 @@ class AttachmentAssetService extends KalturaBaseService
 			$actionName == 'list' ||
 			$actionName == 'getDownloadUrl'
 			)
+		{
+			$this->partnerGroup .= ',0';
 			return true;
+		}
 			
 		return parent::kalturaNetworkAllowed($actionName);
 	}

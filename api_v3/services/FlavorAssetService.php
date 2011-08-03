@@ -32,7 +32,10 @@ class FlavorAssetService extends KalturaBaseService
 			$actionName == 'convert' ||
 			$actionName == 'reconvert'
 			)
+		{
+			$this->partnerGroup .= ',0';
 			return true;
+		}
 			
 		return parent::kalturaNetworkAllowed($actionName);
 	}
