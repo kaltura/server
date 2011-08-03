@@ -16,6 +16,10 @@ class AssetFilter extends baseObjectFilter
 			"_in_entry_id",
 			"_eq_partner_id",
 			"_in_partner_id",
+			"_eq_format",
+			"_in_format",
+			"_eq_container_format",
+			"_in_container_format",
 			"_eq_status",
 			"_in_status",
 			"_notin_status",
@@ -36,6 +40,9 @@ class AssetFilter extends baseObjectFilter
 			"size",
 		);
 			
+		$this->aliases = array ( 
+			"format" => "container_format",
+		);
 	}
 
 	public function describe() 
