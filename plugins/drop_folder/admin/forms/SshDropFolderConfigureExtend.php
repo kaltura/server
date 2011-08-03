@@ -25,15 +25,15 @@ abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolder
 		));
 		
 		$this->addElement('file', 'sshPublicKey', array(
-			'label' => 'SFTP Public Key:'
+			'label' => 'SSH Public Key:'
 		));
 		
 		$this->addElement('file', 'sshPrivateKey', array(
-			'label' => 'SFTP Private Key:'
+			'label' => 'SSH Private Key:'
 		));
 		
 		$this->addElement('text', 'passPhrase', array(
-			'label'			=> 'Pass Phrase:',
+			'label'			=> 'SSH Pass Phrase:',
 			'filters'		=> array('StringTrim'),
 		));
 	}
