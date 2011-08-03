@@ -419,8 +419,12 @@ class KalturaSyndicationFeedRenderer
 			// in case no video player is requested by user and the entry is mix, skip it	
 			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
 				continue;
+				
+			//syndication parameters to pass to XSLT
+			$xslParams = array();	
+			$xslParams['KalturaHasNextItem'] = $nextEntry ? true : false;
 			
-			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $nextEntry ? true : false);				
+			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $xslParams);				
 		}
 		echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
 	}

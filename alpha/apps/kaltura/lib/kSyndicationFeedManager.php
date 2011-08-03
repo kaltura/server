@@ -160,7 +160,7 @@ class kSyndicationFeedManager
 	 * @param $syndicationFeed
 	 * @return string
 	 */
-	public static function getMrssEntry(entry $entry, syndicationFeed $syndicationFeed = null, $link = null, $hasNextItem = false)
+	public static function getMrssEntry(entry $entry, syndicationFeed $syndicationFeed = null, $link = null, $xslParams = array())
 	{
 		$entryMrss =  self::getMrssEntryXml($entry, $syndicationFeed, $link);
 		
@@ -173,7 +173,7 @@ class kSyndicationFeedManager
 		if (($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null(self::getXslt($syndicationFeed))))
 		{
 			$itemXslt = self::getKalturaItemXslt(self::getXslt($syndicationFeed));
-			$entryMrss = self::transformXmlUsingXslt($entryMrss, $itemXslt, array('hasNextItem' => $hasNextItem));
+			$entryMrss = self::transformXmlUsingXslt($entryMrss, $itemXslt, $xslParams);
 			$entryMrss = self::removeNamespaces($entryMrss);
 		}
 		$entryMrss = self::removeXmlHeader($entryMrss);
