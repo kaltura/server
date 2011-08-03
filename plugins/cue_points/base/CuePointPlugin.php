@@ -139,8 +139,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		else
 			$scenes = $mrss->addChild('scenes');
 		
-		$type = self::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION);
-		$cuePoints = CuePointPeer::retrieveByEntryId($object->getId(), $type);
+		$cuePoints = CuePointPeer::retrieveByEntryId($object->getId());
 		
 		kCuePointManager::generateXml($cuePoints);
 	}
