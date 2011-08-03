@@ -47,7 +47,7 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer
 		return $dbBatchJob;
 	}
 	
-	protected function updatedImportnFailed(BatchJob $dbBatchJob, kDropFolderImportJobData $data, BatchJob $twinJob = null)
+	protected function updatedImportFailed(BatchJob $dbBatchJob, kDropFolderImportJobData $data, BatchJob $twinJob = null)
 	{
 	    // set drop folder file status to ERROR_DOWNLOADING
 		$dropFolderFile = DropFolderFilePeer::retrieveByPK($data->getDropFolderFileId());
