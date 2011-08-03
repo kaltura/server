@@ -94,12 +94,13 @@ class SyndicationFeedService extends KalturaBaseService
 	 * @action get
 	 * @param string $id
 	 * @return KalturaBaseSyndicationFeed
+	 * @throws KalturaErrors::INVALID_FEED_ID
 	 */
 	public function getAction($id)
 	{
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($id);
 		if (!$syndicationFeedDB)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_FEED_ID, $id);
 			
 		$syndicationFeed = KalturaSyndicationFeedFactory::getInstanceByType($syndicationFeedDB->getType());
 		//echo $syndicationFeed->feedUrl; die;
@@ -114,12 +115,13 @@ class SyndicationFeedService extends KalturaBaseService
 	 * @param string $id
 	 * @param KalturaBaseSyndicationFeed $syndicationFeed
 	 * @return KalturaBaseSyndicationFeed
+	 * @throws KalturaErrors::INVALID_FEED_ID
 	 */
 	public function updateAction($id, KalturaBaseSyndicationFeed $syndicationFeed)
 	{
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($id);
 		if (!$syndicationFeedDB)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_FEED_ID, $id);
 		
 		$syndicationFeed->toUpdatableObject($syndicationFeedDB, array('type'));	
 		
@@ -146,12 +148,14 @@ class SyndicationFeedService extends KalturaBaseService
 	 * 
 	 * @action delete
 	 * @param string $id
+	 * @throws KalturaErrors::INVALID_FEED_ID
 	 */
 	public function deleteAction($id)
 	{
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($id);
 		if (!$syndicationFeedDB)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
+			throw new KalturaAPIException(KalturaErrors::INVALID_FEED_ID, $id);
+		
 		
 		$syndicationFeedDB->setStatus(KalturaSyndicationFeedStatus::DELETED);
 		$syndicationFeedDB->save();
@@ -203,9 +207,14 @@ class SyndicationFeedService extends KalturaBaseService
 	 * @action getEntryCount
 	 * @param string $feedId
 	 * @return KalturaSyndicationFeedEntryCount
+	 * @throws KalturaErrors::INVALID_FEED_ID
 	 */
 	public function getEntryCountAction($feedId)
 	{
+		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($$feedId);
+		if (!$syndicationFeedDB)
+			throw new KalturaAPIException(KalturaErrors::INVALID_FEED_ID, $feedId);
+		
 		$feedCount = new KalturaSyndicationFeedEntryCount();
 		
 		$feedRenderer = new KalturaSyndicationFeedRenderer($feedId);
@@ -227,9 +236,14 @@ class SyndicationFeedService extends KalturaBaseService
 	 *  @action requestConversion
 	 *  @param string $feedId
 	 *  @return string
+	 * @throws KalturaErrors::INVALID_FEED_ID
 	 */
 	public function requestConversionAction($feedId)
 	{
+		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($$feedId);
+		if (!$syndicationFeedDB)
+			throw new KalturaAPIException(KalturaErrors::INVALID_FEED_ID, $feedId);
+			
 		// find entry ids that already converted to the flavor
 		$feedRendererWithTheFlavor = new KalturaSyndicationFeedRenderer($feedId);
 		$feedRendererWithTheFlavor->addFlavorParamsAttachedFilter();

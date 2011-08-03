@@ -309,4 +309,7 @@ class APIErrors
 	const USER_ROLE_NOT_FOUND = "USER_ROLE_NOT_FOUND,User role not found";
 	
 	const USER_WRONG_PASSWORD = "USER_WRONG_PASSWORD,Wrong password supplied";
+	
+	const INVALID_FEED_ID = "INVALID_FEED_ID,Unknown feed [%s]" ;
+	
 }
