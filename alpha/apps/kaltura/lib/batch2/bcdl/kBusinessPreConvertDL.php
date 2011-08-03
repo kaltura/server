@@ -976,13 +976,21 @@ class kBusinessPreConvertDL
 			kFlowHelper::generateThumbnailsFromFlavor($parentJob->getEntryId(), $parentJob);
 		}
 		
-		if(!count($flavors) && !$ingestedNeeded)
+		if(!count($flavors))
 			$shouldConvert = false;
 	
 		if(!$shouldConvert)
 		{
-			self::bypassConversion($originalFlavorAsset, $entry, $convertProfileJob);
-			return true;
+			if($ingestedNeeded)
+			{
+				kJobsManager::updateBatchJob($convertProfileJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				return false;
+			}
+			else
+			{
+				self::bypassConversion($originalFlavorAsset, $entry, $convertProfileJob);
+				return true;
+			}
 		}
 
 		return self::decideProfileFlavorsConvert($parentJob, $convertProfileJob, $flavors, $conversionProfileFlavorParams, $mediaInfo);
