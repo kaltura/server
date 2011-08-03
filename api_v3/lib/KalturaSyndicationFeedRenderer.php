@@ -411,13 +411,16 @@ class KalturaSyndicationFeedRenderer
 		//header xml
 		echo kSyndicationFeedManager::getMrssHeader($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
 		//items
-		while($entry = $this->getNextEntry())
+		$nextEntry = $this->getNextEntry();
+		while($nextEntry)
 		{
+			$entry = $nextEntry;
+			$nextEntry = $this->getNextEntry();
 			// in case no video player is requested by user and the entry is mix, skip it	
 			if ($entry->getType() === entryType::MIX && !$this->syndicationFeed->allowEmbed)
 				continue;
-					
-			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage);				
+			
+			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $nextEntry ? true : false);				
 		}
 		echo kSyndicationFeedManager::getMrssFooter($this->syndicationFeed->name, $this->syndicationFeed->feedLandingPage, $this->syndicationFeed->feedDescription, $syndicationFeedDB);
 	}

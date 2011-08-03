@@ -160,7 +160,7 @@ class kSyndicationFeedManager
 	 * @param $syndicationFeed
 	 * @return string
 	 */
-	public static function getMrssEntry(entry $entry, syndicationFeed $syndicationFeed = null, $link = null)
+	public static function getMrssEntry(entry $entry, syndicationFeed $syndicationFeed = null, $link = null, $hasNextItem = false)
 	{
 		$entryMrss =  self::getMrssEntryXml($entry, $syndicationFeed, $link);
 		
@@ -173,7 +173,7 @@ class kSyndicationFeedManager
 		if (($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null(self::getXslt($syndicationFeed))))
 		{
 			$itemXslt = self::getKalturaItemXslt(self::getXslt($syndicationFeed));
-			$entryMrss = self::transformXmlUsingXslt($entryMrss, $itemXslt);
+			$entryMrss = self::transformXmlUsingXslt($entryMrss, $itemXslt, array('hasNextItem' => $hasNextItem));
 			$entryMrss = self::removeNamespaces($entryMrss);
 		}
 		$entryMrss = self::removeXmlHeader($entryMrss);
@@ -251,7 +251,7 @@ class kSyndicationFeedManager
 	 * @param string $xslt
 	 * @return string  
 	 */
-	private static function transformXmlUsingXslt($xmlStr, $xslt)
+	private static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array())
 	{
 					
 		$xml = new DOMDocument();
@@ -269,6 +269,10 @@ class kSyndicationFeedManager
 		}
 		
 		$proc = new XSLTProcessor;
+		foreach ($xsltParams as $key => $value)
+		{
+			$proc->setParameter( '', $key, $value);
+		}		
 	    $proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
 		$proc->importStyleSheet($xsl);
 		
@@ -280,7 +284,9 @@ class kSyndicationFeedManager
 			return null;
 		}
 		
-		$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
+		if (isset($xml->documentElement)) {
+			$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
+		}
 				
 		return $xml->saveXML();
 	}
