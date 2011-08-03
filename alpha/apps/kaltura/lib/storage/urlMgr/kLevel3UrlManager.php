@@ -1,6 +1,23 @@
 <?php
 class kLevel3UrlManager extends kUrlManager
 {
+	static private function hmac($hashfunc, $key, $data)
+	{
+		$blocksize=64;
+
+		if (strlen($key) > $blocksize)
+		{
+			$key = pack('H*', $hashfunc($key));
+		}
+
+		$key = str_pad($key, $blocksize, chr(0x00));
+		$ipad = str_repeat(chr(0x36), $blocksize);
+		$opad = str_repeat(chr(0x5c), $blocksize);
+		$hmac = pack('H*', $hashfunc(($key ^ $opad) . pack('H*', $hashfunc(($key ^ $ipad) . $data))));
+
+		return bin2hex($hmac);
+	}
+	
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @return string
@@ -66,7 +83,7 @@ class kLevel3UrlManager extends kUrlManager
 		$name = isset($this->params['rtmp_auth_param_name']) ? $this->params['rtmp_auth_param_name'] : "h";
 		$key = isset($this->params['rtmp_auth_key']) ? $this->params['rtmp_auth_key'] : false;
 		$gen = isset($this->params['rtmp_auth_gen']) ? $this->params['rtmp_auth_gen'] : false;
-		if ($name && $key && $gen)
+		if ($name && $key !== false && $gen !== false)
 		{
 			$url .= "?$name=$gen" . substr(self::hmac('sha1', $key, str_replace('mp4:', '', $url)), 0, 20);
 		}
