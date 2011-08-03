@@ -225,7 +225,7 @@ class SphinxCriterion extends KalturaCriterion
 			$conjuction = ' AND ';
 
 		$conditionClause[] = '(' . implode($conjuction, $this->conditionClause) . ')';
-		KalturaLog::debug("whereClause [ " . print_r($whereClause,true) . "] conditionClause [" . print_r($conditionClause,true) ."]");
+		
 		return true;
 	}
 
