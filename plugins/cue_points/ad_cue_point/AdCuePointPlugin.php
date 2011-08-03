@@ -133,7 +133,7 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 * @see IKalturaCuePointXmlParser::parseXml()
 	 */
 	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
 	{
