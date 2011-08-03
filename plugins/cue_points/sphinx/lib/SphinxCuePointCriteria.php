@@ -59,66 +59,29 @@ class SphinxCuePointCriteria extends SphinxCriteria
 	}
 	
 	/* (non-PHPdoc)
-	 * @see SphinxCriteria::executeSphinx()
+	 * @see SphinxCriteria::getSphinxIdField()
 	 */
-	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
+	protected function getSphinxIdField()
 	{
-		$sql = "SELECT str_cue_point_id FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
-		
-		//debug query
-		//echo $sql."\n"; die;
-		$pdo = DbManager::getSphinxConnection();
-		$stmt = $pdo->query($sql);
-		if(!$stmt)
-		{
-			KalturaLog::err("Invalid sphinx query [$sql]");
-			return;
-		}
-		
-		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);
-		$ids = $this->applyIds($ids);
-		$this->setFetchedIds($ids);
-		KalturaLog::log("Found " . count($ids) . " ids");
-		
-		foreach($this->keyToRemove as $key)
-		{
-			KalturaLog::log("Removing key [$key] from criteria");
-			$this->remove($key);
-		}
-		
-		$this->addAnd(CuePointPeer::ID, $ids, Criteria::IN);
-		
-		$this->recordsCount = 0;
-		
-		if(!$this->doCount)
-			return;
-			
-		if($setLimit)
-		{
-			$this->setOffset(0);
-			
-			$sql = "show meta";
-			$stmt = $pdo->query($sql);
-			$meta = $stmt->fetchAll(PDO::FETCH_NAMED);
-			if(count($meta))
-			{
-				foreach($meta as $metaItem)
-				{
-					KalturaLog::log("Sphinx query " . $metaItem['Variable_name'] . ': ' . $metaItem['Value']);
-					if($metaItem['Variable_name'] == 'total_found')
-						$this->recordsCount = (int)$metaItem['Value'];
-				}
-			}
-		}
-		else
-		{
-			$c = clone $this;
-			$c->setLimit(null);
-			$c->setOffset(null);
-			$this->recordsCount = CuePointPeer::doCount($c);
-		}
+		return 'str_cue_point_id';
 	}
-
+	
+	/* (non-PHPdoc)
+	 * @see SphinxCriteria::getPropelIdField()
+	 */
+	protected function getPropelIdField()
+	{
+		return CuePointPeer::ID;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see SphinxCriteria::doCountOnPeer()
+	 */
+	protected function doCountOnPeer(Criteria $c)
+	{
+		return CuePointPeer::doCount($c);
+	}
+	
 	public function hasSphinxFieldName($fieldName)
 	{
 		return isset(self::$sphinxFields[$fieldName]);
