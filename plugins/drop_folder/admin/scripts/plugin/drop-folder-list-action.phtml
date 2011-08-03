@@ -208,16 +208,8 @@ function loadDropFolder(paramStr)
 
 
 function loadDropFolderSuccess(html) {
-	if (jQuery(html).parent().find('#frmDropFolderConfigure').hasClass('valid')) 
-	{
-		dialogDiv.dialog('close');
-		jQuery('#frmPaginator1').submit();
-	}
-	else
-	{
-		jQuery('#frmDropFolderConfigure').replaceWith(html);
-		jQuery('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
-	}
+	jQuery('#frmDropFolderConfigure').replaceWith(html);
+	jQuery('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
 }
 
 

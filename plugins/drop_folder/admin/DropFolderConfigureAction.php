@@ -22,6 +22,7 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 		$partnerId = $this->_getParam('new_partner_id');
 		$dropFolderType = $this->_getParam('new_drop_folder_type');
 		$dropFolderForm = null;
+		$action->view->formValid = false;
 		
 		try
 		{
@@ -30,7 +31,7 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 				$partnerId = $this->_getParam('partnerId');
 				$dropFolderType = $this->_getParam('type');
 				$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
-				$this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
+				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $dropFolderId);
 			}
 			else
 			{
@@ -53,6 +54,7 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 		}
 		catch(Exception $e)
 		{
+		    $action->view->formValid = false;
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
 		}
@@ -78,10 +80,12 @@ class DropFolderConfigureAction extends KalturaAdminConsolePlugin
 				$responseDropFolder = $dropFolderPluginClient->dropFolder->update($dropFolderId, $dropFolder);
 			}
 			$form->setAttrib('class', 'valid');
+			return true;
 		}
 		else
 		{
 			$form->populate($formData);
+			return false;
 		}
 	}
 }
