@@ -12,7 +12,7 @@ class AdvancedSearchFilterItem
 	
 	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
 	{
-		$matchClause[] = $this->applyCondition($whereClause);
+		$matchClause[] = $this->applyCondition($whereClause, $conditionClause);
 	}
 	
 	public function getFreeTextConditions($freeTexts)
@@ -27,7 +27,7 @@ class AdvancedSearchFilterItem
 	 * @param array $whereClause
 	 * return array
 	 */
-	public function applyCondition(array &$whereClause)
+	public function applyCondition(array &$whereClause, array &$conditionClause)
 	{
 		return null;
 	}
