@@ -97,7 +97,7 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 * @see IKalturaCuePointXmlParser::parseXml()
 	 */
 	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
 	{
@@ -118,5 +118,13 @@ class AnnotationMetadataPlugin extends KalturaPlugin implements IKalturaPending,
 			
 		$objectType = self::getMetadataObjectTypeCoreValue(AnnotationMetadataObjectType::ANNOTATION);
 		return CuePointMetadataPlugin::generateCuePointXml($scene, $objectType, $cuePoint->getId());
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::syndicate()
+	 */
+	public static function syndicate(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		self::generateXml($cuePoint, $scenes, $scene);
 	}
 }

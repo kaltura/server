@@ -136,7 +136,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		$cuePoints = CuePointPeer::retrieveByEntryId($object->getId());
 		
 		$scenes = $mrss->addChild('scenes');
-		kCuePointManager::generateXml($cuePoints, $scenes, false);
+		kCuePointManager::syndicate($cuePoints, $scenes);
 	}
 	
 	/* (non-PHPdoc)

@@ -165,7 +165,7 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 * @see IKalturaCuePointXmlParser::parseXml()
 	 */
 	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
 	{
@@ -203,6 +203,34 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			
 		if(!$scene)
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-annotation'));
+			
+		$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
+		if($cuePoint->getText())
+			$scene->addChild('sceneText', kMrssManager::stringToSafeXml($cuePoint->getText()));
+		if($cuePoint->getParentId())
+		{
+			$parentCuePoint = CuePointPeer::retrieveByPK($cuePoint->getParentId());
+			if($parentCuePoint)
+			{
+				if($parentCuePoint->getSystemName())
+					$scene->addChild('parent', kMrssManager::stringToSafeXml($parentCuePoint->getSystemName()));
+				$scene->addChild('parentId', $parentCuePoint->getId());
+			}
+		}
+			
+		return $scene;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::syndicate()
+	 */
+	public static function syndicate(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!($cuePoint instanceof Annotation))
+			return $scene;
+			
+		if(!$scene)
+			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-annotation'));
 			
 		$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 		if($cuePoint->getText())

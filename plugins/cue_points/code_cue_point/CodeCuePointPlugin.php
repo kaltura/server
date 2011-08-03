@@ -130,7 +130,7 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaCuePointXmlParser::getApiValue()
+	 * @see IKalturaCuePointXmlParser::parseXml()
 	 */
 	public static function parseXml(SimpleXMLElement $scene, $partnerId, CuePoint $cuePoint = null)
 	{
@@ -161,6 +161,24 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 			
 		if(!$scene)
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-code-cue-point'));
+			
+		$scene->addChild('code', kMrssManager::stringToSafeXml($cuePoint->getName()));
+		if($cuePoint->getText())
+			$scene->addChild('description', kMrssManager::stringToSafeXml($cuePoint->getText()));
+			
+		return $scene;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaCuePointXmlParser::syndicate()
+	 */
+	public static function syndicate(CuePoint $cuePoint, SimpleXMLElement $scenes, SimpleXMLElement $scene = null)
+	{
+		if(!($cuePoint instanceof CodeCuePoint))
+			return $scene;
+			
+		if(!$scene)
+			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-code-cue-point'));
 			
 		$scene->addChild('code', kMrssManager::stringToSafeXml($cuePoint->getName()));
 		if($cuePoint->getText())
