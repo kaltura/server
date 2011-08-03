@@ -22,7 +22,10 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		
 		$elements = $xml->getElementsByTagName('p');
 		if(!$elements->length)
+		{
+			KalturaLog::err("XML element <p> not found");
 			return array();
+		}
 			
 		$itemsData = array();
 		foreach($elements as $element)
