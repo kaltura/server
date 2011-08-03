@@ -150,10 +150,12 @@ kmc.functions = {
 			iframe_url += '/?kdpUiconf=' + kmc.vars.clipapp.kdp + '&kclipUiconf=' + kmc.vars.clipapp.kclip;
 			iframe_url += '&partnerId=' + kmc.vars.partner_id + '&mode=' + mode + '&config=kmc&entryId=' + entry_id;
 
+		var title = ( mode == 'trim' ) ? 'Trimming Tool' : 'Clipping Tool';
+
 		kmc.layout.modal.open( {
 			'width' : 950,
 			'height' : 606,
-			'title'	: 'Clipping Application',
+			'title'	: title,
 			'content' : '<iframe src="' + iframe_url + '" width="100%" height="576" frameborder="0"></iframe>',
 			'style'	: 'iframe'
 		} );
@@ -787,6 +789,7 @@ kmc.preview_embed = {
 		$(".preview_url").html(html);
 	},
 	hasMobileFlavors : function( entry_flavors ) {
+		if( !entry_flavors ) { return false; }
 		for(var i=0; i<entry_flavors.length; i++) {
 			var asset = entry_flavors[i];
 			// Add iPad Akamai flavor to iPad flavor Ids list
@@ -895,7 +898,7 @@ kmc.client = {
 // Maintain support for old kmc2 functions:
 function openPlayer(emptystring, width, height, uiconf_id, previewOnly) { 
 	if (previewOnly==true) $("#kcms")[0].alert('previewOnly from studio');
-	kmc.preview_embed.doPreviewEmbed("multitab_playlist", null, null, previewOnly, true, uiconf_id); 
+	kmc.preview_embed.doPreviewEmbed("multitab_playlist", null, null, previewOnly, true, uiconf_id, false, false, false);
 }
 function playlistAdded() {kmc.preview_embed.updateList(true);}
 function playerAdded() {kmc.preview_embed.updateList(false);}
