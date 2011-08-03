@@ -71,6 +71,7 @@ class kBusinessConvertDL
 			KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
 		}
 		
+		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
 		$entry->setReplacingEntryId(null);
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);		
 		$entry->save();
