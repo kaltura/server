@@ -870,10 +870,12 @@ class kJobsManager
 						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_DELETED);
 						
 					$flavorAsset->save();
+					
+					if($sourceIncludedInProfile)
+					{
+						kBusinessPostConvertDL::handleConvertFinished(null, $flavorAsset);
+					}
 				}
-				
-				$entry->setStatus(entryStatus::READY);
-				$entry->save();
 			}
 			return null;
 		}
