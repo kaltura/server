@@ -11,7 +11,8 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	public function parse($content)
 	{
 		$xml = new DOMDocument();
-		try{
+		try
+		{
 			$xml->loadXML($content);
 		}
 		catch(Exception $e)
@@ -21,35 +22,40 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		}
 		
 		$elements = $xml->getElementsByTagName('p');
-		if(!$elements->length)
+		if(! $elements->length)
 		{
 			KalturaLog::err("XML element <p> not found");
 			return array();
 		}
-			
+		
 		$itemsData = array();
 		foreach($elements as $element)
 		{
 			/* @var $element DOMElement */
-			$startTime = kXml::timeToInteger($element->getAttribute('begin'));
+			$startTime = $this->parseStrTTTime($element->getAttribute('begin'));
 			$endTime = $startTime;
 			if($element->hasAttribute('end'))
 			{
-				$endTime = kXml::timeToInteger($element->getAttribute('end'));
+				$endTime = $this->parseStrTTTime($element->getAttribute('end'));
 			}
 			elseif($element->hasAttribute('dur'))
 			{
 				$duration = floatval($element->getAttribute('dur')) * 1000;
 				$endTime = $startTime + $duration;
 			}
-			$itemsData[] = array(
-				'startTime' => $startTime,
-				'endTime' => $endTime, 
-				'content' => $element->textContent,
-			);
+			$itemsData[] = array('startTime' => $startTime, 'endTime' => $endTime, 'content' => $element->textContent);
 		}
 		
 		return $itemsData;
+	}
+	
+	private function parseStrTTTime($timeStr)
+	{
+		$matches = null;
+		if(preg_match('/(\d+)s/', $timeStr))
+			return intval($matches[1]) * 1000;
+			
+		return kXml::timeToInteger($timeStr);
 	}
 	
 	/* (non-PHPdoc)
@@ -58,7 +64,8 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	public function getContent($content)
 	{
 		$xml = new DOMDocument();
-		try{
+		try
+		{
 			$xml->loadXML($content);
 		}
 		catch(Exception $e)
