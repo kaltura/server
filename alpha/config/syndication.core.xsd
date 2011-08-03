@@ -30,8 +30,8 @@
 				</xs:simpleType>
 			</xs:element>
 			<xs:element name="referenceID" minOccurs="0" maxOccurs="1" type="xs:string"/>
-			<xs:element name="createdAt" minOccurs="0" maxOccurs="1" type="xs:dateTime"/>
-			<xs:element name="updatedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime"/>
+			<xs:element name="createdAt" minOccurs="0" maxOccurs="1" type="xs:int"/>
+			<xs:element name="updatedAt" minOccurs="0" maxOccurs="1" type="xs:int"/>
 			<xs:element name="title" minOccurs="0" maxOccurs="1">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -63,8 +63,8 @@
 			<xs:element name="partnerSortData" minOccurs="0" maxOccurs="1" type="xs:int"/>
 			<xs:element name="accessControlId" minOccurs="0" maxOccurs="1" type="xs:int"/>
 			<xs:element name="conversionProfileId" minOccurs="0" maxOccurs="1" type="xs:int"/>
-			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime"/>
-			<xs:element name="endDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
+			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:int"/>
+			<xs:element name="endDate" minOccurs="0" maxOccurs="1" type="xs:int">
 				<xs:annotation>
 					<xs:documentation>
 						If not specified the entry will be available forever.
