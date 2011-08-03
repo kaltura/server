@@ -52,8 +52,8 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $this->doGetCondition();
 	}
 	*/
-	public function applyCondition(array &$whereClause, $xPaths = null)
-	{
+	public function applyCondition(array &$whereClause, array &$conditionClause, $xPaths = null)
+	{		
 		if($this->condition)
 			return $this->condition;
 			
@@ -110,7 +110,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						continue;
 					}
 									
-					$whereClause[] = $metadataField . $comparison . $item->getValue();
+					$this->conditionClause[] = $metadataField . $comparison . $item->getValue();
 				}
 				elseif ($item instanceof AdvancedSearchFilterCondition)
 				{
@@ -129,7 +129,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				}
 				elseif($item instanceof MetadataSearchFilter)
 				{
-					$subConditions[] = $item->applyCondition($whereClause, $xPaths);
+					$subConditions[] = $item->applyCondition($this->whereClause, $this->conditionClause, $xPaths);
 				}					
 			}
 		}	
@@ -148,8 +148,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				$this->condition = $this->appendToDataCondition($this->condition, $subCondition, $this->type);
 		}
 		
-	//	if(!count($this->condition))
-	//		return null;
+		$conjuction = ' OR ';
+		if ($this->type == self::SEARCH_AND)
+			$conjuction = ' AND ';
+
+		if (count($this->conditionClause))
+			$conditionClause[] = '(' . implode($conjuction, $this->conditionClause) . ')';
 		
 		return $this->condition;
 	}
@@ -256,8 +260,9 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	
 	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
 	{
+		KalturaLog::debug("matchClause [". print_r($matchClause,true) ."] whereClause [ " . print_r($whereClause,true) . "] conditionClause [" . print_r($conditionClause,true) ."] orderByClause [" . print_r($orderByClause,true) . "]");
 		$this->applyOrderBy($orderByClause);
-		$conditions = $this->applyCondition($whereClause);
+		$conditions = $this->applyCondition($whereClause, $conditionClause);
 		KalturaLog::debug("apply matchClause: ". $conditions);
 
 		if (count($conditions))
