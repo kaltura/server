@@ -3,7 +3,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.cuePoint
  */
-class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner
+class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEventConsumers, IKalturaMemoryCleaner, IKalturaVersion, IKalturaConfigurator, IKalturaEnumerator, IKalturaSchemaContributor, IKalturaSchemaDefiner, IKalturaMrssContributor
 {
 	const PLUGIN_NAME = 'cuePoint';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -123,6 +123,26 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		';
 		
 		return $xsd;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaMrssContributor::contribute()
+	 */
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
+	{
+		if(!($object instanceof entry))
+			return;
+			
+		$scenes = null;
+		if(isset($mrss->scenes))
+			$scenes = $mrss->scenes;
+		else
+			$scenes = $mrss->addChild('scenes');
+		
+		$type = self::getCuePointTypeCoreValue(AnnotationCuePointType::ANNOTATION);
+		$cuePoints = CuePointPeer::retrieveByEntryId($object->getId(), $type);
+		
+		kCuePointManager::generateXml($cuePoints);
 	}
 	
 	/* (non-PHPdoc)

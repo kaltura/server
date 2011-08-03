@@ -194,14 +194,17 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 
 	/**
 	 * @param array<CuePoint> $cuePoints
+	 * @param SimpleXMLElement $scenes
+	 * @param bool $validate
 	 * @return string xml
 	 */
-	public static function generateXml(array $cuePoints)
+	public static function generateXml(array $cuePoints, SimpleXMLElement $scenes = null, $validate = true)
 	{
 		$schemaType = CuePointPlugin::getApiValue(CuePointSchemaType::SERVE_API);
 		$xsdUrl = "http://" . kConf::get('cdn_host') . "/api_v3/service/schema/action/serve/type/$schemaType";
 		
-		$scenes = new SimpleXMLElement('<scenes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="' . $xsdUrl . '" />');
+		if(!$scenes)
+			$scenes = new SimpleXMLElement('<scenes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="' . $xsdUrl . '" />');
 	
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCuePointXmlParser');
 		
@@ -215,6 +218,8 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 		}
 		
 		$xmlContent = $scenes->asXML();
+		if(!$validate)
+			return $xmlContent;
 	
 		KalturaLog::debug("xml [$xmlContent]");
 		$xml = new DOMDocument();

@@ -117,4 +117,22 @@ class CuePointPeer extends BaseCuePointPeer
 
 		return CuePointPeer::doSelectOne($criteria, $con);
 	}
+
+	/**
+	 * Retrieve a single object by entry id.
+	 *
+	 * @param      string $systemName the entry id.
+	 * @param      int $type the cue point type from CuePointType enum
+	 * @param      PropelPDO $con the connection to use
+	 * @return     CuePoint
+	 */
+	public static function retrieveByEntryId($entryId, $type = null, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
+		if(!is_null($type))
+			$criteria->add(CuePointPeer::TYPE, $type);
+
+		return CuePointPeer::doSelectOne($criteria, $con);
+	}
 }
