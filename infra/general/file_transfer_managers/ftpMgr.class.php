@@ -144,10 +144,11 @@ class ftpMgr extends kFileTransferMgr
 	    $remoteDir = ltrim($remoteDir,'/');
 		$tempList = ftp_nlist($this->getConnection(), $remoteDir);
 		$fileList = array();
+		$remoteDir = trim($remoteDir, '/');
+		$remoteDir = str_replace('/', '\/', $remoteDir);
 		foreach ($tempList as $tempFile)
 		{
 		    $tempFile = trim($tempFile, '/');
-		    $remoteDir = trim($remoteDir, '/');
 		    $fileName = preg_replace('/^'.$remoteDir.'/', '', $tempFile);
 		    $fileList[] = ltrim($fileName, '/');
 		}
