@@ -219,18 +219,13 @@ class SphinxCriterion extends KalturaCriterion
 		$this->conditionClause = array_unique($this->conditionClause);
 		if(!count($this->conditionClause))
 			return true;
-			
-	//	foreach ($this->conditionClause as $eachConditionClause)
-	//			$conditionClause[] = $eachConditionClause;
 		
 		$conjuction = ' OR ';
 		if (!count($this->getConjunctions()) || in_array(Criterion::UND, $this->getConjunctions()))
 			$conjuction = ' AND ';
 
-		$conditionClause[] = implode($conjuction, $this->conditionClause);
-		
-		KalturaLog::debug("condition clause [" . print_r($conditionClause,true). "] where clause [" . print_r($whereClause,true). "]");
-		
+		$conditionClause[] = '(' . implode($conjuction, $this->conditionClause) . ')';
+		KalturaLog::debug("whereClause [ " . print_r($whereClause,true) . "] conditionClause [" . print_r($conditionClause,true) ."]");
 		return true;
 	}
 
