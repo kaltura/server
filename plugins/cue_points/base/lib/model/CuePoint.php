@@ -52,8 +52,8 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 		if(!$kuser)
 		{
 			$isAdmin = false;
-			if($puserId == kCurrentContext::$uid)
-				$isAdmin = kCurrentContext::$is_admin_session;
+//			if($puserId == kCurrentContext::$uid)
+//				$isAdmin = kCurrentContext::$is_admin_session;
 				
 			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $puserId, $isAdmin);
 		}
