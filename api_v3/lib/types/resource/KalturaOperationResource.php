@@ -52,6 +52,9 @@ class KalturaOperationResource extends KalturaContentResource
 		if(is_null($this->operationAttributes) || !count($this->operationAttributes))
 			return $this->resource->toObject();
 			
+		if($this->resource instanceof KalturaUrlResource)
+			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this->resource));
+			 
 		if(!$object_to_fill)
 			$object_to_fill = new kOperationResource();
 			
