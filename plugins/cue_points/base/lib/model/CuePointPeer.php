@@ -133,6 +133,6 @@ class CuePointPeer extends BaseCuePointPeer
 		if(!is_null($type))
 			$criteria->add(CuePointPeer::TYPE, $type);
 
-		return CuePointPeer::doSelectOne($criteria, $con);
+		return CuePointPeer::doSelect($criteria, $con);
 	}
 }
