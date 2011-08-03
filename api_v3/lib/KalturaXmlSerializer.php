@@ -89,6 +89,7 @@ class KalturaXmlSerializer
 				$this->writeStartTag("error");
 				$this->writeTag("message", "Type reflector not found");
 				$this->writeEndTag("error");
+				return;
 			}
 	
 			$properties = $typeReflector->getProperties();
