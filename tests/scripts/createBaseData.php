@@ -392,7 +392,7 @@ class KalturaTestDeploymentHelper
 			$client->metadata->add($metadataProfile->id, KalturaMetadataObjectType::ENTRY, $entry->id, $xmlData[$i]);
 		}
 		
-		$expectedResults = $entries[2] . $entries[4] . $entries[3] . $entries[1];
+		$expectedResults = $entries[4] . $entries[3];
 		
 		KalturaGlobalData::setData("@METADATA_SEARCH_ENTRIES_IDS@", $expectedResults);
 		
