@@ -19,6 +19,20 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 	protected $items;
 	
 	/**
+	 * 
+	 * local whereClause
+	 * @var array
+	 */
+	protected $whereClause = array();
+	
+	/**
+	 * 
+	 * local conditionClause
+	 * @var array
+	 */
+	protected $conditionClause = array();
+	
+	/**
 	 * @return int $type
 	 */
 	public function getType() {
@@ -51,7 +65,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 	 */
 	protected $condition = null;
 	
-	public function applyCondition(array &$whereClause)
+	public function applyCondition(array &$whereClause, array &$conditionClause)
 	{
 		if($this->condition)
 			return $this->condition;
@@ -65,7 +79,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 				KalturaLog::debug("item type: " . get_class($item));
 				if($item instanceof AdvancedSearchFilterItem)
 				{
-					$condition = $item->applyCondition($whereClause);
+					$condition = $item->applyCondition($whereClause, $conditionClause);
 					KalturaLog::debug("Append item [" . get_class($item) . "] condition [".print_r($condition,true)."]");
 					if($condition)
 						$conditions[] = $condition;
@@ -107,7 +121,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem
 	{
 		KalturaLog::debug("apply from [" . get_class($filter) . "]");
 		
-		$conditions = $this->applyCondition($whereClause);
+		$conditions = $this->applyCondition($whereClause, $conditionClause);
 		if($conditions){
 			foreach ($conditions as $key => $value)
 				$matchClause[] = $key . ' ' . $value;
