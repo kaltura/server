@@ -184,6 +184,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 		$i = 0;
 		foreach ($this->conditionClause as $conditionClause)
 		{
+			if ($this->conditionClause[$i] == '')
+				continue;
+			
 			$conditions .=	', (' . $this->conditionClause[$i] . ') as cnd' . $i . ' ';
 			$this->whereClause[] = 'cnd' . $i . ' > 0';
 			

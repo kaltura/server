@@ -181,8 +181,12 @@ class SphinxCriterion extends KalturaCriterion
 						unset($value[$valIndex]);
 
 				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
-				$values = implode(',', $value);
-				$this->whereClause[] = "$sphinxField in($values)";
+				
+				$inConditions = array();
+				foreach($value as $val)
+					 $inConditions[] = "$sphinxField = $val";
+
+				$this->conditionClause[] = implode(' OR ', $inConditions);
 				break;
 				
 			case Criteria::NOT_IN:
@@ -190,40 +194,42 @@ class SphinxCriterion extends KalturaCriterion
 					
 				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 				
+				$notInConditions = array();
 				foreach($value as $val)
-					$this->whereClause[] = "$sphinxField <> $val";
+					 $notInConditions[] = "$sphinxField <> $val";
+
+				$this->conditionClause[] = implode(' AND ', $notInConditions);
 				break;
 				
 			case Criteria::ISNULL:
-				$this->whereClause[] = "$sphinxField = 0";
+				$this->conditionClause[] = "$sphinxField = 0";
 				break;
 				
 			case Criteria::LESS_THAN:
 			case Criteria::LESS_EQUAL:
 				if($value > 0)
-					$this->whereClause[] = "$sphinxField <> 0";
+					$this->conditionClause[] = "$sphinxField <> 0";
 				// fallthrough
 				
 			default:
-				$this->whereClause[] = "$sphinxField $comparison $value";
+				$this->conditionClause[] = "$sphinxField $comparison $value";
 				break;
 		}
 		
-		$this->whereClause = array_unique($this->whereClause);
-		if(!count($this->whereClause))
+		$this->conditionClause = array_unique($this->conditionClause);
+		if(!count($this->conditionClause))
 			return true;
 			
+	//	foreach ($this->conditionClause as $eachConditionClause)
+	//			$conditionClause[] = $eachConditionClause;
+		
+		$conjuction = ' OR ';
 		if (!count($this->getConjunctions()) || in_array(Criterion::UND, $this->getConjunctions()))
-		{
-			$whereClause[] = implode(' AND ', $this->whereClause);
-			foreach ($this->conditionClause as $eachConditionClause)
-				$conditionClause[] = $eachConditionClause;
-		}
-		elseif (in_array(Criterion::ODER, $this->getConjunctions()))
-		{
-			$conditionClause[] = implode(' OR ', $this->whereClause);
-		}
-			
+			$conjuction = ' AND ';
+
+		$conditionClause[] = implode($conjuction, $this->conditionClause);
+		
+		KalturaLog::debug("condition clause [" . print_r($conditionClause,true). "] where clause [" . print_r($whereClause,true). "]");
 		
 		return true;
 	}
