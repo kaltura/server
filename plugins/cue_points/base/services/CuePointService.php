@@ -40,7 +40,9 @@ class CuePointService extends KalturaBaseService
 	function addAction(KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = $cuePoint->toInsertableObject();
+		/* @var $dbCuePoint CuePoint */
 		$dbCuePoint->setPartnerId($this->getPartnerId());
+		$dbCuePoint->setPuserId(is_null($cuePoint->userId) ? $this->getKuser()->getPuserId() : $cuePoint->userId);
 		$dbCuePoint->setStatus(CuePointStatus::READY); 
 					
 		if($this->getCuePointType())

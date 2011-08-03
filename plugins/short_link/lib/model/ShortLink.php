@@ -48,7 +48,10 @@ class ShortLink extends BaseShortLink {
 		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $puserId, true);
 		if(!$kuser)
 		{
-			$isAdmin = kCurrentContext::$is_admin_session;
+			$isAdmin = false;
+			if($puserId == kCurrentContext::$uid)
+				$isAdmin = kCurrentContext::$is_admin_session;
+				
 			$kuser = kuserPeer::createKuserForPartner($this->getPartnerId(), $puserId, $isAdmin);
 		}
 		$this->setKuserId($kuser->getId());

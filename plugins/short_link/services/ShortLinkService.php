@@ -80,7 +80,7 @@ class ShortLinkService extends KalturaBaseService
 		$dbShortLink = new ShortLink();
 		$dbShortLink = $shortLink->toInsertableObject($dbShortLink, array('userId'));
 		$dbShortLink->setPartnerId($this->getPartnerId());
-		$dbShortLink->setPuserId($shortLink->userId);
+		$dbShortLink->setPuserId(is_null($shortLink->userId) ? $this->getKuser()->getPuserId() : $shortLink->userId);
 		$dbShortLink->save();
 		
 		$shortLink = new KalturaShortLink();
