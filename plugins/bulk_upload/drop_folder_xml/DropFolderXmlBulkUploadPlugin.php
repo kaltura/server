@@ -134,7 +134,8 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		if($coreType != self::getSchemaTypeCoreValue(DropFolderXmlSchemaType::DROP_FOLDER_XML))
 			return null;
 			
-		$baseXsdElement = BulkUploadXmlPlugin::getPluginSchema(BulkUploadXmlPlugin::getApiValue(XmlSchemaType::BULK_UPLOAD_XML));
+		$xmlApiType = BulkUploadXmlPlugin::getApiValue(XmlSchemaType::BULK_UPLOAD_XML);
+		$baseXsdElement = BulkUploadXmlPlugin::getPluginSchema($xmlApiType);
 			
 		$xsd = '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">';
 	
@@ -175,6 +176,15 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" substitutionGroup="contentResource" />
 	
 	';
+	
+		$schemaContributors = KalturaPluginManager::getPluginInstances('IKalturaSchemaContributor');
+		foreach($schemaContributors as $key => $schemaContributor)
+		{
+			/* @var $schemaContributor IKalturaSchemaContributor */
+			$elements = $schemaContributor->contributeToSchema($xmlApiType);
+			if($elements)
+				$xsd .= $elements;
+		}
 		
 		$xsd .= '
 </xs:schema>';
