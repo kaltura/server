@@ -97,11 +97,11 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
-					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
+					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time" />
 					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1" type="xs:string" />
 					<xs:element name="sourceUrl" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="adType" minOccurs="0" maxOccurs="1" type="KalturaAdType" />
-					<xs:element name="protocolType" minOccurs="0" maxOccurs="1" type="KalturaAdProtocolType" />
+					<xs:element name="adType" minOccurs="1" maxOccurs="1" type="KalturaAdType" />
+					<xs:element name="protocolType" minOccurs="1" maxOccurs="1" type="KalturaAdProtocolType" />
 					
 					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
@@ -146,15 +146,15 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		if(!($cuePoint instanceof AdCuePoint))
 			return null;
 		
-		$cuePoint->setEndTime(kXml::timeToInteger($scene->sceneEndTime));
+		if(isset($scene->sceneEndTime))
+			$cuePoint->setEndTime(kXml::timeToInteger($scene->sceneEndTime));
 		if(isset($scene->sceneTitle))
 			$cuePoint->setName($scene->sceneTitle);
 		if(isset($scene->sourceUrl))
 			$cuePoint->setSourceUrl($scene->sourceUrl);
-		if(isset($scene->adType))
-			$cuePoint->setAdType($scene->adType);
-		if(isset($scene->protocolType))
-			$cuePoint->setSubType($scene->protocolType);
+			
+		$cuePoint->setAdType($scene->adType);
+		$cuePoint->setSubType($scene->protocolType);
 		
 		return $cuePoint;
 	}
@@ -170,15 +170,15 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		if(!$scene)
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-ad-cue-point'));
 			
-		$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
+		if($cuePoint->getEndTime())
+			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 		if($cuePoint->getName())
 			$scene->addChild('sceneTitle', kMrssManager::stringToSafeXml($cuePoint->getName()));
 		if($cuePoint->getSourceUrl())
 			$scene->addChild('sourceUrl', $cuePoint->getSourceUrl());
-		if($cuePoint->getAdType())
-			$scene->addChild('adType', $cuePoint->getAdType());
-		if($cuePoint->getSubType())
-			$scene->addChild('protocolType', $cuePoint->getSubType());
+
+		$scene->addChild('adType', $cuePoint->getAdType());
+		$scene->addChild('protocolType', $cuePoint->getSubType());
 			
 		return $scene;
 	}

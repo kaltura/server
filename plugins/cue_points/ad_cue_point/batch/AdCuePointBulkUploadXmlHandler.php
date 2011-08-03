@@ -48,10 +48,9 @@ class AdCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			$cuePoint->title = "$scene->sceneTitle";
 		if(isset($scene->sourceUrl))
 			$cuePoint->sourceUrl = "$scene->sourceUrl";
-		if(isset($scene->adType))
-			$cuePoint->adType = "$scene->adType";
-		if(isset($scene->protocolType))
-			$cuePoint->protocolType = "$scene->protocolType";
+
+		$cuePoint->adType = "$scene->adType";
+		$cuePoint->protocolType = "$scene->protocolType";
 			
 		return $cuePoint;
 	}
