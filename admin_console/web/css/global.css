@@ -319,7 +319,7 @@ form.inline-form { padding-top:15px; display:table; clear:both;}
 	 button.secondary { background:none; text-transform:lowercase; color:#009ACC;}
 	  button.secondary div { background:none;}
 	  button.secondary:hover { color:#00C1FF;}
-  ul.errors { width:280px; margin-left:-132px; color:red;}
+  ul.errors { width:280px; margin-left:15px; color:red;}
 
   div.error, div.message { padding:10px; border: solid 1px red; margin: 18px 0; display:inline; float:left; clear:both; font-weight:bold; color:red;}
   div.message { border-color:green; color:green;}
