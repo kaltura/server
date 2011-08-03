@@ -37,10 +37,9 @@ $ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType
 $client->setKs($ks);
 
 KalturaTestDeploymentHelper::setPartner($newPartner);
-
+KalturaTestDeploymentHelper::addPermissions($client);
 KalturaTestDeploymentHelper::addBaseData($client);
 
-KalturaTestDeploymentHelper::addPermissions($client);
 
 /**
  * 
@@ -124,6 +123,7 @@ class KalturaTestDeploymentHelper
 			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("ANNOTATION_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
 			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("DROPFOLDER_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
 			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("CONTENTDISTRIBUTION_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
+			$addedPermissions[] = KalturaTestDeploymentHelper::createPermission("METADATA_PLUGIN_PERMISSION", KalturaPermissionType::PLUGIN);
 		}
 		catch (Exception $e)
 		{
@@ -238,6 +238,8 @@ class KalturaTestDeploymentHelper
 			
 		$flavorAssest = $client->flavorParams->listAction();
 		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
+		
+		self::addMetadataSearchData($client);
 	}
 	
 	/**
@@ -333,5 +335,69 @@ class KalturaTestDeploymentHelper
 	    }
 	    
 	    return $arr;
+	}
+	
+	protected static function addMetadataSearchData(KalturaClient $client)
+	{
+		
+		
+		/*
+		<Input type='string' key='@METADATA_SEARCH_FIELD_VALUE1@'/>
+		<Input type='string' key='@METADATA_SEARCH_FIELD_VALUE2@'/>
+		*/
+		//add metadata profile
+		
+		$metadataProfile = new KalturaMetadataProfile();
+		$metadataProfile->name = 'Metadata profile for tests';
+		$metadataProfile->createMode = KalturaMetadataProfileCreateMode::API;
+		$metadataProfile->systemName = 'Metadata profile for tests';
+
+		$metadataProfileXsd = '<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">   <xsd:element name="metadata">     <xsd:complexType>       <xsd:sequence>         <xsd:element id="md_90192848-AAE47-03390173D13A"         name="Startdate" minOccurs="0" maxOccurs="1" type="dateType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>startdate</label>               <key>startdate</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element>         <xsd:element id="md_D7EAD7A91-6360-BF2F-03393913BE11"         name="Enddate" minOccurs="0" maxOccurs="1" type="dateType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>enddate</label>               <key>enddate</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element> 		<xsd:element id="md_D7EADC16-791-6360-BF2F-03393913Bs11"         name="MyNumber" minOccurs="0" maxOccurs="1" type="intType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyNumber</label>               <key>MyNumber</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element> 		<xsd:element id="md_D7EADC16-7A91-6360F-03393913Bs11"         name="MyNumber2" minOccurs="0" maxOccurs="1" type="intType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyNumber2</label>               <key>MyNumber2</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element> 		<xsd:element id="md_D7EADC16-7A91-6360-BF2F-033932s11"         name="MyNumber3" minOccurs="0" maxOccurs="1" type="intType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyNumber3</label>               <key>MyNumber3</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element>         <xsd:element id="md_C084580E-43B0-38A7-9F23-033B3"         name="MyTextList" minOccurs="0" maxOccurs="1">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>my text list</label>               <key>my text list</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>           <xsd:simpleType>             <xsd:restriction base="listType">               <xsd:enumeration value="a1" />               <xsd:enumeration value="b2" />               <xsd:enumeration value="c3" />             </xsd:restriction>           </xsd:simpleType>         </xsd:element> 		<xsd:element id="md_D7EADC16-7ABF2F-033932s11"         name="MyTest" minOccurs="0" maxOccurs="1" type="textType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyTest</label>               <key>MyTest</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element>       </xsd:sequence>     </xsd:complexType>   </xsd:element>   <xsd:complexType name="textType">     <xsd:simpleContent>       <xsd:extension base="xsd:string" />     </xsd:simpleContent>   </xsd:complexType>     <xsd:complexType name="intType">     <xsd:simpleContent>       <xsd:extension base="xsd:long" />     </xsd:simpleContent>   </xsd:complexType>   <xsd:complexType name="dateType">     <xsd:simpleContent>       <xsd:extension base="xsd:long" />     </xsd:simpleContent>   </xsd:complexType>   <xsd:complexType name="objectType">     <xsd:simpleContent>       <xsd:extension base="xsd:string" />     </xsd:simpleContent>   </xsd:complexType>   <xsd:simpleType name="listType">     <xsd:restriction base="xsd:string" />   </xsd:simpleType> </xsd:schema>';
+		$metadataProfile = $client->metadataProfile->add($metadataProfile, $metadataProfileXsd);
+		
+		KalturaGlobalData::setData("@METADATA_SEARCH_PROFILE_ID@", $metadataProfile->id);
+		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_NAME1@", '/*[local-name()=\'metadata\']/*[local-name()=\'MyTest\']');
+		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_VALUE1@", 'myTest');
+		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_NAME2@", '/*[local-name()=\'metadata\']/*[local-name()=\'Startdate\']');
+		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_VALUE2@", '1310503300');
+		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_NAME3@", '/*[local-name()=\'metadata\']/*[local-name()=\'MyNumber\']');
+		
+		
+		//add entries
+		$entries = array();
+		
+		$xmlData = array (
+			0 => '<metadata><Startdate>1310503400</Startdate><Enddate>1310504000</Enddate><MyNumber>6</MyNumber><MyNumber2>2</MyNumber2><MyNumber3>3</MyNumber3><MyTextList>a1</MyTextList><MyTest>myTest</MyTest></metadata>',
+			1 => '<metadata><Startdate>1310503000</Startdate><Enddate>1310508000</Enddate><MyNumber>3</MyNumber><MyNumber2>4</MyNumber2><MyNumber3>5</MyNumber3><MyTextList>b2</MyTextList><MyTest>just some words...</MyTest></metadata>',
+			2 => '<metadata><Startdate>1310504000</Startdate><Enddate>1310508000</Enddate><MyNumber>2</MyNumber><MyNumber2>5</MyNumber2><MyNumber3>6</MyNumber3><MyTextList>b2</MyTextList><MyTest>just some words...</MyTest></metadata>',
+			3 => '<metadata><Startdate>1310508000</Startdate><Enddate>1310509000</Enddate><MyNumber>5</MyNumber><MyNumber2>2</MyNumber2><MyNumber3>8</MyNumber3><MyTextList>a1</MyTextList><MyTest>myTest</MyTest></metadata>',
+			4 => '<metadata><Startdate>1310504000</Startdate><Enddate>1310509000</Enddate><MyNumber>4</MyNumber><MyNumber2>4</MyNumber2><MyNumber3>4</MyNumber3><MyTextList>a1</MyTextList><MyTest>myTest</MyTest></metadata>'
+		);
+				
+		$entry = new KalturaMediaEntry();		
+		for ($i =0 ; $i < count($xmlData) ; $i++)
+		{
+			$entry->name ='Entry For metadataSearch ' . $i;
+			$entry->type = KalturaEntryType::MEDIA_CLIP;
+			$entry->mediaType = KalturaMediaType::VIDEO;
+			$entry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
+			
+			$contentResource = new KalturaUrlResource();
+			$contentResource->url = "http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv";
+			$client->media->addContent($entry->id, $contentResource);
+			
+			//add metadata 
+
+			$entries[$i] = $entry->id;			
+			$client->metadata->add($metadataProfile->id, KalturaMetadataObjectType::ENTRY, $entry->id, $xmlData[$i]);
+		}
+		
+		$expectedResults = $entries[2] . $entries[4] . $entries[3] . $entries[1];
+		
+		KalturaGlobalData::setData("@METADATA_SEARCH_ENTRIES_IDS@", $expectedResults);
+		
+		
+
+		
 	}
 }
