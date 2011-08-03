@@ -79,14 +79,20 @@ class KalturaXmlSerializer
 			$reflectObject = new ReflectionObject($object);
 			$class = $reflectObject->getName();
 		
+			// write the object type
+			$this->writeTag("objectType", $class);
+			
 			// load class reflection
 			$typeReflector = KalturaTypeReflectorCacher::get($class);
+			if(!$typeReflector)
+			{
+				$this->writeStartTag("error");
+				$this->writeTag("message", "Type reflector not found");
+				$this->writeEndTag("error");
+			}
 	
 			$properties = $typeReflector->getProperties();
 			
-			// write the object type
-			$this->writeTag("objectType", $class);
-
 			foreach($properties as $property)
 			{
 				$name = $property->getName();
