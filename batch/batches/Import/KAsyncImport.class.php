@@ -414,13 +414,8 @@ class KAsyncImport extends KBatchBase
 	protected function getFileLocationForSshKey($keyContent, $prefix = 'key') 
 	{
 		$tempDirectory = sys_get_temp_dir();
-		$fileLocation = tempnam($tempDirectory, $prefix);
-		while (file_exists($fileLocation)) {
-		    $fileLocation += '_'.time();
-		}
-		
+		$fileLocation = tempnam($tempDirectory, $prefix);		
 		file_put_contents($fileLocation, $keyContent);
-		
 		return $fileLocation;
 	}
 	
