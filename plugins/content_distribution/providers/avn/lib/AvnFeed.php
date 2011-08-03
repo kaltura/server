@@ -101,8 +101,16 @@ class AvnFeed
 		
 		$this->setNodeValue('/rss/channel/title', $profile->getFeedTitle());
 		
+		$this->loadAvnCategories($profile->getPartnerId());
+	}
+	
+	/**
+	 * @param int $partnerId
+	 */
+	public function loadAvnCategories($partnerId)
+	{
 		$criteria = new Criteria();
-		$criteria->add(MetadataProfilePeer::PARTNER_ID, $profile->getPartnerId());
+		$criteria->add(MetadataProfilePeer::PARTNER_ID, $partnerId);
 		$metadataProfiles = MetadataProfilePeer::doSelect($criteria);
 		foreach($metadataProfiles as $metadataProfile)
 		{
@@ -110,7 +118,7 @@ class AvnFeed
 			$xsd = kFileSyncUtils::file_get_contents($key, true, false);
 			$this->avnCategories = array_merge($this->avnCategories, $this->getAvnCategoriesFromXsd($xsd));
 		}
-	}
+	} 
 	
 	/**
 	 * @param array $values
@@ -137,7 +145,10 @@ class AvnFeed
 			
 			$this->setNodeValue('media:content/@url', $url, $item);
 			$this->setNodeValue('media:content/@type', $type, $item);
-			$this->setNodeValue('media:content/@isDefault', '', $item); // FIXME
+			if ($values[AvnDistributionField::ORDER_SUB] == '1')
+				$this->setNodeValue('media:content/@isDefault', 'true', $item);
+			else
+				$this->setNodeValue('media:content/@isDefault', 'false', $item);
 		}
 		
 		if ($thumbAsset)
@@ -146,6 +157,10 @@ class AvnFeed
 		}
 	}
 	
+	/**
+	 * @param asset $asset
+	 * @return string
+	 */
 	public function getAssetUrl(asset $asset)
 	{
 		$cdnHost = myPartnerUtils::getCdnHost($asset->getPartnerId());
@@ -158,6 +173,18 @@ class AvnFeed
 		return 'http://' . $url;
 	}
 	
+	/**
+	 * @return string
+	 */
+	public function getXml()
+	{
+		return $this->doc->saveXML();
+	}
+	
+	/**
+	 * @param string $url
+	 * @return string
+	 */
 	protected function getContentTypeFromUrl($url)
 	{
 		$this->ch = curl_init();
@@ -178,7 +205,11 @@ class AvnFeed
 		}
 	}
 	
-	public function getPassthruJsonObj($values)
+	/**
+	 * @param array $values
+	 * @return string
+	 */
+	protected function getPassthruJsonObj($values)
 	{
 		$obj = new stdClass();
 		if (strtolower($values[AvnDistributionField::CATEGORY]) != 'main menu' && strtolower($values[AvnDistributionField::CATEGORY]) != 'thank you')
@@ -186,8 +217,8 @@ class AvnFeed
 		else 
 			$obj->sectionTitle = '';
 		$obj->isOnMainMenu = (strtolower($values[AvnDistributionField::IS_ON_MAIN]) == 'true') ? true : false;
-		$obj->orderMainMenu = $values[AvnDistributionField::ORDER_MAIN];
-		$obj->orderSubMenu = $values[AvnDistributionField::ORDER_SUB];
+		$obj->orderMainMenu = (int)$values[AvnDistributionField::ORDER_MAIN];
+		$obj->orderSubMenu = (int)$values[AvnDistributionField::ORDER_SUB];
 		$obj->headerCaption = $values[AvnDistributionField::HEADER];
 		$obj->subHeaderCaption = $values[AvnDistributionField::SUB_HEADER];
 		$obj->menu = $this->getAvnPassthruMenu($values);
@@ -195,7 +226,11 @@ class AvnFeed
 		return json_encode($obj);
 	}
 	
-	public function getAvnPassthruMenu($values)
+	/**
+	 * @param array $values
+	 * @return array
+	 */
+	protected function getAvnPassthruMenu($values)
 	{
 		$menu = array("", "", "", "", ""); // make it compliant with the provided example
 		
@@ -217,7 +252,11 @@ class AvnFeed
 		return $menu;
 	}
 	
-	public function getAvnCategoriesFromXsd($xsd)
+	/**
+	 * @param string $xsd
+	 * @return array
+	 */
+	protected function getAvnCategoriesFromXsd($xsd)
 	{
 		$categories = array();
 		$doc = new DOMDocument();
@@ -230,10 +269,5 @@ class AvnFeed
 			$categories[] = $categoryNode->nodeValue;
 		}
 		return $categories;
-	}
-	
-	public function getXml()
-	{
-		return $this->doc->saveXML();
 	}
 }
