@@ -254,10 +254,11 @@ kmc.utils = {
 	},
 
 	resize : function() {
+		var min_height = ($.browser.ie) ? 640 : 590;
 		var doc_height = $(document).height(),
 		offset = $.browser.mozilla ? 37 : 74;
 		doc_height = (doc_height-offset);
-		doc_height = (doc_height < 590) ? 590 : doc_height; // Flash minimum height is 590 px
+		doc_height = (doc_height < min_height) ? min_height : doc_height; // Flash minimum height is 590 px
 		$("#flash_wrap").height(doc_height + "px");
 		$("#server_wrap iframe").height(doc_height + "px");
 		$("#server_wrap").css("margin-top", "-"+ (doc_height + 2) +"px");
