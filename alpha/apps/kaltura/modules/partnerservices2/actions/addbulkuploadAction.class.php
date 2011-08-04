@@ -66,6 +66,6 @@ class addbulkuploadAction extends defPartnerservices2Action
 		$kuser = kuser::getKuserById($puser_kuser->getKuserId());
 		$partner = PartnerPeer::retrieveByPK($partner_id);
 		
-		kJobsManager::addBulkUploadJob($filePath, $partner, $kuser->getPuserId(), $profileId);
+		kJobsManager::addBulkUploadJob($filePath, $fileName, $partner, $kuser->getPuserId(), $profileId);
 	}
 }
