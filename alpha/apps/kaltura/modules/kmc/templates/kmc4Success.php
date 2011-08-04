@@ -15,7 +15,7 @@ else
 // Multi Account User
 $currentAccount = '';
 if( count($allowedPartners) > 1 ) {
-	$currentAccount = ' &nbsp;|&nbsp; Account: '.  $partner->getName() .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
+	$currentAccount = ' &nbsp;<span class="sep">|</span>&nbsp; Account: '.  $partner->getName() .' &nbsp;( <a id="ChangePartner" href="#change_partner">Change Account</a> ) &nbsp;';
 }
 ?>
 
@@ -68,11 +68,11 @@ if( count($allowedPartners) > 1 ) {
 	 <ul id="hTabs">
 	    <li id="loading"><img src="/lib/images/kmc/loader.gif" alt="Loading" /> <span>Loading...</span></li>
 	 </ul>
-	 <div id="user">&lt; &nbsp; <?php echo $full_name; ?></div>
+	 <div id="user"><span class="left-arrow"></span><?php echo $full_name; ?></div>
 	 <div id="user_links">
-	  <span id="closeMenu">x&nbsp;</span> &nbsp;&nbsp;<span><?php echo $full_name; ?>&nbsp;&nbsp; ( <a id="Logout" href="#logout">Logout</a> )&nbsp;&nbsp; <?php echo $currentAccount; ?> </span>
+	  <span id="closeMenu"></span> &nbsp;&nbsp;<span><?php echo $full_name; ?>&nbsp;&nbsp; <a id="Logout" href="#logout">( Logout )</a>&nbsp;&nbsp; <?php echo $currentAccount; ?> </span>
 	    <?php if (!$templatePartnerId) { ?>
-	    <span> | &nbsp; <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; | &nbsp;
+	    <span> <span class="sep">|</span> &nbsp; <a id="Quickstart Guide" href="<?php echo $service_url ?>/content/docs/pdf/KMC3_Quick_Start_Guide.pdf" target="_blank">Quickstart Guide</a> &nbsp; <span class="sep">|</span> &nbsp;
 	      <a id="Support" href="<?php echo $support_url; ?>" target="_blank">Support</a></span>
 	    <?php } ?>
 	 </div>
