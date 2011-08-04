@@ -239,7 +239,7 @@ class KalturaTestDeploymentHelper
 		$flavorAssest = $client->flavorParams->listAction();
 		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
 		
-		self::addMetadataSearchData($client);
+		//self::addMetadataSearchData($client);
 	}
 	
 	/**
