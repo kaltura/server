@@ -78,6 +78,11 @@ class KalturaBulkUpload extends KalturaObject
 	 */
 	public $errorNumber;
 	
+	/**
+	 * @var string
+	 */
+	public $fileName;
+	
 	public function fromObject($batchJob)
 	{
 		/* @var $batchJob BatchJob */
@@ -103,6 +108,7 @@ class KalturaBulkUpload extends KalturaObject
 			$this->uploadedBy = $jobData->getUploadedBy();
 			$this->uploadedByUserId = $jobData->getUserId();
 			$this->numOfEntries = $jobData->getNumOfEntries();
+			$this->fileName = $jobData->getFileName();
 		}
 		
 //		$results = BulkUploadResultPeer::retrieveByBulkUploadId($this->id);
