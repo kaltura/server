@@ -1360,7 +1360,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onEntryChanged(entry $entry, array $modifiedColumns)
 	{
-		KalturaLog::debug("start onEntry change");
 		if(!ContentDistributionPlugin::isAllowedPartner($entry->getPartnerId()))
 			return true;
 			
@@ -1381,17 +1380,18 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$entryDistribution->save();
 			}
 			
-			
 			switch($entryDistribution->getStatus())
 			{
 				case EntryDistributionStatus::DELETED:
 				case EntryDistributionStatus::DELETING:
 				case EntryDistributionStatus::REMOVED:
+				
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
 					continue;
 				
 				case EntryDistributionStatus::PENDING:
 				case EntryDistributionStatus::ERROR_SUBMITTING:	
+				
 					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 					$entryDistribution->setValidationErrorsArray($validationErrors);
 					$entryDistribution->save();
@@ -1400,6 +1400,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					break;
 					
 				case EntryDistributionStatus::QUEUED:
+				
 					$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 					$entryDistribution->setValidationErrorsArray($validationErrors);
 					$entryDistribution->save();
@@ -1411,6 +1412,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					break;
 				
 				default:
+				
 					if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flaged for updating");
