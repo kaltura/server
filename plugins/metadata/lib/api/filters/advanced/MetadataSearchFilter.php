@@ -123,7 +123,15 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					$value = $item->getValue();
 					$value = SphinxUtils::escapeString($value);
 					$fieldId = $xPaths[$field]->getId();
-					$dataCondition = "\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "\"";
+					if ($xPaths[$field]->getType() == self::KMC_FIELD_TYPE_LIST)
+					{
+						$dataCondition = "\"{$pluginName}_{$fieldId} $value " . kMetadataManager::SEARCH_TEXT_SUFFIX . "\"";
+					}
+					else
+					{
+						$dataCondition = "{$pluginName}_{$fieldId} << $value << " . kMetadataManager::SEARCH_TEXT_SUFFIX;
+					}
+					
 					kalturalog::debug("add $dataCondition");
 					$dataConditions[] = "( $dataCondition )";
 				}
