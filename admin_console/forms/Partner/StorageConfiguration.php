@@ -27,7 +27,6 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'cols'			=> 48,
 			'rows'			=> 2,
 			'filters'		=> array('StringTrim'),
-		
 		));
 		 
 		$this->addElement('select', 'protocol', array(
@@ -116,6 +115,13 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			
 		));
+		
+		$this->addElement('textarea', 'urlManagerParamsJson', array(
+			'label'			=> 'URL Manager Params:',
+			'cols'			=> 48,
+			'rows'			=> 2,
+			'filters'		=> array('StringTrim'),
+		));
 	}
 	
 	public function addFlavorParamsFields(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, array $selectedFlavorParams = array())
@@ -130,5 +136,18 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append'))),
 			));
 		}
+	}
+	
+	public function populateFromObject($object, $add_underscore = true)
+	{
+	    parent::populateFromObject($object, $add_underscore);
+	    $this->setDefault('urlManagerParamsJson', json_encode($object->urlManagerParams));
+	}
+	
+    public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
+	{
+		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		$object->urlManagerParams = json_decode($properties['urlManagerParamsJson'], true);
+		return $object;
 	}
 }
