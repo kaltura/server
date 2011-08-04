@@ -1077,8 +1077,10 @@ class kJobsManager
 		return $batchJob;		
 	}
 
-	/**
-	 * @param string $filePath the full path to the file 
+	
+		/**
+	 * @param string $filePath the full path to the file
+	 * @param string $fileName name of the file  
 	 * @param Partner $partner
 	 * @param int $puserId
 	 * @param int $conversionProfileId
@@ -1086,7 +1088,7 @@ class kJobsManager
 	 * @throws APIException
 	 * @return BatchJob
 	 */
-	public static function addBulkUploadJob($filePath, Partner $partner, $puserId, $conversionProfileId = null, $bulkUploadType = null)
+	public static function addBulkUploadJob($filePath, $fileName, Partner $partner, $puserId, $conversionProfileId = null, $bulkUploadType = null)
 	{
 		$job = new BatchJob();
 		$job->setPartnerId($partner->getId());
@@ -1115,6 +1117,7 @@ class kJobsManager
 		$data->setFilePath($filePath);
 		$data->setUserId($puserId);
 		$data->setUploadedBy($puserId);
+		$data->setFileName($fileName);
 		if (!$conversionProfileId)
 			$conversionProfileId = $partner->getDefaultConversionProfileId();
 			
