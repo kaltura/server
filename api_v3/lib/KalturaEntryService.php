@@ -365,6 +365,9 @@ class KalturaEntryService extends KalturaBaseService
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
+		if(!$dbAsset->getIsOriginal())
+			kBusinessPostConvertDL::handleConvertFinished(null, $dbAsset);
+		
 		return $dbAsset;
     }
     
