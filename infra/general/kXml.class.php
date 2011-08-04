@@ -266,11 +266,11 @@ class kXml
 	 */
 	public static function integerToTime($int)
 	{
-		$hours = round($int / (60 * 60 * 1000));
+		$hours = floor($int / (60 * 60 * 1000));
 		$int -= ($hours * 60 * 60 * 1000);
-		$minutes = round($int / (60 * 1000));
+		$minutes = floor($int / (60 * 1000));
 		$int -= ($minutes * 60 * 1000);
-		$seconds = round($int / 1000);
+		$seconds = floor($int / 1000);
 		$millis = round(($int % 1000) / 100);
 		$ret = array(
 			str_pad($hours, 2, 0, STR_PAD_LEFT),
