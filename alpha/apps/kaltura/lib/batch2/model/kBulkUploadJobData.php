@@ -53,6 +53,13 @@ class kBulkUploadJobData extends kJobData
 	private $filePath;
 	
 	/**
+	 * 
+	 * The bulk upload job file name
+	 * @var string
+	 */
+	private $fileName;
+		
+	/**
 	 * @return the $userId
 	 */
 	public function getUserId() {
@@ -120,6 +127,20 @@ class kBulkUploadJobData extends kJobData
 	 */
 	public function setFilePath($filePath) {
 		$this->filePath = $filePath;
+	}
+	
+	/**
+	 * @return the $fileName
+	 */
+	public function getFileName() {
+		return $this->fileName;
+	}
+
+	/**
+	 * @param string $fileName
+	 */
+	public function setFileName($fileName) {
+		$this->fileName = $fileName;
 	}
 
 	/**
