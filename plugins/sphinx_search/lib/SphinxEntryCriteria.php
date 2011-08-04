@@ -18,7 +18,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'entry.REFERENCE_ID' => 'reference_id',
 		'entry.REPLACING_ENTRY_ID' => 'replacing_entry_id',
 		'entry.REPLACED_ENTRY_ID' => 'replaced_entry_id',
-		'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id)',
+		'entry.SEARCH_TEXT' => '(name,tags,description,entry_id,reference_id,roots)',
 		'entry.ROOTS' => 'roots',
 		
 		entryPeer::KUSER_ID => 'kuser_id',
@@ -87,7 +87,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'reference_id' => IIndexable::FIELD_TYPE_STRING,
 		'replacing_entry_id' => IIndexable::FIELD_TYPE_STRING,
 		'replaced_entry_id' => IIndexable::FIELD_TYPE_STRING,
-		'(name,tags,description,entry_id,reference_id)' => IIndexable::FIELD_TYPE_STRING,
+		'(name,tags,description,entry_id,reference_id,roots)' => IIndexable::FIELD_TYPE_STRING,
 		'roots' => IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
@@ -190,14 +190,14 @@ class SphinxEntryCriteria extends SphinxCriteria
 		$matchOrRoots = array();
 		if($filter->is_set('_eq_root_entry_id'))
 		{
-			$matchOrRoots[] = "entry " . $filter->get('_eq_root_entry_id');
+			$matchOrRoots[] = entry::ROOTS_FIELD_ENTRY_PREFIX . ' ' . $filter->get('_eq_root_entry_id');
 			$filter->unsetByName('_eq_root_entry_id');
 		}
 		if($filter->is_set('_in_root_entry_id'))
 		{
 			$roots = explode(baseObjectFilter::IN_SEPARATOR, $filter->get('_in_root_entry_id'));
 			foreach($roots as $root)
-				$matchOrRoots[] = "entry $root";
+				$matchOrRoots[] = entry::ROOTS_FIELD_ENTRY_PREFIX . " $root";
 				
 			$filter->unsetByName('_in_root_entry_id');
 		}
@@ -206,7 +206,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 			if($filter->get('_is_root'))
 				$filter->set('_notin_roots', 'entry');
 			else
-				$matchOrRoots[] = "entry";
+				$matchOrRoots[] = entry::ROOTS_FIELD_ENTRY_PREFIX;
 				
 			$filter->unsetByName('_is_root');
 		}
@@ -368,7 +368,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 	public function getPositiveMatch($field)
 	{
 		if($field == 'roots')
-			return 'prefix';
+			return entry::ROOTS_FIELD_PREFIX;
 			
 		return parent::getPositiveMatch($field);
 	}

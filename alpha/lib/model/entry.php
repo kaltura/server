@@ -14,6 +14,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	protected $is_categories_modified = false;
 
 	const MINIMUM_ID_TO_DISPLAY = 8999;
+	
+	const ROOTS_FIELD_PREFIX = 'K_Pref';
+	const ROOTS_FIELD_ENTRY_PREFIX = 'KP_Entry';
+	const ROOTS_FIELD_BULK_UPLOAD_PREFIX = 'KP_Bulk';
 
 	// NOTE - CHANGES MUST BE MADE TO LAYOUT.PHP JS PART AS WELL
 	// different sort orders for browsing entries
@@ -1598,13 +1602,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		// the prefix required becaue combined sphinx match is rrequired, 
 		// only negative expression won't work such as '@roots -entry', 
 		// the prefix will enable '@roots prefix -entry'
-		$ret = array('prefix');
+		$ret = array(entry::ROOTS_FIELD_PREFIX);
 		 
 		if($this->getBulkUploadId())
-			$ret[] = 'bulk job ' . $this->getBulkUploadId();
+			$ret[] = entry::ROOTS_FIELD_BULK_UPLOAD_PREFIX . ' ' . $this->getBulkUploadId();
 			
 		if($this->getRootEntryId() != $this->getId())
-			$ret[] = 'entry ' . $this->getRootEntryId();
+			$ret[] = entry::ROOTS_FIELD_ENTRY_PREFIX . ' ' . $this->getRootEntryId();
 		
 		return implode(',', $ret);
 	}
