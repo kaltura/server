@@ -42,7 +42,7 @@ class SphinxCriterion extends KalturaCriterion
 			{
 				if(!($clause instanceof SphinxCriterion))
 				{
-					KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Kaltura criteria");
+					KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Kaltura criterion");
 					return false;
 				}
 				
