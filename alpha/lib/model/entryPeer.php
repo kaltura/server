@@ -288,7 +288,7 @@ class entryPeer extends BaseentryPeer
 			self::$s_criteria_filter = new criteriaFilter ();
 		}
 		
-		$c = new myCriteria(); 
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS); 
 		$c->addAnd ( entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter ( $c );
 	}
