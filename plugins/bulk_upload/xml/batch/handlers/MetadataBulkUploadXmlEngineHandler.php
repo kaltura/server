@@ -30,6 +30,11 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	 */
 	private $client = null;
 	
+	/**
+	 * @var int
+	 */
+	protected $partnerId = null;
+	
 	public function __construct($objectType, $objectClass, $nodeName = 'customData')
 	{
 		$this->objectType = $objectType;
@@ -73,8 +78,25 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		KalturaLog::debug("Handles custom metadata for object type [$this->objectType] class [$this->objectClass] id [$object->id]");
 			
 		$this->client = $client;
+		$this->partnerId = $object->partnerId;
+		$this->impersonate();
 		foreach($item->$nodeName as $customData)
 			$this->handleCustomData($object->id, $customData);
+		$this->unimpersonate();
+	}
+
+	protected function impersonate()
+	{
+		$clientConfig = $this->client->getConfig();
+		$clientConfig->partnerId = $this->partnerId;
+		$this->client->setConfig($clientConfig);
+	}
+	
+	protected function unimpersonate()
+	{
+		$clientConfig = $this->client->getConfig();
+		$clientConfig->partnerId = -1;
+		$this->client->setConfig($clientConfig);
 	}
 	
 	public function handleCustomData($objectId, SimpleXMLElement $customData)
