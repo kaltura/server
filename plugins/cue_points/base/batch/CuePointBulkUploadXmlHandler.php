@@ -81,7 +81,8 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		$results = $this->client->doMultiRequest();
 		$this->unimpersonate();
 		
-		$this->handleResults($results, $items);
+		if(is_array($results) && is_array($items))
+			$this->handleResults($results, $items);
 	}
 
 	/* (non-PHPdoc)
