@@ -184,7 +184,8 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed->setContentUrl('file://' . pathinfo($videoFilePath, PATHINFO_BASENAME));
 		if (file_exists($thumbnailFilePath))
 			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
-		
+		$feed->setAdParams();
+			
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		
 		$feed->sendFeed($sftpManager);
@@ -242,6 +243,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$feed->setVideoId($data->remoteId);
 		$feed->setMetadataFromEntry();
 		$newPlaylists = $feed->setPlaylists($providerData->currentPlaylists);
+		$feed->setAdParams();
 		
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
 		if (file_exists($thumbnailFilePath))

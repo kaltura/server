@@ -231,6 +231,7 @@ class YouTubeDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 		$mrss->addChild('target', $distributionProfile->getTarget());
 		$mrss->addChild('notification_email', $distributionProfile->getNotificationEmail());
 		$mrss->addChild('account_username', $distributionProfile->getUsername());
+		$mrss->addChild('ad_server_partner_id', $distributionProfile->getAdServerPartnerId());		
 	}
 	
 	/**

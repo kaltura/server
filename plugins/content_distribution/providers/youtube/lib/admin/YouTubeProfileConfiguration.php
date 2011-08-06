@@ -59,6 +59,16 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 			'label' => 'Owner Name:',
 		));
 		
+		
+		$this->addElement('checkbox', 'enable_ad_server', array(
+			'label' => 'Enable AD server:',
+		));
+		
+		$this->addElement('text', 'ad_server_partner_id', array(
+			'label' => 'Ad Server Partner ID:',
+		));
+		
+		
 		$this->addElement('select', 'target', array(
 			'label' => 'Target:',
 			'multioptions' => array(
@@ -69,7 +79,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		));
 		
 		$this->addDisplayGroup(
-			array('username', 'notification_email', 'owner_name', 'target', 'metadata_profile_id'), 
+			array('username', 'notification_email', 'owner_name', 'ad_server_partner_id', 'enable_ad_server', 'target'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);

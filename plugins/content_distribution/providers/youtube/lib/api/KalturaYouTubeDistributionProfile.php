@@ -96,6 +96,16 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 	 * @var string
 	 */
 	public $target;
+	
+	/**
+	 * @var string
+	 */
+	public $adServerPartnerId;
+	
+	/**
+	 * @var bool
+	 */
+	public $enableAdServer;
 
 	
 	/*
@@ -119,6 +129,8 @@ class KalturaYouTubeDistributionProfile extends KalturaConfigurableDistributionP
 		'commercialPolicy',
 		'ugcPolicy',
 		'target',
+	    'adServerPartnerId',
+	    'enableAdServer',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -418,4 +418,28 @@ class YouTubeDistributionFeedHelper
 		return $newPlaylists;
 	}
 	
+	
+	public function setAdParams()
+	{
+	    if (!$this->distributionProfile->enableAdServer) {
+	        return null;
+	    }
+	    
+		$advertisingNode = $this->doc->createElement('yt:advertising');
+		$thirdPartyAdsNode = $this->doc->createElement('yt:third_party_ads');
+		$adTypeNode = $this->doc->createElement('yt:ad_type_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE));
+		$partnerIdNode = $this->doc->createElement('yt:partner_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID));
+		$videoIdNode = $this->doc->createElement('yt:video_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
+		
+		$thirdPartyAdsNode->appendChild($adTypeNode);
+		$thirdPartyAdsNode->appendChild($partnerIdNode);
+		$thirdPartyAdsNode->appendChild($videoIdNode);
+		$advertisingNode->appendChild($thirdPartyAdsNode);
+		
+        $itemNode = $this->xpath->query('/rss/channel/item')->item(0);
+		$itemNode->appendChild($advertisingNode);
+
+		return true;
+	}
+	
 }

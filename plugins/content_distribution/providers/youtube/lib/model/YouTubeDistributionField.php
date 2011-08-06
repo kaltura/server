@@ -46,16 +46,9 @@ interface YouTubeDistributionField extends BaseEnum
 	// item/yt:playlists
 	const PLAYLISTS = 'PLAYLISTS';
 	
-	/*
-	 * //TODO: add advertising fields
-	 * 
-	// item/video_breaks
-	const THIRD_PARTY_AD_SERVER_TARGETING_URL = 'THIRD_PARTY_AD_SERVER_TARGETING_URL';
+	// item/yt:advertising/yt:third_party_ads
+	const THIRD_PARTY_AD_SERVER_AD_TYPE = 'THIRD_PARTY_AD_SERVER_AD_TYPE';
+	const THIRD_PARTY_AD_SERVER_PARTNER_ID = 'THIRD_PARTY_AD_SERVER_PARTNER_ID';
 	const THIRD_PARTY_AD_SERVER_VIDEO_ID = 'THIRD_PARTY_AD_SERVER_VIDEO_ID';
 	
-	// item/ad_policy/instream
-	const AD_POLICY_ALLOW_PREROLLS = 'AD_POLICY_ALLOW_PREROLLS';
-	const AD_POLICY_ALLOW_POSTROLLS = 'AD_POLICY_ALLOW_POSTROLLS';
-	const AD_POLOCY_ALLOW_THIRD_PARTY_ADS = 'AD_POLOCY_ALLOW_THIRD_PARTY_ADS';
-	*/	
 }

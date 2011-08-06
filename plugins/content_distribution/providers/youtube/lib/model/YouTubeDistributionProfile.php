@@ -21,6 +21,8 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_COMMENRCIAL_POLICY = 'commercialPolicy';
 	const CUSTOM_DATA_UGC_POLICY = 'ugcPolicy';
 	const CUSTOM_DATA_TARGET = 'target';
+	const CUSTOM_DATA_AD_SERVER_PARTNER_ID = 'adServerPartnerId';
+	const CUSTOM_DATA_ENABLE_AD_SERVER = 'enableAdServer';
 		
 	
 	// validations
@@ -97,22 +99,25 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	}
 	
 	
-	public function getUsername()				{return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
-	public function getOwnerName()				{return $this->getFromCustomData(self::CUSTOM_DATA_OWNER_NAME);}
-	public function getNotificationEmail()		{return $this->getFromCustomData(self::CUSTOM_DATA_NOTIFICATION_EMAIL);}
-	public function getSftpHost()				{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_HOST);}
-	public function getSftpLogin()				{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_LOGIN);}
-	public function getSftpPublicKey()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY);}
-	public function getSftpPrivateKey()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY);}
-	public function getSftpBaseDir()			{return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_BASE_DIRECTORY);}
-	public function getDefaultCategory()		{return $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY);}
-	public function getAllowComments()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_COMMENTS);}
-	public function getAllowEmbedding()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_EMBEDDING);}
-	public function getAllowRatings()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RATINGS);}
-	public function getAllowResponses()			{return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RESPONSES);}
-	public function getCommercialPolicy()		{return $this->getFromCustomData(self::CUSTOM_DATA_COMMENRCIAL_POLICY);}
-	public function getUgcPolicy()				{return $this->getFromCustomData(self::CUSTOM_DATA_UGC_POLICY);}
-	public function getTarget()					{return $this->getFromCustomData(self::CUSTOM_DATA_TARGET);}
+	public function getUsername()			 {return $this->getFromCustomData(self::CUSTOM_DATA_USERNAME);}
+	public function getOwnerName()			 {return $this->getFromCustomData(self::CUSTOM_DATA_OWNER_NAME);}
+	public function getNotificationEmail()	 {return $this->getFromCustomData(self::CUSTOM_DATA_NOTIFICATION_EMAIL);}
+	public function getSftpHost()			 {return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_HOST);}
+	public function getSftpLogin()			 {return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_LOGIN);}
+	public function getSftpPublicKey()		 {return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PUBLIC_KEY);}
+	public function getSftpPrivateKey()		 {return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_PRIVATE_KEY);}
+	public function getSftpBaseDir()		 {return $this->getFromCustomData(self::CUSTOM_DATA_SFTP_BASE_DIRECTORY);}
+	public function getDefaultCategory()	 {return $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_CATEGORY);}
+	public function getAllowComments()		 {return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_COMMENTS);}
+	public function getAllowEmbedding()		 {return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_EMBEDDING);}
+	public function getAllowRatings()		 {return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RATINGS);}
+	public function getAllowResponses()		 {return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RESPONSES);}
+	public function getCommercialPolicy()	 {return $this->getFromCustomData(self::CUSTOM_DATA_COMMENRCIAL_POLICY);}
+	public function getUgcPolicy()			 {return $this->getFromCustomData(self::CUSTOM_DATA_UGC_POLICY);}
+	public function getTarget()				 {return $this->getFromCustomData(self::CUSTOM_DATA_TARGET);}
+    public function getAdServerPartnerId()   {return $this->getFromCustomData(self::CUSTOM_DATA_AD_SERVER_PARTNER_ID);}
+	public function getEnableAdServer()      {return $this->getFromCustomData(self::CUSTOM_DATA_ENABLE_AD_SERVER);}
+	
 
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
 	public function setOwnerName($v)			{$this->putInCustomData(self::CUSTOM_DATA_OWNER_NAME, $v);}
@@ -130,8 +135,9 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function setCommercialPolicy($v)		{$this->putInCustomData(self::CUSTOM_DATA_COMMENRCIAL_POLICY, $v);}
 	public function setUgcPolicy($v)			{$this->putInCustomData(self::CUSTOM_DATA_UGC_POLICY, $v);}
 	public function setTarget($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGET, $v);}
-
-
+    public function setAdServerPartnerId($v)	{$this->putInCustomData(self::CUSTOM_DATA_AD_SERVER_PARTNER_ID, $v);}
+    public function setEnableAdServer($v)	    {$this->putInCustomData(self::CUSTOM_DATA_ENABLE_AD_SERVER, $v);}
+    
 	
 	protected function getDefaultFieldConfigArray()
 	{	    
@@ -312,6 +318,27 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/YouTubePlaylist" />');
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='YouTubePlaylist']"));
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE);
+	    $fieldConfig->setUserFriendlyFieldName('Third party ad server ad type');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text>1</xsl:text>');
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID);
+	    $fieldConfig->setUserFriendlyFieldName('Third party ad server partner ID');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/ad_server_partner_id" />');
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID);
+	    $fieldConfig->setUserFriendlyFieldName('Entry ID');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(entryId)" />');
+	    $fieldConfig->setUpdateOnChange(false);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    return $fieldConfigArray;
