@@ -147,11 +147,15 @@ class sftpMgr extends kFileTransferMgr
 		return ($stats !== false);
 	}
 
-        // return the current working directory
+    // return the current working directory
 	protected function doPwd ()
 	{
 		$pwd_cmd = 'pwd';
-		return $this->execCommand($pwd_cmd);
+		$result = $this->execCommand($pwd_cmd);
+		if (strstr($result, '/') === false) {
+		    return '';
+		}
+		return $result;
 	}
 
     // delete a file and return true/false according to success
