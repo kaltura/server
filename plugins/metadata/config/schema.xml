@@ -13,6 +13,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="object_type" type="integer" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="create_mode" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />	
 		<index name="partner_id">
 			<index-column name="partner_id" />
 		</index>

@@ -10,6 +10,9 @@
  */ 
 class syndicationFeed extends BasesyndicationFeed
 {
+    
+    
+    
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
 	const SYNDICATION_ACTIVE = 1;

@@ -49,6 +49,7 @@ class MetadataProfileTableMap extends TableMap {
 		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
 		$this->addColumn('OBJECT_TYPE', 'ObjectType', 'INTEGER', false, null, null);
 		$this->addColumn('CREATE_MODE', 'CreateMode', 'INTEGER', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

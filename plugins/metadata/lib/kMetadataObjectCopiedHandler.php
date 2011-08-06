@@ -108,6 +108,11 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer
  				$metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS)
  			);
  			
+ 			kFileSyncUtils::createSyncFileLinkForKey(
+ 				$newMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT),
+ 				$metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT)
+ 			);
+ 			
  			$metadataProfileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfile->getId());
  			foreach($metadataProfileFields as $metadataProfileField)
  			{

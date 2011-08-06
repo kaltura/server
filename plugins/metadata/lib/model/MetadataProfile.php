@@ -17,10 +17,13 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 {
 	const FILE_SYNC_METADATA_DEFINITION = 1;
 	const FILE_SYNC_METADATA_VIEWS = 2;
+	const FILE_SYNC_METADATA_XSLT = 3;
 	
 	const STATUS_ACTIVE = 1;
 	const STATUS_DEPRECATED = 2;
 	const STATUS_TRANSFORMING = 3;
+	
+	const CUSTOM_DATA_METADATA_XSLT_VERSION = 'metadata_xslt_version';
 	
 	/* (non-PHPdoc)
 	 * @see metadata/lib/model/om/BaseMetadata#preInsert()
@@ -29,6 +32,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	{
 		$this->setVersion(1);
 		$this->setViewsVersion(1);
+		$this->setXsltVersion(1);
 		return parent::preInsert($con);
 	}
 
@@ -62,6 +66,22 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 		$this->setViewsVersion($this->getViewsVersion() + 1);
 	}
 	
+    public function incrementXsltVersion()
+	{
+		$this->setXsltVersion($this->getXsltVersion() + 1);
+	}
+	
+	public function setXsltVersion($version)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_METADATA_XSLT_VERSION, $version);
+	}
+	
+    public function getXsltVersion()
+	{
+	    return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_XSLT_VERSION);
+	}	
+	
+	
 	/**
 	 * @param int $sub_type
 	 * @throws FileSyncException
@@ -71,6 +91,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 		$valid_sub_types = array(
 			self::FILE_SYNC_METADATA_DEFINITION,
 			self::FILE_SYNC_METADATA_VIEWS,
+			self::FILE_SYNC_METADATA_XSLT,
 		);
 		
 		if(! in_array($sub_type, $valid_sub_types))
@@ -97,6 +118,9 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 				
 			case self::FILE_SYNC_METADATA_VIEWS:
 				return $this->getViewsVersion();
+				
+			case self::FILE_SYNC_METADATA_XSLT:
+			    return $this->getXsltVersion();
 		}
 		
 		return null;

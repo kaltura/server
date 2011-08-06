@@ -101,7 +101,7 @@ class kSyndicationFeedManager
 		if (!is_null($syndicationFeed) && ($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null(self::getXslt($syndicationFeed))))
 		{
 			$kalturaXslt = self::getKalturaMrssXslt(self::getXslt($syndicationFeed));
-			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
+			$mrss = kXml::transformXmlUsingXslt($mrss, $kalturaXslt);
 		}
 		
 		$divideHeaderFromFooter = strpos($mrss,self::ITEMS_PLACEHOLDER);		
@@ -125,7 +125,7 @@ class kSyndicationFeedManager
 		if (!is_null($syndicationFeed) && ($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null(self::getXslt($syndicationFeed))))
 		{
 			$kalturaXslt = self::getKalturaMrssXslt(self::getXslt($syndicationFeed));
-			$mrss = self::transformXmlUsingXslt($mrss, $kalturaXslt);
+			$mrss = kXml::transformXmlUsingXslt($mrss, $kalturaXslt);
 		}
 		
 		$divideHeaderFromFooter = strpos($mrss, self::ITEMS_PLACEHOLDER) + strlen(self::ITEMS_PLACEHOLDER);
@@ -173,7 +173,7 @@ class kSyndicationFeedManager
 		if (($syndicationFeed->getType() == syndicationFeedType::KALTURA_XSLT) && (!is_null(self::getXslt($syndicationFeed))))
 		{
 			$itemXslt = self::getKalturaItemXslt(self::getXslt($syndicationFeed));
-			$entryMrss = self::transformXmlUsingXslt($entryMrss, $itemXslt, $xslParams);
+			$entryMrss = kXml::transformXmlUsingXslt($entryMrss, $itemXslt, $xslParams);
 			$entryMrss = self::removeNamespaces($entryMrss);
 		}
 		$entryMrss = self::removeXmlHeader($entryMrss);
@@ -245,51 +245,6 @@ class kSyndicationFeedManager
 		return preg_replace("/ xmlns:[^= ]{1,}=[\"][^\"]*[\"]/i", "", $xmlStr);
 	}
 	
-	/**
-	 * 
-	 * @param string $xml
-	 * @param string $xslt
-	 * @return string  
-	 */
-	private static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array())
-	{
-					
-		$xml = new DOMDocument();
-		if(!$xml->loadXML($xmlStr))
-		{
-			KalturaLog::debug("Could not load xmlStr");
-			return null;
-		}
-		
-		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($xslt))
-		{
-			KalturaLog::debug("Could not load xslt");
-			return null;
-		}
-		
-		$proc = new XSLTProcessor;
-		foreach ($xsltParams as $key => $value)
-		{
-			$proc->setParameter( '', $key, $value);
-		}		
-	    $proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
-		$proc->importStyleSheet($xsl);
-		
-		$xml = $proc->transformToDoc($xml);
-
-		if(!$xml)
-		{
-			KalturaLog::err("XML Transformation failed");
-			return null;
-		}
-		
-		if (isset($xml->documentElement)) {
-			$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
-		}
-				
-		return $xml->saveXML();
-	}
 
 	/*
 	 * @param string $xsltStr

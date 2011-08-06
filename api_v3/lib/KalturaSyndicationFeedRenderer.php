@@ -4,7 +4,6 @@ class KalturaSyndicationFeedRenderer
 	const MAX_RETUREND_ENTRIES = 10000;
 	const ENTRY_PEER_LIMIT_QUERY = 500;
 	const LEVEL_INDENTATION = '  ';
-	const HAS_NEXT_ITEM = 'KalturaHasNextItem';
 
 	/**
 	 * Maximum number of items to list
@@ -423,7 +422,7 @@ class KalturaSyndicationFeedRenderer
 				
 			//syndication parameters to pass to XSLT
 			$xslParams = array();	
-			$xslParams[self::HAS_NEXT_ITEM] = $nextEntry ? true : false;
+			$xslParams[XsltParameterName::KALTURA_HAS_NEXT_ITEM] = $nextEntry ? true : false;
 			
 			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $xslParams);				
 		}

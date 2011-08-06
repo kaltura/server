@@ -92,6 +92,12 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	protected $create_mode;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -297,6 +303,16 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	public function getCreateMode()
 	{
 		return $this->create_mode;
+	}
+
+	/**
+	 * Get the [custom_data] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
 	}
 
 	/**
@@ -628,6 +644,26 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	} // setCreateMode()
 
 	/**
+	 * Set the value of [custom_data] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     MetadataProfile The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = MetadataProfilePeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -671,6 +707,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			$this->status = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
 			$this->object_type = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->create_mode = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -680,7 +717,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = MetadataProfilePeer::NUM_COLUMNS - MetadataProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = MetadataProfilePeer::NUM_COLUMNS - MetadataProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating MetadataProfile object", $e);
@@ -901,6 +938,8 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+    	
 		return parent::preSave($con);
 	}
 
@@ -910,7 +949,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+    	 
 	}
 	
 	/**
@@ -1150,6 +1191,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			case 11:
 				return $this->getCreateMode();
 				break;
+			case 12:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -1183,6 +1227,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			$keys[9] => $this->getStatus(),
 			$keys[10] => $this->getObjectType(),
 			$keys[11] => $this->getCreateMode(),
+			$keys[12] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1250,6 +1295,9 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 			case 11:
 				$this->setCreateMode($value);
 				break;
+			case 12:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1286,6 +1334,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[9], $arr)) $this->setStatus($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setObjectType($arr[$keys[10]]);
 		if (array_key_exists($keys[11], $arr)) $this->setCreateMode($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
 	}
 
 	/**
@@ -1309,6 +1358,7 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(MetadataProfilePeer::STATUS)) $criteria->add(MetadataProfilePeer::STATUS, $this->status);
 		if ($this->isColumnModified(MetadataProfilePeer::OBJECT_TYPE)) $criteria->add(MetadataProfilePeer::OBJECT_TYPE, $this->object_type);
 		if ($this->isColumnModified(MetadataProfilePeer::CREATE_MODE)) $criteria->add(MetadataProfilePeer::CREATE_MODE, $this->create_mode);
+		if ($this->isColumnModified(MetadataProfilePeer::CUSTOM_DATA)) $criteria->add(MetadataProfilePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1384,6 +1434,8 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 		$copyObj->setObjectType($this->object_type);
 
 		$copyObj->setCreateMode($this->create_mode);
+
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);
@@ -1464,4 +1516,121 @@ abstract class BaseMetadataProfile extends BaseObject  implements Persistent {
 
 	}
 
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+	
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+	
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+			
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+		
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+
+		$customData = $this->getCustomDataObj( );
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+	
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+	
+	/* ---------------------- CustomData functions ------------------------- */
+	
 } // BaseMetadataProfile

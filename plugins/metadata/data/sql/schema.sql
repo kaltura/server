@@ -24,6 +24,7 @@ CREATE TABLE `metadata_profile`
 	`status` TINYINT,
 	`object_type` INTEGER,
 	`create_mode` INTEGER,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id`(`partner_id`)
 )Type=MyISAM;

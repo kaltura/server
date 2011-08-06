@@ -121,6 +121,15 @@ class MetadataService extends KalturaBaseService
 			
 		$dbMetadata = $this->addMetadata($metadataProfileId, $objectType, $objectId);
 		
+		// if a metadata xslt is defined on the metadata profile - transform the given metadata
+		if($xmlData)
+		{
+		    $xmlDataTransformed = $this->transformMetadata($dbMetadata, $xmlData);
+		    if ($xmlDataTransformed) {
+	            $xmlData = $xmlDataTransformed;
+	        }
+		}
+		
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		kFileSyncUtils::file_put_contents($key, $xmlData);
 		
@@ -357,6 +366,16 @@ class MetadataService extends KalturaBaseService
 			
 		$dbMetadata->save();
 		
+		
+		// if a metadata xslt is defined on the metadata profile - transform the given metadata
+		if($xmlData)
+		{
+		    $xmlDataTransformed = $this->transformMetadata($dbMetadata, $xmlData);
+		    if ($xmlDataTransformed) {
+	            $xmlData = $xmlDataTransformed;
+	        }
+		}
+		
 		if($xmlData)
 		{
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
@@ -413,6 +432,19 @@ class MetadataService extends KalturaBaseService
 		
 		if($filePath)
 		{
+			// if a metadata xslt is defined on the metadata profile - transform the given metadata
+    		$xmlData = file_get_contents($filePath);
+		    if($xmlData)
+    		{
+    		    $xmlDataTransformed = $this->transformMetadata($dbMetadata, $xmlData);
+    		    if ($xmlDataTransformed) {
+    		        $tempDirectory = sys_get_temp_dir();
+		            $tempFilePath = tempnam($tempDirectory, 'xmlData');
+		            file_put_contents($tempFilePath, $xmlDataTransformed);
+		            $filePath = $tempFilePath;
+    	        }
+    		}
+		    
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 			kFileSyncUtils::moveFromFile($filePath, $key);
 			
@@ -450,5 +482,36 @@ class MetadataService extends KalturaBaseService
 		$fileSubType = Metadata::FILE_SYNC_METADATA_DATA;
 		
 		return $this->serveFile($dbMetadata, $fileSubType, $fileName);
+	}
+		
+	
+	private function transformMetadata(Metadata $dbMetadata, $xmlData)
+	{
+        $result = null;
+	    $metadataProfile = $dbMetadata->getMetadataProfile(); 
+	    if (!$metadataProfile) {
+	        KalturaLog::err('Cannot find metadata profile for metadata id ['.$dbMetadata->getId().']');
+	        return null;
+	    }
+	    
+	    $metadataXsltKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
+	    if (kFileSyncUtils::file_exists($metadataXsltKey, true))
+	    {
+		    $xsltString = kFileSyncUtils::file_get_contents($metadataXsltKey, true, false);
+		    if ($xsltString)
+		    {
+		        $xsltParams = array();
+		        $xsltParams[XsltParameterName::KALTURA_CURRENT_TIMESTAMP] = time();
+		        $xmlDataTransformed = kXml::transformXmlUsingXslt($xmlData, $xsltString, $xsltParams);
+		        if ($xmlDataTransformed) {
+		            $result = $xmlDataTransformed;
+		        }
+		        else {
+		            KalturaLog::err('Failed XML transformation for metadata id ['.$dbMetadata->getId().']');
+		        }
+		    }
+	    }
+	    
+	    return $result;
 	}
 }

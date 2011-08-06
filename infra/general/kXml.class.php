@@ -309,4 +309,51 @@ class kXml
 		
 		return round($ret);
 	}
+	
+	/**
+	 * @param string $xml
+	 * @param string $xslt
+	 * @param array $xsltParams
+	 * @return string  
+	 */
+	public static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array())
+	{
+					
+		$xml = new DOMDocument();
+		if(!$xml->loadXML($xmlStr))
+		{
+			KalturaLog::debug("Could not load xmlStr");
+			return null;
+		}
+		
+		$xsl = new DOMDocument();
+		if(!$xsl->loadXML($xslt))
+		{
+			KalturaLog::debug("Could not load xslt");
+			return null;
+		}
+		
+		$proc = new XSLTProcessor;
+		foreach ($xsltParams as $key => $value)
+		{
+			$proc->setParameter( '', $key, $value);
+		}		
+	    $proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
+		$proc->importStyleSheet($xsl);
+		
+		$xml = $proc->transformToDoc($xml);
+
+		if(!$xml)
+		{
+			KalturaLog::err("XML Transformation failed");
+			return null;
+		}
+		
+		if (isset($xml->documentElement)) {
+			$xml->documentElement->removeAttributeNS('http://php.net/xsl', 'php');
+		}
+				
+		return $xml->saveXML();
+	}
+	
 }
