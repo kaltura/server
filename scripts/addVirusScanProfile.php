@@ -12,7 +12,7 @@ DbManager::initialize();
 ***************************************************/
 
 // partner's ID - must be set!
-$partnerId = 470781;//585831
+$partnerId = null;
 
 // please enter a name for the profile:
 $profileName = 'virusScan';
