@@ -1,2 +1,2 @@
 ALTER TABLE  `metadata_profile` 
-ADD  `custom_data` TEXT NOT NULL DEFAULT  '' AFTER  `create_mode`;
+ADD  `custom_data` TEXT AFTER `create_mode`;
