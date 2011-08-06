@@ -9,18 +9,18 @@ $metadataProfileId = null;    //TODO: change to a valid metadata profile id
 // ---------------------------------------------------------------------------
 
 if (!$xsltFilePath) {
-    die('Missing parameter [$xsltFilePath]');
+    die('Missing parameter [$xsltFilePath]'.PHP_EOL);
 }
 if (!$metadataProfileId) {
-    die('Missing parameter [$metadataProfileId]');
+    die('Missing parameter [$metadataProfileId]'.PHP_EOL);
 }
 if (!file_exists($xsltFilePath)) {
-    die('Cannot find file at ['.$xsltFilePath.']');
+    die('Cannot find file at ['.$xsltFilePath.']'.PHP_EOL);
 }
 
 $dbMetadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 if (!$dbMetadataProfile) {
-    die('Cannot find metadata profile with id ['.$metadataProfileId.']');
+    die('Cannot find metadata profile with id ['.$metadataProfileId.']'.PHP_EOL);
 }
 
 $dbMetadataProfile->incrementXsltVersion();
