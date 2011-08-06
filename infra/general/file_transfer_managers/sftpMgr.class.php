@@ -86,6 +86,7 @@ class sftpMgr extends kFileTransferMgr
 		$sftp = $this->getSftpConnection();
 		$remote_file = ltrim($remote_file,'/');
 		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
+		$absolute_path = trim($absolute_path, '/');
         $stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'w');
         if (!$stream) {
         	return false;
@@ -106,6 +107,7 @@ class sftpMgr extends kFileTransferMgr
 		$sftp = $this->getSftpConnection();
 		$remote_file = ltrim($remote_file,'/');
 		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
+		$absolute_path = trim($absolute_path, '/');
         $stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'r');
         if (!$stream) {
         	return false;
@@ -180,9 +182,11 @@ class sftpMgr extends kFileTransferMgr
 	// download a file from the server
 	public function fileGetContents ($remote_file)
 	{
+	    $sftp = $this->getSftpConnection();
 	    $remote_file = ltrim($remote_file,'/');
-		$sftp = $this->getSftpConnection();
-		$uri = "ssh2.sftp://$sftp/$remote_file";
+	    $absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
+		$absolute_path = trim($absolute_path, '/');
+		$uri = "ssh2.sftp://$sftp/$absolute_path";
         $stream = @fopen($uri, 'r');
         if (!$stream)
         	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
@@ -203,7 +207,9 @@ class sftpMgr extends kFileTransferMgr
 		
         $sftp = $this->getSftpConnection();
         $remote_file = ltrim($remote_file,'/');
-		$uri = "ssh2.sftp://$sftp/$remote_file";
+        $absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
+		$absolute_path = trim($absolute_path, '/');
+		$uri = "ssh2.sftp://$sftp/$absolute_path";
         $stream = @fopen($uri, 'w');
         if (!$stream)
         	throw new kFileTransferMgrException("Failed to open stream [".$uri."]");
