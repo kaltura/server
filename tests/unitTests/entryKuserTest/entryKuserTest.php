@@ -1,10 +1,6 @@
 <?php
 
-define('KALTURA_CLIENT_PATH', dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'lib');
-
-require_once 'PHPUnit\Framework\TestCase.php';
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bootstrap.php');
-//require_once(KALTURA_CLIENT_PATH);
 
 /**
  * 
@@ -17,6 +13,7 @@ class entryKuserTest extends PHPUnit_Framework_TestCase
 	const TEST_PARTNER_ID = 495787;
 	const TEST_ADMIN_SECRET = '2dc17b5563696fceb430a8431a2e4a32';
 	const TEST_USER_SECRET = '526603c21b71f4c43b9751bfcca6f387';
+	
 	/**
 	 * @return Partner
 	 */
