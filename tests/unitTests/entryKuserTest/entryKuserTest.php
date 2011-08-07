@@ -8,7 +8,7 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'
  * @author Roni
  *
  */
-class entryKuserTest extends PHPUnit_Framework_TestCase
+class entryKuserTest extends KalturaTestCaseBase
 {
 	const TEST_PARTNER_ID = 495787;
 	const TEST_ADMIN_SECRET = '2dc17b5563696fceb430a8431a2e4a32';
