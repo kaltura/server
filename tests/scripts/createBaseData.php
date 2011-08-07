@@ -162,7 +162,13 @@ class KalturaTestDeploymentHelper
 
 		$result = $systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $newConfig);
 		
-		$client->getConfig()->partnerId = self::$partner->id;
+		$config = new KalturaConfiguration();
+		$config->serviceUrl = $client->getConfig()->serviceUrl;
+		$config->partnerId = self::$partner->id;
+		
+		$client = new KalturaClient($config); // create a client for the partner
+		$ks = $client->session->start(self::$partner->adminSecret, null, KalturaSessionType::ADMIN, self::$partner->id, 86400, null);
+		$client->setKs($ks);
 	}
 
 	/**
@@ -352,7 +358,9 @@ class KalturaTestDeploymentHelper
 		$metadataProfile->systemName = 'Metadata profile for tests';
 
 		$metadataProfileXsd = '<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">   <xsd:element name="metadata">     <xsd:complexType>       <xsd:sequence>         <xsd:element id="md_90192848-AAE47-03390173D13A"         name="Startdate" minOccurs="0" maxOccurs="1" type="dateType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>startdate</label>               <key>startdate</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element>         <xsd:element id="md_D7EAD7A91-6360-BF2F-03393913BE11"         name="Enddate" minOccurs="0" maxOccurs="1" type="dateType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>enddate</label>               <key>enddate</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element> 		<xsd:element id="md_D7EADC16-791-6360-BF2F-03393913Bs11"         name="MyNumber" minOccurs="0" maxOccurs="1" type="intType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyNumber</label>               <key>MyNumber</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element> 		<xsd:element id="md_D7EADC16-7A91-6360F-03393913Bs11"         name="MyNumber2" minOccurs="0" maxOccurs="1" type="intType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyNumber2</label>               <key>MyNumber2</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element> 		<xsd:element id="md_D7EADC16-7A91-6360-BF2F-033932s11"         name="MyNumber3" minOccurs="0" maxOccurs="1" type="intType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyNumber3</label>               <key>MyNumber3</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element>         <xsd:element id="md_C084580E-43B0-38A7-9F23-033B3"         name="MyTextList" minOccurs="0" maxOccurs="1">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>my text list</label>               <key>my text list</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>           <xsd:simpleType>             <xsd:restriction base="listType">               <xsd:enumeration value="a1" />               <xsd:enumeration value="b2" />               <xsd:enumeration value="c3" />             </xsd:restriction>           </xsd:simpleType>         </xsd:element> 		<xsd:element id="md_D7EADC16-7ABF2F-033932s11"         name="MyTest" minOccurs="0" maxOccurs="1" type="textType">           <xsd:annotation>             <xsd:documentation></xsd:documentation>             <xsd:appinfo>               <label>MyTest</label>               <key>MyTest</key>               <searchable>true</searchable>               <description></description>             </xsd:appinfo>           </xsd:annotation>         </xsd:element>       </xsd:sequence>     </xsd:complexType>   </xsd:element>   <xsd:complexType name="textType">     <xsd:simpleContent>       <xsd:extension base="xsd:string" />     </xsd:simpleContent>   </xsd:complexType>     <xsd:complexType name="intType">     <xsd:simpleContent>       <xsd:extension base="xsd:long" />     </xsd:simpleContent>   </xsd:complexType>   <xsd:complexType name="dateType">     <xsd:simpleContent>       <xsd:extension base="xsd:long" />     </xsd:simpleContent>   </xsd:complexType>   <xsd:complexType name="objectType">     <xsd:simpleContent>       <xsd:extension base="xsd:string" />     </xsd:simpleContent>   </xsd:complexType>   <xsd:simpleType name="listType">     <xsd:restriction base="xsd:string" />   </xsd:simpleType> </xsd:schema>';
-		$metadataProfile = $client->metadataProfile->add($metadataProfile, $metadataProfileXsd);
+		
+		$metadataClient = KalturaMetadataClientPlugin::get($client);
+		$metadataProfile = $metadataClient->metadataProfile->add($metadataProfile, $metadataProfileXsd);
 		
 		KalturaGlobalData::setData("@METADATA_SEARCH_PROFILE_ID@", $metadataProfile->id);
 		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_NAME1@", '/*[local-name()=\'metadata\']/*[local-name()=\'MyTest\']');
@@ -376,27 +384,25 @@ class KalturaTestDeploymentHelper
 		$entry = new KalturaMediaEntry();		
 		for ($i =0 ; $i < count($xmlData) ; $i++)
 		{
+			$entry->id = null;
 			$entry->name ='Entry For metadataSearch ' . $i;
 			$entry->type = KalturaEntryType::MEDIA_CLIP;
 			$entry->mediaType = KalturaMediaType::VIDEO;
-			$entry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
+			$newEntry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
 			
 			$contentResource = new KalturaUrlResource();
 			$contentResource->url = "http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv";
-			$client->media->addContent($entry->id, $contentResource);
+			$client->media->addContent($newEntry->id, $contentResource);
 			
 			//add metadata 
-			sleep(5); //sync with sphinx
-			$entries[$i] = $entry->id;			
-			$client->metadata->add($metadataProfile->id, KalturaMetadataObjectType::ENTRY, $entry->id, $xmlData[$i]);
+			sleep(1); //sync with sphinx
+			$entries[$i] = $newEntry->id;
+
+			$metadataClient->metadata->add($metadataProfile->id, KalturaMetadataObjectType::ENTRY, $newEntry->id, $xmlData[$i]);
 		}
 		
 		$expectedResults = $entries[4] . $entries[3];
 		
 		KalturaGlobalData::setData("@METADATA_SEARCH_ENTRIES_IDS@", $expectedResults);
-		
-		
-
-		
 	}
 }
