@@ -9,6 +9,16 @@
         <delete dir="${builddir}" />
     </target>
 
+	<target name="clearCache">
+        <echo msg="Clearing server cache..." />
+        <exec command="php ${sdir}/scripts/clear_cache.php" escape="false"/>
+    </target>
+    
+    <target name="generateClients">
+        <echo msg="Generating clients..." />
+        <exec command="php ${sdir}/generator/generate.sh" escape="false"/>
+    </target>
+    
     <target name="prepare">
         <echo msg="Prepare..." />
         <mkdir dir="${builddir}" />
@@ -22,6 +32,7 @@
         <echo msg="updating server using the update script..." />
         <exec command="php ${sdir}/deployment/updates/update.php" escape="false"/>
     </target>
+    
     
     <!-- Deploy app -->
     <target name="app">
