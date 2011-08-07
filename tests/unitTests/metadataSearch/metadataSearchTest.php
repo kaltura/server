@@ -54,13 +54,15 @@ class metadataSearchTest extends KalturaApiTestCase
 		$filter->advancedSearch = $metadataSearchItem;
 		
 		$entries = $this->client->media->listAction($filter);
-		$i = 0;
 		
+		$expectedEntriesArr = explode(',', $expectedEntries);
+		
+		$i = 0;
+			
 		foreach ($entries as $entry)
 		{
+			$this->compareOnField("entry_id", $entry->id, $expectedEntriesArr[$i], "assertEquals");
 			$i++;
-			$this->CompareAPIObjects($expectedEntries[$i], $entry);	
 		}
-		
 	}
 }
