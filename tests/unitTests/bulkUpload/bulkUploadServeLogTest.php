@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../../bootstrap/bootstrapAPI.php');
+require_once(dirname(__FILE__) . '/../../bootstrap/bootstrapApi.php');
 
 /**
  * The BulkUploadServeLogTest unit test case
