@@ -415,15 +415,19 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	{
 		//TODO:Add the code coverage filter for API_v3
 		//if we got codeCoverage then we add the rest of the server folders
-//		$codeCoverageFilter = PHP_CodeCoverage_Filter::getInstance();
+		$codeCoverageFilter = PHP_CodeCoverage_Filter::getInstance();
 		
-//		if($codeCoverageFilter)
-//		{
-//			$testsBaseDir = dirname(__FILE__);
+		if($codeCoverageFilter)
+		{
+			$testsBaseDir = dirname(__FILE__);
 			
-//			//print("Adding" . $testsBaseDir . "/../../api_v3" . "to the CodeCoverage filter\n");
-//			$codeCoverageFilter->addDirectoryToWhitelist($testsBaseDir . "/../../api_v3");
-//		}
+			$whiteList = $codeCoverageFilter->getWhitelist();
+			if(!in_array("$testsBaseDir/../../api_v3", $whiteList))
+			{
+				KalturaLog::debug("Adding" . $testsBaseDir . "/../../api_v3" . "to the CodeCoverage filter\n");
+				$codeCoverageFilter->addDirectoryToWhitelist($testsBaseDir . "/../../api_v3");
+			}
+		}
 		
 		if($result)
 		{
