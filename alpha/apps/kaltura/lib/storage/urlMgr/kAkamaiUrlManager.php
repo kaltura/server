@@ -207,11 +207,12 @@ class kAkamaiUrlManager extends kUrlManager
 		else {
 			if($this->clipTo)
 				$url .= "/clipTo/$this->clipTo";
-	
-			if($this->extention)
-				$url .= "/name/$flavorAssetId.$this->extention";
-						
-			if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+
+			if($this->protocol == "hdnetworksmil")
+			{
+				$url = "http://".$this->params["hd_flash"].$url.'/forceproxy/true';
+			}
+			else if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 			{
 				$url .= '/forceproxy/true';
 				$url = trim($url, "/");
@@ -221,14 +222,14 @@ class kAkamaiUrlManager extends kUrlManager
 			}
 			else
 			{		
+				if($this->extention)
+					$url .= "/name/$flavorAssetId.$this->extention";
+						
 				if($this->seekFromTime > 0)
 					$url .= '?aktimeoffset=' . floor($this->seekFromTime / 1000);
 			}
 		}
 		
-		if($this->protocol == "hdnetworksmil")
-			$url = "http://".$this->params["hd_flash"].$url;
-			
 		$url = str_replace('\\', '/', $url);
 
 		if ($this->protocol == StorageProfile::PLAY_FORMAT_HTTP && @$this->params['http_auth_salt'])
