@@ -157,6 +157,8 @@ class KalturaTestDeploymentHelper
 		}
 
 		$result = $systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $newConfig);
+		
+		$client->getConfig()->partnerId = self::$partner->id;
 	}
 
 	/**
@@ -239,7 +241,7 @@ class KalturaTestDeploymentHelper
 		$flavorAssest = $client->flavorParams->listAction();
 		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
 		
-		//self::addMetadataSearchData($client);
+		self::addMetadataSearchData($client);
 	}
 	
 	/**
@@ -339,14 +341,7 @@ class KalturaTestDeploymentHelper
 	
 	protected static function addMetadataSearchData(KalturaClient $client)
 	{
-		
-		
-		/*
-		<Input type='string' key='@METADATA_SEARCH_FIELD_VALUE1@'/>
-		<Input type='string' key='@METADATA_SEARCH_FIELD_VALUE2@'/>
-		*/
 		//add metadata profile
-		
 		$metadataProfile = new KalturaMetadataProfile();
 		$metadataProfile->name = 'Metadata profile for tests';
 		$metadataProfile->createMode = KalturaMetadataProfileCreateMode::API;
@@ -387,7 +382,7 @@ class KalturaTestDeploymentHelper
 			$client->media->addContent($entry->id, $contentResource);
 			
 			//add metadata 
-
+			sleep(2); //sync with sphinx
 			$entries[$i] = $entry->id;			
 			$client->metadata->add($metadataProfile->id, KalturaMetadataObjectType::ENTRY, $entry->id, $xmlData[$i]);
 		}
