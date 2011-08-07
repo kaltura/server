@@ -24,6 +24,8 @@ $newPartner = $client->partner->register($partner, $cmsPassword); //create the n
 
 print("New test partner is: " . print_r($newPartner, true));
 
+KalturaGlobalData::clearValue(); //Clears the old global data as we are deploying a new data now.
+
 //Save the partner id into the global data file
 KalturaGlobalData::setData("@SERVICE_URL@", $config->serviceUrl);
 KalturaGlobalData::setData("@TEST_PARTNER_ID@", $newPartner->id);
@@ -37,7 +39,9 @@ $ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType
 $client->setKs($ks);
 
 KalturaTestDeploymentHelper::setPartner($newPartner);
+
 KalturaTestDeploymentHelper::addPermissions($client);
+
 KalturaTestDeploymentHelper::addBaseData($client);
 
 
@@ -382,7 +386,7 @@ class KalturaTestDeploymentHelper
 			$client->media->addContent($entry->id, $contentResource);
 			
 			//add metadata 
-			sleep(2); //sync with sphinx
+			sleep(5); //sync with sphinx
 			$entries[$i] = $entry->id;			
 			$client->metadata->add($metadataProfile->id, KalturaMetadataObjectType::ENTRY, $entry->id, $xmlData[$i]);
 		}

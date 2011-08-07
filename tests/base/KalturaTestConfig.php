@@ -127,4 +127,19 @@ class KalturaTestConfig extends Zend_Config_Ini
 				
 		return $value;
 	}
+	
+	/**
+	 * 
+	 * Clears the given name from it's value. if $name = null clears all values from the config file
+	 * @param string $name
+	 */
+	public function clear($name = null)
+	{
+		foreach ($this->_data as $key => $value)
+		{
+			$this->_data[$key] = null;
+		}
+		
+		$this->saveToIniFile();
+	}
 }

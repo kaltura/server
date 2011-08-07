@@ -148,4 +148,32 @@ class KalturaGlobalData extends KalturaTestConfig
 		
 		return true;
 	}
+
+	/**
+	 * 
+	 * Clears a given name, if name = null clears all the names from the global data file 
+	 * @param string $name
+	 */
+	public static function clearValue($name = null)
+	{
+		if(KalturaGlobalData::$dataFile == null)
+		{
+			$isInit = KalturaGlobalData::initDataFile();
+			if(!$isInit)
+				return null;
+		}
+		
+		if($name)
+		{
+			if(is_string($name) || is_integer($name))
+			{
+				$value = KalturaGlobalData::setData($name, null);
+				KalturaLog::debug("Setting name [$name] to null");
+			}
+		}
+		else
+		{
+			self::$dataFile->clear($name);
+		}
+	}
 }
