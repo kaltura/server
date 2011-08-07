@@ -15,8 +15,8 @@ class serveFlavorAction extends kalturaAction
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
-		
-		$flavorAsset = assetPeer::retrieveById($flavorId);
+	
+		$flavorAsset = assetPeer::retrieveById($flavorId);	
 		if (is_null($flavorAsset))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
@@ -47,22 +47,26 @@ class serveFlavorAction extends kalturaAction
 		}
 		
 		$path = kFileSyncUtils::getReadyLocalFilePathForKey($syncKey);
-		
-		$flvWrapper = new myFlvHandler ( $path );
-		$isFlv = $flvWrapper->isFlv();
+	
+		$isFlv = false;
+		if (!$shouldProxy) // if the forceproxy is set dump file and dont treat it as flv (for progressive download)
+		{
+			$flvWrapper = new myFlvHandler ( $path );
+			$isFlv = $flvWrapper->isFlv();
+		}
+	
 	
 		$clipFrom = $this->getRequestParameter ( "clipFrom" , 0); // milliseconds
 		$clipTo = $this->getRequestParameter ( "clipTo" , 2147483647 ); // milliseconds
 		if ( $clipTo == 0 ) $clipTo = 2147483647;
 
 
-		if(is_dir($path) && $fileParam) {
+		if($fileParam && is_dir($path)) {
 			$path .= "/$fileParam";
-//echo "path($path),file($fileParam)";
 			kFile::dumpFile($path, null, null);
 			die;
 		}
-		else if (!$isFlv)
+		else if (!$isFlv) // dump as regular file if the forceproxy parameter was specified or the file isn't an flv
 		{
 			$limit_file_size = 0;
 			if ($clipTo != 2147483647)
