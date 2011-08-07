@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Enable indexing and searching caption asset objects
