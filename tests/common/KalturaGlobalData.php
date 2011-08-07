@@ -46,6 +46,9 @@ class KalturaGlobalData extends KalturaTestConfig
 			}
 		}
 		
+		//if (!is_numeric($value))
+			$value = '"' . $value . '"';
+		
 		KalturaGlobalData::$dataFile->$name = $value; 
 		KalturaGlobalData::$dataFile->saveToIniFile();
 	}
