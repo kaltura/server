@@ -7,7 +7,7 @@ require_once(dirname(__FILE__) . "/../../bootstrap.php");
 /**
  * Represents an example unit test
  */
-class ExampleUnitTest extends KalturaTestCase
+class ExampleUnitTest extends KalturaTestCaseBase
 {
 	/**
 	 * a Test with a data provider
