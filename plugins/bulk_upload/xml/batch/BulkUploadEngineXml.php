@@ -1264,8 +1264,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				return new KalturaMediaEntry();
 			case KalturaEntryType::DATA:
 				return new KalturaDataEntry();
-			case KalturaEntryType::DOCUMENT:
-				return new KalturaDocumentEntry();
 			case KalturaEntryType::LIVE_STREAM:
 				return new KalturaLiveStreamEntry();
 			case KalturaEntryType::MIX:
@@ -1299,10 +1297,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->setDataElementValues($entry, $item);
 				break;
 				
-			case KalturaEntryType::DOCUMENT:
-				$this->setDocumentElementValues($entry, $item);
-				break;
-				
 			case KalturaEntryType::LIVE_STREAM:
 				$this->setLiveStreamElementValues($entry, $item);
 				break;
@@ -1334,9 +1328,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 			
 		if(isset($item->playlist) && $item->type != KalturaEntryType::PLAYLIST)
-			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-
-		if(isset($item->document) && $item->type != KalturaEntryType::DOCUMENT)
 			throw new KalturaBulkUploadXmlException("Conflicted typed element for type [$typeNumber] on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 
 		if(isset($item->liveStream) && $item->type != KalturaEntryType::LIVE_STREAM)
@@ -1410,17 +1401,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$mix->dataContent = $mixElement->dataContent;
 	}
 		
-	/**
-	 * Sets the document values in the media entry according to the given media node
-	 * @param KalturaDocumentEntry $media 
-	 * @param SimpleXMLElement $itemElement
-	 */
-	protected function setDocumentElementValues(KalturaDocumentEntry $document, SimpleXMLElement $itemElement)
-	{
-		$documentElement = $itemElement->document;
-		$document->documentType = $documentElement->documentType;
-	}
-	
 	/**
 	 * Checks if the media type and the type are valid
 	 * @param KalturaMediaType $mediaType
