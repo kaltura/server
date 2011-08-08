@@ -111,6 +111,9 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					}
 									
 					$this->conditionClause[] = $metadataField . $comparison . $item->getValue();
+					
+					if ($item->getComparison() != KalturaSearchConditionComparison::EQUEL)
+						$this->conditionClause[] = $metadataField . ' <> 0';
 				}
 				elseif ($item instanceof AdvancedSearchFilterCondition)
 				{
