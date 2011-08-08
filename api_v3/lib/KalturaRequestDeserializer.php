@@ -165,8 +165,12 @@ class KalturaRequestDeserializer
             $possibleType = $params["objectType"];
             if (strtolower($possibleType) !== strtolower($typeReflector->getType())) // reflect only if type is different
             {
-                if ($typeReflector->isParentOf($possibleType)) // we know that the objectType that came from the user is right, and we can use it to initiate the object
-                    $typeReflector = KalturaTypeReflectorCacher::get($possibleType);
+                if ($typeReflector->isParentOf($possibleType)) // we know that the objectType that came from the user is right, and we can use it to initiate the object\
+                {
+                    $newTypeReflector = KalturaTypeReflectorCacher::get($possibleType);
+                    if($newTypeReflector)
+                    	$typeReflector = $newTypeReflector;
+                }
             }
 		}
 		
