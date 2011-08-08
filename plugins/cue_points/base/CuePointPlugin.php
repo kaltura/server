@@ -128,7 +128,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	/* (non-PHPdoc)
 	 * @see IKalturaMrssContributor::contribute()
 	 */
-	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
 	{
 		if(!($object instanceof entry))
 			return;

@@ -28,7 +28,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	/* (non-PHPdoc)
 	 * @see IKalturaMrssContributor::contributeToSchema()
 	 */
-	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
 	{
 		$objectType = null;
 		
@@ -52,7 +52,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 			
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $object->getId());
 		foreach($metadatas as $metadata)
-			$this->contributeMetadata($metadata, $mrss);
+			$this->contributeMetadata($metadata, $mrss, $mrssParams);
 	}
 	
 	/**
@@ -60,7 +60,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	 * @param SimpleXMLElement $mrss
 	 * @return SimpleXMLElement
 	 */
-	public function contributeMetadata(Metadata $metadata, SimpleXMLElement $mrss)
+	public function contributeMetadata(Metadata $metadata, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
 	{
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xml = kFileSyncUtils::file_get_contents($key, true, false);
@@ -72,7 +72,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 		$customData->addAttribute('metadataProfileId', $metadata->getMetadataProfileId());
 		$customData->addAttribute('metadataProfileVersion', $metadata->getMetadataProfileVersion());
 		
-		$this->contributeMetadataObject($customData, $metadataXml);
+		$this->contributeMetadataObject($customData, $metadataXml, $mrssParams, $metadata->getMetadataProfileId(), $metadata->getMetadataProfileVersion());
 	}
 	
 	/**
@@ -80,7 +80,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	 * @param SimpleXMLElement $metadata
 	 * @return SimpleXMLElement
 	 */
-	public function contributeMetadataObject(SimpleXMLElement $mrss, SimpleXMLElement $metadata)
+	public function contributeMetadataObject(SimpleXMLElement $mrss, SimpleXMLElement $metadata, kMrssParameters $mrssParams = null, $metadataProfileId = null, $metadataProfileVersion = null)
 	{
 		$metadataObject = $mrss->addChild($metadata->getName());
 		foreach($metadata->attributes() as $attributeField => $attributeValue)
@@ -88,11 +88,33 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 				
 		foreach($metadata as $metadataField => $metadataValue)
 		{
-			if($metadataValue instanceof SimpleXMLElement && count($metadataValue))
+			if($metadataValue instanceof SimpleXMLElement && count($metadataValue)) {
 				$this->contributeMetadataObject($metadataObject, $metadataValue);
-			else
+			}
+			else{
 				$metadataObject->addChild($metadataField, $metadataValue);
-		}
+				if ($mrssParams)
+				{
+					$itemXpathsToExtend = $mrssParams->getItemXpathsToExtend();
+					$c = new Criteria();
+					$c->addAnd(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $metadataProfileId, Criteria::EQUAL);
+					$c->addAnd(MetadataProfileFieldPeer::METADATA_PROFILE_VERSION, $metadataProfileVersion, Criteria::EQUAL);	
+					$c->addAnd(MetadataProfileFieldPeer::KEY, $metadataField, Criteria::EQUAL);		
+					$metadataFieldDb = MetadataProfileFieldPeer::doSelectOne($c);
+					
+					if ($metadataFieldDb && is_array($itemXpathsToExtend) && in_array($metadataFieldDb->getXpath(), $itemXpathsToExtend))
+					{						
+						$relatedEntry = entryPeer::retrieveByPK($metadataValue);
+						if ($relatedEntry)
+						{
+							$relatedItemField = $metadataObject->addChild($metadataField.'_item');
+							$relatedItemField->addAttribute('entryId', $metadataValue);											
+							$relatedEntryMrss = kMrssManager::getEntryMrssXml($relatedEntry, $relatedItemField);
+						}			
+					}
+				}			
+			}					
+		}				
 	}
 
 	/* (non-PHPdoc)

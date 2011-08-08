@@ -264,9 +264,10 @@ class kMrssManager
 	 * @param SimpleXMLElement $mrss
 	 * @param string $link
 	 * @param string $filterFlavors
+	 * @param kMrssParameters $mrssParams
 	 * @return SimpleXMLElement
 	 */
-	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, $link = null, $fitlerByFlovorParams = null)
+	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, $link = null, $fitlerByFlovorParams = null, kMrssParameters $mrssParams = null)
 	{
 		if(!$mrss)
 			$mrss = new SimpleXMLElement('<item/>');
@@ -363,7 +364,7 @@ class kMrssManager
 		$mrssContributors = self::getMrssContributors();
 		if(count($mrssContributors))
 			foreach($mrssContributors as $mrssContributor)
-				$mrssContributor->contribute($entry, $mrss);
+				$mrssContributor->contribute($entry, $mrss, $mrssParams);
 		
 		return $mrss;
 	}

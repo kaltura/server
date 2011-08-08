@@ -10,9 +10,8 @@
  */ 
 class syndicationFeed extends BasesyndicationFeed
 {
-    
-    
-    
+	const CUSTOM_DATA_MRSS_PARAMETERS = 'mrss_parameters';
+	
 	// copied from KalturaSyndicationFeedStatus
 	const SYNDICATION_DELETED = -1;
 	const SYNDICATION_ACTIVE = 1;
@@ -70,5 +69,23 @@ class syndicationFeed extends BasesyndicationFeed
 			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
 			
 		return $ret;
+	}
+	
+	/*
+	 * @return kMrssParameters
+	 */
+	public function getMrssParameters()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_MRSS_PARAMETERS);
+	}
+	
+	/**
+	 * @param kMrssParameters $mrssParams
+	 */
+	public function setMrssParameters(kMrssParameters $mrssParams)
+	{	
+		if (is_array($mrssParams->getItemXpathsToExtend())) {			
+			$this->putInCustomData(self::CUSTOM_DATA_MRSS_PARAMETERS, $mrssParams);
+		}
 	}
 }

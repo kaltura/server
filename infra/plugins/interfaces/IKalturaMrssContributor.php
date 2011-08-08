@@ -9,7 +9,8 @@ interface IKalturaMrssContributor extends IKalturaBase
 	/**
 	 * @param BaseObject $object
 	 * @param SimpleXMLElement $mrss
+	 * @param kMrssParameters $mrssParams
 	 * @return SimpleXMLElement
 	 */
-	public function contribute(BaseObject $object, SimpleXMLElement $mrss);	
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null);	
 }

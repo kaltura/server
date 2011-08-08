@@ -138,7 +138,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	/* (non-PHPdoc)
 	 * @see IKalturaMrssContributor::contributeToSchema()
 	 */
-	public function contribute(BaseObject $object, SimpleXMLElement $mrss)
+	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
 	{
 		if(!($object instanceof entry))
 			return;
