@@ -47,8 +47,21 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
     	$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
-    	
-        return $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+        $dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+        
+        // Copy the media info from the old asset to the new one
+        if($syncable instanceof asset && $resource->getObjectSubType() == asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET)
+        {
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($syncable->getId());
+			if($mediaInfo)
+			{
+				$newMediaInfo = $mediaInfo->copy();
+				$newMediaInfo->setFlavorAssetId($dbAsset->getId());
+				$newMediaInfo->save();
+			}
+        }
+        
+        return $dbAsset;
     }
     
     /**

@@ -8,6 +8,7 @@
 class KalturaOperationResource extends KalturaContentResource 
 {
 	/**
+	 * Only KalturaEntryResource and KalturaAssetResource are supported
 	 * @var KalturaContentResource
 	 */
 	public $resource;
@@ -28,6 +29,9 @@ class KalturaOperationResource extends KalturaContentResource
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('resource');
     	
+		if(!($this->resource instanceof KalturaEntryResource) && !($this->resource instanceof KalturaAssetResource))
+			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this->resource));
+			 
 		$this->resource->validateEntry($dbEntry);
 	}
 	
@@ -52,9 +56,6 @@ class KalturaOperationResource extends KalturaContentResource
 		if(is_null($this->operationAttributes) || !count($this->operationAttributes))
 			return $this->resource->toObject();
 			
-		if($this->resource instanceof KalturaUrlResource)
-			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this->resource));
-			 
 		if(!$object_to_fill)
 			$object_to_fill = new kOperationResource();
 			
