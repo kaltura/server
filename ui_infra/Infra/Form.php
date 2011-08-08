@@ -1,6 +1,10 @@
 <?php
 class Infra_Form extends Zend_Form
 {
+	public function init(){
+		$this->addElementPrefixPath('AdminConsole', APPLICATION_PATH);
+	}
+	
 	public function populateFromObject($object, $add_underscore = true)
 	{
 		$props = $object;
