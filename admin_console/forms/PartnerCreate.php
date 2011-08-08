@@ -1,8 +1,10 @@
 <?php 
 class Form_PartnerCreate extends Infra_Form
-{
+{	
 	public function init()
 	{
+		parent::init();
+		
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setName('new_account'); // form id
@@ -22,7 +24,7 @@ class Form_PartnerCreate extends Infra_Form
 		$this->addElement('text', 'admin_email', array(
 			'label' => 'partner-create form admin email',
 			'required' => true,
-			'validators' => array('EmailAddress'),
+			'validators' => array('PartnerEmail', 'EmailAddress'),
 			'filters'		=> array('StringTrim'),
 		));
 		
