@@ -192,7 +192,7 @@ class AttachmentAssetService extends KalturaBaseService
 	 */
 	protected function attachUrl(AttachmentAsset $attachmentAsset, $url)
 	{
-    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $attachmentAsset->getId() . '.jpg';
+    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . basename($url);
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($attachmentAsset, $fullPath);
 			
@@ -371,7 +371,7 @@ class AttachmentAssetService extends KalturaBaseService
 
 		$ext = $attachmentAsset->getFileExt();
 		if(is_null($ext))
-			$ext = 'jpg';
+			$ext = 'txt';
 			
 		$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		

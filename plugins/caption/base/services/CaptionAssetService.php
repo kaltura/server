@@ -203,7 +203,7 @@ class CaptionAssetService extends KalturaBaseService
 	 */
 	protected function attachUrl(CaptionAsset $captionAsset, $url)
 	{
-    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $captionAsset->getId() . '.jpg';
+    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . basename($url);
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($captionAsset, $fullPath);
 			
@@ -363,8 +363,6 @@ class CaptionAssetService extends KalturaBaseService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$fileName = $entry->getId() . '.jpg';
-		
 		$captionAsset = null;
 		if(is_null($captionParamId))
 		{
@@ -385,6 +383,8 @@ class CaptionAssetService extends KalturaBaseService
 		
 		if(!$captionAsset)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_PARAMS_ID_NOT_FOUND, $captionParamId);
+		
+		$fileName = $captionAsset->getId() . '.' . $captionAsset->getFileExt();
 		
 		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
@@ -426,7 +426,7 @@ class CaptionAssetService extends KalturaBaseService
 
 		$ext = $captionAsset->getFileExt();
 		if(is_null($ext))
-			$ext = 'jpg';
+			$ext = 'txt';
 			
 		$fileName = $captionAsset->getEntryId()."_" . $captionAsset->getId() . ".$ext";
 		
