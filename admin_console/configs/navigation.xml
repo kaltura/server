@@ -65,7 +65,7 @@
 	<batch-proccess-control>
 		<label>Batch Process Control</label>
 		<controller>batch</controller>
-		<action>dynamic_action</action>
+		<action>entry-investigation</action>
 		<pages>
 			<in-progress-tasks>
 				<label>In-Progress Tasks</label>
