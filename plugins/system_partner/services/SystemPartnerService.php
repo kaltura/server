@@ -300,4 +300,40 @@ class SystemPartnerService extends KalturaBaseService
 		}		
 		$userLoginData->save();
 	}
+	
+	
+	/**
+	 * @action listUserLoginData
+	 * @param KalturaUserLoginDataFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaUserLoginDataListResponse
+	 */
+	public function listUserLoginDataAction(KalturaUserLoginDataFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		KalturaLog::debug("start listUserLoginDataAction");
+		if (is_null($filter))
+			$filter = new KalturaUserLoginDataFilter();
+			
+		if (is_null($pager))
+			$pager = new KalturaFilterPager();
+			
+			
+		$userLoginDataFilter = new UserLoginDataFilter();
+		$filter->toObject($userLoginDataFilter);
+		
+		$c = new Criteria();
+		$userLoginDataFilter->attachToCriteria($c);
+		
+		$totalCount = UserLoginDataPeer::doCount($c);
+		$pager->attachToCriteria($c);
+		$list = UserLoginDataPeer::doSelect($c);
+		$newList = KalturaUserLoginDataArray::fromUserLoginDataArray($list);
+		
+		$response = new KalturaUserLoginDataListResponse();
+		$response->totalCount = $totalCount;
+		$response->objects = $newList;
+		return $response;
+	}
+	
+	
 }
