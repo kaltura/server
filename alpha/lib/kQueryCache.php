@@ -25,13 +25,16 @@ class kQueryCache
 		
 		self::$s_memcacheInited = true;
 		
-		if (!function_exists('memcache_connect'))
+		if (!class_exists('Memcache'))
 		{
 			return;
 		}
 		
 		self::$s_memcache = new Memcache;
-		$res = @self::$s_memcache->connect(kConf::get("global_memcache_host"), kConf::get("global_memcache_port"));
+
+		//self::$s_memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
+		
+		$res = @self::$s_memcache->pconnect(kConf::get("global_memcache_host"), kConf::get("global_memcache_port"));
 		if (!$res)
 		{
 			KalturaLog::err("kQueryCache: failed to connect to global memcache");
@@ -98,7 +101,7 @@ class kQueryCache
 		}
 		
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey");
-		self::$s_memcache->set($cacheKey, array($queryResult, time()), 0, self::CACHED_QUERIES_EXPIRY_SEC);
+		self::$s_memcache->set($cacheKey, array($queryResult, time()), MEMCACHE_COMPRESSED, self::CACHED_QUERIES_EXPIRY_SEC);
 	}
 	
 	public static function invalidateQueryCache($object)
