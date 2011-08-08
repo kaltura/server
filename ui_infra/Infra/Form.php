@@ -2,7 +2,7 @@
 class Infra_Form extends Zend_Form
 {
 	public function init(){
-		$this->addElementPrefixPath('AdminConsole', APPLICATION_PATH);
+		$this->addElementPrefixPath('Kaltura', APPLICATION_PATH . '/lib/Kaltura');
 	}
 	
 	public function populateFromObject($object, $add_underscore = true)

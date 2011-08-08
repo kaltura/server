@@ -1,6 +1,6 @@
 <?php
 
-class AdminConsole_Validate_PartnerEmail extends Zend_Validate_Abstract 
+class Kaltura_Validate_PartnerEmail extends Zend_Validate_Abstract 
 {
 	const PARTNER_EMAIL_ALREADY_EXISTS = 'Email Address already exists';
 	
