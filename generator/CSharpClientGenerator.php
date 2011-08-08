@@ -669,7 +669,9 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("			return Single.Parse(result.InnerText);");
 					break;
 				case "bool":
-					$this->appendLine("			return bool.Parse(result.InnerText);");
+					$this->appendLine("			if (result.InnerText == \"1\")");
+					$this->appendLine("				return true;");
+					$this->appendLine("			return false;");
 					break;
 				case "string":
 					$this->appendLine("			return result.InnerText;");

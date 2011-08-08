@@ -34,9 +34,9 @@ namespace Kaltura
 
         protected bool ParseBool(string s)
         {
-            bool b = false;
-            bool.TryParse(s, out b);
-            return b;
+            if (s == "1")
+                return true;
+            return false;
         }
 
         protected virtual void OnPropertyChanged(string propertyName)
