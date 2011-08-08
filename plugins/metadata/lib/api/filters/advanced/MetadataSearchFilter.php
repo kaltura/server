@@ -184,6 +184,12 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			KalturaLog::ERR("Missing field: " . $field);
 			return null;
 		}
+		
+		if(is_null($xPaths[$field]->getSearchIndex())){
+			KalturaLog::ERR("Missing field search index: " . $field);
+			return null;
+		}
+			
 			
 		switch ($xPaths[$field]->getType()){
 			case MetadataSearchFilter::KMC_FIELD_TYPE_DATE:
