@@ -729,7 +729,7 @@ class Akamaizer
 		$result = "1a1a1a";
 		$iLen = strlen($stringToMunge);
 
-		$pos = 1;
+		$pos = 0;
 		while ($pos <= $iLen)
 		{
 			$character = substr($stringToMunge, $pos, 1);
