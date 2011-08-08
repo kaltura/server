@@ -183,10 +183,7 @@ class kMetadataManager
 	 */
 	public static function getAvailableSearchIndex($partnerId, $type)
 	{
-		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
-		$profileFields = MetadataProfileFieldPeer::retrieveByPartner($partnerId);
-		MetadataProfileFieldPeer::setUseCriteriaFilter(true);
-	
+		$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndActive($partnerId);
 		
 		$occupiedIndexes = array();	
 		foreach($profileFields as $profileField)
@@ -510,7 +507,7 @@ class kMetadataManager
 		$dateFieldsCounter = 0;
 		
 		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
-		$profileFields = MetadataProfileFieldPeer::retrieveByPartner($partnerId);
+		$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndActive($partnerId);
 		MetadataProfileFieldPeer::setUseCriteriaFilter(true);
 		
 		foreach($profileFields as $profileField)

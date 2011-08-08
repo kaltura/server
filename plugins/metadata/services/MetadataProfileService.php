@@ -170,6 +170,17 @@ class MetadataProfileService extends KalturaBaseService
 		$dbMetadataProfile->save();
 		
 		$c = new Criteria();
+		$c->add(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $id);
+		$c->add(MetadataProfileFieldPeer::STATUS, MetadataProfileField::STATUS_DEPRECATED, Criteria::NOT_EQUAL);
+		$MetadataProfileFields = MetadataProfileFieldPeer::doSelect($c);
+		
+		foreach($MetadataProfileFields as $MetadataProfileField)
+		{
+			$MetadataProfileField->setStatus(MetadataProfileField::STATUS_DEPRECATED);
+			$MetadataProfileField->save();
+		}
+		
+		$c = new Criteria();
 		$c->add(MetadataPeer::METADATA_PROFILE_ID, $id);
 		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED, Criteria::NOT_EQUAL);
 	
@@ -231,7 +242,7 @@ class MetadataProfileService extends KalturaBaseService
 
 		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
-		
+			
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
