@@ -52,12 +52,6 @@ class kLevel3UrlManager extends kUrlManager
 				
 				// set expire time in GMT hence the date("Z") offset
 				$url .= "&nva=" . strftime("%Y%m%d%H%M%S", time() - date("Z") + 30);
-				
-				$name = isset($this->params['http_auth_param_name']) ? $this->params['http_auth_param_name'] : "h";
-				$key = $this->params['http_auth_key'];
-				$gen = $this->params['http_auth_gen'];
-				$hash = $gen . substr(self::hmac('sha1', $key, $url), 0, 20);
-				$url .= "&$name=$hash"; 
 			}
 		
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -67,8 +61,6 @@ class kLevel3UrlManager extends kUrlManager
 		}
 		else
 		{
-			$url = $this->tokenizeUrl($url);
-
 			if($this->extention && strtolower($this->extention) != 'flv' ||
 				$this->containerFormat && strtolower($this->containerFormat) != 'flash video')
 				$url = "mp4:$url";
@@ -78,32 +70,66 @@ class kLevel3UrlManager extends kUrlManager
 		return $url;
 	}
 
-	protected function tokenizeUrl($url)
-	{
-		$name = isset($this->params['rtmp_auth_param_name']) ? $this->params['rtmp_auth_param_name'] : "h";
-		$key = isset($this->params['rtmp_auth_key']) ? $this->params['rtmp_auth_key'] : false;
-		$gen = isset($this->params['rtmp_auth_gen']) ? $this->params['rtmp_auth_gen'] : false;
+	protected function tokenizeUrl($url, $name, $key, $gen, $baseUrl = null)
+	{	    
 		if ($name && $key !== false && $gen !== false)
 		{
-			$url .= "?$name=$gen" . substr(self::hmac('sha1', $key, str_replace('mp4:', '', $url)), 0, 20);
+    		$fullUrl = ltrim(str_replace('mp4:', '', $url), '/');
+    	    if (!is_null($baseUrl)) {
+    	        $fullUrl = rtrim($baseUrl, '/').'/'.$fullUrl;
+    	    }		    
+		    
+		    $parsedUrl = parse_url($fullUrl);
+		    $pathString = $parsedUrl['path'];
+		    
+		    //TODO: add file extension ?
+		    
+		    $token = substr(self::hmac('sha1', $key, $pathString), 0, 20);
+		    
+		    if (isset($parsedUrl['query ']) && strlen($parsedUrl['query']) > 0) {
+		        $url .= "&$name=$gen".$token;
+		    }
+		    else {
+		        $url .= "?$name=$gen".$token;
+		    }			
 		}
 
 		return $url;
 	}
-
+	
 	/**
-	* @param FileSync $fileSync
-	* @return string
-	*/
-	public function getFileSyncUrl(FileSync $fileSync)
+	 * @param string baseUrl
+	 * @param array $flavorUrls
+	 */
+	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
-		// get url from parent
-		$url = parent::getFileSyncUrl($fileSync);
+	    $name = $key = $gen = false;
 	    
-		// if level3 tokenized url is used for rtmp, generated token string
+	    // if level3 tokenized url is used for rtmp, generated token string
 		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
-			$url = $this->tokenizeUrl($url);
-
-		return $url;
+		{
+		    $name = isset($this->params['rtmp_auth_param_name']) ? $this->params['rtmp_auth_param_name'] : "h";
+		    $key = isset($this->params['rtmp_auth_key']) ? $this->params['rtmp_auth_key'] : false;
+		    $gen = isset($this->params['rtmp_auth_gen']) ? $this->params['rtmp_auth_gen'] : false;
+		}
+		
+		// if level3 tokenized url is used for http, generated token string
+		if($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
+		{
+		    $name = isset($this->params['http_auth_param_name']) ? $this->params['http_auth_param_name'] : "h";
+		    $key = isset($this->params['http_auth_key']) ? $this->params['http_auth_key'] : false;
+		    $gen = isset($this->params['http_auth_gen']) ? $this->params['http_auth_gen'] : false;
+		}
+	    
+	    // tokenize flavor urls
+        foreach($flavorsUrls as $key => $flavor)
+		{
+			if (isset($flavor['url']) && $flavor['url'])
+			{
+			    $flavorsUrls[$key]['url'] = $this->tokenizeUrl($flavor['url'], $name, $key, $gen, $baseUrl);
+			}
+		} 
 	}
+	
+	
 }
