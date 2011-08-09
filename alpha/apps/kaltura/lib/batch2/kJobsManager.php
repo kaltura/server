@@ -375,8 +375,6 @@ class kJobsManager
 	 */
 	public static function addFlavorConvertJob(FileSyncKey $srcSyncKey, flavorParamsOutput $flavor, $flavorAssetId, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, BatchJob $dbConvertFlavorJob = null)
 	{
-		// TODO - validate that file exists
-		
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
