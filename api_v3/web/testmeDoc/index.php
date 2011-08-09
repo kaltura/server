@@ -61,6 +61,8 @@ else
 if (file_exists($cacheFilePath))
 {
 	print file_get_contents($cacheFilePath);
+	require_once("footer.php");
+
 	die;
 }
 
