@@ -309,6 +309,11 @@ class KalturaFrontController
 					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
 					break;
 					
+				case kCoreException::SOURCE_FILE_NOT_FOUND:
+		    		KalturaLog::err($ex);
+					$object = new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
+					break;
+					
 				default:
 		    		KalturaLog::crit($ex);
 					$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);

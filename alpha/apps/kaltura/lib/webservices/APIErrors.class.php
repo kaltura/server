@@ -218,7 +218,10 @@ class APIErrors
 
 
 	const FLAVOR_ASSET_IS_NOT_READY = "FLAVOR_ASSET_IS_NOT_READY,The flavor asset is not ready";
-
+	
+	
+	const SOURCE_FILE_NOT_FOUND = "SOURCE_FILE_NOT_FOUND,The flavor source file not found";
+	
 	
 	const PARTNER_NOT_SET = "PARTNER_NOT_SET, Partner not set";
 

@@ -375,6 +375,8 @@ class kJobsManager
 	 */
 	public static function addFlavorConvertJob(FileSyncKey $srcSyncKey, flavorParamsOutput $flavor, $flavorAssetId, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, BatchJob $dbConvertFlavorJob = null)
 	{
+		// TODO - validate that file exists
+		
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
@@ -392,17 +394,22 @@ class kJobsManager
 			return null;
 		}
 		
-		if(!$local && $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+		if(!$local)
 		{
-			KalturaLog::debug("Creates import job for remote file sync");
+			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+			{
+				KalturaLog::debug("Creates import job for remote file sync");
+				
+				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
+				$flavorAsset->setDescription("Source file sync is importing: $srcSyncKey");
+				$flavorAsset->save();
+				
+				$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
+				$url = $fileSync->getExternalUrl();
+				return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $originalFlavorAsset);
+			}
 			
-			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
-			$flavorAsset->setDescription("Source file sync is importing: $srcSyncKey");
-			$flavorAsset->save();
-			
-			$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
-			$url = $fileSync->getExternalUrl();
-			return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $originalFlavorAsset);
+			throw new kCoreException("Source file not found for flavor conversion [$flavorAssetId]", kCoreException::SOURCE_FILE_NOT_FOUND);
 		}
 		
 		$localPath = null;
