@@ -1596,16 +1596,32 @@ class kFlowHelper
 			
 	    	if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
 	    	{
-				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$dbAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 				$dbAsset->save();
 	    	}
 	    	
 	    	$dbEntry = $dbAsset->getentry();
 		}
 		
-		if($dbEntry && $dbEntry->getStatus() != entryStatus::READY)
+		if($dbEntry && $dbEntry->getStatus() == entryStatus::IMPORT)
 		{
-			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+			$status = entryStatus::NO_CONTENT;
+			$entryFlavorAssets = assetPeer::retrieveFlavorsByEntryId($dbEntry->getId());
+			foreach($entryFlavorAssets as $entryFlavorAsset)
+			{
+				/* @var $entryFlavorAsset flavorAsset */
+				
+				if($entryFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $status == entryStatus::NO_CONTENT)
+					$status = entryStatus::PENDING;
+				
+				if($entryFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING && $status != entryStatus::PRECONVERT)
+					$status = entryStatus::IMPORT;
+				
+				if($entryFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_CONVERTING)
+					$status = entryStatus::PRECONVERT;
+			}
+			
+			$dbEntry->setStatus($status);
 			$dbEntry->save();	
 		}
 	}
