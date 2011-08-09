@@ -252,7 +252,7 @@ class myPartnerRegistration
 		return array($password, $loginData->getPasswordHashKey(), $kuser->getId());
 	}
 
-	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null )
+	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $ignorePassword = false  )
 	{
 		// Validate input fields
 		if( $partner_name == "" )
@@ -280,7 +280,7 @@ class myPartnerRegistration
 						
 		
 		$existingLoginData = UserLoginDataPeer::getByEmail($email);
-		if ($existingLoginData)
+		if ($existingLoginData && !$ignorePassword)
 		{
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
 			if (!$password)

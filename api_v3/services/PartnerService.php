@@ -55,20 +55,31 @@ class PartnerService extends KalturaBaseService
 			if ( $this->getKs() && $this->getKs()->isAdmin() )
 			{
 				$parentPartnerId = $this->getKs()->partner_id;
+				if ($parentPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) {
+		                    $parentPartnerId = null;
+				}
+                		else {
 				
-				// only if this partner is a var/grou, allow setting it as parent for the new created partner
-				$parentPartner = PartnerPeer::retrieveByPK( $parentPartnerId );
-				if ( ! ($parentPartner->getPartnerGroupType() == PartnerGroupType::VAR_GROUP ||
-						$parentPartner->getPartnerGroupType() == PartnerGroupType::GROUP ) )
-				{
-					throw new KalturaAPIException( KalturaErrors::NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD , $parentPartnerId );
+					// only if this partner is a var/grou, allow setting it as parent for the new created partner
+					$parentPartner = PartnerPeer::retrieveByPK( $parentPartnerId );
+					if ( ! ($parentPartner->getPartnerGroupType() == PartnerGroupType::VAR_GROUP ||
+							$parentPartner->getPartnerGroupType() == PartnerGroupType::GROUP ) )
+					{
+						throw new KalturaAPIException( KalturaErrors::NON_GROUP_PARTNER_ATTEMPTING_TO_ASSIGN_CHILD , $parentPartnerId );
+					}
 				}
 			}
 			
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			
+			$ignorePassword = false;
+			if ($existingUser && $this->getKs()->partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID &&
+				 kuserPeer::getKuserByEmail($partner->adminEmail, Partner::ADMIN_CONSOLE_PARTNER_ID) != null) {
+				$ignorePassword = true;
+			}
+			
 			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName() , $dbPartner->getAdminName() , $dbPartner->getAdminEmail() ,
-				$dbPartner->getCommercialUse() , "yes" , $dbPartner->getDescription() , $dbPartner->getUrl1() , $cmsPassword , $dbPartner );
+				$dbPartner->getCommercialUse() , "yes" , $dbPartner->getDescription() , $dbPartner->getUrl1() , $cmsPassword , $dbPartner, $ignorePassword );
 
 			$dbPartner = PartnerPeer::retrieveByPK( $pid );
 

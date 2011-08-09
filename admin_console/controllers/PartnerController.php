@@ -28,13 +28,7 @@ class PartnerController extends Zend_Controller_Action
 				$partner->description = "Admin Console";
 				$client->startMultiRequest();
 				
-				// queue register partner without a ks, otherwise we get an exception saying partner -2 is not a VAR/GROUP
-				$originalKs = $client->getKs();
-				$client->setKs(null);
 				$client->partner->register($partner);
-				
-				// queue partner package update
-				$client->setKs($originalKs);
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
 				$config->storageDeleteFromKaltura = true;
