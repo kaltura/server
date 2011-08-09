@@ -248,7 +248,9 @@ class playManifestAction extends kalturaAction
 			$urlManager->setClipTo($this->clipTo);
 			$urlManager->setSeekFromTime($this->seekFrom);
 			$urlManager->setFileExtension($flavorAsset->getFileExt());
-			$url = $storage->getDeliveryHttpBaseUrl() . '/' . $urlManager->getFileSyncUrl($fileSync);
+			
+			$url = rtrim($storage->getDeliveryHttpBaseUrl(), "/");
+			$url .= "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
 			
 			return $url;
 		}
