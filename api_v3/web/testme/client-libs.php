@@ -104,5 +104,11 @@
 Kaltura has created a mechanism that automatically generates up-to-date software development kits in various languages.<br />
 Every time the API is updated, all of the client libraries listed above will be updated too.<br /></p>
 		</div>
+<?php 
+	if (kConf::hasParam("testme_tracking_code"))
+	{
+		require(kConf::get("testme_tracking_code"));
+	}
+?>
 	</body>
 </html>
