@@ -550,7 +550,9 @@ class playManifestAction extends kalturaAction
 					if ($this->deliveryCode)
 						$baseUrl = str_replace("{deliveryCode}", $this->deliveryCode, $baseUrl);
 				
-					$urlManager = kUrlManager::getUrlManagerByCdn($this->cdnHost);
+					$rtmpHost = parse_url($baseUrl, PHP_URL_HOST);
+
+					$urlManager = kUrlManager::getUrlManagerByCdn($rtmpHost);						
 		
 					// get all flavors with kaltura urls
 					foreach($flavorAssets as $flavorAsset)
@@ -568,6 +570,8 @@ class playManifestAction extends kalturaAction
 							'height' => $flavorAsset->getHeight(),
 						);
 					}
+					
+					$urlManager->finalizeUrls($baseUrl, $flavors);
 				}
 				
 				if(!count($flavors))
@@ -575,6 +579,8 @@ class playManifestAction extends kalturaAction
 					
 				if (strpos($this->protocol, "rtmp") === 0)
 					$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
+					
+				$urlManager->applyToken($baseUrl, $flavors);
 					
 				return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration, $baseUrl);
 
@@ -818,6 +824,7 @@ class playManifestAction extends kalturaAction
 				break;
 				
 			case "url":
+			case "download":
 				$this->format = "http"; // build url for an http delivery
 				return $this->serveUrl();
 				break;
