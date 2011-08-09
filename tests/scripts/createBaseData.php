@@ -366,7 +366,7 @@ class KalturaTestDeploymentHelper
 		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_NAME1@", '/*[local-name()=\'metadata\']/*[local-name()=\'MyTest\']');
 		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_VALUE1@", 'myTest');
 		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_NAME2@", '/*[local-name()=\'metadata\']/*[local-name()=\'Startdate\']');
-		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_VALUE2@", '1310503300');
+		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_VALUE2@", '1310503500');
 		KalturaGlobalData::setData("@METADATA_SEARCH_FIELD_NAME3@", '/*[local-name()=\'metadata\']/*[local-name()=\'MyNumber\']');
 		
 		
