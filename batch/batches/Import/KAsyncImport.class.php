@@ -259,7 +259,7 @@ class KAsyncImport extends KBatchBase
 			}
 			else {
 			    $privateKeyFile = $this->getFileLocationForSshKey($privateKey, 'privateKey');
-			    $publicKeyFile = $this->getFileLocationForSshKey($publicKeyFile, 'publicKey');
+			    $publicKeyFile = $this->getFileLocationForSshKey($publicKey, 'publicKey');
 			    $fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase);
 			}
 			
