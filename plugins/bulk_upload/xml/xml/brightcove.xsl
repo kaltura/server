@@ -10,7 +10,7 @@
 		<channel>
 		 	
 
-    	<xsl:for-each select="publisher-upload-manifest/asset[@type='VIDEO_FULL' or @type='FLV_BUMPER' or @type='FLV_FULL']">
+    	<xsl:for-each select="publisher-upload-manifest/asset">
 	    	<item>
 	
 				<!--xsl:value-of select="../title[ @video-full-refid = 'airport_gibbous_full.flv-52aaedfc6f568c82df324050f' ]/@name"/-->
@@ -36,10 +36,6 @@
 
 	<!--xsl:for-each select="/publisher-upload-manifest/title[ @video-full-refid = $TitleRef ]"-->
 
-
-
-	
-
 	<xsl:for-each select="/publisher-upload-manifest/title">
 
 		<xsl:if test="./rendition-refid = string($TitleRef)">
@@ -63,13 +59,69 @@
 				<mediaType>1</mediaType> 
 			</media>
 			<content>
-				<xsl:attribute name="id">content1</xsl:attribute>
 				<xsl:attribute name="flavorParamsId">0</xsl:attribute>
 				<localFileContentResource>
 				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
 					<!--fileSize>2743980</fileSize-->
 				</localFileContentResource>
 			</content>
+		</xsl:if>
+		
+		<xsl:if test="@video-full-refid = string($TitleRef) or @flash-preview-refid = string($TitleRef)">
+			<action>add</action>
+			<!--licenseType>-1</licenseType-->
+			<!--userId>test1</userId-->
+			<!--partnerData>my own data</partnerData-->
+			<type>1</type>
+			<name><xsl:value-of select="@name"/></name>
+			<description><xsl:value-of select="./long-description"/></description>
+			<tags>
+				<xsl:for-each select="./tag">
+					<tag><xsl:value-of select="."/></tag>
+				</xsl:for-each>
+			</tags>
+			<!--accessControl>Roni</accessControl-->
+			<!--ingestionProfile>Roni_Conversion</ingestionProfile-->
+			<startDate><xsl:value-of select="@start-date"/></startDate>
+			<endDate><xsl:value-of select="@end-date"/></endDate>
+			<media>
+				<mediaType>1</mediaType> 
+			</media>
+			<content>
+				<xsl:attribute name="flavorParams"><xsl:value-of select="$FileName"/></xsl:attribute>
+				<localFileContentResource>
+				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
+					<!--fileSize>2743980</fileSize-->
+				</localFileContentResource>
+			</content>
+		</xsl:if>
+		
+		<xsl:if test="@thumbnail-refid = string($TitleRef) or @video-still-refid = string($TitleRef)">
+			<action>add</action>
+			<type>1</type>
+			<name><xsl:value-of select="@name"/></name>
+			<description><xsl:value-of select="./long-description"/></description>
+			<tags>
+				<xsl:for-each select="./tag">
+					<tag><xsl:value-of select="."/></tag>
+				</xsl:for-each>
+			</tags>
+			<startDate><xsl:value-of select="@start-date"/></startDate>
+			<endDate><xsl:value-of select="@end-date"/></endDate>
+			<media>
+				<mediaType>2</mediaType> 
+			</media>
+			<content>
+				<xsl:attribute name="flavorParams"><xsl:value-of select="$FileName"/></xsl:attribute>
+				<localFileContentResource>
+				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
+					<!--fileSize>2743980</fileSize-->
+				</localFileContentResource>
+			</content>
+		</xsl:if>
+		
+		<xsl:if test="@video-still-refid = string($TitleRef)">
+		
 		</xsl:if>
 
 	</xsl:for-each>
