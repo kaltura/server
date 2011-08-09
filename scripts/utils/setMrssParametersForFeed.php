@@ -1,29 +1,42 @@
 <?php
 
+/*
+ * Before running the script please insert the following two parameters
+ */
+
+//-------------------------------------------------------------------------------------------------------------
+$syndicationFeedId = null; 		// TODO: insert valid syndication feed Id
+$metadataFieldNames = array(
+	'FIRST_FIELD', 				//TODO: change to first metadata field name
+	'SECOND_FIELD', 			//TODO: change to second metadata field name
+);
+
+//-------------------------------------------------------------------------------------------------------------
+
+
 require_once(dirname(__FILE__).'/../bootstrap.php');
-
-//-------------------------------------------------------------------------------------------------------------
-$syndicationFeedId = null; // insert valid syndication feed Id
-
-//setting custom data fields of the syndication feed
-
-// xpath should be of the following form: 
-//$itemXpathsToExtend[] = "/*[local-name()='metadata']/*[local-name()='Custom_Data_Field_Name']";
-$itemXpathsToExtend = array();
-//-------------------------------------------------------------------------------------------------------------
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
+KAutoloader::setClassMapFilePath(KALTURA_ROOT_PATH.'/cache/scripts/classMap'.uniqid().'.cache');
+KAutoloader::register();
 
 // don't add to database if one of the parameters is missing or is an empty string
 if (!$syndicationFeedId) {
-	die ('Missing syndication feed id');
+	die ('ERROR - Missing syndication feed id');
 }
 
 $syndicationFeed = syndicationFeedPeer::retrieveByPK($syndicationFeedId);
 
 if(!$syndicationFeed)
 {
-    die("No such syndication feed with id [$syndicationFeedId].".PHP_EOL);
+    die("ERROR - No such syndication feed with id [$syndicationFeedId].".PHP_EOL);
 }
 
+//setting custom data fields of the syndication feed
+$itemXpathsToExtend = array();
+foreach($metadataFieldNames as $fieldName)
+{
+	$itemXpathsToExtend[] = "/*[local-name()='metadata']/*[local-name()='".$fieldName."']";
+}
 
 $mrssParams = new kMrssParameters();
 $mrssParams->setItemXpathsToExtend($itemXpathsToExtend);
