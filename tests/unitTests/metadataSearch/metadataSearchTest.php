@@ -36,9 +36,10 @@ class metadataSearchTest extends KalturaApiTestCase
 		$searchCondition1->field = $fieldName1;
 		$searchCondition1->value = $fieldValue1;
 		
-		$searchCondition2 = new KalturaSearchCondition();
+		$searchCondition2 = new KalturaSearchComparableCondition();
 		$searchCondition2->field = $fieldName2;
 		$searchCondition2->value = $fieldValue2;
+		$searchCondition2->comparison = KalturaSearchConditionComparison::GREATER_THAN;
 		
 		$searchItems = array();
 		$searchItems[] = $searchCondition1;
@@ -58,8 +59,14 @@ class metadataSearchTest extends KalturaApiTestCase
 		$expectedEntriesArr = explode(',', $expectedEntries);
 		
 		$i = 0;
+		
+		if(!count($entries->objects) && count($expectedEntriesArr))
+			$this->fail('No entries return, expecting: ' . print_r($expectedEntriesArr));
+		
+		if(!count($entries->objects) && !count($expectedEntriesArr))
+			$this->compareOnField("shouldSuccess", 1, 1, "assertEquals");
 			
-		foreach ($entries as $entry)
+		foreach ($entries->objects as $entry)
 		{
 			$this->compareOnField("entry_id", $entry->id, $expectedEntriesArr[$i], "assertEquals");
 			$i++;
