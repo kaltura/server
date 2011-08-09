@@ -53,17 +53,25 @@
 			</tags>
 			<!--accessControl>Roni</accessControl-->
 			<!--ingestionProfile>Roni_Conversion</ingestionProfile-->
-			<startDate><xsl:value-of select="@start-date"/></startDate>
-			<endDate><xsl:value-of select="@end-date"/></endDate>
+			<startDate>
+				<xsl:call-template name="FormatDate">
+	  				<xsl:with-param name="DateTime" select="@start-date"/>
+				</xsl:call-template>
+			</startDate>
+			<endDate>
+				<xsl:call-template name="FormatDate">
+	  				<xsl:with-param name="DateTime" select="@end-date"/>
+				</xsl:call-template>
+			</endDate>
 			<media>
 				<mediaType>1</mediaType> 
 			</media>
 			<content>
 				<xsl:attribute name="flavorParamsId">0</xsl:attribute>
-				<localFileContentResource>
+				<serverFileContentResource>
 				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
 					<!--fileSize>2743980</fileSize-->
-				</localFileContentResource>
+				</serverFileContentResource>
 			</content>
 		</xsl:if>
 		
@@ -82,17 +90,25 @@
 			</tags>
 			<!--accessControl>Roni</accessControl-->
 			<!--ingestionProfile>Roni_Conversion</ingestionProfile-->
-			<startDate><xsl:value-of select="@start-date"/></startDate>
-			<endDate><xsl:value-of select="@end-date"/></endDate>
+			<startDate>
+				<xsl:call-template name="FormatDate">
+	  				<xsl:with-param name="DateTime" select="@start-date"/>
+				</xsl:call-template>
+			</startDate>
+			<endDate>
+				<xsl:call-template name="FormatDate">
+	  				<xsl:with-param name="DateTime" select="@end-date"/>
+				</xsl:call-template>
+			</endDate>
 			<media>
 				<mediaType>1</mediaType> 
 			</media>
 			<content>
 				<xsl:attribute name="flavorParams"><xsl:value-of select="$FileName"/></xsl:attribute>
-				<localFileContentResource>
+				<serverFileContentResource>
 				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
 					<!--fileSize>2743980</fileSize-->
-				</localFileContentResource>
+				</serverFileContentResource>
 			</content>
 		</xsl:if>
 		
@@ -106,24 +122,28 @@
 					<tag><xsl:value-of select="."/></tag>
 				</xsl:for-each>
 			</tags>
-			<startDate><xsl:value-of select="@start-date"/></startDate>
-			<endDate><xsl:value-of select="@end-date"/></endDate>
+			<startDate>
+				<xsl:call-template name="FormatDate">
+	  				<xsl:with-param name="DateTime" select="@start-date"/>
+				</xsl:call-template>
+			</startDate>
+			<endDate>
+				<xsl:call-template name="FormatDate">
+	  				<xsl:with-param name="DateTime" select="@end-date"/>
+				</xsl:call-template>
+			</endDate>
 			<media>
 				<mediaType>2</mediaType> 
 			</media>
 			<content>
 				<xsl:attribute name="flavorParams"><xsl:value-of select="$FileName"/></xsl:attribute>
-				<localFileContentResource>
+				<serverFileContentResource>
 				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
 					<!--fileSize>2743980</fileSize-->
-				</localFileContentResource>
+				</serverFileContentResource>
 			</content>
 		</xsl:if>
 		
-		<xsl:if test="@video-still-refid = string($TitleRef)">
-		
-		</xsl:if>
-
 	</xsl:for-each>
 
 	
@@ -132,61 +152,70 @@
 
   <xsl:template name="FormatDate">
     <xsl:param name="DateTime" />
-    <!-- new date format 2006-01-14T08:55:22 -->
+    <!-- from date format 10/02/2011 7:45 AM -->
+    <!-- to date format 2006-01-14T08:55:22 -->
     <xsl:variable name="mo">
-      <xsl:value-of select="substring($DateTime,1,3)" />
+      <xsl:value-of select="substring-before($DateTime,'/')" />
     </xsl:variable>
-    <xsl:variable name="day-temp">
-      <xsl:value-of select="substring-after($DateTime,'-')" />
+    <xsl:variable name="DayTemp">
+      <xsl:value-of select="substring-after($DateTime,'/')" />
     </xsl:variable>
     <xsl:variable name="day">
-      <xsl:value-of select="substring-before($day-temp,'-')" />
+      <xsl:value-of select="substring-before($DayTemp,'/')" />
     </xsl:variable>
-    <xsl:variable name="year-temp">
-      <xsl:value-of select="substring-after($day-temp,'-')" />
+    <xsl:variable name="YearTemp">
+      <xsl:value-of select="substring-after($DayTemp,'/')" />
     </xsl:variable>
     <xsl:variable name="year">
-      <xsl:value-of select="substring($year-temp,1,4)" />
+      <xsl:value-of select="substring-before($YearTemp,' ')" />
     </xsl:variable>
-    <xsl:variable name="time">
-      <xsl:value-of select="substring-after($year-temp,' ')" />
+    
+    
+    <xsl:variable name="HourMinute">
+      <xsl:value-of select="substring-after($DateTime,' ')" />
     </xsl:variable>
+    <xsl:variable name="ampm">
+      <xsl:value-of select="substring-after($HourMinute,' ')" />
+    </xsl:variable>
+    
     <xsl:variable name="hh">
-      <xsl:value-of select="substring($time,1,2)" />
+      <xsl:value-of select="substring-before($HourMinute,':')" />
+    </xsl:variable>
+    <xsl:variable name="Minute">
+      <xsl:value-of select="substring-before($HourMinute,' ')" />
     </xsl:variable>
     <xsl:variable name="mm">
-      <xsl:value-of select="substring($time,4,2)" />
+      <xsl:value-of select="substring-after($Minute,':')" />
     </xsl:variable>
-    <xsl:variable name="ss">
-      <xsl:value-of select="substring($time,7,2)" />
-    </xsl:variable>
+    
     <xsl:value-of select="$year"/>
     <xsl:value-of select="'-'"/>
-    <xsl:choose>
-      <xsl:when test="$mo = 'Jan'">01</xsl:when>
-      <xsl:when test="$mo = 'Feb'">02</xsl:when>
-      <xsl:when test="$mo = 'Mar'">03</xsl:when>
-      <xsl:when test="$mo = 'Apr'">04</xsl:when>
-      <xsl:when test="$mo = 'May'">05</xsl:when>
-      <xsl:when test="$mo = 'Jun'">06</xsl:when>
-      <xsl:when test="$mo = 'Jul'">07</xsl:when>
-      <xsl:when test="$mo = 'Aug'">08</xsl:when>
-      <xsl:when test="$mo = 'Sep'">09</xsl:when>
-      <xsl:when test="$mo = 'Oct'">10</xsl:when>
-      <xsl:when test="$mo = 'Nov'">11</xsl:when>
-      <xsl:when test="$mo = 'Dec'">12</xsl:when>
-    </xsl:choose>
+    <xsl:if test="(string-length($mo) = '1')">
+      <xsl:value-of select="0"/>
+    </xsl:if>
+    <xsl:value-of select="$mo"/>
     <xsl:value-of select="'-'"/>
-    <xsl:if test="(string-length($day) &lt; 2)">
+    <xsl:if test="(string-length($day) = '1')">
       <xsl:value-of select="0"/>
     </xsl:if>
     <xsl:value-of select="$day"/>
     <xsl:value-of select="'T'"/>
-    <xsl:value-of select="$hh"/>
+    <xsl:if test="($ampm = 'AM')">
+    	<xsl:if test="(string-length($hh) = '1')">
+      		<xsl:value-of select="0"/>
+    	</xsl:if>
+    	<xsl:value-of select="$hh"/>
+    </xsl:if>
+    <xsl:if test="($ampm = 'PM')">
+	    <xsl:choose>
+	    	<xsl:when test="$hh = '12'"><xsl:value-of select="'00'"/></xsl:when>
+	    	<xsl:otherwise><xsl:value-of select="string(sum($hh) + 12)"/></xsl:otherwise>
+	    </xsl:choose>
+    </xsl:if>
     <xsl:value-of select="':'"/>
     <xsl:value-of select="$mm"/>
     <xsl:value-of select="':'"/>
-    <xsl:value-of select="$ss"/>
+    <xsl:value-of select="'00'"/>
   </xsl:template>
 
 
