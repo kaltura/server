@@ -570,8 +570,6 @@ class playManifestAction extends kalturaAction
 							'height' => $flavorAsset->getHeight(),
 						);
 					}
-					
-					$urlManager->finalizeUrls($baseUrl, $flavors);
 				}
 				
 				if(!count($flavors))
@@ -580,7 +578,7 @@ class playManifestAction extends kalturaAction
 				if (strpos($this->protocol, "rtmp") === 0)
 					$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 					
-				$urlManager->applyToken($baseUrl, $flavors);
+				$urlManager->finalizeUrls($baseUrl, $flavors);
 					
 				return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration, $baseUrl);
 
