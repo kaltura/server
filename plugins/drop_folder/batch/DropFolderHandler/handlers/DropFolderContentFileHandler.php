@@ -242,16 +242,38 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 * @return bool true if file was handled or false otherwise
 	 */
 	private function addAsExistingContent()
-	{
+	{	    
 		// check for matching entry and flavor
 		
 		if (is_null($this->dropFolderFile->parsedFlavor))
 		{
-			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
-			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_MISSING_IN_FILE_NAME;
-			$this->dropFolderFile->errorDescription = 'Cannot match to existing entry with no flavor reference';
-			KalturaLog::err($this->dropFolderFile->errorDescription);
-			return false; // file not handled
+		    // if configuration does not include a flavor system name reference, try to check for source flavor's system name in the conversion profile
+		    if (strstr($this->config->slugRegex, self::FLAVOR_NAME_WILDCARD) === false)
+		    {
+		        $conversionProfileId = $this->getConversionProfile()->id;
+    		    $assetParamsFilter = new KalturaConversionProfileAssetParamsFilter();
+        		$assetParamsFilter->conversionProfileIdEqual = $conversionProfileId;
+        		$assetParamsFilter->assetParamsIdEqual = 0;
+        		$this->impersonate($this->dropFolderFile->partnerId);
+        		$assetParamsList = $this->kClient->conversionProfileAssetParams->listAction($assetParamsFilter);
+        		$this->unimpersonate();
+        		if ($assetParamsList && isset($assetParamsList->objects) && isset($assetParamsList->objects[0]) && isset($assetParamsList->objects[0]->systemName))
+        		{
+        		    $sourceFlavorSystemName = $assetParamsList->objects[0]->systemName;
+        		    $this->dropFolderFile->parsedFlavor = $sourceFlavorSystemName;
+        		    $this->parsedFlavorObject = $assetParamsList->objects[0];
+        		    KalturaLog::debug('Slug regex does not include a flavor reference. Using source flavor system name ['.$sourceFlavorSystemName.']');
+        		}
+		    }
+		    
+		    if (is_null($this->dropFolderFile->parsedFlavor))
+		    {
+    			$this->dropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
+    			$this->dropFolderFile->errorCode = KalturaDropFolderFileErrorCode::FLAVOR_MISSING_IN_FILE_NAME;
+    			$this->dropFolderFile->errorDescription = 'Cannot match to existing entry with no flavor reference';
+    			KalturaLog::err($this->dropFolderFile->errorDescription);
+    			return false; // file not handled
+		    }
 		}
 		
 		$matchedEntry = $this->getEntryByReferenceId($this->dropFolderFile->parsedSlug);
