@@ -58,6 +58,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	/**
 	 * @param Metadata $metadata
 	 * @param SimpleXMLElement $mrss
+	 * @param kMrssParameters $mrssParams
 	 * @return SimpleXMLElement
 	 */
 	public function contributeMetadata(Metadata $metadata, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
@@ -78,6 +79,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	/**
 	 * @param SimpleXMLElement $mrss
 	 * @param SimpleXMLElement $metadata
+	 * @param kMrssParameters $mrssParams
 	 * @return SimpleXMLElement
 	 */
 	public function contributeMetadataObject(SimpleXMLElement $mrss, SimpleXMLElement $metadata, kMrssParameters $mrssParams = null, $metadataProfileId = null, $metadataProfileVersion = null)
