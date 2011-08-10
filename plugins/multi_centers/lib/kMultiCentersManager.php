@@ -10,7 +10,7 @@ class kMultiCentersManager
 	 * @param string $sourceFileUrl
 	 * @return BatchJob
 	 */
-	public static function addFileSyncImportJob($entryId, FileSync $fileSync, $sourceFileUrl, BatchJob $parentJob = null)
+	public static function addFileSyncImportJob($entryId, FileSync $fileSync, $sourceFileUrl, BatchJob $parentJob = null, $fileSize = null)
 	{
 		$partnerId = $fileSync->getPartnerId();
 		$fileSyncId = $fileSync->getId();
@@ -35,8 +35,10 @@ class kMultiCentersManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
+
+		$batchJob->setFileSize($fileSize);
 		
-		KalturaLog::log("Creating Filesync Import job, with file sync id: $fileSyncId"); 
+		KalturaLog::log("Creating Filesync Import job, with file sync id: $fileSyncId size: $fileSize"); 
 		return kJobsManager::addJob($batchJob, $fileSyncImportData, BatchJobType::FILESYNC_IMPORT);
 	}
 	
