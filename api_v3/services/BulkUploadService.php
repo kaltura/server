@@ -83,7 +83,7 @@ class BulkUploadService extends KalturaBaseService
 	    $c = new Criteria();
 		$c->addAnd(BatchJobPeer::PARTNER_ID, $this->getPartnerId());
 		$c->addAnd(BatchJobPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
-		$c->addAnd(BatchJobPeer::STATUS, BatchJob::BATCHJOB_STATUS_ABORTED, Criteria::NOT_EQUAL);
+		$c->addAnd(BatchJobPeer::ABORT, true, Criteria::NOT_EQUAL);
 		$c->addDescendingOrderByColumn(BatchJobPeer::ID);
 		
 		$count = BatchJobPeer::doCount($c);
