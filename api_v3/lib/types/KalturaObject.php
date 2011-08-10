@@ -166,7 +166,9 @@ class KalturaObject
 		elseif(is_null($this->$propertyName))
 			return;
 		
-		if ($this->$propertyName instanceof KalturaNullField) return;
+		if ($this->$propertyName instanceof KalturaNullField) 
+			return;
+		
 		if (strlen($this->$propertyName) < $minLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
 	}
@@ -177,6 +179,10 @@ class KalturaObject
 			return;
 			
 		$this->validatePropertyNotNull($propertyName);
+		
+		if ($this->$propertyName instanceof KalturaNullField)
+			return;
+		
 		if (!is_numeric($this->$propertyName))
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NUMERIC_VALUE, $this->getFormattedPropertyNameWithClassName($propertyName));
 	}
@@ -187,6 +193,10 @@ class KalturaObject
 			return;
 			
 		$this->validatePropertyNumeric($propertyName, $allowNull);
+		
+		if ($this->$propertyName instanceof KalturaNullField)
+			return;
+		
 		if ($this->$propertyName < $minValue)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_VALUE, $this->getFormattedPropertyNameWithClassName($propertyName), $minValue);
 	}
@@ -197,6 +207,10 @@ class KalturaObject
 			return;
 			
 		$this->validatePropertyNumeric($propertyName, $allowNull);
+		
+		if ($this->$propertyName instanceof KalturaNullField)
+			return;
+		
 		if ($this->$propertyName > $maxValue)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_VALUE, $this->getFormattedPropertyNameWithClassName($propertyName), $maxValue);
 	}
@@ -210,7 +224,10 @@ class KalturaObject
 	public function validatePropertyMaxLength($propertyName, $maxLength, $allowNull = false)
 	{
 		if(!$allowNull) $this->validatePropertyNotNull($propertyName);
-                if ($this->$propertyName instanceof KalturaNullField) return;                                          
+                
+		if ($this->$propertyName instanceof KalturaNullField)
+			return;
+		                                          
 		if (strlen($this->$propertyName) > $maxLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
 	}
