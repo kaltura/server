@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mrss xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ingestion.xsd">
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>-1</licenseType>
+			<userId>test1</userId>
+			<name>entry name</name>
+			<description>entry description</description>
+			<tags>
+				<tag>fish</tag>
+				<tag>dog</tag>
+			</tags>
+			<categories>
+				<category>cat1</category>
+				<category>cat2</category>
+				<category>cat3>subcat31</category>
+			</categories>
+			<partnerData>my own data</partnerData>
+			<!--<accessControl>Roni</accessControl>-->
+			<accessControlId>511</accessControlId>
+			<!--ingestionProfileId>1197628</ingestionProfileId-->
+			<!--<ingestionProfile>Roni_Conversion</ingestionProfile>-->
+			<startDate>2002-05-30T09:00:00</startDate>
+			<!-- <endDate></endDate> -->
+		    <media>
+				<mediaType>1</mediaType> 
+			</media>
+			<content id="content1" flavorParamsId="0">
+				<localFileContentResource filePath="kaltura1_vp6.flv"> 
+					<fileSize>2743980</fileSize>
+				</localFileContentResource>
+			</content>
+<!-- 					<content id="content2" flavorParamsId="5">
+				<tags>
+					<tag>web</tag>
+					<tag>mbr</tag>
+				</tags>
+				<urlContentResource url="http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv"/>
+			</content>
+ 			<thumbnail id="thumb1" isDefault="false">
+				<localFileContentResource filePath="/web/content/zbale/MyThumb.jpg">
+					<fileChecksum type='sha1'>ca4b64379f7dffc14448acab5a09820c</fileChecksum>
+				</localFileContentResource>
+			</thumbnail>
+			<thumbnail id="thumb2" isDefault="true">
+				<tags>
+					<tag>web</tag>
+					<tag>iphone</tag>
+				</tags>
+				<urlContentResource url="http://devtests.kaltura.dev/content/zbale/MyThumb1.jpg"/>
+			</thumbnail>
+			-->
+			<!--distribution>
+				<distributionProfileId>12</distributionProfileId>
+				<sunrise>2012-01-07T18:00:00</sunrise>
+				<flavorAssetIds></flavorAssetIds>
+				<thumbAssetIds></thumbAssetIds>
+				<ingestedFlavorIds>content1,content2</ingestedFlavorIds>
+				<ingestedThumbIds>thumb1</ingestedThumbIds>
+			</distribution>
+			<distribution submitWhenReady="true">
+				<distributionProvider>YoutubeApi</distributionProvider>
+				<sunset>2014-01-07T18:00:00</sunset>
+			</distribution-->
+			<customData metadataProfile="Roni_Metadata"> <!--metadataProfileId="8"-->
+				<metadata>
+					<MSNVideoCat>FOX_big12</MSNVideoCat>
+					<MSNVideoTop>Fox Sports</MSNVideoTop>
+				</metadata>
+			</customData>
+		</item>
+	</channel>
+</mrss>

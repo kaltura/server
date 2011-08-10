@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mrss 
-	xmlns="http://devtests.kaltura.co.cc/bulkUploadXml.bulkUploadXML"
-	xmlns:cuePointBulkUploadXml="http://devtests.kaltura.co.cc/bulkUploadXml.bulkUploadXML/cuePointBulkUploadXml"
-	>
+<mrss>
 	<channel>
 		<item>
 			<action>add</action>
@@ -21,7 +18,7 @@
 			</categories>
 			<partnerData>my partner data</partnerData>
 			<accessControlId>123</accessControlId>
-			<ingestionProfileId>456</ingestionProfileId>
+			<conversionProfileId>456</conversionProfileId>
 			<media>
 				<mediaType>1</mediaType> 
 			</media>

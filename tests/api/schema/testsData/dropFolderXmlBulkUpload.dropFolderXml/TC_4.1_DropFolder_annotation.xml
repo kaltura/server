@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mrss>
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>-1</licenseType>
+			<userId>Danit</userId>
+			<name>TC_4.1_DropFolder_annotation</name>
+			<description>MyAnnotation</description>
+			<tags>
+				<tag>TBD</tag>
+			</tags>
+			<categories>
+				<category>TBD</category>
+			</categories>
+			<conversionProfileId>2861</conversionProfileId>
+			<media>
+				<mediaType>1</mediaType> 
+			</media>
+			<content flavorParamsId="0">
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/nice_Flv.flv"/>
+			</content>
+			<thumbnail>
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/thumbs/horse.jpg"/>
+			</thumbnail>
+			<!--
+			<subTitle>
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/example.srt"/>
+			</subTitle>
+			<attachment>
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/example.txt"/>
+			</attachment>
+			-->
+			<scenes>
+			<!--<scene-ad-cue-point systemName="SCENE_AD_CUE_POINT_1">
+					<sceneStartTime>00:00:04</sceneStartTime>
+					<tags>
+						<tag>blabla</tag>
+					</tags>
+					<sceneEndTime>00:00:06</sceneEndTime>
+					<sceneTitle>my ad title</sceneTitle>
+					<sourceUrl>http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_2.xml</sourceUrl>
+					<adType>1</adType>
+					<protocolType>0</protocolType>
+				</scene-ad-cue-point>
+				<scene-ad-cue-point systemName="SCENE_AD_CUE_POINT_2">
+					<sceneStartTime>00:00:10.1</sceneStartTime>
+					<tags>
+						<tag></tag>
+					</tags>
+					<sceneEndTime>00:00:12.3</sceneEndTime>
+					<sceneTitle>my second ad title</sceneTitle>
+					<sourceUrl>http://ad3.liverail.com/?LR_PUBLISHER_ID=1331&amp;LR_CAMPAIGN_ID=228&amp;LR_SCHEMA=vast2</sourceUrl>
+					<adType>2</adType>
+					<protocolType>1</protocolType>
+				</scene-ad-cue-point> -->
+			<scene-annotation systemName="MY_ANN_PARENT_1">
+					<sceneStartTime>00:00:05.3</sceneStartTime>
+					<tags>
+						<tag>test</tag>
+						<tag>annotation</tag>
+						<tag>parent</tag>
+					</tags>
+					<sceneEndTime>00:00:10</sceneEndTime>
+					<sceneText>my annotation parent</sceneText>
+				</scene-annotation>
+				<scene-annotation>
+					<sceneStartTime>00:00:07.3</sceneStartTime>
+					<tags>
+						<tag>test</tag>
+						<tag>annotation</tag>
+						<tag>child</tag>
+					</tags>
+					<sceneEndTime>00:00:10</sceneEndTime>
+					<sceneText>my annotation child</sceneText>
+					<parent>MY_ANN_PARENT_1</parent>
+				</scene-annotation>
+				<!--<scene-code-cue-point>
+					<sceneStartTime>00:00:05.3</sceneStartTime>
+					<tags>
+						<tag>test</tag>
+						<tag>code</tag>
+					</tags>
+					<code>MY_CODE</code>
+					<description>my code cue point description</description>
+				</scene-code-cue-point> -->
+			</scenes>
+		</item>
+	</channel>
+</mrss>
