@@ -252,6 +252,42 @@ class KalturaTestDeploymentHelper
 		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
 		
 		self::addMetadataSearchData($client);
+		self::addDWHdata($client);
+	}
+	
+	/**
+	 * 
+	 * Add the data 
+	 */
+	private static function addDWHdata(KalturaClient $client)
+	{
+		$partnerId = $client->getConfig()->partnerId;
+		for($i = 0; $i < 1000; $i++)
+		{
+			$event = new KalturaStatsEvent();
+			$event->partnerId = $partnerId;
+			$event->eventType= KalturaStatsEventType::PLAY;
+			$event->entryId = KalturaGlobalData::getData("@DEFAULT_ENTRY_ID@");
+			$event->clientVer = "test client";
+			$event->sessionId = "test session";
+			$event->referrer = "http://kaltura.com/" . $i % 10;
+			$event->uiconfId = KalturaGlobalData::getData("@UI_CONF_ID@");
+					
+			$client->stats->collect($event);
+		}
+		
+		//Log rotating only if the service url is localhost
+		if($client->getConfig()->serviceUrl == "http://localhost")
+		{
+			//Now log rotate on local machine
+			exec("logrotate -f /opt/kaltura/logrotate/kaltura_log_rotate");
+		
+			//run hourly
+			exec("/opt/kaltura/dwh/etlsource/execute/etl_hourly.sh");
+			
+			//run daily
+			exec("/opt/kaltura/dwh/etlsource/execute/etl_daily.sh");	
+		}
 	}
 	
 	/**
