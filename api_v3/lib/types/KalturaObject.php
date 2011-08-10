@@ -166,9 +166,9 @@ class KalturaObject
 		elseif(is_null($this->$propertyName))
 			return;
 		
-		if (is_string($this->$propertyName))	
-			if (strlen($this->$propertyName) < $minLength)
-				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
+		if ($this->$propertyName instanceof KalturaNullField) return;
+		if (strlen($this->$propertyName) < $minLength)
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MIN_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $minLength);
 	}
 	
 	public function validatePropertyNumeric($propertyName, $allowNull = false)
@@ -210,6 +210,7 @@ class KalturaObject
 	public function validatePropertyMaxLength($propertyName, $maxLength, $allowNull = false)
 	{
 		if(!$allowNull) $this->validatePropertyNotNull($propertyName);
+                if ($this->$propertyName instanceof KalturaNullField) return;                                          
 		if (strlen($this->$propertyName) > $maxLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
 	}
