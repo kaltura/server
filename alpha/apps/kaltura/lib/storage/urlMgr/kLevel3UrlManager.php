@@ -58,6 +58,16 @@ class kLevel3UrlManager extends kUrlManager
 			$seekFromBytes = $this->getSeekFromBytes(kFileSyncUtils::getLocalFilePathForKey($syncKey));
 			if($seekFromBytes)
 				$url .= '&start=' . $seekFromBytes;
+				
+    		// if level3 tokenized url is used for http, generate token string
+    		if($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
+    		{
+    		    $name = isset($this->params['http_auth_param_name']) ? $this->params['http_auth_param_name'] : "h";
+    		    $key = isset($this->params['http_auth_key']) ? $this->params['http_auth_key'] : false;
+    		    $gen = isset($this->params['http_auth_gen']) ? $this->params['http_auth_gen'] : false;
+    		    
+    			$url = $this->tokenizeUrl($url, $name, $key, $gen);
+    		}
 		}
 		else
 		{
@@ -65,25 +75,51 @@ class kLevel3UrlManager extends kUrlManager
 				$this->containerFormat && strtolower($this->containerFormat) != 'flash video')
 				$url = "mp4:$url";
 		}
-		
+				
 		$url = str_replace('\\', '/', $url);
 		return $url;
 	}
+	
+	/**
+	 * @param FileSync $fileSync
+	 * @return string
+	 */
+	public function getFileSyncUrl(FileSync $fileSync)
+	{
+		$url = parent::getFileSyncUrl($fileSync);
+		
+	    // if level3 tokenized url is used for http, generate token string
+		if($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
+		{
+		    $name = isset($this->params['http_auth_param_name']) ? $this->params['http_auth_param_name'] : "h";
+		    $key = isset($this->params['http_auth_key']) ? $this->params['http_auth_key'] : false;
+		    $gen = isset($this->params['http_auth_gen']) ? $this->params['http_auth_gen'] : false;
+		    
+			$url = $this->tokenizeUrl($url, $name, $key, $gen);
+		}
+				
+		return $url;
+	}
+	
+	
 
 	protected function tokenizeUrl($url, $name, $key, $gen, $baseUrl = null)
-	{	    
+	{
 		if ($name && $key !== false && $gen !== false)
 		{
-    		$fullUrl = ltrim(str_replace('mp4:', '', $url), '/');
+		$url = preg_replace('/([^:])\/\//','$1/', $url);
+    		$fullUrl = trim(str_replace('mp4:', '', $url), '/');
     	    if (!is_null($baseUrl)) {
     	        $fullUrl = rtrim($baseUrl, '/').'/'.$fullUrl;
-    	    }		    
+    	    }
+    	    if ($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+		    {
+		        $fullUrl .= '.'.$this->extention;
+		    }
 		    
 		    $parsedUrl = parse_url($fullUrl);
-		    $pathString = $parsedUrl['path'];
-		    
-		    //TODO: add file extension ?
-		    
+		    $pathString = '/'.ltrim($parsedUrl['path'],'/');
+
 		    $token = substr(self::hmac('sha1', $key, $pathString), 0, 20);
 		    
 		    if (isset($parsedUrl['query ']) && strlen($parsedUrl['query']) > 0) {
@@ -91,9 +127,8 @@ class kLevel3UrlManager extends kUrlManager
 		    }
 		    else {
 		        $url .= "?$name=$gen".$token;
-		    }			
+		    }
 		}
-
 		return $url;
 	}
 	
@@ -103,32 +138,22 @@ class kLevel3UrlManager extends kUrlManager
 	 */
 	public function finalizeUrls(&$baseUrl, &$flavorsUrls)
 	{
-	    $name = $key = $gen = false;
-	    
-	    // if level3 tokenized url is used for rtmp, generated token string
+	    // if level3 tokenized url is used for rtmp, generate token string
 		if($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 		{
 		    $name = isset($this->params['rtmp_auth_param_name']) ? $this->params['rtmp_auth_param_name'] : "h";
 		    $key = isset($this->params['rtmp_auth_key']) ? $this->params['rtmp_auth_key'] : false;
 		    $gen = isset($this->params['rtmp_auth_gen']) ? $this->params['rtmp_auth_gen'] : false;
-		}
-		
-		// if level3 tokenized url is used for http, generated token string
-		if($this->protocol == StorageProfile::PLAY_FORMAT_HTTP)
-		{
-		    $name = isset($this->params['http_auth_param_name']) ? $this->params['http_auth_param_name'] : "h";
-		    $key = isset($this->params['http_auth_key']) ? $this->params['http_auth_key'] : false;
-		    $gen = isset($this->params['http_auth_gen']) ? $this->params['http_auth_gen'] : false;
-		}
-	    
-	    // tokenize flavor urls
-        foreach($flavorsUrls as $key => $flavor)
-		{
-			if (isset($flavor['url']) && $flavor['url'])
-			{
-			    $flavorsUrls[$key]['url'] = $this->tokenizeUrl($flavor['url'], $name, $key, $gen, $baseUrl);
-			}
-		} 
+		    
+		    // tokenize flavor urls
+            foreach($flavorsUrls as $flavorKey => $flavor)
+    		{
+    			if (isset($flavor['url']) && $flavor['url'])
+    			{
+    			    $flavorsUrls[$flavorKey ]['url'] = $this->tokenizeUrl($flavor['url'], $name, $key, $gen, $baseUrl);
+    			}
+    		} 
+		}	    
 	}
 	
 	
