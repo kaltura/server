@@ -76,6 +76,6 @@ class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaC
 	 * @param string $fieldName
 	 */
 	public static function getSphinxFieldName($fieldName){
-		return ContentDistributionPlugin::getPluginName() . '_' . $fieldName;
+		return 'contD_' . $fieldName;
 	}
 }

@@ -182,12 +182,30 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		return $this->condition;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see AdvancedSearchFilterItem::apply()
+	 */
 	public function apply(baseObjectFilter $filter, Criteria &$criteria, array &$matchClause, array &$whereClause, array &$conditionClause, array &$orderByClause)
 	{
+		KalturaLog::debug("matchClause [". print_r($matchClause,true) ."] whereClause [ " . print_r($whereClause,true) . "] conditionClause [" . print_r($conditionClause,true) ."] orderByClause [" . print_r($orderByClause,true) . "]");
+		$conditions = $this->applyCondition($whereClause, $conditionClause);
+		KalturaLog::debug("apply matchClause: ". $conditions);
+
+		if (count($conditions))
+			foreach ($conditions as $key => $value)
+				$matchClause[] = $key . ' ' . $value;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see AdvancedSearchFilterItem::applyCondition()
+	 */
+	public function applyCondition(array &$whereClause, array &$conditionClause)
+	{
 		$condition = $this->getCondition();
-		if(class_exists('ContentDistributionSphinxPlugin'))
-			if($condition && strlen($condition))
-				$matchClause[] = '@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPENDER_FIELD_DATA) . $condition;
+		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
+		return array(
+			'@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPENDER_FIELD_DATA) => $condition
+		);
 	}
 	
 	public function addToXml(SimpleXMLElement &$xmlElement)
