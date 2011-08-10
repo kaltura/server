@@ -112,7 +112,7 @@ class kLevel3UrlManager extends kUrlManager
     	    if (!is_null($baseUrl)) {
     	        $fullUrl = rtrim($baseUrl, '/').'/'.$fullUrl;
     	    }
-    	    if ($this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+    	    if ($this->extention && $this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 		    {
 		        $fullUrl .= '.'.$this->extention;
 		    }
