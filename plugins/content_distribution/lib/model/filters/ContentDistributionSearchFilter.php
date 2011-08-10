@@ -178,7 +178,7 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		if(!count($conditions))
 			return null;
 			
-		$this->condition = implode(' & ', $conditions);
+		$this->condition = implode(' ', $conditions);
 		return $this->condition;
 	}
 	
