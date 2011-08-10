@@ -72,6 +72,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 										self::UI_CONF_CLIENTSIDE_ENCODER => "KEU_0.8_win.msi",
 										self::UI_CONF_KMC_GENERAL => "kmc.swf",
 										self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => "",
+										self::UI_CONF_CLIPPER => "",
 										);
 	
 	private static $swf_directory_map = array (
@@ -209,6 +210,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				self::UI_CONF_CLIENTSIDE_ENCODER => true,
 				self::UI_CONF_KMC_GENERAL => true,
 				self::UI_CONF_KMC_ROLES_AND_PERMISSIONS => false,
+				self::UI_CONF_CLIPPER => false,
 			);
 		}		
 	}
