@@ -21,7 +21,6 @@ class KalturaAttachmentAsset extends KalturaAsset
 	 * The attachment format
 	 * @var KalturaAttachmentType
 	 * @filter eq,in
-	 * @insertonly
 	 */
 	public $format;
 	
