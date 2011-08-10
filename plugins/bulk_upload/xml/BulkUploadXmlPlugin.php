@@ -88,7 +88,8 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 		
 		$xmlElement = self::getBulkUploadMrssXml($batchJob);
 		if(is_null($xmlElement)){
-			echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mrss><error>Log file is not ready</error></mrss>";
+			
+			echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mrss><error>Log file is not ready: ".$batchJob->getMessage()."</error></mrss>";
 			kFile::closeDbConnections();
 			exit;
 		}
