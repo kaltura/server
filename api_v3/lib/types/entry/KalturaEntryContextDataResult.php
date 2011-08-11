@@ -44,4 +44,9 @@ class KalturaEntryContextDataResult extends KalturaObject
 	 * @var bool
 	 */
 	public $isAdmin;
+	
+	/**
+	 * @var string
+	 */
+	public $streamerType;
 }
