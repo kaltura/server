@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<mrss>
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>1</licenseType>
+			<userId>assaf</userId>
+			<name>Kaltura ABC Test #3.0.1</name>
+			<description>Create an entry with multiple remote storage resource in each flavor and thumbnail asset</description>
+			<tags>
+				<tag>test3</tag>
+				<tag>item1</tag>				
+			</tags>
+			<categories>
+				<category>tests->test3</category>
+			</categories>
+			<partnerData></partnerData>
+			<conversionProfile>ABC</conversionProfile>
+			<!--
+			<startDate>2011-05-05T00:00:00</startDate>
+			<endDate>2011-12-19T00:00:00</endDate>
+			-->
+
+			<media>
+				<mediaType>1</mediaType>
+			</media>
+
+			<content flavorParams="Source"> 
+				<tags>
+					<tag>web</tag>
+				</tags>
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_Source.flv">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_Source.flv">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources>
+			</content>
+
+			<content flavorParams="BasicSmall"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_BasicSmall.flv">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_BasicSmall.flv">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources>
+			</content>
+
+			<content flavorParams="StandardLarge"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_StandardLarge.flv">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_StandardLarge.flv">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources>
+			</content>
+
+			<content flavorParams="StandardSmall"> 
+				<tags>
+					<tag>web,mbr</tag>
+				</tags>
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_StandardSmall.flv">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_StandardSmall.flv">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources>
+			</content>
+
+			<content flavorParams="HQMP4"> 
+				<tags>
+					<tag>web,mp4_export</tag>
+				</tags>
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_HQMP4.mp4">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_HQMP4.mp4">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources>
+			</content>
+
+			<thumbnail isDefault="true">
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_640x480.jpg">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_640x480.jpg">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources> 
+			</thumbnail>
+
+			<thumbnail>
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_587x289.jpg">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_587x289.jpg">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources> 
+			</thumbnail>
+
+			<thumbnail>
+				<remoteStorageContentResources>
+					<remoteStorageContentResource url="sample1/sample1_400x315.jpg">
+						<storageProfile>www.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+					<remoteStorageContentResource url="sample1/sample1_400x315.jpg">
+						<storageProfile>prod.kaltura.co.cc</storageProfile>
+					</remoteStorageContentResource>
+				</remoteStorageContentResources> 
+			</thumbnail>
+			
+		</item>
+		
+		
+	</channel>
+</mrss>

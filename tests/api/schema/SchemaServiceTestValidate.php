@@ -8,8 +8,6 @@ require_once(dirname(__FILE__) . '/../../bootstrap.php');
  */
 class SchemaServiceTestValidate extends KalturaApiTestCase
 {
-	private $serviceUrl = 'http://devtests.kaltura.co.cc';
-	
 	private static $types = array(
 		'bulkUploadXml.bulkUploadXML',
 		'dropFolderXmlBulkUpload.dropFolderXml',
@@ -21,7 +19,6 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 	public function testXsd()
 	{
 		$serviceUrl = $this->client->getConfig()->serviceUrl;
-		$serviceUrl = $this->serviceUrl;
 		
 		foreach(self::$types as $type)
 		{
@@ -61,7 +58,6 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 	{
 		echo "	Testing File [$xmlPath]\n";
 		$serviceUrl = $this->client->getConfig()->serviceUrl;
-// 		$serviceUrl = $this->serviceUrl;
 		$xsdPath = "$serviceUrl/api_v3/service/schema/action/serve/type/$type";
 		
 //		libxml_use_internal_errors(true);
