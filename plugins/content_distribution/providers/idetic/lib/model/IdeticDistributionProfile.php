@@ -11,7 +11,7 @@ class IdeticDistributionProfile extends ConfigurableDistributionProfile
 	
 	// validations
 	const GENRE_VALID_VALUES = ''; //TODO: add a list of the genre
-	const FLAVOR_VALID_FORMATS = 'mp4,mov,mpg,wmv,avi'; 
+	const FLAVOR_VALID_FORMATS = 'mp4,mov,mpg';//there are problems uploading: wmv & avi formats.
 	
 	
 	/* (non-PHPdoc)
