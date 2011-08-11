@@ -610,7 +610,7 @@ class FlavorAssetService extends KalturaBaseService
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
-		return $assetDb->getDownloadUrl(false);
+		return $assetDb->getDownloadUrl(true);
 	}
 	
 	/**
