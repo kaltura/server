@@ -24,9 +24,11 @@
 
 			<media>
 				<mediaType>1</mediaType>
+				<!--  
 				<playlists>
 					<playlist playlistId="JimmyKimmelMoments" />
 				</playlists>
+				-->
 			</media>
 
 			<content id="flavor1" flavorParamsId="0"> 

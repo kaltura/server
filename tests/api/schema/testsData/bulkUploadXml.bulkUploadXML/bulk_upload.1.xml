@@ -22,15 +22,10 @@
 			<media>
 				<mediaType>1</mediaType> 
 			</media>
-			<content id="content1" flavorParamsId="5">
-				<localFileContentResource filePath="/web/content/Oleg/video.flv"> 
-					<fileSize>1325404</fileSize>
-				</localFileContentResource>
-			</content>
-			<content id="content2" flavorParamsId="7">
+			<content flavorParamsId="7">
 				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/kaltura1_vp6.flv"/>
 			</content>
-			<content id="content3" flavorParamsId="9">
+			<content flavorParamsId="9">
 				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/nice_Flv.flv"/>
 			</content>
 		</item>

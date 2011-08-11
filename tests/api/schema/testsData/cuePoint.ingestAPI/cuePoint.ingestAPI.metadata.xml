@@ -8,6 +8,11 @@
 			<tag>test</tag>
 			<tag>adcue</tag>
 		</tags>
+		<sceneEndTime>00:00:07.3</sceneEndTime>
+		<sceneTitle>my ad title</sceneTitle>
+		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
 		<scene-customData metadataProfileId="1309">
 			<metadata>
 				<adData>my ad custom data</adData>
@@ -16,11 +21,6 @@
 				<List1>aaa</List1>
 			</metadata>
 		</scene-customData>
-		<sceneEndTime>00:00:07.3</sceneEndTime>
-		<sceneTitle>my ad title</sceneTitle>
-		<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
-		<adType>1</adType>
-		<protocolType>1</protocolType>
 	</scene-ad-cue-point>
 	<scene-annotation entryId="0_gophawc4" systemName="MY_ANN_PARENT">
 		<sceneStartTime>00:00:05.3</sceneStartTime>
@@ -29,6 +29,8 @@
 			<tag>annotation</tag>
 			<tag>parent</tag>
 		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation parent</sceneText>
 		<scene-customData metadataProfileId="1312">
 			<metadata>
 				<annotationData>my annotation custom data1</annotationData>
@@ -37,8 +39,6 @@
 				<List1>bbb</List1>
 			</metadata>
 		</scene-customData>
-		<sceneEndTime>00:00:10</sceneEndTime>
-		<sceneText>my annotation parent</sceneText>
 	</scene-annotation>
 	<scene-annotation entryId="0_gophawc4">
 		<sceneStartTime>00:00:05.3</sceneStartTime>
@@ -47,6 +47,9 @@
 			<tag>annotation</tag>
 			<tag>child</tag>
 		</tags>
+		<sceneEndTime>00:00:10</sceneEndTime>
+		<sceneText>my annotation child</sceneText>
+		<parent>MY_ANN_PARENT</parent>
 		<scene-customData metadataProfile="ANNOTATION_PROFILE_1">
 			<metadata>
 				<annotationData>my annotation custom data2</annotationData>
@@ -55,9 +58,6 @@
 				<List1>ccc</List1>
 			</metadata>
 		</scene-customData>
-		<sceneEndTime>00:00:10</sceneEndTime>
-		<sceneText>my annotation child</sceneText>
-		<parent>MY_ANN_PARENT</parent>
 	</scene-annotation>
 	<scene-code-cue-point entryId="0_gophawc4">
 		<sceneStartTime>00:00:05.3</sceneStartTime>
@@ -65,6 +65,8 @@
 			<tag>test</tag>
 			<tag>code</tag>
 		</tags>
+		<code>MY_CODE</code>
+		<description>my code cue point description</description>
 		<scene-customData metadataProfileId="1311">
 			<metadata>
 				<codeData>my code custom data</codeData>
@@ -73,7 +75,5 @@
 				<List1>ccc</List1>
 			</metadata>
 		</scene-customData>
-		<code>MY_CODE</code>
-		<description>my code cue point description</description>
 	</scene-code-cue-point>
 </scenes>

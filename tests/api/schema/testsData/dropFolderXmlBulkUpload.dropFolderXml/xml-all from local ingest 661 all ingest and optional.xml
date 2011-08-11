@@ -27,20 +27,8 @@
 				<mediaType>1</mediaType> 
 			</media>
 			<content id="content1" flavorParamsId="0">
-				<localFileContentResource filePath="/web/content/Oleg/kaltura1_vp6.flv"> 
-					<fileSize>2743980</fileSize>
-				</localFileContentResource>
+				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/nice_Flv.flv"/>
 			</content>
-			<!--content id="content1" flavorParamsId="5">
-				<localFileContentResource filePath="/web/content/Oleg/nice_Flv.flv"> 
-					<fileSize>1258289</fileSize>
-				</localFileContentResource>
-			</content>
-			<content id="content1" flavorParamsId="6">
-				<localFileContentResource filePath="/web/content/Oleg/video.flv"> 
-					<fileSize>1325404</fileSize>
-				</localFileContentResource>
-			</content> -->
 		</item>
 	</channel>
 </mrss>

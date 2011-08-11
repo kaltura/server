@@ -16,30 +16,13 @@
 			</categories>
 			<partnerData>my own data</partnerData>
 			<accessControlId>1571</accessControlId>
-			<ingestionProfileId>2171</ingestionProfileId>
+			<conversionProfileId>2171</conversionProfileId>
 			<media>
 				<mediaType>1</mediaType> 
 			</media>
 			<content id="content1" flavorParamsId="0">
-				<localFileContentResource filePath="The MechanicTrailer.mp4"> 
-					<!--fileSize>14568148</fileSize-->
-				</localFileContentResource>
+				<urlContentResource url="http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv"/>
 			</content>
-			<!-- <content id="content2" flavorParamsId="5">
-				<localFileContentResource filePath="/web/content/Oleg/dropfolder/Shark.flv"> 
-					<fileSize>1337402</fileSize>
-				</localFileContentResource>
-			</content>
-			<content id="content3" flavorParamsId="7">
-				<localFileContentResource filePath="/web/content/Oleg/dropfolder/Shark.flv"> 
-					<fileSize>1337402</fileSize>
-				</localFileContentResource>
-			</content>
-			<thumbnail id="thumb1" isDefault="true">
-				<localFileContentResource filePath="/web/content/Oleg/thumbs/mouse.jpg">
-					<fileChecksum type='sha1'>d22d7f51466360a74ade9dc027b84e4694370f45</fileChecksum>
-				</localFileContentResource>
-			</thumbnail> -->
 		</item>
 	</channel>
 </mrss>
