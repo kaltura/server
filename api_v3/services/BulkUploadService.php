@@ -9,11 +9,6 @@
  */
 class BulkUploadService extends KalturaBaseService
 {
-	// TODO
-	// add listResults action
-	// add listResultsWithEntries action
-	// add listResultsWithImportJobs action
-
 	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
 	
 	/**
