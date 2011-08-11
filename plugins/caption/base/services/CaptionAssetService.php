@@ -278,29 +278,23 @@ class CaptionAssetService extends KalturaBaseService
     
 	/**
 	 * @param CaptionAsset $captionAsset
-	 * @param kRemoteStorageResource $contentResource
+	 * @param IRemoteStorageResource $contentResource
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
-	protected function attachRemoteStorageResource(CaptionAsset $captionAsset, kRemoteStorageResource $contentResource)
+	protected function attachRemoteStorageResource(CaptionAsset $captionAsset, IRemoteStorageResource $contentResource)
 	{
-        $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->getStorageProfileId());
-        if(!$storageProfile)
-        {
-        	if($captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
-        	{
-				$captionAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
-				$captionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$captionAsset->save();
-        	}
-			
-        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
-        }
+		$resources = $contentResource->getResources();
+		
         $captionAsset->incrementVersion();
 		$captionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_READY);
         $captionAsset->save();
         	
         $syncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->getUrl(), $storageProfile);
+		foreach($resources as $currentResource)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
+			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
+		}
     }
     
     
@@ -328,6 +322,7 @@ class CaptionAssetService extends KalturaBaseService
 				return $this->attachFileSyncResource($captionAsset, $contentResource);
 				
 			case 'kRemoteStorageResource':
+			case 'kRemoteStorageResources':
 				return $this->attachRemoteStorageResource($captionAsset, $contentResource);
 				
 			default:

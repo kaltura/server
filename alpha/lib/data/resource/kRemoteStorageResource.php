@@ -5,7 +5,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kRemoteStorageResource extends kUrlResource 
+class kRemoteStorageResource extends kUrlResource implements IRemoteStorageResource
 {
 	/**
 	 * ID of storage profile to be associated with the created file sync, used for file serving URL composing, keep null to use the default. 
@@ -27,5 +27,13 @@ class kRemoteStorageResource extends kUrlResource
 	public function setStorageProfileId($storageProfileId)
 	{
 		$this->storageProfileId = $storageProfileId;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IRemoteStorageResource::getResources()
+	*/
+	public function getResources()
+	{
+		return array($this);
 	}
 }

@@ -272,6 +272,12 @@
 		<xs:attribute name="url" type="xs:string" use="required"/>
 	</xs:complexType>
 	
+	<xs:complexType name="T_remoteStorageContentResources">
+		<xs:sequence>
+			<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
 	<xs:complexType name="T_entryContentResource">
 		<xs:choice minOccurs="0" maxOccurs="1">
 			<xs:element name="flavorParamsId" type="xs:int" minOccurs="1" maxOccurs="1"/>
@@ -292,6 +298,7 @@
 				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="remoteStorageContentResources" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
@@ -331,6 +338,7 @@
 				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="remoteStorageContentResources" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
@@ -405,6 +413,7 @@
 	<xs:element name="serverFileContentResource" type="T_serverFileContentResource" />
 	<xs:element name="urlContentResource" type="T_urlContentResource" />
 	<xs:element name="remoteStorageContentResource" type="T_remoteStorageContentResource" />
+	<xs:element name="remoteStorageContentResources" type="T_remoteStorageContentResources" />
 	<xs:element name="entryContentResource" type="T_entryContentResource" />
 	<xs:element name="assetContentResource" type="T_assetContentResource" />
 	

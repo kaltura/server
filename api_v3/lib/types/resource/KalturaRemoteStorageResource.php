@@ -27,6 +27,10 @@ class KalturaRemoteStorageResource extends KalturaUrlResource
 	{
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('storageProfileId');
+    	
+    	$storageProfile = StorageProfilePeer::retrieveByPK($this->storageProfileId);
+    	if(!$storageProfile)
+    		throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $this->storageProfileId);
 	}
 
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

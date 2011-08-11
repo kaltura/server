@@ -5,53 +5,53 @@
  */
 class KalturaEntryService extends KalturaBaseService 
 {
-    /**
-     * @param kResource $resource
-     * @param entry $dbEntry
-     * @param asset $asset
-     * @return asset
-     * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
-     */
-    protected function attachResource(kResource $resource, entry $dbEntry, asset $asset = null)
-    {
-    	throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
-    }
-    
-    /**
-     * @param KalturaResource $resource
-     * @param entry $dbEntry
-     */
-    protected function replaceResource(KalturaResource $resource, entry $dbEntry)
-    {
-    	throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
-    }
-    
-    /**
-     * @param kFileSyncResource $resource
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     * @throws KalturaErrors::UPLOAD_ERROR
-     * @throws KalturaErrors::INVALID_OBJECT_ID
-     */
-    protected function attachFileSyncResource(kFileSyncResource $resource, entry $dbEntry, asset $dbAsset = null)
-    {
+	/**
+	 * @param kResource $resource
+	 * @param entry $dbEntry
+	 * @param asset $asset
+	 * @return asset
+	 * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
+	 */
+	protected function attachResource(kResource $resource, entry $dbEntry, asset $asset = null)
+	{
+		throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
+	}
+	
+	/**
+	 * @param KalturaResource $resource
+	 * @param entry $dbEntry
+	 */
+	protected function replaceResource(KalturaResource $resource, entry $dbEntry)
+	{
+		throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
+	}
+	
+	/**
+	 * @param kFileSyncResource $resource
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 * @throws KalturaErrors::UPLOAD_ERROR
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */
+	protected function attachFileSyncResource(kFileSyncResource $resource, entry $dbEntry, asset $dbAsset = null)
+	{
 		$dbEntry->setSource(entry::ENTRY_MEDIA_SOURCE_KALTURA);
 		$dbEntry->save();
 		
 		try{
-    		$syncable = kFileSyncObjectManager::retrieveObject($resource->getFileSyncObjectType(), $resource->getObjectId());
+			$syncable = kFileSyncObjectManager::retrieveObject($resource->getFileSyncObjectType(), $resource->getObjectId());
 		}
 		catch(kFileSyncException $e){
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $resource->getObjectId());
 		}
 		
-    	$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
-        $dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
-        
-        // Copy the media info from the old asset to the new one
-        if($syncable instanceof asset && $resource->getObjectSubType() == asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET)
-        {
+		$srcSyncKey = $syncable->getSyncKey($resource->getObjectSubType(), $resource->getVersion());
+		$dbAsset = $this->attachFileSync($srcSyncKey, $dbEntry, $dbAsset);
+		
+		// Copy the media info from the old asset to the new one
+		if($syncable instanceof asset && $resource->getObjectSubType() == asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET)
+		{
 			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($syncable->getId());
 			if($mediaInfo)
 			{
@@ -59,25 +59,25 @@ class KalturaEntryService extends KalturaBaseService
 				$newMediaInfo->setFlavorAssetId($dbAsset->getId());
 				$newMediaInfo->save();
 			}
-        }
-        
-        return $dbAsset;
-    }
-    
-    /**
-     * @param kLocalFileResource $resource
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     */
-    protected function attachLocalFileResource(kLocalFileResource $resource, entry $dbEntry, asset $dbAsset = null)
-    {
+		}
+		
+		return $dbAsset;
+	}
+	
+	/**
+	 * @param kLocalFileResource $resource
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 */
+	protected function attachLocalFileResource(kLocalFileResource $resource, entry $dbEntry, asset $dbAsset = null)
+	{
 		$dbEntry->setSource($resource->getSourceType());
 		$dbEntry->save();
 		
 		if($resource->getIsReady())
 			return $this->attachFile($resource->getLocalFilePath(), $dbEntry, $dbAsset, $resource->getKeepOriginalFile());
-    
+	
 		$lowerStatuses = array(
 			entryStatus::ERROR_CONVERTING,
 			entryStatus::ERROR_IMPORTING,
@@ -90,13 +90,13 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setStatus(entryStatus::IMPORT);
 			$dbEntry->save();
 		}
-    		
-    	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-    	{
+			
+		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
 			$resource->attachCreatedObject($dbEntry);
 			return null;
-    	}
-    	
+		}
+		
 		$isNewAsset = false;
 		if(!$dbAsset)
 		{
@@ -125,20 +125,20 @@ class KalturaEntryService extends KalturaBaseService
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 			
 		return $dbAsset;
-    }
-    
-    /**
-     * @param string $entryFullPath
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
-     * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
-     */
-    protected function attachFile($entryFullPath, entry $dbEntry, asset $dbAsset = null, $copyOnly = false)
-    {
-    	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-    	{
+	}
+	
+	/**
+	 * @param string $entryFullPath
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 * @throws KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY
+	 * @throws KalturaErrors::UPLOADED_FILE_NOT_FOUND_BY_TOKEN
+	 */
+	protected function attachFile($entryFullPath, entry $dbEntry, asset $dbAsset = null, $copyOnly = false)
+	{
+		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
 			{
@@ -156,8 +156,8 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->save();	
 				
 			return null;
-    	}
-    	
+		}
+		
 		$isNewAsset = false;
 		if(!$dbAsset)
 		{
@@ -199,37 +199,37 @@ class KalturaEntryService extends KalturaBaseService
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
 		return $dbAsset;
-    }
-    
-    /**
-     * @param FileSyncKey $srcSyncKey
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
-     */
-    protected function attachFileSync(FileSyncKey $srcSyncKey, entry $dbEntry, asset $dbAsset = null)
-    {
-    	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-    	{
+	}
+	
+	/**
+	 * @param FileSyncKey $srcSyncKey
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+	 */
+	protected function attachFileSync(FileSyncKey $srcSyncKey, entry $dbEntry, asset $dbAsset = null)
+	{
+		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-       		kFileSyncUtils::createSyncFileLinkForKey($syncKey, $srcSyncKey);
-       		
+	   		kFileSyncUtils::createSyncFileLinkForKey($syncKey, $srcSyncKey);
+	   		
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();	
 				
 			return null;
-    	}
-    	
-      	$isNewAsset = false;
-      	if(!$dbAsset)
-      	{
-      		$isNewAsset = true;
-        	$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
-      	}
-      	
-        if(!$dbAsset)
-        {
+		}
+		
+	  	$isNewAsset = false;
+	  	if(!$dbAsset)
+	  	{
+	  		$isNewAsset = true;
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+	  	}
+	  	
+		if(!$dbAsset)
+		{
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
 			
 			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -239,26 +239,26 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
-        }
-                
-        $newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
+		}
+				
+		$newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 
-        if($isNewAsset)
+		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
 		return $dbAsset;
-    }
-    
-    /**
-     * @param kOperationResource $resource
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     */
-    protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
-    {
+	}
+	
+	/**
+	 * @param kOperationResource $resource
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 */
+	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
+	{
 		$isNewAsset = false;
 		$isSource = false;
 		if($dbAsset)
@@ -305,45 +305,46 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		return $dbAsset;
-    }
-    
-    /**
-     * @param kRemoteStorageResource $resource
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
-     * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
-     */
-    protected function attachRemoteStorageResource(kRemoteStorageResource $resource, entry $dbEntry, asset $dbAsset = null)
-    {
-        $storageProfile = StorageProfilePeer::retrieveByPK($resource->getStorageProfileId());
-        if(!$storageProfile)
-        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $resource->getStorageProfileId());
-        	
+	}
+	
+	/**
+	 * @param IRemoteStorageResource $resource
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 * @throws KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED
+	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
+	 */
+	protected function attachRemoteStorageResource(IRemoteStorageResource $resource, entry $dbEntry, asset $dbAsset = null)
+	{
+		$resources = $resource->getResources();
 		$dbEntry->setSource(KalturaSourceType::URL);
-    
-    	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-    	{
+	
+		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $resource->getUrl(), $storageProfile);
-       		
+			foreach($resources as $currentResource)
+			{
+				$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
+				$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
+			}
+			
 			$dbEntry->setStatus(entryStatus::READY);
-			$dbEntry->save();	
+			$dbEntry->save();
 				
 			return null;
-    	}
+		}
 		$dbEntry->save();
-    	
-      	$isNewAsset = false;
-      	if(!$dbAsset)
-      	{
-      		$isNewAsset = true;
-        	$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
-      	}
-      	
-        if(!$dbAsset)
-        {
+		
+	  	$isNewAsset = false;
+	  	if(!$dbAsset)
+	  	{
+	  		$isNewAsset = true;
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
+	  	}
+	  	
+		if(!$dbAsset)
+		{
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "]");
 			
 			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -353,10 +354,15 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED);
-        }
-                
-        $syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $resource->getUrl(), $storageProfile);
+		}
+				
+		$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+	
+		foreach($resources as $currentResource)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
+			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
+		}
 
 		$dbFlavorParams = assetParamsPeer::retrieveByPK($dbAsset->getFlavorParamsId());
 		if($dbFlavorParams)
@@ -374,7 +380,7 @@ class KalturaEntryService extends KalturaBaseService
 			
 		$dbAsset->save();
 		
-        if($isNewAsset)
+		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
@@ -382,19 +388,19 @@ class KalturaEntryService extends KalturaBaseService
 			kBusinessPostConvertDL::handleConvertFinished(null, $dbAsset);
 		
 		return $dbAsset;
-    }
-    
-    /**
-     * @param string $url
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     */
-    protected function attachUrl($url, entry $dbEntry, asset $dbAsset = null)
-    {
-    	if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-    	{
-    		$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
+	}
+	
+	/**
+	 * @param string $url
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 */
+	protected function attachUrl($url, entry $dbEntry, asset $dbAsset = null)
+	{
+		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
+			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
 			if (kFile::downloadUrlToFile($url, $entryFullPath))
 				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
 			
@@ -403,12 +409,12 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->save();
 			
 			return null;
-    	}
-    
-    	if($dbAsset && !($dbAsset instanceof flavorAsset))
-    	{
+		}
+	
+		if($dbAsset && !($dbAsset instanceof flavorAsset))
+		{
 			$ext = pathinfo($url, PATHINFO_EXTENSION);
-    		$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
+			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
 			if (kFile::downloadUrlToFile($url, $entryFullPath))
 			{
 				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
@@ -422,78 +428,78 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset->save();
 			
 			return null;
-    	}
-    	
+		}
+		
 		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset);
 		
 		return $dbAsset;
-    }
-    
-    /**
-     * @param kUrlResource $resource
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     */
-    protected function attachUrlResource(kUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
-    {
-    	if($dbAsset instanceof flavorAsset)
-    	{
+	}
+	
+	/**
+	 * @param kUrlResource $resource
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 */
+	protected function attachUrlResource(kUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
+	{
+		if($dbAsset instanceof flavorAsset)
+		{
 			$dbEntry->setSource(KalturaSourceType::URL);
 			$dbEntry->save();
-    	}
-    	
-    	return $this->attachUrl($resource->getUrl(), $dbEntry, $dbAsset);
-    }
-    
-    /**
-     * @param kAssetsParamsResourceContainers $resource
-     * @param entry $dbEntry
-     * @return asset
-     */
-    protected function attachAssetsParamsResourceContainers(kAssetsParamsResourceContainers $resource, entry $dbEntry)
-    {
-    	KalturaLog::debug("Resources [" . count($resource->getResources()) . "]");
-    	
-    	$ret = null;
-    	foreach($resource->getResources() as $assetParamsResourceContainer)
-    	{
-    		KalturaLog::debug("Resource asset params id [" . $assetParamsResourceContainer->getAssetParamsId() . "]");
-    		$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry);
-    		if(!$dbAsset)
-    			continue;
-    			
-    		KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
-    		$dbEntry->addFlavorParamsId($dbAsset->getFlavorParamsId());
-    		
-    		if($dbAsset->getIsOriginal())
-    			$ret = $dbAsset;
-    	}
-    	$dbEntry->save();
-    	
-    	return $ret;
-    }
-    
-    /**
-     * @param kAssetParamsResourceContainer $resource
-     * @param entry $dbEntry
-     * @param asset $dbAsset
-     * @return asset
-     * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
-     */
-    protected function attachAssetParamsResourceContainer(kAssetParamsResourceContainer $resource, entry $dbEntry, asset $dbAsset = null)
-    {
+		}
+		
+		return $this->attachUrl($resource->getUrl(), $dbEntry, $dbAsset);
+	}
+	
+	/**
+	 * @param kAssetsParamsResourceContainers $resource
+	 * @param entry $dbEntry
+	 * @return asset
+	 */
+	protected function attachAssetsParamsResourceContainers(kAssetsParamsResourceContainers $resource, entry $dbEntry)
+	{
+		KalturaLog::debug("Resources [" . count($resource->getResources()) . "]");
+		
+		$ret = null;
+		foreach($resource->getResources() as $assetParamsResourceContainer)
+		{
+			KalturaLog::debug("Resource asset params id [" . $assetParamsResourceContainer->getAssetParamsId() . "]");
+			$dbAsset = $this->attachAssetParamsResourceContainer($assetParamsResourceContainer, $dbEntry);
+			if(!$dbAsset)
+				continue;
+				
+			KalturaLog::debug("Resource asset id [" . $dbAsset->getId() . "]");
+			$dbEntry->addFlavorParamsId($dbAsset->getFlavorParamsId());
+			
+			if($dbAsset->getIsOriginal())
+				$ret = $dbAsset;
+		}
+		$dbEntry->save();
+		
+		return $ret;
+	}
+	
+	/**
+	 * @param kAssetParamsResourceContainer $resource
+	 * @param entry $dbEntry
+	 * @param asset $dbAsset
+	 * @return asset
+	 * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
+	 */
+	protected function attachAssetParamsResourceContainer(kAssetParamsResourceContainer $resource, entry $dbEntry, asset $dbAsset = null)
+	{
 		$assetParams = assetParamsPeer::retrieveByPK($resource->getAssetParamsId());
 		if(!$assetParams)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $resource->getAssetParamsId());
 			
-    	if(!$dbAsset)
-    		$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbEntry->getId(), $resource->getAssetParamsId());
-    		
-    	$isNewAsset = false;
-    	if(!$dbAsset)
-    	{
-    		$isNewAsset = true;
+		if(!$dbAsset)
+			$dbAsset = assetPeer::retrieveByEntryIdAndParams($dbEntry->getId(), $resource->getAssetParamsId());
+			
+		$isNewAsset = false;
+		if(!$dbAsset)
+		{
+			$isNewAsset = true;
 			$dbAsset = assetPeer::getNewAsset($assetParams->getType());
 			$dbAsset->setPartnerId($dbEntry->getPartnerId());
 			$dbAsset->setEntryId($dbEntry->getId());
@@ -502,18 +508,18 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset->setFlavorParamsId($resource->getAssetParamsId());
 			if($assetParams->hasTag(assetParams::TAG_SOURCE))
 				$dbAsset->setIsOriginal(true);
-    	}
+		}
 		$dbAsset->incrementVersion();
 		$dbAsset->save();
 		
 		$dbAsset = $this->attachResource($resource->getResource(), $dbEntry, $dbAsset);
 		
-        if($isNewAsset)
+		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		
 		return $dbAsset;
-    }
-    
+	}
+	
 	/**
 	 * @param KalturaBaseEntry $entry
 	 * @param entry $dbEntry
@@ -660,8 +666,8 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}
 		
-        $srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
-        
+		$srcFilePath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
+		
 		$job = kJobsManager::addConvertProfileJob(null, $entry, $srcFlavorAsset->getId(), $srcFilePath);
 		if(!$job)
 			return null;
@@ -671,36 +677,36 @@ class KalturaEntryService extends KalturaBaseService
 	
 	protected function addEntryFromFlavorAsset(KalturaBaseEntry $newEntry, entry $srcEntry, flavorAsset $srcFlavorAsset)
 	{
-      	$newEntry->type = $srcEntry->getType();
-      		
+	  	$newEntry->type = $srcEntry->getType();
+	  		
 		if ($newEntry->name === null)
 			$newEntry->name = $srcEntry->getName();
 			
-        if ($newEntry->description === null)
-        	$newEntry->description = $srcEntry->getDescription();
-        
-        if ($newEntry->creditUrl === null)
-        	$newEntry->creditUrl = $srcEntry->getSourceLink();
-        	
-       	if ($newEntry->creditUserName === null)
-       		$newEntry->creditUserName = $srcEntry->getCredit();
-       		
-     	if ($newEntry->tags === null)
-      		$newEntry->tags = $srcEntry->getTags();
-       		
-    	$newEntry->sourceType = KalturaSourceType::SEARCH_PROVIDER;
-     	$newEntry->searchProviderType = KalturaSearchProviderType::KALTURA;
-     	
+		if ($newEntry->description === null)
+			$newEntry->description = $srcEntry->getDescription();
+		
+		if ($newEntry->creditUrl === null)
+			$newEntry->creditUrl = $srcEntry->getSourceLink();
+			
+	   	if ($newEntry->creditUserName === null)
+	   		$newEntry->creditUserName = $srcEntry->getCredit();
+	   		
+	 	if ($newEntry->tags === null)
+	  		$newEntry->tags = $srcEntry->getTags();
+	   		
+		$newEntry->sourceType = KalturaSourceType::SEARCH_PROVIDER;
+	 	$newEntry->searchProviderType = KalturaSearchProviderType::KALTURA;
+	 	
 		$dbEntry = $this->prepareEntryForInsert($newEntry);
-      	$dbEntry->setSourceId( $srcEntry->getId() );
-      	
-     	$kshow = $this->createDummyKShow();
-        $kshowId = $kshow->getId();
-        
-        $msg = null;
-        $flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
-        if(!$flavorAsset)
-        {
+	  	$dbEntry->setSourceId( $srcEntry->getId() );
+	  	
+	 	$kshow = $this->createDummyKShow();
+		$kshowId = $kshow->getId();
+		
+		$msg = null;
+		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $msg);
+		if(!$flavorAsset)
+		{
 			KalturaLog::err("Flavor asset not created for entry [" . $dbEntry->getId() . "] reason [$msg]");
 			
 			if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -710,11 +716,11 @@ class KalturaEntryService extends KalturaBaseService
 			}
 			
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_NOT_CREATED, $msg);
-        }
-                
-        $srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        $newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
+		}
+				
+		$srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$newSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
 				
@@ -739,8 +745,8 @@ class KalturaEntryService extends KalturaBaseService
 		if($ks)
 			$isAdmin = $ks->isAdmin();
 		
-	    $entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType(), $isAdmin);
-	    
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType(), $isAdmin);
+		
 		$entry->fromObject($dbEntry);
 
 		return $entry;
@@ -807,7 +813,7 @@ class KalturaEntryService extends KalturaBaseService
 		$list = entryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
 		
-		return array($list, $totalCount);        
+		return array($list, $totalCount);		
 	}
 	
 	protected function countEntriesByFilter(KalturaBaseEntryFilter $filter = null)
@@ -837,7 +843,7 @@ class KalturaEntryService extends KalturaBaseService
  						null / otheruser	otheruser			stays otheruser		if has edit privilege on entry => stays otheruser (checked by checkIfUserAllowedToUpdateEntry), 
  																					otherwise exception
 	 */
-    
+	
    	/**
    	 * Sets the valid user for the entry 
    	 * Throws an error if the session user is trying to add entry to another user and not using an admin session 

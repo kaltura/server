@@ -309,30 +309,21 @@ class FlavorAssetService extends KalturaBaseService
     
 	/**
 	 * @param flavorAsset $flavorAsset
-	 * @param kRemoteStorageResource $contentResource
+	 * @param IRemoteStorageResource $contentResource
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
-	protected function attachRemoteStorageResource(flavorAsset $flavorAsset, kRemoteStorageResource $contentResource)
+	protected function attachRemoteStorageResource(flavorAsset $flavorAsset, IRemoteStorageResource $contentResource)
 	{
-        $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->getStorageProfileId());
-        if(!$storageProfile)
-        {
-        	if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED || $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
-        	{
-				$flavorAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
-				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$flavorAsset->save();
-        	}
-			
-        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
-        }
-        	
+		$resources = $contentResource->getResources();
 		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
 		
         $syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->getUrl(), $storageProfile);
-		
+		foreach($resources as $currentResource)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
+			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
+		}
 		
 		if($flavorAsset->getIsOriginal())
 			$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
@@ -368,6 +359,7 @@ class FlavorAssetService extends KalturaBaseService
 				return $this->attachFileSyncResource($flavorAsset, $contentResource);
 				
 			case 'kRemoteStorageResource':
+			case 'kRemoteStorageResources':
 				return $this->attachRemoteStorageResource($flavorAsset, $contentResource);
 				
 			default:

@@ -267,29 +267,23 @@ class AttachmentAssetService extends KalturaBaseService
     
 	/**
 	 * @param AttachmentAsset $attachmentAsset
-	 * @param kRemoteStorageResource $contentResource
+	 * @param IRemoteStorageResource $contentResource
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
-	protected function attachRemoteStorageResource(AttachmentAsset $attachmentAsset, kRemoteStorageResource $contentResource)
+	protected function attachRemoteStorageResource(AttachmentAsset $attachmentAsset, IRemoteStorageResource $contentResource)
 	{
-        $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->getStorageProfileId());
-        if(!$storageProfile)
-        {
-        	if($attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
-        	{
-				$attachmentAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
-				$attachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$attachmentAsset->save();
-        	}
-			
-        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
-        }
+		$resources = $contentResource->getResources();
+		
         $attachmentAsset->incrementVersion();
 		$attachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_READY);
         $attachmentAsset->save();
         	
         $syncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->getUrl(), $storageProfile);
+		foreach($resources as $currentResource)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
+			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
+		}
     }
     
     
@@ -317,6 +311,7 @@ class AttachmentAssetService extends KalturaBaseService
 				return $this->attachFileSyncResource($attachmentAsset, $contentResource);
 				
 			case 'kRemoteStorageResource':
+			case 'kRemoteStorageResources':
 				return $this->attachRemoteStorageResource($attachmentAsset, $contentResource);
 				
 			default:

@@ -35,6 +35,7 @@ class DocumentsService extends KalturaEntryService
 				return $this->attachFileSyncResource($resource, $dbEntry, $dbAsset);
 				
 			case 'kRemoteStorageResource':
+			case 'kRemoteStorageResources':
 				return $this->attachRemoteStorageResource($resource, $dbEntry, $dbAsset);
 				
 			default:

@@ -302,29 +302,23 @@ class ThumbAssetService extends KalturaBaseService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param kRemoteStorageResource $contentResource
+	 * @param IRemoteStorageResource $contentResource
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 */
-	protected function attachRemoteStorageResource(thumbAsset $thumbAsset, kRemoteStorageResource $contentResource)
+	protected function attachRemoteStorageResource(thumbAsset $thumbAsset, IRemoteStorageResource $contentResource)
 	{
-        $storageProfile = StorageProfilePeer::retrieveByPK($contentResource->getStorageProfileId());
-        if(!$storageProfile)
-        {
-        	if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
-        	{
-				$thumbAsset->setDescription("Could not find storage profile id [$contentResource->getStorageProfileId()]");
-				$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
-				$thumbAsset->save();
-        	}
-			
-        	throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $contentResource->getStorageProfileId());
-        }
+		$resources = $contentResource->getResources();
+		
         $thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
         $thumbAsset->save();
         	
         $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $contentResource->getUrl(), $storageProfile);
+		foreach($resources as $currentResource)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
+			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
+		}
     }
     
     
@@ -352,6 +346,7 @@ class ThumbAssetService extends KalturaBaseService
 				return $this->attachFileSyncResource($thumbAsset, $contentResource);
 				
 			case 'kRemoteStorageResource':
+			case 'kRemoteStorageResources':
 				return $this->attachRemoteStorageResource($thumbAsset, $contentResource);
 				
 			default:
