@@ -568,7 +568,7 @@ class KalturaEntryService extends KalturaBaseService
 			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
 			if($templateEntry)
 			{
-				$dbEntry = $templateEntry->copy();
+				$dbEntry = $templateEntry->copyTemplate();
 				$dbEntry->save();
 			}
 			else

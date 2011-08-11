@@ -2467,4 +2467,43 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 	{
 		return array("entry:id=".$this->getId());
 	}
+	
+	public function copyTemplate()
+	{
+		// we use get_class(), because this might be a subclass
+		$clazz = get_class($this);
+		$copyObj = new $clazz();
+		
+		$copyObj->setKuserId($this->kuser_id);
+		$copyObj->setName($this->name);
+		$copyObj->setType($this->type);
+		$copyObj->setMediaType($this->media_type);
+		$copyObj->setTags($this->tags);
+		$copyObj->setAnonymous($this->anonymous);
+		$copyObj->setSource($this->source);
+		$copyObj->setSourceId($this->source_id);
+		$copyObj->setSourceLink($this->source_link);
+		$copyObj->setLicenseType($this->license_type);
+		$copyObj->setCredit($this->credit);
+		$copyObj->setDisplayInSearch($this->display_in_search);
+		$copyObj->setScreenName($this->screen_name);
+		$copyObj->setSiteUrl($this->site_url);
+		$copyObj->setPermissions($this->permissions);
+		$copyObj->setGroupId($this->group_id);
+		$copyObj->setPartnerData($this->partner_data);
+		$copyObj->setIndexedCustomData1($this->indexed_custom_data_1);
+		$copyObj->setDescription($this->description);
+		$copyObj->setAdminTags($this->admin_tags);
+		$copyObj->setPuserId($this->puser_id);
+		$copyObj->setAccessControlId($this->access_control_id);
+		$copyObj->setConversionProfileId($this->conversion_profile_id);
+		$copyObj->setCategories($this->categories);
+		$copyObj->setCategoriesIds($this->categories_ids);
+// 		$copyObj->setStartDate($this->start_date);
+// 		$copyObj->setEndDate($this->end_date);
+		
+		$copyObj->setNew(true);
+		$copyObj->setCopiedFrom($this);
+		return $copyObj;
+	}
 }
