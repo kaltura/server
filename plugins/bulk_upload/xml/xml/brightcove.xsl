@@ -10,15 +10,56 @@
 		<channel>
 		 	
 
-    	<xsl:for-each select="publisher-upload-manifest/asset">
+    	<xsl:for-each select="publisher-upload-manifest/title">
+	    	
 	    	<item>
-	
+				<!--xsl:for-each select="/publisher-upload-manifest/title[ @video-full-refid = $AssetRef ]"-->
+				<action>add</action>
+				<!--licenseType>-1</licenseType-->
+				<!--userId>test1</userId-->
+				<!--partnerData>my own data</partnerData-->
+				<type>1</type>
+				<name><xsl:value-of select="@name"/></name>
+				<description><xsl:value-of select="./long-description"/></description>
+				<tags>
+					<xsl:for-each select="./tag">
+						<tag><xsl:value-of select="."/></tag>
+					</xsl:for-each>
+				</tags>
+				<!--accessControl>Roni</accessControl-->
+				<!--ingestionProfile>Roni_Conversion</ingestionProfile-->
+				<startDate>
+					<xsl:call-template name="FormatDate">
+						<xsl:with-param name="DateTime" select="@start-date"/>
+					</xsl:call-template>
+				</startDate>
+				<endDate>
+					<xsl:call-template name="FormatDate">
+						<xsl:with-param name="DateTime" select="@end-date"/>
+					</xsl:call-template>
+				</endDate>
 				<!--xsl:value-of select="../title[ @video-full-refid = 'airport_gibbous_full.flv-52aaedfc6f568c82df324050f' ]/@name"/-->
-	
-				<xsl:call-template name="insidetitle">
-	  				<xsl:with-param name="TitleRef" select="@refid"/>
-	  				<xsl:with-param name="FileName" select="@filename"/>
-				</xsl:call-template>
+				<media>
+					<mediaType>1</mediaType> 
+				</media>
+				
+				<xsl:if test="@video-full-refid">
+					<xsl:call-template name="HandleVideoAsset">
+		  				<xsl:with-param name="TitleRefIdField" select="@refid"/>
+		  				<xsl:with-param name="TitleRef" select="@video-full-refid"/>
+					</xsl:call-template>
+			    </xsl:if>
+			    
+			    <xsl:variable name="TitleRefId">
+      				<xsl:value-of select="@refid" />
+    			</xsl:variable>
+				
+				<xsl:for-each select="./rendition-refid">
+					<xsl:call-template name="HandleVideoAsset">
+		  				<xsl:with-param name="TitleRef" select="."/>
+		  				<xsl:with-param name="TitleRefIdField" select="$TitleRefId"/>
+					</xsl:call-template>
+				</xsl:for-each>	
     		</item>
     	</xsl:for-each>
 
@@ -29,125 +70,30 @@
 
 
 
-<xsl:template name="insidetitle">
+<xsl:template name="HandleVideoAsset">
+	<xsl:param name="TitleRefIdField" select="'Undef'"/>
 	<xsl:param name="TitleRef" select="'Undef'"/>
-	<xsl:param name="FileName" select="'Undef'"/>
-	<!--title><xsl:value-of select="$TitleRef"/></title-->
-
-	<!--xsl:for-each select="/publisher-upload-manifest/title[ @video-full-refid = $TitleRef ]"-->
-
-	<xsl:for-each select="/publisher-upload-manifest/title">
-
-		<xsl:if test="./rendition-refid = string($TitleRef)">
-			<action>add</action>
-			<!--licenseType>-1</licenseType-->
-			<!--userId>test1</userId-->
-			<!--partnerData>my own data</partnerData-->
-			<type>1</type>
-			<name><xsl:value-of select="@name"/></name>
-			<description><xsl:value-of select="./long-description"/></description>
-			<tags>
-				<xsl:for-each select="./tag">
-					<tag><xsl:value-of select="."/></tag>
-				</xsl:for-each>
-			</tags>
-			<!--accessControl>Roni</accessControl-->
-			<!--ingestionProfile>Roni_Conversion</ingestionProfile-->
-			<startDate>
-				<xsl:call-template name="FormatDate">
-	  				<xsl:with-param name="DateTime" select="@start-date"/>
-				</xsl:call-template>
-			</startDate>
-			<endDate>
-				<xsl:call-template name="FormatDate">
-	  				<xsl:with-param name="DateTime" select="@end-date"/>
-				</xsl:call-template>
-			</endDate>
-			<media>
-				<mediaType>1</mediaType> 
-			</media>
-			<content>
-				<xsl:attribute name="flavorParamsId">0</xsl:attribute>
-				<serverFileContentResource>
-				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
-					<!--fileSize>2743980</fileSize-->
-				</serverFileContentResource>
-			</content>
-		</xsl:if>
-		
-		<xsl:if test="@video-full-refid = string($TitleRef) or @flash-preview-refid = string($TitleRef)">
-			<action>add</action>
-			<!--licenseType>-1</licenseType-->
-			<!--userId>test1</userId-->
-			<!--partnerData>my own data</partnerData-->
-			<type>1</type>
-			<name><xsl:value-of select="@name"/></name>
-			<description><xsl:value-of select="./long-description"/></description>
-			<tags>
-				<xsl:for-each select="./tag">
-					<tag><xsl:value-of select="."/></tag>
-				</xsl:for-each>
-			</tags>
-			<!--accessControl>Roni</accessControl-->
-			<!--ingestionProfile>Roni_Conversion</ingestionProfile-->
-			<startDate>
-				<xsl:call-template name="FormatDate">
-	  				<xsl:with-param name="DateTime" select="@start-date"/>
-				</xsl:call-template>
-			</startDate>
-			<endDate>
-				<xsl:call-template name="FormatDate">
-	  				<xsl:with-param name="DateTime" select="@end-date"/>
-				</xsl:call-template>
-			</endDate>
-			<media>
-				<mediaType>1</mediaType> 
-			</media>
-			<content>
-				<xsl:attribute name="flavorParams"><xsl:value-of select="$FileName"/></xsl:attribute>
-				<serverFileContentResource>
-				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
-					<!--fileSize>2743980</fileSize-->
-				</serverFileContentResource>
-			</content>
-		</xsl:if>
-		
-		<xsl:if test="@thumbnail-refid = string($TitleRef) or @video-still-refid = string($TitleRef)">
-			<action>add</action>
-			<type>1</type>
-			<name><xsl:value-of select="@name"/></name>
-			<description><xsl:value-of select="./long-description"/></description>
-			<tags>
-				<xsl:for-each select="./tag">
-					<tag><xsl:value-of select="."/></tag>
-				</xsl:for-each>
-			</tags>
-			<startDate>
-				<xsl:call-template name="FormatDate">
-	  				<xsl:with-param name="DateTime" select="@start-date"/>
-				</xsl:call-template>
-			</startDate>
-			<endDate>
-				<xsl:call-template name="FormatDate">
-	  				<xsl:with-param name="DateTime" select="@end-date"/>
-				</xsl:call-template>
-			</endDate>
-			<media>
-				<mediaType>2</mediaType> 
-			</media>
-			<content>
-				<xsl:attribute name="flavorParams"><xsl:value-of select="$FileName"/></xsl:attribute>
-				<serverFileContentResource>
-				<xsl:attribute name="filePath"><xsl:value-of select="$FileName"/></xsl:attribute>
-					<!--fileSize>2743980</fileSize-->
-				</serverFileContentResource>
-			</content>
-		</xsl:if>
-		
+	<!-- <title><xsl:value-of select="$TitleRef"/></title> -->
+	<xsl:for-each select="/publisher-upload-manifest/asset[@refid = $TitleRef]">
+		<xsl:variable name="FlavorWithDash">
+      		<xsl:value-of select="substring-after(@refid,$TitleRefIdField)" />
+    	</xsl:variable>
+		<xsl:variable name="Flavor">
+      		<xsl:value-of select="substring-after($FlavorWithDash,'_')" />
+    	</xsl:variable>
+		<content>
+			<xsl:attribute name="flavorParams"><xsl:value-of select="$Flavor"/></xsl:attribute>
+			<serverFileContentResource>
+			<xsl:attribute name="filePath"><xsl:value-of select="@filename"/></xsl:attribute>
+				<!--fileSize>2743980</fileSize-->
+			</serverFileContentResource>
+		</content>		
 	</xsl:for-each>
-
 	
 </xsl:template>
+
+
+
 
 
   <xsl:template name="FormatDate">
