@@ -75,7 +75,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		if(empty($item->$nodeName)) // if there is no costum data then we exit
 			return;
 			
-		KalturaLog::debug("Handles custom metadata for object type [$this->objectType] class [$this->objectClass] id [$object->id]");
+		KalturaLog::debug("Handles custom metadata for object type [$this->objectType] class [$this->objectClass] id [$object->id] partner id [$object->partnerId]");
 			
 		$this->client = $client;
 		$this->partnerId = $object->partnerId;
