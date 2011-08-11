@@ -213,6 +213,7 @@
 			<xs:element ref="thumbnail-extension" minOccurs="0"
 				maxOccurs="unbounded" />
 		</xs:sequence>
+		<xs:attribute name="url" type="xs:string" use="required" />
 		<xs:attribute name="thumbAssetId" type="xs:string" use="required" />
 		<xs:attribute name="format" type="xs:string" use="required" />
 		<xs:attribute name="isDefault" type="xs:boolean" use="required" />
