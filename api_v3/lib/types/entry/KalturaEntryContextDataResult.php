@@ -49,4 +49,9 @@ class KalturaEntryContextDataResult extends KalturaObject
 	 * @var string
 	 */
 	public $streamerType;
+	
+	/**
+	 * @var string
+	 */
+	public $mediaProtocol;
 }
