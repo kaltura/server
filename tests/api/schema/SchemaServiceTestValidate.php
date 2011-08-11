@@ -18,22 +18,22 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 		'syndication',
 	);
 	
-	public function testXsd()
-	{
-		$serviceUrl = $this->client->getConfig()->serviceUrl;
+// 	public function testXsd()
+// 	{
+// 		$serviceUrl = $this->client->getConfig()->serviceUrl;
 // 		$serviceUrl = $this->serviceUrl;
 		
-		foreach(self::$types as $type)
-		{
-			echo "Testing XSD Type [$type]\n";
+// 		foreach(self::$types as $type)
+// 		{
+// 			echo "Testing XSD Type [$type]\n";
 			
-			$xsdPath = "$serviceUrl/api_v3/service/schema/action/serve/type/$type";
+// 			$xsdPath = "$serviceUrl/api_v3/service/schema/action/serve/type/$type";
 			
-			$xsd = new DOMDocument();
-			$xsd->load($xsdPath);
-			$xsd->schemaValidate('http://www.w3.org/2001/XMLSchema.xsd');
-		}
-	}
+// 			$xsd = new DOMDocument();
+// 			$xsd->load($xsdPath);
+// 			$xsd->schemaValidate('http://www.w3.org/2001/XMLSchema.xsd');
+// 		}
+// 	}
 	
 	public function testXml()
 	{
