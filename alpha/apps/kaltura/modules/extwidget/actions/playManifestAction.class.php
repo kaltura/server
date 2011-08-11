@@ -540,6 +540,7 @@ class playManifestAction extends kalturaAction
 							'bitrate' => $flavorAsset->getBitrate(),
 							'width' => $flavorAsset->getWidth(),
 							'height' => $flavorAsset->getHeight(),
+						    'extension' => $flavorAsset->getFileExt(),
 						);
 					}
 				}

@@ -97,13 +97,13 @@ class kLevel3UrlManager extends kUrlManager
 		    
 			$url = $this->tokenizeUrl($url, $name, $key, $gen);
 		}
-				
+						
 		return $url;
 	}
 	
 	
 
-	protected function tokenizeUrl($url, $name, $key, $gen, $baseUrl = null)
+	protected function tokenizeUrl($url, $name, $key, $gen, $baseUrl = null, $fileExtension = null)
 	{
 		if ($name && $key !== false && $gen !== false)
 		{
@@ -112,9 +112,9 @@ class kLevel3UrlManager extends kUrlManager
     	    if (!is_null($baseUrl)) {
     	        $fullUrl = rtrim($baseUrl, '/').'/'.$fullUrl;
     	    }
-    	    if ($this->extention && $this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
+    	    if ($fileExtension && $this->protocol == StorageProfile::PLAY_FORMAT_RTMP)
 		    {
-		        $fullUrl .= '.'.$this->extention;
+		        $fullUrl .= '.'.$fileExtension;
 		    }
 		    
 		    $parsedUrl = parse_url($fullUrl);
@@ -150,7 +150,7 @@ class kLevel3UrlManager extends kUrlManager
     		{
     			if (isset($flavor['url']) && $flavor['url'])
     			{
-    			    $flavorsUrls[$flavorKey ]['url'] = $this->tokenizeUrl($flavor['url'], $name, $key, $gen, $baseUrl);
+    			    $flavorsUrls[$flavorKey ]['url'] = $this->tokenizeUrl($flavor['url'], $name, $key, $gen, $baseUrl, $flavor['extension']);
     			}
     		} 
 		}	    
