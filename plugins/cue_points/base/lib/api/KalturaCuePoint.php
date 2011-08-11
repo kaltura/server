@@ -109,6 +109,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		"cuePointType" => "type",
 		"status",
 		"entryId",
+		"partnerId",
 		"createdAt",
 		"updatedAt",
 		"tags",
