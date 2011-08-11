@@ -150,7 +150,8 @@ class kLevel3UrlManager extends kUrlManager
     		{
     			if (isset($flavor['url']) && $flavor['url'])
     			{
-    			    $flavorsUrls[$flavorKey ]['url'] = $this->tokenizeUrl($flavor['url'], $name, $key, $gen, $baseUrl, $flavor['extension']);
+    			    $fileExtension = isset($flavor['extension']) ? $flavor['extension'] : null;
+    			    $flavorsUrls[$flavorKey ]['url'] = $this->tokenizeUrl($flavor['url'], $name, $key, $gen, $baseUrl, $fileExtension);
     			}
     		} 
 		}	    
