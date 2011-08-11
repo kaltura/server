@@ -631,7 +631,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		<xs:attribute name="metadataVersion" use="required" type="xs:int"/>
 		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
 		<xs:attribute name="metadataProfileId" use="required" type="xs:int"/>
-		<xs:attribute name="metadataProfileName" use="optional" type="xs:int"/>
+		<xs:attribute name="metadataProfileName" use="optional" type="xs:string"/>
 		<xs:attribute name="metadataProfileVersion" use="required" type="xs:int"/>
 		
 	</xs:complexType>
