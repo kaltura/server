@@ -160,7 +160,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$subTitle = $mrss->addChild('subTitle');
 		$subTitle->addAttribute('href', $captionAsset->getDownloadUrl(true));
 		$subTitle->addAttribute('captionAssetId', $captionAsset->getId());
-		$subTitle->addAttribute('isDefault', $captionAsset->getDefault());
+		$subTitle->addAttribute('isDefault', ($captionAsset->getDefault() ? 'true' : 'false'));
 		$subTitle->addAttribute('format', $captionAsset->getContainerFormat());
 		$subTitle->addAttribute('lang', $captionAsset->getLanguage());
 		if($captionAsset->getFlavorParamsId())
