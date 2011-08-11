@@ -265,6 +265,24 @@ class asset extends Baseasset implements ISyncableFile
 			return null;
 	}
 	
+	public function getExternalUrl($storageId)
+	{
+		$key = $this->getSyncKey(self::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageId);
+		if(!$fileSync)
+			return null;
+		
+		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
+		if(!$storage)
+			return null;
+			
+		$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
+		$urlManager->setFileExtension($this->getFileExt());
+		
+		$url = rtrim($storage->getDeliveryHttpBaseUrl(), "/") . "/". ltrim($urlManager->getFileSyncUrl($fileSync), "/");
+		return $url;
+	}
+	
 	public function getDownloadUrl($useCdn = false)
 	{
 		return $this->getDownloadUrlWithExpiry(86400, $useCdn);

@@ -126,11 +126,6 @@ abstract class DistributionEngine implements IDistributionEngine
 	{
 		$contentDistributionPlugin = KalturaContentDistributionClientPlugin::get($this->kalturaClient);
 		return $contentDistributionPlugin->contentDistributionBatch->getAssetUrl($flavorAssetId);
-		
-//		$this->impersonate($this->partnerId);
-//		$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAssetId, true);
-//		$this->unimpersonate();
-//		return $url;
 	}
 
 	/**

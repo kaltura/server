@@ -26,6 +26,7 @@ class FlavorAssetService extends KalturaBaseService
 			$actionName == 'get' ||
 			$actionName == 'list' ||
 			$actionName == 'getByEntryId' ||
+			$actionName == 'getUrl' ||
 			$actionName == 'getDownloadUrl' ||
 			$actionName == 'getWebPlayableByEntryId' ||
 			$actionName == 'getFlavorAssetsWithParams' ||
@@ -588,12 +589,38 @@ class FlavorAssetService extends KalturaBaseService
 	}
 	
 	/**
+	 * Get download URL for the asset
+	 * 
+	 * @action getUrl
+	 * @param string $id
+	 * @param int $storageId
+	 * @return string
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
+	 */
+	public function getUrlAction($id, $storageId = null)
+	{
+		$assetDb = assetPeer::retrieveById($id);
+		if (!$assetDb)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
+
+		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+
+		if($storageId)
+			return $assetDb->getExternalUrl($storageId);
+			
+		return $assetDb->getDownloadUrl(false);
+	}
+	
+	/**
 	 * Get download URL for the Flavor Asset
 	 * 
 	 * @action getDownloadUrl
 	 * @param string $id
 	 * @param bool $useCdn
 	 * @return string
+	 * @deprecated use getUrl instead
 	 */
 	public function getDownloadUrlAction($id, $useCdn = false)
 	{

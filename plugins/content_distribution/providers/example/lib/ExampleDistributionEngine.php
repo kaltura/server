@@ -203,7 +203,7 @@ class ExampleDistributionEngine extends DistributionEngine implements
 		$this->impersonate($partnerId);
 		foreach($flavorAssets as $flavorAsset)
 		{
-			$url = $this->kalturaClient->flavorAsset->getDownloadUrl($flavorAsset->id, true);
+			$url = $this->getFlavorAssetUrl($flavorAsset->id);
 			
 			$videoElement = $feed->createElement('video');
 			$videoElement->textContent = $url;

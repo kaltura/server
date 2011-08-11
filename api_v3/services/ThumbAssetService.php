@@ -25,7 +25,7 @@ class ThumbAssetService extends KalturaBaseService
 			$actionName == 'get' ||
 			$actionName == 'list' ||
 			$actionName == 'getByEntryId' ||
-			$actionName == 'getDownloadUrl' ||
+			$actionName == 'getUrl' ||
 			$actionName == 'getWebPlayableByEntryId' ||
 			$actionName == 'generateByEntryId' ||
 			$actionName == 'regenerate'
@@ -488,7 +488,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED
 	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
 	 * @throws KalturaErrors::INVALID_ENTRY_STATUS
-	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
+	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 */
 	public function generateByEntryIdAction($entryId, $destThumbParamsId)
 	{
@@ -537,7 +537,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * @throws KalturaErrors::ENTRY_MEDIA_TYPE_NOT_SUPPORTED
 	 * @throws KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND
 	 * @throws KalturaErrors::INVALID_ENTRY_STATUS
-	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
+	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 */
 	public function generateAction($entryId, KalturaThumbParams $thumbParams, $sourceAssetId = null)
 	{
@@ -824,5 +824,30 @@ class ThumbAssetService extends KalturaBaseService
 		$thumbAssetDb->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$thumbAssetDb->setDeletedAt(time());
 		$thumbAssetDb->save();
+	}
+	
+	/**
+	 * Get download URL for the asset
+	 * 
+	 * @action getUrl
+	 * @param string $id
+	 * @param int $storageId
+	 * @return string
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
+	 */
+	public function getUrlAction($id, $storageId = null)
+	{
+		$assetDb = assetPeer::retrieveById($id);
+		if (!$assetDb)
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+
+		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
+
+		if($storageId)
+			return $assetDb->getExternalUrl($storageId);
+			
+		return $assetDb->getDownloadUrl(false);
 	}
 }

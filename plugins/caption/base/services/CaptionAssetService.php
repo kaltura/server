@@ -24,7 +24,7 @@ class CaptionAssetService extends KalturaBaseService
 		if(
 			$actionName == 'get' ||
 			$actionName == 'list' ||
-			$actionName == 'getDownloadUrl'
+			$actionName == 'getUrl'
 			)
 		{
 			$this->partnerGroup .= ',0';
@@ -385,23 +385,28 @@ class CaptionAssetService extends KalturaBaseService
 	}
 	
 	/**
-	 * Get download URL for the caption Asset
+	 * Get download URL for the asset
 	 * 
-	 * @action getDownloadUrl
+	 * @action getUrl
 	 * @param string $id
-	 * @param bool $useCdn
+	 * @param int $storageId
 	 * @return string
+	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
+	 * @throws KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY
 	 */
-	public function getDownloadUrlAction($id, $useCdn = false)
+	public function getUrlAction($id, $storageId = null)
 	{
-		$captionAssetDb = assetPeer::retrieveById($id);
-		if (!$captionAssetDb)
+		$assetDb = assetPeer::retrieveById($id);
+		if (!$assetDb)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
 
-		if ($captionAssetDb->getStatus() != CaptionAsset::FLAVOR_ASSET_STATUS_READY)
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
 
-		return $captionAssetDb->getDownloadUrl($useCdn);
+		if($storageId)
+			return $assetDb->getExternalUrl($storageId);
+			
+		return $assetDb->getDownloadUrl(false);
 	}
 
 	/**
