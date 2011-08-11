@@ -356,7 +356,7 @@ INSERT INTO `permission` VALUES (1,3,'METADATA_PLUGIN_PERMISSION','metadata Plug
 (123,1,'SHORT_LINK_MODIFY','Short Link Modify','Permission to modify Short Link objects',0,1,'','','2011-02-23 10:25:37','2011-02-23 10:25:37','a:1:{s:13:\"partner_group\";s:0:\"\";}'),
 (124,2,'FEATURE_ANALYTICS_TAB','FEATURE_ANALYTICS_TAB',NULL,99,1,NULL,NULL,'2011-02-23 10:25:37','2011-02-23 10:25:37',NULL),
 (125,3,'CONTENTDISTRIBUTION_PLUGIN_PERMISSION','contentDistribution plugin permission','Permission to use contentDistribution plugin',99,1,NULL,NULL,'05/04/2011 14:34:22','05/04/2011 14:34:22',NULL),
-(126,2,'FEATURE_MOBILE_FLAVORS','FEATURE_MOBILE_FLAVORS',NULL,99,1,NULL,NULL,'05/04/2011 14:34:23','05/04/2011 14:34:23',NULL),
+(126,2,'FEATURE_MOBILE_FLAVORS','FEATURE_MOBILE_FLAVORS',NULL,99,1,NULL,NULL,'05/04/2011 14:34:23','05/04/2011 14:34:23',NULL);
 
 
 INSERT INTO `permission_item` VALUES (1,'kApiActionPermissionItem',0,'metadata_metadataprofile','list','','','',NULL,'2011-02-23 09:53:15','2011-02-23 09:53:15',NULL),
@@ -922,7 +922,7 @@ INSERT INTO `permission_item` VALUES (1,'kApiActionPermissionItem',0,'metadata_m
 (561,'kApiActionPermissionItem',0,'annotation_annotation','add','','','',NULL,'10/04/2011 15:39:19','10/04/2011 15:39:19',NULL),
 (562,'kApiActionPermissionItem',0,'annotation_annotation','get','','','',NULL,'10/04/2011 15:39:20','10/04/2011 15:39:20',NULL),
 (563,'kApiActionPermissionItem',-2,'adminconsole_uiconfadmin','list','','','',NULL,'13/04/2011 17:45:09','13/04/2011 17:45:09',NULL),
-(554,'kApiActionPermissionItem',0,'contentdistribution_contentdistributionbatch','getasseturl','','','',NULL,'13/04/2011 17:51:15','13/04/2011 17:51:15',NULL);
+(564,'kApiActionPermissionItem',0,'contentdistribution_contentdistributionbatch','getasseturl','','','',NULL,'13/04/2011 17:51:15','13/04/2011 17:51:15',NULL);
 
 
 
