@@ -51,7 +51,7 @@ abstract class DropFolderFileHandler
 	}
 	
 
-	public function setConfig(KalturaClient $client, KalturaDropFolderFile $dropFolderFile, KalturaDropFolder $dropFolder)
+	public function setConfig(KalturaClient $client, KalturaDropFolderFile $dropFolderFile, KalturaDropFolder $dropFolder, KSchedularTaskConfig $taskConfig)
 	{
 		$this->kClient = $client;
 		$this->dropFolder = $dropFolder;

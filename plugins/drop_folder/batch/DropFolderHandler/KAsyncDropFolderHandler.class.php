@@ -160,7 +160,7 @@ class KAsyncDropFolderHandler extends KBatchBase
 		
 		//  handle file by the file handelr configured for its drop folder
 		$fileHandler = DropFolderFileHandler::getHandler($dropFolder->fileHandlerType);
-		$fileHandler->setConfig($this->kClient, $dropFolderFile, $dropFolder);
+		$fileHandler->setConfig($this->kClient, $dropFolderFile, $dropFolder, $this->taskConfig);
 		$fileHandled = $fileHandler->handle();
 		if ($fileHandled) {
 			KalturaLog::debug('File handled succesfully');

@@ -13,19 +13,30 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	const DROP_FOLDER_RESOURCE_FILE_CHECKSUM_PARAM = 'fileChecksum';
 	
 	/**
-	 * @var string
-	 */
+	* @var string
+	*/
 	private $tempDirectory = null;
+	
+	/**
+	* @var string
+	*/
+	private $uploadedBy = 'Drop Folder';
 	
 	/**
 	 * @var kFileTransferMgr
 	 */
 	private $fileTransferMgr = null;
 	
-	
 	public function getType() 
 	{
 		return KalturaDropFolderFileHandlerType::XML;
+	}
+	
+	public function setConfig(KalturaClient $client, KalturaDropFolderFile $dropFolderFile, KalturaDropFolder $dropFolder, KSchedularTaskConfig $taskConfig)
+	{
+		parent::setConfig($client, $dropFolderFile, $dropFolder, $taskConfig);
+		if($taskConfig->params->uploadedBy)
+			$this->uploadedBy = $taskConfig->params->uploadedBy;
 	}
 	
 	public function handle()
@@ -140,7 +151,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		try
 		{
 			$this->impersonate($this->dropFolderFile->partnerId);
-			$this->kClient->bulkUpload->add($conversionProfile->id, $tempFileRealPath, KalturaBulkUploadType::DROP_FOLDER_XML);
+			$this->kClient->bulkUpload->add($conversionProfile->id, $tempFileRealPath, KalturaBulkUploadType::DROP_FOLDER_XML, $this->uploadedBy);
 			$this->unimpersonate();
 		}
 		catch (Exception $e)
