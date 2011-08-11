@@ -273,8 +273,17 @@ class KalturaTestDeploymentHelper
 			$event->referrer = "http://kaltura.com/" . $i % 10;
 			$event->uiconfId = KalturaGlobalData::getData("@UI_CONF_ID@");
 					
-			$client->stats->collect($event);
+			try
+			{
+				$client->stats->collect($event);
+			}
+			catch (Exception $e)
+			{
+				//Currently do nothing
+			}
 		}
+		
+		KalturaGlobalData::setData("@PLAYS@", $i);
 		
 		//Log rotating only if the service url is localhost
 		if($client->getConfig()->serviceUrl == "http://localhost")
