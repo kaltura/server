@@ -72,7 +72,7 @@
 				type="xs:string" />
 			<xs:element name="thumbnailUrl" minOccurs="0" maxOccurs="1">
 				<xs:complexType>
-					<xs:attribute name="url" type="T_url" />
+					<xs:attribute name="url" type="xs:string" />
 				</xs:complexType>
 			</xs:element>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1" />
@@ -181,7 +181,7 @@
 			<xs:element ref="content-extension" minOccurs="0"
 				maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="url" type="T_url" use="required" />
+		<xs:attribute name="url" type="xs:string" use="required" />
 		<xs:attribute name="flavorAssetId" type="xs:string" use="required" />
 		<xs:attribute name="containerFormat" type="xs:string"
 			use="required" />
@@ -213,7 +213,6 @@
 			<xs:element ref="thumbnail-extension" minOccurs="0"
 				maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="url" type="T_url" use="required" />
 		<xs:attribute name="thumbAssetId" type="xs:string" use="required" />
 		<xs:attribute name="format" type="xs:string" use="required" />
 		<xs:attribute name="isDefault" type="xs:boolean" use="required" />
@@ -226,14 +225,8 @@
 			<xs:element ref="player-extension" minOccurs="0"
 				maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="url" type="T_url" use="required" />
+		<xs:attribute name="url" type="xs:string" use="required" />
 	</xs:complexType>
-	<xs:simpleType name="T_url">
-		<xs:restriction base="xs:string">
-			<xs:pattern
-				value="((https?)|(ftp))://?(([0-9a-zA-Z_!~*'().&amp;=+$%-]+:)?[0-9a-zA-Z_!~*'().&amp;=+$%-]+@)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-zA-Z_!~*'()-]+\.)*([0-9a-zA-Z][0-9a-zA-Z-]{0,61})?[0-9a-zA-Z]\.[a-zA-Z]{2,6})(.[a-zA-Z]{2,6})+(:[0-9]{1,4})?((/?)|(/[0-9a-zA-Z_!~*'().;?:@&amp;=+$,%#-]+)+)" />
-		</xs:restriction>
-	</xs:simpleType>
 	<xs:complexType name="T_tags">
 		<xs:sequence>
 			<xs:element name="tag" type="xs:string" minOccurs="1"
@@ -307,7 +300,6 @@
 	<xs:element name="player" type="T_player" />
 	<xs:element name="bitrate" type="T_bitrate" />
 	<xs:element name="bitrates" type="T_bitrates" />
-	<xs:attribute name="url" type="T_url" />
 	<xs:element name="tags" type="T_tags" />
 	<xs:element name="category" type="T_category" />
 	<xs:element name="rss-extension" />
