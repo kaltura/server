@@ -66,6 +66,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @var array()
 	 */
 	private $storageProfileNameToId = null;
+	
+	/**
+	 * Conversion profile xsl file
+	 * @var string
+	 */
+	protected $conversionProfileXsl = null;
 
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
@@ -106,26 +112,80 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
+		
+		$this->loadXslt();
 			
-		$xdoc = new DomDocument;
-		$xdoc->Load($this->data->filePath);
+		$xdoc = new DomDocument();
+		if(!$xdoc->loadXML($this->xslTransform($this->data->filePath))){
+			$errorMessage = 'Could not load transformed xsl';
+			KalturaLog::debug("Could not load transformed xsl");
+			throw new KalturaBatchException("Could not load transformed xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+		}
 		//Validate the XML file against the schema
 		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
 		{
-			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($this->data->filePath));
+			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($this->xslTransform($this->data->filePath)));
 			KalturaLog::debug("XML is invalid:\n$errorMessage");
 			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
 		return true;
 	}
+	
+	/**
+	 * Load xsl transform
+	 */
+	protected function loadXslt() 
+	{
+		$data = self::getData();
+		$conversionProfileId = $data->conversionProfileId;
+		if($data->conversionProfileId == -1){
+			$conversionProfileId = PartnerPeer::retrieveByPK($this->currentPartnerId)->getDefaultConversionProfileId();
+		}
+		
+		$conversionProfile = $this->kClient->conversionProfile->get($conversionProfileId);
+		if(!$conversionProfile || !$conversionProfile->xslTransformation)
+			return false;
+		$this->conversionProfileXsl = $conversionProfile->xslTransformation;
+		return true;
+	}
 
+	/**
+	 * Transform Xml file with conversion profile xsl
+	 * If xsl is not found, original Xml returned
+	 * @param string $filePath the original xml that was taken from partner file path 
+	 * @return string - transformed Xml
+	 */
+	protected function xslTransform($filePath)
+	{
+		$xdoc = file_get_contents($filePath);
+		if(is_null($xdoc) || is_null($this->conversionProfileXsl))
+			return $xdoc;
+			
+		$xml = new DOMDocument();
+		if(!$xml->loadXML($xdoc)){
+			KalturaLog::debug("Could not load xml");
+			return $xdoc;
+		}
+		
+		$proc = new XSLTProcessor;
+		$xsl = new DOMDocument();
+		if(!$xsl->loadXML($this->conversionProfileXsl)){
+			KalturaLog::debug("Could not load xsl".$this->conversionProfileXsl);
+			return $xdoc;
+		}
+		$proc->importStyleSheet($xsl);
+		
+		KalturaLog::debug("transformed xml ".$proc->transformToXML($xml));
+		return $proc->transformToXML($xml);
+	}
+	
 	/**
 	 * Parses the Xml file lines and creates the right actions in the system
 	 */
 	protected function parse()
 	{
-		$xdoc = simplexml_load_file($this->data->filePath);
+		$xdoc = new SimpleXMLElement($this->xslTransform($this->data->filePath));
 		
 		foreach( $xdoc->channel as $channel)
 		{
