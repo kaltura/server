@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<scenes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://www.kaltura.co.cc/api_v3/service/schema/action/serve/type/cuePoint.serveAPI">
+	<scene-ad-cue-point sceneId="0_f9nwqpel" entryId="0_j76jstb5">
+		<sceneStartTime>00:00:55.4</sceneStartTime>
+		<userId>elena.tkach@kaltura.com</userId>
+		<sceneEndTime>00:01:00.4</sceneEndTime>
+		<sourceUrl>http://ad3.liverail.com/?LR_PUBLISHER_ID=1331</sourceUrl>
+		<adType>2</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_om5vvvxh" entryId="0_j76jstb5">
+		<sceneStartTime>00:00:52.9</sceneStartTime>
+		<userId>elena.tkach@kaltura.com</userId>
+		<sceneEndTime>00:00:57.9</sceneEndTime>
+		<sourceUrl>http://ad3.liverail.com/?LR_PUBLISHER_ID=1331</sourceUrl>
+		<adType>2</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+	<scene-ad-cue-point sceneId="0_wqt3zzk7" entryId="0_j76jstb5">
+		<sceneStartTime>00:00:38.7</sceneStartTime>
+		<userId>elena.tkach@kaltura.com</userId>
+		<sceneEndTime>00:00:38.7</sceneEndTime>
+		<sourceUrl>http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml</sourceUrl>
+		<adType>1</adType>
+		<protocolType>1</protocolType>
+	</scene-ad-cue-point>
+</scenes>

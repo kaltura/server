@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <project name="test" basedir="." default="app">
+    <property name="builddir" value="${ws}/phing" />
+    <property name="srcdir" value="${sdir}" />
+    <property name="testdir" value="${tdir}" />
+
+    <target name="clean">
+        <echo msg="Clean..." />
+        <delete dir="${builddir}" />
+    </target>
+
+	<target name="clearCache">
+        <echo msg="Clearing server cache..." />
+        <exec command="php ${sdir}/scripts/clear_cache.php" escape="false"/>
+    </target>
+    
+    <target name="generateClients">
+        <echo msg="Generating clients..." />
+        <exec command="php ${sdir}/generator/generate.sh" escape="false"/>
+    </target>
+    
+    <target name="prepare">
+        <echo msg="Prepare..." />
+        <mkdir dir="${builddir}" />
+        <mkdir dir="${builddir}/logs" />
+        <mkdir dir="${builddir}/logs/coverage" />
+        <mkdir dir="${builddir}/docs" />
+        <mkdir dir="${builddir}/app" />
+    </target>
+
+	<target name="update">
+        <echo msg="updating server using the update script..." />
+        <exec command="php ${sdir}/deployment/updates/update.php" escape="false"/>
+    </target>
+    
+    
+    <!-- Deploy app -->
+    <target name="app">
+        <echo msg="We do nothing yet!" />
+    </target>
+
+    <!-- PHP API Documentation -->
+    <target name="phpdoc">
+        <echo msg="PHP Documentor..." />
+        <phpdoc title="API Documentation"
+                destdir="${builddir}/docs"
+                sourcecode="yes"
+                defaultpackagename="MHTest"
+                output="HTML:Smarty:PHP">
+            <fileset dir="${sdir}">
+                <include name="**/*.php" />
+            </fileset>
+        </phpdoc>
+    </target>
+
+    <!-- PHP copy/paste analysis -->
+    <target name="phpcpd">
+        <echo msg="PHP Copy/Paste..." />
+        <exec command="phpcpd --log-pmd ${builddir}/logs/pmd.xml ${sdir}" escape="false" />
+    </target>
+
+    <!-- PHP dependency checker -->
+    <target name="pdepend">
+        <echo msg="PHP Depend..." />
+        <exec command="pdepend --jdepend-xml=${builddir}/logs/jdepend.xml ${sdir}" escape="false" />
+    </target>
+
+    <!-- PHP CodeSniffer -->
+    <target name="phpcs">
+        <echo msg="PHP CodeSniffer..." />
+        <exec command="phpcs --standard=ZEND --report=checkstyle ${sdir} > ${builddir}/logs/checkstyle.xml" escape="false" />
+    </target>
+
+    <!-- Unit Tests & coverage analysis -->
+    <target name="phpunit">
+        <echo msg="PHP Unit API - auto generated tests..." />
+        <exec command="phpunit --log-junit ${builddir}/logs/phpunit.xml --coverage-clover ${builddir}/logs/coverage/clover.xml --coverage-html ${builddir}/logs/coverage/ ${tdir}" logoutput="true"/>
+    </target>
+    
+    <target name="runUnitTests">
+        <echo msg="PHP Unit Unit Tests..." />
+    	<exec command="phpunit --log-junit ${builddir}/logs/phpunitUnitTests.xml --coverage-clover ${builddir}/logs/coverage/cloverUnitTests.xml --coverage-html ${builddir}/logs/coverage/unitTests/ ${tdir}" logoutput="true"/>
+    </target>
+</project>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mrss xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ingestion.xsd">
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>-1</licenseType>
+			<userId>test1</userId>
+			<name>server#allfields</name>
+			<description>no source option</description>
+			<tags>
+				<tag>test</tag>
+			</tags>
+			<categories>
+				<category>local</category>
+			</categories>
+			<partnerData>my own data</partnerData>
+			<accessControlId>1651</accessControlId>
+			<conversionProfileId>2621</conversionProfileId>
+			<startDate>2002-05-30T09:00:00</startDate>
+			<endDate>2012-05-30T09:00:00</endDate>
+			<media>
+				<mediaType>1</mediaType>
+			</media>
+			<content id="content1" flavorParamsId="0">
+				<serverFileContentResource filePath="/web/content/Danit/danit3_BasicSmall.mp4"> 
+					<fileSize>1258289</fileSize>
+				</serverFileContentResource>
+			</content>
+			<content id="content2" flavorParamsId="4">
+				<serverFileContentResource filePath="/web/content/Danit/1_Source.flv"> 
+					<fileSize>1258289</fileSize>
+				</serverFileContentResource>
+			</content>
+			<content id="content3" flavorParamsId="5">
+				<serverFileContentResource filePath="/web/content/Danit/2_Source.flv"> 
+					<fileSize>3656983</fileSize>
+				</serverFileContentResource>
+			</content>
+			<thumbnail id="thumb1" isDefault="true"><!--content of specified thumbnail and if you wish to make it default or not-->
+				<serverFileContentResource filePath="/web/content/Lena/images.jpg">
+				<fileChecksum type='sha1'>1e7517848d27f9b654e81214e05c241eddf0817f</fileChecksum><!--check the file size for choosen file-->
+				</serverFileContentResource>
+			</thumbnail>
+<!--			<customData metadataProfileId="241">
+				<metadata>
+				<Text1>this is my custom metadata</Text1>
+				<Test2>metadata</Test2>
+				</metadata>
+			</customData> -->
+		</item>
+	</channel>
+</mrss>

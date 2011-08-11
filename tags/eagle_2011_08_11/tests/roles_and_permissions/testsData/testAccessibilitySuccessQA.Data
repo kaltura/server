@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<UnitTests>
+  <UnitTestsData>
+    <UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="591" secret="db73089260d7b34f03136050910914c7" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="UserFullP1@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="591" secret="db73089260d7b34f03136050910914c7" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="UserNoP2@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="591" secret="db73089260d7b34f03136050910914c7" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="UserManager3@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="591" secret="db73089260d7b34f03136050910914c7" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="UserUploadOnly1@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+	  <Inputs>
+		<Input type="string" partnerId="591" secret="db73089260d7b34f03136050910914c7" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="UserContentmoderator4@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="591" secret="db73089260d7b34f03136050910914c7" serviceUrl="www.kaltura.co.cc" isAdmin="1" userId="UserPlayerDesigner5@mailinator.com"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="591" secret="d6bde1115dde81c0fcdd09772820c786" serviceUrl="www.kaltura.co.cc" isAdmin="0" userId="enduser7"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+	<UnitTestData>
+      <Inputs>
+		<Input type="string" partnerId="591" secret="d6bde1115dde81c0fcdd09772820c786" serviceUrl="www.kaltura.co.cc" isAdmin="0" userId="enduser8"/>
+      </Inputs>
+      <OutputReferences/>
+    </UnitTestData>
+  </UnitTestsData>
+</UnitTests>

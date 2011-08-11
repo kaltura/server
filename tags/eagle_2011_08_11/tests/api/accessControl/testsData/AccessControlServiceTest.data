@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="AccessControlServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="accessControl" type="KalturaAccessControl" key="">
+        <id></id>
+        <partnerId></partnerId>
+        <name type="string">Test Access Control</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isDefault></isDefault>
+        <restrictions type="string">KalturaRestrictionArray</restrictions>
+      </Input>
+      <OutputReference name="output" type="KalturaAccessControl" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Access Control</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isDefault></isDefault>
+        <Array>
+			<restrictions/>
+		</Array>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="id" type="int" key=""/>
+      <OutputReference name="output" type="KalturaAccessControl" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Access Control</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isDefault></isDefault>
+        <Array>
+			<restrictions/>
+		</Array>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="int" key=""/>
+      <Input name="accessControl" type="KalturaAccessControl" key="">
+        <id></id>
+        <partnerId></partnerId>
+        <name></name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isDefault></isDefault>
+        <restrictions type="string">KalturaRestrictionArray</restrictions>
+      </Input>
+      <OutputReference name="output" type="KalturaAccessControl" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Access Control</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isDefault></isDefault>
+        <Array>
+			<restrictions/>
+		</Array>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="id" type="int" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaAccessControlFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <systemNameEqual></systemNameEqual>
+        <systemNameIn></systemNameIn>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaAccessControlListResponse" key="object key">
+        <Array>
+          <objects type="array" dbValue="KalturaAccessControl" key="0">KalturaAccessControl</objects>
+          <objects type="array" dbValue="KalturaAccessControl" key="1">KalturaAccessControl</objects>
+          <objects type="array" dbValue="KalturaAccessControl" key="2">KalturaAccessControl</objects>
+          <objects type="array" dbValue="KalturaAccessControl" key="3">KalturaAccessControl</objects>
+          <objects type="array" dbValue="KalturaAccessControl" key="4">KalturaAccessControl</objects>
+          <objects type="array" dbValue="KalturaAccessControl" key="5">KalturaAccessControl</objects>
+        </Array>
+        <totalCount type="string">6</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

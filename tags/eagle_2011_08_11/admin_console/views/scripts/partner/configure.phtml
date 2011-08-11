@@ -1,0 +1,60 @@
+<?php if($this->errMessage) echo "<div class=\"error\">{$this->errMessage}</div>"; ?>
+<?php $this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'configure'))); ?>
+
+<?php echo $this->form; ?>
+
+
+<script>
+
+function openLink (url){
+	openConfirm(url);
+}
+
+function openConfirm(url) {
+	var dialogDiv = jQuery('<div id="confirmation-div"><?php echo $this->translate('Do you want to save your changes before leaving this page?'); ?></div>').appendTo('body');
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 350,
+		title: '<?php echo $this->translate('Are you sure?'); ?>',
+		height: 150,
+		buttons: {
+			'<?php echo $this->translate('Save Changes'); ?>': function() {
+				jQuery(this).dialog('close');
+				jQuery('#frmPartnerConfigure').submit();
+				url += "<?php echo '/'.$this->partnerId; ?>";
+				window.location = url;
+			},
+			'<?php echo $this->translate('Ignore Changes'); ?>': function() {
+				jQuery(this).dialog('close');
+				url += "<?php echo '/'.$this->partnerId; ?>";
+				window.location = url;
+			},
+			'<?php echo $this->translate('Cancel'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			
+		}
+	});
+}
+function openChangeServicePackageAlertBox(){
+	var dialogDiv = jQuery('<div id="confirmation-div"><?php echo $this->translate('Please enable/disable features according to the new agreement.'); ?></div>').appendTo('body');
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 350,
+		title: '<?php echo $this->translate('Change in service package'); ?>',
+		height: 150,
+		buttons: {			
+			'<?php echo $this->translate('OK'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {}
+	});
+}
+</script>

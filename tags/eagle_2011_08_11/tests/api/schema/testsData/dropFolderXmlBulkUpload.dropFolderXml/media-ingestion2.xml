@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mrss xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ingestion.xsd">
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>-1</licenseType>
+			<userId>test1</userId>
+			<name>entry name</name>
+			<description>entry description</description>
+			<tags>
+				<tag>fish</tag>
+				<tag>dog</tag>
+			</tags>
+			<categories>
+				<category>cat1</category>
+				<category>cat2</category>
+				<category>cat3>subcat31</category>
+			</categories>
+			<partnerData>my own data</partnerData>
+			<!--<accessControl>Roni</accessControl>-->
+			<accessControlId>511</accessControlId>
+			<!--ingestionProfileId>1197628</ingestionProfileId-->
+			<!--<ingestionProfile>Roni_Conversion</ingestionProfile>-->
+			<startDate>2002-05-30T09:00:00</startDate>
+			<!-- <endDate></endDate> -->
+		    <media>
+				<mediaType>1</mediaType> 
+			</media>
+			<content id="content1" flavorParamsId="0">
+				<urlContentResource url="http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv"/>
+			</content>
+			<customData metadataProfile="Roni_Metadata"> <!--metadataProfileId="8"-->
+				<metadata>
+					<MSNVideoCat>FOX_big12</MSNVideoCat>
+					<MSNVideoTop>Fox Sports</MSNVideoTop>
+				</metadata>
+			</customData>
+		</item>
+	</channel>
+</mrss>

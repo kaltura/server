@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<mrss>
+	<channel>
+		<item>
+			<action>add</action>
+			<type>1</type>
+			<licenseType>1</licenseType>
+			<userId>andy.bauch@email.disney.com</userId>
+			<name>Kaltura XML Test</name>
+			<description>Kaltura XML Test</description>
+			<!-- keywords go here? -->
+			<tags>
+				<tag>Bin Laden</tag>
+				<tag>Last video</tag>				
+			</tags>
+			<!-- content category? -->
+			<categories>
+				<category>Jimmy Kimmel Live->Moments</category>
+			</categories>
+			<!-- what information might be useful to put here? -->
+			<partnerData>what goes here?</partnerData>
+			<startDate>2011-05-05T00:00:00</startDate>
+			<endDate>2011-05-19T00:00:00</endDate>
+
+			<media>
+				<mediaType>1</mediaType>
+				<!--  
+				<playlists>
+					<playlist playlistId="JimmyKimmelMoments" />
+				</playlists>
+				-->
+			</media>
+
+			<content id="flavor1" flavorParamsId="0"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/mp4/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
+			</content>
+			<content id="flavor2" flavorParamsId="65852"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/mp4/526x296/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
+			</content>
+			<content id="flavor3" flavorParamsId="65853"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/mp4/426x240/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
+			</content>
+			<content id="flavor4" flavorParamsId="65854"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/mp4/298x168/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
+			</content>
+
+			<thumbnail id="thumb1" isDefault="true" thumbParamsId="36"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
+			</thumbnail>
+			<thumbnail id="thumb2" isDefault="false" thumbParamsId="36"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/426x240/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
+			</thumbnail>
+			<thumbnail id="thumb3" isDefault="false" thumbParamsId="36"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/298x168/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
+			</thumbnail>
+			<thumbnail id="thumb4" isDefault="false" thumbParamsId="36"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/166x93/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
+			</thumbnail>
+			<thumbnail id="thumb5" isDefault="false" thumbParamsId="36"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/146x82/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
+			</thumbnail>
+			<thumbnail id="thumb6" isDefault="false" thumbParamsId="36"> 
+				<tags>
+					<tag>website</tag>
+				</tags>
+				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/117x66/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
+			</thumbnail>
+
+			<customData metadataProfileId="8">
+				<metadata>
+					<TMSID>EP005455791669</TMSID>
+					<Rating>TV-14</Rating>
+					<Season>9</Season>
+					<EpisodeNumber>55</EpisodeNumber>
+					<OriginalPremiereDate>2011-05-04</OriginalPremiereDate>
+					<Cast>Jimmy Kimmel</Cast>
+					<ICFID>3714895</ICFID>
+					
+				</metadata>
+			</customData>
+
+		</item>
+	</channel>
+</mrss>

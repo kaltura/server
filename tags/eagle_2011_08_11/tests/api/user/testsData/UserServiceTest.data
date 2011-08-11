@@ -1,0 +1,265 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="UserServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="user" type="KalturaUser" key="">
+        <id type="string">123</id>
+        <partnerId></partnerId>
+        <screenName type="string">Test User</screenName>
+        <fullName type="string">Test User</fullName>
+        <email type="string">TestUser@mailinator.com</email>
+        <dateOfBirth></dateOfBirth>
+        <country></country>
+        <state></state>
+        <city></city>
+        <zip></zip>
+        <thumbnailUrl></thumbnailUrl>
+        <description></description>
+        <tags></tags>
+        <adminTags></adminTags>
+        <gender></gender>
+        <status></status>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <indexedPartnerDataInt></indexedPartnerDataInt>
+        <indexedPartnerDataString></indexedPartnerDataString>
+        <storageSize></storageSize>
+        <password></password>
+        <firstName type="string">Test User</firstName>
+        <lastName type="string">Test User</lastName>
+        <isAdmin type="string">1</isAdmin>
+        <lastLoginTime></lastLoginTime>
+        <statusUpdatedAt></statusUpdatedAt>
+        <deletedAt></deletedAt>
+        <loginEnabled></loginEnabled>
+        <roleIds></roleIds>
+        <roleNames></roleNames>
+        <isAccountOwner></isAccountOwner>
+      </Input>
+      <OutputReference name="output" type="KalturaUser" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <screenName type="string">Test User</screenName>
+        <fullName type="string">Test User Test User</fullName>
+        <email type="string">TestUser@mailinator.com</email>
+        <dateOfBirth></dateOfBirth>
+        <country></country>
+        <state></state>
+        <city></city>
+        <zip></zip>
+        <thumbnailUrl></thumbnailUrl>
+        <description></description>
+        <tags></tags>
+        <adminTags></adminTags>
+        <gender></gender>
+        <status type="string">1</status>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <indexedPartnerDataInt></indexedPartnerDataInt>
+        <indexedPartnerDataString></indexedPartnerDataString>
+        <storageSize></storageSize>
+        <password></password>
+        <firstName type="string">Test User</firstName>
+        <lastName type="string">Test User</lastName>
+        <isAdmin type="string">"1"</isAdmin>
+        <lastLoginTime></lastLoginTime>
+        <statusUpdatedAt></statusUpdatedAt>
+        <deletedAt></deletedAt>
+        <loginEnabled type="string">"1"</loginEnabled>
+        <roleIds type="string">2</roleIds>
+        <roleNames type="string">Publisher Administrator</roleNames>
+        <isAccountOwner></isAccountOwner>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="userId" type="string" key=""/>
+      <Input name="user" type="KalturaUser" key="">
+        <id></id>
+        <partnerId></partnerId>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
+        <dateOfBirth></dateOfBirth>
+        <country></country>
+        <state></state>
+        <city></city>
+        <zip></zip>
+        <thumbnailUrl></thumbnailUrl>
+        <description></description>
+        <tags></tags>
+        <adminTags></adminTags>
+        <gender></gender>
+        <status></status>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <indexedPartnerDataInt></indexedPartnerDataInt>
+        <indexedPartnerDataString></indexedPartnerDataString>
+        <storageSize></storageSize>
+        <password></password>
+        <firstName></firstName>
+        <lastName></lastName>
+        <isAdmin></isAdmin>
+        <lastLoginTime></lastLoginTime>
+        <statusUpdatedAt></statusUpdatedAt>
+        <deletedAt></deletedAt>
+        <loginEnabled></loginEnabled>
+        <roleIds></roleIds>
+        <roleNames></roleNames>
+        <isAccountOwner></isAccountOwner>
+      </Input>
+      <OutputReference name="output" type="KalturaUser" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
+        <dateOfBirth></dateOfBirth>
+        <country></country>
+        <state></state>
+        <city></city>
+        <zip></zip>
+        <thumbnailUrl></thumbnailUrl>
+        <description></description>
+        <tags></tags>
+        <adminTags></adminTags>
+        <gender></gender>
+        <status type="string">1</status>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <indexedPartnerDataInt></indexedPartnerDataInt>
+        <indexedPartnerDataString></indexedPartnerDataString>
+        <storageSize type="string">0</storageSize>
+        <password></password>
+        <firstName type="string">Updated</firstName>
+        <lastName type="string">Test User</lastName>
+        <isAdmin type="string">"1"</isAdmin>
+        <lastLoginTime></lastLoginTime>
+        <statusUpdatedAt></statusUpdatedAt>
+        <deletedAt></deletedAt>
+        <loginEnabled type="string">"1"</loginEnabled>
+        <roleIds type="string">2</roleIds>
+        <roleNames type="string">Publisher Administrator</roleNames>
+        <isAccountOwner></isAccountOwner>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="userId" type="string" key=""/>
+      <OutputReference name="output" type="KalturaUser" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
+        <dateOfBirth></dateOfBirth>
+        <country></country>
+        <state></state>
+        <city></city>
+        <zip></zip>
+        <thumbnailUrl></thumbnailUrl>
+        <description></description>
+        <tags></tags>
+        <adminTags></adminTags>
+        <gender></gender>
+        <status type="string">1</status>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <indexedPartnerDataInt></indexedPartnerDataInt>
+        <indexedPartnerDataString></indexedPartnerDataString>
+        <storageSize type="string">0</storageSize>
+        <password></password>
+        <firstName type="string">Updated</firstName>
+        <lastName type="string">Test User</lastName>
+        <isAdmin type="string">"1"</isAdmin>
+        <lastLoginTime></lastLoginTime>
+        <statusUpdatedAt></statusUpdatedAt>
+        <deletedAt></deletedAt>
+        <loginEnabled type="string">"1"</loginEnabled>
+        <roleIds type="string">2</roleIds>
+        <roleNames type="string">Publisher Administrator</roleNames>
+        <isAccountOwner></isAccountOwner>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="userId" type="string" key=""/>
+      <OutputReference name="output" type="KalturaUser" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <screenName type="string">Updated Test User</screenName>
+        <fullName type="string">Updated Test User</fullName>
+        <email type="string">UpdatedTestUser@mailinator.com</email>
+        <dateOfBirth></dateOfBirth>
+        <country></country>
+        <state></state>
+        <city></city>
+        <zip></zip>
+        <thumbnailUrl></thumbnailUrl>
+        <description></description>
+        <tags></tags>
+        <adminTags></adminTags>
+        <gender></gender>
+        <status type="string">2</status>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <partnerData></partnerData>
+        <indexedPartnerDataInt></indexedPartnerDataInt>
+        <indexedPartnerDataString></indexedPartnerDataString>
+        <storageSize type="string">0</storageSize>
+        <password></password>
+        <firstName type="string">Updated</firstName>
+        <lastName type="string">Test User</lastName>
+        <isAdmin type="string">"1"</isAdmin>
+        <lastLoginTime></lastLoginTime>
+        <statusUpdatedAt></statusUpdatedAt>
+        <deletedAt></deletedAt>
+        <loginEnabled type="string">"1"</loginEnabled>
+        <roleIds type="string">2</roleIds>
+        <roleNames type="string">Publisher Administrator</roleNames>
+        <isAccountOwner></isAccountOwner>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaUserFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <loginEnabledEqual></loginEnabledEqual>
+        <partnerIdEqual></partnerIdEqual>
+        <screenNameLike></screenNameLike>
+        <screenNameStartsWith></screenNameStartsWith>
+        <emailLike></emailLike>
+        <emailStartsWith></emailStartsWith>
+        <tagsMultiLikeOr></tagsMultiLikeOr>
+        <tagsMultiLikeAnd></tagsMultiLikeAnd>
+        <statusEqual></statusEqual>
+        <statusIn></statusIn>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <isAdminEqual></isAdminEqual>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaUserListResponse" key="object key">
+        <Array>
+          <objects type="array" key="0">KalturaUser</objects>
+        </Array>
+        <totalCount type="string">1</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

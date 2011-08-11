@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="onPremBuild" default="seccess" >
+    <!-- ============================================  -->
+    <!-- Properties                                    -->
+    <!-- ============================================  -->
+    <property name="installationZip"  value="TM-v5.0.0-beta.zip" override="true" />
+    <property name="installationDir"  value="Kaltura-TM-v5.0.0" override="true" />
+    <property name="installationLoc"  value="/web/content/kaltura_packages/drops/" override="true" />
+        <property name="phpMemLimit"  value="128M" override="true" />
+    <property name="server"  value="hudsontest2.kaltura.dev" override="true" />
+
+
+    <!-- ============================================  -->
+    <!-- Target: run uninstall                         -->
+    <!-- ============================================  -->
+    <target name="uninstall">
+         <!--echo msg="uninstall..." /-->
+         <property name="properties.unins"  value="null" override="false" />
+         <available file="/opt/kaltura/uninstaller" type="dir" property="properties.unins" />
+         <!--echo message="value is ${properties.unins}" /-->
+
+         <if>
+              <equals arg1="${properties.unins}" arg2="true" />
+         <then>
+              <echo msg="uninstall..." />
+              <exec command="php uninstall.php -s" dir="/opt/kaltura/uninstaller" />
+         </then>
+         </if>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: uninclude kaltura                     -->
+    <!-- ============================================  -->
+    <target name="unincludeKaltura" depends="uninstall">
+         <echo msg="uninclude kaltura ..." />
+
+         <copy file="/etc/httpd/conf/httpd.conf" tofile="/etc/httpd/conf/httpd.conf.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="Include \/opt\/kaltura\/app\/configurations\/apache\/my_kaltura.conf" replace="# Dynamic Shared Object (DSO) Support"/>
+                       <regexp pattern="LoadModule filter_module modules\/mod_filter.so" replace="# LoadModule foo_module modules/mod_foo.so"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+         <copy file="/etc/httpd/conf/httpd.conf.bak" tofile="/etc/httpd/conf/httpd.conf" overwrite="true"/>
+
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: delete Kaltura folder                 -->
+    <!-- ============================================  -->
+    <target name="deleteKalturaFolder">
+         <echo msg="delete Kaltura Folder..." />
+         <exec command="rm -rf kaltura" dir="/opt/" />
+         <exec command="rm -rf instlBkgrndRun.log" dir="/opt/" />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: restart apache                        -->
+    <!-- ============================================  -->
+    <target name="restartApache" depends="uninstall,unincludeKaltura,deleteKalturaFolder">
+         <echo msg="restart apache..." />
+         <exec command="apachectl restart" dir="." />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: unzip installtion package             -->
+    <!-- ============================================  -->
+    <target name="unzipPackage" depends="restartApache">
+         <echo msg="delete before unzip..." />
+         <exec command="rm -rf Kaltura-TM-v4.0.0" dir="${installationLoc}" />
+         <exec command="rm -rf Kaltura-TM-v5.0.0" dir="${installationLoc}" />
+         <exec command="rm -rf Kaltura-TM-v0.0.0" dir="${installationLoc}" />
+         <exec command="rm -rf Kaltura-CM-v4.0.0" dir="${installationLoc}" />
+         <exec command="rm -rf Kaltura-CM-v5.0.0" dir="${installationLoc}" />
+         <exec command="rm -rf Kaltura-CM-v0.0.0" dir="${installationLoc}" />
+
+         <echo msg="unzip..." />
+         <exec command="unzip -q ${installationLoc}${installationZip}" dir="${installationLoc}" />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: set time zone in php.ini              -->
+    <!-- ============================================  -->
+    <target name="setTimeZone">
+         <echo msg="setting time zone ..." />
+
+         <copy file="/etc/php.ini" tofile="/etc/php.ini.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                        <regexp pattern=";date.timezone =$" replace="date.timezone = America/New_York" ignoreCase="true"  modifiers="m" />
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+         <copy file="/etc/php.ini.1" tofile="/etc/php.ini" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                        <regexp pattern="date.timezone =$" replace="date.timezone = America/New_York" ignoreCase="true" modifiers="m"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <exec command="apachectl restart" dir="." />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: init user_input file                  -->
+    <!-- ============================================  -->
+    <target name="initUserInputFile" depends="unzipPackage">
+         <echo msg="init user_input file ..." />
+
+         <copy file="${installationLoc}${installationDir}/user_input.bak" tofile="${installationLoc}${installationDir}/user_input.ini" overwrite="true">
+              <filterchain>
+                   <replacetokens begintoken="@@" endtoken="@@">
+                        <token key="REPORT_MAIL" value="guyguy" />
+                        <token key="HTTPD_BIN" value="/usr/sbin/apachectl" />
+                        <token key="PHP_BIN" value="/usr/bin/php" />
+                        <token key="BASE_DIR" value="/opt/kaltura" />
+                        <token key="KALTURA_FULL_VIRTUAL_HOST_NAME" value="${server}" />
+                        <token key="ADMIN_CONSOLE_ADMIN_MAIL" value="admin@kaltura.com" />
+                        <token key="ADMIN_CONSOLE_PASSWORD" value="admin" />
+                        <token key="DB1_HOST" value="localhost" />
+                        <token key="DB1_PORT" value="3306" />
+                        <token key="DB1_NAME" value="kaltura" />
+                        <token key="DB1_USER" value="root" />
+                        <token key="DB1_PASS" value="" />
+                        <token key="XYMON_URL" value="http://www.xymondomain.com/xymon/" />
+                   </replacetokens>
+              </filterchain>
+         </copy>
+
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: Mysql upgrade                         -->
+    <!-- ============================================  -->
+    <target name="mysqlUpgrade">
+         <echo msg="upgrading Mysql..." />
+         <exec command="mysql_upgrade" dir="${installationLoc}" />
+    </target>
+    
+    
+    <!-- ============================================  -->
+    <!-- Target: check for sphinx log dir              -->
+    <!-- ============================================  -->
+    <target name="sphinxLogDir">
+         <property name="properties.sphinxdir"  value="null" override="false" />
+         <available file="/usr/local/var/data" type="dir" property="properties.sphinxdir" />
+
+         <if>
+              <equals arg1="${properties.unins}" arg2="false" />
+         <then>
+              <echo msg="creating sphinx log dir..." />
+              <exec command="mkdir -p /usr/local/var/data" dir="/" />
+         </then>
+         </if>
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: Installation                          -->
+    <!-- ============================================  -->
+    <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade,sphinxLogDir">
+         <echo msg="install..." />
+         <exec command="php install.php -s;" dir="${installationLoc}${installationDir}" />
+         <echo msg="Done" />
+    </target>
+
+
+
+    <!-- ============================================  -->
+    <!-- Target: set domain at etc/hosts               -->
+    <!-- ============================================  -->
+    <target name="setDomain" depends="install">
+         <echo msg="setting domain ..." />
+
+         <copy file="/etc/hosts" tofile="/etc/hosts.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                        <regexp pattern="127.0.0.1" replace="xxxchangexxx127.0.0.1"/>
+                        <regexp pattern="127.0.0.1(.+)" replace="\1 ${server}"/>
+                        <regexp pattern="xxxchangexxx" replace="127.0.0.1"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/etc/hosts.bak" tofile="/etc/hosts" overwrite="true"/>
+
+    </target>
+
+
+
+    <!-- ============================================  -->
+    <!-- Target: include kaltura                       -->
+    <!-- ============================================  -->
+    <target name="includeKaltura" depends="install">
+         <echo msg="include kaltura ..." />
+
+         <copy file="/etc/httpd/conf/httpd.conf" tofile="/etc/httpd/conf/httpd.conf.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <!--token key="Include conf.d/*.conf" value="Include /opt/kaltura/app/configurations/apache/my_kaltura.conf" /-->
+                       <regexp pattern="# Dynamic Shared Object \(DSO\) Support" replace="Include /opt/kaltura/app/configurations/apache/my_kaltura.conf"/>
+                       <regexp pattern="# LoadModule foo_module modules\/mod_foo.so" replace="LoadModule filter_module modules/mod_filter.so"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/etc/httpd/conf/httpd.conf.bak" tofile="/etc/httpd/conf/httpd.conf" overwrite="true"/>
+
+    </target>
+
+
+
+    <!-- ============================================  -->
+    <!-- Target: restart apache                        -->
+    <!-- ============================================  -->
+    <target name="restartServer" depends="setDomain,includeKaltura">
+         <echo msg="restart apache..." />
+         <exec command="apachectl restart" dir="." />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: generate activation key               -->
+    <!-- ============================================  -->
+    <target name="genActivationKey" >
+         <echo msg="generate activation key ..." />
+
+         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                        <regexp pattern='"kaltura_activation_key" => false,' replace='"kaltura_activation_key" => "NjkwNTkzMTg5NWJjM2YyNzg0ZjFlNjViZDIzNzA0NDJ8MXxuZXZlcnww",'/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php" overwrite="true"/>
+
+    </target>
+
+	<!-- ============================================  -->
+    <!-- Target: change log level                      -->
+    <!-- ============================================  -->
+    <target name="changeLogLevel">
+         <echo msg="changing log level..." />
+         <copy file="/opt/kaltura/app/api_v3/config/logger.ini" tofile="/opt/kaltura/app/api_v3/config/logger.ini.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="writers.stream.filters.priority.priority = (\w+)" replace="writers.stream.filters.priority.priority = 7"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/opt/kaltura/app/api_v3/config/logger.ini.1" tofile="/opt/kaltura/app/api_v3/config/logger.ini" overwrite="true"/>
+    </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: change memory limit                   -->
+    <!-- ============================================  -->
+    <target name="changeMemoryLimit">
+         <echo msg="changing memory limit..." />
+         <copy file="/opt/kaltura/app/configurations/apache/my_kaltura.conf" tofile="/opt/kaltura/app/configurations/apache/my_kaltura.conf.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="php_value memory_limit (\w+)" replace="php_value memory_limit 128M"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/opt/kaltura/app/configurations/apache/my_kaltura.conf.1" tofile="/opt/kaltura/app/configurations/apache/my_kaltura.conf" overwrite="true"/>
+    </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: unit tests (not running)              -->
+    <!-- ============================================  -->
+    <target name="unitTest">
+         <echo msg="creating base data for tests..." />
+         <exec command="php /opt/kaltura/app/tests/scripts/createBaseData.php" dir="/opt/kaltura/app/tests/scripts" />
+         <echo msg="running unit tests..." />
+         <exec command="phpunit /opt/kaltura/app/tests/api" dir="/opt/kaltura/app/tests" />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: Success                               -->
+    <!-- ============================================  -->
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
+         <echo msg="Done" />
+    </target>
+
+
+</project>

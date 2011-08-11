@@ -1,0 +1,27 @@
+.tweet, .query {
+  font-family: arial,sans-serif;
+  font-size: small;
+  color: #ffffff; }
+  .tweet .tweet_list, .query .tweet_list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: hidden; }
+    .tweet .tweet_list .awesome, .tweet .tweet_list .epic, .query .tweet_list .awesome, .query .tweet_list .epic {
+      text-transform: uppercase; }
+    .tweet .tweet_list li, .query .tweet_list li {
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: .5em; }
+      .tweet .tweet_list li a, .query .tweet_list li a,
+      .tweet .tweet_list li a:visited, .query .tweet_list li a:visited { color:#009cff; }
+      .tweet .tweet_list li a:hover, .query .tweet_list li a:hover { color:#6cc6ff; }
+      .tweet .tweet_list li .tweet_time a, .query .tweet_list li .tweet_time a,
+      .tweet .tweet_list li .tweet_time a:visited, .query .tweet_list li .tweet_time a:visited { color:#8a8a8a;font-size:12px;  }
+      .tweet .tweet_list li .tweet_time a:hover, .query .tweet_list li .tweet_time a:hover { color:#bbbbbb;  }
+    .tweet .tweet_list .tweet_even, .query .tweet_list .tweet_even { }
+    .tweet .tweet_list .tweet_avatar, .query .tweet_list .tweet_avatar {
+      padding-right: .5em;
+      float: left; }
+      .tweet .tweet_list .tweet_avatar img, .query .tweet_list .tweet_avatar img {
+        vertical-align: middle; }

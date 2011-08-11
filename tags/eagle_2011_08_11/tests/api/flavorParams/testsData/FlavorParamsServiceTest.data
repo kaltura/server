@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="FlavorParamsServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="flavorParams" type="KalturaFlavorParams" key="">
+        <videoCodec></videoCodec>
+        <videoBitrate></videoBitrate>
+        <audioCodec></audioCodec>
+        <audioBitrate></audioBitrate>
+        <audioChannels></audioChannels>
+        <audioSampleRate></audioSampleRate>
+        <width></width>
+        <height></height>
+        <frameRate></frameRate>
+        <gopSize></gopSize>
+        <conversionEngines></conversionEngines>
+        <conversionEnginesExtraParams></conversionEnginesExtraParams>
+        <twoPass></twoPass>
+        <deinterlice></deinterlice>
+        <rotate></rotate>
+        <operators></operators>
+        <engineVersion></engineVersion>
+        <id></id>
+        <partnerId></partnerId>
+        <name type="string">Test Flavor Params</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isSystemDefault></isSystemDefault>
+        <tags></tags>
+        <format></format>
+        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+      </Input>
+      <OutputReference name="output" type="KalturaFlavorParams" key="object key">
+        <videoCodec></videoCodec>
+        <videoBitrate type="string">0</videoBitrate>
+        <audioCodec></audioCodec>
+        <audioBitrate type="string">0</audioBitrate>
+        <audioChannels type="string">0</audioChannels>
+        <audioSampleRate type="string">0</audioSampleRate>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <frameRate type="string">0</frameRate>
+        <gopSize type="string">0</gopSize>
+        <conversionEngines></conversionEngines>
+        <conversionEnginesExtraParams></conversionEnginesExtraParams>
+        <twoPass></twoPass>
+        <deinterlice></deinterlice>
+        <rotate></rotate>
+        <operators></operators>
+        <engineVersion></engineVersion>
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Flavor Params</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isSystemDefault type="string">0</isSystemDefault>
+        <tags></tags>
+        <format></format>
+        <requiredPermissions></requiredPermissions>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="id" type="int" key=""/>
+      <OutputReference name="output" type="KalturaFlavorParams" key="object key">
+        <videoCodec></videoCodec>
+        <videoBitrate type="string">0</videoBitrate>
+        <audioCodec></audioCodec>
+        <audioBitrate type="string">0</audioBitrate>
+        <audioChannels type="string">0</audioChannels>
+        <audioSampleRate type="string">0</audioSampleRate>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <frameRate type="string">0</frameRate>
+        <gopSize type="string">0</gopSize>
+        <conversionEngines></conversionEngines>
+        <conversionEnginesExtraParams></conversionEnginesExtraParams>
+        <twoPass></twoPass>
+        <deinterlice type="string">0</deinterlice>
+        <rotate type="string">0</rotate>
+        <operators></operators>
+        <engineVersion></engineVersion>
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Flavor Params</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isSystemDefault type="string">0</isSystemDefault>
+        <tags></tags>
+        <format></format>
+        <requiredPermissions></requiredPermissions>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="int" key=""/>
+      <Input name="flavorParams" type="KalturaFlavorParams" key="">
+        <videoCodec></videoCodec>
+        <videoBitrate></videoBitrate>
+        <audioCodec></audioCodec>
+        <audioBitrate></audioBitrate>
+        <audioChannels></audioChannels>
+        <audioSampleRate></audioSampleRate>
+        <width></width>
+        <height></height>
+        <frameRate></frameRate>
+        <gopSize></gopSize>
+        <conversionEngines></conversionEngines>
+        <conversionEnginesExtraParams></conversionEnginesExtraParams>
+        <twoPass></twoPass>
+        <deinterlice></deinterlice>
+        <rotate></rotate>
+        <operators></operators>
+        <engineVersion></engineVersion>
+        <id></id>
+        <partnerId></partnerId>
+        <name></name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isSystemDefault></isSystemDefault>
+        <tags></tags>
+        <format></format>
+        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+      </Input>
+      <OutputReference name="output" type="KalturaFlavorParams" key="object key">
+        <videoCodec></videoCodec>
+        <videoBitrate type="string">0</videoBitrate>
+        <audioCodec></audioCodec>
+        <audioBitrate type="string">0</audioBitrate>
+        <audioChannels type="string">0</audioChannels>
+        <audioSampleRate type="string">0</audioSampleRate>
+        <width type="string">0</width>
+        <height type="string">0</height>
+        <frameRate type="string">0</frameRate>
+        <gopSize type="string">0</gopSize>
+        <conversionEngines></conversionEngines>
+        <conversionEnginesExtraParams></conversionEnginesExtraParams>
+        <twoPass></twoPass>
+        <deinterlice type="string">0</deinterlice>
+        <rotate type="string">0</rotate>
+        <operators></operators>
+        <engineVersion></engineVersion>
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <name type="string">Test Flavor Params</name>
+        <systemName></systemName>
+        <description></description>
+        <createdAt></createdAt>
+        <isSystemDefault type="string">0</isSystemDefault>
+        <tags></tags>
+        <format></format>
+        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="id" type="int" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaFlavorParamsFilter" key="">
+        <systemNameEqual></systemNameEqual>
+        <systemNameIn></systemNameIn>
+        <isSystemDefaultEqual></isSystemDefaultEqual>
+        <tagsEqual></tagsEqual>
+        <formatEqual></formatEqual>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaFlavorParamsListResponse" key="object key">
+        <Array>
+          <objects type="array" dbValue="KalturaFlavorParams" key="0">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="1">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="2">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="3">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="4">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="5">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="6">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="7">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="8">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="9">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="10">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="11">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="12">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaPdfFlavorParams" key="13">KalturaPdfFlavorParams</objects>
+          <objects type="array" dbValue="KalturaSwfFlavorParams" key="14">KalturaSwfFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="15">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="16">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="17">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="18">KalturaFlavorParams</objects>
+          <objects type="array" dbValue="KalturaFlavorParams" key="19">KalturaFlavorParams</objects>
+        </Array>
+        <totalCount type="string">20</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>

@@ -1,0 +1,34 @@
+<definition>
+	<version>1.00</version>
+	<type>xml</type>
+	<name>Falling leaves</name>
+	<UI>	
+		<InfoPanel>
+			<UIComponents>
+				<UIComponent type="VBox">
+					<UIComponent type="HSlider" id="numLeaves" label="Leaves count:">
+						<mxAttributes liveDragging="true"/>
+						<parameters>
+							<parameter name="value0" controls="numLeaves" />
+						</parameters>
+					</UIComponent>
+					
+					<UIComponent type="HSlider" id="windSpeed" label="Wind speed:">
+						<mxAttributes liveDragging="true"/>
+						<parameters>
+							<parameter name="value0" controls="windSpeed" />
+						</parameters>
+					</UIComponent>
+					
+					<UIComponent type="HSlider" id="gravity" label="Gravity:">
+						<mxAttributes liveDragging="true"/>
+						<parameters>
+							<parameter name="value0" controls="gravity" />
+						</parameters>
+					</UIComponent>
+				</UIComponent>
+			</UIComponents> 
+		</InfoPanel>
+		
+	</UI>
+</definition>

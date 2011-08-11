@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="PermissionItemServiceTest">
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="permissionItem" type="KalturaApiActionPermissionItem" key="">
+		<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </Input>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="permissionItemId" type="int" key=""/>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="permissionItemId" type="int" key=""/>
+      <Input name="permissionItem" type="KalturaApiActionPermissionItem" key="">
+		<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </Input>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="permissionItemId" type="int" key=""/>
+      <OutputReference name="output" type="KalturaApiActionPermissionItem" key="object key">
+	  	<id></id>
+		<permissionNames></permissionNames>
+		<partnerId></partnerId>
+		<permissionNames></permissionNames>
+		<tags></tags>
+		<value></value>
+		<createdAt></createdAt>
+		<updatedAt></updatedAt>
+		<service></service>
+		<action></action>
+	  </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaPermissionItemFilter" key="">
+        <idEqual></idEqual>
+        <idIn></idIn>
+        <typeEqual></typeEqual>
+        <typeIn></typeIn>
+        <partnerIdEqual></partnerIdEqual>
+        <partnerIdIn></partnerIdIn>
+        <tagsMultiLikeOr></tagsMultiLikeOr>
+        <tagsMultiLikeAnd></tagsMultiLikeAnd>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+        <updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaPermissionItemListResponse" key="object key">
+        <Array>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="0">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="1">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="2">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="3">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="4">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="5">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="6">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="7">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="8">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="9">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="10">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="11">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="12">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="13">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="14">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="15">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="16">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="17">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="18">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="19">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="20">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="21">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="22">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="23">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="24">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="25">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="26">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="27">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="28">KalturaApiActionPermissionItem</objects>
+          <objects type="array" dbValue="KalturaApiActionPermissionItem" key="29">KalturaApiActionPermissionItem</objects>
+        </Array>
+        <totalCount type="string">351</totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>
