@@ -16,7 +16,7 @@ class KalturaRemoteStorageResources extends KalturaContentResource
 	public function validateEntry(entry $dbEntry)
 	{
 		parent::validateEntry($dbEntry);
-    	$this->validatePropertyNotNull('storageProfileId');
+    	$this->validatePropertyNotNull('resources');
 	}
 
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
