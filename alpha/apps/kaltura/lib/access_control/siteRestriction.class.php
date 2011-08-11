@@ -141,10 +141,6 @@ class siteRestriction extends baseRestriction
 		else
 			$sites = explode(",", $this->siteList);
 		
-		// if there is no referrer, request is not valid
-		if (strlen($referrerDomain) == 0)
-			return false;
-			
 		// no site lists, use defaults by the restriction type
 		if (count($sites) == 0)
 		{
@@ -154,6 +150,10 @@ class siteRestriction extends baseRestriction
 				return false;
 		}
 		
+		// if there is no referrer, request is not valid
+		if (strlen($referrerDomain) == 0)
+			return false;
+			
 		// match referrer to restricted domain list
 		if ($this->type == self::SITE_RESTRICTION_TYPE_RESTRICT_LIST)
 		{
