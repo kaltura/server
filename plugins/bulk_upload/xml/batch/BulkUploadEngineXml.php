@@ -816,9 +816,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource = new KalturaRemoteStorageResources();
 			$resource->resources = array();
 			$remoteContentResources = $elementToSearchIn->remoteStorageContentResources;
+			/* @var $remoteContentResources SimpleXMLElement */
 			
-			
-			foreach($remoteContentResources as $remoteContentResource)
+			foreach($remoteContentResources->children() as $remoteContentResource)
 			{
 				$childResource = $this->getResourceInstance($remoteContentResource, $conversionProfileId);
 				if($childResource)
