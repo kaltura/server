@@ -53,6 +53,9 @@ img{ border:none; }
 .floatr{ float:right; }
 .clear { clear: both; }
 
+#mask{ display: none; position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 33px; background:#000; -moz-opacity:0.5; -webkit-opacity:0.5; opacity:0.5; filter: alpha(opacity=5); cursor: default; }
+* html #mask{ position: absolute; background-color:#000; top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(0 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px'); }
+
 #overlay{ display: none; position: fixed; top: 0; left: 0; z-index: 99; width: 100%; height: 100%; background:#000; -moz-opacity:0.5; -webkit-opacity:0.5; opacity:0.5; filter: alpha(opacity=5); cursor: default; }
 * html #overlay{ position: absolute; background-color:#000; top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(0 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px'); }
 

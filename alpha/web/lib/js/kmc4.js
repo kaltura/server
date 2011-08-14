@@ -286,10 +286,10 @@ kmc.utils = {
 	// we should have only one overlay for both flash & html modals
 	maskHeader : function(hide) {
 		if(hide) {
-			$("#overlay").hide();
+			$("#mask").hide();
 		}
 		else {
-			$("#overlay").show();
+			$("#mask").show();
 		}
 	},
 
