@@ -324,37 +324,36 @@ class KalturaTestDeploymentHelper
 		KalturaGlobalData::setData("@PLAYS@", $i);
 		
 		//Log rotating only if the service url is localhost
-		if($client->getConfig()->serviceUrl == "http://localhost")
+		if($client->getConfig()->serviceUrl == "http://localhost/")
 		{
-			$logRotateConfString = "/opt/kaltura/log/kaltura_apache_access.log {\n
-						 rotate 5\n
-						 daily\n
-						 missingok\n
-						 compress\n
-						 nodateext\n
-						 notifempty\n
-						 sharedscripts\n
-						 postrotate\n
-						        /usr/sbin/apachectl -k restart\n
-						 endscript\n
-						 lastaction\n
-						        mv /opt/kaltura/log/kaltura_apache_access.log.1.gz /opt/kaltura/log/kaltura_apache_access.log.$partnerId.gz\n
-						 endscript\n
-						}";
+			$logRotateConfString = "/opt/kaltura/log/kaltura_apache_access.log {
+rotate 5
+daily
+missingok
+compress
+nodateext
+notifempty
+sharedscripts
+postrotate
+	/usr/sbin/apachectl -k restart
+endscript
+lastaction
+	mv /opt/kaltura/log/kaltura_apache_access.log.1.gz /opt/kaltura/log/kaltura_apache_access.log.$partnerId.gz
+endscript
+}";
 	
 			$logRotatePath = "/tmp/log_rotate.conf";
-			$file = fopen("$logRotatePath", "w+");
-			fwrite($file, $logRotateConfString);
-			fclose($file);
+			file_put_contents($logRotatePath, $logRotateConfString);
 
 			//Now log rotate on local machine
 			exec("logrotate -f $logRotatePath");
-		
+			exec("dos2unix $logRotatePath");
+
 //			//run hourly
-//			exec("/opt/kaltura/dwh/etlsource/execute/etl_hourly.sh");
+			exec("/opt/kaltura/dwh/etlsource/execute/etl_hourly.sh");
 //			
 //			//run daily
-//			exec("/opt/kaltura/dwh/etlsource/execute/etl_daily.sh");	
+			exec("/opt/kaltura/dwh/etlsource/execute/etl_daily.sh");	
 		}
 	}
 	
