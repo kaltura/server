@@ -411,10 +411,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$resource->resources[] = $assetResource;
 		}
 		
-		if(!count($resource->resources) && count($noParamsFlavorResources) == 1)
+		if(!count($resource->resources))
 		{
-			$resource = reset($noParamsFlavorResources);
-			$noParamsFlavorResources = array();
+			if (count($noParamsFlavorResources) == 1)
+			{
+				$resource = reset($noParamsFlavorResources);
+				$noParamsFlavorResources = array();
+			}
+			else
+			{
+				$resource = null;
+			}
 		}
 
 		$updatedEntry = $this->sendItemUpdateData($entryId, $entry, $resource, 
@@ -451,23 +458,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * Sends the data using a multi requsest according to the given data
 	 * @param int $entryID
 	 * @param KalturaBaseEntry $entry
-	 * @param KalturaAssetsParamsResourceContainers $resource - the main resource collection for the entry
+	 * @param KalturaResource $resource - the main resource collection for the entry
 	 * @param array $noParamsFlavorAssets - Holds the no flavor params flavor assets 
 	 * @param array $noParamsFlavorResources - Holds the no flavor params flavor resources
 	 * @param array $noParamsThumbAssets - Holds the no flavor params thumb assets
 	 * @param array $noParamsThumbResources - Holds the no flavor params thumb resources
 	 * @return $requestResults - the multi request result
 	 */
-	protected function sendItemUpdateData($entryId, KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource = null, 
+	protected function sendItemUpdateData($entryId, KalturaBaseEntry $entry ,KalturaResource $resource = null, 
 										array $noParamsFlavorAssets, array $noParamsFlavorResources, 
 										array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
 		
 		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
-		if(!count($resource->resources))
-			$resource = null;
-			
 		$updatedEntry = $this->kClient->baseEntry->update($entryId, $entry);
 		
 		$this->startMultiRequest(true);
@@ -609,6 +613,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 			return;
 			
+		if(!count($resource->resources))
+		{
+			if (count($noParamsFlavorResources) == 1)
+			{
+				$resource = reset($noParamsFlavorResources);
+				$noParamsFlavorResources = array();
+			}
+			else
+			{
+				$resource = null;
+			}
+		}
+
 		$createdEntry = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources);
 			
 		//Updates the bulk upload result for the given entry (with the status and other data)
@@ -629,22 +646,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * Sends the data using a multi requsest according to the given data
 	 * @param KalturaBaseEntry $entry
-	 * @param KalturaAssetsParamsResourceContainers $resource
+	 * @param KalturaResource $resource
 	 * @param array $noParamsFlavorAssets
 	 * @param array $noParamsFlavorResources
 	 * @param array $noParamsThumbAssets
 	 * @param array $noParamsThumbResources
 	 * @return $requestResults - the multi request result
 	 */
-	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaAssetsParamsResourceContainers $resource = null, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
+	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaResource $resource = null, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
 	{
 		$this->startMultiRequest(true);
 		
 		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
-		if(!count($resource->resources))
-			$resource = null;
-			
 		$this->kClient->baseEntry->add($entry); //Adds the entry 
 		$newEntryId = $this->kClient->getMultiRequestResult()->id;							// TODO: use the return value of add instead of getMultiRequestResult
 		
