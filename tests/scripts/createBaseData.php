@@ -346,8 +346,8 @@ endscript
 			file_put_contents($logRotatePath, $logRotateConfString);
 
 			//Now log rotate on local machine
-			exec("logrotate -f $logRotatePath");
 			exec("dos2unix $logRotatePath");
+			exec("logrotate -f $logRotatePath");
 
 //			//run hourly
 			exec("/opt/kaltura/dwh/etlsource/execute/etl_hourly.sh");
