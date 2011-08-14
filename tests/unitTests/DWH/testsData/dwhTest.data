@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="dwhTest">
+  <TestProcedureData testProcedureName="testGraph">
+    <TestCaseData testCaseInstanceName="testGraph with data set #0">
+      <Input type="KalturaReportInputFilter" key="">
+        <fromDate type="string">0</fromDate>
+        <toDate type="string">1325311200</toDate>
+        <keywords></keywords>
+        <searchInTags></searchInTags>
+        <searchInAdminTags></searchInAdminTags>
+        <categories></categories>
+        <timeZoneOffset></timeZoneOffset>
+      </Input>
+      <OutputReference type="KalturaReportGraphArray" key="1">
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testTotal">
+    <TestCaseData testCaseInstanceName="testTotal with data set #0">
+      <Input type="KalturaReportInputFilter" key="">
+        <fromDate type="string">0</fromDate>
+        <toDate type="string">1325311200</toDate>
+        <keywords></keywords>
+        <searchInTags></searchInTags>
+        <searchInAdminTags></searchInAdminTags>
+        <categories></categories>
+        <timeZoneOffset></timeZoneOffset>
+      </Input>
+      <OutputReference type="KalturaReportTotal" key="">
+        <header type="string">count_plays,sum_time_viewed,avg_time_viewed,count_loads,load_play_ratio</header>
+        <data type="string">7,0.484,0.0691429,488,0.0143</data>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>
