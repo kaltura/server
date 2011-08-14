@@ -300,6 +300,9 @@ class KalturaTestDeploymentHelper
 	private static function addDWHdata(KalturaClient $client)
 	{
 		$partnerId = $client->getConfig()->partnerId;
+		
+		KalturaGlobalData::setData("@DWH_START_TIME@", time());
+		
 		for($i = 0; $i < 1000; $i++)
 		{
 			$event = new KalturaStatsEvent();
@@ -355,6 +358,8 @@ endscript
 //			//run daily
 			exec("/opt/kaltura/dwh/etlsource/execute/etl_daily.sh");	
 		}
+		
+		KalturaGlobalData::setData("@DWH_END_TIME@", time());
 	}
 	
 	/**

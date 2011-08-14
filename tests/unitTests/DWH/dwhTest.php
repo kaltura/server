@@ -35,7 +35,7 @@ class dwhTest extends KalturaApiTestCase
 		$this->compareOnField("plays", $graphArray, array(), "assertEquals");
 	}
 	
-/**
+	/**
 	 * 
 	 * Test the DWH Checks that the starting calls return okay
 	 * @param array<unknown_type> $params

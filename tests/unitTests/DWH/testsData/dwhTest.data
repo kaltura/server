@@ -3,8 +3,8 @@
   <TestProcedureData testProcedureName="testGraph">
     <TestCaseData testCaseInstanceName="testGraph with data set #0">
       <Input type="KalturaReportInputFilter" key="">
-        <fromDate type="string">0</fromDate>
-        <toDate type="string">1325311200</toDate>
+        <fromDate type="string">@START_DWH_TIME@</fromDate>
+        <toDate type="string">@END_DWH_TIME@</toDate>
         <keywords></keywords>
         <searchInTags></searchInTags>
         <searchInAdminTags></searchInAdminTags>
@@ -18,8 +18,8 @@
   <TestProcedureData testProcedureName="testTotal">
     <TestCaseData testCaseInstanceName="testTotal with data set #0">
       <Input type="KalturaReportInputFilter" key="">
-        <fromDate type="string">0</fromDate>
-        <toDate type="string">1325311200</toDate>
+        <fromDate type="string">@START_DWH_TIME@</fromDate>
+        <toDate type="string">@END_DWH_TIME@</toDate>
         <keywords></keywords>
         <searchInTags></searchInTags>
         <searchInAdminTags></searchInAdminTags>
