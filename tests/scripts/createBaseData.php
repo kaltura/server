@@ -341,7 +341,7 @@ postrotate
 	/usr/sbin/apachectl -k restart
 endscript
 lastaction
-	mv /opt/kaltura/log/kaltura_apache_access.log.1.gz /opt/kaltura/log/kaltura_apache_access.log.$partnerId.gz
+	mv /opt/kaltura/log/kaltura_apache_access.log.1.gz /opt/kaltura/log/kaltura_apache_access.log-$partnerId.gz
 endscript
 }";
 	
