@@ -72,6 +72,8 @@ class kBusinessConvertDL
 		}
 		
 		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
+		$entry->setConversionProfileId($tempEntry->getConversionProfileId());
+		$entry->setConversionQuality($tempEntry->getConversionQuality());
 		$entry->setReplacingEntryId(null);
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);		
 		$entry->save();
