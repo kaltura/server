@@ -634,6 +634,8 @@ class Partner extends BasePartner
 	public function setMonthlyStorageOveragePrice($v)	{$this->putInCustomData('monthly_storage_overage_price', $v);}
 	public function setMonthlyStorageAndBandwidthOveragePrice($v)	{$this->putInCustomData('monthly_storage_and_bandwidth_overage_price', $v);}
 	public function setEndUsersOveragePrice($v)			{$this->putInCustomData('end_users_overage_price', $v);}
+	public function setStreamerType($v)					{$this->putInCustomData('streamer_type', $v);}
+	public function setMediaProtocol($v)				{$this->putInCustomData('media_protocol', $v);}
 	
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota');}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota');}
@@ -656,6 +658,8 @@ class Partner extends BasePartner
 	public function getMonthlyStorageOveragePrice()		{return $this->getFromCustomData('monthly_storage_overage_price');}
 	public function getMonthlyStorageAndBandwidthOveragePrice()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_price');}
 	public function getEndUsersOveragePrice()			{return $this->getFromCustomData('end_users_overage_price');}
+	public function getStreamerType($v)					{return $this->getFromCustomData('streamer_type', null, kConf::get('default_streamer_type'));}
+	public function getMediaProtocol($v)				{return $this->getFromCustomData('media_protocol', null, kConf::get('default_media_protocol'));}
 	
 	/**
 	 * @return kAkamaiLiveParams

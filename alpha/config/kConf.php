@@ -230,6 +230,9 @@ class kConf extends kConfLocal
 				),
 				
 				'syndication_core_xsd_path' => dirname(__FILE__) . '/syndication.core.xsd',
+				
+				'default_streamer_type' => 'http',
+				'default_media_protocol' => 'http',
 			)
 		);
 		

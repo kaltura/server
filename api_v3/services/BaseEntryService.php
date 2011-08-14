@@ -642,6 +642,8 @@ class BaseEntryService extends KalturaEntryService
 			
 		}
 		
+		$result->streamerType = $this->getPartner()->getStreamerType();
+		$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
 		return $result;
 	}
 }

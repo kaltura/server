@@ -146,6 +146,18 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $limits;
 	
+	/**
+	 * http/rtmp/hdnetwork
+	 * @var string
+	 */
+	public $streamerType;
+	
+	/**
+	 * http/https, rtmp/rtmpe
+	 * @var string
+	 */
+	public $mediaProtocol;
+	
 	private static $map_between_objects = array
 	(
 		"partnerName",
@@ -176,7 +188,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"passReplaceFreq",
 		"isFirstLogin",
 		"partnerGroupType",
-		"partnerParentId"
+		"partnerParentId",
+		"streamerType",
+		"mediaProtocol",
 	);
 
 	public function getMapBetweenObjects()
