@@ -46,11 +46,13 @@ class KalturaEntryContextDataResult extends KalturaObject
 	public $isAdmin;
 	
 	/**
+	 * http/rtmp/hdnetwork
 	 * @var string
 	 */
 	public $streamerType;
 	
 	/**
+	 * http/https, rtmp/rtmpe
 	 * @var string
 	 */
 	public $mediaProtocol;
