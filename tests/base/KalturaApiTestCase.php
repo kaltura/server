@@ -204,4 +204,28 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		return curl_exec($ch);
 	} 
+
+	/**
+	 * Starts a new session
+	 * @param KalturaSessionType $type
+	 * @param string $userId
+	 */
+	protected function startSession($type, $userId = null)
+	{
+		print("start session\n");
+		
+		if($type == KalturaSessionType::ADMIN)
+			$secret = KalturaGlobalData::getData("@TEST_PARTNER_ADMIN_SECRET@");
+		else
+			$secret = KalturaGlobalData::getData("@TEST_PARTNER_SECRET@");
+				
+		$ks = $this->client->session->start($secret, $userId, $type, self::TEST_PARTNER_ID);
+		$this->assertNotNull($ks);
+		if (!$ks) {
+			return false;
+		}
+		
+		$this->client->setKs($ks);
+		return true;
+	}
 }
