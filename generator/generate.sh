@@ -2,7 +2,7 @@
 
 output_path=`php -r 'require_once("bootstrap.php"); echo myContentStorage::getFSContentRootPath() . "/content/clientlibs";' 2>&1`
 
-rm -fr $output_path/*
+rm -fr $output_path/$@
 rm -fr ../cache/api_v3/*
 rm -fr ../cache/generator/*
 
