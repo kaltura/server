@@ -233,6 +233,9 @@ class widget extends Basewidget
 	   		$player_name = 'kaltura_player_' . (int)microtime(true);
 
 	   	$widget = /*$extra_links .*/
+				// following line is html5 support
+			 '<script type="text/javascript" 
+src="http://www.kaltura.com/p/'.$this->getPartnerId().'/sp/'.$this->getPartnerId().'00/embedIframeJs/uiconf_id/'.$this->getUiConfId().'/partner_id/' . $this->getPartnerId() . '"></script>'.
 			 '<object name="'.$player_name.'" id="' . $player_name . '" type="application/x-shockwave-flash" allowScriptAccess="always" allowNetworking="all" allowFullScreen="true" height="' . $height . '" width="' . $width . '" data="'.$domain. $swf_url . '">'.
 				'<param name="allowScriptAccess" value="always" />'.
 				'<param name="allowNetworking" value="all" />'.
