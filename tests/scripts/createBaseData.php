@@ -326,14 +326,35 @@ class KalturaTestDeploymentHelper
 		//Log rotating only if the service url is localhost
 		if($client->getConfig()->serviceUrl == "http://localhost")
 		{
+			$logRotateConfString = "/opt/kaltura/log/kaltura_apache_access.log {\n
+						 rotate 5\n
+						 daily\n
+						 missingok\n
+						 compress\n
+						 nodateext\n
+						 notifempty\n
+						 sharedscripts\n
+						 postrotate\n
+						        /usr/sbin/apachectl -k restart\n
+						 endscript\n
+						 lastaction\n
+						        mv /opt/kaltura/log/kaltura_apache_access.log.1.gz /opt/kaltura/log/kaltura_apache_access.log.$partnerId.gz\n
+						 endscript\n
+						}";
+	
+			$logRotatePath = "/tmp/log_rotate.conf";
+			$file = fopen("$logRotatePath", "w+");
+			fwrite($file, $logRotateConfString);
+			fclose($file);
+
 			//Now log rotate on local machine
-			exec("logrotate -f /opt/kaltura/logrotate/kaltura_log_rotate");
+			exec("logrotate -f $logRotatePath");
 		
-			//run hourly
-			exec("/opt/kaltura/dwh/etlsource/execute/etl_hourly.sh");
-			
-			//run daily
-			exec("/opt/kaltura/dwh/etlsource/execute/etl_daily.sh");	
+//			//run hourly
+//			exec("/opt/kaltura/dwh/etlsource/execute/etl_hourly.sh");
+//			
+//			//run daily
+//			exec("/opt/kaltura/dwh/etlsource/execute/etl_daily.sh");	
 		}
 	}
 	
