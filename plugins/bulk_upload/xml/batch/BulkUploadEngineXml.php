@@ -410,6 +410,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$assetResource->assetParamsId = $assetParamsId;
 			$resource->resources[] = $assetResource;
 		}
+		
+		if(!count($resource->resources) && count($noParamsFlavorResources) == 1)
+		{
+			$resource = reset($noParamsFlavorResources);
+			$noParamsFlavorResources = array();
+		}
 
 		$updatedEntry = $this->sendItemUpdateData($entryId, $entry, $resource, 
 												  $noParamsFlavorAssets, $noParamsFlavorResources, 
