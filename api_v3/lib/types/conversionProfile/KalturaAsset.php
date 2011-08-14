@@ -51,6 +51,7 @@ class KalturaAsset extends KalturaObject implements IFilterable
 	 * Tags used to identify the Flavor Asset in various scenarios
 	 * 
 	 * @var string
+	 * @filter like,mlikeor,mlikeand
 	 */
 	public $tags;
 	

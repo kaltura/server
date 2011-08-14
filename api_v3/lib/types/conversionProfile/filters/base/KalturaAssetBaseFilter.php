@@ -16,6 +16,9 @@ class KalturaAssetBaseFilter extends KalturaFilter
 		"partnerIdIn" => "_in_partner_id",
 		"sizeGreaterThanOrEqual" => "_gte_size",
 		"sizeLessThanOrEqual" => "_lte_size",
+		"tagsLike" => "_like_tags",
+		"tagsMultiLikeOr" => "_mlikeor_tags",
+		"tagsMultiLikeAnd" => "_mlikeand_tags",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -101,6 +104,27 @@ class KalturaAssetBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $sizeLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsLike;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd;
 
 	/**
 	 * 
