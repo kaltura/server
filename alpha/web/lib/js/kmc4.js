@@ -942,7 +942,7 @@ kmc.layout = {
 			});
 		} );
 		// Add Modal & Overlay divs when page loads
-		$("body").append('<div id="overlay"></div><div id="modal"><div class="title"><h2></h2><span class="close icon"></span></div><div class="content"></div></div>');
+		$("body").append('<div id="mask"></div><div id="overlay"></div><div id="modal"><div class="title"><h2></h2><span class="close icon"></span></div><div class="content"></div></div>');
 	},
 	overlay: {
 		show: function() {$("#overlay").show();},
