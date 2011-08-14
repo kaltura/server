@@ -279,9 +279,9 @@ class KalturaTestDeploymentHelper
 	 */
 	private static function addUsers(KalturaClient $client)
 	{
-		$user1 = $this->createDefualtUser("puser1");
-		$user2 = $this->createDefualtUser("puser2");
-		$user3 = $this->createDefualtUser("puser3");
+		$user1 = self::createDefualtUser("puser1");
+		$user2 = self::createDefualtUser("puser2");
+		$user3 = self::createDefualtUser("puser3");
 		
 		$userAdded1 = $client->user->add($user1);
 		KalturaGlobalData::setData("@TEST_USER1@", $userAdded1->id);
