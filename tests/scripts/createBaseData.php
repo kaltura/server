@@ -268,7 +268,7 @@ class KalturaTestDeploymentHelper
 		$user->email = "$puserId@mailinator.com";
 		$user->firstName = $puserId;
 		$user->fullName = $puserId;
-		$user->password = "1234";
+		$user->password = "Passme1!";
 		return $user;
 	}
 	
