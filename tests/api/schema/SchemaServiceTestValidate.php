@@ -14,6 +14,7 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 		'cuePoint.ingestAPI',
 		'cuePoint.serveAPI',
 		'syndication',
+		'bulkUploadXml.bulkUploadResultXML',
 	);
 	
 	public function testXsd()
