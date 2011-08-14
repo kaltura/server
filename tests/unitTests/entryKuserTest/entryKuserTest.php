@@ -2,33 +2,16 @@
 
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bootstrap.php');
 
+//TODO: fix this test
+
 /**
  * 
  * Tests the kuser changes in the checkAndSetValidUser
  * @author Roni
  *
  */
-class entryKuserTest extends KalturaTestCaseBase
+class entryKuserTest extends KalturaApiTestCase
 {
-	const TEST_PARTNER_ID = 495787;
-	const TEST_ADMIN_SECRET = '2dc17b5563696fceb430a8431a2e4a32';
-	const TEST_USER_SECRET = '526603c21b71f4c43b9751bfcca6f387';
-	
-	/**
-	 * @return Partner
-	 */
-	private function getDbPartner()
-	{
-		return PartnerPeer::retrieveByPK(self::TEST_PARTNER_ID);
-	}
-
-	/**
-	 * 
-	 * The admin kuser id
-	 * @var int
-	 */
-	public $adminKuserId = 2821602; //2821599;
-	
 	/**
 	 * 
 	 * Holds all created entries (for clean up)
@@ -41,79 +24,35 @@ class entryKuserTest extends KalturaTestCaseBase
 	 * Holds the entry id for update
 	 * @var string
 	 */
-	public $entryId = '0_cdnzza3c'; // entry for update to do on
+	public $entryId = null; // entry for update to do on
 	
 	/**
 	 * 
 	 * Holds an existing puser id
 	 * @var string
 	 */
-	public $puser1 = 'test1'; //existing puser 1
+	public $puser1 = null; //existing puser 1
 	
 	/**
 	 * 
 	 * Holds an existing puser id 2
 	 * @var string
 	 */
-	public $puser2 = 'test2'; //Existing puser 2
+	public $puser2 = null; //Existing puser 2
 	
 	/**
 	 * 
 	 * Holds a non existing puser id
 	 * @var string
 	 */
-	public $puser3 = 'test3'; // non existing puser
-	
-	/**
-	 * 
-	 * The test partner id
-	 * @var int
-	 */
-	public $partnerId = 495787;
+	public $puser3 = null; // non existing puser
 
-	/**
-	 * 
-	 * The admin secret for the test partner
-	 * @var string
-	 */
-	public $adminSecret = '2dc17b5563696fceb430a8431a2e4a32';
-		
-	/**
-	 * The user secret for the test partner
-	 * @var string
-	 */
-	public $userSecret = '526603c21b71f4c43b9751bfcca6f387';
-	
 	/**
 	 * 
 	 * The original puser of the given entry
 	 * @var string
 	 */
 	public $originalPuser = null; 
-	
-	/**
-	 * Starts a new session
-	 * @param KalturaSessionType $type
-	 * @param string $userId
-	 */
-	private function startSession($type, $userId = null)
-	{
-		print("start session\n");
-		$secret = ($type == KalturaSessionType::ADMIN) ? self::TEST_ADMIN_SECRET : self::TEST_USER_SECRET;
-		$ks = $this->client->session->start($secret, $userId, $type, self::TEST_PARTNER_ID);
-		$this->assertNotNull($ks);
-		if (!$ks) {
-			return false;
-		}
-		
-		$this->client->setKs($ks);
-		return true;		
-	}
-	
-	/**
-	 * @var KalturaClient
-	 */
-	private $client = null;
 		
 	/**
 	 * 
@@ -123,7 +62,8 @@ class entryKuserTest extends KalturaTestCaseBase
 	private function getKuserIdFromPuser($puserId)
 	{
 		kuserPeer::clearInstancePool();
-		$kuser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $puserId);
+		$partnerId = KalturaGlobalData::getData("@TEST_PARTNER_ID@");
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if($kuser)
 		{
 			print("in getKuserIdFromPuser kuserId [" . $kuser->getId() . "]\n");
@@ -143,7 +83,13 @@ class entryKuserTest extends KalturaTestCaseBase
 		entryPeer::clearInstancePool();
 		$entry = entryPeer::retrieveByPK($entryId);
 		print("in getKuserIdFromEntry kuserId [ ". $entry->getKuserId() ."]\n");
-		return $entry->getKuserId();
+		
+		$kuserId = null;
+		
+		if($entry)
+			$kuserId = $entry->getKuserId();
+		
+		return $kuserId;
 	}
 	
 	/**
@@ -194,13 +140,6 @@ class entryKuserTest extends KalturaTestCaseBase
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
-		if (!self::TEST_PARTNER_ID || !self::TEST_ADMIN_SECRET || !self::TEST_USER_SECRET)
-		{
-	     	die('Test partners were not defined - quitting test!');
-		}
-		
-		parent::setUp ();
-		$this->client = $this->getClient(self::TEST_PARTNER_ID);
 		entryPeer::clearInstancePool();
 		kuserPeer::clearInstancePool();
 		PartnerPeer::clearInstancePool();
@@ -213,7 +152,6 @@ class entryKuserTest extends KalturaTestCaseBase
 		kuserPeer::clearInstancePool();
 		PartnerPeer::clearInstancePool();
 		entryPeer::clearInstancePool();
-//		$this->clearEntries();
 		
 		$this->client = null;		
 		
@@ -242,27 +180,13 @@ class entryKuserTest extends KalturaTestCaseBase
 	
 	/**
 	 * 
-	 * Clears all created entries
-	 */
-	private function clearEntries()
-	{
-		foreach ($this->createdEntries as $id => $entry) {
-			$obj = entryPeer::retrieveByPK($id);
-				if ($obj) {
-					$obj->delete();
-				}
-		}
-		
-	} 
-	
-	/**
-	 * 
 	 * Deletes the given Kuser 
 	 */
 	private function deleteKuser($puserToDelete)
 	{
 		kuserPeer::clearInstancePool();
-		$kuser = kuserPeer::getKuserByPartnerAndUid(self::TEST_PARTNER_ID, $puserToDelete);
+		$partnerId = KalturaGlobalData::getData("@TEST_PARTNER_ID@");
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserToDelete);
 
 		if($kuser)
 		{
@@ -280,7 +204,9 @@ class entryKuserTest extends KalturaTestCaseBase
 	 */
 	private function getAdminKuserId()
 	{
-		return $this->adminKuserId;
+		$partnerId = KalturaGlobalData::getData("@TEST_PARTNER_ID@");
+		$puserId = KalturaGlobalData::getData("TEST_PARTNER_USER_ID");
+		KuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 	}
 	
 	/**
@@ -336,11 +262,6 @@ class entryKuserTest extends KalturaTestCaseBase
 	 */
 	private function addEntryTest($ksType, $puserId, $shouldFail = false, $errorCode = null)
 	{
-		if(!$this->startSession($ksType, $puserId))
-		{
-			$this->fail("Unable to start session");
-		}
-		
 		$entry = $this->createDefaultEntry($puserId);
 		
 		print("Before call\n");
@@ -377,21 +298,26 @@ class entryKuserTest extends KalturaTestCaseBase
 	
 	/**
 	 * 
-	 * Tests insertion of new entry (and different users) 
+	 * Tests insertion of new entry (and different users)
+	 * @dataProvider provideData 
 	 */
-	public function testAddAction()
+	public function testAddAction($puser1, $puser2, $puser3)
 	{
+		$this->puser1 = $puser1; 
+		$this->puser2 = $puser2;
+		$this->puser3 = $puser3;
+		
 		print("Testing Admin KS adds\n");
 		//Add with admin KS - admin / user existing / not existing
 		print("Test1 KS [Admin], puser [null]\n");
 		$this->addEntryTest(KalturaSessionType::ADMIN, null);
 		
 		print("Test2 KS [Admin], puser [test1] existent \n");
-		$this->addEntryTest(KalturaSessionType::ADMIN, $this->puser1); // existing
+		$this->addEntryTest(KalturaSessionType::ADMIN, $puser1); // existing
 		
 		print("Test3 KS [Admin], puser [test3] non existent\n");
 		$this->deleteKuser($this->puser3); //check that puser 3 is non existing
-		$this->addEntryTest(KalturaSessionType::ADMIN, $this->puser3);
+		$this->addEntryTest(KalturaSessionType::ADMIN, $puser3);
 		
 		print("Testing User KS adds\n");
 		//Add with user KS - user / other user existing / not existing
@@ -399,11 +325,11 @@ class entryKuserTest extends KalturaTestCaseBase
 		$this->addEntryTest(KalturaSessionType::USER, null, true, array('SERVICE_FORBIDDEN'));
 		
 		print("Test5 KS [User], puser [test1] existing\n");
-		$this->addEntryTest(KalturaSessionType::USER, $this->puser1); // existing
+		$this->addEntryTest(KalturaSessionType::USER, $puser1); // existing
 				
 		print("Test6 KS [User], puser [test3] non existent\n");
 		$this->deleteKuser($this->puser3); //check that puser 3 is non existing
-		$this->addEntryTest(KalturaSessionType::USER, $this->puser3, true, array('SERVICE_FORBIDDEN'));
+		$this->addEntryTest(KalturaSessionType::USER, $puser3, true, array('SERVICE_FORBIDDEN'));
 	}
 	
 	/**
@@ -422,38 +348,44 @@ class entryKuserTest extends KalturaTestCaseBase
 	/**
 	 * 
 	 * Test if the user update is valid
+	 * @dataProvider provideData 
 	 */
-	public function testUpdateAction()
+	public function testUpdateAction($puser1, $puser2, $puser3, $entryId)
 	{
+		$this->puser1 = $puser1; 
+		$this->puser2 = $puser2;
+		$this->puser3 = $puser3;
+		$this->entryId = $entryId;
+		
 		print("\nUpdate tests started\n");
 		$this->startSession(KalturaSessionType::ADMIN);
 		
-		$entry = $this->client->baseEntry->get($this->entryId);
+		$entry = $this->client->baseEntry->get($entryId);
 		$updatedEntry = $this->createEntryForUpdate($entry);
 		
 		$this->originalPuser = $entry->userId;
 						
-		$originalKuser = $this->getKuserIdFromEntry($this->entryId);
+		$originalKuser = $this->getKuserIdFromEntry($entryId);
 		
 		print ("original puser [$this->originalPuser], original kuser [$originalKuser]\n");
 		$updatedEntry = $this->switchUsers($updatedEntry);
 		
 		print("Before update call\n");
-		$result = $this->client->baseEntry->update($this->entryId, $updatedEntry);
+		$result = $this->client->baseEntry->update($entryId, $updatedEntry);
 		
 		if(!$result instanceof KalturaMediaEntry)
 		{
 			$this->fail("Entry was not updated " . var_dump($result) . "\n");
 		}
 		
-		$updatedEntry = $this->client->baseEntry->get($this->entryId);
+		$updatedEntry = $this->client->baseEntry->get($entryId);
 		//var_dump($updatedEntry);
 		
 		print("updatedEntry->userId [$updatedEntry->userId], originalPuser [$this->originalPuser] \n");
 		if($updatedEntry->userId != $this->originalPuser) // puser was update we now check if the kuser was changed as well
 		{
 			$newKuserId = $this->getKuserIdFromPuser($updatedEntry->userId);
-			$entryKuserId = $this->getKuserIdFromEntry($this->entryId);
+			$entryKuserId = $this->getKuserIdFromEntry($entryId);
 			if($newKuserId == $entryKuserId)
 			{
 				//if the kusers are the same then all is okay
@@ -497,23 +429,5 @@ class entryKuserTest extends KalturaTestCaseBase
 		{
 			$this->checkException($e, array('INVALID_KS', 'PROPERTY_VALIDATION_ADMIN_PROPERTY'));
 		}
-	}
-	
-	/**
-	 * @param int $partnerId
-	 * @return KalturaClient
-	 */
-	private function getClient($partnerId)
-	{
-		if ($partnerId) {
-			$config = new KalturaConfiguration($partnerId);
-		}
-		else {
-			$config = new KalturaConfiguration();
-		}
-		
-		$config->serviceUrl = 'devtests.kaltura.co.cc';//kConf::get('apphome_url');
-		$client = new KalturaClient($config);
-		return $client;
 	}
 }

@@ -251,8 +251,46 @@ class KalturaTestDeploymentHelper
 		$flavorAssest = $client->flavorParams->listAction();
 		KalturaGlobalData::setData("@DEFAULT_FLAVOR_PARAMS_ID@", $flavorAssest->objects[0]->id);
 		
+		self::addUsers($client);
 		self::addMetadataSearchData($client);
 		self::addDWHdata($client);
+	}
+	
+	/**
+	 * 
+	 * Creates the default puser
+	 * @param string $puserId
+	 */
+	private static function createDefualtUser($puserId)
+	{
+		$user = new KalturaUser();
+		$user->id = $puserId;
+		$user->email = "$puserId@mailinator.com";
+		$user->firstName = $puserId;
+		$user->fullName = $puserId;
+		$user->password = "1234";
+		return $user;
+	}
+	
+	/**
+	 * 
+	 * Adds asnd sets the test partner users 
+	 * @param unknown_type $client
+	 */
+	private static function addUsers(KalturaClient $client)
+	{
+		$user1 = $this->createDefualtUser("puser1");
+		$user2 = $this->createDefualtUser("puser2");
+		$user3 = $this->createDefualtUser("puser3");
+		
+		$userAdded1 = $client->user->add($user1);
+		KalturaGlobalData::setData("@TEST_USER1@", $userAdded1->id);
+		
+		$userAdded2 = $client->user->add($user2);
+		KalturaGlobalData::setData("@TEST_USER2@", $userAdded2->id);
+		
+		$userAdded3 = $client->user->add($user3);
+		KalturaGlobalData::setData("@TEST_USER3@", $userAdded3->id);
 	}
 	
 	/**

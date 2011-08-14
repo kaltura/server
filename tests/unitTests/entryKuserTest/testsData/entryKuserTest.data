@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="entryKuserTest">
+  <TestProcedureData testProcedureName="testAddAction">
+    <TestCaseData testCaseInstanceName="testAddAction with data set #0">
+		<Input type='string' key='@TEST_PUSER1@'/>
+		<Input type='string' key='@TEST_PUSER2@'/>
+		<Input type='string' key='@TEST_PUSER3@'/>
+	</TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdateAction">
+    <TestCaseData testCaseInstanceName="testUpdateAction with data set #0">
+		<Input type='string' key='@TEST_PUSER1@'/>
+		<Input type='string' key='@TEST_PUSER2@'/>
+		<Input type='string' key='@TEST_PUSER3@'/>
+		<Input type='string' key='@DEFUALT_ENTRY_ID@'/>
+	</TestCaseData>
+  </TestProcedureData>
+</TestCaseData>
