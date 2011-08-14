@@ -30,6 +30,7 @@ KCodeExampleBase.prototype.service = null;
 KCodeExampleBase.prototype.action = null;
 KCodeExampleBase.prototype.params = null;
 
+KCodeExampleBase.prototype.importsArray = {};
 KCodeExampleBase.prototype.jqImports = null;
 KCodeExampleBase.prototype.jqActionImports = null;
 
@@ -120,10 +121,13 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 		
 		if(nameParts.length > 1){
 			var objectName = "";
+			var objectTempName = "";
 			var jqObject = null;
 			for(var i = 0; i < nameParts.length; i++){
 				var attribute = nameParts[i];
 				objectName = objectName ? objectName + "_" + attribute : attribute;
+				var attributeName = attribute.charAt(0).toUpperCase() + attribute.substr(1);
+				objectTempName = objectTempName ? objectTempName + attributeName : attribute;
 
 				if(jqObject){
 					if(isNaN(attribute)){
@@ -134,7 +138,7 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 					}
 				}
 				else{
-					jqObject = scope.codeVar(objectName);
+					jqObject = scope.codeVar(objectTempName);
 				}
 				
 				var jqType = jQuery("#object-type-" + objectName);
@@ -142,41 +146,110 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 
 					addedObjects[objectName] = true;
 					
-					var jqNewInstance;
+					var objectType;
+					var jqNewInstance = null;
 					if(jqType.hasClass("array-type")){
-						var objectType = jqType.text();
+						//var objectType = jqType.text();
 						var arrayObjectType = jqType.next().text();
+						objectType = scope.getArrayType(arrayObjectType);
 						jqNewInstance = scope.codeNewArray(arrayObjectType);
 					}
 					else{
-						var objectType = jqType.find("option:selected").text();
+						objectType = jqType.find("option:selected").text();
 						jqNewInstance = scope.codeNewInstance(objectType);
 					}
-						
-					var jqAssign = scope.codeAssign(jqObject, jqNewInstance);
-					scope.addCode(jqAssign, scope.jqParams);
+
+					if(objectName != attribute){
+						jqObject = scope.codeVar(objectTempName);
+						var jqTempParamDef = scope.codeVarDefine(jqObject.clone(), objectType);
+						var jqTempParamDeclare = scope.codeDeclareVar(jqTempParamDef.clone(), objectType, jqNewInstance);
+						scope.addCode(jqTempParamDeclare, scope.jqParams);
+					}
+					else{
+						var jqAssign = scope.codeAssign(jqObject, jqNewInstance);
+						scope.addCode(jqAssign, scope.jqParams);
+					}
 				}
 			}
 		}
 		
-		var jqVar = scope.codeVar(nameParts.shift());
+		var objectName = nameParts.shift();
+		var jqVar = scope.codeVar(objectName);
 		
 		if(nameParts.length){
+			var attribute = null;
 			for(var i = 0; i < nameParts.length; i++){
-				var attribute = nameParts[i];
-
-				if(isNaN(attribute)){
-					jqVar = scope.codeObjectAttribute(jqVar, attribute);
-				}
-				else{
-					jqVar = scope.codeArrayItem(jqVar, attribute);
-				}
+				attribute = nameParts[i];
+				if(i == nameParts.length - 1)
+					continue;
+				
+				var attributeName = attribute.charAt(0).toUpperCase() + attribute.substr(1);
+				objectName = objectName + attributeName;
+			}
+			
+			jqVar = scope.codeVar(objectName);
+			if(isNaN(attribute)){
+				jqVar = scope.codeObjectAttribute(jqVar, attribute);
+			}
+			else{
+				jqVar = scope.codeArrayItem(jqVar, attribute);
 			}
 		}
 		
 		var jqAssign = scope.codeAssign(jqVar, params[name]);
 		scope.addCode(jqAssign, scope.jqParams);
 	}
+
+	var addedObjects = new Object();
+	var objectsAssignes = new Array();
+	for(var name in params){
+		var nameParts = name.split(":");
+		
+		while(nameParts.length > 2){
+			var objectName = nameParts.join("_");
+			var lastAttribute = nameParts.pop();
+			
+			if(addedObjects[objectName])
+				continue;
+			addedObjects[objectName] = true;
+
+			var jqType = jQuery("#object-type-" + objectName);
+			if(!jqType.size())
+				continue;
+
+			var objectTempName = nameParts[0];
+			
+//			var jqObject = scope.codeVar(nameParts[0]);
+			for(var i = 1; i < nameParts.length; i++){
+				var attribute = nameParts[i];
+				
+				objectTempName += attribute.charAt(0).toUpperCase() + attribute.substr(1);
+
+//				if(isNaN(attribute)){
+//					jqObject = scope.codeObjectAttribute(jqObject.clone(), attribute);
+//				}
+//				else{
+//					jqObject = scope.codeArrayItem(jqObject.clone(), attribute);
+//				}
+			}
+			var jqTempObject = scope.codeVar(objectTempName + lastAttribute.charAt(0).toUpperCase() + lastAttribute.substr(1));
+			var jqObject = scope.codeVar(objectTempName);
+
+			if(isNaN(lastAttribute)){
+				jqObject = scope.codeObjectAttribute(jqObject.clone(), lastAttribute);
+				var jqAssign = scope.codeAssign(jqObject.clone(), jqTempObject.clone());
+				objectsAssignes.push(jqAssign);
+			}
+			else{
+				var jqFunction = scope.codeUserFunction("add", [lastAttribute, jqTempObject]);
+				var jqMethod = scope.codeObjectMethod(jqObject.clone(), jqFunction);
+				objectsAssignes.push(jqMethod);
+			}
+		}
+	}
+	
+	while(objectsAssignes.length)
+		scope.addCode(objectsAssignes.pop(), scope.jqParams);
 };
 
 KCodeExampleBase.prototype.setAction = function (service, action, params){
@@ -189,6 +262,7 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 	}
 	
 	if(this.jqActionImports){
+		this.importsArray = new Object();
 		this.jqActionImports.empty();
 	}
 
@@ -201,10 +275,22 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 	
 	if(params){
 		for(var i = 0; i < params.length; i++){
+			var paramType = params[i].type;
+			//var arrayObjectType = null;
+			var jqType = jQuery("#object-type-" + params[i].name);
+			if(jqType.size()){
+				if(jqType.hasClass("array-type")){
+					paramType = 'array';
+					//arrayObjectType = jqType.next().text();
+				}
+				else{
+					paramType = jqType.find("option:selected").text();
+				}
+			}
+			
 			var jqParam = this.codeVar(params[i].name);
-			var jqParamDef = this.codeVarDefine(jqParam, params[i].type);
-			var jqParamDeclare = this.codeDeclareVar(jqParamDef.clone(), params[i].type);
-//			var jqAssignNull = this.codeAssign(jqParamDef.clone());
+			var jqParamDef = this.codeVarDefine(jqParam.clone(), paramType);
+			var jqParamDeclare = this.codeDeclareVar(jqParamDef, paramType);
 			this.addCode(jqParamDeclare, jqInitParams);
 			jqActionArgs.push(jqParam);
 		}
@@ -229,11 +315,16 @@ KCodeExampleBase.prototype.setChangeEvent = function (){
 };
 
 KCodeExampleBase.prototype.addCode = function (code, entity){
+	if(!code)
+		return;
+	
 	if(!entity)
 		entity = this.jqEntity;
 	
 	entity.append(code);
 	entity.append("<br/>");
+	
+	return entity;
 };
 
 KCodeExampleBase.prototype.codePackage = function (packageName){
@@ -246,6 +337,10 @@ KCodeExampleBase.prototype.codePackage = function (packageName){
 };
 
 KCodeExampleBase.prototype.codeImport = function (packageName){
+	if(this.importsArray[packageName])
+		return null;
+	this.importsArray[packageName] = true;
+	
 	var jqCode = jQuery("<span/>");
 
 	jqCode.append("<span class=\"code-" + this.lang + "-system\">import </span>");
@@ -254,7 +349,7 @@ KCodeExampleBase.prototype.codeImport = function (packageName){
 	return jqCode;
 };
 
-KCodeExampleBase.prototype.codeDeclareVar = function (jqObjectDef, type){
+KCodeExampleBase.prototype.codeDeclareVar = function (jqObjectDef, type, newValue){
 	return jqObjectDef;
 };
 
@@ -457,6 +552,10 @@ KCodeExampleBase.prototype.codeNewArray = function (className){
 	return "array";
 };
 
+KCodeExampleBase.prototype.getArrayType = function (className){
+	return "array";
+};
+
 KCodeExampleBase.prototype.codeNewInstance = function (className, constructorArgs){
 	var bracketCounter = this.bracketsCounter++;
 	var jqCode = jQuery("<span class=\"code-" + this.lang + "-new-instance code-" + this.lang + "-system\"/>");
@@ -483,7 +582,9 @@ KCodeExampleBase.prototype.codeNewInstance = function (className, constructorArg
 };
 
 KCodeExampleBase.prototype.codeString = function (str){
-	return jQuery("<span class=\"code-" + this.lang + "-str\">\"" + str + "\"</span>");
+	if(isNaN(str) || !str.length)
+		return jQuery("<span class=\"code-" + this.lang + "-str\">\"" + str + "\"</span>");
+	return jQuery("<span class=\"code-" + this.lang + "-str\">" + str + "</span>");
 };
 
 KCodeExampleBase.prototype.codeHeader = function (){};
@@ -525,16 +626,23 @@ KCodeExamplePHP.prototype.codeHeader = function (){
 };
 
 KCodeExamplePHP.prototype.addCode = function (code, entity){
+	if(!code)
+		return;
+	
 	code.append(";");
 	KCodeExampleBase.prototype.addCode.apply(this, arguments);
 };
 
-KCodeExamplePHP.prototype.codeDeclareVar = function (jqObjectDef, type){
-	return this.codeAssign(jqObjectDef);
+KCodeExamplePHP.prototype.codeDeclareVar = function (jqObjectDef, type, newValue){
+	return this.codeAssign(jqObjectDef, newValue);
 };
 
 KCodeExamplePHP.prototype.codeNewArray = function (className){
 	return "array()";
+};
+
+KCodeExamplePHP.prototype.getArrayType = function (className){
+	return "";
 };
 
 KCodeExamplePHP.prototype.codeNewInstance = function (className, constructorArgs){
@@ -542,7 +650,7 @@ KCodeExamplePHP.prototype.codeNewInstance = function (className, constructorArgs
 		return this.codeNewArray();
 	
 	return KCodeExampleBase.prototype.codeNewInstance.apply(this, arguments);
-}
+};
 
 KCodeExamplePHP.prototype.codeVarDefine = function (jqObject, type){
 	return jqObject;
@@ -554,7 +662,9 @@ KCodeExamplePHP.prototype.codeVar = function (name){
 };
 
 KCodeExamplePHP.prototype.codeString = function (str){
-	return jQuery("<span class=\"code-" + this.lang + "-str\">'" + str + "'</span>");
+	if(isNaN(str) || !str.length)
+		return jQuery("<span class=\"code-" + this.lang + "-str\">'" + str + "'</span>");
+	return jQuery("<span class=\"code-" + this.lang + "-str\">" + str + "</span>");
 };
 
 
@@ -579,36 +689,55 @@ KCodeExampleJava.prototype.getService = function (service){
 };
 
 KCodeExampleJava.prototype.addCode = function (code, entity){
+	if(!code)
+		return;
+	
 	code.append(";");
 	KCodeExampleBase.prototype.addCode.apply(this, arguments);
 };
 
-KCodeExampleJava.prototype.codeDeclareVar = function (jqObjectDef, type){
+KCodeExampleJava.prototype.codeDeclareVar = function (jqObjectDef, type, newValue){
 	switch(type){
 		case "int":
-			return this.codeAssign(jqObjectDef, "0");
+			return this.codeAssign(jqObjectDef, newValue ? newValue : "0");
 
 		case "bool":
-			return this.codeAssign(jqObjectDef, "false");
+			return this.codeAssign(jqObjectDef, newValue ? newValue : "false");
 			
 		default:
-			return this.codeAssign(jqObjectDef);
+			return this.codeAssign(jqObjectDef, newValue);
 	}
 };
 
 KCodeExampleJava.prototype.codeNewArray = function (className){
+	this.addCode(this.codeImport("java.util.ArrayList"), this.jqActionImports);
+	
 	if(className)
 		return this.codeNewInstance("ArrayList&lt;" + className + "&gt;");
-	
 	return this.codeNewInstance("ArrayList");
 };
 
+KCodeExampleJava.prototype.getArrayType = function (className){
+	this.addCode(this.codeImport("java.util.ArrayList"), this.jqActionImports);
+	
+	if(className)
+		return "ArrayList&lt;" + className + "&gt;";
+	return "ArrayList";
+};
+
+KCodeExampleJava.prototype.codeArrayItem = function (jqObject, index){
+	var jqGet = this.codeUserFunction("get", [this.codeString(index)]);
+	return this.codeObjectMethod(jqObject, jqGet);
+};
+
 KCodeExampleJava.prototype.codeNewInstance = function (className, constructorArgs){
-	if(className == "array")
+	if(className == "array"){
+		this.addCode(this.codeImport("java.util.ArrayList"), this.jqActionImports);
 		className = "ArrayList";
+	}
 	
 	return KCodeExampleBase.prototype.codeNewInstance.apply(this, arguments);
-}
+};
 
 KCodeExampleJava.prototype.codeVarDefine = function (jqObject, type){
 
@@ -628,7 +757,8 @@ KCodeExampleJava.prototype.codeVarDefine = function (jqObject, type){
 			break;
 			
 		default:
-			this.addCode(this.codeImport("com.kaltura.client.types." + type), this.jqActionImports);
+			if(type.indexOf("ArrayList") < 0)
+				this.addCode(this.codeImport("com.kaltura.client.types." + type), this.jqActionImports);
 			break;
 	}
 		
@@ -639,6 +769,7 @@ KCodeExampleJava.prototype.codeHeader = function (){
 
 	this.addCode(this.codePackage("com.kaltura.code.example"));
 	
+	this.importsArray = {};	
 	this.jqImports = jQuery("<div class=\"code-java-imports\"/>");
 	this.jqActionImports = jQuery("<div class=\"code-java-action-imports\"/>");
 	this.jqEntity.append(this.jqImports);
@@ -725,6 +856,9 @@ KCodeExampleCsharp.prototype.getService = function (service){
 };
 
 KCodeExampleCsharp.prototype.addCode = function (code, entity){
+	if(!code)
+		return;
+	
 	code.append(";");
 	KCodeExampleBase.prototype.addCode.apply(this, arguments);
 };
@@ -751,16 +885,16 @@ KCodeExampleCsharp.prototype.codePackage = function (packageName, jqBode){
 	return jqCode;
 };
 
-KCodeExampleCsharp.prototype.codeDeclareVar = function (jqObjectDef, type){
+KCodeExampleCsharp.prototype.codeDeclareVar = function (jqObjectDef, type, newValue){
 	switch(type){
 		case "int":
-			return this.codeAssign(jqObjectDef, "0");
+			return this.codeAssign(jqObjectDef, newValue ? newValue : "0");
 
 		case "bool":
-			return this.codeAssign(jqObjectDef, "false");
+			return this.codeAssign(jqObjectDef, newValue ? newValue : "false");
 			
 		default:
-			return this.codeAssign(jqObjectDef);
+			return this.codeAssign(jqObjectDef, newValue);
 	}
 };
 
@@ -771,12 +905,18 @@ KCodeExampleCsharp.prototype.codeNewArray = function (className){
 	return this.codeNewInstance("List");
 };
 
+KCodeExampleCsharp.prototype.getArrayType = function (className){
+	if(className)
+		return "List&lt;" + className + "&gt;";
+	return "List";
+};
+
 KCodeExampleCsharp.prototype.codeNewInstance = function (className, constructorArgs){
 	if(className == "array")
 		className = "List";
 	
 	return KCodeExampleBase.prototype.codeNewInstance.apply(this, arguments);
-}
+};
 
 KCodeExampleCsharp.prototype.codeVarDefine = function (jqObject, type){
 

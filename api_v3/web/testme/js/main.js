@@ -256,6 +256,11 @@ KTestMe.prototype = {
 		jqObjectType.append("<option>" + param.type + "</option>");
 		
 		var scope = this;
+
+		jqObjectType.change(function(){
+			scope.loadActionCodeExample();
+		});
+		
 		var objectTypesProps = new Object();
 		
 		var jqObjectProperties = jQuery("<div class=\"object-properties\">");
@@ -294,8 +299,9 @@ KTestMe.prototype = {
 		jqObjectTitle.append(jqObjectType);
 		
 		this.jqObjectsContainer.append(jqObjectProperties);
-		
-		var propsPoper = {
+
+		var propsPoper = {};
+		propsPoper = {
 				currentPropsWindow: jqObjectProperties,
 				click: function(e){
 					var objectPropsId = propsPoper.currentPropsWindow.attr('id');
@@ -579,7 +585,10 @@ KTestMe.prototype = {
 			generator = new KCodeExamplePHP(jQuery("#example"));
 		
 		this.codeGenerator = generator;
-
+		this.loadActionCodeExample();
+	},
+	
+	loadActionCodeExample: function() {
 		if(!this.actionInfo)
 			return;
 
@@ -587,8 +596,6 @@ KTestMe.prototype = {
 		var action = this.jqActions.find("option:selected").text();
 		
 		this.codeGenerator.setAction(service, action, this.actionInfo.actionParams);
-		this.codeGenerator.setChangeEvent();
-		this.codeGenerator.onParamsChange();
 	}
 };
 
