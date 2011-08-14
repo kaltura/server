@@ -118,13 +118,13 @@ class Form_DropFolderConfigure extends Infra_Form
 		$this->addElement($titleElement);
 		
 		$this->addElement('text', 'dc', array(
-			'label' 		=> 'Data Center:',
+			'label' 		=> 'Drop Folder Batch Jobs Datacenter Location:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'path', array(
-			'label' 		=> 'Folder Path:',
+			'label' 		=> 'Drop Folder Storage Path:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
