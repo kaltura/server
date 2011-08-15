@@ -1,4 +1,3 @@
-
 <?php 
 
 //Includes all needed data from the Server / API (Use a subset if you wish)
