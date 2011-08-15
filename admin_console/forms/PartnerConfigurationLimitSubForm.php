@@ -56,6 +56,20 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
               array('Label'),
               array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatRight',)),
 		));
+		
+		$form->addElement('text',  $this->limitType.'_overageUnit', array(
+			'label'			=> 'Overage Unit:',
+			'filters'		=> array('StringTrim'),
+			//'decorators'	=> array('Label', 'ViewHelper', array('HtmlTag',array('tag'=>'div','closeOnly'=>true, 'class' =>'includeUsage'))),
+		));
+		$element = $form->getElement($this->limitType.'_overageUnit');
+		$element->setBelongsTo($this->limitType);
+		
+		$element->addDecorators(array(
+              'ViewHelper',
+              array('Label'),
+              array(array('row' => 'HtmlTag'), array('tag' => 'div','class'=>'includeUsageFloatRight',)),
+		));
 	}
 	
 	public function populateFromObject($form, $object, $add_underscore = true)

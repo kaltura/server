@@ -218,10 +218,10 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::SCP' => 'SCP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP' => 'SFTP',
 
-	'Kaltura_Client_Enum_StorageServePriority::KALTURA_ONLY' => 'Kaltura Storage Only',
-	'Kaltura_Client_Enum_StorageServePriority::KALTURA_FIRST' => 'Kaltura Storage First',
-	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_ONLY' => 'External Storage Only',
-	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST' => 'External Storage First',
+	'Kaltura_Client_Enum_StorageServePriority::KALTURA_ONLY' => 'Kaltura Only',
+	'Kaltura_Client_Enum_StorageServePriority::KALTURA_FIRST' => 'Kaltura First',
+	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_ONLY' => 'Remote Storage Only',
+	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST' => 'Remote Storage First',
 
 	'Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::ENABLED' => 'Enabled',
 	'Kaltura_Client_ContentDistribution_Enum_DistributionProfileStatus::DISABLED' => 'Disabled',
@@ -231,9 +231,9 @@ return array(
 	'partner not found' => 'Publisher not found',
 
 	//partner group type
-	'Kaltura_Client_Enum_PartnerGroupType::PUBLISHER' => 'Publisher',
-	'Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP' => 'VAR',
-	'Kaltura_Client_Enum_PartnerGroupType::GROUP' => 'Group',
+	'Kaltura_Client_Enum_PartnerGroupType::PUBLISHER' => 'Publisher Account',
+	'Kaltura_Client_Enum_PartnerGroupType::VAR_GROUP' => 'VAR Parent Account (Non-Aggreagated Billing)',
+	'Kaltura_Client_Enum_PartnerGroupType::GROUP' => 'Group Parent Account (Aggregated Billing)',
 
 
 	// login
