@@ -2468,11 +2468,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		return array("entry:id=".$this->getId());
 	}
 	
-	public function copyTemplate()
+	/**
+	 * @return entry
+	 */
+	public function copyTemplate($coptPartnerId = false)
 	{
 		// we use get_class(), because this might be a subclass
 		$clazz = get_class($this);
 		$copyObj = new $clazz();
+		/* @var $copyObj entry */
 		
 		$copyObj->setKuserId($this->kuser_id);
 		$copyObj->setName($this->name);
@@ -2501,6 +2505,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		$copyObj->setCategoriesIds($this->categories_ids);
 // 		$copyObj->setStartDate($this->start_date);
 // 		$copyObj->setEndDate($this->end_date);
+
+		if($coptPartnerId)
+			$copyObj->setPartnerId($this->getPartnerId());
 		
 		$copyObj->setNew(true);
 		$copyObj->setCopiedFrom($this);
