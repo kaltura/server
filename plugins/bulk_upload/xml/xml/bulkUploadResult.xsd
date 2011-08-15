@@ -4,6 +4,7 @@
 		<xs:sequence>
 			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1"/>
 		</xs:sequence>
+		<xs:attribute name="version" use="optional" type="xs:string" />
 	</xs:complexType>
 	
 	<xs:complexType name="T_channel">
