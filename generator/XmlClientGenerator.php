@@ -11,6 +11,11 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
      */
     private $_xmlElement = null;
     
+    /**
+     * @var array
+     */
+    private $_requiredPlugins = array();
+    
     public function XmlClientGenerator()
     {
         parent::ClientGeneratorFromPhp();
@@ -75,12 +80,10 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		    
 			$serviceElement->setAttribute("description", $description);
 		
-			$package = $serviceReflector->getPackage();
-			if(is_string($package))
+			$plugin = $this->extractPluginNameFromPackage($serviceReflector->getPackage());
+			if($plugin)
 			{
-				$packages = explode('.', $package, 2);
-				if(count($packages) == 2 && $packages[0] == 'plugins')
-					$serviceElement->setAttribute("plugin", $packages[1]);
+				$serviceElement->setAttribute("plugin", $plugin);
 			}
 		
 			$actions = $serviceReflector->getActions();
@@ -121,16 +124,40 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	
 	private function appendPlugins(DOMElement $pluginsElement)
 	{
-		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaServices');
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlugin');
 		foreach($pluginInstances as $pluginInstance)
 	    	$this->appendPlugin($pluginsElement, $pluginInstance);
 	}
 	
 	private function appendPlugin(DOMElement $pluginsElement, IKalturaPlugin $pluginInstance)
 	{
-    	$pluginElement = $this->_doc->createElement("plugin");
+    	$pluginServices = $pluginInstance->getInstance('IKalturaServices');
+    	if (!$pluginServices && !in_array($pluginInstance->getPluginName(), $this->_requiredPlugins))
+    	{
+    		return;
+    	}
+    	
+		$pluginElement = $this->_doc->createElement("plugin");
     	$pluginElement->setAttribute('name', $pluginInstance->getPluginName());
-    	$this->appendPluginServices($pluginInstance->getPluginName(), $pluginElement, $pluginInstance);
+    	
+    	$dependencyInterface = $pluginInstance->getInstance('IKalturaPending');
+    	if ($dependencyInterface)
+    	{
+    		$dependencyList = $dependencyInterface->dependsOn();
+    		
+    		foreach ($dependencyList as $dependency)
+    		{
+    			$dependencyElement = $this->_doc->createElement("dependency");
+    			$dependencyElement->setAttribute('pluginName', $dependency->getPluginName());    			
+    			$pluginElement->appendChild($dependencyElement);
+    		}
+    	}
+
+    	if ($pluginServices)
+    	{
+    		$this->appendPluginServices($pluginInstance->getPluginName(), $pluginElement, $pluginServices);
+    	}
+    	
     	$pluginsElement->appendChild($pluginElement);
 	}
 	
@@ -151,6 +178,22 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
     	}
 	}
 	
+	protected function extractPluginNameFromPackage($package)
+	{ 
+		if(!is_string($package))
+			return null;
+			
+		$packages = explode('.', $package, 2);
+		if(count($packages) != 2 || $packages[0] != 'plugins')
+			return null;
+			
+		$pluginName = $packages[1];
+		if (!in_array($pluginName, $this->_requiredPlugins))
+			$this->_requiredPlugins[] = $pluginName;
+		
+		return $pluginName;
+	}
+	
 	private function getEnumElement(KalturaTypeReflector $typeReflector)
 	{
 	    $enumElement = $this->_doc->createElement("enum");
@@ -160,12 +203,10 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		else if ($typeReflector->isStringEnum())
 			$enumElement->setAttribute("enumType", "string");
 			
-		$package = $typeReflector->getPackage();
-		if(is_string($package))
+		$plugin = $this->extractPluginNameFromPackage($typeReflector->getPackage());
+		if($plugin)
 		{
-			$packages = explode('.', $package, 2);
-			if(count($packages) == 2 && $packages[0] == 'plugins')
-				$enumElement->setAttribute("plugin", $packages[1]);
+			$enumElement->setAttribute("plugin", $plugin);
 		}
 		
 		$contants = $typeReflector->getConstants();
@@ -203,12 +244,10 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
             $classElement->setAttribute("base", $parentType);    		        
 	    }
 	    
-		$package = $typeReflector->getPackage();
-		if(is_string($package))
+		$plugin = $this->extractPluginNameFromPackage($typeReflector->getPackage());
+		if($plugin)
 		{
-			$packages = explode('.', $package, 2);
-			if(count($packages) == 2 && $packages[0] == 'plugins')
-				$classElement->setAttribute("plugin", $packages[1]);
+			$classElement->setAttribute("plugin", $plugin);
 		}
 		
 		$description = $typeReflector->getDescription();

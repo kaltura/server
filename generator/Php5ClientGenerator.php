@@ -104,12 +104,17 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		    $this->writePlugin($plugin);
 	}
 	
+	function getPluginClassName($pluginName)
+	{
+		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+	}
+	
 	function writePlugin(KalturaPlugin $plugin)
 	{
 		$pluginName = $plugin->getPluginName();
 		
 		$xpath = new DOMXPath($this->_doc);
-		$pluginClassName = "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+		$pluginClassName = $this->getPluginClassName($pluginName);
 		
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
@@ -125,6 +130,12 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaClientBase.php");');
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaEnums.php");');
 		$this->appendLine('require_once(dirname(__FILE__) . "/../KalturaTypes.php");');
+
+		$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
+		foreach($dependencyNodes as $dependencyNode)
+			$this->appendLine('require_once(dirname(__FILE__) . "/' . 
+				$this->getPluginClassName($dependencyNode->getAttribute("pluginName")) . '.php");');
+
 		$this->appendLine('');
 		
 		$classsAdded = false;
