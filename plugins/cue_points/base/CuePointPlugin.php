@@ -103,7 +103,7 @@ class CuePointPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		</xs:sequence>
 	</xs:complexType>	
 	
-	<xs:complexType name="T_scene">
+	<xs:complexType name="T_scene" abstract="true">
 		<xs:sequence>
 			<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time" />
 			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />

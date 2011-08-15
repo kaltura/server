@@ -117,3 +117,7 @@ div.post_fields { line-height:1.5em; }
 .element-example{
 	border: 1px solid black;
 }
+.extensions-title{
+	font-weight: bold;
+	text-decoration: underline;
+}

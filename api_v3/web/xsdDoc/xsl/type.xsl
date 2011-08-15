@@ -136,15 +136,23 @@
 	</xsl:template>
 
 	<xsl:template name="element">
+		<xsl:param name="type" select="@type"/>
 		<xsl:choose>
 			<xsl:when test="string-length(@name)">
+			
 				<hr/>
 				<a name="element-{@name}"/>
-				<span class="element-title"><xsl:value-of select="@name"/> element</span><br/>
+				<span class="element-title"><xsl:value-of select="@name"/> element</span>
+				<xsl:for-each select="/*[local-name() = 'schema']/*[(local-name() = 'complexType' or local-name() = 'simpleType') and @name = $type]">
+					<xsl:if test="@abstract = 'true'"> (abstract)</xsl:if>
+				</xsl:for-each>
+				<br/>
+				
 				<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'documentation']">
-					<span class="element-description"><xsl:value-of select="."/></span><br/>
+					<span class="element-description"><xsl:copy-of select="."/></span><br/>
 				</xsl:for-each>
 				<xsl:call-template name="element-type"><xsl:with-param name="type" select="@type"/></xsl:call-template>
+				
 				<xsl:if test="count(*[local-name() = 'annotation']/*[local-name() = 'appinfo']/*[local-name() = 'example']/*) > 0">
 					<span class="element-example-title">XML Example</span><br/>
 					<div class="element-example">
@@ -155,11 +163,32 @@
 						</xsl:for-each>
 					</div>
 				</xsl:if>
+				
+				<xsl:if test="count(/*[local-name() = 'schema']/*[local-name() = 'complexType' or local-name() = 'simpleType']/*[local-name() = 'complexContent' or local-name() = 'simpleContent']/*[local-name() = 'extension' and @base = $type]) > 0">
+					<span class="element-extended-title">Extended elements</span><br/>
+					<ol>
+						<xsl:for-each select="/*[local-name() = 'schema']/*[local-name() = 'complexType' or local-name() = 'simpleType']/*[local-name() = 'complexContent' or local-name() = 'simpleContent']/*[local-name() = 'extension' and @base = $type]">
+							<xsl:call-template name="extended-element">
+								<xsl:with-param name="type" select="../../@name"/>
+							</xsl:call-template>
+						</xsl:for-each>
+					</ol>
+				</xsl:if>
+				
 			</xsl:when>
 			<xsl:when test="string-length(@ref)">
 				<xsl:call-template name="element-ref"><xsl:with-param name="name" select="@ref"/></xsl:call-template>
 			</xsl:when>
 		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="extended-element">
+		<xsl:param name="type"/>
+		<xsl:for-each select="/*[local-name() = 'schema']/*[local-name() = 'element' and @type = $type]">
+			<li>
+				<a href="#element-{@name}"><xsl:value-of select="@name"/></a>
+			</li>
+		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:template name="element-ref">
@@ -181,7 +210,11 @@
 			<xsl:when test="string-length(@name)">
 				<tr>
 					<td><xsl:value-of select="@name"/></td>
-					<td></td>
+					<td>
+						<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'documentation']">
+							<span class="child-attribute-description"><xsl:copy-of select="."/></span><br/>
+						</xsl:for-each>
+					</td>
 					<td>
 						<xsl:choose>
 							<xsl:when test="@use = 'required'">Yes</xsl:when>
@@ -189,13 +222,23 @@
 						</xsl:choose>
 					</td>
 					<td><xsl:value-of select="substring-after(@type, ':')"/></td>
-					<td></td>
+					<td>
+						<xsl:if test="count(*[local-name() = 'simpleType']/*[local-name() = 'restriction']/*) > 0">
+							<xsl:for-each select="*[local-name() = 'simpleType']/*[local-name() = 'restriction']/*">
+								<xsl:call-template name="restriction"/>
+							</xsl:for-each>
+						</xsl:if>
+					</td>
 				</tr>
 			</xsl:when>
 			<xsl:when test="string-length(@ref)">
 				<tr>
 					<td><xsl:value-of select="@ref"/></td>
-					<td></td>
+					<td>
+						<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'documentation']">
+							<span class="child-attribute-description"><xsl:copy-of select="."/></span><br/>
+						</xsl:for-each>
+					</td>
 					<td>
 						<xsl:choose>
 							<xsl:when test="@use = 'required'">Yes</xsl:when>
@@ -242,6 +285,31 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<xsl:template name="child-extension">
+		<xsl:param name="extension" select="@ref"/>
+		
+		<xsl:if test="count(/*[local-name() = 'schema']/*[local-name() = 'element' and @substitutionGroup = $extension]) > 0">
+			<tr>
+				<td colspan="6" class="extensions-title">Extensions:</td>
+			</tr>
+		</xsl:if>
+		
+		<xsl:for-each select="/*[local-name() = 'schema']/*[local-name() = 'element' and @substitutionGroup = $extension]">
+			<tr class="extension">
+				<td><a href="#element-{@name}"><xsl:value-of select="@name"/></a></td>
+				<td>
+					<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'documentation']">
+						<span class="child-extension-description"><xsl:copy-of select="."/></span><br/>
+					</xsl:for-each>
+				</td>
+				<td>No</td>
+				<td>Unbounded</td>
+				<td></td>
+				<td></td>
+			</tr>
+		</xsl:for-each>
+	</xsl:template>
+
 	<xsl:template name="child-element">
 		<xsl:choose>
 			<xsl:when test="string-length(@name)">
@@ -249,7 +317,7 @@
 					<td><xsl:value-of select="@name"/></td>
 					<td>
 						<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'documentation']">
-							<span class="child-element-description"><xsl:value-of select="."/></span><br/>
+							<span class="child-element-description"><xsl:copy-of select="."/></span><br/>
 						</xsl:for-each>
 					</td>
 					<td>
@@ -296,7 +364,7 @@
 					<td><a href="#element-{@ref}"><xsl:value-of select="@ref"/></a></td>
 					<td>
 						<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'documentation']">
-							<span class="child-element-description"><xsl:value-of select="."/></span><br/>
+							<span class="child-element-description"><xsl:copy-of select="."/></span><br/>
 						</xsl:for-each>
 					</td>
 					<td>
@@ -326,28 +394,6 @@
 	</xsl:template>
 
 	<xsl:template name="type">
-		<xsl:if test="count(*[local-name() = 'sequence']/*[local-name() = 'element']) > 0">
-			<br/>
-			<span class="child-elements">Child elements</span><br/>
-			<table class="child-elements-table">
-				<thead>
-					<tr>
-						<th>Element Name</th>
-						<th>Description</th>
-						<th>Required</th>
-						<th>Maximum appearences</th>
-						<th>Type</th>
-						<th>Restrictions</th>
-					</tr>
-				</thead>
-				<tbody>
-					<xsl:for-each select="*[local-name() = 'sequence']/*[local-name() = 'element']">
-						<xsl:call-template name="child-element"/>
-					</xsl:for-each>
-				</tbody>
-			</table>
-		</xsl:if>
-		
 		<xsl:if test="count(*[local-name() = 'attribute']) > 0">
 			<br/>
 			<span class="child-attributes">Child attributes</span><br/>
@@ -369,6 +415,42 @@
 			</table>
 		</xsl:if>
 		
+		<xsl:if test="count(*[local-name() = 'sequence']/*[local-name() = 'element']) > 0">
+			<br/>
+			<span class="child-elements">Child elements</span><br/>
+			<table class="child-elements-table">
+				<thead>
+					<tr>
+						<th>Element Name</th>
+						<th>Description</th>
+						<th>Required</th>
+						<th>Maximum appearences</th>
+						<th>Type</th>
+						<th>Restrictions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<xsl:for-each select="*[local-name() = 'sequence']/*">
+						<xsl:choose>
+							<xsl:when test="local-name() = 'element' and not(contains(@ref, '-extension'))">
+								<xsl:call-template name="child-element" />
+							</xsl:when>
+							<xsl:when test="local-name() = 'element' and contains(@ref, '-extension')">
+								<xsl:call-template name="child-extension" />
+							</xsl:when>
+							<xsl:when test="local-name() = 'choice'">
+								<!-- TODO -->
+							</xsl:when>
+						</xsl:choose>
+					</xsl:for-each>
+					
+					<xsl:for-each select="*[local-name() = 'complexContent']/*[local-name() = 'extension']/*">
+						<!-- TODO -->
+					</xsl:for-each>
+				</tbody>
+			</table>
+		</xsl:if>
+		
 		<br/>
 	</xsl:template>
 
@@ -377,7 +459,7 @@
 			<xsl:apply-templates mode="escape" />
 		</div>
 
-		<xsl:for-each select="*[local-name() = 'schema']/*[local-name() = 'element']">
+		<xsl:for-each select="*[local-name() = 'schema']/*[local-name() = 'element' and not(contains(@name, '-extension'))]">
 			<xsl:call-template name="element" />
 		</xsl:for-each>
 	</xsl:template>

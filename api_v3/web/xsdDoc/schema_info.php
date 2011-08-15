@@ -1,4 +1,10 @@
-<?php
+<?php 
+
+$downloadUrl = 'http://' . kConf::get('www_host') . "/api_v3/index.php/service/schema/action/serve/type/$schemaType/name/$schemaType.xsd";
+?>
+Download URL: <a href="<?php echo $downloadUrl; ?>" target="_blank"><?php echo $downloadUrl; ?></a><br/><br/>
+<?php 
+
 $schemaPath = SchemaService::getSchemaPath($schemaType);
 $xslPath = dirname(__FILE__) . '/xsl/type.xsl';
 

@@ -173,7 +173,11 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
 	</xs:complexType>
 
-	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" substitutionGroup="contentResource" />
+	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" substitutionGroup="contentResource-extension">
+		<xs:annotation>
+			<xs:documentation>Specifies that content file location is within a Kaltura defined drop folder</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	
 	';
 	

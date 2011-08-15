@@ -627,16 +627,44 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 			<xs:any namespace="##local" processContents="skip"/>			
 		</xs:sequence>
 		
-		<xs:attribute name="metadataId" use="required" type="xs:int"/>
-		<xs:attribute name="metadataVersion" use="required" type="xs:int"/>
-		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
-		<xs:attribute name="metadataProfileId" use="required" type="xs:int"/>
-		<xs:attribute name="metadataProfileName" use="optional" type="xs:string"/>
-		<xs:attribute name="metadataProfileVersion" use="required" type="xs:int"/>
+		<xs:attribute name="metadataId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Id of the custom metadata object</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataVersion" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Version of the custom metadata object</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfile" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile system name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileName" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileVersion" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile version</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		
 	</xs:complexType>
 	
-	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension" />
+	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension" >
+		<xs:annotation>
+			<xs:documentation>Custom metadata XML</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		return $xsd;
