@@ -417,6 +417,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				$resource = reset($noParamsFlavorResources);
 				$noParamsFlavorResources = array();
+				$noParamsFlavorAssets = array();
 			}
 			else
 			{
@@ -619,6 +620,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				$resource = reset($noParamsFlavorResources);
 				$noParamsFlavorResources = array();
+				$noParamsFlavorAssets = array();
 			}
 			else
 			{
