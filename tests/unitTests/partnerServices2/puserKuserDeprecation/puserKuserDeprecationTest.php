@@ -25,11 +25,15 @@ class puserKuserDeprecationTest extends KalturaServerTestCase
 	
 	/**
 	 * 
-	 * Tests all ps2 services for the given: TODO: add parameters here
-	 * @dataProvider providerTestAllPS2Services
+	 * Tests all ps2 services for the given:
+	 * @var array $partnerData
+	 * @dataProvider provideData
 	 */
 	public function testAllPS2Services(array $partnerData)
 	{
+		//TODO: finish this test!
+		return;
+		
 		//Go over all SP2 services and see that we get the result (run after consulidation)
 		//As all the ps2 services gets a puser_kuser as parameter.
 		$ps2ActionsFolderPath = "C:/opt/kaltura/app/alpha/apps/kaltura/modules/partnerservices2/actions";
@@ -43,8 +47,7 @@ class puserKuserDeprecationTest extends KalturaServerTestCase
 		{			
 			//now get just the PS2 service name
 			$ps2ActionArray = explode(".", $ps2FileName);
-			
-			
+						
 			$actionName = $ps2ActionArray[0];
 			$actionName = str_replace("Action", "", $actionName );
 			
@@ -57,7 +60,7 @@ class puserKuserDeprecationTest extends KalturaServerTestCase
 			var_dump($partnerData["partnerId"]);
 						
 			$ks = "ZjA3N2I1ZTUxZWM0ZDg2MTQ3M2Y1NTg4YmUzNWQ1NWFhYTFmZTM1NXwtMjstMjsxMzAwMzgyNjcyOzI7MTMwMDI5NjI3Mi43NTIxO2FkbWluQGthbHR1cmEuY29tOyo7Ow=="; 
-			
+ 			
 			$result = PS2Helper::doHttpRequest($actionName, $params, $ks);
 			
 			print(var_dump($result) . "\n");
