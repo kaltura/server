@@ -540,8 +540,8 @@ class CaptionAssetService extends KalturaBaseService
 		if(!$captionAssetDb)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 	
-		if($captionAssetDb->getDefault())
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_DEFAULT, $captionAssetId);
+// 		if($captionAssetDb->getDefault())
+// 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_DEFAULT, $captionAssetId);
 		
 		$dbEntry = $captionAssetDb->getentry();
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
