@@ -95,13 +95,13 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('checkbox', 'access_control_on_tumbnails', array(
+	/*	$this->addElement('checkbox', 'access_control_on_tumbnails', array(
 		'label'	  => 'Apply access control rules on thumbnails',
 		'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		//TODO - CHANGE TO REAL PERMISSION
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][] = 'access_control_on_tumbnails';
-				
+		*/		
 //--------------------------- Remote Storage Account policy ---------------------------				
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');
