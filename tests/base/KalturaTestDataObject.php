@@ -179,7 +179,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		{			
 			$this->dataObject->setByName($field, $value);
 		}
-		elseif($this->dataObject instanceof KalturaObjectBase)
+		elseif($this->dataObject instanceof KalturaObjectBase || $this->dataObject instanceof KalturaObject)
 		{
 			$this->dataObject->$field = $value; //Set the field as all fields are public in the API
 		}
