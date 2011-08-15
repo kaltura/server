@@ -219,7 +219,7 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 		else
 			$secret = KalturaGlobalData::getData("@TEST_PARTNER_SECRET@");
 				
-		$ks = $this->client->session->start($secret, $userId, $type, self::TEST_PARTNER_ID);
+		$ks = $this->client->session->start($secret, $userId, $type, $secret);
 		$this->assertNotNull($ks);
 		if (!$ks) {
 			return false;
