@@ -11,8 +11,7 @@ class ExampleUnitTest extends KalturaTestCaseBase
 {
 	/**
 	 * a Test with a data provider
-	 * @dataProvider providerTestNothing
-	 * Data provided test can't have dependency!!! 
+	 * @dataProvider provider
 	 */
 	public function testNothing($unitTestData)
 	{
@@ -22,19 +21,7 @@ class ExampleUnitTest extends KalturaTestCaseBase
 		//An empty assert always true
 		$this->assertEquals(true, true);
 	}
-	
-	/**
-	 * Provides the data for the nothing unit test
-	 * Negates test dependency!!!
-	 * @returns array<array<>>
-	 * 
-	 */
-	public function providerTestNothing()
-	{
-		$inputs = parent::provider(dirname(__FILE__) . "/testsData/exampleTest.Data");
-		return $inputs; //return array<array<>>
-	}
-	
+		
 	/**
 	 * An example test with test dependency
 	 * Test dependency can't be with data provider!!!
@@ -53,7 +40,6 @@ class ExampleUnitTest extends KalturaTestCaseBase
 	 */
 	public function testDependsOnSuccess($dataForSecondTest)
 	{
-		var_dump($dataForSecondTest);
 		$this->assertEquals("WOW i can pass parameters between tests", $dataForSecondTest);
 	}
 	
@@ -62,17 +48,8 @@ class ExampleUnitTest extends KalturaTestCaseBase
 	 */
 	public function testDependentFail()
 	{
-		$this->assertEquals(true, false);
+		//If unmark this will fail
+		//$this->assertEquals(true, false);
 	}
 	
-	/**
-	 * This test depends on the result of the previous test
-	 * @depends testDependentFail
-	 */
-	public function testDependsOnFailed($dataForSecondTest)
-	{
-		//You will not get here... :(
-		throw new Exception("This test will be skipped as his dependency failes");
-		
-	}
 }
