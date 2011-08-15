@@ -49,11 +49,11 @@
 			<div id="header">
 				<h1>Kaltura API SDK - Native Client Libraries</h1>
 				<p>When developing applications that interact with the Kaltura API, it is best to use a native Client Library.</p>
-				<p style="margin-bottom:5px;">Below, please download the Client Library for the programming language of your choice.</p>
+				<p style="margin-bottom:5px;">Below you can download the Client Library for the programming language of your choice.</p>
 				<p>Please note, the client libraries provided here have been generated for the Kaltura.com SaaS API.<br />
-				Users of self-hosted (On Prem or CE) Kaltura servers are encouraged to use their Kaltura Server Clients Generator for optimal compatability.</p>
+				Users of self-hosted editions of Kaltura (On-Prem or CE) are encouraged to use their Kaltura Server Clients Generator for optimal compatibility.</p>
 				<p>To learn how to use the client libraries and see example code implementations, use the <a href="#" >API Test Console</a>.<br />
-				The Test Console generates sample code based on the API actions and parameters selected.</p>
+				The Test Console automatically generates sample code based on the API actions and parameters you select.</p>
 			</div>
 			<div id="boxs">
 				<div id="downloads-box">
