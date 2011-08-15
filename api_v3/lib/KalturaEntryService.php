@@ -375,7 +375,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset->setTags($dbFlavorParams->getTags());
 		}
 		
-		if(!$dbAsset->getIsOriginal())
+		if($dbAsset instanceof flavorAsset && !$dbAsset->getIsOriginal())
 			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 			
 		$dbAsset->save();
@@ -384,7 +384,7 @@ class KalturaEntryService extends KalturaBaseService
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
 			
-		if(!$dbAsset->getIsOriginal())
+		if($dbAsset instanceof flavorAsset && !$dbAsset->getIsOriginal())
 			kBusinessPostConvertDL::handleConvertFinished(null, $dbAsset);
 		
 		return $dbAsset;
@@ -568,7 +568,7 @@ class KalturaEntryService extends KalturaBaseService
 			$templateEntry = entryPeer::retrieveByPK($conversionProfile->getDefaultEntryId());
 			if($templateEntry)
 			{
-				$dbEntry = $templateEntry->copyTemplate();
+				$dbEntry = $templateEntry->copyTemplate(true);
 				$dbEntry->save();
 			}
 			else
