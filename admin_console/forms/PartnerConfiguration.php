@@ -96,7 +96,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('checkbox', 'access_control_on_tumbnails', array(
-		'label'	  => 'Applay access control rules on thumbnails',
+		'label'	  => 'Apply access control rules on thumbnails',
 		'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		//TODO - CHANGE TO REAL PERMISSION
@@ -427,7 +427,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
-		$this->addDisplayGroup(array_merge(array('host', 'cdn_host', 'rtmp_url', 'delivry_block_countries'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));				
+		$this->addDisplayGroup(array_merge(array('host', 'cdn_host', 'rtmp_url', 'delivry_block_countries'), /*$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS],*/ array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));				
 		
 		$this->addDisplayGroup(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert','crossLine'), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));	
 		$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
