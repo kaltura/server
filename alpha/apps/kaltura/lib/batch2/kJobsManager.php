@@ -47,13 +47,13 @@ class kJobsManager
 			self::abortDbBatchJob($dbBatchJob);
 	}
 	
-	public static function abortJob($jobId, $jobType)
+	public static function abortJob($jobId, $jobType, $force = false)
 	{
 		$dbBatchJob = BatchJobPeer::retrieveByPK($jobId);
 		if($dbBatchJob->getJobType() != $jobType)
 			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 			
-		return self::abortDbBatchJob($dbBatchJob);
+		return self::abortDbBatchJob($dbBatchJob, $force);
 	}
 	
 	public static function deleteJob($jobId, $jobType)
@@ -68,9 +68,9 @@ class kJobsManager
 		return $dbBatchJob;
 	}
 	
-	public static function abortDbBatchJob(BatchJob $dbBatchJob)
+	public static function abortDbBatchJob(BatchJob $dbBatchJob, $force = false)
 	{
-		if(in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
+		if(!$force && in_array($dbBatchJob->getStatus(), BatchJobPeer::getClosedStatusList()))
 			return $dbBatchJob;
 			
 		$dbBatchJob->setAbort(1); // 1 = true
