@@ -55,7 +55,18 @@ class KalturaGlobalData extends KalturaTestConfig
 	
 	/**
 	 * 
-	 * Sets data in the global file with the given name and value
+	 * Gets data in the global file with the given name
+	 */
+	public static function getIntData($name)
+	{
+		$res = self::getData($name);
+		if($res){
+			return (int)substr($res, 1, -1);
+		}
+	}
+	/**
+	 * 
+	 * Gets data in the global file with the given name
 	 */
 	public static function getData($name)
 	{
