@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<publisher-upload-manifest publisher-id='51296410001' preparer='Jesse Streb' report-success='true' >
+	
+	
+	<asset
+  refid='GoodGuysThe_BDE109_VIDEO_300'
+  h264-no-processing="true"
+  type='VIDEO_FULL'
+  hash-code='516e425cbe0c91be4682226a764d7d1a'
+  size='118173056'
+  filename='/web/drop_folder/guy/Robber.mp4' />
+	
+	<asset
+  refid='GoodGuysThe_BDE109_VIDEO_500'
+  h264-no-processing="true"
+  type='VIDEO_FULL'
+  hash-code='0fd38fc06d20f39b9c581a4a1b8173a8'
+  size='193609613'
+  filename='/web/drop_folder/guy/qqwer.mp4' />
+  
+	
+  
+	<!-- Asset File Definitions -->
+		<!-- Title/Meta-Data Definitions -->
+	<title
+		name="Don't Tase Me Bro"
+		refid="GoodGuysThe_BDE109"
+		active="FALSE"
+        start-date="08/03/2010 11:00 PM"
+        end-date="10/02/2011 7:45 AM"
+        geo-restricted="TRUE"
+        exclude-listed-countries="FALSE">
+	    
+	    <allowed-country>as</allowed-country>
+	    <allowed-country>gu</allowed-country>
+	    <allowed-country>pr</allowed-country>
+	    <allowed-country>us</allowed-country>
+	    <allowed-country>um</allowed-country>
+	    <allowed-country>vi</allowed-country>
+		
+	<rendition-refid>GoodGuysThe_BDE109_VIDEO_300</rendition-refid>
+    <rendition-refid>GoodGuysThe_BDE109_VIDEO_500</rendition-refid>
+    
+
+		
+		<!-- Description fields -->
+		<short-description>Dan accidentally reveals confidential information.</short-description>
+		<long-description>Dan accidentally reveals confidential information</long-description>
+		
+		<!-- Searchable Keywords - If there were values for the different Genres specificied in the custom meta data we would add them here.-->
+        <tag>fullepisode=true</tag>
+  		<tag>series=The Good Guys</tag>
+  		<tag>The Good Guys</tag>
+		<tag>Don't Tase Me Bro</tag>
+  		
+
+ 
+  		
+  		<!-- Custom Fields Note that if a value does not pertain to a clip then it can be removed.  Example season may not pertain to a clip-->
+		<custom-string-value name="episode">09</custom-string-value>
+		<custom-string-value name="season">1</custom-string-value>
+		<custom-string-value name="airDate">2010-08-02</custom-string-value>
+		<custom-string-value name="thumbHeight">120</custom-string-value>
+		<custom-string-value name="thumbWidth">90</custom-string-value>
+		<custom-enum-value name="genre">Comedy</custom-enum-value>
+		<custom-enum-value name="rating">TV-14</custom-enum-value>
+		<custom-enum-value name="series">The Good Guys</custom-enum-value>
+		<custom-enum-value name="fullepisode">true</custom-enum-value>
+
+	</title>
+    
+	<cuepoint name="ad1" type="AD" time="603000" video-refid="GoodGuysThe_BDE109" />
+	<cuepoint name="ad2" type="AD" time="1077000" video-refid="GoodGuysThe_BDE109" />
+	<cuepoint name="ad3" type="AD" time="1405000" video-refid="GoodGuysThe_BDE109" />
+	<cuepoint name="ad4" type="AD" time="1908000" video-refid="GoodGuysThe_BDE109" />
+	<cuepoint name="ad5" type="AD" time="2313000" video-refid="GoodGuysThe_BDE109" />
+	<cuepoint name="ad6" type="AD" time="2570000" video-refid="GoodGuysThe_BDE109" />
+</publisher-upload-manifest>
+
+
