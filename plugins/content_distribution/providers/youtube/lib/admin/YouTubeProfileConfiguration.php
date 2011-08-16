@@ -72,7 +72,7 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 		));
 		
 		$this->addDisplayGroup(
-			array('username', 'notification_email', 'owner_name', 'ad_server_partner_id', 'enable_ad_server', 'allow_pre_roll_ads', 'allow_post_roll_ads', 'target'), 
+			array('username', 'notification_email', 'owner_name', 'target'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
