@@ -20,7 +20,7 @@
 			<media>
 				<mediaType>1</mediaType> 
 			</media>
-			<content id="content1" flavorParamsId="0">
+			<content flavorParamsId="0">
 				<urlContentResource url="http://www.kaltura.co.cc/content/Oleg/nice_Flv.flv"/>
 			</content>
 		</item>

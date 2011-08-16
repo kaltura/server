@@ -22,22 +22,22 @@
 			<media>
 				<mediaType>1</mediaType>
 			</media>
-			<content id="content1" flavorParamsId="0">
+			<content flavorParamsId="0">
 				<serverFileContentResource filePath="/web/content/Danit/danit3_BasicSmall.mp4"> 
 					<fileSize>1258289</fileSize>
 				</serverFileContentResource>
 			</content>
-			<content id="content2" flavorParamsId="4">
+			<content flavorParamsId="4">
 				<serverFileContentResource filePath="/web/content/Danit/1_Source.flv"> 
 					<fileSize>1258289</fileSize>
 				</serverFileContentResource>
 			</content>
-			<content id="content3" flavorParamsId="5">
+			<content flavorParamsId="5">
 				<serverFileContentResource filePath="/web/content/Danit/2_Source.flv"> 
 					<fileSize>3656983</fileSize>
 				</serverFileContentResource>
 			</content>
-			<thumbnail id="thumb1" isDefault="true"><!--content of specified thumbnail and if you wish to make it default or not-->
+			<thumbnail isDefault="true"><!--content of specified thumbnail and if you wish to make it default or not-->
 				<serverFileContentResource filePath="/web/content/Lena/images.jpg">
 				<fileChecksum type='sha1'>1e7517848d27f9b654e81214e05c241eddf0817f</fileChecksum><!--check the file size for choosen file-->
 				</serverFileContentResource>

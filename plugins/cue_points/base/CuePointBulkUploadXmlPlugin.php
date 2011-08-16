@@ -33,7 +33,11 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		if(
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			&&
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML)
+		)
 			return null;
 	
 		$xsd = '
@@ -57,14 +61,14 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 					<xs:documentation>Cue point start time</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="tags" minOccurs="1" maxOccurs="1">
+			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Cue point searchable keywords</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
 		
-		<xs:attribute name="sceneId" use="optional" type="xs:string">
+		<xs:attribute name="sceneId" use="optional">
 			<xs:annotation>
 				<xs:documentation>ID of cue point to apply update/delete action on</xs:documentation>
 			</xs:annotation>
@@ -74,7 +78,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="systemName" use="optional" type="xs:string">
+		<xs:attribute name="systemName" use="optional">
 			<xs:annotation>
 				<xs:documentation>System name of cue point to apply update/delete action on</xs:documentation>
 			</xs:annotation>

@@ -107,28 +107,60 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 			
 	<xs:complexType name="T_attachment">
 		<xs:sequence>
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
-			<xs:element name="filename" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element name="title" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string" />
+			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags">
+				<xs:annotation>
+					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="filename" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Attachment asset file name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="title" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Attachment asset title</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Attachment asset free text description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="attachment-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		
-		<xs:attribute name="attachmentAssetId" type="xs:string" use="optional" />
-		<xs:attribute name="format" type="KalturaAttachmentType" use="optional" />
-		<xs:attribute name="url" type="xs:string" use="optional" />
+		<xs:attribute name="attachmentAssetId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The asset unique id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="format" type="KalturaAttachmentType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Attachment asset file format</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="url" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Attachment asset file download URL</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 						
 	</xs:complexType>
 	
 	<xs:element name="attachment-extension" />
-	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension" />
+	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Attachment asset element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		return $xsd;
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaMrssContributor::contributeToSchema()
+	 * @see IKalturaMrssContributor::contribute()
 	 */
 	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
 	{

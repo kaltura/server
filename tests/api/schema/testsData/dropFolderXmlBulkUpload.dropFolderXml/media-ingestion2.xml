@@ -27,7 +27,7 @@
 		    <media>
 				<mediaType>1</mediaType> 
 			</media>
-			<content id="content1" flavorParamsId="0">
+			<content flavorParamsId="0">
 				<urlContentResource url="http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv"/>
 			</content>
 			<customData metadataProfile="Roni_Metadata"> <!--metadataProfileId="8"-->

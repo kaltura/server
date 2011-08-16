@@ -39,7 +39,13 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		
-		if($coreType == SchemaType::SYNDICATION || $coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		if(
+			$coreType == SchemaType::SYNDICATION 
+			|| 
+			$coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			||
+			$coreType == BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML)
+		)
 			return '
 		
 	<!-- ' . self::getPluginName() . ' -->
@@ -58,16 +64,36 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	
 	<xs:complexType name="T_customData">
 		<xs:sequence>
-			<xs:any namespace="##local" processContents="skip"/>			
+			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
+				</xs:annotation>		
+			</xs:any>			
 		</xs:sequence>
 		
-		<xs:attribute name="metadataId" use="optional" type="xs:int"/>
-		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
-		<xs:attribute name="metadataProfileId" use="optional" type="xs:int"/>
+		<xs:attribute name="metadataId" use="optional" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Id of the custom metadata object</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfile" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile system name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileId" use="optional" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		
 	</xs:complexType>
 	
-	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension" />
+	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
+		<xs:annotation>
+			<xs:documentation>Custom metadata XML</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 			';
 		
 		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::SERVE_API))
@@ -77,19 +103,51 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	
 	<xs:complexType name="T_customData">
 		<xs:sequence>
-			<xs:any namespace="##local" processContents="skip"/>			
+			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
+				</xs:annotation>		
+			</xs:any>			
 		</xs:sequence>
 		
-		<xs:attribute name="metadataId" use="required" type="xs:int"/>
-		<xs:attribute name="metadataVersion" use="required" type="xs:int"/>
-		<xs:attribute name="metadataProfile" use="optional" type="xs:string"/>
-		<xs:attribute name="metadataProfileId" use="required" type="xs:int"/>
-		<xs:attribute name="metadataProfileName" use="optional" type="xs:string"/>
-		<xs:attribute name="metadataProfileVersion" use="required" type="xs:int"/>
+		<xs:attribute name="metadataId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Id of the custom metadata object</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataVersion" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata version</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfile" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile system name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileName" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="metadataProfileVersion" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Custom metadata schema profile version</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		
 	</xs:complexType>
 	
-	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension" />
+	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
+		<xs:annotation>
+			<xs:documentation>Custom metadata XML</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 			';
 		
 		return null;

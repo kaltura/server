@@ -550,7 +550,7 @@
 		<xs:attribute name="assetId" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					The asset id to be updated with this resource userd only for update
+					The asset id to be updated with this resource used only for update
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>

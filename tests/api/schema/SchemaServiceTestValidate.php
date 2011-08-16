@@ -25,7 +25,7 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 		{
 			echo "Testing XSD Type [$type]\n";
 			
-			$xsdPath = "$serviceUrl/api_v3/service/schema/action/serve/type/$type";
+			$xsdPath = "$serviceUrl/api_v3/index.php/service/schema/action/serve/type/$type";
 			
 			$xsd = new DOMDocument();
 			$xsd->load($xsdPath);
@@ -59,7 +59,7 @@ class SchemaServiceTestValidate extends KalturaApiTestCase
 	{
 		echo "	Testing File [$xmlPath]\n";
 		$serviceUrl = $this->client->getConfig()->serviceUrl;
-		$xsdPath = "$serviceUrl/api_v3/service/schema/action/serve/type/$type";
+		$xsdPath = "$serviceUrl/api_v3/index.php/service/schema/action/serve/type/$type";
 		
 //		libxml_use_internal_errors(true);
 //		libxml_clear_errors();

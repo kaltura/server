@@ -56,7 +56,11 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		if(
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			&&
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML)
+		)
 			return null;
 	
 		$xmlnsBase = "http://" . kConf::get('www_host') . "/$type";
@@ -70,7 +74,7 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
-					<xs:element name="code" minOccurs="0" maxOccurs="1" type="xs:string">
+					<xs:element name="code" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
 							<xs:documentation>Textual code</xs:documentation>
 						</xs:annotation>

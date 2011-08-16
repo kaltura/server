@@ -22,17 +22,17 @@
 			<media>
 				<mediaType>1</mediaType> 
 			</media>
-			<content id="content1" flavorParamsId="0">
+			<content flavorParamsId="0">
 				<remoteStorageContentResource url="Gadis.wmv">
 				<storageProfileId>141</storageProfileId>
 				</remoteStorageContentResource>
 			</content>
-			<content id="content2" flavorParamsId="4">
+			<content flavorParamsId="4">
 				<remoteStorageContentResource url="Gadis.wmv">
 				<storageProfileId>141</storageProfileId>
 				</remoteStorageContentResource>
 			</content>
-			<content id="content3" flavorParamsId="5">
+			<content flavorParamsId="5">
 				<remoteStorageContentResource url="Gadis.wmv">
 				<storageProfileId>141</storageProfileId>
 				</remoteStorageContentResource>

@@ -296,34 +296,90 @@
 		</xs:attribute>
 	</xs:complexType>
 	
-	<xs:complexType name="T_player">
-		<xs:sequence>
-			<xs:element ref="player-extension" minOccurs="0"
-				maxOccurs="unbounded" />
-		</xs:sequence>
-		<xs:attribute name="url" type="xs:string" use="required" />
-	</xs:complexType>
-	
 	<xs:complexType name="T_content">
 		<xs:sequence>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="url" type="xs:string" use="required" />
-		<xs:attribute name="flavorAssetId" type="xs:string" use="required" />
-		<xs:attribute name="containerFormat" type="xs:string" use="required" />
-		<xs:attribute name="format" type="xs:string" use="required" />
-		<xs:attribute name="extension" type="xs:string" use="required" />
-		<xs:attribute name="isSource" type="xs:boolean" use="required" />
-		<xs:attribute name="height" type="xs:int" use="optional" />
-		<xs:attribute name="width" type="xs:int" use="optional" />
-		<xs:attribute name="videoBitrate" type="xs:int" use="optional" />
-		<xs:attribute name="videoCodec" type="xs:string" use="optional" />
-		<xs:attribute name="audioBitrate" type="xs:int" use="optional" />
-		<xs:attribute name="audioCodec" type="xs:string" use="optional" />
-		<xs:attribute name="frameRate" type="xs:int" use="optional" />
-		<xs:attribute name="flavorParamsId" type="xs:int" use="optional" />
-		<xs:attribute name="flavorParamsName" type="xs:string" use="optional" />
+		<xs:attribute name="url" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Download URL</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flavorAssetId" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>ID of the flavor asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="containerFormat" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Format of the asset file</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="format" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Configured format of the flavor</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="extension" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Flavor asset file extension</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="isSource" type="xs:boolean" use="required">
+			<xs:annotation>
+				<xs:documentation>Is the source flavor asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="height" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor height</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="width" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor width</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="videoBitrate" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset video bitrate</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="videoCodec" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset video codec</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="audioBitrate" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset audio bitrate</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="audioCodec" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset audio codec</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="frameRate" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset frame rate</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>ID of accosiated flavor params</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flavorParamsName" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>System name of accosiated flavor params</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="assetId" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>

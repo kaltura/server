@@ -56,7 +56,11 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		if(
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			&&
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML)
+		)
 			return null;
 	
 		$xsd = '

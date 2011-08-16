@@ -194,7 +194,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaSchemaContributor::contributeToSchema()
+	 * @see IKalturaSchemaDefiner::getPluginSchema()
 	 */
 	public static function getPluginSchema($type)
 	{

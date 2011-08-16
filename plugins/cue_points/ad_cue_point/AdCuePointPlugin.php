@@ -97,11 +97,36 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
-					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time" />
-					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="sourceUrl" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="adType" minOccurs="1" maxOccurs="1" type="KalturaAdType" />
-					<xs:element name="protocolType" minOccurs="1" maxOccurs="1" type="KalturaAdProtocolType" />
+					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Textual title</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="250"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="sourceUrl" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>The URL of the ad XML</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="adType" minOccurs="1" maxOccurs="1" type="KalturaAdType">
+						<xs:annotation>
+							<xs:documentation>Indicates the ad type</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="protocolType" minOccurs="1" maxOccurs="1" type="KalturaAdProtocolType">
+						<xs:annotation>
+							<xs:documentation>Indicates the ad protocol type</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					
 					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
@@ -109,7 +134,11 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene-ad-cue-point" type="T_scene_adCuePoint" substitutionGroup="scene" />
+	<xs:element name="scene-ad-cue-point" type="T_scene_adCuePoint" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single ad cue point element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		return $xsd;

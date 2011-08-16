@@ -26,7 +26,7 @@ class kContentDistributionMrssManager implements IKalturaMrssContributor
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaMrssContributor::contributeToSchema()
+	 * @see IKalturaMrssContributor::contribute()
 	 */
 	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
 	{

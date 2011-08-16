@@ -105,10 +105,36 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
-					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
-					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="parent" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="parentId" minOccurs="0" maxOccurs="1" type="xs:string" />
+					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Free text description</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="parent" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>System name of the parent annotation</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="120"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="parentId" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>ID of the parent annotation</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="250"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
 					
 					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
@@ -116,7 +142,11 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene" />
+	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single annotation element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API))
@@ -128,11 +158,37 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
-					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time" />
-					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string" />
+					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Free text description</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:choice minOccurs="0" maxOccurs="1">
-						<xs:element name="parent" minOccurs="1" maxOccurs="1" type="xs:string" />
-						<xs:element name="parentId" minOccurs="1" maxOccurs="1" type="xs:string" />
+						<xs:element name="parent" minOccurs="1" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>System name of the parent annotation</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="120"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="parentId" minOccurs="1" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>ID of the parent annotation</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="250"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
 					</xs:choice>
 					
 					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
@@ -141,7 +197,11 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene" />
+	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single annotation element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		return null;

@@ -114,29 +114,65 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			
 	<xs:complexType name="T_subTitle">
 		<xs:sequence>
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags" />
+			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags">
+				<xs:annotation>
+					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="subtitle-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		
-		<xs:attribute name="captionParamsId" type="xs:int" use="optional" />
-		<xs:attribute name="captionParams" type="xs:string" use="optional" />
-		<xs:attribute name="captionAssetId" type="xs:string" use="optional" />
-		<xs:attribute name="isDefault" type="xs:boolean" use="optional" />
-		<xs:attribute name="format" type="KalturaCaptionType" use="optional" />
-		<xs:attribute name="lang" type="KalturaLanguage" use="optional" />
-		<xs:attribute name="href" type="xs:string" use="optional" />
+		<xs:attribute name="captionParamsId" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>ID of caption params that associated with the caption asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="captionParams" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>System name of caption params that associated with the caption asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="captionAssetId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset unique id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="isDefault" type="xs:boolean" use="optional">
+			<xs:annotation>
+				<xs:documentation>Indicates if the caption asset is the entry default caption asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="format" type="KalturaCaptionType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset file format</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="lang" type="KalturaLanguage" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset file language</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="href" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Caption asset file download URL</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 						
 	</xs:complexType>
 	
 	<xs:element name="subtitle-extension" />
-	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension" />
+	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Caption asset element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		return $xsd;
 	}
 	
 	/* (non-PHPdoc)
-	 * @see IKalturaMrssContributor::contributeToSchema()
+	 * @see IKalturaMrssContributor::contribute()
 	 */
 	public function contribute(BaseObject $object, SimpleXMLElement $mrss, kMrssParameters $mrssParams = null)
 	{

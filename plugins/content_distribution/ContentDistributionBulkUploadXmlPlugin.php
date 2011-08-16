@@ -33,7 +33,11 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		if(
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			&&
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML)
+		)
 			return null;
 	
 		$xsd = '
@@ -47,13 +51,13 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 					<xs:annotation>
 						<xs:documentation>The provider to distribute the entry to</xs:documentation>
 					</xs:annotation>
-				</xs:element>				
+				</xs:element>
 				<xs:element name="distributionProfileId" minOccurs="1" maxOccurs="1" type="xs:int">
 					<xs:annotation>
 						<xs:documentation>ID of the distribution profile to distribute the entry to</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="distributionProfile" minOccurs="1" maxOccurs="1" type="xs:string">
+				<xs:element name="distributionProfile" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>System name of the distribution profile to distribute the entry to</xs:documentation>
 					</xs:annotation>

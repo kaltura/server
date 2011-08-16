@@ -624,7 +624,11 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 	<xs:complexType name="T_customData">
 		<xs:sequence>
-			<xs:any namespace="##local" processContents="skip"/>			
+			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
+				</xs:annotation>		
+			</xs:any>			
 		</xs:sequence>
 		
 		<xs:attribute name="metadataId" use="required" type="xs:int">
@@ -660,7 +664,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		
 	</xs:complexType>
 	
-	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension" >
+	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Custom metadata XML</xs:documentation>
 		</xs:annotation>

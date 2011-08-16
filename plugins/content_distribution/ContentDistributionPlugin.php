@@ -367,52 +367,139 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	
 	<xs:complexType name="T_distribution">
 		<xs:sequence>
-			<xs:element name="remoteId" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:int" />
-			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:int" />
+			<xs:element name="remoteId" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique id in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Time that the entry will become available in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Time that the entry will become unavailable in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="flavorAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
-					</xs:sequence>
-				</xs:complexType>
+				<xs:annotation>
+					<xs:documentation>Comma seperated ids of flavor assets to be submitted to the remote site</xs:documentation>
+				</xs:annotation>
 			</xs:element>
 			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="thumbAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
-					</xs:sequence>
-				</xs:complexType>
+				<xs:annotation>
+					<xs:documentation>Comma seperated ids of thumbnail assets to be submitted to the remote site</xs:documentation>
+				</xs:annotation>
 			</xs:element>
-			<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
-			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime" />
-			<xs:element name="submittedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-			<xs:element name="lastReport" minOccurs="0" maxOccurs="1" type="xs:dateTime" />
-			<xs:element name="dirtyStatus" minOccurs="0" maxOccurs="1" type="KalturaEntryDistributionFlag" />
-			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionStatus" />
-			<xs:element name="sunStatus" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionSunStatus" />
-			<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int" />
-			<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int" />
-			<xs:element name="errorNumber" minOccurs="0" maxOccurs="1" type="xs:int" />
-			<xs:element name="errorType" minOccurs="0" maxOccurs="1" type="KalturaBatchJobErrorTypes" />
+			<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Submission error description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="createdAt" minOccurs="1" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution creation date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="updatedAt" minOccurs="1" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution last update date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="submittedAt" minOccurs="0" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution submission date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="lastReport" minOccurs="0" maxOccurs="1" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Entry distribution last report date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dirtyStatus" minOccurs="0" maxOccurs="1" type="KalturaEntryDistributionFlag">
+				<xs:annotation>
+					<xs:documentation>Indicates that there are future action to be submitted</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionStatus">
+				<xs:annotation>
+					<xs:documentation>Entry distribution status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sunStatus" minOccurs="1" maxOccurs="1" type="KalturaEntryDistributionSunStatus">
+				<xs:annotation>
+					<xs:documentation>Entry distribution availability status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="plays" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry plays count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="views" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry views count in the remote site</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="errorNumber" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Submission error number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="errorType" minOccurs="0" maxOccurs="1" type="KalturaBatchJobErrorTypes">
+				<xs:annotation>
+					<xs:documentation>Submission error type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		
 			<xs:element ref="distribution-extension" minOccurs="0" maxOccurs="unbounded" />
 			
 		</xs:sequence>
 		
-		<xs:attribute name="entryDistributionId" use="required" type="xs:int" />
-		<xs:attribute name="lastReport" use="optional" type="xs:int" />
-		<xs:attribute name="provider" use="optional" type="xs:string" />
-		<xs:attribute name="distributionProviderId" use="optional" type="xs:int" />
-		<xs:attribute name="feedId" use="optional" type="xs:string" />
-		<xs:attribute name="distributionProfileId" use="required" type="xs:int" />
-		<xs:attribute name="distributionProfile" use="optional" type="xs:string" />
-		<xs:attribute name="distributionProfileName" use="optional" type="xs:string" />
+		<xs:attribute name="entryDistributionId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Entry distribution unique id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="provider" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution provider</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProviderId" use="optional" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Entry distribution provider id<br/>relevant to generic providers</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="feedId" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution feed id<br/>relevant to syndicated providers</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProfileId" use="required" type="xs:int">
+			<xs:annotation>
+				<xs:documentation>Entry distribution profile id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProfile" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution profile system name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="distributionProfileName" use="optional" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Entry distribution profile name</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		
 	</xs:complexType>
 	
-	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension" />
+	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>Entry distribution element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	<xs:element name="distribution-extension" />
 		';
 		

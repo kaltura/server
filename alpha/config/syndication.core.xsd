@@ -1,4 +1,4 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
 	<xs:complexType name="T_rss">
 		<xs:sequence>
 			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1">
@@ -8,23 +8,37 @@
 			</xs:element>
 			<xs:element ref="rss-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="version" type="xs:decimal" />
+		<xs:attribute name="version" type="xs:decimal">
+			<xs:annotation>
+				<xs:documentation>
+					Indicates the XSD version to be used
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="T_channel">
 		<xs:sequence>
-			<xs:element name="title" maxOccurs="1" minOccurs="0"
-				type="xs:string" />
-			<xs:element name="link" maxOccurs="1" minOccurs="0"
-				type="xs:string" />
-			<xs:element name="description" maxOccurs="1" minOccurs="0"
-				type="xs:string" />
+			<xs:element name="title" maxOccurs="1" minOccurs="0" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Title of the feed</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="link" maxOccurs="1" minOccurs="0" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Feed link URL</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" maxOccurs="1" minOccurs="0" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Feed description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="items" maxOccurs="1" minOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Wrapper element holding multiple item elements</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="channel-extension" minOccurs="0"
-				maxOccurs="unbounded" />
+			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="T_items">
@@ -73,9 +87,21 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="link" minOccurs="0" maxOccurs="1" type="xs:string" />
-			<xs:element name="type" minOccurs="1" maxOccurs="1" type="KalturaEntryType" />
-			<xs:element name="licenseType" minOccurs="1" maxOccurs="1" type="KalturaLicenseType" />
+			<xs:element name="link" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Entry link URL</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="type" minOccurs="1" maxOccurs="1" type="KalturaEntryType">
+				<xs:annotation>
+					<xs:documentation>Entry type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="licenseType" minOccurs="1" maxOccurs="1" type="KalturaLicenseType">
+				<xs:annotation>
+					<xs:documentation>Entry license type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="userId" minOccurs="1" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>The ID of the user who is the owner of this entry</xs:documentation>
@@ -91,15 +117,34 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryStatus" />
-			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string" />
+			<xs:element name="status" minOccurs="1" maxOccurs="1" type="KalturaEntryStatus">
+				<xs:annotation>
+					<xs:documentation>Entry status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Entry free text description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="thumbnailUrl" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Entry thumbnail URL</xs:documentation>
+				</xs:annotation>
 				<xs:complexType>
 					<xs:attribute name="url" type="xs:string" />
 				</xs:complexType>
 			</xs:element>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1" />
-			<xs:element ref="category" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Entry searchable keywords</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="category" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Entry assigned categories</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="partnerData" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>Used to store various partner related data as a string</xs:documentation>
@@ -154,14 +199,30 @@
 				</xs:element>
 			</xs:choice>
 			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element ref="player" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="player" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Embeded player</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="T_media">
 		<xs:sequence>
-			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="KalturaMediaType" />
-			<xs:element name="duration" minOccurs="1" maxOccurs="1" type="xs:int" />
-			<xs:element name="flavorParamsIds" minOccurs="1" maxOccurs="1" type="xs:string" />
+			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="KalturaMediaType">
+				<xs:annotation>
+					<xs:documentation>Entry media type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="duration" minOccurs="1" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Entry media (video/audio) duration</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="flavorParamsIds" minOccurs="1" maxOccurs="1" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Comma seperated ids of flavor params that have ready flavor asset assign to the entry</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
@@ -222,24 +283,88 @@
 
 	<xs:complexType name="T_content">
 		<xs:sequence>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="url" type="xs:string" use="required" />
-		<xs:attribute name="flavorAssetId" type="xs:string" use="required" />
-		<xs:attribute name="containerFormat" type="xs:string" use="required" />
-		<xs:attribute name="format" type="xs:string" use="required" />
-		<xs:attribute name="extension" type="xs:string" use="required" />
-		<xs:attribute name="isSource" type="xs:boolean" use="required" />
-		<xs:attribute name="height" type="xs:int" use="optional" />
-		<xs:attribute name="width" type="xs:int" use="optional" />
-		<xs:attribute name="videoBitrate" type="xs:int" use="optional" />
-		<xs:attribute name="videoCodec" type="xs:string" use="optional" />
-		<xs:attribute name="audioBitrate" type="xs:int" use="optional" />
-		<xs:attribute name="audioCodec" type="xs:string" use="optional" />
-		<xs:attribute name="frameRate" type="xs:int" use="optional" />
-		<xs:attribute name="flavorParamsId" type="xs:int" use="optional" />
-		<xs:attribute name="flavorParamsName" type="xs:string" use="optional" />
+		<xs:attribute name="url" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Download URL</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flavorAssetId" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>ID of the flavor asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="containerFormat" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Format of the asset file</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="format" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Configured format of the flavor</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="extension" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Flavor asset file extension</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="isSource" type="xs:boolean" use="required">
+			<xs:annotation>
+				<xs:documentation>Is the source flavor asset</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="height" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor height</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="width" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor width</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="videoBitrate" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset video bitrate</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="videoCodec" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset video codec</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="audioBitrate" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset audio bitrate</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="audioCodec" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset audio codec</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="frameRate" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Flavor asset frame rate</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>ID of accosiated flavor params</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="flavorParamsName" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>System name of accosiated flavor params</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="assetId" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>
@@ -251,35 +376,76 @@
 	</xs:complexType>
 	<xs:complexType name="T_thumbnail">
 		<xs:sequence>
-			<xs:element ref="tags" minOccurs="0" maxOccurs="1" />
-			<xs:element ref="thumbnail-extension" minOccurs="0"
-				maxOccurs="unbounded" />
+			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Entry searchable keywords</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="url" type="xs:string" use="required" />
-		<xs:attribute name="thumbAssetId" type="xs:string" use="required" />
-		<xs:attribute name="format" type="xs:string" use="required" />
-		<xs:attribute name="isDefault" type="xs:boolean" use="required" />
-		<xs:attribute name="height" type="xs:int" use="optional" />
-		<xs:attribute name="width" type="xs:int" use="optional" />
-		<xs:attribute name="thumbParamsId" type="xs:int" use="optional" />
+		<xs:attribute name="url" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Download URL</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="thumbAssetId" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Thumbnail asset id</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="format" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Format of the thumbnail asset file</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="isDefault" type="xs:boolean" use="required">
+			<xs:annotation>
+				<xs:documentation>Is the entry default thumbnail</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="height" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Thumbnail height</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="width" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>Thumbnail width</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="thumbParamsId" type="xs:int" use="optional">
+			<xs:annotation>
+				<xs:documentation>ID of thumbnail params that associated with the thumbnail</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="T_player">
 		<xs:sequence>
-			<xs:element ref="player-extension" minOccurs="0"
-				maxOccurs="unbounded" />
+			<xs:element ref="player-extension" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
-		<xs:attribute name="url" type="xs:string" use="required" />
+		<xs:attribute name="url" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>URL of the player</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="T_tags">
 		<xs:sequence>
-			<xs:element name="tag" type="xs:string" minOccurs="1"
-				maxOccurs="unbounded" />
+			<xs:element name="tag" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Free text keyword</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="T_category">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
-				<xs:attribute name="name" use="required" type="xs:string" />
+				<xs:attribute name="name" use="required" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Category name</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -338,7 +504,11 @@
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="media" type="T_media" />
+	<xs:element name="media" type="T_media">
+		<xs:annotation>
+			<xs:documentation>Media related information, such as media type</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	<!-- Not yet supported <xs:element name="mix" type="T_mix"/> <xs:element 
 		name="playlist" type="T_playlist"/> <xs:element name="data" type="T_data"/> 
 		<xs:element name="liveStream" type="T_liveStream"/> <xs:element name="playlists" 
@@ -353,13 +523,26 @@
 			<xs:documentation>Thumbnail asset element</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	<xs:element name="player" type="T_player" />
+	<xs:element name="player" type="T_player">
+		<xs:annotation>
+			<xs:documentation>Entry player element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 	<!--  
 	<xs:element name="bitrate" type="T_bitrate" />
 	<xs:element name="bitrates" type="T_bitrates" />
 	-->
-	<xs:element name="tags" type="T_tags" />
-	<xs:element name="category" type="T_category" />
+	<xs:element name="tags" type="T_tags">
+		<xs:annotation>
+			<xs:documentation>Free text tags</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="category" type="T_category">
+		<xs:annotation>
+			<xs:documentation>Category assignments for entries</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	
 	<xs:element name="rss-extension" />
 	<xs:element name="channel-extension" />
 	<xs:element name="item-extension" />

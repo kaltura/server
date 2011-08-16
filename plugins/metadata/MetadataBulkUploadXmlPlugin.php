@@ -33,7 +33,11 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	public static function contributeToSchema($type)
 	{
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
-		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
+		if(
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
+			&&
+			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML)
+		)
 			return null;
 	
 		$xsd = '
@@ -46,7 +50,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 				<xs:annotation>
 					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
 				</xs:annotation>		
-			</xs:any>	
+			</xs:any>
 		</xs:sequence>
 		
 		<xs:attribute name="metadataId" use="optional" type="xs:int">

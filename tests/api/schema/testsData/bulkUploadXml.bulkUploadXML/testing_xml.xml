@@ -31,62 +31,62 @@
 				-->
 			</media>
 
-			<content id="flavor1" flavorParamsId="0"> 
+			<content flavorParamsId="0"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/mp4/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
 			</content>
-			<content id="flavor2" flavorParamsId="65852"> 
+			<content flavorParamsId="65852"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/mp4/526x296/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
 			</content>
-			<content id="flavor3" flavorParamsId="65853"> 
+			<content flavorParamsId="65853"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/mp4/426x240/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
 			</content>
-			<content id="flavor4" flavorParamsId="65854"> 
+			<content flavorParamsId="65854"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/mp4/298x168/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"/>
 			</content>
 
-			<thumbnail id="thumb1" isDefault="true" thumbParamsId="36"> 
+			<thumbnail isDefault="true" thumbParamsId="36"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
 			</thumbnail>
-			<thumbnail id="thumb2" isDefault="false" thumbParamsId="36"> 
+			<thumbnail isDefault="false" thumbParamsId="36"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/426x240/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
 			</thumbnail>
-			<thumbnail id="thumb3" isDefault="false" thumbParamsId="36"> 
+			<thumbnail isDefault="false" thumbParamsId="36"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/298x168/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
 			</thumbnail>
-			<thumbnail id="thumb4" isDefault="false" thumbParamsId="36"> 
+			<thumbnail isDefault="false" thumbParamsId="36"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/166x93/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
 			</thumbnail>
-			<thumbnail id="thumb5" isDefault="false" thumbParamsId="36"> 
+			<thumbnail isDefault="false" thumbParamsId="36"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
 				<urlContentResource url="http://ll.media.abc.com/video/thumbnails/146x82/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.jpg"/>
 			</thumbnail>
-			<thumbnail id="thumb6" isDefault="false" thumbParamsId="36"> 
+			<thumbnail isDefault="false" thumbParamsId="36"> 
 				<tags>
 					<tag>website</tag>
 				</tags>
