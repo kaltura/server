@@ -18,8 +18,13 @@ class Kaltura_Validate_PartnerEmail extends Zend_Validate_Abstract
 		$otherUsersWithTheSameEmail = $systemPartnerPlugin->systemPartner->listUserLoginData($filter);
 		
 		if (count ( $otherUsersWithTheSameEmail->objects )) {
-			$this->_error ();
-			return false;
+			try {
+				// allow to use email of admin console users
+				$client->user->getByLoginId($value);
+			} catch (Exception $ex) {
+				$this->_error ();
+				return false;	
+			}
 		}
 		
 		return true;
