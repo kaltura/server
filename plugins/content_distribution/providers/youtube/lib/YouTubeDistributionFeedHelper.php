@@ -426,6 +426,7 @@ class YouTubeDistributionFeedHelper
 	    }
 	    
 		$advertisingNode = $this->doc->createElement('yt:advertising');
+		
 		$thirdPartyAdsNode = $this->doc->createElement('yt:third_party_ads');
 		$adTypeNode = $this->doc->createElement('yt:ad_type_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE));
 		$partnerIdNode = $this->doc->createElement('yt:partner_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID));
@@ -435,6 +436,25 @@ class YouTubeDistributionFeedHelper
 		$thirdPartyAdsNode->appendChild($partnerIdNode);
 		$thirdPartyAdsNode->appendChild($videoIdNode);
 		$advertisingNode->appendChild($thirdPartyAdsNode);
+		
+		$allowPreRolls = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
+		$allowPostRolls = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
+		
+		$allowPreRolls = in_array($allowPreRolls, array('true', 'True', '1'));
+		$allowPostRolls = in_array($allowPostRolls, array('true', 'True', '1'));
+		
+		if ( $allowPreRolls || $allowPostRolls)
+		{
+		    $inStreamAdsNode = $this->doc->createElement('yt:instream_ads', 'Allow');
+		    $adSlotsNode = $this->doc->createElement('yt:ad_slots');
+		    $preRollAdsNode = $this->doc->createElement('yt:has_pre_roll', $allowPreRolls ? 'true' : 'false');
+		    $postRollAdsNode = $this->doc->createElement('yt:has_post_roll', $allowPostRolls ? 'true' : 'false');
+		    
+		    $adSlotsNode->appendChild($preRollAdsNode);
+		    $adSlotsNode->appendChild($postRollAdsNode);
+		    $advertisingNode->appendChild($inStreamAdsNode);
+		    $advertisingNode->appendChild($adSlotsNode);
+		}		 
 		
         $itemNode = $this->xpath->query('/rss/channel/item')->item(0);
 		$itemNode->appendChild($advertisingNode);

@@ -23,7 +23,8 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_TARGET = 'target';
 	const CUSTOM_DATA_AD_SERVER_PARTNER_ID = 'adServerPartnerId';
 	const CUSTOM_DATA_ENABLE_AD_SERVER = 'enableAdServer';
-		
+	const CUSTOM_DATA_ALLOW_PRE_ROLL_ADS = 'allowPreRollAds';
+	const CUSTOM_DATA_ALLOW_POST_ROLL_ADS = 'allowPostRollAds';		
 	
 	// validations
 	const MEDIA_TITLE_MAXIMUM_LENGTH = 60;
@@ -117,6 +118,8 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function getTarget()				 {return $this->getFromCustomData(self::CUSTOM_DATA_TARGET);}
     public function getAdServerPartnerId()   {return $this->getFromCustomData(self::CUSTOM_DATA_AD_SERVER_PARTNER_ID);}
 	public function getEnableAdServer()      {return $this->getFromCustomData(self::CUSTOM_DATA_ENABLE_AD_SERVER);}
+    public function getAllowPreRollAds()      {return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_PRE_ROLL_ADS);}
+    public function getAllowPostRollAds()      {return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_POST_ROLL_ADS);}
 	
 
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}
@@ -137,6 +140,8 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function setTarget($v)				{$this->putInCustomData(self::CUSTOM_DATA_TARGET, $v);}
     public function setAdServerPartnerId($v)	{$this->putInCustomData(self::CUSTOM_DATA_AD_SERVER_PARTNER_ID, $v);}
     public function setEnableAdServer($v)	    {$this->putInCustomData(self::CUSTOM_DATA_ENABLE_AD_SERVER, $v);}
+    public function setAllowPreRollAds($v)	    {$this->putInCustomData(self::CUSTOM_DATA_ALLOW_PRE_ROLL_ADS, $v);}
+    public function setAllowPostRollAds($v)	    {$this->putInCustomData(self::CUSTOM_DATA_ALLOW_POST_ROLL_ADS, $v);}
     
 	
 	protected function getDefaultFieldConfigArray()
@@ -338,6 +343,20 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(YouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID);
 	    $fieldConfig->setUserFriendlyFieldName('Entry ID');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(entryId)" />');
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
+	    $fieldConfig->setUserFriendlyFieldName('Allow Pre Roll Ads');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_pre_roll_ads" />');
+	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
+	    $fieldConfig->setUserFriendlyFieldName('Allow Post Roll Ads');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_post_roll_ads" />');
 	    $fieldConfig->setUpdateOnChange(false);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
