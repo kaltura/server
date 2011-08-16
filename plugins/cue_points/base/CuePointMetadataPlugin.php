@@ -44,7 +44,11 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
-	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension" />
+	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
+		<xs:annotation>
+			<xs:documentation>Custom metadata XML</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 			';
 		
 		if($coreType == CuePointPlugin::getSchemaTypeCoreValue(CuePointSchemaType::INGEST_API))

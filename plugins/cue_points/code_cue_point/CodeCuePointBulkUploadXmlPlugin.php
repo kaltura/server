@@ -70,8 +70,21 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
-					<xs:element name="code" minOccurs="0" maxOccurs="1" type="xs:string" />
-					<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string" />
+					<xs:element name="code" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Textual code</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="250"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Free text description</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					
 					<xs:element ref="scene-extension" minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
@@ -79,7 +92,11 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 		</xs:complexContent>
 	</xs:complexType>
 	
-	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePointBulkUploadXml" substitutionGroup="scene" />
+	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePointBulkUploadXml" substitutionGroup="scene">
+		<xs:annotation>
+			<xs:documentation>Single code cue point element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
 		';
 		
 		return $xsd;

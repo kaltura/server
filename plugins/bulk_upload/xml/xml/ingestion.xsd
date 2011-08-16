@@ -1,17 +1,32 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
 	
 	<xs:complexType name="T_mrss">
 		<xs:sequence>
-			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1"/>
+			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>holding multiple item elements</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			
 			<xs:element ref="mrss-extension" minOccurs="0" maxOccurs="unbounded" />
 			
 		</xs:sequence>
+		<xs:attribute name="version" use="optional" type="xs:decimal">
+			<xs:annotation>
+				<xs:documentation>
+					Indicates the XSD version to be used
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	
 	<xs:complexType name="T_channel">
 		<xs:sequence>
-			<xs:element ref="item" maxOccurs="unbounded" minOccurs="1"/>
+			<xs:element ref="item" maxOccurs="unbounded" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>holding entry element</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			
 			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded" />
 			
@@ -32,7 +47,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:choice>
+			<xs:choice minOccurs="1" maxOccurs="1">
 				<xs:sequence>
 					<xs:element name="type" minOccurs="1" maxOccurs="1" type="KalturaEntryType">
 						<xs:annotation>
@@ -58,10 +73,15 @@
 					</xs:element>
 				</xs:sequence>
 			</xs:choice>
-			<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string">
+			<xs:element name="userId" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>User identifier of content creator/owner</xs:documentation>
 				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
 			</xs:element>
 			<xs:element name="name" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
@@ -88,10 +108,15 @@
 					<xs:documentation>Entry`s category assignment</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="partnerData" minOccurs="0" maxOccurs="1" type="xs:string">
+			<xs:element name="partnerData" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Publisher specific information related to the entry<br/>Usually in use for implementing specific integration</xs:documentation>
 				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4000"/>
+					</xs:restriction>
+				</xs:simpleType>
 			</xs:element>
 			<xs:element name="partnerSortData" minOccurs="0" maxOccurs="1" type="xs:int">
 				<xs:annotation>
@@ -104,10 +129,15 @@
 						<xs:documentation>Entry`s access control identifier</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="accessControl" minOccurs="1" maxOccurs="1" type="xs:string">
+				<xs:element name="accessControl" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>Entry`s access control system name</xs:documentation>
 					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="120"/>
+						</xs:restriction>
+					</xs:simpleType>
 				</xs:element>
 			</xs:choice>
 			<xs:choice minOccurs="0" maxOccurs="1">
@@ -116,10 +146,15 @@
 						<xs:documentation>Entry`s transcoding profile identifier</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1" type="xs:string">
+				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>Entry`s transcoding profile system name</xs:documentation>
 					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="120"/>
+						</xs:restriction>
+					</xs:simpleType>
 				</xs:element>
 			</xs:choice>
 			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
@@ -199,11 +234,7 @@
 			</xs:element>
 			-->
 			
-			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded">
-					<xs:annotation>
-						<xs:documentation></xs:documentation>
-					</xs:annotation>
-				</xs:element>
+			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
 			
 		</xs:sequence>
 	</xs:complexType>
@@ -392,10 +423,15 @@
 					<xs:documentation>Remote storage id to be used for linking remote files</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="storageProfile" type="xs:string" minOccurs="1" maxOccurs="1">
+			<xs:element name="storageProfile" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Remote storage system name to be used for linking remote files</xs:documentation>
 				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="120"/>
+					</xs:restriction>
+				</xs:simpleType>
 			</xs:element>
 		</xs:choice>
 		<xs:attribute name="url" type="xs:string" use="required">
@@ -422,10 +458,15 @@
 					<xs:documentation>Origin entry flavor params id</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="flavorParams" type="xs:string" minOccurs="1" maxOccurs="1">
+			<xs:element name="flavorParams" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>Origin entry flavor params system name</xs:documentation>
 				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="120"/>
+					</xs:restriction>
+				</xs:simpleType>
 			</xs:element>
 		</xs:choice>
 		<xs:attribute name="entryId" type="xs:string" use="required">
@@ -481,18 +522,10 @@
 						<xs:documentation>Specifies that content is a Kaltura asset</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1">
-					<xs:annotation>
-						<xs:documentation></xs:documentation>
-					</xs:annotation>
-				</xs:element>
+				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 		
-			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation></xs:documentation>
-				</xs:annotation>
-			</xs:element>
+			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
 		
 		</xs:sequence>
 		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
@@ -502,12 +535,17 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="flavorParams" type="xs:string" use="optional">
+		<xs:attribute name="flavorParams" use="optional">
 			<xs:annotation>
 				<xs:documentation>
 					The flavor params system name to be associated with this flavor asset
 				</xs:documentation>
 			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="120"/>
+				</xs:restriction>
+			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="assetId" type="xs:string" use="optional">
 			<xs:annotation>
@@ -556,18 +594,10 @@
 						<xs:documentation>Specifies that content is a Kaltura asset</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1">
-					<xs:annotation>
-						<xs:documentation></xs:documentation>
-					</xs:annotation>
-				</xs:element>
+				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
 		
-			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded">
-					<xs:annotation>
-						<xs:documentation></xs:documentation>
-					</xs:annotation>
-				</xs:element>
+			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded" />
 			
 		</xs:sequence>
 		<xs:attribute name="assetId" type="xs:string" use="optional">
@@ -587,12 +617,17 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="thumbParams" type="xs:string" use="optional" >
+		<xs:attribute name="thumbParams" use="optional" >
 			<xs:annotation>
 				<xs:documentation>
 					The thumb params system name to be associated with this thumb asset
 				</xs:documentation>
 			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="120"/>
+				</xs:restriction>
+			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
 	
@@ -619,7 +654,7 @@
 	
 	<xs:complexType name="T_categories">
 		<xs:sequence>
-			<xs:element name="category" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+			<xs:element name="category" type="xs:string" minOccurs="1" maxOccurs="32">
 				<xs:annotation>
 					<xs:documentation>Specifies a single category assignment for the Entry. User the `%gt;` character to indicate category hierarchy location</xs:documentation>
 				</xs:annotation>
@@ -677,11 +712,7 @@
 	
 	<xs:attribute name="url" type="T_url" />
 	
-	<xs:element name="contentResource-extension">
-		<xs:annotation>
-			<xs:documentation></xs:documentation>
-		</xs:annotation>
-	</xs:element>
+	<xs:element name="contentResource-extension" />
 	<xs:element name="serverFileContentResource" type="T_serverFileContentResource">
 		<xs:annotation>
 			<xs:documentation>Specifies that content ingestion location is on a Kaltura hosted server</xs:documentation>

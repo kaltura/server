@@ -151,8 +151,22 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 				
 	<xs:complexType name="T_dropFolderFileContentResource">
 		<xs:choice minOccurs="0" maxOccurs="1">
-			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The expected size of the file<br/>
+						Used for validation
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The expected checksum of the file<br/>
+						md5 or sha1<br/>
+						Used for validation
+					</xs:documentation>
+				</xs:annotation>
 				<xs:complexType>
 					<xs:simpleContent>
 						<xs:extension base="xs:string">
@@ -169,8 +183,25 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 				</xs:complexType>
 			</xs:element>
 		</xs:choice>
-		<xs:attribute name="filePath" type="xs:string" use="required"/>
-		<xs:attribute name="dropFolderFileId" type="xs:string" use="optional"/>
+		<xs:attribute name="filePath" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					The name of the file in the drop folder
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="500"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="dropFolderFileId" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>
+					The id of the drop folder file object
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" substitutionGroup="contentResource-extension">

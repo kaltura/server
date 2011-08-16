@@ -42,7 +42,11 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	
 	<xs:complexType name="T_customData">
 		<xs:sequence>
-			<xs:any namespace="##local" processContents="skip"/>			
+			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
+				</xs:annotation>		
+			</xs:any>	
 		</xs:sequence>
 		
 		<xs:attribute name="metadataId" use="optional" type="xs:int">
@@ -50,10 +54,15 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 				<xs:documentation>Id of custom metadata object to apply update/delete action on</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="metadataProfile" use="optional" type="xs:string">
+		<xs:attribute name="metadataProfile" use="optional">
 			<xs:annotation>
 				<xs:documentation>Custom metadata schema profile system name</xs:documentation>
 			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="120"/>
+				</xs:restriction>
+			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="metadataProfileId" use="optional" type="xs:int">
 			<xs:annotation>
@@ -63,7 +72,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		
 	</xs:complexType>
 	
-	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension" >
+	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Custom metadata XML</xs:documentation>
 		</xs:annotation>

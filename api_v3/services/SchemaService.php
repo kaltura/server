@@ -55,8 +55,6 @@ class SchemaService extends KalturaBaseService
 		$xsdFile = fopen($cacheXsdFile, 'w');
 		$elementsXSD = '';
 		
-		fwrite($xsdFile, '<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">');
-	
 		$baseXsdElement = new SimpleXMLElement('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 		if($type == SchemaType::SYNDICATION)
 		{
@@ -75,6 +73,12 @@ class SchemaService extends KalturaBaseService
 		if(!($baseXsdElement instanceof SimpleXMLElement))
 			$baseXsdElement = new SimpleXMLElement('<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"/>');
 	
+		$version = '1.0';
+		if($baseXsdElement['version'])
+			$version = $baseXsdElement['version'];
+		
+		fwrite($xsdFile, "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" version=\"$version\">");
+			
 		foreach($baseXsdElement->children('http://www.w3.org/2001/XMLSchema') as $element)
 		{
 			/* @var $element SimpleXMLElement */

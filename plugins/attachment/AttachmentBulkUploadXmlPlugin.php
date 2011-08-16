@@ -32,6 +32,9 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	 */
 	public static function contributeToSchema($type)
 	{
+		// TODO add IKalturaBulkUploadXmlHandler to handle attachments
+		return null;
+		
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
 			return null;

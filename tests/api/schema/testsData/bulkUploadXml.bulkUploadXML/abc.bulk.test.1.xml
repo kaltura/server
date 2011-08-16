@@ -29,21 +29,21 @@
 				</playlists>
 				-->
 			</media>
-			<content id="flavor1" flavorParamsId="0"> 
+			<content flavorParamsId="0"> 
 				<tags>
 					<tag>web,mbr</tag>
 				</tags>
 				<remoteStorageContentResource url="mp4/644x362/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"><storageProfileId>291</storageProfileId></remoteStorageContentResource>
 			</content>
 
-			<content id="flavor2" flavorParamsId="6"> 
+			<content flavorParamsId="6"> 
 				<tags>
 					<tag>web,mbr</tag>
 				</tags>
 				<remoteStorageContentResource url="mp4/526x296/JKL_20110504_BinLadenMessage_Clip_HD720p_7c94ff84-f478-41e3-8983-c8089725d83a_3714895.mp4"><storageProfileId>291</storageProfileId></remoteStorageContentResource>
 			</content>
 			
-			<thumbnail id="thumb1" isDefault="true">
+			<thumbnail isDefault="true">
 				<tags>
 					<tag>website</tag> 
 				</tags>

@@ -32,6 +32,9 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	 */
 	public static function contributeToSchema($type)
 	{
+		// TODO add IKalturaBulkUploadXmlHandler to handle captions
+		return null;
+		
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if($coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML))
 			return null;

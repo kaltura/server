@@ -99,14 +99,46 @@ div.post_fields { line-height:1.5em; }
 }
 .child-elements-table td, .child-elements-table th{
 	padding: 2px;
-	vertical-align: top;
+	vertical-align: middle;
+	border: 1px solid #cccccc;
 }
+.child-elements-table .extends-title td, .child-elements-table .extends-title td a{
+	padding: 0px;
+	border: 1px solid #0000ff;
+	background-color: #0000ff;
+	color: white;
+	font-weight: bold;
+}
+.child-elements-table .choice-head td{
+	padding: 0px;
+	border: 1px solid #0000ff;
+	background-color: #0000ff;
+	color: white;
+	font-weight: bold;
+}
+.child-elements-table .choice-start td{
+	border-top: 2px solid #0000ff;
+}
+.child-elements-table .choice .last-rowspan{
+	border-bottom: 2px solid #0000ff;
+}
+.child-elements-table .choice-end td{
+	border-bottom: 2px solid #0000ff;
+}
+.child-elements-table .choice .first{
+	border-left: 2px solid #0000ff;
+}
+.child-elements-table .choice .last{
+	border-right: 2px solid #0000ff;
+}
+
 .child-attributes{
 	text-decoration: underline;
 }
 .child-attributes-table td, .child-attributes-table th{
 	padding: 2px;
-	vertical-align: top;
+	vertical-align: middle;
+	border: 1px solid #cccccc;
 }
 .child-attributes-table{
 	border: 1px solid black;
