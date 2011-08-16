@@ -39,6 +39,8 @@ class Form_YouTubeProfileConfiguration extends Form_ConfigurableProfileConfigura
 	
 	protected function addProviderElements()
 	{
+	    $this->setDescription(null);
+	    
 		$element = new Zend_Form_Element_Hidden('providerElements');
 		$element->setLabel('YouTube Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
