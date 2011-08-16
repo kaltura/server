@@ -230,7 +230,16 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			return null;
 			
 		$peer = $object->getPeer();
-		$objectType = $peer->getOMClass(false, null);
+		try
+		{
+			$objectType = $peer->getOMClass(false, null);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[$objectType] " . $e->getMessage());
+			$auditTrail = null;
+			return null;
+		}
 		
 		KalturaLog::debug("Creating audit trail for object id[" . $object->getId() . "] type[$objectType]");
 		
