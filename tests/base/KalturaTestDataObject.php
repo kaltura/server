@@ -446,6 +446,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		else
 		{
 			//Handle no classes objects like string and int
+			KalturaTestDataObject::setPropertyValue($this->value, "value", trim("$xml"), null);
 		}
 	}
 
