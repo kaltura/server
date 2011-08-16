@@ -81,10 +81,9 @@ class CuePointPeer extends BaseCuePointPeer
 				self::$class_types_cache[$assetType] = $extendedCls;
 				return $extendedCls;
 			}
-			self::$class_types_cache[$assetType] = self::OM_CLASS;
 		}
 			
-		return self::OM_CLASS;
+		throw new Exception("Can't instantiate un-typed cue point [" . print_r($row, true) . "]");
 	}
 	
 	/* (non-PHPdoc)
