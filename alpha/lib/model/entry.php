@@ -1502,16 +1502,24 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 		if ( $res == null ) return "Keditor"; // no value means Keditor == advanced
 		return $res;
 	}
-
+	
+	public function setConversionProfileId($conversion_quality)
+	{
+		$this->setConversionQuality($conversion_quality);
+	}
+	public function setConversionQuality($conversion_quality)	
+	{
+		parent::setConversionProfileId($conversion_quality);
+		$this->putInCustomData("conversion_quality", $conversion_quality);
+	}
+	public function getConversionQuality (  ){return $this->getFromCustomData( "conversion_quality" );}
+	
 	public function setBulkUploadId ( $bulkUploadId )	{		$this->putInCustomData ( "bulk_upload_id" , $bulkUploadId );	}
 	public function getBulkUploadId (  )	{		return $this->getFromCustomData( "bulk_upload_id" );	}
 	
 	public function setModerate ( $should_moderate )	{		$this->putInCustomData ( "moderate" , $should_moderate );	}
 	public function getModerate (  )	{		return $this->getFromCustomData( "moderate" );	}
 	
-	public function setConversionQuality ( $conversion_quality)	{		$this->putInCustomData ( "conversion_quality" , $conversion_quality );	}
-	public function getConversionQuality (  )	{		return $this->getFromCustomData( "conversion_quality" );	}
-
 	public function resetUpdateWhenReady ( )	{		$this->putInCustomData ( "current_kshow_version" , null );	}
 	public function setUpdateWhenReady ( $current_kshow_version )	{		$this->putInCustomData ( "current_kshow_version" , $current_kshow_version );	}
 
