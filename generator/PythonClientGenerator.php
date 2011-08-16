@@ -40,10 +40,13 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		}
 	}
 	
+	function getPluginClassName($pluginName)
+	{
+		return "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+	}
+	
 	function writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes)
 	{
-		$xpath = new DOMXPath($this->_doc);
-
 		if ($pluginName == '')
 		{
 			$pluginClassName = "KalturaCoreClient";
@@ -51,7 +54,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		}
 		else 
 		{
-			$pluginClassName = "Kaltura" . ucfirst($pluginName) . "ClientPlugin";
+			$pluginClassName = $this->getPluginClassName($pluginName);
 			$outputFileName = "KalturaPlugins/$pluginClassName.py";
 		}
 		
@@ -73,6 +76,13 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("    sys.path.append(clientRoot)");
 			$this->appendLine('');
 			$this->appendLine('from KalturaCoreClient import *');
+
+			$xpath = new DOMXPath($this->_doc);
+			$dependencyNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/dependency");
+			foreach($dependencyNodes as $dependencyNode)
+				$this->appendLine('from ' .
+					$this->getPluginClassName($dependencyNode->getAttribute("pluginName")) . 
+					' import *');
 		}
 		$this->appendLine('from KalturaClientBase import *');
 		$this->appendLine('');

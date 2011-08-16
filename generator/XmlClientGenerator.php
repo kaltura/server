@@ -124,19 +124,31 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	
 	private function appendPlugins(DOMElement $pluginsElement)
 	{
+		// Add all the plugins that offer services to the list of required plugins
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlugin');
 		foreach($pluginInstances as $pluginInstance)
+		{
+    		if (!$pluginInstance->getInstance('IKalturaServices'))
+    			continue;
+
+    		$pluginName = $pluginInstance->getPluginName();
+    		if (!in_array($pluginName, $this->_requiredPlugins))
+    			$this->_requiredPlugins[] =  $pluginName;
+		}
+		
+		// Add plugin tags to the XML
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlugin');
+		foreach($pluginInstances as $pluginInstance)
+		{
+			if (!in_array($pluginInstance->getPluginName(), $this->_requiredPlugins))
+				continue;
+			
 	    	$this->appendPlugin($pluginsElement, $pluginInstance);
+		}
 	}
 	
 	private function appendPlugin(DOMElement $pluginsElement, IKalturaPlugin $pluginInstance)
-	{
-    	$pluginServices = $pluginInstance->getInstance('IKalturaServices');
-    	if (!$pluginServices && !in_array($pluginInstance->getPluginName(), $this->_requiredPlugins))
-    	{
-    		return;
-    	}
-    	
+	{  
 		$pluginElement = $this->_doc->createElement("plugin");
     	$pluginElement->setAttribute('name', $pluginInstance->getPluginName());
     	
@@ -148,11 +160,16 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
     		foreach ($dependencyList as $dependency)
     		{
     			$dependencyElement = $this->_doc->createElement("dependency");
+    			
+    			if (!in_array($dependency->getPluginName(), $this->_requiredPlugins))
+    				continue;		// don't care about dependencies on plugins not generated in the client lib 
+    			
     			$dependencyElement->setAttribute('pluginName', $dependency->getPluginName());    			
     			$pluginElement->appendChild($dependencyElement);
     		}
     	}
 
+    	$pluginServices = $pluginInstance->getInstance('IKalturaServices');
     	if ($pluginServices)
     	{
     		$this->appendPluginServices($pluginInstance->getPluginName(), $pluginElement, $pluginServices);
