@@ -253,7 +253,10 @@ class KalturaTestDeploymentHelper
 		
 		self::addUsers($client);
 		self::addMetadataSearchData($client);
-		self::addDWHdata($client);
+		self::addDWHdata($client); 
+		self::addBrightCoveConversionProfileData($client);
+		self::addBrightCoveBulkUploadXml($client);
+		
 	}
 	
 	/**
@@ -513,4 +516,31 @@ endscript
 		
 		KalturaGlobalData::setData("@METADATA_SEARCH_ENTRIES_IDS@", $expectedResults);
 	}
+	
+	protected static function addBrightCoveConversionProfileData(KalturaClient $client)
+	{
+		$conversionProfile = new KalturaConversionProfile();
+		$conversionProfile->status = KalturaConversionProfileStatus::ENABLED;
+		$conversionProfile->name = 'BrightCove';
+		$conversionProfile->description = 'conversion profile for testing bulk upload BrightCove xml';
+		$conversionProfile->xslTransformation = file_get_contents(dirname(__FILE__) . '/../../plugins/bulk_upload/xml/xml/brightcove.xsl');
+		$conversionProfile->isDefault = KalturaNullableBoolean::FALSE_VALUE;
+		$conversionProfile->flavorParamsIds = "0";
+		$conversionProfile = $client->conversionProfile->add($conversionProfile);
+		KalturaGlobalData::setData("@CONVERSION_PROFILE_ID_XSLT@", $conversionProfile->id);
+	}
+	
+	protected static function addBrightCoveBulkUploadXml(KalturaClient $client)
+	{
+		$path = dirname(__FILE__) . '/bulkUploadXmls/brightcove';
+		$xmlFiles = scandir($path);
+		$int = 1;
+		foreach($xmlFiles as $xmlFile){
+			if(is_dir($xmlFile)) continue;
+			$filePath = $path . "/" . $xmlFile;
+			$kalturaBulkUpload = $client->bulkUpload->add(KalturaGlobalData::getIntData("@CONVERSION_PROFILE_ID_XSLT@"), $filePath, KalturaBulkUploadType::XML, null);
+			KalturaGlobalData::setData("@XSLT_BULK_UPLOAD_ID_".$int++."@", $kalturaBulkUpload->id);
+		}
+	}
+	
 }
