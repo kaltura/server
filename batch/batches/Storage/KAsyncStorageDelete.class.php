@@ -155,7 +155,7 @@ class KAsyncStorageDelete extends KBatchBase
 		$supported_engines_arr = array();
 		if  ( $this->taskConfig->params->useFTP ) $supported_engines_arr[] = KalturaDeleteProtocol::FTP;
 		if  ( $this->taskConfig->params->useSCP ) $supported_engines_arr[] = KalturaDeleteProtocol::SCP;
-		if  ( $this->taskConfig->params->useSFTP ) $supported_engines_arr[] = KalturaDeleteProtocol::SCP;
+		if  ( $this->taskConfig->params->useSFTP ) $supported_engines_arr[] = KalturaDeleteProtocol::SFTP;
 		
 		return join(',', $supported_engines_arr);
 	}
