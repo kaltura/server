@@ -31,7 +31,10 @@ class AssetFilter extends baseObjectFilter
 			"_lte_updated_at",
 			"_gte_deleted_at",
 			"_lte_deleted_at",
-			) , NULL );
+			"_like_tags" ,
+			"_mlikeor_tags" ,			
+			"_mlikeand_tags" ,
+		) , NULL );
 
 		$this->allowed_order_fields = array ( 
 			"created_at",
