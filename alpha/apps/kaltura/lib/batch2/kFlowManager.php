@@ -369,6 +369,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 				$object->save();
+				
+				if($object->getFlavorParamsId())
+					kFlowHelper::generateThumbnailsFromFlavor($entryId, $raisedJob, $object->getFlavorParamsId());
+				
 				return true;
 			}
 			
