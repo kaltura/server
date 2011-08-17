@@ -17,11 +17,11 @@ $cacheFilePath = "$cachePath/$cacheKey.cache";
 // Html headers + scripts
 require_once("header.php");
 
-// if (file_exists($cacheFilePath))
-// {
-// 	print file_get_contents($cacheFilePath);
-// 	die;
-// }
+if (file_exists($cacheFilePath))
+{
+	print file_get_contents($cacheFilePath);
+	die;
+}
 
 ob_start();
 
