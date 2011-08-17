@@ -446,7 +446,18 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		else
 		{
 			//Handle no classes objects like string and int
-			KalturaTestDataObject::setPropertyValue($this->value, "value", trim("$xml"), null);
+			$child = $xml->children();
+			if($this->type == 'fileHandler'){
+				KalturaTestDataObject::setPropertyValue($this->value, "value", file_get_contents(getcwd().(string)$xml['key']), null);
+			} else {
+				if($child->count() == 0){
+					KalturaTestDataObject::setPropertyValue($this->value, "value", trim($xml), null);
+				}
+				else{
+					KalturaTestDataObject::setPropertyValue($this->value, "value", $child->saveXML(), null);
+				}
+			}
+				
 		}
 	}
 
