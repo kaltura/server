@@ -206,6 +206,18 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 	} 
 
 	/**
+	 * 
+	 * Strip carriage return and new line from a string.
+	 * @param string $string to be stripped.
+	 */
+	protected function stripWhiteSpaces($string)
+	{
+		$string = str_replace("\n", '', $string);
+		$string = str_replace("\r", '', $string);
+		return $string;
+	} 
+
+	/**
 	 * Starts a new session
 	 * @param KalturaSessionType $type
 	 * @param string $userId
