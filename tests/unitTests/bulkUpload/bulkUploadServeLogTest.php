@@ -35,8 +35,6 @@ class BulkUploadServeLogTest extends KalturaApiTestCase
 	{
 		$urlToActualXmlLog= $this->client->bulkUpload->serveLog($id);
 		$actualXmlLog = self::getApiFileFromUrl($urlToActualXmlLog);
-//		print("Result : " . print_r($actualXmlLog, true));
-		$this->assertEquals($xmlLog, $actualXmlLog);
-//		$this->compareOnField("xmlLog", $result , $xmlLog, 'assertEquals');
+		$this->compareOnField("xmlLog", self::stripWhiteSpaces($actualXmlLog) , self::stripWhiteSpaces($xmlLog), 'assertEquals');
 	}
 }
