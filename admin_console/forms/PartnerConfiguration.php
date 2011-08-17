@@ -102,13 +102,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		//TODO - CHANGE TO REAL PERMISSION
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][] = 'access_control_on_tumbnails';
 		*/		
-		
-		$this->addElement('checkbox', 'restrict_thumbnail_by_ks', array(
-			'label'	  => 'Apply access control rule on Player thumbnail',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
-		));		
-
-		//--------------------------- Remote Storage Account policy ---------------------------				
+//--------------------------- Remote Storage Account policy ---------------------------				
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
 		$storageServP->setLabel('Delivery Policy:');
 		$this->addElements(array($storageServP));	
@@ -181,7 +175,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));		
 
-		//--------------------------- Included Usage ---------------------------	
+//--------------------------- Included Usage ---------------------------	
 		$element = new Zend_Form_Element_Hidden('includedUsageLabel');
 		$element->setLabel('For reporting purposes only. Leave empty for unlimited usage or when not applicable');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partnerConfigurationDescription'))));	
@@ -437,7 +431,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert','crossLine'), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));	
 		$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
-		$this->addDisplayGroup(array('def_thumb_offset','restrict_thumbnail_by_ks','crossLine'), 'publisherSpecificIngestionSettings', array('legend' => 'Publisher Specific Ingestion Settings'));
+		$this->addDisplayGroup(array_merge(array('def_thumb_offset') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
 									 Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',

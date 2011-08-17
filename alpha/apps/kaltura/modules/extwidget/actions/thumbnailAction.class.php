@@ -102,8 +102,20 @@ class thumbnailAction extends sfAction
 			}			
 		}
 		
-		
 		$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
+		
+		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
+		if ($rel_width != -1) {
+			$widthRatio  = $entry->getWidth() / $rel_width;
+			$src_x = $src_x * $widthRatio;
+			$src_w = $src_w * $widthRatio;
+		}
+		
+		if ($rel_height != -1) {
+			$heightRatio  = $entry->getHeight() / $rel_height;
+			$src_y  = $src_y * $heightRatio;
+			$src_h  = $src_h * $heightRatio;
+		}						
 		
 		if ( ! $entry )
 		{	
@@ -132,32 +144,6 @@ class thumbnailAction extends sfAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 		}
-		
-		$partner = $entry->getPartner();
-		
-		//checks whether the thumbnail display should be restricted by KS
-		if($partner->getRestrictThumbnailByKs()) {
-			$base64Referrer = $this->getRequestParameter("referrer");
-			$referrer = base64_decode($base64Referrer);
-			if (!is_string($referrer)) 
-				$referrer = ""; // base64_decode can return binary data
-			$ksStr = $this->getRequestParameter("ks");
-			$securyEntryHelper = new KSecureEntryHelper($entry, $ksStr, $referrer);
-			$securyEntryHelper->validateForPlay($entry, $ksStr);
-		}
-		
-		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
-		if ($rel_width != -1) {
-			$widthRatio  = $entry->getWidth() / $rel_width;
-			$src_x = $src_x * $widthRatio;
-			$src_w = $src_w * $widthRatio;
-		}
-		
-		if ($rel_height != -1) {
-			$heightRatio  = $entry->getHeight() / $rel_height;
-			$src_y  = $src_y * $heightRatio;
-			$src_h  = $src_h * $heightRatio;
-		}						
 		
 		$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
@@ -325,8 +311,6 @@ class thumbnailAction extends sfAction
 		}
 		
 		$nocache = strpos($tempThumbPath, "_NOCACHE_") !== false;
-		
-		if($partner->getRestrictThumbnailByKs()) $nocache = TRUE;
 
 		// notify external proxy, so it'll cache this url
 		if (!$nocache && requestUtils::getHost() == kConf::get ( "apphome_url" )  && file_exists($tempThumbPath))
