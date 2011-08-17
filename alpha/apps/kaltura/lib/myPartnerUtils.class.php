@@ -975,6 +975,17 @@ class myPartnerUtils
 		$partner->save();		
 	}
 		
+	public static function getParnerWidgetStatisticsFromDWH($partnerId, $startDate, $endDate) {
+		$reportFilter = new reportsInputFilter();
+		
+		// use gmmktime to avoid server timezone offset - this is for backward compatibility while the KMC is not sending TZ info
+		list($year, $month, $day) = explode('-', $startDate);
+		$reportFilter->from_date = gmmktime(0, 0, 0, $month, $day, $year);
+		list($year, $month, $day) = explode('-', $endDate);
+		$reportFilter->to_date = gmmktime(0, 0, 0, $month, $day, $year);
+		$res = myReportsMgr::getGraph ( $partnerId , myReportsMgr::REPORT_TYPE_WIDGETS_STATS , $reportFilter , null , null );
+		return $res;
+	}
 	
 	public static function getPartnerBandwidthUsageFromDWH($partnerId, $startDate, $endDate, $resolution, $tzOffset = null)
 	{

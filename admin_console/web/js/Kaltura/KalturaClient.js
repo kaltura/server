@@ -625,6 +625,7 @@ KalturaReportType.prototype.MAP_OVERLAY = 4;
 KalturaReportType.prototype.TOP_CONTRIBUTORS = 5;
 KalturaReportType.prototype.TOP_SYNDICATION = 6;
 KalturaReportType.prototype.CONTENT_CONTRIBUTIONS = 7;
+KalturaReportType.prototype.WIDGETS_STATS = 8;
 
 function KalturaSearchProviderType()
 {

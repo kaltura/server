@@ -13,6 +13,7 @@ class myReportsMgr
 	const REPORT_TYPE_TOP_CONTRIBUTORS = 5;
 	const REPORT_TYPE_TOP_SYNDICATION = 6;
 	const REPORT_TYPE_CONTENT_CONTRIBUTIONS = 7;
+	const REPORT_TYPE_WIDGETS_STATS = 8;
 	const REPORT_TYPE_ADMIN_CONSOLE = 10;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER = 100;
 	const REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE = 101;
@@ -516,6 +517,7 @@ class myReportsMgr
 		self::REPORT_TYPE_TOP_CONTRIBUTORS => "top_contributors" ,
 		self::REPORT_TYPE_TOP_SYNDICATION => "top_syndication" ,
 		self::REPORT_TYPE_CONTENT_CONTRIBUTIONS => "content_contributions" ,
+		self::REPORT_TYPE_WIDGETS_STATS => "widgets_stats" ,
 		self::REPORT_TYPE_ADMIN_CONSOLE => "admin_console" ,
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER => "system_generic_partner" ,
 		self::REPORT_TYPE_SYSTEM_GENERIC_PARTNER_TYPE => "system_generic_partner_type" ,
@@ -594,6 +596,10 @@ class myReportsMgr
 				"count_loads" ,
 				"load_play_ratio" ,	
 			),
+			"widgets_stats" => array (
+				"widget_id",
+				"count_plays"
+			)
 		);
 			
 		if ( $order_by[0] == '-' )

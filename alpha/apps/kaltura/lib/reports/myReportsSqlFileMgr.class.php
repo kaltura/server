@@ -203,6 +203,16 @@ KalturaLog::log ( __METHOD__. ": [$type_str] [$flavor_str] [$add_search_text] [$
 				"graph" => "",
 				"graph_no_text" => "!graph",
 			),
+			"widgets_stats" => array (
+				"detail" => "!graph",
+				"detail_no_text" => "!graph",
+				"count" => "!graph",
+				"count_no_text" => "!graph",
+				"total" => "!graph",
+				"total_no_text" => "!graph",
+				"graph" => ""				,
+				"graph_no_text" => "!graph",
+			)
 		);
 
 		if ( isset ( $map[$type_str] ) )
