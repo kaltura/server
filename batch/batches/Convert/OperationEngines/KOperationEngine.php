@@ -92,7 +92,7 @@ abstract class KOperationEngine
 		if($return_value != 0) 
 			throw new KOperationEngineException("return value: [$return_value]");
 			
-		$this->logMediaInfo($data->destFileSyncLocalPath);
+		$this->logMediaInfo($this->outFilesPath);
 	}
 	
 	/**
