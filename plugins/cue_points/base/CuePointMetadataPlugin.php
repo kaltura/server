@@ -53,6 +53,22 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
 		<xs:annotation>
 			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-ad-cue-point entryId="{entry id}">
+						<sceneStartTime>00:00:05</sceneStartTime>
+						<sceneTitle>my ad title</sceneTitle>
+						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+						<adType>1</adType>
+						<protocolType>1</protocolType>
+						<scene-customData metadataProfile="MY_AD_METADATA_PROFILE">
+							<metadata>
+								<adData>my ad custom data</adData>
+							</metadata>
+						</scene-customData>
+					</scene-ad-cue-point>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 			';
@@ -92,6 +108,22 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
 		<xs:annotation>
 			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-ad-cue-point entryId="{entry id}">
+						<sceneStartTime>00:00:05</sceneStartTime>
+						<sceneTitle>my ad title</sceneTitle>
+						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+						<adType>1</adType>
+						<protocolType>1</protocolType>
+						<scene-customData metadataProfile="MY_AD_METADATA_PROFILE">
+							<metadata>
+								<adData>my ad custom data</adData>
+							</metadata>
+						</scene-customData>
+					</scene-ad-cue-point>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 			';
@@ -146,6 +178,28 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
 		<xs:annotation>
 			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-ad-cue-point entryId="{entry id}">
+						<sceneStartTime>00:00:05</sceneStartTime>
+						<sceneTitle>my ad title</sceneTitle>
+						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+						<adType>1</adType>
+						<protocolType>1</protocolType>
+						<scene-customData	metadataId="{metadata id}" 
+										metadataVersion="1" 
+										metadataProfile="MY_METADATA_PROFILE_SYSTEM_NAME}"  
+										metadataProfileId="{metadata profile id}"  
+										metadataProfileName="my metadata profile" 
+										metadataProfileVersion="1" 
+						>
+							<metadata>
+								<adData>my ad custom data</adData>
+							</metadata>
+						</scene-customData>
+					</scene-ad-cue-point>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 			';

@@ -453,16 +453,55 @@
 		<xs:annotation>
 			<xs:documentation>Wrapper element holding XML structure
 			</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<rss version="2.0">
+						<channel>
+							<title>My Feed Title</title>
+							<link/>
+							<description>my feed description</description>
+							<items>
+								<item>...</item>
+								<item>...</item>
+								<item>...</item>
+							</items>
+						</channel>
+					</rss>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="channel" type="T_channel">
 		<xs:annotation>
 			<xs:documentation>Wrapper element holding multiple item elements</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<channel>
+						<title>My Feed Title</title>
+						<link/>
+						<description>my feed description</description>
+						<items>
+							<item>...</item>
+							<item>...</item>
+							<item>...</item>
+						</items>
+					</channel>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="items" type="T_items">
 		<xs:annotation>
 			<xs:documentation>Wrapper element holding multiple item elements</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<items>
+						<item>...</item>
+						<item>...</item>
+						<item>...</item>
+					</items>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="item" type="T_item">
@@ -471,34 +510,36 @@
 			<xs:appinfo>
 				<example>
 					<item>
-						<action>add</action>
+						<entryId>{entry id}</entryId>
+						<createdAt>1311878948</createdAt>
+						<updatedAt>1311879522</updatedAt>
+						<title>my entry name</title>
+						<link>http://my.feed.url?entry_id={entry id}</link>
 						<type>1</type>
 						<licenseType>-1</licenseType>
-						<userId>test_user</userId>
-						<name>test example name</name>
-						<description>test example description</description>
+						<userId>my.example.user</userId>
+						<name>my entry name</name>
+						<status>2</status>
+						<description>my entry free text description</description>
+						<thumbnailUrl url="http://kaltura.domain/thumbnail/path/to/file.jpg"/>
 						<tags>
-							<tag>test</tag>
 							<tag>example</tag>
+							<tag>my_tag</tag>
 						</tags>
-						<categories>
-							<category>tests-&gt;examples</category>
-						</categories>
-						<conversionProfile>CONVERT_PROFILE_EXAMPLE</conversionProfile>
-						<!-- 
-							<conversionProfileId>[conversion profile id]</conversionProfileId>
-						 -->
+						<category name="example1">examples&gt;example1</category>
+						<category name="example2">examples&gt;example2</category>
+						<partnerData>my advanced data</partnerData>
+						<accessControlId>{access control id}</accessControlId>
+						<conversionProfileId>{conversion profile id}</conversionProfileId>
 						<media>
 							<mediaType>1</mediaType>
+							<duration>34951</duration>
+							<flavorParamsIds>0,3</flavorParamsIds>
 						</media>
-						<content flavorParamsId="0">
-							<urlContentResource
-								url="http://www.kaltura.co.cc/content/Oleg/nice_Flv.flv" />
-						</content>
-						<thumbnail>
-							<urlContentResource
-								url="http://www.kaltura.co.cc/content/Oleg/thumbs/horse.jpg" />
-						</thumbnail>
+						<thumbnail url="http://kaltura.domain/thumbnail/path/to/thumbnail1.jpg">...</thumbnail>
+						<thumbnail url="http://kaltura.domain/thumbnail/path/to/thumbnail2.jpg">...</thumbnail>
+						<content url="http://kaltura.domain/flavor/path/to/flavor1.flv">...</content>
+						<content url="http://kaltura.domain/flavor/path/to/flavor2.flv">...</content>
 					</item>
 				</example>
 			</xs:appinfo>
@@ -507,6 +548,17 @@
 	<xs:element name="media" type="T_media">
 		<xs:annotation>
 			<xs:documentation>Media related information, such as media type</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<type>1</type>
+						<media>
+							<mediaType>1</mediaType>
+						</media>
+						<content flavorParamsId="0">...</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<!-- Not yet supported <xs:element name="mix" type="T_mix"/> <xs:element 
@@ -516,16 +568,80 @@
 	<xs:element name="content" type="T_content">
 		<xs:annotation>
 			<xs:documentation>Flavor asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<type>1</type>
+						<media>
+							<mediaType>1</mediaType>
+						</media>
+						<content	url="http://kaltura.domain/path/my_flavor_asset.flv"
+									isSource="true" 
+									containerFormat="flash video" 
+									extension="flv" 
+									assetId="{flavor asset id}"
+									flavorParamsId="0"
+									flavorParamsName="Source" 
+									format="" 
+									videoBitrate="0" 
+									videoCodec="" 
+									audioBitrate="0" 
+									audioCodec="" 
+									frameRate="0" 
+									height="0" 
+									width="0"
+						>
+							<tags>
+								<tag>example</tag>
+								<tag>my_tag</tag>
+							</tags>
+						</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="thumbnail" type="T_thumbnail">
 		<xs:annotation>
 			<xs:documentation>Thumbnail asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<type>1</type>
+						<media>
+							<mediaType>1</mediaType>
+						</media>
+						<thumbnail	url="http://kaltura.domain/path/my_thumbnail_asset.flv" 
+									thumbAssetId="{thumb asset id}" 
+									isDefault="false" 
+									format="" 
+									height="120" 
+									width="120"
+						>
+							<tags>
+								<tag>example</tag>
+								<tag>my_tag</tag>
+							</tags>
+						</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="player" type="T_player">
 		<xs:annotation>
 			<xs:documentation>Entry player element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<type>1</type>
+						<media>
+							<mediaType>1</mediaType>
+						</media>
+						<player	url="http://kaltura.domain/path/my_player_widget.swf"/>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<!--  

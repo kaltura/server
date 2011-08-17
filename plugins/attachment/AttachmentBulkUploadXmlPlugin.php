@@ -115,11 +115,6 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 				<xs:documentation>Attachment asset file format</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="href" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>Attachment asset file download URL</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 						
 	</xs:complexType>
 	
@@ -127,6 +122,20 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Attachment asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<attachment format="1">
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<urlContentResource url="http://my.domain/path/file.txt"/>
+						<filename>my_file_name.txt</filename>
+						<title>my attachment asset title</title>
+						<description>my attachment asset free text description</description>
+					</attachment>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

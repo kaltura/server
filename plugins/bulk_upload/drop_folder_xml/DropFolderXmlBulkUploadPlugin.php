@@ -207,6 +207,34 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 	<xs:element name="dropFolderFileContentResource" type="T_dropFolderFileContentResource" substitutionGroup="contentResource-extension">
 		<xs:annotation>
 			<xs:documentation>Specifies that content file location is within a Kaltura defined drop folder</xs:documentation>
+			<xs:appinfo>
+				<example title="Using file size validation example">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>...</content>
+						<thumbnail>
+							<dropFolderFileContentResource filePath="file.jpg">
+								<fileSize>453453344</fileSize>
+							</dropFolderFileContentResource>
+						</thumbnail>
+					</item>
+				</example>
+				<example title="Using checksum validation example">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>...</content>
+						<thumbnail>
+							<dropFolderFileContentResource filePath="file.jpg">
+								<fileChecksum type="md5">sdfsjodf90sfsdfzfasdfwrg34</fileChecksum>
+							</dropFolderFileContentResource>
+						</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	

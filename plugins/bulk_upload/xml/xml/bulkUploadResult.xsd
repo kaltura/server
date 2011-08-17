@@ -393,21 +393,98 @@
 	<xs:element name="mrss" type="T_mrss">
 		<xs:annotation>
 			<xs:documentation>Wrapper element holding XML structure</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<mrss version="2.0">
+						<channel>
+							<items>
+								<item>...</item>
+								<item>...</item>
+								<item>...</item>
+							</items>
+						</channel>
+					</mrss>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="channel" type="T_channel">
 		<xs:annotation>
 			<xs:documentation>Wrapper element holding multiple item elements</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<mrss version="2.0">
+						<channel>
+							<items>
+								<item>...</item>
+								<item>...</item>
+								<item>...</item>
+							</items>
+						</channel>
+					</mrss>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="item" type="T_item">
 		<xs:annotation>
 			<xs:documentation>Single entry wrapper element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<result>
+							<errorDescription>...</errorDescription>
+						</result>
+						<action>add</action>
+						<entryId>{entry id}</entryId>
+						<createdAt>1311878948</createdAt>
+						<updatedAt>1311879522</updatedAt>
+						<title>my entry name</title>
+						<link>http://my.feed.url?entry_id={entry id}</link>
+						<type>1</type>
+						<licenseType>-1</licenseType>
+						<userId>my.example.user</userId>
+						<name>my entry name</name>
+						<status>2</status>
+						<description>my entry free text description</description>
+						<thumbnailUrl url="http://kaltura.domain/thumbnail/path/to/file.jpg"/>
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<category name="example1">examples&gt;example1</category>
+						<category name="example2">examples&gt;example2</category>
+						<partnerData>my advanced data</partnerData>
+						<accessControlId>{access control id}</accessControlId>
+						<conversionProfileId>{conversion profile id}</conversionProfileId>
+						<media>
+							<mediaType>1</mediaType>
+							<duration>34951</duration>
+							<flavorParamsIds>0,3</flavorParamsIds>
+						</media>
+						<thumbnail url="http://kaltura.domain/thumbnail/path/to/thumbnail1.jpg">...</thumbnail>
+						<thumbnail url="http://kaltura.domain/thumbnail/path/to/thumbnail2.jpg">...</thumbnail>
+						<content url="http://kaltura.domain/flavor/path/to/flavor1.flv">...</content>
+						<content url="http://kaltura.domain/flavor/path/to/flavor2.flv">...</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="result" type="T_result">
 		<xs:annotation>
 			<xs:documentation>Entry action result element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<result>
+							<errorDescription>...</errorDescription>
+						</result>
+						<action>add</action>
+						<entryId>{entry id}</entryId>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="tags" type="T_tags">
@@ -423,16 +500,89 @@
 	<xs:element name="media" type="T_media">
 		<xs:annotation>
 			<xs:documentation>Media related information, such as media type</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<result>
+							<errorDescription>...</errorDescription>
+						</result>
+						<action>add</action>
+						<entryId>{entry id}</entryId>
+						<media>
+							<mediaType>1</mediaType>
+							<duration>34951</duration>
+							<flavorParamsIds>0,3</flavorParamsIds>
+						</media>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="content" type="T_content">
 		<xs:annotation>
 			<xs:documentation>Flavor asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<result>
+							<errorDescription>...</errorDescription>
+						</result>
+						<action>add</action>
+						<entryId>{entry id}</entryId>
+						<media>...</media>
+						<content	url="http://kaltura.domain/path/my_flavor_asset.flv"
+									isSource="true" 
+									containerFormat="flash video" 
+									extension="flv" 
+									assetId="{flavor asset id}"
+									flavorParamsId="0"
+									flavorParamsName="Source" 
+									format="" 
+									videoBitrate="0" 
+									videoCodec="" 
+									audioBitrate="0" 
+									audioCodec="" 
+									frameRate="0" 
+									height="0" 
+									width="0">
+						>
+							<tags>
+								<tag>example</tag>
+								<tag>my_tag</tag>
+							</tags>
+						</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="thumbnail" type="T_thumbnail">
 		<xs:annotation>
 			<xs:documentation>Thumbnail asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<result>
+							<errorDescription>...</errorDescription>
+						</result>
+						<action>add</action>
+						<entryId>{entry id}</entryId>
+						<media>...</media>
+						<thumbnail	url="http://kaltura.domain/path/my_thumbnail_asset.flv" 
+									thumbAssetId="{thumb asset id}" 
+									isDefault="false" 
+									format="" 
+									height="120" 
+									width="120"
+						>
+							<tags>
+								<tag>example</tag>
+								<tag>my_tag</tag>
+							</tags>
+						</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	

@@ -157,14 +157,20 @@
 				<xsl:call-template name="element-type"><xsl:with-param name="type" select="@type"/></xsl:call-template>
 				
 				<xsl:if test="count(*[local-name() = 'annotation']/*[local-name() = 'appinfo']/*[local-name() = 'example']/*) > 0">
-					<span class="element-example-title">XML Example</span><br/>
-					<div class="element-example">
-						<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'appinfo']/*[local-name() = 'example']">
+					<xsl:for-each select="*[local-name() = 'annotation']/*[local-name() = 'appinfo']/*[local-name() = 'example']">
+						<span class="element-example-title">
+							<xsl:choose>
+								<xsl:when test="string-length(@title) > 0"><xsl:value-of select="@title"/></xsl:when>
+								<xsl:otherwise>XML Example</xsl:otherwise>
+							</xsl:choose>
+						</span>
+						<br/>
+						<div class="element-example">
 							<xsl:apply-templates mode="escape">
 								<xsl:with-param name="indent" select="1" />
 							</xsl:apply-templates>
-						</xsl:for-each>
-					</div>
+						</div>
+					</xsl:for-each>
 				</xsl:if>
 				
 				<xsl:if test="count(/*[local-name() = 'schema']/*[local-name() = 'complexType' or local-name() = 'simpleType']/*[local-name() = 'complexContent' or local-name() = 'simpleContent']/*[local-name() = 'extension' and @base = $type]) > 0">

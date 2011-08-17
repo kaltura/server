@@ -152,6 +152,19 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Attachment asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<attachment url="http://kaltura.domain/path/to/attachment/asset/file.txt" attachmentAssetId="{attachment asset id}" format="1">
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<filename>my_file_name.txt</filename>
+						<title>my attachment asset title</title>
+						<description>my attachment asset free text description</description>
+					</attachment>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

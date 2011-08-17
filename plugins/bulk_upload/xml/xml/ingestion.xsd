@@ -665,22 +665,85 @@
 	<xs:element name="mrss" type="T_mrss">
 		<xs:annotation>
 			<xs:documentation>Wrapper element holding XML structure</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<mrss>
+						<channel>
+							<item>...</item>
+							<item>...</item>
+							<item>...</item>
+						</channel>
+					</mrss>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="channel" type="T_channel">
 		<xs:annotation>
 			<xs:documentation>Wrapper element holding multiple item elements</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<mrss>
+						<channel>
+							<item>...</item>
+							<item>...</item>
+							<item>...</item>
+						</channel>
+					</mrss>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="item" type="T_item">
 		<xs:annotation>
 			<xs:documentation>Single entry wrapper element</xs:documentation>
+			<xs:appinfo>
+				<example title="Media entry example">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<licenseType>-1</licenseType>
+						<userId>my.user.id</userId>
+						<name>my entry name</name>
+						<description>my entry free text description</description>
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<categories>
+							<category>examples&gt;example1</category>
+							<category>examples&gt;example2</category>
+						</categories>
+						<conversionProfile>MY_CONVERSION_PROFILE_SYSTEM_NAME</conversionProfile>
+						<media>
+							<mediaType>1</mediaType> 
+						</media>
+						<content flavorParamsId="0">...</content>
+						<content flavorParamsId="1">...</content>
+						<content flavorParamsId="2">...</content>
+						<thumbnail>...</thumbnail>
+						<thumbnail>...</thumbnail>
+						<thumbnail>...</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	
 	<xs:element name="media" type="T_media">
 		<xs:annotation>
 			<xs:documentation>Media related information, such as media type</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>
+							<mediaType>1</mediaType> 
+						</media>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	
@@ -697,11 +760,54 @@
 	<xs:element name="content" type="T_content">
 		<xs:annotation>
 			<xs:documentation>Flavor asset element</xs:documentation>
+			<xs:appinfo>
+				<example title="Flavor from URL example">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content flavorParams="source"> 
+							<tags>
+								<tag>web</tag>
+								<tag>mbr</tag>
+							</tags>
+							<urlContentResource>...</urlContentResource>
+						</content>
+					</item>
+				</example>
+				<example title="Flavor from existing entry example">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content flavorParams="source"> 
+							<tags>
+								<tag>web</tag>
+								<tag>mbr</tag>
+							</tags>
+							<entryContentResource>...</entryContentResource>
+						</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="thumbnail" type="T_thumbnail">
 		<xs:annotation>
 			<xs:documentation>Thumbnail asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>...</content>
+						<thumbnail>
+							<urlContentResource>...</urlContentResource>
+						</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	
@@ -716,31 +822,138 @@
 	<xs:element name="serverFileContentResource" type="T_serverFileContentResource">
 		<xs:annotation>
 			<xs:documentation>Specifies that content ingestion location is on a Kaltura hosted server</xs:documentation>
+			<xs:appinfo>
+				<example title="Using file size validation example">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>...</content>
+						<thumbnail>
+							<serverFileContentResource filePath="/server/external/disc/path/file.jpg">
+								<fileSize>453453344</fileSize>
+							</serverFileContentResource>
+						</thumbnail>
+					</item>
+				</example>
+				<example title="Using checksum validation example">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>...</content>
+						<thumbnail>
+							<serverFileContentResource filePath="/server/external/disc/path/file.jpg">
+								<fileChecksum type="md5">sdfsjodf90sfsdfzfasdfwrg34</fileChecksum>
+							</serverFileContentResource>
+						</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="urlContentResource" type="T_urlContentResource">
 		<xs:annotation>
 			<xs:documentation>Specifies that content file location is a URL (http,ftp)</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>
+							<urlContentResource url="http://my.domain/path/video.jpg"/>
+						</content>
+						<thumbnail>
+							<urlContentResource url="http://my.domain/path/thumb.jpg"/>
+						</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="remoteStorageContentResource" type="T_remoteStorageContentResource">
 		<xs:annotation>
 			<xs:documentation>Specifies that content file location is a path within a Kaltura defined remote storage</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>
+							<remoteStorageContentResource url="path/video.jpg">
+								<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME</storageProfile>
+							</remoteStorageContentResource>
+						</content>
+						<thumbnail>
+							<remoteStorageContentResource url="path/thumb.jpg">
+								<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME</storageProfile>
+							</remoteStorageContentResource>
+						</thumbnail>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="remoteStorageContentResources" type="T_remoteStorageContentResources">
 		<xs:annotation>
 			<xs:documentation>Set of content files within several Kaltura defined remote storages</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>
+							<remoteStorageContentResources>
+								<remoteStorageContentResource url="path1/video.jpg">
+									<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME_1</storageProfile>
+								</remoteStorageContentResource>
+								<remoteStorageContentResource url="path2/video.jpg">
+									<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME_2</storageProfile>
+								</remoteStorageContentResource>
+							</remoteStorageContentResources>
+						</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="entryContentResource" type="T_entryContentResource">
 		<xs:annotation>
 			<xs:documentation>Specifies that content is a Kaltura entry</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>
+							<entryContentResource entryId="{existing entry id}">
+								<flavorParams>BASIC_SMALL</flavorParams>
+							</entryContentResource>
+						</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="assetContentResource" type="T_assetContentResource">
 		<xs:annotation>
 			<xs:documentation>Specifies that content is a Kaltura asset</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<content>
+							<assetContentResource assetId="{existing asset id}"/>
+						</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	

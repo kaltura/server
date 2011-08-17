@@ -120,11 +120,6 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				<xs:documentation>Caption asset file language</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="href" type="xs:string" use="optional">
-			<xs:annotation>
-				<xs:documentation>Caption asset file download URL</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 						
 	</xs:complexType>
 	
@@ -132,6 +127,17 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Caption asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<subTitle isDefault="true" format="2" lang="Hebrew">
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<urlContentResource url="http://my.domain/path/caption.srt"/>
+					</subTitle>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

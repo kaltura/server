@@ -137,6 +137,21 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	<xs:element name="scene-ad-cue-point" type="T_scene_adCuePoint" substitutionGroup="scene">
 		<xs:annotation>
 			<xs:documentation>Single ad cue point element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-ad-cue-point sceneId="{scene id}" entryId="{entry id}" systemName="MY_AD_CUE_POINT_SYSTEM_NAME">
+						<sceneStartTime>00:00:05</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<sceneTitle>my ad title</sceneTitle>
+						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
+						<adType>1</adType>
+						<protocolType>1</protocolType>
+					</scene-ad-cue-point>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

@@ -125,6 +125,15 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Content distribution submission</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<distribution>
+						<distributionProfile>MY_DISTRIBUTION_PROFILE</distributionProfile>
+						<sunrise>1310665296</sunrise>
+						<sunset>1310865296</sunset>
+					</distribution>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	

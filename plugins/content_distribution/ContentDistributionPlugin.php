@@ -384,13 +384,23 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			</xs:element>
 			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Comma seperated ids of flavor assets to be submitted to the remote site</xs:documentation>
+					<xs:documentation>Ids of flavor assets to be submitted to the remote site</xs:documentation>
 				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="flavorAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
 			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Comma seperated ids of thumbnail assets to be submitted to the remote site</xs:documentation>
+					<xs:documentation>Ids of thumbnail assets to be submitted to the remote site</xs:documentation>
 				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="thumbAssetId" minOccurs="0" maxOccurs="unbounded" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
 			<xs:element name="errorDescription" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
@@ -498,6 +508,34 @@ class ContentDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Entry distribution element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<distribution	entryDistributionId="{entry distribution id}" 
+									distributionProfileId="{distribution profile id}" 
+									distributionProfileName="My Profile"
+					>
+						<remoteId>{remote site id}</remoteId>
+						<sunrise>1305636600</sunrise>
+						<sunset>1305640200</sunset>
+						<flavorAssetIds>
+							<flavorAssetId>0_bp1qzu1d</flavorAssetId>
+							<flavorAssetId>0_bp1qzfsd</flavorAssetId>
+						</flavorAssetIds>
+						<thumbAssetIds>
+							<thumbAssetId>0_di94zu1d</thumbAssetId>
+							<thumbAssetId>0_di940sde</thumbAssetId>
+						</thumbAssetIds>
+						<errorDescription>Error: No metadata objects found</errorDescription>
+						<createdAt>2011-05-17T07:46:20</createdAt>
+						<updatedAt>2011-06-09T09:23:46</updatedAt>
+						<submittedAt>2011-05-17T08:03:00</submittedAt>
+						<dirtyStatus>3</dirtyStatus>
+						<status>8</status>
+						<sunStatus>3</sunStatus>
+						<errorType>1</errorType>
+					</distribution>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="distribution-extension" />

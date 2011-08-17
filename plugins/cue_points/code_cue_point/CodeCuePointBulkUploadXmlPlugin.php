@@ -99,6 +99,19 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePointBulkUploadXml" substitutionGroup="scene">
 		<xs:annotation>
 			<xs:documentation>Single code cue point element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-code-cue-point entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<code>MY_CODE</code>
+						<description>my code cue point description</description>
+					</scene-code-cue-point>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

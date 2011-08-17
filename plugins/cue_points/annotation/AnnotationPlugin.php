@@ -145,6 +145,19 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene">
 		<xs:annotation>
 			<xs:documentation>Single annotation element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-annotation sceneId="{scene id}" entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<sceneEndTime>00:00:10</sceneEndTime>
+						<sceneText>my annotation</sceneText>
+					</scene-annotation>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';
@@ -200,6 +213,40 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	<xs:element name="scene-annotation" type="T_scene_annotation" substitutionGroup="scene">
 		<xs:annotation>
 			<xs:documentation>Single annotation element</xs:documentation>
+			<xs:appinfo>
+				<example title="Single annotation example">
+					<scene-annotation entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<sceneEndTime>00:00:10</sceneEndTime>
+						<sceneText>my annotation</sceneText>
+					</scene-annotation>
+				</example>
+				<example title="Multiple related annotations example">
+					<scene-annotation entryId="{entry id}" systemName="MY_ANNOTATION_PARENT_SYSTEM_NAME">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<sceneEndTime>00:00:10</sceneEndTime>
+						<sceneText>my annotation parent</sceneText>
+					</scene-annotation>
+					<scene-annotation entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<sceneEndTime>00:00:10</sceneEndTime>
+						<sceneText>my annotation child</sceneText>
+						<parent>MY_ANNOTATION_PARENT_SYSTEM_NAME</parent>
+					</scene-annotation>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

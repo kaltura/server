@@ -667,6 +667,25 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<customData	metadataId="{metadata id}" 
+								metadataVersion="1" 
+								metadataProfile="MY_METADATA_PROFILE_SYSTEM_NAME}"  
+								metadataProfileId="{metadata profile id}"  
+								metadataProfileName="my metadata profile" 
+								metadataProfileVersion="1" 
+					>
+						<metadata>
+							<Text1>text test</Text1>
+							<TextMulti>test one</TextMulti>
+							<TextMulti>test two</TextMulti>
+							<List1>bbb</List1>
+							<Entry>0_5b3t2c8z</Entry>
+						</metadata>
+					</customData>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

@@ -164,6 +164,16 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Caption asset element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<subTitle href="http://kaltura.domain/path/caption_file.srt" captionAssetId="{caption_asset_id}" isDefault="true" format="2" lang="Hebrew">
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+					</subTitle>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';

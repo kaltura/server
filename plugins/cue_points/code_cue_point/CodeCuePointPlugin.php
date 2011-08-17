@@ -122,6 +122,19 @@ class CodeCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePoint" substitutionGroup="scene">
 		<xs:annotation>
 			<xs:documentation>Single code cue point element</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<scene-code-cue-point sceneId="{scene id}" entryId="{entry id}">
+						<sceneStartTime>00:00:05.3</sceneStartTime>
+						<tags>
+							<tag>sample</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<code>MY_CODE</code>
+						<description>my code cue point description</description>
+					</scene-code-cue-point>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 		';
