@@ -232,6 +232,7 @@ class ConversionProfileService extends KalturaBaseService
 		$assetParamsObjects = assetParamsPeer::retrieveByPKs($flavorParamsIds);
 		foreach($assetParamsObjects as $assetParams)
 		{
+			/* @var $assetParams assetParams */
 			if(in_array($assetParams->getId(), $existingIds))
 				continue;
 				
@@ -240,6 +241,13 @@ class ConversionProfileService extends KalturaBaseService
 			$fpc->setFlavorParamsId($assetParams->getId());
 			$fpc->setReadyBehavior($assetParams->getReadyBehavior());
 			$fpc->setSystemName($assetParams->getSystemName());
+			$fpc->setForceNoneComplied(false);
+			
+			if($assetParams->hasTag(assetParams::TAG_SOURCE))
+				$fpc->setOrigin(assetParamsOrigin::INGEST);
+			else
+				$fpc->setOrigin(assetParamsOrigin::CONVERT);
+			
 			$fpc->save();
 		}
 	}
