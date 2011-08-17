@@ -977,7 +977,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(isset($elementToSearchIn[$assetParamsId]))
 			{
-				$this->validateAssetParamsId($assetParamsId, $assetType, $conversionProfileId);
+				$this->validateAssetParamsId($elementToSearchIn[$assetParamsId], $assetType, $conversionProfileId);
 				return (int)$elementToSearchIn[$assetParamsId];
 			}
 	
@@ -988,7 +988,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			if(isset($elementToSearchIn->$assetParamsId))
 			{
-				$this->validateAssetParamsId($assetParamsId, $assetType, $conversionProfileId);
+				$this->validateAssetParamsId($elementToSearchIn->$assetParamsId, $assetType, $conversionProfileId);
 				return (int)$elementToSearchIn->$assetParamsId;	
 			}
 	
