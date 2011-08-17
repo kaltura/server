@@ -156,7 +156,10 @@ class kBusinessPostConvertDL
 		
 		$inheritedFlavorParamsIds = array();
 		$requiredFlavorParamsIds = array();
-		$flavorParamsConversionProfileItems = flavorParamsConversionProfilePeer::retrieveByConversionProfile($profile->getId());
+		$flavorParamsConversionProfileItems = array();
+		if($profile)
+			$flavorParamsConversionProfileItems = flavorParamsConversionProfilePeer::retrieveByConversionProfile($profile->getId());
+		
 		foreach($flavorParamsConversionProfileItems as $flavorParamsConversionProfile)
 		{
 			if($flavorParamsConversionProfile->getReadyBehavior() == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
