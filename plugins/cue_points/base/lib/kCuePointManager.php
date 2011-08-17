@@ -88,7 +88,7 @@ class kCuePointManager implements kObjectDeletedEventConsumer
 			$cuePoint = CuePointPeer::retrieveByPK($scene['sceneId']);
 			
 		if(!$cuePoint && isset($scene['systemName']) && $scene['systemName'])
-			$cuePoint = CuePointPeer::retrieveBySystemName($scene['systemName']);
+			$cuePoint = CuePointPeer::retrieveBySystemName($scene['entryId'], $scene['systemName']);
 			
 		if(!$cuePoint)
 			$cuePoint = $newCuePoint;

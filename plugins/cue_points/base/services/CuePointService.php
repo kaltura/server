@@ -40,6 +40,14 @@ class CuePointService extends KalturaBaseService
 	function addAction(KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = $cuePoint->toInsertableObject();
+		
+		if($cuePoint->systemName)
+		{
+			$existingCuePoint = CuePointPeer::retrieveBySystemName($cuePoint->entryId, $cuePoint->systemName);
+			if($existingCuePoint)
+				throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_SYSTEM_NAME_EXISTS, $cuePoint->systemName, $existingCuePoint->getId());
+		}
+		
 		/* @var $dbCuePoint CuePoint */
 		$dbCuePoint->setPartnerId($this->getPartnerId());
 		$dbCuePoint->setPuserId(is_null($cuePoint->userId) ? $this->getKuser()->getPuserId() : $cuePoint->userId);
@@ -125,17 +133,17 @@ class CuePointService extends KalturaBaseService
 	 * @action get
 	 * @param string $id 
 	 * @return KalturaCuePoint
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
 	 */		
 	function getAction($id)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK( $id );
 
 		if(!$dbCuePoint)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 			
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 			
 		$cuePoint = KalturaCuePoint::getInstance($dbCuePoint->getType());
 		if(!$cuePoint)
@@ -207,16 +215,24 @@ class CuePointService extends KalturaBaseService
 	 * @param string $id
 	 * @param KalturaCuePoint $cuePoint
 	 * @return KalturaCuePoint
+	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
 	 */
 	function updateAction($id, KalturaCuePoint $cuePoint)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK($id);
 		
 		if (!$dbCuePoint)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 			
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
+		
+		if($cuePoint->systemName)
+		{
+			$existingCuePoint = CuePointPeer::retrieveBySystemName($dbCuePoint->getEntryId(), $cuePoint->systemName);
+			if($existingCuePoint && $existingCuePoint->getId() != $id)
+				throw new KalturaAPIException(KalturaCuePointErrors::CUE_POINT_SYSTEM_NAME_EXISTS, $cuePoint->systemName, $existingCuePoint->getId());
+		}
 		
 		$dbCuePoint = $cuePoint->toUpdatableObject($dbCuePoint);
 				
@@ -232,17 +248,17 @@ class CuePointService extends KalturaBaseService
 	 * 
 	 * @action delete
 	 * @param string $id 
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
 	 */		
 	function deleteAction($id)
 	{
 		$dbCuePoint = CuePointPeer::retrieveByPK( $id );
 		
 		if(!$dbCuePoint)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 			
 		if($this->getCuePointType() && $dbCuePoint->getType() != $this->getCuePointType())
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			throw new KalturaAPIException(KalturaCuePointErrors::INVALID_CUE_POINT_ID, $id);
 		
 		$dbCuePoint->setStatus(CuePointStatus::DELETED);
 		$dbCuePoint->save();

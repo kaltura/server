@@ -246,7 +246,7 @@ class AnnotationPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		if(isset($scene->parentId))
 			$parentCuePoint = CuePointPeer::retrieveByPK($scene->parentId);
 		elseif(isset($scene->parent))
-			$parentCuePoint = CuePointPeer::retrieveBySystemName($scene->parent);
+			$parentCuePoint = CuePointPeer::retrieveBySystemName($cuePoint->getEntryId(), $scene->parent);
 		if($parentCuePoint)
 			$cuePoint->setParentId($parentCuePoint->getId());
 		

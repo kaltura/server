@@ -104,14 +104,17 @@ class CuePointPeer extends BaseCuePointPeer
 
 	/**
 	 * Retrieve a single object by system name.
+	 * The cue point system name is unique per entry
 	 *
+	 * @param      string $entryId the entry id.
 	 * @param      string $systemName the system name.
 	 * @param      PropelPDO $con the connection to use
 	 * @return     CuePoint
 	 */
-	public static function retrieveBySystemName($systemName, PropelPDO $con = null)
+	public static function retrieveBySystemName($entryId, $systemName, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
+		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
 		$criteria->add(CuePointPeer::SYSTEM_NAME, $systemName);
 
 		return CuePointPeer::doSelectOne($criteria, $con);
