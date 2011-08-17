@@ -126,10 +126,10 @@ class playManifestAction extends kalturaAction
 		
 		if($this->flavorId && ($flavorAsset = assetPeer::retrieveById($this->flavorId)) != null)
 		{
-			if($this->format != StorageProfile::PLAY_FORMAT_SILVER_LIGHT && $flavorAsset->hasTag(flavorParams::TAG_WEB) && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			if($this->format != StorageProfile::PLAY_FORMAT_SILVER_LIGHT && $flavorAsset->hasTag(assetParams::TAG_WEB) && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				$flavorAssets[] = $flavorAsset;
 				
-			if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT && $flavorAsset->hasTag(flavorParams::TAG_SLWEB) && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT && $flavorAsset->hasTag(assetParams::TAG_SLWEB) && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				$flavorAssets[] = $flavorAsset;
 		}
 		elseif($oneOnly)
@@ -138,11 +138,11 @@ class playManifestAction extends kalturaAction
 			
 			if(!$flavorAsset)
 			{
-				$tag = flavorParams::TAG_WEB;
+				$tag = assetParams::TAG_WEB;
 				if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
-					$tag = flavorParams::TAG_SLWEB;
+					$tag = assetParams::TAG_SLWEB;
 				elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-					$tag = flavorParams::TAG_APPLEMBR;
+					$tag = assetParams::TAG_APPLEMBR;
 					
 				$webFlavorAssets = assetPeer::retrieveReadyByEntryIdAndTag($this->entryId, $tag);
 				if(count($webFlavorAssets))
@@ -166,15 +166,15 @@ class playManifestAction extends kalturaAction
 			}
 			else 
 			{
-				$tag = flavorParams::TAG_MBR;
+				$tag = assetParams::TAG_MBR;
 				if($this->format == StorageProfile::PLAY_FORMAT_SILVER_LIGHT)
-					$tag = flavorParams::TAG_SLWEB;
+					$tag = assetParams::TAG_SLWEB;
 				elseif($this->format == StorageProfile::PLAY_FORMAT_APPLE_HTTP)
-					$tag = flavorParams::TAG_APPLEMBR;
+					$tag = assetParams::TAG_APPLEMBR;
 				$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, $tag);
 
-				if(!count($flavorAssets) && $tag == flavorParams::TAG_MBR)
-					$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
+				if(!count($flavorAssets) && $tag == assetParams::TAG_MBR)
+					$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, assetParams::TAG_WEB);
 				
 				// if format is APPLE HTTP and there aren't any segmented flavors use ipad and iphone with
 				// akamai hd on the fly segmenter
@@ -416,7 +416,7 @@ class playManifestAction extends kalturaAction
 				if($this->flavorId)
 				{
 					$flavorAsset = assetPeer::retrieveById($this->flavorId);
-					if(!$flavorAsset->hasTag(flavorParams::TAG_WEB))
+					if(!$flavorAsset->hasTag(assetParams::TAG_WEB))
 						KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 						
 					if(!$flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
@@ -426,9 +426,9 @@ class playManifestAction extends kalturaAction
 				}
 				else 
 				{
-					$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, flavorParams::TAG_MBR);
+					$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, assetParams::TAG_MBR);
 					if(!count($flavorAssets))
-						$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, flavorParams::TAG_WEB);
+						$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndTag($this->entryId, assetParams::TAG_WEB);
 				}
 
 				$flavorAssets = $this->removeMaxBitrateFlavors($flavorAssets);
