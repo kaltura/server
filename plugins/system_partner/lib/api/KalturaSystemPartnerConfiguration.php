@@ -6,6 +6,12 @@
 class KalturaSystemPartnerConfiguration extends KalturaObject
 {
 	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $id;
+	
+	/**
 	 * @var string
 	 */
 	public $partnerName;
@@ -160,6 +166,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	
 	private static $map_between_objects = array
 	(
+		"id",
 		"partnerName",
 		"description",
 		"adminName",
