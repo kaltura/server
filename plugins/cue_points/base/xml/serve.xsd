@@ -19,7 +19,7 @@
 			</xs:element>
 			<xs:element name="userId" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
-					<xs:documentation>Cue point owner user id</xs:documentation>
+					<xs:documentation>User ID of cue point's owner</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="tags" minOccurs="0" maxOccurs="1" type="T_tags">
@@ -31,7 +31,7 @@
 		
 		<xs:attribute name="sceneId" use="required">
 			<xs:annotation>
-				<xs:documentation>ID of cue point to apply update/delete action on</xs:documentation>
+				<xs:documentation>Unique auto generated id of the cue point</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -41,7 +41,7 @@
 		</xs:attribute>
 		<xs:attribute name="systemName" use="optional">
 			<xs:annotation>
-				<xs:documentation>System name of cue point to apply update/delete action on</xs:documentation>
+				<xs:documentation>Unique (per entry) user identifier of the cue point</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -51,7 +51,7 @@
 		</xs:attribute>
 		<xs:attribute name="entryId" use="required">
 			<xs:annotation>
-				<xs:documentation>ID of entry to associate the cue point with</xs:documentation>
+				<xs:documentation>ID of entry that is associated with cue point</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">

@@ -26,7 +26,7 @@
 		
 		<xs:attribute name="sceneId" use="optional">
 			<xs:annotation>
-				<xs:documentation>ID of cue point to apply update/delete action on</xs:documentation>
+				<xs:documentation>ID of cue point to which actions (update/delete) can be applied</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -36,7 +36,7 @@
 		</xs:attribute>
 		<xs:attribute name="systemName" use="optional">
 			<xs:annotation>
-				<xs:documentation>System name of cue point to apply update/delete action on</xs:documentation>
+				<xs:documentation>System name of cue point to which actions (update/delete) can be applied</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
