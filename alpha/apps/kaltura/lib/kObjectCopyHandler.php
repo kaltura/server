@@ -49,14 +49,20 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 		{
 			$flavorParamsId = self::getMappedId('assetParams', $fromObject->getFlavorParamsId());
 			if($flavorParamsId)
+			{
 				$toObject->setFlavorParamsId($flavorParamsId);
+				$toObject->save();
+			}
 		}
 		
 		if($fromObject instanceof entry)
 		{
 			$conversionProfileId = self::getMappedId('conversionProfile2', $fromObject->getConversionProfileId());
 			if($conversionProfileId)
+			{
 				$toObject->setConversionProfileId($conversionProfileId);
+				$toObject->save();
+			}
 		}
 		
 		return true;
