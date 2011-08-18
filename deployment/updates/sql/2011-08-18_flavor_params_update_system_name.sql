@@ -1,0 +1,1 @@
+UPDATE flavor_params SET system_name = replace(name, ' ', '') WHERE is_default=1;
