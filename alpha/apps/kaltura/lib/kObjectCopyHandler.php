@@ -30,6 +30,12 @@ class kObjectCopyHandler implements kObjectCopiedEventConsumer
 			
 		if($fromObject instanceof assetParamsOutput)
 			return true;
+		
+		if($fromObject instanceof conversionProfile2)
+			return true;
+			
+		if($fromObject instanceof entry)
+			return true;
 			
 		return false;
 	}
