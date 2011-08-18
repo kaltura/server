@@ -83,6 +83,11 @@ class KalturaBulkUpload extends KalturaObject
 	 */
 	public $fileName;
 	
+	/**
+	 * @var string
+	 */
+	public $description;
+	
 	public function fromObject($batchJob)
 	{
 		/* @var $batchJob BatchJob */
@@ -94,6 +99,7 @@ class KalturaBulkUpload extends KalturaObject
 		$this->uploadedOn = $batchJob->getCreatedAt(null);
 		$this->status = $batchJob->getStatus();
 		$this->error = $batchJob->getMessage();
+		$this->description = $batchJob->getDescription();
 		$this->bulkUploadType = kPluginableEnumsManager::coreToApi('BulkUploadType', $batchJob->getJobSubType());
 		
 		$this->logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$batchJob->getId()}/ks/" . kCurrentContext::$ks;
