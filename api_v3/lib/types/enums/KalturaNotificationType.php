@@ -16,7 +16,7 @@ class KalturaNotificationType extends KalturaEnum
 	const USER_ADD = 21;
 	const USER_BANNED = 26;
 	
-	public function getDescription()
+	public static function getDescriptions()
 	{
 		return array(
 			self::ENTRY_ADD => "The <i>entry_add</i> notification is being sent to notify that a new entry has been successfully added and ready for use.",

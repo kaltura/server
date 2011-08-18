@@ -17,4 +17,12 @@ class DropFolderXmlBulkUploadType implements IKalturaPluginEnum, BulkUploadType
 			'DROP_FOLDER_XML' => self::DROP_FOLDER_XML,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

@@ -22,4 +22,12 @@ class DropFolderXmlBulkUploadErrorCode implements IKalturaPluginEnum, DropFolder
 			'ERROR_ADDING_BULK_UPLOAD' => self::ERROR_ADDING_BULK_UPLOAD,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

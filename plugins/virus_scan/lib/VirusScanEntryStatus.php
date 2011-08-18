@@ -13,4 +13,12 @@ class VirusScanEntryStatus implements IKalturaPluginEnum, entryStatus
 			'INFECTED' => self::INFECTED
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

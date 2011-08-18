@@ -11,4 +11,9 @@ interface IKalturaPluginEnum
 	 * @return array
 	 */
 	public static function getAdditionalValues();
+	
+	/**
+	* @return array
+	*/
+	public static function getAdditionalDescriptions();
 }

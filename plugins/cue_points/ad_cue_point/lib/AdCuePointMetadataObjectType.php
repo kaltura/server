@@ -13,4 +13,12 @@ class AdCuePointMetadataObjectType implements IKalturaPluginEnum, MetadataObject
 			'AD_CUE_POINT' => self::AD_CUE_POINT,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

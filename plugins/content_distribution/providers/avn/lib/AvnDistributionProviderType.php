@@ -25,6 +25,14 @@ class AvnDistributionProviderType implements IKalturaPluginEnum, DistributionPro
 		);
 	}
 	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
+	
 	public function getPluginName()
 	{
 		return AvnDistributionPlugin::getPluginName();

@@ -16,4 +16,12 @@ class DropFolderBatchType implements IKalturaPluginEnum, BatchJobType
 			'DROP_FOLDER_HANDLER' => self::DROP_FOLDER_HANDLER,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

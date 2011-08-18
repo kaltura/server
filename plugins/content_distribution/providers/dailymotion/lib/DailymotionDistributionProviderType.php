@@ -13,4 +13,12 @@ class DailymotionDistributionProviderType implements IKalturaPluginEnum, Distrib
 			'DAILYMOTION' => self::DAILYMOTION,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

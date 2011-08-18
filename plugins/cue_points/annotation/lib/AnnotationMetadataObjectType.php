@@ -13,4 +13,12 @@ class AnnotationMetadataObjectType implements IKalturaPluginEnum, MetadataObject
 			'ANNOTATION' => self::ANNOTATION,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

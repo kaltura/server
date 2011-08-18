@@ -13,4 +13,12 @@ class QuickTimeToolsConversionEngineType implements IKalturaPluginEnum, conversi
 			'QUICK_TIME_PLAYER_TOOLS' => self::QUICK_TIME_PLAYER_TOOLS
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

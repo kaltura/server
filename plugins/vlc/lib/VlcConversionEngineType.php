@@ -13,4 +13,12 @@ class VlcConversionEngineType implements IKalturaPluginEnum, conversionEngineTyp
 			'VLC' => self::VLC
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

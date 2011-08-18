@@ -13,4 +13,12 @@ class Mp4boxConversionEngineType implements IKalturaPluginEnum, conversionEngine
 			'MP4BOX' => self::MP4BOX
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

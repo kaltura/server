@@ -25,6 +25,14 @@ class PodcastDistributionProviderType implements IKalturaPluginEnum, Distributio
 		);
 	}
 	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
+	
 	public function getPluginName()
 	{
 		return PodcastDistributionPlugin::getPluginName();

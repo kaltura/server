@@ -19,4 +19,15 @@ class XmlSchemaType implements IKalturaPluginEnum, SchemaType
 			'BULK_UPLOAD_RESULT_XML' => self::BULK_UPLOAD_RESULT_XML,
 		);
 	}
+	
+	/**
+	* @return array
+	*/
+	public static function getAdditionalDescriptions()
+	{
+		return array(
+			BulkUploadXmlPlugin::getApiValue(self::BULK_UPLOAD_XML) => 'Bulk upload',
+			BulkUploadXmlPlugin::getApiValue(self::BULK_UPLOAD_RESULT_XML) => 'Bulk upload results',
+		);
+	}
 }

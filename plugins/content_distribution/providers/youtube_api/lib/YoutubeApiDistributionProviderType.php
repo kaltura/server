@@ -13,4 +13,12 @@ class YoutubeApiDistributionProviderType implements IKalturaPluginEnum, Distribu
 			'YOUTUBE_API' => self::YOUTUBE_API,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

@@ -13,4 +13,12 @@ class CodeCuePointMetadataObjectType implements IKalturaPluginEnum, MetadataObje
 			'CODE_CUE_POINT' => self::CODE_CUE_POINT,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

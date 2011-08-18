@@ -13,4 +13,12 @@ class CaptionAssetType implements IKalturaPluginEnum, assetType
 			'CAPTION' => self::CAPTION,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

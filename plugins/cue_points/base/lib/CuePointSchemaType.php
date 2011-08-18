@@ -19,4 +19,15 @@ class CuePointSchemaType implements IKalturaPluginEnum, SchemaType
 			'INGEST_API' => self::INGEST_API,
 		);
 	}
+	
+	/**
+	* @return array
+	*/
+	public static function getAdditionalDescriptions()
+	{
+		return array(
+			CuePointPlugin::getApiValue(self::SERVE_API) => 'Cue point serve',
+			CuePointPlugin::getApiValue(self::INGEST_API) => 'Cue point ingest',
+		);
+	}
 }

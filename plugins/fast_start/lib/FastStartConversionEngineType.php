@@ -13,4 +13,12 @@ class FastStartConversionEngineType implements IKalturaPluginEnum, conversionEng
 			'FAST_START' => self::FAST_START
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

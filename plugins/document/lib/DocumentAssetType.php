@@ -17,4 +17,12 @@ class DocumentAssetType implements IKalturaPluginEnum, assetType
 			'PDF' => self::PDF,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

@@ -13,4 +13,12 @@ class VirusScanBatchJobType implements IKalturaPluginEnum, BatchJobType
 			'VIRUS_SCAN' => self::VIRUS_SCAN
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

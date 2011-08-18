@@ -13,4 +13,12 @@ class FreewheelDistributionProviderType implements IKalturaPluginEnum, Distribut
 			'FREEWHEEL' => self::FREEWHEEL,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

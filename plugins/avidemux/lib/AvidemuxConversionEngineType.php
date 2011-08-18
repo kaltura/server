@@ -13,4 +13,12 @@ class AvidemuxConversionEngineType implements conversionEngineType, IKalturaPlug
 			'AVIDEMUX' => self::AVIDEMUX
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

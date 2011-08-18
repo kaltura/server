@@ -25,4 +25,12 @@ class ContentDistributionBatchJobType implements IKalturaPluginEnum, BatchJobTyp
 			'DISTRIBUTION_SYNC' => self::DISTRIBUTION_SYNC,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

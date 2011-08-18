@@ -17,4 +17,12 @@ class BulkUploadCsvType implements IKalturaPluginEnum, BulkUploadType
 			'CSV' => self::CSV,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

@@ -19,4 +19,12 @@ class SystemPartnerPermissionName implements IKalturaPluginEnum, PermissionName
 			'SYSTEM_ADMIN_PUBLISHER_CONFIG_GROUP_OPTIONS' => self::SYSTEM_ADMIN_PUBLISHER_CONFIG_GROUP_OPTIONS,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

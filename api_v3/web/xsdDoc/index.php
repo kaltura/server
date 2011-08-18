@@ -1,7 +1,7 @@
 <?php 
-error_reporting(E_ALL);
-
 require_once("../../bootstrap.php");
+ActKeyUtils::checkCurrent();
+KalturaLog::setContext("TESTME");
 
 // get inputs
 $schemaType = @$_GET["type"];

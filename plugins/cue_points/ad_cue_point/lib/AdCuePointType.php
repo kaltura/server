@@ -13,4 +13,12 @@ class AdCuePointType implements IKalturaPluginEnum, CuePointType
 			'AD' => self::AD,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

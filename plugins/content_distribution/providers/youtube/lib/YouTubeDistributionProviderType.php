@@ -13,4 +13,12 @@ class YouTubeDistributionProviderType implements IKalturaPluginEnum, Distributio
 			'YOUTUBE' => self::YOUTUBE,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

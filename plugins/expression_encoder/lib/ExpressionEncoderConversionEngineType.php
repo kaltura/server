@@ -13,4 +13,12 @@ class ExpressionEncoderConversionEngineType implements IKalturaPluginEnum, conve
 			'EXPRESSION_ENCODER' => self::EXPRESSION_ENCODER
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

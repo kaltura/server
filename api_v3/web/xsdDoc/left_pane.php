@@ -5,7 +5,7 @@
 	
 	$exclude = explode(',', $indexConfig->get("exclude"));
 	$schemaReflector = KalturaTypeReflectorCacher::get('KalturaSchemaType');
-	$schemas = $schemaReflector->getConstantsValues();
+	$schemas = $schemaReflector->getConstants();
 ?>
 <div class="left">
 	<div class="left-content">
@@ -20,9 +20,9 @@
 		<div id="schemas">
 			<h2>Schemas</h2>
 			<ul class="schemas">
-			<?php foreach($schemas as $schemaName => $value): ?>
+			<?php foreach($schemas as $schema): ?>
 				<li class="schema">
-					<a href="?type=<?php echo $value; ?>"><?php echo ucwords(strtolower(str_replace('_', ' ', $schemaName))); ?></a>
+					<a href="?type=<?php echo $schema->getDefaultValue(); ?>"><?php echo $schema->getDescription(); ?></a>
 				</li>
 			<?php endforeach; ?>
 			</ul>

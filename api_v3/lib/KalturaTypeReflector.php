@@ -377,13 +377,12 @@ class KalturaTypeReflector
 			return $this->_constants;
 			
 		$this->_constants = array();
-			
+		$constantsDescription = array();
+		
 		if ($this->isEnum() || $this->isStringEnum())
 		{
 			$reflectClass = new ReflectionClass($this->_type);
-			$constantsDescription = array();
-			if ($reflectClass->hasMethod("getDescription"))
-				$constantsDescription = $reflectClass->getMethod("getDescription")->invoke($this->_instance);
+			$constantsDescription = call_user_func(array($this->_type, 'getDescriptions'));
 			$contants = $reflectClass->getConstants();
 			foreach($contants as $enum => $value)
 			{
@@ -392,8 +391,9 @@ class KalturaTypeReflector
 				else
 					$prop = new KalturaPropertyInfo("string", $enum);
 					
-				if (array_key_exists($value, $constantsDescription))
+				if (isset($constantsDescription[$value]))
 					$prop->setDescription($constantsDescription[$value]);
+				
 				$prop->setDefaultValue($value);
 				$this->_constants[] = $prop;
 			}
@@ -417,8 +417,13 @@ class KalturaTypeReflector
 //					$enumConstans = $enum::getAdditionalValues();
 					foreach($enumConstans as $name => $value)
 					{
+						$value = $pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value;
 						$prop = new KalturaPropertyInfo("string", $name);
-						$prop->setDefaultValue($pluginName . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $value);
+						$prop->setDefaultValue($value);
+							
+						if (isset($constantsDescription[$value]))
+							$prop->setDescription($constantsDescription[$value]);
+						
 						$this->_constants[] = $prop;
 					}
 				}

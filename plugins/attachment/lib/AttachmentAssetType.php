@@ -13,4 +13,12 @@ class AttachmentAssetType implements IKalturaPluginEnum, assetType
 			'ATTACHMENT' => self::ATTACHMENT,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

@@ -13,4 +13,12 @@ class InletArmadaConversionEngineType implements IKalturaPluginEnum, conversionE
 			'INLET_ARMADA' => self::INLET_ARMADA
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

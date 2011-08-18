@@ -13,4 +13,12 @@ class CodeCuePointType implements IKalturaPluginEnum, CuePointType
 			'CODE' => self::CODE,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

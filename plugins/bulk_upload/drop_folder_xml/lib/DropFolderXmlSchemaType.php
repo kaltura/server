@@ -17,4 +17,14 @@ class DropFolderXmlSchemaType implements IKalturaPluginEnum, SchemaType
 			'DROP_FOLDER_XML' => self::DROP_FOLDER_XML,
 		);
 	}
+	
+	/**
+	* @return array
+	*/
+	public static function getAdditionalDescriptions()
+	{
+		return array(
+			DropFolderXmlBulkUploadPlugin::getApiValue(self::DROP_FOLDER_XML) => 'Drop folder',
+		);
+	}
 }

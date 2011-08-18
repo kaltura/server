@@ -17,4 +17,12 @@ class BulkUploadXmlType implements IKalturaPluginEnum, BulkUploadType
 			'XML' => self::XML,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

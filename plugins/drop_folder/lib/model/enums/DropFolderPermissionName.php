@@ -21,4 +21,12 @@ class DropFolderPermissionName implements IKalturaPluginEnum, PermissionName
 			'CONTENT_INGEST_DROP_FOLDER_MODIFY' => self::CONTENT_INGEST_DROP_FOLDER_MODIFY,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

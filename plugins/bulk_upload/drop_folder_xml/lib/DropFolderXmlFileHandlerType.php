@@ -17,4 +17,12 @@ class DropFolderXmlFileHandlerType implements IKalturaPluginEnum, DropFolderFile
 			'XML' => self::XML,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

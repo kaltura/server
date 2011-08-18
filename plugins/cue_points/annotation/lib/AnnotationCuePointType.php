@@ -13,4 +13,12 @@ class AnnotationCuePointType implements IKalturaPluginEnum, CuePointType
 			'ANNOTATION' => self::ANNOTATION,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

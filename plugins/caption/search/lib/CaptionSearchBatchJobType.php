@@ -13,4 +13,12 @@ class CaptionSearchBatchJobType implements IKalturaPluginEnum, BatchJobType
 			'PARSE_CAPTION_ASSET' => self::PARSE_CAPTION_ASSET
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

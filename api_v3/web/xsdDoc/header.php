@@ -12,21 +12,7 @@
 				$(".right").css("height", $("body").outerHeight() - $("#kmcSubMenu").outerHeight({ "margin": true }) - 10);
 			});
 			$(window).resize();
-			<?php if ($inputObject) { ?>
-			$(".left").scrollTo({top: 0, left: 0});
-			$(".left").scrollTo($("#object_<?php echo $inputObject;?>"), 0, {axis:'y'});
-			<?php } ?>
-			<?php if ($inputService) { ?>
-			$(".left").scrollTo({top: 0, left: 0});
-			$(".left").scrollTo($("#service_<?php echo $inputService;?>"), 0, {axis:'y'});
-			<?php } ?>
 		});
-
-		<?php if ($inputService) { ?>
-		$(document).ready(function() {
-			$('#service_<?php echo $inputService ?>').addClass('service expended');			
-		});
-		<?php } ?>
 	</script>
 </head>
 <?php

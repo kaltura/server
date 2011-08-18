@@ -13,4 +13,12 @@ class ExampleDistributionProviderType implements IKalturaPluginEnum, Distributio
 			'EXAMPLE' => self::EXAMPLE,
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

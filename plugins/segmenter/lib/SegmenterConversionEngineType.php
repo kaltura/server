@@ -13,4 +13,12 @@ class SegmenterConversionEngineType implements IKalturaPluginEnum, conversionEng
 			'SEGMENTER' => self::SEGMENTER
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
 }

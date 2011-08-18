@@ -25,6 +25,14 @@ class ComcastMrssDistributionProviderType implements IKalturaPluginEnum, Distrib
 		);
 	}
 	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
+	
 	public function getPluginName()
 	{
 		return ComcastMrssDistributionPlugin::getPluginName();

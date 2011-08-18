@@ -30,6 +30,14 @@ class IdeticDistributionProviderType extends KalturaDistributionProviderType
 		);
 	}
 	
+	/**
+	 * @return array
+	 */
+	public static function getAdditionalDescriptions()
+	{
+		return array();
+	}
+	
 	public function getPluginName()
 	{
 		return IdeticDistributionPlugin::getPluginName();
