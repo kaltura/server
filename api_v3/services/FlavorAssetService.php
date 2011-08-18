@@ -326,6 +326,17 @@ class FlavorAssetService extends KalturaBaseService
 			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
 		}
 		
+		$dbFlavorParams = assetParamsPeer::retrieveByPK($flavorAsset->getFlavorParamsId());
+		if($dbFlavorParams)
+		{
+			$flavorAsset->setBitrate($dbFlavorParams->getVideoBitrate());
+			$flavorAsset->setContainerFormat($dbFlavorParams->getFormat());
+			$flavorAsset->setFrameRate($dbFlavorParams->getFrameRate());
+			$flavorAsset->setHeight($dbFlavorParams->getHeight());
+			$flavorAsset->setWidth($dbFlavorParams->getWidth());
+			$flavorAsset->setTags($dbFlavorParams->getTags());
+		}
+		
 		if($flavorAsset->getIsOriginal())
 			$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_QUEUED);
 		else
