@@ -143,12 +143,20 @@
 			<xs:choice minOccurs="0" maxOccurs="1">
 				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int">
 					<xs:annotation>
-						<xs:documentation>Entry`s transcoding profile identifier</xs:documentation>
+						<xs:documentation>
+							Entry`s transcoding profile identifier<br/>
+							If not specified, the bulk upload default will be used<br/>
+							If not specified, or set to (-1), the partner default will be used 
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Entry`s transcoding profile system name</xs:documentation>
+						<xs:documentation>
+							Entry`s transcoding profile system name<br/>
+							If not specified, the bulk upload default will be used<br/>
+							If not specified, the partner default will be used
+						</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
@@ -698,7 +706,7 @@
 		<xs:annotation>
 			<xs:documentation>Single entry wrapper element</xs:documentation>
 			<xs:appinfo>
-				<example title="Media entry example">
+				<example title="Adding new media entry example">
 					<item>
 						<action>add</action>
 						<type>1</type>
@@ -724,6 +732,35 @@
 						<thumbnail>...</thumbnail>
 						<thumbnail>...</thumbnail>
 						<thumbnail>...</thumbnail>
+					</item>
+				</example>
+				<example title="Updating existing media entry example">
+					<item>
+						<action>update</action>
+						<entryId>{entry id}</entryId>
+						<userId>my.user.id</userId>
+						<name>my entry name</name>
+						<description>my entry free text description</description>
+						<tags>
+							<tag>example</tag>
+							<tag>my_tag</tag>
+						</tags>
+						<categories>
+							<category>examples&gt;example1</category>
+							<category>examples&gt;example2</category>
+						</categories>
+						<content flavorParamsId="0">...</content>
+						<content flavorParamsId="1">...</content>
+						<content flavorParamsId="2">...</content>
+						<thumbnail>...</thumbnail>
+						<thumbnail>...</thumbnail>
+						<thumbnail>...</thumbnail>
+					</item>
+				</example>
+				<example title="Deleting entry example">
+					<item>
+						<action>delete</action>
+						<entryId>{entry id}</entryId>
 					</item>
 				</example>
 			</xs:appinfo>
