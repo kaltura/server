@@ -82,7 +82,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		parent::__construct($taskConfig, $kClient, $job);
 		
-		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/service/schema/action/serve/type/' . KalturaSchemaType::BULK_UPLOAD_XML;
+		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/index.php/service/schema/action/serve/type/' . KalturaSchemaType::BULK_UPLOAD_XML;
 		if($taskConfig->params->xsdFilePath) 
 			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
 			
