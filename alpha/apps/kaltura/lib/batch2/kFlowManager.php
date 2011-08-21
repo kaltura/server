@@ -391,7 +391,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
 		{
 			if($object->getFlavorParamsId())
-				kFlowHelper::generateThumbnailsFromFlavor($entryId, $raisedJob, $object->getFlavorParamsId());
+				kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
 	
 			return true;
 		}
