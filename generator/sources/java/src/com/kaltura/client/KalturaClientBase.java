@@ -16,6 +16,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -145,11 +146,35 @@ abstract public class KalturaClientBase {
 
         // build request
         HttpClient client = new HttpClient();
-		HttpConnectionManagerParams connParams = client.getHttpConnectionManager().getParams();
+
+        // added by Unicon to handle proxy hosts
+        String proxyHost = System.getProperty( "http.proxyHost" );
+        if ( proxyHost != null ) {
+            int proxyPort = -1;
+            String proxyPortStr = System.getProperty( "http.proxyPort" );
+            if (proxyPortStr != null) {
+                try {
+                    proxyPort = Integer.parseInt( proxyPortStr );
+                } catch (NumberFormatException e) {
+                    logger.warn("Invalid number for system property http.proxyPort ("+proxyPortStr+"), using default port instead");
+                }
+            }
+            ProxyHost proxy = new ProxyHost( proxyHost, proxyPort );
+            client.getHostConfiguration().setProxyHost( proxy );
+        }        
+        // added by Unicon to force encoding to UTF-8
+        String utf8CharSet = "UTF-8";
+        client.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, utf8CharSet);
+        client.getParams().setParameter(HttpMethodParams.HTTP_ELEMENT_CHARSET, utf8CharSet);
+        client.getParams().setParameter(HttpMethodParams.HTTP_URI_CHARSET, utf8CharSet);
+        
+        HttpConnectionManagerParams connParams = client.getHttpConnectionManager().getParams();
 		connParams.setSoTimeout(this.kalturaConfiguration.getTimeout());
 		client.getHttpConnectionManager().setParams(connParams);
 		
         PostMethod method = new PostMethod(url);
+        method.setRequestHeader("Accept","text/xml,application/xml,*/*");
+        method.setRequestHeader("Accept-Charset","utf-8,ISO-8859-1;q=0.7,*;q=0.5");
         
         if (!kfiles.isEmpty()) {        	
             method = this.getPostMultiPartWithFiles(method, kparams, kfiles);        	
@@ -178,9 +203,8 @@ abstract public class KalturaClientBase {
 			byte[] responseBody = method.getResponseBody ( );
 
 			// Deal with the response.
-			// Use caution: ensure correct character encoding and is not binary
-			// data
-			responseString = new String (responseBody);
+			// Use caution: ensure correct character encoding and is not binary data
+			responseString = new String (responseBody, utf8CharSet); // Unicon: this MUST be set to UTF-8 charset -AZ
 			logger.debug(responseString);
 			
 		} catch ( HttpException e ) {
@@ -224,7 +248,13 @@ abstract public class KalturaClientBase {
         for(int i = 0; i < multiRequestResult.getChildNodes().getLength(); i++) 
         {
             Element arrayNode = (Element)multiRequestResult.getChildNodes().item(i);
-            if (arrayNode.getElementsByTagName("objectType").getLength() == 0)
+            
+            KalturaApiException exception = getExceptionOnAPIError(arrayNode);
+            if (exception != null)
+            {
+            	multiResponse.add(exception);
+            }
+            else if (arrayNode.getElementsByTagName("objectType").getLength() == 0)
             {
             	multiResponse.add(arrayNode.getTextContent());
             }
@@ -233,18 +263,7 @@ abstract public class KalturaClientBase {
             	multiResponse.add(KalturaObjectFactory.create(arrayNode));
             }
        }
-        
- /*       foreach (Element arrayNode in multiRequestResult.ChildNodes)
-        {
-            if (arrayNode["error"] != null)
-                multiResponse.Add(new KalturaAPIException(arrayNode["error"]["code"].InnerText, arrayNode["error"]["message"].InnerText));
-            else if (arrayNode["objectType"] != null)
-                multiResponse.Add(KalturaObjectFactory.Create(arrayNode));
-            else
-                multiResponse.Add(arrayNode.InnerText);
-        }
-*/
-        return multiResponse;
+	   return multiResponse;
     }
 	
     
@@ -296,18 +315,33 @@ abstract public class KalturaClientBase {
         }
     }
 
-    private void throwExceptionOnAPIError(Element result) throws KalturaApiException {
-    	
-    	Element resultElement = null;
+    private KalturaApiException getExceptionOnAPIError(Element result) throws KalturaApiException {
     	try {
-    		resultElement = XmlUtils.getElementByXPath(result, "error");
+	    	Element errorElement = XmlUtils.getElementByXPath(result, "error");
+	    	if (errorElement == null)
+	    	{
+	    		return null;
+	    	}
+	    	
+	    	Element messageElement = XmlUtils.getElementByXPath(errorElement, "message");
+	    	Element codeElement = XmlUtils.getElementByXPath(errorElement, "code");
+	    	if (messageElement == null || codeElement == null)
+	    	{
+	    		return null;
+	    	}
+	    	
+	    	return new KalturaApiException(messageElement.getTextContent(), codeElement.getTextContent());
     	} catch (XPathExpressionException xee) {
     		throw new KalturaApiException("XPath expression exception evaluating result");
     	}
-    	        
-        if (resultElement != null) {
-        	throw new KalturaApiException(resultElement.getTextContent());
-        }
+    }
+
+    private void throwExceptionOnAPIError(Element result) throws KalturaApiException {
+    	KalturaApiException exception = getExceptionOnAPIError(result);
+    	if (exception != null)
+    	{
+    		throw exception;
+    	}
     }
 
     private PostMethod getPostMultiPartWithFiles(PostMethod postMethod, KalturaParams kparams, KalturaFiles kfiles) {
