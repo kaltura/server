@@ -14,9 +14,19 @@ class KalturaDocumentEntry extends KalturaBaseEntry
 	 */
 	public $documentType;
 	
+	/**
+	 * Comma separated asset params ids that exists for this media entry
+	 * 
+	 * @var string
+	 * @readonly
+	 * @filter matchor,matchand
+	 */
+	public $assetParamsIds;
+	
 	private static $map_between_objects = array
 	(
 		"documentType" => "mediaType",
+		"assetParamsIds" => "flavorParamsIds",
 	);
 	
 	public function __construct()

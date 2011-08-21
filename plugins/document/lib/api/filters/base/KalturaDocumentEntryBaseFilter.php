@@ -10,6 +10,8 @@ class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
 	(
 		"documentTypeEqual" => "_eq_document_type",
 		"documentTypeIn" => "_in_document_type",
+		"assetParamsIdsMatchOr" => "_matchor_asset_params_ids",
+		"assetParamsIdsMatchAnd" => "_matchand_asset_params_ids",
 	);
 
 	private $order_by_map = array
@@ -39,4 +41,18 @@ class KalturaDocumentEntryBaseFilter extends KalturaBaseEntryFilter
 	 * @var string
 	 */
 	public $documentTypeIn;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $assetParamsIdsMatchOr;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $assetParamsIdsMatchAnd;
 }
