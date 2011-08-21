@@ -31,7 +31,8 @@ class FlavorAssetService extends KalturaBaseService
 			$actionName == 'getWebPlayableByEntryId' ||
 			$actionName == 'getFlavorAssetsWithParams' ||
 			$actionName == 'convert' ||
-			$actionName == 'reconvert'
+			$actionName == 'reconvert' ||
+			$actionName == 'setContent'
 			)
 		{
 			$this->partnerGroup .= ',0';
