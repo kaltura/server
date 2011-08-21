@@ -154,9 +154,9 @@ kmc.functions = {
 
 		kmc.layout.modal.open( {
 			'width' : 950,
-			'height' : 606,
+			'height' : 616,
 			'title'	: title,
-			'content' : '<iframe src="' + iframe_url + '" width="100%" height="576" frameborder="0"></iframe>',
+			'content' : '<iframe src="' + iframe_url + '" width="100%" height="586" frameborder="0"></iframe>',
 			'style'	: 'iframe'
 		} );
 	}
