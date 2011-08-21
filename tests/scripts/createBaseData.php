@@ -91,28 +91,16 @@ class KalturaTestDeploymentHelper
 	public static function handleInput(array $argv)
 	{
 		if(isset($argv[1]))
-		{
-			print("using serviceUrl: $argv[1] \n");
 			self::$serviceUrl = $argv[1];
-		}
-		else
-			print("Service url wasn't inserted using default: http://localhost/ \n");
 		
 		if(isset($argv[2]))
-		{
-			print("using admin console login name: $argv[2] \n");
 			self::$adminConsoleLoginId = $argv[2];
-		}
-		else
-			print("admin console login name wasn't inserted using default: admin@kaltura.com \n");
 			
 		if(isset($argv[3]))
-		{
-			print("using admin console login password: $argv[3] \n");
 			self::$adminConsoleLoginPassword = $argv[3];
-		}
-		else
-			print("admin console login password wasn't inserted using default: admin / \n");
+			
+		print("using: service url: " . self::$serviceUrl ." admin console credentials: " . self::$adminConsoleLoginId. ", " . self::$adminConsoleLoginPassword . " \n");
+			
 	}
 	
 	/**
