@@ -346,7 +346,7 @@
 								<xsl:if test="contains($trClass, 'choice-end')">
 									<xsl:attribute name="class">last-rowspan</xsl:attribute>
 								</xsl:if>
-								<xsl:text>Choice </xsl:text>
+								<xsl:text>Option </xsl:text>
 								<xsl:value-of select="$choiceIndex"/>
 							</xsl:element>
 						</xsl:if>
@@ -412,7 +412,7 @@
 						<xsl:when test="$choiceCounter > 0">
 							<td class="first">[Any element]</td>
 							<xsl:if test="position() = 1 or $choiceSize = 1">
-								<td rowspan="{$choiceSize}">Choice <xsl:value-of select="$choiceIndex"/></td>
+								<td rowspan="{$choiceSize}">Option <xsl:value-of select="$choiceIndex"/></td>
 							</xsl:if>
 						</xsl:when>
 						<xsl:otherwise>
@@ -465,7 +465,7 @@
 						<xsl:when test="$choiceCounter > 0">
 							<td class="first">Choice</td>
 							<xsl:if test="position() = 1 or $choiceSize = 1">
-								<td rowspan="{$choiceSize}">Choice <xsl:value-of select="$choiceIndex"/></td>
+								<td rowspan="{$choiceSize}">Option <xsl:value-of select="$choiceIndex"/></td>
 							</xsl:if>
 						</xsl:when>
 						<xsl:otherwise>
@@ -551,7 +551,7 @@
 								<xsl:when test="$choiceCounter > 0">
 									<td class="first"><xsl:value-of select="@name"/></td>
 									<xsl:if test="position() = 1 or $choiceSize = 1">
-										<td rowspan="{$choiceSize}">Choice <xsl:value-of select="$choiceIndex"/></td>
+										<td rowspan="{$choiceSize}">Option <xsl:value-of select="$choiceIndex"/></td>
 									</xsl:if>
 								</xsl:when>
 								<xsl:otherwise>
@@ -606,7 +606,7 @@
 								<xsl:when test="$choiceCounter > 0">
 									<td class="first"><a href="#element-{@ref}"><xsl:value-of select="@ref"/></a></td>
 									<xsl:if test="position() = 1 or $choiceSize = 1">
-										<td rowspan="{$choiceSize}">Choice <xsl:value-of select="$choiceIndex"/></td>
+										<td rowspan="{$choiceSize}">Option <xsl:value-of select="$choiceIndex"/></td>
 									</xsl:if>
 								</xsl:when>
 								<xsl:otherwise>
