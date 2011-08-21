@@ -638,7 +638,7 @@ class KalturaTypeReflector
 		if ($this->_constants === null)
 			$this->getConstants();
 			
-		return array("_type", "_instance", "_properties", "_currentProperties", "_constants", "_isEnum", "_isStringEnum", "_isDynamicEnum", "_isArray", "_description");
+		return array("_type", "_instance", "_properties", "_currentProperties", "_constants", "_isEnum", "_isStringEnum", "_isDynamicEnum", "_isArray", "_description", "_abstract");
 	}
 
 

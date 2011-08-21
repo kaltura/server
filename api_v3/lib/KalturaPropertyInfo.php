@@ -138,6 +138,16 @@ class KalturaPropertyInfo
 			return false;
 	}
 	
+	public function isAbstract()
+	{
+		$this->getTypeReflector();
+		
+		if ($this->_typeReflector)
+			return $this->_typeReflector->isAbstract();
+		else
+			return false;
+	}
+	
 	public function getArrayType()
 	{
 		$this->getTypeReflector();
@@ -287,6 +297,7 @@ class KalturaPropertyInfo
 		$array["isEnum"] 		= $this->isEnum();
 		$array["isStringEnum"] 	= $this->isStringEnum();
 		$array["isArray"] 		= $this->isArray();
+		$array["isAbstract"] 		= $this->isAbstract();
 		
 		if ($this->isArray())
 		{

@@ -253,7 +253,8 @@ KTestMe.prototype = {
 			return;
 		
 		var jqObjectType = jQuery("<select id=\"object-type-" + param.name.replace(/:/g, "_") + "\" class=\"object-type\">");
-		jqObjectType.append("<option>" + param.type + "</option>");
+		if(!param.isAbstract)
+			jqObjectType.append("<option>" + param.type + "</option>");
 		
 		var scope = this;
 
@@ -377,6 +378,8 @@ KTestMe.prototype = {
 		for(var i = 0; i < subTypes.length; i++)
 		{
 			var subType = subTypes[i];
+			if(subType.isAbstract)
+				continue;
 			jqObjectType.append("<option>" + subType.type + "</option>");
 
 
