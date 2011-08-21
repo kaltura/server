@@ -2,24 +2,19 @@
 require_once dirname(__FILE__) . '/../bootstrap.php';
 
 $serviceUrl = 'http://localhost/';  //Default url is local host if no prameter is given
-if(isset($argv[1]))
-{
-	print("using serviceUrl: $argv[1] \n");
-	$serviceUrl = $argv[1];
-}
-else
-	print("Service url wasn't inserted using default: http://localhost/ \n");
+
+print ("Usage: php createBaseData serviceUrl adminConsoleLoginId adminConsoleLoginPassword\n");
+print ("For example: php createBaseData http:/devtests.kaltura.dev admin@kaltura.com admin\n");
+
+KalturaTestDeploymentHelper::handleInput($argv);	
 
 $config = new KalturaConfiguration();
-$config->serviceUrl = $serviceUrl;
-
-//$config->serviceUrl = 'http://hudsontest2.kaltura.dev/';
-//$config->serviceUrl = 'http://devtests.kaltura.dev/';
+$config->serviceUrl = KalturaTestDeploymentHelper::$serviceUrl;
 
 $client = new KalturaClient($config);
-$cmsPassword = 'Roni123!';
-$partner = KalturaTestDeploymentHelper::createTestPartner();
 
+$partner = KalturaTestDeploymentHelper::createTestPartner();
+$cmsPassword = 'Roni123!';
 $newPartner = $client->partner->register($partner, $cmsPassword); //create the new test partner
 
 print("New test partner is: " . print_r($newPartner, true));
@@ -55,6 +50,27 @@ class KalturaTestDeploymentHelper
 {
 	/**
 	 * 
+	 * The admin console partner login name
+	 * @var string
+	 */
+	private static $adminConsoleLoginId = 'admin@kaltura.com';
+
+	/**
+	 * 
+	 * The service url to deploy the tests for
+	 * @var string
+	 */
+	public static $serviceUrl = 'localhost';
+	
+	/**
+	 * 
+	 * the admin console password
+	 * @var string
+	 */
+	private static $adminConsoleLoginPassword = 'admin';
+	
+	/**
+	 * 
 	 * The deployment new created partner
 	 * @var KalturaPartner
 	 */
@@ -66,6 +82,38 @@ class KalturaTestDeploymentHelper
 	 * @var int
 	 */
 	const SYSTEM_DEFAULT_PARTNER = 0;
+	
+	/**
+	 * 
+	 * Handles the user input
+	 * @param array $argv
+	 */
+	public static function handleInput(array $argv)
+	{
+		if(isset($argv[1]))
+		{
+			print("using serviceUrl: $argv[1] \n");
+			self::$serviceUrl = $argv[1];
+		}
+		else
+			print("Service url wasn't inserted using default: http://localhost/ \n");
+		
+		if(isset($argv[2]))
+		{
+			print("using admin console login name: $argv[2] \n");
+			self::$adminConsoleLoginId = $argv[2];
+		}
+		else
+			print("admin console login name wasn't inserted using default: admin@kaltura.com \n");
+			
+		if(isset($argv[3]))
+		{
+			print("using admin console login password: $argv[3] \n");
+			self::$adminConsoleLoginPassword = $argv[3];
+		}
+		else
+			print("admin console login password wasn't inserted using default: admin / \n");
+	}
 	
 	/**
 	 * 
@@ -114,7 +162,7 @@ class KalturaTestDeploymentHelper
 		$adminClient = new KalturaClient($adminConfig);
 
 		//TODO: get this from the installation or outside input
-		$ks = $adminClient->user->loginByLoginId('admin@kaltura.com', 'admin'); 
+		$ks = $adminClient->user->loginByLoginId('admin@kaltura.com', 'admin');
 		$adminClient->setKs($ks);
 		
 		$addedPermissions = array();
@@ -298,7 +346,7 @@ class KalturaTestDeploymentHelper
 	
 	/**
 	 * 
-	 * Add the data 
+	 * Add the data for DWH
 	 */
 	private static function addDWHdata(KalturaClient $client)
 	{
@@ -460,6 +508,11 @@ endscript
 	    return $arr;
 	}
 	
+	/**
+	 * 
+	 * Adds the metadata search test data
+	 * @param KalturaClient $client
+	 */
 	protected static function addMetadataSearchData(KalturaClient $client)
 	{
 		//add metadata profile
@@ -517,6 +570,11 @@ endscript
 		KalturaGlobalData::setData("@METADATA_SEARCH_ENTRIES_IDS@", $expectedResults);
 	}
 	
+	/**
+	 * 
+	 * Adds the brightcove coversion test data
+	 * @param KalturaClient $client
+	 */
 	protected static function addBrightCoveConversionProfileData(KalturaClient $client)
 	{
 		$conversionProfile = new KalturaConversionProfile();
@@ -530,6 +588,11 @@ endscript
 		KalturaGlobalData::setData("@CONVERSION_PROFILE_ID_XSLT@", $conversionProfile->id);
 	}
 	
+	/**
+	 * 
+	 * Add bright cove bulk upload XML
+	 * @param KalturaClient $client
+	 */
 	protected static function addBrightCoveBulkUploadXml(KalturaClient $client)
 	{
 		$path = dirname(__FILE__) . '/bulkUploadXmls/brightcove';
