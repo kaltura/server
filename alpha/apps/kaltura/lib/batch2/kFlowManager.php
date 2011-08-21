@@ -369,14 +369,8 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			{
 				$object->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 				$object->save();
-				
-				if($object->getFlavorParamsId())
-					kFlowHelper::generateThumbnailsFromFlavor($entryId, $raisedJob, $object->getFlavorParamsId());
-				
-				return true;
 			}
-			
-			if($object->getIsOriginal())
+			elseif($object->getIsOriginal())
 			{
 				if($entry->getType() == entryType::MEDIA_CLIP)
 				{
@@ -392,6 +386,14 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$object->setStatus(asset::FLAVOR_ASSET_STATUS_VALIDATING);
 				$object->save();
 			}
+		}
+		
+		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
+		{
+			if($object->getFlavorParamsId())
+				kFlowHelper::generateThumbnailsFromFlavor($entryId, $raisedJob, $object->getFlavorParamsId());
+	
+			return true;
 		}
 		
 		if($object->getIsOriginal() && $entry->getStatus() == entryStatus::NO_CONTENT)

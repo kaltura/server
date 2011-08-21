@@ -194,6 +194,19 @@ class KalturaEntryService extends KalturaBaseService
 			throw $e;
 		}
 		
+		if($dbAsset && !($dbAsset instanceof flavorAsset))
+		{
+			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
+				
+			if($dbAsset->getFlavorParamsId())
+			{
+				$dbFlavorParams = assetParamsPeer::retrieveByPK($dbAsset->getFlavorParamsId());
+				if($dbFlavorParams)
+					$dbAsset->setTags($dbFlavorParams->getTags());
+			}
+			$dbAsset->save();
+		}
+		
 		if($isNewAsset)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAsset));
@@ -418,8 +431,6 @@ class KalturaEntryService extends KalturaBaseService
 			if (kFile::downloadUrlToFile($url, $entryFullPath))
 			{
 				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-				$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
-				$dbAsset->save();
 				return $dbAsset;
 			}
 			
