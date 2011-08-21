@@ -723,6 +723,8 @@
 							<category>examples&gt;example2</category>
 						</categories>
 						<conversionProfile>MY_CONVERSION_PROFILE_SYSTEM_NAME</conversionProfile>
+						<startDate>2011-05-05T00:00:00</startDate>
+						<endDate>2011-05-19T00:00:00</endDate>
 						<media>
 							<mediaType>1</mediaType> 
 						</media>
@@ -749,6 +751,8 @@
 							<category>examples&gt;example1</category>
 							<category>examples&gt;example2</category>
 						</categories>
+						<startDate>2011-05-05T00:00:00</startDate>
+						<endDate>2011-05-19T00:00:00</endDate>
 						<content flavorParamsId="0">...</content>
 						<content flavorParamsId="1">...</content>
 						<content flavorParamsId="2">...</content>
