@@ -20,6 +20,11 @@ class myDbHelper
 	 */
 	public static function getConnection($name)
 	{
+		if(!Propel::isInit())
+		{
+			DbManager::setConfig(kConf::getDB());
+			DbManager::initialize();
+		}
 		return Propel::getConnection ($name);
 	}
 	
