@@ -174,6 +174,9 @@ class KalturaRequestDeserializer
             }
 		}
 		
+		if($typeReflector->isAbstract())
+			throw new KalturaAPIException(KalturaErrors::OBJECT_TYPE_ABSTRACT, $typeReflector->getType());
+		 
 	    $class = $typeReflector->getType();
 		$obj = new $class;
 		$properties = $typeReflector->getProperties();
