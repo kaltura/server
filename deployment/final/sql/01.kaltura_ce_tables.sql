@@ -5,6 +5,7 @@ CREATE TABLE `access_control` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `partner_id` int(11) NOT NULL,
   `name` varchar(128) NOT NULL DEFAULT '',
+  `system_name` varchar(128) NOT NULL DEFAULT '',
   `description` varchar(1024) NOT NULL DEFAULT '',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -17,7 +18,7 @@ CREATE TABLE `access_control` (
   `prv_restrict_privilege` varchar(20) DEFAULT NULL,
   `prv_restrict_length` int(11) DEFAULT NULL,
   `kdir_restrict_type` tinyint(4) DEFAULT NULL,
-  `custom_data` TEXT,
+  `custom_data` text,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
@@ -30,7 +31,7 @@ CREATE TABLE `admin_permission` (
   `admin_kuser_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `admin_permission_FI_1` (`admin_kuser_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `alert`;
@@ -96,7 +97,7 @@ CREATE TABLE `audit_trail` (
   `server_name` varchar(63) DEFAULT NULL,
   `ip_address` varchar(15) DEFAULT NULL,
   `user_agent` varchar(127) DEFAULT NULL,
-  `client_tag` VARCHAR(127),
+  `client_tag` varchar(127) DEFAULT NULL,
   `description` varchar(1023) DEFAULT NULL,
   `error_description` varchar(1023) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -257,7 +258,9 @@ CREATE TABLE `bulk_upload_result` (
   `bulk_upload_job_id` int(11) DEFAULT NULL,
   `line_index` int(11) DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
-  `entry_id` varchar(20) DEFAULT NULL,
+  `object_id` varchar(20) DEFAULT NULL,
+  `object_type` int(11) DEFAULT '1',
+  `action` int(11) DEFAULT '1',
   `entry_status` int(11) NOT NULL,
   `row_data` varchar(1023) DEFAULT NULL,
   `title` varchar(127) DEFAULT NULL,
@@ -275,10 +278,29 @@ CREATE TABLE `bulk_upload_result` (
   `partner_data` varchar(4096) NOT NULL,
   `error_description` varchar(255) DEFAULT NULL,
   `plugins_data` varchar(9182) NOT NULL,
+  `custom_data` text,
   PRIMARY KEY (`id`),
-  KEY `entry_id_index_id` (`entry_id`,`id`),
+  KEY `entry_id_index_id` (`object_id`,`id`),
   KEY `job_id_line_index` (`bulk_upload_job_id`,`line_index`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `caption_asset_item`;
+
+CREATE TABLE `caption_asset_item`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`created_at` DATETIME,
+	`partner_id` INTEGER,
+	`entry_id` VARCHAR(20),
+	`caption_asset_id` VARCHAR(20),
+	`content` VARCHAR(255),
+	`start_time` INTEGER,
+	`end_time` INTEGER,
+	PRIMARY KEY (`id`),
+	KEY `caption_asset`(`caption_asset_id`),
+	KEY `partner_caption_asset`(`partner_id`, `caption_asset_id`)
+)ENGINE=MyISAM;
 
 
 DROP TABLE IF EXISTS `category`;
@@ -426,6 +448,10 @@ CREATE TABLE `conversion_profile_2` (
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   `description` varchar(1024) NOT NULL DEFAULT '',
+  `system_name` varchar(128) NOT NULL DEFAULT '',
+  `tags` text NOT NULL,
+  `status` int(11) NOT NULL DEFAULT '2',
+  `default_entry_id` varchar(20) DEFAULT NULL,
   `crop_left` int(11) NOT NULL DEFAULT '-1',
   `crop_top` int(11) NOT NULL DEFAULT '-1',
   `crop_width` int(11) NOT NULL DEFAULT '-1',
@@ -434,8 +460,40 @@ CREATE TABLE `conversion_profile_2` (
   `clip_duration` int(11) NOT NULL DEFAULT '-1',
   `input_tags_map` varchar(1023) DEFAULT NULL,
   `creation_mode` smallint(6) DEFAULT '1',
-  PRIMARY KEY (`id`)
+  `custom_data` text,
+  PRIMARY KEY (`id`),
+  KEY `partner_id_status` (`partner_id`,`status`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `cue_point`;
+
+CREATE TABLE `cue_point` (
+  `int_id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` varchar(255) NOT NULL,
+  `parent_id` varchar(255) DEFAULT NULL,
+  `entry_id` varchar(31) NOT NULL,
+  `partner_id` int(11) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `system_name` varchar(127) DEFAULT NULL,
+  `text` text,
+  `tags` varchar(255) DEFAULT NULL,
+  `start_time` int(11) NOT NULL,
+  `end_time` int(11) DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `type` int(11) NOT NULL,
+  `sub_type` int(11) NOT NULL,
+  `kuser_id` int(11) NOT NULL,
+  `custom_data` text,
+  `partner_data` text,
+  `partner_sort_value` int(11) DEFAULT NULL,
+  `thumb_offset` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `partner_entry_index` (`partner_id`,`entry_id`),
+  KEY `int_id_index` (`int_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `distribution_profile`;
@@ -447,6 +505,7 @@ CREATE TABLE `distribution_profile` (
   `partner_id` int(11) DEFAULT NULL,
   `provider_type` int(11) DEFAULT NULL,
   `name` varchar(31) DEFAULT NULL,
+  `system_name` varchar(128) NOT NULL DEFAULT '',
   `status` tinyint(4) DEFAULT NULL,
   `submit_enabled` tinyint(4) DEFAULT NULL,
   `update_enabled` tinyint(4) DEFAULT NULL,
@@ -467,6 +526,56 @@ CREATE TABLE `distribution_profile` (
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `drop_folder`;
+
+CREATE TABLE `drop_folder` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `partner_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text,
+  `type` int(11) NOT NULL,
+  `status` int(11) NOT NULL,
+  `dc` int(11) NOT NULL,
+  `path` text NOT NULL,
+  `conversion_profile_id` int(11) DEFAULT NULL,
+  `file_delete_policy` int(11) DEFAULT NULL,
+  `file_handler_type` int(11) DEFAULT NULL,
+  `file_name_patterns` text NOT NULL,
+  `file_handler_config` text NOT NULL,
+  `tags` text,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `custom_data` text,
+  PRIMARY KEY (`id`),
+  KEY `partner_id_index` (`partner_id`),
+  KEY `status_index` (`status`),
+  KEY `dc_index` (`dc`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `drop_folder_file`;
+
+CREATE TABLE `drop_folder_file` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `partner_id` int(11) NOT NULL,
+  `drop_folder_id` int(11) NOT NULL,
+  `file_name` varchar(500) NOT NULL,
+  `status` int(11) NOT NULL,
+  `file_size` int(11) NOT NULL,
+  `file_size_last_set_at` datetime DEFAULT NULL,
+  `error_code` int(11) DEFAULT NULL,
+  `error_description` text,
+  `parsed_slug` varchar(500) DEFAULT NULL,
+  `parsed_flavor` varchar(500) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `custom_data` text,
+  PRIMARY KEY (`id`),
+  KEY `partner_id_index` (`partner_id`),
+  KEY `status_index` (`status`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 DROP TABLE IF EXISTS `dynamic_enum`;
 
 CREATE TABLE `dynamic_enum` (
@@ -476,7 +585,7 @@ CREATE TABLE `dynamic_enum` (
   `plugin_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enum_unique` (`enum_name`,`value_name`,`plugin_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=10001 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `email_campaign`;
@@ -597,7 +706,7 @@ CREATE TABLE `entry` (
   KEY `entry_FI_5` (`conversion_profile_id`),
   FULLTEXT KEY `search_text_index` (`search_text`),
   FULLTEXT KEY `search_text_discrete_index` (`search_text_discrete`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `entry_distribution`;
@@ -616,7 +725,7 @@ CREATE TABLE `entry_distribution` (
   `flavor_asset_ids` varchar(255) DEFAULT NULL,
   `sunrise` datetime DEFAULT NULL,
   `sunset` datetime DEFAULT NULL,
-  `remote_id` varchar(31) DEFAULT NULL,
+  `remote_id` varchar(255) DEFAULT NULL,
   `plays` int(11) DEFAULT NULL,
   `views` int(11) DEFAULT NULL,
   `validation_errors` text,
@@ -688,7 +797,7 @@ CREATE TABLE `file_sync` (
   KEY `partner_id_object_id_object_type_index` (`partner_id`,`object_id`,`object_type`),
   KEY `dc_status_index` (`dc`,`status`),
   KEY `updated_at_index` (`updated_at`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `flag`;
@@ -734,13 +843,14 @@ CREATE TABLE `flavor_asset` (
   `video_codec_id` varchar(127) DEFAULT NULL,
   `type` int(11) NOT NULL DEFAULT '0',
   `custom_data` text,
+  `partner_data` varchar(4096) DEFAULT NULL,
   PRIMARY KEY (`int_id`),
   KEY `partner_id_entry_id` (`partner_id`,`entry_id`),
   KEY `flavor_asset_FI_1` (`entry_id`),
   KEY `flavor_asset_FI_2` (`flavor_params_id`),
   KEY `id_indx` (`id`),
   KEY `updated_at_index` (`updated_at`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `flavor_params`;
@@ -750,6 +860,7 @@ CREATE TABLE `flavor_params` (
   `version` int(11) NOT NULL DEFAULT '0',
   `partner_id` int(11) NOT NULL,
   `name` varchar(128) NOT NULL DEFAULT '',
+  `system_name` varchar(128) NOT NULL DEFAULT '',
   `tags` text,
   `description` varchar(1024) NOT NULL DEFAULT '',
   `ready_behavior` tinyint(4) NOT NULL,
@@ -791,6 +902,8 @@ DROP TABLE IF EXISTS `flavor_params_conversion_profile`;
 CREATE TABLE `flavor_params_conversion_profile` (
   `conversion_profile_id` int(11) NOT NULL,
   `flavor_params_id` int(11) NOT NULL,
+  `system_name` varchar(128) NOT NULL DEFAULT '',
+  `origin` tinyint(4) NOT NULL DEFAULT '0',
   `ready_behavior` tinyint(4) NOT NULL,
   `force_none_complied` int(11) DEFAULT '0',
   `created_at` datetime DEFAULT NULL,
@@ -800,7 +913,7 @@ CREATE TABLE `flavor_params_conversion_profile` (
   KEY `flavor_params_conversion_profile_FI_1` (`conversion_profile_id`),
   KEY `flavor_params_conversion_profile_FI_2` (`flavor_params_id`),
   KEY `updated_at_FI_3` (`updated_at`)
-) ENGINE=MyISAM ;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `flavor_params_output`;
@@ -867,6 +980,7 @@ CREATE TABLE `flickr_token` (
   KEY `is_valid_index` (`is_valid`,`kalt_token`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+
 DROP TABLE IF EXISTS `generic_distribution_provider`;
 
 CREATE TABLE `generic_distribution_provider` (
@@ -921,6 +1035,7 @@ CREATE TABLE `invalid_session` (
   `ks` varchar(300) DEFAULT NULL,
   `ks_valid_until` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
+  `actions_limit` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ks_index` (`ks`),
   KEY `ks_valid_until_index` (`ks_valid_until`)
@@ -1057,7 +1172,7 @@ CREATE TABLE `kuser` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `login_data_id` int(11) DEFAULT NULL,
   `is_admin` tinyint(4) DEFAULT NULL,
-  `screen_name` varchar(127) CHARACTER SET latin1 DEFAULT NULL,
+  `screen_name` varchar(127) DEFAULT NULL,
   `first_name` varchar(40) DEFAULT NULL,
   `last_name` varchar(40) DEFAULT NULL,
   `full_name` varchar(40) DEFAULT NULL,
@@ -1118,7 +1233,7 @@ CREATE TABLE `kuser` (
   KEY `login_data_id_index` (`login_data_id`),
   KEY `is_admin_index` (`is_admin`),
   FULLTEXT KEY `search_text_index` (`search_text`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `kuser_to_user_role`;
@@ -1132,7 +1247,7 @@ CREATE TABLE `kuser_to_user_role` (
   PRIMARY KEY (`id`),
   KEY `kuser_to_user_role_FI_1` (`kuser_id`),
   KEY `kuser_to_user_role_FI_2` (`user_role_id`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `kvote`;
@@ -1291,10 +1406,14 @@ CREATE TABLE `metadata_profile` (
   `views_version` int(11) DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `name` varchar(31) DEFAULT NULL,
+  `system_name` varchar(127) NOT NULL DEFAULT '',
+  `description` varchar(255) NOT NULL DEFAULT '',
   `status` tinyint(4) DEFAULT NULL,
   `object_type` int(11) DEFAULT NULL,
+  `create_mode` int(11) NOT NULL DEFAULT '1',
+  `custom_data` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `metadata_profile_field`;
@@ -1311,6 +1430,7 @@ CREATE TABLE `metadata_profile_field` (
   `type` varchar(127) DEFAULT NULL,
   `xpath` varchar(255) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
+  `search_index` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
@@ -1547,7 +1667,7 @@ CREATE TABLE `permission` (
   KEY `partner_id_index` (`partner_id`),
   KEY `name_index` (`name`),
   KEY `name_partner_id_index` (`name`,`partner_id`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `permission_item`;
@@ -1566,7 +1686,7 @@ CREATE TABLE `permission_item` (
   `updated_at` datetime DEFAULT NULL,
   `custom_data` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM; 			
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `permission_to_permission_item`;
@@ -1580,7 +1700,7 @@ CREATE TABLE `permission_to_permission_item` (
   PRIMARY KEY (`id`),
   KEY `permission_to_permission_item_FI_1` (`permission_id`),
   KEY `permission_to_permission_item_FI_2` (`permission_item_id`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pr_news`;
@@ -1688,7 +1808,7 @@ CREATE TABLE `scheduler` (
   `last_status` datetime DEFAULT NULL,
   `host` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `scheduler_config`;
@@ -1779,37 +1899,7 @@ CREATE TABLE `short_link` (
   KEY `int_id` (`int_id`),
   KEY `partner_id` (`partner_id`),
   KEY `kuser_partner_name` (`partner_id`,`kuser_id`,`system_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS `sphinx_log`;
-
-CREATE TABLE `sphinx_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `entry_id` varchar(20) DEFAULT NULL,
-  `partner_id` int(11) DEFAULT '0',
-  `dc` int(11) DEFAULT NULL,
-  `sql` longtext,
-  `created_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `entry_id` (`entry_id`),
-  KEY `creatd_at` (`created_at`),
-  KEY `sphinx_log_FI_1` (`partner_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS `sphinx_log_server`;
-
-CREATE TABLE `sphinx_log_server` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server` varchar(63) DEFAULT NULL,
-  `dc` int(11) DEFAULT NULL,
-  `last_log_id` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `sphinx_log_server_FI_1` (`last_log_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `storage_profile`;
@@ -1820,6 +1910,7 @@ CREATE TABLE `storage_profile` (
   `updated_at` datetime DEFAULT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `name` varchar(31) DEFAULT NULL,
+  `system_name` varchar(128) NOT NULL DEFAULT '',
   `desciption` varchar(127) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
   `protocol` tinyint(4) DEFAULT NULL,
@@ -1839,7 +1930,7 @@ CREATE TABLE `storage_profile` (
   `path_manager_class` varchar(127) DEFAULT NULL,
   `url_manager_class` varchar(127) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `syndication_feed`;
@@ -1868,8 +1959,8 @@ CREATE TABLE `syndication_feed` (
   `feed_image_url` varchar(512) DEFAULT NULL,
   `feed_author` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `custom_data` TEXT,
-  `display_in_search` TINYINT default 1,
+  `custom_data` text,
+  `display_in_search` tinyint(4) DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `int_id_index` (`int_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -1897,9 +1988,9 @@ CREATE TABLE `temp_entry_update` (
 DROP TABLE IF EXISTS `temp_updated_kusers_storage_usage`;
 
 CREATE TABLE `temp_updated_kusers_storage_usage` (
-  `kuser_id` INT(11) NOT NULL,
-  `storage_kb` INT(11)
-) ENGINE=MYISAM DEFAULT CHARSET=latin1;
+  `kuser_id` int(11) NOT NULL,
+  `storage_kb` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `tmp`;
@@ -1988,6 +2079,7 @@ CREATE TABLE `ui_conf` (
   `display_in_search` tinyint(4) DEFAULT '0',
   `creation_mode` tinyint(4) DEFAULT '1',
   `version` varchar(10) DEFAULT NULL,
+  `html5_url` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`),
   KEY `partner_id_creation_mode_index` (`partner_id`,`creation_mode`),
@@ -2011,6 +2103,8 @@ CREATE TABLE `upload_token` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `dc` int(11) DEFAULT NULL,
+  `object_type` varchar(127) DEFAULT NULL,
+  `object_id` varchar(31) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `int_id` (`int_id`),
   KEY `partner_id_status` (`partner_id`,`status`),
@@ -2018,7 +2112,8 @@ CREATE TABLE `upload_token` (
   KEY `status_created_at` (`status`,`created_at`),
   KEY `created_at` (`created_at`),
   KEY `upload_token_FI_1` (`kuser_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 DROP TABLE IF EXISTS `user_login_data`;
 
@@ -2036,7 +2131,7 @@ CREATE TABLE `user_login_data` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `login_email_index` (`login_email`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `user_role`;
@@ -2055,7 +2150,17 @@ CREATE TABLE `user_role` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_index` (`partner_id`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `version_management`;
+
+CREATE TABLE `version_management` (
+  `version` int(11) DEFAULT NULL,
+  `filename` varchar(250) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`filename`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `virus_scan_profile`;
@@ -2102,7 +2207,7 @@ CREATE TABLE `widget` (
   KEY `partner_id_index` (`partner_id`),
   KEY `created_at_index` (`created_at`),
   KEY `updated_at` (`updated_at`)
-) ENGINE=MyISAM;
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `widget_log`;
@@ -2147,3 +2252,12 @@ CREATE TABLE `work_group` (
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+
+
+
+
+
+
