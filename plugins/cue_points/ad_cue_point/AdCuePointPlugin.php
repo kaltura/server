@@ -243,7 +243,7 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		if($cuePoint->getName())
 			$scene->addChild('sceneTitle', kMrssManager::stringToSafeXml($cuePoint->getName()));
 		if($cuePoint->getSourceUrl())
-			$scene->addChild('sourceUrl', $cuePoint->getSourceUrl());
+			$scene->addChild('sourceUrl', htmlspecialchars($cuePoint->getSourceUrl()));
 
 		$scene->addChild('adType', $cuePoint->getAdType());
 		$scene->addChild('protocolType', $cuePoint->getSubType());
