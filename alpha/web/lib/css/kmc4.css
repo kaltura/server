@@ -28,6 +28,7 @@ body { height:100%; background:#F7F7F7;} /* url(../images/kmc/kmc_sprite.png) re
    #kmcHeader #user .left-arrow { margin-top: -12px\9 }
    #kmcHeader #user_links { position: absolute; right: 6px; top: 6px; z-index: 22; padding: 2px 10px; white-space: nowrap; background: #2b2b2b; border: 1px solid #4d4d4d; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #c9c9c9; font: normal 11px arial,sans-serif; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -o-user-select: none; user-select: none;}
    #kmcHeader #user_links #closeMenu { cursor: pointer; background: url("../images/kmc/kmc_sprite.png") no-repeat -182px -175px; display: inline-block; width: 10px; height: 10px; margin: auto -3px auto -2px }
+   #kmcHeader #user_links #closeMenu { margin-top: -12px\9 }
    #kmcHeader #user_links .sep { color: #4d4d4d; }
    #kmcHeader #user_links a { color: #5fa9ba; }
    #kmcHeader #user_links a:hover { color: #76c5ee; }
