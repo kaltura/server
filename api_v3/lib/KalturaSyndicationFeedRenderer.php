@@ -106,8 +106,9 @@ class KalturaSyndicationFeedRenderer
 		$entryFilter->setPartnerSearchScope($this->syndicationFeed->partnerId);
 		$entryFilter->setStatusEquel(entryStatus::READY);
 		$entryFilter->setTypeIn(array(entryType::MEDIA_CLIP, entryType::MIX));
-		$entryFilter->setModerationStatusNot(entry::ENTRY_MODERATION_STATUS_REJECTED);
-		$entryFilter->setDurationGreaterThan(0);
+		$entryFilter->setModerationStatusNotIn(array(
+			entry::ENTRY_MODERATION_STATUS_REJECTED, 
+			entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION));
 			
 		$entryFilter->attachToCriteria($this->baseCriteria);
 			
