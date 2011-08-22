@@ -9,7 +9,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 * @var KalturaAdProtocolType
 	 * @filter eq,in
 	 * @insertonly
-	 * @requiresPermission insert
+	 * @requiresPermission insert,update
 	 */
 	public $protocolType;
 	
