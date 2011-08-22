@@ -70,7 +70,7 @@ class SymantecScanEnginePlugin extends KalturaPlugin implements IKalturaPending,
 				return 'SymantecScanEngine';
 			
 			if($enumValue == KalturaVirusScanEngineType::SYMANTEC_SCAN_JAVA_ENGINE)
-				return 'SymantecScanEngine';
+				return 'SymantecScanJavaEngine';
 		}
 
 		return null;

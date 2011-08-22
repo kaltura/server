@@ -32,34 +32,24 @@ class SymantecScanJavaEngine extends SymantecScanEngine
 	{
 		if (!$this->binFile)
 		{
-			$errorDescriptiong = 'Engine command line not set';
+			$errorDescription = 'Engine command line not set';
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
 		if (!file_exists($filePath)) {
-			$errorDescriptiong = 'Source file does not exists ['.$filePath.']';
+			$errorDescription = 'Source file does not exists ['.$filePath.']';
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
-		
-		clearstatcache();
-		$fileLastChanged = filemtime($filePath);
 		
 		$scanMode = $cleanIfInfected ? 'scanrepair' : 'scan';
 		
 		$cmd = $this->binFile . " --action $scanMode --verbose -f $filePath";
 
-		$returnValue = null;
 		$errorDescription = null;
 		$output = null;
 		
 		KalturaLog::debug("Executing - [$cmd]");
 		exec($cmd, $output, $return_value);
-		
-		if ($returnValue != 0)	// command line error
-		{	
-			$errorDescription = "Error executing command [$cmd] - return value [$returnValue]";
-			return KalturaVirusScanJobResult::SCAN_ERROR;
-		}
 		
 		$found = false;
 		foreach ($output as $line)
