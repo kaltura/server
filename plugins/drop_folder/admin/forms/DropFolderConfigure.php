@@ -153,7 +153,7 @@ class Form_DropFolderConfigure extends Infra_Form
 		
 		$this->addElement('text', 'autoFileDeleteDays', array(
 			'label' 		=> 'Auto delete files after (days):',
-			'required'		=> true,
+			//'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
 		
