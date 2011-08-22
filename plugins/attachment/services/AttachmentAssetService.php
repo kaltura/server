@@ -88,7 +88,7 @@ class AttachmentAssetService extends KalturaBaseService
     function setContentAction($id, KalturaContentResource $contentResource)
     {
    		$dbAttachmentAsset = assetPeer::retrieveById($id);
-   		if(!$dbAttachmentAsset)
+   		if (!$dbAttachmentAsset || !($dbAttachmentAsset instanceof AttachmentAsset))
    			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
@@ -129,7 +129,7 @@ class AttachmentAssetService extends KalturaBaseService
     function updateAction($id, KalturaAttachmentAsset $attachmentAsset)
     {
 		$dbAttachmentAsset = assetPeer::retrieveById($id);
-		if(!$dbAttachmentAsset)
+		if (!$dbAttachmentAsset || !($dbAttachmentAsset instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
@@ -342,7 +342,7 @@ class AttachmentAssetService extends KalturaBaseService
 	public function getUrlAction($id, $storageId = null)
 	{
 		$assetDb = assetPeer::retrieveById($id);
-		if (!$assetDb)
+		if (!$assetDb || !($assetDb instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
@@ -366,7 +366,7 @@ class AttachmentAssetService extends KalturaBaseService
 	public function serveAction($attachmentAssetId)
 	{
 		$attachmentAsset = assetPeer::retrieveById($attachmentAssetId);
-		if (!$attachmentAsset)
+		if (!$attachmentAsset || !($attachmentAsset instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 
 		$ext = $attachmentAsset->getFileExt();
@@ -388,7 +388,7 @@ class AttachmentAssetService extends KalturaBaseService
 	public function getAction($attachmentAssetId)
 	{
 		$attachmentAssetsDb = assetPeer::retrieveById($attachmentAssetId);
-		if(!$attachmentAssetsDb)
+		if (!$attachmentAssetsDb || !($attachmentAssetsDb instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 		
 		$attachmentAssets = new KalturaAttachmentAsset();
@@ -443,7 +443,7 @@ class AttachmentAssetService extends KalturaBaseService
 	public function deleteAction($attachmentAssetId)
 	{
 		$attachmentAssetDb = assetPeer::retrieveById($attachmentAssetId);
-		if(!$attachmentAssetDb)
+		if (!$attachmentAssetDb || !($attachmentAssetDb instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 	
 		$dbEntry = $attachmentAssetDb->getentry();

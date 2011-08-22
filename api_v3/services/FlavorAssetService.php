@@ -99,7 +99,7 @@ class FlavorAssetService extends KalturaBaseService
     function updateAction($id, KalturaFlavorAsset $flavorAsset)
     {
    		$dbFlavorAsset = assetPeer::retrieveById($id);
-   		if(!$dbFlavorAsset)
+   		if (!$dbFlavorAsset || !($dbFlavorAsset instanceof flavorAsset))
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbFlavorAsset->getentry();
@@ -134,7 +134,7 @@ class FlavorAssetService extends KalturaBaseService
     function setContentAction($id, KalturaContentResource $contentResource)
     {
    		$dbFlavorAsset = assetPeer::retrieveById($id);
-   		if(!$dbFlavorAsset)
+   		if (!$dbFlavorAsset || !($dbFlavorAsset instanceof flavorAsset))
    			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbFlavorAsset->getentry();
@@ -408,7 +408,7 @@ class FlavorAssetService extends KalturaBaseService
 	public function getAction($id)
 	{
 		$flavorAssetDb = assetPeer::retrieveById($id);
-		if (!$flavorAssetDb)
+		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
 		$flavorAsset = new KalturaFlavorAsset();
@@ -562,7 +562,7 @@ class FlavorAssetService extends KalturaBaseService
 	public function reconvertAction($id)
 	{
 		$flavorAssetDb = assetPeer::retrieveById($id);
-		if (!$flavorAssetDb)
+		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
 		if ($flavorAssetDb->getIsOriginal())
@@ -583,7 +583,7 @@ class FlavorAssetService extends KalturaBaseService
 	public function deleteAction($id)
 	{
 		$flavorAssetDb = assetPeer::retrieveById($id);
-		if (!$flavorAssetDb)
+		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 			
 		$entry = $flavorAssetDb->getEntry();
@@ -613,7 +613,7 @@ class FlavorAssetService extends KalturaBaseService
 	public function getUrlAction($id, $storageId = null)
 	{
 		$assetDb = assetPeer::retrieveById($id);
-		if (!$assetDb)
+		if (!$assetDb || !($assetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
@@ -637,7 +637,7 @@ class FlavorAssetService extends KalturaBaseService
 	public function getDownloadUrlAction($id, $useCdn = false)
 	{
 		$flavorAssetDb = assetPeer::retrieveById($id);
-		if (!$flavorAssetDb)
+		if (!$flavorAssetDb || !($flavorAssetDb instanceof flavorAsset))
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
 		if ($flavorAssetDb->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)

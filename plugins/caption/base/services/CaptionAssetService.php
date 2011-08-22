@@ -96,7 +96,7 @@ class CaptionAssetService extends KalturaBaseService
     function setContentAction($id, KalturaContentResource $contentResource)
     {
    		$dbCaptionAsset = assetPeer::retrieveById($id);
-   		if(!$dbCaptionAsset)
+   		if (!$dbCaptionAsset || !($dbCaptionAsset instanceof CaptionAsset))
    			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbCaptionAsset->getentry();
@@ -137,7 +137,7 @@ class CaptionAssetService extends KalturaBaseService
     function updateAction($id, KalturaCaptionAsset $captionAsset)
     {
 		$dbCaptionAsset = assetPeer::retrieveById($id);
-		if(!$dbCaptionAsset)
+		if (!$dbCaptionAsset || !($dbCaptionAsset instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbCaptionAsset->getentry();
@@ -397,7 +397,7 @@ class CaptionAssetService extends KalturaBaseService
 	public function getUrlAction($id, $storageId = null)
 	{
 		$assetDb = assetPeer::retrieveById($id);
-		if (!$assetDb)
+		if (!$assetDb || !($assetDb instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
@@ -421,7 +421,7 @@ class CaptionAssetService extends KalturaBaseService
 	public function serveAction($captionAssetId)
 	{
 		$captionAsset = assetPeer::retrieveById($captionAssetId);
-		if (!$captionAsset)
+		if (!$captionAsset || !($captionAsset instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 
 		$ext = $captionAsset->getFileExt();
@@ -443,7 +443,7 @@ class CaptionAssetService extends KalturaBaseService
 	public function setAsDefaultAction($captionAssetId)
 	{
 		$captionAsset = assetPeer::retrieveById($captionAssetId);
-		if (!$captionAsset)
+		if (!$captionAsset || !($captionAsset instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
 		$entry = $captionAsset->getentry();
@@ -482,7 +482,7 @@ class CaptionAssetService extends KalturaBaseService
 	public function getAction($captionAssetId)
 	{
 		$captionAssetsDb = assetPeer::retrieveById($captionAssetId);
-		if(!$captionAssetsDb)
+		if (!$captionAssetsDb || !($captionAssetsDb instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		
 		$captionAssets = new KalturaCaptionAsset();
@@ -537,7 +537,7 @@ class CaptionAssetService extends KalturaBaseService
 	public function deleteAction($captionAssetId)
 	{
 		$captionAssetDb = assetPeer::retrieveById($captionAssetId);
-		if(!$captionAssetDb)
+		if (!$captionAssetDb || !($captionAssetDb instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 	
 // 		if($captionAssetDb->getDefault())

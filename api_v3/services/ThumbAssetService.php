@@ -100,7 +100,7 @@ class ThumbAssetService extends KalturaBaseService
     function setContentAction($id, KalturaContentResource $contentResource)
     {
    		$dbThumbAsset = assetPeer::retrieveById($id);
-   		if(!$dbThumbAsset)
+   		if (!$dbThumbAsset || !($dbThumbAsset instanceof thumbAsset))
    			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbThumbAsset->getentry();
@@ -160,7 +160,7 @@ class ThumbAssetService extends KalturaBaseService
     function updateAction($id, KalturaThumbAsset $thumbAsset)
     {
 		$dbThumbAsset = assetPeer::retrieveById($id);
-		if(!$dbThumbAsset)
+		if (!$dbThumbAsset || !($dbThumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbThumbAsset->getentry();
@@ -408,7 +408,7 @@ class ThumbAssetService extends KalturaBaseService
 	public function serveAction($thumbAssetId)
 	{
 		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
-		if (!$thumbAsset)
+		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 
 		$ext = $thumbAsset->getFileExt();
@@ -431,7 +431,7 @@ class ThumbAssetService extends KalturaBaseService
 	public function setAsDefaultAction($thumbAssetId)
 	{
 		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
-		if (!$thumbAsset)
+		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
 		$entry = $thumbAsset->getentry();
@@ -588,7 +588,7 @@ class ThumbAssetService extends KalturaBaseService
 	public function regenerateAction($thumbAssetId)
 	{
 		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
-		if(!$thumbAsset)
+		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 			
 		if(is_null($thumbAsset->getFlavorParamsId()))
@@ -634,7 +634,7 @@ class ThumbAssetService extends KalturaBaseService
 	public function getAction($thumbAssetId)
 	{
 		$thumbAssetsDb = assetPeer::retrieveById($thumbAssetId);
-		if(!$thumbAssetsDb)
+		if (!$thumbAssetsDb || !($thumbAssetsDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 		
 		$thumbAssets = new KalturaThumbAsset();
@@ -809,7 +809,7 @@ class ThumbAssetService extends KalturaBaseService
 	public function deleteAction($thumbAssetId)
 	{
 		$thumbAssetDb = assetPeer::retrieveById($thumbAssetId);
-		if(!$thumbAssetDb)
+		if (!$thumbAssetDb || !($thumbAssetDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $thumbAssetId);
 	
 		if($thumbAssetDb->hasTag(thumbParams::TAG_DEFAULT_THUMB))
@@ -839,7 +839,7 @@ class ThumbAssetService extends KalturaBaseService
 	public function getUrlAction($id, $storageId = null)
 	{
 		$assetDb = assetPeer::retrieveById($id);
-		if (!$assetDb)
+		if (!$assetDb || !($assetDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
