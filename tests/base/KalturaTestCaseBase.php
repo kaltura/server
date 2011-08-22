@@ -634,7 +634,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				}
 			}
 		}
-		elseif($inputAsObject instanceof KalturaObjectBase)// object is Kaltura object base
+		elseif($inputAsObject instanceof KalturaObjectBase || $inputAsObject instanceof KalturaObject)// Object is Kaltura object base
 		{
 			$reflector = new ReflectionClass($inputAsObject);
 			$properties = $reflector->getProperties(ReflectionProperty::IS_PUBLIC);
