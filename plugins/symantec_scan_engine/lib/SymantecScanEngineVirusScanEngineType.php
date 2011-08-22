@@ -6,11 +6,13 @@
 class SymantecScanEngineVirusScanEngineType implements IKalturaPluginEnum, VirusScanEngineType
 {
 	const SYMANTEC_SCAN_ENGINE = 'SymantecScanEngine';
+	const SYMANTEC_SCAN_JAVA_ENGINE = 'SymantecScanJavaEngine';
 	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'SYMANTEC_SCAN_ENGINE' => self::SYMANTEC_SCAN_ENGINE
+			'SYMANTEC_SCAN_ENGINE' => self::SYMANTEC_SCAN_ENGINE,
+			'SYMANTEC_SCAN_JAVA_ENGINE' => self::SYMANTEC_SCAN_JAVA_ENGINE,
 		);
 	}
 	
