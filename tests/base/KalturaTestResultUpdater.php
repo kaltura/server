@@ -36,7 +36,7 @@ class KalturaTestResultUpdater
 		KalturaLog::debug("dataFilePath [$dataFilePath], failuresFilePath [$failuresFilePath]\n");
 		
 		$oldFilesIndex = KalturaTestResultUpdater::getLastDataFileIndex($dataFilePath);
-		copy($dataFilePath, $dataFilePath."old".$oldFilesIndex);
+		copy($dataFilePath, $dataFilePath.".old".$oldFilesIndex);
 		
 		$oldTestDataFile = KalturaTestCaseDataFile::generateFromDataXml($dataFilePath);
 		$testsFailures = KalturaTestCaseFailures::generateFromXml($failuresFilePath);
