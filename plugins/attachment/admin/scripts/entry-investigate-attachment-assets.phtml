@@ -11,6 +11,7 @@
 			<th><?php echo $this->translate('entry-investigate attachment asset format th'); ?></th>
 			<th><?php echo $this->translate('entry-investigate attachment asset title th'); ?></th>
 			<th><?php echo $this->translate('entry-investigate attachment asset description th'); ?></th>
+			<th><?php echo $this->translate('entry-investigate attachment asset partner description th'); ?></th>
 			<th><?php echo $this->translate('entry-investigate attachment asset status th'); ?></th>
 		</tr>
 	</thead>
@@ -20,6 +21,7 @@
 			{
 				foreach($this->attachmentAssets as $attachmentAsset)
 				{
+					/* @var $attachmentAsset KalturaAttachmentAsset */
 					$fileSyncs = array();
 					if(isset($this->attachmentAssetsFileSyncs[$attachmentAsset->id]))
 						$fileSyncs = $this->attachmentAssetsFileSyncs[$attachmentAsset->id];
@@ -33,6 +35,7 @@
 							<td><?php echo $this->enumTranslate('Kaltura_Client_Attachment_Enum_AttachmentType', $attachmentAsset->format); ?></td>
 							<td><?php echo $attachmentAsset->title; ?></td>
 							<td><?php echo $attachmentAsset->description; ?></td>
+							<td><?php echo $attachmentAsset->partnerDescription; ?></td>
 							<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_FlavorAssetStatus', $attachmentAsset->status); ?></td>
 						</tr>
 						<tr class="additionalData" id="tr_attachment_asset_data_<?php echo $attachmentAsset->id; ?>" style="display: none">
