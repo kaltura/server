@@ -419,7 +419,7 @@ $format = "fl";
 			if(isset($this->_vidRotation)) {
 				if($this->_vidRotation==180)
 					$cmdStr = $cmdStr.",flip";
-				else
+				else if($this->_vidRotation==90 || $this->_vidRotation==-90)
 					$cmdStr = $cmdStr.",rotate=1";
 				
 			}
