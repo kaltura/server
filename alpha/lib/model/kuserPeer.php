@@ -580,4 +580,12 @@ class kuserPeer extends BasekuserPeer
 		
 		return array("kuser:partnerId=".$partnerIdCriterion->getValue().",puserid=".$puserIdCriterion->getValue());
 	}
+	
+	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)
+	{
+		self::setUseCriteriaFilter(false);
+		$ret = self::retrieveByPK($pk, $con);
+		self::setUseCriteriaFilter(true);
+		return $ret;
+	}
 }
