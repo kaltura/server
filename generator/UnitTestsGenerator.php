@@ -593,7 +593,7 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 			return;
 				
 		if($action)
-		$actionName = ucfirst($action);
+			$actionName = ucfirst($action);
 		
 		$this->writeIni("");
 		$this->writeIni("[test{$actionName}]");
