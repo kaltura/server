@@ -341,28 +341,36 @@ class KalturaTestDeploymentHelper
 		$partnerId = $client->getConfig()->partnerId;
 		
 		KalturaGlobalData::setData("@DWH_START_TIME@", time());
-		
+
+		$ch = curl_init();
+							
 		for($i = 0; $i < 1000; $i++)
 		{
-			$event = new KalturaStatsEvent();
-			$event->partnerId = $partnerId;
-			$event->eventType= KalturaStatsEventType::PLAY;
-			$event->entryId = KalturaGlobalData::getData("@DEFAULT_ENTRY_ID@");
+			$eventType= KalturaStatsEventType::PLAY;
+			$entryId = KalturaGlobalData::getData("@DEFAULT_ENTRY_ID@");
 			$event->clientVer = "test client";
+			$clientVer = "testClient";
 			$event->sessionId = "test session";
-			$event->referrer = "http://kaltura.com/" . $i % 10;
-			$event->uiconfId = KalturaGlobalData::getData("@UI_CONF_ID@");
-					
-			try
-			{
-				$client->stats->collect($event);
-			}
-			catch (Exception $e)
-			{
-				//Currently do nothing
-			}
+			$sessionId = "testSession";
+			$referer = "http://kaltura.com/" . $i % 10;
+			$uiconfId = KalturaGlobalData::getData("@UI_CONF_ID@");
+			$currentTimeStamp = time();
+
+//			$statsString = "GET //api_v3/index.php?service=stats&action=collect&kalsig=5e1adae915042f96eacf7c6d972b2f54&event%3AeventTimestamp=$currentTimeStamp&event%3AuiconfId=$uiconfId&event%3AsessionId=53BDB894%2D35D8%2D6369%2DE4BF%2DF227861A76FD&event%3AobjectType=KalturaStatsEvent&event%3AisFirstInSession=false&event%3AclientVer=3%2E0%3Av3%2E5%2E16%2Ea&event%3Aseek=false&event%3ApartnerId=$partnerId&ignoreNull=1&event%3Aduration=11&clientTag=kdp%3Av3%2E5%2E16%2Ea%2Ccache%5Fst%3A1314028568&event%3AcurrentPoint=33&event%3AeventType=$eventType&event%3Areferrer=$referer&event%3AentryId=$entryId HTTP/1.1";
+	//		self::$serviceUrl;
+
+			// set URL and other appropriate options
+			curl_setopt($ch, CURLOPT_URL, self::$serviceUrl . '/api_v3/index.php?service=stats&action=collect&kalsig=5e1adae915042f96eacf7c6d972b2f54&event%3AeventTimestamp=$currentTimeStamp&event%3AuiconfId=$uiconfId&event%3AsessionId=53BDB894%2D35D8%2D6369%2DE4BF%2DF227861A76FD&event%3AobjectType=KalturaStatsEvent&event%3AisFirstInSession=false&event%3AclientVer=3%2E0%3Av3%2E5%2E16%2Ea&event%3Aseek=false&event%3ApartnerId=$partnerId&ignoreNull=1&event%3Aduration=11&clientTag=kdp%3Av3%2E5%2E16%2Ea%2Ccache%5Fst%3A1314028568&event%3AcurrentPoint=33&event%3AeventType=$eventType&event%3Areferrer=$referer&event%3AentryId=$entryId');
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			
+			// grab URL and pass it to the browser
+			$res = curl_exec($ch);		
 		}
 		
+		// close cURL resource, and free up system resources
+		curl_close($ch);
+			
 		KalturaGlobalData::setData("@PLAYS@", $i);
 		
 		//Log rotating only if the service url is localhost
