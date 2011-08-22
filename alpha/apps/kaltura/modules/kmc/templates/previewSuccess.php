@@ -33,7 +33,6 @@ switch($delivery_type) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<title>Kaltura Player</title>
-	<!--<script src="/html5/html5lib/v<?php echo $html5_version; ?>/mwEmbedLoader.php"></script>-->
 	<script src="<?php echo $scriptUrl; ?>"></script>
 </head>
 <body>
@@ -44,12 +43,6 @@ switch($delivery_type) {
 				<h2>Kaltura Player</h2>
 			</div>
 			<div class="contwrap">
-<?php /*
-			<div style="width:300px;">
-				<span style="font-size: 16px;">Entry id:</span> <input style="width: 100px;" id="kentryid" value="<?php echo $sf_params->get('e');?>" /> 
-				<input style="width: 100px; font-size: 12px;" id="showVideo" type="button" value="Change entry" disabled="true">
-			</div><br />
-*/?>
 			<div id="videoContainer">
 			    <object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" 
 				    allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="<?php echo $uiConf->getHeight();?>" width="<?php echo $uiConf->getWidth();?>"
@@ -80,36 +73,5 @@ switch($delivery_type) {
 			</div><!-- end contwrap -->
 		</div><!-- end content -->
 	</div><!-- end #main -->
-<?php /*
-			<iframe src="/html5/html5lib/v1.2/mwEmbedFrame.php/entry_id//wid/_<?php echo $sf_params->get('partner_id'); ?>/uiconf_id/<?php echo $sf_params->get('u'); ?>/p/<?php echo $sf_params->get('p'); ?>" width="400" height="300" frameborder="0"></iframe>
-<script type="text/javascript">
-var partnerId = <?php echo $sf_params->get('p'); ?>;
-var uiConf = <?php echo $sf_params->get('u'); ?>;
-
-mw.ready( function(){
-
-	mw.setConfig( 'EmbedPlayer.OverlayControls', false );
-	
-	$j('#showVideo').attr('disabled', null);
-	
-	$j('#showVideo').click( function(){		
-		var entryId =  $j( '#kentryid' ).val();
-		kalturaIframeEmbed('videoContainer', { 
-			entry_id: entryId, 
-			wid: '_' + partnerId,
-			uiconf_id: uiConf,
-			p: partnerId 
-		}, {
-			hash: mw.getKalturaIframeHash(), 
-			width: 400,
-			height: 300 
-		} );
-	});
-
-	$j('#showVideo').trigger('click');
-	
-} );
-</script>
-	*/ ?>
 </body>
 </html>

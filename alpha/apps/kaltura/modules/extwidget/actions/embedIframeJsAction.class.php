@@ -36,7 +36,7 @@ class embedIframeJsAction extends sfAction
 		else
 		{
 			$html5_version = kConf::get('html5_version');
-			$url =  "$host/html5/html5lib/v{$html5_version}/mwEmbedLoader.php";
+			$url =  "$host/html5/html5lib/{$html5_version}/mwEmbedLoader.php";
 		}
 		
 		$this->redirect($url);

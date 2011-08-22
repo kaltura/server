@@ -6,8 +6,6 @@ class previewAction extends kalturaAction
 {
 	public function execute ( ) 
 	{
-		$this->html5_version = kConf::get('html5_version');
-
 		$this->uiconf_id = $this->getRequestParameter('uiconf_id');
 		if(!$this->uiconf_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'uiconf_id');

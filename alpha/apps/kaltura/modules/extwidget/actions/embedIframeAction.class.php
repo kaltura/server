@@ -135,7 +135,7 @@ class embedIframeAction extends sfAction
 		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
 		
 		$url =  $host;
-		$url .=  "/html5/html5lib/v{$html5_version}/mwEmbedFrame.php";
+		$url .=  "/html5/html5lib/{$html5_version}/mwEmbedFrame.php";
 		$url .=  "/entry_id/{$entry_id}/wid/{$widget_id}/uiconf_id/{$uiconf_id}";
 		
 		if ($allowCache)
