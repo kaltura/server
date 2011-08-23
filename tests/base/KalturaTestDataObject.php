@@ -484,8 +484,9 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		}
 		else  //regular type (string, int, ...)
 		{
+			KalturaLog::debug("$objectInstaceType doesn't exitst as class \n");
 			//TODO: check all base types like int, string, ...
-		}		
+		}
 		
 		return $objectInstace;
 	} 

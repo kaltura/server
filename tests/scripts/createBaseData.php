@@ -341,7 +341,7 @@ class KalturaTestDeploymentHelper
 		$partnerId = $client->getConfig()->partnerId;
 		
 		KalturaGlobalData::setData("@DWH_START_TIME@", time());
-
+		try {
 		$ch = curl_init();
 							
 		for($i = 0; $i < 1000; $i++)
@@ -370,7 +370,12 @@ class KalturaTestDeploymentHelper
 		
 		// close cURL resource, and free up system resources
 		curl_close($ch);
-			
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Exception was raised during http request: " . $e->getMessage() ."\n");
+		}
+		
 		KalturaGlobalData::setData("@PLAYS@", $i);
 		
 		//Log rotating only if the service url is localhost
