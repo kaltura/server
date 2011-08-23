@@ -360,7 +360,7 @@ class KalturaTestDeploymentHelper
 	//		self::$serviceUrl;
 
 			// set URL and other appropriate options
-			curl_setopt($ch, CURLOPT_URL, self::$serviceUrl . '/api_v3/index.php?service=stats&action=collect&kalsig=5e1adae915042f96eacf7c6d972b2f54&event%3AeventTimestamp=$currentTimeStamp&event%3AuiconfId=$uiconfId&event%3AsessionId=53BDB894%2D35D8%2D6369%2DE4BF%2DF227861A76FD&event%3AobjectType=KalturaStatsEvent&event%3AisFirstInSession=false&event%3AclientVer=3%2E0%3Av3%2E5%2E16%2Ea&event%3Aseek=false&event%3ApartnerId=$partnerId&ignoreNull=1&event%3Aduration=11&clientTag=kdp%3Av3%2E5%2E16%2Ea%2Ccache%5Fst%3A1314028568&event%3AcurrentPoint=33&event%3AeventType=$eventType&event%3Areferrer=$referer&event%3AentryId=$entryId');
+			curl_setopt($ch, CURLOPT_URL, self::$serviceUrl . "/api_v3/index.php?service=stats&action=collect&kalsig=5e1adae915042f96eacf7c6d972b2f54&event%3AeventTimestamp=$currentTimeStamp&event%3AuiconfId=$uiconfId&event%3AsessionId=53BDB894%2D35D8%2D6369%2DE4BF%2DF227861A76FD&event%3AobjectType=KalturaStatsEvent&event%3AisFirstInSession=false&event%3AclientVer=3%2E0%3Av3%2E5%2E16%2Ea&event%3Aseek=false&event%3ApartnerId=$partnerId&ignoreNull=1&event%3Aduration=11&clientTag=kdp%3Av3%2E5%2E16%2Ea%2Ccache%5Fst%3A1314028568&event%3AcurrentPoint=33&event%3AeventType=$eventType&event%3Areferrer=$referer&event%3AentryId=$entryId");
 			curl_setopt($ch, CURLOPT_HEADER, 0);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			
