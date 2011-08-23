@@ -294,6 +294,8 @@ class KalturaClient:
         
     def doMultiRequest(self):
         resultXml = self.doQueue()
+        if resultXml == None:
+            return []
         result = []
         for childNode in resultXml.childNodes:
             exceptionObj = self.getExceptionIfError(childNode)
