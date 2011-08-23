@@ -21,8 +21,6 @@ if ($argc == 4){
 	die;
 }
 	
-	
-$stopFile = dirname ( __FILE__ ) . '/stop_flavor_migration'; // creating this file will stop the script
 $countLimitEachLoop = 500;
 $offset = $countLimitEachLoop;
 //------------------------------------------------------
