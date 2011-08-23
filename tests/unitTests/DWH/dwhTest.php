@@ -32,7 +32,7 @@ class dwhTest extends KalturaApiTestCase
 	public function testGraph(KalturaReportInputFilter $reportInputFilter, $expectedGraphArray)
 	{
 		$graphArray = $this->client->report->getGraphs(KalturaReportType::TOP_CONTENT, $reportInputFilter);
-		$this->compareOnField("plays", $graphArray, array(), "assertEquals");
+		$this->compareOnField("plays", $graphArray, $expectedGraphArray, "assertEquals");
 	}
 	
 	/**
