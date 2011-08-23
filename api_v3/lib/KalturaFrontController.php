@@ -49,13 +49,15 @@ class KalturaFrontController
 	}
 	
 	
-	public function onRequestEnd($requestIndex = 0)
+	public function onRequestEnd($success = true, $errorCode = null, $requestIndex = 0)
 	{
 		$duration = microtime(true) - $this->requestStart;
 		
 		KalturaLog::analitics(array(
 			'request_end',
 			'diration' => $duration,
+			'success' => intval($success),
+			'errorCode' => $errorCode,
 			'requestIndex' => $requestIndex,
 		));
 	}
@@ -84,13 +86,14 @@ class KalturaFrontController
 			{
 				$this->onRequestStart($this->service, $this->action, $this->params);
 		    	$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params);
+	        	$this->onRequestEnd();
 			}
 			catch(Exception $ex)
 			{
 				$result = $this->getExceptionObject($ex);
 				KalturaResponseCacher::disableCache();
+	        	$this->onRequestEnd(false, $ex->getCode());
 			}
-	        $this->onRequestEnd();
 		}
 		
 		if (isset($_REQUEST["ignoreNull"]))
@@ -220,7 +223,8 @@ class KalturaFrontController
 	        	if(!isset($currentParams['ks']) && kCurrentContext::$ks) {
 	        		$cache->setKS(kCurrentContext::$ks);
 	        	}
-	        		
+	        	
+	        	$this->onRequestStart($currentService, $currentAction, $currentParams, $i);
 				$cachedResult = $cache->checkCache('X-Kaltura-Part-Of-MultiRequest');
 				if ($cachedResult)
 				{
@@ -228,19 +232,18 @@ class KalturaFrontController
 				}
 				else
 				{		
-					$this->onRequestStart($currentService, $currentAction, $currentParams, $i);
 	        		$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
 	        		// store serialized resposne in cache
 	        		$cache->storeCache(serialize($currentResult));
 				}	
-	        	
+	        	$this->onRequestEnd(true, null, $i);
 	        }
 	        catch(Exception $ex)
 	        {
 	            $currentResult = $this->getExceptionObject($ex);
 				KalturaResponseCacher::disableCache();
+	        	$this->onRequestEnd(false, $ex->getCode(), $i);
 	        }
-	        $this->onRequestEnd($i);
 	        
             $results[$i] = $currentResult;	        
 	        $i++;
