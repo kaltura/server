@@ -379,7 +379,7 @@ class KalturaTestDeploymentHelper
 		KalturaGlobalData::setData("@PLAYS@", $i);
 		
 		//Log rotating only if the service url is localhost
-		if(self::$serviceUrl == "http://localhost/")
+		if(self::$serviceUrl == "localhost")
 		{
 			$logRotateConfString = "/opt/kaltura/log/kaltura_apache_access.log {
 rotate 5
