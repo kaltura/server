@@ -78,17 +78,27 @@ class kQueryCache
 		
 		list($queryResult, $queryTime) = $cacheResult[$cacheKey];
 		
+		$existingInvKeys = array();
 		foreach ($invalidationKeys as $invalidationKey)
 		{
-			if (array_key_exists($invalidationKey, $cacheResult) &&
-				$queryTime < $cacheResult[$invalidationKey] + self::INVALIDATION_TIME_MARGIN_SEC)
+			if (!array_key_exists($invalidationKey, $cacheResult))
 			{
-				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$cacheKey, invkey=$invalidationKey querytime=$queryTime invtime={$cacheResult[$invalidationKey]}");
+				continue;
+			}
+			
+			$invalidationTime = $cacheResult[$invalidationKey];
+			$existingInvKeys[] = "$invalidationKey:$invalidationTime";
+			
+			if ($queryTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
+			{
+				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$cacheKey, invkey=$invalidationKey querytime=$queryTime invtime=$invalidationTime");
 				return null;
 			}
 		}
 		
-		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$cacheKey");
+		$existingInvKeys = implode(',', $existingInvKeys);
+		
+		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$cacheKey queryTime=$queryTime invkeys=[$existingInvKeys]");
 		return $queryResult;
 	}
 	
@@ -100,8 +110,9 @@ class kQueryCache
 			return;
 		}
 		
-		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey");
-		self::$s_memcache->set($cacheKey, array($queryResult, time()), MEMCACHE_COMPRESSED, self::CACHED_QUERIES_EXPIRY_SEC);
+		$queryTime = time();
+		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
+		self::$s_memcache->set($cacheKey, array($queryResult, $queryTime), MEMCACHE_COMPRESSED, self::CACHED_QUERIES_EXPIRY_SEC);
 	}
 	
 	public static function invalidateQueryCache($object)
