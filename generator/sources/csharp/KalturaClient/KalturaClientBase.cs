@@ -184,6 +184,10 @@ namespace Kaltura
             XmlElement multiRequestResult = DoQueue();
 
             KalturaMultiResponse multiResponse = new KalturaMultiResponse();
+			if (multiRequestResult == null)
+			{
+				return multiResponse;
+			}
             foreach (XmlElement arrayNode in multiRequestResult.ChildNodes)
             {
                 if (arrayNode["error"] != null)

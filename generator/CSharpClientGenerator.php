@@ -371,6 +371,10 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine("				}");
 					$this->appendLine("			}");
 					break;
+				default: // for objects
+					$this->appendLine("			if (this.$dotNetPropName != null)");
+					$this->appendLine("				kparams.Add(\"$propName\", this.$dotNetPropName.ToParams());");
+					break;
 			}
 		}
 		$this->appendLine("			return kparams;");
@@ -401,6 +405,10 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	{");
 		$this->appendLine("		public static object Create(XmlElement xmlElement)");
 		$this->appendLine("		{");
+		$this->appendLine("			if (xmlElement[\"objectType\"] == null)");
+		$this->appendLine("			{");
+		$this->appendLine("				return null;");
+		$this->appendLine("			}");
 		$this->appendLine("			switch (xmlElement[\"objectType\"].InnerText)");
 		$this->appendLine("			{");
 		foreach($classNodes as $classNode)
