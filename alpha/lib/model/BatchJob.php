@@ -37,6 +37,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
 
+	const MAX_SERIALIZED_JOB_DATA_SIZE = 8193;
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
 	
 	private $aEntry = null;
@@ -442,42 +443,51 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return $child;
 	}
 
-	/**
+		/**
 	 * @param boolean  $bypassSerialization enables PS2 support
 	 */
 	public function getData($bypassSerialization = false)
 	{
 		if($bypassSerialization)
 			return parent::getData();
-			
 		$data = parent::getData();
 		if(!is_null($data))
 		{
-			try{
-				return unserialize($data);
-			}
-			catch(Exception $e){
+			try {
+				$unserializedData = unserialize ( $data );
+				if ($unserializedData instanceof kJobCompressedData) {
+					$serializedJobData = $unserializedData->getSerializedJobData ();
+					if ($serializedJobData) {
+						$unserializedData = unserialize($serializedJobData);
+					}
+					else{
+						//TODO throw exception
+					}
+				}
+				return $unserializedData;
+			} catch(Exception $e){
 				return null;
 			}
 		}
-			
 		return null;
-	} 
+	}
 	
 	/**
 	 * @param boolean  $bypassSerialization enables PS2 support
 	 */
-	public function setData($v, $bypassSerialization = false)
-	{
-		if($bypassSerialization)
-			return parent::setData($v);
-			
-		$this->setDuplicationKey(BatchJobPeer::createDuplicationKey($this->getJobType(), $v));
-		
-		if(!is_null($v))
-			parent::setData(serialize($v));
-		else	
-			parent::setData(null);
+	public function setData($v, $bypassSerialization = false) {
+		if ($bypassSerialization)
+			return parent::setData ( $v );
+		$this->setDuplicationKey ( BatchJobPeer::createDuplicationKey ( $this->getJobType (), $v ) );
+		if (! is_null ( $v )) {
+			$sereializedValue = serialize ( $v );
+			if (strlen ( ( string ) $sereializedValue ) > $this::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
+				$v = new kJobCompressedData ( $sereializedValue );
+				$sereializedValue = serialize ( $v );
+			}
+			parent::setData ( $sereializedValue );	
+		} else
+			parent::setData ( null );
 	} 
 	
 	
