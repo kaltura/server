@@ -307,6 +307,11 @@ class ks
 		$ks->original_str = $encoded_str;
 
 		$parts = explode(self::SEPARATOR, $real_str);
+		if (count($parts) < 5)
+		{
+			throw new Exception ( self::getErrorStr ( self::INVALID_STR ) );
+		}
+		
 		list(
 			$ks->partner_id, 
 			$ks->partner_pattern, 
