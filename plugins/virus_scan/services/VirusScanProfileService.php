@@ -12,8 +12,11 @@ class VirusScanProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		myPartnerUtils::addPartnerToCriteria(new VirusScanProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
-		myPartnerUtils::addPartnerToCriteria(new assetPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		if($partnerId != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			myPartnerUtils::addPartnerToCriteria(new VirusScanProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+			myPartnerUtils::addPartnerToCriteria(new assetPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
+		}
 		
 		if(!VirusScanPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);

@@ -14,8 +14,17 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	
 	public static function isAllowedPartner($partnerId)
 	{
+		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			return true;
+		
+		if($partnerId == Partner::BATCH_PARTNER_ID)
+			return true;
+		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		if($partner)
+			return $partner->getPluginEnabled(self::PLUGIN_NAME);
+	
+		return false;
 	}
 	
 	/**
