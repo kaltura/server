@@ -14,7 +14,42 @@
 
 jQuery(document).ready(function() {
 	handlerTypeChanged();
+	console.log('in ready');
+	fileDeletePolicy();
 });
+
+function fileDeletePolicy() {
+	$("select#fileDeletePolicy").each(function(inx, value){
+		var $input = $(value);
+		$input.change(function(){
+			var $autoFileDeleteDays = $('#autoFileDeleteDays');
+			var $autoFileDeleteDaysLabel = $('#autoFileDeleteDays-label');
+			
+			if ($input.val() == 1) {
+				$autoFileDeleteDays.attr("hidden", false);
+				$autoFileDeleteDaysLabel.attr("hidden", false);
+		    }else{
+		    	$autoFileDeleteDays.attr("hidden", true);
+		    	$autoFileDeleteDaysLabel.attr("hidden", true);
+				$autoFileDeleteDays.val('0');
+		    }
+		});
+
+		var $autoFileDeleteDays = $('#autoFileDeleteDays');
+		var $autoFileDeleteDaysLabel = $('#autoFileDeleteDays-label');
+		
+		if( $input.attr('type') == 'select-one'){
+			if ($input.val() == 1) {
+				$autoFileDeleteDays.attr("hidden", false);
+				$autoFileDeleteDaysLabel.attr("hidden", false);
+		    }else{
+		    	$autoFileDeleteDays.attr("hidden", true);
+		    	$autoFileDeleteDaysLabel.attr("hidden", true);
+				$autoFileDeleteDays.val('0');
+		    }
+		}
+	});}
+
 
 
 function handlerTypeChanged()
@@ -28,7 +63,6 @@ function handlerTypeChanged()
 	}	
 }
 
-                                   
 jQuery(document).ready(function() {
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
@@ -36,7 +70,7 @@ jQuery(document).ready(function() {
 	<?php else: ?>
 		jQuery('#frmDropFolderConfigure').ajaxForm(loadDropFolderSuccess);
 	<?php endif; ?>
-});                                   
+});
 
 </script>
 
