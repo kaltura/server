@@ -15,7 +15,7 @@ KalturaLog::setContext("API");
 KalturaLog::analitics(array(
 	'session_start',
 	'time' => $start,
-	'agent' => $_SERVER['HTTP_USER_AGENT'],
+	'agent' => (isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : null),
 	'host' => (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null),
 	'clientTag' => isset($_REQUEST['clientTag']) ? $_REQUEST['clientTag'] : null,
 	'request' => http_build_query($_REQUEST),
