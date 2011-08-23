@@ -58,10 +58,11 @@ while ( count ( $partners ) ) {
 		
 	}
 
-	$offset += $countLimitEachLoop;
+	
 	$c->setOffset($offset);
 	$partners = PartnerPeer::doSelect ( $c, $con );
 	sleep ( 1 );
+	$offset += $countLimitEachLoop;
 }
 
 
