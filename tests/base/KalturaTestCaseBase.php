@@ -574,6 +574,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			}
 		}
 	
+		KalturaLog::info("Tests data provided Before transformation to objects: \n[" . print_r($inputsForTestProcedure, true) . "]");
+		
 		$inputsForTestProcedure = $this->transformToObjects($inputsForTestProcedure);
 		
 		KalturaLog::info("Tests data provided [" . print_r($inputsForTestProcedure, true) . "]");
@@ -615,6 +617,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	protected function setGlobalData($inputAsObject)
 	{
+		KalturaLog::debug("Settign the object global data fields");
+		
 		if($inputAsObject instanceof BaseObject)
 		{
 			//Gets the data peer of the object (used to geting all the obejct feilds)
@@ -668,6 +672,8 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 	 */
 	protected function transformToObjects(array $inputsForTestProcedure)
 	{
+		KalturaLog::debug("Transforming to inputs objects");
+		
 		$inputsAsObjects = array();
 		
 		$currentIndex = 0;
@@ -678,16 +684,9 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			
 			foreach ($inputForTestProcedure as $inputObject)
 			{
-				$objectIndex = 0;
-				
-				//TOOD: How to skip the Output Reference more nicely
-				if($objectIndex == $numOfObjects - 1) //The last object is the output reference
-				{
-					$objectIndex++; // Not a must becuase the for leaves the function
-					continue;
-				}
-				
 				$inputAsObject = $inputObject->getDataObject();
+				
+				KalturaLog::debug("the input object is: " . get_class($inputAsObject));
 				
 				if(is_null($inputAsObject) || empty($inputAsObject)) //No object is available
 				{
@@ -704,8 +703,6 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 					$inputAsObject = null;	
 				
 				$inputsAsObjects[$currentIndex][] = $inputAsObject;
-				
-				$objectIndex++;
 			}
 			
 			$currentIndex++;
