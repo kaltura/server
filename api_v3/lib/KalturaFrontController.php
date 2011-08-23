@@ -2,6 +2,7 @@
 class KalturaFrontController 
 {
     private static $instance;
+	private $requestStart = null;
 	private $start = null;
 	private $end = null;
 	private $params = array();
@@ -34,6 +35,31 @@ class KalturaFrontController
 		return self::$instance;
 	}
 	
+	public function onRequestStart($service, $action, array $params, $requestIndex = 0)
+	{
+		$this->requestStart = microtime(true);
+		KalturaLog::analitics(array(
+			'request_start',
+			'time' => $this->requestStart,
+			'service' => $service, 
+			'action' => $action, 
+			'params' => http_build_query($params), 
+			'requestIndex' => $requestIndex,
+		));
+	}
+	
+	
+	public function onRequestEnd($requestIndex = 0)
+	{
+		$duration = microtime(true) - $this->requestStart;
+		
+		KalturaLog::analitics(array(
+			'request_end',
+			'diration' => $duration,
+			'requestIndex' => $requestIndex,
+		));
+	}
+	
 	public function run()
 	{
 	    $this->start = microtime(true);
@@ -56,6 +82,7 @@ class KalturaFrontController
 		{
 			try
 			{
+				$this->onRequestStart($this->service, $this->action, $this->params);
 		    	$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params);
 			}
 			catch(Exception $ex)
@@ -63,6 +90,7 @@ class KalturaFrontController
 				$result = $this->getExceptionObject($ex);
 				KalturaResponseCacher::disableCache();
 			}
+	        $this->onRequestEnd();
 		}
 		
 		if (isset($_REQUEST["ignoreNull"]))
@@ -200,6 +228,7 @@ class KalturaFrontController
 				}
 				else
 				{		
+					$this->onRequestStart($currentService, $currentAction, $currentParams, $i);
 	        		$currentResult = $this->dispatcher->dispatch($currentService, $currentAction, $currentParams);
 	        		// store serialized resposne in cache
 	        		$cache->storeCache(serialize($currentResult));
@@ -211,6 +240,7 @@ class KalturaFrontController
 	            $currentResult = $this->getExceptionObject($ex);
 				KalturaResponseCacher::disableCache();
 	        }
+	        $this->onRequestEnd($i);
 	        
             $results[$i] = $currentResult;	        
 	        $i++;

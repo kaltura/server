@@ -12,6 +12,15 @@ require_once(dirname(__FILE__)."/../bootstrap.php");
 ActKeyUtils::checkCurrent();
 KalturaLog::setContext("API");
 
+KalturaLog::analitics(array(
+	'session_start',
+	'time' => $start,
+	'agent' => $_SERVER['HTTP_USER_AGENT'],
+	'host' => (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null),
+	'clientTag' => isset($_REQUEST['clientTag']) ? $_REQUEST['clientTag'] : null,
+	'request' => http_build_query($_REQUEST),
+));
+
 KalturaLog::debug(">------------------------------------- api_v3 -------------------------------------");
 KalturaLog::info("API-start ");
 
@@ -21,5 +30,15 @@ $controller->run();
 $end = microtime(true);
 KalturaLog::info("API-end [".($end - $start)."]");
 KalturaLog::debug("<------------------------------------- api_v3 -------------------------------------");
+
+KalturaLog::analitics(array(
+	'session_end',
+	'duration' => ($end - $start),
+	'partnerId' => kCurrentContext::$partner_id,
+	'masterPartnerId' => kCurrentContext::$master_partner_id,
+	'ks' => kCurrentContext::$ks,
+	'isAdmin' => kCurrentContext::$is_admin_session,
+	'kuserId' => (kCurrentContext::$uid ? kCurrentContext::$uid : kCurrentContext::$ks_uid),
+));
 
 $cache->end();
