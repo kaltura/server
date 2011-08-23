@@ -365,7 +365,7 @@ class KalturaTestDeploymentHelper
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			
 			// grab URL and pass it to the browser
-			$res = curl_exec($ch);		
+			$res = curl_exec($ch);
 		}
 		
 		// close cURL resource, and free up system resources
@@ -374,7 +374,7 @@ class KalturaTestDeploymentHelper
 		KalturaGlobalData::setData("@PLAYS@", $i);
 		
 		//Log rotating only if the service url is localhost
-		if($client->getConfig()->serviceUrl == "http://localhost/")
+		if(self::$serviceUrl == "http://localhost/")
 		{
 			$logRotateConfString = "/opt/kaltura/log/kaltura_apache_access.log {
 rotate 5
