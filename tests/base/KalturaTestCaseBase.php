@@ -685,7 +685,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 			{
 				$inputAsObject = $inputObject->getDataObject();
 				
-				if(is_object($inputAsObject))
+				if(class_exists($inputAsObject))
 					KalturaLog::debug("the input object is: " . get_class($inputAsObject));
 				
 				if(is_null($inputAsObject) || empty($inputAsObject)) //No object is available
