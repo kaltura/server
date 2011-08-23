@@ -231,7 +231,7 @@ class KalturaTestCaseInstanceFailure
 				{
 					$id = $inputValue->getId();
 				}
-				elseif ($inputValue instanceof KalturaObjectBase)
+				elseif ($inputValue instanceof KalturaObjectBase || $inputValue instanceof KalturaObject)
 				{
 					if(property_exists($inputValue, 'id'))
 					{

@@ -479,7 +479,12 @@ class KalturaTestDataObject extends KalturaTestDataBase
 			$isInstantiable = $reflectionClass->isInstantiable();
 			if(!$isAbstract && $isInstantiable)
 			{
+				KalturaLog::debug("Creating $objectInstace");
 				$objectInstace = new $objectInstaceType;
+			}
+			else
+			{
+				KalturaLog::debug("$objectInstace wasn't created maybe it's abstract or not instantiable");
 			}
 		}
 		else  //regular type (string, int, ...)
@@ -501,14 +506,17 @@ class KalturaTestDataObject extends KalturaTestDataBase
 	private static function setPropertyValue(&$objectInstace, $fieldName, $fieldValue, $fieldValueType)
 	{
 		if(!$fieldName)
+		{
+			KalturaLog::debug("Can't set field $fieldName because it doesn't exist");	
 			return;
+		}
 		
 		//set the object to this value
 		if($objectInstace instanceof BaseObject)
 		{
 			$objectInstace->setByName($fieldName, $fieldValue);
 		}
-		else if($objectInstace instanceof KalturaObjectBase)
+		else if($objectInstace instanceof KalturaObjectBase || $objectInstace instanceof KalturaObject)
 		{
 			$objectInstace->$fieldName = $fieldValue;
 		}

@@ -680,8 +680,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		foreach ($inputsForTestProcedure as $inputForTestProcedure)
 		{
 			$inputsAsObjects[] = array();
-			$numOfObjects = count($inputForTestProcedure);
-			
+						
 			foreach ($inputForTestProcedure as $inputObject)
 			{
 				$inputAsObject = $inputObject->getDataObject();

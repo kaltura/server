@@ -235,7 +235,7 @@ class KalturaTestDataBase
 		{
 			$objectInstace->setByName($fieldName, $fieldValue);
 		}
-		else if($objectInstace instanceof KalturaObjectBase)
+		else if($objectInstace instanceof KalturaObjectBase || $objectInstace instanceof KalturaObject)
 		{
 			$objectInstace->$fieldName = $fieldValue;
 		}
