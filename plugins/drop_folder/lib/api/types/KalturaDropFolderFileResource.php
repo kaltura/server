@@ -52,14 +52,17 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
     	if(!$dropFolder)
     		throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFile->getDropFolderId());
     	
-    	$filePath = rtrim($dropFolder->getPath(), '\\\/') . '/' . ltrim($dropFolderFile->getFileName(), '\\\/');
-    	if(!file_exists($filePath))
-    	{
-    		$dropFolderFile->setStatus(DropFolderFileStatus::ERROR_HANDLING);
-    		$dropFolderFile->save();
-    		
-    		throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST, $filePath);
-    	}
+    	if ($dropFolder->getType() == DropFolderType::LOCAL)
+		{
+        	$filePath = rtrim($dropFolder->getPath(), '\\\/') . '/' . ltrim($dropFolderFile->getFileName(), '\\\/');
+        	if(!file_exists($filePath))
+        	{
+        		$dropFolderFile->setStatus(DropFolderFileStatus::ERROR_HANDLING);
+        		$dropFolderFile->save();
+        		
+        		throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST, $filePath);
+        	}
+		}
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
