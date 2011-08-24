@@ -6,11 +6,16 @@
 class kXml
 {
 	
-		//check if the prop's value is valid for xml encoding.
+	//check if the prop's value is valid for xml encoding.
 	public static function isXMLValidContent($value) {
 		if (preg_match ( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', $value ))
 			return false;
 		return true;
+	}	
+	
+	//strip invalid xml characters 
+	public static function stripXMLInvalidChars($value) {
+		return preg_replace ( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', "", $value );
 	}	
 	
 	public static function getLibXmlErrorDescription($xml)
