@@ -7,24 +7,6 @@
 require_once("bootstrap.php");
 $g_context = null;
 
-function TRACE ( $obj )
-{
-	global $g_context;
-	
-	if ( is_string( $obj ))
-		$str = $obj;
-	else
-		$str = print_r ( $obj ,  true );
-	
-	$time = ( microtime(true) );
-	$milliseconds = (int)(($time - (int)$time) * 1000);  
-	if ( function_exists('memory_get_usage') )
-		$mem_usage = "{". memory_get_usage(true) . "}";
-	else
-		$mem_usage = ""; 
-	echo $g_context . ":" . strftime( "%d/%m %H:%M:%S." , time() ) . $milliseconds . " " . $mem_usage . ": " . $str ."\n";
-}
-
 /**
  * 
  * @package Scheduler

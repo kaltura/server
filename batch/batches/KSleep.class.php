@@ -36,9 +36,9 @@ class KSleep extends KBatchBase
 	{
 //		print_r ( $this->kClient );
 		$r = rand ( 2,5);
-	TRACE ( "Slppeing for [$r]");
+		KalturaLog::info( "Slppeing for [$r]");
 		sleep ( $r );		
-	TRACE ( "Bye!");		
+		KalturaLog::info( "Bye!");		
 	}
 }
 
