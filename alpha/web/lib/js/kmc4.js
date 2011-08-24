@@ -897,9 +897,9 @@ kmc.client = {
 };
 
 // Maintain support for old kmc2 functions:
-function openPlayer(emptystring, width, height, uiconf_id, previewOnly) { 
+function openPlayer(title, width, height, uiconf_id, previewOnly) {
 	if (previewOnly==true) $("#kcms")[0].alert('previewOnly from studio');
-	kmc.preview_embed.doPreviewEmbed("multitab_playlist", null, null, previewOnly, true, uiconf_id, false, false, false);
+	kmc.preview_embed.doPreviewEmbed("multitab_playlist", title, null, previewOnly, true, uiconf_id, false, false, false);
 }
 function playlistAdded() {kmc.preview_embed.updateList(true);}
 function playerAdded() {kmc.preview_embed.updateList(false);}
