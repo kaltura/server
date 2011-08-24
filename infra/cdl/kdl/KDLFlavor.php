@@ -153,6 +153,17 @@ class KDLFlavor extends KDLMediaDataSet {
 	 * generateCommandLines
 	 */
 	private function generateCommandLines(KDLFlavor $target, $transcoders){
+
+		if(isset($target->_video)) {
+			if(!property_exists($target->_video,"_h264ForMobile")) {
+				if(isset($target->_engineVersion) && $target->_engineVersion==1){
+					$target->_video->_h264ForMobile = 1;
+				}
+				else {
+					$target->_video->_h264ForMobile = 0;
+				}
+			}
+		}
 		foreach($transcoders as $key=>$trPrmObj) {
 
 			if(is_array($trPrmObj)){
@@ -182,28 +193,7 @@ KalturaLog::log(__METHOD__."==>\n");
 			continue;
 		}
 	}
-	
-	/* ---------------------------
-	 * parseOperatorParamStr2Map
-	 */
-	private function parseOperatorParamStr2Map($paramsArrStr)
-	{
-	$paramsMap = array();
-		if(isset($paramsArrStr)) {
-			$paramsInArr=explode(",",$paramsArrStr);
-			foreach ($paramsInArr as $paramStr) {
-				$pair=explode("=",$paramStr);
-				$paramsMap[$pair[0]]=$pair[1];
-			}
-		}
-		if(count($paramsMap)==0) {
-			return null;
-		}
-		else {
-			return $paramsMap;
-		}
-	}
-	
+		
 	/* ---------------------------
 	 * ValidateProduct
 	 */
@@ -843,8 +833,9 @@ KalturaLog::log(__METHOD__."==>\n");
 	 */
 	public function SetTranscoderCmdLineGenerator($inFile=KDLCmdlinePlaceholders::InFileName, $outFile=KDLCmdlinePlaceholders::OutFileName)
 	{
-		$cmdLine = new KDLTranscoderCommand($inFile,$outFile, $this->_clipStart, $this->_clipDur);
+		$cmdLine = new KDLTranscoderCommand($inFile,$outFile, $this);
 
+/*
 		if($this->_video){
 			$cmdLine->_vidId = $this->_video->_id;
 			$cmdLine->_vidBr = $this->_video->_bitRate;
@@ -873,7 +864,7 @@ KalturaLog::log(__METHOD__."==>\n");
 		}
 		else
 		$cmdLine->_conId="none";
-
+*/
 		return $cmdLine;
 	}
 
