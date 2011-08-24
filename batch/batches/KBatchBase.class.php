@@ -9,8 +9,23 @@ require_once ("bootstrap.php");
  * 
  * @package Scheduler
  */
-abstract class KBatchBase extends KRunableClass implements IKalturaLogger
+abstract class KBatchBase implements IKalturaLogger
 {
+	/**
+	 * @var KSchedularTaskConfig
+	 */
+	protected $taskConfig;
+	
+	/**
+	 * @var string
+	 */
+	protected $sessionKey;
+	
+	/**
+	 * @var int timestamp
+	 */
+	private $start;
+	
 	/**
 	 * @var KalturaClient
 	 */
@@ -73,6 +88,11 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 			$job = $this->exec($job, $job->data);
 			
 		return $jobs;
+	}
+	
+	public function done()
+	{
+		KalturaLog::info("Done after [" . (microtime ( true ) - $this->start ) . "] seconds");
 	}
 	
 	/**
@@ -293,7 +313,41 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 	 */
 	public function __construct($taskConfig = null)
 	{
-		parent::__construct($taskConfig);
+		/*
+		 *  argv[0] - the script name
+		 *  argv[1] - serialized KSchedulerConfig config
+		 */
+		global $argv, $g_context;
+
+		$this->sessionKey = uniqid('sess');		
+		$this->start = microtime(true);
+		
+		if(is_null($taskConfig))
+		{
+			$this->taskConfig = unserialize(base64_decode($argv[1]));
+		}
+		else
+		{
+			$this->taskConfig = $taskConfig;
+		}
+		
+		if(!$this->taskConfig)
+			die("Task config not supplied");
+		
+		date_default_timezone_set($this->taskConfig->getTimezone());
+		
+		// clear seperator between executions
+		KalturaLog::debug('___________________________________________________________________________________');
+		KalturaLog::info(file_get_contents(dirname( __FILE__ ) . "/../VERSION.txt"));
+		
+		if(! ($this->taskConfig instanceof KSchedularTaskConfig))
+		{
+			KalturaLog::err('config is not a KSchedularTaskConfig');
+			die;
+		}
+		 
+		KalturaLog::debug("set_time_limit({$this->taskConfig->maximumExecutionTime})");
+		set_time_limit($this->taskConfig->maximumExecutionTime);
 		
 		KalturaLog::debug('This batch index: ' . $this->getIndex());
 		KalturaLog::debug('This session key: ' . $this->sessionKey);
@@ -313,6 +367,16 @@ abstract class KBatchBase extends KRunableClass implements IKalturaLogger
 		$this->onBatchUp();
 		
 		KScheduleHelperManager::saveRunningBatch($this->taskConfig->getCommandsDir(), $this->getName(), $this->getIndex());
+	}
+	
+	protected function getParams($name)
+	{
+		return  $this->taskConfig->$name;
+	}
+	
+	protected function getAdditionalParams($name)
+	{
+		return  $this->taskConfig->params->$name;
 	}
 	
 	/**
