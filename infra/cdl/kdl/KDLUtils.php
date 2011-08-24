@@ -193,6 +193,29 @@ $parsed = array();
 			}
 		}
 	}
+
+	/* ---------------------------
+	 * parseParamStr2Map
+	 */
+	public static function parseParamStr2Map($paramsArrStr)
+	{
+	$paramsMap = array();
+		if(isset($paramsArrStr)) {
+			$paramsInArr=explode(",",$paramsArrStr);
+			foreach ($paramsInArr as $paramStr) {
+				$pair=explode("=",$paramStr);
+				$paramsMap[$pair[0]]=$pair[1];
+			}
+		}
+		if(count($paramsMap)==0) {
+			return null;
+		}
+		else {
+			return $paramsMap;
+		}
+	}
+	
+	
 }
 
 
