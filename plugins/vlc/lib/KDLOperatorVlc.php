@@ -32,7 +32,7 @@ rem ok3   %VLCEXE% -I dummy --vout-filter="transform" "%infile%" --sout="#transc
 %VLCEXE% --extraintf logger --log-verbose=2 --verbose-objects=+all --no-sout-transcode-hurry-up -I dummy -vvv "%infile%" --sout "#transcode{vcodec=h264,vb=1800,width=256,height=128,acodec=aac,ab=128,channels=2,samplerate=44100}:std{access=file,mux=mp4,dst="%outfile%"}"  --rotate-angle=90 --sout-x264-profile=main
 
  */
-$cmdStr = "--extraintf logger --log-verbose=2 --verbose-objects=+all --no-sout-transcode-hurry-up -I dummy -vvv";
+$cmdStr = "--extraintf logger --log-verbose=10 --verbose-objects=+all --no-sout-transcode-hurry-up -I dummy -vvv";
 
 $format = "fl";
 $acodec = "libmp3lam";
@@ -52,7 +52,7 @@ $acodec = "libmp3lam";
 		}
 
 $transcodeStr;
-		$transcodeStr = " --sout=#transcode{";
+		$transcodeStr = " --sout='#transcode{";
 		
 $vid = $target->_video;
 //$vid->_id="none";
@@ -69,13 +69,9 @@ $vid = $target->_video;
 					break; 
 				case KDLVideoTarget::H264: //-qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4
 				case KDLVideoTarget::H264B:
-					$transcodeStr .= "venc=x264{".$this->generateH264params($vid)."},vcodec=h264";
-					break; 				
 				case KDLVideoTarget::H264M:
-					$transcodeStr .= "venc=x264{profile=main},vcodec=h264";
-					break; 				
 				case KDLVideoTarget::H264H:
-					$transcodeStr .= "venc=x264{profile=high},vcodec=h264";
+					$transcodeStr .= "venc=x264{".$this->generateH264params($vid)."},vcodec=h264";
 					break; 				
 				case KDLVideoTarget::MPEG4:
 					$transcodeStr .= "venc=ffmpeg,vcodec=mpeg4";
@@ -198,7 +194,7 @@ $con = $target->_container;
 		if($extra)
 			$cmdStr .= " ".$extra;
 		
-		$cmdStr .= " vlc://quit";
+		$cmdStr .= "' vlc://quit";
 
 //$cmdStr = "--extraintf logger --log-verbose=2 --verbose-objects=+all --no-sout-transcode-hurry-up -I dummy -vvv \"__inFileName__\" --sout \"#transcode{vcodec=h264,vb=1800,width=256,height=128,acodec=aac,ab=128,channels=2,samplerate=44100}:std{access=file,mux=mp4,dst=\"__outFileName__\"}\"  --sout-x264-profile=baseline vlc://quit";
 //$cmdStr = "--extraintf logger --log-verbose=2 --verbose-objects=+all --no-sout-transcode-hurry-up -I dummy -vvv \"__inFileName__\" --start-time=100 --sout=\"#transcode{venc=x264,vcodec=h264,vb=469,width=320,height=240,fps=25,aenc=ffmpeg,acodec=aac,ab=96,samplerate=22050}:standard{access=file,mux=mp4,dst=\"__outFileName__\"}\" vlc://quit";
@@ -210,7 +206,7 @@ $con = $target->_container;
 	/* ---------------------------
 	 * generateH264params
 	 */
-	private function generateH264params($videoObject)
+	private function generateH264paramsOld($videoObject)
 	{
 /*
 -sws - scale quality option, 0-lowest, 9- good
@@ -256,6 +252,93 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 	public function CheckConstraints(KDLMediaDataSet $source, KDLFlavor $target, array &$errors=null, array &$warnings=null)
 	{
 	    return parent::CheckConstraints($source, $target, $errors, $warnings);
+	}
+	
+	/* ---------------------------
+	 * generateH264params
+	 */
+	private function generateH264params($videoObject)
+	{
+	$h264 = new KDLCodecH264($videoObject);
+		switch($videoObject->_id) {
+		case KDLVideoTarget::H264:
+		case KDLVideoTarget::H264B:
+			$params="profile=baseline";;
+			break;
+		case KDLVideoTarget::H264M:
+			$params="profile=main";
+			break;
+		case KDLVideoTarget::H264H:				
+			$params="profile=high";
+			break;
+		}
+	
+
+		$encopts = "qcomp=$h264->_qcomp,qpmin=$h264->_qmin,qpmax=$h264->_qmax,qpstep=$h264->_qdiff";
+		{
+			if(isset($h264->_vidBr)) {
+				$encopts.= "bitrate=$h264->_vidBr:";
+				if(isset($h264->_crf))	$encopts.= "crf=30:";
+			}
+			if(isset($h264->_subq))			$encopts.= "subme=$h264->_subq,";
+			if(isset($h264->_refs))			$encopts.= "ref=$h264->_refs,";
+			if(isset($h264->_bframes))		$encopts.= "bframes=$h264->_bframes,";
+			if(isset($h264->_b_pyramid))	$encopts.= "bpyramid=1,";
+			if(isset($h264->_weight_b))		$encopts.= "weightb=1,";
+//			if(isset($h264->_threads))		$encopts.= "threads=$h264->_threads,";
+			if(isset($h264->_coder) && $h264->_coder==0) $encopts.= "cabac=$h264->_coder,";
+			if(isset($h264->_level))		$encopts.= "level=$h264->_level,";
+//			if(isset($h264->_global_header))$encopts.= "global_header,";
+			if(isset($h264->_dct8x8))		$encopts.= "8x8dct,";
+			if(isset($h264->_trellis))		$encopts.= "trellis=$h264->_trellis,";
+			if(isset($h264->_chroma_me))	$encopts.= "chroma-me=$h264->_chroma_me:";
+
+			if(isset($h264->_me))			$encopts.= "me=$h264->_me,";
+			if(isset($h264->_keyint_min))	$encopts.= "min-keyint=$h264->_keyint_min,";
+			if(isset($h264->_me_range))		$encopts.= "merange=$h264->_me_range,";
+			if(isset($h264->_sc_threshold))	$encopts.= "scenecut=$h264->_sc_threshold,";
+			if(isset($h264->_i_qfactor))	$encopts.= "ipratio=$h264->_i_qfactor,";
+			if(isset($h264->_bt))			$encopts.= "ratetol=$h264->_bt,";
+			if(isset($h264->_maxrate))		$encopts.= "vbv-maxrate=$h264->_maxrate,";
+			if(isset($h264->_bufsize))		$encopts.= "vbv-bufsize=$h264->_bufsize,";
+//			if(isset($h264->_rc_eq))		$encopts.= " -rc_eq $h264->_rc_eq";
+			
+			if(isset($h264->_partitions)){
+				$partArr = explode(",",$h264->_partitions);
+				$partitions = null;
+				foreach ($partArr as $p) {
+					switch($p){
+					case "all":
+						$partitions.="all";
+						break;
+					case "p8x8":
+						$partitions.="+p8x8";
+						break;
+					case "p4x4":
+						$partitions.="+p4x4";
+						break;
+					case "b8x8":
+						$partitions.="+b8x8";
+						break;
+					case "i8x8":
+						$partitions.="+i8x8";
+						break;
+					case "i4x4":
+						$partitions.="+i4x4";
+						break;
+					}
+				}
+				if(isset($partitions))	$encopts.="partitions=$partitions,";
+			}
+			
+			if(isset($encopts))	{
+				$encopts = rtrim($encopts,",");
+				$params.= ",$encopts";
+			}
+		}
+		
+		
+		return $params;
 	}
 }
 	
