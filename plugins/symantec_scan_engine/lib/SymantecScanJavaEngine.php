@@ -42,18 +42,26 @@ class SymantecScanJavaEngine extends SymantecScanEngine
 		}
 		
 		$scanMode = $cleanIfInfected ? 'scanrepair' : 'scan';
-		
-		$cmd = $this->binFile . " --action $scanMode --verbose -f $filePath";
+		$logFile = "$filePath.virusScan.log";
+		$cmd = $this->binFile . " --action $scanMode --verbose -f $filePath > $logFile 2>&1";
 
 		$errorDescription = null;
 		$output = null;
 		
 		KalturaLog::debug("Executing - [$cmd]");
-		exec($cmd, $output, $return_value);
+		system($cmd, $return_value);
+		$output = file($logFile);
 		
 		$found = false;
 		foreach ($output as $line)
 		{
+			$matches = null;
+			if(preg_match('/^ERROR: (.+)/', $line, $matches))
+			{
+				$errorDescription = $matches[1];
+				return KalturaVirusScanJobResult::SCAN_ERROR;
+			}
+			
 			if (kString::beginsWith($line, self::STATUS_PREFIX)) {
 				$found = $line;
 				break;
