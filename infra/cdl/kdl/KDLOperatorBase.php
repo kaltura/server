@@ -235,7 +235,7 @@ class KDLOperationParams {
 		 * Other engines will not be effected.
 		 * The correct solution is to add additional param fields to engin's JSOn record 
 		 */
-		$paramsMap = $this->parseParamStr2Map();
+		$paramsMap = KDLUtils::parseParamStr2Map($this->_params);
 		if(!isset($paramsMap)){
 			return;
 		}
@@ -261,10 +261,14 @@ class KDLOperationParams {
 					case 'height':
 						$mdObj->_height = $param;
 						break;
+					case 'h264ForMobile':
+						$mdObj->_h264ForMobile = $param;
+						break;
 					default:
 						break;
 				}
 			}
+			
 			if($target->_audio) {
 				$mdObj = $target->_audio;
 				switch($key){
@@ -293,27 +297,6 @@ class KDLOperationParams {
 						break;
 				}
 			}
-		}
-	}
-	
-	/* ---------------------------
-	 * parseParamStr2Map
-	 */
-	private function parseParamStr2Map()
-	{
-	$paramsMap = array();
-		if(isset($this->_params)) {
-			$paramsInArr=explode(",",$this->_params);
-			foreach ($paramsInArr as $paramStr) {
-				$pair=explode("=",$paramStr);
-				$paramsMap[$pair[0]]=$pair[1];
-			}
-		}
-		if(count($paramsMap)==0) {
-			return null;
-		}
-		else {
-			return $paramsMap;
 		}
 	}
 	
