@@ -12,7 +12,7 @@ class VirusScanProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		if($partnerId != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if($this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID)
 		{
 			myPartnerUtils::addPartnerToCriteria(new VirusScanProfilePeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
 			myPartnerUtils::addPartnerToCriteria(new assetPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());
