@@ -81,6 +81,59 @@ protected
 	/***********************
 	 *
 	 */
+	public function templateRead($jobTemplateId, &$rvObj)
+	{
+		$rv=xmlrpc_call_method($this->serverUrl,__FUNCTION__, 
+			array(
+				$this->sessionId,
+				array($jobTemplateId,"int")			// job template id
+			));
+		
+		if($rvObj) $rvObj=$rv;
+		if($rv && $rv->response && $rv->response=="ok")
+			return true;
+		return false;
+	}
+	
+	/***********************
+	 *
+	 */
+	public function templateAdd($xmlSource, $name, $groupId, &$rvObj)
+	{
+		$rv=xmlrpc_call_method($this->serverUrl,__FUNCTION__, 
+			array(
+				$this->sessionId,
+				$xmlSource,
+				$name,
+				array($groupId,"int")			// job template id
+			));
+		
+		if($rvObj) $rvObj=$rv;
+		if($rv && $rv->response && $rv->response=="ok")
+			return true;
+		return false;
+	}
+	
+	/***********************
+	 *
+	 */
+	public function templateDelete($jobTemplateId, &$rvObj)
+	{
+		$rv=xmlrpc_call_method($this->serverUrl,__FUNCTION__, 
+			array(
+				$this->sessionId,
+				array($jobTemplateId,"int")			// job template id
+			));
+		
+		if($rvObj) $rvObj=$rv;
+		if($rv && $rv->response && $rv->response=="ok")
+			return true;
+		return false;
+	}
+	
+	/***********************
+	 *
+	 */
 	public function jobAdd($jobTemplateId, $jobSourceFile, $jobDestFile, $priority, $desc, $jobCustomerIdList=array(), $nodeGuid="", &$rvObj=null)
 	{
 
