@@ -1575,7 +1575,27 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
+		{
+			$distributionProfileId = $entryDistribution->getDistributionProfileId();
+			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+			if(!$distributionProfile)
+				continue;
+			
+			$distributionProvider = $distributionProfile->getProvider();
+			if(!$distributionProvider)
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
+				continue;
+			}
+			
+			if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+				continue;
+			}
+			
 			self::onEntryDistributionUpdateRequired($entryDistribution);
+		}
 		
 		return true;
 	}
