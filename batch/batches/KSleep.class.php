@@ -24,7 +24,11 @@ class KSleep extends KPeriodicWorker
 		return -1;
 	}
 	
-	public function run()
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::run()
+	*/
+	public function run($jobs = null)
 	{
 //		print_r ( $this->kClient );
 		$r = rand ( 2,5);

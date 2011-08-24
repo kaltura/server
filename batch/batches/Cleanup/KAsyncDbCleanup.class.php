@@ -29,7 +29,10 @@ class KAsyncDbCleanup extends KPeriodicWorker
 		return self::getType();
 	}
 	
-	public function run()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::run()
+	*/
+	public function run($jobs = null)
 	{
 		KalturaLog::info("DB cleanup batch is running");
 		

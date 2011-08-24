@@ -25,7 +25,11 @@ class KAsyncDropFolderHandler extends KPeriodicWorker
 		return self::getType();
 	}
 	
-	public function run()
+	
+	/* (non-PHPdoc)
+	 * @see KBatchBase::run()
+	*/
+	public function run($jobs = null)
 	{
 		KalturaLog::info("Drop folder handler batch is running");
 		

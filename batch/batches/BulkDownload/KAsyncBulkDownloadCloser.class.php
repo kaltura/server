@@ -41,8 +41,12 @@ class KAsyncBulkDownloadCloser extends KJobCloserWorker
 	{
 		return $this->fetchStatus($job);
 	}
+
 	
-	public function run()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::run()
+	*/
+	public function run($jobs = null)
 	{
 		KalturaLog::debug("run()");
 		KalturaLog::info("Bulk download closer batch is running");

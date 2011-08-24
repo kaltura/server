@@ -45,7 +45,10 @@ class KAsyncNotifier extends KJobHandlerWorker
 		return $job;
 	}
 	
-	public function run()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::run()
+	*/
+	public function run($jobs = null)
 	{
 		KalturaLog::info("Notification batch is running");
 		
