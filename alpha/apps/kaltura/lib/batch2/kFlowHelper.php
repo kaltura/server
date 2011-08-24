@@ -1699,6 +1699,7 @@ class kFlowHelper
 				}
 				
 				$dbAsset->save();
+				kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 	    	}
 	    	
 			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);

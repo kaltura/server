@@ -6,6 +6,7 @@ abstract class VirusScanEngine
 	/**
 	 * Return a new instance of a class extending VirusScanEngine, according to give $type
 	 * @param KalturaVirusScanEngineType $type
+	 * @return VirusScanEngine
 	 */
 	public static function getEngine($type)
 	{

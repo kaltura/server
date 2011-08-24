@@ -469,20 +469,22 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		KalturaLog::debug("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
 		if($object->getIsOriginal())
 		{
-			if($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED && $entry->getType() == entryType::MEDIA_CLIP)
-			{
-				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				if(kFileSyncUtils::fileSync_exists($syncKey))
-				{
-					KalturaLog::debug("Start conversion");
-					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-					kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
-				}
-				else
-				{
-					KalturaLog::debug("File sync not created yet");
-				}
-			}
+//			Already handled by object added event
+//			
+// 			if($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED && $entry->getType() == entryType::MEDIA_CLIP)
+// 			{
+// 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+// 				if(kFileSyncUtils::fileSync_exists($syncKey))
+// 				{
+// 					KalturaLog::debug("Start conversion");
+// 					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+// 					kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
+// 				}
+// 				else
+// 				{
+// 					KalturaLog::debug("File sync not created yet");
+// 				}
+// 			}
 		}
 		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
 		{
