@@ -17,7 +17,7 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Mailer
  */
-class KAsyncMailer extends KBatchBase
+class KAsyncMailer extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -36,22 +36,17 @@ class KAsyncMailer extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return null;
+		return $job;
 	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job){}
-	protected function freeExclusiveJob(KalturaBatchJob $job){}
 	
 	const MAILER_DEFAULT_SENDER_EMAIL = 'notifications@kaltura.com';
 	const MAILER_DEFAULT_SENDER_NAME = 'Kaltura Notification Service';
 	
-	// TODO - replace email config mechanism !!
+	// replace email config mechanism !!
 	protected $texts_array; // will hold the configuration of the in file
 	
 	/**
@@ -59,7 +54,10 @@ class KAsyncMailer extends KBatchBase
 	 */
 	protected $mail;
 	
-	public function run()
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::run()
+	 */
+	public function run($jobs = null)
 	{
 		KalturaLog::info("Mail batch is running");
 		

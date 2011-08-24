@@ -4,7 +4,7 @@ require_once("bootstrap.php");
  * @package plugins.captionSearch
  * @subpackage Scheduler
  */
-class KAsyncParseCaptionAsset extends KBatchBase
+class KAsyncParseCaptionAsset extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -23,7 +23,7 @@ class KAsyncParseCaptionAsset extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{

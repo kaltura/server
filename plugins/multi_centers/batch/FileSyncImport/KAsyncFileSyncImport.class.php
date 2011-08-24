@@ -7,7 +7,7 @@ require_once('bootstrap.php');
  * @package plugins.multiCenters
  * @subpackage Scheduler.FileSyncImport
  */
-class KAsyncFileSyncImport extends KBatchBase
+class KAsyncFileSyncImport extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -26,77 +26,36 @@ class KAsyncFileSyncImport extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return null;
-	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	public function run($jobs = null)
-	{
-		KalturaLog::info("FileSyncImport batch is running");
-
-		if($this->taskConfig->isInitOnly()) {
-			return $this->init();
-		}
-
-		// no jobs given - get from server
-		if(is_null($jobs)) {
-			$jobs = $this->kClient->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		}
-			
-		KalturaLog::info(count($jobs) . " filesync import jobs to perform");
-
-		if(!count($jobs) > 0)
+		if ($useCloser)
 		{
-			// no jobs to perform
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-
-		// should we use the KAsyncFileSyncImportCloser batch worker or not ?
-		$useCloser = $this->taskConfig->params->useCloser;
-
-		foreach($jobs as &$job)
-		{
-			if ($useCloser)
+			// if closer is used, the file will be download to a temporary directory, and then moved to its final destination by the KAsyncFileSyncImportCloser batch
+			if (!$job->data->tmpFilePath)
 			{
-				// if closer is used, the file will be download to a temporary directory, and then moved to its final destination by the KAsyncFileSyncImportCloser batch
-				if (!$job->data->tmpFilePath)
-				{
-					// adding temp path to the job data, so that the closer will be able to use it later
-					$tmpPath = $this->getTmpPath($job->data->sourceUrl);
-					if (!$tmpPath) {
-						$msg = 'Error: Cannot create temporary directory for url ['.$job->data->sourceUrl.']';
-						$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
-						continue; // proceed to next job
-					}
-					$job->data->tmpFilePath = $tmpPath;
-					$this->updateJob($job, "Temp destination set", KalturaBatchJobStatus::PROCESSING, 2, $job->data);
+				// adding temp path to the job data, so that the closer will be able to use it later
+				$tmpPath = $this->getTmpPath($job->data->sourceUrl);
+				if (!$tmpPath) {
+					$msg = 'Error: Cannot create temporary directory for url ['.$job->data->sourceUrl.']';
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, $msg, KalturaBatchJobStatus::RETRY);				
 				}
-				// destination = temporary path
-				$fileDestination = $job->data->tmpFilePath;
+				$job->data->tmpFilePath = $tmpPath;
+				$this->updateJob($job, "Temp destination set", KalturaBatchJobStatus::PROCESSING, 2, $job->data);
 			}
-			else
-			{
-				// destination = final path
-				$fileDestination = $job->data->destFilePath;
-			}
-			
-			// start downoading the file to its destination (temp or final)
-			$job = $this->fetchUrl($job, $job->data->sourceUrl, $fileDestination);			
+			// destination = temporary path
+			$fileDestination = $job->data->tmpFilePath;
 		}
-			
-		return $jobs;
+		else
+		{
+			// destination = final path
+			$fileDestination = $job->data->destFilePath;
+		}
+		
+		// start downoading the file to its destination (temp or final)
+		return $this->fetchUrl($job, $job->data->sourceUrl, $fileDestination);	
 	}
-
-	
-
-	
 	
 	private function fetchUrl(KalturaBatchJob &$job, $sourceUrl, $destination)
 	{
@@ -618,34 +577,4 @@ class KAsyncFileSyncImport extends KBatchBase
 			
 		return $destFile;
 	}
-	
-	
-	
-	
-	// --------------------------
-	// -- Job update functions --
-	// --------------------------
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
-	{
-		return $this->kClient->fileSyncImportBatch->updateExclusiveFileSyncImportJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE) {
-			$resetExecutionAttempts = true;
-		}
-
-		$response = $this->kClient->fileSyncImportBatch->freeExclusiveFileSyncImportJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-
-		return $response->job;
-	}
-
 }
-

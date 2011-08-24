@@ -11,7 +11,7 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Storage
  */
-class KAsyncStorageExport extends KBatchBase
+class KAsyncStorageExport extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -30,15 +30,24 @@ class KAsyncStorageExport extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->export($job, $job->data);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
+	protected function getMaxJobsEachRun()
+	{
+		return 1;
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getFilter()
+	 */
 	protected function getFilter()
 	{
 		$filter = parent::getFilter();
@@ -54,48 +63,6 @@ class KAsyncStorageExport extends KBatchBase
 		}
 			
 		return $filter;
-	}
-	
-	public function run($jobs = null)
-	{
-		KalturaLog::info("Net-Storage Export batch is running");
-		
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		if(is_null($jobs))
-			$jobs = $this->kClient->batch->getExclusiveStorageExportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		
-		KalturaLog::info(count($jobs) . " export jobs to perform");
-		
-		if(! count($jobs))
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-		
-		foreach($jobs as &$job)
-		{
-			try
-			{
-				$job = $this->export($job, $job->data);
-			}
-			catch(KalturaException $kex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-			catch(KalturaClientException $kcex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
-			}
-			catch(Exception $ex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-		}
-			
-		return $jobs;
 	}
 	
 	/**
@@ -147,25 +114,6 @@ class KAsyncStorageExport extends KBatchBase
 		}
 		
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
-	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{
-		return $this->kClient->batch->updateExclusiveStorageExportJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-	
-		$response = $this->kClient->batch->freeExclusiveStorageExportJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
 	}
 	
 	/*

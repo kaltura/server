@@ -19,7 +19,7 @@ require_once ("bootstrap.php");
  * @package Scheduler
  * @subpackage Capture-Thumbnail
  */
-class KAsyncCaptureThumb extends KBatchBase
+class KAsyncCaptureThumb extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -34,42 +34,23 @@ class KAsyncCaptureThumb extends KBatchBase
 	 */
 	public function getJobType()
 	{
-		return KalturaBatchJobType::CAPTURE_THUMB;
+		return self::getType();
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->captureThumb($job, $job->data);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	public function run($jobs = null)
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
+	protected function getMaxJobsEachRun()
 	{
-		KalturaLog::info("Capture thumbnail batch is running");
-		
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		if(is_null($jobs))
-			$jobs = $this->kClient->batch->getExclusiveCaptureThumbJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		
-		KalturaLog::info(count($jobs) . " capture thumbnail jobs to perform");
-		
-		if(!count($jobs))
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-		
-		foreach($jobs as &$job) {
-			$job = $this->captureThumb($job, $job->data);
-		}
-		return $jobs;
+		return 1;
 	}
 	
 	private function captureThumb(KalturaBatchJob $job, KalturaCaptureThumbJobData $data)
@@ -215,24 +196,5 @@ class KAsyncCaptureThumb extends KBatchBase
 		$data->thumbPath = $sharedFile;
 		$job->data = $data;
 		return $job;
-	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{
-		return $this->kClient->batch->updateExclusiveCaptureThumbJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-	
-		$response = $this->kClient->batch->freeExclusiveCaptureThumbJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
 	}
 }

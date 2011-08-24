@@ -7,7 +7,7 @@ require_once("bootstrap.php");
  * @package plugins.dropFolder
  * @subpackage Scheduler
  */
-class KAsyncDropFolderHandler extends KBatchBase
+class KAsyncDropFolderHandler extends KPeriodicWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -24,27 +24,6 @@ class KAsyncDropFolderHandler extends KBatchBase
 	{
 		return self::getType();
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
-	 */
-	protected function exec(KalturaBatchJob $job)
-	{
-		return null;
-	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	protected function init()
-	{ /* non-relevant abstract function */ }
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{ /* non-relevant abstract function */ }
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{ /* non-relevant abstract function */ }
-	
-	
 	
 	public function run()
 	{

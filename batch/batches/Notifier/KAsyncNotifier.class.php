@@ -17,7 +17,7 @@ require_once ("bootstrap.php");
  * @package Scheduler
  * @subpackage Notifier
  */
-class KAsyncNotifier extends KBatchBase
+class KAsyncNotifier extends KJobHandlerWorker
 {
 	private $partnerMap = null;
 	
@@ -38,14 +38,12 @@ class KAsyncNotifier extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return null;
+		return $job;
 	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
 	
 	public function run()
 	{
@@ -82,7 +80,7 @@ class KAsyncNotifier extends KBatchBase
 		
 		try
 		{
-			// TODO - eventually all partners will support multiNotifications 
+			// eventually all partners will support multiNotifications 
 			// when so - can remove some of the code
 			// see  which notifications should go to multiNotification and which should stay in single notificaiton
 			list($single_notifications, $multi_notifications) = $this->splitToMulti($notificationJobs);
@@ -102,7 +100,7 @@ class KAsyncNotifier extends KBatchBase
 				$this->updateMultiNotificationStatus($multi_notifications_per_partner, $http_code, $res);
 			}
 			
-			// TODO - see if can reduce number of notifications 
+			// see if can reduce number of notifications 
 			// if an object was deleted - all previous notifications are not relevant
 			foreach($single_notifications as $not)
 			{
@@ -166,7 +164,7 @@ class KAsyncNotifier extends KBatchBase
 		$end_time = microtime(true);
 		KalturaLog::info("partner [{$not->partnerId}] notification [{$not->id}] of type [{$not->jobSubType}] to [{$url}]\nhttp result code [{$http_code}]\n" . print_r($params, true) . "\nresult [{$result}]\nraw_signature [$raw_siganture]\ntook [" . ($end_time - $start_time) . "]");
 		
-		// TODO - see if the hit worked properly
+		// see if the hit worked properly
 		// the hit should return a specific string to indicate a success 
 		return array($params, $result, $http_code);
 	}
@@ -220,7 +218,7 @@ class KAsyncNotifier extends KBatchBase
 		$end_time = microtime(true);
 		KalturaLog::info("partner [{$not->partnerId}] notification [$not_id_str] to [{$url}]\nhttp result code [{$http_code}]\n" . print_r($params, true) . "\nresult [{$result}]\nraw_signature [$raw_siganture]\ntook [" . ($end_time - $start_time) . "]");
 		
-		// TODO - see if the hit worked properly
+		// see if the hit worked properly
 		// the hit should return a specific string to indicate a success 
 		return array($params, $result, $http_code);
 	}
@@ -272,25 +270,6 @@ class KAsyncNotifier extends KBatchBase
 		
 		$this->onUpdate($not);
 		$this->updateExclusiveJob($not->id, $updateNot);
-	}
-	
-	/**
-	 * @param int $jobId
-	 * @param KalturaBatchJob $job
-	 */
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{
-		KalturaLog::info("job[$job->id] status: [$job->status]");
-		
-		$this->kClient->batch->updateExclusiveNotificationJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-	
-	/**
-	 * @param KalturaBatchJob $job
-	 */
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$this->kClient->batch->freeExclusiveNotificationJob($job->id, $this->getExclusiveLockKey());
 	}
 	
 	/**

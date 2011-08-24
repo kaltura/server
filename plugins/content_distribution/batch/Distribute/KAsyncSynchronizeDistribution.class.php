@@ -6,7 +6,7 @@ require_once("bootstrap.php");
  * @package plugins.contentDistribution 
  * @subpackage Scheduler.Distribute
  */
-class KAsyncSynchronizeDistribution extends KBatchBase
+class KAsyncSynchronizeDistribution extends KPeriodicWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -23,29 +23,6 @@ class KAsyncSynchronizeDistribution extends KBatchBase
 	{
 		return self::getType();
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
-	 */
-	protected function exec(KalturaBatchJob $job)
-	{
-		return null;
-	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	protected function init(){}
-	
-	/**
-	 * @param int $jobId
-	 * @param KalturaBatchJob $job
-	 */
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job){}
-	
-	/**
-	 * @param KalturaBatchJob $job
-	 */
-	protected function freeExclusiveJob(KalturaBatchJob $job){}
 	
 	public function run()
 	{

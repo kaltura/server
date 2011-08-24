@@ -7,7 +7,7 @@ require_once('bootstrap.php');
  * @package plugins.multiCenters
  * @subpackage Scheduler.FileSyncImport
  */
-class KAsyncFileSyncImportCloser extends KBatchBase
+class KAsyncFileSyncImportCloser extends KJobCloserWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -26,48 +26,23 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return null;
+		if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
+		
+		return $this->moveFile($job, $job->data->tmpFilePath, $job->data->destFilePath);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	public function run($jobs = null)
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
+	protected function getMaxJobsEachRun()
 	{
-		KalturaLog::info("FileSyncImportCloser batch is running");
-
-		if($this->taskConfig->isInitOnly()) {
-			return $this->init();
-		}
-
-		if(is_null($jobs)) {
-			$jobs = $this->kClient->fileSyncImportBatch->getExclusiveAlmostDoneFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		}
-			
-		KalturaLog::info(count($jobs) . " filesync import closer jobs to perform");
-
-		if(!count($jobs) > 0)
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-
-		foreach($jobs as &$job) {
-			if(($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time()) {
-				$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CLOSER_TIMEOUT, 'Timed out', KalturaBatchJobStatus::FAILED);
-			}
-			else {
-				// move file from temp location to final destination
-				$job = $this->moveFile($job, $job->data->tmpFilePath, $job->data->destFilePath);
-			}
-		}
-		return $jobs;
+		return 1;
 	}
-
 	
 	private function moveFile(KalturaBatchJob $job, $fromPath, $toPath)
 	{
@@ -134,27 +109,4 @@ class KAsyncFileSyncImportCloser extends KBatchBase
 			return $this->checkFileExists($path);
 		}		
 	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
-	{
-		return $this->kClient->fileSyncImportBatch->updateExclusiveFileSyncImportJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE) {
-			$resetExecutionAttempts = true;
-		}
-
-		$response = $this->kClient->fileSyncImportBatch->freeExclusiveFileSyncImportJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-
-		return $response->job;
-	}
-
 }
-

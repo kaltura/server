@@ -17,20 +17,12 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Debug
  */
-class KSleep extends KBatchBase
+class KSleep extends KPeriodicWorker
 {
 	public static function getType()
 	{
 		return -1;
 	}
-	
-	protected function init()
-	{
-		
-	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job){}
-	protected function freeExclusiveJob(KalturaBatchJob $job){}
 	
 	public function run()
 	{
@@ -41,5 +33,3 @@ class KSleep extends KBatchBase
 		KalturaLog::info( "Bye!");		
 	}
 }
-
-?>

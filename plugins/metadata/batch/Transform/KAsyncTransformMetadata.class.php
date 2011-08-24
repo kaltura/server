@@ -6,7 +6,7 @@ require_once("bootstrap.php");
  * @package plugins.metadata
  * @subpackage Scheduler.Transform
  */
-class KAsyncTransformMetadata extends KBatchBase
+class KAsyncTransformMetadata extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -25,38 +25,19 @@ class KAsyncTransformMetadata extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->upgrade($job, $job->data);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	public function run($jobs = null)
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
+	protected function getMaxJobsEachRun()
 	{
-		KalturaLog::info("Transform metadata batch is running");
-		
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		if(is_null($jobs))
-			$jobs = $this->kClient->metadataBatch->getExclusiveTransformMetadataJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		
-		KalturaLog::info(count($jobs) . " transform jobs to perform");
-		
-		if(! count($jobs) > 0)
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-		
-		foreach($jobs as &$job)
-			$job = $this->upgrade($job, $job->data);
-			
-		return $jobs;
+		return 1;
 	}
 	
 	private function transform(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
@@ -160,20 +141,5 @@ class KAsyncTransformMetadata extends KBatchBase
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		return $job;
-	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
-	{
-		return $this->kClient->metadataBatch->updateExclusiveTransformMetadataJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$response = $this->kClient->metadataBatch->freeExclusiveTransformMetadataJob($job->id, $this->getExclusiveLockKey(), false);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
 	}
 }

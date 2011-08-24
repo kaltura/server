@@ -27,25 +27,12 @@ class KAsyncConvertCollection extends KAsyncConvert
 		return KalturaBatchJobType::CONVERT_COLLECTION;
 	}
 	
-	protected function init()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::getJobType()
+	 */
+	public function getJobType()
 	{
-		$this->saveQueueFilter(self::getType());
-	}
-	
-	public function run($jobs = null)
-	{
-		KalturaLog::notice ( "Convert collection batch is running");
-		
-		return parent::run($jobs);
-	}
-	
-	protected function getJobs()
-	{
-		return $this->kClient->batch->getExclusiveConvertCollectionJobs( 
-					$this->getExclusiveLockKey() , 
-					$this->taskConfig->maximumExecutionTime , 
-					$this->getMaxJobsEachRun() , 
-					$this->getFilter());
+		return self::getType();
 	}
 	
 	protected function convertImpl(KalturaBatchJob $job, KalturaConvartableJobData $data)
@@ -275,36 +262,4 @@ class KAsyncConvertCollection extends KAsyncConvert
 		}
 		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
 	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-			
-		$response = $this->kClient->batch->freeExclusiveConvertCollectionJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
-	}	
-
-	
-	/*
-	 * @return string
-	 */
-	protected function getSupportedEnginesDescription()
-	{
-		return "[" . KalturaConversionEngineType::EXPRESSION_ENCODER3 . "] Expression Encoder 3";
-	}
-	
-	/*
-	 * @return string
-	 */
-	protected function getSupportedEngines()
-	{
-		return KalturaConversionEngineType::EXPRESSION_ENCODER3;
-	}
 }
-?>

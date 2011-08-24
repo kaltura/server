@@ -17,7 +17,7 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Conversion
  */
-class KAsyncConvertProfileCloser extends KBatchBase
+class KAsyncConvertProfileCloser extends KJobCloserWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -36,44 +36,13 @@ class KAsyncConvertProfileCloser extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->checkTimeout($job);
 	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	protected function init()
-	{
-		$this->saveQueueFilter(self::getType(), true);		
-	}
-	
-	public function run()
-	{
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		$jobs = $this->kClient->batch->getExclusiveAlmostDoneConvertProfileJobs( 
-			$this->getExclusiveLockKey() , 
-			$this->taskConfig->maximumExecutionTime , 
-			$this->taskConfig->maxJobsEachRun , 
-			$this->getFilter() );
-			
-		if(!count($jobs))
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType(), null, true);
-			return;
-		}
-		
-		foreach($jobs as $job)
-		{
-			$this->checkTimeout($job);
-		}
-	}
-	
+
 	private function checkTimeout(KalturaBatchJob $job)
 	{
 		if($job->queueTime && ($job->queueTime + $this->taskConfig->params->maxTimeBeforeFail) < time())
@@ -81,24 +50,4 @@ class KAsyncConvertProfileCloser extends KBatchBase
 			
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
 	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{
-		return $this->kClient->batch->updateExclusiveConvertProfileJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-	
-		$response = $this->kClient->batch->freeExclusiveConvertProfileJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
-	}
 }
-?>

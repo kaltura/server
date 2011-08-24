@@ -6,7 +6,7 @@ require_once("bootstrap.php");
  * @package plugins.virusScan
  * @subpackage Scheduler
  */
-class KAsyncVirusScan extends KBatchBase
+class KAsyncVirusScan extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -25,39 +25,19 @@ class KAsyncVirusScan extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->scan($job, $job->data);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	public function run($jobs = null)
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
+	protected function getMaxJobsEachRun()
 	{
-		KalturaLog::info("Virus scan batch is running");
-		
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		if(is_null($jobs))
-			$jobs = $this->kClient->virusScanBatch->getExclusiveVirusScanJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		
-		KalturaLog::info(count($jobs) . " virus scan jobs to perform");
-		
-		if(! count($jobs) > 0)
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-		
-		foreach($jobs as &$job)
-		{
-			$job = $this->scan($job, $job->data);
-		}	
-		return $jobs;
+		return 1;
 	}
 	
 	protected function scan(KalturaBatchJob $job, KalturaVirusScanJobData $data)
@@ -129,21 +109,4 @@ class KAsyncVirusScan extends KBatchBase
 		}
 		return $job;
 	}
-	
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job, $entryStatus = null)
-	{
-		return $this->kClient->virusScanBatch->updateExclusiveVirusScanJob($jobId, $this->getExclusiveLockKey(), $job, $entryStatus);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$response = $this->kClient->virusScanBatch->freeExclusiveVirusScanJob($job->id, $this->getExclusiveLockKey(), false);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
-	}
 }
-?>

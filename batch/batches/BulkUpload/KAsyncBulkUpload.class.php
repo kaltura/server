@@ -16,7 +16,7 @@ setlocale ( LC_ALL, 'en_US.UTF-8' );
  * @package Scheduler
  * @subpackage Bulk-Upload
  */
-class KAsyncBulkUpload extends KBatchBase 
+class KAsyncBulkUpload extends KJobHandlerWorker 
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -31,71 +31,55 @@ class KAsyncBulkUpload extends KBatchBase
 	 */
 	public function getJobType()
 	{
-		return KalturaBatchJobType::BULKUPLOAD;
+		return self::getType();
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return $this->startBulkUpload($job);
-	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	public function run() {
-		KalturaLog::info ( "Bulk upload batch is running" );
-		
-		if ($this->taskConfig->isInitOnly ())
-			return $this->init ();
-		
-		$jobs = $this->kClient->batch->getExclusiveBulkUploadJobs ( $this->getExclusiveLockKey (), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter () );
-		
-		KalturaLog::info ( count ( $jobs ) . " bulk upload jobs to perform" );
-		
-		if (! count ( $jobs )) {
-			KalturaLog::info ( "Queue size: 0 sent to scheduler" );
-			$this->saveSchedulerQueue ( self::getType () );
-			return false;
-		}
-		
-		$jobResults = array();
 		ini_set('auto_detect_line_endings', true);
-		foreach ( $jobs as $job ) 
+		try 
 		{
-			try {
-				$jobResults[] = $this->startBulkUpload($job);
-			}
-			catch (KalturaBulkUploadAbortedException $abortedException)
-			{
-				$this->unimpersonate();
-				$jobResults[] = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ABORTED);
-			}
-			catch(KalturaBatchException $kbex)
-			{
-				$this->unimpersonate();
-				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $kbex->getCode(), "Error: " . $kbex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-			catch(KalturaException $kex)
-			{
-				$this->unimpersonate();
-				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-			catch(KalturaClientException $kcex)
-			{
-				$this->unimpersonate();
-				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
-			}
-			catch(Exception $ex)
-			{
-				$this->unimpersonate();
-				$jobResults[] = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
+			$job = $this->startBulkUpload($job);
+		}
+		catch (KalturaBulkUploadAbortedException $abortedException)
+		{
+			$this->unimpersonate();
+			$job = $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ABORTED);
+		}
+		catch(KalturaBatchException $kbex)
+		{
+			$this->unimpersonate();
+			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::APP, $kbex->getCode(), "Error: " . $kbex->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+		catch(KalturaException $kex)
+		{
+			$this->unimpersonate();
+			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+		catch(KalturaClientException $kcex)
+		{
+			$this->unimpersonate();
+			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
+		}
+		catch(Exception $ex)
+		{
+			$this->unimpersonate();
+			$job = $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		ini_set('auto_detect_line_endings', false);
 		
-		return $jobResults;
+		return $job;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
+	protected function getMaxJobsEachRun()
+	{
+		return 1;
 	}
 	
 	/**
@@ -149,32 +133,5 @@ class KAsyncBulkUpload extends KBatchBase
 	protected function countCreatedEntries($jobId) 
 	{
 		return $this->kClient->batch->countBulkUploadEntries($jobId);
-	}
-	
-	/**
-	 * (non-PHPdoc)
-	 * @see KBatchBase::updateExclusiveJob()
-	 */
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job) 
-	{
-		return $this->kClient->batch->updateExclusiveBulkUploadJob ( $jobId, $this->getExclusiveLockKey (), $job );
-	}
-	
-	/**
-	 * (non-PHPdoc)
-	 * @see KBatchBase::freeExclusiveJob()
-	 */
-	protected function freeExclusiveJob(KalturaBatchJob $job) 
-	{
-		$resetExecutionAttempts = false;
-		if ($job->status == KalturaBatchJobStatus::ALMOST_DONE || $job->status == KalturaBatchJobStatus::RETRY)
-			$resetExecutionAttempts = true;
-		
-		$response = $this->kClient->batch->freeExclusiveBulkUploadJob ( $job->id, $this->getExclusiveLockKey (), $resetExecutionAttempts );
-		
-		KalturaLog::info ( "Queue size: $response->queueSize sent to scheduler" );
-		$this->saveSchedulerQueue ( self::getType (), $response->queueSize );
-		
-		return $response->job;
 	}
 }

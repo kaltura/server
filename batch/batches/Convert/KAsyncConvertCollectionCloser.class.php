@@ -17,7 +17,7 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Conversion
  */
-class KAsyncConvertCollectionCloser extends KBatchBase
+class KAsyncConvertCollectionCloser extends KJobCloserWorker
 {
 	private $localTempPath;
 	private $sharedTempPath;
@@ -39,27 +39,15 @@ class KAsyncConvertCollectionCloser extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->closeConvert($job, $job->data);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	protected function init()
-	{
-		$this->saveQueueFilter(self::getType(), true);
-	}
-	
 	public function run($jobs = null)
 	{
-		KalturaLog::info("Convert closer is running");
-
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
 		// creates a temp file path
 		$this->localTempPath = $this->taskConfig->params->localTempPath;
 		$this->sharedTempPath = $this->taskConfig->params->sharedTempPath;
@@ -77,46 +65,8 @@ class KAsyncConvertCollectionCloser extends KBatchBase
 			KalturaLog::err( "Cannot continue conversion without temp shared directory");
 			return null;
 		}
-		
-		if(is_null($jobs))
-		{		
-			$jobs = $this->kClient->batch->getExclusiveAlmostDoneConvertCollectionJobs(
-				$this->getExclusiveLockKey() , 
-				$this->taskConfig->maximumExecutionTime , 
-				$this->taskConfig->maxJobsEachRun , 
-				$this->getFilter());
-		}
 			
-		KalturaLog::info(count($jobs) . " convert jobs to close");
-		
-		if(! count($jobs))
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType(), null, true);
-			return null;
-		}
-		
-		foreach($jobs as &$job)
-		{
-			try
-			{
-				$job = $this->closeConvert($job, $job->data);
-			}
-			catch(KalturaException $kex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-			catch(KalturaClientException $kcex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
-			}
-			catch(Exception $ex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-		}
-			
-		return $jobs;
+		return parent::run($jobs);
 	}
 	
 	private function closeConvert(KalturaBatchJob $job, KalturaConvertCollectionJobData $data)
@@ -338,19 +288,4 @@ class KAsyncConvertCollectionCloser extends KBatchBase
 		}
 		return $this->kClient->batch->updateExclusiveConvertCollectionJob($jobId, $this->getExclusiveLockKey(), $job, $flavors);
 	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-	
-		$response = $this->kClient->batch->freeExclusiveConvertCollectionJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
-	}
 }
-?>

@@ -17,7 +17,7 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Conversion
  */
-class KAsyncConvert extends KBatchBase
+class KAsyncConvert extends KJobHandlerWorker
 {
 	/**
 	 * @var string
@@ -56,19 +56,19 @@ class KAsyncConvert extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->convert($job, $job->data);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getFilter()
+	 */
 	protected function getFilter()
 	{
 		$filter = parent::getFilter();
-		$filter->jobSubTypeIn = $this->getSupportedEngines();
 		
 		if($this->taskConfig->params->minFileSize && is_numeric($this->taskConfig->params->minFileSize))
 			$filter->fileSizeGreaterThan = $this->taskConfig->params->minFileSize;
@@ -79,19 +79,19 @@ class KAsyncConvert extends KBatchBase
 		return $filter;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
 	protected function getMaxJobsEachRun()
 	{
 		return 1;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::run()
+	 */
 	public function run($jobs = null)
 	{
-		KalturaLog::notice ( "Convert batch is running");
-		KalturaLog::notice ( "Supporting engines: " . $this->getSupportedEngines() );
-		 
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
 		// creates a temp file path
 		$this->localTempPath = $this->taskConfig->params->localTempPath;
 		$this->sharedTempPath = $this->taskConfig->params->sharedTempPath;
@@ -111,50 +111,7 @@ class KAsyncConvert extends KBatchBase
 		
 		$this->distributedFileManager = new KDistributedFileManager($this->taskConfig->params->localFileRoot, $this->taskConfig->params->remoteFileRoot, $this->taskConfig->params->fileCacheExpire);
 		
-		if(is_null($jobs))
-			$jobs = $this->getJobs();
-			
-		if(!count($jobs))
-		{
-			KalturaLog::notice ( "Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-		
-		foreach($jobs as &$job)
-		{
-			try
-			{
-				$job = $this->convert($job, $job->data);
-			}
-			catch(KalturaException $kex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_API, $kex->getCode(), "Error: " . $kex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-			catch(kTemporaryException $ktex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ktex->getCode(), "Error: " . $ktex->getMessage(), KalturaBatchJobStatus::RETRY);
-			}
-			catch(KalturaClientException $kcex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::KALTURA_CLIENT, $kcex->getCode(), "Error: " . $kcex->getMessage(), KalturaBatchJobStatus::RETRY);
-			}
-			catch(Exception $ex)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
-			}
-		}
-			
-		return $jobs;
-	}
-	
-	protected function getJobs()
-	{
-		return $this->kClient->batch->getExclusiveConvertJobs( 
-					$this->getExclusiveLockKey() , 
-					$this->taskConfig->maximumExecutionTime , 
-					$this->getMaxJobsEachRun() , 
-					$this->getFilter());
+		return parent::run($jobs);
 	}
 	
 	protected function convert(KalturaBatchJob $job, KalturaConvartableJobData $data)
@@ -314,33 +271,4 @@ class KAsyncConvert extends KBatchBase
 		}
 		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
 	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{
-		return $this->kClient->batch->updateExclusiveConvertJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-			
-		$response = $this->kClient->batch->freeExclusiveConvertJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
-	}	
-
-
-	/*
-	 * @return string
-	 */
-	protected function getSupportedEngines()
-	{
-		return $this->taskConfig->filter->jobSubTypeIn;
-	}
 }
-?>

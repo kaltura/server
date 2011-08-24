@@ -13,9 +13,8 @@ ini_set('memory_limit', '128M');
  * @package Scheduler
  * @subpackage Email-Ingestion
  */
-class KAsyncEmailIngestion extends KBatchBase {
-
-
+class KAsyncEmailIngestion extends KPeriodicWorker
+{
 	/***************/
 	/* Definitions */
 	/***************/
@@ -34,8 +33,6 @@ class KAsyncEmailIngestion extends KBatchBase {
 
 
 	private $temp_files = array();
-
-
 
 	/***********************************************/
 	/* Implementation of parent ABSTRACT functions */
@@ -56,24 +53,6 @@ class KAsyncEmailIngestion extends KBatchBase {
 	{
 		return self::getType();
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
-	 */
-	protected function exec(KalturaBatchJob $job)
-	{
-		return null;
-	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-
-	/**
-	 * Batch is done running
-	 */
-	public function done ()
-	{
-		KalturaLog::info("Email ingestion batch DONE");
-	}
 
 	public function __destruct()
 	{
@@ -85,17 +64,8 @@ class KAsyncEmailIngestion extends KBatchBase {
 				}
 			}
 		}
+		parent::__destruct();
 	}
-
-	protected function init()
-	{ /* non-relevant abstract function */ }
-
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{ /* non-relevant abstract function */ }
-
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{ /* non-relevant abstract function */ }
-
 
 	/********/
 	/* Main */

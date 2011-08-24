@@ -6,28 +6,20 @@ require_once("bootstrap.php");
  * @package plugins.contentDistribution 
  * @subpackage Scheduler.Distribute
  */
-abstract class KAsyncDistribute extends KBatchBase
+abstract class KAsyncDistribute extends KJobHandlerWorker
 {
 	/**
-	 * Enter description here ...
 	 * @var IDistributionEngine
 	 */
 	protected $engine;
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return null;
+		return $this->distribute($job, $job->data);;
 	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	/**
-	 * @return array<KalturaBatchJob>
-	 */
-	abstract protected function getExclusiveDistributeJobs();
 	
 	/**
 	 * @return DistributionEngine
@@ -39,36 +31,6 @@ abstract class KAsyncDistribute extends KBatchBase
 	 * @return bool true if job is closed, false for almost done
 	 */
 	abstract protected function execute(KalturaDistributionJobData $data);
-	
-	/**
-	 * Saves the typed queue to for the scheduler
-	 */
-	abstract protected function saveEmptyQueue();
-	
-	public function run($jobs = null)
-	{
-		KalturaLog::info("Distribute batch is running");
-		
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		if(is_null($jobs))
-			$jobs = $this->getExclusiveDistributeJobs();
-		
-		KalturaLog::info(count($jobs) . " Distribute jobs to perform");
-		
-		if(! count($jobs) > 0)
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveEmptyQueue();
-			return null;
-		}
-		
-		foreach($jobs as &$job)
-			$job = $this->distribute($job, $job->data);
-			
-		return $jobs;
-	}
 	
 	protected function distribute(KalturaBatchJob $job, KalturaDistributionJobData $data)
 	{

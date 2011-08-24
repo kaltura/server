@@ -18,7 +18,7 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Import
  */
-class KAsyncImport extends KBatchBase
+class KAsyncImport extends KJobHandlerWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -37,38 +37,19 @@ class KAsyncImport extends KBatchBase
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->fetchFile($job, $job->data);
 	}
 	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-	
-	public function run($jobs = null)
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getMaxJobsEachRun()
+	 */
+	protected function getMaxJobsEachRun()
 	{
-		KalturaLog::info("Import media batch is running");
-		
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		if(is_null($jobs))
-			$jobs = $this->kClient->batch->getExclusiveImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, 1, $this->getFilter());
-		
-		KalturaLog::info(count($jobs) . " import jobs to perform");
-		
-		if(! count($jobs) > 0)
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return null;
-		}
-		
-		foreach($jobs as &$job)
-			$job = $this->fetchFile($job, $job->data);
-			
-		return $jobs;
+		return 1;
 	}
 	
 	/*
@@ -384,28 +365,6 @@ class KAsyncImport extends KBatchBase
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
 		return $job;
-	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{
-		return $this->kClient->batch->updateExclusiveImportJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-	
-//		if($job->errNumber == KalturaBatchJobAppErrors::OUTPUT_FILE_WRONG_SIZE)
-//			$resetExecutionAttempts = true;
-			
-		$response = $this->kClient->batch->freeExclusiveImportJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
 	}
 	
 	/*

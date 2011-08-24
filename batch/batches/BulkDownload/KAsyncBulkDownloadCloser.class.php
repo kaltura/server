@@ -16,7 +16,7 @@ require_once("bootstrap.php");
  * @package Scheduler
  * @subpackage Bulk-Download
  */
-class KAsyncBulkDownloadCloser extends KBatchBase
+class KAsyncBulkDownloadCloser extends KJobCloserWorker
 {
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -31,22 +31,15 @@ class KAsyncBulkDownloadCloser extends KBatchBase
 	 */
 	public function getJobType()
 	{
-		return KalturaBatchJobType::BULKDOWNLOAD;
+		return self::getType();
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KBatchBase::exec()
+	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		return $this->fetchStatus($job);
-	}
-	
-	// TODO remove run, updateExclusiveJob and freeExclusiveJob
-
-	protected function init()
-	{
-		$this->saveQueueFilter(self::getType(), true);
 	}
 	
 	public function run()
@@ -68,7 +61,7 @@ class KAsyncBulkDownloadCloser extends KBatchBase
 		if(!count($jobs))
 		{
 			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType(), null, true);
+			$this->saveSchedulerQueue(self::getType());
 			return;
 		}
 		
@@ -85,25 +78,4 @@ class KAsyncBulkDownloadCloser extends KBatchBase
 		
 		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::ALMOST_DONE);
 	}
-	
-	protected function updateExclusiveJob($jobId, KalturaBatchJob $job)
-	{
-		return $this->kClient->batch->updateExclusiveBulkDownloadJob($jobId, $this->getExclusiveLockKey(), $job);
-	}
-	
-	protected function freeExclusiveJob(KalturaBatchJob $job)
-	{
-		$resetExecutionAttempts = false;
-		if($job->status == KalturaBatchJobStatus::ALMOST_DONE)
-			$resetExecutionAttempts = true;
-			
-		$response = $this->kClient->batch->freeExclusiveBulkDownloadJob($job->id, $this->getExclusiveLockKey(), $resetExecutionAttempts);
-		
-		KalturaLog::info("Queue size: $response->queueSize sent to scheduler");
-		$this->saveSchedulerQueue(self::getType(), $response->queueSize);
-		
-		return $response->job;
-	}
 }
-
-?>

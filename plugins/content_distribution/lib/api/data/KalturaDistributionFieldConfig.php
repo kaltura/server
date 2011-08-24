@@ -41,7 +41,8 @@ class KalturaDistributionFieldConfig extends KalturaObject
     
     /**
      * Entry column or metadata xpath that should trigger an update
-     * TODO: find a better solution for this
+     * 
+     * @todo find a better solution for this
      * @var KalturaStringArray
      */
     public $updateParams;

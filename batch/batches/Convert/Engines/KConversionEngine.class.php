@@ -71,9 +71,6 @@ abstract class KConversionEngine
 			case KalturaConversionEngineType::ENCODING_COM :
 				$engine = new KConversionEngineEncodingCom( $engine_config );
 				break;
-			case KalturaConversionEngineType::KALTURA_COM:
-				// TODO - implement
-				break;
 			case KalturaConversionEngineType::FFMPEG_AUX:
 				$engine = new KConversionEngineFfmpegAux( $engine_config );
 				break;
