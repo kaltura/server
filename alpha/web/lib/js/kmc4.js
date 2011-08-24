@@ -1096,11 +1096,11 @@ kmc.user = {
 		switch(action) {
 			case "password":
 				title = "Change Password";
-				iframe_height = 180;
+				iframe_height = 200;
 				break;
 			case "email":
 				title = "Change Email Address";
-				iframe_height = 160;
+				iframe_height = 200;
 				break;
 			case "name":
 				title = "Edit Name";
