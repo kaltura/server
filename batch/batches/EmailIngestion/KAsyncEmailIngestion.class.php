@@ -67,11 +67,10 @@ class KAsyncEmailIngestion extends KPeriodicWorker
 		parent::__destruct();
 	}
 
-	/********/
-	/* Main */
-	/********/
-
-	public function run ()
+	/* (non-PHPdoc)
+	 * @see KBatchBase::run()
+	*/
+	public function run($jobs = null)
 	{
 		KalturaLog::info("Email ingestion batch is running");
 
