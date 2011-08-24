@@ -37,7 +37,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD = 1;
 	const FILE_SYNC_BATCHJOB_SUB_TYPE_CONFIG = 3;
 
-	const MAX_SERIALIZED_JOB_DATA_SIZE = 8193;
+	const MAX_SERIALIZED_JOB_DATA_SIZE = 8192;
 	private static $indicator = null;//= new myFileIndicator( "gogobatchjob" );
 	
 	private $aEntry = null;
