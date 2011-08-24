@@ -14,6 +14,7 @@ KalturaLog::setContext("API");
 
 KalturaLog::analitics(array(
 	'session_start',
+	'pid' => getmypid(),
 	'time' => $start,
 	'agent' => (isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : null),
 	'host' => (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null),
