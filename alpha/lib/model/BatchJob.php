@@ -481,7 +481,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		$this->setDuplicationKey ( BatchJobPeer::createDuplicationKey ( $this->getJobType (), $v ) );
 		if (! is_null ( $v )) {
 			$sereializedValue = serialize ( $v );
-			if (strlen ( ( string ) $sereializedValue ) > $this::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
+			if (strlen ( ( string ) $sereializedValue ) > self::MAX_SERIALIZED_JOB_DATA_SIZE ) { 
 				$v = new kJobCompressedData ( $sereializedValue );
 				$sereializedValue = serialize ( $v );
 			}
