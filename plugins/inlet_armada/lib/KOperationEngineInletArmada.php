@@ -38,7 +38,9 @@ class KOperationEngineInletArmada  extends KSingleOutputOperationEngine
 	{
 		KalturaLog::debug("operator==>".print_r($operator,1));
 
-$encodingTemplate;
+$encodingTemplateId;
+$encodingTemplateName;
+$cloneAndUpadate=false;
 $srcPrefixWindows;
 $srcPrefixLinux;
 $trgPrefixWindows;
@@ -53,13 +55,11 @@ $trgPrefixWindows;
 		$login = $this->taskConfig->params->InletArmadaLogin;
 		$passw = $this->taskConfig->params->InletArmadaPassword;
 		if($this->taskConfig->params->InletArmadaPriority)
-			$prio = $this->taskConfig->params->InletArmadaPriority;
+			$priority = $this->taskConfig->params->InletArmadaPriority;
 		else
-			$prio = 5;
+			$priority = 5;
 			// ----------------------------------
 			
-		sscanf($operator->extra,"encodingTemplate=%s",&$encodingTemplate);
-		
 		$inlet = new InletAPIWrap($url);
 		KalturaLog::debug(print_r($inlet,1));
 		$rvObj=new XmlRpcData;
@@ -69,6 +69,28 @@ $trgPrefixWindows;
 			throw new KOperationEngineException("Inlet failure: login, rv(".(print_r($rvObj,true)).")");
 		}
 		KalturaLog::debug("userLogon - ".print_r($rvObj,1));
+		
+		$paramsMap = KDLUtils::parseParamStr2Map($operator->extra);
+		foreach($paramsMap as $key=>$param){
+			switch($key){
+				case 'encodingTemplate':
+				case 'encodingTemplateId':
+					$encodingTemplateId=$param;
+					break;
+				case 'encodingTemplateName':
+					$encodingTemplateId = $this->lookForJobTemplateId($inlet, $param);
+					$encodingTemplateName=$param;
+					break;
+				case 'priority':
+					$priority=$param;
+					break;
+				case 'cloneAndUpadate':
+					$cloneAndUpadate=$param;
+					break;
+				default:
+					break;
+			}
+		}
 		
 			// Adjust linux file path to Inlet Armada Windows path
 		if($srcPrefixWindows && $srcPrefixLinux) {
@@ -88,10 +110,10 @@ $trgPrefixWindows;
 			$outFileWindows = $this->outFilePath;
 			
 		$rv=$inlet->jobAdd(			
-				$encodingTemplate,			// job template id
+				$encodingTemplateId,		// job template id
 				$srcFileWindows,		// String job_source_file, 
 				$outFileWindows,		// String job_destination_file, 
-				$prio,				// Int priority, 
+				$priority,				// Int priority, 
 				$srcFileWindows,			// String description, 
 				array(),"",
 				$rvObj);						
@@ -188,5 +210,34 @@ $trgPrefixWindows;
 			return $pathStr.$slashCh;
 		else
 			return $pathStr;
+	}
+	
+	/*************************************
+	 * 
+	 */
+	private lookForJobTemplateId($inlet, $name)
+	{
+	$rvObj=new XmlRpcData;
+		$rv=$inlet->templateGroupList($rvObj);
+		if(!$rv) {
+			throw new KOperationEngineException("Inlet failure: templateGroupList, rv(".print_r($rvObj,1).")");
+		}
+		$templateDescObj=$this->templateGroupListToJobTemplate($rvObj->template_group_list, $name);
+		retuen $templateDescObj->template_id;
+	}
+	
+	/*************************************
+	 * 
+	 */
+	private templateGroupListToJobTemplate($groupList, $val, $fieldName="template_description")
+	{
+		foreach ($groupList as $grp) {
+			foreach ($grp->templates as $tpl) {
+				if($tpl->$fieldName==$val) {
+					return $tpl;
+				}
+			}
+		}
+		return null;
 	}
 }
