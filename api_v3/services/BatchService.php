@@ -18,7 +18,14 @@
  */
 class BatchService extends KalturaBaseService 
 {
-
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::initService()
+	 */
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+		myPartnerUtils::resetAllFilters();
+	}
 	
 // --------------------------------- BulkUploadJob functions 	--------------------------------- //
 	
