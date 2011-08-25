@@ -189,6 +189,9 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	 * @param string $fieldName
 	 */
 	public static function getSearchFieldName($fieldName){
+		if ($fieldName == self::SEARCH_FIELD_DATA)
+			return  'plugins_data';
+			
 		return CaptionPlugin::getPluginName() . '_' . $fieldName;
 	}
 }

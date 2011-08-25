@@ -77,11 +77,6 @@ class CaptionSphinxPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	public static function getSphinxSchema()
 	{
 		return array(
-			kSphinxSearchManager::getSphinxIndexName('entry') => array (
-				'fields' => array(
-					CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA) => SphinxFieldType::RT_FIELD,
-				)
-			),
 			kSphinxSearchManager::getSphinxIndexName(CaptionSearchPlugin::INDEX_NAME) => array (	
 				'path'		=> '/sphinx/kaltura_caption_item_rt',
 				'fields'	=> self::getSphinxSchemaFields(),
