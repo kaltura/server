@@ -220,7 +220,6 @@ class SystemPartnerService extends KalturaBaseService
 		$dbPartner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$dbPartner)
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $partnerId);
-
 		$configuration->toUpdatableObject($dbPartner);
 		$dbPartner->save();
 		PartnerPeer::removePartnerFromCache($partnerId);
@@ -255,6 +254,32 @@ class SystemPartnerService extends KalturaBaseService
 		return $partnerPackages;
 	}
 	
+	/**
+	 * @action getPackagesClassOfService
+	 * @return KalturaSystemPartnerPackageArray
+	 */
+	public function getPackagesClassOfServiceAction()
+	{
+		$partnerPackages = new PartnerPackages();
+		$packages = $partnerPackages->listPackagesClassOfService();
+		$partnerPackages = new KalturaSystemPartnerPackageArray();
+		$partnerPackages->fromArray($packages);
+		return $partnerPackages;
+	}
+	
+	/**
+	 * @action getPackagesVertical
+	 * @return KalturaSystemPartnerPackageArray
+	 */
+	public function getPackagesVerticalAction()
+	{
+		$partnerPackages = new PartnerPackages();
+		$packages = $partnerPackages->listPackagesVertical();
+		$partnerPackages = new KalturaSystemPartnerPackageArray();
+		$partnerPackages->fromArray($packages);
+		return $partnerPackages;
+	}
+
 	/**
 	 * 
 	 * @action resetUserPassword
