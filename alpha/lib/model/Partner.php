@@ -449,9 +449,27 @@ class Partner extends BasePartner
 	public function getAppStudioExamplePlayList1() { return $this->getFromCustomData("appStudioExamplePlayList1", null); }
 	public function setAppStudioExamplePlayList1( $v ) { $this->putInCustomData("appStudioExamplePlayList1", $v); } 
 
+	/** Partner Packges and classification **/
+	public function getPartnerPackageClassOfService() { return $this->getFromCustomData("partnerPackageClassOfService", null); }
+	public function setPartnerPackageClassOfService( $v ) { $this->putInCustomData("partnerPackageClassOfService", $v); } 
+	
+	public function getVerticalClasiffication() { return $this->getFromCustomData("verticalClasiffication", null); }
+	public function setVerticalClasiffication( $v ) { $this->putInCustomData("verticalClasiffication", $v); } 
+		
 	/** added DelivryBlockCountries param for having per-partner ability to block serving of files to specific country **/
 	public function getDelivryBlockCountries() { return $this->getFromCustomData("delivryBlockCountries", null); }
 	public function setDelivryBlockCountries( $v ) { $this->putInCustomData("delivryBlockCountries", $v); }
+	
+	/** partner CRM information **/
+	public function getCrmId() { return $this->getFromCustomData("crmId", null); }
+	public function setCrmId( $v ) { $this->putInCustomData("crmId", $v); }
+	
+	public function getCrmLink() { return $this->getFromCustomData("crmLink", null); }
+	public function setCrmLink( $v ) { $this->putInCustomData("crmLink", $v); }	
+	
+	/** partner is for internal usage only **/
+	public function getInternalUse() { return $this->getFromCustomData("internalUse", false); }
+	public function setInternalUse( $v ) { $this->putInCustomData("internalUse", $v); }	
 	
 	/** added deliveryRestrictions param for having per-partner ability to block serving of files to specific cdns and protocols **/
 	public function getDeliveryRestrictions() { return $this->getFromCustomData("deliveryRestrictions", null); }
@@ -463,6 +481,18 @@ class Partner extends BasePartner
 
 	public function getImportRemoteSourceForConvert() { return $this->getFromCustomData("importRemoteSourceForConvert", null, false); }
 	public function setImportRemoteSourceForConvert( $v ) { $this->putInCustomData("importRemoteSourceForConvert", $v); }
+	
+	
+	/** monitor Usage Expiry **/
+	public function getDoNotMonitorUsage() { return $this->getFromCustomData("doNotMonitorUsage", null); }
+	public function setDoNotMonitorUsage( $v ) { $this->putInCustomData("doNotMonitorUsage", $v); }
+	
+	public function getMonitorUsageExpiryReason() { return $this->getFromCustomData("monitorUsageExpiryReason", null); }
+	public function setMonitorUsageExpiryReason( $v ) { $this->putInCustomData("monitorUsageExpiryReason", $v); }
+	
+	public function getMonitorUsageExpiryDate() { return $this->getFromCustomData("monitorUsageExpiryDate", null); }
+	public function setMonitorUsageExpiryDate( $v ) { $this->putInCustomData("monitorUsageExpiryDate", $v); }
+	
 	
 	/** 27Apr2011 - added fields for new registration form **/
 	// first name
@@ -637,6 +667,18 @@ class Partner extends BasePartner
 	public function setStreamerType($v)					{$this->putInCustomData('streamer_type', $v);}
 	public function setMediaProtocol($v)				{$this->putInCustomData('media_protocol', $v);}
 	
+	public function setAdminLoginUsersOverageUnit($v)	{$this->putInCustomData('admin_login_users_overage_unit', $v);}
+	public function setPublishersOverageUnit($v)		{$this->putInCustomData('publishers_overage_unit', $v);}
+	public function setBandwidthOverageUnit($v)		{$this->putInCustomData('bandwidth_overage_unit', $v);}
+	public function setStreamEntriesOverageUnit($v)	{$this->putInCustomData('stream_entries_overage_unit', $v);}
+	public function setEntriesOverageUnit($v)			{$this->putInCustomData('entries_overage_unit', $v);}
+	public function setMonthlyStorageOverageUnit($v)	{$this->putInCustomData('monthly_storage_overage_unit', $v);}
+	public function setMonthlyStorageAndBandwidthOverageUnit($v)	{$this->putInCustomData('monthly_storage_and_bandwidth_overage_unit', $v);}
+	public function setEndUsersOverageUnit($v)			{$this->putInCustomData('end_users_overage_unit', $v);}
+	public function setLoginUsersOverageUnit($v)          {$this->putInCustomData('login_users_overage_unit', $v);}
+    public function setMaxLoginAttemptsOverageUnit($v)    {$this->putInCustomData('login_attempts_overage_unit', $v);}
+    public function setMaxBulkSizeOverageUnit($v)         {$this->putInCustomData('bulk_size_overage_unit', $v);}
+    
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota');}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota');}
 	public function getPublishersQuota()				{return $this->getFromCustomData('publishers_quota');}
@@ -658,8 +700,21 @@ class Partner extends BasePartner
 	public function getMonthlyStorageOveragePrice()		{return $this->getFromCustomData('monthly_storage_overage_price');}
 	public function getMonthlyStorageAndBandwidthOveragePrice()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_price');}
 	public function getEndUsersOveragePrice()			{return $this->getFromCustomData('end_users_overage_price');}
-	public function getStreamerType($v)					{return $this->getFromCustomData('streamer_type', null, kConf::get('default_streamer_type'));}
-	public function getMediaProtocol($v)				{return $this->getFromCustomData('media_protocol', null, kConf::get('default_media_protocol'));}
+	public function getStreamerType()					{return $this->getFromCustomData('streamer_type', null, kConf::get('default_streamer_type'));}
+	public function getMediaProtocol()				{return $this->getFromCustomData('media_protocol', null, kConf::get('default_media_protocol'));}
+	
+	public function getAdminLoginUsersOverageUnit()	{return $this->getFromCustomData('admin_login_users_overage_unit');}
+	public function getPublishersOverageUnit()			{return $this->getFromCustomData('publishers_overage_unit');}
+	public function getBandwidthOverageUnit()			{return $this->getFromCustomData('bandwidth_overage_unit');}
+	public function getStreamEntriesOverageUnit()		{return $this->getFromCustomData('stream_entries_overage_unit');}
+	public function getEntriesOverageUnit()			{return $this->getFromCustomData('entries_overage_unit');}
+	public function getMonthlyStorageOverageUnit()		{return $this->getFromCustomData('monthly_storage_overage_unit');}
+	public function getMonthlyStorageAndBandwidthOverageUnit()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_unit');}
+	public function getEndUsersOverageUnit()			{return $this->getFromCustomData('end_users_overage_unit');}
+	public function getLoginUsersOverageUnit()          {$this->getFromCustomData('login_users_overage_unit');}
+    public function getMaxLoginAttemptsOverageUnit()    {$this->getFromCustomData('login_attempts_overage_unit');}
+    public function getMaxBulkSizeOverageUnit()         {$this->getFromCustomData('bulk_size_overage_unit');}
+	
 	
 	/**
 	 * @return kAkamaiLiveParams
