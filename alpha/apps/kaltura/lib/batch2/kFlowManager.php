@@ -464,7 +464,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			||	!in_array(assetPeer::STATUS, $modifiedColumns))
 			return true;
 		
-		$entry = $object->getentry();
+		$entry = entryPeer::retrieveByPKNoFilter($object->getEntryId());
 		
 		KalturaLog::debug("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
 		if($object->getIsOriginal())
