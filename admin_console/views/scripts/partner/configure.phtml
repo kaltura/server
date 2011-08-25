@@ -4,11 +4,110 @@
 <?php echo $this->form; ?>
 
 
-<script>
+<script type="text/javascript">
+$(function(){
+	$("#fieldset-publisherSpecificDeliverySettings input").each(function(inx, value){
+		var $input = $(value);
+		
+		if( $input.attr('type') == 'checkbox') {
+			$input.change(function(){
+				var id = $(this).attr('id').replace('checkbox_', '');
+				var $text_input = $('#' + id);
+				
+				if ($(this).attr("checked")) {
+					$text_input.attr("disabled", false);  
+			    }else{
+			    	$text_input.attr("disabled", true);
+			    	$text_input.val("0");
+			    } 
+			});
+		}
 
-function openLink (url){
-	openConfirm(url);
-}
+		if( $input.attr('type') == 'text') {
+			var id = $(this).attr('id');
+			var $checkbox_input = $('#checkbox_' + id);
+			
+			if ($input.val() == 0) {
+				$input.val("0");
+				$input.attr("disabled", true);
+		    }else{
+		    	$input.attr("disabled", false);
+		    	$checkbox_input.attr("checked", true);
+		    }
+		} 
+	});
+
+	$('select#partner_package').change(function(){
+		var $monitor_usage = $('#do_not_monitor_usage');
+		var $monitor_usage_expiry_date = $('#monitor_usage_expiry_date');
+		var $monitor_usage_expiry_reason = $('#monitor_usage_expiry_reason');
+		
+		if ($(this).val() == 1) {
+			$monitor_usage.attr("checked", false);
+			$monitor_usage.attr("disabled", false);
+	    }else if ($(this).val() == 2) {
+			$monitor_usage.attr("checked", false);
+			$monitor_usage.attr("disabled", true);
+			$monitor_usage_expiry_date.attr("disabled", true);
+			$monitor_usage_expiry_date.val("0");
+			$monitor_usage_expiry_reason.attr("disabled", true);
+			$monitor_usage_expiry_reason.val("0");
+	    } 
+	});
+
+	$('#monitor_usage_expiry_date').change(function(){
+		$('#monitor_usage_expiry_reason').val('');
+	});
+
+	$("#fieldset-accountOptionsMonitorUsage input").each(function(inx, value){
+				var $input = $(value);
+				
+				if( $input.attr('type') == 'checkbox') {
+					$input.change(function(){
+						var $expiry_date = $('#monitor_usage_expiry_date');
+						var $expiry_reason = $('#monitor_usage_expiry_reason');
+						
+						if ($(this).attr("checked")) {
+							$expiry_date.attr("disabled", false);
+							$expiry_reason.attr("disabled", false);
+							var myDate = new Date();
+							var strDate =(myDate.getMonth()+1) + '/' + myDate.getDate() + '/' + myDate.getFullYear();
+							$expiry_date.val(strDate);
+							$expiry_reason.val("0");
+					    }else{
+					    	$expiry_date.attr("disabled", true);
+					    	$expiry_date.val("0");
+					    	$expiry_reason.attr("disabled", true);
+					    	$expiry_reason.val("0");
+					    } 
+					});
+
+					
+
+					var $expiry_date = $('#monitor_usage_expiry_date');
+					var $expiry_reason = $('#monitor_usage_expiry_reason');
+					
+					if ($(this).attr("checked")) {
+						$expiry_date.attr("disabled", false);
+						$expiry_reason.attr("disabled", false);
+						if ($expiry_date.val() == 0){
+							var myDate = new Date();
+							var strDate =(myDate.getMonth()+1) + '/' + myDate.getDate() + '/' + myDate.getFullYear();
+							$expiry_date.val(strDate);
+							$expiry_reason.val('0');
+						}
+				    }else{
+						$expiry_date.attr("disabled", true);
+				    	$expiry_date.val("0");
+				    	$expiry_reason.attr("disabled", true);
+				    	$expiry_reason.val("0");
+				    } 
+				}
+			});
+	
+	jQuery('#monitor_usage_expiry_date').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
+	
+});
 
 function openConfirm(url) {
 	var dialogDiv = jQuery('<div id="confirmation-div"><?php echo $this->translate('Do you want to save your changes before leaving this page?'); ?></div>').appendTo('body');
@@ -56,5 +155,28 @@ function openChangeServicePackageAlertBox(){
 		},
 		close: function() {}
 	});
+}
+
+function openViewHistory(partner_id){
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'exteneded-free-trail-history', 'partner_id' => '')); ?>' + partner_id;
+	var dialogDiv = jQuery('<div id="confirmation-div"></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 750,
+		title: '<?php echo $this->translate('Trail Account Extension History'); ?>',
+		height: 400,
+		buttons: {			
+			'<?php echo $this->translate('OK'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {}
+	});
+	dialogDiv.load(
+			url
+		);
 }
 </script>
