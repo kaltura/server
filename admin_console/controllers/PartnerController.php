@@ -14,8 +14,8 @@ class PartnerController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		$form = new Form_PartnerCreate();
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages());
-		
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
+	
 		if ($request->isPost())
 		{
 			if ($form->isValid($request->getPost()))
@@ -31,6 +31,8 @@ class PartnerController extends Zend_Controller_Action
 				$client->partner->register($partner);
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
+				$config->partnerPackageClassOfService = $form->getValue('partner_package_class_of_service');
+				$config->partnerPackageVertical = $form->getValue('vertical_clasiffication');
 				$config->storageDeleteFromKaltura = true;
 				$config->storageServePriority = Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST;
 				$systemPartnerPlugin->systemPartner->updateConfiguration('{1:result:id}', $config);
@@ -73,6 +75,15 @@ class PartnerController extends Zend_Controller_Action
 		
 		$form = new Form_PartnerFilter();
 		$form->setAction($action);
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
+		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package');
+		
+		$this->view->partnerPackages = array();
+		foreach($partnerPackages as $package)
+		{
+			$this->view->partnerPackages[$package->id] = $package->name;
+		}
 		
 		// init filter
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
@@ -261,7 +272,9 @@ class PartnerController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$form = new Form_PartnerConfiguration();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages());
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesClassOfService(), 'partner_package_class_of_service');
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesVertical(), 'vertical_clasiffication');
 		
 		$request = $this->getRequest();
 		
@@ -270,6 +283,10 @@ class PartnerController extends Zend_Controller_Action
 		{
 			$form->populate($request->getPost());
 			$config = $form->getObject("Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration", $request->getPost());
+			
+			
+			$config->monitorUsageExpiryDate = strtotime($this->_getParam('monitor_usage_expiry_date'));
+				
 			
 			try{
 				$systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $config);
@@ -293,19 +310,56 @@ class PartnerController extends Zend_Controller_Action
 			catch (Exception $e){
 				$this->view->errMessage = $e->getMessage();
 			}
-//			$form->getElement('account_name')->setDescription($partner->name);
 			
+			$form->getElement('monitor_usage_history')->setAttrib('onClick', 'openViewHistory('. $partnerId .')');
+			$monitorUsageDataElement = $form->getElement('monitor_usage_expiry_date');
+			$monitorUsageDataElement->setValue(date("m/d/y",$monitorUsageDataElement->getValue()));
 		}
 		
 		$this->view->form = $form;
 		$this->view->partnerId = $partnerId;
 	}
 	
+	public function extenededFreeTrailHistoryAction()
+	{
+		$this->_helper->layout->disableLayout();
+		$partnerId = $this->_getParam('partner_id');
+		$client = Infra_ClientHelper::getClient();
+		$form = new Form_ExtenededFreeTrailHistory();
+		$auditPlugin = Kaltura_Client_Audit_Plugin::get($client);
+			
+		$this->view->errMessage = false;
+
+		$client->startMultiRequest();
+		$filter = new Kaltura_Client_Audit_Type_AuditTrailFilter();
+		$filter->objectIdEqual = $partnerId;
+		
+		$auditPlugin->auditTrail->listAction($filter);
+		
+		try{
+			$result = $client->doMultiRequest();
+			$this->view->auditList = $result[0];
+		}
+		catch (Exception $e){
+			$this->view->errMessage = $e->getMessage();
+		}
+					
+		$this->view->history = $result[0];
+		$this->view->form = $form;
+		$this->view->partnerId = $partnerId;
+	}
+	
+	
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
 		$filter = new Kaltura_Client_Type_PartnerFilter();
 		$filterType = $request->getParam('filter_type');
 		$filterInput = $request->getParam('filter_input');
+		$filterIncludActive = $request->getParam('include_active');
+		$filterIncludBlocked = $request->getParam('include_blocked');
+		$filterIncludRemoved = $request->getParam('include_removed');
+		$filterPackage = $request->getParam('partner_package');
+		
 		if ($filterType == 'byid')
 		{
 			$filter->idIn = $filterInput;
@@ -318,8 +372,16 @@ class PartnerController extends Zend_Controller_Action
 				$filter->partnerNameDescriptionWebsiteAdminNameAdminEmailLike = $filterInput;
 		}
 		$statuses = array();
-		$statuses[] = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
-		$statuses[] = Kaltura_Client_Enum_PartnerStatus::BLOCKED;
+		if ($filterIncludActive)
+			$statuses[] = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
+		if ($filterIncludBlocked)
+			$statuses[] = Kaltura_Client_Enum_PartnerStatus::BLOCKED;
+		if ($filterIncludRemoved)
+			$statuses[] = Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK;
+		
+		if ($filterPackage != '')
+			$filter->partnerPackageEqual = $filterPackage;
+			
 		$filter->statusIn = implode(',', $statuses);
 		$filter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
 		return $filter;
