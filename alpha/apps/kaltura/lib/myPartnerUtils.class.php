@@ -672,11 +672,9 @@ class myPartnerUtils
 		$c->addAnd ( PartnerActivityPeer::PARTNER_ID , $partner->getId() );
 		
 		switch ( $partner->getPartnerPackage() ){
-			case PartnerPackages::PARTNER_PACKAGE_20:
-			case PartnerPackages::PARTNER_PACKAGE_50:
-			case PartnerPackages::PARTNER_PACKAGE_100:
-			case PartnerPackages::PARTNER_PACKAGE_250:
-			case PartnerPackages::PARTNER_PACKAGE_500:
+			case PartnerPackages::CLASS_OF_SERVICE_SILVER:
+			case PartnerPackages::CLASS_OF_SERVICE_GOLD:
+			case PartnerPackages::CLASS_OF_SERVICE_PLATINUM:
 				$time_diff = time()-(60*60*24*((int)date('d')-1));
 				$month = date('Y-m-d',$time_diff);
 				$c->addAnd ( PartnerActivityPeer::ACTIVITY_DATE, $month, Criteria::GREATER_EQUAL );
@@ -687,7 +685,7 @@ class myPartnerUtils
 				break;
 		}
 		$packages = new PartnerPackages();
-		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
+		$partnerPackage = $packages->getPackageClassOfServiceDetails($partner->getPartnerPackage());
 		
     	$c->addSelectColumn('sum('.PartnerActivityPeer::AMOUNT.') as total_traffic');
 
@@ -862,7 +860,7 @@ class myPartnerUtils
 		$delete_grace = time() -  (dateUtils::DAY * 30);
 		
 		$packages = new PartnerPackages();
-		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
+		$partnerPackage = $packages->getPackageClassOfServiceDetails($partner->getPartnerPackage());
 		
 		$report_date = date('Y-m').'-01';
                 // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
