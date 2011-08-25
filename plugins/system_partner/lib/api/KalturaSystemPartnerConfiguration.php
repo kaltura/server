@@ -164,6 +164,26 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $mediaProtocol;
 	
+	/**
+	 * @var string 
+	 */
+	public $monitorUsageExpiryReason;
+	
+	/**
+	 *  Unix timestamp (In seconds)
+	 * 
+	 * @var int
+	 * 
+	 */
+	public $monitorUsageExpiryDate;
+	
+	/**
+	 * @var int
+	 */
+	public $doNotMonitorUsage;
+	
+	
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -198,6 +218,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"partnerParentId",
 		"streamerType",
 		"mediaProtocol",
+		"monitorUsageExpiryDate",
+		"monitorUsageExpiryReason",
+		"doNotMonitorUsage",
 	);
 
 	public function getMapBetweenObjects()
@@ -226,20 +249,27 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		{
 			foreach($this->permissions as $permission)
 			{
-				$dbPermission = PermissionPeer::getByNameAndPartner($permission->name, $object_to_fill->getId());
+				KalturaLog::debug("partner: " . $object_to_fill->getId() . " add permissions: " . print_r($permission,true));
+				
+				$dbPermission = PermissionPeer::getByNameAndPartner($permission->name, array($object_to_fill->getId()));
 				if($dbPermission)
 				{
+					KalturaLog::debug("add permissions: exists; set status; " . $permission->status);
+					KalturaLog::debug("db permissions:  " . print_r($dbPermission,true));
 					$dbPermission->setStatus($permission->status);
 				}
 				else
 				{
+					KalturaLog::debug("add permissions: didn't exists");
 					$dbPermission = new Permission();
 					$dbPermission->setType($permission->type);
 					$dbPermission->setPartnerId($object_to_fill->getId());
-					
+					//$dbPermission->setStatus($permission->status);
 					$permission->type = null;
 					$dbPermission = $permission->toInsertableObject($dbPermission);
 				}
+				
+				KalturaLog::debug("add permissions: save" . print_r($dbPermission,true));
 				$dbPermission->save();
 			}
 		}
