@@ -227,7 +227,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 	
 	protected function updatedVirusScanFailed(BatchJob $dbBatchJob, kVirusScanJobData $data, BatchJob $twinJob = null)
 	{
-		$entry = entryPeer::retrieveByPK($dbBatchJob->getEntryId());
+		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
 		if ($entry)
 		{
 			$entry->setStatus(VirusScanPlugin::getEntryStatusCoreValue(VirusScanEntryStatus::INFECTED));
