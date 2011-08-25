@@ -826,6 +826,9 @@ return array(
 
 	// partner-configure
 	'partner-configure intro text' => 'NOTE:  changing these settings here will override the existing default settings for this Publisher.',
+	'partner-configure Publisher Name' => 'Publisher Name:',
+	'partner-configure Description' => 'Description:',
+	'partner-configure Administrator Name' => 'Administrator Name:',
 
 	// partner-create
 	'partner-create intro text' => 'Please fill in the following form to create a new Publisher account. When a new account is created, a registration email will automatically be sent to the Administrator Email you have provided below.',
@@ -835,7 +838,7 @@ return array(
 	'partner-create form admin email' => 'Administrator Email:',
 	'partner-create form admin phone' => 'Administrator Phone:',
 	'partner-create form description' => 'Describe Company:',
-	'partner-create form package' => 'Usage Package:',
+	'partner-create form package' => 'Service Edition Type:',
 
 	'partner-create form url' => 'Website Url:',
 	'partner-create form content' => 'Website Content:',
