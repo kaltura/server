@@ -363,7 +363,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		$entry = $object->getentry();
 		
-		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED)
+		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_QUEUED || $object->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING)
 		{
 			if(!($object instanceof flavorAsset))
 			{
