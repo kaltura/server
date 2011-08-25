@@ -1,7 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__) . '/../bootstrap/bootstrapApi.php');
 require_once(dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
-require_once(dirname(__FILE__) . '/../bootstrap/bootstrapClient.php');
 
 /**
  * Responsible for importing objects from kaltura DB 

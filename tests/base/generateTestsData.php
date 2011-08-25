@@ -8,6 +8,7 @@
  */
 
 	require_once (dirname(__FILE__) . '/../bootstrap/bootstrapServer.php');
+	require_once (dirname(__FILE__) . '/../bootstrap/bootstrapApi.php');
 	
 	//When used from command line
 	if(count($argv) > 1)
