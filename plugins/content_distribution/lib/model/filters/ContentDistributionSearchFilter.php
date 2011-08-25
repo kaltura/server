@@ -204,7 +204,7 @@ class ContentDistributionSearchFilter extends AdvancedSearchFilterItem
 		$condition = $this->getCondition();
 		KalturaLog::debug("condition [" . print_r($condition, true) . "]");
 		return array(
-			'@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPENDER_FIELD_DATA) => $condition
+			'@' . ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPANDER_FIELD_DATA) => $condition
 		);
 	}
 	
