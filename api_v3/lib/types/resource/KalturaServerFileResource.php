@@ -28,9 +28,6 @@ class KalturaServerFileResource extends KalturaDataCenterContentResource
 	{
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('localFilePath');
-    	
-    	if(!file_exists($this->localFilePath))
-    		throw new KalturaAPIException(KalturaErrors::LOCAL_FILE_NOT_FOUND, $this->localFilePath);
 	}
 
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -39,6 +36,12 @@ class KalturaServerFileResource extends KalturaDataCenterContentResource
 			$object_to_fill = new kLocalFileResource();
 			
 		$object_to_fill->setKeepOriginalFile(true);
-		return parent::toObject($object_to_fill, $props_to_skip);
+		$ret = parent::toObject($object_to_fill, $props_to_skip);
+		/* @var $ret kLocalFileResource */
+		
+		if(!file_exists($ret->getLocalFilePath()))
+			throw new KalturaAPIException(KalturaErrors::LOCAL_FILE_NOT_FOUND, $ret->getLocalFilePath());
+		
+		return $ret;
 	}
 }
