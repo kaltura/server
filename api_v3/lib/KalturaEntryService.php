@@ -525,7 +525,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		$dbAsset = $this->attachResource($resource->getResource(), $dbEntry, $dbAsset);
 		
-		if($isNewAsset && $dbAsset->getStatus() != asset::FLAVOR_ASSET_STATUS_IMPORTING)
+		if($dbAsset && $isNewAsset && $dbAsset->getStatus() != asset::FLAVOR_ASSET_STATUS_IMPORTING)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAsset));
 		
 		return $dbAsset;
