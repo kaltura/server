@@ -688,7 +688,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 				if(is_object($inputAsObject))
 					KalturaLog::debug("the input object is: " . get_class($inputAsObject));
 				else 
-					KalturaLog::debug("the input object is not an object: " . get_class($inputAsObject));
+					KalturaLog::debug("the input object is not an object!");
 					
 				if(is_null($inputAsObject) || empty($inputAsObject)) //No object is available
 				{
