@@ -8,6 +8,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	const PLUGIN_NAME = 'captionSearch';
 	const INDEX_NAME = 'caption_item';
 	const SEARCH_FIELD_DATA = 'data';
+	const SEARCH_TEXT_SUFFIX = 'csend';
 	
 	const CAPTION_SEARCH_FLOW_MANAGER_CLASS = 'kCaptionSearchFlowManager';
 	
@@ -161,7 +162,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		
 		$dataField = CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
 		$searchValues = array(
-			$dataField => implode(',', $data)
+			$dataField => CaptionSearchPlugin::PLUGIN_NAME . ' ' . implode(',', $data) . ' ' . CaptionSearchPlugin::SEARCH_TEXT_SUFFIX
 		);
 		
 		return $searchValues;
