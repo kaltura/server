@@ -240,7 +240,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$freeText = "^$freeText$";
 			
 //			$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-			$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts";
+			$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts << " . kMetadataManager::SEARCH_TEXT_SUFFIX;
 			
 			return $additionalConditions;
 		}
@@ -257,7 +257,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			foreach($freeTextsArr as $freeText)
 			{
 //				$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeText";
-				$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText";
+				$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText << " . kMetadataManager::SEARCH_TEXT_SUFFIX;
 			}
 			return $additionalConditions;
 		}
@@ -270,7 +270,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		$freeTextsArr = array_unique($freeTextsArr);
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 //		$additionalConditions[] = "@(" . entryFilter::FREE_TEXT_FIELDS . ") $freeTextExpr";
-		$additionalConditions[] = '@'. MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr";
+		$additionalConditions[] = '@'. MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr << " . kMetadataManager::SEARCH_TEXT_SUFFIX;
 		return $additionalConditions;
 	}
 	
