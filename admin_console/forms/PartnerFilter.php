@@ -4,18 +4,16 @@ class Form_PartnerFilter extends Zend_Form
 	public function init()
 	{
 		$this->setMethod('post');
-		$this->setAttrib('id', 'frmPartnerFilter');
 		
 		$this->setDecorators(array(
 			'FormElements', 
-			array('HtmlTag', array('tag' => 'fieldset')),
-			array('Form', array('class' => 'simple')),
+			'Form',
+			array('HtmlTag', array('tag' => 'fieldset'))
 		));
 		
 		// filter type
 		$this->addElement('select', 'filter_type', array(
 			'required' 		=> true,
-			'label' => 'partner-filter filter by',
 			'multiOptions' 	=> array(
 				'none' => 'None', 
 				'byid' => 'Publisher ID',
@@ -29,10 +27,27 @@ class Form_PartnerFilter extends Zend_Form
 		$this->addElement('text', 'filter_input', array(
 			'required' 		=> true,
 			'filters'		=> array('StringTrim'),
-			'decorators' 	=> array(
-				'ViewHelper', 
-				array('HtmlTag', array('tag' => 'div', 'id' => 'filter_text')),
-			)
+			'decorators' 	=> array('ViewHelper', array('HtmlTag', array('tag' => 'div', 'id' => 'filter_text')))
+		));
+		
+		// active status
+		$this->addElement('checkbox', 'include_active', array(
+			'label' => 'partner-usage filter active',
+			'checked' => true,
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
+		));
+		
+		// blocked status
+		$this->addElement('checkbox', 'include_blocked', array(
+			'label' => 'partner-usage filter blocked',
+			'checked' => true,
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
+		));
+		
+		// removed status
+		$this->addElement('checkbox', 'include_removed', array(
+			'label' => 'partner-usage filter removed',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
 		));
 		
 		$this->addElement('text', 'filter_input_help', array(
@@ -41,16 +56,43 @@ class Form_PartnerFilter extends Zend_Form
 			)
 		));
 		
+		$this->addElement('select', 'partner_package', array(		
+			'filters'		=> array('StringTrim'),
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
+		));
+		
 		$this->addDisplayGroup(array('filter_type', 'filter_input', 'filter_input_help'), 'filter_type_group', array(
+			'description' => 'partner-usage filter by',
 			'decorators' => array(
+				array('Description', array('tag' => 'legend', 'class' => 'partner_filter')), 
 				'FormElements', 
+				'Fieldset'
+			)
+		));
+		
+		$this->addDisplayGroup(array('include_active', 'include_blocked', 'include_removed'), 'statuses', array(
+			'description' => 'partner-usage filter status types',
+			'decorators' => array(
+				array('Description', array('tag' => 'legend', 'class' => 'partner_filter')), 
+				'FormElements', 
+				'Fieldset'
+			)
+		));
+		
+		$this->addDisplayGroup(array('partner_package'), 'partnerPackage', array(
+			'description' => 'Show Service Editions:', 
+			'decorators' => array(
+				array('Description', array('tag' => 'legend', 'class' => 'partner_filter')), 
+				'FormElements', 
+				'Fieldset',
 			)
 		));
 		
 		// submit button
 		$this->addElement('button', 'cmdSubmit', array(
 			'type' => 'submit',
-			'label'		=> 'partner-filter search',
+			'id' => 'do_filter',
+			'label'		=> 'partner-usage filter search',
 			'decorators' => array('ViewHelper'),
 		));
 	}
