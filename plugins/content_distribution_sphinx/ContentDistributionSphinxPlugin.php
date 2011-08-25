@@ -32,11 +32,6 @@ class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaC
 	public static function getSphinxSchema()
 	{
 		return array(
-			kSphinxSearchManager::getSphinxIndexName('entry') => array (
-				'fields' => array(
-					ContentDistributionSphinxPlugin::getSphinxFieldName(ContentDistributionPlugin::SPHINX_EXPENDER_FIELD_DATA) => SphinxFieldType::RT_FIELD,
-				)
-			),
 			kSphinxSearchManager::getSphinxIndexName('entry_distribution') => array (	
 				'path'		=> '/sphinx/kaltura_distribution_rt',
 				'fields'	=> array(
@@ -76,6 +71,9 @@ class ContentDistributionSphinxPlugin extends KalturaPlugin implements IKalturaC
 	 * @param string $fieldName
 	 */
 	public static function getSphinxFieldName($fieldName){
+		if ($fieldName == ContentDistributionPlugin::SPHINX_EXPANDER_FIELD_DATA)
+			return 'plugins_data';
+			
 		return 'content_d_' . $fieldName;
 	}
 }
