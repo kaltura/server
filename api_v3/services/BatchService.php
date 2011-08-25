@@ -454,7 +454,11 @@ class BatchService extends KalturaBaseService
 		{
 			foreach ($jobs as &$job)
 			{
+				/* @var $job BatchJob */
 				$data = $job->getData();
+				if(!($data instanceof kConvertJobData))
+					continue;
+				
 				$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($data->getFlavorParamsOutputId());
 				$data->setFlavorParamsOutput($flavorParamsOutput);
 				$job->setData($data);
