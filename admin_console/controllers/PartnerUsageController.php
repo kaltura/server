@@ -3,6 +3,7 @@ class PartnerUsageController extends Zend_Controller_Action
 {
 	public function indexAction()
 	{
+		
 		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
@@ -13,6 +14,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		
 		$form = new Form_PartnerUsageFilter();
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
 		$form->populate($request->getParams());
 		
 		// when no statuses selected
@@ -34,7 +36,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
-		
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
 		// set view
 		$this->view->from = $from;
 		$this->view->to = $to;
@@ -133,6 +135,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		$includeActive = $form->getValue('include_active');
 		$includeBlocked = $form->getValue('include_blocked');
 		$includeRemoved = $form->getValue('include_removed');
+		$filterPackage = $form->getValue('partner_package');
+		
 		if ($filterType == 'byid')
 		{
 			$filter->idIn = $filterInput;
@@ -152,6 +156,9 @@ class PartnerUsageController extends Zend_Controller_Action
 		if ($includeRemoved)
 			$statuses[] = Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK;
 			
+		if ($filterPackage != '')
+			$filter->partnerPackageEqual = $filterPackage;
+						
 		$filter->statusIn = implode(',', $statuses);
 		$filter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
 		return $filter;
