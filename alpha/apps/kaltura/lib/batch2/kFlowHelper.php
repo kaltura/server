@@ -224,7 +224,7 @@ class kFlowHelper
 		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
-			$entry = $dbBatchJob->getEntry();
+			$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
 			if($entry->getStatus() != entryStatus::READY && $entry->getStatus() != entryStatus::DELETED)
 				kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::PRECONVERT);
 		}
