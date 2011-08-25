@@ -90,7 +90,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			
 			self::$cachedPartnerConfig[$partnerId] = $config;
 		}
-		
+
 		if(!isset($config[$objectType]))
 		{
 			KalturaLog::debug("Object type [$objectType] not audited");
@@ -222,7 +222,11 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function createAuditTrail(BaseObject $object, $action) 
 	{
-		$partnerId = $this->getPartnerId($object);
+		$partnerId = kCurrentContext::$partner_id;
+		
+		if (isset(kCurrentContext::$master_partner_id))
+			$partnerId = kCurrentContext::$master_partner_id;
+					
 		if(!$this->traceEnabled($partnerId))
 			return null;
 			
