@@ -783,7 +783,12 @@ class playManifestAction extends kalturaAction
 		$ksStr = $this->getRequestParameter("ks");
 	
 		$base64Referrer = $this->getRequestParameter("referrer");
-		$referrer = base64_decode($base64Referrer);
+		
+		// replace space in the base64 string with + as space is invalid in base64 strings and caused
+		// by symfony calling str_parse to replace + with spaces.
+		// this happens only with params passed in the url path and not the query strings. specifically the ~ char at
+		// a columns divided by 3 causes this issue (e.g. http://www.xyzw.com/~xxx)
+		$referrer = base64_decode(str_replace(" ", "+", $base64Referrer));
 		if (!is_string($referrer)) 
 			$referrer = ""; // base64_decode can return binary data
 			
