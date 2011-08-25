@@ -50,6 +50,12 @@ class Form_PartnerUsageFilter extends Zend_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
 		));
 		
+		//partner package
+		$this->addElement('select', 'partner_package', array(		
+			'filters'		=> array('StringTrim'),
+			'decorators' => array('ViewHelper', 'Label'),
+		));
+		
 		// from
 		$from = new Zend_Date(time() - (60*60*24*30));
 		$this->addElement('text', 'from_date', array(
@@ -102,6 +108,15 @@ class Form_PartnerUsageFilter extends Zend_Form
 				array('Description', array('tag' => 'legend')), 
 				'FormElements', 
 				'Fieldset'
+			)
+		));
+		
+		$this->addDisplayGroup(array('partner_package'), 'partnerPackage', array(
+			'description' => 'Show Service Editions:', 
+			'decorators' => array(
+				array('Description', array('tag' => 'legend')),
+				'FormElements', 
+				'Fieldset',
 			)
 		));
 		
