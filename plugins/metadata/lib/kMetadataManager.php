@@ -216,7 +216,7 @@ class kMetadataManager
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::debug("Found " . count($metadatas) . " metadata object");
 		
-		$dataFieldName = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA);
+		$dataFieldName = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA);
 		
 		$searchValues = array();
 		foreach($metadatas as $metadata)
@@ -239,8 +239,10 @@ class kMetadataManager
 	public static function getDataSearchValues(Metadata $metadata, $searchValues = array())
 	{
 		KalturaLog::debug("Parsing metadata [" . $metadata->getId() . "] search values");
-		if (isset($searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)]))
-			$searchTexts[] = $searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)];
+		if (isset($searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)])){
+			foreach ($searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)] as $DataSerachValue)
+				$searchTexts[] = $DataSerachValue;
+		}
 		
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
@@ -319,7 +321,7 @@ class kMetadataManager
 		if(isset($searchTexts['text']))
 			$ret['text'] = $searchTexts['text'];
 		
-		$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)] = $ret;
+		$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)] = $ret;
 		
 		return $searchValues;
 	}

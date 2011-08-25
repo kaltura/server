@@ -11,7 +11,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	
 	const PLUGIN_NAME = 'metadata';
 	
-	const SPHINX_EXPENDER_FIELD_DATA = 'data';
+	const SPHINX_EXPANDER_FIELD_DATA = 'data';
 	const SPHINX_EXPENDER_FIELD_DATE = 'date_'; 
 	const SPHINX_EXPENDER_FIELD_INT = 'int_';
 	
@@ -562,7 +562,6 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		for ($i=0; $i < $numOfIntFields; $i++)
 			$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_BIGINT;
 		
-		$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATA)] = SphinxFieldType::RT_FIELD;
 		//TODO - change to be taken using kSphinxManager::getSphinxIndexName('entry::table_name')
 		$sphinxSchema[kSphinxSearchManager::getSphinxIndexName('entry')]['fields'] = $kalturaEntryFields;
 		return $sphinxSchema;
@@ -699,6 +698,9 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * @param string $fieldName
 	 */
 	public static function getSphinxFieldName($fieldName){
+		if ($fieldName == self::SPHINX_EXPANDER_FIELD_DATA)
+			return 'plugins_data';
+			
 		return self::PLUGIN_NAME . '_' . $fieldName;
 	}
 }
