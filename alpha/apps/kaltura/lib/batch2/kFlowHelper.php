@@ -69,7 +69,7 @@ class kFlowHelper
 		
 		// get entry
 		$entryId = $dbBatchJob->getEntryId();
-		$dbEntry = entryPeer::retrieveByPK($entryId);
+		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
