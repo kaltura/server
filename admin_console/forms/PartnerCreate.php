@@ -56,7 +56,7 @@ class Form_PartnerCreate extends Infra_Form
 		$this->addElement('select', 'partner_package', array(
 			'label'			=> 'partner-create form package',
 			'filters'		=> array('StringTrim'),
-			
+			'required' 		=> true,
 		));
 		
 		$this->addElement('text', 'website', array(
