@@ -14,6 +14,7 @@ $baseConfigurationIndexs = 	array(
 		'group_id'                 	=> SphinxFieldType::RT_FIELD,
 		'description'              	=> SphinxFieldType::RT_FIELD,
 		'admin_tags'     			=> SphinxFieldType::RT_FIELD,
+		'plugins_data'				=> SphinxFieldType::RT_FIELD,
 		'duration_type'          	=> SphinxFieldType::RT_FIELD,
 		'reference_id'             	=> SphinxFieldType::RT_FIELD,
 		'replacing_entry_id'    	=> SphinxFieldType::RT_FIELD,
