@@ -94,14 +94,7 @@ class kFlowHelper
 		
 		$flavorAsset = null;
 		if($data->getFlavorAssetId())
-		{
 			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-			if($flavorAsset)
-			{
-				$flavorAsset->incrementVersion();
-				$flavorAsset->save();
-			}
-		}
 		
 		$isNewFlavor = false;
 		if(!$flavorAsset)
@@ -156,39 +149,38 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 		
-		if($isNewFlavor)
-		{
+		if($flavorAsset->getVersion() == 1)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
-		}
-		else
-		{
-			if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
-			{
-				// is remote storage flavor
-				if($flavorAsset->getIsOriginal())
-					kJobsManager::addConvertProfileJob($dbBatchJob, $flavorAsset->getentry(), $flavorAsset->getId(), $localFilePath);
-			}
-			else
-			{ 
-				// 	if the flavor is the source, its readiness should be decided during the profile conversion
-				if($flavorAsset->getIsOriginal())
-					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
-				else
-					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
-					
-				$flavorAsset->save();
-			}
-			
-			if($flavorAsset->getIsOriginal())
-			{
-				$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
-				foreach($entryFlavors as $entryFlavor)
-				{
-					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
-						kBusinessPreConvertDL::decideAddEntryFlavor($dbBatchJob, $flavorAsset->getEntryId(), $entryFlavor->getFlavorParamsId());
-				}
-			}
-		}
+		
+// 		if(!$isNewFlavor)
+// 		{
+// 			if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+// 			{
+// 				// is remote storage flavor
+// 				if($flavorAsset->getIsOriginal())
+// 					kJobsManager::addConvertProfileJob($dbBatchJob, $flavorAsset->getentry(), $flavorAsset->getId(), $localFilePath);
+// 			}
+// 			else
+// 			{ 
+//				// if the flavor is the source, its readiness should be decided during the profile conversion
+// 				if($flavorAsset->getIsOriginal())
+// 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+// 				else
+// 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
+//					
+// 				$flavorAsset->save();
+// 			}
+//			
+// 			if($flavorAsset->getIsOriginal())
+// 			{
+// 				$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
+// 				foreach($entryFlavors as $entryFlavor)
+// 				{
+// 					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
+// 						kBusinessPreConvertDL::decideAddEntryFlavor($dbBatchJob, $flavorAsset->getEntryId(), $entryFlavor->getFlavorParamsId());
+// 				}
+// 			}
+// 		}
 		
 		return $dbBatchJob;
 	}
