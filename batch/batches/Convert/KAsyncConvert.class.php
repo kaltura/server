@@ -87,6 +87,16 @@ class KAsyncConvert extends KJobHandlerWorker
 	}
 	
 	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getJobs()
+	 * 
+	 * TODO remove the flavor params output from the job data and get it later using the api
+	 */
+	protected function getJobs()
+	{
+		return $this->kClient->batch->getExclusiveConvertJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
+	}
+	
+	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::run()
 	 */
 	public function run($jobs = null)

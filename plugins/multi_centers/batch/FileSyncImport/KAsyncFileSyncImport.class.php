@@ -26,6 +26,17 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 	}
 	
 	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getJobs()
+	 * 
+	 * TODO remove the destFilePath from the job data and get it later using the api, then delete this method
+	 */
+	protected function getJobs()
+	{
+		$multiCentersPlugin = KalturaMultiCentersClientPlugin::get($this->kClient);
+		return $multiCentersPlugin->fileSyncImportBatch->getExclusiveFileSyncImportJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
+	}
+	
+	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)

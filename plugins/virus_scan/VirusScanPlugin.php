@@ -34,7 +34,6 @@ class VirusScanPlugin extends KalturaPlugin implements IKalturaPermissions, IKal
 	{
 		$map = array(
 			'virusScanProfile' => 'VirusScanProfileService',
-			'virusScanBatch' => 'VirusScanBatchService',
 		);
 		return $map;
 	}

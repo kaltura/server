@@ -53,6 +53,16 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		return 1;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KJobHandlerWorker::getJobs()
+	 * 
+	 * TODO remove the thumb params output from the job data and get it later using the api, then delete this method
+	 */
+	protected function getJobs()
+	{
+		return $this->kClient->batch->getExclusiveCaptureThumbJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
+	}
+	
 	private function captureThumb(KalturaBatchJob $job, KalturaCaptureThumbJobData $data)
 	{
 		KalturaLog::debug("captureThumb($job->id)");

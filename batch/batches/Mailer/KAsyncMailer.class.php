@@ -63,11 +63,13 @@ class KAsyncMailer extends KJobHandlerWorker
 		if($this->taskConfig->isInitOnly())
 			return $this->init();
 		
-		$jobs = $this->kClient->batch->getExclusiveMailJobs( 
+		$jobs = $this->kClient->batch->getExclusiveJobs( 
 			$this->getExclusiveLockKey() , 
 			$this->taskConfig->maximumExecutionTime , 
-			$this->taskConfig->maxJobsEachRun , 
-			$this->getFilter());
+			$this->getMaxJobsEachRun() , 
+			$this->getFilter(),
+			$this->getJobType()
+		);
 			
 		KalturaLog::info(count($jobs) . " mail jobs to perform");
 								
@@ -90,7 +92,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		{
 			KalturaLog::info("Free job[$job->id]");
 			$this->onFree($job);
-	 		$this->kClient->batch->freeExclusiveMailJob($job->id, $this->getExclusiveLockKey());
+	 		$this->kClient->batch->freeExclusiveJob($job->id, $this->getExclusiveLockKey(), $this->getJobType());
 		}
 		$responses = $this->kClient->doMultiRequest();
 		$response = end($responses);
@@ -136,7 +138,7 @@ class KAsyncMailer extends KJobHandlerWorker
 			
 			$updateJob = new KalturaBatchJob();
 			$updateJob->status = $job->status;
-	 		$this->kClient->batch->updateExclusiveMailJob($job->id, $this->getExclusiveLockKey(), $updateJob);			
+	 		$this->kClient->batch->updateExclusiveJob($job->id, $this->getExclusiveLockKey(), $updateJob);			
 		}
 		catch ( Exception $ex )
 		{

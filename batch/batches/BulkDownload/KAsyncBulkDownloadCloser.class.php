@@ -40,37 +40,6 @@ class KAsyncBulkDownloadCloser extends KJobCloserWorker
 		return $this->fetchStatus($job);
 	}
 
-	
-	/* (non-PHPdoc)
-	 * @see KBatchBase::run()
-	*/
-	public function run($jobs = null)
-	{
-		KalturaLog::debug("run()");
-		KalturaLog::info("Bulk download closer batch is running");
-		
-		if($this->taskConfig->isInitOnly())
-			return $this->init();
-		
-		$jobs = $this->kClient->batch->getExclusiveAlmostDoneBulkDownloadJobs( 
-			$this->getExclusiveLockKey(), 
-			$this->taskConfig->maximumExecutionTime, 
-			1, 
-			$this->getFilter());
-			
-		KalturaLog::info(count($jobs) . " bulk download jobs to close");
-					
-		if(!count($jobs))
-		{
-			KalturaLog::info("Queue size: 0 sent to scheduler");
-			$this->saveSchedulerQueue(self::getType());
-			return;
-		}
-		
-		foreach($jobs as $job)
-			$this->fetchStatus($job);
-	}
-	
 	private function fetchStatus(KalturaBatchJob $job)
 	{
 		KalturaLog::debug("fetchStatus($job->id)");

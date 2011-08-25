@@ -20,136 +20,7 @@ class BatchService extends KalturaBaseService
 {
 
 	
-// --------------------------------- ImportJob functions 	--------------------------------- //
-	
-	/**
-	 * batch getExclusiveImportJob action allows to get a BatchJob of type IMPORT 
-	 * 
-	 * @action getExclusiveImportJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveImportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::IMPORT );
-	}
-
-	
-	/**
-	 * batch updateExclusiveImportJob action updates a BatchJob of type IMPORT that was claimed using the getExclusiveImportJobs
-	 * 
-	 * @action updateExclusiveImportJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveImportJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::IMPORT)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusiveImportJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveImportJobs
-	 * 
-	 * @action freeExclusiveImportJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveImportJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::IMPORT, $resetExecutionAttempts);
-	}	
-// --------------------------------- ImportJob functions 	--------------------------------- //
-
-	
-	
 // --------------------------------- BulkUploadJob functions 	--------------------------------- //
-	
-	/**
-	 * batch getExclusiveBulkUploadJob action allows to get a BatchJob of type BULKUPLOAD 
-	 * 
-	 * @action getExclusiveBulkUploadJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveBulkUploadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKUPLOAD );
-	}
-	
-	/**
-	 * batch getExclusiveAlmostDoneBulkUploadJobs action allows to get a BatchJob of type BULKUPLOAD that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneBulkUploadJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneBulkUploadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKUPLOAD);
-	}
-
-	
-	/**
-	 * batch updateExclusiveBulkUploadJob action updates a BatchJob of type BULKUPLOAD that was claimed using the getExclusiveBulkUploadJobs
-	 * 
-	 * @action updateExclusiveBulkUploadJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $convertJob
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveBulkUploadJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::BULKUPLOAD)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusiveBulkUploadJob action frees a BatchJob of type BULKUPLOAD that was claimed using the getExclusiveBulkUploadJobs
-	 * 
-	 * @action freeExclusiveBulkUploadJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveBulkUploadJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::BULKUPLOAD, $resetExecutionAttempts);
-	}	
-
 	
 	/**
 	 * batch addBulkUploadResultAction action adds KalturaBulkUploadResult to the DB
@@ -301,42 +172,13 @@ class BatchService extends KalturaBaseService
 		
 		return count($unclosedEntries);
 	}	
+	
 // --------------------------------- BulkUploadJob functions 	--------------------------------- //
 
 	
 	
 // --------------------------------- ConvertJob functions 	--------------------------------- //
 
-	
-	/**
-	 * batch getExclusiveAlmostDoneConvertCollectionJobs action allows to get a BatchJob of type CONVERT_COLLECTION that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneConvertCollectionJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneConvertCollectionJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT_COLLECTION );
-	}	
-	
-	/**
-	 * batch getExclusiveAlmostDoneConvertProfileJobs action allows to get a BatchJob of type CONVERT_PROFILE that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneConvertProfileJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneConvertProfileJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT_PROFILE );
-	}
 	
 	/**
 	 * batch updateExclusiveConvertCollectionJobAction action updates a BatchJob of type CONVERT_PROFILE that was claimed using the getExclusiveConvertJobs
@@ -366,77 +208,6 @@ class BatchService extends KalturaBaseService
 	}
 	
 	/**
-	 * batch updateExclusiveConvertProfileJobAction action updates a BatchJob of type CONVERT_PROFILE that was claimed using the getExclusiveConvertJobs
-	 * 
-	 * @action updateExclusiveConvertProfileJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveConvertProfileJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::CONVERT_PROFILE)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		if($dbBatchJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-			$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-	
-	/**
-	 * batch freeExclusiveConvertCollectionJobAction action frees a BatchJob of type CONVERT_COLLECTION that was claimed using the getExclusiveConvertJobs
-	 * 
-	 * @action freeExclusiveConvertCollectionJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveConvertCollectionJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::CONVERT_COLLECTION, $resetExecutionAttempts);
-	}	
-	
-	/**
-	 * batch freeExclusiveConvertProfileJobAction action frees a BatchJob of type CONVERT_PROFILE that was claimed using the getExclusiveConvertJobs
-	 * 
-	 * @action freeExclusiveConvertProfileJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveConvertProfileJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::CONVERT_PROFILE, $resetExecutionAttempts);
-	}	
-	
-	
-	/**
-	 * batch getExclusiveConvertCollectionJob action allows to get a BatchJob of type CONVERT_COLLECTION 
-	 * 
-	 * @action getExclusiveConvertCollectionJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveConvertCollectionJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT_COLLECTION);
-		
-		return KalturaBatchJobArray::fromBatchJobArray($jobs);
-	}
-	
-	
-	/**
 	 * batch getExclusiveConvertJob action allows to get a BatchJob of type CONVERT 
 	 * 
 	 * @action getExclusiveConvertJobs
@@ -444,7 +215,9 @@ class BatchService extends KalturaBaseService
 	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
+	 * @return KalturaBatchJobArray
+	 * 
+	 * TODO remove the flavor params output from the job data and get it later using the api, then delete this method
 	 */
 	function getExclusiveConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
@@ -467,46 +240,6 @@ class BatchService extends KalturaBaseService
 		
 		return KalturaBatchJobArray::fromBatchJobArray($jobs);
 	}
-	
-	/**
-	 * batch getExclusiveAlmostDoneConvertJobsAction action allows to get a BatchJob of type CONVERT that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneConvertJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT );
-	}
-	
-	
-	/**
-	 * batch updateExclusiveConvertJob action updates a BatchJob of type CONVERT that was claimed using the getExclusiveConvertJobs
-	 * 
-	 * @action updateExclusiveConvertJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveConvertJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::CONVERT)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-	
 	
 	/**
 	 * batch updateExclusiveConvertJobSubType action updates the sub type for a BatchJob of type CONVERT that was claimed using the getExclusiveConvertJobs
@@ -536,89 +269,13 @@ class BatchService extends KalturaBaseService
 		$batchJob = new KalturaBatchJob(); // start from blank
 		return $batchJob->fromObject($dbBatchJob);
 	}
-
 	
-	/**
-	 * batch freeExclusiveConvertJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveConvertJobs
-	 * 
-	 * @action freeExclusiveConvertJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveConvertJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::CONVERT, $resetExecutionAttempts);
-	}	
 // --------------------------------- ConvertJob functions 	--------------------------------- //
 
 	
 	
-// --------------------------------- PostConvertJob functions 	--------------------------------- //
-
-	
-	
-	/**
-	 * batch getExclusivePostConvertJob action allows to get a BatchJob of type POSTCONVERT 
-	 * 
-	 * @action getExclusivePostConvertJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusivePostConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::POSTCONVERT );
-	}
-
-	
-	/**
-	 * batch updateExclusivePostConvertJob action updates a BatchJob of type POSTCONVERT that was claimed using the getExclusivePostConvertJobs
-	 * 
-	 * @action updateExclusivePostConvertJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusivePostConvertJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::POSTCONVERT)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusivePostConvertJob action frees a BatchJob of type IMPORT that was claimed using the getExclusivePostConvertJobs
-	 * 
-	 * @action freeExclusivePostConvertJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusivePostConvertJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::POSTCONVERT, $resetExecutionAttempts);
-	}	
-
-// --------------------------------- PostConvertJob functions 	--------------------------------- //
-
-	
 // --------------------------------- CaptureThumbJob functions 	--------------------------------- //
 
-	
 	
 	/**
 	 * batch getExclusiveCaptureThumbJob action allows to get a BatchJob of type CAPTURE_THUMB 
@@ -629,6 +286,8 @@ class BatchService extends KalturaBaseService
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
 	 * @return KalturaBatchJobArray 
+	 * 
+	 * TODO remove the thumb params output from the job data and get it later using the api, then delete this method
 	 */
 	function getExclusiveCaptureThumbJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
@@ -648,91 +307,10 @@ class BatchService extends KalturaBaseService
 		return KalturaBatchJobArray::fromBatchJobArray($jobs);
 	}
 
-	
-	/**
-	 * batch updateExclusiveCaptureThumbJob action updates a BatchJob of type CAPTURE_THUMB that was claimed using the getExclusiveCaptureThumbJobs
-	 * 
-	 * @action updateExclusiveCaptureThumbJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveCaptureThumbJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::CAPTURE_THUMB)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusiveCaptureThumbJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveCaptureThumbJobs
-	 * 
-	 * @action freeExclusiveCaptureThumbJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveCaptureThumbJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::CAPTURE_THUMB, $resetExecutionAttempts);
-	}	
-
 // --------------------------------- CaptureThumbJob functions 	--------------------------------- //
 
 	
 // --------------------------------- ExtractMediaJob functions 	--------------------------------- //
-	
-	
-	
-	/**
-	 * batch getExclusiveExtractMediaJob action allows to get a BatchJob of type EXTRACT_MEDIA 
-	 * 
-	 * @action getExclusiveExtractMediaJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveExtractMediaJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::EXTRACT_MEDIA );
-	}
-
-	
-	/**
-	 * batch updateExclusiveExtractMediaJob action updates a BatchJob of type EXTRACT_MEDIA that was claimed using the getExclusiveExtractMediaJobs
-	 * 
-	 * @action updateExclusiveExtractMediaJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveExtractMediaJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::EXTRACT_MEDIA)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
 	
 	/**
 	 * batch addMediaInfoAction action saves a media info object
@@ -773,139 +351,8 @@ class BatchService extends KalturaBaseService
 		return $mediaInfo;
 	}
 	
-	/**
-	 * batch freeExclusiveExtractMediaJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveExtractMediaJobs
-	 * 
-	 * @action freeExclusiveExtractMediaJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveExtractMediaJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::EXTRACT_MEDIA, $resetExecutionAttempts);
-	}	
 // --------------------------------- ExtractMediaJob functions 	--------------------------------- //
 	
-	
-// --------------------------------- StorageExportJob functions 	--------------------------------- //
-	
-	
-	
-	/**
-	 * batch getExclusiveStorageExportJob action allows to get a BatchJob of type STORAGE_EXPORT 
-	 * 
-	 * @action getExclusiveStorageExportJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveStorageExportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::STORAGE_EXPORT );
-	}
-
-	
-	/**
-	 * batch updateExclusiveStorageExportJob action updates a BatchJob of type STORAGE_EXPORT that was claimed using the getExclusiveStorageExportJobs
-	 * 
-	 * @action updateExclusiveStorageExportJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveStorageExportJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::STORAGE_EXPORT)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusiveStorageExportJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveStorageExportJobs
-	 * 
-	 * @action freeExclusiveStorageExportJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveStorageExportJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::STORAGE_EXPORT, $resetExecutionAttempts);
-	}	
-// --------------------------------- StorageExportJob functions 	--------------------------------- //
-		
-// --------------------------------- StorageDeleteJob functions 	--------------------------------- //
-	
-	
-	
-	/**
-	 * batch getExclusiveStorageDeleteJob action allows to get a BatchJob of type STORAGE_DELETE 
-	 * 
-	 * @action getExclusiveStorageDeleteJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveStorageDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::STORAGE_DELETE );
-	}
-
-	
-	/**
-	 * batch updateExclusiveStorageDeleteJob action updates a BatchJob of type StorageDelete that was claimed using the getExclusiveStorageDeleteJobs
-	 * 
-	 * @action updateExclusiveStorageDeleteJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveStorageDeleteJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::STORAGE_DELETE)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusiveStorageDeleteJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveStorageDeleteJobs
-	 * 
-	 * @action freeExclusiveStorageDeleteJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveStorageDeleteJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::STORAGE_DELETE, $resetExecutionAttempts);
-	}	
-// --------------------------------- StorageDeleteJob functions 	--------------------------------- //
 	
 // --------------------------------- Notification functions 	--------------------------------- //	
 	
@@ -941,322 +388,8 @@ class BatchService extends KalturaBaseService
 		return $response;
 	}
 
-	
-	/**
-	 * batch updateExclusiveNotificationJob action updates a BatchJob of type NOTIFICATION that was claimed using the getExclusiveNotificationJobs
-	 * 
-	 * @action updateExclusiveNotificationJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveNotificationJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::NOTIFICATION)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusiveNotificationJob action frees a BatchJob of type IMPORT that was claimed using the getExclusiveNotificationJobs
-	 * 
-	 * @action freeExclusiveNotificationJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveNotificationJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::NOTIFICATION, $resetExecutionAttempts);
-	}	
-	
-	
 // --------------------------------- Notification functions 	--------------------------------- //
 
-
-	
-// --------------------------------- MailJob functions 	--------------------------------- //	
-	
-	/**
-	 * batch getExclusiveMailJob action allows to get a BatchJob of type MAIL 
-	 * 
-	 * @action getExclusiveMailJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveMailJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::MAIL );
-	}
-
-	
-	/**
-	 * batch updateExclusiveMailJob action updates a BatchJob of type MAIL that was claimed using the getExclusiveMailJobs
-	 * 
-	 * @action updateExclusiveMailJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveMailJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::MAIL)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-
-	
-	/**
-	 * batch freeExclusiveMailJob action frees a BatchJob of type MAIL that was claimed using the getExclusiveMailJobs
-	 * 
-	 * @action freeExclusiveMailJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveMailJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::MAIL, $resetExecutionAttempts);
-	}	
-// --------------------------------- MailJob functions 	--------------------------------- //
-	
-
-// --------------------------------- BulkDownloadJob functions 	--------------------------------- //
-	
-	/**
-	 * batch getExclusiveBulkDownloadJobs action allows to get a BatchJob of type BULKDOWNLOAD
-	 * 
-	 * @action getExclusiveBulkDownloadJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveBulkDownloadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKDOWNLOAD);
-	}
-	
-	/**
-	 * batch getExclusiveAlmostDoneBulkDownloadJobs action allows to get a BatchJob of type BULKDOWNLOAD that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneBulkDownloadJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneBulkDownloadJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::BULKDOWNLOAD );
-	}
-
-	/**
-	 * batch updateExclusiveBulkDownloadJob action updates a BatchJob of type BULKDOWNLOAD that was claimed using the getExclusiveBulkDownloadJobs
-	 * 
-	 * @action updateExclusiveBulkDownloadJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveBulkDownloadJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::BULKDOWNLOAD)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-	
-	/**
-	 * batch freeExclusiveBulkDownloadJob action frees a BatchJob of type BULKDOWNLOAD that was claimed using the getExclusiveBulkDownloadJobs
-	 * 
-	 * @action freeExclusiveBulkDownloadJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveBulkDownloadJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::BULKDOWNLOAD, $resetExecutionAttempts);
-	}	
-	
-// --------------------------------- BulkDownloadJob functions 	--------------------------------- //
-
-	
-// --------------------------------- ProvisionProvideJob functions 	--------------------------------- //
-	
-	/**
-	 * batch getExclusiveProvisionProvideJobs action allows to get a BatchJob of type ProvisionProvide
-	 * 
-	 * @action getExclusiveProvisionProvideJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveProvisionProvideJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_PROVIDE);
-	}
-	
-	/**
-	 * batch getExclusiveAlmostDoneProvisionProvideJobs action allows to get a BatchJob of type ProvisionProvide that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneProvisionProvideJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneProvisionProvideJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_PROVIDE );
-	}
-
-	/**
-	 * batch updateExclusiveProvisionProvideJob action updates a BatchJob of type ProvisionProvide that was claimed using the getExclusiveProvisionProvideJobs
-	 * 
-	 * @action updateExclusiveProvisionProvideJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveProvisionProvideJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::PROVISION_PROVIDE)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-	
-	/**
-	 * batch freeExclusiveProvisionProvideJob action frees a BatchJob of type ProvisionProvide that was claimed using the getExclusiveProvisionProvideJobs
-	 * 
-	 * @action freeExclusiveProvisionProvideJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveProvisionProvideJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::PROVISION_PROVIDE, $resetExecutionAttempts);
-	}	
-	
-// --------------------------------- ProvisionProvideJob functions 	--------------------------------- //
-	
-// --------------------------------- ProvisionDeleteJob functions 	--------------------------------- //
-	
-	/**
-	 * batch getExclusiveProvisionDeleteJobs action allows to get a BatchJob of type ProvisionDelete
-	 * 
-	 * @action getExclusiveProvisionDeleteJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveProvisionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveJobsAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_DELETE);
-	}
-	
-	/**
-	 * batch getExclusiveAlmostDoneProvisionDeleteJobs action allows to get a BatchJob of type ProvisionDelete that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneProvisionDeleteJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneProvisionDeleteJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::PROVISION_DELETE );
-	}
-
-	/**
-	 * batch updateExclusiveProvisionDeleteJob action updates a BatchJob of type ProvisionDelete that was claimed using the getExclusiveProvisionDeleteJobs
-	 * 
-	 * @action updateExclusiveProvisionDeleteJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveProvisionDeleteJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::PROVISION_DELETE)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-	
-	/**
-	 * batch freeExclusiveProvisionDeleteJob action frees a BatchJob of type ProvisionDelete that was claimed using the getExclusiveProvisionDeleteJobs
-	 * 
-	 * @action freeExclusiveProvisionDeleteJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveProvisionDeleteJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::PROVISION_DELETE, $resetExecutionAttempts);
-	}	
-	
-// --------------------------------- ProvisionDeleteJob functions 	--------------------------------- //
-	
 	
 // --------------------------------- generic functions 	--------------------------------- //
 

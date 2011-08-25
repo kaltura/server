@@ -8,9 +8,6 @@ require_once ("bootstrap.php");
 /**
  * Will run periodically and cleanup directories from old files that have a specific pattern (older than x days) 
  * 
- * @uses batch->getExclusiveNotificationJobs
- * @uses batch->updateExclusiveNotificationJob
- * @uses batch->freeExclusiveNotificationJob
  * @uses batch->addMailJob
  * @uses multiRequest
  * 

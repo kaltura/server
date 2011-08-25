@@ -20,6 +20,8 @@ class FileSyncImportBatchService extends BatchService
 	 * @param int $numberOfJobs The maximum number of jobs to return. 
 	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
 	 * @return KalturaBatchJobArray 
+	 * 
+	 * TODO remove the destFilePath from the job data and get it later using the api, then delete this method
 	 */
 	function getExclusiveFileSyncImportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
 	{
@@ -79,61 +81,6 @@ class FileSyncImportBatchService extends BatchService
 		$dbJob = $job->toObject($dbJob);
 		$dbJob->save();
 	}
-	
-	
-	/**
-	 * batch updateExclusiveFileSyncImportJob action updates a BatchJob of type FILESYNC_IMPORT that was claimed using the getExclusiveFileSyncImportJobs
-	 * 
-	 * @action updateExclusiveFileSyncImportJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param KalturaBatchJob $job
-	 * @return KalturaBatchJob 
-	 */
-	function updateExclusiveFileSyncImportJobAction($id ,KalturaExclusiveLockKey $lockKey, KalturaBatchJob $job)
-	{
-		$dbBatchJob = BatchJobPeer::retrieveByPK($id);
-		
-		// verifies that the job is of the right type
-		if($dbBatchJob->getJobType() != KalturaBatchJobType::FILESYNC_IMPORT)
-			throw new KalturaAPIException(APIErrors::UPDATE_EXCLUSIVE_JOB_WRONG_TYPE, $id, serialize($lockKey), serialize($job));
-	
-		$dbBatchJob = kBatchManager::updateExclusiveBatchJob($id, $lockKey->toObject(), $job->toObject($dbBatchJob));
-				
-		$batchJob = new KalturaBatchJob(); // start from blank
-		return $batchJob->fromObject($dbBatchJob);
-	}
-	
-	/**
-	 * batch freeExclusiveFileSyncImportJob action frees a BatchJob of type FILESYNC_IMPORT that was claimed using the getExclusiveFileSyncImportJobs
-	 * 
-	 * @action freeExclusiveFileSyncImportJob
-	 * @param int $id The id of the job to free
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism
-	 * @param bool $resetExecutionAttempts Resets the job execution attampts to zero  
-	 * @return KalturaFreeJobResponse 
-	 */
-	function freeExclusiveFileSyncImportJobAction($id ,KalturaExclusiveLockKey $lockKey, $resetExecutionAttempts = false)
-	{
-		return $this->freeExclusiveJobAction($id ,$lockKey, KalturaBatchJobType::FILESYNC_IMPORT, $resetExecutionAttempts);
-	}	
-	
-	
-	/**
-	 * batch getExclusiveAlmostDoneFileSyncImportJobs action allows to get a BatchJob of type BULKUPLOAD that wait for remote closure 
-	 * 
-	 * @action getExclusiveAlmostDoneFileSyncImportJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 */
-	function getExclusiveAlmostDoneFileSyncImportJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		return $this->getExclusiveAlmostDoneAction($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::FILESYNC_IMPORT);
-	}
-	
 	
 // --------------------------------- End of FileSyncImportJob functions 	------------------------ //
 

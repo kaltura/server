@@ -25,13 +25,18 @@ abstract class KJobHandlerWorker extends KBatchBase
 		return $this->taskConfig->maxJobsEachRun;
 	}
 	
+	protected function getJobs()
+	{
+		return $this->kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter(), $this->getJobType());
+	}
+	
 	public function run($jobs = null)
 	{
 		if($this->taskConfig->isInitOnly())
 			return $this->init();
 		
 		if(is_null($jobs))
-			$jobs = $this->kClient->batch->getExclusiveJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter(), $this->getJobType());
+			$jobs = $this->getJobs();
 		
 		KalturaLog::info(count($jobs) . " jobs to handle");
 		
