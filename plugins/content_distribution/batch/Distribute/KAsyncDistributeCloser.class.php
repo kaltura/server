@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Closes asynchronous distribution jobs
  *

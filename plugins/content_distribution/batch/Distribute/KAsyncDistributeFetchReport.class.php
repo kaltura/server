@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Distributes kaltura entries to remote destination  
  *

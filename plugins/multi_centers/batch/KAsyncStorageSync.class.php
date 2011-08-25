@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Will export a single file to ftp or scp server 
  *

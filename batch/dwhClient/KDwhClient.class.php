@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage DWH
  */
-require_once("bootstrap.php");
 
 /**
  * Will encapsultate the

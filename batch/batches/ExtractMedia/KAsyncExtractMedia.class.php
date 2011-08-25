@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage Extract-Media
  */
-require_once("bootstrap.php");
 
 /**
  * Will extract the media info of a single file 

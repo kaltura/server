@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage Email-Ingestion
  */
-require_once("bootstrap.php");
 ini_set('memory_limit', '128M');
 
 /**

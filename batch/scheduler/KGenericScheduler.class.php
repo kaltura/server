@@ -1,6 +1,4 @@
 <?php
-require_once("bootstrap.php");
-
 /**
  * Will schedual execution of external commands
  * Copied base functionality from KScheduler
@@ -813,5 +811,3 @@ class KGenericScheduler
 		KDwhClient::send($event);
 	}
 }
-
-?>

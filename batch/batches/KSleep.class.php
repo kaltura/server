@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage Debug
  */
-require_once("bootstrap.php");
 
 /**
  * Will import a single URL and store it in the file system.

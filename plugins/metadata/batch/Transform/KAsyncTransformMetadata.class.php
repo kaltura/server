@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Will transform metadata XML based on XSL and will update the metadata object with the new version 
  *

@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage Conversion
  */
-require_once("bootstrap.php");
 
 /**
  * Will convert a collection of flavors and store it in the file system.

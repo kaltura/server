@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Manages commands between the helper and the scheuler
  *
@@ -258,5 +257,3 @@ class KScheduleHelperManager
 		file_put_contents($filePath, $data, FILE_APPEND);
 	}
 }
-
-?>

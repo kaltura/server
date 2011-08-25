@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 
 /**
  * Will schedual execution of external commands
@@ -94,5 +93,3 @@ class KGenericDebuger
 			echo "line $line: $text\n";
 	}
 }
-
-?>

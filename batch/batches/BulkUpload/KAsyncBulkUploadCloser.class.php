@@ -3,8 +3,6 @@
  * @package Scheduler
  * @subpackage Bulk-Upload
  */
-require_once("bootstrap.php");
-
 
 /**
  * Will close almost done bulk uploads.

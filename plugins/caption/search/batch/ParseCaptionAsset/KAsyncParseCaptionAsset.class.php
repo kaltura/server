@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * @package plugins.captionSearch
  * @subpackage Scheduler

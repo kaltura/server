@@ -3,7 +3,6 @@
  * @package Scheduler
  * @subpackage DWH
  */
-require_once("bootstrap.php");
 
 /**
  * 
@@ -92,4 +91,3 @@ class KBatchEvent extends KDwhEventBase
 		return $str;	
 	}
 }
-?>

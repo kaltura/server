@@ -1,6 +1,4 @@
 <?php
-require_once("bootstrap.php");
-
 /**
  * Handles files in drop folders
  *

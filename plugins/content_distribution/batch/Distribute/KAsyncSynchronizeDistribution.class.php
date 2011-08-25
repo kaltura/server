@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Synchronize Distribution status and create delayed jobs
  *

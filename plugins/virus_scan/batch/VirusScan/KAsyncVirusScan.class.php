@@ -1,5 +1,4 @@
 <?php
-require_once("bootstrap.php");
 /**
  * Will scan for viruses on specified file  
  *
