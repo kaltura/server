@@ -19,6 +19,9 @@ abstract class KJobHandlerWorker extends KBatchBase
 	
 	protected function getMaxJobsEachRun()
 	{
+		if(!$this->taskConfig->maxJobsEachRun)
+			return 1;
+		
 		return $this->taskConfig->maxJobsEachRun;
 	}
 	
