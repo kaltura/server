@@ -130,7 +130,8 @@ class AvnFeed
 		$channelNode->appendChild($item);
 		
 		$this->setNodeValue('guid', $values[AvnDistributionField::GUID], $item);
-		$this->setNodeValue('pubDate', $values[AvnDistributionField::PUB_DATE], $item);
+		$pubDate = date('n/j/Y g:i:s A', $values[AvnDistributionField::PUB_DATE]);
+		$this->setNodeValue('pubDate', $pubDate, $item);
 		$this->setNodeValue('title', $values[AvnDistributionField::TITLE], $item);
 		$this->setNodeValue('description', $values[AvnDistributionField::DESCRIPTION], $item);
 		$this->setNodeValue('link', $values[AvnDistributionField::LINK], $item);
