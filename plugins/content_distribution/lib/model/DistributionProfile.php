@@ -269,7 +269,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		
 		$requiredFlavorParamsIds = $this->getRequiredFlavorParamsIdsArray();
 		KalturaLog::log("Required Flavor Params Ids [" . print_r($requiredFlavorParamsIds, true) . "]");
-		$entryFlavorAssets = assetPeer::retrieveReadyByEntryId($entryDistribution->getEntryId());
+		$entryFlavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entryDistribution->getEntryId());
 		
 		$requiredFlavorParamsIdsKeys = array_flip($requiredFlavorParamsIds);
 		foreach($entryFlavorAssets as $entryFlavorAsset)
