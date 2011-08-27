@@ -68,7 +68,7 @@ class playManifestAction extends kalturaAction
 	private function buildXml($streamType, array $flavors, $mimeType = 'video/x-flv', $duration = null, $baseUrl = null, $mediaUrl = null)
 	{
 		$durationXml = ($duration ? "<duration>$duration</duration>" : '');
-		$baseUrlXml = ($baseUrl ? "<baseURL>$baseUrl</baseURL>" : '');
+		$baseUrlXml = ($baseUrl ? "<baseURL>".htmlspecialchars($baseUrl)."</baseURL>" : '');
 		$flvaorsXml = '';
 		
 		$deliveryCodeStr = '';
