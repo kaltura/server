@@ -167,7 +167,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string 
 	 */
-	public $monitorUsageExpiryReason;
+	public $extendedFreeTrailExpiryReason;
 	
 	/**
 	 *  Unix timestamp (In seconds)
@@ -175,12 +175,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 * 
 	 */
-	public $monitorUsageExpiryDate;
+	public $extendedFreeTrailExpiryDate;
 	
 	/**
 	 * @var int
 	 */
-	public $doNotMonitorUsage;
+	public $extendedFreeTrail;
 	
 	
 	
@@ -218,9 +218,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"partnerParentId",
 		"streamerType",
 		"mediaProtocol",
-		"monitorUsageExpiryDate",
-		"monitorUsageExpiryReason",
-		"doNotMonitorUsage",
+		"extendedFreeTrailExpiryDate",
+		"extendedFreeTrailExpiryReason",
+		"extendedFreeTrail",
 	);
 
 	public function getMapBetweenObjects()
