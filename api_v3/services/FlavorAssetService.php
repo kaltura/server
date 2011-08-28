@@ -335,7 +335,7 @@ class FlavorAssetService extends KalturaBaseService
 			$flavorAsset->setFrameRate($dbFlavorParams->getFrameRate());
 			$flavorAsset->setHeight($dbFlavorParams->getHeight());
 			$flavorAsset->setWidth($dbFlavorParams->getWidth());
-			$flavorAsset->setTags($dbFlavorParams->getTags());
+			$flavorAsset->addTags($dbFlavorParams->getTagsArray());
 		}
 		
 		if($flavorAsset->getIsOriginal())

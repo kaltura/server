@@ -385,7 +385,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbAsset->setFrameRate($dbFlavorParams->getFrameRate());
 			$dbAsset->setHeight($dbFlavorParams->getHeight());
 			$dbAsset->setWidth($dbFlavorParams->getWidth());
-			$dbAsset->setTags($dbFlavorParams->getTags());
+			$dbAsset->addTags($dbFlavorParams->getTagsArray());
 		}
 		
 		if($dbAsset instanceof flavorAsset && !$dbAsset->getIsOriginal())
