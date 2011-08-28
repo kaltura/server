@@ -109,9 +109,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('checkbox', 'restrict_thumbnail_by_ks', array(
-			'label'	  => 'Apply access control rule on Player thumbnail',
+			'label'	  => 'Apply access control rule on thumbnail',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
 		));		
+		
+		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][] = 'restrict_thumbnail_by_ks';
+				
 
 //--------------------------- Remote Storage Account policy ---------------------------				
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
