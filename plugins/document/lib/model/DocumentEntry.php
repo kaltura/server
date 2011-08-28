@@ -71,4 +71,6 @@ class DocumentEntry extends entry
 		
 		return $url;
 	}
+
+	public function getCreateThumb (  )			{	return false;} // Documents never have a thumb
 }
