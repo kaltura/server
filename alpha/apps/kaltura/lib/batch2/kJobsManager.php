@@ -724,11 +724,8 @@ class kJobsManager
  		
  		if($asset)
  		{
- 			if($asset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
- 			{
-	 			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
-	 			$asset->save();
- 			}
+ 			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+ 			$asset->save();
  			
  			$jobData->setFlavorAssetId($asset->getId());
  		}
