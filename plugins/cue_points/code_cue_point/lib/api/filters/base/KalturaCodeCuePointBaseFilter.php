@@ -16,10 +16,18 @@ class KalturaCodeCuePointBaseFilter extends KalturaCuePointFilter
 		"descriptionLike" => "_like_description",
 		"descriptionMultiLikeOr" => "_mlikeor_description",
 		"descriptionMultiLikeAnd" => "_mlikeand_description",
+		"endTimeGreaterThanOrEqual" => "_gte_end_time",
+		"endTimeLessThanOrEqual" => "_lte_end_time",
+		"durationGreaterThanOrEqual" => "_gte_duration",
+		"durationLessThanOrEqual" => "_lte_duration",
 	);
 
 	private $order_by_map = array
 	(
+		"+endTime" => "+end_time",
+		"-endTime" => "-end_time",
+		"+duration" => "+duration",
+		"-duration" => "-duration",
 	);
 
 	public function getMapBetweenObjects()
@@ -87,4 +95,32 @@ class KalturaCodeCuePointBaseFilter extends KalturaCuePointFilter
 	 * @var string
 	 */
 	public $descriptionMultiLikeAnd;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $endTimeGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $endTimeLessThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $durationGreaterThanOrEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var int
+	 */
+	public $durationLessThanOrEqual;
 }
