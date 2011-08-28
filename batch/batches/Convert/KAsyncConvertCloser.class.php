@@ -131,7 +131,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::REMOTE_DOWNLOAD_FAILED, $err, KalturaBatchJobStatus::ALMOST_DONE);
 		}
-		$this->fetchFile($data->destFileSyncRemoteUrl . '.log', $data->destFileSyncLocalPath . '.log');
+		$this->fetchFile($data->logFileSyncRemoteUrl, $data->logFileSyncLocalPath);
 		
 		return $this->moveFile($job, $data);
 	}
@@ -145,7 +145,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		
 		try
 		{
-			rename($data->destFileSyncLocalPath . '.log', $sharedFile . '.log');
+			rename($data->logFileSyncLocalPath, "$sharedFile.log");
 		}
 		catch(Exception $ex)
 		{
@@ -162,7 +162,9 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		}
 		
 		@chmod($sharedFile, 0777);
+		@chmod("$sharedFile.log", 0777);
 		$data->destFileSyncLocalPath = $sharedFile;
+		$data->logFileSyncLocalPath = "$sharedFile.log";
 		
 		if($this->checkFileExists($sharedFile, $fileSize))
 		{
@@ -176,6 +178,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		}
 		$updateData = new KalturaConvertJobData();
 		$updateData->destFileSyncLocalPath = $data->destFileSyncLocalPath;
+		$updateData->logFileSyncLocalPath = $data->logFileSyncLocalPath;
 		return $this->closeJob($job, null, null, $job->message, $job->status, $updateData);
 	}
 	

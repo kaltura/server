@@ -242,8 +242,8 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		clearstatcache();
 		$fileSize = filesize($data->destFileSyncLocalPath);
-		@rename($data->destFileSyncLocalPath . '.log', "$sharedFile.log");
 		kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
+		kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
 		
 		if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
 		{
@@ -252,11 +252,14 @@ class KAsyncConvert extends KJobHandlerWorker
 		}
 		
 		@chmod($sharedFile, 0777);
+		@chmod("$sharedFile.log", 0777);
 		$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
+		$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
 	
 		if($this->taskConfig->params->isRemote) // for remote conversion
 		{			
 			$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
+			$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
 			$job->status = KalturaBatchJobStatus::ALMOST_DONE;
 			$job->message = "File ready for download";
 		}

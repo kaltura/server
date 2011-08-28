@@ -20,6 +20,10 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	 */
 	public $logFileSyncLocalPath;
 	
+	/**
+	 * @var string
+	 */
+	 public $logFileSyncRemoteUrl;
 	
 	/**
 	 * @var string
@@ -36,6 +40,8 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	(
 		"destFileSyncLocalPath" ,
 		"destFileSyncRemoteUrl" ,
+		"logFileSyncLocalPath" ,
+		"logFileSyncRemoteUrl" ,
 		"flavorAssetId" ,
 		"remoteMediaId" ,
 	);

@@ -347,27 +347,44 @@ class kFlowHelper
 		$flavorAsset->save();
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+		
+		$flavorParamsOutput = $data->getFlavorParamsOutput();
+		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
+		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+		}
+		else 
+		{
+			// TODO create remote file sync
+		}
+		
 		
 		// creats the file sync
-		$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-		try{
-			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath() . '.log', $logSyncKey);
-		}
-		catch(Exception $e){
-			$err = 'Saving conversion log: ' . $e->getMessage();
-			KalturaLog::err($err);
-			
-			$desc = $dbBatchJob->getDescription() . "\n" . $err;
-			$dbBatchJob->getDescription($desc);
+		if(file_exists($data->getLogFileSyncLocalPath()))
+		{
+			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			try{
+				kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+			}
+			catch(Exception $e){
+				$err = 'Saving conversion log: ' . $e->getMessage();
+				KalturaLog::err($err);
+				
+				$desc = $dbBatchJob->getDescription() . "\n" . $err;
+				$dbBatchJob->getDescription($desc);
+			}
 		}
 		
-		$data->setDestFileSyncLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
-		KalturaLog::debug("Convert archived file to: " . $data->getDestFileSyncLocalPath());
-
-		// save the data changes to the db
-		$dbBatchJob->setData($data);
-		$dbBatchJob->save();
+		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
+		{
+			$data->setDestFileSyncLocalPath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
+			KalturaLog::debug("Convert archived file to: " . $data->getDestFileSyncLocalPath());
+			
+			// save the data changes to the db
+			$dbBatchJob->setData($data);
+			$dbBatchJob->save();
+		}
 		
 		$entry = $dbBatchJob->getEntry();
 		if(!$entry)
@@ -377,7 +394,6 @@ class kFlowHelper
 		$entry->save();
 		
 		$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
-		$flavorParamsOutput = $data->getFlavorParamsOutput();
 		
 		$createThumb = $entry->getCreateThumb();
 		$extractMedia = true;
@@ -680,7 +696,23 @@ class kFlowHelper
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
-
+		
+		// creats the file sync
+		if(file_exists($data->getLogFileSyncLocalPath()))
+		{
+			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
+			try{
+				kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+			}
+			catch(Exception $e){
+				$err = 'Saving conversion log: ' . $e->getMessage();
+				KalturaLog::err($err);
+				
+				$desc = $dbBatchJob->getDescription() . "\n" . $err;
+				$dbBatchJob->getDescription($desc);
+			}
+		}
+		
 //		$flavorAsset->incrementVersion();
 //		$flavorAsset->save();
 		
