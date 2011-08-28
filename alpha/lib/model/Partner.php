@@ -494,7 +494,15 @@ class Partner extends BasePartner
 	public function setExtendedFreeTrailExpiryReason( $v ) { $this->putInCustomData("extendedFreeTrailExpiryReason", $v); }
 	
 	public function getExtendedFreeTrailExpiryDate() { return $this->getFromCustomData("extendedFreeTrailExpiryDate", null); }
-	public function setExtendedFreeTrailExpiryDate( $v ) { $this->putInCustomData("extendedFreeTrailExpiryDate", $v); }
+	public function setExtendedFreeTrailExpiryDate( $v ) 
+	{ 
+		$this->setExtendedFreeTrailEndsWarning(false);
+		$this->putInCustomData("extendedFreeTrailExpiryDate", $v); 
+	}
+	
+	public function getExtendedFreeTrailEndsWarning() { return $this->getFromCustomData("extendedFreeTrailEndsWarning", null, false); }
+	public function setExtendedFreeTrailEndsWarning( $v ) { $this->putInCustomData("extendedFreeTrailEndsWarning", $v); }
+	
 	
 	
 	/** 27Apr2011 - added fields for new registration form **/
