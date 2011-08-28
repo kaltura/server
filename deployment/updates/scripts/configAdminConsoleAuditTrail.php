@@ -24,8 +24,8 @@ $objectsToTrack = array(
 			KalturaAuditTrailAction::CHANGED,
 		),
 		'descriptors' => array(
-			"monitorUsageExpiryDate",
-			"monitorUsageExpiryReason",
+			"extendedFreeTrailExpiryReasonDate",
+			"extendedFreeTrailExpiryReason",
 			
 		),
 	)
