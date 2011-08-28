@@ -181,6 +181,10 @@ class KalturaErrors extends APIErrors
 	
 	const FLAVOR_PARAMS_SOURCE_DUPLICATE = "FLAVOR_PARAMS_SOURCE_DUPLICATE,More than onc source flavor defined";
 	
+	const FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND = "FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND,Flavor params output id \"%s\" not found";
+	
+	const THUMB_PARAMS_OUTPUT_ID_NOT_FOUND = "THUMB_PARAMS_OUTPUT_ID_NOT_FOUND,Thumbnail params output id \"%s\" not found";
+	
 	/**
 	 * FlavorAsset Service
 	 */

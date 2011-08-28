@@ -53,19 +53,11 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		return 1;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KJobHandlerWorker::getJobs()
-	 * 
-	 * TODO remove the thumb params output from the job data and get it later using the api, then delete this method
-	 */
-	protected function getJobs()
-	{
-		return $this->kClient->batch->getExclusiveCaptureThumbJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
-	}
-	
 	private function captureThumb(KalturaBatchJob $job, KalturaCaptureThumbJobData $data)
 	{
 		KalturaLog::debug("captureThumb($job->id)");
+		
+		$thumbParamsOutput = $this->kClient->thumbParamsOutput->get($data->thumbParamsOutputId);
 		
 		try
 		{
@@ -115,7 +107,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 					
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $capturePath, $this->taskConfig->params->FFMpegCmd);
-				$created = $thumbMaker->createThumnail($data->thumbParamsOutput->videoOffset);
+				$created = $thumbMaker->createThumnail($thumbParamsOutput->videoOffset);
 				if(!$created || !file_exists($capturePath))
 					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::THUMBNAIL_NOT_CREATED, "Thumbnail not created", KalturaBatchJobStatus::FAILED);
 				
@@ -129,17 +121,17 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$uniqid = uniqid('thumb_');
 			$thumbPath = realpath($rootPath) . "/$uniqid";
 			
-			$quality = $data->thumbParamsOutput->quality;
-			$cropType = $data->thumbParamsOutput->cropType;
-			$cropX = $data->thumbParamsOutput->cropX;
-			$cropY = $data->thumbParamsOutput->cropY;
-			$cropWidth = $data->thumbParamsOutput->cropWidth;
-			$cropHeight = $data->thumbParamsOutput->cropHeight;
-			$bgcolor = $data->thumbParamsOutput->backgroundColor;
-			$width = $data->thumbParamsOutput->width;
-			$height = $data->thumbParamsOutput->height;
-			$scaleWidth = $data->thumbParamsOutput->scaleWidth;
-			$scaleHeight = $data->thumbParamsOutput->scaleHeight;
+			$quality = $thumbParamsOutput->quality;
+			$cropType = $thumbParamsOutput->cropType;
+			$cropX = $thumbParamsOutput->cropX;
+			$cropY = $thumbParamsOutput->cropY;
+			$cropWidth = $thumbParamsOutput->cropWidth;
+			$cropHeight = $thumbParamsOutput->cropHeight;
+			$bgcolor = $thumbParamsOutput->backgroundColor;
+			$width = $thumbParamsOutput->width;
+			$height = $thumbParamsOutput->height;
+			$scaleWidth = $thumbParamsOutput->scaleWidth;
+			$scaleHeight = $thumbParamsOutput->scaleHeight;
 			
 			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor);

@@ -87,16 +87,6 @@ class KAsyncConvert extends KJobHandlerWorker
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KJobHandlerWorker::getJobs()
-	 * 
-	 * TODO remove the flavor params output from the job data and get it later using the api
-	 */
-	protected function getJobs()
-	{
-		return $this->kClient->batch->getExclusiveConvertJobs($this->getExclusiveLockKey(), $this->taskConfig->maximumExecutionTime, $this->getMaxJobsEachRun(), $this->getFilter());
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::run()
 	 */
 	public function run($jobs = null)
@@ -125,6 +115,8 @@ class KAsyncConvert extends KJobHandlerWorker
 	
 	protected function convert(KalturaBatchJob $job, KalturaConvartableJobData $data)
 	{
+		$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+		
 		if($this->taskConfig->params->isRemote)
 			$job->lastWorkerRemote = true;
 			

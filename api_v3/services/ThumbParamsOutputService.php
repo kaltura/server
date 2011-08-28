@@ -1,21 +1,40 @@
 <?php
 /**
- * Thumb Params Output service
+ * Thumbnail Params Output service
  *
  * @service thumbParamsOutput
- * @package plugins.adminConsole
- * @subpackage api.services
+ * @package api
+ * @subpackage services
  */
 class ThumbParamsOutputService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-
-		// since plugin might be using KS impersonation, we need to validate the requesting
-		// partnerId from the KS and not with the $_POST one
-		if(!AdminConsolePlugin::isAllowedPartner($this->getPartnerId()))
+		
+		if($this->getPartnerId() != Partner::BATCH_PARTNER_ID && $this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+	}
+	
+	/**
+	 * Get thumb params output object by ID
+	 * 
+	 * @action get
+	 * @param int $id
+	 * @return KalturaThumbParamsOutput
+	 * @throws KalturaErrors::THUMB_PARAMS_OUTPUT_ID_NOT_FOUND
+	 */
+	public function getAction($id)
+	{
+		$thumbParamsOutputDb = assetParamsOutputPeer::retrieveByPK($id);
+		
+		if (!$thumbParamsOutputDb)
+			throw new KalturaAPIException(KalturaErrors::THUMB_PARAMS_OUTPUT_ID_NOT_FOUND, $id);
+			
+		$thumbParamsOutput = new KalturaThumbParamsOutput();
+		$thumbParamsOutput->fromObject($thumbParamsOutputDb);
+		
+		return $thumbParamsOutput;
 	}
 	
 	/**
@@ -41,7 +60,7 @@ class ThumbParamsOutputService extends KalturaBaseService
 		$c = new Criteria();
 		$thumbParamsOutputFilter->attachToCriteria($c);
 		
-		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::FLAVOR);
+		$thumbTypes = KalturaPluginManager::getExtendedTypes(assetParamsOutputPeer::OM_CLASS, assetType::THUMBNAIL);
 		$c->add(assetParamsOutputPeer::TYPE, $thumbTypes, Criteria::IN);
 		
 		$totalCount = assetParamsOutputPeer::doCount($c);

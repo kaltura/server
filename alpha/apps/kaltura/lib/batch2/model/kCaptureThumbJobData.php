@@ -28,6 +28,7 @@ class kCaptureThumbJobData extends kJobData
 	
 	/**
 	 * @var thumbParamsOutput
+	 * @deprecated
 	 */
 	private $thumbParamsOutput;
 	
@@ -123,7 +124,7 @@ class kCaptureThumbJobData extends kJobData
 	 */
 	public function setThumbParamsOutput($thumbParamsOutput)
 	{
-		$this->thumbParamsOutput = $thumbParamsOutput;
+// 		$this->thumbParamsOutput = $thumbParamsOutput;
 	}
 
 	/**
@@ -164,6 +165,11 @@ class kCaptureThumbJobData extends kJobData
 	public function getThumbParamsOutput()
 	{
 		return $this->thumbParamsOutput;
+		
+		if (is_null($this->thumbParamsOutputId))
+			return null;
+			
+		return assetParamsOutputPeer::retrieveByPK($this->thumbParamsOutputId);
 	}
 
 	/**

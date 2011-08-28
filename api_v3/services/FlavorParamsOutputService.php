@@ -3,19 +3,38 @@
  * Flavor Params Output service
  *
  * @service flavorParamsOutput
- * @package plugins.adminConsole
- * @subpackage api.services
+ * @package api
+ * @subpackage services
  */
 class FlavorParamsOutputService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-
-		// since plugin might be using KS impersonation, we need to validate the requesting
-		// partnerId from the KS and not with the $_POST one
-		if(!AdminConsolePlugin::isAllowedPartner($this->getPartnerId()))
+		
+		if($this->getPartnerId() != Partner::BATCH_PARTNER_ID && $this->getPartnerId() != Partner::ADMIN_CONSOLE_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+	}
+	
+	/**
+	 * Get flavor params output object by ID
+	 * 
+	 * @action get
+	 * @param int $id
+	 * @return KalturaFlavorParamsOutput
+	 * @throws KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND
+	 */
+	public function getAction($id)
+	{
+		$flavorParamsOutputDb = assetParamsOutputPeer::retrieveByPK($id);
+		
+		if (!$flavorParamsOutputDb)
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND, $id);
+			
+		$flavorParamsOutput = new KalturaFlavorParamsOutput();
+		$flavorParamsOutput->fromObject($flavorParamsOutputDb);
+		
+		return $flavorParamsOutput;
 	}
 	
 	/**

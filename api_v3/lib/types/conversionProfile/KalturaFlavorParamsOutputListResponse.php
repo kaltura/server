@@ -1,7 +1,7 @@
 <?php
 /**
- * @package plugins.adminConsole
- * @subpackage api.objects
+ * @package api
+ * @subpackage objects
  */
 class KalturaFlavorParamsOutputListResponse extends KalturaObject
 {

@@ -788,7 +788,7 @@ class BatchController extends Zend_Controller_Action
 				$filter = new Kaltura_Client_Type_FlavorParamsOutputFilter();
 				$filter->flavorAssetIdEqual = $flavor->id;
 				try{
-					$flavorParamsOutputsList = $adminConsolePlugin->flavorParamsOutput->listAction($filter);
+					$flavorParamsOutputsList = $client->flavorParamsOutput->listAction($filter);
 					$flavorData->flavorParamsOutputs = $flavorParamsOutputsList;
 				}
 				catch(Exception $e){

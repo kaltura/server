@@ -24,6 +24,10 @@ class BatchService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+		
+		if($this->getPartnerId() != Partner::BATCH_PARTNER_ID)
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
+		
 		myPartnerUtils::resetAllFilters();
 	}
 	
@@ -215,40 +219,6 @@ class BatchService extends KalturaBaseService
 	}
 	
 	/**
-	 * batch getExclusiveConvertJob action allows to get a BatchJob of type CONVERT 
-	 * 
-	 * @action getExclusiveConvertJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray
-	 * 
-	 * TODO remove the flavor params output from the job data and get it later using the api, then delete this method
-	 */
-	function getExclusiveConvertJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CONVERT);
-		
-		if($jobs)
-		{
-			foreach ($jobs as &$job)
-			{
-				/* @var $job BatchJob */
-				$data = $job->getData();
-				if(!($data instanceof kConvertJobData))
-					continue;
-				
-				$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($data->getFlavorParamsOutputId());
-				$data->setFlavorParamsOutput($flavorParamsOutput);
-				$job->setData($data);
-			}
-		}
-		
-		return KalturaBatchJobArray::fromBatchJobArray($jobs);
-	}
-	
-	/**
 	 * batch updateExclusiveConvertJobSubType action updates the sub type for a BatchJob of type CONVERT that was claimed using the getExclusiveConvertJobs
 	 * 
 	 * @action updateExclusiveConvertJobSubType
@@ -280,42 +250,6 @@ class BatchService extends KalturaBaseService
 // --------------------------------- ConvertJob functions 	--------------------------------- //
 
 	
-	
-// --------------------------------- CaptureThumbJob functions 	--------------------------------- //
-
-	
-	/**
-	 * batch getExclusiveCaptureThumbJob action allows to get a BatchJob of type CAPTURE_THUMB 
-	 * 
-	 * @action getExclusiveCaptureThumbJobs
-	 * @param KalturaExclusiveLockKey $lockKey The unique lock key from the batch-process. Is used for the locking mechanism  
-	 * @param int $maxExecutionTime The maximum time in seconds the job reguarly take. Is used for the locking mechanism when determining an unexpected termination of a batch-process.
-	 * @param int $numberOfJobs The maximum number of jobs to return. 
-	 * @param KalturaBatchJobFilter $filter Set of rules to fetch only rartial list of jobs  
-	 * @return KalturaBatchJobArray 
-	 * 
-	 * TODO remove the thumb params output from the job data and get it later using the api, then delete this method
-	 */
-	function getExclusiveCaptureThumbJobsAction(KalturaExclusiveLockKey $lockKey, $maxExecutionTime, $numberOfJobs, KalturaBatchJobFilter $filter = null)
-	{
-		$jobs = $this->getExclusiveJobs($lockKey, $maxExecutionTime, $numberOfJobs, $filter, BatchJobType::CAPTURE_THUMB);
-		
-		if($jobs)
-		{
-			foreach ($jobs as &$job)
-			{
-				$data = $job->getData();
-				$thumbParamsOutput = assetParamsOutputPeer::retrieveByPK($data->getThumbParamsOutputId());
-				$data->setThumbParamsOutput($thumbParamsOutput);
-				$job->setData($data);
-			}
-		}
-		
-		return KalturaBatchJobArray::fromBatchJobArray($jobs);
-	}
-
-// --------------------------------- CaptureThumbJob functions 	--------------------------------- //
-
 	
 // --------------------------------- ExtractMediaJob functions 	--------------------------------- //
 	

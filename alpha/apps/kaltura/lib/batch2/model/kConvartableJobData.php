@@ -33,6 +33,7 @@ class kConvartableJobData extends kJobData
 	
 	/**
 	 * @var flavorParamsOutput
+	 * @deprecated
 	 */
 	private $flavorParamsOutput;
 	
@@ -82,7 +83,7 @@ class kConvartableJobData extends kJobData
 	 */
 	public function setFlavorParamsOutput($flavorParamsOutput)
 	{
-		$this->flavorParamsOutput = $flavorParamsOutput;
+// 		$this->flavorParamsOutput = $flavorParamsOutput;
 	}
 
 	/**
@@ -122,8 +123,8 @@ class kConvartableJobData extends kJobData
 	 */
 	public function getFlavorParamsOutput()
 	{
-		if ($this->flavorParamsOutput)
-			return $this->flavorParamsOutput;
+// 		if ($this->flavorParamsOutput)
+// 			return $this->flavorParamsOutput;
 			
 		if (is_null($this->flavorParamsOutputId))
 			return null;

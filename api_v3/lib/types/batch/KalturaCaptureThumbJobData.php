@@ -27,11 +27,6 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 	public $thumbParamsOutputId;
 	
 	/**
-	 * @var KalturaThumbParamsOutput
-	 */
-	public $thumbParamsOutput;
-	
-	/**
 	 * @var string
 	 */
 	public $thumbAssetId;
@@ -63,36 +58,11 @@ class KalturaCaptureThumbJobData extends KalturaJobData
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	    
-	/**
-	 * @param kCaptureThumbJobData $dbCaptureThumbJobData
-	 * @return KalturaCaptureThumbJobData
-	 */
-	public function fromObject(  $dbCaptureThumbJobData)
-	{
-		parent::fromObject($dbCaptureThumbJobData);
-		
-		$dbThumbParams = $dbCaptureThumbJobData->getThumbParamsOutput();
-		if($dbThumbParams)
-		{
-			$this->thumbParamsOutput = KalturaFlavorParamsFactory::getFlavorParamsOutputInstance($dbThumbParams->getType());
-			$this->thumbParamsOutput->fromObject($dbThumbParams);
-		}
-		
-		return $this;
-	}
-
 	public function toObject(  $dbCaptureThumbJobData = null, $props_to_skip = array()) 
 	{
 		if(is_null($dbCaptureThumbJobData))
 			$dbCaptureThumbJobData = new kCaptureThumbJobData();
 			
-		if($this->thumbParamsOutput instanceof KalturaThumbParams)
-		{
-			$dbThumbParams = new thumbParamsOutput();
-			$dbThumbParams = $this->thumbParamsOutput->toObject($dbThumbParams);
-			$dbCaptureThumbJobData->setThumbParamsOutput($dbThumbParams);
-		}
-		
 		return parent::toObject($dbCaptureThumbJobData, $props_to_skip);
 	}
 }
