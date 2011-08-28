@@ -338,13 +338,13 @@ class PartnerController extends Zend_Controller_Action
 		
 		try{
 			$result = $client->doMultiRequest();
-			$this->view->auditList = $result[0];
+			$this->view->auditList = isset($result[0]) ? $result[0] : array() ;
 		}
 		catch (Exception $e){
 			$this->view->errMessage = $e->getMessage();
 		}
-					
-		$this->view->history = $result[0];
+							
+		$this->view->history = isset($result[0]) ? $result[0] : array() ;
 		$this->view->form = $form;
 		$this->view->partnerId = $partnerId;
 	}
