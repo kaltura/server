@@ -72,6 +72,13 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	 * @var KalturaStringArray
 	 */
 	public $requiredPermissions;
+
+	/**
+	 * Id of remote storage profile that used to get the source, zero indicates Kaltura data center
+	 *  
+	 * @var int
+	 */
+	public $sourceRemoteStorageProfileId;
 	
 	private static $map_between_objects = array
 	(
@@ -83,6 +90,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"createdAt",
 		"isSystemDefault" => "isDefault",
 		"tags",
+		"sourceRemoteStorageProfileId",
 	);
 	
 	/* (non-PHPdoc)
