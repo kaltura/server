@@ -589,11 +589,12 @@ class myInsertEntryHelper
 							$flavorTags = KDLWrap::CDLMediaInfo2Tags($mediaInfo, array(flavorParams::TAG_WEB, flavorParams::TAG_MBR));
 							$flavorAsset->setTags(implode(',', $flavorTags));
 						}
-						$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
 						$flavorAsset->save();
 					}
 					
 					kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
+					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_READY);
+					$flavorAsset->save();
 				}
 				else
 				{
