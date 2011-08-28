@@ -100,4 +100,14 @@ class assetParamsOutput extends BaseassetParamsOutput
 	{
 		return array();
 	}
+	
+	public function setSourceRemoteStorageProfileId($sourceRemoteStorageProfileId)
+	{
+		$this->putInCustomData('sourceRemoteStorageProfileId', $sourceRemoteStorageProfileId);
+	}
+	
+	public function getSourceRemoteStorageProfileId()
+	{
+		return $this->getFromCustomData('sourceRemoteStorageProfileId', null, StorageProfile::STORAGE_KALTURA_DC);
+	}
 }
