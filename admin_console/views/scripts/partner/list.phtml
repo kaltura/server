@@ -16,7 +16,8 @@
 				<th><?php echo $this->translate('Admin Email'); ?></th>
 				<th><?php echo $this->translate('Admin Phone'); ?></th>
 				<th><?php echo $this->translate('Account Creation Date'); ?></th>
-				<th><?php echo $this->translate('Action'); ?></th>
+				<th><?php echo $this->translate('Profiles'); ?></th>
+				<th><?php echo $this->translate('Actions'); ?></th>				
 			</tr>
 		</thead>
 		<tfoot>
@@ -39,6 +40,30 @@
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
+						<?php if (Infra_AclHelper::isAllowed('widget','list')): ?>
+							<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
+						<?php endif; ?>	
+						<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
+							<?php if (Infra_AclHelper::isAllowed('partner','configure-storage')): ?>	
+								<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
+							<?php endif; ?>
+						<?php endif; ?>
+						<?php
+						// add options from plugin pages 
+						foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
+						{
+							$options = $partnerActionPluginPage->getPublisherAdminActionOptions($partner, Infra_AclHelper::getCurrentPermissions());
+							foreach ($options as $option)
+							{
+								echo '<option value="' . $option[1] . '">'. $this->translate($options[0]) .'</option>';
+							}						
+						}
+						?>	
+					</select>
+				</td>
+				<td>
+					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
+						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
 							<option value="manage" ><?php echo $this->translate('Manage'); ?></option>
 						<?php endif; ?>	
@@ -50,13 +75,7 @@
 								<option value="configure"><?php echo $this->translate('Configure'); ?></option>
 							<?php endif; ?>
 						<?php endif; ?>
-						<?php if (Infra_AclHelper::isAllowed('widget','list')): ?>
-							<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
-						<?php endif; ?>	
 						<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
-							<?php if (Infra_AclHelper::isAllowed('partner','configure-storage')): ?>	
-								<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
-							<?php endif; ?>	
 							<?php if (Infra_AclHelper::isAllowed('partner','block')): ?>		
 								<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE): ?>
 									<option value="block"><?php echo $this->translate('Block'); ?></option>
@@ -68,17 +87,7 @@
 								<option value="remove"><?php echo $this->translate('Remove'); ?></option>
 							<?php endif; ?>
 						<?php endif; ?>						
-						<?php
-						// add options from plugin pages 
-						foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
-						{
-							$options = $partnerActionPluginPage->getPublisherAdminActionOptions($partner, Infra_AclHelper::getCurrentPermissions());
-							foreach ($options as $option)
-							{
-								echo '<option value="' . $option[1] . '">'. $this->translate($options[0]) .'</option>';
-							}						
-						}
-						?>
+						
 					</select>
 				</td>
 			</tr>
