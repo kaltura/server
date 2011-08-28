@@ -595,9 +595,10 @@ form#frmCreateDropFolder dt { float: left; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight input { width:30px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight label {margin-top:3px; margin-bottom:5px; float:left; width:88px; }
 #partner-configure-dialog #frmPartnerConfigure .field_checkbox { width:0px; }
-#partner-configure-dialog #mothly_bandwidth_combined {float:left; width:136px; height:87px}
+#partner-configure-dialog #mothly_bandwidth_combined {float:left; width:136px; height:87px;}
 #partner-configure-dialog #fieldset-publisherSpecificDeliverySettings .partner_configuration_checkbox_field {width:18px; float:left;}
 #partner-configure-dialog #fieldset-publisherSpecificDeliverySettings .partner_configuration_checkbox_field_only {float:none; width:450px; }
+#partner-configure-dialog #mothly_bandwidth_combined label {float:left; height:45px; margin-top:3px;}
 
 #partner-configure-dialog #fieldset-publisherSpecificDeliverySettings  dt {width:257px; float:left;}
 
