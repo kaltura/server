@@ -7,6 +7,8 @@ class AvnDistributionProfile extends ConfigurableDistributionProfile
 {
 	const CUSTOM_DATA_UNIQUE_HASH_FOR_FEED_URL = 'uniqueHashForFeedUrl';
 	const CUSTOM_DATA_FEED_TITLE = 'feedTitle';
+	const SPECIAL_THUMBNAIL_WIDTH = 640;
+	const SPECIAL_THUMBNAIL_HEIGHT = 480;
 	
 	protected $maxLengthValidation= array (
 		AvnDistributionField::TITLE => 30,
@@ -17,6 +19,8 @@ class AvnDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected $inListOrNullValidation = array (
 	);
+	
+	protected $overrideRequiredThumbs;
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -116,9 +120,21 @@ class AvnDistributionProfile extends ConfigurableDistributionProfile
 
 	public function validateForSubmission(EntryDistribution $entryDistribution, $action)
 	{
+		$allFieldValues = $this->getAllFieldValues($entryDistribution);
+		
+		// check if this entry is main menu or thank you screen and override the thumbnail validation
+		if (isset($allFieldValues[AvnDistributionField::CATEGORY]))
+		{ 
+			if (in_array(strtolower($allFieldValues[AvnDistributionField::CATEGORY]), array('main menu', 'thank you')))
+			{
+				$this->overrideRequiredThumbs = new kDistributionThumbDimensions();
+				$this->overrideRequiredThumbs->setWidth(self::SPECIAL_THUMBNAIL_WIDTH);
+				$this->overrideRequiredThumbs->setHeight(self::SPECIAL_THUMBNAIL_HEIGHT);
+			}
+		}
+		
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
 		
-		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if (!$allFieldValues || !is_array($allFieldValues)) 
 		{
 			KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
@@ -128,7 +144,25 @@ class AvnDistributionProfile extends ConfigurableDistributionProfile
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($this->maxLengthValidation, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($this->inListOrNullValidation, $allFieldValues, $action));
 
+		
+		
 		return $validationErrors;
+	}
+	
+	/**
+	 * @return array<kDistributionThumbDimensions>
+	 */
+	public function getRequiredThumbDimensionsObjects()
+	{
+		$requiredThumbs = parent::getRequiredThumbDimensionsObjects();
+		
+		if (!is_null($this->overrideRequiredThumbs))
+		{
+			$requiredThumbs = array();
+			$requiredThumbs[] = $this->overrideRequiredThumbs;
+		}
+	
+		return $requiredThumbs;
 	}
 	
 	public function getFeedUrl()
