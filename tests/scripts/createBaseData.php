@@ -269,6 +269,15 @@ class KalturaTestDeploymentHelper
 			
 		KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
 
+		$document = new KalturaDocumentEntry;
+		$document->documentType = KalturaDocumentType::PDF;
+		$document->name = "TEST_DOCUMENT_NAME";
+		$document->description = "TEST_DOCUMENT_DESC";
+		$uploadToken = $client->upload->upload("/opt/kaltura/app/tests/api/KalturaPlugins/DocumentsService_documents/test_doc.pdf");	
+		KalturaGlobalData::setData("@DEFAULT_DOCUMENT_UPLOAD_TOKEN@", $uploadToken);
+		$docId = $client->document->addFromUploadedFile($document, $uploadToken)->id;
+		KalturaGlobalData::setData("@DEFAULT_DOCUMENT_ENTRY_ID@", $docId);
+
 		//Add entry with duration from the dedault entries of the new partner
 		$filter = new KalturaMediaEntryFilter();
 		$filter->durationGreaterThan = 10;
