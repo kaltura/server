@@ -243,23 +243,6 @@ class kFlowHelper
 						$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
 				}
 				break;
-				
-			case mediaInfo::ASSET_TYPE_FLAVOR_INPUT:
-				if($rootBatchJob->getJobType() == BatchJobType::REMOTE_CONVERT)
-				{
-					$remoteConvertData = $rootBatchJob->getData();
-					$errDescription = null;
-					
-					$syncKey = null; // TODO - how to get or create the sync key?
-					$newConvertJob = kBusinessPreConvertDL::decideFlavorConvert($syncKey, $remoteConvertData->getFlavorParamsOutputId(), $errDescription, $remoteConvertData->getMediaInfoId(), $dbBatchJob);
-					if(!$newConvertJob)
-						kJobsManager::failBatchJob($rootBatchJob);
-				}
-				break;
-				
-			default:
-				// currently do nothing
-				break;
 		}
 		return $dbBatchJob;
 	}
