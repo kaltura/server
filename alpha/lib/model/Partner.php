@@ -398,6 +398,9 @@ class Partner extends BasePartner
 	public function getForceCdnHost()	{		return $this->getFromCustomData( "forceCdnHost" , null, false  );	}
 	public function setForceCdnHost( $v )	{		return $this->putInCustomData( "forceCdnHost", $v );	}	
 		
+	public function getRestrictThumbnailByKs()	{		return $this->getFromCustomData( "restrictThumbnailByKs" , null, false  );	}
+	public function setRestrictThumbnailByKs( $v )	{		return $this->putInCustomData( "restrictThumbnailByKs", $v );	}	
+		
 	public function getRtmpUrl()	{		return $this->getFromCustomData( "rtmpUrl" , null, false  );	}
 	public function setRtmpUrl( $v )	{		return $this->putInCustomData( "rtmpUrl", $v );	}	
 		

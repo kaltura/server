@@ -80,6 +80,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var int
 	 */
+	public $restrictThumbnailByKs;
+		
+	/**
+	 * @var int
+	 */
 	public $defThumbOffset;
 	
 	/**
@@ -221,6 +226,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailExpiryDate",
 		"extendedFreeTrailExpiryReason",
 		"extendedFreeTrail",
+		"restrictThumbnailByKs"
 	);
 
 	public function getMapBetweenObjects()
