@@ -37,25 +37,28 @@ $(function(){
 		} 
 	});
 
-	$('select#partner_package').change(function(){
-		var $monitor_usage = $('#do_not_monitor_usage');
-		var $monitor_usage_expiry_date = $('#extended_free_trail_expiry_date');
-		var $monitor_usage_expiry_reason = $('#extended_free_trail_expiry_date_reason');
+	$('#partner_package-element select').change(function(){
+		console.log('in here');
+		var $extended_free_trail = $('#extended_free_trail');
+		var $extended_free_trail_expiry_date = $('#extended_free_trail_expiry_date');
+		var $extended_free_trail_expiry_reason = $('#extended_free_trail_expiry_reason');
 		
 		if ($(this).val() == 1) {
-			$monitor_usage.attr("checked", false);
-			$monitor_usage.attr("disabled", false);
+			$extended_free_trail.attr("checked", false);
+			$extended_free_trail.attr("disabled", false);
+			console.log('in here 1');
 	    }else if ($(this).val() == 2) {
-			$monitor_usage.attr("checked", false);
-			$monitor_usage.attr("disabled", true);
-			$monitor_usage_expiry_date.attr("disabled", true);
-			$monitor_usage_expiry_date.val("0");
-			$monitor_usage_expiry_reason.attr("disabled", true);
-			$monitor_usage_expiry_reason.val("0");
+	    	console.log('in here 2');
+			$extended_free_trail.attr("checked", false);
+			$extended_free_trail.attr("disabled", true);
+			$extended_free_trail_expiry_date.attr("disabled", true);
+			$extended_free_trail_expiry_date.val("0");
+			$extended_free_trail_expiry_reason.attr("disabled", true);
+			$extended_free_trail_expiry_reason.val("0");
 	    } 
 	});
 
-	$('#monitor_usage_expiry_date').change(function(){
+	$('#extended_free_trail_expiry_date').change(function(){
 		$('#extended_free_trail_expiry_reason').val('');
 	});
 
