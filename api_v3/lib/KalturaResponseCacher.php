@@ -17,12 +17,16 @@ class KalturaResponseCacher
 	protected $_expiry = 600;
 	protected $_cacheHeadersExpiry = 60; // cache headers for CDN & browser - used  for GET request with kalsig param
 	
-	protected static $_useCache = true;
+	protected $_instanceId = 0;
 	
+	protected static $_useCache = array();		// contains instance ids that will use the cache
+	protected static $_nextInstanceId = 0;
+		
 	public function __construct($params = null, $cacheDirectory = null, $expiry = 0)
 	{
-		self::$_useCache = kConf::get('enable_cache');
-
+		$this->_instanceId = self::$_nextInstanceId;  
+		self::$_nextInstanceId++;
+		
 		if ($expiry)
 			$this->_defaultExpiry = $this->_expiry = $expiry;
 			
@@ -31,7 +35,7 @@ class KalturaResponseCacher
 		
 		$this->_cacheDirectory .= "cache_v3-".$this->_expiry . DIRECTORY_SEPARATOR;
 		
-		if (!self::$_useCache)
+		if (!kConf::get('enable_cache'))
 			return;
 			
 		if (!$params) {
@@ -50,7 +54,6 @@ class KalturaResponseCacher
 			{
 				if ($matches[1] > time())
 				{
-					self::$_useCache = false;
 					return;
 				}
 			}
@@ -59,7 +62,6 @@ class KalturaResponseCacher
 		$isAdminLogin = isset($params['service']) && isset($params['action']) && $params['service'] == 'adminuser' && $params['action'] == 'login';
 		if ($isAdminLogin || isset($params['nocache']))
 		{
-			self::$_useCache = false;
 			return;
 		}
 		
@@ -79,6 +81,8 @@ class KalturaResponseCacher
 		
 		$this->_params = $params;
 		$this->setKS($ks);
+
+		self::$_useCache[] = $this->_instanceId;	
 	}
 	
 	public function setKS($ks)
@@ -105,7 +109,7 @@ class KalturaResponseCacher
 	
 	public static function disableCache()
 	{
-		self::$_useCache = false;
+		self::$_useCache = array();
 	}
 	
 	/**
@@ -123,7 +127,7 @@ class KalturaResponseCacher
 	 */	 
 	public function checkCache($cacheHeaderName = 'X-Kaltura', $cacheHeader = 'cached-dispatcher')
 	{
-		if (!self::$_useCache)
+		if (!in_array($this->_instanceId, self::$_useCache))
 			return false;
 			
 		$startTime = microtime(true);
@@ -144,7 +148,7 @@ class KalturaResponseCacher
 		
 	public function checkOrStart()
 	{
-		if (!self::$_useCache)
+		if (!in_array($this->_instanceId, self::$_useCache))
 			return;
 					
 		$response = $this->checkCache();
@@ -269,7 +273,7 @@ class KalturaResponseCacher
 	
 	private function shouldCache()
 	{
-		if (!self::$_useCache)
+		if (!in_array($this->_instanceId, self::$_useCache))
 			return false;
 			
 		$ks = null;
