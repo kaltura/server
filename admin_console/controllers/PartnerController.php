@@ -285,7 +285,7 @@ class PartnerController extends Zend_Controller_Action
 			$config = $form->getObject("Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration", $request->getPost());
 			
 			
-			$config->monitorUsageExpiryDate = strtotime($this->_getParam('extended_free_trail_expiry_date'));
+			$config->extendedFreeTrailExpiryDate = strtotime($this->_getParam('extended_free_trail_expiry_date'));
 				
 			
 			try{
