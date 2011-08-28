@@ -222,8 +222,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function createAuditTrail(BaseObject $object, $action) 
 	{
-		
-			$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = kCurrentContext::$master_partner_id;
 					
 		if(!$this->traceEnabled($partnerId))
 			return null;
