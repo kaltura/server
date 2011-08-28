@@ -311,7 +311,7 @@ class PartnerController extends Zend_Controller_Action
 				$this->view->errMessage = $e->getMessage();
 			}
 			
-			$form->getElement('extended_free_trail')->setAttrib('onClick', 'openViewHistory('. $partnerId .')');
+			$form->getElement('monitor_usage_history')->setAttrib('onClick', 'openViewHistory('. $partnerId .')');
 			$monitorUsageDataElement = $form->getElement('extended_free_trail_expiry_date');
 			$monitorUsageDataElement->setValue(date("m/d/y",$monitorUsageDataElement->getValue()));
 		}
