@@ -235,15 +235,12 @@ class kFlowHelper
 				
 				if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 				{
-					$conversionsCreated = kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
+					kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 					
-					if($conversionsCreated)
-					{
-						// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
-						$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-						if($currentFlavorAsset)
-							$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
-					}
+					// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
+					$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+					if($currentFlavorAsset && $currentFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+						$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
 				}
 				break;
 				
