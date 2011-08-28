@@ -484,14 +484,14 @@ class Partner extends BasePartner
 	
 	
 	/** monitor Usage Expiry **/
-	public function getDoNotMonitorUsage() { return $this->getFromCustomData("doNotMonitorUsage", null); }
-	public function setDoNotMonitorUsage( $v ) { $this->putInCustomData("doNotMonitorUsage", $v); }
+	public function getExtendedFreeTrail() { return $this->getFromCustomData("extendedFreeTrail", null); }
+	public function setExtendedFreeTrail( $v ) { $this->putInCustomData("extendedFreeTrail", $v); }
 	
-	public function getMonitorUsageExpiryReason() { return $this->getFromCustomData("monitorUsageExpiryReason", null); }
-	public function setMonitorUsageExpiryReason( $v ) { $this->putInCustomData("monitorUsageExpiryReason", $v); }
+	public function getExtendedFreeTrailExpiryReason() { return $this->getFromCustomData("extendedFreeTrailExpiryReason", null); }
+	public function setExtendedFreeTrailExpiryReason( $v ) { $this->putInCustomData("extendedFreeTrailExpiryReason", $v); }
 	
-	public function getMonitorUsageExpiryDate() { return $this->getFromCustomData("monitorUsageExpiryDate", null); }
-	public function setMonitorUsageExpiryDate( $v ) { $this->putInCustomData("monitorUsageExpiryDate", $v); }
+	public function getExtendedFreeTrailExpiryDate() { return $this->getFromCustomData("extendedFreeTrailExpiryDate", null); }
+	public function setExtendedFreeTrailExpiryDate( $v ) { $this->putInCustomData("extendedFreeTrailExpiryDate", $v); }
 	
 	
 	/** 27Apr2011 - added fields for new registration form **/
