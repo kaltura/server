@@ -31,21 +31,6 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 * @requiresPermission insert,update
 	 */
 	public $title;
-	
-	/**
-	 * @var int 
-	 * @filter gte,lte,order
-	 * @requiresPermission insert,update
-	 */
-	public $endTime;
-	
-	/**
-	 * Duration in milliseconds
-	 * @var int 
-	 * @filter gte,lte,order
-	 * @readonly
-	 */
-	public $duration;
 
 	public function __construct()
 	{
@@ -58,8 +43,6 @@ class KalturaAdCuePoint extends KalturaCuePoint
 		"sourceUrl",
 		"adType",
 		"title" => "name",
-		"endTime",
-		"duration",
 	);
 	
 	/* (non-PHPdoc)
@@ -79,27 +62,5 @@ class KalturaAdCuePoint extends KalturaCuePoint
 			$object_to_fill = new AdCuePoint();
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaCuePoint::validateForInsert()
-	 */
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		parent::validateForInsert($propertiesToSkip);
-			
-		if(!is_null($this->endTime))
-			$this->validateEndTime();
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaCuePoint::validateForUpdate()
-	 */
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		if(!is_null($this->endTime))
-			$this->validateEndTime($sourceObject->getId());
-			
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

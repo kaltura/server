@@ -16,6 +16,21 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 	 * @filter like,mlikeor,mlikeand
 	 */
 	public $description;
+	
+	/**
+	 * @var int 
+	 * @filter gte,lte,order
+	 * @requiresPermission insert,update
+	 */
+	public $endTime;
+	
+	/**
+	 * Duration in milliseconds
+	 * @var int 
+	 * @filter gte,lte,order
+	 * @readonly
+	 */
+	public $duration;
 
 	public function __construct()
 	{
@@ -26,6 +41,8 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 	(
 		"code" => "name",
 		"description" => "text",
+		"endTime",
+		"duration",
 	);
 	
 	/* (non-PHPdoc)
@@ -55,5 +72,19 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 		parent::validateForInsert($propertiesToSkip);
 		
 		$this->validatePropertyNotNull("code");
+			
+		if(!is_null($this->endTime))
+			$this->validateEndTime();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaCuePoint::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if(!is_null($this->endTime))
+			$this->validateEndTime($sourceObject->getId());
+			
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

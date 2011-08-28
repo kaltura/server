@@ -42,8 +42,6 @@ class AdCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 		if(!($cuePoint instanceof KalturaAdCuePoint))
 			return null;
 		
-		if(isset($scene->sceneEndTime))
-			$cuePoint->endTime = kXml::timeToInteger($scene->sceneEndTime);
 		if(isset($scene->sceneTitle))
 			$cuePoint->title = "$scene->sceneTitle";
 		if(isset($scene->sourceUrl))

@@ -42,6 +42,8 @@ class CodeCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 		if(!($cuePoint instanceof KalturaCodeCuePoint))
 			return null;
 		
+		if(isset($scene->sceneEndTime))
+			$cuePoint->endTime = kXml::timeToInteger($scene->sceneEndTime);
 		if(isset($scene->code))
 			$cuePoint->code = "$scene->code";
 		if(isset($scene->description))
