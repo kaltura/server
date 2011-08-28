@@ -339,9 +339,9 @@ class kFlowHelper
 		}
 		else 
 		{
-			// TODO create remote file sync
+			$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+			kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $storageProfile);
 		}
-		
 		
 		// creats the file sync
 		if(file_exists($data->getLogFileSyncLocalPath()))
@@ -1718,7 +1718,6 @@ class kFlowHelper
 	 			KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
 				return;
 			}
-			// TODO - maybe I need to increment the entry file sync version?
 			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
