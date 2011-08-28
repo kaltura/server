@@ -39,8 +39,8 @@ $(function(){
 
 	$('select#partner_package').change(function(){
 		var $monitor_usage = $('#do_not_monitor_usage');
-		var $monitor_usage_expiry_date = $('#monitor_usage_expiry_date');
-		var $monitor_usage_expiry_reason = $('#monitor_usage_expiry_reason');
+		var $monitor_usage_expiry_date = $('#extended_free_trail_expiry_date');
+		var $monitor_usage_expiry_reason = $('#extended_free_trail_expiry_date_reason');
 		
 		if ($(this).val() == 1) {
 			$monitor_usage.attr("checked", false);
@@ -56,7 +56,7 @@ $(function(){
 	});
 
 	$('#monitor_usage_expiry_date').change(function(){
-		$('#monitor_usage_expiry_reason').val('');
+		$('#extended_free_trail_expiry_reason').val('');
 	});
 
 	$("#fieldset-accountOptionsMonitorUsage input").each(function(inx, value){
@@ -64,8 +64,8 @@ $(function(){
 				
 				if( $input.attr('type') == 'checkbox') {
 					$input.change(function(){
-						var $expiry_date = $('#monitor_usage_expiry_date');
-						var $expiry_reason = $('#monitor_usage_expiry_reason');
+						var $expiry_date = $('#extended_free_trail_expiry_date');
+						var $expiry_reason = $('#extended_free_trail_expiry_reason');
 						
 						if ($(this).attr("checked")) {
 							$expiry_date.attr("disabled", false);
@@ -84,8 +84,8 @@ $(function(){
 
 					
 
-					var $expiry_date = $('#monitor_usage_expiry_date');
-					var $expiry_reason = $('#monitor_usage_expiry_reason');
+					var $expiry_date = $('#extended_free_trail_expiry_date');
+					var $expiry_reason = $('#extended_free_trail_expiry_reason');
 					
 					if ($(this).attr("checked")) {
 						$expiry_date.attr("disabled", false);
@@ -105,7 +105,7 @@ $(function(){
 				}
 			});
 	
-	jQuery('#monitor_usage_expiry_date').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
+	jQuery('#extended_free_trail_expiry_date').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
 	
 });
 

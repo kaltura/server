@@ -14,7 +14,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES] = array();
 		$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS] = array();
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS] = array();
-
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -206,17 +205,17 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 //--------------------------- New Account Options ---------------------------			
 												
-		$this->addElement('checkbox', 'do_not_monitor_usage', array(
+		$this->addElement('checkbox', 'extended_free_trail', array(
 			'label'	  => 'Extended Free Trail',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		
-		$this->addElement('text', 'monitor_usage_expiry_date', array(
+		$this->addElement('text', 'extended_free_trail_expiry_date', array(
 			'label'		=> 'Free Trial Extension Expiry Date:',
 			'required' => true,
 		));
 		
-		$this->addElement('text', 'monitor_usage_expiry_reason', array(
+		$this->addElement('text', 'extended_free_trail_expiry_reason', array(
 			'label'		=> 'Extension Expiry Reason:',
 			'required' => true,
 		));
@@ -368,7 +367,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	
 	public function handlePermissions()
 	{
-		//permissions groups
+		//permissions groups 
 		$configureAccountsTechData = array('publisherSpecificDeliverySettings', 'remoteStorageAccountPolicy', 'advancedNotificationSettings', 'publisherSpecificIngestionSettings', 'passwordSecurity'); //EAGLE PRD group 1
 		$configureGeneralInformation = array('generalInformation'); // EAGLE PRD group 2
 		$configureAccountsGroup = array('groupAssociation'); // EAGLE PRD group 3
@@ -396,6 +395,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-usage'))){
 			$this->setPermissionGroupElementsToReadOnly($configureAccountsOptionsMonitorUsage);
 		}
+		
 	}
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------		
 	/**
@@ -556,7 +556,7 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
-		$this->addDisplayGroup(array('do_not_monitor_usage', 'monitor_usage_expiry_date', 'monitor_usage_expiry_reason', 'monitor_usage_history'), 'accountOptionsMonitorUsage', array('legend' => 'New Account Options'));
+		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason', 'monitor_usage_history'), 'accountOptionsMonitorUsage', array('legend' => 'New Account Options'));
 		$this->addDisplayGroup(array('is_first_login','crossLine'), 'accountOptions');
 				
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',

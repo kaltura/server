@@ -285,7 +285,7 @@ class PartnerController extends Zend_Controller_Action
 			$config = $form->getObject("Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration", $request->getPost());
 			
 			
-			$config->monitorUsageExpiryDate = strtotime($this->_getParam('monitor_usage_expiry_date'));
+			$config->monitorUsageExpiryDate = strtotime($this->_getParam('extended_free_trail_expiry_date'));
 				
 			
 			try{
@@ -311,8 +311,8 @@ class PartnerController extends Zend_Controller_Action
 				$this->view->errMessage = $e->getMessage();
 			}
 			
-			$form->getElement('monitor_usage_history')->setAttrib('onClick', 'openViewHistory('. $partnerId .')');
-			$monitorUsageDataElement = $form->getElement('monitor_usage_expiry_date');
+			$form->getElement('extended_free_trail')->setAttrib('onClick', 'openViewHistory('. $partnerId .')');
+			$monitorUsageDataElement = $form->getElement('extended_free_trail_expiry_date');
 			$monitorUsageDataElement->setValue(date("m/d/y",$monitorUsageDataElement->getValue()));
 		}
 		
