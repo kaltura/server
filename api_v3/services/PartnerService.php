@@ -242,7 +242,7 @@ class PartnerService extends KalturaBaseService
 
 		$packages = new PartnerPackages();
 		$partnerUsage = new KalturaPartnerUsage;
-		$partnerPackage = $packages->getPackageClassOfServiceDetails($dbPartner->getPartnerPackage());
+		$partnerPackage = $packages->getPackageDetails($dbPartner->getPartnerPackage());
 		
 		$report_date = date ( "Y-m-d" , time());
 		
