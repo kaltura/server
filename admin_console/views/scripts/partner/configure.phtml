@@ -37,6 +37,36 @@ $(function(){
 		} 
 	});
 
+	var $combined_bw_max = $('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_max');
+	var $combined_bw_price = $('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_overagePrice');
+	var $combined_bw_unit = $('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_overageUnit');
+
+	if ($combined_bw_max.val() > 0 || $combined_bw_price.val() > 0 || $combined_bw_unit.val() > 0){
+		//combined usage
+		$('#mothly_bandwidth_combined-1').attr("checked", true);
+		setCombinedUsage(false);					
+	}else{
+		//separated usage
+		$('#mothly_bandwidth_combined-2').attr("checked", true);
+		setCombinedUsage(true);
+	} 
+
+	$("#mothly_bandwidth_combined input").each(function(inx, value){
+		var $input = $(value);
+
+
+		$input.change(function(){
+			if($(this).is(':checked') === true) {
+		        if ($(this).val() == 1){
+			        setCombinedUsage(false);
+		        }else{
+		        	setCombinedUsage(true);
+		        	
+		        }
+		    }
+		}); 
+	});
+
 	$('#partner_package-element select').change(function()
 	{
 		var $extended_free_trail = $('#extended_free_trail');
@@ -125,6 +155,31 @@ $(function(){
 	jQuery('#extended_free_trail_expiry_date').datepicker({showOn: 'both', buttonImage: '<?php echo $this->baseUrl('images/calendar.gif'); ?>', buttonImageOnly: true});
 	
 });
+
+function setCombinedUsage($isCombined){
+	if ($isCombined == true){
+		$('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_max').attr({value:''});
+		$('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_overagePrice').attr({value:''});
+		$('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_overageUnit').attr({value:''});
+	}else{
+		$('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_max').attr({disabled: !$isCombined, value:''});
+		$('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_overagePrice').attr({disabled: !$isCombined, value:''});
+		$('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_overageUnit').attr({disabled: !$isCombined, value:''});
+		$('#MONTHLY_STORAGE-MONTHLY_STORAGE_max').attr({disabled: !$isCombined, value:''});
+		$('#MONTHLY_STORAGE-MONTHLY_STORAGE_overagePrice').attr({disabled: !$isCombined, value:''});
+		$('#MONTHLY_STORAGE-MONTHLY_STORAGE_overageUnit').attr({disabled: !$isCombined, value:''});
+	}
+	
+	$('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_max').attr({disabled: $isCombined});
+	$('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_overagePrice').attr({disabled: $isCombined});
+	$('#MONTHLY_STORAGE_AND_BANDWIDTH-MONTHLY_STORAGE_AND_BANDWIDTH_overageUnit').attr({disabled: $isCombined});
+	$('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_max').attr("disabled", !$isCombined);
+	$('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_overagePrice').attr("disabled", !$isCombined);
+	$('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_overageUnit').attr("disabled", !$isCombined);
+	$('#MONTHLY_STORAGE-MONTHLY_STORAGE_max').attr("disabled", !$isCombined);
+	$('#MONTHLY_STORAGE-MONTHLY_STORAGE_overagePrice').attr("disabled", !$isCombined);
+	$('#MONTHLY_STORAGE-MONTHLY_STORAGE_overageUnit').attr("disabled", !$isCombined);
+}
 
 function openConfirm(url) {
 	var dialogDiv = jQuery('<div id="confirmation-div"><?php echo $this->translate('Do you want to save your changes before leaving this page?'); ?></div>').appendTo('body');
