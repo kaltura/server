@@ -32,6 +32,11 @@ class KalturaConvartableJobData extends KalturaJobData
 	public $flavorParamsOutputId;
 	
 	/**
+	 * @var KalturaFlavorParamsOutput
+	 */
+	public $flavorParamsOutput;
+	
+	/**
 	 * @var int
 	 */
 	public $mediaInfoId;
