@@ -187,6 +187,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $extendedFreeTrail;
 	
+	/**
+	 * @var string
+	 */
+	public $crmId;
+	
+	/**
+	 * @var string
+	 */
+	public $crmLink;
+	
 	
 	
 	private static $map_between_objects = array
@@ -226,7 +236,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailExpiryDate",
 		"extendedFreeTrailExpiryReason",
 		"extendedFreeTrail",
-		"restrictThumbnailByKs"
+		"restrictThumbnailByKs",
+		"crmLink",
+		"crmId"
 	);
 
 	public function getMapBetweenObjects()
