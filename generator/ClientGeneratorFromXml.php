@@ -80,14 +80,13 @@ abstract class ClientGeneratorFromXml
 		$dir = dir($directory);
 		while (false !== $entry = $dir->read()) 
 		{
-			// skip pointers & hidden files
-			if ($this->beginsWith($entry, ".") && 
-				$entry != ".project" && 
-				$entry != ".settings" && 
-				$entry != ".classpath" ) 
+			// skip source control files
+			if ($this->beginsWith($entry, ".svn") || 
+				$this->beginsWith($entry, ".cvs") || 
+				$this->beginsWith($entry, ".git") )
 			{
 				continue;
-			}
+			} 
 			 
 			$this->addSourceFiles(realpath("$directory/$entry"));
 		}

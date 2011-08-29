@@ -298,7 +298,7 @@ function createPackage($outputPath, $generatorName, $overrideGenDate = null)
 		if ($overrideGenDate == null) $overrideGenDate = $generatedDate;
 		$fileName = "{$generatorName}_{$overrideGenDate}.tar.gz";
 		$gzipOutputPath = "..".DIRECTORY_SEPARATOR.$fileName;
-		$cmd = "tar -czf \"$gzipOutputPath\" ..".DIRECTORY_SEPARATOR.$generatorName." --exclude-vcs --exclude \".svn\"";
+		$cmd = "tar -czf \"$gzipOutputPath\" ..".DIRECTORY_SEPARATOR.$generatorName;
 		$oldDir = getcwd();
 		
 		$outputPath = realpath($outputPath);
