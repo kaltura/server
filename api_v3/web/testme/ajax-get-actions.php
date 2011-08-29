@@ -13,8 +13,10 @@ $actions = array();
 foreach($actionNames as $actionName)
 {
     $actionInfo = $serviceReflector->getActionInfo($actionName);
-    if(!$actionInfo->deprecated)
-    	$actions[] = $actionInfo->action;
+    $actionName = $actionInfo->action;
+    if ($actionInfo->deprecated)
+    	$actionName .= ' (deprecated)';
+   	$actions[] = array($actionInfo->action, $actionName);
 }
 
 echo json_encode($actions);

@@ -49,7 +49,7 @@
 		$list = array();
 		foreach($services as $serviceName => $serviceReflector)
 		{
-			if($serviceReflector->isDeprecated() || $serviceReflector->isServerOnly())
+			if($serviceReflector->isServerOnly())
 				unset($services[$serviceName]);
 		}
 		ksort($services, SORT_STRING);
@@ -108,7 +108,11 @@
 			<div class="param"><label for="service">Select service:</label> <select
 	name="service">
 					<?php foreach($services as $serviceReflector): ?>
-					<option value="<?php echo $serviceReflector->getServiceId();?>"><?php echo $serviceReflector->getServiceName(); ?></option>
+					<option value="<?php echo $serviceReflector->getServiceId();?>">
+						<?php echo $serviceReflector->getServiceName();
+							if ($serviceReflector->isDeprecated())
+								echo ' (deprecated)'; ?>
+					</option>
 					<?php endforeach; ?>
 				</select></div>
 <div class="param"><label for="action">Select action:</label> <select

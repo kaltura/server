@@ -85,7 +85,7 @@ KTestMe.prototype = {
 		this.jqActions.empty();
 		this.jqActions.attr("disabled", false);
 		jQuery.each(data, delegate(this, function (i, item) {
-			this.jqActions.append("<option>"+item+"</option>");
+			this.jqActions.append("<option value=\"" + item[0] + "\">" + item[1] + "</option>");
 		}));
 		
 		if (!this.historyItem)
