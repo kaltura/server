@@ -43,7 +43,7 @@ class getpartnerusageAction extends defPartnerservices2Action
 			$this->addException( APIErrors::UNKNOWN_PARTNER_ID );
 		}
 		$packages = new PartnerPackages();
-		$partnerPackage = $packages->getPackageClassOfServiceDetails($partner->getPartnerPackage());
+		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
 		
 		$report_date = dateUtils::todayOffset(-3);
 		
