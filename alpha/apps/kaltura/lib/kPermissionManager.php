@@ -737,7 +737,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public static function getUsagePermitted($object_name, $param_name)
 	{
-		return self::getParamPermitted(ApiParameterPermissionItemAction::USEAGE, $object_name, $param_name);
+		return self::getParamPermitted(ApiParameterPermissionItemAction::USAGE, $object_name, $param_name);
 	}
 	
 	/**
