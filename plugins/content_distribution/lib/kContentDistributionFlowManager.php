@@ -42,6 +42,8 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				
 			if(in_array(assetPeer::VERSION, $modifiedColumns))
 				return self::onAssetVersionChanged($object);
+			
+			KalturaLog::log("Status and version didn't change");
 		}
 		
 		if($object instanceof EntryDistribution)
@@ -1287,6 +1289,24 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	 */
 	public static function onEntryDistributionUpdateRequired(EntryDistribution $entryDistribution)
 	{
+		$distributionProfileId = $entryDistribution->getDistributionProfileId();
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
+		if(!$distributionProfile)
+			return true;
+		
+		$distributionProvider = $distributionProfile->getProvider();
+		if(!$distributionProvider)
+		{
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
+			return true;
+		}
+		
+		if(!$distributionProvider->isUpdateEnabled())
+		{
+			KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+			return true;
+		}
+		
 		$ignoreStatuses = array(
 			EntryDistributionStatus::PENDING,
 			EntryDistributionStatus::DELETED,
@@ -1567,19 +1587,30 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public static function onAssetVersionChanged(asset $asset)
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($asset->getPartnerId()))
+		{
+			KalturaLog::log("Partner [ . $asset->getPartnerId() . ] is not allowed");
 			return true;
+		}
 			
 		$entry = $asset->getentry();
 		if(!$entry)
+		{
+			KalturaLog::log("Entry [ . $asset->getEntryId() . ] not found");
 			return true;
+		}
 			
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
+		KalturaLog::log("Entry distributions [" . count($entryDistributions) . "] found");
+		
 		foreach($entryDistributions as $entryDistribution)
 		{
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile [" . $entryDistribution->getDistributionProfileId() . "] not found");
 				continue;
+			}
 			
 			$distributionProvider = $distributionProfile->getProvider();
 			if(!$distributionProvider)
@@ -1606,11 +1637,17 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public static function onAssetReadyOrDeleted(asset $asset)
 	{
 		if(!ContentDistributionPlugin::isAllowedPartner($asset->getPartnerId()))
+		{
+			KalturaLog::log("Partner [" . $asset->getPartnerId() . "] is not allowed");
 			return true;
+		}
 			
 		$entry = $asset->getentry();
 		if(!$entry)
+		{
+			KalturaLog::log("Entry [" . $asset->getEntryId() . "] not found");
 			return true;
+		}
 			
 		$entryDistributions = EntryDistributionPeer::retrieveByEntryId($asset->getEntryId());
 		foreach($entryDistributions as $entryDistribution)
@@ -1618,7 +1655,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 			$distributionProfileId = $entryDistribution->getDistributionProfileId();
 			$distributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
 			if(!$distributionProfile)
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile [$distributionProfileId] not found");
 				continue;
+			}
 				
 			if($entryDistribution->getStatus() == EntryDistributionStatus::QUEUED || $entryDistribution->getStatus() == EntryDistributionStatus::PENDING)
 			{
@@ -1626,7 +1666,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
 				
 				if(!$listChanged)
+				{
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] asset lists didn't change");
 					continue;
+				}
 				
 				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::SUBMIT);
 				$entryDistribution->setValidationErrorsArray($validationErrors);
@@ -1658,7 +1701,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				$listChanged = ($listChanged | kContentDistributionManager::assignThumbAssets($entryDistribution, $entry, $distributionProfile));
 				
 				if(!$listChanged)
+				{
+					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] asset lists didn't change");
 					continue;
+				}
 					
 				$validationErrors = $distributionProfile->validateForSubmission($entryDistribution, DistributionAction::UPDATE);
 				$entryDistribution->setValidationErrorsArray($validationErrors);

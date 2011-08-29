@@ -267,6 +267,22 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	{
 		$validationErrors = array();
 		
+		$distributionProvider = $this->getProvider();
+		if(!$distributionProvider)
+		{
+			KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $this->getProviderType() . "] not found");
+			return $validationErrors;
+		}
+		
+		if($action == DistributionAction::UPDATE || $entryDistribution->getStatus() == EntryDistributionStatus::READY || $entryDistribution->getStatus() == EntryDistributionStatus::ERROR_UPDATING)
+		{
+			if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+				return $validationErrors;
+			}
+		}
+		
 		$requiredFlavorParamsIds = $this->getRequiredFlavorParamsIdsArray();
 		KalturaLog::log("Required Flavor Params Ids [" . print_r($requiredFlavorParamsIds, true) . "]");
 		$entryFlavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entryDistribution->getEntryId());
