@@ -97,6 +97,11 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
+					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
 							<xs:documentation>Textual title</xs:documentation>
@@ -185,6 +190,8 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 		if(!($cuePoint instanceof AdCuePoint))
 			return null;
 		
+		if(isset($scene->sceneEndTime))
+			$cuePoint->setEndTime(kXml::timeToInteger($scene->sceneEndTime));
 		if(isset($scene->sceneTitle))
 			$cuePoint->setName($scene->sceneTitle);
 		if(isset($scene->sourceUrl))
@@ -206,7 +213,9 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 			
 		if(!$scene)
 			$scene = kCuePointManager::generateCuePointXml($cuePoint, $scenes->addChild('scene-ad-cue-point'));
-			
+		
+		if($cuePoint->getEndTime())
+			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 		if($cuePoint->getName())
 			$scene->addChild('sceneTitle', kMrssManager::stringToSafeXml($cuePoint->getName()));
 		if($cuePoint->getSourceUrl())
@@ -228,7 +237,9 @@ class AdCuePointPlugin extends KalturaPlugin implements IKalturaCuePoint
 			
 		if(!$scene)
 			$scene = kCuePointManager::syndicateCuePointXml($cuePoint, $scenes->addChild('scene-ad-cue-point'));
-			
+		
+		if($cuePoint->getEndTime())
+			$scene->addChild('sceneEndTime', kXml::integerToTime($cuePoint->getEndTime()));
 		if($cuePoint->getName())
 			$scene->addChild('sceneTitle', kMrssManager::stringToSafeXml($cuePoint->getName()));
 		if($cuePoint->getSourceUrl())

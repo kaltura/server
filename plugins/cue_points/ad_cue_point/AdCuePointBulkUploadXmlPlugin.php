@@ -71,6 +71,11 @@ class AdCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		<xs:complexContent>
 			<xs:extension base="T_scene">
 				<xs:sequence>
+					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time">
+						<xs:annotation>
+							<xs:documentation>Cue point end time</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
 							<xs:documentation>Textual title</xs:documentation>
