@@ -18,7 +18,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
 
-		$this->setDescription('partner-configure intro text');
+		//$this->setDescription('partner-configure intro text');
 		$this->loadDefaultDecorators();
 		$this->addDecorator('Description', array('placement' => 'prepend'));	
 		
@@ -30,6 +30,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('text', 'partner_name', array(
 			'label'			=> 'partner-configure Publisher Name',
 			'filters'		=> array('StringTrim'),
+			'required' 		=> true,
 		));
 				
 		$this->addElement('text', 'description', array(
@@ -43,7 +44,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 			'ignore' 		=> true,
-			'disable'       => 'disable',
+			'required' 		=> true,
 		));	
 		
 		// change to read only		 
@@ -52,7 +53,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 			'ignore' 		=> true,
-			'disable'       => 'disable',
 		));
 		
 		$this->addElement('text', 'id', array(
@@ -60,7 +60,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 			'ignore' 		=> true,
-			'disable'       => 'disable',
 		));
 		
 		$this->addElement('text', 'kmc_version', array(
@@ -68,7 +67,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 			'ignore' 		=> true,
-			'disable'       => 'disable',
 		));
 						
 //--------------------------- Publisher specific Delivery Settings ---------------------------		 
@@ -213,12 +211,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElement('text', 'extended_free_trail_expiry_date', array(
 			'label'		=> 'Free Trial Extension Expiry Date:',
-			'required' => true,
 		));
 		
 		$this->addElement('text', 'extended_free_trail_expiry_reason', array(
 			'label'		=> 'Extension Expiry Reason:',
-			'required' => true,
 		));
 		
 		$this->addElement('button', 'monitor_usage_history', array(
@@ -357,7 +353,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			foreach ($displayGroupElements as $el)
 			{
 				$el->setAttrib('readonly', true);				
-				$el->setAttrib('disable', 'disable');
+				//$el->setAttrib('disable', 'disable');
 				//disable links
 				if ($dispalyGroupName == 'enableDisableFeatures'){
 					$el->setDescription('<a class=linkToPage href=# onClick="return false;">(config)</a>');
@@ -596,5 +592,23 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->limitSubForms[$subFormName] = $subForm;
 		$subForm->addElementsToForm($this);
 	}
+	
+	    /**
+     * Validate the form
+     *
+     * @param  array $data
+     * @return boolean
+     */
+    public function isValid($data)
+    {
+    	if (isset($data['extended_free_trail']) && $data['extended_free_trail']){
+		    $extended_free_trail_expiry_date = $this->getElement('extended_free_trail_expiry_date');
+		    $extended_free_trail_expiry_date->setRequired(true);
+    		$extended_free_trail_expiry_reason = $this->getElement('extended_free_trail_expiry_reason');
+    		$extended_free_trail_expiry_reason->setRequired(true);
+    	}
+    	
+    	return parent::isValid($data);
+    }
 			
 }
