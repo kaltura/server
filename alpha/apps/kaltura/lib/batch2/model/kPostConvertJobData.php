@@ -9,43 +9,49 @@ class kPostConvertJobData extends kConvartableJobData
 	 * @var string
 	 */
 	private $flavorAssetId;
-	
+
 	/**
 	 * Indicates if a thumbnail should be created
-	 * 
+	 *
 	 * @var boolean
 	 */
 	private $createThumb;
-	
+
 	/**
 	 * The path of the created thumbnail
-	 *  
+	 *
 	 * @var string
 	 */
 	private $thumbPath;
-	
+
 	/**
 	 * The position of the thumbnail in the media file
-	 *  
+	 *
 	 * @var int
 	 */
 	private $thumbOffset;
-	
+
 	/**
 	 * The height of the movie, will be used to comapare if this thumbnail is the best we can have
-	 *  
+	 *
 	 * @var int
 	 */
 	private $thumbHeight;
-	
+
 	/**
 	 * The bit rate of the movie, will be used to comapare if this thumbnail is the best we can have
-	 *  
+	 *
 	 * @var int
 	 */
 	private $thumbBitrate;
-	
-	
+
+	/**
+	 * Source, destination flavor or source in bypass (only source configured in the profile)
+	 *
+	 * @var int
+	 */
+	private $postConvertAssetType;
+
 	/**
 	 * @param $thumbBitrate the $thumbBitrate to set
 	 */
@@ -126,7 +132,6 @@ class kPostConvertJobData extends kConvartableJobData
 		return $this->createThumb;
 	}
 
-	
 	/**
 	 * @param $flavorAssetId the $flavorAssetId to set
 	 */
@@ -149,14 +154,29 @@ class kPostConvertJobData extends kConvartableJobData
 	public function getReadyBehavior()
 	{
 		$flavorParamsOutput = $this->getFlavorParamsOutput();
-		
+
 		if(!$flavorParamsOutput)
-			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($this->getFlavorParamsOutputId());
+		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($this->getFlavorParamsOutputId());
 			
 		if($flavorParamsOutput)
-			return $flavorParamsOutput->getReadyBehavior();
+		return $flavorParamsOutput->getReadyBehavior();
 			
 		return null;
 	}
 
+	/**
+	 * @param $postConvertAssetType the $postConvertAssetType to set
+	 */
+	public function setPostConvertAssetType($postConvertAssetType)
+	{
+		$this->postConvertAssetType = $postConvertAssetType;
+	}
+
+	/**
+	 * @return the $postConvertAssetType
+	 */
+	public function getPostConvertAssetType()
+	{
+		return $this->postConvertAssetType;
+	}
 }

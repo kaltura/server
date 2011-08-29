@@ -79,6 +79,13 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	 * @var int
 	 */
 	public $sourceRemoteStorageProfileId;
+
+	/**
+	 * Media parser type to be used for post-conversion validation
+	 *  
+	 * @var KalturaMediaParserType
+	 */
+	public $mediaParserType;
 	
 	private static $map_between_objects = array
 	(
@@ -91,6 +98,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"isSystemDefault" => "isDefault",
 		"tags",
 		"sourceRemoteStorageProfileId",
+		"mediaParserType",
 	);
 	
 	/* (non-PHPdoc)

@@ -68,6 +68,22 @@ class KalturaPostConvertJobData extends KalturaConvartableJobData
 			
 		return parent::toObject($dbData);
 	}
+	
+	/**
+	 * @param string $subType from enum KalturaMediaParserType
+	 * @return int from enum mediaParserType
+	 */
+	public function toSubType($subType)
+	{
+		return kPluginableEnumsManager::apiToCore('mediaParserType', $subType);
+	}
+	
+	/**
+	 * @param int $subType from enum mediaParserType
+	 * @return string from enum KalturaMediaParserType
+	 */
+	public function fromSubType($subType)
+	{
+		return kPluginableEnumsManager::coreToApi('mediaParserType', $subType);
+	}
 }
-
-?>

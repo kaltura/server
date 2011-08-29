@@ -488,7 +488,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
 		{
-			$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_FLAVOR;
+			$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
 			$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
 			$syncKey = $object->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			
@@ -498,7 +498,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($srcFileSyncLocalPath)
-				kJobsManager::addPostConvertJob(null, $jobSubType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
+				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
 		}
 		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY) 
 		{

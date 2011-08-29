@@ -5,10 +5,34 @@
  */
 abstract class KBaseMediaParser
 {
+	const MEDIA_PARSER_TYPE_MEDIAINFO = 0;
+	const MEDIA_PARSER_TYPE_FFMPEG = 1;
+	
 	/**
 	 * @var string
 	 */
 	protected $filePath;
+	
+	/**
+	 * @param string $type
+	 * @param string $filePath
+	 * @param KSchedularTaskConfig $taskConfig
+	 * @return KBaseMediaParser
+	 */
+	public static function getParser($type, $filePath, KSchedularTaskConfig $taskConfig)
+	{
+		switch($type)
+		{
+			case self::MEDIA_PARSER_TYPE_MEDIAINFO:
+				return new KMediaInfoMediaParser($filePath, $taskConfig->params->mediaInfoCmd);
+				
+			case self::MEDIA_PARSER_TYPE_FFMPEG:
+				return new KFFMpegMediaParser($filePath, $taskConfig->params->FFMpegCmd);
+				
+			default:
+				return KalturaPluginManager::loadObject('KBaseMediaParser', $type, func_get_args());
+		}
+	}
 	
 	/**
 	 * @param string $filePath

@@ -3,8 +3,6 @@
  * @package Scheduler
  * @subpackage Post-Convert
  */
-require_once ("bootstrap.php");
-
 
 /**
  * Will convert a single flavor and store it in the file system.
@@ -104,11 +102,11 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		}
 		
 		$mediaInfo = null;
-		
 		try
 		{
-//			if($this->taskConfig->params->useMediaInfo)
-				$mediaInfo = $this->extractMediaInfo(realpath($mediaFile));
+			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig);
+			if($engine)
+				$mediaInfo = $engine->getMediaInfo();
 		}
 		catch(Exception $ex)
 		{
@@ -116,17 +114,11 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			$mediaInfo = null;
 		}
 		
+		if(is_null($mediaInfo))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
+		
 		try
 		{
-//			if(is_null($mediaInfo) && $this->taskConfig->params->useFFMpeg)
-//				$mediaInfo = $this->extractFfmpegInfo(realpath($mediaFile));
-			
-			if(is_null($mediaInfo))
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
-			}
-			
-			KalturaLog::debug("flavorAssetId [$data->flavorAssetId]");
 			$mediaInfo->flavorAssetId = $data->flavorAssetId;
 			$createdMediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
 			
@@ -139,14 +131,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			
 			// creates a temp file path 
 			$rootPath = $this->taskConfig->params->localTempPath;
-			if(! is_dir($rootPath))
-			{
-				if(file_exists($rootPath))
-					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::CANNOT_CREATE_DIRECTORY, "Cannot create temp thumbnail directory [$rootPath] due to an error", KalturaBatchJobStatus::FAILED, $data);
-					
-				KalturaLog::info("Creating temp thumbnail directory [$rootPath]");
-				mkdir($rootPath);
-			}
+			$this->createDir($rootPath);
 				
 			// creates the path
 			$uniqid = uniqid('thumb_');
@@ -161,12 +146,8 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			if($mediaInfo->videoBitRate)
 				$data->thumbBitrate = $mediaInfo->videoBitRate;
 					
-//			$width = $mediaInfo->videoWidth;
-//			$height = $mediaInfo->videoHeight;
-					
 			// generates the thumbnail
 			$thumbMaker = new KFFMpegThumbnailMaker($mediaFile, $thumbPath, $this->taskConfig->params->FFMpegCmd);
-//			$created = $thumbMaker->createThumnail($data->thumbOffset, $width, $height);
 			$created = $thumbMaker->createThumnail($data->thumbOffset);
 			
 			if(!$created || !file_exists($thumbPath))

@@ -756,8 +756,8 @@ class kBusinessPreConvertDL
 		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($srcSyncKey);
 		
-		$jobSubType = BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_BYPASS;
-		return kJobsManager::addPostConvertJob($convertProfileJob, $jobSubType, $srcFileSyncLocalPath, $originalFlavorAsset->getId(), null, true, $offset);
+		$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_BYPASS;
+		return kJobsManager::addPostConvertJob($convertProfileJob, $postConvertAssetType, $srcFileSyncLocalPath, $originalFlavorAsset->getId(), null, true, $offset);
 	}
 	
 	/**

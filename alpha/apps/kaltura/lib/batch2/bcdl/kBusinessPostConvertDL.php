@@ -59,8 +59,13 @@ class kBusinessPostConvertDL
 		$productMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 		$targetFlavor = assetParamsOutputPeer::retrieveByAssetId($currentFlavorAsset->getId());
 		
+		$postConvertData = $dbBatchJob->getData();
+		$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
+		if($postConvertData instanceof kPostConvertJobData)
+			$postConvertAssetType = $postConvertData->getPostConvertAssetType();
+		
 		// don't validate in case of bypass, in case target flavor or media info are null 
-		if($dbBatchJob->getJobSubType() != BatchJob::BATCHJOB_SUB_TYPE_POSTCONVERT_BYPASS && $targetFlavor && $productMediaInfo)
+		if($postConvertAssetType && $targetFlavor && $productMediaInfo)
 		{
 			try{
 				$productFlavor = KDLWrap::CDLValidateProduct($sourceMediaInfo, $targetFlavor, $productMediaInfo);

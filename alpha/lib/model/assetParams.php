@@ -158,4 +158,14 @@ class assetParams extends BaseassetParams
 	{
 		return $this->getFromCustomData('sourceRemoteStorageProfileId', null, StorageProfile::STORAGE_KALTURA_DC);
 	}
+	
+	public function setMediaParserType($mediaParserType)
+	{
+		$this->putInCustomData('mediaParserType', $mediaParserType);
+	}
+	
+	public function getMediaParserType()
+	{
+		return $this->getFromCustomData('mediaParserType', null, mediaParserType::MEDIAINFO);
+	}
 }

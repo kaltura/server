@@ -616,7 +616,7 @@ class kJobsManager
 	
 	/**
 	 * @param BatchJob $parentJob
-	 * @param int $jobSubType
+	 * @param int $postConvertAssetType
 	 * @param string $srcFileSyncLocalPath
 	 * @param int $flavorAssetId
 	 * @param int $flavorParamsOutputId
@@ -624,9 +624,10 @@ class kJobsManager
 	 * @param int $thumbOffset
 	 * @return BatchJob
 	 */
-	public static function addPostConvertJob(BatchJob $parentJob = null, $jobSubType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
+	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $srcFileSyncLocalPath, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
 		$postConvertData = new kPostConvertJobData();
+		$postConvertData->setPostConvertAssetType($postConvertAssetType);
 		$postConvertData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
 		$postConvertData->setFlavorParamsOutputId($flavorParamsOutputId);
 		$postConvertData->setFlavorAssetId($flavorAssetId);
@@ -709,7 +710,7 @@ class kJobsManager
 		}
 		
 		KalturaLog::log("Post Convert created with file: " . $postConvertData->getSrcFileSyncLocalPath());
-		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $jobSubType);
+		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $flavorParamsOutput->getMediaParserType());
 	}
 	
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null)
