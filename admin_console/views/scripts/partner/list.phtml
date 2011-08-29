@@ -195,7 +195,15 @@ function remoteStorage(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'external-storages'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
 	document.location = url;
 }
-function configure(partnerId) {
+
+function configurePartnerSuccess(html) {
+	jQuery('#frmPartnerConfigure').replaceWith(html);
+	jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
+	onPageLoad();
+}
+
+function configure(partnerId) 
+{
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure', 'partner_id' => '')); ?>' + partnerId;
 	
 	jQuery('#partner-configure-dialog').remove();
@@ -210,16 +218,11 @@ function configure(partnerId) {
 		title: '<?php echo $this->translate('Account Specific Setup Configuration'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
-				jQuery(this).find('form').submit();
-				jQuery(this).dialog('close');
-				jQuery('#frmPaginator1').submit();
+				jQuery(this).find('#frmPartnerConfigure').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
 			}
-		},
-		close: function() {
-			
 		}	
 	});
 	
@@ -227,9 +230,7 @@ function configure(partnerId) {
 		url, 
 		null, 
 		function() {
-			jQuery(this).find('form').ajaxForm(function() { 
-				dialogDiv.dialog('close');
-			}); 
+			jQuery(this).find('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess); 
 		}
 	);
 }
