@@ -27,12 +27,6 @@
 	$services = $clientGenerator->getServices();
 	foreach($services as $serviceName => $serviceReflector)
 	{
-		if($serviceReflector->isDeprecated())
-		{
-			unset($services[$serviceName]);
-			continue;
-		}
-			
 		$actions = $serviceReflector->getActions();
 		foreach($actions as &$action) // we need only the keys
 			$action = null;
@@ -74,9 +68,10 @@
 					<?php 
 						$serviceId = $serviceReflector->getServiceId();
 						$actions = $serviceReflector->getActions();
+						$deprecated = $serviceReflector->isDeprecated() ? " (deprecated)" : "";
 					?>
 					<li class="service" id="service_<?php echo $serviceId; ?>">
-						<a href="?service=<?php echo $serviceId; ?>"><?php echo $serviceReflector->getServiceName(); ?></a>
+						<a href="?service=<?php echo $serviceId; ?>"><?php echo $serviceReflector->getServiceName().$deprecated; ?></a>
 						<ul class="actions">
 						<?php foreach($actions as $actionId => $actionName): ?>
 							<li class="action"><a href="?service=<?php echo $serviceId; ?>&action=<?php echo $actionId; ?>"><?php echo $actionName;?></a></li>

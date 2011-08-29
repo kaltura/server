@@ -78,19 +78,36 @@ if (!isObjectNameValid($object))
 $typeReflector = KalturaTypeReflectorCacher::get($object);
 
 $type = $typeReflector->getType();
-$description = formatDescription($typeReflector->getDescription());
 echo 
 	"<h2>Kaltura API</h2>
 		<table class=\"action\" width=\"80%\">
 		<tr>
 			<th colspan=\"4\" class=\"service_action_title\">$type</th>
-		</tr>
-		<tr>
-			<td colspan=\"4\" class=\"title\">Description:</td>
+		</tr>";
+
+$description = trim(formatDescription($typeReflector->getDescription()));
+if ($description)
+{
+	echo
+		"<tr>
+			<td colspan=\"4\" class=\"title\">Description</td>
 		</tr>
 		<tr>
 			<td class=\"description\" colspan=\"3\">$description</td>
 		</tr>";
+}
+
+$plugin = extractPluginNameFromPackage($typeReflector->getPackage());
+if ($plugin)
+{
+	echo
+		"<tr>
+			<td colspan=\"4\" class=\"title\">Plugin</td>
+		</tr>
+		<tr>
+			<td class=\"description\" colspan=\"3\">$plugin</td>
+		</tr>";
+	}
 
 if ($typeReflector->isArray())
 {
@@ -146,11 +163,6 @@ else
 			$properties = $curReflector->getCurrentProperties();
 		}
 		
-		if (count($properties) == 0)
-		{
-			continue;
-		}
-		
 		usort($properties, 'comparePropNames');
 		
 		$classProperties[$curClass] = $properties;
@@ -172,6 +184,10 @@ else
 			{
 				$classTitle = $curClass;
 			}
+			else if (count($properties) == 0)
+			{
+				$classTitle = "<a href=\"?object=$curClass\">$curClass</a>";
+			}
 			else 
 			{
 				$classTitle = "<img src=\"images/collapsed.gif\"> ";
@@ -190,6 +206,12 @@ else
 				</table>";
 		}
 
+		if (count($properties) == 0)
+		{
+			echo '</td></tr>';
+			continue;
+		}
+		
 		echo "<table style=\"$propTableStyle\"><tbody>";
 		
 		// print column headers
@@ -259,6 +281,47 @@ else
 		}
 		
 		echo '</table></td></tr>';
+	}
+	
+	KalturaTypeReflector::setClassInheritMapPath($cachePath . "/classInheritMap.cache");
+	if(!KalturaTypeReflector::hasClassInheritMapCache())
+	{
+		$config = new Zend_Config_Ini("../../config/testme.ini", null, array('allowModifications' => true));
+		$config = KalturaPluginManager::mergeConfigs($config, 'testme');
+		$indexConfig = $config->get('testmedoc');
+		
+		$include = $indexConfig->get("include");
+		$exclude = $indexConfig->get("exclude");
+		$additional = $indexConfig->get("additional");
+			
+		$clientGenerator = new DummyForDocsClientGenerator();
+		$clientGenerator->setIncludeOrExcludeList($include, $exclude);
+		$clientGenerator->setAdditionalList($additional);
+		$clientGenerator->load();
+		
+		$objects = $clientGenerator->getTypes();
+			
+		KalturaTypeReflector::setClassMap(array_keys($objects));
+	}
+	
+	$directChildren = array();
+	foreach (KalturaTypeReflector::getSubClasses($object) as $subClass)
+	{
+		if (get_parent_class($subClass) != $object)
+		{
+			continue;
+		}
+		
+		$directChildren[] = "<a href=\"?object=$subClass\">$subClass</a>";
+	}
+	sort($directChildren);
+
+	if (count($directChildren) != 0)
+	{
+		echo "<tr><td colspan=\"3\">";
+		echo "Sub classes: ";
+		echo implode(", ", $directChildren);
+		echo '</td></tr>';
 	}
 }
 echo "</table>";

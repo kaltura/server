@@ -16,10 +16,15 @@ $serviceInfo = $serviceReflector->getServiceInfo();
     <td class="title">Service Name</td>
     <td class="odd"><?php echo  $serviceInfo->serviceName; ?></td>
   </tr>
-<!--  <tr>
-    <th>Package</th>
-    <td><?php echo  $serviceInfo->package; ?></td>
-  </tr>-->
+  <?php $plugin = extractPluginNameFromPackage($serviceInfo->package);
+  	if ($plugin)
+  	{ ?>
+  <tr>
+    <td class="title">Plugin</td>
+    <td class="odd"><?php echo $plugin ?></td>
+  </tr>
+  <?php 
+  	}?>
   <tr>
     <td class="title">Description</td>
     <td><?php echo  nl2br($serviceInfo->description); ?></td>

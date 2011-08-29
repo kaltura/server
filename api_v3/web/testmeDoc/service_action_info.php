@@ -24,13 +24,19 @@ $actionInfo = $serviceReflector->getActionInfo($action);
 	<tr>
 		<th colspan="3" class="service_action_title"><?php echo $service; ?>:<?php echo $action; ?></th>
 	</tr>
+<?php 
+$description = trim(nl2br($actionInfo->description));
+if ($description):
+?>
 	<tr>
 		<td  colspan="3" class="title">Description:</td>
 	</tr>
 	<tr>
-		<td class="description" colspan="3"><?php echo  nl2br($actionInfo->description); ?></td>
+		<td class="description" colspan="3"><?php echo $description; ?></td>
 	</tr>
-<?php if($actionParams): ?>
+<?php 
+endif;
+if($actionParams): ?>
 	<tr>
 		<td colspan="3" class="title">Input Params</td>
 	</tr>
