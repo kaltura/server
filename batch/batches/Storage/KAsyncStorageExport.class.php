@@ -124,6 +124,7 @@ class KAsyncStorageExport extends KJobHandlerWorker
 		if  ( $this->taskConfig->params->useFTP ) $supported_engines_arr[] = KalturaExportProtocol::FTP;
 		if  ( $this->taskConfig->params->useSCP ) $supported_engines_arr[] = KalturaExportProtocol::SCP;
 		if  ( $this->taskConfig->params->useSFTP ) $supported_engines_arr[] = KalturaExportProtocol::SFTP;
+		if  ( $this->taskConfig->params->useS3 ) $supported_engines_arr[] = KalturaExportProtocol::S3;
 		
 		return join(',', $supported_engines_arr);
 	}

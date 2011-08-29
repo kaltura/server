@@ -212,6 +212,7 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::FTP' => 'FTP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::SCP' => 'SCP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP' => 'SFTP',
+	'Kaltura_Client_Enum_StorageProfileProtocol::S3' => 'Amazon S3',
 
 	'Kaltura_Client_Enum_StorageServePriority::Kaltura_ONLY' => 'Kaltura Storage Only',
 	'Kaltura_Client_Enum_StorageServePriority::Kaltura_FIRST' => 'Kaltura Storage First',

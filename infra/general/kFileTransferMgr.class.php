@@ -16,7 +16,8 @@ class kFileTransferMgrType
 	const SFTP = 3; // SFTP Protocol
 	const HTTP = 4;
 	const HTTPS = 5;
-	const LOCAL = 6;
+	const S3 = 6;
+	const LOCAL = 7;
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file
 define ("PATH_TO_MANAGERS", "file_transfer_managers");
@@ -241,6 +242,9 @@ abstract class kFileTransferMgr
 			case kFileTransferMgrType::HTTP:
 			case kFileTransferMgrType::HTTPS:
 				return new httpMgr();
+
+			case kFileTransferMgrType::S3:
+				return new s3Mgr();
 				
 			case kFileTransferMgrType::LOCAL:
 			    return new localMgr();

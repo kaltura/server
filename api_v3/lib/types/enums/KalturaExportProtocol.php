@@ -9,4 +9,5 @@ class KalturaExportProtocol extends KalturaEnum
 	const FTP = 1;
 	const SCP = 2;
 	const SFTP = 3;
+	const S3 = 6;
 }
