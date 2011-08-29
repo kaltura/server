@@ -239,6 +239,7 @@ class kMetadataManager
 	public static function getDataSearchValues(Metadata $metadata, $searchValues = array())
 	{
 		KalturaLog::debug("Parsing metadata [" . $metadata->getId() . "] search values");
+		$searchTexts = array();
 		if (isset($searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)])){
 			foreach ($searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA)] as $DataSerachValue)
 				$searchTexts[] = $DataSerachValue;
@@ -247,10 +248,16 @@ class kMetadataManager
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
 		
-		$xml = new DOMDocument();
-		$xml->load($xmlPath);
-		$xPath = new DOMXPath($xml);
-		
+		try{
+			$xml = new DOMDocument();
+			$xml->load($xmlPath);
+			$xPath = new DOMXPath($xml);
+		}
+		catch (Exception $ex)
+		{
+			KalturaLog::err('Could not load metadata xml [' . $xmlPath . '] - ' . $ex->getMessage());
+		}
+					
 		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
 	
 		$searchItems = array();
