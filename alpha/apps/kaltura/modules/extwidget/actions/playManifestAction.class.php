@@ -65,7 +65,7 @@ class playManifestAction extends kalturaAction
 	const PLAY_STREAM_TYPE_RECORDED = 'recorded';
 	const PLAY_STREAM_TYPE_ANY = 'any';
 
-	private function buildXml($streamType, array $flavors, $mimeType = 'video/x-flv', $duration = null, $baseUrl = null, $mediaUrl = null)
+	private function buildXml($streamType, array $flavors, $duration = null, $baseUrl = null, $mediaUrl = null)
 	{
 		$durationXml = ($duration ? "<duration>$duration</duration>" : '');
 		$baseUrlXml = ($baseUrl ? "<baseURL>".htmlspecialchars($baseUrl)."</baseURL>" : '');
@@ -89,6 +89,28 @@ class playManifestAction extends kalturaAction
 			$url .= $deliveryCodeStr;
 			$flvaorsXml .= "<media url=\"$url\" bitrate=\"$bitrate\" width=\"$width\" height=\"$height\"/>";
 		}		
+		
+		$mimeType = 'video/x-flv';
+		if ($this->entry->getType() == entryType::MEDIA_CLIP && 
+			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO &&
+			count($flavors))
+		{
+			$isMp3 = true;
+			foreach($flavors as $flavor)
+			{
+				$parsedUrl = parse_url($flavor['url']);
+				$flavorExt = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
+				if (strtolower($flavorExt) != 'mp3')
+				{
+					$isMp3 = false;
+				}
+			}
+			
+			if ($isMp3)
+			{
+				$mimeType = 'audio/mpeg';
+			}
+		}
 		
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 				<manifest xmlns=\"http://ns.adobe.com/f4m/1.0\">
@@ -394,7 +416,7 @@ class playManifestAction extends kalturaAction
 						$duration = $this->entry->getDurationInt();
 						$flavors = $this->buildFlavorsArray($duration, true);
 						
-						return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration);
+						return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, $duration);
 				}
 				
 			default:
@@ -588,7 +610,7 @@ class playManifestAction extends kalturaAction
 					
 				$urlManager->finalizeUrls($baseUrl, $flavors);
 					
-				return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, 'video/x-flv', $duration, $baseUrl);
+				return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, $duration, $baseUrl);
 
 			case entryType::LIVE_STREAM:
 				
@@ -614,7 +636,7 @@ class playManifestAction extends kalturaAction
 				if (strpos($this->protocol, "rtmp") === 0)
 					$baseUrl = $this->protocol . '://' . preg_replace('/^rtmp.*?:\/\//', '', $baseUrl);
 					
-				return $this->buildXml(self::PLAY_STREAM_TYPE_LIVE, $flavors, 'video/x-flv', null, $baseUrl);
+				return $this->buildXml(self::PLAY_STREAM_TYPE_LIVE, $flavors, null, $baseUrl);
 		}
 		
 		KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
@@ -851,7 +873,7 @@ class playManifestAction extends kalturaAction
 				$duration = $this->entry->getDurationInt();
 				$mediaUrl = "<media url=\"".requestUtils::getHost().str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]))."\"/>"; 
 						
-				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, array(), 'video/x-flv', $duration, null, $mediaUrl);
+				$xml =$this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, array(), $duration, null, $mediaUrl);
 				break;
 		}
 		
