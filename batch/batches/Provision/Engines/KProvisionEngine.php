@@ -15,7 +15,7 @@ abstract class KProvisionEngine
 	
 	
 	/**
-	 * Will return the proper engine depending on the type (KalturaConversionEngineType)
+	 * Will return the proper engine depending on the type (KalturaSourceType)
 	 *
 	 * @param int $provider
 	 * @param KSchedularTaskConfig $taskConfig
