@@ -12,6 +12,7 @@ class kConfLocal
 			array(
 			
 				"cdn_host" => "@CDN_HOST@",
+				"cdn_host_https" => "@CDN_HOST@",
 				"iis_host" => "@IIS_HOST@",
 				"www_host" => "@WWW_HOST@",
 				"rtmp_url" => "@RTMP_URL@",
