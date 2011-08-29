@@ -14,6 +14,7 @@ html, body { margin:0; padding:0; height: 100%; }
    input[type="text"], input.text, input[type="password"] { height:16px; padding-left:3px; border: solid 1px #D3D5D6; border-top-color:#6D6F70;}
    input[type="checkbox"], input.checkbox { vertical-align:-2px;}
    input[type="radio"], input.radio { margin-right:5px;}
+	input[readonly] { background-color: #f0f0f0; color: #6d6d6d;}
 
    label { padding: 0 10px 0 5px;}
     label:hover { color:#009ACC;} /*#00C1FF;*/
