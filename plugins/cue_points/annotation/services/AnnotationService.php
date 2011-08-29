@@ -51,4 +51,24 @@ class AnnotationService extends CuePointService
 	{
 		return parent::updateAction($id, $annotation);
 	}
+	
+	/**
+	* List annotation objects by filter and pager
+	*
+	* @action list
+	* @param KalturaAnnotationFilter $filter
+	* @param KalturaFilterPager $pager
+	* @return KalturaAnnotationListResponse
+	*/
+	function listAction(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		$filter->cuePointTypeEqual = KalturaCuePointType::ANNOTATION;
+		
+		$list = parent::listAction($filter, $pager);
+		$ret = new KalturaAnnotationListResponse();
+		$ret->objects = $list->objects;
+		$ret->totalCount = $list->totalCount;
+		
+		return $ret;
+	}
 }
