@@ -765,6 +765,7 @@ class myPartnerUtils
 	const KALTURA_PACKAGE_LIMIT_WARNING_2 = 83;
 	const KALTURA_DELETE_ACCOUNT = 84;
 	const KALTURA_PAID_PACKAGE_SUGGEST_UPGRADE = 85;
+	const KALTURA_EXTENED_FREE_TRAIL_ENDS_WARNING = 87;
 	
 	public static function collectPartnerUsageFromDWH($partner, $partnerPackage, $report_date, $data_for_graph = false)
         {
@@ -851,8 +852,32 @@ class myPartnerUtils
 		return md5($partner_secret.$partner_id.kConf::get('kaltura_email_hash'));
 	}
 	
-	public static function doPartnerUsage($partner)
+	public static function doPartnerUsage(Partner $partner)
 	{
+		if($partner->getExtendedFreeTrail())
+		{	
+			if($partner->getExtendedFreeTrailExpiryDate() < time())
+			{
+				//ExtendedFreeTrail ended
+				$partner->setExtendedFreeTrail(null);
+				$partner->setExtendedFreeTrailExpiryDate(null);
+				$partner->setExtendedFreeTrailExpiryReason('');
+			}else{
+				//ExtendedFreeTrail
+				if (($partner->getExtendedFreeTrailExpiryDate() > (time() - (60 * 60 * 24 * 4))) && !$partner->getExtendedFreeTrailEndsWarning())
+				{
+					$partner->setExtendedFreeTrailEndsWarning(true);
+					$partner->save();
+					$email_link_hash = 'pid='.$partner->getId().'&h='.(self::getEmailLinkHash($partner->getId(), $partner->getSecret()));
+					$mail_parmas = array($partner->getAdminName() ,$email_link_hash);
+					myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_EXTENED_FREE_TRAIL_ENDS_WARNING, $partner, $mail_parmas);
+				}			
+				
+				return;
+			}
+			
+		}
+		
 		$should_block_delete_partner = true;
 		
 		$blocking_days_grace = 7;
