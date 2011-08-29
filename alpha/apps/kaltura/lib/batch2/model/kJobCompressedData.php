@@ -19,7 +19,7 @@ class kJobCompressedData extends kJobData {
 	public function kJobCompressedData($serializedJobData) {
 		$this->compressedJobData = gzcompress ( $serializedJobData );
 		if (! $this->compressedJobData) {
-		//TODO throw exception
+			throw new Exception ( KalturaErrors::ERROR_OCCURED_WHILE_GZCOMPRESS );
 		}
 	}
 	
@@ -27,7 +27,11 @@ class kJobCompressedData extends kJobData {
 	 * return serialized kJobData
 	 */
 	public function getSerializedJobData() {
-		return gzuncompress($this->compressedJobData);
+		$serializedJobData = gzuncompress ( $this->compressedJobData );
+		if ($serializedJobData )
+			return $serializedJobData;
+		else
+			throw new KalturaBatchException ( KalturaErrors::ERROR_OCCURED_WHILE_GZUNCOMPRESS);
 	}
 
 }

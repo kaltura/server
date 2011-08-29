@@ -248,6 +248,10 @@ class KalturaErrors extends APIErrors
 	
 	const PARTNER_NOT_SET = "PARTNER_NOT_SET, Partner not set";
 	
+	const ERROR_OCCURED_WHILE_GZCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZCOMPRESS_JOB_DATA, error accored while gzcompress job data";
+	
+	const ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA = "ERROR_OCCURED_WHILE_GZUNCOMPRESS_JOB_DATA, error accored while gzuncompress job data";
+	
 	/**
 	 * Upload Service
 	 */

@@ -457,12 +457,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 				$unserializedData = unserialize ( $data );
 				if ($unserializedData instanceof kJobCompressedData) {
 					$serializedJobData = $unserializedData->getSerializedJobData ();
-					if ($serializedJobData) {
-						$unserializedData = unserialize($serializedJobData);
-					}
-					else{
-						//TODO throw exception
-					}
+					$unserializedData = unserialize ( $serializedJobData );
 				}
 				return $unserializedData;
 			} catch(Exception $e){
