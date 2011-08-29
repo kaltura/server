@@ -94,7 +94,8 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 				$this->contributeMetadataObject($metadataObject, $metadataValue);
 			}
 			else{
-				$metadataObject->addChild($metadataField, $metadataValue);
+				$metadataObject->addChild($metadataField, kString::stringToSafeXml($metadataValue));
+				//$metadataObject->addChild($metadataField, $metadataValue);
 				if ($mrssParams)
 				{
 					$itemXpathsToExtend = $mrssParams->getItemXpathsToExtend();

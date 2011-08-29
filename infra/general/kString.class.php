@@ -263,6 +263,19 @@ class kString
 		return str_replace ( array ( "&", '"' , '<', '>', "'" ) , array ( "&amp;", "&quot;" , "&lt;", "&gt;", "&apos;" ), $str );
 	}
 	
+	/**
+	 * @param string $string
+	 * @return string
+	 */
+	public function stringToSafeXml($string, $now = false)
+	{
+		$string = @iconv('utf-8', 'utf-8', $string);
+		$partially_safe = self::xmlEncode($string);
+		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
+		
+		return $safe;
+	}
+	
 	public static function generateRandomString($minlength, $maxlength, $useupper, $usespecial, $usenumbers)
 	{
 		// copied from myPartnerRegistration.class.php
@@ -321,4 +334,5 @@ class kString
 		$str = str_replace("\r", '', $str);
 		return $str;
 	}
+	
 }
