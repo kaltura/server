@@ -386,7 +386,13 @@ class PartnerController extends Zend_Controller_Action
 		if ($filterPackage != '')
 			$filter->partnerPackageEqual = $filterPackage;
 			
-		$filter->statusIn = implode(',', $statuses);
+		$statusIn = implode(',', $statuses);
+		if ($statusIn != ''){
+			$filter->statusIn = $statusIn;
+		}else{
+			$filter->statusIn = Kaltura_Client_Enum_PartnerStatus::ACTIVE . ',' . Kaltura_Client_Enum_PartnerStatus::BLOCKED;
+		}
+		 
 		$filter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
 		return $filter;
 	}
