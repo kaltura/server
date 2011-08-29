@@ -39,26 +39,28 @@
 				<td><?php echo $this->dateFormat($partner->createdAt, Zend_Date::DATE_LONG); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $partner->id; ?>)">
-						<option value=""><?php echo $this->translate('Select Action'); ?></option>
-						<?php if (Infra_AclHelper::isAllowed('widget','list')): ?>
-							<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
-						<?php endif; ?>	
-						<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
-							<?php if (Infra_AclHelper::isAllowed('partner','configure-storage')): ?>	
-								<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
+						<option value="" ><?php echo $this->translate('Select Action'); ?></option>
+						<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK): ?>
+							<?php if (Infra_AclHelper::isAllowed('widget','list')): ?>
+								<option value="widgets" ><?php echo $this->translate('Widgets'); ?></option>
+							<?php endif; ?>	
+							<?php if ($partner->id != Infra_Consts::TEMPLATE_PARTNER_ID): ?>
+								<?php if (Infra_AclHelper::isAllowed('partner','configure-storage')): ?>	
+									<option value="remoteStorage"><?php echo $this->translate('Remote Storage'); ?></option>
+								<?php endif; ?>
 							<?php endif; ?>
-						<?php endif; ?>
-						<?php
-						// add options from plugin pages 
-						foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
-						{
-							$options = $partnerActionPluginPage->getPublisherAdminActionOptions($partner, Infra_AclHelper::getCurrentPermissions());
-							foreach ($options as $option)
+							<?php
+							// add options from plugin pages 
+							foreach ($this->partnerActionPluginPages as $partnerActionPluginPage)
 							{
-								echo '<option value="' . $option[1] . '">'. $this->translate($options[0]) .'</option>';
-							}						
-						}
-						?>	
+								$options = $partnerActionPluginPage->getPublisherAdminActionOptions($partner, Infra_AclHelper::getCurrentPermissions());
+								foreach ($options as $option)
+								{
+									echo '<option value="' . $option[1] . '">'. $this->translate($options[0]) .'</option>';
+								}						
+							}
+							?>
+						<?php endif; ?>	
 					</select>
 				</td>
 				<td>
