@@ -281,18 +281,22 @@ class PartnerController extends Zend_Controller_Action
 		$this->view->errMessage = false;
 		if ($request->isPost())
 		{
-			$form->populate($request->getPost());
-			$config = $form->getObject("Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration", $request->getPost());
-			
-			
-			$config->extendedFreeTrailExpiryDate = strtotime($this->_getParam('extended_free_trail_expiry_date'));
+			if ($form->isValid($request->getPost()))
+			{	
+				$this->view->formValid = true;
+				$form->populate($request->getPost());
+				$config = $form->getObject("Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration", $request->getPost());
+				$config->extendedFreeTrailExpiryDate = strtotime($this->_getParam('extended_free_trail_expiry_date'));
 				
-			
-			try{
-				$systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $config);
-			}
-			catch (Exception $e){
-				$this->view->errMessage = $e->getMessage();
+				try{
+					$systemPartnerPlugin->systemPartner->updateConfiguration($partnerId, $config);
+				}
+				catch (Exception $e){
+					$this->view->errMessage = $e->getMessage();
+				}
+			}else{
+				$this->view->formValid = false;
+				$form->populate($request->getPost());
 			}
 		}
 		else
