@@ -70,7 +70,7 @@ class CaptionAssetService extends KalturaBaseService
     	
 		$dbCaptionAsset->setEntryId($entryId);
 		$dbCaptionAsset->setPartnerId($dbEntry->getPartnerId());
-		$dbCaptionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbCaptionAsset->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 		$dbCaptionAsset->save();
 
 		$captionAsset = new KalturaCaptionAsset();
@@ -112,12 +112,12 @@ class CaptionAssetService extends KalturaBaseService
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
 		
     	$newStatuses = array(
-    		CaptionAsset::FLAVOR_ASSET_STATUS_READY,
-    		CaptionAsset::FLAVOR_ASSET_STATUS_VALIDATING,
-    		CaptionAsset::FLAVOR_ASSET_STATUS_TEMP,
+    		CaptionAsset::ASSET_STATUS_READY,
+    		CaptionAsset::ASSET_STATUS_VALIDATING,
+    		CaptionAsset::ASSET_STATUS_TEMP,
     	);
     	
-    	if($previousStatus == CaptionAsset::FLAVOR_ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
+    	if($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
    		
 		$captionAsset = new KalturaCaptionAsset();
@@ -170,17 +170,17 @@ class CaptionAssetService extends KalturaBaseService
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
 		
-		$syncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$syncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
 		try {
 			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, $copyOnly);
 		}
 		catch (Exception $e) {
 			
-			if($captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+			if($captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_NOT_APPLICABLE)
 			{
 				$captionAsset->setDescription($e->getMessage());
-				$captionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_ERROR);
 				$captionAsset->save();
 			}												
 			throw $e;
@@ -193,7 +193,7 @@ class CaptionAssetService extends KalturaBaseService
 		$captionAsset->setHeight($height);
 		$captionAsset->setSize(filesize($finalPath));
 		
-		$captionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_READY);
+		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
 	}
     
@@ -207,10 +207,10 @@ class CaptionAssetService extends KalturaBaseService
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($captionAsset, $fullPath);
 			
-		if($captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+		if($captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_NOT_APPLICABLE)
 		{
 			$captionAsset->setDescription("Failed downloading file[$url]");
-			$captionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_ERROR);
 			$captionAsset->save();
 		}
 		
@@ -235,7 +235,7 @@ class CaptionAssetService extends KalturaBaseService
 		if($contentResource->getIsReady())
 			return $this->attachFile($captionAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
 			
-		$captionAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+		$captionAsset->setStatus(asset::ASSET_STATUS_IMPORTING);
 		$captionAsset->save();
 		
 		$contentResource->attachCreatedObject($captionAsset);
@@ -250,7 +250,7 @@ class CaptionAssetService extends KalturaBaseService
 		$captionAsset->incrementVersion();
 		$captionAsset->save();
 		
-        $newSyncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $newSyncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
                 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
@@ -260,7 +260,7 @@ class CaptionAssetService extends KalturaBaseService
 		$captionAsset->setHeight($height);
 		$captionAsset->setSize(filesize($finalPath));
 		
-		$captionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_READY);
+		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
 		$captionAsset->save();
     }
     
@@ -286,10 +286,10 @@ class CaptionAssetService extends KalturaBaseService
 		$resources = $contentResource->getResources();
 		
         $captionAsset->incrementVersion();
-		$captionAsset->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_READY);
+		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
         $captionAsset->save();
         	
-        $syncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $syncKey = $captionAsset->getSyncKey(CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		foreach($resources as $currentResource)
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
@@ -329,10 +329,10 @@ class CaptionAssetService extends KalturaBaseService
 				$msg = "Resource of type [" . get_class($contentResource) . "] is not supported";
 				KalturaLog::err($msg);
 				
-				if($captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+				if($captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_NOT_APPLICABLE)
 				{
 					$captionAsset->setDescription($msg);
-					$captionAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+					$captionAsset->setStatus(asset::ASSET_STATUS_ERROR);
 					$captionAsset->save();
 				}
 				
@@ -381,7 +381,7 @@ class CaptionAssetService extends KalturaBaseService
 		
 		$fileName = $captionAsset->getId() . '.' . $captionAsset->getFileExt();
 		
-		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
 	
 	/**
@@ -400,13 +400,44 @@ class CaptionAssetService extends KalturaBaseService
 		if (!$assetDb || !($assetDb instanceof CaptionAsset))
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
 
-		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIEXception(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
 
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
 		return $assetDb->getDownloadUrl(true);
+	}
+	
+	/**
+	 * Get remote storage existing paths for the asset
+	 * 
+	 * @action getRemotePaths
+	 * @param string $id
+	 * @return KalturaRemotePathArray
+	 * @throws KalturaErrors::CAPTION_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::CAPTION_ASSET_IS_NOT_READY
+	 */
+	public function getRemotePathsAction($id)
+	{
+		$assetDb = assetPeer::retrieveById($id);
+		if (!$assetDb || !($assetDb instanceof CaptionAsset))
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
+
+		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
+
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$c->add(FileSyncPeer::OBJECT_ID, $id);
+		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$fileSyncs = FileSyncPeer::doSelect($c);
+			
+		return KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
 	}
 
 	/**
@@ -430,7 +461,7 @@ class CaptionAssetService extends KalturaBaseService
 			
 		$fileName = $captionAsset->getEntryId()."_" . $captionAsset->getId() . ".$ext";
 		
-		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
 	
 	/**
@@ -548,7 +579,7 @@ class CaptionAssetService extends KalturaBaseService
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAssetDb->getEntryId());
 		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
 		
-		$captionAssetDb->setStatus(CaptionAsset::FLAVOR_ASSET_STATUS_DELETED);
+		$captionAssetDb->setStatus(CaptionAsset::ASSET_STATUS_DELETED);
 		$captionAssetDb->setDeletedAt(time());
 		$captionAssetDb->save();
 	}

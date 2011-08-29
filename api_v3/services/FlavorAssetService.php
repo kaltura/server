@@ -626,6 +626,37 @@ class FlavorAssetService extends KalturaBaseService
 	}
 	
 	/**
+	 * Get remote storage existing paths for the asset
+	 * 
+	 * @action getRemotePaths
+	 * @param string $id
+	 * @return KalturaRemotePathArray
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
+	 */
+	public function getRemotePathsAction($id)
+	{
+		$assetDb = assetPeer::retrieveById($id);
+		if (!$assetDb || !($assetDb instanceof flavorAsset))
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
+
+		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::FLAVOR_ASSET);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$c->add(FileSyncPeer::OBJECT_ID, $id);
+		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$fileSyncs = FileSyncPeer::doSelect($c);
+			
+		return KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+	}
+	
+	/**
 	 * Get download URL for the Flavor Asset
 	 * 
 	 * @action getDownloadUrl

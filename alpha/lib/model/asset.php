@@ -10,19 +10,80 @@
  */ 
 class asset extends Baseasset implements ISyncableFile
 {
+	/**
+	 * @deprecated use ASSET_STATUS_ERROR instead
+	 */
 	const FLAVOR_ASSET_STATUS_ERROR = -1;
+	
+	/**
+	* @deprecated use ASSET_STATUS_QUEUED instead
+	*/
 	const FLAVOR_ASSET_STATUS_QUEUED = 0;
+	
+	/**
+	* @deprecated use ASSET_STATUS_CONVERTING instead
+	*/
 	const FLAVOR_ASSET_STATUS_CONVERTING = 1;
+	
+	/**
+	* @deprecated use ASSET_STATUS_READY instead
+	*/
 	const FLAVOR_ASSET_STATUS_READY = 2;
+	
+	/**
+	* @deprecated use ASSET_STATUS_DELETED instead
+	*/
 	const FLAVOR_ASSET_STATUS_DELETED = 3;
+	
+	/**
+	* @deprecated use ASSET_STATUS_NOT_APPLICABLE instead
+	*/
 	const FLAVOR_ASSET_STATUS_NOT_APPLICABLE = 4;
+	
+	/**
+	* @deprecated use ASSET_STATUS_TEMP instead
+	*/
 	const FLAVOR_ASSET_STATUS_TEMP = 5; // used during conversion and should be deleted
+	
+	/**
+	* @deprecated use ASSET_STATUS_WAIT_FOR_CONVERT instead
+	*/
 	const FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT = 6; // can't convert since the source is not ready yet, will be converted when the source is ready
+	
+	/**
+	* @deprecated use ASSET_STATUS_IMPORTING instead
+	*/
 	const FLAVOR_ASSET_STATUS_IMPORTING = 7;
+	
+	/**
+	* @deprecated use ASSET_STATUS_VALIDATING instead
+	*/
 	const FLAVOR_ASSET_STATUS_VALIDATING = 8;
 	
+	const ASSET_STATUS_ERROR = -1;
+	const ASSET_STATUS_QUEUED = 0;
+	const ASSET_STATUS_CONVERTING = 1;
+	const ASSET_STATUS_READY = 2;
+	const ASSET_STATUS_DELETED = 3;
+	const ASSET_STATUS_NOT_APPLICABLE = 4;
+	const ASSET_STATUS_TEMP = 5; // used during conversion and should be deleted
+	const ASSET_STATUS_WAIT_FOR_CONVERT = 6; // can't convert since the source is not ready yet, will be converted when the source is ready
+	const ASSET_STATUS_IMPORTING = 7;
+	const ASSET_STATUS_VALIDATING = 8;
+	
+	/**
+	 * @deprecated use FILE_SYNC_ASSET_SUB_TYPE_ASSET instead
+	 */
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET = 1;
+	
+	/**
+	* @deprecated use FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG instead
+	*/
 	const FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG = 2;
+	
+	
+	const FILE_SYNC_ASSET_SUB_TYPE_ASSET = 1;
+	const FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG = 2;
 	
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
 	

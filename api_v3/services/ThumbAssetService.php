@@ -74,7 +74,7 @@ class ThumbAssetService extends KalturaBaseService
     	
 		$dbThumbAsset->setEntryId($entryId);
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
-		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$dbThumbAsset->save();
 
 		$thumbAsset = new KalturaThumbAsset();
@@ -117,12 +117,12 @@ class ThumbAssetService extends KalturaBaseService
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbThumbAsset));
 		
     	$newStatuses = array(
-    		thumbAsset::FLAVOR_ASSET_STATUS_READY,
-    		thumbAsset::FLAVOR_ASSET_STATUS_VALIDATING,
-    		thumbAsset::FLAVOR_ASSET_STATUS_TEMP,
+    		thumbAsset::ASSET_STATUS_READY,
+    		thumbAsset::ASSET_STATUS_VALIDATING,
+    		thumbAsset::ASSET_STATUS_TEMP,
     	);
     	
-    	if($previousStatus == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED && in_array($dbThumbAsset->getStatus(), $newStatuses))
+    	if($previousStatus == thumbAsset::ASSET_STATUS_QUEUED && in_array($dbThumbAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbThumbAsset));
    		
 		$thumbAssetsCount = assetPeer::countThumbnailsByEntryId($dbThumbAsset->getEntryId());
@@ -194,17 +194,17 @@ class ThumbAssetService extends KalturaBaseService
 		$thumbAsset->setSize(filesize($fullPath));
 		$thumbAsset->save();
 		
-		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
 		try {
 			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, $copyOnly);
 		}
 		catch (Exception $e) {
 			
-			if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+			if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
 			{
 				$thumbAsset->setDescription($e->getMessage());
-				$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_ERROR);
 				$thumbAsset->save();
 			}												
 			throw $e;
@@ -217,7 +217,7 @@ class ThumbAssetService extends KalturaBaseService
 		$thumbAsset->setHeight($height);
 		$thumbAsset->setSize(filesize($finalPath));
 		
-		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
 	}
     
@@ -231,10 +231,10 @@ class ThumbAssetService extends KalturaBaseService
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($thumbAsset, $fullPath);
 			
-		if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+		if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
 		{
 			$thumbAsset->setDescription("Failed downloading file[$url]");
-			$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_ERROR);
 			$thumbAsset->save();
 		}
 		
@@ -259,7 +259,7 @@ class ThumbAssetService extends KalturaBaseService
 		if($contentResource->getIsReady())
 			return $this->attachFile($thumbAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
 			
-		$thumbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+		$thumbAsset->setStatus(asset::ASSET_STATUS_IMPORTING);
 		$thumbAsset->save();
 		
 		$contentResource->attachCreatedObject($thumbAsset);
@@ -274,7 +274,7 @@ class ThumbAssetService extends KalturaBaseService
 		$thumbAsset->incrementVersion();
 		$thumbAsset->save();
 		
-        $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
                 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
@@ -284,7 +284,7 @@ class ThumbAssetService extends KalturaBaseService
 		$thumbAsset->setHeight($height);
 		$thumbAsset->setSize(filesize($finalPath));
 		
-		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
     }
     
@@ -310,10 +310,10 @@ class ThumbAssetService extends KalturaBaseService
 		$resources = $contentResource->getResources();
 		
         $thumbAsset->incrementVersion();
-		$thumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
         $thumbAsset->save();
         	
-        $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		foreach($resources as $currentResource)
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
@@ -353,10 +353,10 @@ class ThumbAssetService extends KalturaBaseService
 				$msg = "Resource of type [" . get_class($contentResource) . "] is not supported";
 				KalturaLog::err($msg);
 				
-				if($thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+				if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
 				{
 					$thumbAsset->setDescription($msg);
-					$thumbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+					$thumbAsset->setStatus(asset::ASSET_STATUS_ERROR);
 					$thumbAsset->save();
 				}
 				
@@ -392,7 +392,7 @@ class ThumbAssetService extends KalturaBaseService
 		if(!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbParamId);
 		
-		return $this->serveFile($thumbAsset, thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($thumbAsset, thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
 
 	/**
@@ -417,7 +417,7 @@ class ThumbAssetService extends KalturaBaseService
 			
 		$fileName = $thumbAsset->getEntryId()."_" . $thumbAsset->getId() . ".$ext";
 		
-		return $this->serveFile($thumbAsset, thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($thumbAsset, thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
 	
 	/**
@@ -472,7 +472,7 @@ class ThumbAssetService extends KalturaBaseService
 		$entry->setCreateThumb(false);
 		$entry->save();
 		
-		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
 	}
@@ -727,12 +727,12 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset = new thumbAsset();
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbThumbAsset->setEntryId($dbEntry->getId());
-		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$dbThumbAsset->setFileExt($ext);
 		$dbThumbAsset->incrementVersion();
 		$dbThumbAsset->save();
 		
-		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($url));
 		
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
@@ -741,7 +741,7 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$dbThumbAsset->save();
 		
 		$thumbAssets = new KalturaThumbAsset();
@@ -770,12 +770,12 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset = new thumbAsset();
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbThumbAsset->setEntryId($dbEntry->getId());
-		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$dbThumbAsset->setFileExt($ext);
 		$dbThumbAsset->incrementVersion();
 		$dbThumbAsset->save();
 		
-		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$syncKey = $dbThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
 		
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
@@ -784,7 +784,7 @@ class ThumbAssetService extends KalturaBaseService
 		$dbThumbAsset->setWidth($width);
 		$dbThumbAsset->setHeight($height);
 		$dbThumbAsset->setSize(filesize($finalPath));
-		$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_READY);
+		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$dbThumbAsset->save();
 		
 		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
@@ -821,7 +821,7 @@ class ThumbAssetService extends KalturaBaseService
 			
 		$this->checkIfUserAllowedToUpdateEntry($entry);
 		
-		$thumbAssetDb->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_DELETED);
+		$thumbAssetDb->setStatus(thumbAsset::ASSET_STATUS_DELETED);
 		$thumbAssetDb->setDeletedAt(time());
 		$thumbAssetDb->save();
 	}
@@ -842,12 +842,43 @@ class ThumbAssetService extends KalturaBaseService
 		if (!$assetDb || !($assetDb instanceof thumbAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
 
-		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIEXception(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
 		return $assetDb->getDownloadUrl(true);
+	}
+	
+	/**
+	 * Get remote storage existing paths for the asset
+	 * 
+	 * @action getRemotePaths
+	 * @param string $id
+	 * @return KalturaRemotePathArray
+	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
+	 */
+	public function getRemotePathsAction($id)
+	{
+		$assetDb = assetPeer::retrieveById($id);
+		if (!$assetDb || !($assetDb instanceof thumbAsset))
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
+
+		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
+
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$c->add(FileSyncPeer::OBJECT_ID, $id);
+		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$fileSyncs = FileSyncPeer::doSelect($c);
+			
+		return KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
 	}
 }

@@ -62,7 +62,7 @@ class AttachmentAssetService extends KalturaBaseService
     	
 		$dbAttachmentAsset->setEntryId($entryId);
 		$dbAttachmentAsset->setPartnerId($dbEntry->getPartnerId());
-		$dbAttachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_QUEUED);
+		$dbAttachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
 		$dbAttachmentAsset->save();
 
 		$attachmentAsset = new KalturaAttachmentAsset();
@@ -104,12 +104,12 @@ class AttachmentAssetService extends KalturaBaseService
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbAttachmentAsset));
 		
     	$newStatuses = array(
-    		AttachmentAsset::FLAVOR_ASSET_STATUS_READY,
-    		AttachmentAsset::FLAVOR_ASSET_STATUS_VALIDATING,
-    		AttachmentAsset::FLAVOR_ASSET_STATUS_TEMP,
+    		AttachmentAsset::ASSET_STATUS_READY,
+    		AttachmentAsset::ASSET_STATUS_VALIDATING,
+    		AttachmentAsset::ASSET_STATUS_TEMP,
     	);
     	
-    	if($previousStatus == AttachmentAsset::FLAVOR_ASSET_STATUS_QUEUED && in_array($dbAttachmentAsset->getStatus(), $newStatuses))
+    	if($previousStatus == AttachmentAsset::ASSET_STATUS_QUEUED && in_array($dbAttachmentAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbAttachmentAsset));
    		
 		$attachmentAsset = new KalturaAttachmentAsset();
@@ -159,17 +159,17 @@ class AttachmentAssetService extends KalturaBaseService
 		$attachmentAsset->setSize(filesize($fullPath));
 		$attachmentAsset->save();
 		
-		$syncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$syncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		
 		try {
 			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, $copyOnly);
 		}
 		catch (Exception $e) {
 			
-			if($attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+			if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
 			{
 				$attachmentAsset->setDescription($e->getMessage());
-				$attachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+				$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_ERROR);
 				$attachmentAsset->save();
 			}												
 			throw $e;
@@ -182,7 +182,7 @@ class AttachmentAssetService extends KalturaBaseService
 		$attachmentAsset->setHeight($height);
 		$attachmentAsset->setSize(filesize($finalPath));
 		
-		$attachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_READY);
+		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();
 	}
     
@@ -196,10 +196,10 @@ class AttachmentAssetService extends KalturaBaseService
 		if (kFile::downloadUrlToFile($url, $fullPath))
 			return $this->attachFile($attachmentAsset, $fullPath);
 			
-		if($attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+		if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
 		{
 			$attachmentAsset->setDescription("Failed downloading file[$url]");
-			$attachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_ERROR);
+			$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_ERROR);
 			$attachmentAsset->save();
 		}
 		
@@ -224,7 +224,7 @@ class AttachmentAssetService extends KalturaBaseService
 		if($contentResource->getIsReady())
 			return $this->attachFile($attachmentAsset, $contentResource->getLocalFilePath(), $contentResource->getKeepOriginalFile());
 			
-		$attachmentAsset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+		$attachmentAsset->setStatus(asset::ASSET_STATUS_IMPORTING);
 		$attachmentAsset->save();
 		
 		$contentResource->attachCreatedObject($attachmentAsset);
@@ -239,7 +239,7 @@ class AttachmentAssetService extends KalturaBaseService
 		$attachmentAsset->incrementVersion();
 		$attachmentAsset->save();
 		
-        $newSyncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $newSyncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
                 
 		$finalPath = kFileSyncUtils::getLocalFilePathForKey($newSyncKey);
@@ -249,7 +249,7 @@ class AttachmentAssetService extends KalturaBaseService
 		$attachmentAsset->setHeight($height);
 		$attachmentAsset->setSize(filesize($finalPath));
 		
-		$attachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_READY);
+		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
 		$attachmentAsset->save();
     }
     
@@ -275,10 +275,10 @@ class AttachmentAssetService extends KalturaBaseService
 		$resources = $contentResource->getResources();
 		
         $attachmentAsset->incrementVersion();
-		$attachmentAsset->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_READY);
+		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
         $attachmentAsset->save();
         	
-        $syncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+        $syncKey = $attachmentAsset->getSyncKey(AttachmentAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		foreach($resources as $currentResource)
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
@@ -318,10 +318,10 @@ class AttachmentAssetService extends KalturaBaseService
 				$msg = "Resource of type [" . get_class($contentResource) . "] is not supported";
 				KalturaLog::err($msg);
 				
-				if($attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::FLAVOR_ASSET_STATUS_NOT_APPLICABLE)
+				if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
 				{
 					$attachmentAsset->setDescription($msg);
-					$attachmentAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+					$attachmentAsset->setStatus(asset::ASSET_STATUS_ERROR);
 					$attachmentAsset->save();
 				}
 				
@@ -337,7 +337,7 @@ class AttachmentAssetService extends KalturaBaseService
 	 * @param int $storageId
 	 * @return string
 	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
-	 * @throws KalturaAttachmentErrors::FLAVOR_ASSET_IS_NOT_READY
+	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_IS_NOT_READY
 	 */
 	public function getUrlAction($id, $storageId = null)
 	{
@@ -345,13 +345,44 @@ class AttachmentAssetService extends KalturaBaseService
 		if (!$assetDb || !($assetDb instanceof AttachmentAsset))
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
 
-		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIEXception(KalturaAttachmentErrors::ATTACHMENT_ASSET_IS_NOT_READY);
 
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
 		return $assetDb->getDownloadUrl(true);
+	}
+	
+	/**
+	 * Get remote storage existing paths for the asset
+	 * 
+	 * @action getRemotePaths
+	 * @param string $id
+	 * @return KalturaRemotePathArray
+	 * @throws KalturaErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
+	 * @throws KalturaErrors::ATTACHMENT_ASSET_IS_NOT_READY
+	 */
+	public function getRemotePathsAction($id)
+	{
+		$assetDb = assetPeer::retrieveById($id);
+		if (!$assetDb || !($assetDb instanceof AttachmentAsset))
+			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
+
+		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
+			throw new KalturaAPIEXception(KalturaAttachmentErrors::ATTACHMENT_ASSET_IS_NOT_READY);
+
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$c->add(FileSyncPeer::OBJECT_ID, $id);
+		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$fileSyncs = FileSyncPeer::doSelect($c);
+			
+		return KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
 	}
 	
 	/**
@@ -375,7 +406,7 @@ class AttachmentAssetService extends KalturaBaseService
 			
 		$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		
-		return $this->serveFile($attachmentAsset, AttachmentAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveFile($attachmentAsset, AttachmentAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
 	}
 
 	/**
@@ -451,7 +482,7 @@ class AttachmentAssetService extends KalturaBaseService
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $attachmentAssetDb->getEntryId());
 		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
 		
-		$attachmentAssetDb->setStatus(AttachmentAsset::FLAVOR_ASSET_STATUS_DELETED);
+		$attachmentAssetDb->setStatus(AttachmentAsset::ASSET_STATUS_DELETED);
 		$attachmentAssetDb->setDeletedAt(time());
 		$attachmentAssetDb->save();
 	}
