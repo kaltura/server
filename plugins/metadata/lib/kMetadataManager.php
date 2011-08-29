@@ -256,6 +256,7 @@ class kMetadataManager
 		catch (Exception $ex)
 		{
 			KalturaLog::err('Could not load metadata xml [' . $xmlPath . '] - ' . $ex->getMessage());
+			return '';
 		}
 					
 		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
