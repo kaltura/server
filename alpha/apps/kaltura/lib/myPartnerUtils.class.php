@@ -671,7 +671,7 @@ class myPartnerUtils
 			Criteria::IN );
 		$c->addAnd ( PartnerActivityPeer::PARTNER_ID , $partner->getId() );
 		
-		switch ( $partner->getPartnerPackage() ){
+		switch ( $partner->getPackageClassOfServiceDetails() ){
 			case PartnerPackages::CLASS_OF_SERVICE_SILVER:
 			case PartnerPackages::CLASS_OF_SERVICE_GOLD:
 			case PartnerPackages::CLASS_OF_SERVICE_PLATINUM:
@@ -685,7 +685,7 @@ class myPartnerUtils
 				break;
 		}
 		$packages = new PartnerPackages();
-		$partnerPackage = $packages->getPackageClassOfServiceDetails($partner->getPartnerPackage());
+		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
 		
     	$c->addSelectColumn('sum('.PartnerActivityPeer::AMOUNT.') as total_traffic');
 
@@ -885,7 +885,7 @@ class myPartnerUtils
 		$delete_grace = time() -  (dateUtils::DAY * 30);
 		
 		$packages = new PartnerPackages();
-		$partnerPackage = $packages->getPackageClassOfServiceDetails($partner->getPartnerPackage());
+		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
 		
 		$report_date = date('Y-m').'-01';
                 // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
