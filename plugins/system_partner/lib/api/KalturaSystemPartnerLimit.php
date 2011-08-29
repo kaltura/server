@@ -11,7 +11,7 @@ class KalturaSystemPartnerLimit extends KalturaObject
 	public $type;
 	
 	/**
-	 * @var int
+	 * @var float
 	 */
 	public $max;
 	
