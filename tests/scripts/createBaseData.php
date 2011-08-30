@@ -555,6 +555,8 @@ endscript
 			4 => '<metadata><Startdate>1310504000</Startdate><Enddate>1310509000</Enddate><MyNumber>4</MyNumber><MyNumber2>4</MyNumber2><MyNumber3>4</MyNumber3><MyTextList>a1</MyTextList><MyTest>myTest</MyTest></metadata>'
 		);
 				
+		KalturaGlobalData::setData("@METADATA_TEST_XML@", $xmlData[0]);
+		
 		$entry = new KalturaMediaEntry();		
 		for ($i =0 ; $i < count($xmlData) ; $i++)
 		{
