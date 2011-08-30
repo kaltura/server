@@ -412,7 +412,9 @@ class PartnerController extends Zend_Controller_Action
 		
 		// init filter
 		$filter = new Kaltura_Client_Type_StorageProfileFilter();
-		$filter->partnerIdEqual = $request->getParam('filter_input');
+		
+		if ($request->getParam('filter_input') != '')
+			$filter->partnerIdEqual = $request->getParam('filter_input');
 		
 		// get results and paginate
 		$paginatorAdapter = new Infra_FilterPaginator($client->storageProfile, "listAction", null, $filter);
