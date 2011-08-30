@@ -290,13 +290,14 @@ class Form_PartnerConfiguration extends Infra_Form
 				      ));
 				}		      
 			}
-			$permissionNames[$modul->group][] = $modul->permissionName;
+			$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
 		}
-		
+				
 		$this->addAllDisplayGroups($permissionNames);
 	}
 	
 	//adding display group to all features
+	ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 	$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
 		
 	//removing decorators from display groups
