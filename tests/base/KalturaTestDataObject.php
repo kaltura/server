@@ -184,7 +184,10 @@ class KalturaTestDataObject extends KalturaTestDataBase
 			$this->dataObject->$field = $value; //Set the field as all fields are public in the API
 		}
 		else
-			throw new Exception("Currentl only propel objects are supported");
+		{
+			$objectType = gettype($this->dataObject);
+			throw new Exception("Type not supported: $objectType isn't");
+		}
 	}
 
 	/**
