@@ -286,9 +286,23 @@ class BaseEntryService extends KalturaEntryService
 	 * @param int $version Desired version of the data
 	 * @return KalturaBaseEntry The requested entry
 	 */
-	function getAction($entryId, $version = -1)
-	{
-		return $this->getEntry($entryId, $version);
+    function getAction($entryId, $version = -1)
+    {
+    	return $this->getEntry($entryId, $version);
+    }
+
+    /**
+     * Get remote storage existing paths for the asset
+     *
+     * @action getRemotePaths
+     * @param string $entryId
+     * @return KalturaRemotePathListResponse
+     * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @throws KalturaErrors::ENTRY_NOT_READY
+     */
+    public function getRemotePathsAction($entryId)
+    {
+		return $this->getRemotePaths($entryId);
 	}
 	
 	/**

@@ -762,6 +762,32 @@ class KalturaEntryService extends KalturaBaseService
 
 		return $entry;
 	}
+
+	protected function getRemotePaths($entryId, $entryType = null)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+
+		if (!$dbEntry || ($entryType !== null && $dbEntry->getType() != $entryType))
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		if ($dbEntry->getStatus() != entryStatus::READY)
+			throw new KalturaAPIEXception(KalturaErrors::ENTRY_NOT_READY, $entryId);
+
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ENTRY);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$c->add(FileSyncPeer::OBJECT_ID, $entryId);
+		$c->add(FileSyncPeer::VERSION, $dbEntry->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $dbEntry->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$fileSyncs = FileSyncPeer::doSelect($c);
+
+		$listResponse = new KalturaRemotePathListResponse();
+		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->totalCount = count($listResponse->objects);
+		return $listResponse;
+	}
 	
 	/**
 	 * @param KalturaBaseEntryFilter $filter
