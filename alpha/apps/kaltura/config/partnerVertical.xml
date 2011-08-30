@@ -2,7 +2,7 @@
 <packages>
 	<package>
 		<id>1</id>
-		<name>Media Company / Agency</name>
+		<name>Vertical Market 1</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>20</cycle_bw>
 		<cycle_fee>50</cycle_fee>
@@ -11,7 +11,7 @@
 	</package>
 	<package>
 		<id>2</id>
-		<name>Education Organization</name>
+		<name>Vertical Market 2</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>50</cycle_bw>
 		<cycle_fee>100</cycle_fee>
@@ -20,7 +20,7 @@
 	</package>
 	<package>
 		<id>3</id>
-		<name>Enterprise / Small Business / Gov. Agency</name>
+		<name>Vertical Market 3</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>100</cycle_bw>
 		<cycle_fee>150</cycle_fee>
@@ -29,7 +29,7 @@
 	</package>
 	<package>
 		<id>4</id>
-		<name>CDN / ISP /  Integrator / Hosting Provider</name>
+		<name>Vertical Market 4</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>100</cycle_bw>
 		<cycle_fee>150</cycle_fee>

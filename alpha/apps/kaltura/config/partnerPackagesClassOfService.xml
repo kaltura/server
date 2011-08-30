@@ -2,7 +2,7 @@
 <packages>
 	<package>
 		<id>1</id>
-		<name>Silver</name>
+		<name>Class of Service  Level - 1</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>20</cycle_bw>
 		<cycle_fee>50</cycle_fee>
@@ -11,7 +11,7 @@
 	</package>
 	<package>
 		<id>2</id>
-		<name>Gold</name>
+		<name>Class of Service  Level - 2</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>50</cycle_bw>
 		<cycle_fee>100</cycle_fee>
@@ -20,7 +20,7 @@
 	</package>
 	<package>
 		<id>3</id>
-		<name>Platinum</name>
+		<name>Class of Service  Level - 3</name>
 		<cycle_type>1</cycle_type>
 		<cycle_bw>100</cycle_bw>
 		<cycle_fee>150</cycle_fee>
