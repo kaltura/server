@@ -152,6 +152,7 @@ function newStorageSuccess(html) {
 	if (jQuery(html).parent().find('form').hasClass('valid')) 
 	{
 		dialogDiv.dialog('close');
+		jQuery('#frmPaginator1').submit();
 	}
 	else
 	{
