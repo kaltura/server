@@ -197,6 +197,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $crmLink;
 	
+	/**
+	 * @var string
+	 */
+	public $verticalClasiffication;
+	
+	/**
+	 * @var string
+	 */
+	public $partnerPackageClassOfService;
+	
 	
 	
 	private static $map_between_objects = array
@@ -238,7 +248,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrail",
 		"restrictThumbnailByKs",
 		"crmLink",
-		"crmId"
+		"crmId",
+		"verticalClasiffication",
+		"partnerPackageClassOfService"
 	);
 
 	public function getMapBetweenObjects()
