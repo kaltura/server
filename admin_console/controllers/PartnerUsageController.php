@@ -36,7 +36,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', 'All Service Editions');
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', true, 'All Service Editions');
 		// set view
 		$this->view->from = $from;
 		$this->view->to = $to;

@@ -14,7 +14,11 @@ class PartnerController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		$form = new Form_PartnerCreate();
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
+		
+		$partner = Zend_Registry::get('config')->partner;
+		$allowNonePackage = $partner->enableNonePackage;
+		
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
 	
 		if ($request->isPost())
 		{
@@ -77,7 +81,7 @@ class PartnerController extends Zend_Controller_Action
 		$form->setAction($action);
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
-		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', 'All Service Editions');
+		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', true, 'All Service Editions');
 		
 		$this->view->partnerPackages = array();
 		foreach($partnerPackages as $package)
@@ -272,7 +276,11 @@ class PartnerController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$form = new Form_PartnerConfiguration();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
+		
+		$partner = Zend_Registry::get('config')->partner;
+		$allowNonePackage = $partner->enableNonePackage;
+		
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesClassOfService(), 'partner_package_class_of_service');
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesVertical(), 'vertical_clasiffication');
 		
