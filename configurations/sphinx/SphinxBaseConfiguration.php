@@ -4,6 +4,7 @@ $baseConfigurationIndexs =
 	array( 'kaltura_entry' => array(	
 		'type'					=> 'rt',
 		'path'					=> '/sphinx/kaltura_rt',
+		'rt_mem_limit'			=> '1024M',
 		
 		'fields' => array( 
 			'entry_id'					=> SphinxFieldType::RT_FIELD,
@@ -101,17 +102,21 @@ $baseConfigurationIndexs =
 								U+C5->U+E5, U+E5, U+C4->U+E4, U+E4, U+D6->U+F6, U+F6',
 		));
 		
-$baseConfigurations = array ('searchd' => array(
-		'log'				=> '/var/log/sphinx/kaltura_sphinx_searchd.log',
-		'query_log'			=> '/var/log/sphinx/kaltura_sphinx_query.log',
+$baseConfigurations = array (
+'searchd' => array(
+		'log'			=> '/var/log/sphinx/kaltura_sphinx_searchd.log',
+		'query_log'		=> '/var/log/sphinx/kaltura_sphinx_query.log',
+		'query_log_format'	=> 'sphinxql',
 		'read_timeout'		=> '5',
 		'max_children'		=> '30',
-		'pid_file'			=> '/opt/kaltura/sphinx/searchd.pid',
+		'pid_file'		=> '/opt/kaltura/sphinx/searchd.pid',
 		'max_matches'		=> '10000',
 		'preopen_indexes'	=> '0',
 		'unlink_old'		=> '1',
-		'workers'			=> 'threads',
+		'workers'		=> 'threads',
 		'binlog_path'		=> '/var/log/sphinx/data',
 		'binlog_flush'		=> '1',
-		'listen'			=> '0.0.0.0:9312:mysql41'
-	));
+		'rt_flush_period'	=> '3600',
+		'listen'		=> '0.0.0.0:9312:mysql41'
+	)
+);
