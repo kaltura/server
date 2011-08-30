@@ -205,7 +205,9 @@ class WidgetController extends Zend_Controller_Action
 	
 	protected function getAllUiConfTypes()
 	{
-		$types = array();
+		$types = array(
+			'Generic'
+		);
 		$reflectionClass = new ReflectionClass('Kaltura_Client_Enum_UiConfObjType');
 		$constants = $reflectionClass->getConstants();
 		foreach($constants as $name => $value)
