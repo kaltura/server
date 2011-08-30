@@ -837,7 +837,7 @@ class BatchController extends Zend_Controller_Action
 				$filter = new Kaltura_Client_Type_ThumbParamsOutputFilter();
 				$filter->thumbAssetIdEqual = $thumb->id;
 				try{
-					$thumbParamsOutputsList = $adminConsolePlugin->thumbParamsOutput->listAction($filter);
+					$thumbParamsOutputsList = $client->thumbParamsOutput->listAction($filter);
 					$thumbData->thumbParamsOutputs = $thumbParamsOutputsList;
 				}
 				catch(Exception $e){
