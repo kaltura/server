@@ -1,6 +1,10 @@
 <?php if($this->errMessage) echo "<div class=\"error\">{$this->errMessage}</div>"; ?>
 <?php $this->form->setAction($this->url(array('controller' => 'partner', 'action' => 'exteneded-free-trail-history'))); ?>
 
+<?php if (!isset($this->auditList->objects) || !count($this->auditList->objects)):?>
+	<div>No Trial Extension history</div>
+<?php else:?>
+
 <table class="clear">
 		<thead>
 			<tr>
@@ -11,6 +15,8 @@
 			</tr>
 		</thead>
 		<tbody>
+			
+		
 			<?php foreach($this->auditList->objects as $audit): ?>
 			<tr class="1">
 				<td><?php echo $audit->userId; ?></td>
@@ -19,7 +25,7 @@
 				<?php
 				if (@$audit->data->changedItems){
 					foreach($audit->data->changedItems as $changedItems){
-					 if ($changedItems->descriptor == 'monitorUsageExpiryDate'){ 
+					 if ($changedItems->descriptor == 'extendedFreeTrailExpiryDate'){ 
 					 	echo date('m/d/y',$changedItems->newValue); 
 					 	break;
 					 }
@@ -27,7 +33,7 @@
 					</td><td>
 				<?php if (@$audit->data->changedItems){
 					foreach($audit->data->changedItems as $changedItems){
-					 	if ($changedItems->descriptor == 'monitorUsageExpiryReason'){ 
+					 	if ($changedItems->descriptor == 'extendedFreeTrailExpiryReason'){ 
 					 		echo $changedItems->newValue; 
 					 		break;
 						}
@@ -37,3 +43,4 @@
 			<?php endforeach;?>
 		</tbody>
 	</table>
+<?php endif;?>
