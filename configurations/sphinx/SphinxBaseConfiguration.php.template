@@ -3,6 +3,8 @@ $baseDir = '@BASE_DIR@';
 $baseConfigurationIndexs = 	array( 
 	'kaltura_entry' => array(	
 	'path'					=> '/sphinx/kaltura_rt',
+	'rt_mem_limit'			=> '1024M',
+	
 	'fields' => array( 
 		'entry_id'					=> SphinxFieldType::RT_FIELD,
 		'name'                     	=> SphinxFieldType::RT_FIELD,
@@ -56,6 +58,7 @@ $baseConfigurations = array (
 	'searchd' => array(
 		'log'				=> '@LOG_DIR@/sphinx/kaltura_sphinx_searchd.log',
 		'query_log'			=> '@LOG_DIR@/sphinx/kaltura_sphinx_query.log',
+		'query_log_format'	=> 'sphinxql',
 		'read_timeout'		=> '5',
 		'max_children'		=> '30',
 		'pid_file'			=> '@BASE_DIR@/sphinx/searchd.pid',
@@ -65,6 +68,7 @@ $baseConfigurations = array (
 		'workers'			=> 'threads',
 		'binlog_path'		=> '@LOG_DIR@/sphinx/data',
 		'binlog_flush'		=> '1',
+		'rt_flush_period'	=> '3600',
 		'listen'			=> '0.0.0.0:9312:mysql41'
 	)
 );
