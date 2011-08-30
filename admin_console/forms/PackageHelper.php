@@ -1,10 +1,13 @@
 <?php
 class Form_PackageHelper
 {
-	public static function addPackagesToForm(Zend_Form $form, $packages, $fieldName, $defaultName = "N/A")
+	public static function addPackagesToForm(Zend_Form $form, $packages, $fieldName, $addDefult = true, $defaultName = "N/A")
 	{
 		$arr = array();
-		$arr[''] = $defaultName;
+		
+		if ($addDefult)
+			$arr[''] = $defaultName;
+		
 		foreach($packages as $package)
 		{
 			$arr[$package->id] = $package->name;
