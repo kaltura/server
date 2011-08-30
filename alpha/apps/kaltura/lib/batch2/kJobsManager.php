@@ -722,7 +722,9 @@ class kJobsManager
 		}
 		
 		KalturaLog::log("Post Convert created with file: " . $postConvertData->getSrcFileSyncLocalPath());
-		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $flavorParamsOutput->getMediaParserType());
+		
+		$mediaParserType = ($flavorParamsOutput ? $flavorParamsOutput->getMediaParserType() : mediaParserType::MEDIAINFO);
+		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $mediaParserType);
 	}
 	
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null)
