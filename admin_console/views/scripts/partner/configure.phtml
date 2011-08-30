@@ -84,6 +84,29 @@ function onPageLoad() {
 		} 
 	});
 
+	$("#partner_group_type-element select").each(function(inx, value){
+		var $partner_parent_id = $('#partner_parent_id');
+		if ($(this).val() != 1){
+			$partner_parent_id.attr("readonly", 1);
+			$partner_parent_id.val('0');
+	    } 
+	});
+
+	$('#partner_group_type-element select').change(function()
+		{
+			var $partner_parent_id = $('#partner_parent_id');
+			
+			if ($(this).val() == 1){
+				$partner_parent_id.removeAttr('readonly');
+		    }else{
+				$partner_parent_id.attr("readonly", 1);
+				$partner_parent_id.val('0');
+		    } 
+		});
+
+	
+	
+
 	var $separated_bw_max = $('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_max');
 	var $separated_bw_price = $('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_overagePrice');
 	var $separated_bw_unit = $('#MONTHLY_BANDWIDTH-MONTHLY_BANDWIDTH_overageUnit');
