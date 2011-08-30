@@ -63,17 +63,28 @@ foreach ($sphinxConfigurationIndexs as $sphinxIndexName => $sphinxIndexValues){
 	if (isset($sphinxIndexValues['fields'])){
 		foreach ($sphinxIndexValues['fields'] as $fieldValue => $fieldName){
 				fwrite($sphinxConfigHandler, "\t" . $fieldName . "\t" . ' = ' . $fieldValue . PHP_EOL);	
-			}
+		}
+		fwrite($sphinxConfigHandler, PHP_EOL);	
 		unset($sphinxIndexValues['fields']);
 	}
 	
 	foreach ($sphinxIndexValues as $key => $value){
+		if ($key == 'blend_chars' || $key == 'charset_table')
+			continue;	
+		
 		if ($key == 'path'){
 			$value = $baseDir . $value;
 		}
 		fwrite($sphinxConfigHandler, "\t" . $key . "\t" . ' = ' . $value . PHP_EOL);
 	}
 	
+	if (isset($sphinxIndexValues['blend_chars']))
+		fwrite($sphinxConfigHandler, "\t" . 'blend_chars' . "\t" . ' = ' . $sphinxIndexValues['blend_chars'] . PHP_EOL);
+
+	if (isset($sphinxIndexValues['charset_table']))
+		fwrite($sphinxConfigHandler, "\t" . 'charset_table' . "\t" . ' = ' . $sphinxIndexValues['charset_table'] . PHP_EOL);
+	
+		
 	fwrite($sphinxConfigHandler, '}' . PHP_EOL);
 }
 
