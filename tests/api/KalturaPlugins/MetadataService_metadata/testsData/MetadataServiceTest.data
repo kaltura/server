@@ -64,16 +64,16 @@
       <Input name="id" type="int" key=""/>
       <OutputReference name="output" type="KalturaMetadata" key="object key">
         <id></id>
-        <partnerId type="string">178</partnerId>
-        <metadataProfileId type="string">43</metadataProfileId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <metadataProfileId type="string">@METADATA_SEARCH_PROFILE_ID@</metadataProfileId>
         <metadataProfileVersion type="string">1</metadataProfileVersion>
         <metadataObjectType type="string">1</metadataObjectType>
-        <objectId type="string">0_pl8xu1o2</objectId>
+        <objectId type="string">@ENTRY_WITH_DURATION_ID@</objectId>
         <version type="string">1</version>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <status type="string">1</status>
-        <xml type="string">&lt;metadata&gt;&lt;Startdate&gt;1310503400&lt;/Startdate&gt;&lt;Enddate&gt;1310504000&lt;/Enddate&gt;&lt;MyNumber&gt;6&lt;/MyNumber&gt;&lt;MyNumber2&gt;2&lt;/MyNumber2&gt;&lt;MyNumber3&gt;3&lt;/MyNumber3&gt;&lt;MyTextList&gt;a1&lt;/MyTextList&gt;&lt;MyTest&gt;myTest&lt;/MyTest&gt;&lt;/metadata&gt;</xml>
+        <xml type="string">@METADATA_TEST_XML@</xml>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -83,16 +83,16 @@
       <Input name="xmlData" type="string" key=""/>
       <OutputReference name="output" type="KalturaMetadata" key="object key">
         <id></id>
-        <partnerId type="string">178</partnerId>
-        <metadataProfileId type="string">43</metadataProfileId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <metadataProfileId type="string">@METADATA_SEARCH_PROFILE_ID@</metadataProfileId>
         <metadataProfileVersion type="string">1</metadataProfileVersion>
         <metadataObjectType type="string">1</metadataObjectType>
-        <objectId type="string">0_pl8xu1o2</objectId>
+        <objectId type="string">@ENTRY_WITH_DURATION_ID@</objectId>
         <version type="string">1</version>
         <createdAt></createdAt>
         <updatedAt></updatedAt>
         <status type="string">1</status>
-        <xml type="string">&lt;metadata&gt;&lt;Startdate&gt;1310503400&lt;/Startdate&gt;&lt;Enddate&gt;1310504000&lt;/Enddate&gt;&lt;MyNumber&gt;6&lt;/MyNumber&gt;&lt;MyNumber2&gt;2&lt;/MyNumber2&gt;&lt;MyNumber3&gt;3&lt;/MyNumber3&gt;&lt;MyTextList&gt;a1&lt;/MyTextList&gt;&lt;MyTest&gt;myTest&lt;/MyTest&gt;&lt;/metadata&gt;</xml>
+        <xml type="string">@METADATA_TEST_XML@</xml>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
