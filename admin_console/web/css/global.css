@@ -409,8 +409,8 @@ body#monitoring-xymon {}
  #partner-configure-dialog label { padding:0;}
 /*  #partner-configure-dialog dl { margin-top:15px;}*/
    #partner-configure-dialog dl p { width:333px; padding:3px; margin-top:5px; border: solid 1px #ccc; background:#f0f0f0;}
-   #partner-configure-dialog .partnerConfigureFormColumnLeft dt { width:288px; margin: 3px 0 9px;}	
-   #partner-configure-dialog .partnerConfigureFormColumnRight dt { width:280px; margin: 3px 0 9px;}
+   #partner-configure-dialog .partnerConfigureFormColumnLeft dt { width:288px; margin: 3px 0 10px;}	
+   #partner-configure-dialog .partnerConfigureFormColumnRight dt { width:280px; margin: 3px 0 5px;}
    #partner-configure-dialog dd input { width:154px; height:22px;}
    #partner-configure-dialog dd input#max_bulk_size { width:150px;}
 
@@ -559,6 +559,7 @@ form#frmCreateDropFolder dt { float: left; }
 
 #partner-configure-dialog .configureDiv { float:left; width:50%; }
 #partner-configure-dialog .configureDiv #fieldset-enableDisableFeatures input { width: 20px; }
+#partner-configure-dialog  #fieldset-enableDisableFeatures label { width: 20px; padding: 0 10px 0 5px}
 #partner-configure-dialog .partnerConfigureFormColumnLeft fieldset { border:none; background:none;  margin: 0px 0px 0px 21px; }
 #partner-configure-dialog .partnerConfigureFormColumnLeft fieldset legend{ font-weight:bold; margin-bottom:10px;}
 #partner-configure-dialog .partnerConfigureFormColumnRight fieldset { border:none; background:none; margin: 0px 0px 0px 21px; }
