@@ -59,17 +59,20 @@ foreach ($sphinxConfigurationIndexs as $sphinxIndexName => $sphinxIndexValues){
 	$sphinxIndexValues = kSphinxSearchManager::getSphinxDefaultConfig($sphinxIndexValues);
 	
 	fwrite($sphinxConfigHandler, 'index ' . $sphinxIndexName . PHP_EOL . '{' . PHP_EOL);
-	foreach ($sphinxIndexValues as $key => $value)
-		if ($key == 'fields'){
-			foreach ($value as $fieldValue => $fieldName){
+	
+	if (isset($sphinxIndexValues['fields'])){
+		foreach ($sphinxIndexValues['fields'] as $fieldValue => $fieldName){
 				fwrite($sphinxConfigHandler, "\t" . $fieldName . "\t" . ' = ' . $fieldValue . PHP_EOL);	
 			}
-		}else{
-			if ($key == 'path'){
-				$value = $baseDir . $value;
-			}
-			fwrite($sphinxConfigHandler, "\t" . $key . "\t" . ' = ' . $value . PHP_EOL);
+		unset($sphinxIndexValues['fields']);
+	}
+	
+	foreach ($sphinxIndexValues as $key => $value){
+		if ($key == 'path'){
+			$value = $baseDir . $value;
 		}
+		fwrite($sphinxConfigHandler, "\t" . $key . "\t" . ' = ' . $value . PHP_EOL);
+	}
 	
 	fwrite($sphinxConfigHandler, '}' . PHP_EOL);
 }
