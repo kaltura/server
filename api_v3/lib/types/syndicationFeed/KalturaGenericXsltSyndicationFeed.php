@@ -10,6 +10,16 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 	* @var string
 	*/
 	public $xslt;
+
+	/**
+	 * This parameter determines which custom metadata fields of type related-entry should be
+	 * expanded to contain the kaltura MRSS feed of the related entry. Related-entry fields not
+	 * included in this list will contain only the related entry id.
+	 * This property contains a list xPaths in the Kaltura MRSS.
+	 * 
+	 * @var KalturaStringArray
+	 */
+	public $itemXpathsToExtend;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -32,6 +42,40 @@ class KalturaGenericXsltSyndicationFeed extends KalturaGenericSyndicationFeed
 
 		$key = $source_object->getSyncKey(genericSyndicationFeed::FILE_SYNC_SYNDICATION_FEED_XSLT);
 		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
+
+		$mrssParams = $source_object->getMrssParameters();
+		if ($mrssParams)
+		{
+			$this->itemXpathsToExtend = KalturaStringArray::fromStringArray($mrssParams->getItemXpathsToExtend());
+		}
+		else
+		{
+			$this->itemXpathsToExtend = new KalturaStringArray();
+		}
+	}
+	
+	public function toObject($dbObject = null, $skip = array())
+	{
+		parent::toObject($dbObject, $skip);
+		
+		$mrssParams = $dbObject->getMrssParameters();
+		if (!$mrssParams)
+		{
+			$mrssParams = new kMrssParameters;
+		}
+		
+		if ($this->itemXpathsToExtend)
+		{
+			$itemXpathsToExtend = array();
+			foreach($this->itemXpathsToExtend as $curXpath)
+			{
+				$itemXpathsToExtend[] = $curXpath->value;
+			}
+
+			$mrssParams->setItemXpathsToExtend($itemXpathsToExtend);
+		}
+		
+		$dbObject->setMrssParameters($mrssParams);
 	}
 	
 	/**
