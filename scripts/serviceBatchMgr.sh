@@ -129,7 +129,8 @@ stop() {
 		echo_failure
 		echo
 		echo "Service $FILE_NAME not running"
-		RC=2
+		#RC=2
+		RC=0
 	fi
 	rm -f $LOCKFILE
 	return $RC
