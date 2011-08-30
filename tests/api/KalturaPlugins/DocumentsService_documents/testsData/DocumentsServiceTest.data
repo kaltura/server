@@ -70,7 +70,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string"></accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
