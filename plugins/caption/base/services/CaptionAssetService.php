@@ -415,8 +415,8 @@ class CaptionAssetService extends KalturaBaseService
 	 * @action getRemotePaths
 	 * @param string $id
 	 * @return KalturaRemotePathListResponse
-	 * @throws KalturaErrors::CAPTION_ASSET_ID_NOT_FOUND
-	 * @throws KalturaErrors::CAPTION_ASSET_IS_NOT_READY
+	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
+	 * @throws KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY
 	 */
 	public function getRemotePathsAction($id)
 	{

@@ -360,8 +360,8 @@ class AttachmentAssetService extends KalturaBaseService
 	 * @action getRemotePaths
 	 * @param string $id
 	 * @return KalturaRemotePathListResponse
-	 * @throws KalturaErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
-	 * @throws KalturaErrors::ATTACHMENT_ASSET_IS_NOT_READY
+	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
+	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_IS_NOT_READY
 	 */
 	public function getRemotePathsAction($id)
 	{
