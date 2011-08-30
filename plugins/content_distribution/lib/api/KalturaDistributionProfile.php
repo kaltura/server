@@ -124,6 +124,18 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 	 */
 	public $sunsetDefaultOffset;
 	
+	/**
+	 * The best external storage to be used to download the asset files from
+	 * @var int
+	 */
+	public $recommendedStorageProfileForDownload;
+	
+	/**
+	 * The best Kaltura data center to be used to download the asset files to
+	 * @var int
+	 */
+	public $recommendedDcForDownload;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -146,6 +158,8 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 		'requiredFlavorParamsIds',
 		'sunriseDefaultOffset',
 		'sunsetDefaultOffset',
+		'recommendedStorageProfileForDownload',
+		'recommendedDcForDownload',
 	 );
 		 
 	public function getMapBetweenObjects()
