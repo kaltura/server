@@ -8,7 +8,7 @@
         <id></id>
         <name type="string">TEST_DOCUMENT_NAME</name>
         <description type="string">TEST_DOCUMENT_DESC</description>
-        <partnerId></partnerId>
+        <partnerId>@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
@@ -30,7 +30,7 @@
         <licenseType></licenseType>
         <version></version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId></accessControlId>
+        <accessControlId>@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
@@ -70,7 +70,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string">70</accessControlId>
+        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
