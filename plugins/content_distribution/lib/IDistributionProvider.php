@@ -56,6 +56,16 @@ interface IDistributionProvider
 	public function isAvailabilityUpdateEnabled();
 	
 	/**
+	 * Indicates that asset (flavor or thumbnail) files must be synced on the same dc that executes the job
+	 * If the files exists on the other dc, the job will be performed on the other dc.
+	 * If the files are missing, they could be downloaded from remote storage.
+	 *  
+	 * @param int $jobType ContentDistributionBatchJobType core value
+	 * @return bool
+	 */
+	public function isLocalFileRequired($jobType);
+	
+	/**
 	 * indicates that since this provider doesn’t support update action, delete and submit should be used instead.
 	 * @return bool
 	 */

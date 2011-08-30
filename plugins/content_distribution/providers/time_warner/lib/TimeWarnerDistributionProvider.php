@@ -89,6 +89,14 @@ class TimeWarnerDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isLocalFileRequired()
+	 */
+	public function isLocalFileRequired($jobType)
+	{
+		return false;
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::useDeleteInsteadOfUpdate()

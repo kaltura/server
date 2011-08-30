@@ -99,6 +99,14 @@ class PodcastDistributionProvider implements IDistributionProvider
 	}
 	
 	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isLocalFileRequired()
+	 */
+	public function isLocalFileRequired($jobType)
+	{
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see IDistributionProvider::getJobIntervalBeforeSunrise()
 	 */
 	public function getJobIntervalBeforeSunrise()
