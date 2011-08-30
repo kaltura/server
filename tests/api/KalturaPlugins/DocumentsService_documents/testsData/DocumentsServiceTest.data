@@ -48,7 +48,7 @@
         <id></id>
         <name type="string">TEST_DOCUMENT_NAME</name>
         <description type="string">TEST_DOCUMENT_DESC</description>
-        <partnerId type="string">168</partnerId>
+        <partnerId type="string"></partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
@@ -70,7 +70,7 @@
         <licenseType type="string">-1</licenseType>
         <version type="string">0</version>
         <thumbnailUrl></thumbnailUrl>
-        <accessControlId type="string">@DEFAULT_ACCESS_CONTROL@</accessControlId>
+        <accessControlId type="string"></accessControlId>
         <startDate></startDate>
         <endDate></endDate>
         <referenceId></referenceId>
