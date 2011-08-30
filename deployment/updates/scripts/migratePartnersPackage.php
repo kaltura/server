@@ -34,6 +34,9 @@ while ( count ( $partners ) ) {
 		if ($partner->getPartnerPackage() > PartnerPackages::PARTNER_PACKAGE_PAID){
 			$partner->setPartnerPackage(PartnerPackages::PARTNER_PACKAGE_PAID);
 			$partner->save();
+		}elseif ($partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_FREE && $partner->getPartnerPackage() != PartnerPackages::PARTNER_PACKAGE_PAID){
+			$partner->setPartnerPackage(PartnerPackages::PARTNER_PACKAGE_FREE);
+			$partner->save();
 		}
 	}
 	
