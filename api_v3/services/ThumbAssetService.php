@@ -856,7 +856,7 @@ class ThumbAssetService extends KalturaBaseService
 	 * 
 	 * @action getRemotePaths
 	 * @param string $id
-	 * @return KalturaRemotePathArray
+	 * @return KalturaRemotePathListResponse
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 */
@@ -879,6 +879,9 @@ class ThumbAssetService extends KalturaBaseService
 		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
-		return KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse = new KalturaRemotePathListResponse();
+		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->totalCount = count($listResponse->objects);
+		return $listResponse;
 	}
 }

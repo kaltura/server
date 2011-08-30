@@ -630,7 +630,7 @@ class FlavorAssetService extends KalturaBaseService
 	 * 
 	 * @action getRemotePaths
 	 * @param string $id
-	 * @return KalturaRemotePathArray
+	 * @return KalturaRemotePathListResponse
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::FLAVOR_ASSET_IS_NOT_READY
 	 */
@@ -653,7 +653,10 @@ class FlavorAssetService extends KalturaBaseService
 		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
 		$fileSyncs = FileSyncPeer::doSelect($c);
 			
-		return KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse = new KalturaRemotePathListResponse();
+		$listResponse->objects = KalturaRemotePathArray::fromFileSyncArray($fileSyncs);
+		$listResponse->totalCount = count($listResponse->objects);
+		return $listResponse;
 	}
 	
 	/**
