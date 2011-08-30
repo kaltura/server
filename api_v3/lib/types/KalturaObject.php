@@ -109,7 +109,7 @@ class KalturaObject
 			$propertyInfo = $typeReflector->getProperty($this_prop);
 			if (!$propertyInfo)
 			{
-	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+	            KalturaLog::alert("property [$this_prop] was not found on object class [" . get_class($this) . "]");
 	            continue;
 			}
 			
@@ -132,7 +132,7 @@ class KalturaObject
 			if (is_callable($setter_callback))
 		 	    call_user_func_array( $setter_callback , array ($value ) );
 	 	    else 
-            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "]");
+            	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "] defined as property [$this_prop] on api class [" . get_class($this) . "]");
 		}
 		return $object_to_fill;		
 	}
