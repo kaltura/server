@@ -78,6 +78,7 @@ abstract class ClientGeneratorFromXml
 		
 		// loop through the folder
 		$dir = dir($directory);
+		$sourceFilesPaths = array();
 		while (false !== $entry = $dir->read()) 
 		{
 			// skip source control files
@@ -87,12 +88,13 @@ abstract class ClientGeneratorFromXml
 			{
 				continue;
 			} 
-			 
-			$this->addSourceFiles(realpath("$directory/$entry"));
+			$sourceFilesPaths[] = realpath("$directory/$entry");
 		}
-		 
 		// clean up
 		$dir->close();
+		
+		foreach($sourceFilesPaths as $sourceFilesPath)
+			$this->addSourceFiles($sourceFilesPath);
 	}
 	
 	protected function endsWith($str, $end) 
