@@ -259,6 +259,7 @@ class BatchService extends KalturaBaseService
 	 * @action addMediaInfo
 	 * @param KalturaMediaInfo $mediaInfo
 	 * @return KalturaMediaInfo 
+	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 */
 	function addMediaInfoAction(KalturaMediaInfo $mediaInfo)
 	{
@@ -267,7 +268,10 @@ class BatchService extends KalturaBaseService
 		
 		if($mediaInfo->flavorAssetId)
 		{
-			$flavorAsset = assetPeer::retrieveById($mediaInfo->flavorAssetId);
+			$flavorAsset = assetPeer::retrieveByIdNoFilter($mediaInfo->flavorAssetId);
+			if(!$flavorAsset)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $mediaInfo->flavorAssetId);
+			
 			$mediaInfoDb = mediaInfoPeer::retrieveByFlavorAssetId($mediaInfo->flavorAssetId);
 			
 			if($mediaInfoDb && $mediaInfoDb->getFlavorAssetVersion() == $flavorAsset->getVersion())
