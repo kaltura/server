@@ -77,7 +77,7 @@ class PartnerController extends Zend_Controller_Action
 		$form->setAction($action);
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
-		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package');
+		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', 'All Service Editions');
 		
 		$this->view->partnerPackages = array();
 		foreach($partnerPackages as $package)
