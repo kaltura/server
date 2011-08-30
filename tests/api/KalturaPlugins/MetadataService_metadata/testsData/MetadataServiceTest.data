@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="MetadataServiceTest">
+  <TestProcedureData testProcedureName="testListAction">
+    <TestCaseData testCaseInstanceName="testListAction with data set #0">
+      <Input name="filter" type="KalturaMetadataFilter" key="">
+        <partnerIdEqual></partnerIdEqual>
+        <metadataProfileIdEqual></metadataProfileIdEqual>
+        <metadataProfileVersionEqual></metadataProfileVersionEqual>
+        <metadataProfileVersionGreaterThanOrEqual></metadataProfileVersionGreaterThanOrEqual>
+        <metadataProfileVersionLessThanOrEqual></metadataProfileVersionLessThanOrEqual>
+        <metadataObjectTypeEqual></metadataObjectTypeEqual>
+        <objectIdEqual></objectIdEqual>
+        <objectIdIn></objectIdIn>
+        <versionEqual></versionEqual>
+        <versionGreaterThanOrEqual></versionGreaterThanOrEqual>
+        <versionLessThanOrEqual></versionLessThanOrEqual>
+        <createdAtGreaterThanOrEqual></createdAtGreaterThanOrEqual>
+        <createdAtLessThanOrEqual></createdAtLessThanOrEqual>
+        <updatedAtGreaterThanOrEqual></updatedAtGreaterThanOrEqual>
+        <updatedAtLessThanOrEqual></updatedAtLessThanOrEqual>
+        <statusEqual></statusEqual>
+        <statusIn></statusIn>
+        <orderBy></orderBy>
+        <advancedSearch type="string">KalturaSearchItem</advancedSearch>
+      </Input>
+      <Input name="pager" type="KalturaFilterPager" key="">
+        <pageSize></pageSize>
+        <pageIndex></pageIndex>
+      </Input>
+      <OutputReference name="output" type="KalturaMetadataListResponse" key="object key">
+        <objects></objects>
+        <totalCount></totalCount>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testAdd">
+    <TestCaseData testCaseInstanceName="testAdd with data set #0">
+      <Input name="metadataProfileId" type="int" key="@METADATA_SEARCH_PROFILE_ID@"/>
+      <Input name="objectType" type="string" key="1"/>
+      <Input name="objectId" type="string" key="@ENTRY_WITH_DURATION_ID@"/>
+      <Input name="xmlData" type="string" key="@METADATA_TEST_XML@"/>
+      <OutputReference name="output" type="KalturaMetadata" key="object key">
+        <id></id>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
+        <metadataProfileId type="string">@METADATA_SEARCH_PROFILE_ID@</metadataProfileId>
+        <metadataProfileVersion type="string">1</metadataProfileVersion>
+        <metadataObjectType type="string">1</metadataObjectType>
+        <objectId type="string">@ENTRY_WITH_DURATION_ID@</objectId>
+        <version type="string">1</version>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <status type="string">1</status>
+        <xml type="string">@METADATA_TEST_XML@</xml>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testDelete">
+    <TestCaseData testCaseInstanceName="testDelete with data set #0">
+      <Input name="id" type="int" key=""/>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testGet">
+    <TestCaseData testCaseInstanceName="testGet with data set #0">
+      <Input name="id" type="int" key=""/>
+      <OutputReference name="output" type="KalturaMetadata" key="object key">
+        <id></id>
+        <partnerId type="string">178</partnerId>
+        <metadataProfileId type="string">43</metadataProfileId>
+        <metadataProfileVersion type="string">1</metadataProfileVersion>
+        <metadataObjectType type="string">1</metadataObjectType>
+        <objectId type="string">0_pl8xu1o2</objectId>
+        <version type="string">1</version>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <status type="string">1</status>
+        <xml type="string">&lt;metadata&gt;&lt;Startdate&gt;1310503400&lt;/Startdate&gt;&lt;Enddate&gt;1310504000&lt;/Enddate&gt;&lt;MyNumber&gt;6&lt;/MyNumber&gt;&lt;MyNumber2&gt;2&lt;/MyNumber2&gt;&lt;MyNumber3&gt;3&lt;/MyNumber3&gt;&lt;MyTextList&gt;a1&lt;/MyTextList&gt;&lt;MyTest&gt;myTest&lt;/MyTest&gt;&lt;/metadata&gt;</xml>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+  <TestProcedureData testProcedureName="testUpdate">
+    <TestCaseData testCaseInstanceName="testUpdate with data set #0">
+      <Input name="id" type="int" key=""/>
+      <Input name="xmlData" type="string" key=""/>
+      <OutputReference name="output" type="KalturaMetadata" key="object key">
+        <id></id>
+        <partnerId type="string">178</partnerId>
+        <metadataProfileId type="string">43</metadataProfileId>
+        <metadataProfileVersion type="string">1</metadataProfileVersion>
+        <metadataObjectType type="string">1</metadataObjectType>
+        <objectId type="string">0_pl8xu1o2</objectId>
+        <version type="string">1</version>
+        <createdAt></createdAt>
+        <updatedAt></updatedAt>
+        <status type="string">1</status>
+        <xml type="string">&lt;metadata&gt;&lt;Startdate&gt;1310503400&lt;/Startdate&gt;&lt;Enddate&gt;1310504000&lt;/Enddate&gt;&lt;MyNumber&gt;6&lt;/MyNumber&gt;&lt;MyNumber2&gt;2&lt;/MyNumber2&gt;&lt;MyNumber3&gt;3&lt;/MyNumber3&gt;&lt;MyTextList&gt;a1&lt;/MyTextList&gt;&lt;MyTest&gt;myTest&lt;/MyTest&gt;&lt;/metadata&gt;</xml>
+      </OutputReference>
+    </TestCaseData>
+  </TestProcedureData>
+</TestCaseData>
