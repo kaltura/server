@@ -19,7 +19,10 @@ class PartnerController extends Zend_Controller_Action
 		$allowNonePackage = $partner->enableNonePackage;
 		
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
-	
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesClassOfService(), 'partner_package_class_of_service');
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesVertical(), 'vertical_clasiffication');
+		
+		
 		if ($request->isPost())
 		{
 			if ($form->isValid($request->getPost()))
@@ -302,6 +305,16 @@ class PartnerController extends Zend_Controller_Action
 				catch (Exception $e){
 					$this->view->errMessage = $e->getMessage();
 				}
+				
+				$extentFreeTrail = $this->_getParam('extended_free_trail');
+				
+				if (isset($extentFreeTrail) && $extentFreeTrail){
+					$status = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
+					$client = Infra_ClientHelper::getClient();
+					$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+					$systemPartnerPlugin->systemPartner->updateStatus($partnerId, $status);
+				}
+				
 			}else{
 				$this->view->formValid = false;
 				$form->populate($request->getPost());
