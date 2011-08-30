@@ -34,82 +34,28 @@ class Form_PartnerCreate extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('select', 'describe_yourself', array(
-			'label' => 'partner-create form description',
-			'required' => true,
-			'filters'		=> array('StringTrim'),
-			'multiOptions' => array(
-				'' => 'Please select...',
-				'Integrator/Web developer' => 'Integrator/Web developer',
-				'Ad Agency' => 'Ad Agency',
-				'Kaltura Plugin Distributor' => 'Kaltura Plugin Distributor',
-				'Social Network' => 'Social Network',
-				'Personal Site' => 'Personal Site',
-				'Corporate Site' => 'Corporate Site',
-				'E-Commerce' => 'E-Commerce',
-				'E-Learning' => 'E-Learning',
-				'Media Company/ Producer' => 'Media Company/ Producer',
-				'Other' => 'Other',
-			)
-		));
-		
 		$this->addElement('select', 'partner_package', array(
 			'label'			=> 'partner-create form package',
 			'filters'		=> array('StringTrim'),
 			'required' 		=> true,
 		));
 		
+		$this->addElement('select', 'partner_package_class_of_service', array(		
+			'label'			=> 'Class of Service:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('select', 'vertical_clasiffication', array(		
+			'label'			=> 'Vertical Clasiffication:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('text', 'website', array(
 			'label' => 'partner-create form url',
-			'required' => true,
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('multiselect', 'content_categories', array(
-			'label' => 'partner-create form content',
-			'size' => 5,
-			'required' => true,
-			'filters'		=> array('StringTrim'),
-			'multiple' => true,
-			'multiOptions' => array(
-				'Select all that apply' => array(
-					'Arts & Literature' => 'Arts & Literature',
-					'Automotive' => 'Automotive',
-					'Business' => 'Business',
-					'Comedy' => 'Comedy',
-					'Education' => 'Education',
-					'Entertainment' => 'Entertainment',
-					'Film & Animation' => 'Film & Animation',
-					'Gaming' => 'Gaming',
-					'Howto & Style' => 'Howto & Style',
-					'Lifestyle' => 'Lifestyle',
-					'Men' => 'Men',
-					'Music' => 'Music',
-					'News & Politics' => 'News & Politics',
-					'Nonprofits & Activism' => 'Nonprofits & Activism',
-					'People & Blogs' => 'People & Blogs',
-					'Pets & Animals' => 'Pets & Animals',
-					'Science & Technology' => 'Science & Technology',
-					'Sports' => 'Sports',
-					'Travel & Events' => 'Travel & Events',
-					'Women' => 'Women',
-					'N/A' => 'N/A',
-				)
-			)
-		));
-		
-		$this->addElement('radio', 'adult_content', array(
-			'label' => 'partner-create form adult',
-			'required' => true,
-			'filters'		=> array('StringTrim'),
-			'multiOptions' => array(
-				'1' => 'Yes',
-				'0' => 'No'
-			),
-			'separator' => '&nbsp;'
-		));
-		
-		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'partner_package'), 'partner_info', array(
+		$this->addDisplayGroup(array('name', 'company', 'admin_email', 'phone', 'describe_yourself', 'partner_package', 'partner_package_class_of_service' , 'vertical_clasiffication'), 'partner_info', array(
 			'legend' => 'Publisher Info',
 			'decorators' => array(
 				'Description', 
