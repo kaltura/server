@@ -283,7 +283,7 @@ class Form_PartnerConfiguration extends Infra_Form
 				if ($linkAllowed)
 				{
 					$element = $this->getElement($modul->permissionName);
-					$element->setDescription('<a class=linkToPage href=# onClick=openLink("../'.$modul->indexLink.'")>(config)</a>');
+					$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
 					$element->addDecorators(array('ViewHelper',		      
 				        array('Label', array('placement' => 'append')),
 				        array('Description', array('escape' => false, 'tag' => false)),
