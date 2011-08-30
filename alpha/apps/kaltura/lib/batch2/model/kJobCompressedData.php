@@ -31,7 +31,7 @@ class kJobCompressedData extends kJobData {
 		if ($serializedJobData )
 			return $serializedJobData;
 		else
-			throw new KalturaBatchException ( KalturaErrors::ERROR_OCCURED_WHILE_GZUNCOMPRESS);
+			throw new Exception ( KalturaErrors::ERROR_OCCURED_WHILE_GZUNCOMPRESS);
 	}
 
 }
