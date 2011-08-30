@@ -10,15 +10,6 @@ class KalturaUiConfAdmin extends KalturaUiConf
 	 */
 	public $isPublic;
 	
-	private static $map_between_objects = array(
-		'isPublic'
-	);
-
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-	}
-
 	public function fromObject($source_object)
 	{
 		if ($source_object instanceof uiConf)
