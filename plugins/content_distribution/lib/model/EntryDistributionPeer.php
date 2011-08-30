@@ -46,7 +46,6 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 
 		return EntryDistributionPeer::doSelect($criteria, $con);
 	}
-
 	
 	/**
 	 * Retrieve single EntryDistribution object by entry id and profile id.
@@ -63,6 +62,23 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 		$criteria->add(EntryDistributionPeer::DISTRIBUTION_PROFILE_ID, $distributionProfileId);
 
 		return EntryDistributionPeer::doSelectOne($criteria, $con);
+	}
+	
+	/**
+	 * Retrieve EntryDistribution objects by entry id according to specified statuses list
+	 *
+	 * @param      string $entryId
+	 * @param      array $statuses
+	 * @param      PropelPDO $con the connection to use
+	 * @return     EntryDistribution
+	 */
+	public static function retrieveByEntryAndStatuses($entryId, array $statuses, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryDistributionPeer::ENTRY_ID, $entryId);
+		$criteria->add(EntryDistributionPeer::STATUS, $statuses, Criteria::IN);
+
+		return EntryDistributionPeer::doSelect($criteria, $con);
 	}
 	
 	/**

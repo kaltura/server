@@ -26,6 +26,140 @@ class kContentDistributionManager
 		return $entryDistribution;
 	}
 	
+	
+	protected static function addImportJob($dc, $entryUrl, asset $asset)
+	{
+		$entryUrl = str_replace('//', '/', $entryUrl);
+		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
+	
+		$jobData = new kImportJobData();
+		$jobData->setCacheOnly(true);
+		$jobData->setSrcFileUrl($entryUrl);
+		$jobData->setFlavorAssetId($asset->getId());
+	
+		$batchJob = new BatchJob();
+		$batchJob->setDc($dc);
+		$batchJob->setEntryId($asset->getEntryId());
+		$batchJob->setPartnerId($asset->getPartnerId());
+		
+		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT);
+	}
+	
+	/**
+	 * @param EntryDistribution $entryDistribution
+	 * @param DistributionProfile $distributionProfile
+	 * @param int $dc
+	 * @return bool true if the job could be created
+	 */
+	protected static function prepareDistributionJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile, &$dc)
+	{
+		// prepare ids list of all the assets
+		$assetIds = explode(',', implode(',', array(
+			$entryDistribution->getThumbAssetIds(),
+			$entryDistribution->getFlavorAssetIds()
+		)));
+		
+		$assets = assetPeer::retrieveByIds($assetIds);
+		$assetObjects = array();
+		foreach($assets as $asset)
+		{
+			/* @var $asset asset */
+			$assetObjects[$asset->getId()] = array(
+				'asset' => $asset,
+				'downloadUrl' => null,
+			);
+		}
+		
+		// lists all files from all assets
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$c->add(FileSyncPeer::OBJECT_ID, $assetIds, Criteria::IN);
+		$c->add(FileSyncPeer::PARTNER_ID, $entryDistribution->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$fileSyncs = FileSyncPeer::doSelect($c);
+		
+		$dcs = array();
+		foreach($fileSyncs as $fileSync)
+		{
+			/* @var $fileSync FileSync */
+			$assetId = $fileSync->getObjectId();
+			
+			if(!isset($assetObjects[$assetId])) // the object is not in the list of assets
+				continue;
+			
+			$asset = $assetObjects[$assetId]['asset'];
+			/* @var $asset asset */
+			
+			if($asset->getVersion() != $fileSync->getVersion()) // the file sync is not of the current asset version
+				continue;
+			
+			$fileSync = kFileSyncUtils::resolve($fileSync);
+			
+			// use the best URL as the source for download in case it will be needed
+			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			{
+				if(!is_null($assetObjects[$assetId]['downloadUrl']) && $fileSync->getDc() != $distributionProfile->getRecommendedStorageProfileForDownload())
+					continue;
+				
+				$downloadUrl = $fileSync->getExternalUrl();
+				if(!$downloadUrl)
+					continue;
+				
+				$assetObjects[$assetId]['downloadUrl'] = $downloadUrl;
+				continue;
+			}
+			
+			// populates the list of files in each dc
+			$fileSyncDc = $fileSync->getDc();
+			if(!isset($dcs[$fileSyncDc]))
+				$dcs[$fileSyncDc] = array();
+			
+			$dcs[$fileSyncDc][$assetId] = $fileSync->getId();					
+		}
+		
+		if(count($dcs[$dc]) == count($assets)) // all files exist in the current dc
+			return true;
+		
+		// check if all files exist on any of the remote dcs
+		$otherDcs = kDataCenterMgr::getAllDcs();
+		foreach($otherDcs as $remoteDc)
+		{
+			$remoteDcId = $remoteDc['id'];
+			if(count($dcs[$remoteDcId]) != count($assets))
+				continue;
+			
+			$dc = $remoteDcId;
+			return true;
+		}
+		
+		if(
+			$entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_SUBMITTING
+			||
+			$entryDistribution->getStatus() == EntryDistributionStatus::IMPORT_UPDATING
+		)
+			return false;
+		
+		// create all needed import jobs
+		$destinationDc = $distributionProfile->getRecommendedDcForDownload();
+		$dcExistingFiles = $dcs[$destinationDc];
+		foreach($assetObjects as $assetId => $assetObject)
+		{
+			$asset = $assetObject['asset'];
+			/* @var $asset asset */
+			
+			if(isset($dcExistingFiles[$assetId]))
+				continue;
+			
+			$jobData = new kImportJobData();
+			$jobData->setCacheOnly(true);
+			
+			self::addImportJob($destinationDc, $assetObject['downloadUrl'], $asset);
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * @param EntryDistribution $entryDistribution
 	 * @param DistributionProfile $distributionProfile
@@ -33,16 +167,33 @@ class kContentDistributionManager
 	 */
 	protected static function addSubmitAddJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		if($entryDistribution->getStatus() == EntryDistributionStatus::SUBMITTING)
+			return null;
+		
+		$dc = kDataCenterMgr::getCurrentDcId();
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		if($distributionProfile->getProvider()->isLocalFileRequired($jobType))
+		{
+			$readyForSubmit = self::prepareDistributionJob($entryDistribution, $distributionProfile, $dc);
+			if(!$readyForSubmit)
+			{
+				$entryDistribution->setStatus(EntryDistributionStatus::IMPORT_SUBMITTING);
+				$entryDistribution->save();
+				
+				return null;
+			}
+		}
+		
  		$jobData = new kDistributionSubmitJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
  		$jobData->setProviderType($distributionProfile->getProviderType());
  		
 		$batchJob = new BatchJob();
+		$batchJob->setDc($dc);
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		
-		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		$jobSubType = $distributionProfile->getProviderType();
 	
 		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
@@ -103,6 +254,23 @@ class kContentDistributionManager
 	 */
 	protected static function addSubmitUpdateJob(EntryDistribution $entryDistribution, DistributionProfile $distributionProfile)
 	{
+		if($entryDistribution->getStatus() == EntryDistributionStatus::UPDATING)
+			return null;
+		
+		$dc = kDataCenterMgr::getCurrentDcId();
+		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
+		if($distributionProfile->getProvider()->isLocalFileRequired($jobType))
+		{
+			$readyForSubmit = self::prepareDistributionJob($entryDistribution, $distributionProfile, $dc);
+			if(!$readyForSubmit)
+			{
+				$entryDistribution->setStatus(EntryDistributionStatus::IMPORT_UPDATING);
+				$entryDistribution->save();
+				
+				return null;
+			}
+		}
+		
  		$jobData = new kDistributionUpdateJobData();
  		$jobData->setDistributionProfileId($entryDistribution->getDistributionProfileId());
  		$jobData->setEntryDistributionId($entryDistribution->getId());
@@ -114,7 +282,6 @@ class kContentDistributionManager
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		
-		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		$jobSubType = $distributionProfile->getProviderType();
 	
 		return kJobsManager::addJob($batchJob, $jobData, $jobType, $jobSubType);
@@ -220,6 +387,7 @@ class kContentDistributionManager
 		$validStatus = array(
 			EntryDistributionStatus::ERROR_DELETING,
 			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::IMPORT_UPDATING,
 			EntryDistributionStatus::READY,
 		);
 		
@@ -375,6 +543,7 @@ class kContentDistributionManager
 			EntryDistributionStatus::ERROR_DELETING,
 			EntryDistributionStatus::ERROR_SUBMITTING,
 			EntryDistributionStatus::ERROR_UPDATING,
+			EntryDistributionStatus::IMPORT_SUBMITTING,
 			EntryDistributionStatus::PENDING,
 			EntryDistributionStatus::QUEUED,
 			EntryDistributionStatus::READY,
