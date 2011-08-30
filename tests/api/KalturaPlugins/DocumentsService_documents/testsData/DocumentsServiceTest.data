@@ -93,7 +93,7 @@
         <id></id>
         <name type="string">TEST_DOCUMENT_NAME</name>
         <description type="string">TEST_DOCUMENT_DESC</description>
-        <partnerId type="string"></partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <userId></userId>
         <tags></tags>
         <adminTags></adminTags>
