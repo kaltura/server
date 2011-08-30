@@ -13,6 +13,7 @@ class FileSync extends BaseFileSync
 	const FILE_SYNC_FILE_TYPE_FILE = 1;
 	const FILE_SYNC_FILE_TYPE_LINK = 2;
 	const FILE_SYNC_FILE_TYPE_URL = 3;
+	const FILE_SYNC_FILE_TYPE_CACHE = 4;
 	
 	const FILE_SYNC_STATUS_ERROR = -1;
 	const FILE_SYNC_STATUS_PENDING = 1;

@@ -77,7 +77,7 @@ class kFlowHelper
 		    $syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
 			{
-				kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true);
+				kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
 			}
 			catch (Exception $e) {
 				if($dbEntry->getStatus() == entryStatus::NO_CONTENT)
@@ -139,7 +139,7 @@ class kFlowHelper
 			$flavorAsset->setFileExt($ext);
 			$flavorAsset->save();
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey);
+			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
 		}
 		
 		// set the path in the job data
@@ -151,36 +151,6 @@ class kFlowHelper
 		
 		if($flavorAsset->getVersion() == 1)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
-		
-// 		if(!$isNewFlavor)
-// 		{
-// 			if($flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
-// 			{
-// 				// is remote storage flavor
-// 				if($flavorAsset->getIsOriginal())
-// 					kJobsManager::addConvertProfileJob($dbBatchJob, $flavorAsset->getentry(), $flavorAsset->getId(), $localFilePath);
-// 			}
-// 			else
-// 			{ 
-//				// if the flavor is the source, its readiness should be decided during the profile conversion
-// 				if($flavorAsset->getIsOriginal())
-// 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
-// 				else
-// 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING);
-//					
-// 				$flavorAsset->save();
-// 			}
-//			
-// 			if($flavorAsset->getIsOriginal())
-// 			{
-// 				$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
-// 				foreach($entryFlavors as $entryFlavor)
-// 				{
-// 					if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
-// 						kBusinessPreConvertDL::decideAddEntryFlavor($dbBatchJob, $flavorAsset->getEntryId(), $entryFlavor->getFlavorParamsId());
-// 				}
-// 			}
-// 		}
 		
 		return $dbBatchJob;
 	}

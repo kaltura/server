@@ -15,12 +15,15 @@ class kImportJobData extends kJobData
 	 */
 	private $destFileLocalPath;
 	
-	
 	/**
 	 * @var string
 	 */
 	private $flavorAssetId;
 	
+	/**
+	 * @var bool
+	 */
+	private $cacheOnly = false;
 	
 	/**
 	 * @return the $srcFileUrl
@@ -29,6 +32,7 @@ class kImportJobData extends kJobData
 	{
 		return $this->srcFileUrl;
 	}
+	
 	/**
 	 * @param $flavorAssetId the $flavorAssetId to set
 	 */
@@ -44,7 +48,22 @@ class kImportJobData extends kJobData
 	{
 		return $this->flavorAssetId;
 	}
+	
+	/**
+	 * @param $cacheOnly the $cacheOnly to set
+	 */
+	public function setCacheOnly($cacheOnly)
+	{
+		$this->cacheOnly = $cacheOnly;
+	}
 
+	/**
+	 * @return the $cacheOnly
+	 */
+	public function getCacheOnly()
+	{
+		return $this->cacheOnly;
+	}
 
 	/**
 	 * @return the $destFileLocalPath
