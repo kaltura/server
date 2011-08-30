@@ -10,7 +10,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public static function traceEnabled($partnerId, AuditTrail $auditTrail = null) 
 	{
-		KalturaLog::debug("### partner id: " . $partnerId);
 		if(is_null($partnerId))
 		{
 			KalturaLog::debug("Partner id is null");
@@ -223,9 +222,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function createAuditTrail(BaseObject $object, $action) 
 	{
-		KalturaLog::debug("### partner: " . kCurrentContext::$partner_id);
-		KalturaLog::debug("### partner master: " . kCurrentContext::$master_partner_id);
-		
 		$partnerId = kCurrentContext::$master_partner_id;
 				
 		if(!$this->traceEnabled($partnerId))
@@ -306,7 +302,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
 		$partnerId = kCurrentContext::$master_partner_id;
-		KalturaLog::debug("### partner id: " . $partnerId);
 		if(($partnerId == partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 		
@@ -335,7 +330,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
 	{
 		$partnerId = kCurrentContext::$master_partner_id;
-		KalturaLog::debug("### partner id: " . $partnerId);
 		if(($partnerId == partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -362,7 +356,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	{
 		
 		$partnerId = kCurrentContext::$master_partner_id;
-		KalturaLog::debug("### partner id: " . $partnerId);
 		if(($partnerId == partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -388,7 +381,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
 		$partnerId = kCurrentContext::$master_partner_id;
-		KalturaLog::debug("### partner id: " . $partnerId);		
 		if(($partnerId == partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
