@@ -31,6 +31,19 @@ class KalturaEntryResource extends KalturaContentResource
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE, $this->entryId, $srcEntry->getType(), entryType::MEDIA_CLIP);
 		if ($srcEntry->getMediaType() != $dbEntry->getMediaType())
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_MEDIA_TYPE, $this->entryId, $srcEntry->getMediaType(), $dbEntry->getMediaType());
+		
+		if(is_null($this->flavorParamsId))
+		{
+			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
+			if (!$srcFlavorAsset)
+				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
+		}
+		else
+		{
+			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
+			if (!$srcFlavorAsset)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $this->assetId);
+		}
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
@@ -54,9 +67,6 @@ class KalturaEntryResource extends KalturaContentResource
 			$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
 		else
 			$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
-
-		if (!$srcFlavorAsset)
-			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $this->assetId);
 			
 		$object_to_fill->setFileSyncObjectType(FileSyncObjectType::FLAVOR_ASSET);
 		$object_to_fill->setObjectSubType(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
