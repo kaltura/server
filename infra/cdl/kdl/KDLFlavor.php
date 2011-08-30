@@ -24,16 +24,21 @@ class KDLFlavor extends KDLMediaDataSet {
 	public	$_transcoders = array();
 
 		/* --------------------------
-		 * following fields are for frlavorOutputParams
+		 * following fields are for flavorOutputParams
 		 * to be moved to the KDLWrap
 		 */
 	public 	$_id = null;
 	public 	$_type = 1;
-	public  $_ready_behavior=null;
 	public  $_tags=null;
 	public  $_name=null;
 	public	$_engineVersion=0;
-		/* --------------------------- */
+	
+	public	$_cdlObject = null; /* To avoid duplicating of fields that are only used for transfer 
+									to flavorOutputParams objects, the original CDL object
+									is saved on the KDLFlavor object. The required fields are 
+									copied in the KDLWrap 
+								*/ 
+	/* --------------------------- */
 	
 	/* ----------------------
 	 * Cont/Dtor
@@ -48,6 +53,7 @@ class KDLFlavor extends KDLMediaDataSet {
 		if(!is_null($this->_container)) $this->_container = clone $this->_container;
 		if(!is_null($this->_video)) $this->_video = clone $this->_video;
 		if(!is_null($this->_audio)) $this->_audio = clone $this->_audio;
+		if(!is_null($this->_cdlObject)) $this->_cdlObject = clone $this->_cdlObject;
 	}
 	/* ----------------------
 	 * ProcessRedundancy
