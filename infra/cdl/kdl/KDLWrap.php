@@ -171,11 +171,14 @@ KalturaLog::log(__METHOD__."==>\n");
 		$flavor = new flavorParamsOutputWrap();
 
 		$flavor->setFlavorParamsId($target->_id);
+		$flavor->setName($target->_name);
 		$flavor->setType($target->_type);
-		$flavor->setReadyBehavior($target->_ready_behavior);
 		$flavor->setTags($target->_tags);
 		
-		$flavor->setName($target->_name);
+		$flavor->setReadyBehavior($target->_cdlObject->getReadyBehavior());
+		$flavor->setSourceRemoteStorageProfileId($target->_cdlObject->getSourceRemoteStorageProfileId());
+		$flavor->setMediaParserType($target->_cdlObject->getMediaParserType());
+		
 		if($target->IsRedundant()) {
 			$flavor->_isRedundant = true;
 		}
@@ -285,7 +288,6 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 		$kdlFlavor->_name = $cdlFlavor->getName();
 		$kdlFlavor->_id = $cdlFlavor->getId();
 		$kdlFlavor->_type = $cdlFlavor->getType();
-		$kdlFlavor->_ready_behavior = $cdlFlavor->getReadyBehavior();
 		$kdlFlavor->_tags = $cdlFlavor->getTags();
 		if($cdlFlavor instanceof flavorParams)
 		{ 
@@ -293,6 +295,7 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 			$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
 		}
 		
+		$kdlFlavor->_cdlObject = $cdlFlavor;
 			/* 
 			 * Media container initialization
 			 */	
