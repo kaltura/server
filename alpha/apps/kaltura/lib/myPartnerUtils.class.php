@@ -864,7 +864,7 @@ class myPartnerUtils
 				$partner->setExtendedFreeTrailExpiryReason('');
 			}else{
 				//ExtendedFreeTrail
-				if (($partner->getExtendedFreeTrailExpiryDate() > (time() - (60 * 60 * 24 * 4))) && !$partner->getExtendedFreeTrailEndsWarning())
+				if (($partner->getExtendedFreeTrailExpiryDate() > (time() - (dateUtils::DAY * 7))) && !$partner->getExtendedFreeTrailEndsWarning())
 				{
 					$partner->setExtendedFreeTrailEndsWarning(true);
 					$partner->save();
