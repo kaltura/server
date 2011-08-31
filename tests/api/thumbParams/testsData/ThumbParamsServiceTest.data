@@ -16,6 +16,7 @@
         <scaleHeight></scaleHeight>
         <backgroundColor></backgroundColor>
         <sourceParamsId></sourceParamsId>
+        <format></format>
         <id></id>
         <partnerId></partnerId>
         <name type="string">Test Thumb Params</name>
@@ -24,8 +25,9 @@
         <createdAt></createdAt>
         <isSystemDefault></isSystemDefault>
         <tags></tags>
-        <format></format>
-        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <requiredPermissions></requiredPermissions>
+        <sourceRemoteStorageProfileId></sourceRemoteStorageProfileId>
+        <mediaParserType></mediaParserType>
       </Input>
       <OutputReference name="output" type="KalturaThumbParams" key="object key">
         <cropType type="string">1</cropType>
@@ -41,6 +43,7 @@
         <scaleHeight type="string">0</scaleHeight>
         <backgroundColor type="string">0</backgroundColor>
         <sourceParamsId type="string">0</sourceParamsId>
+        <format></format>
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <name type="string">Test Thumb Params</name>
@@ -49,8 +52,9 @@
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format></format>
-        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <requiredPermissions></requiredPermissions>
+        <sourceRemoteStorageProfileId type="string">0</sourceRemoteStorageProfileId>
+        <mediaParserType type="string">0</mediaParserType>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -71,6 +75,7 @@
         <scaleHeight type="string">0</scaleHeight>
         <backgroundColor type="string">0</backgroundColor>
         <sourceParamsId type="string">0</sourceParamsId>
+        <format></format>
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <name type="string">Test Thumb Params</name>
@@ -79,8 +84,9 @@
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <sourceRemoteStorageProfileId type="string">0</sourceRemoteStorageProfileId>
+        <mediaParserType type="string">0</mediaParserType>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -101,6 +107,7 @@
         <scaleHeight></scaleHeight>
         <backgroundColor></backgroundColor>
         <sourceParamsId></sourceParamsId>
+        <format></format>
         <id></id>
         <partnerId></partnerId>
         <name></name>
@@ -109,8 +116,9 @@
         <createdAt></createdAt>
         <isSystemDefault></isSystemDefault>
         <tags></tags>
-        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <sourceRemoteStorageProfileId></sourceRemoteStorageProfileId>
+        <mediaParserType></mediaParserType>
       </Input>
       <OutputReference name="output" type="KalturaThumbParams" key="object key">
         <cropType type="string">1</cropType>
@@ -126,6 +134,7 @@
         <scaleHeight type="string">0</scaleHeight>
         <backgroundColor type="string">0</backgroundColor>
         <sourceParamsId type="string">0</sourceParamsId>
+        <format></format>
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <name type="string">Test Thumb Params</name>
@@ -134,8 +143,9 @@
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <sourceRemoteStorageProfileId type="string">0</sourceRemoteStorageProfileId>
+        <mediaParserType type="string">0</mediaParserType>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -147,11 +157,11 @@
   <TestProcedureData testProcedureName="testListAction">
     <TestCaseData testCaseInstanceName="testListAction with data set #0">
       <Input name="filter" type="KalturaThumbParamsFilter" key="">
+        <formatEqual></formatEqual>
         <systemNameEqual></systemNameEqual>
         <systemNameIn></systemNameIn>
         <isSystemDefaultEqual></isSystemDefaultEqual>
         <tagsEqual></tagsEqual>
-        <formatEqual></formatEqual>
         <orderBy></orderBy>
         <advancedSearch type="string">KalturaSearchItem</advancedSearch>
       </Input>
@@ -161,7 +171,7 @@
       </Input>
       <OutputReference name="output" type="KalturaThumbParamsListResponse" key="object key">
         <Array>
-          <objects type="array" dbValue="KalturaThumbParams" key="0">KalturaThumbParams</objects>
+          <objects type="array" key="0">KalturaThumbParams</objects>
         </Array>
         <totalCount type="string">1</totalCount>
       </OutputReference>
