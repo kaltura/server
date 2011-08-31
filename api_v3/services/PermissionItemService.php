@@ -156,8 +156,10 @@ class PermissionItemService extends KalturaBaseService
 		$permissionItemFilter->attachToCriteria($c);
 		$count = PermissionItemPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		
+		$pager->attachToCriteria ( $c );
 		$list = PermissionItemPeer::doSelect($c);
 		
 		$response = new KalturaPermissionItemListResponse();

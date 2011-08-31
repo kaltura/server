@@ -719,8 +719,10 @@ class BatchControlService extends KalturaBaseService
 		
 		$controlPanelCommandFilter->attachToCriteria($c);
 		
-		if ($pager )	
-			$pager->attachToCriteria($c);
+		if (!$pager)
+			$pager = new KalturaFilterPager ();
+		
+		$pager->attachToCriteria($c);
 		
 		$count = ControlPanelCommandPeer::doCount($c);
 		$list = ControlPanelCommandPeer::doSelect($c);

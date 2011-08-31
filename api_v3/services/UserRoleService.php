@@ -204,8 +204,9 @@ class UserRoleService extends KalturaBaseService
 		$userRoleFilter->attachToCriteria($c);
 		$count = UserRolePeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria ( $c );
 		$list = UserRolePeer::doSelect($c);
 		
 		$response = new KalturaUserRoleListResponse();

@@ -1135,8 +1135,10 @@ class JobsService extends KalturaBaseService
 		
 		$batchJobFilter->attachToCriteria($c);
 		
-		if ($pager )	
-			$pager->attachToCriteria($c);
+		if(!$pager)
+		   $pager = new KalturaFilterPager();
+		
+		$pager->attachToCriteria($c);
 		
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 		$list = BatchJobPeer::doSelect($c);

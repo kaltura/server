@@ -210,8 +210,10 @@ class PermissionService extends KalturaBaseService
 		$permissionFilter->attachToCriteria($c);
 		$count = PermissionPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if(!$pager)
+			$pager = new KalturaFilterPager ();
+		
+		$pager->attachToCriteria ( $c );
 		
 		$list = PermissionPeer::doSelect($c);
 		

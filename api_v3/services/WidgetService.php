@@ -165,7 +165,9 @@ class WidgetService extends KalturaBaseService
 		$widgetFilter->attachToCriteria( $c );
 		
 		$totalCount = widgetPeer::doCount( $c );
-		if ( $pager )	$pager->attachToCriteria( $c );
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria ( $c );
 		$list = widgetPeer::doSelect( $c );
 		
 		$newList = KalturaWidgetArray::fromWidgetArray( $list );
