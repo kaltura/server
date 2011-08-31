@@ -206,10 +206,9 @@ class UnitTestsGenerator extends ClientGeneratorFromPhp
 				continue;
 			}
 
-			print("Afer filtering $serviceName, $actionName \n");
+			print("After filtering $serviceName, $actionName \n");
 			$outputTypeReflector = $serviceReflector->getActionOutputType($action);
 			$actionParams = $serviceReflector->getActionParams($action);
-			print("*** calling writeServiceAction with ".$actionInfo->action."\n");
 
 			$this->writeServiceAction($serviceId, $serviceName, $actionInfo->action, $actionParams, $outputTypeReflector);
 		}
