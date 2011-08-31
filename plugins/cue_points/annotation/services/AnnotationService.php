@@ -62,7 +62,10 @@ class AnnotationService extends CuePointService
 	*/
 	function listAction(KalturaAnnotationFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		$filter->cuePointTypeEqual = KalturaCuePointType::ANNOTATION;
+		if(!$filter)
+			$filter = new KalturaAnnotationFilter();
+		
+		$filter->cuePointTypeEqual = AnnotationPlugin::getApiValue(AnnotationCuePointType::ANNOTATION);
 		
 		$list = parent::listAction($filter, $pager);
 		$ret = new KalturaAnnotationListResponse();
