@@ -10,7 +10,7 @@ class Form_ContentFileHandlerConfig extends Infra_Form
 		
 		$this->addElement('text', 'slugRegex', array(
 			'label' 		=> 'Slug Regex:',
-		    'value' 		=> '/(?P<referenceId>\w+)[.]\w+/',
+		    'value' 		=> '/(?P<referenceId>.+)[.]\w{3,}/',
 			'filters'		=> array('StringTrim'),
 		));
 				

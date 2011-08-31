@@ -11,7 +11,8 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	
 	const REFERENCE_ID_WILDCARD = 'referenceId';
 	const FLAVOR_NAME_WILDCARD  = 'flavorName';
-	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.]\w+/'; // matches "referenceId_flavorName.extension"
+	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>.+)[.]\w{3,}/';
+// 	const DEFAULT_SLUG_REGEX = '/(?P<referenceId>\w+)_(?P<flavorName>\w+)[.]\w+/'; // matches "referenceId_flavorName.extension"
 	
 	/**
 	 * @var KalturaDropFolderContentFileHandlerConfig
