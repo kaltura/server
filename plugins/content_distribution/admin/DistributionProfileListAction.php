@@ -52,6 +52,11 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin implements
 		$form = new Form_PartnerFilter();
 		$newForm = new Form_NewDistributionProfile();
 		
+		$client = Infra_ClientHelper::getClient();
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
+		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', true, 'All Service Editions');
+		
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'DistributionProfileListAction'), null, true);
 		$form->setAction($actionUrl);
 		
