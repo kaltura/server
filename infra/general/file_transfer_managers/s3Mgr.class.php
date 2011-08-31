@@ -149,6 +149,11 @@ class s3Mgr extends kFileTransferMgr
 		return false;
 	}
 
+	protected function doFileSize($remote_file)
+	{
+		return false;
+	}
+
 	// download a file from the server
 	public function fileGetContents ($remote_file)
 	{
