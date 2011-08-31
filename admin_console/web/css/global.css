@@ -412,6 +412,7 @@ body#monitoring-xymon {}
    #partner-configure-dialog .partnerConfigureFormColumnLeft dt { width:288px; margin: 3px 0 10px;}	
    #partner-configure-dialog .partnerConfigureFormColumnRight dt { width:280px; margin: 3px 0 5px;}
    #partner-configure-dialog dd input { width:154px; height:22px;}
+ #partner-configure-dialog .partnerConfigureFormColumnRight dd input { width:250px; height:22px;}
    #partner-configure-dialog dd input#max_bulk_size { width:150px;}
 
    #partner-configure-dialog select { width:156px; height:24px; padding:1px;}
@@ -568,7 +569,7 @@ form#frmCreateDropFolder dt { float: left; }
 
 #partner-configure-dialog .partnerConfigureFormColumnLeft fieldset dt {float:left; }
 #partner-configure-dialog .partnerConfigureFormColumnRight fieldset dt {float:left; }
-#partner-configure-dialog .partnerConfigureFormColumnRight fieldset dd {margin-bottom:5px; }
+#partner-configure-dialog .partnerConfigureFormColumnRight fieldset dd {margin-bottom:5px; float:left; }
 #partner-configure-dialog .partnerConfigureFormColumnLeft fieldset dd {margin-bottom:5px; }
 #partner-configure-dialog .partnerConfigureFormColumnLeft .partner_configuration_checkbox_field {float:none; width:450px; }
 #partner-configure-dialog .partnerConfigureFormColumnRight .partner_configuration_checkbox_field {float:none; width:684px; }
@@ -582,10 +583,11 @@ form#frmCreateDropFolder dt { float: left; }
 #partner-configure-dialog #frmPartnerConfigure .partnerConfigureFormColumnRight fieldset { width:685px; }
 #partner-configure-dialog #fieldset-includedUsage legend { margin-top:-8px; }
 
-#partner-configure-dialog #monitor_usage_history {background:none; width:160px}
+#partner-configure-dialog #monitor_usage_history {background:none; width:128px; margin-left:5px;}
 #partner-configure-dialog #frmPartnerConfigure .includeUsage input{ width:60px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsage label{ min-width:80px; }
 #partner-configure-dialog #frmPartnerConfigure select { width:159px;}
+#partner-configure-dialog #frmPartnerConfigure .partnerConfigureFormColumnRight select { width:255px;}
 
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft { width:240px; float:left; margin-top:3px; }
 #partner-configure-dialog #fieldset-includedUsageSecondPart .includeUsageFloatLeft { width:377px; float:left; margin-top:3px; }
@@ -601,9 +603,11 @@ form#frmCreateDropFolder dt { float: left; }
 #partner-configure-dialog #fieldset-publisherSpecificDeliverySettings .partner_configuration_checkbox_field {width:18px; float:left;}
 #partner-configure-dialog #fieldset-publisherSpecificDeliverySettings .partner_configuration_checkbox_field_only {float:none; width:450px; }
 #partner-configure-dialog #mothly_bandwidth_combined label {float:left; height:45px; margin-top:3px;}
-
+#partner-configure-dialog #monitor_usage_history-label {width:0px;}
 #partner-configure-dialog #fieldset-publisherSpecificDeliverySettings  dt {width:269px; float:left;}
 
+#partner-configure-dialog #partner_group_type-label {width:150px;}
+#partner-configure-dialog #partner_group_type-element select {width:297px;}
 
 /* Idetic Distribution */
 #provider-configure-dialog .hint { color: #FF3200; }
