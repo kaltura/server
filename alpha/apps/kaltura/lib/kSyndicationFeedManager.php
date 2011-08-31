@@ -68,7 +68,10 @@ class kSyndicationFeedManager
 	 */
 	private static function getMrssEntryXml(entry $entry, syndicationFeed $syndicationFeed = null, $link = null)
 	{
-		$mrssParams = clone $syndicationFeed->getMrssParameters();
+		if ($syndicationFeed->getMrssParameters())
+			$mrssParams = clone $syndicationFeed->getMrssParameters();
+		else 
+			$mrssParams = new kMrssParameters;
 		$mrssParams->setLink($link);
 		$mrssParams->setFilterByFlavorParams($syndicationFeed->getFlavorParamId());
 		$mrssParams->setIncludePlayerTag(true);
