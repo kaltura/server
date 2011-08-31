@@ -152,6 +152,16 @@ class kFlowHelper
 		if($flavorAsset->getVersion() == 1)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 		
+		if(!$isNewFlavor && $flavorAsset->getIsOriginal())
+		{
+			$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
+			foreach($entryFlavors as $entryFlavor)
+			{
+				if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
+					kBusinessPreConvertDL::decideAddEntryFlavor($dbBatchJob, $flavorAsset->getEntryId(), $entryFlavor->getFlavorParamsId());
+			}
+		}
+
 		return $dbBatchJob;
 	}
 	
