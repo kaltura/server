@@ -91,12 +91,12 @@
         <engineVersion></engineVersion>
         <format></format>
         <id></id>
-        <partnerId type="string" dbValue="0">333</partnerId>
+        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <name type="string" dbValue="Source">Test Flavor Params</name>
-        <systemName dbValue="Source"></systemName>
-        <description dbValue="Maintains the original format and settings of the file - duplicate of the source file"></description>
+        <systemName></systemName>
+        <description></description>
         <createdAt></createdAt>
-        <isSystemDefault type="string" dbValue="1">0</isSystemDefault>
+        <isSystemDefault type="string">0</isSystemDefault>
         <tags dbValue="source"></tags>
         <Array>
           <requiredPermissions></requiredPermissions>
