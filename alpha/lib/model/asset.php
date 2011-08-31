@@ -86,6 +86,7 @@ class asset extends Baseasset implements ISyncableFile
 	const FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG = 2;
 	
 	const CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION = "partnerDescription";
+	const CUSTOM_DATA_FIELD_PARTNER_DATA = "partnerData";
 	
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{
@@ -428,7 +429,9 @@ class asset extends Baseasset implements ISyncableFile
 	}
 	
 	public function getPartnerDescription()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION);}
-
 	public function setPartnerDescription($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION, $v);}
+	
+	public function getPartnerData()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DATA);}
+	public function setPartnerData($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DATA, $v);}
 	
 }
