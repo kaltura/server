@@ -292,12 +292,14 @@ class Form_PartnerConfiguration extends Infra_Form
 			}
 			$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
 		}
-				
+		ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
+		ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);		
 		$this->addAllDisplayGroups($permissionNames);
 	}
 	
 	//adding display group to all features
-	ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
+	
+	
 	$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
 		
 	//removing decorators from display groups
@@ -450,7 +452,7 @@ class Form_PartnerConfiguration extends Infra_Form
 				$permission->name = $modul->permissionName;
 				$permission->status = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
 				
-				if(!isset($properties[$modul->permissionName]) || !$properties[$modul->permissionName])
+				if(!isset($properties[str_replace('.', '', $modul->permissionName)]) || !$properties[str_replace('.', '', $modul->permissionName)])
 					$permission->status = Kaltura_Client_Enum_PermissionStatus::BLOCKED;
 					
 				$systemPartnerConfiguration->permissions[] = $permission;
