@@ -88,7 +88,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 									U+C5->U+E5, U+E5, U+C4->U+E4, U+E4, U+D6->U+F6, U+F6',
 		);
 		
-		return array_merge($defaultConfig, $mergeConfig);
+		return array_merge($mergeConfig, $defaultConfig);
 	}
 	
 	/* (non-PHPdoc)
