@@ -31,6 +31,10 @@ class MetadataProfilesAction extends KalturaAdminConsolePlugin
 		$pageSize = $request->getParam('pageSize', 10);
 		
 		$action->view->form = new Form_PartnerFilter();
+		$client = Infra_ClientHelper::getClient();
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
+		Form_PackageHelper::addPackagesToForm($action->view->form, $partnerPackages, 'partner_package', true, 'All Service Editions');
 		
 		// init filter
 		$partnerFilter = $this->getPartnerFilterFromRequest($request);
@@ -62,6 +66,7 @@ class MetadataProfilesAction extends KalturaAdminConsolePlugin
 		$freeText = $request->getParam('freeText', false);
 		
 		$form = new Form_PartnerFilter();
+		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', true, 'All Service Editions');
 		$form->populate($request->getParams());
 		$action->view->form = $form;
 
