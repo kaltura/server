@@ -396,8 +396,9 @@ class MetadataService extends KalturaBaseService
 		$metadataFilter->attachToCriteria($c);
 		$count = MetadataPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria($c);
 		$list = MetadataPeer::doSelect($c);
 		
 		$response = new KalturaMetadataListResponse();

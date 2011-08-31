@@ -46,8 +46,9 @@ class ShortLinkService extends KalturaBaseService
 		$shortLinkFilter->attachToCriteria($c);
 		$count = ShortLinkPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria ( $c );
 		$list = ShortLinkPeer::doSelect($c);
 		
 		$response = new KalturaShortLinkListResponse();

@@ -41,8 +41,9 @@ class VirusScanProfileService extends KalturaBaseService
 		$virusScanProfileFilter->attachToCriteria($c);
 		$count = VirusScanProfilePeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria ( $c );
 		$list = VirusScanProfilePeer::doSelect($c);
 		
 		$response = new KalturaVirusScanProfileListResponse();

@@ -126,8 +126,9 @@ class UiConfAdminService extends KalturaBaseService
 		$c = new Criteria();
 		$uiConfFilter->attachToCriteria($c);
 		$count = uiConfPeer::doCount($c);
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria($c);
 		$list = uiConfPeer::doSelect($c);
 		
 		$newList = KalturaUiConfAdminArray::fromUiConfAdminArray($list);

@@ -176,8 +176,9 @@ class EntryDistributionService extends KalturaBaseService
 		$entryDistributionFilter->attachToCriteria($c);
 		$count = EntryDistributionPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria ( $c );
 		$list = EntryDistributionPeer::doSelect($c);
 		
 		$response = new KalturaEntryDistributionListResponse();

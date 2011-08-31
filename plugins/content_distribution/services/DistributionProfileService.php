@@ -154,7 +154,8 @@ class DistributionProfileService extends KalturaBaseService
 		$distributionProfileFilter->attachToCriteria($c);
 		$count = DistributionProfilePeer::doCount($c);
 		
-		if ($pager)
+		if (!$pager)
+		$pager = new KalturaFilterPager();
 			$pager->attachToCriteria($c);
 		$list = DistributionProfilePeer::doSelect($c);
 		

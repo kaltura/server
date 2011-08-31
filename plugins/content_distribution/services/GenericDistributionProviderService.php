@@ -128,8 +128,9 @@ class GenericDistributionProviderService extends KalturaBaseService
 		$genericDistributionProviderFilter->attachToCriteria($c);
 		$count = GenericDistributionProviderPeer::doCount($c);
 		
-		if ($pager)
-			$pager->attachToCriteria($c);
+		if (! $pager)
+			$pager = - new KalturaFilterPager ();
+		$pager->attachToCriteria($c);
 		$list = GenericDistributionProviderPeer::doSelect($c);
 		
 		$response = new KalturaGenericDistributionProviderListResponse();
