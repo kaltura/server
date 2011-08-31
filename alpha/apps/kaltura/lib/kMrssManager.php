@@ -190,7 +190,9 @@ class kMrssManager
 	 */
 	public static function getEntryMrss(entry $entry, SimpleXMLElement $mrss = null, $link = null)
 	{
-		$mrss = self::getEntryMrssXml($entry, $mrss, $link);
+		$mrssParams = new kMrssParameters;
+		$mrssParams->setLink($link);
+		$mrss = self::getEntryMrssXml($entry, $mrss, $mrssParams);
 		return $mrss->asXML();
 	}
 	
@@ -262,14 +264,12 @@ class kMrssManager
 	/**
 	 * @param entry $entry
 	 * @param SimpleXMLElement $mrss
-	 * @param string $link
-	 * @param string $filterFlavors
 	 * @param kMrssParameters $mrssParams
 	 * @return SimpleXMLElement
 	 */
-	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, $link = null, $fitlerByFlovorParams = null, kMrssParameters $mrssParams = null)
+	public static function getEntryMrssXml(entry $entry, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null)
 	{
-		if(!$mrss)
+		if($mrss === null)
 			$mrss = new SimpleXMLElement('<item/>');
 		
 		$mrss->addChild('entryId', $entry->getId());
@@ -278,8 +278,8 @@ class kMrssManager
 		$mrss->addChild('createdAt', $entry->getCreatedAt(null));
 		$mrss->addChild('updatedAt', $entry->getUpdatedAt(null));
 		$mrss->addChild('title', self::stringToSafeXml($entry->getName()));
-		if(!is_null($link))
-			$mrss->addChild('link', $link . $entry->getId());
+		if($mrssParams && !is_null($mrssParams->getLink()))
+			$mrss->addChild('link', $mrssParams->getLink() . $entry->getId());
 		$mrss->addChild('type', $entry->getType());
 		$mrss->addChild('licenseType', $entry->getLicenseType());
 		$mrss->addChild('userId', $entry->getPuserId(true));
@@ -351,7 +351,9 @@ class kMrssManager
 		$assets = assetPeer::retrieveReadyByEntryId($entry->getId());
 		foreach($assets as $asset)
 		{
-			if (!is_null($fitlerByFlovorParams) && $asset->getFlavorParamsId() != $fitlerByFlovorParams)
+			if ($mrssParams && 
+				!is_null($mrssParams->getFilterByFlavorParams()) && 
+				$asset->getFlavorParamsId() != $mrssParams->getFilterByFlavorParams())
 				continue;
 
 			if($asset instanceof flavorAsset)
@@ -366,6 +368,18 @@ class kMrssManager
 			foreach($mrssContributors as $mrssContributor)
 				$mrssContributor->contribute($entry, $mrss, $mrssParams);
 		
+		if ($mrssParams && 
+			$mrssParams->getIncludePlayerTag())
+		{
+			$uiconfId = (!is_null($mrssParams->getPlayerUiconfId()))? '/ui_conf_id/'.$mrssParams->getPlayerUiconfId(): '';
+			$playerUrl = 'http://'.kConf::get('www_host').
+							'/kwidget/wid/_'.$entry->getPartnerId().
+							'/entry_id/'.$entry->getId().'/ui_conf' . ($uiconfId ? "/$uiconfId" : '');
+	
+			$player = $mrss->addChild('player');
+			$player->addAttribute('url', $playerUrl);
+		}
+				
 		return $mrss;
 	}
 }

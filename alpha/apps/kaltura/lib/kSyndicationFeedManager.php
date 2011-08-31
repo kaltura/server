@@ -68,22 +68,20 @@ class kSyndicationFeedManager
 	 */
 	private static function getMrssEntryXml(entry $entry, syndicationFeed $syndicationFeed = null, $link = null)
 	{
-		$mrss = kMrssManager::getEntryMrssXml($entry, null, $link, $syndicationFeed->getFlavorParamId(), $syndicationFeed->getMrssParameters());
+		$mrssParams = clone $syndicationFeed->getMrssParameters();
+		$mrssParams->setLink($link);
+		$mrssParams->setFilterByFlavorParams($syndicationFeed->getFlavorParamId());
+		$mrssParams->setIncludePlayerTag(true);
+		$mrssParams->setPlayerUiconfId($syndicationFeed->getPlayerUiconfId());
+		
+		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams);
 		
 		if(!$mrss)
 		{
 			KalturaLog::err("No MRSS returned for entry [".$entry->getId()."]");
 			return null;
 		}
-		
-		$uiconfId = (!is_null($syndicationFeed->getPlayerUiconfId()))? '/ui_conf_id/'.$syndicationFeed->getPlayerUiconfId(): '';
-		$playerUrl = 'http://'.kConf::get('www_host').
-						'/kwidget/wid/_'.$entry->getPartnerId().
-						'/entry_id/'.$entry->getId().'/ui_conf' . ($uiconfId ? "/$uiconfId" : '');
-
-		$player = $mrss->addChild('player');
-		$player->addAttribute('url', $playerUrl);
-				
+						
 		return $mrss->asXML();
 	}
 	
