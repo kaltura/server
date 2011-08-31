@@ -136,6 +136,9 @@ class kFlowHelper
 		{
 			$ext = pathinfo($data->getDestFileLocalPath(), PATHINFO_EXTENSION);	
 			KalturaLog::info("Imported file extension: $ext");
+			if(!$flavorAsset->getVersion())
+				$flavorAsset->incrementVersion();
+			
 			$flavorAsset->setFileExt($ext);
 			$flavorAsset->save();
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
