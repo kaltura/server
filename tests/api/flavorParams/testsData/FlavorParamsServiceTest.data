@@ -20,6 +20,7 @@
         <rotate></rotate>
         <operators></operators>
         <engineVersion></engineVersion>
+        <format></format>
         <id></id>
         <partnerId></partnerId>
         <name type="string">Test Flavor Params</name>
@@ -28,8 +29,9 @@
         <createdAt></createdAt>
         <isSystemDefault></isSystemDefault>
         <tags></tags>
-        <format></format>
-        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <requiredPermissions></requiredPermissions>
+        <sourceRemoteStorageProfileId></sourceRemoteStorageProfileId>
+        <mediaParserType></mediaParserType>
       </Input>
       <OutputReference name="output" type="KalturaFlavorParams" key="object key">
         <videoCodec></videoCodec>
@@ -49,6 +51,7 @@
         <rotate></rotate>
         <operators></operators>
         <engineVersion></engineVersion>
+        <format></format>
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
         <name type="string">Test Flavor Params</name>
@@ -57,8 +60,11 @@
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format></format>
-        <requiredPermissions></requiredPermissions>
+        <Array>
+          <requiredPermissions></requiredPermissions>
+        </Array>
+        <sourceRemoteStorageProfileId type="string">0</sourceRemoteStorageProfileId>
+        <mediaParserType type="string">0</mediaParserType>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -83,16 +89,20 @@
         <rotate type="string">0</rotate>
         <operators></operators>
         <engineVersion></engineVersion>
-        <id></id>
-        <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
-        <name type="string">Test Flavor Params</name>
-        <systemName></systemName>
-        <description></description>
-        <createdAt></createdAt>
-        <isSystemDefault type="string">0</isSystemDefault>
-        <tags></tags>
         <format></format>
-        <requiredPermissions></requiredPermissions>
+        <id></id>
+        <partnerId type="string" dbValue="0">333</partnerId>
+        <name type="string" dbValue="Source">Test Flavor Params</name>
+        <systemName dbValue="Source"></systemName>
+        <description dbValue="Maintains the original format and settings of the file - duplicate of the source file"></description>
+        <createdAt></createdAt>
+        <isSystemDefault type="string" dbValue="1">0</isSystemDefault>
+        <tags dbValue="source"></tags>
+        <Array>
+          <requiredPermissions></requiredPermissions>
+        </Array>
+        <sourceRemoteStorageProfileId type="string">0</sourceRemoteStorageProfileId>
+        <mediaParserType type="string">0</mediaParserType>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -117,16 +127,18 @@
         <rotate></rotate>
         <operators></operators>
         <engineVersion></engineVersion>
+        <format></format>
         <id></id>
         <partnerId></partnerId>
-        <name></name>
-        <systemName></systemName>
+        <name type="string">Test Flavor Params Updated</name>
+        <systemName type="string">Test Flavor Params System Name Updated</systemName>
         <description></description>
         <createdAt></createdAt>
         <isSystemDefault></isSystemDefault>
         <tags></tags>
-        <format></format>
         <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <sourceRemoteStorageProfileId></sourceRemoteStorageProfileId>
+        <mediaParserType></mediaParserType>
       </Input>
       <OutputReference name="output" type="KalturaFlavorParams" key="object key">
         <videoCodec></videoCodec>
@@ -146,16 +158,20 @@
         <rotate type="string">0</rotate>
         <operators></operators>
         <engineVersion></engineVersion>
+        <format></format>
         <id></id>
         <partnerId type="string">@TEST_PARTNER_ID@</partnerId>
-        <name type="string">Test Flavor Params</name>
-        <systemName></systemName>
+        <name type="string">Test Flavor Params Updated</name>
+        <systemName type="string">Test Flavor Params System Name Updated</systemName>
         <description></description>
         <createdAt></createdAt>
         <isSystemDefault type="string">0</isSystemDefault>
         <tags></tags>
-        <format></format>
-        <requiredPermissions type="string">KalturaStringArray</requiredPermissions>
+        <Array>
+          <requiredPermissions></requiredPermissions>
+        </Array>
+        <sourceRemoteStorageProfileId type="string">0</sourceRemoteStorageProfileId>
+        <mediaParserType type="string">0</mediaParserType>
       </OutputReference>
     </TestCaseData>
   </TestProcedureData>
@@ -167,11 +183,11 @@
   <TestProcedureData testProcedureName="testListAction">
     <TestCaseData testCaseInstanceName="testListAction with data set #0">
       <Input name="filter" type="KalturaFlavorParamsFilter" key="">
+        <formatEqual></formatEqual>
         <systemNameEqual></systemNameEqual>
         <systemNameIn></systemNameIn>
         <isSystemDefaultEqual></isSystemDefaultEqual>
         <tagsEqual></tagsEqual>
-        <formatEqual></formatEqual>
         <orderBy></orderBy>
         <advancedSearch type="string">KalturaSearchItem</advancedSearch>
       </Input>
@@ -181,26 +197,26 @@
       </Input>
       <OutputReference name="output" type="KalturaFlavorParamsListResponse" key="object key">
         <Array>
-          <objects type="array" dbValue="KalturaFlavorParams" key="0">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="1">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="2">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="3">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="4">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="5">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="6">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="7">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="8">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="9">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="10">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="11">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="12">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaPdfFlavorParams" key="13">KalturaPdfFlavorParams</objects>
-          <objects type="array" dbValue="KalturaSwfFlavorParams" key="14">KalturaSwfFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="15">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="16">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="17">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="18">KalturaFlavorParams</objects>
-          <objects type="array" dbValue="KalturaFlavorParams" key="19">KalturaFlavorParams</objects>
+          <objects type="array" key="0">KalturaFlavorParams</objects>
+          <objects type="array" key="1">KalturaFlavorParams</objects>
+          <objects type="array" key="2">KalturaFlavorParams</objects>
+          <objects type="array" key="3">KalturaFlavorParams</objects>
+          <objects type="array" key="4">KalturaFlavorParams</objects>
+          <objects type="array" key="5">KalturaFlavorParams</objects>
+          <objects type="array" key="6">KalturaFlavorParams</objects>
+          <objects type="array" key="7">KalturaFlavorParams</objects>
+          <objects type="array" key="8">KalturaFlavorParams</objects>
+          <objects type="array" key="9">KalturaFlavorParams</objects>
+          <objects type="array" key="10">KalturaFlavorParams</objects>
+          <objects type="array" key="11">KalturaFlavorParams</objects>
+          <objects type="array" key="12">KalturaFlavorParams</objects>
+          <objects type="array" key="13">KalturaPdfFlavorParams</objects>
+          <objects type="array" key="14">KalturaSwfFlavorParams</objects>
+          <objects type="array" key="15">KalturaFlavorParams</objects>
+          <objects type="array" key="16">KalturaFlavorParams</objects>
+          <objects type="array" key="17">KalturaFlavorParams</objects>
+          <objects type="array" key="18">KalturaFlavorParams</objects>
+          <objects type="array" key="19">KalturaFlavorParams</objects>
         </Array>
         <totalCount type="string">20</totalCount>
       </OutputReference>
