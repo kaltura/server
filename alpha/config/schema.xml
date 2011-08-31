@@ -1353,7 +1353,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="video_codec_id" type="varchar" size="127" />
 		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_data" type="varchar" size="4096" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
 			<reference local="entry_id" foreign="id" />
 		</foreign-key>
