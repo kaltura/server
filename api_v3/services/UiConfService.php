@@ -217,8 +217,9 @@ class UiConfService extends KalturaBaseService
 		$c = new Criteria();
 		$uiConfFilter->attachToCriteria( $c );
 		$count = uiConfPeer::doCount( $c );
-		if ($pager)
-			$pager->attachToCriteria( $c );
+		if (! $pager)
+			$pager = new kalturaFilterPager ();
+		$pager->attachToCriteria( $c );
 		$list = uiConfPeer::doSelect( $c );
 		
 		$newList = KalturaUiConfArray::fromUiConfArray( $list );
