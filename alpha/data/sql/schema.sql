@@ -1534,7 +1534,6 @@ CREATE TABLE `flavor_asset`
 	`video_codec_id` VARCHAR(127),
 	`type` INTEGER default 0 NOT NULL,
 	`custom_data` TEXT,
-	`partner_data` VARCHAR(4096),
 	PRIMARY KEY (`int_id`),
 	INDEX `I_referenced_media_info_FK_1_1` (`id`),
 	INDEX `flavor_asset_FI_1` (`entry_id`),

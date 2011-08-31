@@ -165,12 +165,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
-	 * The value for the partner_data field.
-	 * @var        string
-	 */
-	protected $partner_data;
-
-	/**
 	 * @var        entry
 	 */
 	protected $aentry;
@@ -573,16 +567,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
-	}
-
-	/**
-	 * Get the [partner_data] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getPartnerData()
-	{
-		return $this->partner_data;
 	}
 
 	/**
@@ -1201,29 +1185,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
-	 * Set the value of [partner_data] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     asset The current object (for fluent API support)
-	 */
-	public function setPartnerData($v)
-	{
-		if(!isset($this->oldColumnsValues[assetPeer::PARTNER_DATA]))
-			$this->oldColumnsValues[assetPeer::PARTNER_DATA] = $this->partner_data;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->partner_data !== $v) {
-			$this->partner_data = $v;
-			$this->modifiedColumns[] = assetPeer::PARTNER_DATA;
-		}
-
-		return $this;
-	} // setPartnerData()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1306,7 +1267,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			$this->video_codec_id = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
 			$this->type = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
 			$this->custom_data = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-			$this->partner_data = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1316,7 +1276,7 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 24; // 24 = assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 23; // 23 = assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating asset object", $e);
@@ -1906,9 +1866,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			case 22:
 				return $this->getCustomData();
 				break;
-			case 23:
-				return $this->getPartnerData();
-				break;
 			default:
 				return null;
 				break;
@@ -1953,7 +1910,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			$keys[20] => $this->getVideoCodecId(),
 			$keys[21] => $this->getType(),
 			$keys[22] => $this->getCustomData(),
-			$keys[23] => $this->getPartnerData(),
 		);
 		return $result;
 	}
@@ -2054,9 +2010,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			case 22:
 				$this->setCustomData($value);
 				break;
-			case 23:
-				$this->setPartnerData($value);
-				break;
 		} // switch()
 	}
 
@@ -2104,7 +2057,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[20], $arr)) $this->setVideoCodecId($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setType($arr[$keys[21]]);
 		if (array_key_exists($keys[22], $arr)) $this->setCustomData($arr[$keys[22]]);
-		if (array_key_exists($keys[23], $arr)) $this->setPartnerData($arr[$keys[23]]);
 	}
 
 	/**
@@ -2139,7 +2091,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(assetPeer::VIDEO_CODEC_ID)) $criteria->add(assetPeer::VIDEO_CODEC_ID, $this->video_codec_id);
 		if ($this->isColumnModified(assetPeer::TYPE)) $criteria->add(assetPeer::TYPE, $this->type);
 		if ($this->isColumnModified(assetPeer::CUSTOM_DATA)) $criteria->add(assetPeer::CUSTOM_DATA, $this->custom_data);
-		if ($this->isColumnModified(assetPeer::PARTNER_DATA)) $criteria->add(assetPeer::PARTNER_DATA, $this->partner_data);
 
 		return $criteria;
 	}
@@ -2237,8 +2188,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		$copyObj->setType($this->type);
 
 		$copyObj->setCustomData($this->custom_data);
-
-		$copyObj->setPartnerData($this->partner_data);
 
 
 		if ($deepCopy) {
