@@ -35,10 +35,17 @@ class ScriptsRunner {
 		$dsn = $dbConf['datasources']['propel']['connection']['dsn'];
 		$dsn = explode(":", $dsn);
 		$dsnArray = explode(";", $dsn[1], -1);
+		
+		// init with default port
+		$this->dbParams['port'] = '3306';
+		
 		foreach ($dsnArray as $param) {
 			$items = explode("=",$param);
 			$this->dbParams[$items[0]] = $items[1];
 		} 
+		foreach ($this->dbParams as $key=>$value) {			
+			echo $key."=>".$value."\n";
+		}
 		$this->version = $this->getMaxVersion() + 1;
 		$this->alreadyRun = $this->getDeployedScripts();
 	}
