@@ -12,7 +12,7 @@ if (in_array ( 'realrun', $argv ))
 	
 
 	
-$countLimitEachLoop = 7;
+$countLimitEachLoop = 100;
 $offset = $countLimitEachLoop;
 //------------------------------------------------------
 
