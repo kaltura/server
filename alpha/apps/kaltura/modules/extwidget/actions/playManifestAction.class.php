@@ -98,18 +98,12 @@ class playManifestAction extends kalturaAction
 			$isMp3 = true;
 			foreach($flavors as $flavor)
 			{
-				$parsedUrl = parse_url($flavor['url']);
-				$flavorExt = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
-				if (strtolower($flavorExt) != 'mp3')
-				{
+				if (strtolower($flavor['ext']) != 'mp3')
 					$isMp3 = false;
-				}
 			}
 			
 			if ($isMp3)
-			{
 				$mimeType = 'audio/mpeg';
-			}
 		}
 		
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -228,6 +222,8 @@ class playManifestAction extends kalturaAction
 		$durationSet = false;
 		foreach($flavorAssets as $flavorAsset)
 		{
+			/* @var $flavorAsset flavorAsset */
+			
 			if(!$durationSet)
 			{
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
@@ -239,8 +235,17 @@ class playManifestAction extends kalturaAction
 				}
 			}
 			
+			$url = $this->getFlavorHttpUrl($flavorAsset);
+			$ext = $flavorAsset->getFileExt();
+			if(!$ext)
+			{
+				$parsedUrl = parse_url($url);
+				$ext = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
+			}
+			
 			$flavors[] = array(
-				'url' => $this->getFlavorHttpUrl($flavorAsset),
+				'url' => $url,
+				'ext' => $ext,
 				'bitrate' => $flavorAsset->getBitrate(),
 				'width' => $flavorAsset->getWidth(),
 				'height' => $flavorAsset->getHeight(),
@@ -587,14 +592,24 @@ class playManifestAction extends kalturaAction
 					// get all flavors with kaltura urls
 					foreach($flavorAssets as $flavorAsset)
 					{
+						/* @var $flavorAsset flavorAsset */
+						
 						$urlManager->setClipTo($this->clipTo);
 						$urlManager->setFileExtension($flavorAsset->getFileExt());
 						$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_RTMP);
 						$url = $urlManager->getFlavorAssetUrl($flavorAsset);
 						$url = preg_replace('/^\//', '', $url);
 						
+						$ext = $flavorAsset->getFileExt();
+						if(!$ext)
+						{
+							$parsedUrl = parse_url($url);
+							$ext = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
+						}
+						
 						$flavors[] = array(
 							'url' => $url,
+							'ext' => $ext,
 							'bitrate' => $flavorAsset->getBitrate(),
 							'width' => $flavorAsset->getWidth(),
 							'height' => $flavorAsset->getHeight(),
