@@ -4,7 +4,7 @@
  */
 class MetadataBulkUploadXmlEnginePlugin extends KalturaPlugin implements IKalturaPending, IKalturaConfigurator
 {
-	const PLUGIN_NAME = 'metadataBulkUploadXml';
+	const PLUGIN_NAME = 'metadataBulkUploadXmlEngine';
 	
 	const BULK_UPLOAD_XML_VERSION_MAJOR = 1;
 	const BULK_UPLOAD_XML_VERSION_MINOR = 0;
