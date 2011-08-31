@@ -59,35 +59,20 @@ foreach ($sphinxConfigurationIndexs as $sphinxIndexName => $sphinxIndexValues){
 	$sphinxIndexValues = kSphinxSearchManager::getSphinxDefaultConfig($sphinxIndexValues);
 	
 	fwrite($sphinxConfigHandler, 'index ' . $sphinxIndexName . PHP_EOL . '{' . PHP_EOL);
-	
-	if (isset($sphinxIndexValues['fields'])){
-		foreach ($sphinxIndexValues['fields'] as $fieldValue => $fieldName){
+	foreach ($sphinxIndexValues as $key => $value)
+		if ($key == 'fields'){
+			foreach ($value as $fieldValue => $fieldName){
 				fwrite($sphinxConfigHandler, "\t" . $fieldName . "\t" . ' = ' . $fieldValue . PHP_EOL);	
+			}
+		}else{
+			if ($key == 'path'){
+				$value = $baseDir . $value;
+			}
+			fwrite($sphinxConfigHandler, "\t" . $key . "\t" . ' = ' . $value . PHP_EOL);
 		}
-		fwrite($sphinxConfigHandler, PHP_EOL);	
-		unset($sphinxIndexValues['fields']);
-	}
-	
-	foreach ($sphinxIndexValues as $key => $value){
-		if ($key == 'blend_chars' || $key == 'charset_table')
-			continue;	
-		
-		if ($key == 'path'){
-			$value = $baseDir . $value;
-		}
-		fwrite($sphinxConfigHandler, "\t" . $key . "\t" . ' = ' . $value . PHP_EOL);
-	}
-	
-	if (isset($sphinxIndexValues['blend_chars']))
-		fwrite($sphinxConfigHandler, "\t" . 'blend_chars' . "\t" . ' = ' . $sphinxIndexValues['blend_chars'] . PHP_EOL);
-
-	if (isset($sphinxIndexValues['charset_table']))
-		fwrite($sphinxConfigHandler, "\t" . 'charset_table' . "\t" . ' = ' . $sphinxIndexValues['charset_table'] . PHP_EOL);
-	
 		
 	fwrite($sphinxConfigHandler, '}' . PHP_EOL);
 }
-
 foreach ($sphinxConfigurations as $sphinxConfigurationName => $sphinxConfigurationValues){
 		fwrite($sphinxConfigHandler, $sphinxConfigurationName . PHP_EOL . '{' . PHP_EOL);
 		foreach ($sphinxConfigurationValues as $key => $value)
