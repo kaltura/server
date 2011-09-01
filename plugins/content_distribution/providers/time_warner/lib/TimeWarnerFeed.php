@@ -168,10 +168,7 @@ class TimeWarnerFeed
 		$this->setNodeValue('twcable:shortTitle', $values[TimeWarnerDistributionField::CABLE_SHORT_TITLE], $item);
 		$this->setNodeValue('twcable:showName', $values[TimeWarnerDistributionField::CABLE_SHOW_NAME], $item);
 		
-		if (TimeWarnerDistributionField::START_TIME){
-			$startTime = date('c', $values[TimeWarnerDistributionField::START_TIME]);
-		}
-		
+		$startTime = date('c', $values[TimeWarnerDistributionField::START_TIME]);
 		$endTime = date('c', $values[TimeWarnerDistributionField::END_TIME]);
 		$dcTerms = "start=$startTime; end=$endTime;";
 		$this->setNodeValue('dcterms:valid', $dcTerms, $item);
