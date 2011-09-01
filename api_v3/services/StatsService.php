@@ -158,4 +158,16 @@ referrer
 		
 		return $kalturaCEError;
 	}
+	
+	/**
+	 * Use this action to report errors to the kaltura server.
+	 * 
+	 * @action reportError
+	 * @param string $errorCode 
+	 * @param string $errorMessage 
+	 */
+	function reportError($errorCode, $errorMessage)
+	{
+		// do nothing - the stats will be collected by going over the api log 
+	}
 }
