@@ -129,4 +129,9 @@ class SyndicationDistributionProvider implements IDistributionProvider
 	{
 		return array();
 	}
+	
+    public function isLocalFileRequired($jobType)
+	{
+	    return false;
+	}
 }

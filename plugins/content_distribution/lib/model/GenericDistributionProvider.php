@@ -266,4 +266,9 @@ class GenericDistributionProvider extends BaseGenericDistributionProvider implem
 	public function setUpdateRequiredEntryFields($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_ENTRY_FIELDS, $v);}
 	public function setUpdateRequiredMetadataXpaths($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_UPDATE_REQUIRED_METADATA_XPATHS, $v);}
 	
+	
+	public function isLocalFileRequired($jobType)
+	{
+	    return false;
+	}
 } // GenericDistributionProvider
