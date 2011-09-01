@@ -27,10 +27,8 @@ class KalturaEntryResource extends KalturaContentResource
     	$srcEntry = entryPeer::retrieveByPK($this->entryId);
 		if (!$srcEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		if ($srcEntry->getType() != entryType::MEDIA_CLIP)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE, $this->entryId, $srcEntry->getType(), entryType::MEDIA_CLIP);
-		if ($srcEntry->getMediaType() != $dbEntry->getMediaType())
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_MEDIA_TYPE, $this->entryId, $srcEntry->getMediaType(), $dbEntry->getMediaType());
+		if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
+			return parent::validateEntry($dbEntry);
 		
 		if(is_null($this->flavorParamsId))
 		{
@@ -73,5 +71,41 @@ class KalturaEntryResource extends KalturaContentResource
 		$object_to_fill->setObjectId($srcFlavorAsset->getId());
 		
 		return $object_to_fill;
+	}
+	
+	public function entryHandled(entry $dbEntry)
+	{
+    	$srcEntry = entryPeer::retrieveByPK($this->entryId);
+    	if(
+    		$srcEntry->getType() == KalturaEntryType::MEDIA_CLIP 
+    		&& 
+    		$dbEntry->getType() == KalturaEntryType::MEDIA_CLIP 
+    		&& 
+    		$dbEntry->getMediaType() == KalturaMediaType::IMAGE
+    	)
+    	{
+    		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+    		{
+    			$dbEntry->setDimensions($srcEntry->getWidth(), $srcEntry->getHeight());
+    			$dbEntry->setMediaDate($srcEntry->getMediaDate(null));
+    			$dbEntry->save();
+    		}
+    		else 
+    		{
+		    	$srcFlavorAsset = null;
+		    	if(is_null($this->flavorParamsId))
+					$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($this->entryId);
+				else
+					$srcFlavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entryId, $this->flavorParamsId);
+				
+				if($srcFlavorAsset)
+				{
+	    			$dbEntry->setDimensions($srcFlavorAsset->getWidth(), $srcFlavorAsset->getHeight());
+	    			$dbEntry->save();
+				}
+    		}
+    	}
+    	
+    	return parent::entryHandled($dbEntry);
 	}
 }

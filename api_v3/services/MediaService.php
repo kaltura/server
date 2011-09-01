@@ -88,17 +88,6 @@ class MediaService extends KalturaEntryService
     	$kResource = $resource->toObject();
     	$this->attachResource($kResource, $dbEntry);
     	
-		if($dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
-		{
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-	    	$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-	    	if($filePath && file_exists($filePath) && filesize($filePath))
-	    	{
-	    		list($width, $height, $type, $attr) = getimagesize($filePath);
-	    		$dbEntry->setDimensions($width, $height);
-	    		$dbEntry->save();
-	    	}
-		}
     	$resource->entryHandled($dbEntry);
     	
 		return $this->getEntry($entryId);

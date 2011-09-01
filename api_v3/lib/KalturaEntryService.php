@@ -139,6 +139,34 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
+			$exifImageType = @exif_imagetype($entryFullPath);
+			$validTypes = array(
+				IMAGETYPE_JPEG,
+				IMAGETYPE_TIFF_II,
+				IMAGETYPE_TIFF_MM,
+				IMAGETYPE_IFF,
+				IMAGETYPE_PNG
+			);
+			
+			if(in_array($exifImageType, $validTypes))
+			{
+				$exifData = @exif_read_data($entry_fullPath);
+				if ($exifData && isset($exifData["DateTimeOriginal"]) && $exifData["DateTimeOriginal"])
+				{
+					$mediaDate = $exifData["DateTimeOriginal"];
+					$ts = strtotime($mediaDate);
+					
+					// handle invalid dates either due to bad format or out of range
+					if ($ts === -1 || $ts === false || $ts < strtotime('2000-01-01') || $ts > strtotime('2015-01-01'))
+						$mediaDate = null;
+					
+					$dbEntry->setMediaDate($mediaDate);
+				}
+			}
+			
+			list($width, $height, $type, $attr) = getimagesize($entryFullPath);
+			$dbEntry->setDimensions($width, $height);
+			
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
 			{
@@ -152,6 +180,7 @@ class KalturaEntryService extends KalturaBaseService
 				}											
 				throw $e;
 			}
+			
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();	
 				
