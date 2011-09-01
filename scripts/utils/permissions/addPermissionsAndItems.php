@@ -58,25 +58,65 @@ function addPermission($permissionCfg)
 	if (!$permissionCfg->name) {
 		throw new Exception('Permission name must be set');
 	}
-	if (is_null($permissionCfg->partnerId) || $permissionCfg->partnerId === '') {
-		throw new Exception('Permission partner id must be set');
+	if ((is_null($permissionCfg->partnerId) || $permissionCfg->partnerId === '') &&
+		(is_null($permissionCfg->partnerPackages) ||  $permissionCfg->partnerPackages === '' )){
+		throw new Exception('Permission partner id or partner package must be set');
 	}
 	
+	if (isset($permissionCfg->partnerId) && $permissionCfg->partnerId != '')
+		addPermissionToPartner($permissionCfg);
+		
+	if (isset($permissionCfg->partnerPackages) &&  $permissionCfg->partnerPackages != '' )
+	{
+		$countLimitEachLoop = 100;
+		$offset = $countLimitEachLoop;
+		
+		$c = new Criteria();
+		$c->add(PartnerPeer::ID, 0, Criteria::GREATER_THAN);
+		$c->add(PartnerPeer::PARTNER_PACKAGE, $permissionCfg->partnerPackages, Criteria::IN);
+		$c->setLimit($countLimitEachLoop);
+		
+		$partners = PartnerPeer::doSelect($c);
+		
+		while(count($partners)) 
+		{
+			foreach($partners as $partner)
+				addPermissionToPartner($permissionCfg, $partner->getId());
+				
+			$c->setOffset($offset);
+			PartnerPeer::clearInstancePool();
+			$partners = PartnerPeer::doSelect($c);
+			$offset += $countLimitEachLoop;
+			sleep(1);
+		}
+	}
+}
+
+function addPermissionToPartner($permissionCfg, $partnerId = null){
 	// init new db permission object
+	if (is_null($partnerId))
+		$partnerId = $permissionCfg->partnerId;
+	
 	PermissionPeer::setUseCriteriaFilter(false);
-	$permission = PermissionPeer::getByNameAndPartner($permissionCfg->name, $permissionCfg->partnerId);
+	$permission = PermissionPeer::getByNameAndPartner($permissionCfg->name, $partnerId);
 	PermissionPeer::setUseCriteriaFilter(true);
 	if(!$permission)	
 		$permission = new Permission();
 			
 	foreach ($permissionCfg as $key => $value)
 	{
+		if($key == 'partnerPackages')
+			continue;
+			
 		$setterCallback = array ( $permission ,"set{$key}");	
 		call_user_func_array( $setterCallback , array ($value ) );
 	}
 	
 	if (!$permission->getFriendlyName())
 		$permission->setFriendlyName($permission->getName());
+	
+	if ($partnerId != null)
+		$permission->setPartnerId($partnerId);
 		
 	$permission->setStatus(PermissionStatus::ACTIVE);
 	
@@ -86,7 +126,7 @@ function addPermission($permissionCfg)
 		if($permission->getId())
 			$permission->save();
 		else
-			PermissionPeer::addToPartner($permission, $permission->getPartnerId());
+			PermissionPeer::addToPartner($permission, $permission->getPartnerId());		
 	}
 	catch (kPermissionException $e)	{
 		if ($e->getCode() === kPermissionException::PERMISSION_ALREADY_EXISTS) {
@@ -97,8 +137,6 @@ function addPermission($permissionCfg)
 		}
 	}
 }
-
-
 
 function addActionPermissionItem($itemCfg)
 {	
