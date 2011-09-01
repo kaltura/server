@@ -32,6 +32,8 @@ foreach ( $rows as $row ) {
 	if ($count % 500)
 		kuserPeer::clearInstancePool ();
 }
-$sql = "CALL mark_operational_sync_as_done($syncType)";
-$dbh->query ( $sql );
+if ($count == count($rows)) {
+	$sql = "CALL mark_operational_sync_as_done($syncType)";
+	$dbh->query ( $sql );
+}
 KalturaLog::debug ( "Done updating $count kusers from DWH to operational DB" );
