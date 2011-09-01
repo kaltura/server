@@ -304,7 +304,7 @@ function openViewHistory(partner_id){
 
 jQuery(document).ready(function() {
 	<?php if ($this->formValid): ?>
-		jQuery(this).dialog('close');
+		jQuery('#partner-configure-dialog').dialog('close');
 		jQuery('#frmPaginator1').submit();
 	<?php else: ?>
 		jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
