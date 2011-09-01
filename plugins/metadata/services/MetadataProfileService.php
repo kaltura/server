@@ -20,60 +20,7 @@ class MetadataProfileService extends KalturaBaseService
 		if(!MetadataPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
 	}
-	
-	
-	/**
-	 * List metadata profile objects by filter and pager
-	 * 
-	 * @action list
-	 * @param KalturaMetadataProfileFilter $filter
-	 * @param KalturaFilterPager $pager
-	 * @return KalturaMetadataProfileListResponse
-	 */
-	function listAction(KalturaMetadataProfileFilter $filter = null, KalturaFilterPager $pager = null)
-	{
-		if (!$filter)
-			$filter = new KalturaMetadataProfileFilter;
-			
-		$metadataProfileFilter = new MetadataProfileFilter();
-		$filter->toObject($metadataProfileFilter);
 		
-		$c = new Criteria();
-		$metadataProfileFilter->attachToCriteria($c);
-		$count = MetadataProfilePeer::doCount($c);
-		
-		if (! $pager)
-			$pager = new KalturaFilterPager ();
-		$pager->attachToCriteria ( $c );
-		$list = MetadataProfilePeer::doSelect($c);
-		
-		$response = new KalturaMetadataProfileListResponse();
-		$response->objects = KalturaMetadataProfileArray::fromMetadataProfileArray($list);
-		$response->totalCount = $count;
-		
-		return $response;
-	}
-	
-	
-	/**
-	 * List metadata profile fields by metadata profile id
-	 * 
-	 * @action listFields
-	 * @param int $metadataProfileId
-	 * @return KalturaMetadataProfileFieldListResponse
-	 */
-	function listFieldsAction($metadataProfileId)
-	{
-		$dbFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
-		
-		$response = new KalturaMetadataProfileFieldListResponse();
-		$response->objects = KalturaMetadataProfileFieldArray::fromMetadataProfileFieldArray($dbFields);
-		$response->totalCount = count($dbFields);
-		
-		return $response;
-	}
-	
-	
 	/**
 	 * Allows you to add a metadata profile object and metadata profile content associated with Kaltura object type
 	 * 
@@ -108,7 +55,6 @@ class MetadataProfileService extends KalturaBaseService
 		
 		return $metadataProfile;
 	}
-	
 	
 	/**
 	 * Allows you to add a metadata profile object and metadata profile file associated with Kaltura object type
@@ -152,53 +98,6 @@ class MetadataProfileService extends KalturaBaseService
 		return $metadataProfile;
 	}
 	
-	
-	/**
-	 * Delete an existing metadata profile
-	 * 
-	 * @action delete
-	 * @param int $id
-	 * @throws KalturaErrors::INVALID_OBJECT_ID
-	 */		
-	function deleteAction($id)
-	{
-		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
-		
-		if(!$dbMetadataProfile)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-		
-		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::DEPRECATED);
-		$dbMetadataProfile->save();
-		
-		$c = new Criteria();
-		$c->add(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $id);
-		$c->add(MetadataProfileFieldPeer::STATUS, MetadataProfileField::STATUS_DEPRECATED, Criteria::NOT_EQUAL);
-		$MetadataProfileFields = MetadataProfileFieldPeer::doSelect($c);
-		
-		foreach($MetadataProfileFields as $MetadataProfileField)
-		{
-			$MetadataProfileField->setStatus(MetadataProfileField::STATUS_DEPRECATED);
-			$MetadataProfileField->save();
-		}
-		
-		$c = new Criteria();
-		$c->add(MetadataPeer::METADATA_PROFILE_ID, $id);
-		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED, Criteria::NOT_EQUAL);
-	
-		$peer = null;
-		MetadataPeer::setUseCriteriaFilter(false);
-		$metadatas = MetadataPeer::doSelect($c);
-		foreach($metadatas as $metadata)
-			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
-		
-		$update = new Criteria();
-		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
-			
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		BasePeer::doUpdate($c, $update, $con);
-	}
-
-	
 	/**
 	 * Retrieve a metadata profile object by id
 	 * 
@@ -219,7 +118,6 @@ class MetadataProfileService extends KalturaBaseService
 		
 		return $metadataProfile;
 	}
-	
 	
 	/**
 	 * Update an existing metadata object
@@ -298,6 +196,100 @@ class MetadataProfileService extends KalturaBaseService
 		return $metadataProfile;
 	}	
 	
+/**
+	 * List metadata profile objects by filter and pager
+	 * 
+	 * @action list
+	 * @param KalturaMetadataProfileFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaMetadataProfileListResponse
+	 */
+	function listAction(KalturaMetadataProfileFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+			$filter = new KalturaMetadataProfileFilter;
+			
+		$metadataProfileFilter = new MetadataProfileFilter();
+		$filter->toObject($metadataProfileFilter);
+		
+		$c = new Criteria();
+		$metadataProfileFilter->attachToCriteria($c);
+		$count = MetadataProfilePeer::doCount($c);
+		
+		if (! $pager)
+			$pager = new KalturaFilterPager ();
+		$pager->attachToCriteria ( $c );
+		$list = MetadataProfilePeer::doSelect($c);
+		
+		$response = new KalturaMetadataProfileListResponse();
+		$response->objects = KalturaMetadataProfileArray::fromMetadataProfileArray($list);
+		$response->totalCount = $count;
+		
+		return $response;
+	}
+	
+	/**
+	 * List metadata profile fields by metadata profile id
+	 * 
+	 * @action listFields
+	 * @param int $metadataProfileId
+	 * @return KalturaMetadataProfileFieldListResponse
+	 */
+	function listFieldsAction($metadataProfileId)
+	{
+		$dbFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadataProfileId);
+		
+		$response = new KalturaMetadataProfileFieldListResponse();
+		$response->objects = KalturaMetadataProfileFieldArray::fromMetadataProfileFieldArray($dbFields);
+		$response->totalCount = count($dbFields);
+		
+		return $response;
+	}
+	
+		/**
+	 * Delete an existing metadata profile
+	 * 
+	 * @action delete
+	 * @param int $id
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */		
+	function deleteAction($id)
+	{
+		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
+		
+		if(!$dbMetadataProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::DEPRECATED);
+		$dbMetadataProfile->save();
+		
+		$c = new Criteria();
+		$c->add(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $id);
+		$c->add(MetadataProfileFieldPeer::STATUS, MetadataProfileField::STATUS_DEPRECATED, Criteria::NOT_EQUAL);
+		$MetadataProfileFields = MetadataProfileFieldPeer::doSelect($c);
+		
+		foreach($MetadataProfileFields as $MetadataProfileField)
+		{
+			$MetadataProfileField->setStatus(MetadataProfileField::STATUS_DEPRECATED);
+			$MetadataProfileField->save();
+		}
+		
+		$c = new Criteria();
+		$c->add(MetadataPeer::METADATA_PROFILE_ID, $id);
+		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED, Criteria::NOT_EQUAL);
+	
+		$peer = null;
+		MetadataPeer::setUseCriteriaFilter(false);
+		$metadatas = MetadataPeer::doSelect($c);
+		foreach($metadatas as $metadata)
+			kEventsManager::raiseEvent(new kObjectDeletedEvent($metadata));
+		
+		$update = new Criteria();
+		$update->add(MetadataPeer::STATUS, KalturaMetadataStatus::DELETED);
+			
+		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+		BasePeer::doUpdate($c, $update, $con);
+	}
 	
 	/**
 	 * Update an existing metadata object definition file
@@ -364,7 +356,6 @@ class MetadataProfileService extends KalturaBaseService
 		return $metadataProfile;
 	}	
 	
-	
 	/**
 	 * Update an existing metadata object definition file
 	 * 
@@ -418,7 +409,6 @@ class MetadataProfileService extends KalturaBaseService
 		
 		return $metadataProfile;
 	}
-	
 	
 	/**
 	 * Update an existing metadata object views file
