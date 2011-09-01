@@ -118,14 +118,14 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setFieldName(TimeWarnerDistributionField::START_TIME);
 		$fieldConfig->setUserFriendlyFieldName('Distribution start date');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(TimeWarnerDistributionField::END_TIME);
 		$fieldConfig->setUserFriendlyFieldName('Distribution end date');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunset" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
