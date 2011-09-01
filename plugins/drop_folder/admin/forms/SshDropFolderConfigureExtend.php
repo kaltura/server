@@ -28,8 +28,22 @@ abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolder
 			'label' => 'SSH Public Key:'
 		));
 		
+		$this->addElement('textarea', 'publicKey', array(
+			'label' => 'SSH Public Key Data:',
+			'rows' => '2',
+			'cols' => '50',
+			'readonly' => '1'
+		));
+		
 		$this->addElement('file', 'sshPrivateKey', array(
 			'label' => 'SSH Private Key:'
+		));
+		
+		$this->addElement('textarea', 'privateKey', array(
+			'label' => 'SSH Private Key Data:',
+			'rows' => '2',
+			'cols' => '50',
+			'readonly' => '1'
 		));
 		
 		$this->addElement('text', 'passPhrase', array(
