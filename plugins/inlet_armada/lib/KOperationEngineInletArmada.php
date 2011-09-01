@@ -215,7 +215,7 @@ $trgPrefixWindows;
 	/*************************************
 	 * 
 	 */
-	private lookForJobTemplateId($inlet, $name)
+	private function lookForJobTemplateId($inlet, $name)
 	{
 	$rvObj=new XmlRpcData;
 		$rv=$inlet->templateGroupList($rvObj);
@@ -223,13 +223,13 @@ $trgPrefixWindows;
 			throw new KOperationEngineException("Inlet failure: templateGroupList, rv(".print_r($rvObj,1).")");
 		}
 		$templateDescObj=$this->templateGroupListToJobTemplate($rvObj->template_group_list, $name);
-		retuen $templateDescObj->template_id;
+		return $templateDescObj->template_id;
 	}
 	
 	/*************************************
 	 * 
 	 */
-	private templateGroupListToJobTemplate($groupList, $val, $fieldName="template_description")
+	private function templateGroupListToJobTemplate($groupList, $val, $fieldName="template_description")
 	{
 		foreach ($groupList as $grp) {
 			foreach ($grp->templates as $tpl) {
