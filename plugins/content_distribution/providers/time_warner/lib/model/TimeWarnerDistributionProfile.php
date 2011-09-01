@@ -16,10 +16,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 	);
 	
 	protected $inListOrNullValidation = array (
-		TimeWarnerDistributionField::AUTHOR => array(
-			'HBO',
-			'Cinemax',
-		),		
 		TimeWarnerDistributionField::MEDIA_RATING => array(
 			'TV-Y',
 			'TV-G',
@@ -40,32 +36,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 			'Fulllength',
 			'Miniseries',
 			'Promo',
-		),
-		/*TimeWarnerDistributionField::MEDIA_CATEGORY_GE => array(
-			'Action',
-			'Animation Comedy',
-			'Crime',
-			'Documentary',
-			'Drama',
-			'Family', 
-			'Food',
-			'Health',
-			'History',
-			'Home',
-			'Horror',
-			'Reality',
-			'Sports',
-			'Strange'
-		),*/
-		TimeWarnerDistributionField::CABLE_NETWORK => array(
-			'HBO',
-			'Cinemax',
-		),	
-		TimeWarnerDistributionField::CABLE_PROVIDER => array(
-			'HBO',
-			'Cinemax',
-		),	
-	
+		),		
 	);
 	protected $multipleInListOrNull = array (
 		TimeWarnerDistributionField::MEDIA_CATEGORY_GE => array(
