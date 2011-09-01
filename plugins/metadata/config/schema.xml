@@ -61,5 +61,8 @@
 			<index-column name="object_type" />
 			<index-column name="object_id" />
 		</index>
+		<index name="object_id">
+			<index-column name="object_id" />
+		</index>
 	</table>
 </database>
