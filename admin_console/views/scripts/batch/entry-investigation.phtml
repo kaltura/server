@@ -1238,10 +1238,14 @@
 		jQuery("#" + entityId).toggle();
 
 		var $paintarea = jQuery("#paintarea");
+		
 		if(!$paintarea)
 			return;
 		
 		var offset = $paintarea.offset();
+		if(offset == null)
+			offset = {top: 0, left: 0};
+		
 		var y = offset.top + 5;
 		
 		for(var i in jobNodes){
