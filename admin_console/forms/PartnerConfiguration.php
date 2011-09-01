@@ -463,27 +463,28 @@ class Form_PartnerConfiguration extends Infra_Form
 					$basePermission->name = $modul->basePermissionName;
 					$basePermission->type = $modul->basePermissionType;
 					$basePermission->status = $permission->status;
+										
+					$permissionSet = false;
+					KalturaLog::debug("try to add permission: ". $basePermission->name);
+					foreach ($systemPartnerConfiguration->permissions as $permission)
+					{				
+						if (($permission->name == $basePermission->name) && ($permission->type == $basePermission->type))
+						{
+							if ($basePermission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
+								$permission->status = $basePermission->status;
+							KalturaLog::debug("permission exists with status : " . $permission->status);		
+							$permissionSet = true;
+							break;
+						}
+					}
 					
-					$basePermissionsToAdd[] = $basePermission;
-					
-				}
-			}
-			
-			foreach ($basePermissionsToAdd as $basePermissionToAdd){
-				$permissionSet = false;
-				foreach ($systemPartnerConfiguration->permissions as $permission)
-				{				
-					if (($permission->name == $basePermissionToAdd->name) && ($permission->name == $basePermissionToAdd->type)){
-						if ($basePermissionToAdd->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
-							$permission->status = $basePermissionToAdd->status;
-						
-						$permissionSet = true;
+					if(!$permissionSet)
+					{
+						KalturaLog::debug("permission didn't exist with status : " . $permission->status);
+						$systemPartnerConfiguration->permissions[] = $basePermission;
 					}
 				}
-				
-				if(!$permissionSet)
-					$systemPartnerConfiguration->permissions[] = $basePermissionToAdd;
-			}
+			}	
 		}
 			
 
