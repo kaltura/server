@@ -6,7 +6,7 @@ package com.kaltura.delegates {
 	import com.kaltura.errors.KalturaError;
 	import com.kaltura.events.KalturaEvent;
 	import com.kaltura.net.KalturaCall;
-	
+	import com.kaltura.encryption.MD5;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -39,7 +39,7 @@ package com.kaltura.delegates {
 		//Setters & getters 
 		public function get call():KalturaCall { return _call; }
 		public function set call(newVal:KalturaCall):void { _call = newVal; }
-
+		
 		public function get config():IKalturaConfig { return _config; }
 		public function set config(newVal:IKalturaConfig):void { _config = newVal as KalturaConfig; }
 		
@@ -90,12 +90,12 @@ package com.kaltura.delegates {
 			_call.handleError(kError);
 			dispatchEvent(new KalturaEvent(KalturaEvent.FAILED, false, false, false, null, kError));
 		}
-
+		
 		protected function execute():void {
 			if (call == null) { throw new Error('No call defined.'); }
 			post(); //post the call
 		}
-
+		
 		/**
 		 * Helper function for sending the call straight to the server
 		 */
@@ -117,10 +117,10 @@ package com.kaltura.delegates {
 			//The configuration is stronger then the args
 			if(_config.partnerId != null && _call.args["partnerId"] == -1)
 				_call.setRequestArgument("partnerId", _config.partnerId); 
-				
+			
 			if (_config.ks != null)
 				_call.setRequestArgument("ks", _config.ks);
-
+			
 			if(_config.clientTag != null)
 				_call.setRequestArgument("clientTag", _config.clientTag);
 			
@@ -130,12 +130,41 @@ package com.kaltura.delegates {
 			//call.setRequestArgument("kalsig", getMD5Checksum(call));
 		}
 		
+		protected function getMD5Checksum(call:KalturaCall):String
+		{
+			var props:Array = new Array();
+			for each(var prop:String in call.args)
+			props.push(prop);
+			
+			props.push("service");
+			props.push("action");
+			props.sort();
+			
+			var s:String;
+			for each(prop in props)
+			{
+				s += prop;
+				
+				if (prop == "service")
+					s += call.service;
+				else if (prop == "action")
+					s += call.action;
+				else
+					s += call.args[prop];
+			}
+			
+			return MD5.encrypt(s);
+		}
+		
 		protected function sendRequest():void {
 			//construct the loader
 			createURLLoader();
 			
+			//Create signature hash.
+			var kalsig:String = getMD5Checksum(call);
+			
 			//create the service request for normal calls
-			var url : String = _config.protocol + _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action;
+			var url : String = _config.protocol + _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action+"&kalsig="+kalsig;
 			
 			if( _call.method == URLRequestMethod.GET )url += "&";
 			
@@ -143,7 +172,7 @@ package com.kaltura.delegates {
 			req.contentType = "application/x-www-form-urlencoded";
 			req.method = call.method; 
 			req.data = call.args; 
-
+			
 			loader.dataFormat = URLLoaderDataFormat.TEXT;
 			loader.load(req);
 		}
@@ -193,7 +222,7 @@ package com.kaltura.delegates {
 				kError.errorMsg = event.text;
 				//kError.errorCode;
 			}
-				
+			
 			call.handleError(kError);
 			
 			dispatchEvent(new KalturaEvent(KalturaEvent.FAILED, false, false, false, null, kError));

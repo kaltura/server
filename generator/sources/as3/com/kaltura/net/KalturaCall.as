@@ -21,7 +21,8 @@ package com.kaltura.net {
 		public var success:Boolean = false;
 		public var action : String;
 		public var service : String;
-		public var method : String = URLRequestMethod.POST;
+		public static var defaultMethod : String = URLRequestMethod.POST;
+		public var method : String = defaultMethod;
 		
 		public var useTimeout:Boolean = true;
 		
@@ -44,7 +45,7 @@ package com.kaltura.net {
 		 * OVERRIDE this function to make init the right delegate action
 		 * */
 		public function execute():void {}
-		 
+		
 		public function setRequestArgument(name:String, value:*):void {
 			if (value is Number)
 			{
@@ -58,7 +59,7 @@ package com.kaltura.net {
 			}
 			if (value === null) {	return;	 }
 			if (value === KalturaClient.NULL_STRING) {	this.args[name + '__null'] = '';  return;	 }
-				
+			
 			if (name) { //&& String(value).length > 0
 				this.args[name] = value; 
 			}
@@ -112,7 +113,7 @@ package com.kaltura.net {
 			}
 			else
 				objKeys = ObjectUtil.getObjectAllKeys( obj );
-	
+			
 			var j:int=0;
 			for (var i:int=0; i<objKeys.length; i++)
 			{
@@ -190,13 +191,13 @@ package com.kaltura.net {
 					//var objArr : Array = getQualifiedClassName(arr[i]).split("::");
 					//var tempPrefix : String = objArr[objArr.length-1];
 					tempArr  = kalturaObject2Arrays( arr[i] , newPrefix ); //  + ":" +tempPrefix
-
+					
 					keyArray = keyArray.concat( tempArr[0] );
 					valArray = valArray.concat( tempArr[1] );
 					j = valArray.length;
 				}
 			}
-
+			
 			if (arr.length == 0)
 			{
 				keyArray[j] = prefix + ":-";
@@ -207,7 +208,7 @@ package com.kaltura.net {
 			keyValArr = [ keyArray , valArray];
 			return keyValArr;
 		}
-
+		
 		
 		protected function applySchema(p_shema:Array,p_args:Array):void 
 		{	
