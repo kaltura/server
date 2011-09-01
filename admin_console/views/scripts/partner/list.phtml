@@ -199,6 +199,8 @@ function remoteStorage(partnerId) {
 }
 
 function configurePartnerSuccess(html) {
+	jQuery('.ui-widget-overlay').css('z-index', 1000 );
+	jQuery('#loader').hide();	
 	jQuery('#frmPartnerConfigure').replaceWith(html);
 	jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
 	onPageLoad();
@@ -220,6 +222,8 @@ function configure(partnerId)
 		title: '<?php echo $this->translate('Account Specific Setup Configuration'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery('.ui-widget-overlay').css('z-index', 1003 );
+				jQuery('#loader').show();
 				jQuery(this).find('#frmPartnerConfigure').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
