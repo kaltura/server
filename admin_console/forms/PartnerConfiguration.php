@@ -438,6 +438,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		if ($moduls)
 		{
 			$basePermissionsToAdd = array();
+			$basePermissionsToRemove = array();
 			
 			if(is_null($systemPartnerConfiguration->permissions))
 				$systemPartnerConfiguration->permissions = array();
@@ -463,11 +464,8 @@ class Form_PartnerConfiguration extends Infra_Form
 					$basePermission->type = $modul->basePermissionType;
 					$basePermission->status = $permission->status;
 					
-					if ($basePermission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE){
-						$basePermissionsToAdd[] = $basePermission;
-					}else{
-						$systemPartnerConfiguration->permissions[] = $basePermission;
-					}
+					$basePermissionsToAdd[] = $basePermission;
+					
 				}
 			}
 			
@@ -476,16 +474,19 @@ class Form_PartnerConfiguration extends Infra_Form
 				foreach ($systemPartnerConfiguration->permissions as $permission)
 				{				
 					if (($permission->name == $basePermissionToAdd->name) && ($permission->name == $basePermissionToAdd->type)){
-						$permission->status = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
+						if ($basePermissionToAdd->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE)
+							$permission->status = $basePermissionToAdd->status;
+						
 						$permissionSet = true;
 					}
-					
-					if(!$permissionSet){
-						$systemPartnerConfiguration->permissions[] = $basePermissionToAdd;
-					}
 				}
+				
+				if(!$permissionSet)
+					$systemPartnerConfiguration->permissions[] = $basePermissionToAdd;
 			}
-		}	
+		}
+			
+
 			
 		foreach ($this->limitSubForms as $subForm)
 		{
