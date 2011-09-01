@@ -13,7 +13,7 @@ DbManager::initialize ();
 
 $syncType = 'kuser';
 $dbh = myDbHelper::getConnection ( myDbHelper::DB_HELPER_CONN_DWH );
-$sql = "CALL get_data_for_operational($syncType)";
+$sql = "CALL get_data_for_operational('$syncType')";
 $count = 0;
 $rows = $dbh->query ( $sql )->fetchAll ();
 foreach ( $rows as $row ) {
@@ -23,16 +23,13 @@ foreach ( $rows as $row ) {
 		continue;
 	}
 	$kuser->setStorageSize ( $row ['storage_size'] );
-	if ($kuser->save ()) {
-		$count ++;
-		KalturaLog::debug ( 'Successfully saved kuser [' . $row ['kuser_id'] . ']' );
-	} else {
-		KalturaLog::err ( 'Error while saving kuser [' . $row ['kuser_id'] . ']' );
-	}
+	$kuser->save ();
+	$count ++;
+	KalturaLog::debug ( 'Successfully saved kuser [' . $row ['kuser_id'] . ']' );
 	if ($count % 500)
 		kuserPeer::clearInstancePool ();
 }
-if ($count == count($rows)) {
+if ($count == count ( $rows )) {
 	$sql = "CALL mark_operational_sync_as_done($syncType)";
 	$dbh->query ( $sql );
 }

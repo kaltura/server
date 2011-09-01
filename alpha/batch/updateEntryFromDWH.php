@@ -13,7 +13,7 @@ DbManager::initialize ();
 
 $syncType = 'entry';
 $dbh = myDbHelper::getConnection ( myDbHelper::DB_HELPER_CONN_DWH );
-$sql = "CALL get_data_for_operational($syncType)";
+$sql = "CALL get_data_for_operational('$syncType')";
 $count = 0;
 $rows = $dbh->query ( $sql )->fetchAll ();
 foreach ( $rows as $row ) {
@@ -24,12 +24,9 @@ foreach ( $rows as $row ) {
 	}
 	$entry->setViews ( $row ['views'] );
 	$entry->setPlays ( $row ['plays'] );
-	if ($entry->save ()) {
-		$count ++;
-		KalturaLog::debug ( 'Successfully saved entry [' . $row ['entry_id'] . ']' );
-	} else {
-		KalturaLog::err ( 'Error while saving entry [' . $row ['entry_id'] . ']' );
-	}
+	$entry->save();
+	$count++;
+	KalturaLog::debug ( 'Successfully saved entry [' . $row ['entry_id'] . ']' );
 	if ($count % 500)
 		entryPeer::clearInstancePool ();
 }
