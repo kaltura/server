@@ -30,8 +30,6 @@ foreach ( $rows as $row ) {
 	if ($count % 500)
 		entryPeer::clearInstancePool ();
 }
-if ($count == count($rows)) {
-	$sql = "CALL mark_operational_sync_as_done('$syncType')";
-	$dbh->query ( $sql );
-}
+$sql = "CALL mark_operational_sync_as_done('$syncType')";
+$dbh->query ( $sql );
 KalturaLog::debug ( "Done updating $count entries from DWH to operational DB" );
