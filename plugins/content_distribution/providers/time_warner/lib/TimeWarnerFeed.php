@@ -151,6 +151,7 @@ class TimeWarnerFeed
 		}
 		$this->addCategory($item,'TX-'.$values[TimeWarnerDistributionField::MEDIA_CATEGORY_TX]);		
 		$geCategories = explode(',', $values[TimeWarnerDistributionField::MEDIA_CATEGORY_GE]);
+		$geCategories = array_unique($geCategories);
 		foreach($geCategories as $geCategory)
 		{
 			$this->addCategory($item,'GE-'.$geCategory);

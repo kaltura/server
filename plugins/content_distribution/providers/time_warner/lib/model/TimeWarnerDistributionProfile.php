@@ -36,7 +36,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 			'Fulllength',
 			'Miniseries',
 			'Promo',
-		),		
+		),	    
 	);
 	protected $multipleInListOrNull = array (
 		TimeWarnerDistributionField::MEDIA_CATEGORY_GE => array(
@@ -167,8 +167,9 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(TimeWarnerDistributionField::MEDIA_CATEGORY_GE);
-		$fieldConfig->setUserFriendlyFieldName('TwGeCategory');
-		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwGeCategory" />');
+		$fieldConfig->setUserFriendlyFieldName('TwGeCategory');		
+		$tagsXslt = '<xsl:for-each select="customData/metadata/TwGeCategory"><xsl:if test="position() &gt; 1"><xsl:value-of select="\',\'" /></xsl:if><xsl:value-of select="." /></xsl:for-each>';
+		$fieldConfig->setEntryMrssXslt($tagsXslt);		
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
