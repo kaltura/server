@@ -41,7 +41,8 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 	protected $multipleInListOrNull = array (
 		TimeWarnerDistributionField::MEDIA_CATEGORY_GE => array(
 				'Action',
-				'Animation Comedy',
+				'Animation',
+				'Comedy',
 				'Crime',
 				'Documentary',
 				'Drama',
@@ -91,8 +92,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('Entry name');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -100,8 +99,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('Entry description');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(description)" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -109,8 +106,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwAuthor');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwAuthor" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwAuthor']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -118,8 +113,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('Entry updated at');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(updatedAt)" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::UPDATED_AT));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -141,8 +134,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCopyright');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCopyright" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCopyright']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -151,8 +142,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$tagsXslt = '<xsl:for-each select="tags/tag"><xsl:if test="position() &gt; 1"><xsl:value-of select="\',\'" /></xsl:if><xsl:value-of select="." /></xsl:for-each>';
 		$fieldConfig->setEntryMrssXslt($tagsXslt);
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::TAGS));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -160,8 +149,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwContentRating');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwContentRating" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwContentRating']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -169,8 +156,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCtCategory');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCtCategory" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCtCategory']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -178,8 +163,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwTxCategory');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwTxCategory" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwTxCategory']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -187,8 +170,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwGeCategory');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwGeCategory" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwGeCategory']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -196,8 +177,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwGrCategory');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwGrCategory" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwGrCategory']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -205,8 +184,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwPlMediaApproved');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwPlMediaApproved" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwPlMediaApproved']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -214,8 +191,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCableEpisodeNumber');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCableEpisodeNumber" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCableEpisodeNumber']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -223,8 +198,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('External Id');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(entryId)" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::ID));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -232,8 +205,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('Entry created at');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(createdAt)" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::CREATED_AT));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -241,8 +212,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCableNetwork');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCableNetwork" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCableNetwork']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -250,8 +219,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCableProvider');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCableProvider" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCableProvider']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -259,8 +226,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCableDescription');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCableDescription" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCableDescription']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -268,8 +233,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCableTitle');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCableTitle" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCableTitle']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
@@ -277,8 +240,6 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setUserFriendlyFieldName('TwCableShowName');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCableShowName" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='TwCableShowName']"));
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		return $fieldConfigArray;
