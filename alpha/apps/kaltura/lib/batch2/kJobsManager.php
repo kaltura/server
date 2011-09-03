@@ -409,7 +409,7 @@ class kJobsManager
 					
 					$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
 					$url = $fileSync->getExternalUrl();
-					return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $originalFlavorAsset);
+					return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $originalFlavorAsset, null, null, true);
 				}
 				
 				throw new kCoreException("Source file not found for flavor conversion [$flavorAssetId]", kCoreException::SOURCE_FILE_NOT_FOUND);
@@ -727,7 +727,7 @@ class kJobsManager
 		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $mediaParserType);
 	}
 	
-	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null)
+	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null, $keepCurrentVersion = false)
 	{
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
@@ -739,8 +739,17 @@ class kJobsManager
  		
  		if($asset)
  		{
- 			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
- 			$asset->save();
+ 			if($keepCurrentVersion)
+ 			{
+ 				if($asset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+	 				$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+ 			}
+ 			else 
+ 			{
+ 				$asset->incrementVersion();
+	 			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+ 			}
+	 		$asset->save();
  			
  			$jobData->setFlavorAssetId($asset->getId());
  		}
@@ -878,7 +887,7 @@ class kJobsManager
 						{
 							KalturaLog::debug("Creates import job for remote file sync");
 							$url = $syncFile->getExternalUrl();
-							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset);
+							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);
 							continue;
 						}
 					}

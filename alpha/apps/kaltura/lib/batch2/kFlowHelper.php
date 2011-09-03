@@ -112,7 +112,10 @@ class kFlowHelper
 			$isNewFlavor = true;
 		}
 		
-		$syncKey = null;
+		$isNewContent = true;
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		if(kFileSyncUtils::fileSync_exists($syncKey))
+			$isNewContent = false;
 		
 		if($twinJob)
 		{
@@ -152,7 +155,7 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 		
-		if($flavorAsset->getVersion() == 1)
+		if($isNewContent)
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 		
 		if(!$isNewFlavor && $flavorAsset->getIsOriginal())
