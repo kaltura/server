@@ -328,6 +328,25 @@ class kwidgetAction extends sfAction
 				$track_wrapper = "&wrapper_tracker_url=".urlencode(kConf::get('kdpwrapper_track_url')."?activation_key=".kConf::get('kaltura_activation_key')."&package_version=".kConf::get('kaltura_version'));
 			}
 			
+			if (kConf::hasParam("optimized_playback"))
+			{
+				$optimizedPlayback = kConf::get("optimized_playback");
+				if (array_key_exists($partner_id, $optimizedPlayback))
+				{
+					// force a specific kdp for the partner
+					$params = $optimizedPlayback[$partner_id];
+					if (array_key_exists('kdp_version', $params))
+					$swf_url =  $partner_cdnHost . myPartnerUtils::getUrlForPartner ( $partner_id , $subp_id ) . "/flash/kdp3/".$params['kdp_version']."/kdp3.swf";
+						
+					if (array_key_exists('conf_vars', $params))
+					$conf_vars .= "&".$params['conf_vars'];
+						
+					// cache immidiately
+					$cache_st =0;
+					$allowCache = true;
+				}
+			}
+
 			$dynamic_date = $widgetIdStr .
 			$track_wrapper.
 				"&kdpUrl=".urlencode($swf_url).

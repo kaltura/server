@@ -344,6 +344,26 @@ class requestUtils
 		return array($start, $end, $length);
 	}                  
 	
+	public static function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
+	{
+		if ($max_age)
+		{
+			// added max-stale=0 to fight evil proxies
+			$cache_scope = $private ? "private" : "public";
+			header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
+			if ($last_modified)
+				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . 'GMT');
+			else
+				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
+		}
+		else
+		{
+			header("Cache-Control:");
+			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+		}
+	}
+	
 	public static function sendCdnHeaders($ext, $content_length, $max_age = 8640000 , $mime = null, $private = false, $last_modified = null)
 	{
 		if ( $max_age === null ) $max_age = 8640000;
@@ -376,23 +396,8 @@ class requestUtils
 		{
 			$content_type = $mime ;
 		}
-		
-		if ($max_age)
-		{
-			// added max-stale=0 to fight evil proxies
-			$cache_scope = $private ? "private" : "public";
-			header("Cache-Control: $cache_scope, max-age=$max_age max-stale=0");
-			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT'); 
-			if ($last_modified)
-				header('Last-modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . 'GMT');
-			else
-				header('Last-Modified: Sun, 19 Nov 2000 08:52:00 GMT');
-		}
-		else
-		{
-			header("Cache-Control:");
-			header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
-		}
+
+		self::sendCachingHeaders($max_age, $private, $last_modified);
 		
 		header("Content-Length: $content_length ");
 		header("Pragma:");

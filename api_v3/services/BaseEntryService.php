@@ -624,7 +624,23 @@ class BaseEntryService extends KalturaEntryService
 				
 		if ($accessControl && $accessControl->hasRestrictions())
 		{
-			KalturaResponseCacher::disableCache();
+			// for now add caching headers only for specific partners listed in kConf
+			// later caching will be used for all partners, and access control will be done in the caching layer
+			$disableCache = true;
+			if (kConf::hasParam("optimized_playback"))
+			{
+				$partnerId = $dbEntry->getPartnerId();
+				$optimizedPlayback = kConf::get("optimized_playback");
+				if (array_key_exists($partnerId, $optimizedPlayback))
+				{
+					$params = $optimizedPlayback[$partnerId];
+					if (array_key_exists('cache_kdp_acccess_control', $params) && $params['cache_kdp_acccess_control'])
+						$disableCache = false;
+				}
+			}
+			
+			if ($disableCache)
+				KalturaResponseCacher::disableCache();
 			
 			$accessControlScope = accessControlScope::partialInit();
 			$accessControlScope->setReferrer($contextDataParams->referrer);

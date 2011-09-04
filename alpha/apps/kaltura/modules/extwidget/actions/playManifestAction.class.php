@@ -901,6 +901,20 @@ class playManifestAction extends kalturaAction
 			header("Content-Type: text/xml; charset=UTF-8");
 			header("Content-Disposition: inline; filename=manifest.xml");
 		}
+
+		// for now add caching headers only for specific partners listed in kConf
+		// later caching will be used for all partners, and url tokenization will be done in the caching layer
+		if (kConf::hasParam("optimized_playback"))
+		{
+			$partnerId = $this->entry->getPartnerId();
+			$optimizedPlayback = kConf::get("optimized_playback");
+			if (isset($optimizedPlayback[$partnerId]))
+			{
+				$params = $optimizedPlayback[$partnerId];
+				if (isset($params['cache_playmanifest']) && $params['cache_playmanifest'])
+					requestUtils::sendCachingHeaders(60);
+			}
+		}
 		
 		echo $xml;
 		die;
