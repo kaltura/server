@@ -37,7 +37,7 @@ class thumbnailTest extends KalturaApiTestCase
 		$results = $this->client->thumbAsset->listAction($filter, null);
 		
 		$assetUrl = $this->client->thumbAsset->getUrl($results->objects[0]->id, null);
-		$filePath = dirname(__FILE__) . 'data/new_thumb_asset.jpg';
+		$filePath = dirname(__FILE__) . '\testsData\new_thumb_asset.jpg';
 		self::saveApiFileFromUrl($assetUrl, $filePath);
 		
 		
@@ -52,7 +52,7 @@ class thumbnailTest extends KalturaApiTestCase
 		@unlink("resultLog.txt");	// delete tmp log file that was used to retrieve compare return value
 		
 		if ($retValue != 0)
-			$this->fail('Files are not equal [' . $filePath . '] [' . $result . ']' . Compare return value was' . $retValue);
+			$this->fail('Files are not equal [' . $filePath . '] [' . $result . ']' . 'Compare return value was' . $retValue);
 		
 		
 	}

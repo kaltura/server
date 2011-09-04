@@ -5,6 +5,5 @@
 		<Input type='string' key='@DEFAULT_THUMBNAIL_ENTRY_ID@'/>
 		<OutputReference type='string' key="testsData/thumb_source.jpg"/>
 	</TestCaseData>
-	</TestCaseData>
   </TestProcedureData>
 </TestCaseData>
