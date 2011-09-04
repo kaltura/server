@@ -631,6 +631,31 @@ class kContentDistributionManager
 	 */
 	public static function assignFlavorAssets(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile)
 	{
+		$submittingStatuses = array(
+			EntryDistributionStatus::PENDING,
+			EntryDistributionStatus::QUEUED,
+			EntryDistributionStatus::SUBMITTING,
+			EntryDistributionStatus::IMPORT_SUBMITTING,
+			EntryDistributionStatus::ERROR_SUBMITTING,
+		);
+		
+		// if not in first submmiting status then it's an update and need to check if update is supported. 
+		if(!in_array($entryDistribution->getStatus(), $submittingStatuses))
+		{
+			$distributionProvider = $distributionProfile->getProvider();
+			if(!$distributionProvider)
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
+				return false;
+			}
+						
+			if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+				return false;
+			}
+		}	
+		
 		$requiredFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
 		$optionalFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
 		$flavorParamsIds = array_merge($requiredFlavorParamsIds, $optionalFlavorParamsIds);
@@ -666,6 +691,31 @@ class kContentDistributionManager
 	 */
 	public static function assignThumbAssets(EntryDistribution $entryDistribution, entry $entry, DistributionProfile $distributionProfile)
 	{
+		$submittingStatuses = array(
+			EntryDistributionStatus::PENDING,
+			EntryDistributionStatus::QUEUED,
+			EntryDistributionStatus::SUBMITTING,
+			EntryDistributionStatus::IMPORT_SUBMITTING,
+			EntryDistributionStatus::ERROR_SUBMITTING,
+		);
+		
+		// if not in first submmiting status then it's an update and need to check if update is supported. 
+		if(!in_array($entryDistribution->getStatus(), $submittingStatuses))
+		{
+			$distributionProvider = $distributionProfile->getProvider();
+			if(!$distributionProvider)
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider not found");
+				return false;
+			}
+						
+			if(!$distributionProvider->isUpdateEnabled() || !$distributionProvider->isMediaUpdateEnabled())
+			{
+				KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
+				return false;
+			}
+		}	
+		
 		$thumbAssetsIds = array();
 		$thumbDimensions = $distributionProfile->getThumbDimensionsObjects();
 		$thumbDimensionsWithKeys = array();
