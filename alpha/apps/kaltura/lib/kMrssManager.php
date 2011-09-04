@@ -308,8 +308,7 @@ class kMrssManager
 		$mrss->addChild('userId', $entry->getPuserId(true));
 		$mrss->addChild('name', self::stringToSafeXml($entry->getName()));
 		$mrss->addChild('status', self::stringToSafeXml($entry->getStatus()));
-		if($entry->getDescription())
-			$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
+		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
 		$thumbnailUrl = $mrss->addChild('thumbnailUrl');
 		$thumbnailUrl->addAttribute('url', $entry->getThumbnailUrl());
 		if(trim($entry->getTags(), " \r\n\t"))
