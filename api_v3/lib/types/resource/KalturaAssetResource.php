@@ -17,6 +17,23 @@ class KalturaAssetResource extends KalturaContentResource
 	{
 		parent::validateEntry($dbEntry);
     	$this->validatePropertyNotNull('assetId');
+    	
+    	$srcFlavorAsset = assetPeer::retrieveById($this->assetId);
+    	if (!$srcFlavorAsset)
+    		throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $resource->assetId);
+    	
+    	$key = $srcFlavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+    	$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
+    	$c->addAnd(FileSyncPeer::FILE_TYPE, array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_LINK), Criteria::IN);
+    	
+    	$fileSyncs = FileSyncPeer::doSelect($c);
+    	foreach($fileSyncs as $fileSync)
+    	{
+    		$fileSync = kFileSyncUtils::resolve($fileSync);
+    		if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE)
+    			return;
+    	}
+    	throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
