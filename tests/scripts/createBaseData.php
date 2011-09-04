@@ -618,4 +618,20 @@ endscript
 		}
 	}
 	
+	protected static function addThumbnailAssetData() {
+		$entry = new KalturaMediaEntry();
+		$entry->name ="Entry For flavor asset test";
+		$entry->type = KalturaEntryType::MEDIA_CLIP;
+		$entry->mediaType = KalturaMediaType::VIDEO;
+		$defaultEntry = $client->media->add($entry, KalturaEntryType::MEDIA_CLIP);
+		
+		$contentResource = new KalturaUrlResource();
+		$contentResource->url = "http://sites.google.com/site/demokmc/Home/titanicin5seconds.flv";
+		$client->media->addContent($defaultEntry->id, $contentResource);
+			
+		KalturaGlobalData::setData("@DEFAULT_THUMBNAIL_ENTRY_ID@", $defaultEntry->id);
+	}
+	
+	
+	
 }
