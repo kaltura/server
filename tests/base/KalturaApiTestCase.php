@@ -203,7 +203,27 @@ class KalturaApiTestCase extends KalturaTestCaseBase implements IKalturaLogger
 		curl_setopt($ch, CURLOPT_NOBODY, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		return curl_exec($ch);
-	} 
+	}
+
+	/**
+	 * 
+	 * save file output from a given url.
+	 * used for api actions that return file.
+	 * @param string $url url from which the answer is given.
+	 * @param string $filePath file path to save to
+	 */
+	protected function saveApiFileFromUrl($url, $filePath)
+	{
+		$ch = curl_init($url);
+		$fp = fopen($filePath, 'wb');
+
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+
+		curl_exec($ch);
+		curl_close($ch);
+		fclose($fp);
+	}
 
 	/**
 	 * 
