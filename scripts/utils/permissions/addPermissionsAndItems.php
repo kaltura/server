@@ -70,10 +70,10 @@ function addPermission($permissionCfg)
 	{
 		$countLimitEachLoop = 100;
 		$offset = $countLimitEachLoop;
-		
+			
 		$c = new Criteria();
 		$c->add(PartnerPeer::ID, 0, Criteria::GREATER_THAN);
-		$c->add(PartnerPeer::PARTNER_PACKAGE, $permissionCfg->partnerPackages, Criteria::IN);
+		$c->add(PartnerPeer::PARTNER_PACKAGE, explode(',',$permissionCfg->partnerPackages), Criteria::IN);
 		$c->setLimit($countLimitEachLoop);
 		
 		$partners = PartnerPeer::doSelect($c);
