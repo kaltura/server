@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<TestCaseData testCaseName="thumbnailTest">
+  <TestProcedureData testProcedureName="testCreateEntryForThumbAsset">
+    <TestCaseData testCaseInstanceName="testCreateEntryForThumbAsset with data set #0">
+		<Input type='string' key='@DEFAULT_THUMBNAIL_ENTRY_ID@'/>
+		<OutputReference type='string' key="testsData/thumb_source.jpg"/>
+	</TestCaseData>
+	</TestCaseData>
+  </TestProcedureData>
+</TestCaseData>
