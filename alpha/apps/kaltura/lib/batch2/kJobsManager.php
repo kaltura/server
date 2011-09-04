@@ -421,7 +421,7 @@ class kJobsManager
 		}
 		else
 		{
-			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $flavor->getSourceRemoteStorageProfileId());
+			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($srcSyncKey, $flavor->getSourceRemoteStorageProfileId());
 			
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
 				$localPath = $fileSync->getFilePath();
