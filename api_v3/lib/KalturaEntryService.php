@@ -1119,7 +1119,16 @@ class KalturaEntryService extends KalturaBaseService
 		$this->checkAndSetValidUserUpdate($entry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($entry);
 		$this->validateAccessControlId($entry);
-		$this->validateEntryScheduleDates($entry);
+		
+		if(!is_null($entry->startDate) || !is_null($entry->endDate))
+		{
+			if(is_null($entry->startDate))
+				$entry->startDate = $dbEntry->getStartDate(null);
+			if(is_null($entry->endDate))
+				$entry->endDate = $dbEntry->getEndDate(null);
+			
+			$this->validateEntryScheduleDates($entry);
+		}
 		
 		$dbEntry = $entry->toUpdatableObject($dbEntry);
 		
