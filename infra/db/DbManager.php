@@ -45,7 +45,16 @@ class DbManager
 		
 		Propel::setConfiguration(self::$config);
 		Propel::setLogger(KalturaLog::getInstance());
-		Propel::initialize();
+		
+		try
+		{
+			Propel::initialize();
+		}
+		catch(PropelException $pex)
+		{
+			KalturaLog::alert($pex->getMessage());
+			throw new PropelException("Database error");
+		}
 	}
 	
 	public static function shutdown()
@@ -59,7 +68,16 @@ class DbManager
 	public static function createSphinxConnection($sphinxServer, $port = 9312)
 	{
 		$dsn = "mysql:host=$sphinxServer;port=$port;";
-		return new KalturaPDO($dsn);
+		
+		try
+		{
+			return new KalturaPDO($dsn);
+		}
+		catch(PropelException $pex)
+		{
+			KalturaLog::alert($pex->getMessage());
+			throw new PropelException("Database error");
+		}
 	}
 
 	/**
@@ -106,6 +124,11 @@ class DbManager
 
 					KalturaLog::debug("getSphinxConnection: connected to $key");
 					return self::$sphinxConnection;
+				}
+				catch(PropelException $pex)
+				{
+					KalturaLog::alert($pex->getMessage());
+					throw new PropelException("Database error");
 				}
 				catch(Exception $ex)
 				{

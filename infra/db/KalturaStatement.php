@@ -57,7 +57,15 @@ class KalturaStatement extends PDOStatement
 		}
 		else
 		{
-			parent::execute($input_parameters);
+			try
+			{
+				parent::execute($input_parameters);
+			}
+			catch(PropelException $pex)
+			{
+				KalturaLog::alert($pex->getMessage());
+				throw new PropelException("Database error");
+			}
 			KalturaLog::debug("Sql took - " . (microtime(true) - $sqlStart) . " seconds");
 		}
 	}

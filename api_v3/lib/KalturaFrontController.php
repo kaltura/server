@@ -352,6 +352,11 @@ class KalturaFrontController
 					$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 			}
 		}
+		else if ($ex instanceof PropelException)
+		{
+		    KalturaLog::alert($ex);
+			$object = new KalturaAPIException(KalturaErrors::INTERNAL_DATABASE_ERROR);
+		}
 		else
 		{ 
 		    KalturaLog::crit($ex);

@@ -14,7 +14,16 @@ class KalturaPDO extends PropelPDO
 	public function exec($sql)
 	{
 		KalturaLog::debug($sql);
-		return parent::exec($sql);
+		
+		try
+		{
+			return parent::exec($sql);
+		}
+		catch(PropelException $pex)
+		{
+			KalturaLog::alert($pex->getMessage());
+			throw new PropelException("Database error");
+		}
 	}
 
 	/**
@@ -23,14 +32,22 @@ class KalturaPDO extends PropelPDO
 	 */
 	public function query()
 	{
-		$args	= func_get_args();
+		$args = func_get_args();
 		
 		$sql = $args[0];
 		KalturaLog::debug($sql);
 		
-		if (version_compare(PHP_VERSION, '5.3', '<'))
-			return call_user_func_array(array($this, 'parent::query'), $args);
-		
-		return call_user_func_array('parent::query', $args);
+		try
+		{
+			if (version_compare(PHP_VERSION, '5.3', '<'))
+				return call_user_func_array(array($this, 'parent::query'), $args);
+			
+			return call_user_func_array('parent::query', $args);
+		}
+		catch(PropelException $pex)
+		{
+			KalturaLog::alert($pex->getMessage());
+			throw new PropelException("Database error");
+		}
 	}
 }

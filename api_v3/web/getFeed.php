@@ -29,8 +29,15 @@ try
 		
 	$syndicationFeedRenderer->execute($limit);
 }
+catch(PropelException $pex)
+{
+	KalturaLog::alert($pex->getMessage());
+	header('KalturaSyndication: Database error');
+	die;
+}
 catch(Exception $ex)
 {
+	KalturaLog::err($pex->getMessage());
 	header('KalturaSyndication: '.$ex->getMessage());
 	die;
 }

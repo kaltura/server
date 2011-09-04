@@ -8,6 +8,8 @@ class APIErrors
 	//  %s - some text to display in the message
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVER_ERROR,Internal server error %s";
 	
+	const INTERNAL_DATABASE_ERROR = "INTERNAL_DATABASE_ERROR,Internal database error";
+	
 	const SERVERL_ERROR = "SERVERL_ERROR,Server error %s";
 	
 	const MISSING_KS ="MISSING_KS,Missing KS. Session not established";

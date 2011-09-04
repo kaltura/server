@@ -358,11 +358,15 @@ $this->benchmarkEnd( "signature" );
 //				$this->addError ( $api_ex->api_code ,$api_ex->extra_data );
 			}
 		}
+		catch ( PropelException $pex )
+		{
+			KalturaLog::alert($pex->getMessage());
+			$this->addError(APIErrors::INTERNAL_DATABASE_ERROR);
+		}
 		catch ( Exception $ex )
 		{
-			// TODO -  in this case there is no reason to display the message - its internal - remove the message
-			$this->addError ( APIErrors::INTERNAL_SERVERL_ERROR , $ex->getMessage());
-			$this->logMessage("Error: " . $ex->getMessage() );
+			$this->addError(APIErrors::INTERNAL_SERVERL_ERROR, $ex->getMessage());
+			KalturaLog::err($ex->getMessage());
 		}
 
 		$execute_impl_end_time = microtime(true);
