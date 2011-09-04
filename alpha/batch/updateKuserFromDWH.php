@@ -33,7 +33,7 @@ $sql = "CALL get_data_for_operational('$syncType')";
 $count = 0;
 $rows = $dbh->query ( $sql )->fetchAll ();
 foreach ( $rows as $row ) {
-	$kuser = KuserPeer::retrieveByPK ( $row ['kuser_id'] );
+	$kuser = kuserPeer::retrieveByPK ( $row ['kuser_id'] );
 	if (is_null ( $kuser )) {
 		KalturaLog::err ( 'Couldn\'t find kuser [' . $row ['kuser_id'] . ']' );
 		continue;
