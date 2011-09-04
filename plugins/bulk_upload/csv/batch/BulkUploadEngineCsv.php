@@ -70,7 +70,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			}
 			
 			$this->lineNumber ++;
-			if($this->lineNumber < $startLineNumber)
+			if($this->lineNumber <= $startLineNumber)
 			{
 				$values = fgetcsv($fileHandle);
 				continue;
