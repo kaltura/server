@@ -66,6 +66,9 @@ class KExternalErrors
 		
 		header("X-Kaltura:error-$errorCode");
 		header("X-Kaltura-App: exiting on error $errorCode - $description");
+		
+		requestUtils::sendCachingHeaders(60);
+		
 		die();
 	}
 }	
