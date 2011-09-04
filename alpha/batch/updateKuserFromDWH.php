@@ -1,15 +1,31 @@
 <?php
 error_reporting ( E_ALL );
+set_time_limit(0);
 
-define ( 'SF_ROOT_DIR', realpath ( dirname ( __FILE__ ) . '/../../alpha/' ) );
-define ( 'SF_APP', 'kaltura' );
-define ( 'SF_DEBUG', true );
+ini_set("memory_limit","700M");
 
+define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
+require_once(ROOT_DIR . '/alpha/config/kConf.php');
+require_once(ROOT_DIR . '/infra/bootstrap_base.php');
+require_once(ROOT_DIR . '/infra/KAutoloader.php');
 require_once (SF_ROOT_DIR . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR . SF_APP . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php');
-require_once (SF_ROOT_DIR . '/../infra/bootstrap_base.php');
 
-DbManager::setConfig ( kConf::getDB () );
-DbManager::initialize ();
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
+KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/classMap.cache');
+KAutoloader::register();
+
+date_default_timezone_set(kConf::get("date_default_timezone"));
+
+$loggerConfigPath = ROOT_DIR.'/scripts/logger.ini';
+$config = new Zend_Config_Ini($loggerConfigPath);
+KalturaLog::initLog($config);
+KalturaLog::setContext(basename(__FILE__));
+KalturaLog::info("Starting script");
+
+KalturaLog::info("Initializing database...");
+DbManager::setConfig(kConf::getDB());
+DbManager::initialize();
+KalturaLog::info("Database initialized successfully");
 
 $syncType = 'kuser';
 $dbh = myDbHelper::getConnection ( myDbHelper::DB_HELPER_CONN_DWH );

@@ -8,6 +8,7 @@ define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../'));
 require_once(ROOT_DIR . '/alpha/config/kConf.php');
 require_once(ROOT_DIR . '/infra/bootstrap_base.php');
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
+require_once (SF_ROOT_DIR . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR . SF_APP . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php');
 
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
 KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/scripts/classMap.cache');
@@ -28,7 +29,7 @@ KalturaLog::info("Database initialized successfully");
 
 $syncType = 'entry';
 $dbh = myDbHelper::getConnection ( myDbHelper::DB_HELPER_CONN_DWH );
-$sql = "CALL get_data_for_operational($syncType)";
+$sql = "CALL get_data_for_operational('$syncType')";
 $count = 0;
 $rows = $dbh->query ( $sql )->fetchAll ();
 foreach ( $rows as $row ) {
@@ -39,15 +40,12 @@ foreach ( $rows as $row ) {
 	}
 	$entry->setViews ( $row ['views'] );
 	$entry->setPlays ( $row ['plays'] );
-	if ($entry->save ()) {
-		$count ++;
-		KalturaLog::debug ( 'Successfully saved entry [' . $row ['entry_id'] . ']' );
-	} else {
-		KalturaLog::err ( 'Error while saving entry [' . $row ['entry_id'] . ']' );
-	}
+	$entry->save ();
+	$count ++;
+	KalturaLog::debug ( 'Successfully saved entry [' . $row ['entry_id'] . ']' );
 	if ($count % 500)
 		entryPeer::clearInstancePool ();
 }
-$sql = "CALL mark_operational_sync_as_done($syncType)";
+$sql = "CALL mark_operational_sync_as_done('$syncType')";
 $dbh->query ( $sql );
-KalturaLog::debug ( "Done updating entries from DWH to operational DB" );
+KalturaLog::debug ( "Done updating $count entries from DWH to operational DB" );
