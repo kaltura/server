@@ -237,6 +237,17 @@ class kMrssManager
 		$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
 		$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
 		$content->addAttribute('extension', $flavorAsset->getFileExt());
+
+		$mediaParams = array(
+			'format' => $flavorAsset->getContainerFormat(),
+			'videoBitrate' => $flavorAsset->getBitrate(),
+			'videoCodec' => $flavorAsset->getVideoCodecId(),
+			'audioBitrate' => 0,
+			'audioCodec' => '',
+			'frameRate' => $flavorAsset->getFrameRate(),
+			'height' => $flavorAsset->getHeight(),
+			'width' => $flavorAsset->getWidth(),
+		);
 		
 		if(!is_null($flavorAsset->getFlavorParamsId()))
 		{
@@ -245,15 +256,27 @@ class kMrssManager
 			if($flavorParams)
 			{
 				$content->addAttribute('flavorParamsName', $flavorParams->getName());
-				$content->addAttribute('format', $flavorParams->getFormat());
-				$content->addAttribute('videoBitrate', $flavorParams->getVideoBitrate());
-				$content->addAttribute('videoCodec', $flavorParams->getVideoCodec());
-				$content->addAttribute('audioBitrate', $flavorParams->getAudioBitrate());
-				$content->addAttribute('audioCodec', $flavorParams->getAudioCodec());
-				$content->addAttribute('frameRate', $flavorParams->getFrameRate());
-				$content->addAttribute('height', $flavorParams->getHeight());
-				$content->addAttribute('width', $flavorParams->getWidth());
+
+				$flavorParamsDetails = array(
+					'format' => 		$flavorParams->getFormat(),
+					'videoBitrate' => 	$flavorParams->getVideoBitrate(),
+					'videoCodec' => 	$flavorParams->getVideoCodec(),
+					'audioBitrate' => 	$flavorParams->getAudioBitrate(),
+					'audioCodec' => 	$flavorParams->getAudioCodec(),
+					'frameRate' => 		$flavorParams->getFrameRate(),
+					'height' => 		$flavorParams->getHeight(),
+					'width' => 			$flavorParams->getWidth(),
+				);
+
+				// merge the flavar param details with the flavor asset details
+				// the flavor asset details take precedence whenever they exist 
+				$mediaParams = array_merge($flavorParamsDetails, array_filter($mediaParams));
 			}
+		}
+		
+		foreach ($mediaParams as $key => $value)
+		{
+			$content->addAttribute($key, $value);
 		}
 			
 		$tags = $content->addChild('tags');
