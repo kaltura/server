@@ -301,7 +301,7 @@ class KalturaTestDeploymentHelper
 		self::addDWHdata($client); 
 		self::addBrightCoveConversionProfileData($client);
 		self::addBrightCoveBulkUploadXml($client);
-		
+		self::addThumbnailAssetData($client);
 	}
 	
 	/**
@@ -618,7 +618,7 @@ endscript
 		}
 	}
 	
-	protected static function addThumbnailAssetData() {
+	protected static function addThumbnailAssetData(KalturaClient $client) {
 		$entry = new KalturaMediaEntry();
 		$entry->name ="Entry For flavor asset test";
 		$entry->type = KalturaEntryType::MEDIA_CLIP;
