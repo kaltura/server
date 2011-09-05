@@ -8,14 +8,7 @@ class SphinxCriterion extends KalturaCriterion
 	 * @var bool
 	 */
 	protected $hasOr = false;
-	
-	/**
-	 * 
-	 * local whereClause
-	 * @var array
-	 */
-	protected $whereClause = array();
-	
+		
 	/**
 	 * 
 	 * local conditionClause
@@ -46,7 +39,7 @@ class SphinxCriterion extends KalturaCriterion
 					return false;
 				}
 				
-				if(!$clause->apply($this->whereClause, $matchClause, $this->conditionClause, $depth + 1))
+				if(!$clause->apply($whereClause, $matchClause, $this->conditionClause, $depth + 1))
 				{
 					KalturaLog::debug("Failed to apply clause [" . $clause->getColumn() . "]");
 					return false;
@@ -185,7 +178,7 @@ class SphinxCriterion extends KalturaCriterion
 				if ($depth == 0)
 				{
 					$values = implode(',', $value);
-					$this->whereClause[] = "$sphinxField in($values)";
+					$whereClause[] = "$sphinxField in($values)";
 				}
 				else 
 				{
