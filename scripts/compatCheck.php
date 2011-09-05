@@ -137,6 +137,8 @@ function beginsWith($str, $end)
 function processRequest($parsedParams)
 {
 	global $testedActions, $testedRequests;
+	global $serviceUrlOld, $serviceUrlNew, $maxTestsPerActionType;
+
 	
 	if (!array_key_exists('service', $parsedParams))
 	{
@@ -234,6 +236,11 @@ if ($argc < 4)
 $serviceUrlOld = $argv[1];
 $serviceUrlNew = $argv[2];
 $apiV3LogPath = $argv[3];
+
+if (!beginsWith(strtolower($serviceUrlOld), 'http://'))
+	$serviceUrlOld = 'http://' . $serviceUrlOld;
+if (!beginsWith(strtolower($serviceUrlNew), 'http://'))
+	$serviceUrlNew = 'http://' . $serviceUrlNew;
 
 $startPosition = 0;
 $endPosition = 0;
