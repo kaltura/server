@@ -378,11 +378,17 @@ class kJobsManager
 		$localPath = null;
 		$remoteUrl = null;
 		
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		if(!$flavorAsset)
+		{
+			KalturaLog::err("No flavor asset found for id [$flavorAssetId]");
+			return null;
+		}
+		
 		if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 			
-			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 			$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 			
 			if(!$fileSync)
