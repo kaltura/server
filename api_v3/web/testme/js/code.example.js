@@ -1000,6 +1000,93 @@ KCodeExampleCsharp.prototype.codeHeader = function (){
 	this.jqEntity.append(jqPackage);
 };
 
+
+function KCodeExamplePython(entity){
+	this.init(entity, 'python');
+}
+
+KCodeExamplePython.prototype = new KCodeExampleBase();
+
+KCodeExamplePython.prototype.init = function(entity, codeLanguage){
+	KCodeExampleBase.prototype.init.apply(this, arguments);
+};
+
+KCodeExamplePython.prototype.getKsMethod = function (){
+	return "setKs";
+};
+
+KCodeExamplePython.prototype.codeDeclareVar = function (jqObjectDef, type, newValue){
+	switch(type){
+		case "int":
+			return this.codeAssign(jqObjectDef, newValue ? newValue : "0");
+
+		case "bool":
+			return this.codeAssign(jqObjectDef, newValue ? newValue : "false");
+			
+		default:
+			return this.codeAssign(jqObjectDef, newValue);
+	}
+};
+
+KCodeExamplePython.prototype.codeHeader = function (){
+
+	this.importsArray = {};	
+	this.jqImports = jQuery("<div class=\"code-python-imports\"/>");
+	this.jqActionImports = jQuery("<div class=\"code-python-action-imports\"/>");
+	this.jqEntity.append(this.jqImports);
+	this.jqEntity.append(this.jqActionImports);
+
+	this.jqAction = jQuery("<div class=\"code-action\"/>");
+	
+	var jqBody = jQuery("<div/>");
+	var jqConfigObject = this.codeVar("config");
+	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
+	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(true), this.codeNewInstance("KalturaConfiguration"));
+	this.addCode(jqConfigObjectInit, jqBody);
+
+	var jqSetPartnerId = this.codeUserFunction("setPartnerId", [this.codeVar("partnerId")]);
+	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetPartnerId), jqBody);
+
+	var jqSetEndpoint = this.codeUserFunction("setEndpoint", [this.codeString("http://" + location.hostname + "/")]);
+	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetEndpoint), jqBody);
+
+	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(true), "KalturaClient");
+	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)]));
+	this.addCode(jqClientInit, jqBody);
+	
+	jqBody.append(this.jqAction);
+
+	var jqExceptionObject = this.codeVar("e");
+	var jqExceptionObjectDeclare = this.codeVarDefine(jqExceptionObject.clone(true), "KalturaApiException");
+	var jqTraceFunction = this.codeUserFunction("printStackTrace");
+	var jqTrace = this.codeObjectMethod(jqExceptionObject.clone(true), jqTraceFunction);
+	
+	var jqTry = jQuery("<div/>");
+	jqTry.addClass("indent");
+	jqTry.append(jqBody);
+	
+	var jqCatch = jQuery("<div/>");
+	jqCatch.addClass("indent");
+	this.addCode(jqTrace, jqCatch);
+	
+	var jqTryCatch = this.codeTryCatch(jqTry, jqExceptionObjectDeclare.clone(true), jqCatch);
+	jqTryCatch.addClass("indent");
+	
+	var jqArgsDeclare = this.codeVarDefine("args", "String[]");
+	var jqMain = this.codeFunctionDeclare("main", jqTryCatch, ["public", "static"], [jqArgsDeclare], this.getVoid());
+	jqMain.addClass("indent");
+	
+	var jqClass = this.codeClassDeclare("CodeExample", jqMain);
+		
+	this.jqEntity.append(jqClass);
+};
+
+
+
+
+
+
+
 function switchToCodeGenerator(type, generator){
 	kTestMe.initCodeExample(generator);
 	jQuery(".code-menu").removeClass("active");
@@ -1017,6 +1104,12 @@ function switchToJava(){
 function switchToCSharp(){
 	switchToCodeGenerator('csharp', new KCodeExampleCsharp(jQuery("#example")));
 }
+
+function switchToPython(){
+	switchToCodeGenerator('python', new KCodeExamplePython(jQuery("#example")));
+}
+
+
 
 function toggleCode(){
 	$('#codeExample').toggle();

@@ -55,3 +55,16 @@
 .code-csharp-system {color: #800000; font-weight: bolder;}
 .code-csharp-over {background-color: #DDDDDD; color: #000000;}
 
+
+.code-python-package {}
+.code-python-bracket {color: #000000; font-weight: normal;}
+.code-python-bracket-over {font-weight: bolder;}
+.code-python-var {color: #000000; font-weight: normal;}
+.code-python-assign {}
+.code-python-new-instance {}
+.code-python-class-name {color: #000000; font-weight: normal;}
+.code-python-call-func {}
+.code-python-func-name {} 
+.code-python-str {color: #0000FF;}
+.code-python-system {color: #800000; font-weight: bolder;}
+.code-python-over {background-color: #DDDDDD; color: #000000;}
