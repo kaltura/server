@@ -23,7 +23,7 @@ class SphinxCriterion extends KalturaCriterion
 	 */
 	protected $conditionClause = array();
 	
-	public function apply(array &$whereClause, array &$matchClause, array &$conditionClause)
+	public function apply(array &$whereClause, array &$matchClause, array &$conditionClause, $depth = 0)
 	{
 		$field = $this->getTable() . '.' . $this->getColumn();
 		
@@ -46,7 +46,7 @@ class SphinxCriterion extends KalturaCriterion
 					return false;
 				}
 				
-				if(!$clause->apply($this->whereClause, $matchClause, $this->conditionClause))
+				if(!$clause->apply($this->whereClause, $matchClause, $this->conditionClause, $depth + 1))
 				{
 					KalturaLog::debug("Failed to apply clause [" . $clause->getColumn() . "]");
 					return false;
@@ -182,11 +182,19 @@ class SphinxCriterion extends KalturaCriterion
 
 				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 				
-				$inConditions = array();
-				foreach($value as $val)
-					 $inConditions[] = "$sphinxField = $val";
-
-				$this->conditionClause[] = implode(' OR ', $inConditions);
+				if ($depth == 0)
+				{
+					$values = implode(',', $value);
+					$this->whereClause[] = "$sphinxField in($values)";
+				}
+				else 
+				{
+					$inConditions = array();
+					foreach($value as $val)
+						 $inConditions[] = "$sphinxField = $val";
+	
+					$this->conditionClause[] = implode(' OR ', $inConditions);
+				}
 				break;
 				
 			case Criteria::NOT_IN:
