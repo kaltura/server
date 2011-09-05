@@ -103,6 +103,49 @@ class WidgetController extends Zend_Controller_Action
 		$this->view->form = $form;
 	}
 	
+	public function externalEditAction()
+	{
+		$request = $this->getRequest();
+		$id = $request->getParam('id');
+		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')));
+		
+		
+		$form = new Form_Widget();
+		$form->setObjTypes($this->getSupportedUiConfTypes());
+		$form->setAction($action);
+		
+		$client = Infra_ClientHelper::getClient();
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+		
+		$uiConf = $adminConsolePlugin->uiConfAdmin->get($id);
+
+		if ($request->isPost())
+		{
+			$form->loadVersions($request->getParam('obj_type'));
+			if ($form->isValid($request->getParams()))
+			{
+				$uiConfUpdate = $form->getObject('Kaltura_Client_AdminConsole_Type_UiConfAdmin', $request->getPost());
+				$uiConf = $adminConsolePlugin->uiConfAdmin->update($id, $uiConfUpdate);
+				$form->populateFromObject($uiConf);
+				$form->setAttrib('class', 'valid');
+			}
+			else
+			{
+				$form->populate($request->getParams());
+			}
+		}
+		else
+		{
+			$form->loadVersions($uiConf->objType);
+			$form->populateFromObject($uiConf);
+		}
+		$form->setEditorButtons();
+		$form->addElement('submit', 'Submit', array('label' => 'Submit'));
+		
+		$this->view->typesInfo = $client->uiConf->getAvailableTypes();
+		$this->view->form = $form;
+	}
+	
 	public function deleteAction() 
 	{
 		$this->_helper->viewRenderer->setNoRender();
