@@ -85,7 +85,7 @@ KTestMe.prototype = {
 		this.jqActions.empty();
 		this.jqActions.attr("disabled", false);
 		jQuery.each(data, delegate(this, function (i, item) {
-			this.jqActions.append("<option value=\"" + item[0] + "\">" + item[1] + "</option>");
+			this.jqActions.append("<option value=\"" + item.action + "\" title=\"" + item.name + "\">" + item.label + "</option>");
 		}));
 		
 		if (!this.historyItem)
@@ -112,7 +112,11 @@ KTestMe.prototype = {
 	
 	onGetActionInfoSuccess: function(data) {
 		this.actionInfo = data;
-		jQuery("#actionHelp").attr("title", this.jqServices.val() + "." + this.jqActions.val() + " - " + data.description);
+
+		var service = this.jqServices.find("option:selected").attr("title");
+		var action = this.jqActions.find("option:selected").attr("title");
+		
+		jQuery("#actionHelp").attr("title", service + "." + action + " - " + data.description);
 		this.jqObjectsContainer.empty();
 		jQuery.each(data.actionParams, delegate(this, function (i, param) {
 			if (param.isComplexType)
@@ -145,8 +149,8 @@ KTestMe.prototype = {
 		}
 
 		if(this.codeGenerator){
-			var service = this.jqServices.find("option:selected").text();
-			var action = this.jqActions.find("option:selected").text();
+			var service = this.jqServices.find("option:selected").attr("title");
+			var action = this.jqActions.find("option:selected").attr("title");
 			
 			this.codeGenerator.setAction(service, action, data.actionParams);
 		}
@@ -595,8 +599,8 @@ KTestMe.prototype = {
 		if(!this.actionInfo)
 			return;
 
-		var service = this.jqServices.find("option:selected").text();
-		var action = this.jqActions.find("option:selected").text();
+		var service = this.jqServices.find("option:selected").attr("title");
+		var action = this.jqActions.find("option:selected").attr("title");
 		
 		this.codeGenerator.setAction(service, action, this.actionInfo.actionParams);
 	}

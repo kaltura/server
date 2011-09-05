@@ -108,7 +108,7 @@
 			<div class="param"><label for="service">Select service:</label> <select
 	name="service">
 					<?php foreach($services as $serviceReflector): ?>
-					<option value="<?php echo $serviceReflector->getServiceId();?>">
+					<option value="<?php echo $serviceReflector->getServiceId();?>" title="<?php echo $serviceReflector->getServiceName(); ?>">
 						<?php echo $serviceReflector->getServiceName();
 							if ($serviceReflector->isDeprecated())
 								echo ' (deprecated)'; ?>

@@ -71,7 +71,7 @@ KCodeExampleBase.prototype.getActionMethod = function (action){
 };
 
 KCodeExampleBase.prototype.getService = function (service){
-	return this.codeObjectAttribute(this.jqClientObject.clone(), service);
+	return this.codeObjectAttribute(this.jqClientObject.clone(true), service);
 };
 
 KCodeExampleBase.prototype.onParamsChange = function (){
@@ -93,10 +93,10 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 			var value = jqField.val();
 			if(scope.getKsMethod()){
 				var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
-				scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(), jqSetKs), scope.jqParams);
+				scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(true), jqSetKs), scope.jqParams);
 			}
 			else if(scope.getKsVar()){
-				scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
+				scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(true), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
 			}
 			return;
 		}
@@ -131,10 +131,10 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 
 				if(jqObject){
 					if(isNaN(attribute)){
-						jqObject = scope.codeObjectAttribute(jqObject.clone(), attribute);
+						jqObject = scope.codeObjectAttribute(jqObject.clone(true), attribute);
 					}
 					else{
-						jqObject = scope.codeArrayItem(jqObject.clone(), attribute);
+						jqObject = scope.codeArrayItem(jqObject.clone(true), attribute);
 					}
 				}
 				else{
@@ -160,10 +160,16 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 					}
 
 					if(objectName != attribute){
+						jqOriginalObject = jqObject;
 						jqObject = scope.codeVar(objectTempName);
-						var jqTempParamDef = scope.codeVarDefine(jqObject.clone(), objectType);
-						var jqTempParamDeclare = scope.codeDeclareVar(jqTempParamDef.clone(), objectType, jqNewInstance);
+						var jqTempParamDef = scope.codeVarDefine(jqObject.clone(true), objectType);
+						var jqTempParamDeclare = scope.codeDeclareVar(jqTempParamDef.clone(true), objectType, jqNewInstance);
 						scope.addCode(jqTempParamDeclare, scope.jqParams);
+
+						if(nameParts.length == 3){
+							var jqAssign = scope.codeAssign(jqOriginalObject, jqObject.clone(true));
+							scope.addCode(jqAssign, scope.jqParams);
+						}
 					}
 					else{
 						var jqAssign = scope.codeAssign(jqObject, jqNewInstance);
@@ -226,23 +232,23 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 				objectTempName += attribute.charAt(0).toUpperCase() + attribute.substr(1);
 
 //				if(isNaN(attribute)){
-//					jqObject = scope.codeObjectAttribute(jqObject.clone(), attribute);
+//					jqObject = scope.codeObjectAttribute(jqObject.clone(true), attribute);
 //				}
 //				else{
-//					jqObject = scope.codeArrayItem(jqObject.clone(), attribute);
+//					jqObject = scope.codeArrayItem(jqObject.clone(true), attribute);
 //				}
 			}
 			var jqTempObject = scope.codeVar(objectTempName + lastAttribute.charAt(0).toUpperCase() + lastAttribute.substr(1));
 			var jqObject = scope.codeVar(objectTempName);
 
 			if(isNaN(lastAttribute)){
-				jqObject = scope.codeObjectAttribute(jqObject.clone(), lastAttribute);
-				var jqAssign = scope.codeAssign(jqObject.clone(), jqTempObject.clone());
+				jqObject = scope.codeObjectAttribute(jqObject.clone(true), lastAttribute);
+				var jqAssign = scope.codeAssign(jqObject.clone(true), jqTempObject.clone(true));
 				objectsAssignes.push(jqAssign);
 			}
 			else{
 				var jqFunction = scope.codeUserFunction("add", [lastAttribute, jqTempObject]);
-				var jqMethod = scope.codeObjectMethod(jqObject.clone(), jqFunction);
+				var jqMethod = scope.codeObjectMethod(jqObject.clone(true), jqFunction);
 				objectsAssignes.push(jqMethod);
 			}
 		}
@@ -289,7 +295,7 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 			}
 			
 			var jqParam = this.codeVar(params[i].name);
-			var jqParamDef = this.codeVarDefine(jqParam.clone(), paramType);
+			var jqParamDef = this.codeVarDefine(jqParam.clone(true), paramType);
 			var jqParamDeclare = this.codeDeclareVar(jqParamDef, paramType);
 			this.addCode(jqParamDeclare, jqInitParams);
 			jqActionArgs.push(jqParam);
@@ -360,8 +366,23 @@ KCodeExampleBase.prototype.codeVarDefine = function (jqObject, type){
 	return jqCode;
 };
 
-KCodeExampleBase.prototype.codeVar = function (name){
-	return jQuery("<span class=\"code-" + this.lang + "-var code-var-" + name + "\">" + name + "</span>");
+KCodeExampleBase.prototype.codeVar = function (name, varName){
+	if(!varName)
+		varName = name;
+	
+	var jqVar = jQuery("<span class=\"code-" + this.lang + "-var code-var-" + varName + "\">" + name + "</span>");
+	var scope = this;
+	jqVar.hover(
+		function(){
+			var jq = jQuery(".code-var-" + varName);
+			jq.addClass("code-" + scope.lang + "-over");
+		},
+		function(){
+			var jq = jQuery(".code-var-" + varName);
+			jq.removeClass("code-" + scope.lang + "-over");
+		}
+	);
+	return jqVar;
 };
 
 KCodeExampleBase.prototype.codeObjectMethod = function (jqObject, jqFunction){
@@ -620,9 +641,9 @@ KCodeExamplePHP.prototype.codeHeader = function (){
 
 	var jqConfigObject = this.codeVar("config");
 
-	this.addCode(this.codeAssign(jqConfigObject.clone(), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")])));
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "serviceUrl"), this.codeString("http://" + location.hostname + "/")));
-	this.addCode(this.codeAssign(this.jqClientObject.clone(), this.codeNewInstance("KalturaClient", [jqConfigObject.clone()])));
+	this.addCode(this.codeAssign(jqConfigObject.clone(true), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")])));
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString("http://" + location.hostname + "/")));
+	this.addCode(this.codeAssign(this.jqClientObject.clone(true), this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)])));
 };
 
 KCodeExamplePHP.prototype.addCode = function (code, entity){
@@ -657,8 +678,8 @@ KCodeExamplePHP.prototype.codeVarDefine = function (jqObject, type){
 };
 
 KCodeExamplePHP.prototype.codeVar = function (name){
-	name = "$" + name;
-	return KCodeExampleBase.prototype.codeVar.apply(this, arguments);
+	var vars = ["$" + name, name];
+	return KCodeExampleBase.prototype.codeVar.apply(this, vars);
 };
 
 KCodeExamplePHP.prototype.codeString = function (str){
@@ -685,7 +706,7 @@ KCodeExampleJava.prototype.getKsMethod = function (){
 KCodeExampleJava.prototype.getService = function (service){
 	var getter = "get" + service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
 	var jqGetter = this.codeFunction(getter);
-	return this.codeObjectMethod(this.jqClientObject.clone(), jqGetter);
+	return this.codeObjectMethod(this.jqClientObject.clone(true), jqGetter);
 };
 
 KCodeExampleJava.prototype.addCode = function (code, entity){
@@ -787,25 +808,25 @@ KCodeExampleJava.prototype.codeHeader = function (){
 	var jqBody = jQuery("<div/>");
 	var jqConfigObject = this.codeVar("config");
 	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
-	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(), this.codeNewInstance("KalturaConfiguration"));
+	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(true), this.codeNewInstance("KalturaConfiguration"));
 	this.addCode(jqConfigObjectInit, jqBody);
 
 	var jqSetPartnerId = this.codeUserFunction("setPartnerId", [this.codeVar("partnerId")]);
-	this.addCode(this.codeObjectMethod(jqConfigObject.clone(), jqSetPartnerId), jqBody);
+	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetPartnerId), jqBody);
 
 	var jqSetEndpoint = this.codeUserFunction("setEndpoint", [this.codeString("http://" + location.hostname + "/")]);
-	this.addCode(this.codeObjectMethod(jqConfigObject.clone(), jqSetEndpoint), jqBody);
+	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetEndpoint), jqBody);
 
-	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(), "KalturaClient");
-	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone()]));
+	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(true), "KalturaClient");
+	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)]));
 	this.addCode(jqClientInit, jqBody);
 	
 	jqBody.append(this.jqAction);
 
 	var jqExceptionObject = this.codeVar("e");
-	var jqExceptionObjectDeclare = this.codeVarDefine(jqExceptionObject.clone(), "KalturaApiException");
+	var jqExceptionObjectDeclare = this.codeVarDefine(jqExceptionObject.clone(true), "KalturaApiException");
 	var jqTraceFunction = this.codeUserFunction("printStackTrace");
-	var jqTrace = this.codeObjectMethod(jqExceptionObject.clone(), jqTraceFunction);
+	var jqTrace = this.codeObjectMethod(jqExceptionObject.clone(true), jqTraceFunction);
 	
 	var jqTry = jQuery("<div/>");
 	jqTry.addClass("indent");
@@ -815,7 +836,7 @@ KCodeExampleJava.prototype.codeHeader = function (){
 	jqCatch.addClass("indent");
 	this.addCode(jqTrace, jqCatch);
 	
-	var jqTryCatch = this.codeTryCatch(jqTry, jqExceptionObjectDeclare.clone(), jqCatch);
+	var jqTryCatch = this.codeTryCatch(jqTry, jqExceptionObjectDeclare.clone(true), jqCatch);
 	jqTryCatch.addClass("indent");
 	
 	var jqArgsDeclare = this.codeVarDefine("args", "String[]");
@@ -852,7 +873,7 @@ KCodeExampleCsharp.prototype.getActionMethod = function (action){
 
 KCodeExampleCsharp.prototype.getService = function (service){
 	service = service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
-	return this.codeObjectAttribute(this.jqClientObject.clone(), service);
+	return this.codeObjectAttribute(this.jqClientObject.clone(true), service);
 };
 
 KCodeExampleCsharp.prototype.addCode = function (code, entity){
@@ -958,12 +979,12 @@ KCodeExampleCsharp.prototype.codeHeader = function (){
 	var jqBody = jQuery("<div/>");
 	var jqConfigObject = this.codeVar("config");
 	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
-	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")]));
+	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(true), this.codeNewInstance("KalturaConfiguration", [this.codeVar("partnerId")]));
 	this.addCode(jqConfigObjectInit, jqBody);
-	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(), "ServiceUrl"), this.codeString("http://" + location.hostname + "/")), jqBody);
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "ServiceUrl"), this.codeString("http://" + location.hostname + "/")), jqBody);
 
-	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(), "KalturaClient");
-	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone()]));
+	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(true), "KalturaClient");
+	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)]));
 	this.addCode(jqClientInit, jqBody);
 	
 	jqBody.append(this.jqAction);

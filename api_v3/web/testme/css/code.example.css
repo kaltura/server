@@ -24,6 +24,7 @@
 .code-php-func-name {} 
 .code-php-str {color: #00BB00;}
 .code-php-system {color: #0000FF;}
+.code-php-over {background-color: #DDDDDD; color: #000000;}
 
 
 .code-java-package {}
@@ -37,6 +38,7 @@
 .code-java-func-name {} 
 .code-java-str {color: #0000FF;}
 .code-java-system {color: #800000; font-weight: bolder;}
+.code-java-over {background-color: #DDDDDD; color: #000000;}
 
 
 .code-csharp-package {}
@@ -51,4 +53,5 @@
 .code-csharp-func-name {} 
 .code-csharp-str {color: #0000FF;}
 .code-csharp-system {color: #800000; font-weight: bolder;}
+.code-csharp-over {background-color: #DDDDDD; color: #000000;}
 
