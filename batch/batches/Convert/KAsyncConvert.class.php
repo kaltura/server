@@ -281,12 +281,19 @@ class KAsyncConvert extends KJobHandlerWorker
 			$job->message = "File is ready in the remote storage";
 		}
 		
-		kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
-		@chmod("$sharedFile.log", 0777);
-		$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
-	
-		if($this->taskConfig->params->isRemote) // for remote conversion
-			$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
+		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
+		{
+			kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
+			@chmod("$sharedFile.log", 0777);
+			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
+		
+			if($this->taskConfig->params->isRemote) // for remote conversion
+				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
+		}
+		else 
+		{
+			$data->logFileSyncLocalPath = '';
+		}
 		
 		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
 	}
