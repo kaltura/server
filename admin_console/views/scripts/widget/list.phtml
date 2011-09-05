@@ -50,6 +50,7 @@
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<?php if (Infra_AclHelper::isAllowed('widget','edit')): ?>
 							<option value="editForm" ><?php echo $this->translate('Edit'); ?></option>
+							<option value="externalEditForm" ><?php echo $this->translate('External Edit'); ?></option>
 						<?php endif; ?>
 						<?php if (Infra_AclHelper::isAllowed('widget','delete')): ?>
 							<option value="deleteWidget" ><?php echo $this->translate('Delete'); ?></option>
@@ -123,6 +124,11 @@ function editForm(id) {
 			jQuery(this).find('form').ajaxForm(formSubmit); 
 		}
 	);
+}
+
+function externalEditForm(id) {
+	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'external-edit'), null, true); ?>' + '/id/' + id;
+	window.location = url;
 }
 
 function newForm(partnerId) {
