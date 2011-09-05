@@ -453,7 +453,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 			if($this->type == 'fileHandler'){
 				KalturaTestDataObject::setPropertyValue($this->value, "value", file_get_contents(getcwd().(string)$xml['key']), null);
 			} else {
-				if($child->count() == 0){
+				if(count($child) == 0){
 					KalturaTestDataObject::setPropertyValue($this->value, "value", trim($xml), null);
 				}
 				else{
