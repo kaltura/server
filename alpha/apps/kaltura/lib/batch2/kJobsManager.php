@@ -432,7 +432,7 @@ class kJobsManager
 			{
 				kBatchManager::updateEntry($flavorAsset->getEntryId(), entryStatus::ERROR_CONVERTING);
 				
-				$description = "Remote source file sync not found $srcSyncKey, tstorage profile id [" . $flavor->getSourceRemoteStorageProfileId() . "]";
+				$description = "Remote source file sync not found $srcSyncKey, storage profile id [" . $flavor->getSourceRemoteStorageProfileId() . "]";
 				KalturaLog::err($description);
 				
 				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
@@ -442,8 +442,7 @@ class kJobsManager
 				return null;
 			}
 			
-			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
-				$localPath = $fileSync->getFilePath();
+			$localPath = $fileSync->getFilePath();
 			$remoteUrl = $fileSync->getExternalUrl();
 		}
 		
