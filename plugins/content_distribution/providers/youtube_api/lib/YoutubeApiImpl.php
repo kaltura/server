@@ -124,7 +124,9 @@ class YouTubeApiImpl
 		{   */
 			$newEntry = $this->yt->insertEntry($myVideoEntry, $uploadUrl, 'Zend_Gdata_YouTube_VideoEntry'); 
 			$newEntry -> setMajorProtocolVersion(2);
-			$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
+			if(isset($props['playlists']))
+				$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
+			
 			return $newEntry->getVideoId();
 /*		}
 		catch (Zend_Gdata_App_HttpException $httpException) 
