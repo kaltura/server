@@ -37,13 +37,20 @@ class thumbnailTest extends KalturaApiTestCase
 		$results = $this->client->thumbAsset->listAction($filter, null);
 		
 		$assetUrl = $this->client->thumbAsset->getUrl($results->objects[0]->id, null);
-		$filePath = dirname(__FILE__) . '\testsData\new_thumb_asset.jpg';
+		$filePath = dirname(__FILE__) . '/testsData/new_thumb_asset.jpg';
 		self::saveApiFileFromUrl($assetUrl, $filePath);
 		
 		
 		$tmpFile = tempnam(dirname(__FILE__), 'imageComperingTmp');
-		$convert = dirname(kConf::get('bin_path_imagemagick')) . '\compare';
-		$cmd = $convert . ' ' . $filePath . ' ' . $result . ' ' . $tmpFile . ' 2>resultLog.txt';		
+		$imageMagick = dirname(kConf::get('bin_path_imagemagick'));
+		if ($imageMagick == '.') {
+			$compare = 'compare';
+		} else {
+			$compare = dirname(kConf::get('bin_path_imagemagick')) . '/compare';
+		}
+
+		$result = dirname(__FILE__) . '/' . $result;
+		$cmd = $compare . ' ' . $filePath . ' ' . $result . ' ' . $tmpFile . ' 2>resultLog.txt';		
 		$retValue = null;
 		$output = null;
 		$output = system($cmd, $retValue);
