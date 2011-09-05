@@ -1,3 +1,3 @@
 #!/bin/bash
-
-php @APP_DIR@/alpha/batch/updateKuserFromDWH.php >> @LOG_DIR@/updateKuserFromDWH.log 2>&1
+WHEN=$(date +%Y%m%d)
+php @APP_DIR@/alpha/batch/updateKuserFromDWH.php >> @LOG_DIR@/updateKuserFromDWH-${WHEN}.log 2>&1
