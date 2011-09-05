@@ -219,7 +219,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		if($filter->get(baseObjectFilter::ORDER) === "recent")
 		{
 			$filter->set("_lte_available_from", time());
-			$filter->set("_gteornull_end_date", time()); // schedule not finished
+			//$filter->set("_gteornull_end_date", time()); // schedule not finished
 			$filter->set(baseObjectFilter::ORDER, "-available_from");
 		}
 		
