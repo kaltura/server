@@ -90,6 +90,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 		'(name,tags,description,entry_id,reference_id,roots)' => IIndexable::FIELD_TYPE_STRING,
 		'roots' => IIndexable::FIELD_TYPE_STRING,
 		'description' => IIndexable::FIELD_TYPE_STRING,
+		'admin_tags' => IIndexable::FIELD_TYPE_STRING,
 		
 		'int_entry_id' => IIndexable::FIELD_TYPE_INTEGER,
 		'kuser_id' => IIndexable::FIELD_TYPE_INTEGER,
