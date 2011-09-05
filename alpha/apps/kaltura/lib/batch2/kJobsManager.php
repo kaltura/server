@@ -849,6 +849,8 @@ class kJobsManager
 			
 			$partner = $entry->getPartner();
 			
+			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+			
 			// load the asset params to the instance pool
 			$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfile->getId());
 			assetParamsPeer::retrieveByPKs($flavorIds);
@@ -857,7 +859,6 @@ class kJobsManager
 			$sourceFileRequiredStorages = array();
 			$sourceIncludedInProfile = false;
 			$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-			$conversionProfile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
 			$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfile->getId());
 			KalturaLog::debug("Found flavors [" . count($flavors) . "] in conversion profile [" . $conversionProfile->getId() . "]");
 			foreach($flavors as $flavor)
