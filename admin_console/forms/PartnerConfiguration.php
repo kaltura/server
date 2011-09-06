@@ -292,6 +292,13 @@ class Form_PartnerConfiguration extends Infra_Form
 			}
 			$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
 		}
+		
+		$this->addElement('checkbox', 'moderate_content', array(
+			'label'	  => 'Content Moderation',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
+		$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
+	
 		ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 		ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);		
 		$this->addAllDisplayGroups($permissionNames);
