@@ -134,6 +134,15 @@
          </copy>
 
     </target>
+    
+    
+    <!-- ============================================  -->
+    <!-- Target: replace generate config file          -->
+    <!-- ============================================  -->
+    <target name="replaceGenerateConfig">
+         <echo msg="replacing generate config file..." />
+         <copy file="${installationLoc}${installationDir}/package/app/app/generator/config.template.dev.ini" tofile="${installationLoc}${installationDir}/package/app/app/generator/config.template.ini" overwrite="true"/>
+    </target>
 
 
     <!-- ============================================  -->
@@ -165,7 +174,7 @@
     <!-- ============================================  -->
     <!-- Target: Installation                          -->
     <!-- ============================================  -->
-    <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade,sphinxLogDir">
+    <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade,sphinxLogDir,replaceGenerateConfig">
          <echo msg="install..." />
          <exec command="php install.php -s;" dir="${installationLoc}${installationDir}" />
          <echo msg="Done" />
@@ -277,16 +286,6 @@
     </target>
     
     <!-- ============================================  -->
-    <!-- Target: generate test clients                 -->
-    <!-- ============================================  -->
-    <target name="generateTestClients">
-         <echo msg="generating test clients..." />
-         <exec command="php /opt/kaltura/app/scripts/clear_cache.php" dir="/opt/kaltura/app/scripts" />
-         <copy file="/opt/kaltura/app/generator/config.template.dev.ini" tofile="/opt/kaltura/app/generator/config.ini" overwrite="true"/>
-         <exec command="./opt/kaltura/app/generator/generate.sh" dir="/opt/kaltura/app/generator" />
-    </target>
-    
-    <!-- ============================================  -->
     <!-- Target: unit tests (not running)              -->
     <!-- ============================================  -->
     <target name="unitTest">
@@ -300,7 +299,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit,generateTestClients">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
          <echo msg="Done" />
     </target>
 
