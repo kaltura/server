@@ -151,7 +151,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		try
 		{
 			$this->impersonate($this->dropFolderFile->partnerId);
-			$this->kClient->bulkUpload->add($conversionProfile->id, $tempFileRealPath, KalturaBulkUploadType::DROP_FOLDER_XML, $this->uploadedBy);
+			$this->kClient->bulkUpload->add($conversionProfile->id, $tempFileRealPath, KalturaBulkUploadType::DROP_FOLDER_XML, $this->uploadedBy, $this->dropFolderFile->fileName);
 			$this->unimpersonate();
 		}
 		catch (Exception $e)
