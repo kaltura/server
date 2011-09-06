@@ -281,6 +281,7 @@
     <!-- ============================================  -->
     <target name="generateTestClients">
          <echo msg="generating test clients..." />
+         <exec command="php /opt/kaltura/app/scripts/clear_cache.php" dir="/opt/kaltura/app/scripts" />
          <copy file="/opt/kaltura/app/generator/config.template.dev.ini" tofile="/opt/kaltura/app/generator/config.ini" overwrite="true"/>
          <exec command="./opt/kaltura/app/generator/generate.sh" dir="/opt/kaltura/app/generator" />
     </target>
