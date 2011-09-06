@@ -14,7 +14,7 @@ kmc4Success:
   has_layout:     on
   layout:       kmclayout
   javascripts:  [ -*, http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js , http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js ]
-  stylesheets:  [ -*, /lib/css/kmc4 ]
+  stylesheets:  [ -*, /lib/css/kmc5 ]
  
 varpartnerlistSuccess:
   has_layout:     on

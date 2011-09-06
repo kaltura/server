@@ -512,7 +512,7 @@ kmc.preview_embed = {
 		uiconf_details = kmc.preview_embed.getUiconfDetails(uiconf_id,is_playlist);
 
 		if( live_bitrates ) { kmc.vars.embed_code_delivery_type = "http"; } // Reset delivery type to http
-		
+
 		embed_code = kmc.preview_embed.buildKalturaEmbed(id, name, description, is_playlist, uiconf_id);
 		preview_player = embed_code.replace('{FLAVOR}','ks=' + kmc.vars.ks + '&');
 		embed_code = embed_code.replace('{FLAVOR}','');

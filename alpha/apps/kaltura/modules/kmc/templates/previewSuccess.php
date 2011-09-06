@@ -34,6 +34,7 @@ switch($delivery_type) {
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<title>Kaltura Player</title>
 	<script src="<?php echo $scriptUrl; ?>"></script>
+	<script>mw.setConfig('Kaltura.NoApiCache', true);</script>
 </head>
 <body>
 	<div id="main" style="position: static;">

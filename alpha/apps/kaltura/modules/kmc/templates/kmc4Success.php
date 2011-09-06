@@ -60,7 +60,7 @@ if( count($allowedPartners) > 1 ) {
 			google_analytics_account : "<?php echo kConf::get("ga_account"); ?>",
 			language	 : "<?php echo (isset($language) ? $language : '') ?>"
 		}
-	}
+	};
 </script>
 
 	<div id="kmcHeader"<?php if($templatePartnerId) echo ' class="whiteLabel"'; ?>>
@@ -86,4 +86,4 @@ if( count($allowedPartners) > 1 ) {
          <iframe frameborder="0" id="server_frame" height="100%" width="100%"></iframe>
         </div> <!-- server_wrap -->
 	</div><!-- main -->
-<script type="text/javascript" src="/lib/js/kmc4.js"></script>
+<script type="text/javascript" src="/lib/js/kmc5.js"></script>
