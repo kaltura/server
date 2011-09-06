@@ -27,16 +27,21 @@ KalturaGlobalData::setData("@TEST_PARTNER_ID@", $newPartner->id);
 KalturaGlobalData::setData("@TEST_PARTNER_ADMIN_SECRET@", $newPartner->adminSecret);
 KalturaGlobalData::setData("@TEST_PARTNER_SECRET@", $newPartner->secret);
 
+print ("create a client\n");
 $config->partnerId = $newPartner->id; //Set the new test partner id
 $client = new KalturaClient($config); // create a client for the new partner
 
+print ("ks\n");
 $ks = $client->session->start($newPartner->adminSecret, null, KalturaSessionType::ADMIN, $newPartner->id, 86400, null);
 $client->setKs($ks);
 
+print ("set partner\n");
 KalturaTestDeploymentHelper::setPartner($newPartner);
 
+print ("add Permissions\n");
 KalturaTestDeploymentHelper::addPermissions($client);
 
+print ("add Base Data\n");
 KalturaTestDeploymentHelper::addBaseData($client);
 
 
