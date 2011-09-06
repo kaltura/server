@@ -1,6 +1,7 @@
 <?php
 
-define('START_MARKER', '[KalturaFrontController->run] DEBUG: Params [');
+define('PS2_START_MARKER', 'symfony [info] {sfRequest} request parameters ');
+define('APIV3_START_MARKER', '[KalturaFrontController->run] DEBUG: Params [');
 
 function print_r_reverse($in) {
     $lines = explode("\n", trim($in));
@@ -53,7 +54,10 @@ function doCurl($url, $params = array(), $files = array())
 {
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_POST, 1);
+	if ($params)
+	{
+		curl_setopt($ch, CURLOPT_POST, 1);
+	}
 	if (count($files) > 0)
 	{
 		foreach($files as &$file)
@@ -69,11 +73,14 @@ function doCurl($url, $params = array(), $files = array())
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_USERAGENT, '');
 	curl_setopt($ch, CURLOPT_TIMEOUT, 0);
-		
+
+	$beforeTime = microtime(true);	
 	$result = curl_exec($ch);
+	$endTime = microtime(true);
+	
 	$curlError = curl_error($ch);
 	curl_close($ch);
-	return array($result, $curlError);
+	return array($result, $curlError, $endTime - $beforeTime);
 }
 
 function stripXMLInvalidChars($value) 
@@ -83,7 +90,12 @@ function stripXMLInvalidChars($value)
 
 function xmlToArray($xmlstring)
 {
+	// fix the xml if it's invalid
 	$xmlstring = stripXMLInvalidChars($xmlstring);
+	$xmlstring = str_replace('&', '&amp;', $xmlstring);
+	$xmlstring = str_replace(array('&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;amp;', '&amp;apos;'), array('&lt;', '&gt;', '&quot;', '&amp;', '&apos;'), $xmlstring);
+	
+	// parse the xml
 	$xml = simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
 	$array = json_decode($json,TRUE);
@@ -134,12 +146,90 @@ function beginsWith($str, $end)
 	return (substr($str, 0, strlen($end)) === $end);
 }
 
+function getRequestHash($fullActionName, $paramsForHash)
+{
+	unset($paramsForHash['ks']);
+	unset($paramsForHash['kalsig']);
+	unset($paramsForHash['clientTag']);
+	return md5($fullActionName . serialize($paramsForHash));
+}
+
+function shouldProcessRequest($fullActionName, $parsedParams)
+{
+	global $testedActions, $testedRequests, $maxTestsPerActionType;
+	global $requestNumber, $startPosition, $endPosition;
+	
+	// test action type count
+	if (!array_key_exists($fullActionName, $testedActions))
+	{
+		$testedActions[$fullActionName] = 0;
+	}
+	
+	if ($testedActions[$fullActionName] > $maxTestsPerActionType)
+	{
+		return 'no';
+	}
+	
+	// test whether this action was already tested
+	$requestHash = getRequestHash($fullActionName, $parsedParams);
+	if (in_array($requestHash, $testedRequests))
+	{
+		return 'no';
+	}
+	
+	// apply start/end positions
+	$requestNumber++;
+	if ($endPosition != 0 && $requestNumber > $endPosition)
+	{
+		return 'quit';
+	}
+			
+	if ($requestNumber <= $startPosition)
+	{
+		return 'no';
+	}
+	
+	$testedRequests[] = $requestHash;
+	$testedActions[$fullActionName]++;
+	
+	return 'yes';
+}
+
+function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
+{
+	global $serviceUrlOld, $serviceUrlNew;
+	
+	print "Testing $fullActionName...";
+	
+	usleep(200000);         // sleep for 0.2 sec to avoid hogging the server
+	list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams);
+	list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams);
+	
+	if ($curlErrorNew || $curlErrorOld)
+	{
+		print "Curl error [$curlErrorNew] [$curlErrorOld]\n";
+		return;
+	}
+	
+	$errors = compareResults($resultNew, $resultOld);
+	
+	if (!count($errors))
+	{
+		print sprintf("Ok (new=%.3f old=%.3f)\n", $newTime, $oldTime);
+		return;
+	}
+	
+	print "\n-------------------------------------------------------------------------------\n";
+	print "\tAction = $fullActionName\n";
+	print "\tParams = ".print_r($parsedParams, true)."\n";
+	foreach ($errors as $error)
+	{
+		print "\tError: $error\n";
+	}
+}
+
 function processRequest($parsedParams)
 {
-	global $testedActions, $testedRequests;
-	global $serviceUrlOld, $serviceUrlNew, $maxTestsPerActionType;
-
-	
 	if (!array_key_exists('service', $parsedParams))
 	{
 		print "Error: service not specified " . print_r($parsedParams, true) . "\n";
@@ -160,82 +250,154 @@ function processRequest($parsedParams)
 		
 	$action = $parsedParams['action'];
 	$fullActionName = strtolower("$service.$action");
-	if (!beginsWith($fullActionName, 'playlist.execute') && 
-		!in_array($action, array('get', 'list', 'count')))
-	{
-		return;
-	}
-	
-	if (!array_key_exists($fullActionName, $testedActions))
-	{
-		$testedActions[$fullActionName] = 0;
-	}
-	
-	if ($testedActions[$fullActionName] > $maxTestsPerActionType)
-	{
-		return;
-	}
-
 	unset($parsedParams['service']);
 	unset($parsedParams['action']);
 	$parsedParams['format'] = '2';		# XML
 	
-	$paramsForHash = $parsedParams;
-	unset($paramsForHash['ks']);
-	unset($paramsForHash['kalsig']);
-	unset($paramsForHash['clientTag']);
-	$requestHash = md5($fullActionName . serialize($paramsForHash));
-	if (in_array($requestHash, $testedRequests))
+	if (!beginsWith($fullActionName, 'playlist.execute') &&
+		!beginsWith($action, 'get') &&
+		!beginsWith($action, 'list') &&
+		!beginsWith($action, 'count'))
 	{
 		return;
 	}
 	
-	$testedRequests[] = $requestHash;
-	$testedActions[$fullActionName]++;
+	switch (shouldProcessRequest($fullActionName, $parsedParams))
+	{
+	case 'quit':
+		return true;
+		
+	case 'no':
+		return;
+	}
 	
 	$uri = "/api_v3/index.php?service=$service&action=$action";
 	
-	print "Testing $service.$action...";
-	
-	usleep(200000);         // sleep for 0.2 sec to avoid hogging the server
-	$beforeTime = microtime(true);
-	list($resultNew, $curlErrorNew) = doCurl($serviceUrlNew . $uri, $parsedParams);
-	$newTime = microtime(true) - $beforeTime;
-	
-	$beforeTime = microtime(true);
-	list($resultOld, $curlErrorOld) = doCurl($serviceUrlOld . $uri, $parsedParams);
-	$oldTime = microtime(true) - $beforeTime;
-	
-	if ($curlErrorNew || $curlErrorOld)
+	testAction($fullActionName, $parsedParams, $uri, $parsedParams);
+}
+
+function processApiV3Log($handle, $origSize)
+{
+	$inParams = false;
+	while (ftell($handle) < $origSize && ($buffer = fgets($handle)) !== false) {
+		if (!$inParams)
+		{
+			$markerPos = strpos($buffer, APIV3_START_MARKER);
+			if ($markerPos === false)
+				continue;
+			$params = substr($buffer, $markerPos + strlen(APIV3_START_MARKER));
+			$inParams = true;
+		}
+		else
+		{
+			if ($buffer[0] == ']')
+			{
+				$parsedParams = print_r_reverse($params);
+				if (print_r($parsedParams, true) != $params)
+				{
+					print "print_r_reverse failed\n";
+					continue;
+				}
+
+				if (processRequest($parsedParams))
+				{
+					break;
+				}
+						
+				$inParams = false;
+			}
+			else
+			{
+				$params .= $buffer;
+			}
+		}
+	}
+}
+
+function processPS2Request($parsedParams)
+{
+	global $serviceUrlOld, $serviceUrlNew;
+
+	if (!array_key_exists('module', $parsedParams) ||
+		!array_key_exists('action', $parsedParams))
 	{
-		print "Curl error [$curlErrorNew] [$curlErrorOld]\n";
+		print "Error: module/action not specified " . print_r($parsedParams, true) . "\n";
+	}
+
+	$module = $parsedParams['module'];
+	$action = $parsedParams['action'];
+	unset($parsedParams['module']);
+	unset($parsedParams['action']);
+	
+	if (strtolower($module) == 'partnerservices2' &&
+		strtolower($action) == 'defpartnerservices2base')
+	{
+		$action = $parsedParams['myaction'];
+		unset($parsedParams['myaction']);
+	}
+	
+	$fullActionName = strtolower("$module.$action");
+	
+	if (!in_array($fullActionName, array(
+		'extwidget.playmanifest', 
+		'keditorservices.getmetadata', 
+		'keditorservices.getentryinfo', 
+		'partnerservices2.executeplaylist',
+		'partnerservices2.getentries',
+		'partnerservices2.getentry',
+		'partnerservices2.getentryroughcuts',
+		'partnerservices2.getkshow',
+		'partnerservices2.getuiconf',
+		'partnerservices2.getwidget',
+		'partnerservices2.listentries',
+		'partnerservices2.listkshows',
+		'partnerservices2.listplaylists',
+		)))
+	{
 		return;
 	}
 	
-	$errors = compareResults($resultNew, $resultOld);
-	if (!count($errors))
+	switch (shouldProcessRequest($fullActionName, $parsedParams))
 	{
-		print sprintf("Ok (new=%.3f old=%.3f)\n", $newTime, $oldTime);
+	case 'quit':
+		return true;
+		
+	case 'no':
 		return;
 	}
 	
-	print "\n-------------------------------------------------------------------------------\n";
-	print "\tService = $service\n";
-	print "\tAction = $action\n";
-	print "\tParams = ".print_r($parsedParams, true)."\n";
-	foreach ($errors as $error)
-	{
-		print "\tError: $error\n";
+	$uri = "/index.php/$module/$action?" . http_build_query($parsedParams, null, "&");
+
+	testAction($fullActionName, $parsedParams, $uri);
+}
+
+function processPS2Log($handle, $origSize)
+{
+	while (ftell($handle) < $origSize && ($buffer = fgets($handle)) !== false) {
+		$markerPos = strpos($buffer, PS2_START_MARKER);
+		if ($markerPos === false)
+			continue;
+		$params = substr($buffer, $markerPos + strlen(PS2_START_MARKER));
+		$parsedParams = eval('return ' . trim($params) . ';');
+
+		if (processPS2Request($parsedParams))
+		{
+			break;
+		}
 	}
 }
 
 // parse the command line
-if ($argc < 4)
-	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api_v3 log> [<start position> [<end position> [<max tests per action>]]]\n");
+if ($argc < 5)
+	die("Usage:\n\tphp compatCheck <old service url> <new service url> <api log> <api_v3/ps2> [<start position> [<end position> [<max tests per action>]]]\n");
 
 $serviceUrlOld = $argv[1];
 $serviceUrlNew = $argv[2];
 $apiV3LogPath = $argv[3];
+$logFormat = strtolower($argv[4]);
+
+if (!in_array($logFormat, array('api_v3', 'ps2')))
+	die("Log format shoud be either api_v3 or ps2");
 
 if (!beginsWith(strtolower($serviceUrlOld), 'http://'))
 	$serviceUrlOld = 'http://' . $serviceUrlOld;
@@ -246,12 +408,17 @@ $startPosition = 0;
 $endPosition = 0;
 $maxTestsPerActionType = 10;
 
-if ($argc > 4)
-	$startPosition = intval($argv[4]);
 if ($argc > 5)
-	$endPosition = intval($argv[5]);
+	$startPosition = intval($argv[5]);
 if ($argc > 6)
-	$maxTestsPerActionType = intval($argv[6]);
+	$endPosition = intval($argv[6]);
+if ($argc > 7)
+	$maxTestsPerActionType = intval($argv[7]);
+
+// init globals
+$testedActions = array();
+$testedRequests = array();
+$requestNumber = 0;
 	
 // process the log file
 $handle = @fopen($apiV3LogPath, "r");
@@ -261,47 +428,9 @@ if (!$handle)
 $logStats = fstat($handle);
 $origSize = $logStats['size'];
 
-$testedActions = array();
-$testedRequests = array();
-$requestNumber = 0;
-$inParams = false;
-while (ftell($handle) < $origSize && ($buffer = fgets($handle)) !== false) {
-	if (!$inParams)
-	{
-		$markerPos = strpos($buffer, START_MARKER);
-		if ($markerPos === false)
-			continue;
-		$params = substr($buffer, $markerPos + strlen(START_MARKER));
-		$inParams = true;
-	}
-	else
-	{
-		if ($buffer[0] == ']')
-		{
-			$parsedParams = print_r_reverse($params);
-			if (print_r($parsedParams, true) != $params)
-			{
-				print "print_r_reverse failed\n";
-				continue;
-			}
+if ($logFormat == 'api_v3')
+	processApiV3Log($handle, $origSize);
+else
+	processPS2Log($handle, $origSize);
 
-			$requestNumber++;
-			if ($endPosition != 0 && $requestNumber > $endPosition)
-			{
-				break;
-			}
-			
-			if ($requestNumber > $startPosition)
-			{
-				processRequest($parsedParams);
-			}
-						
-			$inParams = false;
-		}
-		else
-		{
-			$params .= $buffer;
-		}
-	}
-}
 fclose($handle);
