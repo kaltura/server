@@ -80,6 +80,17 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 		return;
 	scope.jqParams.empty();
 	
+	// TODO
+//	var ksField = jqItem.find("input:text,select[name=ks]");
+//	var value = ksField.val();
+//	if(scope.getKsMethod()){
+//		var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
+//		scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(true), jqSetKs), scope.jqParams);
+//	}
+//	else if(scope.getKsVar()){
+//		scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(true), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
+//	}
+	
 	var params = [];
 	jQuery(".param").each(function(i, item) {
 		var jqItem = jQuery(item);
@@ -89,17 +100,8 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 		var jqField = jqItem.find("input:text,select");
 		var name = jqField.attr("name");
 		
-		if(name == "ks"){
-			var value = jqField.val();
-			if(scope.getKsMethod()){
-				var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
-				scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(true), jqSetKs), scope.jqParams);
-			}
-			else if(scope.getKsVar()){
-				scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(true), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
-			}
+		if(name == "ks")
 			return;
-		}
 		
 		var jqValue = null;
 		
@@ -165,11 +167,6 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 						var jqTempParamDef = scope.codeVarDefine(jqObject.clone(true), objectType);
 						var jqTempParamDeclare = scope.codeDeclareVar(jqTempParamDef.clone(true), objectType, jqNewInstance);
 						scope.addCode(jqTempParamDeclare, scope.jqParams);
-
-						if(nameParts.length == 3){
-							var jqAssign = scope.codeAssign(jqOriginalObject, jqObject.clone(true));
-							scope.addCode(jqAssign, scope.jqParams);
-						}
 					}
 					else{
 						var jqAssign = scope.codeAssign(jqObject, jqNewInstance);
@@ -207,13 +204,14 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 	}
 
 	var addedObjects = new Object();
-	var objectsAssignes = new Array();
+	var objectsNames = new Array();
 	for(var name in params){
 		var nameParts = name.split(":");
 		
-		while(nameParts.length > 2){
+		while(nameParts.length >= 2){
 			var objectName = nameParts.join("_");
-			var lastAttribute = nameParts.pop();
+			var fieldName = nameParts.join(":");
+			nameParts.pop();
 			
 			if(addedObjects[objectName])
 				continue;
@@ -223,39 +221,47 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 			if(!jqType.size())
 				continue;
 
-			var objectTempName = nameParts[0];
-			
-//			var jqObject = scope.codeVar(nameParts[0]);
-			for(var i = 1; i < nameParts.length; i++){
-				var attribute = nameParts[i];
-				
-				objectTempName += attribute.charAt(0).toUpperCase() + attribute.substr(1);
-
-//				if(isNaN(attribute)){
-//					jqObject = scope.codeObjectAttribute(jqObject.clone(true), attribute);
-//				}
-//				else{
-//					jqObject = scope.codeArrayItem(jqObject.clone(true), attribute);
-//				}
-			}
-			var jqTempObject = scope.codeVar(objectTempName + lastAttribute.charAt(0).toUpperCase() + lastAttribute.substr(1));
-			var jqObject = scope.codeVar(objectTempName);
-
-			if(isNaN(lastAttribute)){
-				jqObject = scope.codeObjectAttribute(jqObject.clone(true), lastAttribute);
-				var jqAssign = scope.codeAssign(jqObject.clone(true), jqTempObject.clone(true));
-				objectsAssignes.push(jqAssign);
-			}
-			else{
-				var jqFunction = scope.codeUserFunction("add", [lastAttribute, jqTempObject]);
-				var jqMethod = scope.codeObjectMethod(jqObject.clone(true), jqFunction);
-				objectsAssignes.push(jqMethod);
-			}
+			objectsNames.push(fieldName);
 		}
 	}
+	objectsNames.sort();
+
+	var objectsAssigns = new Array();
+	for(var i in objectsNames){
+		
+		var nameParts = objectsNames[i].split(":");
+		var objectName = nameParts.join("_");
+		var lastAttribute = nameParts.pop();
+		var objectTempName = nameParts[0];
+		
+		while(objectsAssigns.length && objectName.indexOf(objectsAssigns[objectsAssigns.length - 1].name) != 0){
+			scope.addCode(objectsAssigns.pop().assign, scope.jqParams);
+		}
+		
+		for(var i = 1; i < nameParts.length; i++){
+			var attribute = nameParts[i];
+			objectTempName += attribute.charAt(0).toUpperCase() + attribute.substr(1);
+		}
+		
+		var jqTempObject = scope.codeVar(objectTempName + lastAttribute.charAt(0).toUpperCase() + lastAttribute.substr(1));
+		var jqObject = scope.codeVar(objectTempName);
+		var jqAssign = null;
+		
+		if(isNaN(lastAttribute)){
+			jqObject = scope.codeObjectAttribute(jqObject.clone(true), lastAttribute);
+			jqAssign = scope.codeAssign(jqObject.clone(true), jqTempObject.clone(true));
+		}
+		else{
+			jqAssign = scope.codeAssignArrayItem(jqObject.clone(true), lastAttribute, jqTempObject);
+		}
+		objectsAssigns.push({
+			name: objectName,
+			assign: jqAssign
+		});
+	}
 	
-	while(objectsAssignes.length)
-		scope.addCode(objectsAssignes.pop(), scope.jqParams);
+	while(objectsAssigns.length)
+		scope.addCode(objectsAssigns.pop().assign, scope.jqParams);
 };
 
 KCodeExampleBase.prototype.setAction = function (service, action, params){
@@ -402,6 +408,20 @@ KCodeExampleBase.prototype.codeArrayItem = function (jqObject, index){
 	jqCode.append(this.getArrayOpener());
 	jqCode.append(index);
 	jqCode.append(this.getArrayCloser());
+	
+	return jqCode;
+};
+
+KCodeExampleBase.prototype.codeAssignArrayItem = function (jqArray, index, jqValue){
+
+	var jqCode = jQuery("<span/>");
+	
+	jqCode.append(jqArray);	
+	jqCode.append(this.getArrayOpener());
+	jqCode.append(index);
+	jqCode.append(this.getArrayCloser());
+	jqCode.append(" = ");
+	jqCode.append(jqValue);	
 	
 	return jqCode;
 };
@@ -751,6 +771,12 @@ KCodeExampleJava.prototype.codeArrayItem = function (jqObject, index){
 	return this.codeObjectMethod(jqObject, jqGet);
 };
 
+
+KCodeExampleJava.prototype.codeAssignArrayItem = function (jqArray, index, jqValue){
+	var jqFunction = this.codeUserFunction("add", [index, jqValue]);
+	return this.codeObjectMethod(jqArray, jqFunction);
+};
+
 KCodeExampleJava.prototype.codeNewInstance = function (className, constructorArgs){
 	if(className == "array"){
 		this.addCode(this.codeImport("java.util.ArrayList"), this.jqActionImports);
@@ -1011,6 +1037,10 @@ KCodeExamplePython.prototype.init = function(entity, codeLanguage){
 	KCodeExampleBase.prototype.init.apply(this, arguments);
 };
 
+KCodeExampleBase.prototype.getNull = function (){
+	return jQuery("<span class=\"code-" + this.lang + "-system\">None</span>");
+};
+
 KCodeExamplePython.prototype.getKsMethod = function (){
 	return "setKs";
 };
@@ -1028,6 +1058,53 @@ KCodeExamplePython.prototype.codeDeclareVar = function (jqObjectDef, type, newVa
 	}
 };
 
+KCodeExamplePython.prototype.codeNewArray = function (className){
+	return "[]";
+};
+
+KCodeExamplePython.prototype.codeAssignArrayItem = function (jqArray, index, jqValue){
+	var jqFunction = this.codeUserFunction("append", [jqValue]);
+	return this.codeObjectMethod(jqArray, jqFunction);
+};
+
+KCodeExamplePython.prototype.codeVarDefine = function (jqObject, type){
+	return jqObject;
+};
+
+KCodeExamplePython.prototype.codeImport = function (packageName){
+	var jqCode = jQuery("<span/>");
+
+	jqCode.append("<span class=\"code-" + this.lang + "-system\">from </span>");
+	jqCode.append("<span class=\"code-" + this.lang + "-package\">" + packageName + "</span>");
+	jqCode.append("<span class=\"code-" + this.lang + "-system\"> import *</span>");
+	
+	return jqCode;
+};
+
+KCodeExamplePython.prototype.codeNewInstance = function (className, constructorArgs){
+	var bracketCounter = this.bracketsCounter++;
+	var jqCode = jQuery("<span class=\"code-" + this.lang + "-new-instance code-" + this.lang + "-system\"/>");
+	var jqClassName = jQuery("<span class=\"code-" + this.lang + "-class-name\">" + className + "</span>");
+	var jqOpenBracket = jQuery("<span id=\"bracket-open-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">(</span>");
+	var jqCloseBracket = jQuery("<span id=\"bracket-close-" + bracketCounter + "\" class=\"code-" + this.lang + "-bracket bracket-" + bracketCounter + "\">)</span>");
+	this.setBracketsEvent(bracketCounter, [jqOpenBracket, jqCloseBracket]);
+
+	jqCode.append(jqClassName);	
+	jqCode.append(jqOpenBracket);
+	
+	if(constructorArgs){
+		for(var i = 0; i < constructorArgs.length; i++)	{
+			if(i)
+				jqCode.append(", ");
+			
+			jqCode.append(constructorArgs[i]);
+		}
+	}
+		
+	jqCode.append(jqCloseBracket);
+	return jqCode;
+};
+
 KCodeExamplePython.prototype.codeHeader = function (){
 
 	this.importsArray = {};	
@@ -1036,49 +1113,14 @@ KCodeExamplePython.prototype.codeHeader = function (){
 	this.jqEntity.append(this.jqImports);
 	this.jqEntity.append(this.jqActionImports);
 
-	this.jqAction = jQuery("<div class=\"code-action\"/>");
-	
-	var jqBody = jQuery("<div/>");
+	this.addCode(this.codeImport("KalturaClient"), this.jqImports);
+
 	var jqConfigObject = this.codeVar("config");
 	var jqConfigObjectDeclare = this.codeVarDefine(jqConfigObject, "KalturaConfiguration");
-	var jqConfigObjectInit = this.codeAssign(jqConfigObjectDeclare.clone(true), this.codeNewInstance("KalturaConfiguration"));
-	this.addCode(jqConfigObjectInit, jqBody);
 
-	var jqSetPartnerId = this.codeUserFunction("setPartnerId", [this.codeVar("partnerId")]);
-	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetPartnerId), jqBody);
-
-	var jqSetEndpoint = this.codeUserFunction("setEndpoint", [this.codeString("http://" + location.hostname + "/")]);
-	this.addCode(this.codeObjectMethod(jqConfigObject.clone(true), jqSetEndpoint), jqBody);
-
-	var jqClientDeclare = this.codeVarDefine(this.jqClientObject.clone(true), "KalturaClient");
-	var jqClientInit = this.codeAssign(jqClientDeclare, this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)]));
-	this.addCode(jqClientInit, jqBody);
-	
-	jqBody.append(this.jqAction);
-
-	var jqExceptionObject = this.codeVar("e");
-	var jqExceptionObjectDeclare = this.codeVarDefine(jqExceptionObject.clone(true), "KalturaApiException");
-	var jqTraceFunction = this.codeUserFunction("printStackTrace");
-	var jqTrace = this.codeObjectMethod(jqExceptionObject.clone(true), jqTraceFunction);
-	
-	var jqTry = jQuery("<div/>");
-	jqTry.addClass("indent");
-	jqTry.append(jqBody);
-	
-	var jqCatch = jQuery("<div/>");
-	jqCatch.addClass("indent");
-	this.addCode(jqTrace, jqCatch);
-	
-	var jqTryCatch = this.codeTryCatch(jqTry, jqExceptionObjectDeclare.clone(true), jqCatch);
-	jqTryCatch.addClass("indent");
-	
-	var jqArgsDeclare = this.codeVarDefine("args", "String[]");
-	var jqMain = this.codeFunctionDeclare("main", jqTryCatch, ["public", "static"], [jqArgsDeclare], this.getVoid());
-	jqMain.addClass("indent");
-	
-	var jqClass = this.codeClassDeclare("CodeExample", jqMain);
-		
-	this.jqEntity.append(jqClass);
+	this.addCode(this.codeAssign(jqConfigObjectDeclare.clone(true), this.codeNewInstance("KalturaConfiguration", [this.codeVar("PARTNER_ID")])));
+	this.addCode(this.codeAssign(this.codeObjectAttribute(jqConfigObject.clone(true), "serviceUrl"), this.codeString("http://" + location.hostname + "/")));
+	this.addCode(this.codeAssign(this.jqClientObject.clone(true), this.codeNewInstance("KalturaClient", [jqConfigObject.clone(true)])));
 };
 
 
@@ -1122,3 +1164,47 @@ function toggleCode(){
 	kTestMe.calculateDimensions(1);
 	kTestMe.jqWindow.resize();
 }
+
+
+
+
+//function doIt(){
+//	
+//	var params = [
+//	      		'accessControl:restrictions:0:countryList',
+//	    		'accessControl:restrictions:1:aaa',
+//	    		'accessControl:restrictions:1:countryList',
+//	];
+//	
+//	tasksStack = [];
+//	
+//	for(var name in params){
+//		//do some stuff
+//		while (name not beigns with tasksStack[tasksStack.length - 1])
+//			tasksStask.pop
+//
+//		tasksStack['accessControlRestrictions0'] = 'accessControl->restrictions[0] = accessControlRestrictions0';
+//		tasksStack[] = [name, object];
+//	}
+//}
+
+
+
+//accessControlRestrictions = array();
+//accessControlRestriction0->countryList = xxx;
+//accessControlRestriction1->aaa = 1234;
+//accessControlRestriction1->countryList = www;
+
+//
+//accessControl:restrictions
+//accessControl:restrictions:0
+//accessControl:restrictions:0:countryList
+//
+//accessControl:restrictions:1
+//accessControl:restrictions:1:aaa
+
+//accessControl:restrictions
+
+//accessControlRestrictions[0] = accessControlRestriction0;
+//accessControlRestrictions[1] = accessControlRestriction1;
+//accessControl->restrictions = accessControlRestrictions;
