@@ -178,7 +178,7 @@ class SphinxCriterion extends KalturaCriterion
 				if (!count($value))
 					break;
 				
-				if (!$depth)
+				if (!$depth && !count($clauses))
 				{
 					$values = implode(',', $value);
 					$whereClause[] = "$sphinxField in($values)";
