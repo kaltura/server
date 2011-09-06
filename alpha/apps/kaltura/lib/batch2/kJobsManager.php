@@ -610,16 +610,66 @@ class kJobsManager
 	 */
 	public static function addCapturaThumbJob(BatchJob $parentJob = null, $partnerId, $entryId, $thumbAssetId, FileSyncKey $srcSyncKey, $srcAssetType, thumbParamsOutput $thumbParams = null)
 	{
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
-		
-		$localPath = null;
-		$remoteUrl = null;
-		if($fileSync)
+		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
+		if(!$thumbAsset)
 		{
-			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
-				$localPath = $fileSync->getFullPath();
-			$remoteUrl = $fileSync->getExternalUrl();
+			KalturaLog::err("No thumbnail asset found for id [$thumbAssetId]");
+			return null;
 		}
+		
+		$partner = PartnerPeer::retrieveByPK($thumbAsset->getPartnerId());
+		
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		if(!$fileSync)
+		{
+			$thumbAsset->setStatus(asset::ASSET_STATUS_ERROR);
+			$thumbAsset->setDescription("Source file sync not found: $srcSyncKey");
+			$thumbAsset->save();
+			
+			KalturaLog::err("Source file sync not found: $srcSyncKey");
+			return null;
+		}
+		
+		if(!$local)
+		{
+			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+			{
+				$url = $fileSync->getExternalUrl();
+				$originalAsset = kFileSyncUtils::retrieveObjectForSyncKey($srcSyncKey);
+				if($originalAsset instanceof flavorAsset)
+				{
+					KalturaLog::debug("Creates import job for remote file sync [$url]");
+					
+					if($thumbParams)
+					{
+						$thumbParams->setSourceParamsId($originalAsset->getFlavorParamsId());
+						$thumbParams->save();
+					}
+					
+					$thumbAsset->setStatus(asset::ASSET_STATUS_WAIT_FOR_CONVERT);
+					$thumbAsset->setDescription("Source file sync is importing: $srcSyncKey");
+					$thumbAsset->save();
+					
+					return kJobsManager::addImportJob($parentJob, $thumbAsset->getEntryId(), $partner->getId(), $url, $originalAsset, null, null, true);
+				}
+				
+				KalturaLog::debug("Downloading remote file sync [$url]");
+				$downloadPath = myContentStorage::getFSUploadsPath() . '/' . $thumbAsset->getId() . '.jpg';
+				if (kFile::downloadUrlToFile($url, $downloadPath))
+				{
+					kFileSyncUtils::moveFromFile($downloadPath, $srcSyncKey);
+					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, false, false);
+					if(!$fileSync)
+						throw new kCoreException("Source file not found for thumbnail capture [$thumbAssetId]", kCoreException::SOURCE_FILE_NOT_FOUND);
+				}
+			}
+			else
+			{
+				throw new kCoreException("Source file not found for thumbnail capture [$thumbAssetId]", kCoreException::SOURCE_FILE_NOT_FOUND);
+			}
+		}
+		$localPath = $fileSync->getFullPath();
+		$remoteUrl = $fileSync->getExternalUrl();
 		
 		// creates convert data
 		$data = new kCaptureThumbJobData();

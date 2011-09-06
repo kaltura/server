@@ -163,8 +163,26 @@ class kFlowHelper
 			$entryFlavors = assetPeer::retrieveFlavorsByEntryId($flavorAsset->getEntryId());
 			foreach($entryFlavors as $entryFlavor)
 			{
+				/* @var $entryFlavor flavorAsset */
 				if($entryFlavor->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT && $entryFlavor->getFlavorParamsId())
 					kBusinessPreConvertDL::decideAddEntryFlavor($dbBatchJob, $flavorAsset->getEntryId(), $entryFlavor->getFlavorParamsId());
+			}
+			
+			$entryThumbnails = assetPeer::retrieveThumbnailsByEntryId($flavorAsset->getEntryId());
+			foreach($entryThumbnails as $entryThumbnail)
+			{
+				/* @var $entryThumbnail thumbAsset */
+				if($entryThumbnail->getStatus() != asset::ASSET_STATUS_WAIT_FOR_CONVERT || !$entryThumbnail->getFlavorParamsId())
+					continue;
+				
+				$thumbParamsOutput = assetParamsOutputPeer::retrieveByAssetId($entryThumbnail->getId());
+				/* @var $thumbParamsOutput thumbParamsOutput */
+				if($thumbParamsOutput->getSourceParamsId() != $flavorAsset->getFlavorParamsId())
+					continue;
+				
+				$srcSyncKey = $flavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+				$srcAssetType = $flavorAsset->getType();
+				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $srcAssetType, $thumbParamsOutput);
 			}
 		}
 
