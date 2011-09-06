@@ -233,6 +233,25 @@ class kConf extends kConfLocal
 				
 				'default_streamer_type' => 'http',
 				'default_media_protocol' => 'http',
+				
+				'template_partner_custom_data_exclude_fields' => array(
+					'defConversionProfileType',
+					'defaultAccessControlId',
+					'defaultConversionProfileId',
+					'landingPage',
+					'userLandingPage',
+					'isFirstLogin',
+					'curConvProfType',
+					'templatePartnerId',
+					'flowManagerClass',
+					'partnerSpecificServices',
+					'enabledPlugins',
+					'appStudioExampleEntry',
+					'appStudioExamplePlayList0',
+					'appStudioExamplePlayList1',
+					'account_owner_kuser_id',
+					'role_cache_dirty_at',
+				),
 			)
 		);
 		

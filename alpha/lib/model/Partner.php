@@ -691,7 +691,7 @@ class Partner extends BasePartner
     public function setMaxBulkSizeOverageUnit($v)         {$this->putInCustomData('bulk_size_overage_unit', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
-	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 0);}
+	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
 	public function getPublishersQuota()				{return $this->getFromCustomData('publishers_quota', null, 0);}
 	public function getBandwidthQuota()					{return $this->getFromCustomData('bandwidth_quota', null, 0);}
 	public function getStreamEntriesQuota()				{return $this->getFromCustomData('stream_entries_quota', null, 0);}

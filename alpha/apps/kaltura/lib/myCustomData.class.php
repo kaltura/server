@@ -47,6 +47,17 @@ class myCustomData
 	}
 	
 	/**
+	 * @return array
+	 */
+	public function toArray()
+	{
+		if(is_array($this->data))
+			return $this->data;
+		
+		return array();
+	}
+	
+	/**
 	 * @param string $name
 	 * @param string $value
 	 * @param string $namespace = null

@@ -1118,8 +1118,13 @@ class myPartnerUtils
  	
  	public static function copyTemplateContent(Partner $fromPartner, Partner $toPartner, $dontCopyUsers = false)
  	{
- 		$toPartner->setAdminLoginUsersQuota($fromPartner->getAdminLoginUsersQuota());
- 		$toPartner->save();
+ 		$partnerCustomDataArray = $fromPartner->getCustomDataObj()->toArray();
+ 		$excludeCustomDataFields = kConf::get('template_partner_custom_data_exclude_fields');
+ 		foreach($partnerCustomDataArray as $customDataName => $customDataValue)
+ 			if(!in_array($customDataName, $excludeCustomDataFields))
+ 				$toPartner->putInCustomData($customDataName, $customDataValue);
+		
+		$toPartner->save();
  		
  		kEventsManager::raiseEvent(new kObjectCopiedEvent($fromPartner, $toPartner));
  		
