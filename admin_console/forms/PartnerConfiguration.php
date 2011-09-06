@@ -111,7 +111,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
 		));		
 		
-		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][] = 'restrict_thumbnail_by_ks';
+		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Apply access control rule on thumbnail'] = 'restrict_thumbnail_by_ks';
 				
 
 //--------------------------- Remote Storage Account policy ---------------------------				
