@@ -277,6 +277,15 @@
     </target>
     
     <!-- ============================================  -->
+    <!-- Target: generate test clients                 -->
+    <!-- ============================================  -->
+    <target name="generateTestClients">
+         <echo msg="generating test clients..." />
+         <copy file="/opt/kaltura/app/generator/config.template.dev.ini" tofile="/opt/kaltura/app/generator/config.ini" overwrite="true"/>
+         <exec command="./opt/kaltura/app/generator/generate.sh" dir="/opt/kaltura/app/generator" />
+    </target>
+    
+    <!-- ============================================  -->
     <!-- Target: unit tests (not running)              -->
     <!-- ============================================  -->
     <target name="unitTest">
@@ -290,7 +299,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit,generateTestClients">
          <echo msg="Done" />
     </target>
 
