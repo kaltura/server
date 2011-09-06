@@ -17,6 +17,11 @@ abstract class KBulkUploadEngine
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
 
 	/**
+	 * @var KSchedularTaskConfig
+	 */
+	protected $taskConfig;
+	
+	/**
 	 * 
 	 * The batch current partner id
 	 * @var int
@@ -224,6 +229,7 @@ abstract class KBulkUploadEngine
 		
 		$this->kClient = $kClient;
 		$this->kClientConfig = $kClient->getConfig();
+		$this->taskConfig = $taskConfig;
 		
 		$this->job = $job;
 		$this->data = $job->data;
@@ -284,6 +290,13 @@ abstract class KBulkUploadEngine
 	protected function impersonate()
 	{
 		$this->kClientConfig->partnerId = $this->currentPartnerId;
+		$this->kClient->setConfig($this->kClientConfig);
+		KalturaLog::info("");
+	}
+	
+	protected function unimpersonate()
+	{
+		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
 		$this->kClient->setConfig($this->kClientConfig);
 	}
 		
@@ -375,6 +388,7 @@ abstract class KBulkUploadEngine
 			$bulkUploadResult->entryId = $requestResult->id;
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
+		$this->impersonate();
 		$this->kClient->doMultiRequest();
 	}
 	

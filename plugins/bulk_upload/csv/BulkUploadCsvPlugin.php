@@ -82,7 +82,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	 */
 	public static function writeBulkUploadLogFile($batchJob)
 	{
-		if($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV)){
+		if(($batchJob->getJobSubType() != null) && ($batchJob->getJobSubType() != self::getBulkUploadTypeCoreValue(BulkUploadCsvType::CSV))){
 			return;
 		}
 		

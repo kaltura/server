@@ -145,8 +145,11 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			
 			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
-				$requestResults = $this->kClient->doMultiRequest();
+				// make all the media->add as the partner
 				$this->impersonate();
+				$requestResults = $this->kClient->doMultiRequest();
+				$this->unimpersonate();
+				
 				$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
 				$this->startMultiRequest(true);
@@ -154,9 +157,11 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			}
 		}
 		
-		// commit the multi request entries
-		$requestResults = $this->kClient->doMultiRequest();
+		// make all the media->add as the partner
 		$this->impersonate();
+		$requestResults = $this->kClient->doMultiRequest();
+		$this->unimpersonate();
+		
 		if(count($requestResults))
 			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 
