@@ -170,12 +170,15 @@ class SphinxCriterion extends KalturaCriterion
 					
 				sort($value); // importent, solves sphinx IN bug
 				foreach($value as $valIndex => $valValue)
-					if(is_null($valValue) || !strlen(trim($valValue)))
+					if(is_null($valValue) || !strlen(trim($valValue)) || (($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($valValue)))
 						unset($value[$valIndex]);
 
 				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 				
-				if ($depth == 0)
+				if (!count($value))
+					break;
+				
+				if (!$depth)
 				{
 					$values = implode(',', $value);
 					$whereClause[] = "$sphinxField in($values)";
@@ -195,6 +198,10 @@ class SphinxCriterion extends KalturaCriterion
 					
 				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
 				
+				foreach($value as $valIndex => $valValue)
+					if(is_null($valValue) || !strlen(trim($valValue)) || (($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($valValue)))
+						unset($value[$valIndex]);
+				
 				$notInConditions = array();
 				foreach($value as $val)
 					 $notInConditions[] = "$sphinxField <> $val";
@@ -213,7 +220,8 @@ class SphinxCriterion extends KalturaCriterion
 				// fallthrough
 				
 			default:
-				$this->conditionClause[] = "$sphinxField $comparison $value";
+				if (!(($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($value)))
+					$this->conditionClause[] = "$sphinxField $comparison $value";
 				break;
 		}
 		
