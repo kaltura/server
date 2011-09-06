@@ -176,7 +176,7 @@
     <!-- ============================================  -->
     <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade,sphinxLogDir,replaceGenerateConfig">
          <echo msg="install..." />
-         <exec command="php install.php -s;" dir="${installationLoc}${installationDir}" />
+         <exec command="php preInstallation.php -s kaltura;" dir="${installationLoc}${installationDir}" />
          <echo msg="Done" />
     </target>
 
