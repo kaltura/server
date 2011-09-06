@@ -1,4 +1,5 @@
 <?php
+ini_set( "memory_limit" , "256M" );
 $start = microtime(true);
 set_time_limit(0);
 require_once(dirname(__FILE__).'/../../alpha/config/sfrootdir.php');
