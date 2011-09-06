@@ -44,6 +44,8 @@ class BaseEntryService extends KalturaEntryService
    		$dbEntry->setStatus(entryStatus::NO_CONTENT);
     	$dbEntry->save();
     	
+    	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
+    	
 	    $entry->fromObject($dbEntry);
 	    return $entry;
     }
