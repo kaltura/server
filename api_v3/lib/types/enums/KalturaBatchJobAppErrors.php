@@ -31,6 +31,7 @@ class KalturaBatchJobAppErrors extends KalturaEnum
 	const BULK_ACTION_NOT_SUPPORTED = 77;
 	const BULK_MISSING_MANDATORY_PARAMETER = 78;
 	const BULK_ITEM_VALIDATION_FAILED = 79;
+	const BULK_ITEM_NOT_FOUND = 701;
 		
 	const CONVERSION_FAILED = 81;
 	
