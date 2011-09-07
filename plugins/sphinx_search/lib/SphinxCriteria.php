@@ -229,10 +229,15 @@ abstract class SphinxCriteria extends KalturaCriteria
 				continue;
 			}
 			
-			if($criterion->apply($this->whereClause, $this->matchClause, $this->conditionClause))
+			$curConditionClause = '';
+			if($criterion->apply($this->whereClause, $this->matchClause, $curConditionClause))
 			{
 				KalturaLog::debug("Criterion [" . $criterion->getColumn() . "] attached");
 				$this->keyToRemove[] = $field;
+				if ($curConditionClause)
+				{
+					$this->conditionClause[] = $curConditionClause;
+				}
 			}
 			else
 			{

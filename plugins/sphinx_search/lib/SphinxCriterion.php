@@ -4,49 +4,35 @@ class SphinxCriterion extends KalturaCriterion
 {
 	const MAX_IN_VALUES = 150;
 	
-	/**
-	 * @var bool
-	 */
-	protected $hasOr = false;
-		
-	/**
-	 * 
-	 * local conditionClause
-	 * @var array
-	 */
-	protected $conditionClause = array();
-	
-	public function apply(array &$whereClause, array &$matchClause, array &$conditionClause, $depth = 0)
+	protected function hasOr()
 	{
-		$field = $this->getTable() . '.' . $this->getColumn();
-		
-		if($this->hasOr)
+		if (in_array(Criterion::ODER, $this->getConjunctions()))
 		{
-			KalturaLog::debug("criterion has OR");
-			//return false;
+			return true;
 		}
-			
-		KalturaLog::debug("Applies criterion [$field]");
-	
-		$clauses = $this->getClauses();
-		if(count($clauses))
+
+		foreach($this->getClauses() as $clause)
 		{
-			foreach($clauses as $clause)
+			if (($clause instanceof SphinxCriterion) && $clause->hasOr())
 			{
-				if(!($clause instanceof SphinxCriterion))
-				{
-					KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Kaltura criterion");
-					return false;
-				}
-				
-				if(!$clause->apply($whereClause, $matchClause, $this->conditionClause, $depth + 1))
-				{
-					KalturaLog::debug("Failed to apply clause [" . $clause->getColumn() . "]");
-					return false;
-				}
+				return true;
 			}
 		}
 		
+		return false;
+	}
+	
+	public function apply(array &$whereClause, array &$matchClause, &$conditionClause, $depth = 0, $queryHasOr = true)
+	{
+		$field = $this->getTable() . '.' . $this->getColumn();
+		
+		if (!$depth && !$this->hasOr())
+		{
+			$queryHasOr = false;
+		}
+			
+		KalturaLog::debug("Applies criterion [$field] queryHasOr=[$queryHasOr]");
+	
 		$comparison = $this->getComparison();
 		if($comparison == Criteria::CUSTOM || $comparison == Criteria::CUSTOM_EQUAL || $comparison == Criteria::ISNOTNULL)
 		{
@@ -163,6 +149,8 @@ class SphinxCriterion extends KalturaCriterion
 			return true;
 		}
 		
+		$thisClause = array();
+		
 		switch($comparison)
 		{
 			case Criteria::IN:
@@ -178,18 +166,18 @@ class SphinxCriterion extends KalturaCriterion
 				if (!count($value))
 					break;
 				
-				if (!$depth && !count($clauses))
-				{
-					$values = implode(',', $value);
-					$whereClause[] = "$sphinxField in($values)";
-				}
-				else 
+				if ($queryHasOr)
 				{
 					$inConditions = array();
 					foreach($value as $val)
 						 $inConditions[] = "$sphinxField = $val";
 	
-					$this->conditionClause[] = implode(' OR ', $inConditions);
+					$thisClause[] = implode(' OR ', $inConditions);
+				}
+				else 
+				{
+					$values = implode(',', $value);
+					$thisClause[] = "$sphinxField in($values)";
 				}
 				break;
 				
@@ -206,46 +194,66 @@ class SphinxCriterion extends KalturaCriterion
 				foreach($value as $val)
 					 $notInConditions[] = "$sphinxField <> $val";
 
-				$this->conditionClause[] = implode(' AND ', $notInConditions);
+				$thisClause[] = implode(' AND ', $notInConditions);
 				break;
 				
 			case Criteria::ISNULL:
-				$this->conditionClause[] = "$sphinxField = 0";
+				$thisClause[] = "$sphinxField = 0";
 				break;
 				
 			case Criteria::LESS_THAN:
 			case Criteria::LESS_EQUAL:
 				if($value > 0)
-					$this->conditionClause[] = "$sphinxField <> 0";
+					$thisClause[] = "$sphinxField <> 0";
 				// fallthrough
 				
 			default:
 				if (!(($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($value)))
-					$this->conditionClause[] = "$sphinxField $comparison $value";
+					$thisClause[] = "$sphinxField $comparison $value";
 				break;
 		}
 		
-		$this->conditionClause = array_unique($this->conditionClause);
-		if(!count($this->conditionClause))
-			return true;
+		$thisClause = '(' . implode(' AND ', $thisClause) . ')';
 		
-		$conjuction = ' OR ';
-		if (!count($this->getConjunctions()) || in_array(Criterion::UND, $this->getConjunctions()))
-			$conjuction = ' AND ';
-
-		$conditionClause[] = '(' . implode($conjuction, $this->conditionClause) . ')';
+		$clauses = $this->getClauses();
+		$conjuctions = $this->getConjunctions();
+		
+		foreach($clauses as $index => $clause)
+		{
+			if(!($clause instanceof SphinxCriterion))
+			{
+				KalturaLog::debug("Clause [" . $clause->getColumn() . "] is not Kaltura criterion");
+				return false;
+			}
+			
+			$curConditionClause = '';
+			if(!$clause->apply($whereClause, $matchClause, $curConditionClause, $depth + 1, $queryHasOr))
+			{
+				KalturaLog::debug("Failed to apply clause [" . $clause->getColumn() . "]");
+				return false;
+			}
+			
+			if (!$curConditionClause)
+			{
+				continue;
+			}
+			
+			$thisClause .= $conjuctions[$index] .  $curConditionClause;
+			if ($queryHasOr)
+			{
+				$thisClause = "($thisClause)";
+			}
+		}
+		
+		if ($queryHasOr)
+		{
+			$conditionClause = $thisClause;
+		}
+		else
+		{
+			$whereClause[] = $thisClause;
+		}
 		
 		return true;
-	}
-
-
-	/**
-	 * Append an OR Criterion onto this Criterion's list.
-	 * @return     Criterion
-	 */
-	public function addOr(Criterion $criterion)
-	{
-		$this->hasOr = true;
-		return parent::addOr($criterion);
 	}
 }
