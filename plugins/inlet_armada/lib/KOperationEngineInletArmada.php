@@ -93,7 +93,7 @@ $trgPrefixWindows;
 		}
 		
 			// Adjust linux file path to Inlet Armada Windows path
-		if($srcPrefixWindows && $srcPrefixLinux) {
+		if(isset($srcPrefixWindows) && isset($srcPrefixLinux)) {
 			$srcPrefixLinux = $this->addLastSlashInFolderPath($srcPrefixLinux, "/");
 			$srcPrefixWindows = $this->addLastSlashInFolderPath($srcPrefixWindows, "\\");
 			$srcFileWindows  = str_replace($srcPrefixLinux, $srcPrefixWindows, $inFilePath);
@@ -101,7 +101,7 @@ $trgPrefixWindows;
 		else
 			$srcFileWindows  = $inFilePath;
 			
-		if($trgPrefixWindows){
+		if(isset($trgPrefixWindows)){
 			$trgPrefixLinux = $this->addLastSlashInFolderPath($this->taskConfig->params->localTempPath, "/");
 			$trgPrefixWindows = $this->addLastSlashInFolderPath($trgPrefixWindows, "\\");
 			$outFileWindows = str_replace($trgPrefixLinux, $trgPrefixWindows, $this->outFilePath);
@@ -120,7 +120,7 @@ $trgPrefixWindows;
 		if(!$rv) {
 			throw new KOperationEngineException("Inlet failure: add job, rv(".print_r($rvObj,1).")");
 		}
-		KalturaLog::debug("jobAdd - encodingTemplate($encodingTemplate), inFile($srcFileWindows), outFile($outFileWindows),rv-".print_r($rvObj,1));
+		KalturaLog::debug("jobAdd - encodingTemplate($encodingTemplateId), inFile($srcFileWindows), outFile($outFileWindows),rv-".print_r($rvObj,1));
 		
 		$jobId=$rvObj->job_id;
 		$attemptCnt=0;
