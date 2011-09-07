@@ -60,18 +60,32 @@
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
-				<xs:sequence>
-					<xs:element name="entryId" minOccurs="1" maxOccurs="1" nillable="false">
-						<xs:annotation>
-							<xs:documentation>ID of entry to apply update/delete action on</xs:documentation>
-						</xs:annotation>
-						<xs:simpleType>
-							<xs:restriction base="xs:string">
-								<xs:maxLength value="20"/>
-							</xs:restriction>
-						</xs:simpleType>
-					</xs:element>
-				</xs:sequence>
+				<xs:choice minOccurs="1" maxOccurs="2">
+					<xs:sequence>
+						<xs:element name="entryId" minOccurs="1" maxOccurs="1" nillable="false">
+							<xs:annotation>
+								<xs:documentation>ID of entry to apply update/delete action on</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+					<xs:sequence>
+						<xs:element name="referenceId" minOccurs="1" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>Partner external identifier of the entry</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="100"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:choice>
 			</xs:choice>
 			<xs:element name="userId" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
