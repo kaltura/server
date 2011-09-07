@@ -184,7 +184,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 	 */
 	public function handleItemUpdated(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
-		$this->handleItemAdded($client, $object, $item);
+		$this->handleItemAdded($object, $item);
 	}
 
 	/* (non-PHPdoc)
