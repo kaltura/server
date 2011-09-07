@@ -28,7 +28,7 @@ while /bin/true ; do
 		 rm -f @BASE_DIR@/searchd_is_not_running_email
           fi
 	  touch @BASE_DIR@/searchd_is_running_email
-          echo "`date` searchd on  `hostname` was restarted" 
+          echo "`date` searchd on  `hostname` was restarted by `whoami`" 
 	  $BASE_PATH/searchd --config $CONFIG_FILE --stopwait
 	  echo "Exit code for stop was $?"
 	  $BASE_PATH/searchd --config $CONFIG_FILE
