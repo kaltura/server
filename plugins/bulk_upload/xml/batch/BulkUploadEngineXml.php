@@ -1391,7 +1391,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry->type = (int)$item->type;
 		
 		if(isset($item->referenceId))
-			$entry->name = (string)$item->referenceId;
+			$entry->referenceId = (string)$item->referenceId;
 		if(isset($item->name))
 			$entry->name = (string)$item->name;
 		if(isset($item->description))
