@@ -260,6 +260,14 @@ abstract class KBulkUploadEngine
 	}
 	
 	/**
+	 * @return KalturaClient
+	 */
+	public function getClient()
+	{
+		return $this->kClient;
+	}
+	
+	/**
 	 * @return KalturaBatchJob
 	 */
 	public function getJob()
@@ -287,13 +295,13 @@ abstract class KBulkUploadEngine
 	 * 
 	 * Impersonates into the current partner (overrides the batch partner) 
 	 */
-	protected function impersonate()
+	public function impersonate()
 	{
 		$this->kClientConfig->partnerId = $this->currentPartnerId;
 		$this->kClient->setConfig($this->kClientConfig);
 	}
 	
-	protected function unimpersonate()
+	public function unimpersonate()
 	{
 		$this->kClientConfig->partnerId = $this->taskConfig->getPartnerId();
 		$this->kClient->setConfig($this->kClientConfig);
@@ -336,22 +344,6 @@ abstract class KBulkUploadEngine
 	}
 	
 	/**
-	 * 
-	 * Start a multirequest, if specified start the multi request for the job partner
-	 * @param bool $isSpecificForPartner
-	 */
-	protected function startMultiRequest($isSpecificForPartner = false)
-	{
-		if($isSpecificForPartner)
-		{
-			$this->kClientConfig->partnerId = $this->currentPartnerId;
-			$this->kClient->setConfig($this->kClientConfig);
-		}
-		
-		$this->kClient->startMultiRequest();
-	}	
-	
-	/**
 	 * save the results for returned created entries
 	 * 
 	 * @param array $requestResults
@@ -387,7 +379,10 @@ abstract class KBulkUploadEngine
 			$bulkUploadResult->entryId = $requestResult->id;
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
+		
+		$this->impersonate();
 		$this->kClient->doMultiRequest();
+		$this->unimpersonate();
 	}
 	
 	/**
