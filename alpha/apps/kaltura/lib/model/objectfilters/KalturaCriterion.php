@@ -14,5 +14,5 @@ abstract class KalturaCriterion extends Criterion
 		parent::__construct($criteria, $column, $value, $comparison);
 	}
 	
-	abstract public function apply(array &$whereClause, array &$matchClause, array &$conditionClause);
+	abstract public function apply(array &$whereClause, array &$matchClause, &$conditionClause, $depth = 0, $queryHasOr = true);
 }
