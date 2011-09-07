@@ -477,7 +477,7 @@ abstract class BaseWidgetLogPeer {
 		else
 		{
 			// private data is allowed
-			if(empty($partnerGroup) && empty($kalturaNetwork))
+			if(empty($partnerGroup))
 			{
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
@@ -488,32 +488,24 @@ abstract class BaseWidgetLogPeer {
 			}
 			else 
 			{
-				$criterion = null;
-				if($partnerGroup)
+				// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
+				$partners = explode(',', trim($partnerGroup));
+				foreach($partners as &$p)
+					trim($p); // make sure there are not leading or trailing spaces
+
+				// add the partner_id to the partner_group
+				if (!in_array(strval($partnerId), $partners))
+					$partners[] = strval($partnerId);
+				
+				if(count($partners) == 1 && reset($partners) == $partnerId)
 				{
-					// $partnerGroup hold a list of partners separated by ',' or $kalturaNetwork is not empty (should be mySearchUtils::KALTURA_NETWORK = 'kn')
-					$partners = explode(',', trim($partnerGroup));
-					foreach($partners as &$p)
-						trim($p); // make sure there are not leading or trailing spaces
-	
-					// add the partner_id to the partner_group
-					if (!in_array($partnerId, $partners))
-					{
-						// NOTE: we need to add the partner as a string since we want all
-						// the PATNER_ID IN () values to be of the same type.
-						// otherwise mysql will fail choosing the right index and will
-						// do a full table scan
-						$partners[] = "".$partnerId;
-					}
-					
-					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+					$criteria->addAnd(self::PARTNER_ID, $partnerId);
 				}
 				else 
 				{
-					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partnerId);
-				}	
-				
-				$criteria->addAnd($criterion);
+					$criterion = $criteria->getNewCriterion(self::PARTNER_ID, $partners, Criteria::IN);
+					$criteria->addAnd($criterion);
+				}
 			}
 		}
 			

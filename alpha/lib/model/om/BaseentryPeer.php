@@ -665,7 +665,6 @@ abstract class BaseentryPeer {
 					}
 					$criteria->addAnd($criterion);
 				}
-				
 			}
 		}
 			
