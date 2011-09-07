@@ -179,7 +179,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		$this->xmlBulkUploadEngine->impersonate();
 		
 		foreach($item->subTitle as $caption)
-			$this->handleCaptionAsset($object->id, $object->conversionProfileId, $object->partnerId, $caption);
+			$this->handleCaptionAsset($object->id, $object->conversionProfileId, $caption);
 		
 		$this->xmlBulkUploadEngine->unimpersonate();
 	}
