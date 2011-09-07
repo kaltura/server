@@ -3,38 +3,50 @@
  * Enable entry caption asset ingestion from XML bulk upload
  * @package plugins.caption
  */
-class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor
+class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'captionBulkUploadXml';
 	const BULK_UPLOAD_XML_PLUGIN_NAME = 'bulkUploadXml';
+
+	const BULK_UPLOAD_XML_VERSION_MAJOR = 1;
+	const BULK_UPLOAD_XML_VERSION_MINOR = 1;
+	const BULK_UPLOAD_XML_VERSION_BUILD = 0;
 	
+	/**
+	 * @var BulkUploadEngineXml
+	 */
+	private $xmlBulkUploadEngine = null;
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
-	 */
+	*/
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaPending::dependsOn()
-	 */
+	*/
 	public static function dependsOn()
 	{
-		$bulkUploadXmlDependency = new KalturaDependency(self::BULK_UPLOAD_XML_PLUGIN_NAME);
+		$bulkUploadXmlVersion = new KalturaVersion(
+			self::BULK_UPLOAD_XML_VERSION_MAJOR,
+			self::BULK_UPLOAD_XML_VERSION_MINOR,
+			self::BULK_UPLOAD_XML_VERSION_BUILD
+		);
+
 		$captionDependency = new KalturaDependency(CaptionPlugin::getPluginName());
-		
+		$bulkUploadXmlDependency = new KalturaDependency(self::BULK_UPLOAD_XML_PLUGIN_NAME, $bulkUploadXmlVersion);
+
 		return array($bulkUploadXmlDependency, $captionDependency);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaSchemaContributor::contributeToSchema()
-	 */
+	*/
 	public static function contributeToSchema($type)
 	{
-		// TODO add IKalturaBulkUploadXmlHandler to handle captions
-		return null;
-		
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
 			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
@@ -42,7 +54,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_RESULT_XML)
 		)
 			return null;
-	
+
 		$xsd = '
 		
 	<!-- ' . self::getPluginName() . ' -->
@@ -141,7 +153,98 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		</xs:annotation>
 	</xs:element>
 		';
-		
+
 		return $xsd;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::configureBulkUploadXmlHandler()
+	 */
+	public function configureBulkUploadXmlHandler(BulkUploadEngineXml $xmlBulkUploadEngine)
+	{
+		$this->xmlBulkUploadEngine = $xmlBulkUploadEngine;
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::handleItemAdded()
+	*/
+	public function handleItemAdded(KalturaObjectBase $object, SimpleXMLElement $item)
+	{
+		if(!($object instanceof KalturaBaseEntry))
+			return;
+		  
+		if(empty($item->subTitle))
+			return;
+		
+		$this->xmlBulkUploadEngine->impersonate();
+		
+		foreach($item->subTitle as $caption)
+			$this->handleCaptionAsset($object->id, $object->conversionProfileId, $object->partnerId, $caption);
+		
+		$this->xmlBulkUploadEngine->unimpersonate();
+	}
+
+	private function handleCaptionAsset($entryId, $conversionProfileId, SimpleXMLElement $caption)
+	{
+		$captionAssetPlugin = KalturaCaptionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		
+		$captionAsset = new KalturaCaptionAsset();
+		$captionAsset->flavorParamsId = $this->xmlBulkUploadEngine->getAssetParamsId($caption, $conversionProfileId, true, 'caption');
+		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($contentElement->tags);
+		
+		if(isset($caption->captionAssetId))
+			$captionAsset->id = $caption->captionAssetId;
+		
+		if(isset($caption['isDefault']))
+		$captionAsset->isDefault = $caption['isDefault'];
+		
+		if(isset($caption['format']))
+			$captionAsset->format = $caption['format'];
+		
+		if(isset($caption['lang']))
+			$captionAsset->language = $caption['lang'];
+				
+		$captionAssetId = null;
+		if(isset($caption['captionAssetId']))
+		{
+			$captionAssetId = $caption['captionAssetId'];
+			$captionAssetPlugin->captionAsset->update($captionAssetId, $captionAsset);
+		}
+		else
+		{
+			$captionAsset = $captionAssetPlugin->captionAsset->add($entryId, $captionAsset);
+			$captionAssetId = $captionAsset->id;
+		}
+		
+		$captionAssetResource = $this->xmlBulkUploadEngine->getResource($caption, $conversionProfileId);
+		if($captionAssetResource)
+			$captionAssetPlugin->captionAsset->setContent($captionAssetId, $captionAssetResource);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::handleItemUpdated()
+	*/
+	public function handleItemUpdated(KalturaObjectBase $object, SimpleXMLElement $item)
+	{
+		$this->handleItemAdded($client, $object, $item);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::handleItemDeleted()
+	*/
+	public function handleItemDeleted(KalturaObjectBase $object, SimpleXMLElement $item)
+	{
+		// No handling required
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	*/
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/captionBulkUploadXml.generator.ini');
+
+		return null;
 	}
 }

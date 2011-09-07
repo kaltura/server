@@ -7,19 +7,14 @@
 abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHandler
 {
 	/**
-	 * @var KalturaClient
+	 * @var BulkUploadEngineXml
 	 */
-	protected $client = null;
+	private $xmlBulkUploadEngine = null;
 	
 	/**
 	 * @var KalturaCuePointClientPlugin
 	 */
 	protected $cuePointPlugin = null;
-	
-	/**
-	 * @var int
-	 */
-	protected $partnerId = null;
 	
 	/**
 	 * @var int
@@ -40,24 +35,18 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	{
 	}
 	
-	protected function impersonate()
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::configureBulkUploadXmlHandler()
+	 */
+	public function configureBulkUploadXmlHandler(BulkUploadEngineXml $xmlBulkUploadEngine)
 	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = $this->partnerId;
-		$this->client->setConfig($clientConfig);
-	}
-	
-	protected function unimpersonate()
-	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = -1;
-		$this->client->setConfig($clientConfig);
+		$this->xmlBulkUploadEngine = $xmlBulkUploadEngine;
 	}
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemAdded()
 	 */
-	public function handleItemAdded(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
+	public function handleItemAdded(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		if(!($object instanceof KalturaBaseEntry))
 			return;
@@ -65,21 +54,19 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		if(empty($item->scenes))
 			return;
 			
-		$this->client = $client;
-		$this->partnerId = $object->partnerId;
 		$this->entryId = $object->id;
-		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($client);
+		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 		
-		$this->impersonate();
-		$this->client->startMultiRequest();
+		$this->xmlBulkUploadEngine->impersonate();
+		$this->xmlBulkUploadEngine->getClient()->startMultiRequest();
 	
 		$items = array();
 		foreach($item->scenes->children() as $scene)
 			if($this->addCuePoint($scene))
 				$items[] = $scene;
 			
-		$results = $this->client->doMultiRequest();
-		$this->unimpersonate();
+		$results = $this->xmlBulkUploadEngine->getClient()->doMultiRequest();
+		$this->xmlBulkUploadEngine->unimpersonate();
 		
 		if(is_array($results) && is_array($items))
 			$this->handleResults($results, $items);
@@ -88,7 +75,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemUpdated()
 	 */
-	public function handleItemUpdated(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
+	public function handleItemUpdated(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		if(!($object instanceof KalturaBaseEntry))
 			return;
@@ -96,21 +83,19 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		if(empty($item->scenes))
 			return;
 			
-		$this->client = $client;
-		$this->partnerId = $object->partnerId;
 		$this->entryId = $object->id;
 		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($client);
 		
-		$this->impersonate();
-		$this->client->startMultiRequest();
+		$this->xmlBulkUploadEngine->impersonate();
+		$this->xmlBulkUploadEngine->getClient()->startMultiRequest();
 		
 		$items = array();
 		foreach($item->scenes->children() as $scene)
 			if($this->updateCuePoint($scene))
 				$items[] = $scene;
 			
-		$results = $this->client->doMultiRequest();
-		$this->unimpersonate();
+		$results = $this->xmlBulkUploadEngine->getClient()->doMultiRequest();
+		$this->xmlBulkUploadEngine->unimpersonate();
 		
 		$this->handleResults($results, $items);
 	}
@@ -118,7 +103,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemDeleted()
 	 */
-	public function handleItemDeleted(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
+	public function handleItemDeleted(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		// No handling required
 	}
@@ -139,12 +124,14 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			{
 				/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
 				
+				$pluginsInstance->configureBulkUploadXmlHandler($this->xmlBulkUploadEngine);
+				
 				if($this->operations[$index] == KalturaBulkUploadAction::ADD)
-					$pluginsInstance->handleItemAdded($this->client, $cuePoint, $items[$index]);
+					$pluginsInstance->handleItemAdded($cuePoint, $items[$index]);
 				elseif($this->operations[$index] == KalturaBulkUploadAction::UPDATE)
-					$pluginsInstance->handleItemUpdated($this->client, $cuePoint, $items[$index]);
+					$pluginsInstance->handleItemUpdated($cuePoint, $items[$index]);
 				elseif($this->operations[$index] == KalturaBulkUploadAction::DELETE)
-					$pluginsInstance->handleItemDeleted($this->client, $cuePoint, $items[$index]);
+					$pluginsInstance->handleItemDeleted($cuePoint, $items[$index]);
 			}
 		}
 	}

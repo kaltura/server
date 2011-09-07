@@ -25,9 +25,9 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 	private $distributionProfilesProviders = null;
 	
 	/**
-	 * @var KalturaClient
+	 * @var BulkUploadEngineXml
 	 */
-	private $client = null;
+	private $xmlBulkUploadEngine = null;
 	
 	/**
 	 * @return string
@@ -62,7 +62,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 	{
 		if(is_null($this->distributionProfilesNames))
 		{
-			$distributionPlugin = KalturaContentDistributionClientPlugin::get($this->client);
+			$distributionPlugin = KalturaContentDistributionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 			$distributionProfileListResponse = $distributionPlugin->distributionProfile->listAction();
 			if(!is_array($distributionProfileListResponse->objects))
 				return null;
@@ -90,9 +90,17 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 	}
 	
 	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::configureBulkUploadXmlHandler()
+	 */
+	public function configureBulkUploadXmlHandler(BulkUploadEngineXml $xmlBulkUploadEngine)
+	{
+		$this->xmlBulkUploadEngine = $xmlBulkUploadEngine;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemAdded()
 	 */
-	public function handleItemAdded(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
+	public function handleItemAdded(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		if(!($object instanceof KalturaBaseEntry))
 			return;
@@ -100,26 +108,11 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if(empty($item->distribution))
 			return;
 			
-		$this->client = $client;
 		foreach($item->distribution as $distribution)
-			$this->handleDistribution($object->id, $object->partnerId, $distribution);
+			$this->handleDistribution($object->id, $distribution);
 	}
 	
-	private function impersonate($partnerId)
-	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = $partnerId;
-		$this->client->setConfig($clientConfig);
-	}
-	
-	private function unimpersonate()
-	{
-		$clientConfig = $this->client->getConfig();
-		$clientConfig->partnerId = -1;
-		$this->client->setConfig($clientConfig);
-	}
-	
-	public function handleDistribution($entryId, $partnerId, SimpleXMLElement $distribution)
+	public function handleDistribution($entryId, SimpleXMLElement $distribution)
 	{
 		$distributionProfileId = null;
 		if(!empty($distribution->distributionProfileId))
@@ -131,7 +124,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if(!$distributionProfileId)
 			throw new KalturaBatchException("Missing custom data distributionProfile attribute", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		
-		$distributionPlugin = KalturaContentDistributionClientPlugin::get($this->client);
+		$distributionPlugin = KalturaContentDistributionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 		
 		$entryDistributionFilter = new KalturaEntryDistributionFilter();
 		$entryDistributionFilter->distributionProfileIdEqual = $distributionProfileId;
@@ -171,7 +164,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if($distribution['submitWhenReady'])
 			$submitWhenReady = true;
 			
-		$this->impersonate($partnerId);
+		$this->xmlBulkUploadEngine->impersonate();
 		if($entryDistributionId)
 		{
 			$updatedEntryDistribution = $distributionPlugin->entryDistribution->update($entryDistributionId, $entryDistribution);
@@ -183,12 +176,13 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 			$createdEntryDistribution = $distributionPlugin->entryDistribution->add($entryDistribution);
 			$distributionPlugin->entryDistribution->submitAdd($createdEntryDistribution->id, $submitWhenReady);
 		}
+		$this->xmlBulkUploadEngine->unimpersonate();
 	}
 
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemUpdated()
 	 */
-	public function handleItemUpdated(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
+	public function handleItemUpdated(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		$this->handleItemAdded($client, $object, $item);
 	}
@@ -196,7 +190,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemDeleted()
 	 */
-	public function handleItemDeleted(KalturaClient $client, KalturaObjectBase $object, SimpleXMLElement $item)
+	public function handleItemDeleted(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
 		// No handling required
 	}
