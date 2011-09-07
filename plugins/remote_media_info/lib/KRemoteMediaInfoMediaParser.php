@@ -14,7 +14,7 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 	public function __construct($filePath, KSchedularTaskConfig $taskConfig)
 	{
 		$this->url = $taskConfig->params->remoteMediaInfoUrl;
-		parent::__construct($filePath);
+		parent::__construct($filePath, $this->url);
 	}
 	
 	/**

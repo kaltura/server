@@ -19,13 +19,10 @@ class RemoteMediaInfoPlugin extends KalturaPlugin implements IKalturaObjectLoade
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == KalturaConversionEngineType::EXPRESSION_ENCODER)
+		if($baseClass == 'KBaseMediaParser' && $enumValue == KalturaMediaParserType::REMOTE_MEDIAINFO)
 		{
-			if(!isset($constructorArgs['params']) || !isset($constructorArgs['outFilePath']))
-				return null;
-				
-			$params = $constructorArgs['params'];
-			return new KOperationEngineExpressionEncoder($params->expEncoderCmd, $constructorArgs['outFilePath']);
+			$reflectionClass = new ReflectionClass('KRemoteMediaInfoMediaParser');
+			return $reflectionClass->newInstanceArgs($constructorArgs);
 		}
 		
 		return null;
@@ -38,12 +35,9 @@ class RemoteMediaInfoPlugin extends KalturaPlugin implements IKalturaObjectLoade
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'KOperationEngine' && $enumValue == self::getApiValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
-			return 'KOperationExpressionEncoder';
+		if($baseClass == 'KBaseMediaParser' && $enumValue == self::getApiValue(RemoteMediaInfoMediaParserType::REMOTE_MEDIAINFO))
+			return 'KRemoteMediaInfoMediaParser';
 			
-		if($baseClass == 'KDLOperatorBase' && $enumValue == self::getConversionEngineCoreValue(ExpressionEncoderConversionEngineType::EXPRESSION_ENCODER))
-			return 'KDLOperatorExpressionEncoder';
-		
 		return null;
 	}
 	
@@ -53,10 +47,10 @@ class RemoteMediaInfoPlugin extends KalturaPlugin implements IKalturaObjectLoade
 	public static function getEnums($baseEnumName = null)
 	{
 		if(is_null($baseEnumName))
-			return array('ExpressionEncoderConversionEngineType');
+			return array('RemoteMediaInfoMediaParserType');
 	
-		if($baseEnumName == 'conversionEngineType')
-			return array('ExpressionEncoderConversionEngineType');
+		if($baseEnumName == 'mediaParserType')
+			return array('RemoteMediaInfoMediaParserType');
 			
 		return array();
 	}
@@ -64,10 +58,10 @@ class RemoteMediaInfoPlugin extends KalturaPlugin implements IKalturaObjectLoade
 	/**
 	 * @return int id of dynamic enum in the DB.
 	 */
-	public static function getConversionEngineCoreValue($valueName)
+	public static function getMediaParserTypeValue($valueName)
 	{
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-		return kPluginableEnumsManager::apiToCore('conversionEngineType', $value);
+		return kPluginableEnumsManager::apiToCore('mediaParserType', $value);
 	}
 	
 	/**

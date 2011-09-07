@@ -3,14 +3,14 @@
  * @package plugins.remoteMediaInfo
  * @subpackage lib
  */
-class RemoteMediaInfoMediaParserTypeType implements IKalturaPluginEnum, mediaParserType
+class RemoteMediaInfoMediaParserType implements IKalturaPluginEnum, mediaParserType
 {
 	const REMOTE_MEDIA_INFO = 'RemoteMediaInfo';
 	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'REMOTE_MEDIA_INFO' => self::REMOTE_MEDIA_INFO
+			'REMOTE_MEDIA_INFO' => self::REMOTE_MEDIAINFO
 		);
 	}
 	
