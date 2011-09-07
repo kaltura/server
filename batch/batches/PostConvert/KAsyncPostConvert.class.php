@@ -82,9 +82,14 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	private function postConvert(KalturaBatchJob $job, KalturaPostConvertJobData $data)
 	{
 		KalturaLog::debug("postConvert($job->id)");
-		
+
 		try
 		{
+			$flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
+			if(isset($flavorParamsOutput->sourceRemoteStorageProfileId) && $flavorParamsOutput->sourceRemoteStorageProfileId>0){
+				KalturaLog::debug("RemoteStorageProfileId is set to ".$flavorParamsOutput->sourceRemoteStorageProfileId.", can not run mediaInfo locally");
+				return $this->postConvertRemoteStorage($job, $data);
+			}
 			$mediaFile = trim($data->srcFileSyncLocalPath);
 			
 			if(!file_exists($mediaFile))
@@ -169,6 +174,50 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
 		}
+	}
+	
+	private function postConvertRemoteStorage(KalturaBatchJob $job, KalturaPostConvertJobData $data)
+	{
+KalturaLog::debug("postConvertRemoteStorage($job->id)");
+
+		$mediaInfo = null;
+		try
+		{
+			$mediaFile = trim($data->srcFileSyncLocalPath);
+			
+			KalturaLog::debug("mediaFile [$mediaFile]");
+			$this->updateJob($job,"Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
+
+			$engine = KBaseMediaParser::getParser("RemoteMediaInfo", $mediaFile, $this->taskConfig);
+
+			if($engine)
+				$mediaInfo = $engine->getMediaInfo();
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::err("Error: " . $ex->getMessage());
+			$mediaInfo = null;
+		}
+		
+		if(is_null($mediaInfo))
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::EXTRACT_MEDIA_FAILED, "Failed to extract media info: $mediaFile", KalturaBatchJobStatus::FAILED);
+		
+		try
+		{
+			$mediaInfo->flavorAssetId = $data->flavorAssetId;
+			$createdMediaInfo = $this->getClient()->batch->addMediaInfo($mediaInfo);
+			
+			// must save the mediaInfoId before reporting that the task is finished
+			$this->updateJob($job, "Saving media info id $createdMediaInfo->id", KalturaBatchJobStatus::PROCESSED, 50, $data);
+			return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED, $data);
+			
+		}
+		catch(Exception $ex)
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
+		}
+
+
 	}
 	
 	/**
