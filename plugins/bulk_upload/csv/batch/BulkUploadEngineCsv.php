@@ -130,6 +130,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected function createEntries()
 	{
 		// start a multi request for add entries
+		$this->impersonate();
 		$this->kClient->startMultiRequest();
 		
 		KalturaLog::info("job[{$this->job->id}] start creating entries");
@@ -146,9 +147,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
 				// make all the media->add as the partner
-				$this->impersonate();
 				$requestResults = $this->kClient->doMultiRequest();
-				$this->unimpersonate();
 				
 				$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
@@ -158,7 +157,6 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		}
 		
 		// make all the media->add as the partner
-		$this->impersonate();
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
 		
