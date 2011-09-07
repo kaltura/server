@@ -17,7 +17,15 @@ class UiConfService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		if(strtolower($actionName) != 'listtemplates')
-			parent::applyPartnerFilterForClass ( new uiConfPeer() ); 	
+			parent::applyPartnerFilterForClass(new uiConfPeer()); 	
+	}
+	
+	protected function partnerGroup()
+	{
+		if ($this->actionName === 'get' || $this->actionName === 'clone')
+			return '0';
+		
+		return parent::partnerGroup();
 	}
 	
 	protected function kalturaNetworkAllowed($actionName)
