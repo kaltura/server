@@ -29,9 +29,9 @@ while /bin/true ; do
           fi
 	  touch @BASE_DIR@/searchd_is_running_email
           echo "`date` searchd on  `hostname` was restarted" 
-	  sudo -u $SUDO_USER $BASE_PATH/searchd --config $CONFIG_FILE --stopwait
+	  $BASE_PATH/searchd --config $CONFIG_FILE --stopwait
 	  echo "Exit code for stop was $?"
-	  sudo -u $SUDO_USER $BASE_PATH/searchd --config $CONFIG_FILE
+	  $BASE_PATH/searchd --config $CONFIG_FILE
           sleep 2
 	  continue          
     fi
