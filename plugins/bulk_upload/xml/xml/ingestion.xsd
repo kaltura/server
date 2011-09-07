@@ -59,6 +59,16 @@
 							<xs:documentation>License type of the new created entry</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="referenceId" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Partner external identifier of the entry</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="100"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
 				</xs:sequence>
 				<xs:choice minOccurs="1" maxOccurs="2">
 					<xs:sequence>
