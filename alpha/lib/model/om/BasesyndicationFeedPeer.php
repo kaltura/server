@@ -515,7 +515,7 @@ abstract class BasesyndicationFeedPeer {
 		else
 		{
 			// private data is allowed
-			if(empty($partnerGroup))
+			if(!strlen(strval($partnerGroup)))
 			{
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
