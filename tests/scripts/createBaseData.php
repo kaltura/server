@@ -274,7 +274,7 @@ class KalturaTestDeploymentHelper
 			
 		KalturaGlobalData::setData("@DEFAULT_ENTRY_ID@", $defaultEntry->id);
 
-		$document = new KalturaDocumentEntry;
+		$document = new KalturaDocumentEntry();
 		$document->documentType = KalturaDocumentType::PDF;
 		$document->name = "TEST_DOCUMENT_NAME";
 		$document->description = "TEST_DOCUMENT_DESC";
