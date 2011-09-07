@@ -505,7 +505,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$this->impersonate();
 		$updatedEntry = $this->kClient->baseEntry->update($entryId, $entry);
-		$this->unimpersonate();
 		
 		$this->kClient->startMultiRequest();
 		
@@ -533,7 +532,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);		// TODO: use thumb instead of getMultiRequestResult
 		}
 		
-		$this->impersonate();
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
 			
@@ -716,7 +714,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 * @return $requestResults - the multi request result
 	 */
 	protected function sendItemAddData(KalturaBaseEntry $entry ,KalturaResource $resource = null, array $noParamsFlavorAssets, array $noParamsFlavorResources, array $noParamsThumbAssets, array $noParamsThumbResources)
-	{
+	{	
+		$this->impersonate();
 		$this->kClient->startMultiRequest();
 		
 		KalturaLog::debug("Resource is: " . print_r($resource, true));
@@ -740,8 +739,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumb = $this->kClient->thumbAsset->add($newEntryId, $thumbAsset, $thumbResource);
 			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);			// TODO: use thumb instead of getMultiRequestResult
 		}
-								
-		$this->impersonate();
+							
 		$requestResults = $this->kClient->doMultiRequest();;
 		$this->unimpersonate();
 		
@@ -778,7 +776,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->kClient->flavorAsset->getByEntryId($createdEntryId);
 		$this->kClient->thumbAsset->getByEntryId($createdEntryId);
 		$result = $this->kClient->doMultiRequest();
-		$this->unimpersonate();
 			
 		$createdFlavorAssets = $result[0]; 
 		$createdThumbAssets =  $result[1];
@@ -809,7 +806,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->kClient->thumbAsset->update($createdThumbAsset->id, $thumbAsset);
 		}
 		
-		$this->impersonate();
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
 				

@@ -351,6 +351,7 @@ abstract class KBulkUploadEngine
 	 */
 	protected function updateEntriesResults(array $requestResults, array $bulkUploadResults)
 	{
+		$this->impersonate();
 		$this->kClient->startMultiRequest();
 		KalturaLog::info("Updating " . count($requestResults) . " results");
 		
@@ -380,7 +381,6 @@ abstract class KBulkUploadEngine
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
 		
-		$this->impersonate();
 		$this->kClient->doMultiRequest();
 		$this->unimpersonate();
 	}
