@@ -362,7 +362,7 @@ return array(
 	'entry-investigate info entry data label' => 'Data',
 	'entry-investigate info entry size label' => 'Size',
 	'entry-investigate info entry custom label' => 'Custom Data',
-	'entry-investigate info entry cq label' => 'C/Q',
+	'entry-investigate info entry cq label' => 'Conversion Profile',
 	'entry-investigate info entry duration label' => 'Duration',
 	'entry-investigate info entry search text label' => 'Search Text',
 	'entry-investigate info entry discrete search text label' => 'Discrete Search Text',

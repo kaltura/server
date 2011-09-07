@@ -88,11 +88,11 @@
 										?>
 											<th><?php echo $this->translate('entry-investigate info entry media type label'); ?></th>
 											<th><?php echo $this->translate('entry-investigate info entry source type label'); ?></th>
-											<th><?php echo $this->translate('entry-investigate info entry cq label'); ?></th>
 											<th><?php echo $this->translate('entry-investigate info entry media date label'); ?></th>
 										<?php 
 									}
 								?>
+								<th><?php echo $this->translate('entry-investigate info entry cq label'); ?></th>
 								<th><?php echo $this->translate('entry-investigate info entry thumb label'); ?></th>
 								<th><?php echo $this->translate('entry-investigate info entry size label'); ?></th>
 								<th><?php echo $this->translate('entry-investigate info entry duration label'); ?></th>
@@ -148,11 +148,11 @@
 										?>
 											<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_MediaType', $entry->mediaType); ?></td>
 											<td><?php echo $this->enumTranslate('Kaltura_Client_Enum_SourceType', $entry->sourceType); ?></td>
-											<td><?php echo $entry->conversionProfileId; ?></td>
 											<td><?php echo date($this->translate('time format'), $entry->mediaDate); ?></td>
 										<?php 
 									}
 								?>
+								<td><?php echo $entry->conversionProfileId; ?></td>
 								<td><div class="thumbWrap"><img height="15px" width="20px" src="<?php echo $entry->thumbnailUrl; ?>" class="thumb"/></div></td>
 								<td><?php echo $entry->width . "x" . $entry->height; ?></td>
 								<td><?php echo $entry->duration; ?></td>
