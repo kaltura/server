@@ -190,7 +190,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->flavorParamsId = $this->xmlBulkUploadEngine->getAssetParamsId($caption, $conversionProfileId, true, 'caption');
-		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($contentElement->tags);
+		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($caption->tags);
 		
 		if(isset($caption->captionAssetId))
 			$captionAsset->id = $caption->captionAssetId;
