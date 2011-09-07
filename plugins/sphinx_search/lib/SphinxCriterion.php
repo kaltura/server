@@ -76,7 +76,7 @@ class SphinxCriterion extends KalturaCriterion
 		return null;
 	}
 	
-	protected function getNonStringClause($sphinxField, $comparison, $value, $queryHasOr)
+	protected function getNonStringClause($sphinxField, $type, $comparison, $value, $queryHasOr)
 	{
 		$thisClause = array();
 		
@@ -135,7 +135,7 @@ class SphinxCriterion extends KalturaCriterion
 				
 			case Criteria::LESS_THAN:
 			case Criteria::LESS_EQUAL:
-				if($value > 0)
+				if($type == IIndexable::FIELD_TYPE_DATETIME && $value > 0)
 					$thisClause[] = "$sphinxField <> 0";
 				// fallthrough
 				
@@ -235,7 +235,7 @@ class SphinxCriterion extends KalturaCriterion
 		}
 		else
 		{
-			$thisClause = $this->getNonStringClause($sphinxField, $comparison, $value, $queryHasOr);
+			$thisClause = $this->getNonStringClause($sphinxField, $type, $comparison, $value, $queryHasOr);
 		}
 		
 		$clauses = $this->getClauses();
