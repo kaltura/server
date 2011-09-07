@@ -291,7 +291,6 @@ abstract class KBulkUploadEngine
 	{
 		$this->kClientConfig->partnerId = $this->currentPartnerId;
 		$this->kClient->setConfig($this->kClientConfig);
-		KalturaLog::info("");
 	}
 	
 	protected function unimpersonate()
@@ -388,7 +387,6 @@ abstract class KBulkUploadEngine
 			$bulkUploadResult->entryId = $requestResult->id;
 			$this->addBulkUploadResult($bulkUploadResult);
 		}
-		$this->impersonate();
 		$this->kClient->doMultiRequest();
 	}
 	
