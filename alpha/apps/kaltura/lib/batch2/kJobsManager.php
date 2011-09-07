@@ -744,6 +744,10 @@ class kJobsManager
 			{
 				$postConvertData->setCreateThumb(false);
 			}
+			elseif($flavorParamsOutput->getSourceRemoteStorageProfileId() != StorageProfile::STORAGE_KALTURA_DC)
+			{
+				$postConvertData->setCreateThumb(false);
+			}
 			elseif($flavorAsset)
 			{
 				$entry = $flavorAsset->getentry();
