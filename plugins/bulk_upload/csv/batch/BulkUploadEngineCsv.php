@@ -130,7 +130,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected function createEntries()
 	{
 		// start a multi request for add entries
-		$this->startMultiRequest(true);
+		$this->kClient->startMultiRequest();
 		
 		KalturaLog::info("job[{$this->job->id}] start creating entries");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
@@ -152,7 +152,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 				
 				$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
 				$this->checkAborted();
-				$this->startMultiRequest(true);
+				$this->kClient->startMultiRequest();
 				$bulkUploadResultChunk = array();
 			}
 		}
