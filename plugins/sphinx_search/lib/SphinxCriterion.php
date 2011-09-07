@@ -22,15 +22,146 @@ class SphinxCriterion extends KalturaCriterion
 		return false;
 	}
 	
+	protected function getStringMatchClause($sphinxField, $comparison, $value)
+	{
+		switch($comparison)
+		{
+			case Criteria::EQUAL:
+				$value = SphinxUtils::escapeString($value);
+				return "@$sphinxField ^$value$";
+				
+			case Criteria::NOT_IN:
+				$vals = is_array($value) ? $value : explode(',', $value);
+					
+				foreach($vals as $valIndex => $valValue)
+				{
+					if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						unset($vals[$valIndex]);
+					else
+						$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+				}
+				
+				if(count($vals))
+				{
+					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
+					$val = $this->criteria->getPositiveMatch($sphinxField) .  ' !' . implode(' !', $vals);
+					return "@$sphinxField $val";
+				}
+				break;
+			
+			case Criteria::IN:
+				$vals = is_array($value) ? $value : explode(',', $value);
+					
+				foreach($vals as $valIndex => $valValue)
+				{
+					if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						unset($vals[$valIndex]);
+					else
+						$vals[$valIndex] = SphinxUtils::escapeString($valValue);
+				}
+				
+				if(count($vals))
+				{
+					$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
+					$val = '(^' . implode('$ | ^', $vals) . '$)';
+					return "@$sphinxField $val";
+				}
+				break;
+				
+			default:
+				$value = SphinxUtils::escapeString($value);
+				return "@$sphinxField $value";
+		}
+		
+		return null;
+	}
+	
+	protected function getNonStringClause($sphinxField, $comparison, $value, $queryHasOr)
+	{
+		$thisClause = array();
+		
+		switch($comparison)
+		{
+			case Criteria::IN:
+				$value = is_array($value) ? $value : explode(',', $value);
+					
+				sort($value); // importent, solves sphinx IN bug
+				foreach($value as $valIndex => $valValue)
+					if(is_null($valValue) || !strlen(trim($valValue)) || (($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($valValue)))
+						unset($value[$valIndex]);
+
+				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
+				
+				if (!count($value))
+					break;
+				
+				if ($queryHasOr)
+				{
+					$inConditions = array();
+					foreach($value as $val)
+						 $inConditions[] = "$sphinxField = $val";
+	
+					$thisClause[] = implode(' OR ', $inConditions);
+				}
+				else 
+				{
+					$values = implode(',', $value);
+					$thisClause[] = "$sphinxField in($values)";
+				}
+				break;
+				
+			case Criteria::NOT_IN:
+				$value = is_array($value) ? $value : explode(',', $value);
+					
+				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
+				
+				foreach($value as $valIndex => $valValue)
+					if(is_null($valValue) || !strlen(trim($valValue)) || (($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($valValue)))
+						unset($value[$valIndex]);
+				
+				if (!count($value))
+					break;
+				
+				$notInConditions = array();
+				foreach($value as $val)
+					 $notInConditions[] = "$sphinxField <> $val";
+
+				$thisClause[] = implode(' AND ', $notInConditions);
+				break;
+				
+			case Criteria::ISNULL:
+				$thisClause[] = "$sphinxField = 0";
+				break;
+				
+			case Criteria::LESS_THAN:
+			case Criteria::LESS_EQUAL:
+				if($value > 0)
+					$thisClause[] = "$sphinxField <> 0";
+				// fallthrough
+				
+			default:
+				if (!(($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($value)))
+					$thisClause[] = "$sphinxField $comparison $value";
+				break;
+		}
+		
+		$thisClause = implode(' AND ', $thisClause);
+		if ($queryHasOr && $thisClause)
+		{
+			$thisClause = "($thisClause)";
+		}
+		return $thisClause;
+	}
+
 	public function apply(array &$whereClause, array &$matchClause, &$conditionClause, $depth = 0, $queryHasOr = true)
 	{
-		$field = $this->getTable() . '.' . $this->getColumn();
-		
 		if (!$depth && !$this->hasOr())
 		{
 			$queryHasOr = false;
 		}
 			
+		$field = $this->getTable() . '.' . $this->getColumn();
+		
 		KalturaLog::debug("Applies criterion [$field] queryHasOr=[$queryHasOr]");
 	
 		$comparison = $this->getComparison();
@@ -96,124 +227,16 @@ class SphinxCriterion extends KalturaCriterion
 		
 		if($type == IIndexable::FIELD_TYPE_STRING)
 		{
-			switch($comparison)
-			{
-				case Criteria::EQUAL:
-					$value = SphinxUtils::escapeString($value);
-					$matchClause[] = "@$sphinxField ^$value$";
-					break;
-					
-				case Criteria::NOT_IN:
-					$vals = is_array($value) ? $value : explode(',', $value);
-						
-					foreach($vals as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
-							unset($vals[$valIndex]);
-						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-					
-					if(count($vals))
-					{
-						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = $this->criteria->getPositiveMatch($sphinxField) .  ' !' . implode(' !', $vals);
-						$matchClause[] = "@$sphinxField $val";
-					}
-					break;
-				
-				case Criteria::IN:
-					$vals = is_array($value) ? $value : explode(',', $value);
-						
-					foreach($vals as $valIndex => $valValue)
-					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
-							unset($vals[$valIndex]);
-						else
-							$vals[$valIndex] = SphinxUtils::escapeString($valValue);
-					}
-					
-					if(count($vals))
-					{
-						$vals = array_slice($vals, 0, SphinxCriterion::MAX_IN_VALUES);
-						$val = '(^' . implode('$ | ^', $vals) . '$)';
-						$matchClause[] = "@$sphinxField $val";
-					}
-					break;
-					
-				default:
-					$value = SphinxUtils::escapeString($value);
-					$matchClause[] = "@$sphinxField $value";
-					break;
-			}
-			return true;
+			$curMatchClause = $this->getStringMatchClause($sphinxField, $comparison, $value);
+			if ($curMatchClause)
+				$matchClause[] = $curMatchClause;
+			
+			$thisClause = '';
 		}
-		
-		$thisClause = array();
-		
-		switch($comparison)
+		else
 		{
-			case Criteria::IN:
-				$value = is_array($value) ? $value : explode(',', $value);
-					
-				sort($value); // importent, solves sphinx IN bug
-				foreach($value as $valIndex => $valValue)
-					if(is_null($valValue) || !strlen(trim($valValue)) || (($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($valValue)))
-						unset($value[$valIndex]);
-
-				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
-				
-				if (!count($value))
-					break;
-				
-				if ($queryHasOr)
-				{
-					$inConditions = array();
-					foreach($value as $val)
-						 $inConditions[] = "$sphinxField = $val";
-	
-					$thisClause[] = implode(' OR ', $inConditions);
-				}
-				else 
-				{
-					$values = implode(',', $value);
-					$thisClause[] = "$sphinxField in($values)";
-				}
-				break;
-				
-			case Criteria::NOT_IN:
-				$value = is_array($value) ? $value : explode(',', $value);
-					
-				$value = array_slice($value, 0, SphinxCriterion::MAX_IN_VALUES);
-				
-				foreach($value as $valIndex => $valValue)
-					if(is_null($valValue) || !strlen(trim($valValue)) || (($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($valValue)))
-						unset($value[$valIndex]);
-				
-				$notInConditions = array();
-				foreach($value as $val)
-					 $notInConditions[] = "$sphinxField <> $val";
-
-				$thisClause[] = implode(' AND ', $notInConditions);
-				break;
-				
-			case Criteria::ISNULL:
-				$thisClause[] = "$sphinxField = 0";
-				break;
-				
-			case Criteria::LESS_THAN:
-			case Criteria::LESS_EQUAL:
-				if($value > 0)
-					$thisClause[] = "$sphinxField <> 0";
-				// fallthrough
-				
-			default:
-				if (!(($type == IIndexable::FIELD_TYPE_INTEGER || $type == IIndexable::FIELD_TYPE_DATETIME) && !is_numeric($value)))
-					$thisClause[] = "$sphinxField $comparison $value";
-				break;
+			$thisClause = $this->getNonStringClause($sphinxField, $comparison, $value, $queryHasOr);
 		}
-		
-		$thisClause = '(' . implode(' AND ', $thisClause) . ')';
 		
 		$clauses = $this->getClauses();
 		$conjuctions = $this->getConjunctions();
@@ -238,20 +261,27 @@ class SphinxCriterion extends KalturaCriterion
 				continue;
 			}
 			
-			$thisClause .= $conjuctions[$index] .  $curConditionClause;
+			if ($thisClause)
+			{
+				$thisClause .= $conjuctions[$index];
+			}
+			$thisClause .= $curConditionClause;
 			if ($queryHasOr)
 			{
 				$thisClause = "($thisClause)";
 			}
 		}
 		
-		if ($queryHasOr)
+		if ($thisClause)
 		{
-			$conditionClause = $thisClause;
-		}
-		else
-		{
-			$whereClause[] = $thisClause;
+			if ($queryHasOr)
+			{
+				$conditionClause = $thisClause;
+			}
+			else
+			{
+				$whereClause[] = $thisClause;
+			}
 		}
 		
 		return true;
