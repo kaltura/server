@@ -39,11 +39,22 @@ function checkCache()
             	$response = @file_get_contents("/tmp/cache-$key");
                 if ($response)
                 {
+					if (strpos($uri, "/partnerservices2/executeplaylist") !== false) // for now cache only playlist on cdn
+					{
+						$max_age = 60;
+						header("Cache-Control: private, max-age=$max_age, max-stale=0");
+						header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . 'GMT');
+						header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . 'GMT');
+					}
+					else
+					{
+						header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
+						header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+						header("Pragma: no-cache" );
+					}
+
 					$processing_time = microtime(true) - $start_time;
 					header("X-Kaltura:cached-dispatcher,$key,$processing_time");
-					header("Expires: Sun, 19 Nov 2000 08:52:00 GMT");
-					header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-					header("Pragma: no-cache" );
 					echo $response;
 					die;
 				}
