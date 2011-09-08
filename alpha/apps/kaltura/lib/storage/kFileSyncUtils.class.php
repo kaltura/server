@@ -1,6 +1,11 @@
 <?php
 class kFileSyncUtils
 {
+	/**
+	 * @var array<int order, int storageId> 
+	 */
+	private static $storageProfilesOrder = null;
+	
 	public static function file_exists ( FileSyncKey $key , $fetch_from_remote_if_no_local = false )
 	{
 		KalturaLog::log(__METHOD__." - key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local]");
@@ -401,6 +406,34 @@ class kFileSyncUtils
 	}
 
 	/**
+	 * Get all the external FileSync objects by its key
+	 * 
+	 * @param FileSyncKey $key
+	 * @return array<FileSync>
+	 */	
+	public static function getAllReadyExternalFileSyncsForKey(FileSyncKey $key)
+	{
+		$c = new Criteria();
+		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		
+		$fileSyncs = FileSyncPeer::doSelect($c);
+		if(
+			$key->partner_id 
+			&&
+			count($fileSyncs) > 1
+			&& 
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $key->partner_id)
+		)
+		{
+			self::prepareStorageProfilesForSort($key->partner_id);
+			uasort($fileSyncs, array('self', 'compareStorageProfiles'));
+		}
+		return $fileSyncs;
+	}
+
+	/**
 	 * Get the external FileSync object by its key
 	 * 
 	 * @param FileSyncKey $key
@@ -421,8 +454,59 @@ class kFileSyncUtils
 			$c->addAnd ( FileSyncPeer::DC , $externalStorageId );
 		}
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+		
+		if(
+			!$key->partner_id 
+			|| 
+			!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $key->partner_id)
+		)
+			return FileSyncPeer::doSelectOne($c);
+		
+		$fileSyncs = FileSyncPeer::doSelect($c);
+		if(count($fileSyncs) > 1)
+		{
+			self::prepareStorageProfilesForSort($key->partner_id);
+			uasort($fileSyncs, array('self', 'compareStorageProfiles'));
+		}
+		return reset($fileSyncs);
+	}
 
-		return FileSyncPeer::doSelectOne( $c );
+	/**
+	 * @param FileSync $fileSyncA
+	 * @param FileSync $fileSyncB
+	 * @return number
+	 */
+	public static function compareStorageProfiles($fileSyncA, $fileSyncB) 
+	{
+		if(!is_array(self::$storageProfilesOrder) || !count(self::$storageProfilesOrder))
+			return 0;
+		
+		$a = array_search($fileSyncA->getDc(), self::$storageProfilesOrder);
+		$b = array_search($fileSyncB->getDc(), self::$storageProfilesOrder);
+		
+		if ($a == $b)
+			return 0;
+		
+		return ($a < $b) ? -1 : 1;
+	}
+	
+	/**
+	 * Prepare storage profiles array for sorting
+	 *
+	 * @param int $partnerId
+	 */
+	protected static function prepareStorageProfilesForSort($partnerId)
+	{
+		if(!is_null(self::$storageProfilesOrder))
+			return;
+		
+		$criteria = new Criteria();
+		$criteria->addSelectColumn(StorageProfilePeer::ID);
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->addAscendingOrderByColumn(StorageProfilePeer::DELIVERY_PRIORITY);
+
+		$stmt = StorageProfilePeer::doSelectStmt($criteria);
+		self::$storageProfilesOrder = $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
 
 	/**
@@ -435,7 +519,7 @@ class kFileSyncUtils
 	{
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-		$c->addAnd ( FileSyncPeer::FILE_TYPE , array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_LINK), Criteria::IN );
+		$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
 
 		return FileSyncPeer::doSelectOne( $c );
@@ -823,18 +907,31 @@ class kFileSyncUtils
 		
 		// create a FileSync for the current DC with status READY
 		$current_dc_file_sync = FileSync::createForFileSyncKey( $target_key );
-		$current_dc_file_sync->setDc( $dc_id );
 		$current_dc_file_sync->setPartnerId ( $target_key->partner_id);
 		$current_dc_file_sync->setFileSize ( -1 );
 		$current_dc_file_sync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
 		$current_dc_file_sync->setReadyAt ( time() );
 		$current_dc_file_sync->setOriginal ( 1 );
-		$current_dc_file_sync->setLinkedId( $sourceFile->getId() );
-		$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
+		
+		if($sourceFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		{
+			$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
+			$current_dc_file_sync->setDc( $sourceFile->getDc() );
+			$current_dc_file_sync->setFileRoot( $sourceFile->getFileRoot() );
+			$current_dc_file_sync->setFilePath( $sourceFile->getFilePath() );
+		}
+		else 
+		{
+			$current_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_LINK );
+			$current_dc_file_sync->setDc( $dc_id );
+			$current_dc_file_sync->setLinkedId( $sourceFile->getId() );
+		}
+		
 		$current_dc_file_sync->save();
 		
 		//increment link_count for this DC source]
-		self::incrementLinkCountForFileSync($sourceFile);
+		if($sourceFile->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
+			self::incrementLinkCountForFileSync($sourceFile);
 		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $source_key );
