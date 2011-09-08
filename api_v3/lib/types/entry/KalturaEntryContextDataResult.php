@@ -56,4 +56,10 @@ class KalturaEntryContextDataResult extends KalturaObject
 	 * @var string
 	 */
 	public $mediaProtocol;
+	
+	/**
+	 *
+	 * @var string
+	 */
+	public $storageProfiles;
 }
