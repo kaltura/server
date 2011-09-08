@@ -359,7 +359,7 @@ class asset extends Baseasset implements ISyncableFile
 				$serveRemote = true;
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
 				if(!$fileSync)
-					throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 				
 				break;
 			
@@ -377,7 +377,7 @@ class asset extends Baseasset implements ISyncableFile
 					
 				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
 				if(!$fileSync)
-					throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 				
 				$serveRemote = true;
 				break;
@@ -385,7 +385,7 @@ class asset extends Baseasset implements ISyncableFile
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 				if(!$fileSync)
-					throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 				
 				break;
 		}

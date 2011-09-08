@@ -1016,7 +1016,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 					$serveRemote = true;
 					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
 					if(!$fileSync)
-						throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+						throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 					
 					break;
 				
@@ -1034,7 +1034,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 						
 					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
 					if(!$fileSync)
-						throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+						throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 					
 					$serveRemote = true;
 					break;
@@ -1042,7 +1042,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 					$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 					if(!$fileSync)
-						throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+						throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 					
 					break;
 			}
