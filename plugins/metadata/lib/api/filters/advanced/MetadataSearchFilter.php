@@ -109,8 +109,13 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						KalturaLog::ERR("Missing metadataField for $field in xpath array: " . print_r($xPaths,true));
 						continue;
 					}
-									
-					$newCondition = $metadataField . $comparison . $item->getValue();
+				
+					if (!is_numeric($item->getValue()))
+						$value = SphinxUtils::escapeString($item->getValue());
+					else
+						$value = $item->getValue();
+						
+					$newCondition = $metadataField . $comparison . $value;
 					
 					if ($item->getComparison() != KalturaSearchConditionComparison::EQUEL)
 						$newCondition = "($newCondition AND $metadataField <> 0)";
