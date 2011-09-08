@@ -1527,6 +1527,7 @@
 		<column primaryKey="false" lazyLoad="false" name="path_manager_class" type="varchar" required="false" size="127" />
 		<column primaryKey="false" lazyLoad="false" name="url_manager_class" type="varchar" required="false" size="127" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_priority" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="delivery_status" type="tinyint" />
 	</table>
 	<table skipSql="false" abstract="false" name="email_ingestion_profile">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
