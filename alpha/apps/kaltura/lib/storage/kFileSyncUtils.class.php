@@ -501,7 +501,10 @@ class kFileSyncUtils
 	protected static function prepareStorageProfilesForSort($partnerId)
 	{
 		if(!is_null(self::$storageProfilesOrder))
+		{
+			KalturaLog::debug("Storage profiles order already defined [" . print_r(self::$storageProfilesOrder, true) . "]");
 			return;
+		}
 		
 		$criteria = new Criteria();
 		$criteria->addSelectColumn(StorageProfilePeer::ID);
@@ -511,6 +514,7 @@ class kFileSyncUtils
 
 		$stmt = StorageProfilePeer::doSelectStmt($criteria);
 		self::$storageProfilesOrder = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		KalturaLog::debug("Storage profiles order [" . print_r(self::$storageProfilesOrder, true) . "]");
 	}
 
 	/**
