@@ -413,21 +413,24 @@ class kFileSyncUtils
 	 */	
 	public static function getAllReadyExternalFileSyncsForKey(FileSyncKey $key)
 	{
+		if(is_null($key->partner_id))
+			throw new kFileSyncException("partner id not defined for key [$key]", kFileSyncException::FILE_SYNC_PARTNER_ID_NOT_DEFINED);
+		
+		self::prepareStorageProfilesForSort($key->partner_id);
+		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
 		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::DC, self::$storageProfilesOrder, Criteria::IN);
 		
 		$fileSyncs = FileSyncPeer::doSelect($c);
 		if(
-			$key->partner_id 
-			&&
 			count($fileSyncs) > 1
 			&& 
 			PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $key->partner_id)
 		)
 		{
-			self::prepareStorageProfilesForSort($key->partner_id);
 			uasort($fileSyncs, array('self', 'compareStorageProfiles'));
 		}
 		return $fileSyncs;
@@ -442,12 +445,18 @@ class kFileSyncUtils
 	 */	
 	public static function getReadyExternalFileSyncForKey(FileSyncKey $key, $externalStorageId = null)
 	{
+		if(is_null($key->partner_id))
+			throw new kFileSyncException("partner id not defined for key [$key]", kFileSyncException::FILE_SYNC_PARTNER_ID_NOT_DEFINED);
+		
+		self::prepareStorageProfilesForSort($key->partner_id);
+		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		
 		if(is_null($externalStorageId))
 		{
 			$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL ); // any external
+			$c->addAnd ( FileSyncPeer::DC , self::$storageProfilesOrder, Criteria::IN );
 		}
 		else
 		{
@@ -455,19 +464,13 @@ class kFileSyncUtils
 		}
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
 		
-		if(
-			!$key->partner_id 
-			|| 
-			!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $key->partner_id)
-		)
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $key->partner_id))
 			return FileSyncPeer::doSelectOne($c);
 		
 		$fileSyncs = FileSyncPeer::doSelect($c);
 		if(count($fileSyncs) > 1)
-		{
-			self::prepareStorageProfilesForSort($key->partner_id);
 			uasort($fileSyncs, array('self', 'compareStorageProfiles'));
-		}
+		
 		return reset($fileSyncs);
 	}
 
@@ -503,6 +506,7 @@ class kFileSyncUtils
 		$criteria = new Criteria();
 		$criteria->addSelectColumn(StorageProfilePeer::ID);
 		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(StorageProfilePeer::DELIVERY_STATUS, StorageProfileDeliveryStatus::BLOCKED, Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(StorageProfilePeer::DELIVERY_PRIORITY);
 
 		$stmt = StorageProfilePeer::doSelectStmt($criteria);
