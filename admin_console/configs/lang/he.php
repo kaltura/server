@@ -214,6 +214,9 @@ return array(
 	'Kaltura_Client_Enum_StorageProfileProtocol::SFTP' => 'SFTP',
 	'Kaltura_Client_Enum_StorageProfileProtocol::S3' => 'Amazon S3',
 
+	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::ACTIVE' => 'Active',
+	'Kaltura_Client_Enum_StorageProfileDeliveryStatus::BLOCKED' => 'Blocked',
+
 	'Kaltura_Client_Enum_StorageServePriority::Kaltura_ONLY' => 'Kaltura Storage Only',
 	'Kaltura_Client_Enum_StorageServePriority::Kaltura_FIRST' => 'Kaltura Storage First',
 	'Kaltura_Client_Enum_StorageServePriority::EXTERNAL_ONLY' => 'External Storage Only',

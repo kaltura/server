@@ -19,13 +19,22 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'label' 		=> '*Remote Storage Name:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
-		
 		));
 		 
+		$deliveryStatus = new Kaltura_Form_Element_EnumSelect('deliveryStatus', array('enum' => 'Kaltura_Client_Enum_StorageProfileDeliveryStatus'));
+		$deliveryStatus->setLabel('Delivery Status:');
+		$this->addElements(array($deliveryStatus));	
+		
+		$this->addElement('text', 'deliveryPriority', array(
+			'label' 		=> 'Delivery Priority:',
+			'required'		=> true,
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('textarea', 'desciption', array(
 			'label'			=> 'Description:',
-			'cols'			=> 48,
-			'rows'			=> 2,
+			'cols'			=> 60,
+			'rows'			=> 3,
 			'filters'		=> array('StringTrim'),
 		));
 		 

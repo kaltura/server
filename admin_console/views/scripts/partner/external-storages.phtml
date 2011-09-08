@@ -176,6 +176,8 @@ function configure(storageId) {
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmStorageConfig').submit();
+				jQuery(this).dialog('close');
+				jQuery('#frmPaginator1').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
