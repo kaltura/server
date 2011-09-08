@@ -30,4 +30,6 @@ class kCoreException extends Exception
 	const OBJECT_TYPE_NOT_FOUND = "OBJECT_TYPE_NOT_FOUND";
 	
 	const SOURCE_FILE_NOT_FOUND = "SOURCE_FILE_NOT_FOUND";
+	
+	const FILE_NOT_FOUND = "FILE_NOT_FOUND";
 }

@@ -7,18 +7,8 @@
  * @package api
  * @subpackage services
  */
-class ThumbAssetService extends KalturaBaseService
+class ThumbAssetService extends KalturaAssetService
 {
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		
-		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
-		parent::applyPartnerFilterForClass(new assetPeer());
-		parent::applyPartnerFilterForClass(new assetParamsPeer());
-	}
-
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
@@ -386,13 +376,13 @@ class ThumbAssetService extends KalturaBaseService
 		$fileName = $entry->getId() . '.jpg';
 		
 		if(is_null($thumbParamId))
-			return $this->serveFile($entry, entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB, $fileName);
+			return $this->serveAsset($entry, $fileName);
 		
 		$thumbAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $thumbParamId);
 		if(!$thumbAsset)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_PARAMS_ID_NOT_FOUND, $thumbParamId);
 		
-		return $this->serveFile($thumbAsset, thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveAsset($thumbAsset, $fileName);
 	}
 
 	/**
@@ -417,7 +407,7 @@ class ThumbAssetService extends KalturaBaseService
 			
 		$fileName = $thumbAsset->getEntryId()."_" . $thumbAsset->getId() . ".$ext";
 		
-		return $this->serveFile($thumbAsset, thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveAsset($thumbAsset, $fileName);
 	}
 	
 	/**

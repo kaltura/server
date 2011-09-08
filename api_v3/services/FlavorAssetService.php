@@ -7,18 +7,8 @@
  * @package api
  * @subpackage services
  */
-class FlavorAssetService extends KalturaBaseService
+class FlavorAssetService extends KalturaAssetService
 {
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		
-		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
-		parent::applyPartnerFilterForClass(new assetPeer());
-		parent::applyPartnerFilterForClass(new assetParamsPeer());
-	}
-
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(

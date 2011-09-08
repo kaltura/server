@@ -347,6 +347,52 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function getDownloadUrl($useCdn = false)
 	{
+		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		
+		$fileSync = null;
+		$serveRemote = false;
+		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+		
+		switch($partner->getStorageServePriority())
+		{
+			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
+				$serveRemote = true;
+				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+				if(!$fileSync)
+					throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+				
+				break;
+			
+			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
+				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+				if($fileSync)
+					$serveRemote = true;
+				
+				break;
+			
+			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
+				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+				if($fileSync)
+					break;
+					
+				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+				if(!$fileSync)
+					throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+				
+				$serveRemote = true;
+				break;
+			
+			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
+				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+				if(!$fileSync)
+					throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+				
+				break;
+		}
+		
+		if($serveRemote && $fileSync)
+			return $fileSync->getExternalUrl();
+		
 		return $this->getDownloadUrlWithExpiry(86400, $useCdn);
 	}
 	

@@ -7,7 +7,7 @@
  * @package plugins.attachment
  * @subpackage api.services
  */
-class AttachmentAssetService extends KalturaBaseService
+class AttachmentAssetService extends KalturaAssetService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -409,7 +409,7 @@ class AttachmentAssetService extends KalturaBaseService
 			
 		$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		
-		return $this->serveFile($attachmentAsset, AttachmentAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveAsset($attachmentAsset, $fileName);
 	}
 
 	/**

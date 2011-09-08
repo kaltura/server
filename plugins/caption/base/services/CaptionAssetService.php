@@ -7,18 +7,8 @@
  * @package plugins.caption
  * @subpackage api.services
  */
-class CaptionAssetService extends KalturaBaseService
+class CaptionAssetService extends KalturaAssetService
 {
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		
-		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
-		parent::applyPartnerFilterForClass(new assetParamsOutputPeer());
-		parent::applyPartnerFilterForClass(new assetPeer());
-		parent::applyPartnerFilterForClass(new assetParamsPeer());
-	}
-
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
@@ -381,7 +371,7 @@ class CaptionAssetService extends KalturaBaseService
 		
 		$fileName = $captionAsset->getId() . '.' . $captionAsset->getFileExt();
 		
-		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveAsset($captionAsset, $fileName);
 	}
 	
 	/**
@@ -464,7 +454,7 @@ class CaptionAssetService extends KalturaBaseService
 			
 		$fileName = $captionAsset->getEntryId()."_" . $captionAsset->getId() . ".$ext";
 		
-		return $this->serveFile($captionAsset, CaptionAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName);
+		return $this->serveAsset($captionAsset, $fileName);
 	}
 	
 	/**
