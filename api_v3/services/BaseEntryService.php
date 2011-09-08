@@ -623,6 +623,7 @@ class BaseEntryService extends KalturaEntryService
 		$result->isIpAddressRestricted = false;
 		$result->isUserAgentRestricted = false;
 		$result->previewLength = -1;
+		$result->storageProfiles = null;
 				
 		if ($accessControl && $accessControl->hasRestrictions())
 		{
@@ -674,8 +675,37 @@ class BaseEntryService extends KalturaEntryService
 			
 		}
 		
-		$result->streamerType = $this->getPartner()->getStreamerType();
+		if($contextDataParams->streamerType)
+			$result->streamerType = $contextDataParams->streamerType;
+		else
+			$result->streamerType = $this->getPartner()->getStreamerType();
+			
 		$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
+		
+		$partner = PartnerPeer::retrieveByPK($dbEntry->getPartnerId());
+		if($result->streamerType == StorageProfile::PLAY_FORMAT_RTMP && 
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $dbEntry->getPartnerId()) &&
+			$partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
+		{
+			if (!is_null($contextDataParams->flavorAssetId)){
+				$asset = assetPeer::retrieveBestPlayByEntryId($this->entryId);
+			}else{
+				$asset = assetPeer::retrieveByPK($contextDataParams->$flavorId);
+			}
+			
+			if(!$asset)
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $entryId);
+								
+			$assetSyncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$fileSyncs = kFileSyncUtils::getAllReadyExternalFileSyncsForKey($assetSyncKey);
+		
+			$storageProfileIds = array();
+			foreach ($fileSyncs as $fileSync)
+				$storageProfileIds[] = $fileSync->getDc();
+			
+			$result->storageProfileIds = implode(',',$storageProfileIds);
+		}
+		
 		return $result;
 	}
 }
