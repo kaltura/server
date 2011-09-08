@@ -267,7 +267,7 @@ class kString
 	 * @param string $string
 	 * @return string
 	 */
-	public function stringToSafeXml($string, $now = false)
+	public static function stringToSafeXml($string, $now = false)
 	{
 		$string = @iconv('utf-8', 'utf-8', $string);
 		$partially_safe = self::xmlEncode($string);
