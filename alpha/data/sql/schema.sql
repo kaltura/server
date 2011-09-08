@@ -1763,6 +1763,7 @@ CREATE TABLE `storage_profile`
 	`custom_data` TEXT,
 	`path_manager_class` VARCHAR(127),
 	`url_manager_class` VARCHAR(127),
+	`delivery_priority` INTEGER,
 	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
