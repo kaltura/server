@@ -119,7 +119,10 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		{
 			$resource = new KalturaUrlResource();
 			$resource->url = $bulkUploadResult->url;
+			
+			$this->impersonate();
 			$this->kClient->media->addContent($bulkUploadResult->entryId, $resource);
+			$this->unimpersonate();
 		}
 	}
 	
@@ -130,7 +133,6 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 	protected function createEntries()
 	{
 		// start a multi request for add entries
-		$this->impersonate();
 		$this->kClient->startMultiRequest();
 		
 		KalturaLog::info("job[{$this->job->id}] start creating entries");
@@ -142,7 +144,9 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 					
 			$bulkUploadResultChunk[] = $bulkUploadResult;
 			
+			$this->impersonate();
 			$this->kClient->media->add($mediaEntry);
+			$this->unimpersonate();
 			
 			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
 			{
@@ -158,7 +162,6 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		
 		// make all the media->add as the partner
 		$requestResults = $this->kClient->doMultiRequest();
-		$this->unimpersonate();
 		
 		if(count($requestResults))
 			$this->updateEntriesResults($requestResults, $bulkUploadResultChunk);
