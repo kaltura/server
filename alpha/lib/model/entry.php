@@ -998,6 +998,59 @@ class entry extends Baseentry implements ISyncableFile, IIndexable
 
 	public function getThumbnailUrl( $version = NULL )
 	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_KMC_DRILL_DOWN_THUMB_RESIZE, $this->getPartnerId()))
+		{
+			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
+			if($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+				$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+			
+			$syncKey = $this->getSyncKey($subType);
+			
+			$fileSync = null;
+			$serveRemote = false;
+			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
+			
+			switch($partner->getStorageServePriority())
+			{
+				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
+					$serveRemote = true;
+					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+					if(!$fileSync)
+						throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+					
+					break;
+				
+				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
+					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+					if($fileSync)
+						$serveRemote = true;
+					
+					break;
+				
+				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
+					$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+					if($fileSync)
+						break;
+						
+					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+					if(!$fileSync)
+						throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+					
+					$serveRemote = true;
+					break;
+				
+				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
+					$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+					if(!$fileSync)
+						throw new kCoreException(kCoreException::FILE_NOT_FOUND);
+					
+					break;
+			}
+			
+			if($serveRemote && $fileSync)
+				return $fileSync->getExternalUrl();
+		}
+		
 		//$path = $this->getThumbnailPath ( $version );
 		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/thumbnail/entry_id/" . $this->getId() ;
 		$current_version = $this->getThumbnailVersion();
