@@ -1764,6 +1764,7 @@ CREATE TABLE `storage_profile`
 	`path_manager_class` VARCHAR(127),
 	`url_manager_class` VARCHAR(127),
 	`delivery_priority` INTEGER,
+	`delivery_status` TINYINT,
 	PRIMARY KEY (`id`)
 )Type=MyISAM;
 
