@@ -5,6 +5,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	const GROUP_ENABLE_DISABLE_FEATURES = 'GROUP_ENABLE_DISABLE_FEATURES';
     const GROUP_CONTENT_INGESTION_OPTIONS = 'GROUP_CONTENT_INGESTION_OPTIONS';
     const GROUP_PUBLISHER_DELIVERY_SETTINGS = 'GROUP_PUBLISHER_DELIVERY_SETTINGS';
+    const GROUP_REMOTE_STORAGE = 'GROUP_REMOTE_STORAGE';
    	
     protected $limitSubForms = array();
     
@@ -14,6 +15,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES] = array();
 		$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS] = array();
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS] = array();
+		$permissionNames[self::GROUP_REMOTE_STORAGE] = array();
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -121,12 +123,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addElement('checkbox', 'storage_delete_from_kaltura', array(
 			'label'	  => 'Delete exported storage from Kaltura',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 				
 		$this->addElement('checkbox', 'import_remote_source_for_convert', array(
 			'label'	  => 'Import remote source for convert',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 	
 //--------------------------- Advanced Notification settings ---------------------------		
@@ -300,7 +302,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
 	
 		ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
-		ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);		
+		ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
+		ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);		
 		$this->addAllDisplayGroups($permissionNames);
 	}
 	
@@ -553,7 +556,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		$this->addDisplayGroup(array_merge(array('checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_rtmp_url', 'rtmp_url', 'checkbox_delivry_block_countries', 'delivry_block_countries'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));				
 		
-		$this->addDisplayGroup(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert','crossLine'), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));	
+		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));	
 		$this->addDisplayGroup(array('notifications_config', 'allow_multi_notification','crossLine'), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
