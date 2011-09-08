@@ -26,7 +26,7 @@ abstract class BaseStorageProfilePeer {
 	const TM_CLASS = 'StorageProfileTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 25;
+	const NUM_COLUMNS = 26;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -106,6 +106,9 @@ abstract class BaseStorageProfilePeer {
 	/** the column name for the DELIVERY_PRIORITY field */
 	const DELIVERY_PRIORITY = 'storage_profile.DELIVERY_PRIORITY';
 
+	/** the column name for the DELIVERY_STATUS field */
+	const DELIVERY_STATUS = 'storage_profile.DELIVERY_STATUS';
+
 	/**
 	 * An identiy map to hold any loaded instances of StorageProfile objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -122,11 +125,11 @@ abstract class BaseStorageProfilePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Desciption', 'Status', 'Protocol', 'StorageUrl', 'StorageBaseDir', 'StorageUsername', 'StoragePassword', 'StorageFtpPassiveMode', 'DeliveryHttpBaseUrl', 'DeliveryRmpBaseUrl', 'DeliveryIisBaseUrl', 'MinFileSize', 'MaxFileSize', 'FlavorParamsIds', 'MaxConcurrentConnections', 'CustomData', 'PathManagerClass', 'UrlManagerClass', 'DeliveryPriority', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'desciption', 'status', 'protocol', 'storageUrl', 'storageBaseDir', 'storageUsername', 'storagePassword', 'storageFtpPassiveMode', 'deliveryHttpBaseUrl', 'deliveryRmpBaseUrl', 'deliveryIisBaseUrl', 'minFileSize', 'maxFileSize', 'flavorParamsIds', 'maxConcurrentConnections', 'customData', 'pathManagerClass', 'urlManagerClass', 'deliveryPriority', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCIPTION, self::STATUS, self::PROTOCOL, self::STORAGE_URL, self::STORAGE_BASE_DIR, self::STORAGE_USERNAME, self::STORAGE_PASSWORD, self::STORAGE_FTP_PASSIVE_MODE, self::DELIVERY_HTTP_BASE_URL, self::DELIVERY_RMP_BASE_URL, self::DELIVERY_IIS_BASE_URL, self::MIN_FILE_SIZE, self::MAX_FILE_SIZE, self::FLAVOR_PARAMS_IDS, self::MAX_CONCURRENT_CONNECTIONS, self::CUSTOM_DATA, self::PATH_MANAGER_CLASS, self::URL_MANAGER_CLASS, self::DELIVERY_PRIORITY, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'desciption', 'status', 'protocol', 'storage_url', 'storage_base_dir', 'storage_username', 'storage_password', 'storage_ftp_passive_mode', 'delivery_http_base_url', 'delivery_rmp_base_url', 'delivery_iis_base_url', 'min_file_size', 'max_file_size', 'flavor_params_ids', 'max_concurrent_connections', 'custom_data', 'path_manager_class', 'url_manager_class', 'delivery_priority', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', 'PartnerId', 'Name', 'SystemName', 'Desciption', 'Status', 'Protocol', 'StorageUrl', 'StorageBaseDir', 'StorageUsername', 'StoragePassword', 'StorageFtpPassiveMode', 'DeliveryHttpBaseUrl', 'DeliveryRmpBaseUrl', 'DeliveryIisBaseUrl', 'MinFileSize', 'MaxFileSize', 'FlavorParamsIds', 'MaxConcurrentConnections', 'CustomData', 'PathManagerClass', 'UrlManagerClass', 'DeliveryPriority', 'DeliveryStatus', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', 'partnerId', 'name', 'systemName', 'desciption', 'status', 'protocol', 'storageUrl', 'storageBaseDir', 'storageUsername', 'storagePassword', 'storageFtpPassiveMode', 'deliveryHttpBaseUrl', 'deliveryRmpBaseUrl', 'deliveryIisBaseUrl', 'minFileSize', 'maxFileSize', 'flavorParamsIds', 'maxConcurrentConnections', 'customData', 'pathManagerClass', 'urlManagerClass', 'deliveryPriority', 'deliveryStatus', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::CREATED_AT, self::UPDATED_AT, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCIPTION, self::STATUS, self::PROTOCOL, self::STORAGE_URL, self::STORAGE_BASE_DIR, self::STORAGE_USERNAME, self::STORAGE_PASSWORD, self::STORAGE_FTP_PASSIVE_MODE, self::DELIVERY_HTTP_BASE_URL, self::DELIVERY_RMP_BASE_URL, self::DELIVERY_IIS_BASE_URL, self::MIN_FILE_SIZE, self::MAX_FILE_SIZE, self::FLAVOR_PARAMS_IDS, self::MAX_CONCURRENT_CONNECTIONS, self::CUSTOM_DATA, self::PATH_MANAGER_CLASS, self::URL_MANAGER_CLASS, self::DELIVERY_PRIORITY, self::DELIVERY_STATUS, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', 'partner_id', 'name', 'system_name', 'desciption', 'status', 'protocol', 'storage_url', 'storage_base_dir', 'storage_username', 'storage_password', 'storage_ftp_passive_mode', 'delivery_http_base_url', 'delivery_rmp_base_url', 'delivery_iis_base_url', 'min_file_size', 'max_file_size', 'flavor_params_ids', 'max_concurrent_connections', 'custom_data', 'path_manager_class', 'url_manager_class', 'delivery_priority', 'delivery_status', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, )
 	);
 
 	/**
@@ -136,11 +139,11 @@ abstract class BaseStorageProfilePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Name' => 4, 'SystemName' => 5, 'Desciption' => 6, 'Status' => 7, 'Protocol' => 8, 'StorageUrl' => 9, 'StorageBaseDir' => 10, 'StorageUsername' => 11, 'StoragePassword' => 12, 'StorageFtpPassiveMode' => 13, 'DeliveryHttpBaseUrl' => 14, 'DeliveryRmpBaseUrl' => 15, 'DeliveryIisBaseUrl' => 16, 'MinFileSize' => 17, 'MaxFileSize' => 18, 'FlavorParamsIds' => 19, 'MaxConcurrentConnections' => 20, 'CustomData' => 21, 'PathManagerClass' => 22, 'UrlManagerClass' => 23, 'DeliveryPriority' => 24, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'name' => 4, 'systemName' => 5, 'desciption' => 6, 'status' => 7, 'protocol' => 8, 'storageUrl' => 9, 'storageBaseDir' => 10, 'storageUsername' => 11, 'storagePassword' => 12, 'storageFtpPassiveMode' => 13, 'deliveryHttpBaseUrl' => 14, 'deliveryRmpBaseUrl' => 15, 'deliveryIisBaseUrl' => 16, 'minFileSize' => 17, 'maxFileSize' => 18, 'flavorParamsIds' => 19, 'maxConcurrentConnections' => 20, 'customData' => 21, 'pathManagerClass' => 22, 'urlManagerClass' => 23, 'deliveryPriority' => 24, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::NAME => 4, self::SYSTEM_NAME => 5, self::DESCIPTION => 6, self::STATUS => 7, self::PROTOCOL => 8, self::STORAGE_URL => 9, self::STORAGE_BASE_DIR => 10, self::STORAGE_USERNAME => 11, self::STORAGE_PASSWORD => 12, self::STORAGE_FTP_PASSIVE_MODE => 13, self::DELIVERY_HTTP_BASE_URL => 14, self::DELIVERY_RMP_BASE_URL => 15, self::DELIVERY_IIS_BASE_URL => 16, self::MIN_FILE_SIZE => 17, self::MAX_FILE_SIZE => 18, self::FLAVOR_PARAMS_IDS => 19, self::MAX_CONCURRENT_CONNECTIONS => 20, self::CUSTOM_DATA => 21, self::PATH_MANAGER_CLASS => 22, self::URL_MANAGER_CLASS => 23, self::DELIVERY_PRIORITY => 24, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'name' => 4, 'system_name' => 5, 'desciption' => 6, 'status' => 7, 'protocol' => 8, 'storage_url' => 9, 'storage_base_dir' => 10, 'storage_username' => 11, 'storage_password' => 12, 'storage_ftp_passive_mode' => 13, 'delivery_http_base_url' => 14, 'delivery_rmp_base_url' => 15, 'delivery_iis_base_url' => 16, 'min_file_size' => 17, 'max_file_size' => 18, 'flavor_params_ids' => 19, 'max_concurrent_connections' => 20, 'custom_data' => 21, 'path_manager_class' => 22, 'url_manager_class' => 23, 'delivery_priority' => 24, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, 'PartnerId' => 3, 'Name' => 4, 'SystemName' => 5, 'Desciption' => 6, 'Status' => 7, 'Protocol' => 8, 'StorageUrl' => 9, 'StorageBaseDir' => 10, 'StorageUsername' => 11, 'StoragePassword' => 12, 'StorageFtpPassiveMode' => 13, 'DeliveryHttpBaseUrl' => 14, 'DeliveryRmpBaseUrl' => 15, 'DeliveryIisBaseUrl' => 16, 'MinFileSize' => 17, 'MaxFileSize' => 18, 'FlavorParamsIds' => 19, 'MaxConcurrentConnections' => 20, 'CustomData' => 21, 'PathManagerClass' => 22, 'UrlManagerClass' => 23, 'DeliveryPriority' => 24, 'DeliveryStatus' => 25, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, 'partnerId' => 3, 'name' => 4, 'systemName' => 5, 'desciption' => 6, 'status' => 7, 'protocol' => 8, 'storageUrl' => 9, 'storageBaseDir' => 10, 'storageUsername' => 11, 'storagePassword' => 12, 'storageFtpPassiveMode' => 13, 'deliveryHttpBaseUrl' => 14, 'deliveryRmpBaseUrl' => 15, 'deliveryIisBaseUrl' => 16, 'minFileSize' => 17, 'maxFileSize' => 18, 'flavorParamsIds' => 19, 'maxConcurrentConnections' => 20, 'customData' => 21, 'pathManagerClass' => 22, 'urlManagerClass' => 23, 'deliveryPriority' => 24, 'deliveryStatus' => 25, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::CREATED_AT => 1, self::UPDATED_AT => 2, self::PARTNER_ID => 3, self::NAME => 4, self::SYSTEM_NAME => 5, self::DESCIPTION => 6, self::STATUS => 7, self::PROTOCOL => 8, self::STORAGE_URL => 9, self::STORAGE_BASE_DIR => 10, self::STORAGE_USERNAME => 11, self::STORAGE_PASSWORD => 12, self::STORAGE_FTP_PASSIVE_MODE => 13, self::DELIVERY_HTTP_BASE_URL => 14, self::DELIVERY_RMP_BASE_URL => 15, self::DELIVERY_IIS_BASE_URL => 16, self::MIN_FILE_SIZE => 17, self::MAX_FILE_SIZE => 18, self::FLAVOR_PARAMS_IDS => 19, self::MAX_CONCURRENT_CONNECTIONS => 20, self::CUSTOM_DATA => 21, self::PATH_MANAGER_CLASS => 22, self::URL_MANAGER_CLASS => 23, self::DELIVERY_PRIORITY => 24, self::DELIVERY_STATUS => 25, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, 'partner_id' => 3, 'name' => 4, 'system_name' => 5, 'desciption' => 6, 'status' => 7, 'protocol' => 8, 'storage_url' => 9, 'storage_base_dir' => 10, 'storage_username' => 11, 'storage_password' => 12, 'storage_ftp_passive_mode' => 13, 'delivery_http_base_url' => 14, 'delivery_rmp_base_url' => 15, 'delivery_iis_base_url' => 16, 'min_file_size' => 17, 'max_file_size' => 18, 'flavor_params_ids' => 19, 'max_concurrent_connections' => 20, 'custom_data' => 21, 'path_manager_class' => 22, 'url_manager_class' => 23, 'delivery_priority' => 24, 'delivery_status' => 25, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, )
 	);
 
 	/**
@@ -235,6 +238,7 @@ abstract class BaseStorageProfilePeer {
 		$criteria->addSelectColumn(StorageProfilePeer::PATH_MANAGER_CLASS);
 		$criteria->addSelectColumn(StorageProfilePeer::URL_MANAGER_CLASS);
 		$criteria->addSelectColumn(StorageProfilePeer::DELIVERY_PRIORITY);
+		$criteria->addSelectColumn(StorageProfilePeer::DELIVERY_STATUS);
 	}
 
 	/**

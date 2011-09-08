@@ -170,6 +170,12 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	protected $delivery_priority;
 
 	/**
+	 * The value for the delivery_status field.
+	 * @var        int
+	 */
+	protected $delivery_status;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -505,6 +511,16 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	public function getDeliveryPriority()
 	{
 		return $this->delivery_priority;
+	}
+
+	/**
+	 * Get the [delivery_status] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getDeliveryStatus()
+	{
+		return $this->delivery_status;
 	}
 
 	/**
@@ -1132,6 +1148,29 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	} // setDeliveryPriority()
 
 	/**
+	 * Set the value of [delivery_status] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     StorageProfile The current object (for fluent API support)
+	 */
+	public function setDeliveryStatus($v)
+	{
+		if(!isset($this->oldColumnsValues[StorageProfilePeer::DELIVERY_STATUS]))
+			$this->oldColumnsValues[StorageProfilePeer::DELIVERY_STATUS] = $this->delivery_status;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->delivery_status !== $v) {
+			$this->delivery_status = $v;
+			$this->modifiedColumns[] = StorageProfilePeer::DELIVERY_STATUS;
+		}
+
+		return $this;
+	} // setDeliveryStatus()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1188,6 +1227,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			$this->path_manager_class = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
 			$this->url_manager_class = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
 			$this->delivery_priority = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+			$this->delivery_status = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1197,7 +1237,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 25; // 25 = StorageProfilePeer::NUM_COLUMNS - StorageProfilePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 26; // 26 = StorageProfilePeer::NUM_COLUMNS - StorageProfilePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating StorageProfile object", $e);
@@ -1710,6 +1750,9 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			case 24:
 				return $this->getDeliveryPriority();
 				break;
+			case 25:
+				return $this->getDeliveryStatus();
+				break;
 			default:
 				return null;
 				break;
@@ -1756,6 +1799,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			$keys[22] => $this->getPathManagerClass(),
 			$keys[23] => $this->getUrlManagerClass(),
 			$keys[24] => $this->getDeliveryPriority(),
+			$keys[25] => $this->getDeliveryStatus(),
 		);
 		return $result;
 	}
@@ -1862,6 +1906,9 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			case 24:
 				$this->setDeliveryPriority($value);
 				break;
+			case 25:
+				$this->setDeliveryStatus($value);
+				break;
 		} // switch()
 	}
 
@@ -1911,6 +1958,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[22], $arr)) $this->setPathManagerClass($arr[$keys[22]]);
 		if (array_key_exists($keys[23], $arr)) $this->setUrlManagerClass($arr[$keys[23]]);
 		if (array_key_exists($keys[24], $arr)) $this->setDeliveryPriority($arr[$keys[24]]);
+		if (array_key_exists($keys[25], $arr)) $this->setDeliveryStatus($arr[$keys[25]]);
 	}
 
 	/**
@@ -1947,6 +1995,7 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(StorageProfilePeer::PATH_MANAGER_CLASS)) $criteria->add(StorageProfilePeer::PATH_MANAGER_CLASS, $this->path_manager_class);
 		if ($this->isColumnModified(StorageProfilePeer::URL_MANAGER_CLASS)) $criteria->add(StorageProfilePeer::URL_MANAGER_CLASS, $this->url_manager_class);
 		if ($this->isColumnModified(StorageProfilePeer::DELIVERY_PRIORITY)) $criteria->add(StorageProfilePeer::DELIVERY_PRIORITY, $this->delivery_priority);
+		if ($this->isColumnModified(StorageProfilePeer::DELIVERY_STATUS)) $criteria->add(StorageProfilePeer::DELIVERY_STATUS, $this->delivery_status);
 
 		return $criteria;
 	}
@@ -2048,6 +2097,8 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 		$copyObj->setUrlManagerClass($this->url_manager_class);
 
 		$copyObj->setDeliveryPriority($this->delivery_priority);
+
+		$copyObj->setDeliveryStatus($this->delivery_status);
 
 
 		$copyObj->setNew(true);

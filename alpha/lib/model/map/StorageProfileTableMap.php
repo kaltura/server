@@ -62,6 +62,7 @@ class StorageProfileTableMap extends TableMap {
 		$this->addColumn('PATH_MANAGER_CLASS', 'PathManagerClass', 'VARCHAR', false, 127, null);
 		$this->addColumn('URL_MANAGER_CLASS', 'UrlManagerClass', 'VARCHAR', false, 127, null);
 		$this->addColumn('DELIVERY_PRIORITY', 'DeliveryPriority', 'INTEGER', false, null, null);
+		$this->addColumn('DELIVERY_STATUS', 'DeliveryStatus', 'TINYINT', false, null, null);
 		// validators
 	} // initialize()
 
