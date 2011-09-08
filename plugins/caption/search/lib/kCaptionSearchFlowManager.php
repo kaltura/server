@@ -23,7 +23,14 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer
 	{
 		/* @var $object CaptionAsset */
 		
-		self::addParseCaptionAssetJob($object, $raisedJob);
+		try
+		{
+			self::addParseCaptionAssetJob($object, $raisedJob);
+		}
+		catch (kCoreException $kce)
+		{
+			KalturaLog::err("Cannot create parse caption job, error [" . $kce->getMessage() . "]");
+		}
 		
 		// updated in the entry in the indexing server
 		$entry = $object->getentry();
@@ -38,6 +45,24 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer
 	
 	public function addParseCaptionAssetJob(CaptionAsset $captionAsset, BatchJob $parentJob = null)
 	{
+		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+		if(!$fileSync)
+		{
+			if(!PermissionPeer::isValidForPartner(CaptionPermissionName::IMPORT_REMOTE_CAPTION_FOR_INDEXING, $captionAsset->getPartnerId()))
+				throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
+			
+			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+			if(!$fileSync)
+				throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
+			
+	    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $captionAsset->getId() . '.tmp';
+			if(!kFile::downloadUrlToFile($fileSync->getExternalUrl(), $fullPath))
+				throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
+			
+			kFileSyncUtils::moveFromFile($fullPath, $syncKey, true, false, true);
+		}
+		
 		$jobData = new kParseCaptionAssetJobData();
 		$jobData->setCaptionAssetId($captionAsset->getId());
 			
