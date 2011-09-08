@@ -541,7 +541,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		//Make thi closer to request
 		if(is_null($updatedEntry)) //checks that the entry was created
 		{
-			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			throw new KalturaBulkUploadXmlException("The entry wasn't updated", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
 		return $updatedEntry;
@@ -752,7 +752,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		if(!($createdEntry instanceof KalturaObjectBase)) // if the entry is not kaltura object (in case of errors)
 		{
-			throw new KalturaBulkUploadXmlException("The entry wasn't created requestResults [$requestResults]", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+			throw new KalturaBulkUploadXmlException("Returned type is [" . get_class($createdEntry) . "], KalturaObjectBase was expected", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
 		}
 		
 		if(!isset($createdEntry->id) || empty($createdEntry->id)) //checks that the entry id was set and it is not empty
