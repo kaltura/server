@@ -68,6 +68,8 @@ class kConfLocal
 				"batch_notification_sender_name" => "@ENVIRONMENT_NAME@" ,	
 				"batch_alert_email" => "alert@@KALTURA_VIRTUAL_HOST_NAME@" , 
 				"batch_alert_name" => "@ENVIRONMENT_NAME@",
+				"bulk_notification_sender_email" => "notifications@@KALTURA_VIRTUAL_HOST_NAME@" , 
+				"bulk_notification_sender_name" => "@ENVIRONMENT_NAME@" ,	
 			
 				"system_pages_login_username" => "@SYSTEM_PAGES_LOGIN_USER@ ",
 				"system_pages_login_password" => "@SYSTEM_PAGES_LOGIN_PASS@",				
