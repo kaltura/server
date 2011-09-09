@@ -167,9 +167,7 @@ class BulkUploadXmlPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	private static function stringToSafeXml($string)
 	{
 		$string = @iconv('utf-8', 'utf-8', $string);
-		$partially_safe = kString::xmlEncode($string);
-		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
-		
+		$safe = kString::xmlEncode($string);
 		return $safe;
 	}
 	

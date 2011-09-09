@@ -270,9 +270,7 @@ class kString
 	public static function stringToSafeXml($string, $now = false)
 	{
 		$string = @iconv('utf-8', 'utf-8', $string);
-		$partially_safe = self::xmlEncode($string);
-		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
-		
+		$safe = self::xmlEncode($string);		
 		return $safe;
 	}
 	
