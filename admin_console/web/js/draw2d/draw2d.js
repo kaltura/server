@@ -4290,7 +4290,7 @@ this.resizeHandleHalfWidth=parseInt(this.resizeHandle2.getWidth()/2);
 draw2d.Canvas.call(this,id);
 this.setPanning(false);
 if(this.html!==null){
-this.html.style.backgroundImage="url(grid_10.png)";
+//this.html.style.backgroundImage="url(grid_10.png)";
 this.html.className="Workflow";
 oThis=this;
 this.html.tabIndex="0";
