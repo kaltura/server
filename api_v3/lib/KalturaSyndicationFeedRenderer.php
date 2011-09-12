@@ -422,6 +422,7 @@ class KalturaSyndicationFeedRenderer
 			//syndication parameters to pass to XSLT
 			$xslParams = array();	
 			$xslParams[XsltParameterName::KALTURA_HAS_NEXT_ITEM] = $nextEntry ? true : false;
+			$xslParams[XsltParameterName::KALTURA_SYNDICATION_FEED_FLAVOR_PARAM_ID] = $syndicationFeedDB->getFlavorParamId();
 			
 			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $xslParams);				
 		}
