@@ -236,7 +236,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$dbBatchJob->setFinishTime(time());
 				$dbBatchJob->save();
 
-				// TODO - don't abort if it's bulk upload
 				kJobsManager::abortChildJobs($dbBatchJob);
 			}
 
@@ -352,7 +351,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if($object instanceof asset)
-		return true;
+			return true;
 
 		return false;
 	}
@@ -379,7 +378,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 
 					if(kFileSyncUtils::fileSync_exists($syncKey))
-					kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
+						kJobsManager::addConvertProfileJob($raisedJob, $entry, $object->getId(), $path);
 				}
 			}
 			else
@@ -392,7 +391,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		if($object->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $object instanceof thumbAsset)
 		{
 			if($object->getFlavorParamsId())
-			kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
+				kFlowHelper::generateThumbnailsFromFlavor($object->getEntryId(), $raisedJob, $object->getFlavorParamsId());
 
 			return true;
 		}
@@ -412,24 +411,25 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
 		if(
-		$object instanceof entry
-		&&	in_array(entryPeer::STATUS, $modifiedColumns)
-		&&	$object->getStatus() == entryStatus::READY
-		&&	$object->getReplacedEntryId()
+			$object instanceof entry
+			&&	in_array(entryPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == entryStatus::READY
+			&&	$object->getReplacedEntryId()
 		)
-		return true;
+			return true;
 
 		if(
-		$object instanceof UploadToken
-		&&	in_array(UploadTokenPeer::STATUS, $modifiedColumns)
-		&&	$object->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD
+			$object instanceof UploadToken
+			&&	in_array(UploadTokenPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD
 		)
-		return true;
+			return true;
 
 		if(
-		$object instanceof flavorAsset
-		&&	in_array(assetPeer::STATUS, $modifiedColumns))
-		return true;
+			$object instanceof flavorAsset
+			&&	in_array(assetPeer::STATUS, $modifiedColumns)
+		)
+			return true;
 			
 		return false;
 	}
@@ -440,10 +440,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
 		if(
-		$object instanceof entry
-		&&	in_array(entryPeer::STATUS, $modifiedColumns)
-		&&	$object->getStatus() == entryStatus::READY
-		&&	$object->getReplacedEntryId()
+			$object instanceof entry
+			&&	in_array(entryPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == entryStatus::READY
+			&&	$object->getReplacedEntryId()
 		)
 		{
 			kFlowHelper::handleEntryReplacement($object);
@@ -451,9 +451,9 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 
 		if(
-		$object instanceof UploadToken
-		&&	in_array(UploadTokenPeer::STATUS, $modifiedColumns)
-		&&	$object->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD
+			$object instanceof UploadToken
+			&&	in_array(UploadTokenPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD
 		)
 		{
 			kFlowHelper::handleUploadFinished($object);
@@ -461,33 +461,18 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 
 		if(
-		!($object instanceof flavorAsset)
-		||	!in_array(assetPeer::STATUS, $modifiedColumns))
-		return true;
+			!($object instanceof flavorAsset)
+			||	!in_array(assetPeer::STATUS, $modifiedColumns)
+		)
+			return true;
 
 		$entry = entryPeer::retrieveByPKNoFilter($object->getEntryId());
 
 		KalturaLog::debug("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
 		if($object->getIsOriginal())
-		{
-			//			Already handled by object added event
-			//
-			// 			if($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED && $entry->getType() == entryType::MEDIA_CLIP)
-			// 			{
-			// 				$syncKey = $object->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			// 				if(kFileSyncUtils::fileSync_exists($syncKey))
-			// 				{
-			// 					KalturaLog::debug("Start conversion");
-			// 					$path = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-			// 					kJobsManager::addConvertProfileJob(null, $entry, $object->getId(), $path);
-			// 				}
-			// 				else
-			// 				{
-			// 					KalturaLog::debug("File sync not created yet");
-			// 				}
-			// 			}
-		}
-		elseif($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
+			return true;
+		
+		if($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_VALIDATING)
 		{
 			$postConvertAssetType = BatchJob::POSTCONVERT_ASSET_TYPE_FLAVOR;
 			$offset = $entry->getThumbOffset(); // entry getThumbOffset now takes the partner DefThumbOffset into consideration
@@ -495,11 +480,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 			$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
 			if(!$fileSync)
-			return true;
+				return true;
 
 			$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			if($srcFileSyncLocalPath)
-			kJobsManager::addPostConvertJob(null, $postConvertAssetType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
+				kJobsManager::addPostConvertJob(null, $postConvertAssetType, $srcFileSyncLocalPath, $object->getId(), null, $entry->getCreateThumb(), $offset);
 		}
 		elseif ($object->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 		{
@@ -510,7 +495,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				$entry->save();
 			}
 		}
-
+		
 		return true;
 	}
 
@@ -520,7 +505,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
 		if($object instanceof UploadToken)
-		return true;
+			return true;
 			
 		return false;
 	}
