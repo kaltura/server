@@ -253,14 +253,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 						throw new KalturaBatchException("Action: {$actionToPerform} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 				}
 			}
-			catch (KalturaBulkUploadXmlException $e)
+			catch (Exception $e)
 			{
-				KalturaLog::err("Item failed because excpetion was raised': " . $e->getMessage());
+				KalturaLog::err('Item failed (' . get_class($e) . '): ' . $e->getMessage());
 				$bulkUploadResult = $this->createUploadResult($item, $action);
 				$bulkUploadResult->errorDescription = $e->getMessage();
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 				$this->addBulkUploadResult($bulkUploadResult);
-			}			
+			}
 		}
 	}
 	
@@ -510,11 +510,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->kClient->startMultiRequest();
 		
 		$updatedEntryId = $updatedEntry->id;   	
-		
 		if(!is_null($updatedEntry->replacingEntryId))
-		{
 			$updatedEntryId = $updatedEntry->replacingEntryId;
-		}
 					
 		if($resource)
 			$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource);
@@ -535,15 +532,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
-			
-		//TODO: handle the update array
-		KalturaLog::debug("Updated entry [". print_r($updatedEntry,true) ."]");
 		
-		//Make thi closer to request
-		if(is_null($updatedEntry)) //checks that the entry was created
-		{
-			throw new KalturaBulkUploadXmlException("The entry wasn't updated", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
+		foreach($requestResults as $requestResult)
+			if($requestResult instanceof Exception)
+				throw $requestResult;
 		
 		return $updatedEntry;
 	}
@@ -744,22 +736,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$requestResults = $this->kClient->doMultiRequest();;
 		$this->unimpersonate();
 		
-		$createdEntry = reset($requestResults);
+		foreach($requestResults as $requestResult)
+			if($requestResult instanceof Exception)
+				throw $requestResult;
 		
+		$createdEntry = reset($requestResults);
 		if(is_null($createdEntry)) //checks that the entry was created
-		{
 			throw new KalturaBulkUploadXmlException("The entry wasn't created", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
 		
 		if(!($createdEntry instanceof KalturaObjectBase)) // if the entry is not kaltura object (in case of errors)
-		{
 			throw new KalturaBulkUploadXmlException("Returned type is [" . get_class($createdEntry) . "], KalturaObjectBase was expected", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
-		
-		if(!isset($createdEntry->id) || empty($createdEntry->id)) //checks that the entry id was set and it is not empty
-		{
-			throw new KalturaBulkUploadXmlException("The entry id [$createdEntry->id] wasn't set", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
-		}
 		
 		return $createdEntry;
 	}
@@ -777,7 +763,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->kClient->flavorAsset->getByEntryId($createdEntryId);
 		$this->kClient->thumbAsset->getByEntryId($createdEntryId);
 		$result = $this->kClient->doMultiRequest();
-			
+		
+		foreach($result as $requestResult)
+			if($requestResult instanceof Exception)
+				throw $requestResult;
+		
 		$createdFlavorAssets = $result[0]; 
 		$createdThumbAssets =  $result[1];
 				
@@ -809,7 +799,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
-				
+		
+		foreach($requestResults as $requestResult)
+			if($requestResult instanceof Exception)
+				throw $requestResult;
+		
 		return $requestResults;
 	}
 	

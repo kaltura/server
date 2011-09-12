@@ -391,7 +391,7 @@ abstract class KBulkUploadEngine
 	protected function checkAborted()
 	{
 		if($this->kClient->isMultiRequest())
-			$this->kClient->doMultiRequest();
+			return false;
 			
 		$batchJobResponse = $this->kClient->jobs->getBulkUploadStatus($this->job->id);
 		$updatedJob = $batchJobResponse->batchJob;
