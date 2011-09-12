@@ -75,6 +75,19 @@ class KalturaServiceReflector
 		return $this->_docCommentParser->package;
 	}
 	
+	
+	public function getPluginName()
+	{
+		if(!is_string($this->_docCommentParser->package) || !strlen($this->_docCommentParser->package))
+			return null;
+			
+		$packages = explode('.', $this->_docCommentParser->package, 2);
+		if(count($packages) != 2 || $packages[0] != 'plugins')
+			return null;
+			
+		return $packages[1];
+	}
+	
 	public function isDeprecated()
 	{
 		return $this->_docCommentParser->deprecated;
