@@ -111,6 +111,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		libxml_use_internal_errors(true);
+		libxml_clear_errors();
 		
 		$this->loadXslt();
 			
@@ -166,7 +167,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xdoc = file_get_contents($filePath);
 		if(is_null($xdoc) || is_null($this->conversionProfileXsl))
 			return $xdoc;
-			
+		
+		libxml_clear_errors();
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($xdoc)){
 			KalturaLog::debug("Could not load xml");
