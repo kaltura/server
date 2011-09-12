@@ -135,7 +135,7 @@
       <Input name="filter" type="KalturaAssetFilter" key="">
         <idEqual></idEqual>
         <idIn></idIn>
-        <entryIdEqual></entryIdEqual>
+        <entryIdEqual>@DEFAULT_ENTRY_ID@</entryIdEqual>
         <entryIdIn></entryIdIn>
         <partnerIdEqual></partnerIdEqual>
         <partnerIdIn></partnerIdIn>
