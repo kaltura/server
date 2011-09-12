@@ -675,12 +675,17 @@ class BaseEntryService extends KalturaEntryService
 			
 		}
 		
-		if($contextDataParams->streamerType)
+		if($contextDataParams->streamerType){
 			$result->streamerType = $contextDataParams->streamerType;
+			$result->mediaProtocol = $contextDataParams->streamerType;
+		}
 		else
+		{
 			$result->streamerType = $this->getPartner()->getStreamerType();
+			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
+		}
 			
-		$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
+		
 		
 		$partner = PartnerPeer::retrieveByPK($dbEntry->getPartnerId());
 		if($result->streamerType == StorageProfile::PLAY_FORMAT_RTMP && 
