@@ -12,6 +12,7 @@ class Form_NewDistributionProfile extends Zend_Form
 		
 		$this->addElement('text', 'newPartnerId', array(
 			'label'			=> 'Publisher ID:',
+			'onkeypress'	=> "return supressFormSubmit(event)",
 			'filters'		=> array('StringTrim'),
 		));
 		
