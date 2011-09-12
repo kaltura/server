@@ -116,15 +116,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->loadXslt();
 			
 		$xdoc = new DomDocument();
-		if(!$xdoc->loadXML($this->xslTransform($this->data->filePath))){
-			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($this->xslTransform($this->data->filePath)));
+		
+		$xmlContent = $this->xslTransform($this->data->filePath);
+		libxml_clear_errors();
+		if(!$xdoc->loadXML($xmlContent)){
+			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlContent));
 			KalturaLog::debug("Could not load xml");
 			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		//Validate the XML file against the schema
+		libxml_clear_errors();
 		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
 		{
-			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($this->xslTransform($this->data->filePath)));
+			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlContent));
 			KalturaLog::debug("XML is invalid:\n$errorMessage");
 			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
@@ -171,6 +175,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
+		libxml_clear_errors();
 		$proc = new XSLTProcessor;
 		$xsl = new DOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
@@ -179,7 +184,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Could not load xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		$proc->importStyleSheet($xsl);
-		
+		libxml_clear_errors();		
 		return $proc->transformToXML($xml);
 	}
 	
