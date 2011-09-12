@@ -34,6 +34,9 @@ abstract class BaseUserRolePeer {
 	/** the column name for the ID field */
 	const ID = 'user_role.ID';
 
+	/** the column name for the SYSTEM_NAME field */
+	const SYSTEM_NAME = 'user_role.SYSTEM_NAME';
+
 	/** the column name for the STR_ID field */
 	const STR_ID = 'user_role.STR_ID';
 

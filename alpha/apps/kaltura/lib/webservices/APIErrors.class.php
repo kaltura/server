@@ -295,6 +295,8 @@ class APIErrors
 	
 	const UNKNOWN_ROLE_ID = "UNKNOWN_ROLE_ID,Unknown role id";
 	
+	const UNKNOWN_ROLE_SYSTEM_NAME = "UNKNOWN_ROLE_SYSTEM_NAME,Unknown role system name";
+	
 	const ONLY_ONE_ROLE_PER_USER_ALLOWED = "ONLY_ONE_ROLE_PER_USER_ALLOWED,User cannot have more than one role";
 	
 	const CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN = "CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN,Root admin user cannot be set to not admin";

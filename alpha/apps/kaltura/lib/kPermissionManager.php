@@ -470,11 +470,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			$ks = ks::fromSecureString(self::$ksString);
 			$ksSetRoleId = $ks->getSetRole();
-			
-			if ($ksSetRoleId != false){
+
+			if ($ksSetRoleId)
+			{
 				//check if role exists
 				$c = new Criteria();
-				$c->addAnd(UserRolePeer::ID, $ksSetRoleId, Criteria::EQUAL);
+				$c->addAnd(is_numeric($ksSetRoleId) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME
+					, $ksSetRoleId, Criteria::EQUAL);
 				$c->addAnd(UserRolePeer::PARTNER_ID, self::$ksPartnerId, Criteria::EQUAL);
 				$roleId = UserRolePeer::doSelectOne($c);
 				
@@ -485,7 +487,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 					throw new KalturaAPIException ( APIErrors::UNKNOWN_ROLE_ID ,$ksSetRoleId);
 				}
 			}
-			
 			// if user is defined -> get his role IDs
 			if (!$roleIds && self::$kuser) {
 				$roleIds = self::$kuser->getRoleIds();
