@@ -16,7 +16,7 @@ class PartnerController extends Zend_Controller_Action
 		$form = new Form_PartnerCreate();
 		
 		$partner = Zend_Registry::get('config')->partner;
-		$allowNonePackage = $partner->enableNonePackage;
+		$allowNonePackage = isset($partner->enableNonePackage) ? $partner->enableNonePackage : false;
 		
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
 		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackagesClassOfService(), 'partner_package_class_of_service');
