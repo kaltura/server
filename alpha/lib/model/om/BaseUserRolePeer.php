@@ -26,16 +26,13 @@ abstract class BaseUserRolePeer {
 	const TM_CLASS = 'UserRoleTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 11;
+	const NUM_COLUMNS = 12;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
 
 	/** the column name for the ID field */
 	const ID = 'user_role.ID';
-
-	/** the column name for the SYSTEM_NAME field */
-	const SYSTEM_NAME = 'user_role.SYSTEM_NAME';
 
 	/** the column name for the STR_ID field */
 	const STR_ID = 'user_role.STR_ID';
@@ -67,6 +64,9 @@ abstract class BaseUserRolePeer {
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'user_role.CUSTOM_DATA';
 
+	/** the column name for the SYSTEM_NAME field */
+	const SYSTEM_NAME = 'user_role.SYSTEM_NAME';
+
 	/**
 	 * An identiy map to hold any loaded instances of UserRole objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -83,11 +83,11 @@ abstract class BaseUserRolePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'StrId', 'Name', 'Description', 'PartnerId', 'Status', 'PermissionNames', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'strId', 'name', 'description', 'partnerId', 'status', 'permissionNames', 'tags', 'createdAt', 'updatedAt', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::STR_ID, self::NAME, self::DESCRIPTION, self::PARTNER_ID, self::STATUS, self::PERMISSION_NAMES, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'str_id', 'name', 'description', 'partner_id', 'status', 'permission_names', 'tags', 'created_at', 'updated_at', 'custom_data', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'StrId', 'Name', 'Description', 'PartnerId', 'Status', 'PermissionNames', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', 'SystemName', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'strId', 'name', 'description', 'partnerId', 'status', 'permissionNames', 'tags', 'createdAt', 'updatedAt', 'customData', 'systemName', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::STR_ID, self::NAME, self::DESCRIPTION, self::PARTNER_ID, self::STATUS, self::PERMISSION_NAMES, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::SYSTEM_NAME, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'str_id', 'name', 'description', 'partner_id', 'status', 'permission_names', 'tags', 'created_at', 'updated_at', 'custom_data', 'system_name', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -97,11 +97,11 @@ abstract class BaseUserRolePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'StrId' => 1, 'Name' => 2, 'Description' => 3, 'PartnerId' => 4, 'Status' => 5, 'PermissionNames' => 6, 'Tags' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'CustomData' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'strId' => 1, 'name' => 2, 'description' => 3, 'partnerId' => 4, 'status' => 5, 'permissionNames' => 6, 'tags' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'customData' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::STR_ID => 1, self::NAME => 2, self::DESCRIPTION => 3, self::PARTNER_ID => 4, self::STATUS => 5, self::PERMISSION_NAMES => 6, self::TAGS => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::CUSTOM_DATA => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'str_id' => 1, 'name' => 2, 'description' => 3, 'partner_id' => 4, 'status' => 5, 'permission_names' => 6, 'tags' => 7, 'created_at' => 8, 'updated_at' => 9, 'custom_data' => 10, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'StrId' => 1, 'Name' => 2, 'Description' => 3, 'PartnerId' => 4, 'Status' => 5, 'PermissionNames' => 6, 'Tags' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'CustomData' => 10, 'SystemName' => 11, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'strId' => 1, 'name' => 2, 'description' => 3, 'partnerId' => 4, 'status' => 5, 'permissionNames' => 6, 'tags' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'customData' => 10, 'systemName' => 11, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::STR_ID => 1, self::NAME => 2, self::DESCRIPTION => 3, self::PARTNER_ID => 4, self::STATUS => 5, self::PERMISSION_NAMES => 6, self::TAGS => 7, self::CREATED_AT => 8, self::UPDATED_AT => 9, self::CUSTOM_DATA => 10, self::SYSTEM_NAME => 11, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'str_id' => 1, 'name' => 2, 'description' => 3, 'partner_id' => 4, 'status' => 5, 'permission_names' => 6, 'tags' => 7, 'created_at' => 8, 'updated_at' => 9, 'custom_data' => 10, 'system_name' => 11, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
 	);
 
 	/**
@@ -182,6 +182,7 @@ abstract class BaseUserRolePeer {
 		$criteria->addSelectColumn(UserRolePeer::CREATED_AT);
 		$criteria->addSelectColumn(UserRolePeer::UPDATED_AT);
 		$criteria->addSelectColumn(UserRolePeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(UserRolePeer::SYSTEM_NAME);
 	}
 
 	/**

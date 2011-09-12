@@ -1934,6 +1934,7 @@ CREATE TABLE `user_role`
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
+	`system_name` VARCHAR(128) default '' NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`)
 )Type=MyISAM;

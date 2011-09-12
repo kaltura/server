@@ -86,6 +86,13 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
+	 * The value for the system_name field.
+	 * Note: this column has a database default value of: ''
+	 * @var        string
+	 */
+	protected $system_name;
+
+	/**
 	 * @var        array KuserToUserRole[] Collection to store aggregation of KuserToUserRole objects.
 	 */
 	protected $collKuserToUserRoles;
@@ -121,6 +128,27 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	public function getColumnsOldValues()
 	{
 		return $this->oldColumnsValues;
+	}
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->system_name = '';
+	}
+
+	/**
+	 * Initializes internal state of BaseUserRole object.
+	 * @see        applyDefaults()
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
 	}
 
 	/**
@@ -291,6 +319,16 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	public function getCustomData()
 	{
 		return $this->custom_data;
+	}
+
+	/**
+	 * Get the [system_name] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getSystemName()
+	{
+		return $this->system_name;
 	}
 
 	/**
@@ -596,6 +634,29 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
+	 * Set the value of [system_name] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     UserRole The current object (for fluent API support)
+	 */
+	public function setSystemName($v)
+	{
+		if(!isset($this->oldColumnsValues[UserRolePeer::SYSTEM_NAME]))
+			$this->oldColumnsValues[UserRolePeer::SYSTEM_NAME] = $this->system_name;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->system_name !== $v || $this->isNew()) {
+			$this->system_name = $v;
+			$this->modifiedColumns[] = UserRolePeer::SYSTEM_NAME;
+		}
+
+		return $this;
+	} // setSystemName()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -605,6 +666,10 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->system_name !== '') {
+				return false;
+			}
+
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -638,6 +703,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			$this->created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->updated_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->custom_data = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+			$this->system_name = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -647,7 +713,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 11; // 11 = UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 12; // 12 = UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating UserRole object", $e);
@@ -1137,6 +1203,9 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			case 10:
 				return $this->getCustomData();
 				break;
+			case 11:
+				return $this->getSystemName();
+				break;
 			default:
 				return null;
 				break;
@@ -1169,6 +1238,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			$keys[8] => $this->getCreatedAt(),
 			$keys[9] => $this->getUpdatedAt(),
 			$keys[10] => $this->getCustomData(),
+			$keys[11] => $this->getSystemName(),
 		);
 		return $result;
 	}
@@ -1233,6 +1303,9 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 			case 10:
 				$this->setCustomData($value);
 				break;
+			case 11:
+				$this->setSystemName($value);
+				break;
 		} // switch()
 	}
 
@@ -1268,6 +1341,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setCustomData($arr[$keys[10]]);
+		if (array_key_exists($keys[11], $arr)) $this->setSystemName($arr[$keys[11]]);
 	}
 
 	/**
@@ -1290,6 +1364,7 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(UserRolePeer::CREATED_AT)) $criteria->add(UserRolePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(UserRolePeer::UPDATED_AT)) $criteria->add(UserRolePeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(UserRolePeer::CUSTOM_DATA)) $criteria->add(UserRolePeer::CUSTOM_DATA, $this->custom_data);
+		if ($this->isColumnModified(UserRolePeer::SYSTEM_NAME)) $criteria->add(UserRolePeer::SYSTEM_NAME, $this->system_name);
 
 		return $criteria;
 	}
@@ -1363,6 +1438,8 @@ abstract class BaseUserRole extends BaseObject  implements Persistent {
 		$copyObj->setUpdatedAt($this->updated_at);
 
 		$copyObj->setCustomData($this->custom_data);
+
+		$copyObj->setSystemName($this->system_name);
 
 
 		if ($deepCopy) {
