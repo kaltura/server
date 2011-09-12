@@ -1968,9 +1968,9 @@ item.style.margin="0px";
 item.style.padding="0px";
 item.style.border="0px";
 if(this.url!==null){
-item.style.backgroundImage="url("+this.url+")";
+//item.style.backgroundImage="url("+this.url+")";
 }else{
-item.style.backgroundImage="";
+//item.style.backgroundImage="";
 }
 return item;
 };
@@ -1985,9 +1985,9 @@ url=null;
 }
 this.url=url;
 if(this.url!==null){
-this.html.style.backgroundImage="url("+this.url+")";
+//this.html.style.backgroundImage="url("+this.url+")";
 }else{
-this.html.style.backgroundImage="";
+//this.html.style.backgroundImage="";
 }
 };
 draw2d.Port=function(_5733,_5734){
@@ -5090,7 +5090,7 @@ var item=draw2d.Figure.prototype.createHTMLElement.call(this);
 item.style.margin="0px";
 item.style.padding="0px";
 item.style.border="1px solid black";
-item.style.backgroundImage="url(window_bg.png)";
+//item.style.backgroundImage="url(window_bg.png)";
 item.style.zIndex=draw2d.WindowFigure.ZOrderIndex;
 item.style.cursor=null;
 item.className="WindowFigure";
@@ -5108,7 +5108,7 @@ this.titlebar.style.backgroundColor="blue";
 this.titlebar.style.borderBottom="2px solid gray";
 this.titlebar.style.whiteSpace="nowrap";
 this.titlebar.style.textAlign="center";
-this.titlebar.style.backgroundImage="url(window_toolbar.png)";
+//this.titlebar.style.backgroundImage="url(window_toolbar.png)";
 this.titlebar.className="WindowFigure_titlebar";
 this.textNode=document.createTextNode(this.title);
 this.titlebar.appendChild(this.textNode);
@@ -5232,9 +5232,9 @@ item.style.margin="0px";
 item.style.padding="0px";
 item.style.outline="none";
 if(this.getImageUrl()!==null){
-item.style.backgroundImage="url("+this.getImageUrl()+")";
+//item.style.backgroundImage="url("+this.getImageUrl()+")";
 }else{
-item.style.backgroundImage="";
+//item.style.backgroundImage="";
 }
 var oThis=this;
 this.omousedown=function(event){
@@ -5360,9 +5360,9 @@ item.style.width="24px";
 item.style.margin="0px";
 item.style.padding="0px";
 if(this.getImageUrl()!==null){
-item.style.backgroundImage="url("+this.getImageUrl()+")";
+//item.style.backgroundImage="url("+this.getImageUrl()+")";
 }else{
-item.style.backgroundImage="";
+//item.style.backgroundImage="";
 }
 var oThis=this;
 this.omousedown=function(event){
@@ -5437,9 +5437,9 @@ item.style.width="24px";
 item.style.margin="0px";
 item.style.padding="0px";
 if(this.getImageUrl()!==null){
-item.style.backgroundImage="url("+this.getImageUrl()+")";
+//item.style.backgroundImage="url("+this.getImageUrl()+")";
 }else{
-item.style.backgroundImage="";
+//item.style.backgroundImage="";
 }
 var oThis=this;
 this.click=function(event){
