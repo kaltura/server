@@ -143,8 +143,7 @@ class TimeWarnerDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-		// append time warner specific configuration
-		$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+		// none required
 	}
 
 	/**
