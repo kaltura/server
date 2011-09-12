@@ -111,7 +111,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		libxml_use_internal_errors(true);
-		libxml_clear_errors();
 		
 		$this->loadXslt();
 			
