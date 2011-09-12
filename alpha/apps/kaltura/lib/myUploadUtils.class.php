@@ -70,8 +70,6 @@ class myUploadUtils
 		myContentStorage::fullMkdir($fullPath);
 		if ( ! move_uploaded_file($file_data['tmp_name'], $fullPath) )
 		{
-			KalturaLog::log ( "Error while uploading [$token] [$filename] [$extra_id] [$create_thumb] " . print_r ( $file_data ,true ) ."\n->[$fullPath]" );
-					
 			$err =  array ( 	"token" => $token , 
 						"filename" => $filename , 
 						"origFilename" => $origFilename ,
