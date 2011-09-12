@@ -25,6 +25,21 @@ class embedIframeJsAction extends sfAction
 		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
+
+		if (kConf::hasParam("optimized_playback"))
+		{
+        		$optimizedPlayback = kConf::get("optimized_playback");
+        		if (array_key_exists($partner_id, $optimizedPlayback))
+        		{
+                		// force a specific kdp for the partner
+                		$params = $optimizedPlayback[$partner_id];
+                		if (array_key_exists('html5_url', $params))
+				{
+					$ui_conf_html5_url = $params['html5_url'];
+				}
+			}
+		}
+
 		if( kString::beginsWith( $ui_conf_html5_url , "http") )
 		{
 			$url = $ui_conf_html5_url; // absolute URL
