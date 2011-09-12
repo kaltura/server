@@ -117,9 +117,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 		$xdoc = new DomDocument();
 		if(!$xdoc->loadXML($this->xslTransform($this->data->filePath))){
-			$errorMessage = 'Could not load transformed xsl';
-			KalturaLog::debug("Could not load transformed xsl");
-			throw new KalturaBatchException("Could not load transformed xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($this->xslTransform($this->data->filePath)));
+			KalturaLog::debug("Could not load xml");
+			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		//Validate the XML file against the schema
 		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
@@ -167,18 +167,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($xdoc)){
 			KalturaLog::debug("Could not load xml");
-			return $xdoc;
+			$errorMessage = kXml::getLibXmlErrorDescription($xdoc);
+			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		
 		$proc = new XSLTProcessor;
 		$xsl = new DOMDocument();
 		if(!$xsl->loadXML($this->conversionProfileXsl)){
 			KalturaLog::debug("Could not load xsl".$this->conversionProfileXsl);
-			return $xdoc;
+			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);
+			throw new KalturaBatchException("Could not load xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		$proc->importStyleSheet($xsl);
 		
-		KalturaLog::debug("transformed xml ".$proc->transformToXML($xml));
 		return $proc->transformToXML($xml);
 	}
 	
