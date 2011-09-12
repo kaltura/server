@@ -9,7 +9,20 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::globalPartnerAllowed()
+	 */
+	protected function globalPartnerAllowed($actionName)
+	{
+		if($actionName == 'getContextData')
+			return true;
+		
+		return parent::globalPartnerAllowed($actionName);
+	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::kalturaNetworkAllowed()
+	 */
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if ($actionName === 'get') {
@@ -21,6 +34,9 @@ class BaseEntryService extends KalturaEntryService
 		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::partnerRequired()
+	 */
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName === 'flag') {

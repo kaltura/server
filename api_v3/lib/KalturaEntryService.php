@@ -5,6 +5,17 @@
  */
 class KalturaEntryService extends KalturaBaseService 
 {
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::globalPartnerAllowed()
+	 */
+	protected function globalPartnerAllowed($actionName)
+	{
+		if($actionName == 'get')
+			return true;
+		
+		return parent::globalPartnerAllowed($actionName);
+	}
+	
 	/**
 	 * @param kResource $resource
 	 * @param entry $dbEntry
