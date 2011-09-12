@@ -59,6 +59,9 @@ class kUploadTokenMgr
 		}
 		catch(kUploadTokenException $ex)
 		{
+			if(!$resume && $finalChunk)
+				kFlowHelper::handleUploadFailed($this->_uploadToken);
+			
 			$this->tryMoveToErrors($fileData);
 			throw $ex;
 		}

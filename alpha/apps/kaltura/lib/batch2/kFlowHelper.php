@@ -319,16 +319,16 @@ class kFlowHelper
 		KalturaLog::debug("Convert finished with destination file: " . $data->getDestFileSyncLocalPath());
 
 		if($dbBatchJob->getAbort())
-		return $dbBatchJob;
+			return $dbBatchJob;
 
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
-		throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
 		if(!$flavorAsset)
-		throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 
 		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
@@ -375,7 +375,7 @@ class kFlowHelper
 
 		$entry = $dbBatchJob->getEntry();
 		if(!$entry)
-		throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
+			throw new APIException(APIErrors::INVALID_ENTRY, $dbBatchJob, $dbBatchJob->getEntryId());
 			
 		$entry->addFlavorParamsId($data->getFlavorParamsOutput()->getFlavorParamsId());
 		$entry->save();
@@ -406,7 +406,7 @@ class kFlowHelper
 		}
 
 		if($createThumb && in_array($flavorParamsOutput->getVideoCodec(), self::$thumbUnSupportVideoCodecs))
-		$createThumb = false;
+			$createThumb = false;
 
 		$operatorSet = new kOperatorSets();
 		$operatorSet->setSerialized(stripslashes($flavorParamsOutput->getOperators()));
@@ -1623,9 +1623,9 @@ class kFlowHelper
 		$jobData->setMailPriority(kMailJobData::MAIL_PRIORITY_NORMAL);
 		$jobData->setStatus(kMailJobData::MAIL_STATUS_PENDING);
 		if (count($links) <= 1)
-		$jobData->setMailType(62);
+			$jobData->setMailType(62);
 		else
-		$jobData->setMailType(63);
+			$jobData->setMailType(63);
 			
 		$jobData->setFromEmail(kConf::get("batch_download_video_sender_email"));
 		$jobData->setFromName(kConf::get("batch_download_video_sender_name"));
@@ -1641,7 +1641,7 @@ class kFlowHelper
 		}
 			
 		if(!$adminName)
-		$adminName = $recipientEmail;
+			$adminName = $recipientEmail;
 			
 		$jobData->setBodyParamsArray(array($adminName, $linksHtml));
 		$jobData->setRecipientEmail($recipientEmail);
@@ -1655,12 +1655,61 @@ class kFlowHelper
 	/**
 	 * @param UploadToken $uploadToken
 	 */
+	public static function handleUploadFailed(UploadToken $uploadToken)
+	{
+		$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_DELETED);
+		$uploadToken->save();
+		
+		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
+		{
+			$dbAsset = assetPeer::retrieveById($uploadToken->getObjectId());
+			if(!$dbAsset)
+			{
+				KalturaLog::err("Asset id [" . $uploadToken->getObjectId() . "] not found");
+				return;
+			}
+
+			if($dbAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_IMPORTING)
+			{
+				$dbAsset->setStatus(asset::ASSET_STATUS_ERROR);
+				$dbAsset->save();
+			}
+
+			$profile = null;
+			try{
+				$profile = myPartnerUtils::getConversionProfile2ForEntry($currentFlavorAsset->getEntryId());
+				KalturaLog::debug("profile [" . $profile->getId() . "]");
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::err($e->getMessage());
+				return;
+			}
+				
+			$currentReadyBehavior = self::getReadyBehavior($dbAsset, $profile);
+			if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED)
+				kBatchManager::updateEntry($dbAsset->getEntryId(), entryStatus::ERROR_IMPORTING);
+			
+			return;
+		}
+				
+		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
+		{
+			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
+			if($dbEntry && $dbEntry->getStatus() == entryStatus::IMPORT)
+				kBatchManager::updateEntry($dbEntry->getId(), entryStatus::ERROR_IMPORTING);
+		}
+	}
+
+	/**
+	 * @param UploadToken $uploadToken
+	 */
 	public static function handleUploadCanceled(UploadToken $uploadToken)
 	{
 		$dbEntry = null;
 
 		if($uploadToken->getObjectType() == entryPeer::OM_CLASS)
-		$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
+			$dbEntry = entryPeer::retrieveByPK($uploadToken->getObjectId());
 
 		if(is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS))
 		{
@@ -1689,13 +1738,13 @@ class kFlowHelper
 				/* @var $entryFlavorAsset flavorAsset */
 
 				if($entryFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY && $status == entryStatus::NO_CONTENT)
-				$status = entryStatus::PENDING;
+					$status = entryStatus::PENDING;
 
 				if($entryFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_IMPORTING && $status != entryStatus::PRECONVERT)
-				$status = entryStatus::IMPORT;
+					$status = entryStatus::IMPORT;
 
 				if($entryFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_CONVERTING)
-				$status = entryStatus::PRECONVERT;
+					$status = entryStatus::PRECONVERT;
 			}
 
 			$dbEntry->setStatus($status);
