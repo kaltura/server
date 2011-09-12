@@ -111,7 +111,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		libxml_use_internal_errors(true);
-		libxml_clear_errors();
 		
 		$this->loadXslt();
 			
@@ -185,8 +184,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Could not load xsl [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
 		$proc->importStyleSheet($xsl);
-		libxml_clear_errors();		
-		return $proc->transformToXML($xml);
+		libxml_clear_errors();
+		$transformedXml = $proc->transformToXML($xml);
+		if(!$transformedXml){
+			KalturaLog::debug("Could not transform xml".$this->conversionProfileXsl);
+			$errorMessage = kXml::getLibXmlErrorDescription($this->conversionProfileXsl);
+			throw new KalturaBatchException("Could not transform xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
+		}
+		return $transformedXml;
 	}
 	
 	/**
