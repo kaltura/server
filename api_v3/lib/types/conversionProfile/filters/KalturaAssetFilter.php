@@ -10,6 +10,6 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 		if(is_null($this->entryIdEqual) && is_null($this->entryIdIn) )
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
 		
-		return $this->toObject($object_to_fill, $props_to_skip);
+		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
