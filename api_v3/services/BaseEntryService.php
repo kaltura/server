@@ -675,9 +675,11 @@ class BaseEntryService extends KalturaEntryService
 			
 		}
 		
-		if($contextDataParams->streamerType){
+		if($contextDataParams->streamerType && $contextDataParams->streamerType == StorageProfile::PLAY_FORMAT_RTMP){
+			//support streamerType only to be set rtmp
+			//$contextDataParams->streamerType is RTMP and therefore $result->mediaProtocol should be RTMP as well
 			$result->streamerType = $contextDataParams->streamerType;
-			$result->mediaProtocol = $contextDataParams->streamerType;
+			$result->mediaProtocol = StorageProfile::PLAY_FORMAT_RTMP;
 		}
 		else
 		{
