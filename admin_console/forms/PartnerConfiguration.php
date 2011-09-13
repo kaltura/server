@@ -45,7 +45,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'partner-configure Administrator Name',
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
-			'ignore' 		=> true,
 			'required' 		=> true,
 		));	
 		
