@@ -710,10 +710,16 @@ class BaseEntryService extends KalturaEntryService
 			PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $dbEntry->getPartnerId()) &&
 			$partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 		{
-			if (!is_null($contextDataParams->flavorAssetId)){
+			if (is_null($contextDataParams->flavorAssetId)){
 				$asset = assetPeer::retrieveBestPlayByEntryId($this->entryId);
+				
+				if(!$asset)
+					throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND, $this->entryId);
 			}else{
-				$asset = assetPeer::retrieveByPK($contextDataParams->$flavorId);
+				$asset = assetPeer::retrieveByPK($contextDataParams->flavorAssetId);
+				
+				if(!$asset)
+					throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 			}
 			
 			if(!$asset)
