@@ -238,4 +238,14 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 	{
 		$this->putInCustomData('storageProfileId', $v);
 	}
+	
+	public function setMediaParserType($mediaParserType)
+	{
+		$this->putInCustomData('mediaParserType', $mediaParserType);
+	}
+	
+	public function getMediaParserType()
+	{
+		return $this->getFromCustomData('mediaParserType', null, mediaParserType::MEDIAINFO);
+	}
 }

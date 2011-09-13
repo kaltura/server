@@ -52,30 +52,13 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 	 */
 	private function extractMediaInfo($mediaFile)
 	{
-		KalturaLog::debug("extractMediaInfo($mediaFile)");
-		$mediaInfo = null;
-		try {
-			$mediaParser = new KMediaInfoMediaParser($mediaFile, $this->taskConfig->params->mediaInfoCmd);
-			$mediaInfo = $mediaParser->getMediaInfo();
-		}
-		catch (Exception $ex){
-			KalturaLog::err($ex->getMessage());
-			$mediaInfo = null;
-		}
+		KalturaLog::debug("file path [$mediaFile]");
 		
-		try {
-			if(is_null($mediaInfo) && $this->taskConfig->params->mediaInfoCmd2){
-				$mediaParser = new KMediaInfoMediaParser($mediaFile, $this->taskConfig->params->mediaInfoCmd2);
-				$mediaInfo = $mediaParser->getMediaInfo();
-			}
-		}
-		catch (Exception $ex){
-			KalturaLog::err($ex->getMessage());
-			$mediaInfo = null;
-		}
+		$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig);
+		if($engine)
+			return $engine->getMediaInfo();		
 		
-		
-		return $mediaInfo;
+		return null;
 	}
 	
 	/**
@@ -111,12 +94,14 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
 			
 		$mediaInfo = null;
-		
-				// First mediaInfo attempt - 
 		try
 		{
-//			if($this->taskConfig->params->useMediaInfo)
-				$mediaInfo = $this->extractMediaInfo(realpath($mediaFile));
+			$mediaFile = realpath($mediaFile);
+			KalturaLog::debug("file path [$mediaFile]");
+			
+			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig);
+			if($engine)
+				$mediaInfo = $engine->getMediaInfo();		
 		}
 		catch(Exception $ex)
 		{

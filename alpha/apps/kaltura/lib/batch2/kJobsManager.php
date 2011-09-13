@@ -1093,6 +1093,20 @@ class kJobsManager
 	
 	public static function addExtractMediaJob(BatchJob $parentJob, $inputFileSyncLocalPath, $flavorAssetId)
 	{
+		$profile = null;
+		try{
+			$profile = myPartnerUtils::getConversionProfile2ForEntry($parentJob->getEntryId());
+			KalturaLog::debug("profile [" . $profile->getId() . "]");
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+		}
+		
+		$mediaInfoEngine = mediaParserType::MEDIAINFO;
+		if($profile)
+			$mediaInfoEngine = $profile->getMediaParserType();
+		
 		$extractMediaData = new kExtractMediaJobData();
 		$extractMediaData->setSrcFileSyncLocalPath($inputFileSyncLocalPath);
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
@@ -1100,7 +1114,7 @@ class kJobsManager
 		$batchJob = $parentJob->createChild(false);
 		
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
-		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA);
+		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
 	}
 	
 	public static function addNotificationJob(BatchJob $parentJob = null, $entryId, $partnerId, $notificationType, $sendType, $puserId, $objectId, $notificationData)

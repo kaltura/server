@@ -133,6 +133,13 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 	 * @var int
 	 */
 	public $storageProfileId;
+
+	/**
+	 * Media parser type to be used for extract media
+	 *  
+	 * @var KalturaMediaParserType
+	 */
+	public $mediaParserType;
 	
 	private static $map_between_objects = array
 	(
@@ -149,6 +156,7 @@ class KalturaConversionProfile extends KalturaObject implements IFilterable
 		"clipStart",
 		"clipDuration",
 		"storageProfileId",
+		"mediaParserType",
 	);
 	
 	public function getMapBetweenObjects ( )
