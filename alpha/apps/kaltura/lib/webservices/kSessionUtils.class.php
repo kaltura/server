@@ -487,11 +487,10 @@ class ks
 			// extract playlist ID from pair
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE) 
-				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] > 0)){
-					return $exPrivileges[1];				
-				}else{
+				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0)){
 					throw new KalturaAPIException ( APIErrors::INVALID_SET_ROLE);
 				}
+				return $exPrivileges[1];
 		}
 		
 		return false;
@@ -510,12 +509,9 @@ class ks
 			$exPrivileges = explode(':', $priv);
 			//validate setRole
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE){ 
-				if (!((is_numeric($exPrivileges[1])) && ($exPrivileges[1] > 0)))
-					throw new KalturaAPIException ( APIErrors::INVALID_SET_ROLE);
-				
 				$c = new Criteria();
-				$c->addAnd(UserRolePeer::ID, $exPrivileges[1], Criteria::EQUAL);
-				$c->addAnd(UserRolePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+				$c->addAnd(is_numeric($exPrivileges[1]) ? UserRolePeer::ID : UserRolePeer::SYSTEM_NAME, $exPrivileges[1], Criteria::EQUAL);
+				$c->addAnd(UserRolePeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
 				$roleId = UserRolePeer::doSelectOne($c);
 				
 				if ($roleId){
