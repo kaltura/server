@@ -27,7 +27,7 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		
 		$this->addElement('text', 'deliveryPriority', array(
 			'label' 		=> 'Delivery Priority:',
-			'required'		=> true,
+			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
 		
