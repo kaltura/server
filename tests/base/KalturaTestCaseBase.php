@@ -402,7 +402,14 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		if($name != KalturaTestCaseBase::TEST_NOTHING_TEST_NAME) //we init the framework for all tests but hte test nothing test
 			$this->initFramework($result);
 		
-		$result = parent::run($result);
+		try {
+			$result = parent::run($result);	
+		}
+		catch(Exception $e)
+		{
+			$this->fail("Exception was raised during running of the test: " . $e->getMessage());
+		}
+		
 						
 		return $result; 
 	}
@@ -499,7 +506,7 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		}
 
 		$this->currentFailure = null;
-	
+		
 		$testResult = parent::runTest();
 		return $testResult;
 	}
