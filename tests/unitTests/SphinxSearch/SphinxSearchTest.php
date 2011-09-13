@@ -171,5 +171,7 @@ class SphinxSerach extends PHPUnit_Framework_TestCase
 			if ($name == 'tests')
 				return $writer->stream;
 		}
+		
+		$this->assertTrue ( false, 'missing tests log file');
 	}
 }
