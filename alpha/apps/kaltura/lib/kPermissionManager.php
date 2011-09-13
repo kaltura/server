@@ -268,8 +268,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		// get mapping of permissions to permission items
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::NAME, $permissionNames, Criteria::IN);
-		$c->addAnd(PermissionPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, self::$operatingPartnerId), Criteria::IN);
-		$c->addAnd(PermissionItemPeer::PARTNER_ID, array(PartnerPeer::GLOBAL_PARTNER, self::$operatingPartnerId), Criteria::IN);
+		$c->addAnd(PermissionPeer::PARTNER_ID, array(strval(PartnerPeer::GLOBAL_PARTNER), strval(self::$operatingPartnerId)), Criteria::IN);
+		$c->addAnd(PermissionItemPeer::PARTNER_ID, array(strval(PartnerPeer::GLOBAL_PARTNER), strval(self::$operatingPartnerId)), Criteria::IN);
 		$lookups = PermissionToPermissionItemPeer::doSelectJoinAll($c);
 		foreach ($lookups as $lookup)
 		{
