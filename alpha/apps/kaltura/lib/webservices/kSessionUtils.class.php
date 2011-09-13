@@ -487,10 +487,12 @@ class ks
 			// extract playlist ID from pair
 			$exPrivileges = explode(':', $priv);
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE) 
+			{
 				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0)){
 					throw new KalturaAPIException ( APIErrors::INVALID_SET_ROLE);
 				}
 				return $exPrivileges[1];
+			}
 		}
 		
 		return false;
