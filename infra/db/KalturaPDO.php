@@ -14,6 +14,7 @@ class KalturaPDO extends PropelPDO
 	public function exec($sql)
 	{
 		KalturaLog::debug($sql);
+		KalturaLog::logByType($sql, KalturaLog::LOG_TYPE_TESTS);
 		
 		try
 		{

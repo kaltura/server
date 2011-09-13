@@ -48,7 +48,9 @@ class KalturaStatement extends PDOStatement
 		}
 			
 		$sql = str_replace($search, $replace, $this->queryString);
+		
 		KalturaLog::debug($sql);
+		KalturaLog::logByType($sql, KalturaLog::LOG_TYPE_TESTS);
 		
 		$sqlStart = microtime(true);
 		if(self::$dryRun)
