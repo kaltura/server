@@ -117,10 +117,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		switch($dbBatchJob->getStatus())
 		{
-			case BatchJob::BATCHJOB_STATUS_PENDING: return kFlowHelper::handleBulkUploadPending($dbBatchJob, $data, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_ABORTED: return kFlowHelper::handleBulkUploadAborted($dbBatchJob, $data, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_FAILED: return kFlowHelper::handleBulkUploadFailed($dbBatchJob, $data, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_FINISHED: return kFlowHelper::handleBulkUploadFinished($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_ABORTED: 
+				return kFlowHelper::handleBulkUploadAborted($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FAILED: 
+			case BatchJob::BATCHJOB_STATUS_FATAL: 
+				return kFlowHelper::handleBulkUploadFailed($dbBatchJob, $data, $twinJob);
+			case BatchJob::BATCHJOB_STATUS_FINISHED: 
+				return kFlowHelper::handleBulkUploadFinished($dbBatchJob, $data, $twinJob);
 			default: return $dbBatchJob;
 		}
 	}

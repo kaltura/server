@@ -233,21 +233,16 @@ class kFlowHelper
 			kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::PRECONVERT);
 		}
 
-		switch($dbBatchJob->getJobSubType())
+		if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 		{
-			case mediaInfo::ASSET_TYPE_ENTRY_INPUT:
+			kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
 
-				if($rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
-				{
-					kBusinessPreConvertDL::decideProfileConvert($dbBatchJob, $rootBatchJob, $data->getMediaInfoId());
-
-					// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
-					$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-					if($currentFlavorAsset && $currentFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
-					$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
-				}
-				break;
+			// handle the source flavor as if it was converted, makes the entry ready according to ready behavior rules
+			$currentFlavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			if($currentFlavorAsset && $currentFlavorAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+			$dbBatchJob = kBusinessPostConvertDL::handleConvertFinished($dbBatchJob, $currentFlavorAsset);
 		}
+		
 		return $dbBatchJob;
 	}
 
@@ -1224,63 +1219,6 @@ class kFlowHelper
 
 	/**
 	 * @param BatchJob $dbBatchJob
-	 * @param kPullJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
-	public static function handlePullFailed(BatchJob $dbBatchJob, kPullJobData $data, BatchJob $twinJob = null)
-	{
-		$rootBatchJob = $dbBatchJob->getRootJob();
-		if($rootBatchJob)
-		$rootBatchJob = kJobsManager::failBatchJob($rootBatchJob, "Pull job " . $dbBatchJob->getId() . " failed");
-			
-		return $dbBatchJob;
-	}
-
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kPullJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob|BatchJob
-	 */
-	public static function handlePullFinished(BatchJob $dbBatchJob, kPullJobData $data, BatchJob $twinJob = null)
-	{
-		if($dbBatchJob->getAbort())
-		return $dbBatchJob;
-
-		// creates a child extract meida job
-		$extractMediaData = new kExtractMediaJobData();
-		$extractMediaData->setSrcFileSyncLocalPath($data->getDestFileLocalPath());
-		kJobsManager::addJob($dbBatchJob->createChild(), $extractMediaData, BatchJobType::EXTRACT_MEDIA, mediaInfo::ASSET_TYPE_FLAVOR_INPUT);
-
-		return $dbBatchJob;
-	}
-
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kBulkUploadJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
-	public static function handleBulkUploadPending(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
-	{
-		// moved to BulkUploadService
-		// create file sunc
-		//		$syncKey = $dbBatchJob->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
-		//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($data->getCsvFilePath()));
-		//
-		//		// sets the pointer to the csv file
-		//		$data->setCsvFilePath(kFileSyncUtils::getLocalFilePathForKey($syncKey));
-		//
-		//		// save the data to the db
-		//		$dbBatchJob->setData($data);
-		//		$dbBatchJob->save();
-
-		return $dbBatchJob;
-	}
-
-	/**
-	 * @param BatchJob $dbBatchJob
 	 * @param kBulkUploadJobData $data
 	 * @param BatchJob $twinJob
 	 * @return BatchJob
@@ -1289,15 +1227,16 @@ class kFlowHelper
 	{
 		//(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null)
 		kJobsManager::addMailJob(
-		null,
-		0,
-		$dbBatchJob->getPartnerId(),
-		64,
-		kMailJobData::MAIL_PRIORITY_NORMAL,
-		kConf::get( "batch_alert_email" ),
-		kConf::get( "batch_alert_name" ),
-		$dbBatchJob->getPartner()->getAdminEmail(),
-		array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId()));
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			64,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get( "batch_alert_email" ),
+			kConf::get( "batch_alert_name" ),
+			$dbBatchJob->getPartner()->getAdminEmail(),
+			array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId())
+		);
 			
 		return $dbBatchJob;
 	}
@@ -1312,15 +1251,16 @@ class kFlowHelper
 	{
 		//(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null)
 		kJobsManager::addMailJob(
-		null,
-		0,
-		$dbBatchJob->getPartnerId(),
-		66,
-		kMailJobData::MAIL_PRIORITY_NORMAL,
-		kConf::get( "batch_alert_email" ),
-		kConf::get( "batch_alert_name" ),
-		$dbBatchJob->getPartner()->getAdminEmail(),
-		array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId()));
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			66,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get( "batch_alert_email" ),
+			kConf::get( "batch_alert_name" ),
+			$dbBatchJob->getPartner()->getAdminEmail(),
+			array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId())
+		);
 			
 		return $dbBatchJob;
 	}
@@ -1335,15 +1275,16 @@ class kFlowHelper
 	{
 		//(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null)
 		kJobsManager::addMailJob(
-		null,
-		0,
-		$dbBatchJob->getPartnerId(),
-		65,
-		kMailJobData::MAIL_PRIORITY_NORMAL,
-		kConf::get( "batch_alert_email" ),
-		kConf::get( "batch_alert_name" ),
-		$dbBatchJob->getPartner()->getAdminEmail(),
-		array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage()));
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			65,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get( "batch_alert_email" ),
+			kConf::get( "batch_alert_name" ),
+			$dbBatchJob->getPartner()->getAdminEmail(),
+			array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage())
+		);
 			
 		return $dbBatchJob;
 	}
@@ -1403,7 +1344,7 @@ class kFlowHelper
 		if($data->getExtractMedia()) // check if extract media required
 		{
 			// creates extract media job
-			kJobsManager::addExtractMediaJob($dbBatchJob, $data->getInputFileSyncLocalPath(), $data->getFlavorAssetId(), mediaInfo::ASSET_TYPE_ENTRY_INPUT);
+			kJobsManager::addExtractMediaJob($dbBatchJob, $data->getInputFileSyncLocalPath(), $data->getFlavorAssetId());
 		}
 		else
 		{

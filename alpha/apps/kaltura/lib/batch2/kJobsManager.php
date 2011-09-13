@@ -1091,7 +1091,7 @@ class kJobsManager
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $partner->getStorageProtocol());
 	}
 	
-	public static function addExtractMediaJob(BatchJob $parentJob, $inputFileSyncLocalPath, $flavorAssetId, $assetType)
+	public static function addExtractMediaJob(BatchJob $parentJob, $inputFileSyncLocalPath, $flavorAssetId)
 	{
 		$extractMediaData = new kExtractMediaJobData();
 		$extractMediaData->setSrcFileSyncLocalPath($inputFileSyncLocalPath);
@@ -1100,7 +1100,7 @@ class kJobsManager
 		$batchJob = $parentJob->createChild(false);
 		
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
-		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $assetType);
+		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA);
 	}
 	
 	public static function addNotificationJob(BatchJob $parentJob = null, $entryId, $partnerId, $notificationType, $sendType, $puserId, $objectId, $notificationData)
