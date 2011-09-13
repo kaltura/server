@@ -8,16 +8,17 @@ class KalturaLogFilterType implements Zend_Log_Filter_Interface
 	/**
 	 * @param string
 	 */
-	public $_type;
+	public $_type = null;
 	
 	/**
 	 * Filter by the current log writer type
 	 *
 	 * @param string $type
 	 */
-    public function __construct($type = '')
+    public function __construct($type = null)
     {
-        $this->_type = $type;
+    	if($type)
+    		$this->_type = $type;
     }
 
     /**
@@ -28,13 +29,13 @@ class KalturaLogFilterType implements Zend_Log_Filter_Interface
      */
     public function accept($event)
     {
-    	if (!isset($event['type']) || $event['type'] == null){
-    		 if ($this->_type == KalturaLog::LOG_TYPE_KALTURA_API_V3)
+    	if (!isset($event['type']) || is_null($event['type'])){
+    		 if (is_null($this->_type))
     		 	return true;
     		 
     		 return false;
     	} 
-    	    	
+    	
     	if ($event['type'] == $this->_type)
     		return true;
     			

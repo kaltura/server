@@ -18,7 +18,6 @@ class KalturaLog
     const INFO    = Zend_Log::INFO;
     const DEBUG   = Zend_Log::DEBUG;
     
-    const LOG_TYPE_KALTURA_API_V3 = 'LOG_TYPE_KALTURA_API_V3';
     const LOG_TYPE_ANALITICS = 'LOG_TYPE_ANALITICS';
 	
 	public static function getInstance ()
