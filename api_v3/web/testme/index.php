@@ -154,6 +154,8 @@
 		onclick="switchToCSharp()">C#</a></li>
 	<li class="code-menu code-menu-python"><a href="#"
 		onclick="switchToPython()">Python</a></li>
+	<li class="code-menu code-menu-javascript"><a href="#"
+		onclick="switchToJavascript()">Javascript</a></li>
 	<li class="code-menu"><a class="code-menu-toggle" href="#"
 		onclick="toggleCode()" id="codeToggle">Show Code Example</a></li>
 </ul>
