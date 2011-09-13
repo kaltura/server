@@ -66,7 +66,7 @@ KCodeExampleBase.prototype.getActionMethod = function (action){
 	return action;
 };
 
-KCodeExampleBase.prototype.getService = function (service, plugin){
+KCodeExampleBase.prototype.getService = function (service, plugin, entity){
 	return this.codeObjectAttribute(this.jqClientObject.clone(true), service);
 };
 
@@ -76,16 +76,15 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 		return;
 	scope.jqParams.empty();
 	
-	// TODO
-//	var ksField = jqItem.find("input:text,select[name=ks]");
-//	var value = ksField.val();
-//	if(scope.getKsMethod()){
-//		var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
-//		scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(true), jqSetKs), scope.jqParams);
-//	}
-//	else if(scope.getKsVar()){
-//		scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(true), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
-//	}
+	var ksField = jQuery("input:text[name=ks]");
+	var value = ksField.val();
+	if(scope.getKsMethod()){
+		var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
+		scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(true), jqSetKs), scope.jqParams);
+	}
+	else if(scope.getKsVar()){
+		scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(true), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
+	}
 	
 	var params = [];
 	jQuery(".param").each(function(i, item) {
@@ -304,7 +303,7 @@ KCodeExampleBase.prototype.setAction = function (service, action, params, plugin
 		}
 	}
 
-	var jqService = this.getService(service, plugin);
+	var jqService = this.getService(service, plugin, this.jqAction);
 	var actionMethod = this.getActionMethod(action);
 	var jqResult = this.codeVar("results");
 	var jqResultDeclare = this.codeVarDefine(jqResult, "Object");
@@ -392,6 +391,16 @@ KCodeExampleBase.prototype.codeObjectMethod = function (jqObject, jqFunction){
 	
 	jqCode.append(jqObject);	
 	jqCode.append(this.getObjectDelimiter());
+	jqCode.append(jqFunction);
+	
+	return jqCode;
+};
+
+KCodeExampleBase.prototype.codeClassMethod = function (className, jqFunction){
+	var jqCode = jQuery("<span/>");
+	
+	jqCode.append("<span class=\"code-" + this.lang + "-class-name\">" + className + "</span>");	
+	jqCode.append(this.getClassDelimiter());
 	jqCode.append(jqFunction);
 	
 	return jqCode;
@@ -649,6 +658,19 @@ KCodeExamplePHP.prototype.getClassDelimiter = function (){
 	return "::";
 };
 
+KCodeExamplePHP.prototype.getService = function (service, plugin, entity){
+	if(!plugin)
+		return KCodeExampleBase.prototype.getService.apply(this, arguments);
+	
+	var pluginClientName = plugin + "ClientPlugin";
+	var pluginClientClass = "Kaltura" + pluginClientName.substr(0, 1).toUpperCase() + pluginClientName.substr(1);
+	var jqPluginObject = this.codeVar("pluginClientName");
+	var jqFunction = this.codeFunction('get', [this.jqClientObject.clone(true)]);
+	
+	this.addCode(this.codeAssign(jqPluginObject.clone(true), this.codeClassMethod(pluginClientClass, jqFunction)), entity);
+	return this.codeObjectAttribute(jqPluginObject.clone(true), service);
+};
+
 KCodeExamplePHP.prototype.codeHeader = function (){
 
 	this.jqEntity.append(jQuery("<span class=\"code-php-code\">&lt;?php</span>"));
@@ -719,7 +741,7 @@ KCodeExampleJava.prototype.getKsMethod = function (){
 	return "setSessionId";
 };
 
-KCodeExampleJava.prototype.getService = function (service, plugin){
+KCodeExampleJava.prototype.getService = function (service, plugin, entity){
 	var getter = "get" + service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
 	var jqGetter = this.codeFunction(getter);
 	return this.codeObjectMethod(this.jqClientObject.clone(true), jqGetter);
@@ -893,7 +915,7 @@ KCodeExampleCsharp.prototype.getActionMethod = function (action){
 	return action.substr(0, 1).toUpperCase() + action.substr(1);
 };
 
-KCodeExampleCsharp.prototype.getService = function (service, plugin){
+KCodeExampleCsharp.prototype.getService = function (service, plugin, entity){
 	service = service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
 	return this.codeObjectAttribute(this.jqClientObject.clone(true), service);
 };
