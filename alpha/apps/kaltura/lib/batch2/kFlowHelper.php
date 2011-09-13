@@ -1225,7 +1225,21 @@ class kFlowHelper
 	 */
 	public static function handleBulkUploadFinished(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
 	{
-		//(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null)
+		$ks = new ks();
+		$ks->valid_until = time() + 86400 ; 
+		$ks->type = ks::TYPE_KS;
+		$ks->partner_id = $dbBatchJob->getPartnerId();
+		$ks->master_partner_id = null;
+		$ks->partner_pattern = $dbBatchJob->getPartnerId();
+		$ks->error = 0;
+		$ks->rand = microtime(true);
+		$ks->user = '';
+		$ks->privileges = 'setrole:Manager';
+		$ks->additional_data = null;
+		$ks_str = $ks->toSecureString();
+		
+		$logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$dbBatchJob->getId()}/ks/" . $ks_str;
+			
 		kJobsManager::addMailJob(
 			null,
 			0,
@@ -1235,7 +1249,7 @@ class kFlowHelper
 			kConf::get( "batch_alert_email" ),
 			kConf::get( "batch_alert_name" ),
 			$dbBatchJob->getPartner()->getAdminEmail(),
-			array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId())
+			array($dbBatchJob->getPartner()->getAdminName(), $dbBatchJob->getId(), $logFileUrl)
 		);
 			
 		return $dbBatchJob;
