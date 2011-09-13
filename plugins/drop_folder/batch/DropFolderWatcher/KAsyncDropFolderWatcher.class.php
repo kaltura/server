@@ -83,7 +83,12 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		
 		foreach ($dropFolders as $folder)
 		{
-			$this->watchFolder($folder);
+		    try {
+			    $this->watchFolder($folder);
+		    }
+		    catch (Exception $e) {
+		        KalturaLog::err('Unknown error with folder id ['.$folder->id.'] - '.$e->getMessage());			
+		    }
 		}
 	}
 		
