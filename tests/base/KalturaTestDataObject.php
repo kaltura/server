@@ -186,7 +186,7 @@ class KalturaTestDataObject extends KalturaTestDataBase
 		else
 		{
 			$objectType = gettype($this->dataObject);
-			throw new Exception("Type not supported: $objectType isn't");
+			throw new Exception("$objectType Type is not supported: ");
 		}
 	}
 
@@ -387,7 +387,8 @@ class KalturaTestDataObject extends KalturaTestDataBase
 				//if dbValue exists
 				if(isset($child["dbValue"]))
 				{
-					$this->comments[$childKey] = $child['dbValue'];
+					$commentValue = $child['dbValue'];
+					$this->comments[$childKey] = "$commentValue";
 				}
 												
 				if(strlen($child) != 0)
@@ -422,7 +423,8 @@ class KalturaTestDataObject extends KalturaTestDataBase
 							//if dbValue exists
 							if(isset($singleElementValue["dbValue"]))
 							{
-								$this->comments[$singleElementKey][$key] = $singleElementValue["dbValue"];
+								$singleElementComment = $singleElementValue["dbValue"];
+								$this->comments[$singleElementKey][$key] = "$singleElementComment";
 							}
 						}
 						
