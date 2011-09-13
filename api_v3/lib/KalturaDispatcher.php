@@ -86,6 +86,7 @@ class KalturaDispatcher
 		
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");
+		KalturaLog::logByType("Disptach finshed", KalturaLog::LOG_TYPE_TESTS);		
 				
 		kMemoryManager::clearMemory();
 		
