@@ -140,8 +140,18 @@
     <!-- Target: replace generate config file          -->
     <!-- ============================================  -->
     <target name="replaceGenerateConfig">
-         <echo msg="replacing generate config file..." />
-         <copy file="${installationLoc}${installationDir}/package/app/app/generator/config.template.dev.ini" tofile="${installationLoc}${installationDir}/package/app/app/generator/config.template.ini" overwrite="true"/>
+         <echo msg="replacing generate config file if needed..." />
+         <property name="properties.gener"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}/package/app/app/generator/config.template.dev.ini" property="properties.gener" />
+         <!--echo message="value is ${properties.gener}" /-->
+
+         <if>
+              <equals arg1="${properties.gener}" arg2="true" />
+         <then>
+              <echo msg="replacing generate config file..." />
+			  <copy file="${installationLoc}${installationDir}/package/app/app/generator/config.template.dev.ini" tofile="${installationLoc}${installationDir}/package/app/app/generator/config.template.ini" overwrite="true"/>
+         </then>
+         </if>
     </target>
 
 
