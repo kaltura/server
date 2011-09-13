@@ -19,6 +19,7 @@ class KalturaLog
     const DEBUG   = Zend_Log::DEBUG;
     
     const LOG_TYPE_ANALITICS = 'LOG_TYPE_ANALITICS';
+    const LOG_TYPE_TESTS = 'LOG_TYPE_TESTS';
 	
 	public static function getInstance ()
 	{
@@ -99,9 +100,15 @@ class KalturaLog
 	static function logByType($message, $type, $priority = self::DEBUG)
 	{
 		self::initLog();
-		self::$_logger->setEventItem("type", $type);
+		
+		//check if this is a zend log (and not a sfLogger)
+		if (get_class(self::$_logger) == 'Zend_Log')		
+			self::$_logger->setEventItem("type", $type);
+			
 		self::$_logger->log($message, $priority);
-		self::$_logger->setEventItem("type", '');
+		
+		if (get_class(self::$_logger) == 'Zend_Log')
+			self::$_logger->setEventItem("type", '');
 	}
 	
 	static function setContext($context)
