@@ -1234,7 +1234,7 @@ class kFlowHelper
 		$ks->error = 0;
 		$ks->rand = microtime(true);
 		$ks->user = '';
-		$ks->privileges = 'setrole:Manager';
+		$ks->privileges = 'setrole:BULK_LOG_DOWNLOAD';
 		$ks->additional_data = null;
 		$ks_str = $ks->toSecureString();
 		
