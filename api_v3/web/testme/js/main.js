@@ -149,10 +149,19 @@ KTestMe.prototype = {
 		}
 
 		if(this.codeGenerator){
+			var plugin = null;
 			var service = this.jqServices.find("option:selected").attr("title");
 			var action = this.jqActions.find("option:selected").attr("title");
+
+			if(service.indexOf(".") > 0)
+			{
+				var arr = service.split(".", 2);
+				service = arr[0];
+				plugin = arr[1];
+				
+			}
 			
-			this.codeGenerator.setAction(service, action, data.actionParams);
+			this.codeGenerator.setAction(service, action, data.actionParams, plugin);
 		}
 	},
 	
@@ -599,10 +608,20 @@ KTestMe.prototype = {
 		if(!this.actionInfo)
 			return;
 
+		var plugin = null;
 		var service = this.jqServices.find("option:selected").attr("title");
 		var action = this.jqActions.find("option:selected").attr("title");
+
+
+		if(service.indexOf(".") > 0)
+		{
+			var arr = service.split(".", 2);
+			service = arr[0];
+			plugin = arr[1];
+			
+		}
 		
-		this.codeGenerator.setAction(service, action, this.actionInfo.actionParams);
+		this.codeGenerator.setAction(service, action, this.actionInfo.actionParams, plugin);
 	}
 };
 

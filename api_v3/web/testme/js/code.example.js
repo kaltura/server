@@ -26,10 +26,6 @@ KCodeExampleBase.prototype.jqClientObject = null;
 KCodeExampleBase.prototype.jqAction = null;
 KCodeExampleBase.prototype.jqParams = null;
 
-KCodeExampleBase.prototype.service = null;
-KCodeExampleBase.prototype.action = null;
-KCodeExampleBase.prototype.params = null;
-
 KCodeExampleBase.prototype.importsArray = {};
 KCodeExampleBase.prototype.jqImports = null;
 KCodeExampleBase.prototype.jqActionImports = null;
@@ -70,7 +66,7 @@ KCodeExampleBase.prototype.getActionMethod = function (action){
 	return action;
 };
 
-KCodeExampleBase.prototype.getService = function (service){
+KCodeExampleBase.prototype.getService = function (service, plugin){
 	return this.codeObjectAttribute(this.jqClientObject.clone(true), service);
 };
 
@@ -264,7 +260,7 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 		scope.addCode(objectsAssigns.pop().assign, scope.jqParams);
 };
 
-KCodeExampleBase.prototype.setAction = function (service, action, params){
+KCodeExampleBase.prototype.setAction = function (service, action, params, plugin){
 	if(this.jqAction){
 		this.jqAction.empty();
 	}
@@ -308,7 +304,7 @@ KCodeExampleBase.prototype.setAction = function (service, action, params){
 		}
 	}
 
-	var jqService = this.getService(service);
+	var jqService = this.getService(service, plugin);
 	var actionMethod = this.getActionMethod(action);
 	var jqResult = this.codeVar("results");
 	var jqResultDeclare = this.codeVarDefine(jqResult, "Object");
@@ -723,7 +719,7 @@ KCodeExampleJava.prototype.getKsMethod = function (){
 	return "setSessionId";
 };
 
-KCodeExampleJava.prototype.getService = function (service){
+KCodeExampleJava.prototype.getService = function (service, plugin){
 	var getter = "get" + service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
 	var jqGetter = this.codeFunction(getter);
 	return this.codeObjectMethod(this.jqClientObject.clone(true), jqGetter);
@@ -897,7 +893,7 @@ KCodeExampleCsharp.prototype.getActionMethod = function (action){
 	return action.substr(0, 1).toUpperCase() + action.substr(1);
 };
 
-KCodeExampleCsharp.prototype.getService = function (service){
+KCodeExampleCsharp.prototype.getService = function (service, plugin){
 	service = service.substr(0, 1).toUpperCase() + service.substr(1) + "Service";
 	return this.codeObjectAttribute(this.jqClientObject.clone(true), service);
 };

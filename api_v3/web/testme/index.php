@@ -107,13 +107,24 @@
 
 			<div class="param"><label for="service">Select service:</label> <select
 	name="service">
-					<?php foreach($services as $serviceReflector): ?>
-					<option value="<?php echo $serviceReflector->getServiceId();?>" title="<?php echo $serviceReflector->getServiceName(); ?>">
-						<?php echo $serviceReflector->getServiceName();
+					<?php 
+						foreach($services as $serviceReflector)
+						{
+							/* @var $serviceReflector KalturaServiceReflector */
+							$serviceId = $serviceReflector->getServiceId();
+							$serviceName = $serviceReflector->getServiceName();
+							$serviceLabel = $serviceReflector->getServiceName();
+							$pluginName = $serviceReflector->getPluginName();
+							
+							if ($pluginName)
+								$serviceName = "$pluginName.$serviceName";
+							
 							if ($serviceReflector->isDeprecated())
-								echo ' (deprecated)'; ?>
-					</option>
-					<?php endforeach; ?>
+								$serviceLabel . ' (deprecated)';
+							
+							echo "<option value=\"$serviceId\" title=\"$serviceName\">$serviceLabel</option>";
+						}
+					?>
 				</select></div>
 <div class="param"><label for="action">Select action:</label> <select
 	name="action">
