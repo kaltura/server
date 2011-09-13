@@ -175,9 +175,12 @@ KalturaLog::log(__METHOD__."==>\n");
 		$flavor->setType($target->_type);
 		$flavor->setTags($target->_tags);
 		
-		$flavor->setReadyBehavior($target->_cdlObject->getReadyBehavior());
-		$flavor->setSourceRemoteStorageProfileId($target->_cdlObject->getSourceRemoteStorageProfileId());
-		$flavor->setMediaParserType($target->_cdlObject->getMediaParserType());
+		if($target->_cdlObject)
+		{
+			$flavor->setReadyBehavior($target->_cdlObject->getReadyBehavior());
+			$flavor->setSourceRemoteStorageProfileId($target->_cdlObject->getSourceRemoteStorageProfileId());
+			$flavor->setMediaParserType($target->_cdlObject->getMediaParserType());
+		}
 		
 		if($target->IsRedundant()) {
 			$flavor->_isRedundant = true;
