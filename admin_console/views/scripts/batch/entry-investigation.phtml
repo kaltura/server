@@ -1127,6 +1127,8 @@
 			return;
 		
 		var offset = $paintarea.offset();
+		if(offset == null)
+			offset = {top: 0, left: 0};
 		var x = offset.left + 5;
 		var y = offset.top + 5;
 
