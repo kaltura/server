@@ -206,6 +206,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 */
 	public function applyFilters()
 	{
+		KalturaLog::logByType('kaltura_entry_criteria ' . serialize($this), KalturaLog::LOG_TYPE_TESTS);
 		$this->criteriasLeft = 0;
 		
 		KalturaLog::debug("Applies " . count($this->filters) . " filters");
