@@ -506,8 +506,15 @@ class KalturaTestCaseBase extends PHPUnit_Framework_TestCase
 		}
 
 		$this->currentFailure = null;
-		
+
+		try {
 		$testResult = parent::runTest();
+		}
+		catch (Exception $e)
+		{
+			$this->fail("Exception was raised during running of the test: " . $e->getMessage());	
+		}
+		
 		return $testResult;
 	}
 
