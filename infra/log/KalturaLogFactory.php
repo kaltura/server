@@ -155,6 +155,12 @@ class KalturaLogFactory
 					$filter = new KalturaLogPartnerFilter($config->partnerId);
 				}
 				break;
+			case "KalturaLogFilterType":
+				if ($config->type !== null)
+				{
+					$filter = new KalturaLogFilterType($config->type);
+				}
+				break;
 		}
 		return $filter;
 	}

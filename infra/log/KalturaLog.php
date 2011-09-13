@@ -6,7 +6,6 @@
 class KalturaLog
 {
 	private static $_logger;
-	private static $_analitics;
 	private static $_initialized = false;
 	private static $_instance = null;
 	
@@ -18,7 +17,9 @@ class KalturaLog
     const NOTICE  = Zend_Log::NOTICE;
     const INFO    = Zend_Log::INFO;
     const DEBUG   = Zend_Log::DEBUG;
-    const ANALITICS = Zend_Log::NOTICE;
+    
+    const LOG_TYPE_KALTURA_API_V3 = 'LOG_TYPE_KALTURA_API_V3';
+    const LOG_TYPE_ANALITICS = 'LOG_TYPE_ANALITICS';
 	
 	public static function getInstance ()
 	{
@@ -34,11 +35,7 @@ class KalturaLog
 			return;
 		
 		self::$_logger = KalturaLogFactory::getLogger($config);
-		self::$_analitics = self::$_logger;
 		self::$_initialized = true;
-		
-		if($config->analitics)
-			self::$_analitics = KalturaLogFactory::getLogger($config->analitics);
 	}
 	
 	public static function setLogger($logger)
@@ -97,8 +94,15 @@ class KalturaLog
 
 	static function analitics(array $data)
 	{
+		self::logByType(implode(',', $data), self::LOG_TYPE_ANALITICS, self::NOTICE);
+	}
+	
+	static function logByType($message, $type, $priority = self::DEBUG)
+	{
 		self::initLog();
-		self::$_analitics->log(implode(',', $data), self::ANALITICS);
+		self::$_logger->setEventItem("type", $type);
+		self::$_logger->log($message, $priority);
+		self::$_logger->setEventItem("type", '');
 	}
 	
 	static function setContext($context)
