@@ -1463,4 +1463,12 @@ class KalturaEntryService extends KalturaBaseService
 				$filter->durationLessThanOrEqual = $filter->durationLessThanOrEqual * 1000;
 		}
 	}
+	
+	// hack due to KCW of version  from KMC
+	protected function getConversionQualityFromRequest () 
+	{
+		if(isset($_REQUEST["conversionquality"]))
+			return $_REQUEST["conversionquality"];
+		return null;
+	}
 }

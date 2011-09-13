@@ -258,11 +258,10 @@ class BaseEntryService extends KalturaEntryService
 	    $dbEntry->setSourceId( $uploadTokenId );
 	    $dbEntry->setSourceLink( $entryFullPath );
 	    $dbEntry->setDefaultModerationStatus();
-     
-	    // hack due to KCW of version  from KMC
-	    if (isset ( $_REQUEST ["conversionquality"] )) {
-			$dbEntry->setConversionQuality ( $_REQUEST ["conversionquality"] );
-		}
+		
+		// hack due to KCW of version  from KMC
+		if (! is_null ( parent::getConversionQualityFromRequest () ))
+			$dbEntry->setConversionQuality ( parent::getConversionQualityFromRequest () );
 		
 	    $dbEntry->save();
 	    
@@ -737,4 +736,5 @@ class BaseEntryService extends KalturaEntryService
 		
 		return $result;
 	}
+	
 }

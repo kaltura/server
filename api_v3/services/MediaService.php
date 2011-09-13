@@ -1012,29 +1012,37 @@ class MediaService extends KalturaEntryService
 	 */
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
+		if(!($entry instanceof KalturaMediaEntry))
+			throw new KalturaClientException("Invalid object type", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
 		$entry->validatePropertyNotNull("mediaType");
 		
-		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
+		$conversionQuality = $this->getConversionQuality($entry);
+		if (!is_null($conversionQuality))
+			$entry->conversionQuality = $conversionQuality;
 		
-		if ( $this->getConversionQualityFromRequest() )
-			$dbEntry->setConversionQuality( $this->getConversionQualityFromRequest() );
-			
+		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 		$kshow = $this->createDummyKShow();
         $kshowId = $kshow->getId();
-        
         $dbEntry->setKshowId($kshowId);
 		$dbEntry->save();
-		
 		return $dbEntry;
 	}
 	
-	// TODO - this is because the re ia a GLOBAL parameter sent in the request "conversionquality" that
-	// hack due to KCW of version  from KMC
-	private function getConversionQualityFromRequest () 
+	private function getConversionQuality($entry) 
 	{
-		if(isset($_REQUEST["conversionquality"]))
-			return $_REQUEST["conversionquality"];
-			
-		return null;
-	}	
+		$conversionQuality = $entry->conversionQuality;
+		if (parent::getConversionQualityFromRequest())
+			$conversionQuality = $this->getConversionQualityFromRequest();	
+		if(is_null($conversionQuality))
+			return null;
+		$conversionProfile2 = conversionProfile2Peer::retrieveByPK($conversionQuality);
+		if (!$conversionProfile2) {
+			KalturaLog::debug("Maybe old conversion profile");
+			$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionQuality);
+			if ($conversionProfile)
+				$conversionQuality = $conversionProfile->getConversionProfile2Id();
+		}
+		return $conversionQuality;
+	}
+	
 }
