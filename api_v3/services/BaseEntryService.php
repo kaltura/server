@@ -711,10 +711,10 @@ class BaseEntryService extends KalturaEntryService
 			$partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 		{
 			if (is_null($contextDataParams->flavorAssetId)){
-				$asset = assetPeer::retrieveBestPlayByEntryId($this->entryId);
+				$asset = assetPeer::retrieveBestPlayByEntryId($entryId);
 				
 				if(!$asset)
-					throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND, $this->entryId);
+					throw new KalturaAPIException(KalturaErrors::NO_FLAVORS_FOUND, $entryId);
 			}else{
 				$asset = assetPeer::retrieveByPK($contextDataParams->flavorAssetId);
 				
