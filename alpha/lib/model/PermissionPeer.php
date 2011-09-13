@@ -32,7 +32,7 @@ class PermissionPeer extends BasePermissionPeer
 			
 			$c = new Criteria();
 			$c->addAnd(PermissionPeer::NAME, $permission, Criteria::EQUAL);
-			$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+			$c->addAnd(PermissionPeer::PARTNER_ID, array(strval($partnerId), strval(PartnerPeer::GLOBAL_PARTNER)), Criteria::IN);
 			// a user role can only contain NORMAL permission types - TODO should be changed to perPartner / perUser permissions
 			$c->addAnd(PermissionPeer::TYPE, PermissionType::NORMAL, Criteria::EQUAL);
 			$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
@@ -52,7 +52,7 @@ class PermissionPeer extends BasePermissionPeer
 		$permission->setPartnerId($partnerId);
 		$c = new Criteria();
 		if ($checkGlobalPartner) {
-			$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+			$c->addAnd(PermissionPeer::PARTNER_ID, array(strval($partnerId), strval(PartnerPeer::GLOBAL_PARTNER)), Criteria::IN);
 			$c->addDescendingOrderByColumn(PermissionPeer::PARTNER_ID);
 		}
 		else {
@@ -218,7 +218,7 @@ class PermissionPeer extends BasePermissionPeer
 	public static function getAllValidForPartner($partnerId, $checkDependency = true)
 	{
 		$c = new Criteria();
-		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$c->addAnd(PermissionPeer::PARTNER_ID, array(strval($partnerId), strval(PartnerPeer::GLOBAL_PARTNER)), Criteria::IN);
 		$c->addAnd(PermissionPeer::STATUS, PermissionStatus::ACTIVE, Criteria::EQUAL);
 		PermissionPeer::setUseCriteriaFilter(false);
 		$allPermissions = PermissionPeer::doSelect($c);
@@ -236,7 +236,7 @@ class PermissionPeer extends BasePermissionPeer
 	{
 		$c = new Criteria();
 		$c->addAnd(PermissionPeer::NAME, explode(',', $permissionNames), Criteria::IN);
-		$c->addAnd(PermissionPeer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+		$c->addAnd(PermissionPeer::PARTNER_ID, array(strval($partnerId), strval(PartnerPeer::GLOBAL_PARTNER)), Criteria::IN);
 		PermissionPeer::setUseCriteriaFilter(false);
 		$permissionObjects = PermissionPeer::doSelect($c);
 		PermissionPeer::setUseCriteriaFilter(true);
@@ -331,3 +331,4 @@ class PermissionPeer extends BasePermissionPeer
 		return $result;
 	}
 } // PermissionPeer
+
