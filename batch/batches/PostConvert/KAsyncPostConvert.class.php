@@ -50,35 +50,12 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	{
 		return 1;
 	}
-	
+
 	/**
-	 * extractMediaInfo extract the file info using mediainfo and parse the returned data
-	 *  
-	 * @param string $mediaFile file full path
-	 * @return KalturaMediaInfo or null for failure
+	 * @param KalturaBatchJob $job
+	 * @param KalturaPostConvertJobData $data
+	 * @return KalturaBatchJob
 	 */
-	private function extractMediaInfo($mediaFile)
-	{
-		KalturaLog::debug("extractMediaInfo($mediaFile)");
-		
-		$mediaParser = new KMediaInfoMediaParser($mediaFile, $this->taskConfig->params->mediaInfoCmd);
-		return $mediaParser->getMediaInfo();
-	}
-	
-	/**
-	 * extractFfmpegInfo extract the file info using FFmpeg and parse the returned data
-	 *  
-	 * @param string $mediaFile file full path
-	 * @return KalturaMediaInfo or null for failure
-	 */
-	private function extractFfmpegInfo($mediaFile)
-	{
-		KalturaLog::debug("extractFfmpegInfo($mediaFile)");
-		
-		$mediaParser = new KFFMpegMediaParser($mediaFile, $this->taskConfig->params->FFMpegCmd);
-		return $mediaParser->getMediaInfo();
-	}
-	
 	private function postConvert(KalturaBatchJob $job, KalturaPostConvertJobData $data)
 	{
 		KalturaLog::debug("postConvert($job->id)");
