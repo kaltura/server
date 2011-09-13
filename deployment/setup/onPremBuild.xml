@@ -186,7 +186,22 @@
     <!-- ============================================  -->
     <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade,sphinxLogDir,replaceGenerateConfig">
          <echo msg="install..." />
-         <exec command="php preInstallation.php -s kaltura;" dir="${installationLoc}${installationDir}" />
+         <property name="properties.instl"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}/preInstallation.php" property="properties.instl" />
+         <!--echo message="value is ${properties.instl}" /-->
+
+         <if>
+              <equals arg1="${properties.instl}" arg2="true" />
+         <then>
+              <echo msg="preinstallation..." />
+	          <exec command="php preInstallation.php -s kaltura" dir="${installationLoc}${installationDir}" />
+         </then>
+         <else>
+			  <echo msg="installation..." />
+	          <exec command="php install.php -s" dir="${installationLoc}${installationDir}" />
+         </else>
+         </if>
+         
          <echo msg="Done" />
     </target>
 
