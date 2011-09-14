@@ -1116,6 +1116,7 @@
 						<content>...</content>
 					</item>
 				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	
