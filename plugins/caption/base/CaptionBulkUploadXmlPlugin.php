@@ -138,13 +138,13 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	<xs:element name="subtitle-extension" />
 	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension">
 		<xs:annotation>
-			<xs:documentation>Caption asset element</xs:documentation>
+			<xs:documentation>A single caption asset element</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<subTitle isDefault="true" format="2" lang="Hebrew">
 						<tags>
-							<tag>example</tag>
-							<tag>my_tag</tag>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
 						</tags>
 						<urlContentResource url="http://my.domain/path/caption.srt"/>
 					</subTitle>
