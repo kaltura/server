@@ -58,7 +58,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 	 */
 	private function postConvert(KalturaBatchJob $job, KalturaPostConvertJobData $data)
 	{
-		KalturaLog::debug("postConvert($job->id)");
+		$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
 		try
 		{
