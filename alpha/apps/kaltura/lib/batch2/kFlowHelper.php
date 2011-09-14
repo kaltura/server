@@ -1261,7 +1261,7 @@ public static function createBulkUploadLogUrl(BatchJob $dbBatchJob)
 	{
 		KalturaLog::log("*** finished\n");
 		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 64, array($dbBatchJob->getPartner()->getAdminName(), $dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
+			self::sendBulkUploadNotificationEmail($dbBatchJob, 64, array($dbBatchJob->getPartner()->getBulkUploadNotificationsEmail(), $dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
@@ -1272,10 +1272,9 @@ public static function createBulkUploadLogUrl(BatchJob $dbBatchJob)
 	 * @return BatchJob
 	 */
 	public static function handleBulkUploadAborted(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
-        {
-		KalturaLog::log("*** aborted\n");
+	{
 		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 66, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
+			self::sendBulkUploadNotificationEmail($dbBatchJob, 66, array($dbBatchJob->getPartner()->getBulkUploadNotificationsEmail(),$dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
@@ -1286,10 +1285,9 @@ public static function createBulkUploadLogUrl(BatchJob $dbBatchJob)
 	 * @return BatchJob
 	 */
 	public static function handleBulkUploadFailed(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
-        {
-		KalturaLog::log("*** failed\n");
+	{
 		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 65, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrorNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
+			self::sendBulkUploadNotificationEmail($dbBatchJob, 65, array($dbBatchJob->getPartner()->getBulkUploadNotificationsEmail(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrorNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
