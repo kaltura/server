@@ -63,8 +63,12 @@ function addPermission($permissionCfg)
 		throw new Exception('Permission partner id or partner package must be set');
 	}
 	
-	if (isset($permissionCfg->partnerId) && $permissionCfg->partnerId != '')
-		addPermissionToPartner($permissionCfg);
+	if (isset($permissionCfg->partnerId) && $permissionCfg->partnerId != '') {
+		$partnerIds = explode(",", $permissionCfg->partnerId);
+		foreach($partnerIds as $partnerId) 
+			addPermissionToPartner($permissionCfg, $partnerId);
+	}
+		
 		
 	if (isset($permissionCfg->partnerPackages) &&  $permissionCfg->partnerPackages != '' )
 	{

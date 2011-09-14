@@ -29,7 +29,13 @@ $ini = new Zend_Config_Ini($iniFile);
 $oldPermissionsCfg = $ini->permissions;
 foreach ($oldPermissionsCfg as $permCfg)
 {
-	removePermission($permCfg);
+	if (is_null($permCfg->partnerId) || $permCfg->partnerId === '') {
+		throw new Exception('Permission partner id must be set');
+	} else {
+		$partnerIds = explode(",", $permCfg->partnerId);
+		foreach($partnerIds as $partnerId) 
+			removePermission($permCfg, $partnerId);
+	}
 }
 
 // add new api action permission items
@@ -52,20 +58,21 @@ KalturaLog::log('Done');
 
 // ------------------------------------------------------
 
-function removePermission($permissionCfg)
+function removePermission($permissionCfg, $partnerId = null)
 {
 	// verify obligatory fields
 	if (!$permissionCfg->name) {
 		throw new Exception('Permission name must be set');
 	}
-	if (is_null($permissionCfg->partnerId) || $permissionCfg->partnerId === '') {
-		throw new Exception('Permission partner id must be set');
+	
+	if (is_null($partnerId)) {
+		$partnerId = $permissionCfg->partnerId;
 	}
 	
 	// init new db permission object
 	$c = new Criteria();
 	$c->add(PermissionPeer::NAME, $permissionCfg->name);
-	$c->add(PermissionPeer::PARTNER_ID, $permissionCfg->partnerId);
+	$c->add(PermissionPeer::PARTNER_ID, $partnerId);
 	
 	$permission = PermissionPeer::doSelectOne($c);
 	if(!$permission)
