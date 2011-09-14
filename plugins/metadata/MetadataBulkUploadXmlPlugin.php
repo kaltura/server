@@ -90,7 +90,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 							<MultipleTextFieldName>entry multiple text field value1</MultipleTextFieldName>
 							<MultipleTextFieldName>entry multiple text field value2</MultipleTextFieldName>
 							<TextSelectionListFieldName>entry selected text value</TextSelectionListFieldName>
-							<DateFieldName>21741540<DateFieldName>
+							<DateFieldName>21741540</DateFieldName>
 							<EntryIDFieldName>0_5b3t2c8z</EntryIDFieldName>
 						</metadata>
 					</customData>
