@@ -15,8 +15,14 @@ class kXml
 	
 	//strip invalid xml characters 
 	public static function stripXMLInvalidChars($value) {
-		return preg_replace ( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', "", $value );
-	}	
+		preg_match_all( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', $value, $invalidChars );
+		$invalidChars = reset($invalidChars);
+		if (count($invalidChars))
+		{
+			$value = str_replace($invalidChars, "", $value);
+		}
+		return $value;
+	}
 	
 	public static function getLibXmlErrorDescription($xml)
 	{
