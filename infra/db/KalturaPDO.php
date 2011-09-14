@@ -14,7 +14,6 @@ class KalturaPDO extends PropelPDO
 	public function exec($sql)
 	{
 		KalturaLog::debug($sql);
-		KalturaLog::logByType($sql, KalturaLog::LOG_TYPE_TESTS);
 		
 		try
 		{
@@ -37,6 +36,7 @@ class KalturaPDO extends PropelPDO
 		
 		$sql = $args[0];
 		KalturaLog::debug($sql);
+		KalturaLog::logByType($sql, KalturaLog::LOG_TYPE_TESTS);
 		
 		try
 		{
