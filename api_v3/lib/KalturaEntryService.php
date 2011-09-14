@@ -19,8 +19,8 @@ class KalturaEntryService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		parent::applyPartnerFilterForClass(new conversionProfilePeer());
-		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
+		parent::applyPartnerFilterForClass(new ConversionProfilePeer());
+		parent::applyPartnerFilterForClass(new ConversionProfile2Peer());
 	}
 	
 	/**
