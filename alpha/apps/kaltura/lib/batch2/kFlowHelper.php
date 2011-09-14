@@ -1217,13 +1217,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kBulkUploadJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
-	public static function handleBulkUploadFinished(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
+public static function createBulkUploadLogUrl(BatchJob $dbBatchJob)
 	{
 		$ks = new ks();
 		$ks->valid_until = time() + 86400 ; 
@@ -1239,7 +1233,11 @@ class kFlowHelper
 		$ks_str = $ks->toSecureString();
 		
 		$logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$dbBatchJob->getId()}/ks/" . $ks_str;
-			
+		return $logFileUrl;
+	}
+
+	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
+	{
 		kJobsManager::addMailJob(
 			null,
 			0,
@@ -1249,9 +1247,21 @@ class kFlowHelper
 			kConf::get( "batch_alert_email" ),
 			kConf::get( "batch_alert_name" ),
 			$dbBatchJob->getPartner()->getAdminEmail(),
-			array($dbBatchJob->getPartner()->getAdminName(), $dbBatchJob->getId(), $logFileUrl)
+			$params
 		);
-			
+	}
+
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kBulkUploadJobData $data
+	 * @param BatchJob $twinJob
+	 * @return BatchJob
+	 */
+	public static function handleBulkUploadFinished(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
+	{
+		KalturaLog::log("*** finished\n");
+		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
+			self::sendBulkUploadNotificationEmail($dbBatchJob, 64, array($dbBatchJob->getPartner()->getAdminName(), $dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
@@ -1263,35 +1273,9 @@ class kFlowHelper
 	 */
 	public static function handleBulkUploadAborted(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
         {
-                $ks = new ks();
-                $ks->valid_until = time() + 86400 ;
-                $ks->type = ks::TYPE_KS;
-                $ks->partner_id = $dbBatchJob->getPartnerId();
-                $ks->master_partner_id = null;
-                $ks->partner_pattern = $dbBatchJob->getPartnerId();
-                $ks->error = 0;
-                $ks->rand = microtime(true);
-                $ks->user = '';
-                $ks->privileges = 'setrole:BULK_LOG_VIEWER_ROLE';
-                $ks->additional_data = null;
-                $ks_str = $ks->toSecureString();
-
-                $logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$dbBatchJob->getId()}/ks/" . $ks_str;
-
-		KalturaLog::log("logFileUrl: $logFileUrl \n");
-
-		kJobsManager::addMailJob(
-			null,
-			0,
-			$dbBatchJob->getPartnerId(),
-			66,
-			kMailJobData::MAIL_PRIORITY_NORMAL,
-			kConf::get( "batch_alert_email" ),
-			kConf::get( "batch_alert_name" ),
-			$dbBatchJob->getPartner()->getAdminEmail(),
-			array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $logFileUrl)
-		);
-			
+		KalturaLog::log("*** aborted\n");
+		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
+			self::sendBulkUploadNotificationEmail($dbBatchJob, 66, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
@@ -1303,33 +1287,9 @@ class kFlowHelper
 	 */
 	public static function handleBulkUploadFailed(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
         {
-                $ks = new ks();
-                $ks->valid_until = time() + 86400 ;
-                $ks->type = ks::TYPE_KS;
-                $ks->partner_id = $dbBatchJob->getPartnerId();
-                $ks->master_partner_id = null;
-                $ks->partner_pattern = $dbBatchJob->getPartnerId();
-                $ks->error = 0;
-                $ks->rand = microtime(true);
-                $ks->user = '';
-                $ks->privileges = 'setrole:BULK_LOG_VIEWER_ROLE';
-                $ks->additional_data = null;
-                $ks_str = $ks->toSecureString();
-
-                $logFileUrl = requestUtils::getHost() . "/api_v3/service/bulkUpload/action/serveLog/id/{$dbBatchJob->getId()}/ks/" . $ks_str;
-
-		kJobsManager::addMailJob(
-			null,
-			0,
-			$dbBatchJob->getPartnerId(),
-			65,
-			kMailJobData::MAIL_PRIORITY_NORMAL,
-			kConf::get( "batch_alert_email" ),
-			kConf::get( "batch_alert_name" ),
-			$dbBatchJob->getPartner()->getAdminEmail(),
-			array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage(), $logFileUrl)
-		);
-			
+		KalturaLog::log("*** failed\n");
+		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
+			self::sendBulkUploadNotificationEmail($dbBatchJob, 65, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrorNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
