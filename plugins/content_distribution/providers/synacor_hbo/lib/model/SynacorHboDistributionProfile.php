@@ -31,31 +31,40 @@ class SynacorHboDistributionProfile extends ConfigurableDistributionProfile
 		return parent::preSave($con);
 	}
 	
+	
+    public function validateForSubmission(EntryDistribution $entryDistribution, $action)
+	{	    
+	    $validationErrors = parent::validateForSubmission($entryDistribution, $action);
+	    
+	    $profile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+	    if (!$profile)
+	    {
+	        KalturaLog::err("Distribution  profile [" . $entryDistribution->getDistributionProfileId() . "] not found");
+			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'profile', 'distribution profile not found');
+			return $validationErrors;
+	    }
+	    
+	    if (strlen($profile->getFeedTitle()) <= 0)
+	    {
+	        $newError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'Feed title');
+            $newError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+	        $validationErrors[] = $newError;        
+	    }
+	    
+	    if (strlen($profile->getFeedLink()) <= 0)
+	    {
+	        $newError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'Feed link');
+            $newError->setValidationErrorType(DistributionValidationErrorType::STRING_EMPTY);
+	        $validationErrors[] = $newError;	
+	    }
+		
+		return $validationErrors;
+	}
+	
 
 	protected function getDefaultFieldConfigArray()
 	{
 		$fieldConfigArray = array();
-		
-		$fieldConfig = new DistributionFieldConfig();
-		$fieldConfig->setFieldName(SynacorHboDistributionField::FEED_TITLE);
-		$fieldConfig->setUserFriendlyFieldName('Feed Title');
-		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/feed_title" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-		
-		$fieldConfig = new DistributionFieldConfig();
-		$fieldConfig->setFieldName(SynacorHboDistributionField::FEED_SUBTITLE);
-		$fieldConfig->setUserFriendlyFieldName('Feed Subtitle');
-		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/feed_subtitle" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-		
-		$fieldConfig = new DistributionFieldConfig();
-		$fieldConfig->setFieldName(SynacorHboDistributionField::FEED_LINK);
-		$fieldConfig->setUserFriendlyFieldName('Feed Link');
-		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/feed_link" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;		
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(SynacorHboDistributionField::ENTRY_TITLE);

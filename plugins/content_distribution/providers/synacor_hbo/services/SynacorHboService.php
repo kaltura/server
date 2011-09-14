@@ -54,7 +54,8 @@ class SynacorHboService extends KalturaBaseService
 		$entries = entryPeer::doSelect($baseCriteria);
 		
 		$feed = new SynacorHboFeed('synacor_hbo_feed_template.xml');
-		$fields = null;
+		$feed->setDistributionProfile($fields);
+
 		foreach($entries as $entry)
 		{
 			/* @var $entry entry */
@@ -68,9 +69,6 @@ class SynacorHboService extends KalturaBaseService
 			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
 			$thumbAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getThumbAssetIds()));
 			$feed->addItem($fields, $entry, $flavorAssets, $thumbAssets);
-		}
-		if (is_array($fields)) {
-		    $feed->setFeedFields($fields);
 		}
 		
 		header('Content-Type: text/xml');

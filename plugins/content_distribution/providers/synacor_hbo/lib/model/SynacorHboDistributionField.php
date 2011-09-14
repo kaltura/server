@@ -5,10 +5,6 @@
  */ 
 interface SynacorHboDistributionField extends BaseEnum
 {
-    const FEED_TITLE = 'FEED_TITLE';
-    const FEED_SUBTITLE = 'FEED_SUBTITLE';
-    const FEED_LINK = 'FEED_LINK';
-    
     const ENTRY_TITLE = 'ENTRY_TITLE';
     const ENTRY_SUMMARY = 'ENTRY_SUMMARY';
     const ENTRY_UPDATED = 'ENTRY_UPDATED';

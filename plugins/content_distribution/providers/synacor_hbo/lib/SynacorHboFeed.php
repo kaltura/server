@@ -91,12 +91,12 @@ class SynacorHboFeed
 	}
 	
 	
-	public function setFeedFields(array $values)
+	public function setDistributionProfile(SynacorHboDistributionProfile $profile)
 	{
-	    $this->setNodeValue('/atom:feed/atom:title', $values[SynacorHboDistributionField::FEED_TITLE]);
-		$this->setNodeValue('/atom:feed/atom:link', $values[SynacorHboDistributionField::FEED_LINK]);
+	    $this->setNodeValue('/atom:feed/atom:title', $profile->getFeedTitle());
+		$this->setNodeValue('/atom:feed/atom:link', $profile->getFeedLink());
 		
-		$feedSubtitleValue = $values[SynacorHboDistributionField::FEED_SUBTITLE];
+		$feedSubtitleValue = $profile->getFeedSubtitle();
 		if (strlen($feedSubtitleValue) > 0) {
 		    $this->setNodeValue('/atom:feed/atom:subtitle', $feedSubtitleValue);
 		}

@@ -12,6 +12,7 @@ class Form_SynacorHboProfileConfiguration extends Form_ConfigurableProfileConfig
 		$this->addElement('text', 'feed_title', array(
 			'label'			=> 'Feed Title:',
 			'filters'		=> array('StringTrim'),
+		    'required'		=> true,
 		));
 		
 		$this->addElement('text', 'feed_subtitle', array(
@@ -22,6 +23,7 @@ class Form_SynacorHboProfileConfiguration extends Form_ConfigurableProfileConfig
 		$this->addElement('text', 'feed_link', array(
 			'label'			=> 'Feed Link:',
 			'filters'		=> array('StringTrim'),
+		    'required'		=> true,
 		));
 		
 		$this->addElement('text', 'feed_author_name', array(
