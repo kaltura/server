@@ -1,5 +1,5 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
-	
+
 	<xs:complexType name="T_mrss">
 		<xs:sequence>
 			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1">
@@ -7,9 +7,9 @@
 					<xs:documentation>A single entry wrapper element</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			
+
 			<xs:element ref="mrss-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 		<xs:attribute name="version" use="optional" type="xs:decimal">
 			<xs:annotation>
@@ -19,7 +19,7 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_channel">
 		<xs:sequence>
 			<xs:element ref="item" maxOccurs="unbounded" minOccurs="1">
@@ -27,12 +27,12 @@
 					<xs:documentation>holding entry element</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			
+
 			<xs:element ref="channel-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 	</xs:complexType>
-		
+
 	<xs:complexType name="T_item">
 		<xs:sequence>
 			<xs:element name="action" minOccurs="0" maxOccurs="1">
@@ -230,7 +230,7 @@
 				<xs:element ref="liveStream" minOccurs="1" maxOccurs="1" />
 				-->
 			</xs:choice>
-			
+
 			<xs:element ref="content" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>
@@ -245,9 +245,9 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			
+
 			<xs:element ref="item-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 	</xs:complexType>
 
@@ -269,9 +269,9 @@
 				</xs:annotation>
 			</xs:element>
 			-->
-			
+
 			<xs:element ref="media-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 	</xs:complexType>
 
@@ -292,9 +292,9 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			
+
 			<xs:element ref="mix-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 	</xs:complexType>
 	-->
@@ -316,9 +316,9 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			
+
 			<xs:element ref="playlist-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 	</xs:complexType>
 	-->
@@ -331,9 +331,9 @@
 		<xs:sequence>
 			<xs:element name="dataContent" minOccurs="0" maxOccurs="1" type="xs:string"/>
 			<xs:element name="retrieveDataContentByGet" minOccurs="0" maxOccurs="1" type="xs:boolean" />
-		
+
 			<xs:element ref="data-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 	</xs:complexType>
 	-->
@@ -350,9 +350,9 @@
 					<xs:element name="encodingIP1" minOccurs="1" maxOccurs="1" />
 					<xs:element name="encodingIP2" minOccurs="0" maxOccurs="1" />
 					<xs:element name="streamPassword" minOccurs="0" maxOccurs="1" />
-				
+
 					<xs:element ref="liveStream-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -410,7 +410,7 @@
 				<xs:complexType>
 					<xs:simpleContent>
 						<xs:extension base="xs:string">
-							<xs:attribute name="type" use="optional" default="md5">				
+							<xs:attribute name="type" use="optional" default="md5">
 								<xs:simpleType>
 									<xs:restriction base="xs:string">
 										<xs:enumeration value="md5"/>
@@ -429,21 +429,21 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<!--  
 	<xs:complexType name="T_bitrate">
 		<xs:attribute name="bitrate" use="required" type="xs:int"/>
 		<xs:attribute name="width" use="required" type="xs:int"/>
 		<xs:attribute name="height" use="required" type="xs:int"/>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_bitrates">
 		<xs:sequence>
 			<xs:element ref="bitrate" minOccurs="1" maxOccurs="3"/>
 		</xs:sequence>
 	</xs:complexType>
 	-->
-	
+
 	<xs:complexType name="T_urlContentResource">
 		<xs:attribute ref="url" use="required">
 			<xs:annotation>
@@ -451,7 +451,7 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_remoteStorageContentResource">
 		<xs:choice minOccurs="1" maxOccurs="1">
 			<xs:element name="storageProfileId" type="xs:int" minOccurs="1" maxOccurs="1">
@@ -480,7 +480,7 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_remoteStorageContentResources">
 		<xs:sequence>
 			<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="unbounded">
@@ -493,7 +493,7 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_entryContentResource">
 		<xs:choice minOccurs="0" maxOccurs="1">
 			<xs:element name="flavorParamsId" type="xs:int" minOccurs="1" maxOccurs="1">
@@ -518,7 +518,7 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_assetContentResource">
 		<xs:attribute name="assetId" type="xs:string" use="required">
 			<xs:annotation>
@@ -526,7 +526,7 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_content">
 		<xs:sequence>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
@@ -586,9 +586,9 @@
 				</xs:element>
 				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
-		
+
 			<xs:element ref="content-extension" minOccurs="0" maxOccurs="unbounded" />
-		
+
 		</xs:sequence>
 		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
 			<xs:annotation>
@@ -619,7 +619,7 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_thumbnail">
 		<xs:sequence>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
@@ -677,9 +677,9 @@
 				</xs:element>
 				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
 			</xs:choice>
-		
+
 			<xs:element ref="thumbnail-extension" minOccurs="0" maxOccurs="unbounded" />
-			
+
 		</xs:sequence>
 		<xs:attribute name="assetId" type="xs:string" use="optional">
 			<xs:annotation>
@@ -715,13 +715,13 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:simpleType name="T_url">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="(([hH][tT][tT][pP][sS]?)|([fF][tT][pP]))://?(([ 0-9a-zA-Z_!~*'().&amp;=+$%-\[\]]+:)?[ 0-9a-zA-Z_!~*'().&amp;=+$%-\[\]]+@)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-zA-Z_!~*'()-]+\.)*(([0-9a-zA-Z][0-9a-zA-Z-]{0,61})?[0-9a-zA-Z])[.]([a-zA-Z]{2,6}))([.]([a-zA-Z]{2,6}))*(:[0-9]{1,4})?((/?)|(/[ 0-9a-zA-Z_!~*'().;?:@&amp;=+$,%#-\[\]]+)+)"/>
 		</xs:restriction>
 	</xs:simpleType>
-	
+
 	<xs:complexType name="T_tags">
 		<xs:sequence>
 			<xs:element name="tag" minOccurs="1" maxOccurs="unbounded">
@@ -736,7 +736,7 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="T_categories">
 		<xs:sequence>
 			<xs:element name="category" type="xs:string" minOccurs="1" maxOccurs="32">
@@ -746,7 +746,7 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:element name="mrss" type="T_mrss">
 		<xs:annotation>
 			<xs:documentation>A wrapper element that holds the XML structure</xs:documentation>
@@ -869,7 +869,7 @@
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	
+
 	<xs:element name="media" type="T_media">
 		<xs:annotation>
 			<xs:documentation>Media related information</xs:documentation>
@@ -886,17 +886,17 @@
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	
+
 	<!--
 	Not supported yet
 	<xs:element name="mix" type="T_mix" />
 	<xs:element name="playlist" type="T_playlist" />
 	<xs:element name="data" type="T_data" />
 	<xs:element name="liveStream" type="T_liveStream" />
-	
+
 	<xs:element name="playlists" type="T_playlists" />
 	-->
-	
+
 	<xs:element name="content" type="T_content">
 		<xs:annotation>
 			<xs:documentation>Specifies media/flavor asset information, such as location of media files to upload, type of ingestion, and related transcoding flavor settings</xs:documentation>
@@ -936,14 +936,14 @@
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	
+
 	<!--  
 	<xs:element name="bitrate" type="T_bitrate" />
 	<xs:element name="bitrates" type="T_bitrates" />
 	-->
-	
+
 	<xs:attribute name="url" type="T_url" />
-	
+
 	<xs:element name="contentResource-extension" />
 	<xs:element name="serverFileContentResource" type="T_serverFileContentResource">
 		<xs:annotation>
@@ -1082,7 +1082,7 @@
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	
+
 	<xs:element name="tags" type="T_tags">
 		<xs:annotation>
 			<xs:documentation>Free text tags</xs:documentation>
@@ -1119,7 +1119,7 @@
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
-	
+
 	<xs:element name="mrss-extension" />
 	<xs:element name="channel-extension" />
 	<xs:element name="item-extension" />
