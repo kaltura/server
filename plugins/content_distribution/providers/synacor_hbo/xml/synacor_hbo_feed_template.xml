@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xsi:schemaLocation="" xmlns:go="http://hbogo.com/elements/1.0">
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:go="http://hbogo.com/elements/1.0">
 	<title type="text"></title>
 	<subtitle type="text"></subtitle> 
 	<link rel="self" href=""/>
