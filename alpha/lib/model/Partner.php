@@ -489,6 +489,20 @@ class Partner extends BasePartner
 	public function getEnableBulkUploadNotificationsEmails() {return $this->getFromCustomData("enableBulkUploadNotificationsEmails", null, false); }
 	public function setEnableBulkUploadNotificationsEmails($v) { $this->putInCustomData("enableBulkUploadNotificationsEmails", $v); }
 	
+	public function getBulkUploadNotificationsEmail() 
+	{ 
+		$email = $this->getFromCustomData("bulkUploadNotificationsEmail", null, null);
+
+		if (is_null($email))
+			return $this->getAdminEmail();
+			
+		return $email;			
+	}
+	
+	public function setBulkUploadNotificationsEmail($v) { $this->putInCustomData("bulkUploadNotificationsEmail", $v); }
+	
+	
+	
 	/** monitor Usage Expiry **/
 	public function getExtendedFreeTrail() { return $this->getFromCustomData("extendedFreeTrail", null); }
 	public function setExtendedFreeTrail( $v ) { $this->putInCustomData("extendedFreeTrail", $v); }
