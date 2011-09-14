@@ -176,7 +176,7 @@ class SynacorHboFeed
 		{
 		    $thumbAsset = $thumbAssets[0];
     		/* @var $thumbAssets thumbAssets */
-    		$thumbUrl = $this->getAssetUrl($flavorAsset);
+    		$thumbUrl = $this->getAssetUrl($thumbAsset);
     		$this->setNodeValue('atom:link[@type=\'image/jpeg\']/@href', $thumbUrl, $item);
 		}
 		
