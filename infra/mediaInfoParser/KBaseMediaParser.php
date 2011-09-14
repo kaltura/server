@@ -5,8 +5,8 @@
  */
 abstract class KBaseMediaParser
 {
-	const MEDIA_PARSER_TYPE_MEDIAINFO = 0;
-	const MEDIA_PARSER_TYPE_FFMPEG = 1;
+	const MEDIA_PARSER_TYPE_MEDIAINFO = '0';
+	const MEDIA_PARSER_TYPE_FFMPEG = '1';
 	
 	/**
 	 * @var string
@@ -30,7 +30,7 @@ abstract class KBaseMediaParser
 				return new KFFMpegMediaParser($filePath, $taskConfig->params->FFMpegCmd);
 				
 			default:
-				return KalturaPluginManager::loadObject('KBaseMediaParser', $type, func_get_args());
+				return KalturaPluginManager::loadObject('KBaseMediaParser', $type, array($filePath, $taskConfig));
 		}
 	}
 	

@@ -18,23 +18,8 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 	}
 	
 	/**
-	* @return KalturaMediaInfo
-	*/
-	public function getMediaInfo()
-	{
-// 		$output = file_get_contents($this->url . $filePath);
-		$output = getRawMediaInfo();
-		
-		if (trim($output) === "")
-			throw new Exception("Failed to parse media using " . get_class($this));
-			
-		return $this->parseOutput($output);
-	}
-	
-	
-	/**
-	* @return string
-	*/
+	 * @return string
+	 */
 	public function getRawMediaInfo()
 	{
 	$mediaInfoSample = "
