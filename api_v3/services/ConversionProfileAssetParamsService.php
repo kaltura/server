@@ -67,6 +67,10 @@ class ConversionProfileAssetParamsService extends KalturaBaseService
 	 */
 	public function updateAction($conversionProfileId, $assetParamsId, KalturaConversionProfileAssetParams $conversionProfileAssetParams)
 	{
+		$conversionProfile = ConversionProfile2Peer::retrieveByPK($conversionProfileId);
+		if(!$conversionProfile)
+			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
+			
 		$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByFlavorParamsAndConversionProfile($assetParamsId, $conversionProfileId);
 		if(!$flavorParamsConversionProfile)
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId, $assetParamsId);
