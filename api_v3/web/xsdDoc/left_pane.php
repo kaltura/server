@@ -13,7 +13,6 @@
 			<h2>General</h2>
 			<ul>
 				<li><a href="?page=overview">Overview</a></li>
-				<li><a href="?page=terminology">Terminology</a></li>
 			</ul>
 		</div>
 

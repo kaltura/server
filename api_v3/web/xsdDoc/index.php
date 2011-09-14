@@ -4,12 +4,15 @@ ActKeyUtils::checkCurrent();
 KalturaLog::setContext("TESTME");
 
 // get inputs
+$inputPage = @$_GET["page"];
 $schemaType = @$_GET["type"];
 
 // get cache file name
 $cachePath = kConf::get("cache_root_path").'/xsdDoc';
 $cacheKey = 'root';
-if ($schemaType)
+if($inputPage)
+	$cacheKey = $inputPage;
+elseif($schemaType)
 	$cacheKey = $schemaType;
 
 $cacheFilePath = "$cachePath/$cacheKey.cache";
@@ -31,14 +34,14 @@ require_once("left_pane.php");
 	<div class="right">
 		<div id="doc" >
 			<?php 
-			
-				if ($schemaType)
-					require_once("schema_info.php");
-			
+				if($inputPage)
+					require_once("$inputPage.php");
+				else if ($schemaType)
+					require_once("schema_info.php"); 
 			?>
 		</div>
 	</div>
-<?php 
+<?php
 
 $out = ob_get_contents();
 ob_end_clean();
