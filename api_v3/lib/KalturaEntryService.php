@@ -20,7 +20,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		parent::applyPartnerFilterForClass(new ConversionProfilePeer());
-		parent::applyPartnerFilterForClass(new ConversionProfile2Peer());
+		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
 	}
 	
 	/**
