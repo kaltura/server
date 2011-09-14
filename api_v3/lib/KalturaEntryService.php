@@ -16,6 +16,13 @@ class KalturaEntryService extends KalturaBaseService
 		return parent::globalPartnerAllowed($actionName);
 	}
 	
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+		parent::applyPartnerFilterForClass(new conversionProfilePeer());
+		parent::applyPartnerFilterForClass(new conversionProfile2Peer());
+	}
+	
 	/**
 	 * @param kResource $resource
 	 * @param entry $dbEntry
