@@ -54,7 +54,7 @@ class SynacorHboService extends KalturaBaseService
 		$entries = entryPeer::doSelect($baseCriteria);
 		
 		$feed = new SynacorHboFeed('synacor_hbo_feed_template.xml');
-		$feed->setDistributionProfile($fields);
+		$feed->setDistributionProfile($profile);
 
 		foreach($entries as $entry)
 		{
