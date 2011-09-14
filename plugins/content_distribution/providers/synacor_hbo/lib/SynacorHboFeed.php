@@ -94,7 +94,7 @@ class SynacorHboFeed
 	public function setDistributionProfile(SynacorHboDistributionProfile $profile)
 	{
 	    $this->setNodeValue('/atom:feed/atom:title', $profile->getFeedTitle());
-		$this->setNodeValue('/atom:feed/atom:link', $profile->getFeedLink());
+		$this->setNodeValue('/atom:feed/atom:link/@href', $profile->getFeedLink());
 		
 		$feedSubtitleValue = $profile->getFeedSubtitle();
 		if (strlen($feedSubtitleValue) > 0) {
