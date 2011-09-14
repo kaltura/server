@@ -1032,7 +1032,7 @@ class MediaService extends KalturaEntryService
 	{
 		$conversionQuality = $entry->conversionQuality;
 		if (parent::getConversionQualityFromRequest())
-			$conversionQuality = $this->getConversionQualityFromRequest();	
+			$conversionQuality = parent::getConversionQualityFromRequest();	
 		if(is_null($conversionQuality))
 			return null;
 		$conversionProfile2 = conversionProfile2Peer::retrieveByPK($conversionQuality);
