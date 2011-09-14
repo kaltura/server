@@ -154,7 +154,7 @@ class MetadataProfileService extends KalturaBaseService
 			$dbMetadataProfile->incrementVersion();
 		}
 			
-		if(!is_null($viewsData))
+		if(!is_null($viewsData) && $viewsData != '')
 		{
 			$viewsData = html_entity_decode($viewsData);
 			$dbMetadataProfile->incrementViewsVersion();
