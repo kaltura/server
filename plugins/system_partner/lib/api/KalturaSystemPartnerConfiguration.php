@@ -207,6 +207,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $partnerPackageClassOfService;
 	
+	/**
+	 * 
+	 * @var bool
+	 */
+	public $enableBulkUploadNotificationsEmails;
+	
 	
 	
 	private static $map_between_objects = array
@@ -250,7 +256,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"crmLink",
 		"crmId",
 		"verticalClasiffication",
-		"partnerPackageClassOfService"
+		"partnerPackageClassOfService",
+		"enableBulkUploadNotificationsEmails"
 	);
 
 	public function getMapBetweenObjects()
