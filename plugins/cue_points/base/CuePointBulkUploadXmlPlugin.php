@@ -48,7 +48,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		<xs:sequence>
 			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded">
 				<xs:annotation>
-					<xs:documentation>Cue point element</xs:documentation>
+					<xs:documentation>A cue point element</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -58,19 +58,19 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		<xs:sequence>
 			<xs:element name="sceneStartTime" minOccurs="1" maxOccurs="1" type="xs:time">
 				<xs:annotation>
-					<xs:documentation>Cue point start time</xs:documentation>
+					<xs:documentation>A cue point that marks the start time</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Cue point searchable keywords</xs:documentation>
+					<xs:documentation>Searchable keywords associated with a cue point</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
 		
 		<xs:attribute name="sceneId" use="optional">
 			<xs:annotation>
-				<xs:documentation>ID of cue point to apply update/delete action on</xs:documentation>
+				<xs:documentation>The identifier of the cue point that an update/delete action applies to</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -80,7 +80,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		</xs:attribute>
 		<xs:attribute name="systemName" use="optional">
 			<xs:annotation>
-				<xs:documentation>System name of cue point to apply update/delete action on</xs:documentation>
+				<xs:documentation>The system name of the cue point that an update/delete action applies to</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -93,7 +93,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	
 	<xs:element name="scenes" type="T_scenes" substitutionGroup="item-extension">
 		<xs:annotation>
-			<xs:documentation>Cue points wrapper</xs:documentation>
+			<xs:documentation>A cue points wrapper element</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<scenes>
@@ -110,9 +110,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	<xs:element name="scene" type="T_scene">
 		<xs:annotation>
 			<xs:documentation>
-				Base cue point element<br/>
-				Is abstract and cannot be used<br/>
-				Use the extended elements only
+				A base cue point element. This is an abstract element and cannot be used. Use only extended elements.
 			</xs:documentation>
 		</xs:annotation>
 	</xs:element>

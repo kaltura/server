@@ -73,18 +73,18 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 				<xs:sequence>
 					<xs:element name="sceneEndTime" minOccurs="1" maxOccurs="1" type="xs:time">
 						<xs:annotation>
-							<xs:documentation>Cue point end time</xs:documentation>
+							<xs:documentation>A cue point that marks the end time</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					<xs:element name="sceneText" minOccurs="0" maxOccurs="1" type="xs:string">
 						<xs:annotation>
-							<xs:documentation>Free text description</xs:documentation>
+							<xs:documentation>A free text description</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					<xs:choice minOccurs="0" maxOccurs="1">
 						<xs:element name="parent" minOccurs="1" maxOccurs="1">
 							<xs:annotation>
-								<xs:documentation>System name of the parent annotation</xs:documentation>
+								<xs:documentation>The system name of a parent annotation</xs:documentation>
 							</xs:annotation>
 							<xs:simpleType>
 								<xs:restriction base="xs:string">
@@ -94,7 +94,7 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 						</xs:element>
 						<xs:element name="parentId" minOccurs="1" maxOccurs="1">
 							<xs:annotation>
-								<xs:documentation>ID of the parent annotation</xs:documentation>
+								<xs:documentation>The identifier of a parent annotation</xs:documentation>
 							</xs:annotation>
 							<xs:simpleType>
 								<xs:restriction base="xs:string">
@@ -112,25 +112,25 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	
 	<xs:element name="scene-annotation" type="T_scene_annotationBulkUploadXml" substitutionGroup="scene">
 		<xs:annotation>
-			<xs:documentation>Single annotation element</xs:documentation>
+			<xs:documentation>A single annotation cue point element</xs:documentation>
 			<xs:appinfo>
-				<example title="Single annotation example">
+				<example title="XML Example 1: Single annotation">
 					<scene-annotation entryId="{entry id}">
 						<sceneStartTime>00:00:05.3</sceneStartTime>
 						<tags>
-							<tag>sample</tag>
-							<tag>my_tag</tag>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
 						</tags>
 						<sceneEndTime>00:00:10</sceneEndTime>
 						<sceneText>my annotation</sceneText>
 					</scene-annotation>
 				</example>
-				<example title="Multiple related annotations example">
+				<example title="Example 2: Multiple related annotations">
 					<scene-annotation entryId="{entry id}" systemName="MY_ANNOTATION_PARENT_SYSTEM_NAME">
 						<sceneStartTime>00:00:05.3</sceneStartTime>
 						<tags>
-							<tag>sample</tag>
-							<tag>my_tag</tag>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
 						</tags>
 						<sceneEndTime>00:00:10</sceneEndTime>
 						<sceneText>my annotation parent</sceneText>
@@ -138,8 +138,8 @@ class AnnotationBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 					<scene-annotation entryId="{entry id}">
 						<sceneStartTime>00:00:05.3</sceneStartTime>
 						<tags>
-							<tag>sample</tag>
-							<tag>my_tag</tag>
+							<tag>tag3</tag>
+							<tag>tag4</tag>
 						</tags>
 						<sceneEndTime>00:00:10</sceneEndTime>
 						<sceneText>my annotation child</sceneText>

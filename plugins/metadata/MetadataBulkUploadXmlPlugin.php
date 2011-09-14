@@ -48,19 +48,19 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		<xs:sequence>
 			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Custom metadata XML according to schema profile</xs:documentation>
+					<xs:documentation>The XML for custom metadata according to a schema profile</xs:documentation>
 				</xs:annotation>		
 			</xs:any>
 		</xs:sequence>
 		
 		<xs:attribute name="metadataId" use="optional" type="xs:int">
 			<xs:annotation>
-				<xs:documentation>Id of custom metadata object to apply update/delete action on</xs:documentation>
+				<xs:documentation>The identifier of the custom metadata object that an update/delete action applies to</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="metadataProfile" use="optional">
 			<xs:annotation>
-				<xs:documentation>Custom metadata schema profile system name</xs:documentation>
+				<xs:documentation>The schema profile system name of the custom metadata</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -70,7 +70,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		</xs:attribute>
 		<xs:attribute name="metadataProfileId" use="optional" type="xs:int">
 			<xs:annotation>
-				<xs:documentation>Custom metadata schema profile id</xs:documentation>
+				<xs:documentation>The schema profile identifier of the custom metadata</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		
@@ -78,7 +78,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	
 	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension">
 		<xs:annotation>
-			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:documentation>XML for custom metadata</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<customData	metadataId="{metadata id}" 
@@ -86,11 +86,12 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 								metadataProfileId="{metadata profile id}"  
 					>
 						<metadata>
-							<Text1>text test</Text1>
-							<TextMulti>test one</TextMulti>
-							<TextMulti>test two</TextMulti>
-							<List1>bbb</List1>
-							<Entry>0_5b3t2c8z</Entry>
+							<TextFieldName>entry field value</TextFieldName>
+							<MultipleTextFieldName>entry multiple text field value1</MultipleTextFieldName>
+							<MultipleTextFieldName>entry multiple text field value2</MultipleTextFieldName>
+							<TextSelectionListFieldName>entry selected text value</TextSelectionListFieldName>
+							<DateFieldName>21741540<DateFieldName>
+							<EntryIDFieldName>0_5b3t2c8z</EntryIDFieldName>
 						</metadata>
 					</customData>
 				</example>

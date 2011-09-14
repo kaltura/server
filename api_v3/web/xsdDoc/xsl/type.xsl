@@ -313,7 +313,7 @@
 		</xsl:for-each>
 		
 		<xsl:if test="count(*[local-name() = 'enumeration']) > 1">
-			List of accptable values:
+			Acceptable values:
 			<ul>
 				<xsl:for-each select="*[local-name() = 'enumeration']">
 					<li><xsl:value-of select="@value"/></li>
@@ -651,7 +651,7 @@
 	<xsl:template name="type">
 		<xsl:if test="count(*[local-name() = 'attribute']) > 0 or count(*[local-name() = 'simpleContent']/*[local-name() = 'extension']/*[local-name() = 'attribute']) > 0">
 			<br/>
-			<span class="child-attributes">Child attributes</span><br/>
+			<span class="child-attributes">Attributes</span><br/>
 			<table class="child-attributes-table" cellspacing="0">
 				<thead>
 					<tr>
@@ -675,14 +675,14 @@
 		
 		<xsl:if test="count(*[not(local-name() = 'attribute') and not(local-name() = 'annotation')]) > 0">
 			<br/>
-			<span class="child-elements">Child elements</span><br/>
+			<span class="child-elements">Sub-Elements</span><br/>
 			<table class="child-elements-table" cellspacing="0">
 				<thead>
 					<tr>
 						<th colspan="2">Element Name</th>
 						<th>Description</th>
 						<th>Required</th>
-						<th>Maximum appearences</th>
+						<th>Maximum Appearances</th>
 						<th>Type</th>
 						<th>Restrictions</th>
 					</tr>

@@ -49,17 +49,17 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 			<xs:choice minOccurs="1" maxOccurs="1">
 				<xs:element name="distributionProvider" minOccurs="1" maxOccurs="1" type="KalturaDistributionProviderType">
 					<xs:annotation>
-						<xs:documentation>The provider to distribute the entry to</xs:documentation>
+						<xs:documentation>The provider (Distribution Partner) that the entry is distributed to</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element name="distributionProfileId" minOccurs="1" maxOccurs="1" type="xs:int">
 					<xs:annotation>
-						<xs:documentation>ID of the distribution profile to distribute the entry to</xs:documentation>
+						<xs:documentation>The identifier of the distribution profile to use for entry distribution</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element name="distributionProfile" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>System name of the distribution profile to distribute the entry to</xs:documentation>
+						<xs:documentation>The system name of the distribution profile to use for entry distribution</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
@@ -71,36 +71,32 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 			<xs:element name="sunrise" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
-						The date and time that the entry will become available<br/>
-						on the remote site<br/> 
-						Taken from the entry if not specified
+						The date and time that the entry becomes available on the remote site.<br/>
+						If not specified, the entry scheduling date and time are used.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="sunset" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
-						The date and time that the entry will become unavailable<br/>
-						on the remote site<br/>
-						Taken from the entry if not specified
+						The date and time that the entry becomes unavailable on the remote site.<br/>
+						If not specified, the entry scheduling date and time are used.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="flavorAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Comma seperated list of existing flavor asset ids<br/>
-						to be used in this distribution destination<br/>
-						Could be used only on existing entry
+						Comma-separated list of existing flavor asset IDs for the distribution destination.<br/>
+						Used only for an existing entry.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="thumbAssetIds" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
 					<xs:documentation>
-						Comma seperated list of existing thumbnail asset ids<br/>
-						to be used in this distribution destination<br/>
-						Could be used only on existing entry
+						Comma-separated list of existing thumbnail asset IDs for the distribution destination.<br/>
+						Used only for an existing entry.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -111,12 +107,12 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 		
 		<xs:attribute name="entryDistributionId" use="required" type="xs:int">
 			<xs:annotation>
-				<xs:documentation>ID of entry distribution to apply update/delete action on</xs:documentation>
+				<xs:documentation>The identifier of an entry distribution object that an update/delete action applies to</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="submitWhenReady" use="optional" type="xs:boolean" default="false">
 			<xs:annotation>
-				<xs:documentation>Indicates that the entry should be submitted once it is possible</xs:documentation>
+				<xs:documentation>Indicates that the entry should be submitted when it is possible</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		
@@ -124,13 +120,13 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 	
 	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension">
 		<xs:annotation>
-			<xs:documentation>Content distribution submission</xs:documentation>
+			<xs:documentation>Details related to a content distribution submission</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<distribution>
 						<distributionProfile>MY_DISTRIBUTION_PROFILE</distributionProfile>
-						<sunrise>1310665296</sunrise>
-						<sunset>1310865296</sunset>
+						<sunrise>2011-10-26T21:32:52</sunrise>
+						<sunset>2011-12-26T21:32:52</sunset>
 					</distribution>
 				</example>
 			</xs:appinfo>

@@ -52,7 +52,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
 		<xs:annotation>
-			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:documentation>XML for custom metadata</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<scene-ad-cue-point entryId="{entry id}">
@@ -61,7 +61,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
 						<adType>1</adType>
 						<protocolType>1</protocolType>
-						<scene-customData metadataProfile="MY_AD_METADATA_PROFILE">
+						<scene-customData metadataProfile="MY_AD_METADATA_PROFILE_SYSTEM_NAME">
 							<metadata>
 								<adData>my ad custom data</adData>
 							</metadata>
@@ -107,7 +107,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
 		<xs:annotation>
-			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:documentation>XML for custom metadata</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<scene-ad-cue-point entryId="{entry id}">
@@ -116,7 +116,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>
 						<adType>1</adType>
 						<protocolType>1</protocolType>
-						<scene-customData metadataProfile="MY_AD_METADATA_PROFILE">
+						<scene-customData metadataProfile="MY_AD_METADATA_PROFILE_SYSTEM_NAME">
 							<metadata>
 								<adData>my ad custom data</adData>
 							</metadata>
@@ -177,7 +177,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 	
 	<xs:element name="scene-customData" type="T_customData" substitutionGroup="scene-extension">
 		<xs:annotation>
-			<xs:documentation>Custom metadata XML</xs:documentation>
+			<xs:documentation>XML for custom metadata</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<scene-ad-cue-point entryId="{entry id}">

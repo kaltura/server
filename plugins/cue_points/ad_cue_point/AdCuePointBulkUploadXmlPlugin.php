@@ -73,12 +73,12 @@ class AdCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 				<xs:sequence>
 					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time">
 						<xs:annotation>
-							<xs:documentation>Cue point end time</xs:documentation>
+							<xs:documentation>A cue point that marks the end time</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					<xs:element name="sceneTitle" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
-							<xs:documentation>Textual title</xs:documentation>
+							<xs:documentation>Text that defines the title</xs:documentation>
 						</xs:annotation>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
@@ -110,14 +110,14 @@ class AdCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	
 	<xs:element name="scene-ad-cue-point" type="T_scene_adCuePointBulkUploadXml" substitutionGroup="scene">
 		<xs:annotation>
-			<xs:documentation>Single ad cue point element</xs:documentation>
+			<xs:documentation>A single advertisement cue point element</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<scene-ad-cue-point systemName="MY_AD_CUE_POINT_SYSTEM_NAME">
 						<sceneStartTime>00:00:05</sceneStartTime>
 						<tags>
-							<tag>sample</tag>
-							<tag>my_tag</tag>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
 						</tags>
 						<sceneTitle>my ad title</sceneTitle>
 						<sourceUrl>http://source.to.my/ad.xml</sourceUrl>

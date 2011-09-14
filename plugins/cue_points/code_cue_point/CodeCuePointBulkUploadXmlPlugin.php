@@ -76,7 +76,7 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 				<xs:sequence>
 					<xs:element name="sceneEndTime" minOccurs="0" maxOccurs="1" type="xs:time">
 						<xs:annotation>
-							<xs:documentation>Cue point end time</xs:documentation>
+							<xs:documentation>A cue point that marks the end time</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					<xs:element name="code" minOccurs="0" maxOccurs="1">
@@ -91,7 +91,7 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 					</xs:element>
 					<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
 						<xs:annotation>
-							<xs:documentation>Free text description</xs:documentation>
+							<xs:documentation>A free text description</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 					
@@ -103,14 +103,14 @@ class CodeCuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaP
 	
 	<xs:element name="scene-code-cue-point" type="T_scene_codeCuePointBulkUploadXml" substitutionGroup="scene">
 		<xs:annotation>
-			<xs:documentation>Single code cue point element</xs:documentation>
+			<xs:documentation>A single code cue point element</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<scene-code-cue-point entryId="{entry id}">
 						<sceneStartTime>00:00:05.3</sceneStartTime>
 						<tags>
-							<tag>sample</tag>
-							<tag>my_tag</tag>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
 						</tags>
 						<code>MY_CODE</code>
 						<description>my code cue point description</description>

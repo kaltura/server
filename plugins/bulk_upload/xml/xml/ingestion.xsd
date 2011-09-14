@@ -4,7 +4,7 @@
 		<xs:sequence>
 			<xs:element ref="channel" maxOccurs="unbounded" minOccurs="1">
 				<xs:annotation>
-					<xs:documentation>holding multiple item elements</xs:documentation>
+					<xs:documentation>A single entry wrapper element</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			
@@ -14,7 +14,7 @@
 		<xs:attribute name="version" use="optional" type="xs:decimal">
 			<xs:annotation>
 				<xs:documentation>
-					Indicates the XSD version to be used
+					The XSD version to be used
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -37,7 +37,12 @@
 		<xs:sequence>
 			<xs:element name="action" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Entry action to apply from item element</xs:documentation>
+					<xs:documentation>
+						The action to apply from the item element:<br/>
+						Add - Add a new entry<br/>
+						Update - Update an existing entry<br/>
+						Delete - Delete an existing entry
+					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -52,18 +57,28 @@
 					<xs:sequence>
 						<xs:element name="type" minOccurs="1" maxOccurs="1" type="KalturaEntryType">
 							<xs:annotation>
-								<xs:documentation>Entry type of the new created entry<br/>(Only MEDIA_CLIP is supported for XML ingestion)</xs:documentation>
+								<xs:documentation>
+									The type of the new entry.<br/>
+									Only the MEDIA_CLIP (= 1) type is supported for XML ingestion.<br/> 
+									This option is used only when applying an “Add” Action.
+								</xs:documentation>
 							</xs:annotation>
 						</xs:element>
 						<xs:element name="licenseType" minOccurs="0" maxOccurs="1" type="KalturaLicenseType">
 							<xs:annotation>
-								<xs:documentation>License type of the new created entry</xs:documentation>
+								<xs:documentation>
+									The license type of the new entry.<br/>
+									This option is used only when applying an “Add” Action.
+								</xs:documentation>
 							</xs:annotation>
 						</xs:element>
 					</xs:sequence>
 					<xs:element name="entryId" minOccurs="1" maxOccurs="1">
 						<xs:annotation>
-							<xs:documentation>ID of entry to apply update/delete action on</xs:documentation>
+							<xs:documentation>
+								The identifier of the entry that an update/delete action applies to.<br/>
+								This option is used only when applying an “Update” or a “Delete” Action.
+							</xs:documentation>
 						</xs:annotation>
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
@@ -85,7 +100,7 @@
 			</xs:choice>
 			<xs:element name="userId" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>User identifier of content creator/owner</xs:documentation>
+					<xs:documentation>The user identifier of the content creator/owner</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -95,7 +110,7 @@
 			</xs:element>
 			<xs:element name="name" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Entry`s title</xs:documentation>
+					<xs:documentation>The title of the entry</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -105,22 +120,25 @@
 			</xs:element>
 			<xs:element name="description" minOccurs="0" maxOccurs="1" type="xs:string">
 				<xs:annotation>
-					<xs:documentation>Entry`s description text</xs:documentation>
+					<xs:documentation>Text that describes the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Entry`s free text tags</xs:documentation>
+					<xs:documentation>Tags associated with the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element ref="categories" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Entry`s category assignment</xs:documentation>
+					<xs:documentation>The categories assigned to the entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="partnerData" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Publisher specific information related to the entry<br/>Usually in use for implementing specific integration</xs:documentation>
+					<xs:documentation>
+						Publisher-specific information related to the entry.<br/>
+						Usually used for implementing an account-specific integration.
+					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -130,18 +148,21 @@
 			</xs:element>
 			<xs:element name="partnerSortData" minOccurs="0" maxOccurs="1" type="xs:int">
 				<xs:annotation>
-					<xs:documentation>Partner specific order, to enable custom ordering and filtering<br/>Usually in use for implementing specific integration</xs:documentation>
+					<xs:documentation>
+						Partner-specific order used to enable custom ordering and filtering.<br/>
+						Usually used to implement an account-specific integration.
+					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:choice minOccurs="0" maxOccurs="1">
 				<xs:element name="accessControlId" minOccurs="1" maxOccurs="1" type="xs:int">
 					<xs:annotation>
-						<xs:documentation>Entry`s access control identifier</xs:documentation>
+						<xs:documentation>The access control profile identifier of the entry. If not specified, the account's default access control profile is used.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element name="accessControl" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Entry`s access control system name</xs:documentation>
+						<xs:documentation>The access control profile system name of the entry. If not specified, the account's default access control profile is used. You can use the Kaltura API to set a specific access control system name.</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
@@ -154,18 +175,19 @@
 				<xs:element name="conversionProfileId" minOccurs="1" maxOccurs="1" type="xs:int">
 					<xs:annotation>
 						<xs:documentation>
-							Entry`s transcoding profile identifier<br/>
-							If not specified, the bulk upload default will be used<br/>
-							If not specified, or set to (-1), the partner default will be used 
+							The transcoding profile identifier of the entry.<br/>
+							If the transcoding profile is not specified, the transcoding profile set to the bulk upload API action is used.<br/>
+							If the bulk upload API action's transcoding profile is not specified or is set to (-1), the account's default transcoding profile is used. 
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element name="conversionProfile" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>
-							Entry`s transcoding profile system name<br/>
-							If not specified, the bulk upload default will be used<br/>
-							If not specified, the partner default will be used
+							The transcoding profile system name of the entry.<br/>
+							If the transcoding profile is not specified, the transcoding profile set to the bulk upload API action is used.<br/>
+							If the bulk upload API action's transcoding profile is not specified or is set to (-1), the account's default transcoding profile is used.<br/>
+							You can use the Kaltura API to set a specific transcoding profile system name.
 						</xs:documentation>
 					</xs:annotation>
 					<xs:simpleType>
@@ -178,16 +200,16 @@
 			<xs:element name="startDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
-						Entry`s scheduling start date<br/>
-						When not defined entry will be available for publishing as of creation time
+						The scheduled start date for the entry.<br/>
+						When the start date is not defined, the entry is available for publishing upon creation.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="endDate" minOccurs="0" maxOccurs="1" type="xs:dateTime">
 				<xs:annotation>
 					<xs:documentation>
-						Entry`s scheduling start date<br/>
-						When not defined entry will be available for publishing forever
+						The scheduled end date for the entry.<br/>
+						When the end date is not defined, the entry is available for publishing with no end time restriction.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -196,7 +218,7 @@
 				<xs:element ref="media" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>
-							Specifying media related information, such as media type
+							Specifies media-related information, such as media type
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
@@ -212,18 +234,14 @@
 			<xs:element ref="content" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>
-						Specifying flavor asset  information<br/>
-						such as location of media files to upload<br/>
-						type of ingestion, related transcoding settings etc
+						Specifies media/flavor asset information, such as location of media files to upload, type of ingestion, and related transcoding flavor settings
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element ref="thumbnail" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>
-						Specifying thumbnail related information<br/>
-						such as location of media files<br/>
-						related transcoding settings etc
+						Specifies thumbnail-related information, such as location of media files and related thumbnail flavor settings
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -238,8 +256,8 @@
 			<xs:element name="mediaType" minOccurs="1" maxOccurs="1" type="KalturaMediaType">
 				<xs:annotation>
 					<xs:documentation>
-						Specifies the entry media type<br/>
-						Only VIDEO, AUDIO are currently supported for XML based ingestion
+						Specifies the entry media type.<br/>
+						Only VIDEO (=1), AUDIO (=5) and IMAGE (=2) are currently supported for XML-based ingestion.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
@@ -377,16 +395,16 @@
 			<xs:element name="fileSize" type="xs:int" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
-						The expected size of the file<br/>
-						used for validation
+						The expected size of the file.<br/>
+						Used for validation.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="fileChecksum" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
-						The expected checksum of the file<br/>
-						used for validation
+						The expected checksum of the file.<br/>
+						Used for validation.
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
@@ -407,7 +425,7 @@
 		</xs:choice>
 		<xs:attribute name="filePath" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>The full path of the file</xs:documentation>
+				<xs:documentation>The full path of the file on the Kaltura-hosted server</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -429,7 +447,7 @@
 	<xs:complexType name="T_urlContentResource">
 		<xs:attribute ref="url" use="required">
 			<xs:annotation>
-				<xs:documentation>Remote location of file</xs:documentation>
+				<xs:documentation>The URL location of the file</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -438,12 +456,16 @@
 		<xs:choice minOccurs="1" maxOccurs="1">
 			<xs:element name="storageProfileId" type="xs:int" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Remote storage id to be used for linking remote files</xs:documentation>
+					<xs:documentation>
+						The identifier of the remote storage profile used as the source of content ingestion. Only links to the files on this remote storage are set from the entry, without actually uploading content to Kaltura. (The remote storage must be defined in Kaltura.)
+					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="storageProfile" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Remote storage system name to be used for linking remote files</xs:documentation>
+					<xs:documentation>
+						The system name of the remote storage profile used as the source of content ingestion. Only links to the files on this remote storage are set from the entry, without actually uploading content to Kaltura. (The remote storage must be defined in Kaltura.)
+					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -454,7 +476,7 @@
 		</xs:choice>
 		<xs:attribute name="url" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>Relative path from remote storage base directory</xs:documentation>
+				<xs:documentation>The relative path of the file from the remote storage base directory</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -463,7 +485,10 @@
 		<xs:sequence>
 			<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="unbounded">
 				<xs:annotation>
-					<xs:documentation>Single content file location within a Kaltura defined remote storage</xs:documentation>
+					<xs:documentation>
+						Specifies that the content location is a path within a single remote storage defined in Kaltura.<br/> 
+						Using this option, only a link to the content location is set from the entry, without actually uploading content to Kaltura.
+					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -473,12 +498,12 @@
 		<xs:choice minOccurs="0" maxOccurs="1">
 			<xs:element name="flavorParamsId" type="xs:int" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Origin entry flavor params id</xs:documentation>
+					<xs:documentation>The flavor params identifier of the content origin entry</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="flavorParams" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Origin entry flavor params system name</xs:documentation>
+					<xs:documentation>The flavor params system name of the content origin entry</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -489,7 +514,7 @@
 		</xs:choice>
 		<xs:attribute name="entryId" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>Origin entry id</xs:documentation>
+				<xs:documentation>The identifier of the entry that is the origin of the content</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -497,7 +522,7 @@
 	<xs:complexType name="T_assetContentResource">
 		<xs:attribute name="assetId" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>Origin asset id</xs:documentation>
+				<xs:documentation>The identifier of  the asset that is the origin of the content</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
@@ -506,38 +531,57 @@
 		<xs:sequence>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
+					<xs:documentation>
+						Specifies specific tags for the ingested flavor asset.<br/> 
+						Tags are used mostly to set the flavor as suitable for a specific delivery option or device. For example: web, mobile, html5,  iphone, ipad, mbr (mbr is used for setting the flavor to an adaptive bit-rate delivery)<br/>
+						When the tags element is not set, the tags assigned to the transcoding flavor are used. In any case, tags from this element will be appended to the flavor params tags already set in the system.
+					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:choice minOccurs="1" maxOccurs="1">
 				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content ingestion location is on a Kaltura hosted server</xs:documentation>
+						<xs:documentation>
+							Specifies that the content location is on a Kaltura-hosted server.<br/>
+							By default, this option is not available to Kaltura partners.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content file location is a URL (http,ftp)</xs:documentation>
+						<xs:documentation>
+							Specifies that the content location is a URL (http/ftp)
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content file location is a path within a Kaltura defined remote storage</xs:documentation>
+						<xs:documentation>
+							Specifies that the content location is a path within a remote storage defined in Kaltura.<br/> 
+							Using this option, only a link to the content location is set from the entry, without actually uploading content to Kaltura.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="remoteStorageContentResources" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Set of content files within several Kaltura defined remote storages</xs:documentation>
+						<xs:documentation>
+							Specifies that content is located within several remote storages defined in Kaltura.<br/> 
+							Using this option, only links to the content locations are set from the entry, without actually uploading content to Kaltura.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content is a Kaltura entry</xs:documentation>
+						<xs:documentation>
+							Specifies that the source of content ingestion is the content of an existing Kaltura entry
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content is a Kaltura asset</xs:documentation>
+						<xs:documentation>
+							Specifies that the source of content ingestion is a specific asset of an existing Kaltura entry
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
@@ -549,14 +593,15 @@
 		<xs:attribute name="flavorParamsId" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					The flavor params id to be associated with this flavor asset
+					The identifier of the flavor params to be associated with the media/flavor asset. This is the flavor params identifier across partner entries. The identifier can be used to filter content.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="flavorParams" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					The flavor params system name to be associated with this flavor asset
+					The system name of the flavor params to be associated with the media/flavor asset.<br/>
+					This is the flavor params identifier across partner entries. The identifier can be used to filter content.
 				</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
@@ -568,7 +613,8 @@
 		<xs:attribute name="assetId" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					The asset id to be updated with this resource used only for update
+					The identifier of the asset to be updated with the media/flavor asset.<br/>
+					Used only for updating an existing media/flavor asset.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -578,38 +624,55 @@
 		<xs:sequence>
 			<xs:element ref="tags" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>Specifies specific tags you want to set for the thumbnail asset</xs:documentation>
+					<xs:documentation>
+						Specifies specific user tags to set for the thumbnail asset
+					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:choice minOccurs="1" maxOccurs="1">
 				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content ingestion location is on a Kaltura hosted server</xs:documentation>
+						<xs:documentation>
+							Specifies that the thumbnail location is on a Kaltura-hosted server.<br/>
+							By default, this option is not available to Kaltura partners.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="urlContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content file location is a URL (http,ftp)</xs:documentation>
+						<xs:documentation>
+							Specifies that the thumbnail location is a URL (http/ftp)
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content file location is a path within a Kaltura defined remote storage</xs:documentation>
+						<xs:documentation>
+							Specifies that the thumbnail location is a path within a remote storage defined in Kaltura.<br/>
+							Using this option, only a link to the thumbnail location is set from the entry, without actually uploading thumbnails to Kaltura.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="remoteStorageContentResources" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Set of content files within several Kaltura defined remote storages</xs:documentation>
+						<xs:documentation>
+							Specifies that the thumbnail is located within several remote storages defined in Kaltura.<br/> 
+							Using this option, only links to the thumbnail locations are set from the entry, without actually uploading thumbnails to Kaltura.
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="entryContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content is a Kaltura entry</xs:documentation>
+						<xs:documentation>
+							Specifies that the source of thumbnail ingestion is an existing Kaltura entry
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="assetContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
-						<xs:documentation>Specifies that content is a Kaltura asset</xs:documentation>
+						<xs:documentation>
+							Specifies that the source of thumbnail ingestion is a specific asset of an existing Kaltura entry
+						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 				<xs:element ref="contentResource-extension" minOccurs="1" maxOccurs="1" />
@@ -620,25 +683,29 @@
 		</xs:sequence>
 		<xs:attribute name="assetId" type="xs:string" use="optional">
 			<xs:annotation>
-				<xs:documentation>The asset id to be updated with this resource userd only for update</xs:documentation>
+				<xs:documentation>
+					The identifier of the asset to be updated with the resource. Used only for updating an existing thumbnail.
+				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="isDefault" type="xs:boolean" use="optional" default="false">
 			<xs:annotation>
-				<xs:documentation>Specifiy whether this thumbnail will be set to be the default thumbnail of the entry</xs:documentation>
+				<xs:documentation>
+					Specifies whether this thumbnail is set as the default thumbnail of the entry.
+				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="thumbParamsId" type="xs:int" use="optional" >
 			<xs:annotation>
 				<xs:documentation>
-					The thumb params to be associated with this thumb asset
+					The identifier of the thumb params to be associated with this thumbnail asset.  This is the thumbnail params identifier across partner entries. The identifier can be used to filter content.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="thumbParams" use="optional" >
 			<xs:annotation>
 				<xs:documentation>
-					The thumb params system name to be associated with this thumb asset
+					The thumb params system name to be associated with this thumbnail asset. This is the thumbnail params identifier across partner entries. The identifier can be used to filter content.
 				</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
@@ -659,7 +726,7 @@
 		<xs:sequence>
 			<xs:element name="tag" minOccurs="1" maxOccurs="unbounded">
 				<xs:annotation>
-					<xs:documentation>Specifies a single free text tag to be set for the related object</xs:documentation>
+					<xs:documentation>Specifies a single tag to set for a related object</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -674,7 +741,7 @@
 		<xs:sequence>
 			<xs:element name="category" type="xs:string" minOccurs="1" maxOccurs="32">
 				<xs:annotation>
-					<xs:documentation>Specifies a single category assignment for the Entry. User the `%gt;` character to indicate category hierarchy location</xs:documentation>
+					<xs:documentation>Specifies a single category assigned to an entry. Use the &gt; character (`&amp;gt;`) to indicate the position of the category in the category tree hierarchy</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -682,10 +749,10 @@
 	
 	<xs:element name="mrss" type="T_mrss">
 		<xs:annotation>
-			<xs:documentation>Wrapper element holding XML structure</xs:documentation>
+			<xs:documentation>A wrapper element that holds the XML structure</xs:documentation>
 			<xs:appinfo>
 				<example>
-					<mrss>
+					<mrss version="1.0">
 						<channel>
 							<item>...</item>
 							<item>...</item>
@@ -698,10 +765,10 @@
 	</xs:element>
 	<xs:element name="channel" type="T_channel">
 		<xs:annotation>
-			<xs:documentation>Wrapper element holding multiple item elements</xs:documentation>
+			<xs:documentation>A wrapper element that holds multiple item elements</xs:documentation>
 			<xs:appinfo>
 				<example>
-					<mrss>
+					<mrss version="1.0">
 						<channel>
 							<item>...</item>
 							<item>...</item>
@@ -714,25 +781,51 @@
 	</xs:element>
 	<xs:element name="item" type="T_item">
 		<xs:annotation>
-			<xs:documentation>Single entry wrapper element</xs:documentation>
+			<xs:documentation>A single entry wrapper element</xs:documentation>
 			<xs:appinfo>
-				<example title="Adding new media entry example">
+				<example title="XML Example 1: Adding a new media entry: Adding source media file and a default thumbnail">
 					<item>
 						<action>add</action>
 						<type>1</type>
 						<licenseType>-1</licenseType>
-						<userId>my.user.id</userId>
+						<userId>myUserId</userId>
 						<name>my entry name</name>
 						<description>my entry free text description</description>
 						<tags>
-							<tag>example</tag>
-							<tag>my_tag</tag>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
 						</tags>
 						<categories>
 							<category>examples&gt;example1</category>
 							<category>examples&gt;example2</category>
 						</categories>
-						<conversionProfile>MY_CONVERSION_PROFILE_SYSTEM_NAME</conversionProfile>
+						<conversionProfile>MY_TRANSCODING_PROFILE_SYSTEM_NAME</conversionProfile>
+						<startDate>2011-05-05T00:00:00</startDate>
+						<endDate>2011-05-19T00:00:00</endDate>
+						<media>
+							<mediaType>1</mediaType> 
+						</media>
+						<content>...</content>
+						<thumbnail isDefault="true">...</thumbnail>
+					</item>
+				</example>
+				<example title="XML Example 2: Adding a new media entry: Adding multiple previously transcoded files as flavors and multiple thumbnails">
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<licenseType>-1</licenseType>
+						<userId>myUserId</userId>
+						<name>my entry name</name>
+						<description>my entry free text description</description>
+						<tags>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
+						</tags>
+						<categories>
+							<category>examples&gt;example1</category>
+							<category>examples&gt;example2</category>
+						</categories>
+						<conversionProfile>MY_TRANSCODING_PROFILE_SYSTEM_NAME</conversionProfile>
 						<startDate>2011-05-05T00:00:00</startDate>
 						<endDate>2011-05-19T00:00:00</endDate>
 						<media>
@@ -741,37 +834,33 @@
 						<content flavorParamsId="0">...</content>
 						<content flavorParamsId="1">...</content>
 						<content flavorParamsId="2">...</content>
-						<thumbnail>...</thumbnail>
+						<thumbnail isDefault="true">...</thumbnail>
 						<thumbnail>...</thumbnail>
 						<thumbnail>...</thumbnail>
 					</item>
 				</example>
-				<example title="Updating existing media entry example">
+				<example title="XML Example 3: Updating an existing media entry: Updating both metadata and media">
 					<item>
 						<action>update</action>
 						<entryId>{entry id}</entryId>
-						<userId>my.user.id</userId>
-						<name>my entry name</name>
-						<description>my entry free text description</description>
+						<userId>UpdatedUserId</userId>
+						<name>updated entry name</name>
+						<description>updated entry description</description>
 						<tags>
-							<tag>example</tag>
-							<tag>my_tag</tag>
+							<tag>tag3</tag>
+							<tag>tag4</tag>
 						</tags>
 						<categories>
-							<category>examples&gt;example1</category>
-							<category>examples&gt;example2</category>
+							<category>examples&gt;example3</category>
+							<category>examples&gt;example4</category>
 						</categories>
 						<startDate>2011-05-05T00:00:00</startDate>
 						<endDate>2011-05-19T00:00:00</endDate>
-						<content flavorParamsId="0">...</content>
-						<content flavorParamsId="1">...</content>
-						<content flavorParamsId="2">...</content>
-						<thumbnail>...</thumbnail>
-						<thumbnail>...</thumbnail>
+						<content>...</content>
 						<thumbnail>...</thumbnail>
 					</item>
 				</example>
-				<example title="Deleting entry example">
+				<example title="XML Example 4: Deleting an existing entry">
 					<item>
 						<action>delete</action>
 						<entryId>{entry id}</entryId>
@@ -783,7 +872,7 @@
 	
 	<xs:element name="media" type="T_media">
 		<xs:annotation>
-			<xs:documentation>Media related information, such as media type</xs:documentation>
+			<xs:documentation>Media related information</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<item>
@@ -810,14 +899,14 @@
 	
 	<xs:element name="content" type="T_content">
 		<xs:annotation>
-			<xs:documentation>Flavor asset element</xs:documentation>
+			<xs:documentation>Specifies media/flavor asset information, such as location of media files to upload, type of ingestion, and related transcoding flavor settings</xs:documentation>
 			<xs:appinfo>
-				<example title="Flavor from URL example">
+				<example>
 					<item>
 						<action>add</action>
 						<type>1</type>
 						<media>...</media>
-						<content flavorParams="source"> 
+						<content> 
 							<tags>
 								<tag>web</tag>
 								<tag>mbr</tag>
@@ -826,26 +915,12 @@
 						</content>
 					</item>
 				</example>
-				<example title="Flavor from existing entry example">
-					<item>
-						<action>add</action>
-						<type>1</type>
-						<media>...</media>
-						<content flavorParams="source"> 
-							<tags>
-								<tag>web</tag>
-								<tag>mbr</tag>
-							</tags>
-							<entryContentResource>...</entryContentResource>
-						</content>
-					</item>
-				</example>
 			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="thumbnail" type="T_thumbnail">
 		<xs:annotation>
-			<xs:documentation>Thumbnail asset element</xs:documentation>
+			<xs:documentation>Specifies thumbnail asset information, such as location of image files to upload, type of ingestion, and related thumbnail flavor settings</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<item>
@@ -853,7 +928,7 @@
 						<type>1</type>
 						<media>...</media>
 						<content>...</content>
-						<thumbnail>
+						<thumbnail isDefault="true">
 							<urlContentResource>...</urlContentResource>
 						</thumbnail>
 					</item>
@@ -872,32 +947,32 @@
 	<xs:element name="contentResource-extension" />
 	<xs:element name="serverFileContentResource" type="T_serverFileContentResource">
 		<xs:annotation>
-			<xs:documentation>Specifies that content ingestion location is on a Kaltura hosted server</xs:documentation>
+			<xs:documentation>Specifies that the location of content ingestion is on a Kaltura-hosted server. By default, this option is not available to Kaltura partners.</xs:documentation>
 			<xs:appinfo>
-				<example title="Using file size validation example">
+				<example title="XML Example 1: Adding content from a Kaltura server: Using file size validation">
 					<item>
 						<action>add</action>
 						<type>1</type>
 						<media>...</media>
-						<content>...</content>
-						<thumbnail>
-							<serverFileContentResource filePath="/server/external/disc/path/file.jpg">
+						<content>
+							<serverFileContentResource filePath="/server/external/disc/path/video.mp4">
 								<fileSize>453453344</fileSize>
 							</serverFileContentResource>
-						</thumbnail>
+						</content>
+						<thumbnail>...</thumbnail>
 					</item>
 				</example>
-				<example title="Using checksum validation example">
+				<example title="XML Example 2: Adding content from a Kaltura server: Using checksum validation">
 					<item>
 						<action>add</action>
 						<type>1</type>
 						<media>...</media>
-						<content>...</content>
-						<thumbnail>
+						<content>
 							<serverFileContentResource filePath="/server/external/disc/path/file.jpg">
 								<fileChecksum type="md5">sdfsjodf90sfsdfzfasdfwrg34</fileChecksum>
 							</serverFileContentResource>
-						</thumbnail>
+						</content>
+						<thumbnail>...</thumbnail>
 					</item>
 				</example>
 			</xs:appinfo>
@@ -905,7 +980,7 @@
 	</xs:element>
 	<xs:element name="urlContentResource" type="T_urlContentResource">
 		<xs:annotation>
-			<xs:documentation>Specifies that content file location is a URL (http,ftp)</xs:documentation>
+			<xs:documentation>Specifies that the location of content ingestion is a URL (http/ftp)</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<item>
@@ -913,7 +988,7 @@
 						<type>1</type>
 						<media>...</media>
 						<content>
-							<urlContentResource url="http://my.domain/path/video.jpg"/>
+							<urlContentResource url="http://my.domain/path/video.mp4"/>
 						</content>
 						<thumbnail>
 							<urlContentResource url="http://my.domain/path/thumb.jpg"/>
@@ -925,7 +1000,7 @@
 	</xs:element>
 	<xs:element name="remoteStorageContentResource" type="T_remoteStorageContentResource">
 		<xs:annotation>
-			<xs:documentation>Specifies that content file location is a path within a Kaltura defined remote storage</xs:documentation>
+			<xs:documentation>Specifies that the location of content ingestion is a path within a remote storage defined in Kaltura. Using this option, only a link to the content location is set from the entry, without actually uploading content to Kaltura.</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<item>
@@ -933,12 +1008,12 @@
 						<type>1</type>
 						<media>...</media>
 						<content>
-							<remoteStorageContentResource url="path/video.jpg">
+							<remoteStorageContentResource url="path_from_base_dir/video.mp4">
 								<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME</storageProfile>
 							</remoteStorageContentResource>
 						</content>
 						<thumbnail>
-							<remoteStorageContentResource url="path/thumb.jpg">
+							<remoteStorageContentResource url="path_from_base_dir/thumb.jpg">
 								<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME</storageProfile>
 							</remoteStorageContentResource>
 						</thumbnail>
@@ -949,7 +1024,7 @@
 	</xs:element>
 	<xs:element name="remoteStorageContentResources" type="T_remoteStorageContentResources">
 		<xs:annotation>
-			<xs:documentation>Set of content files within several Kaltura defined remote storages</xs:documentation>
+			<xs:documentation>Sets the location of content ingestion within several remote storages defined in Kaltura. Using this option, only links to the content location are set from the entry, without actually uploading content to Kaltura.</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<item>
@@ -958,10 +1033,10 @@
 						<media>...</media>
 						<content>
 							<remoteStorageContentResources>
-								<remoteStorageContentResource url="path1/video.jpg">
+								<remoteStorageContentResource url="path_from_base_dir/video.mp4">
 									<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME_1</storageProfile>
 								</remoteStorageContentResource>
-								<remoteStorageContentResource url="path2/video.jpg">
+								<remoteStorageContentResource url="path_from_base_dir/video.mp4">
 									<storageProfile>MY_STORAGE_PROFILE_SYSTEM_NAME_2</storageProfile>
 								</remoteStorageContentResource>
 							</remoteStorageContentResources>
@@ -973,15 +1048,15 @@
 	</xs:element>
 	<xs:element name="entryContentResource" type="T_entryContentResource">
 		<xs:annotation>
-			<xs:documentation>Specifies that content is a Kaltura entry</xs:documentation>
+			<xs:documentation>Specifies that the source of content ingestion is the content of an existing Kaltura entry</xs:documentation>
 			<xs:appinfo>
-				<example>
+				<example title="XML Example: Adding flavor asset from an existing entry and associating it with a specific flavor params in a target entry">
 					<item>
 						<action>add</action>
 						<type>1</type>
 						<media>...</media>
 						<content>
-							<entryContentResource entryId="{existing entry id}">
+							<entryContentResource entryId="{origin entry id}">
 								<flavorParams>BASIC_SMALL</flavorParams>
 							</entryContentResource>
 						</content>
@@ -992,7 +1067,7 @@
 	</xs:element>
 	<xs:element name="assetContentResource" type="T_assetContentResource">
 		<xs:annotation>
-			<xs:documentation>Specifies that content is a Kaltura asset</xs:documentation>
+			<xs:documentation>Specifies that the source of content ingestion is a specific asset of an existing Kaltura entry</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<item>
@@ -1011,11 +1086,36 @@
 	<xs:element name="tags" type="T_tags">
 		<xs:annotation>
 			<xs:documentation>Free text tags</xs:documentation>
+			<xs:appinfo>
+				<example title="XML Example: Entry tags">
+					<item>
+						<action>add</action>
+						<tags>
+							<tag>tag1</tag>
+							<tag>tag2</tag>
+						</tags>
+						<media>...</media>
+						<content>...</content>
+					</item>
+				</example>
+			</xs:appinfo>
 		</xs:annotation>
 	</xs:element>
 	<xs:element name="categories" type="T_categories">
 		<xs:annotation>
-			<xs:documentation>Category assignments for entries</xs:documentation>
+			<xs:documentation>Entry`s category assignment.</xs:documentation>
+			<xs:appinfo>
+				<example title="XML Example: Entry categories">
+					<item>
+						<action>add</action>
+						<categories>
+							<category>examples&gt;example1</category>
+							<category>examples&gt;example2</category>
+						</categories>
+						<media>...</media>
+						<content>...</content>
+					</item>
+				</example>
 		</xs:annotation>
 	</xs:element>
 	
