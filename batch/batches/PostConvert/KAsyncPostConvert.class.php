@@ -64,12 +64,15 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		{
 			$mediaFile = trim($data->srcFileSyncLocalPath);
 			
-			if(!file_exists($mediaFile))
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
-			
-			if(!is_file($mediaFile))
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
+			if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
+			{
+				if(!file_exists($mediaFile))
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
 				
+				if(!is_file($mediaFile))
+					return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
+			}
+			
 			KalturaLog::debug("mediaFile [$mediaFile]");
 			$this->updateJob($job,"Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED, 1);
 		}
