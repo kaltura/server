@@ -298,7 +298,15 @@ class MetadataService extends KalturaBaseService
 			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 			if($status != KalturaMetadataStatus::VALID)
+			{
+				if($previousVersion)
+				{
+					$dbMetadata->setVersion($previousVersion);
+					$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
+					$dbMetadata->save();
+				}
 				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
+			}
 		}
 		
 		$metadata = new KalturaMetadata();
@@ -367,7 +375,15 @@ class MetadataService extends KalturaBaseService
 			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 			if($status != KalturaMetadataStatus::VALID)
+			{
+				if($previousVersion)
+				{
+					$dbMetadata->setVersion($previousVersion);
+					$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
+					$dbMetadata->save();
+				}
 				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
+			}
 		}
 		
 		$metadata = new KalturaMetadata();
