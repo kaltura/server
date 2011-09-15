@@ -89,6 +89,17 @@ class HuluDistributionProvider extends ConfigurableDistributionProvider
 	{
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isLocalFileRequired()
+	 */
+	public function isLocalFileRequired($jobType)
+	{
+		if($jobType == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			return true;
+		
+		return false;
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::useDeleteInsteadOfUpdate()
