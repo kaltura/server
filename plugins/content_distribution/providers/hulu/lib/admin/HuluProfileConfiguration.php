@@ -37,7 +37,7 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 			$additionalCategories[] = $category->value;
 		}
 		
-		$this->setDefault(series_additional_categories, $additionalCategories);
+		$this->setDefault('series_additional_categories', $additionalCategories);
 	}
 	
 	protected function addProviderElements()
