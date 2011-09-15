@@ -345,6 +345,9 @@ class kMetadataManager
 	 */
 	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsdPath, $newVersion, $newXsdPath)
 	{
+		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_VALIDATION, $metadataProfile->getPartnerId()))
+			return;
+		
 		$xsl = kXsd::compareXsd($prevXsdPath, $newXsdPath);
 		if(!$xsl)
 			return;
