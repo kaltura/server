@@ -366,11 +366,11 @@ class kMetadataManager
 	 */
 	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage)
 	{
-		KalturaLog::debug('Validating metadata [' . $metadata->getId() . ']');
+		KalturaLog::debug("Validating metadata [$metadata]");
 		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$metadataProfile)
 		{
-			$errorMessage = 'Metadata profile [' . $metadata->getMetadataProfileId() . '] not found';
+			$errorMessage = "Metadata profile [$metadataProfileId] not found";
 			KalturaLog::err($errorMessage);
 			return false;
 		}
