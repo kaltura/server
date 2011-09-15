@@ -60,7 +60,7 @@ class PartnerUsageController extends Zend_Controller_Action
 		
 		// init filters
 		$partnerFilter = $this->getPartnerFilterFromForm($form);
-		$usageFilter = new KalturaSystemPartnerUsageFilter();
+		$usageFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerUsageFilter();
 		$usageFilter->fromDate = $from->toString(Zend_Date::TIMESTAMP);
 		$usageFilter->toDate = $to->toString(Zend_Date::TIMESTAMP);
 		
@@ -70,7 +70,8 @@ class PartnerUsageController extends Zend_Controller_Action
 		$items = array();
 		while(true)
 		{
-			$response = $client->systemPartner->getUsage($partnerFilter, $usageFilter, $pager);
+			$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+			$response = $systemPartnerPlugin->systemPartner->getUsage($partnerFilter, $usageFilter, $pager);
 			if (count($response->objects) <= 0)
 				break;
 				
