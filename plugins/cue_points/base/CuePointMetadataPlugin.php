@@ -247,7 +247,7 @@ class CuePointMetadataPlugin extends KalturaPlugin implements IKalturaPending, I
 				$metadata->setMetadataProfileVersion($metadataProfile->getVersion());
 				$metadata->setObjectType($objectType);
 				$metadata->setObjectId($cuePoint->getId());
-				$metadata->setStatus(KalturaMetadataStatus::INVALID);
+				$metadata->setStatus(KalturaMetadataStatus::VALID);
 				
 				foreach($metadataElement->children() as $metadataContent)
 				{

@@ -99,7 +99,7 @@ class MetadataService extends KalturaBaseService
 		$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 		$dbMetadata->setObjectType($objectType);
 		$dbMetadata->setObjectId($objectId);
-		$dbMetadata->setStatus(KalturaMetadataStatus::INVALID);
+		$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
 
 		// validate object exists
 		$object = kMetadataManager::getObjectFromPeer($dbMetadata);
