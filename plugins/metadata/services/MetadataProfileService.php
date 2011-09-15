@@ -337,17 +337,20 @@ class MetadataProfileService extends KalturaBaseService
 			if(!kFileSyncUtils::fileSync_exists($oldKey))
 				continue;
 			
+			$xml = kFileSyncUtils::file_get_contents($oldKey, true, false);
+			if(!$xml)
+				continue;
+			
+			$errorMessage = '';
+			if(!kMetadataManager::validateMetadata($dbMetadataProfile->getId(), $xml, $errorMessage))
+				continue;
+			
 			$metadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			$metadata->setStatus(Metadata::STATUS_VALID);
 			$metadata->save();
 			
 			$key = $metadata->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
-			$fileSync = kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey);
-			if(!$fileSync)
-				continue;
-			
-			$errorMessage = '';
-			kMetadataManager::validateMetadata($metadata, $errorMessage);
+			kFileSyncUtils::createSyncFileLinkForKey($key, $oldKey);
 		}
 		
 		$metadataProfile = new KalturaMetadataProfile();

@@ -40,36 +40,26 @@ class MetadataService extends KalturaBaseService
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
 		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
-	
 		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
 		if($check)
 			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());
 			
-		$dbMetadata = $this->addMetadata($metadataProfileId, $objectType, $objectId);
-		
 		// if a metadata xslt is defined on the metadata profile - transform the given metadata
-		if($xmlData)
-		{
-		    $xmlDataTransformed = $this->transformMetadata($dbMetadata, $xmlData);
-		    if ($xmlDataTransformed) {
-	            $xmlData = $xmlDataTransformed;
-	        }
-		}
+		$xmlDataTransformed = $this->transformMetadata($metadataProfileId, $xmlData);
+	    if ($xmlDataTransformed)
+            $xmlData = $xmlDataTransformed;
+		
+		$errorMessage = '';
+		if(!kMetadataManager::validateMetadata($metadataProfileId, $xmlData, $errorMessage))
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
+		
+		$dbMetadata = $this->addMetadata($metadataProfileId, $objectType, $objectId);
 		
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		kFileSyncUtils::file_put_contents($key, $xmlData);
 		
-		$errorMessage = '';
-		$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
-		if($status == KalturaMetadataStatus::VALID)
-		{
-			$this->deleteOldVersions($dbMetadata);
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
-		}
-		else
-		{
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
-		}
+		$this->deleteOldVersions($dbMetadata);
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 				
 		$metadata = new KalturaMetadata();
 		$metadata->fromObject($dbMetadata);
@@ -138,37 +128,13 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromFileAction($metadataProfileId, $objectType, $objectId, $xmlFile)
 	{
-		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
-	
-		$check = MetadataPeer::retrieveByObject($metadataProfileId, $objectType, $objectId);
-		if($check)
-			throw new KalturaAPIException(MetadataErrors::METADATA_ALREADY_EXISTS, $check->getId());
-			
 		$filePath = $xmlFile['tmp_name'];
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
-			
-		$dbMetadata = $this->addMetadata($metadataProfileId, $objectType, $objectId);
 		
-		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		kFileSyncUtils::moveFromFile($filePath, $key);
-		
-		$errorMessage = '';
-		$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
-		if($status == KalturaMetadataStatus::VALID)
-		{
-			$this->deleteOldVersions($dbMetadata);
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
-		}
-		else
-		{
-			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
-		}
-		
-		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
-		
-		return $metadata;
+		$xmlData = file_get_contents($filePath);
+		@unlink($filePath);
+		return $this->addAction($metadataProfileId, $objectType, $objectId, $xmlData);
 	}
 	
 	
@@ -273,45 +239,30 @@ class MetadataService extends KalturaBaseService
 		$previousVersion = null;
 		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
 			$previousVersion = $dbMetadata->getVersion();
-		
-		if($xmlData)
-			$dbMetadata->incrementVersion();
-			
-		$dbMetadata->save();
-		
-		
-		// if a metadata xslt is defined on the metadata profile - transform the given metadata
+				
 		if($xmlData)
 		{
-		    $xmlDataTransformed = $this->transformMetadata($dbMetadata, $xmlData);
-		    if ($xmlDataTransformed) {
+			// if a metadata xslt is defined on the metadata profile - transform the given metadata
+		    $xmlDataTransformed = $this->transformMetadata($dbMetadata->getMetadataProfileId(), $xmlData);
+		    if ($xmlDataTransformed)
 	            $xmlData = $xmlDataTransformed;
-	        }
-		}
+			
+			$errorMessage = '';
+			if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessage))
+				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
+			
+			$dbMetadata->incrementVersion();
+			$dbMetadata->save();
 		
-		if($xmlData)
-		{
 			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 			kFileSyncUtils::file_put_contents($key, $xmlData);
 			
-			$errorMessage = '';
-			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
 			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
-			if($status != KalturaMetadataStatus::VALID)
-			{
-				if($previousVersion)
-				{
-					$dbMetadata->setVersion($previousVersion);
-					$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
-					$dbMetadata->save();
-				}
-				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
-			}
 		}
 		
 		$metadata = new KalturaMetadata();
 		$metadata->fromObject($dbMetadata);
-		
+			
 		return $metadata;
 	}	
 	
@@ -331,65 +282,13 @@ class MetadataService extends KalturaBaseService
 	 */	
 	function updateFromFileAction($id, $xmlFile = null)
 	{
-		$dbMetadata = MetadataPeer::retrieveByPK($id);
+		$filePath = $xmlFile['tmp_name'];
+		if(!file_exists($filePath))
+			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
 		
-		if(!$dbMetadata)
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-		
-		$filePath = null;
-		if($xmlFile)
-		{
-			$filePath = $xmlFile['tmp_name'];
-			if(!file_exists($filePath))
-				throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
-		}
-		
-		$previousVersion = null;
-		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
-			$previousVersion = $dbMetadata->getVersion();
-		
-		if($filePath)
-			$dbMetadata->incrementVersion();
-			
-		$dbMetadata->save();
-		
-		if($filePath)
-		{
-			// if a metadata xslt is defined on the metadata profile - transform the given metadata
-    		$xmlData = file_get_contents($filePath);
-		    if($xmlData)
-    		{
-    		    $xmlDataTransformed = $this->transformMetadata($dbMetadata, $xmlData);
-    		    if ($xmlDataTransformed) {
-    		        $tempDirectory = sys_get_temp_dir();
-		            $tempFilePath = tempnam($tempDirectory, 'xmlData');
-		            file_put_contents($tempFilePath, $xmlDataTransformed);
-		            $filePath = $tempFilePath;
-    	        }
-    		}
-		    
-			$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			kFileSyncUtils::moveFromFile($filePath, $key);
-			
-			$errorMessage = '';
-			$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
-			if($status != KalturaMetadataStatus::VALID)
-			{
-				if($previousVersion)
-				{
-					$dbMetadata->setVersion($previousVersion);
-					$dbMetadata->setStatus(KalturaMetadataStatus::VALID);
-					$dbMetadata->save();
-				}
-				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
-			}
-		}
-		
-		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
-		
-		return $metadata;
+		$xmlData = file_get_contents($filePath);
+		@unlink($filePath);
+		return $this->updateAction($id, $xmlData);
 	}		
 	
 	/**
@@ -518,33 +417,32 @@ class MetadataService extends KalturaBaseService
 	}
 		
 	
-	private function transformMetadata(Metadata $dbMetadata, $xmlData)
+	private function transformMetadata($metadataProfileId, $xmlData)
 	{
         $result = null;
-	    $metadataProfile = $dbMetadata->getMetadataProfile(); 
+	    $metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId); 
 	    if (!$metadataProfile) {
 	        KalturaLog::err('Cannot find metadata profile for metadata id ['.$dbMetadata->getId().']');
 	        return null;
 	    }
 	    
 	    $metadataXsltKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
-	    if (kFileSyncUtils::file_exists($metadataXsltKey, true))
-	    {
-		    $xsltString = kFileSyncUtils::file_get_contents($metadataXsltKey, true, false);
-		    if ($xsltString)
-		    {
-		        $xsltParams = array();
-		        $xsltParams[XsltParameterName::KALTURA_CURRENT_TIMESTAMP] = time();
-		        $xmlDataTransformed = kXml::transformXmlUsingXslt($xmlData, $xsltString, $xsltParams);
-		        if ($xmlDataTransformed) {
-		            $result = $xmlDataTransformed;
-		        }
-		        else {
-		            KalturaLog::err('Failed XML transformation for metadata id ['.$dbMetadata->getId().']');
-		        }
-		    }
-	    }
+	    if (!kFileSyncUtils::file_exists($metadataXsltKey, true))
+	    	return null;
 	    
-	    return $result;
+	    $xsltString = kFileSyncUtils::file_get_contents($metadataXsltKey, true, false);
+	    if (!$xsltString)
+	    	return null;
+	    
+        $xsltParams = array(
+        	XsltParameterName::KALTURA_CURRENT_TIMESTAMP => time(),
+        );
+        
+        $xmlDataTransformed = kXml::transformXmlUsingXslt($xmlData, $xsltString, $xsltParams);
+        if ($xmlDataTransformed)
+            return $xmlDataTransformed;
+        
+        KalturaLog::err('Failed XML [$xmlData] transformation for metadata with XSL [$xsltString]');
+	    return null;
 	}
 }

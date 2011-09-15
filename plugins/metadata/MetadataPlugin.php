@@ -434,9 +434,15 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		
 		if(!$xmlData)
 			return;
-			
-		$dbMetadata = new Metadata();
 		
+		$errorMessage = '';
+		if(!kMetadataManager::validateMetadata($metadataProfileId, $xmlData, $errorMessage))
+		{
+			self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
+			return;
+		}
+		
+		$dbMetadata = new Metadata();
 		$dbMetadata->setPartnerId($entry->getPartnerId());
 		$dbMetadata->setMetadataProfileId($metadataProfileId);
 		$dbMetadata->setMetadataProfileVersion($metadataProfile->getVersion());
@@ -450,16 +456,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		kFileSyncUtils::file_put_contents($key, $xmlData);
 		
-		$errorMessage = '';
-		$status = kMetadataManager::validateMetadata($dbMetadata, $errorMessage);
-		if($status == Metadata::STATUS_VALID)
-		{
-			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
-		}
-		else
-		{
-			self::addBulkUploadResultDescription($entryId, $entry->getBulkUploadId(), $errorMessage);
-		}
+		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata));
 	}
 	
 	protected static function addBulkUploadResultDescription($entryId, $bulkUploadId, $description)

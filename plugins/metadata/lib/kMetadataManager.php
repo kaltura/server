@@ -358,52 +358,45 @@ class kMetadataManager
 	/**
 	 * Validate the XML against the profile XSD and set the metadata status
 	 * 
-	 * @param Metadata $metadata
+	 * @param int $metadataProfileId
+	 * @param string $metadata
+	 * @param string $errorMessage
 	 * 
-	 * returns metadata status
+	 * returns bool
 	 */
-	public static function validateMetadata(Metadata $metadata, &$errorMessage)
+	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage)
 	{
 		KalturaLog::debug('Validating metadata [' . $metadata->getId() . ']');
-		$metadataProfile = $metadata->getMetadataProfile();
+		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
 		if(!$metadataProfile)
 		{
 			$errorMessage = 'Metadata profile [' . $metadata->getMetadataProfileId() . '] not found';
 			KalturaLog::err($errorMessage);
-			return self::setMetadataStatus($metadata, Metadata::STATUS_INVALID);
+			return false;
 		}
 		
-		$metadataKey = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($metadataKey);
-		if(!file_exists($xmlPath))
-		{
-			$errorMessage = "Metadata xml [$xmlPath] not found";
-			KalturaLog::err($errorMessage);
-			return self::setMetadataStatus($metadata, Metadata::STATUS_INVALID);
-		}
-			
 		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
 		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($metadataProfileKey);
 		if(!file_exists($xsdPath))
 		{
 			$errorMessage = "Metadata profile xsd [$xsdPath] not found";
 			KalturaLog::err($errorMessage);
-			return self::setMetadataStatus($metadata, Metadata::STATUS_INVALID);
+			return false;
 		}
 			
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
 		$xml = new DOMDocument();
-		$xml->load($xmlPath);
+		$xml->loadXML($metadata);
 		if($xml->schemaValidate($xsdPath))
 		{
 			KalturaLog::debug("Metadata is valid");
-			return self::setMetadataStatus($metadata, Metadata::STATUS_VALID, $metadataProfile->getVersion());
+			return true;
 		}
 		
 		$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlPath));
-		KalturaLog::debug("Metadata is invalid:\n$errorMessage");
-		return self::setMetadataStatus($metadata, Metadata::STATUS_INVALID);
+		KalturaLog::err("Metadata is invalid:\n$errorMessage");
+		return false;
 	}
 	
 	/**
