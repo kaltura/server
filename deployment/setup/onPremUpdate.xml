@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="onPremUpdate" default="seccess" >
+    <!-- ============================================  -->
+    <!-- Properties                                    -->
+    <!-- ============================================  -->
+    <property name="installationZip"  value="TM-v5.0.0-beta.zip" override="true" />
+    <property name="installationDir"  value="Kaltura-TM-v5.0.0" override="true" />
+    <property name="installationLoc"  value="/web/content/kaltura_packages/drops/" override="true" />
+    <property name="server"  value="hudsontest2.kaltura.dev" override="true" />
+    
+    <!-- ============================================  -->
+    <!-- Target: stop batch proccess                   -->
+    <!-- ============================================  -->
+	<target name="stopBatch">
+        <echo msg="Stopping batch..." />
+        <exec command="sh /opt/kaltura/app/scripts/serviceBatchMgr.sh stop" escape="false"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: clear cache                           -->
+    <!-- ============================================  -->
+	<target name="clearCache" depends="stopBatch">
+        <echo msg="Clearing cache..." />
+        <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false"/>
+        <exec command="rm -rf /opt/kaltura/app/cache/*" escape="false"/>
+    </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: restart apache                        -->
+    <!-- ============================================  -->
+    <target name="restartApache">
+         <echo msg="restart apache..." />
+         <exec command="apachectl restart" dir="." />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: Replace non root files                -->
+    <!-- ============================================  -->
+    <target name="replaceNonRootFiles" depends="restartApache,clearCache">
+         <echo msg="replacing non root files..." />
+         <copy file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh" tofile="/opt/kaltura/app/plugins/sphinx_search/scripts/watch.daemon.sh" overwrite="true"/>
+    </target>
+    
+    
+    <!-- ============================================  -->
+    <!-- Target: Update                                -->
+    <!-- ============================================  -->
+    <target name="update" depends="replaceNonRootFiles,restartApache,clearCache">
+         <echo msg="update..." />
+         <exec command="php updateConfigFiles.php -s" dir="${installationLoc}${installationDir}" />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: unit tests (not running)              -->
+    <!-- ============================================  -->
+    <target name="unitTest">
+         <echo msg="creating base data for tests..." />
+         <exec command="php /opt/kaltura/app/tests/scripts/createBaseData.php" dir="/opt/kaltura/app/tests/scripts" />
+         <echo msg="running unit tests..." />
+         <exec command="phpunit /opt/kaltura/app/tests/api" dir="/opt/kaltura/app/tests" />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: clear cache                           -->
+    <!-- ============================================  -->
+	<target name="clearCachee" depends="update">
+        <echo msg="Clearing cache..." />
+        <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false"/>
+        <exec command="rm -rf /opt/kaltura/app/cache/*" escape="false"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: Success                               -->
+    <!-- ============================================  -->
+    <target name="seccess" depends="clearCachee">
+         <echo msg="Done" />
+    </target>
+
+
+</project>
