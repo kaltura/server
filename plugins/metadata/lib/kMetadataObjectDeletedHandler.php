@@ -3,7 +3,7 @@
  * @package plugins.metadata
  * @subpackage lib
  */
-class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
+class kMetadataObjectDeletedHandler extends kObjectDeleteHandler implements kObjectChangedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
@@ -20,6 +20,25 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 			return true;
 			
 		return parent::shouldConsumeDeletedEvent($object);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	 */
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if($object instanceof Metadata && in_array(MetadataPeer::STATUS, $modifiedColumns) && $object->getStatus() == Metadata::STATUS_INVALID)
+			return true;
+		
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	{
+		$this->syncableDeleted($object->getId(), FileSyncObjectType::METADATA);
 	}
 	
 	/* (non-PHPdoc)
