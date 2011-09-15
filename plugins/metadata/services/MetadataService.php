@@ -205,9 +205,12 @@ class MetadataService extends KalturaBaseService
 	function updateAction($id, $xmlData = null)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
-		
 		if(!$dbMetadata)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		
+		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($dbMetadata->getMetadataProfileId());
+		if(!$dbMetadataProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_METADATA_PROFILE, $dbMetadata->getMetadataProfileId());
 		
 		$previousVersion = null;
 		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
@@ -224,6 +227,7 @@ class MetadataService extends KalturaBaseService
 			if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessage))
 				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
 			
+			$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			$dbMetadata->incrementVersion();
 			$dbMetadata->save();
 		
