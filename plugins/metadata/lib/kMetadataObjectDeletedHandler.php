@@ -6,6 +6,23 @@
 class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 {
 	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return true;
+			
+		if($object instanceof Metadata)
+			return true;
+			
+		if($object instanceof MetadataProfile)
+			return true;
+			
+		return parent::shouldConsumeDeletedEvent($object);
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectDeleteHandler::objectDeleted()
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null) 
@@ -19,7 +36,7 @@ class kMetadataObjectDeletedHandler extends kObjectDeleteHandler
 		if($object instanceof MetadataProfile)
 			$this->metadataProfileDeleted($object);
 			
-		return true;
+		return parent::objectDeleted($object);
 	}
 	
 	/**
