@@ -16,8 +16,8 @@ passthru("php $script $config");
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
 $permissionRoleMap = array(
-	'Support manager' => 'SYSTEM_ADMIN_WIDGET',
-	'Publishers Administrator' => 'SYSTEM_ADMIN_WIDGET',
+	'Support manager' => 'SYSTEM_ADMIN_PARTNER_CONFIGURATION_VIEW',
+	'Publishers Administrator' => 'SYSTEM_ADMIN_PARTNER_CONFIGURATION_VIEW',
 );
 
 foreach ($permissionRoleMap as $roleName => $permissionList)
