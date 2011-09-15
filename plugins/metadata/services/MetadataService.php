@@ -23,19 +23,17 @@ class MetadataService extends KalturaBaseService
 	}
 	
 
-/**
+	/**
 	 * Allows you to add a metadata object and metadata content associated with Kaltura object
 	 * 
 	 * @action add
 	 * @param int $metadataProfileId
-
 	 * @param KalturaMetadataObjectType $objectType
 	 * @param string $objectId
 	 * @param string $xmlData XML metadata
 	 * @return KalturaMetadata
 	 * @throws MetadataErrors::METADATA_ALREADY_EXISTS
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
-
 	 */
 	function addAction($metadataProfileId, $objectType, $objectId, $xmlData)
 	{
@@ -73,7 +71,6 @@ class MetadataService extends KalturaBaseService
 	 * 
 	 * @param int $metadataProfileId
 	 * @param KalturaMetadataObjectType $objectType
-
 	 * @param string $objectId
 	 * @return Metadata
 	 * @throws MetadataErrors::METADATA_ALREADY_EXISTS
@@ -113,7 +110,7 @@ class MetadataService extends KalturaBaseService
 		return $dbMetadata;
 	}
 
-/**
+	/**
 	 * Allows you to add a metadata object and metadata file associated with Kaltura object
 	 * 
 	 * @action addFromFile
@@ -171,7 +168,6 @@ class MetadataService extends KalturaBaseService
 	 * 
 	 * @action addFromBulk
 	 * @param int $metadataProfileId
-
 	 * @param KalturaMetadataObjectType $objectType
 	 * @param string $objectId
 	 * @param string $url XML metadata remote url
@@ -189,7 +185,6 @@ class MetadataService extends KalturaBaseService
 	 * @action get
 	 * @param int $id 
 	 * @return KalturaMetadata
-
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */		
 	function getAction($id)
@@ -205,27 +200,13 @@ class MetadataService extends KalturaBaseService
 		return $metadata;
 	}
 	
-	
-//	/**
-//	 * Update an existing metadata object with new XML content
-//	 * 
-//	 * @action update
-//	 * @param int $id 
-//	 * @param KalturaMetadata $metadata
-//	 * @param string $xmlData XML metadata
-//	 * @return KalturaMetadata
-//	 */	
-//	function updateAction($id, KalturaMetadata $metadata, $xmlData = null)
-	
 	/**
-
 	 * Update an existing metadata object with new XML content
 	 * 
 	 * @action update
 	 * @param int $id 
 	 * @param string $xmlData XML metadata
 	 * @return KalturaMetadata
-
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
 	 */	
@@ -269,14 +250,12 @@ class MetadataService extends KalturaBaseService
 	
 	/**
 	 * Update an existing metadata object with new XML file
-
 	 * 
 	 * @action updateFromFile
 	 * @param int $id 
 	 * @param file $xmlFile XML metadata
 	 * @return KalturaMetadata
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
-
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
 	 */	
