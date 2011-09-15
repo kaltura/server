@@ -89,6 +89,14 @@ class FreewheelGenericDistributionProvider extends ConfigurableDistributionProvi
 	{
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionProvider::isLocalFileRequired()
+	 */
+	public function isLocalFileRequired($jobType)
+	{
+		return false;
+	}
 
 	/* (non-PHPdoc)
 	 * @see IDistributionProvider::useDeleteInsteadOfUpdate()
