@@ -323,6 +323,7 @@ form.inline-form { padding-top:15px; display:table; clear:both;}
 	  button.secondary div { background:none;}
 	  button.secondary:hover { color:#00C1FF;}
   ul.errors { width:280px; margin-left:15px; color:red;}
+  
 
   div.error, div.message { padding:10px; border: solid 1px red; margin: 18px 0; display:inline; float:left; clear:both; font-weight:bold; color:red;}
   div.message { border-color:green; color:green;}
@@ -606,7 +607,7 @@ form#frmCreateDropFolder dt { float: left; }
 #partner-configure-dialog #mothly_bandwidth_combined label {float:left; height:45px; margin-top:3px;}
 #partner-configure-dialog #monitor_usage_history-label {width:0px;}
 #partner-configure-dialog #fieldset-publisherSpecificDeliverySettings  dt {width:269px; float:left;}
-
+#partner-configure-dialog #extended_free_trail_expiry_reason-element .errors {width:240px;}
 #partner-configure-dialog #partner_group_type-label {width:150px;}
 #partner-configure-dialog #partner_group_type-element select {width:297px;}
 
