@@ -62,12 +62,30 @@
          <echo msg="running unit tests..." />
          <exec command="phpunit /opt/kaltura/app/tests/api" dir="/opt/kaltura/app/tests" />
     </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: generate activation key               -->
+    <!-- ============================================  -->
+    <target name="genActivationKey" depends="update">
+         <echo msg="generate activation key ..." />
+
+         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                        <regexp pattern='"kaltura_activation_key" => false,' replace='"kaltura_activation_key" => "NjkwNTkzMTg5NWJjM2YyNzg0ZjFlNjViZDIzNzA0NDJ8MXxuZXZlcnww",'/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php" overwrite="true"/>
+
+    </target>
 
 
     <!-- ============================================  -->
     <!-- Target: clear cache                           -->
     <!-- ============================================  -->
-	<target name="clearCachee" depends="update">
+	<target name="clearCachee" depends="genActivationKey">
         <echo msg="Clearing cache..." />
         <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false"/>
         <exec command="rm -rf /opt/kaltura/app/cache/*" escape="false"/>
