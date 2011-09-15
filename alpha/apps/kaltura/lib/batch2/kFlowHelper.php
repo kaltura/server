@@ -1289,7 +1289,7 @@ KalturaLog::debug("####");
 	{
 		KalturaLog::debug("####");	
 	if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 65, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrorNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
+			self::sendBulkUploadNotificationEmail($dbBatchJob, 65, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
