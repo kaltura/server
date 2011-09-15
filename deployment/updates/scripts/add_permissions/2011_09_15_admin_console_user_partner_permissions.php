@@ -9,7 +9,7 @@
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/scripts/utils/permissions/addPermissionsAndItems.php';
-$config = realpath(dirname(__FILE__)) . '/../../../../plugins/system_partner/config/system_partner_permissions_part_3.ini';
+$config = realpath(dirname(__FILE__)) . '/../../../../plugins/system_partner/config/system_partner_permissions_part_4.ini';
 passthru("php $script $config");
 
 
