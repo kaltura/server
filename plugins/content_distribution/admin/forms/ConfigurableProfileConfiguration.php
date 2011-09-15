@@ -44,7 +44,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 	protected function addItemXpathsToExtend($itemXpathsToExtend)
 	{
 		if (count($itemXpathsToExtend) == 0)
-			$itemXpathsToExtend = array('');
+			$itemXpathsToExtend = array(new Kaltura_Client_Type_String());
 			
 		$mainSubForm = new Zend_Form_SubForm();
 		$mainSubForm->setLegend('Item XPaths To Extend');
