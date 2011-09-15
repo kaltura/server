@@ -149,16 +149,8 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromUrlAction($metadataProfileId, $objectType, $objectId, $url)
 	{
-		$objectType = kPluginableEnumsManager::apiToCore('MetadataObjectType', $objectType);
-	
-		$dbMetadata = $this->addMetadata($metadataProfileId, $objectType, $objectId);
-		
-		kMetadataManager::addImportMetadataJob($dbMetadata->getPartnerId(), $dbMetadata->getId(), $url);
-		
-		$metadata = new KalturaMetadata();
-		$metadata->fromObject($dbMetadata);
-		
-		return $metadata;
+		$xmlData = file_get_contents($filePath);
+		return $this->addAction($metadataProfileId, $objectType, $objectId, $xmlData);
 	}
 	
 	
