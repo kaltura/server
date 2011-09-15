@@ -12,6 +12,11 @@ class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
 	 */
 	public $fieldConfigArray;
 	
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $itemXpathsToExtend;
+	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -43,6 +48,12 @@ class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
 		    }
 		}
 		$dbObject->setFieldConfigArray($dbFieldConfigArray);
+		
+		$itemXpathsToExtendArray = array();
+		foreach($this->itemXpathsToExtend as $stringObj)
+			$itemXpathsToExtendArray[] = $stringObj->value;
+			
+		$dbObject->setItemXpathsToExtend($itemXpathsToExtendArray);
 					
 		return $dbObject;
 	}
@@ -52,6 +63,7 @@ class KalturaConfigurableDistributionProfile extends KalturaDistributionProfile
 		parent::fromObject($source_object);
 		
 		$this->fieldConfigArray = KalturaDistributionFieldConfigArray::fromDbArray($source_object->getFieldConfigArray());
+		$this->itemXpathsToExtend = KalturaStringArray::fromStringArray($source_object->getItemXpathsToExtend());
 	}
 	
 	

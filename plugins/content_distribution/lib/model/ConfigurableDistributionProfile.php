@@ -6,6 +6,7 @@
 abstract class ConfigurableDistributionProfile extends DistributionProfile
 {
     const CUSTOM_DATA_FIELD_CONFIG_ARRAY = 'fieldConfigArray';
+    const CUSTOM_DATA_ITEM_XPATHS_TO_EXTEND = 'itemXpathsToExtend';
 	
 	protected $fieldConfigArray = null;
 	
@@ -88,6 +89,29 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	        }	        
 	    }
 	    $this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY, serialize($tempArray));
+	}
+	
+	public function getItemXpathsToExtend()
+	{
+		$temp = unserialize($this->getFromCustomData(self::CUSTOM_DATA_ITEM_XPATHS_TO_EXTEND));
+		if (is_array($temp))
+			return $temp;
+		else
+			return array();
+	}
+	
+	public function setItemXpathsToExtend($itemXpathsToExtend)
+	{
+		if (!is_array($itemXpathsToExtend))
+			$itemXpathsToExtend = array();
+			
+		$array = array();
+		foreach($itemXpathsToExtend as $val)
+		{
+			if ($val)
+				$array[] = $val;
+		}
+		$this->putInCustomData(self::CUSTOM_DATA_ITEM_XPATHS_TO_EXTEND, serialize($array));
 	}
 	
 	/**
@@ -206,8 +230,23 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
             KalturaLog::err('Entry not found with ID ['.$entry->getId().']');
             return null;
         }
-			
-		$mrssStr = kMrssManager::getEntryMrss($entry);
+		
+		// set the default criteria to use the current entry distribution partner id (it is restored later)
+		// this is needed for related entries under kMetadataMrssManager which is using retrieveByPK without the correct partner id filter
+		$oldEntryCriteria = entryPeer::getCriteriaFilter()->getFilter();
+		entryPeer::setDefaultCriteriaFilter();
+		entryPeer::addPartnerToCriteria($entryDistribution->getPartnerId(), true);
+		
+		$mrss = null;
+		$mrssParams = new kMrssParameters();
+		if ($this->getItemXpathsToExtend())
+			$mrssParams->setItemXpathsToExtend($this->getItemXpathsToExtend());
+		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
+		$mrssStr = $mrss->asXML();
+		
+		// restore the original criteria
+		entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
+		
 		if(!$mrssStr)
 		{
 			KalturaLog::err('No MRSS returned for entry ['.$entry->getId().']');
@@ -247,7 +286,6 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		*/
 		
 		KalturaLog::debug('Result XML: '.$resultXmlObj->saveXML());		
-		
 		return $resultXmlObj;
 	}
 	

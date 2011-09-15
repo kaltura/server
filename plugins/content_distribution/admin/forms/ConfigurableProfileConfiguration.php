@@ -6,13 +6,25 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		$fieldConfigArray = isset($properties['fieldConfigArray']) ? $properties['fieldConfigArray'] : array();		
 		$object->fieldConfigArray = $this->getFieldConfigArray($fieldConfigArray);
+		
+		$itemXpathsToExtend = isset($properties['itemXpathsToExtend']) && is_array($properties['itemXpathsToExtend']) ? $properties['itemXpathsToExtend'] : array();
+		foreach($itemXpathsToExtend as &$val)
+		{
+			$temp = new Kaltura_Client_Type_String();
+			$temp->value = $val;
+			$val = $temp;
+		}
+		$object->itemXpathsToExtend = $itemXpathsToExtend;
+		
 		return $object;
 	}
 	
 	public function populateFromObject($object, $add_underscore = true)
 	{
 		parent::populateFromObject($object, $add_underscore);
-	    $this->addFieldConfigArray($object->fieldConfigArray);
+		$this->addFieldConfigArray($object->fieldConfigArray);
+		
+		$this->addItemXpathsToExtend($object->itemXpathsToExtend);
 	}	
 	
 	protected function getFieldConfigArray($fieldConfigArray)
@@ -27,5 +39,40 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 	    $fieldConfigArraySubForm = new Form_DistributionFieldConfigArray_SubForm();
 	    $fieldConfigArraySubForm->addFieldConfigArray($fieldConfigArray);
 	    $this->addSubForm($fieldConfigArraySubForm, 'fieldConfigArray');
+	}
+	
+	protected function addItemXpathsToExtend($itemXpathsToExtend)
+	{
+		if (count($itemXpathsToExtend) == 0)
+			$itemXpathsToExtend = array('');
+			
+		$mainSubForm = new Zend_Form_SubForm();
+		$mainSubForm->setLegend('Item XPaths To Extend');
+		$mainSubForm->setDecorators(array(
+			'FormElements',
+			array('ViewScript', array(
+				'viewScript' => 'distribution-item-xpath-to-extend.phtml',
+				'placement' => 'APPEND'
+			)),
+			'Fieldset'
+		));
+		
+		$i = 1;
+		foreach($itemXpathsToExtend as $stringObject)
+		{
+			$subForm = new Zend_Form_SubForm(array('disableLoadDefaultDecorators' => true));
+			$subForm->setDecorators(array(
+				'FormElements',
+			));
+			$subForm->addElement('text', 'itemXpathsToExtend', array(
+				'decorators' => array('ViewHelper', array('HtmlTag', array('tag' => 'div'))),
+				'isArray' => true,
+				'value' => $stringObject->value
+			));
+			
+			$mainSubForm->addSubForm($subForm, 'itemXpathsToExtend_subform_'.$i++);
+		}
+		
+		$this->addSubForm($mainSubForm, 'itemXpathsToExtend_group');
 	}
 }
