@@ -153,7 +153,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 					return 'SwfFlavorParams';
 					
 				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
-					return 'DocumentFlavorParams';
+					return 'flavorParams';
 				
 				default:
 					return null;	
@@ -171,7 +171,7 @@ class DocumentPlugin extends KalturaPlugin implements IKalturaPlugin, IKalturaSe
 					return 'SwfFlavorParamsOutput';
 					
 				case DocumentPlugin::getAssetTypeCoreValue(DocumentAssetType::DOCUMENT):
-					return 'DocumentFlavorParamsOutput';
+					return 'flavorParamsOutput';
 				
 				default:
 					return null;	
