@@ -12,7 +12,7 @@ else
 
 $page_num = 0;
 $run = TRUE;
-echo "*title,description,tag,url,category,contentType,thumbnailUrl\n";
+echo "*title,description,tags,url,category,contentType,thumbnailUrl\n";
 while($run) {
 	$url = "http://api.brightcove.com/services/library?command=find_all_videos&media_delivery=http&token=".$token."&page_number=".$page_num++;
 	$json = file_get_contents($url);
