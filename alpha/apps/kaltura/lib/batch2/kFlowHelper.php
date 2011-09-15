@@ -1238,7 +1238,6 @@ public static function createBulkUploadLogUrl(BatchJob $dbBatchJob)
 
 	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
 	{
-		KalturaLog::debug("#### email id" .  $email_id . ' params: '. print_r($params,true));
 		kJobsManager::addMailJob(
 			null,
 			0,
