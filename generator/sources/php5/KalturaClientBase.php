@@ -550,6 +550,33 @@ class KalturaClientBase
 		
 		return $params;
 	}
+	
+	public function generateSession($adminSecretForSigning, $userId = "", $type = KalturaSessionType::USER, $partnerId = -1, $expiry = 86400, $privileges = '')
+	{
+		$rand = rand(0, 32000);
+		$expiry = time()+$expiry;
+		$fields = array ( 
+			$this->config->partnerId , 
+			$this->config->partnerId , 
+			$expiry , 
+			$type, 
+			$rand , 
+			$userId , 
+			$privileges 
+		);
+		$info = implode ( ";" , $fields );
+
+		$signature = $this->hash ( $adminSecretForSigning , $info );	 
+		$strToHash =  $signature . "|" . $info ;
+		$encoded_str = base64_encode( $strToHash );
+
+		return $encoded_str;
+	}
+	
+	private function hash ( $salt , $str )
+	{
+		return sha1($salt.$str);
+	}
 }
 
 /**
