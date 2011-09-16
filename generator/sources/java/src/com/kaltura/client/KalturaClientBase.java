@@ -1,5 +1,7 @@
 package com.kaltura.client;
 
+import com.kaltura.client.enums.KalturaSessionType;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,6 +28,8 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
+
+import sun.misc.BASE64Encoder;
 
 import com.kaltura.client.utils.XmlUtils;
 
@@ -385,5 +389,60 @@ abstract public class KalturaClientBase {
 		return method;
 		
     }
-           
+
+	public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry, String privileges) throws Exception
+	{
+		try
+		{
+			// initialize required values
+			int rand = (int)(Math.random() * 32000);
+			expiry = (int)(System.currentTimeMillis() / 1000) + 86400;
+			
+			// build info string
+			StringBuilder sbInfo = new StringBuilder();
+			sbInfo.append(this.kalturaConfiguration.partnerId).append(";").append(";").append(expiry).append(";").append(type).append(";").append(rand).append(";").append(userId).append(";").append(privileges);
+			
+			// sign info with SHA1 algorithm
+			MessageDigest algorithm = MessageDigest.getInstance("SHA1");
+			algorithm.reset();
+			algorithm.update(adminSecretForSigning.getBytes());
+			algorithm.update(sbInfo.toString().getBytes());
+			byte infoSignature[] = algorithm.digest();
+			
+			// convert signature to hex:
+			String signature = this.convertToHex(infoSignature);
+			
+			// build final string to base64 encode
+			StringBuilder sbToEncode = new StringBuilder();
+			sbToEncode.append(signature.toString()).append("|").append(sbInfo.toString());
+			BASE64Encoder encoder = new BASE64Encoder();
+			
+			// encode the signature and info with base64
+			String hashedString = encoder.encode(sbToEncode.toString().getBytes());
+			
+			// return the generated session key (KS)
+			return hashedString;
+		} catch (NoSuchAlgorithmException ex)
+		{
+			throw new Exception(ex);
+		}
+	}
+
+	// new function to convert byte array to Hex
+	private String convertToHex(byte[] data) { 
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < data.length; i++) { 
+			int halfbyte = (data[i] >>> 4) & 0x0F;
+			int two_halfs = 0;
+			do { 
+				if ((0 <= halfbyte) && (halfbyte <= 9)) 
+					buf.append((char) ('0' + halfbyte));
+				else 
+					buf.append((char) ('a' + (halfbyte - 10)));
+				halfbyte = data[i] & 0x0F;
+			} while(two_halfs++ < 1);
+		} 
+		return buf.toString();
+	} 
+    
 }
