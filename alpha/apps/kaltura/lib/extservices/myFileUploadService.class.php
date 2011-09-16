@@ -33,7 +33,8 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 	static public function getMediaTypeFromFileExt ( $ext )
 	{
 		// notice that video is checked first since it has precedence over audio (both may have the same ext.)
-		if (in_array($ext, self::$video_file_ext))
+		$ext = strtolower($ext);
+	    if (in_array($ext, self::$video_file_ext))
 			return entry::ENTRY_MEDIA_TYPE_VIDEO;
 		elseif (in_array($ext, self::$image_file_ext))
 			return entry::ENTRY_MEDIA_TYPE_IMAGE;
