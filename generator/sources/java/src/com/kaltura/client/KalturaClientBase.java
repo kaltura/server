@@ -389,6 +389,31 @@ abstract public class KalturaClientBase {
 		return method;
 		
     }
+    
+    public String generateSession(String adminSecretForSigning) throws Exception
+    {
+    	return this.generateSession(adminSecretForSigning, "");
+    }
+    
+    public String generateSession(String adminSecretForSigning, String userId) throws Exception
+    {
+    	return this.generateSession(adminSecretForSigning, userId, KalturaSessionType.USER);
+    }
+    
+    public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type) throws Exception
+    {
+    	return this.generateSession(adminSecretForSigning, userId, type, -1);
+    }
+    
+    public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId) throws Exception
+    {
+    	return this.generateSession(adminSecretForSigning, userId, type, partnerId, 86400);
+    }
+    
+    public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry) throws Exception
+    {
+    	return this.generateSession(adminSecretForSigning, userId, type, partnerId, expiry, "");
+    }
 
 	public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId, int expiry, String privileges) throws Exception
 	{
@@ -400,7 +425,13 @@ abstract public class KalturaClientBase {
 			
 			// build info string
 			StringBuilder sbInfo = new StringBuilder();
-			sbInfo.append(this.kalturaConfiguration.partnerId).append(";").append(";").append(expiry).append(";").append(type.getHashCode()).append(";").append(rand).append(";").append(userId).append(";").append(privileges);
+			sbInfo.append(this.kalturaConfiguration.partnerId).append(";"); // index 0 - partner ID
+			sbInfo.append(this.kalturaConfiguration.partnerId).append(";"); // index 1 - partner pattern - using partner ID
+			sbInfo.append(expiry).append(";"); // index 2 - expiration timestamp
+			sbInfo.append(type.getHashCode()).append(";"); // index 3 - session type
+			sbInfo.append(rand).append(";"); // index 4 - random number
+			sbInfo.append(userId).append(";"); // index 5 - user ID
+			sbInfo.append(privileges); // index 6 - privileges
 			
 			// sign info with SHA1 algorithm
 			MessageDigest algorithm = MessageDigest.getInstance("SHA1");
