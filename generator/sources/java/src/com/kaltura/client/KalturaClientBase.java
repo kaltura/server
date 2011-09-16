@@ -400,7 +400,7 @@ abstract public class KalturaClientBase {
 			
 			// build info string
 			StringBuilder sbInfo = new StringBuilder();
-			sbInfo.append(this.kalturaConfiguration.partnerId).append(";").append(";").append(expiry).append(";").append(type).append(";").append(rand).append(";").append(userId).append(";").append(privileges);
+			sbInfo.append(this.kalturaConfiguration.partnerId).append(";").append(";").append(expiry).append(";").append(type.getHashCode()).append(";").append(rand).append(";").append(userId).append(";").append(privileges);
 			
 			// sign info with SHA1 algorithm
 			MessageDigest algorithm = MessageDigest.getInstance("SHA1");
@@ -420,8 +420,10 @@ abstract public class KalturaClientBase {
 			// encode the signature and info with base64
 			String hashedString = encoder.encode(sbToEncode.toString().getBytes());
 			
+			// remove line breaks in the session string
+			String ks = hashedString.replace("\n", "");
 			// return the generated session key (KS)
-			return hashedString;
+			return ks;
 		} catch (NoSuchAlgorithmException ex)
 		{
 			throw new Exception(ex);
