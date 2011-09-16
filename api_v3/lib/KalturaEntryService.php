@@ -499,7 +499,7 @@ class KalturaEntryService extends KalturaBaseService
     		}
 		}
 		
-		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset, $jobSubType, $resource->getImportJobData());
+		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset, null, $resource->getImportJobData());
 		
 		return $dbAsset;
 	}
