@@ -451,49 +451,6 @@ class KalturaEntryService extends KalturaBaseService
 	}
 	
 	/**
-	 * @param string $url
-	 * @param entry $dbEntry
-	 * @param asset $dbAsset
-	 * @return asset
-	 */
-	protected function attachUrl($url, entry $dbEntry, asset $dbAsset = null)
-	{
-		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
-		{
-			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
-			if (kFile::downloadUrlToFile($url, $entryFullPath))
-				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-			
-			KalturaLog::err("Failed downloading file[$url]");
-			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
-			$dbEntry->save();
-			
-			return null;
-		}
-	
-		if($dbAsset && !($dbAsset instanceof flavorAsset))
-		{
-			$ext = pathinfo($url, PATHINFO_EXTENSION);
-			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-			if (kFile::downloadUrlToFile($url, $entryFullPath))
-			{
-				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-				return $dbAsset;
-			}
-			
-			KalturaLog::err("Failed downloading file[$url]");
-			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
-			$dbAsset->save();
-			
-			return null;
-		}
-		
-		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset);
-		
-		return $dbAsset;
-	}
-	
-	/**
 	 * @param kUrlResource $resource
 	 * @param entry $dbEntry
 	 * @param asset $dbAsset
@@ -507,7 +464,44 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->save();
 		}
 		
-		return $this->attachUrl($resource->getUrl(), $dbEntry, $dbAsset);
+		$url = $resource->getUrl();
+		
+		if (!$resource->forceAsyncDownload())
+		{
+    		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+    		{
+    			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
+    			if (kFile::downloadUrlToFile($url, $entryFullPath))
+    				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+    			
+    			KalturaLog::err("Failed downloading file[$url]");
+    			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+    			$dbEntry->save();
+    			
+    			return null;
+    		}
+    	
+    		if($dbAsset && !($dbAsset instanceof flavorAsset))
+    		{
+    			$ext = pathinfo($url, PATHINFO_EXTENSION);
+    			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
+    			if (kFile::downloadUrlToFile($url, $entryFullPath))
+    			{
+    				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+    				return $dbAsset;
+    			}
+    			
+    			KalturaLog::err("Failed downloading file[$url]");
+    			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_ERROR);
+    			$dbAsset->save();
+    			
+    			return null;
+    		}
+		}
+		
+		kJobsManager::addImportJob(null, $dbEntry->getId(), $this->getPartnerId(), $url, $dbAsset, $jobSubType, $resource->getImportJobData());
+		
+		return $dbAsset;
 	}
 	
 	/**

@@ -28,4 +28,21 @@ class kUrlResource extends kContentResource
 	{
 		$this->url = $url;
 	}
+	
+	/**
+	 * Return import job data to use to import the file from the url
+	 * @return kImportJobData
+	 */
+	public function getImportJobData()
+	{
+	    return null;
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function forceAsyncDownload()
+	{
+	    return false;
+	}
 }

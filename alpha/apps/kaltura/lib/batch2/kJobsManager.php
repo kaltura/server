@@ -804,6 +804,15 @@ class kJobsManager
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
 		
+		if (is_null($subType)) {
+    		if (stripos($entryUrl, 'sftp:') === 0) {
+    		    $subType = kFileTransferMgrType::SFTP;
+    		}
+    	    if (stripos($entryUrl, 'scp:') === 0) {
+    		    $subType = kFileTransferMgrType::SCP;
+    		}
+		}
+		
 		if (!$jobData) {
  		    $jobData = new kImportJobData();
 		}

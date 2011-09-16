@@ -269,6 +269,10 @@ class KalturaBatchJob extends KalturaBaseJob implements IFilterable
 				$this->data = new KalturaImportJobData();
 				break;
 				
+			case 'kSshImportJobData':
+				$this->data = new KalturaSshImportJobData();
+				break;
+				
 			case 'kPostConvertJobData':
 				$this->data = new KalturaPostConvertJobData();
 				break;

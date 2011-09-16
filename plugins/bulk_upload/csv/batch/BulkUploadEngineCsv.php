@@ -117,8 +117,18 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			
 		if($bulkUploadResult->entryId && $bulkUploadResult->entryStatus == KalturaEntryStatus::IMPORT)
 		{
-			$resource = new KalturaUrlResource();
-			$resource->url = $bulkUploadResult->url;
+		    $url = $bulkUploadResult->url;
+		    $isSsh = (stripos($url, 'sftp:') === 0) || (stripos($url, 'scp:') === 0);
+		    if ($isSsh) {
+		        $resource = new KalturaSshUrlResource();
+		        $resource->privateKey = $bulkUploadResult->sshPrivateKey;
+		        $resource->publicKey = $bulkUploadResult->sshPublicKey;
+		        $resource->keyPassphrase = $bulkUploadResult->sshKeyPassphrase;
+		    }
+		    else {
+		        $resource = new KalturaUrlResource();
+		    }
+			$resource->url = $url;
 			
 			$this->impersonate();
 			$this->kClient->media->addContent($bulkUploadResult->entryId, $resource);
@@ -335,7 +345,7 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			$bulkUploadResult->errorDescription = "Exeeded max records count per bulk";
 		}
 		
-		if(! $this->isUrl($bulkUploadResult->url)) // validates the url
+		if(!$this->isUrl($bulkUploadResult->url)) // validates the url
 		{
 			$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
 			$bulkUploadResult->errorDescription = "Invalid url '$bulkUploadResult->url' on line $this->lineNumber";
@@ -353,11 +363,24 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 			$bulkUploadResult->errorDescription = "Invalid schedule end date '$scheduleEndDate' on line $this->lineNumber";
 		}
 		
+	    $privateKey = isset($bulkUploadResult->sshPrivateKey) ? $bulkUploadResult->sshPrivateKey : false;
+		$publicKey = isset($bulkUploadResult->sshPublicKey) ? $bulkUploadResult->sshPublicKey : false;
+		
+		if (empty($privateKey) & !empty($publicKey)) {
+		    $bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+			$bulkUploadResult->errorDescription = "Missing SSH private key on line  $this->lineNumber";
+		
+		}
+		else if (!empty($privateKey) & empty($publicKey)) {
+		    $bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
+			$bulkUploadResult->errorDescription = "Missing SSH public key on line $this->lineNumber";
+		}
+		
 		if($bulkUploadResult->entryStatus == KalturaEntryStatus::ERROR_IMPORTING)
 		{
 			$this->addBulkUploadResult($bulkUploadResult);
 			return;
-		}
+		}		
 		
 		$bulkUploadResult->scheduleStartDate = self::parseFormatedDate($scheduleStartDate);
 		$bulkUploadResult->scheduleEndDate = self::parseFormatedDate($scheduleEndDate);
@@ -395,6 +418,9 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$ret[] = 'scheduleEndDate';
 	    $ret[] = 'thumbnailUrl';
 	    $ret[] = 'partnerData';
+	    $ret[] = 'sshPrivateKey';
+	    $ret[] = 'sshPublicKey';
+	    $ret[] = 'sshKeyPassphrase';
 			
 	    return $ret;
 	}

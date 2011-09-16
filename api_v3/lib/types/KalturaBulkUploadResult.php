@@ -184,6 +184,24 @@ class KalturaBulkUploadResult extends KalturaObject
      * @var KalturaBulkUploadPluginDataArray
      */
     public $pluginsData;
+    
+    
+    /**
+     * @var string
+     */
+    public $sshPrivateKey;
+    
+    /**
+     * @var string
+     */
+    public $sshPublicKey;
+    
+    /**
+     * @var string
+     */
+    public $sshKeyPassphrase;
+    
+    
        
 	private static $mapBetweenObjects = array
 	(
@@ -211,6 +229,9 @@ class KalturaBulkUploadResult extends KalturaObject
 		"thumbnailSaved",
 	    "partnerData",
 	    "errorDescription",
+	    "sshPrivateKey",
+	    "sshPublicKey",
+	    "sshKeyPassphrase",
 	);
 	
 	public function getMapBetweenObjects()

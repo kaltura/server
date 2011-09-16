@@ -193,12 +193,13 @@ class FlavorAssetService extends KalturaAssetService
 	/**
 	 * @param flavorAsset $flavorAsset
 	 * @param string $url
+	 * @param kImportJobData $importJobData
 	 */
-	protected function attachUrl(flavorAsset $flavorAsset, $url)
+	protected function attachUrl(flavorAsset $flavorAsset, $url, kImportJobData $importJobData = null)
 	{
 		$flavorAsset->save();
 		
-		kJobsManager::addImportJob(null, $flavorAsset->getEntryId(), $this->getPartnerId(), $url, $flavorAsset);
+		kJobsManager::addImportJob(null, $flavorAsset->getEntryId(), $this->getPartnerId(), $url, $flavorAsset, null, $importJobData);
     }
     
 	/**
@@ -207,7 +208,7 @@ class FlavorAssetService extends KalturaAssetService
 	 */
 	protected function attachUrlResource(flavorAsset $flavorAsset, kUrlResource $contentResource)
 	{
-    	$this->attachUrl($flavorAsset, $contentResource->getUrl());
+    	$this->attachUrl($flavorAsset, $contentResource->getUrl(), $contentResource->getImportJobData());
     }
     
 	/**
@@ -353,6 +354,7 @@ class FlavorAssetService extends KalturaAssetService
     	switch($contentResource->getType())
     	{
 			case 'kUrlResource':
+			case 'kSshUrlResource':
 				return $this->attachUrlResource($flavorAsset, $contentResource);
 				
 			case 'kLocalFileResource':

@@ -10,6 +10,10 @@
  */ 
 class BulkUploadResult extends BaseBulkUploadResult
 {
+    const CUSTOM_DATA_SSH_PRIVATE_KEY = 'sshPrivateKey';
+    const CUSTOM_DATA_SSH_PUBLIC_KEY = 'sshPublicKey';
+    const CUSTOM_DATA_SSH_KEY_PASSPHRASE = 'sshKeyPassphrase';
+        
 	private $aEntry = null;
 	
 	public function getEntry()
@@ -75,4 +79,15 @@ class BulkUploadResult extends BaseBulkUploadResult
 			
 		return parent::setPluginsData(json_encode($v));
 	} // setPluginsData()
+	
+	
+	public function getSshPrivateKey()		{return $this->getFromCustomData(self::CUSTOM_DATA_SSH_PRIVATE_KEY);}
+	public function setSshPrivateKey($v)	{$this->putInCustomData(self::CUSTOM_DATA_SSH_PRIVATE_KEY, $v);}
+	
+    public function getSshPublicKey()		{return $this->getFromCustomData(self::CUSTOM_DATA_SSH_PUBLIC_KEY);}
+	public function setSshPublicKey($v)	    {$this->putInCustomData(self::CUSTOM_DATA_SSH_PUBLIC_KEY, $v);}
+	
+    public function getSshKeyPassphrase()	{return $this->getFromCustomData(self::CUSTOM_DATA_SSH_KEY_PASSPHRASE);}
+	public function setSshKeyPassphrase($v)	{$this->putInCustomData(self::CUSTOM_DATA_SSH_KEY_PASSPHRASE, $v);}
+	
 }

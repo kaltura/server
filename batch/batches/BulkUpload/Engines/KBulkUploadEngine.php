@@ -164,7 +164,7 @@ abstract class KBulkUploadEngine
 	{
 		$str = KCurlWrapper::encodeUrl($str);
 		
-		$strRegex = "^(?P<protocol>(https?)|(ftp)):\\/\\/?" .
+		$strRegex = "^(?P<protocol>(https?)|(ftp)|(sftp)|(scp)):\\/\\/?" .
 					"(?P<credentials>([ 0-9a-zA-Z_!~*'().&=+$%-\\[\\]]+:)?[ 0-9a-zA-Z_!~*'().&=+$%-\\[\\]]+@)?" . //user@
 					"(?P<domain>([0-9]{1,3}\\.){3}[0-9]{1,3}" . // IP- 199.194.52.184
 					"|" . // allows either IP or domain
