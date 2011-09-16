@@ -32,15 +32,27 @@ public class Kaltura {
 		System.out.print("\nSample code finished successfully.");
 	}
 
-	private KalturaClient getKalturaClient(int partnerId, String secret, boolean isAdmin) throws KalturaApiException
+	private KalturaClient getKalturaClient(int partnerId, String adminSecret, boolean isAdmin) throws KalturaApiException
 	{
 		KalturaConfiguration config = new KalturaConfiguration();
 		config.setPartnerId(partnerId);
 		config.setEndpoint("http://www.kaltura.com");
 		KalturaClient client = new KalturaClient(config);
 		String userId="1"; 
-		String ks = client.getSessionService().start(secret, userId, (isAdmin ? KalturaSessionType.ADMIN : KalturaSessionType.USER));
-		client.setSessionId(ks);
+		//String ks = client.getSessionService().start(secret, userId, (isAdmin ? KalturaSessionType.ADMIN : KalturaSessionType.USER));
+		KalturaSessionType type = (isAdmin ? KalturaSessionType.ADMIN: KalturaSessionType.USER);
+
+		try
+		{
+			String ks = client.generateSession(adminSecret, userId, type, partnerId, 86400, "");
+			System.out.print("generated KS locally: ["+ks+"]");
+			client.setSessionId(ks);
+		}
+		catch(Exception ex)
+		{
+			throw new KalturaApiException();
+		}
+		
 		return client;
 	}
 	
@@ -78,7 +90,7 @@ public class Kaltura {
 	{
 		try {
 			System.out.print("\nUploading test video...");
-			KalturaClient client = getKalturaClient(KalturaTestConfig.PARTNER_ID, KalturaTestConfig.SECRET, false);			
+			KalturaClient client = getKalturaClient(KalturaTestConfig.PARTNER_ID, KalturaTestConfig.ADMIN_SECRET, false);			
 			File up = new File(KalturaTestConfig.UPLOAD_FILE);
 			String token = client.getBaseEntryService().upload(up);
 			KalturaMediaEntry entry = new KalturaMediaEntry();
