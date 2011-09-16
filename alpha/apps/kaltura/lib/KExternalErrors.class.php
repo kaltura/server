@@ -66,8 +66,10 @@ class KExternalErrors
 		
 		header("X-Kaltura:error-$errorCode");
 		header("X-Kaltura-App: exiting on error $errorCode - $description");
-		
-		requestUtils::sendCachingHeaders(60);
+
+		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED && 
+			$errorCode != self::IP_COUNTRY_BLOCKED)
+			requestUtils::sendCachingHeaders(60);
 		
 		die();
 	}
