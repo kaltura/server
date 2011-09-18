@@ -122,6 +122,16 @@ class KalturaFlavorParams extends KalturaAssetParams
 	 */
 	public $format;
 	
+	/**
+	 * @var int
+	 */
+	public $arProcessingMode;
+
+	/**
+	 * @var int
+	 */
+	public $forceMult16;
+
 	private static $map_between_objects = array
 	(
 		"videoCodec",
@@ -142,6 +152,8 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"operators",
 		"engineVersion",
 		"format",
+		"arProcessingMode",
+		"forceMult16",
 	);
 	
 	public function getMapBetweenObjects()
