@@ -91,4 +91,10 @@ class flavorParams extends assetParams
 
 	public function getClipOffset()		{return $this->getFromCustomData('ClipOffset');}
 	public function getClipDuration()	{return $this->getFromCustomData('ClipDuration');}
+
+	public function setArProcessingMode($v)	{$this->putInCustomData('ArProcessingMode', $v);}
+	public function getArProcessingMode()	{return $this->getFromCustomData('ArProcessingMode', null, 0);}
+	
+	public function setForceMult16($v)	{$this->putInCustomData('ForceMult16', $v);}
+	public function getForceMult16()	{return $this->getFromCustomData('ForceMult16', null, 1);}
 }
