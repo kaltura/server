@@ -39,7 +39,7 @@ class PartnerController extends Zend_Controller_Action
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
 				$config->partnerPackageClassOfService = $form->getValue('partner_package_class_of_service');
-				$config->partnerPackageVertical = $form->getValue('vertical_clasiffication');
+				$config->verticalClasiffication = $form->getValue('vertical_clasiffication');
 				$config->storageDeleteFromKaltura = true;
 				$config->storageServePriority = Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST;
 				$systemPartnerPlugin->systemPartner->updateConfiguration('{1:result:id}', $config);
