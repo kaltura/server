@@ -1,4 +1,6 @@
 #!/bin/bash
+source ../../../configurations/system.ini
+
 #
 # Init file for searchd
 #
@@ -15,11 +17,11 @@
 # public domain
 
 BASE_PATH=@SPHINX_BIN_DIR@
-PID_FILE=@BASE_DIR@/sphinx/searchd.pid
-CONFIG_FILE=@APP_DIR@/configurations/sphinx/kaltura.conf
+PID_FILE=$BASE_DIR/sphinx/searchd.pid
+CONFIG_FILE=$APP_DIR/configurations/sphinx/kaltura.conf
 
 EXEC_PATH=$BASE_PATH
-LOG_PATH=@LOG_DIR@/sphinx
+LOG_PATH=$LOG_DIR/sphinx
 
 RETVAL=0
 prog="searchd"
