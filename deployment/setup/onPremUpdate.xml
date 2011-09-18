@@ -46,7 +46,7 @@
     <!-- ============================================  -->
     <!-- Target: replace generate config file          -->
     <!-- ============================================  -->
-    <target name="replaceGenerateConfig">
+    <target name="replaceGenerateConfig" depends="replaceNonRootFiles">
          <echo msg="replacing generate config file if needed..." />
          <property name="properties.gener"  value="null" override="false" />
          <available file="${installationLoc}${installationDir}/package/app/app/generator/config.template.dev.ini" property="properties.gener" />
@@ -65,7 +65,7 @@
     <!-- ============================================  -->
     <!-- Target: Update                                -->
     <!-- ============================================  -->
-    <target name="update" depends="replaceNonRootFiles,restartApache,clearCache">
+    <target name="update" depends="replaceNonRootFiles,restartApache,clearCache,replaceGenerateConfig">
          <echo msg="update..." />
          <exec command="php updateConfigFiles.php -s" dir="${installationLoc}${installationDir}" />
     </target>
