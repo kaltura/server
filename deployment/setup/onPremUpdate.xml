@@ -43,6 +43,24 @@
          <copy file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh" tofile="/opt/kaltura/app/plugins/sphinx_search/scripts/watch.daemon.sh" overwrite="true"/>
     </target>
     
+    <!-- ============================================  -->
+    <!-- Target: replace generate config file          -->
+    <!-- ============================================  -->
+    <target name="replaceGenerateConfig">
+         <echo msg="replacing generate config file if needed..." />
+         <property name="properties.gener"  value="null" override="false" />
+         <available file="opt/kaltura/app/generator/config.template.dev.ini" property="properties.gener" />
+         <!--echo message="value is ${properties.gener}" /-->
+
+         <if>
+              <equals arg1="${properties.gener}" arg2="true" />
+         <then>
+              <echo msg="replacing generate config file..." />
+			  <copy file="opt/kaltura/app/generator/config.template.dev.ini" tofile="opt/kaltura/app/generator/config.ini" overwrite="true"/>
+         </then>
+         </if>
+    </target>
+    
     
     <!-- ============================================  -->
     <!-- Target: Update                                -->
