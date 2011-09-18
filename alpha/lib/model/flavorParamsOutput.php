@@ -66,10 +66,9 @@ class flavorParamsOutput extends assetParamsOutput
 	public function setClipDuration($v)	{$this->putInCustomData('ClipDuration', $v);}
 	public function getClipDuration()	{return $this->getFromCustomData('ClipDuration');}
 
-
-	public function setAspectRatioProcessingMode($v)	{$this->putInCustomData('ArProcessingMode', $v);}
-	public function getAspectRatioProcessingMode()	{return $this->getFromCustomData('ArProcessingMode', null, 0);}
+	public function setAspectRatioProcessingMode($v)	{$this->putInCustomData('AspectRatioProcessingMode', $v);}
+	public function getAspectRatioProcessingMode()	{return $this->getFromCustomData('AspectRatioProcessingMode', null, 0);}
 	
-	public function setForceMultiplyBy16($v)	{$this->putInCustomData('ForceMult16', $v);}
-	public function getForceMultiplyBy16()	{return $this->getFromCustomData('ForceMult16', null, 1);}
+	public function setForceFrameToMultiplication16($v)	{$this->putInCustomData('ForceFrameToMultiplication16', $v);}
+	public function getForceFrameToMultiplication16()	{return $this->getFromCustomData('ForceFrameToMultiplication16', null, 1);}
 }
