@@ -1,4 +1,6 @@
 #!/bin/bash
+source ../configurations/system.ini
+
 #
 #       /etc/rc.d/init.d/test
 # serviceBatchSingle      This shell script takes care of starting and stopping a Kaltura Batch Service (singleton mode)
@@ -12,11 +14,10 @@
 . /etc/rc.d/init.d/functions
 
 # Directory containing the batchers' php files
-BATCH_DIR="@APP_DIR@/alpha/batch" 
+BATCH_DIR="$APP_DIR/alpha/batch" 
 #BATCH_DIR="/opt/kaltura"
-LOG_DIR="@LOG_DIR@" 
 # "/opt/kaltura"
-RULES_PATH="@APP_DIR@"
+RULES_PATH="$APP_DIR"
 
 # Contains the batchers list, with true/false values
 RULES_FILE="$RULES_PATH/rules.cfg"
@@ -58,8 +59,8 @@ start() {
 		echo "Service $FILE_NAME already running"
 		return 1
 	else
-		echo "@PHP_BIN@ $BATCH_DIR/batchRunner.php "@PHP_BIN@ $BATCH_DIR/$FILE_NAME.php" $LOG_DIR/$HOSTNAME-$FILE_NAME.log >> $LOG_DIR/$HOSTNAME-batchRunner.log  2>&1 &"
-		@PHP_BIN@ $BATCH_DIR/batchRunner.php "@PHP_BIN@ $BATCH_DIR/$FILE_NAME.php" $LOG_DIR/$HOSTNAME-$FILE_NAME.log >> $LOG_DIR/$HOSTNAME-batchRunner.log  2>&1 &
+		echo "$PHP_BIN $BATCH_DIR/batchRunner.php "$PHP_BIN $BATCH_DIR/$FILE_NAME.php" $LOG_DIR/$HOSTNAME-$FILE_NAME.log >> $LOG_DIR/$HOSTNAME-batchRunner.log  2>&1 &"
+		$PHP_BIN $BATCH_DIR/batchRunner.php "$PHP_BIN $BATCH_DIR/$FILE_NAME.php" $LOG_DIR/$HOSTNAME-$FILE_NAME.log >> $LOG_DIR/$HOSTNAME-batchRunner.log  2>&1 &
 		if [ "$?" -eq 0 ]; then
 			echo_success
 			echo

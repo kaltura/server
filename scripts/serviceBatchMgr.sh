@@ -1,4 +1,6 @@
 #!/bin/bash
+source ../configurations/system.ini
+
 #
 # serviceBatchMgr      This shell script takes care of starting and stopping a Kaltura Batch Service
 #
@@ -9,8 +11,8 @@
 #. /etc/rc.d/init.d/functions
 
 # Directory containing the batchers' php files
-BATCHDIR=@APP_DIR@/batch
-LOGDIR="@LOG_DIR@" 
+BATCHDIR=$APP_DIR/batch
+LOGDIR="$LOG_DIR" 
 
 BATCHEXE=KGenericBatchMgr.class.php
 # The batch service filename without extensions
@@ -84,12 +86,12 @@ start() {
 }
 
 start_scheduler() {
-		echo "@PHP_BIN@ $BATCHEXE @PHP_BIN@ $CONFIG_FILE >> ${LOGDIR}/KGenericBatchMgr.log 2>&1 &"
+		echo "$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/KGenericBatchMgr.log 2>&1 &"
                 if [ $default_config -eq 1 ]; then
                    echo "Warning : using default batch_config.ini !"
                 fi
                 cd $BATCHDIR
-		@PHP_BIN@ $BATCHEXE @PHP_BIN@ $CONFIG_FILE >> ${LOGDIR}/KGenericBatchMgr.log 2>&1 &
+		$PHP_BIN $BATCHEXE $PHP_BIN $CONFIG_FILE >> ${LOGDIR}/KGenericBatchMgr.log 2>&1 &
                 if [ "$?" -eq 0 ]; then
                         echo_success
                         echo
