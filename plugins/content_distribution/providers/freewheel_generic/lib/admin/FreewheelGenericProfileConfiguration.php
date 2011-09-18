@@ -17,6 +17,28 @@ class Form_FreewheelGenericProfileConfiguration extends Form_ConfigurableProfile
 		));
 	}
 	
+	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
+	{
+		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
+		
+		return $object;
+	}
+	
+	public function populateFromObject($object, $add_underscore = true)
+	{
+		parent::populateFromObject($object, $add_underscore);
+		
+		if ($object->replaceGroup)
+			$this->setDefault('replace_group', 'true');
+		else 
+			$this->setDefault('replace_group', 'false');
+			
+		if ($object->replaceAirDates)
+			$this->setDefault('replace_air_dates', 'true');
+		else 
+			$this->setDefault('replace_air_dates', 'false');
+	}	
+	
 	protected function addProviderElements()
 	{
 		$element = new Zend_Form_Element_Hidden('providerElements');
@@ -45,8 +67,26 @@ class Form_FreewheelGenericProfileConfiguration extends Form_ConfigurableProfile
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('select', 'replace_group', array(
+			'label'			=> 'Replace Group:',
+			'filters'		=> array('StringTrim'),
+			'multiOptions'	=> array(
+				'true' => 'true',
+				'false' => 'false'
+			)
+		));
+		
+		$this->addElement('select', 'replace_air_dates', array(
+			'label'			=> 'Replace Air Dates:',
+			'filters'		=> array('StringTrim'),
+			'multiOptions'	=> array(
+				'true' => 'true',
+				'false' => 'false'
+			)
+		));
+		
 		$this->addDisplayGroup(
-			array('apikey', 'email', 'sftp_login', 'sftp_pass'), 
+			array('apikey', 'email', 'sftp_login', 'sftp_pass', 'replace_group', 'replace_air_dates'), 
 			'general', 
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);

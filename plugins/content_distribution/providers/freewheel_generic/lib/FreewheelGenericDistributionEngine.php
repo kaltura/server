@@ -108,8 +108,6 @@ class FreewheelGenericDistributionEngine extends DistributionEngine implements
 		
 		$feed = new FreewheelGenericFeedHelper('freewheel_template.xml', $distributionProfile, $providerData);
 		$xml = $feed->getXml();
-		var_dump($xml);
-		die;
 		$result = $this->upload($entryId.".xml", $xml, $distributionProfile->apikey);
 	}
 	
