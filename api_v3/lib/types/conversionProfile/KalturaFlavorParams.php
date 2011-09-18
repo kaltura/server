@@ -130,7 +130,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 	/**
 	 * @var int
 	 */
-	public $forceMultiplyBy16;
+	public $forceFrameToMultiplication16;
 
 	private static $map_between_objects = array
 	(
@@ -153,7 +153,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"engineVersion",
 		"format",
 		"aspectRatioProcessingMode",
-		"forceMultiplyBy16",
+		"forceFrameToMultiplication16",
 	);
 	
 	public function getMapBetweenObjects()
