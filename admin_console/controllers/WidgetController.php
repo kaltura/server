@@ -15,11 +15,6 @@ class WidgetController extends Zend_Controller_Action
 		$form->setAction($action);
 		$form->populate($request->getParams());
 		
-		$client = Infra_ClientHelper::getClient();
-		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
-		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package', true, 'All Service Editions');
-		
 		$uiConfFilter = $this->getUiConfFilterFromRequest($request);
 		$uiConfFilter->orderBy = Kaltura_Client_Enum_UiConfOrderBy::CREATED_AT_DESC;
 		

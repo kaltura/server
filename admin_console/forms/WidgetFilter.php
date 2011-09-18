@@ -1,5 +1,5 @@
 <?php 
-class Form_WidgetFilter extends Form_PartnerFilter
+class Form_WidgetFilter extends Form_PartnerBaseFilter
 {
 	public function init()
 	{
@@ -8,7 +8,7 @@ class Form_WidgetFilter extends Form_PartnerFilter
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
 			'none' => 'None',
-			'by-uiconf-id' => 'Widget ID', 
+			'by-uiconf-id' => 'UI Conf ID',  
 			'by-partner-id' => 'Publisher ID',
 			'by-partner-name' => 'Publisher Name',
 		));

@@ -172,7 +172,7 @@ class GenericDistributionProviderConfigureAction extends KalturaAdminConsolePlug
 				if ($request->isPost())
 				{
 					$form->populate($request->getPost());
-					$genericDistributionProvider = $form->getObject("Kaltura_Client_ContentDistribution_Type_GenericDistributionProviderAction", $request->getPost());
+					$genericDistributionProvider = $form->getObject("Kaltura_Client_ContentDistribution_Type_GenericDistributionProvider", $request->getPost());
 					
 					if(!$genericDistributionProvider->partnerId)
 						$genericDistributionProvider->partnerId = 0;

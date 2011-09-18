@@ -1,33 +1,16 @@
 <?php 
-class Form_PartnerFilter extends Zend_Form
+class Form_PartnerFilter extends Form_PartnerBaseFilter
 {
 	public function init()
 	{
-		$this->setMethod('post');
+		parent::init();
 		
-		$this->setDecorators(array(
-			'FormElements', 
-			'Form',
-			array('HtmlTag', array('tag' => 'fieldset'))
-		));
-		
-		// filter type
-		$this->addElement('select', 'filter_type', array(
-			'required' 		=> true,
-			'multiOptions' 	=> array(
+		$filterType = $this->getElement('filter_type');
+		$filterType->setMultiOptions(array(
 				'none' => 'None', 
 				'byid' => 'Publisher ID',
 				'byname' => 'Publisher Name',
 				'free' => 'Free-form text'
-			),
-			'decorators' => array('ViewHelper', 'Label'),
-		));
-		
-		// search input
-		$this->addElement('text', 'filter_input', array(
-			'required' 		=> true,
-			'filters'		=> array('StringTrim'),
-			'decorators' 	=> array('ViewHelper', array('HtmlTag', array('tag' => 'div', 'id' => 'filter_text')))
 		));
 		
 		// active status
@@ -50,24 +33,10 @@ class Form_PartnerFilter extends Zend_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
 		));
 		
-		$this->addElement('text', 'filter_input_help', array(
-			'decorators' => array(
-				array('HtmlTag', array('tag' => 'div', 'class' => 'help', 'placement' => 'append')),
-			)
-		));
 		
 		$this->addElement('select', 'partner_package', array(		
 			'filters'		=> array('StringTrim'),
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
-		));
-		
-		$this->addDisplayGroup(array('filter_type', 'filter_input', 'filter_input_help'), 'filter_type_group', array(
-			'description' => 'partner-usage filter by',
-			'decorators' => array(
-				array('Description', array('tag' => 'legend', 'class' => 'partner_filter')), 
-				'FormElements', 
-				'Fieldset'
-			)
 		));
 		
 		$this->addDisplayGroup(array('include_active', 'include_blocked', 'include_removed'), 'statuses', array(
@@ -88,12 +57,5 @@ class Form_PartnerFilter extends Zend_Form
 			)
 		));
 		
-		// submit button
-		$this->addElement('button', 'cmdSubmit', array(
-			'type' => 'submit',
-			'id' => 'do_filter',
-			'label'		=> 'partner-usage filter search',
-			'decorators' => array('ViewHelper'),
-		));
 	}
 }
