@@ -3,6 +3,7 @@
     <property name="builddir" value="${ws}/phing" />
     <property name="srcdir" value="${sdir}" />
     <property name="testdir" value="${tdir}" />
+    <property name="server"  value="hudsontest2.kaltura.dev" override="true" />
 
     <target name="clean">
         <echo msg="Clean..." />
@@ -16,7 +17,7 @@
     
     <target name="generateClients">
         <echo msg="Generating clients..." />
-        <exec command="php ${sdir}/generator/generate.sh" escape="false"/>
+        <exec command=".${sdir}/generator/generate.sh" escape="false"/>
     </target>
     
     <target name="prepare">
@@ -81,4 +82,19 @@
         <echo msg="PHP Unit Unit Tests..." />
     	<exec command="phpunit --log-junit ${builddir}/logs/phpunitUnitTests.xml --coverage-clover ${builddir}/logs/coverage/cloverUnitTests.xml --coverage-html ${builddir}/logs/coverage/unitTests/ ${tdir}" logoutput="true"/>
     </target>
+    
+    <!-- change the configuration file -->
+    <target name="changeConfig">
+        <echo msg="changing the configuration file..." />
+        <copy file="/opt/kaltura/app/admin_console/configs/application.ini" tofile="/opt/kaltura/app/admin_console/configs/application.ini.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="settings.serviceUrl = (\w+)" replace="settings.serviceUrl = http://${server}/"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="/opt/kaltura/app/admin_console/configs/application.ini.1" tofile="/opt/kaltura/app/admin_console/configs/application.ini" overwrite="true"/>
+    </target>
+    
 </project>
