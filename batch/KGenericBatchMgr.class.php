@@ -20,7 +20,7 @@ else if(isset($_SERVER['PHP_PEAR_PHP_BIN']))
 	$phpPath = $_SERVER['PHP_PEAR_PHP_BIN'];
 }
 	
-$iniFile = dirname ( __FILE__ ) . "/batch_config.ini";		// should be the full file path
+$iniFile = dirname ( __FILE__ ) . "/../configurations/batch.ini";		// should be the full file path
 
 if(isset($argc) && $argc > 2)
 {
