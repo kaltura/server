@@ -213,6 +213,20 @@ require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.D
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
-KalturaLog::setLogger(sfContext::getInstance()->getLogger());
+
+// Logger
+$loggerConfigPath = realpath(dirname(__FILE__) . "/../configurations/logger.ini");
+try // we don't want to fail when logger is not configured right
+{
+	$config = new Zend_Config_Ini($loggerConfigPath);
+	$ps2 = $config->ps2;
+	KalturaLog::initLog($ps2);
+	kLog::setLogger(KalturaLog::getInstance());
+}
+catch(Zend_Config_Exception $ex)
+{
+	$config = null;
+}
+
 ActKeyUtils::checkCurrent();
 sfContext::getInstance()->getController()->dispatch();
