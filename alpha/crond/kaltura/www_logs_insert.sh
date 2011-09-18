@@ -1,4 +1,5 @@
 #!/bin/bash
+source ../../../configurations/system.ini
 
 cd /opt/kaltura/logs
 

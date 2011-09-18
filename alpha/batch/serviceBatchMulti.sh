@@ -1,4 +1,6 @@
 #!/bin/bash
+source ../../configurations/system.ini
+
 #
 # serviceBatchMulti      This shell script takes care of starting and stopping a Kaltura Batch Service (multiprocess mode)
 #

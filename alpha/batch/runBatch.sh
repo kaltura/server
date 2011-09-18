@@ -1,4 +1,6 @@
 #!/bin/bash
+source ../../configurations/system.ini
+
 # $1 is the action (start|stop|restart)
 # $2 is the batch name (optional) 
 cd $(dirname $0)

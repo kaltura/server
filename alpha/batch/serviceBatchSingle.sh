@@ -1,4 +1,6 @@
 #!/bin/bash
+source ../../configurations/system.ini
+
 #
 # serviceBatchSingle      This shell script takes care of starting and stopping a Kaltura Batch Service (singleton mode)
 #
@@ -6,7 +8,6 @@
 #
 # chkconfig: 2345 13 87
 # description: Kaltura Batch
-
 source kaltura_env.sh
 
 # Directory containing the batchers' php files

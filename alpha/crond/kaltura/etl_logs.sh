@@ -1,4 +1,6 @@
 #!/bin/bash
+source ../../../configurations/system.ini
+
 DWHSERV=pa-reports
 WHEN=$(date +%F)
 KALTURALOGS="/opt/kaltura/logs"
