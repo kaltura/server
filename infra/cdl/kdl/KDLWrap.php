@@ -214,6 +214,10 @@ KalturaLog::log(__METHOD__."==>\n");
 			$flavor->setHeight($target->_video->_height);
 			$flavor->setFrameRate($target->_video->_frameRate);
 			$flavor->setGopSize($target->_video->_gop);
+			if($target->_video->_arProcessingMode)
+				$flavor->setAspectRatioProcessingMode($target->_video->_arProcessingMode);
+			if($target->_video->_forceMult16)
+				$flavor->setForceFrameToMultiplication16($target->_video->_forceMult16);
 		}
 
 		if($target->_audio) {
@@ -326,7 +330,9 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 			$kdlFlavor->_video->_frameRate = $cdlFlavor->getFrameRate();
 			$kdlFlavor->_video->_gop = $cdlFlavor->getGopSize();
 			$kdlFlavor->_isTwoPass = $cdlFlavor->getTwoPass();
-	//		$flavor->_video->_dar = $api->getVideoDar();
+			$kdlFlavor->_video->_arProcessingMode = $cdlFlavor->getAspectRatioProcessingMode();
+			$kdlFlavor->_video->_forceMult16 = $cdlFlavor->getForceFrameToMultiplication16();
+			//		$flavor->_video->_dar = $api->getVideoDar();
 			if($kdlFlavor->_video->IsDataSet()==false)
 				$kdlFlavor->_video = null;
 		}
