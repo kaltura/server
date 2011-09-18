@@ -1,0 +1,63 @@
+<?xml version='1.0'?>
+<TestCaseData testCaseName='FlavorParamsOutputServiceTest'>
+<TestProcedureData testProcedureName='testGet'>
+	<TestCaseData testCaseInstanceName='testGet with data set #0'>
+		<Input name = 'id' type = 'int' key = ''/>
+		<OutputReference name = 'output' type = 'KalturaFlavorParamsOutput' key = 'object key'>
+			<name></name>
+			<systemName></systemName>
+			<description></description>
+			<tags></tags>
+			<requiredPermissions>KalturaStringArray</requiredPermissions>
+			<sourceRemoteStorageProfileId></sourceRemoteStorageProfileId>
+			<videoCodec>KalturaVideoCodec</videoCodec>
+			<videoBitrate></videoBitrate>
+			<audioCodec>KalturaAudioCodec</audioCodec>
+			<audioBitrate></audioBitrate>
+			<audioChannels></audioChannels>
+			<audioSampleRate></audioSampleRate>
+			<width></width>
+			<height></height>
+			<frameRate></frameRate>
+			<gopSize></gopSize>
+			<conversionEngines></conversionEngines>
+			<conversionEnginesExtraParams></conversionEnginesExtraParams>
+			<twoPass></twoPass>
+			<deinterlice></deinterlice>
+			<rotate></rotate>
+			<operators></operators>
+			<engineVersion></engineVersion>
+			<format>KalturaContainerFormat</format>
+			<flavorParamsId></flavorParamsId>
+			<commandLinesStr></commandLinesStr>
+			<flavorParamsVersion></flavorParamsVersion>
+			<flavorAssetId></flavorAssetId>
+			<flavorAssetVersion></flavorAssetVersion>
+			<readyBehavior></readyBehavior>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testListAction'>
+	<TestCaseData testCaseInstanceName='testListAction with data set #0'>
+		<Input name = 'filter' type = 'KalturaFlavorParamsOutputFilter' key = ''>
+			<orderBy></orderBy>
+			<advancedSearch>KalturaSearchItem</advancedSearch>
+			<systemNameEqual></systemNameEqual>
+			<systemNameIn></systemNameIn>
+			<isSystemDefaultEqual></isSystemDefaultEqual>
+			<tagsEqual></tagsEqual>
+			<formatEqual></formatEqual>
+			<flavorParamsIdEqual></flavorParamsIdEqual>
+			<flavorParamsVersionEqual></flavorParamsVersionEqual>
+			<flavorAssetIdEqual></flavorAssetIdEqual>
+			<flavorAssetVersionEqual></flavorAssetVersionEqual>
+		</Input>
+		<Input name = 'pager' type = 'KalturaFilterPager' key = ''>
+			<pageSize></pageSize>
+			<pageIndex></pageIndex>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaFlavorParamsOutputListResponse' key = 'object key'>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+</TestCaseData>
