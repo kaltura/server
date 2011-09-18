@@ -203,6 +203,8 @@ include_once("KDLCommon.php");
 			   $_gop, //=KDLConstants::DefaultGOP;
 			   $_rotation,
 			   $_scanType=0; // 0:progressive, 1:interlaced
+		public $_arProcessingMode = 0; //0: fix mode (original), 1: preserve ar (relevant when both wid and hgt are set)
+		public $_forceMult16 = 1;
 			   
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		
