@@ -59,6 +59,9 @@ class executeplaylistAction extends defPartnerservices2Action
 
 	protected function getObjectPrefix () { return "entries"; } 
 
+	protected function partnerGroup2() {return  kCurrentContext::$ks_partner_id . ',0';}
+	
+	protected function kalturaNetwork2() {return null;}
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser , $create_cachekey=false)
 	{
@@ -119,7 +122,7 @@ class executeplaylistAction extends defPartnerservices2Action
 		if ($this->isAdmin())
 			myPlaylistUtils::setIsAdminKs(true);
 
-		$entry_list = myPlaylistUtils::executePlaylistById( $partner_id , $playlist_id , $extra_filters , $detailed );
+		$entry_list = myPlaylistUtils::executePlaylistById( $partner_id , $playlist_id , null , $detailed );
 
 		myEntryUtils::updatePuserIdsForEntries ( $entry_list );
 		
