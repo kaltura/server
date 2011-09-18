@@ -33,8 +33,10 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$this->bootstrap('autoloaders');
 		$this->bootstrap('config');
 		
-		$config = Zend_Registry::get('config');
-		KalturaLog::initLog($config->logger);
+		$loggerConfigPath = realpath(APPLICATION_PATH . '/../configurations/logger.ini');
+		$config = new Zend_Config_Ini($loggerConfigPath);
+		$adminConsoleLogger = $config->admin;
+		KalturaLog::initLog($adminConsoleLogger);
 		KalturaLog::debug('starting request');
 	}
 	

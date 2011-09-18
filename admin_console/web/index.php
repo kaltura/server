@@ -17,10 +17,19 @@ set_include_path(implode(PATH_SEPARATOR, array(
 /** Zend_Application */
 require_once 'Zend/Application.php';
 
+$configPath = realpath(APPLICATION_PATH . '/../configurations/admin.ini');
+if(!file_exists($configPath))
+{
+	$configTemplatePath = realpath(APPLICATION_PATH . '/../configurations/admin.template.ini');
+	$msg = "Please rename template file [$configTemplatePath] to admin.ini and replace the tokens";
+	error_log($msg);
+	die($msg);
+}
+
 // Create application, bootstrap, and run
 $application = new Zend_Application(
     APPLICATION_ENV,
-    APPLICATION_PATH . '/configs/application.ini'
+    $configPath
 );
 $application->bootstrap()
             ->run();
