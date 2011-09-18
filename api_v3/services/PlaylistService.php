@@ -15,6 +15,17 @@ class PlaylistService extends KalturaEntryService
 //		parent::initService($serviceId, $serviceName, $actionName);
 //		parent::applyPartnerFilterForClassNoKalturaNetwork ( new accessControlPeer() );
 //	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaBaseService::globalPartnerAllowed()
+	 */
+	protected function globalPartnerAllowed($actionName)
+	{
+		if($actionName == 'execute')
+			return true;
+		
+		return parent::globalPartnerAllowed($actionName);
+	}
 	
 	protected function kalturaNetworkAllowed($actionName)
 	{
