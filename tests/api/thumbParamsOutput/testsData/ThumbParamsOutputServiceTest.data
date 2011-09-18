@@ -1,0 +1,57 @@
+<?xml version='1.0'?>
+<TestCaseData testCaseName='ThumbParamsOutputServiceTest'>
+<TestProcedureData testProcedureName='testGet'>
+	<TestCaseData testCaseInstanceName='testGet with data set #0'>
+		<Input name = 'id' type = 'int' key = ''/>
+		<OutputReference name = 'output' type = 'KalturaThumbParamsOutput' key = 'object key'>
+			<name></name>
+			<systemName></systemName>
+			<description></description>
+			<tags></tags>
+			<requiredPermissions>KalturaStringArray</requiredPermissions>
+			<sourceRemoteStorageProfileId></sourceRemoteStorageProfileId>
+			<cropType></cropType>
+			<quality></quality>
+			<cropX></cropX>
+			<cropY></cropY>
+			<cropWidth></cropWidth>
+			<cropHeight></cropHeight>
+			<videoOffset></videoOffset>
+			<width></width>
+			<height></height>
+			<scaleWidth></scaleWidth>
+			<scaleHeight></scaleHeight>
+			<backgroundColor></backgroundColor>
+			<sourceParamsId></sourceParamsId>
+			<format>KalturaContainerFormat</format>
+			<thumbParamsId></thumbParamsId>
+			<thumbParamsVersion></thumbParamsVersion>
+			<thumbAssetId></thumbAssetId>
+			<thumbAssetVersion></thumbAssetVersion>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+<TestProcedureData testProcedureName='testListAction'>
+	<TestCaseData testCaseInstanceName='testListAction with data set #0'>
+		<Input name = 'filter' type = 'KalturaThumbParamsOutputFilter' key = ''>
+			<orderBy></orderBy>
+			<advancedSearch>KalturaSearchItem</advancedSearch>
+			<systemNameEqual></systemNameEqual>
+			<systemNameIn></systemNameIn>
+			<isSystemDefaultEqual></isSystemDefaultEqual>
+			<tagsEqual></tagsEqual>
+			<formatEqual></formatEqual>
+			<thumbParamsIdEqual></thumbParamsIdEqual>
+			<thumbParamsVersionEqual></thumbParamsVersionEqual>
+			<thumbAssetIdEqual></thumbAssetIdEqual>
+			<thumbAssetVersionEqual></thumbAssetVersionEqual>
+		</Input>
+		<Input name = 'pager' type = 'KalturaFilterPager' key = ''>
+			<pageSize></pageSize>
+			<pageIndex></pageIndex>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaThumbParamsOutputListResponse' key = 'object key'>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+</TestCaseData>
