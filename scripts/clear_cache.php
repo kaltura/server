@@ -2,7 +2,7 @@
 
 error_reporting(E_ALL);
 
-require_once(dirname(__FILE__).'/../alpha/config/kConf.php');
+require_once(dirname(__FILE__).'/../infra/kConf.php');
 
 // clear kConf defined cache directories
 $path = realpath(kConf::get('cache_root_path'));

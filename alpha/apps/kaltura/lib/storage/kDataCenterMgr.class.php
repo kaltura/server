@@ -34,7 +34,7 @@ class kDataCenterMgr
 	
 	public static function getCurrentDc () 
 	{
-		$dc_config = kConf::get ( "dc_config" );
+		$dc_config = kConf::getMap("dc_config");
 		// find the current
 		if ( self::$s_current_dc )
 			return self::getDcById( self::$s_current_dc );
@@ -44,7 +44,7 @@ class kDataCenterMgr
 	// returns a tupple with the id and the DC's properties
 	public static function getDcById ( $dc_id ) 
 	{
-		$dc_config = kConf::get ( "dc_config" );
+		$dc_config = kConf::getMap("dc_config");
 		// find the dc with the desired id
 		$dc_list = $dc_config["list"];
 		if ( isset( $dc_list[$dc_id] ) )		
@@ -59,7 +59,7 @@ class kDataCenterMgr
 		
 	public static function getAllDcs( $include_current = false )
 	{
-		$dc_config = kConf::get ( "dc_config" );
+		$dc_config = kConf::getMap("dc_config");
 		
 		$dc_list = $dc_config["list"];
 		

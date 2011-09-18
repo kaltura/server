@@ -14,7 +14,7 @@ define ( 'SELECT_INDEX', 2 );
 
 require_once (ROOT_DIR . '/infra/bootstrap_base.php');
 require_once (ROOT_DIR . '/infra/KAutoloader.php');
-require_once (ROOT_DIR . '/alpha/config/kConf.php');
+require_once (ROOT_DIR . '/infra/kConf.php');
 
 KAutoloader::addClassPath ( KAutoloader::buildPath ( KALTURA_ROOT_PATH, "alpha", "*" ) );
 KAutoloader::addClassPath ( KAutoloader::buildPath ( KALTURA_ROOT_PATH, "infra", "*" ) );

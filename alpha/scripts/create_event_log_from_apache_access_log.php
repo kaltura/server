@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__file__).'/../config/kConf.php');
+require_once(dirname(__file__).'/../../infra/kConf.php');
 date_default_timezone_set(kConf::get("date_default_timezone"));
 
 define ( "EVENT_LOG_SEPARATOR" , "," );

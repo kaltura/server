@@ -7,7 +7,7 @@ require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
 
 define("KALTURA_API_PATH", KALTURA_ROOT_PATH . "/api_v3");
 
-require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
+require_once(KALTURA_ROOT_PATH . '/infra/kConf.php');
 // Autoloader
 require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
 KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));

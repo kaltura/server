@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../config/kConf.php');
+require_once(dirname(__FILE__).'/../../infra/kConf.php');
  
 function checkCache()
 {

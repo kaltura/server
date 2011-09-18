@@ -1,7 +1,7 @@
 <?php
 
 require_once (dirname ( __FILE__ ) . "/../../infra/bootstrap_base.php");
-require_once (KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
+require_once (KALTURA_ROOT_PATH . '/infra/kConf.php');
 
 // Autoloader - override the autoloader defaults
 require_once (KALTURA_INFRA_PATH . DIRECTORY_SEPARATOR . "KAutoloader.php");

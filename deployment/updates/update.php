@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."alpha".DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."kConf.php");
+require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."kConf.php");
 		
 ini_set("memory_limit", "512M");
 error_reporting(E_ALL);

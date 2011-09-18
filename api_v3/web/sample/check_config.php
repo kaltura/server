@@ -1,7 +1,7 @@
 <?php
 if ((!defined("PARTNER_ID") || PARTNER_ID == null) && !isset($_SESSION['sampleimpl_config'])) 
 {
-    include ('../../../alpha/config/kConf.php');
+    include ('../../../infra/kConf.php');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html lang="en">
@@ -31,7 +31,7 @@ if ((!defined("PARTNER_ID") || PARTNER_ID == null) && !isset($_SESSION['sampleim
             <td>ADMIN_SECRET</td><td>The partner ADMIN SECRET to create an admin session.</td>
         </tr>
         <tr class="even">
-            <td>SERVER_URL</td><td>This is the value of www_host from {KALTURA_CE_PATH}/kaltura/alpha/config/kConf.php.</td>
+            <td>SERVER_URL</td><td>This is the value of www_host from {KALTURA_CE_PATH}/kaltura/infra/kConf.php.</td>
         </tr>
         <tr>
             <td class="whitebg" colspan="2">* You should have recieved the SECRETS and PARTNER ID at the end of KalturaCE installation</td>

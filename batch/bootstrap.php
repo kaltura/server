@@ -5,7 +5,7 @@
  */
 
 require_once("../infra/bootstrap_base.php");
-require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
+require_once(KALTURA_ROOT_PATH . '/infra/kConf.php');
 
 define("KALTURA_BATCH_PATH", KALTURA_ROOT_PATH . "/batch");
 

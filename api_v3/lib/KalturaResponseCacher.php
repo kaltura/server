@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../../alpha/config/kConf.php');
+require_once(dirname(__FILE__) . '/../../infra/kConf.php');
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.class.php');
 
 class KalturaResponseCacher

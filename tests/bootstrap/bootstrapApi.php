@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . "/../../infra/bootstrap_base.php");
-require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
+require_once(KALTURA_ROOT_PATH . '/infra/kConf.php');
 
 define("KALTURA_TEST_BASE_PATH", KALTURA_ROOT_PATH . "/tests/base");
 
