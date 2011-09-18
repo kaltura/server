@@ -17,7 +17,7 @@ class DocumentsService extends KalturaEntryService
      */
     protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
-    	switch(get_class($resource))
+    	switch($resource->getType())
     	{
 			case 'kAssetsParamsResourceContainers':
 				return $this->attachAssetsParamsResourceContainers($resource, $dbEntry);
@@ -26,7 +26,6 @@ class DocumentsService extends KalturaEntryService
 				return $this->attachAssetParamsResourceContainer($resource, $dbEntry, $dbAsset);
 				
 			case 'kUrlResource':
-			case 'kSshUrlResource':
 				return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
 				
 			case 'kLocalFileResource':

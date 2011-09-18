@@ -354,7 +354,6 @@ class FlavorAssetService extends KalturaAssetService
     	switch($contentResource->getType())
     	{
 			case 'kUrlResource':
-			case 'kSshUrlResource':
 				return $this->attachUrlResource($flavorAsset, $contentResource);
 				
 			case 'kLocalFileResource':
