@@ -150,7 +150,7 @@ div#my_info, div#new_admin { clear: both;}
 	   p#clear_dates { text-align:center; margin-top:3px;}
 	  #filters img { vertical-align:middle; #vertical-align:2px; padding-right:5px;}
 
-	#results { float:left; width: 100%; }
+	#results { float:left; Xwidth: 100%; }
 	*:first-child+html #results { margin-top: 18px; } /* ie7 only */
 	body#batch-in-progress-tasks #results, body#batch-failed-tasks #results { margin-left:20px;}
 
@@ -290,7 +290,7 @@ tbody tr:hover td { background:#D8EAEF;}
  tbody tr.additionalData td { max-width:1450px; padding-bottom:30px; overflow:visible; background:#f4f4f4;}
   tbody tr.additionalData:hover > td { background:#f4f4f4;}
   tbody tr.additionalData table { position:relative; z-index:33; margin: 5px 0 10px 50px; min-width:500px;}
-   tbody tr.additionalData table tr td { background:#fff;}
+   tbody tr.additionalData table tr td { background:#fff; padding-bottom:30px; white-space:nowrap;}
     tbody tr.additionalData table tr:hover td { background:#D8EAEF;}
 
 
@@ -487,7 +487,7 @@ dd#Algorithm-element { clear: both; }
 
 .truncated { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-#results table { width: 100%; }
+#results table { Xwidth: 100%; }
 
 .flavor_param { clear: both; }
 .flavor_param label { float: left; margin: 2px 20px 2px 0; }

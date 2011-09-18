@@ -9,7 +9,7 @@ class Form_Widget extends Infra_Form
 		
 
 		$this->addElement('text', 'id', array(
-			'label'			=> 'Widget ID:',
+			'label'			=> 'UI Conf ID:',
 			'required'		=> false,
 			'disabled' 		=> true,
 			'filters'		=> array('StringTrim'),
@@ -23,7 +23,7 @@ class Form_Widget extends Infra_Form
 		));
 		
 		$this->addElement('text', 'name', array(
-			'label'			=> 'Widget Name:',
+			'label'			=> 'UI Conf Name:',
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 			'validators' 	=> array()
@@ -52,7 +52,7 @@ class Form_Widget extends Infra_Form
 		));
 
 		$this->addElement('select', 'obj_type', array(
-			'label'			=> 'Widget Type:',
+			'label'			=> 'UI Conf Type:',
 			'filters'		=> array('StringTrim'),
 			'required'		=> true,
 			'multiOptions' 		=> array(
@@ -174,9 +174,9 @@ class Form_Widget extends Infra_Form
 		
 		$confFileButtons = array();
 		$confFileButtons[] = $openEditorButton;
-		if ($this->getValue('obj_type') == Kaltura_Client_Enum_UiConfObjType::CONTRIBUTION_WIZARD)
+		$enableVisualEditor = Zend_Registry::get('config')->settings->enableKCWVisualEditor;
+		if (($this->getValue('obj_type') == KalturaUiConfObjType::CONTRIBUTION_WIZARD) && ( is_null($enableVisualEditor) || $enableVisualEditor)) 
 			$confFileButtons[] = $openVisualEditorButton;
-
 		$confFileFeaturesButtons = array();
 		$confFileFeaturesButtons[] = $openEditorButton;
 		

@@ -274,12 +274,14 @@ return array(
 	'user change role' => 'Here you can change the role of an admin console user.',
 
 	// widgets
-	'widget-list intro text' => 'Here you can manage all widgets',
-	'are you sure delete widget?' => 'Are you sure you want to delete this widget?',
-	'widget was deleted' => 'Widget was deleted successfully',
-	'widget was not deleted' => 'Widget could not be deleted',
-	'widget was duplicated' => 'Widget was duplicated successfully',
-	'widget was not duplicated' => 'Widget could not be duplicated',
+	 'uiconf-list intro text' => 'Here you can manage all the UI Configuration objects in your deployment.  UI Conf objects that are associated with Publisher 0 are applicable to all accounts in your platform and UI Conf objects associated with Publisher 99 are used as templates and cloned upon the creation of new accounts<br/><br/>
+									<b>PLEASE NOTE:</b>  Any change to existing UI Conf objects might negatively affect your platform&apos;s UI functionality. It is therefore recommended to always duplicate and keep a backup copy of UI Conf object you wish to edit.',
+     'are you sure delete uiconf?' => 'Are you sure you want to delete this UI Conf?',
+     'uiconf was deleted' => 'UI Conf was deleted successfully',
+     'uiconf was not deleted' => 'UI Conf could not be deleted',
+     'uiconf was duplicated' => 'UI Conf was duplicated successfully',
+     'uiconf was not duplicated' => 'UI Conf could not be duplicated',
+	
 
 	'Kaltura_Client_Enum_UiConfObjType::PLAYER' => 'Player',
 	'Kaltura_Client_Enum_UiConfObjType::PLAYER_V3' => 'KDP3',
@@ -287,7 +289,7 @@ return array(
 	'Kaltura_Client_Enum_UiConfObjType::ADVANCED_EDITOR' => 'Advanced Editor',
 	'Kaltura_Client_Enum_UiConfObjType::CONTRIBUTION_WIZARD' => 'Contribution Wizard',
 	'Kaltura_Client_Enum_UiConfObjType::PLAYLIST' => 'Playlist',
-	'Kaltura_Client_Enum_UiConfObjType::APP_STUDIO' => 'App Studio',
+	'Kaltura_Client_Enum_UiConfObjType::APP_STUDIO' => 'Application Studio',
 	'Kaltura_Client_Enum_UiConfObjType::KRECORD' => 'kRecord',
 	'Kaltura_Client_Enum_UiConfObjType::KMC_ACCOUNT' => 'KMC Account',
 	'Kaltura_Client_Enum_UiConfObjType::KMC_ANALYTICS' => 'KMC Analytics',
@@ -296,8 +298,10 @@ return array(
 	'Kaltura_Client_Enum_UiConfObjType::KMC_LOGIN' => 'KMC Login',
 	'Kaltura_Client_Enum_UiConfObjType::KMC_GENERAL' => 'KMC General',
 	'Kaltura_Client_Enum_UiConfObjType::KMC_ROLES_AND_PERMISSIONS' => 'KMC Roles and Permissions',
-
-
+	'KalturaUiConfObjType::PLAYER_SL' => 'Player Silverlight',
+	'KalturaUiConfObjType::CLIENTSIDE_ENCODER' => 'Client Side Encoder',
+	 
+    
 	//batch index
 	'batch intro text' => 'In this page you can manage the tasks of your online entries.',
 
@@ -534,7 +538,7 @@ return array(
 	'entry-investigate history failed link' => 'Failed Tasks Control',
 
 	'entry-investigate history batch th' => 'Task (ID)',
-	'entry-investigate history batch tooltip' => 'The type of task related to this entry�s processing history and its specific ID',
+	'entry-investigate history batch tooltip' => 'The type of task related to this entrys processing history and its specific ID',
 	'entry-investigate history data th' => 'Data',
 	'entry-investigate history status th' => 'Status (failure reason)',
 	'entry-investigate history status tooltip' => 'The status of this task. The task status is one of the following: Waiting, In Process, completed, Failed',

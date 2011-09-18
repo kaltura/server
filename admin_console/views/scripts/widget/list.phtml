@@ -3,7 +3,7 @@
 						->appendFile($this->baseUrl('codemirror/js/codemirror.js'));
 ?>
 
-<p><?php echo $this->translate('widget-list intro text'); ?></p>
+<p><?php echo $this->translate('uiconf-list intro text'); ?></p>
 <?php echo $this->form; ?>
 <?php echo $this->newButton; ?>
 <div id="results" class="clear">
@@ -12,8 +12,8 @@
 	<table class="clear">
 		<thead>
 			<tr>
-				<th><?php echo $this->translate('Widget ID'); ?></th>
-				<th><?php echo $this->translate('Widget Name'); ?></th>
+				<th><?php echo $this->translate('UI Conf ID'); ?></th>
+				<th><?php echo $this->translate('UI Conf Name'); ?></th>
 				<th><?php echo $this->translate('Type'); ?></th>
 				<th><?php echo $this->translate('Publisher ID'); ?></th>
 				<th><?php echo $this->translate('Publisher Name'); ?></th>
@@ -107,7 +107,7 @@ function editForm(id) {
 		resizable: false,
 		width: 390,
 		height: Math.min(jQuery(window).height() * 0.9, 970),
-		title: '<?php echo $this->translate('Edit Widget'); ?>',
+		title: '<?php echo $this->translate('Edit UI Conf'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('form').submit();
@@ -143,7 +143,7 @@ function newForm(partnerId) {
 		resizable: false,
 		width: 390,
 		height: Math.min(jQuery(window).height() * 0.9, 970),
-		title: '<?php echo $this->translate('Add New Widget'); ?>',
+		title: '<?php echo $this->translate('Add New UI Conf'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('form').submit();
@@ -163,7 +163,7 @@ function newForm(partnerId) {
 }
 
 function deleteWidget(id) {
-	var ok = confirm('<?php echo $this->translate('are you sure delete widget?'); ?>');
+	var ok = confirm('<?php echo $this->translate('are you sure delete uiconf?'); ?>');
 
 	if (ok) {
 		var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'delete', 'id' => '')); ?>' + id;
@@ -174,11 +174,11 @@ function deleteWidget(id) {
 			success: function(result) {
 				if (result != 'ok')
 					return this.error();
-				alert('<?php echo $this->translate('widget was deleted');?>');
+				alert('<?php echo $this->translate('uiconf was deleted');?>');
 				jQuery('#frmPaginator1').submit();
 			},
 			error: function() {
-				alert('<?php echo $this->translate('widget was not deleted');?>');
+				alert('<?php echo $this->translate('uiconf was not deleted');?>');
 			}
 		});
 	}
@@ -193,11 +193,11 @@ function duplicateWidget(id) {
 		success: function(result) {
 			if (result != 'ok')
 				return this.error();
-			alert('<?php echo $this->translate('widget was duplicated');?>');
+			alert('<?php echo $this->translate('uiconf was duplicated');?>');
 			jQuery('#frmPaginator1').submit();
 		},
 		error: function() {
-			alert('<?php echo $this->translate('widget was not duplicated');?>');
+			alert('<?php echo $this->translate('uiconf was not duplicated');?>');
 		}
 	});
 }

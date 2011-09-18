@@ -51,12 +51,12 @@
 		</pages>
 	</users>
 	<widgets>
-		<label>Widgets</label>
+		<label>UI Confs</label>
 		<controller>widget</controller>
 		<action>dynamic_action</action>
 		<pages>
 			<widgets>
-				<label>Widgets Management</label>
+				<label>UI Confs Management</label>
 				<controller>widget</controller>
 				<action>list</action>
 			</widgets>
