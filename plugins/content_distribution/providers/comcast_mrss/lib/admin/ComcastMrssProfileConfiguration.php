@@ -30,6 +30,7 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		}
 		$object->cPlatformTvSeries = $cPlatformArray;
 		$object->cPlatformTvSeriesField = $this->getValue('c_platform_tv_series_field'); // because parent::getObject doesn't include empty fields 
+		$object->feedLink = $this->getValue('feed_link'); // because parent::getObject doesn't include empty fields 
 			
 		return $object;
 	}
@@ -128,7 +129,6 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		
 		$element = new Zend_Form_Element_Text('feed_link');
 		$element->setLabel('Feed link:');
-		$element->setRequired(true);
 		$element->addValidator(new Zend_Validate_StringLength(0, 80));
 		$this->addElement($element);
 		
@@ -145,11 +145,6 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		$element->setValue(str_replace('+0000', 'Z', $date->format(DateTime::ISO8601))); // comcast used Z for UTC timezone in their example (2008-04-11T12:30:00Z) 
 		$this->addElement($element);
 		
-		$element = new Zend_Form_Element_Text('item_link');
-		$element->setLabel('Item link:');
-		$element->setRequired(true);
-		$this->addElement($element);
-		
 		$this->addElement('select', 'c_platform_tv_series_field', array(
 			'label' => 'cPlatform TV Series Field:',
 		));
@@ -162,7 +157,7 @@ class Form_ComcastMrssProfileConfiguration extends Form_ConfigurableProfileConfi
 		$this->addMetadataFieldsAsValues('c_platform_tv_series_field');
 		
 		$this->addDisplayGroup(
-			array('feed_title', 'feed_link', 'feed_description', 'feed_last_build_date', 'item_link', 'cplatform_xml', 'c_platform_tv_series_field'), 
+			array('feed_title', 'feed_link', 'feed_description', 'feed_last_build_date', 'cplatform_xml', 'c_platform_tv_series_field'), 
 			'feed', 
 			array('legend' => 'Feed Configuration', 'decorators' => array('FormElements', 'Fieldset'))
 		);

@@ -102,6 +102,21 @@ class ComcastMrssFeed
 	
 	/**
 	 * @param string $xpath
+	 * @param DOMNode $contextnode
+	 */
+	public function removeNode($xpath, DOMNode $contextnode = null)
+	{
+		if ($contextnode)
+			$node = $this->xpath->query($xpath, $contextnode)->item(0);
+		else 
+			$node = $this->xpath->query($xpath)->item(0);
+			
+		if (!is_null($node))
+			$node->parentNode->removeChild($node);
+	}
+	
+	/**
+	 * @param string $xpath
 	 * @param string $value
 	 */
 	public function getNodeValue($xpath)
@@ -121,7 +136,10 @@ class ComcastMrssFeed
 		$this->distributionProfile = $profile;
 		
 		$this->setNodeValue('/rss/channel/title', $profile->getFeedTitle());
-		$this->setNodeValue('/rss/channel/link', $profile->getFeedLink());
+		if ($profile->getFeedLink())
+			$this->setNodeValue('/rss/channel/link', $profile->getFeedLink());
+		else
+			$this->removeNode('/rss/channel/link');
 		$this->setNodeValue('/rss/channel/description', $profile->getFeedDescription());
 		$this->setNodeValue('/rss/channel/lastBuildDate', $profile->getFeedLastBuildDate());
 	}
@@ -139,7 +157,10 @@ class ComcastMrssFeed
 		
 		$this->setNodeValue('title', $values[ComcastMrssDistributionField::TITLE], $item);
 		$this->setNodeValue('description', $values[ComcastMrssDistributionField::DESCRIPTION], $item);
-		$this->setNodeValue('link', $values[ComcastMrssDistributionField::LINK], $item);
+		if ($values[ComcastMrssDistributionField::LINK])
+			$this->setNodeValue('link', $values[ComcastMrssDistributionField::LINK], $item);
+		else
+			$this->removeNode('link', $item);
 		$this->setNodeValue('pubDate', $this->formatComcastDate($values[ComcastMrssDistributionField::PUB_DATE]), $item);
 		$this->setNodeValue('lastBuildDate', $this->formatComcastDate($values[ComcastMrssDistributionField::LAST_BUILD_DATE]), $item);
 		$this->setNodeValue('guid', $values[ComcastMrssDistributionField::GUID_ID], $item);
