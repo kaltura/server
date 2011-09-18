@@ -20,11 +20,6 @@
 				<controller>partner-usage</controller>
 				<action>index</action>
 			</account-usage>
-			<external-storages>
-				<label>Publishers’ Remote Storage</label>
-				<controller>partner</controller>
-				<action>external-storages</action>
-			</external-storages>
 		</pages>
 	</accounts>
 	<users>
