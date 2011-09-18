@@ -1,7 +1,7 @@
 prod:
   .settings:
     no_script_name:           off
-    logging_enabled:        on  
+    logging_enabled:        off  
     error_reporting:        4095
 
 	       
@@ -10,7 +10,7 @@ dev:
     # E_ALL | E_STRICT = 4095
     error_reporting:        4095
     web_debug:              on
-    logging_enabled:        on
+    logging_enabled:        off
     cache:                  off
     no_script_name:         off
     etag:                   off
@@ -29,7 +29,7 @@ batch:
     # E_ALL | E_STRICT = 4095
     error_reporting:        4095
     web_debug:              on
-    logging_enabled:        on
+    logging_enabled:        off
     cache:                  off
     no_script_name:         off
     etag:                   off
@@ -38,7 +38,6 @@ batch:
 all:
   .settings:
     timeout:                31536000
-    log_dir:                @LOG_DIR@  
 
   .actions:
     default_module:         corp
