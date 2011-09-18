@@ -125,12 +125,12 @@ class KalturaFlavorParams extends KalturaAssetParams
 	/**
 	 * @var int
 	 */
-	public $arProcessingMode;
+	public $aspectRatioProcessingMode;
 
 	/**
 	 * @var int
 	 */
-	public $forceMult16;
+	public $forceMultiplyBy16;
 
 	private static $map_between_objects = array
 	(
@@ -152,8 +152,8 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"operators",
 		"engineVersion",
 		"format",
-		"arProcessingMode",
-		"forceMult16",
+		"aspectRatioProcessingMode",
+		"forceMultiplyBy16",
 	);
 	
 	public function getMapBetweenObjects()
