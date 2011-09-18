@@ -512,30 +512,21 @@ $target->_video = null;
 		}
 
 		/*
-		 * Evaluate target frame size, either absolute
-		 * or relative to source height
+		 * Evaluate target frame size, from the source frame size 
+		 * and from the predefined target frame size
 		 */
-		/*
-		 $widFlvr = 0;
-		 if($target->_width==0 || $target->_width=="")
-			$widFlvr = $target->_height*$darSrcFrame;
-			else
-			$widFlvr = $target->_width;
 
-			//
-			if($target->_height==0 || $target->_height=="" || $target->_height>$hgtSrc){
-			$target->_height = $hgtSrc;
-			$target->_width  = $widSrc;
-			}
-			else {
-			$target->_height = $target->_height;
-			$target->_width  = $widFlvr;
-			}
-			*/
+			/*
+			 * Both target width and height are not set ==> use the source frame size 
+			 */
 		if(($target->_width==0 || $target->_width=="") && ($target->_height==0 || $target->_height=="")){
 			$target->_height = $hgtSrc;
 			$target->_width  = $widSrc;
 		}
+			/*
+			 * The target width was net set ==> 
+			 * evaluate it from the height while keeping source the aspect ratio 
+			 */
 		else if($target->_width==0 || $target->_width==""){
 			$target->_width = $target->_height*$darSrcFrame;
 			if($target->_width>$widSrc) {
@@ -543,6 +534,10 @@ $target->_video = null;
 				$target->_width  = $widSrc;
 			}
 		}
+			/*
+			 * The target height was net set ==> 
+			 * evaluate it from the width while keeping source the aspect ratio 
+			 */
 		else if($target->_height==0 || $target->_height==""){
 			$target->_height = $target->_width/$darSrcFrame;
 			if($target->_height>$hgtSrc) {
@@ -550,6 +545,37 @@ $target->_video = null;
 				$target->_width  = $widSrc;
 			}
 		}
+			/*
+			 * Dual dimension 'keep aspect ratio' mode:
+			 * Scale down the source to match inside the flavor params 
+			 * predefined frame size while keeping source the aspect ratio
+			 */
+		else if(isset($target->_arProcessingMode) && $target->_arProcessingMode==1){
+			$darTrgFrame = $target->_width/$target->_height;
+				/*
+				 * The target AR is wider than the source
+				 */
+			if($darTrgFrame>$darSrcFrame){
+				$target->_width = $target->_height*$darSrcFrame;
+				if($target->_width>$widSrc) {
+					$target->_height = $hgtSrc;
+					$target->_width  = $widSrc;
+				}
+			}
+				/*
+				 * The target AR is narrower than the source
+				 */
+			else {
+				$target->_height = $target->_width/$darSrcFrame;
+				if($target->_height>$hgtSrc) {
+					$target->_height = $hgtSrc;
+					$target->_width  = $widSrc;
+				}
+			}
+		}
+			/*
+			 * Fixed target frame size
+			 */
 		else {
 			if($target->_width>$source->_width) {
 				$target->_width=$source->_width;
@@ -559,84 +585,15 @@ $target->_video = null;
 			}
 		}
 
+		$target->_height = round($target->_height);
+		$target->_width  = round($target->_width);
 		/*
 		 * x16 - make sure both hgt/wid comply to
 		 */
-		$target->_height = round($target->_height);
-		$target->_width  = round($target->_width);
-		$target->_height = $target->_height -($target->_height%16);
-		$target->_width  = $target->_width  -($target->_width%16);
-	}
-	private static function evaluateTargetVideoFramesize1(KDLVideoData $source, KDLVideoData $target) {
-
-		$widSrc = $source->_width;
-		$hgtSrc = $source->_height;
-		$darSrcFrame = $widSrc/$hgtSrc;
-		/*
-		 * DAR adjustment
-		 */
-		if($source->_dar!="" && $source->_dar>0){
-			$darSrc = $source->_dar;
-			$diff = abs(1-$darSrc/$darSrcFrame);
-			if($diff>0.1) {
-				$widSrc = $darSrc*$hgtSrc;
-				$darSrcFrame = $darSrc;
-			}
+		if(!isset($target->_forceMult16) || $target->_forceMult16==1) {
+			$target->_height = $target->_height -($target->_height%16);
+			$target->_width  = $target->_width  -($target->_width%16);
 		}
-
-		/*
-		 * Evaluate target frame size, either absolute
-		 * or relative to source height
-		 */
-		if(($target->_width==0 || $target->_width=="") && ($target->_height==0 || $target->_height=="")){
-			$target->_height = $hgtSrc;
-			$target->_width  = $widSrc;
-		}
-		else if($target->_width==0 || $target->_width==""){
-			$target->_width = $target->_height*$darSrcFrame;
-		}
-		else if($target->_height==0 || $target->_height==""){
-			$target->_height = $target->_width/$darSrcFrame;
-		}
-		else {
-			$darSrcFrame = $target->_width/$target->_height;
-		}
-
-		if($target->_height>$source->_height){
-			$target->_height=$source->_height;
-		}
-
-		if($target->_width>$source->_width){
-			$target->_width=$source->_width;
-			$target->_height = $target->_width/$darSrcFrame;
-		}
-		/*
-		 * x16 - make sure both hgt/wid comply to
-		 */
-		$target->_height = round($target->_height);
-		$target->_width  = round($target->_width);
-		$dimenGranularity = 16;
-		/*
-		 $dimenRemind = $target->_height%$dimenGranularity;
-		 $target->_height = $target->_height-$dimenRemind;
-		 if($dimenRemind>0.7*$dimenGranularity)
-			$target->_height += $dimenGranularity;
-			*/
-		$target->_height = self::dimensionByGranularity($dimenGranularity, $target->_height);
-		$target->_width = round($target->_height*$darSrcFrame);
-		$target->_width  = self::dimensionByGranularity($dimenGranularity, $target->_width);
-	}
-
-	/* ---------------------------
-	 *  dimensionByGranularity
-	 */
-	private static function dimensionByGranularity($gran, $dimen)
-	{
-		$reminder = $dimen % $gran;
-		$dimen = $dimen-$reminder;
-		if($reminder>0.7*$gran)
-		$dimen += $gran;
-		return (int)$dimen;
 	}
 
 	/* ---------------------------
