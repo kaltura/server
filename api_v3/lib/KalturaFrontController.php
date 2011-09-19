@@ -91,7 +91,9 @@ class KalturaFrontController
 			catch(Exception $ex)
 			{
 				$result = $this->getExceptionObject($ex);
-				KalturaResponseCacher::disableCache();
+				// keep caching for GET requests with kalsig (signature of call params) which will be cached by the cdn 
+				if ($_SERVER["REQUEST_METHOD"] != "GET" && !isset($_REQUEST["kalsig"]))
+					KalturaResponseCacher::disableCache();
 	        	$this->onRequestEnd(false, $ex->getCode());
 			}
 		}
@@ -241,7 +243,9 @@ class KalturaFrontController
 	        catch(Exception $ex)
 	        {
 	            $currentResult = $this->getExceptionObject($ex);
-				KalturaResponseCacher::disableCache();
+				// keep caching for GET requests with kalsig (signature of call params) which will be cached by the cdn 
+				if ($_SERVER["REQUEST_METHOD"] != "GET" && !isset($_REQUEST["kalsig"]))
+					KalturaResponseCacher::disableCache();
 	        	$this->onRequestEnd(false, $ex->getCode(), $i);
 	        }
 	        
