@@ -33,14 +33,24 @@ class kOperatorSets
 	 */
 	public function getOperator($set = 0, $index = 0)
 	{
-		if(!isset($this->sets[$set]))
+		if(!is_array($this->sets))
 			return null;
+		
+		$theSet = null;
+		if(isset($this->sets[$set]))
+			$theSet = $this->sets[$set];
+		else
+			$theSet = end($this->sets);
 			
 		$index = max($index, 0);
-		if(!isset($this->sets[$set][$index]))
+		
+		if(!is_array($theSet))
 			return null;
-			
-		return $this->sets[$set][$index];
+		
+		if(isset($theSet[$index]))
+			return $theSet[$index];
+		
+		return end($theSet);
 	}
 	
 	/**
