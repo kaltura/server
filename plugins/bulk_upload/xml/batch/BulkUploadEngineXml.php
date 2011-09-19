@@ -82,7 +82,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	{
 		parent::__construct($taskConfig, $kClient, $job);
 		
-		$this->xsdFilePath = 'http://' . kConf::get('cdn_host') . '/api_v3/index.php/service/schema/action/serve/type/' . KalturaSchemaType::BULK_UPLOAD_XML;
+		$this->xsdFilePath = 'http://' . kConf::get('www_host') . '/api_v3/index.php/service/schema/action/serve/type/' . KalturaSchemaType::BULK_UPLOAD_XML;
 		if($taskConfig->params->xsdFilePath) 
 			$this->xsdFilePath = $taskConfig->params->xsdFilePath;
 			
@@ -119,7 +119,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$xmlContent = $this->xslTransform($this->data->filePath);
 		libxml_clear_errors();
 		if(!$xdoc->loadXML($xmlContent)){
-			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlContent));
+			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
 			KalturaLog::debug("Could not load xml");
 			throw new KalturaBatchException("Could not load xml [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
@@ -127,7 +127,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		libxml_clear_errors();
 		if(!$xdoc->schemaValidate($this->xsdFilePath)) 
 		{
-			$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlContent));
+			$errorMessage = kXml::getLibXmlErrorDescription($xmlContent);
 			KalturaLog::debug("XML is invalid:\n$errorMessage");
 			throw new KalturaBatchException("Validate files failed on job [{$this->job->id}], $errorMessage", KalturaBatchJobAppErrors::BULK_VALIDATION_FAILED);
 		}
