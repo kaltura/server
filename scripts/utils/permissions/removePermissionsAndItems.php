@@ -27,32 +27,36 @@ $ini = new Zend_Config_Ini($iniFile);
 
 // add new permissions
 $oldPermissionsCfg = $ini->permissions;
-foreach ($oldPermissionsCfg as $permCfg)
-{
-	if (is_null($permCfg->partnerId) || $permCfg->partnerId === '') {
-		throw new Exception('Permission partner id must be set');
-	} else {
-		$partnerIds = explode(",", $permCfg->partnerId);
-		foreach($partnerIds as $partnerId) 
-			removePermission($permCfg, $partnerId);
+if ($oldPermissionsCfg) {
+	foreach ($oldPermissionsCfg as $permCfg)
+	{
+		if (is_null($permCfg->partnerId) || $permCfg->partnerId === '') {
+			throw new Exception('Permission partner id must be set');
+		} else {
+			$partnerIds = explode(",", $permCfg->partnerId);
+			foreach($partnerIds as $partnerId) 
+				removePermission($permCfg, $partnerId);
+		}
 	}
 }
 
 // add new api action permission items
 $oldActionItemsCfg = $ini->action_permission_items;
-foreach ($oldActionItemsCfg as $itemCfg)
-{
-	removeActionPermissionItem($itemCfg);
+if ($oldActionItemsCfg) {
+	foreach ($oldActionItemsCfg as $itemCfg)
+	{
+		removeActionPermissionItem($itemCfg);
+	}
 }
-
 
 // add new api parameters permission items
 $oldParameterItemsCfg = $ini->parameter_permission_items;
-foreach ($oldParameterItemsCfg as $itemCfg)
-{
-	removeParameterPermissionItem($itemCfg);
+if ($oldParameterItemsCfg) {
+	foreach ($oldParameterItemsCfg as $itemCfg)
+	{
+		removeParameterPermissionItem($itemCfg);
+	}
 }
-
 
 KalturaLog::log('Done');
 

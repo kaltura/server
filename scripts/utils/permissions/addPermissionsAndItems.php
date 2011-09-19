@@ -27,26 +27,31 @@ $ini = new Zend_Config_Ini($iniFile);
 
 // add new permissions
 $newPermissionsCfg = $ini->permissions;
-foreach ($newPermissionsCfg as $permCfg)
-{
-	addPermission($permCfg);
+if ($newPermissionsCfg) {
+	foreach ($newPermissionsCfg as $permCfg)
+	{
+		addPermission($permCfg);
+	}
 }
 
 // add new api action permission items
 $newActionItemsCfg = $ini->action_permission_items;
-foreach ($newActionItemsCfg as $itemCfg)
-{
-	addActionPermissionItem($itemCfg);
+if ($newActionItemsCfg) {
+	foreach ($newActionItemsCfg as $itemCfg)
+	{
+		addActionPermissionItem($itemCfg);
+	}
 }
 
 
 // add new api parameters permission items
 $newParameterItemsCfg = $ini->parameter_permission_items;
-foreach ($newParameterItemsCfg as $itemCfg)
-{
-	addParameterPermissionItem($itemCfg);
+if ($newParameterItemsCfg) {
+	foreach ($newParameterItemsCfg as $itemCfg)
+	{
+		addParameterPermissionItem($itemCfg);
+	}
 }
-
 
 KalturaLog::log('Done');
 
