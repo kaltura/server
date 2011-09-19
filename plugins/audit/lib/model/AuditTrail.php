@@ -49,37 +49,11 @@ class AuditTrail extends BaseAuditTrail
 		return self::$allwodObjectTypes;
 	}
 	
-	private static $uniqueRequestId = null;
-	
 	public function __construct()
 	{	
 		parent::__construct();
 		
 		$this->setContext($this->getDefaultContext());
-	}
-
-	/**
-	 * @return int unique id per request
-	 */
-	public function getUniqueRequestId() 
-	{
-		if(!is_null(self::$uniqueRequestId))
-			return self::$uniqueRequestId;
-			
-		$dcId = kDataCenterMgr::getCurrentDcId();
-		for($i = 0; $i < 10; ++$i)
-		{
-			$requestId = $dcId . '_' . kString::generateStringId();
-			$exists = AuditTrailPeer::retrieveByRequestId( $requestId );
-			
-			if(!$exists)
-			{
-				self::$uniqueRequestId = $requestId;
-				return self::$uniqueRequestId;
-			}
-		}
-		
-		throw new kAuditTrailException('Unable to generate unique id', kAuditTrailException::UNIQUE_ID_NOT_GENERATED);
 	}
 
 	/**
@@ -200,7 +174,7 @@ class AuditTrail extends BaseAuditTrail
 		if(is_null($this->getClientTag()))
 			$this->setClientTag(kCurrentContext::$client_lang);
 		
-		$this->setRequestId($this->getUniqueRequestId());
+		$this->setRequestId(new UniqueId());
 		$this->setMasterPartnerId(kCurrentContext::$master_partner_id);
 		$this->setKs(kCurrentContext::$ks);
 		$this->setIpAddress(kCurrentContext::$user_ip);
