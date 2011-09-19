@@ -728,20 +728,20 @@ class Partner extends BasePartner
 	public function getMonthlyStorageOveragePrice()		{return $this->getFromCustomData('monthly_storage_overage_price');}
 	public function getMonthlyStorageAndBandwidthOveragePrice()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_price');}
 	public function getEndUsersOveragePrice()			{return $this->getFromCustomData('end_users_overage_price');}
-	public function getStreamerType()					{return $this->getFromCustomData('streamer_type', null, kConf::get('default_streamer_type'));}
-	public function getMediaProtocol()				{return $this->getFromCustomData('media_protocol', null, kConf::get('default_media_protocol'));}
+	public function getStreamerType()					{return $this->getFromCustomData('streamer_type');}
+	public function getMediaProtocol()					{return $this->getFromCustomData('media_protocol');}
 	
-	public function getAdminLoginUsersOverageUnit()	{return $this->getFromCustomData('admin_login_users_overage_unit');}
+	public function getAdminLoginUsersOverageUnit()		{return $this->getFromCustomData('admin_login_users_overage_unit');}
 	public function getPublishersOverageUnit()			{return $this->getFromCustomData('publishers_overage_unit');}
 	public function getBandwidthOverageUnit()			{return $this->getFromCustomData('bandwidth_overage_unit');}
 	public function getStreamEntriesOverageUnit()		{return $this->getFromCustomData('stream_entries_overage_unit');}
-	public function getEntriesOverageUnit()			{return $this->getFromCustomData('entries_overage_unit');}
+	public function getEntriesOverageUnit()				{return $this->getFromCustomData('entries_overage_unit');}
 	public function getMonthlyStorageOverageUnit()		{return $this->getFromCustomData('monthly_storage_overage_unit');}
 	public function getMonthlyStorageAndBandwidthOverageUnit()	{return $this->getFromCustomData('monthly_storage_and_bandwidth_overage_unit');}
 	public function getEndUsersOverageUnit()			{return $this->getFromCustomData('end_users_overage_unit');}
-	public function getLoginUsersOverageUnit()          {$this->getFromCustomData('login_users_overage_unit');}
-    public function getMaxLoginAttemptsOverageUnit()    {$this->getFromCustomData('login_attempts_overage_unit');}
-    public function getMaxBulkSizeOverageUnit()         {$this->getFromCustomData('bulk_size_overage_unit');}
+	public function getLoginUsersOverageUnit()          {return $this->getFromCustomData('login_users_overage_unit');}
+    public function getMaxLoginAttemptsOverageUnit()    {return $this->getFromCustomData('login_attempts_overage_unit');}
+    public function getMaxBulkSizeOverageUnit()         {return $this->getFromCustomData('bulk_size_overage_unit');}
 	
 	
 	/**
