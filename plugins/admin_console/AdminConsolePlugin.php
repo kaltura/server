@@ -24,7 +24,6 @@ class AdminConsolePlugin extends KalturaPlugin implements IKalturaPermissions, I
 		$map = array(
 			'flavorParamsOutput' => 'FlavorParamsOutputService',
 			'thumbParamsOutput' => 'ThumbParamsOutputService',
-			'mediaInfo' => 'MediaInfoService',
 			'entryAdmin' => 'EntryAdminService',
 			'uiConfAdmin' => 'UiConfAdminService',
 		);

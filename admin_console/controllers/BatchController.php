@@ -798,7 +798,7 @@ class BatchController extends Zend_Controller_Action
 				$filter = new Kaltura_Client_Type_MediaInfoFilter();
 				$filter->flavorAssetIdEqual = $flavor->id;
 				try{
-					$mediaInfosList = $adminConsolePlugin->mediaInfo->listAction($filter);
+					$mediaInfosList = $client->mediaInfo->listAction($filter);
 					$flavorData->mediaInfos = $mediaInfosList;
 				}
 				catch(Exception $e){

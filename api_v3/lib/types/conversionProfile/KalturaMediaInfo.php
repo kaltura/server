@@ -39,6 +39,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The container id
 	 * 
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $containerId;
 
@@ -46,6 +47,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The container profile
 	 * 
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $containerProfile;
 	
@@ -67,6 +69,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The video format
 	 * 
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $videoFormat;
 	
@@ -95,6 +98,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The video bit rate mode
 	 * 
 	 * @var KalturaBitRateMode
+	 * @requiresPermission read
 	 */
 	public $videoBitRateMode;
 
@@ -123,11 +127,13 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The video display aspect ratio (dar)
 	 * 
 	 * @var float
+	 * @requiresPermission read
 	 */
 	public $videoDar;
 	
 	/**
 	 * @var int
+	 * @requiresPermission read
 	 */
 	public $videoRotation;
 	
@@ -135,6 +141,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The audio format
 	 * 
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $audioFormat;
 	
@@ -156,6 +163,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The audio bit rate
 	 * 
 	 * @var int
+	 * @requiresPermission read
 	 */
 	public $audioBitRate;
 	
@@ -163,6 +171,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The audio bit rate mode
 	 * 
 	 * @var KalturaBitRateMode
+	 * @requiresPermission read
 	 */
 	public $audioBitRateMode;
 
@@ -184,6 +193,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The audio resolution
 	 * 
 	 * @var int
+	 * @requiresPermission read
 	 */
 	public $audioResolution;
 	
@@ -191,6 +201,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The writing library
 	 * 
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $writingLib;
 	
@@ -198,21 +209,25 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 * The data as returned by the mediainfo command line
 	 * 
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $rawData;
 	
 	/**
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $multiStreamInfo;
 	
 	/**
 	 * @var int
+	 * @requiresPermission read
 	 */
 	public $scanType;
 	
 	/**
 	 * @var string
+	 * @requiresPermission read
 	 */
 	public $multiStream;
 

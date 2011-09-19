@@ -3,20 +3,16 @@
  * Media Info service
  *
  * @service mediaInfo
- * @package plugins.adminConsole
- * @subpackage api.services
+ * @package api
+ * @subpackage services
  */
 class MediaInfoService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-
-		// since plugin might be using KS impersonation, we need to validate the requesting
-		// partnerId from the KS and not with the $_POST one
-		if(!AdminConsolePlugin::isAllowedPartner($this->getPartnerId()))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
-	}
+		myPartnerUtils::addPartnerToCriteria(new mediaInfoPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());	
+    }
 	
 	/**
 	 * List media info objects by filter and pager
