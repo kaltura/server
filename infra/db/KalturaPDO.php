@@ -15,6 +15,9 @@ class KalturaPDO extends PropelPDO
 	{
 		KalturaLog::debug($sql);
 		
+		$comment = KalturaStatement::getComment();
+		$sql = "/* $comment */ $sql";
+		
 		try
 		{
 			return parent::exec($sql);
@@ -37,6 +40,9 @@ class KalturaPDO extends PropelPDO
 		$sql = $args[0];
 		KalturaLog::debug($sql);
 		KalturaLog::logByType($sql, KalturaLog::LOG_TYPE_TESTS);
+		
+		$comment = KalturaStatement::getComment();
+		$sql = "/* $comment */ $sql";
 		
 		try
 		{
