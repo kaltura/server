@@ -3,7 +3,7 @@
  * @package deployment
  * @subpackage dragonfly.roles_and_permissions
  * 
- * Adds tvcom permissions
+ * Adds synacor hbo distribution permissions
  * 
  * No need to re-run after server code deploy
  */
