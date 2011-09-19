@@ -53,8 +53,11 @@ class embedIframeJsAction extends sfAction
 			$html5_version = kConf::get('html5_version');
 			$url =  "$host/html5/html5lib/{$html5_version}/mwEmbedLoader.php";
 		}
-		
-		$this->redirect($url);
+
+		requestUtils::sendCachingHeaders(60);
+		header("Pragma:");
+		header("Location:$url");
+		die;
 	}
 }
 
