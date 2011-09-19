@@ -205,6 +205,9 @@ class myPartnerRegistration
 	 		KalturaLog::log("Template content partner was not found!");
  		else
 	 		myPartnerUtils::copyTemplateContent($fromPartner, $newPartner, true);
+	 		
+	 	if ($newPartner->getType() == Partner::PARTNER_TYPE_WORDPRESS)
+	 		kPermissionManager::setPs2Permission($newPartner);
 		
 		$newPartner->setKmcVersion(kConf::get('new_partner_kmc_version'));
 		$newPartner->save();
