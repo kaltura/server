@@ -392,6 +392,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$configureAccountPackagesService = array('accountPackagesService'); // EAGLE PRD group 4
 		$configureAccountsOptionsMonitorUsage = array('accountOptionsMonitorUsage'); // EAGLE PRD group 5
 		$configureAccountsOptions = array('accountPackages','accountOptions','includedUsage', 'includedUsageSecondPart', 'enableDisableFeatures'); // EAGLE PRD group 6
+		$configureKmcUsers = array('configureKmcUsers');
 		
 		//according to current permissin call to setPermissionGroupElementsToReadOnly		
 		//with the correct group array as parameter
@@ -403,6 +404,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-info'))){
 			$this->setPermissionGroupElementsToReadOnly($configureAccountsOptions);
+		}
+		if (!(Infra_AclHelper::isAllowed('partner', 'configure-kmc-users'))){
+			$this->setPermissionGroupElementsToReadOnly($configureKmcUsers);
 		}
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-general-information'))){
 			$this->setPermissionGroupElementsToReadOnly($configureGeneralInformation);
@@ -593,7 +597,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array(
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit'
+									), 'configureKmcUsers');
+		$this->addDisplayGroup(array(
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_overagePrice',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_overageUnit',
@@ -607,6 +613,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overagePrice',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overageUnit',
 									'crossLine'), 'includedUsageSecondPart');	
+									
 	}
 	
 	protected function addLimitSubForm($subForm, $subFormName)

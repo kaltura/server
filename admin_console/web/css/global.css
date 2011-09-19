@@ -593,11 +593,13 @@ form#frmCreateDropFolder dt { float: left; }
 
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft { width:240px; float:left; margin-top:3px; }
 #partner-configure-dialog #fieldset-includedUsageSecondPart .includeUsageFloatLeft { width:377px; float:left; margin-top:3px; }
+#partner-configure-dialog #fieldset-configureKmcUsers .includeUsageFloatLeft { width:377px; float:left; margin-top:3px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight { width:150px; float:left; margin-top:3px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft div { margin-left:3px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft input { width:40px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatLeft label { margin-top:3px; margin-bottom:5px; float:left; width:190px; }
 #partner-configure-dialog #fieldset-includedUsageSecondPart .includeUsageFloatLeft label { margin-top:3px; margin-bottom:5px; float:left; width:326px; }
+#partner-configure-dialog #fieldset-configureKmcUsers .includeUsageFloatLeft label { margin-top:3px; margin-bottom:5px; float:left; width:326px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight input { width:40px; }
 #partner-configure-dialog #frmPartnerConfigure .includeUsageFloatRight label {margin-top:3px; margin-bottom:5px; float:left; width:88px; }
 #partner-configure-dialog #frmPartnerConfigure .field_checkbox { width:0px; }
