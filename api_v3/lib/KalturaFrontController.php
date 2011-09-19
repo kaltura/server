@@ -38,7 +38,7 @@ class KalturaFrontController
 	public function onRequestStart($service, $action, array $params, $requestIndex = 0)
 	{
 		$this->requestStart = microtime(true);
-		KalturaLog::analitics(array(
+		KalturaLog::analytics(array(
 			'request_start',
 			'time' => $this->requestStart,
 			'service' => $service, 
@@ -53,7 +53,7 @@ class KalturaFrontController
 	{
 		$duration = microtime(true) - $this->requestStart;
 		
-		KalturaLog::analitics(array(
+		KalturaLog::analytics(array(
 			'request_end',
 			'diration' => $duration,
 			'success' => intval($success),

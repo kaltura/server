@@ -12,7 +12,7 @@ require_once(dirname(__FILE__)."/../bootstrap.php");
 ActKeyUtils::checkCurrent();
 KalturaLog::setContext("API");
 
-KalturaLog::analitics(array(
+KalturaLog::analytics(array(
 	'session_start',
 	'pid' => getmypid(),
 	'time' => $start,
@@ -34,7 +34,7 @@ KalturaLog::info("API-end [".($end - $start)."]");
 KalturaLog::debug("<------------------------------------- api_v3 -------------------------------------");
 KalturaLog::logByType("<------------------------------------- api_v3 -------------------------------------", KalturaLog::LOG_TYPE_TESTS);
 
-KalturaLog::analitics(array(
+KalturaLog::analytics(array(
 	'session_end',
 	'duration' => ($end - $start),
 	'partnerId' => kCurrentContext::$partner_id,

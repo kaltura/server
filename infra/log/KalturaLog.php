@@ -18,7 +18,7 @@ class KalturaLog
     const INFO    = Zend_Log::INFO;
     const DEBUG   = Zend_Log::DEBUG;
     
-    const LOG_TYPE_ANALITICS = 'LOG_TYPE_ANALITICS';
+    const LOG_TYPE_ANALYTICS = 'LOG_TYPE_ANALYTICS';
     const LOG_TYPE_TESTS = 'LOG_TYPE_TESTS';
 	
 	public static function getInstance ()
@@ -92,9 +92,9 @@ class KalturaLog
 		self::$_logger->log($message, self::DEBUG);
 	}
 
-	static function analitics(array $data)
+	static function analytics(array $data)
 	{
-		self::logByType(implode(',', $data), self::LOG_TYPE_ANALITICS, self::NOTICE);
+		self::logByType(implode(',', $data), self::LOG_TYPE_ANALYTICS, self::NOTICE);
 	}
 	
 	static function logByType($message, $type, $priority = self::DEBUG)
