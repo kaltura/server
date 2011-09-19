@@ -902,6 +902,21 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$partner->save();
 		PartnerPeer::removePartnerFromCache($partnerId);
 	}
+	
+	/**
+	 * 
+	 * add ps2 permission for given partner
+	 * @param Partner $partner
+	 */
+	public static function setPs2Permission(Partner $partner)
+ 	{		
+ 		$ps2Permission = new Permission();
+ 		$ps2Permission->setName(PermissionName::FEATURE_PS2_PERMISSIONS_VALIDATION);
+ 		$ps2Permission->setPartnerId($partner->getId());
+ 		$ps2Permission->setStatus(PermissionStatus::ACTIVE);
+ 		$ps2Permission->setType(PermissionType::SPECIAL_FEATURE);
+ 		$ps2Permission->save();
+ 	}
 
 		
 }
