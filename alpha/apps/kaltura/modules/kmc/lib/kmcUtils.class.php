@@ -173,6 +173,7 @@ class kmcUtils
 		// implement query to get uiconfs from DB
 		$c = new Criteria();
 		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
+		$c->addAnd ( uiConfPeer::PARTNER_ID, 0 );
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
 		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_KDP3);
 		$c->addAnd ( uiConfPeer::TAGS, 'kdp508', Criteria::LIKE);
