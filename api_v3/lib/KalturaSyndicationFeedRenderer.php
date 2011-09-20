@@ -385,9 +385,7 @@ class KalturaSyndicationFeedRenderer
 	private function stringToSafeXml($string, $now = false)
 	{
 		$string = @iconv('utf-8', 'utf-8', $string);
-		$partially_safe = kString::xmlEncode($string);
-		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
-		
+		$safe = kString::xmlEncode($string);
 		return $safe;
 	}
 	
@@ -434,6 +432,7 @@ class KalturaSyndicationFeedRenderer
 			//syndication parameters to pass to XSLT
 			$xslParams = array();	
 			$xslParams[XsltParameterName::KALTURA_HAS_NEXT_ITEM] = $nextEntry ? true : false;
+			$xslParams[XsltParameterName::KALTURA_SYNDICATION_FEED_FLAVOR_PARAM_ID] = $syndicationFeedDB->getFlavorParamId();
 			
 			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $xslParams);				
 		}
@@ -548,7 +547,7 @@ class KalturaSyndicationFeedRenderer
 		$url = $urlManager->getFlavorAssetUrl($flavorAsset);
 		$url = $this->cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
-			
+			
 		return $this->protocol . '://' . $url;
 	}
 	
