@@ -65,9 +65,10 @@ class KalturaRequestDeserializer
 				}
 				
 				if ($actionParam->isOptional())
+				{
 					$serviceArguments[] = $this->castSimpleType($type, $actionParam->getDefaultValue());
-					
-				continue;
+					continue;
+				}
 			}
 			
 			if ($actionParam->isFile())
@@ -79,9 +80,10 @@ class KalturaRequestDeserializer
 				}
 				
 				if ($actionParam->isOptional()) 
+				{
 					$serviceArguments[] = null;
-					
-				continue; 	
+					continue;
+				} 	
 			}
 			
 			if ($actionParam->isEnum()) // enum
@@ -122,9 +124,10 @@ class KalturaRequestDeserializer
 				}
 				
 				if ($actionParam->isOptional())
+				{
 					$serviceArguments[] = $actionParam->getDefaultValue();
-					
-				continue;
+					continue;
+				}
 			}
 			
 			if ($actionParam->isArray()) // array
