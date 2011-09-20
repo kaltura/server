@@ -244,7 +244,29 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 						
 				$action = KalturaBulkUploadAction::ADD;
 				if(isset($item->action))
+				{
 					$actionToPerform = strtolower($item->action);
+				}
+				elseif(isset($item->entryId))
+				{
+					$actionToPerform = self::$actionsMap[KalturaBulkUploadAction::UPDATE];
+				}
+				elseif(isset($item->referenceId))
+				{
+					$referenceId = "{$item->referenceId}";
+					$filter = new KalturaBaseEntryFilter();
+					$filter->referenceIdEqual = $referenceId;
+					$pager = new KalturaFilterPager();
+					$pager->pageSize = 1;
+						
+					$this->impersonate();
+					$entries = $this->kClient->baseEntry->listAction($filter, $pager);
+					$this->unimpersonate();
+						
+					/* @var $entries KalturaBaseEntryListResponse */
+					if($entries->totalCount)
+						$actionToPerform = self::$actionsMap[KalturaBulkUploadAction::UPDATE];
+				}
 				
 				switch($actionToPerform)
 				{
