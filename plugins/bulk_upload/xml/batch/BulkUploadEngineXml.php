@@ -211,6 +211,38 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	}
 
 	/**
+	 * @param string $referenceId
+	 * @return string entry id 
+	 */
+	protected function getEntryIdFromReference($referenceId)
+	{
+		$filter = new KalturaBaseEntryFilter();
+		$filter->referenceIdEqual = $referenceId;
+		$filter->statusIn = implode(',', array(
+			KalturaEntryStatus::ERROR_IMPORTING,
+			KalturaEntryStatus::ERROR_CONVERTING,
+			KalturaEntryStatus::IMPORT,
+			KalturaEntryStatus::PRECONVERT,
+			KalturaEntryStatus::READY,
+			KalturaEntryStatus::PENDING,
+			KalturaEntryStatus::NO_CONTENT,
+		));
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1;
+		
+		$this->impersonate();
+		$entries = $this->kClient->baseEntry->listAction($filter, $pager);
+		$this->unimpersonate();
+		
+		/* @var $entries KalturaBaseEntryListResponse */
+		if(!$entries->totalCount)
+			return null;
+		
+		$existingEntry = reset($entries->objects);
+		return $existingEntry->id;
+	}
+
+	/**
 	 * Gets and handles a channel from the mrss
 	 * @param SimpleXMLElement $channel 
 	 */
@@ -253,18 +285,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				}
 				elseif(isset($item->referenceId))
 				{
-					$referenceId = "{$item->referenceId}";
-					$filter = new KalturaBaseEntryFilter();
-					$filter->referenceIdEqual = $referenceId;
-					$pager = new KalturaFilterPager();
-					$pager->pageSize = 1;
-						
-					$this->impersonate();
-					$entries = $this->kClient->baseEntry->listAction($filter, $pager);
-					$this->unimpersonate();
-						
-					/* @var $entries KalturaBaseEntryListResponse */
-					if($entries->totalCount)
+					if($this->getEntryIdFromReference("{$item->referenceId}"))
 						$actionToPerform = self::$actionsMap[KalturaBulkUploadAction::UPDATE];
 				}
 				
@@ -354,22 +375,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		elseif(isset($item->referenceId))
 		{
-			$referenceId = "{$item->referenceId}";
-			$filter = new KalturaBaseEntryFilter();
-			$filter->referenceIdEqual = $referenceId;
-			$pager = new KalturaFilterPager();
-			$pager->pageSize = 1;
-			
-			$this->impersonate();
-			$entries = $this->kClient->baseEntry->listAction($filter, $pager);
-			$this->unimpersonate();
-			
-			/* @var $entries KalturaBaseEntryListResponse */
-			if(!$entries->totalCount)
-				throw new KalturaBatchException("Reference id [$referenceId] not found", KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
-			
-			$existingEntry = reset($entries->objects);
-			$entryId = $existingEntry->id;
+			$entryId = $this->getEntryIdFromReference("{$item->referenceId}");
+			if(!$entryId)
+				throw new KalturaBatchException("Reference id [{$item->referenceId}] not found", KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
 		}
 		else
 		{
@@ -587,22 +595,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		elseif(isset($item->referenceId))
 		{
-			$referenceId = "{$item->referenceId}";
-			$filter = new KalturaBaseEntryFilter();
-			$filter->referenceIdEqual = $referenceId;
-			$pager = new KalturaFilterPager();
-			$pager->pageSize = 1;
-			
-			$this->impersonate();
-			$entries = $this->kClient->baseEntry->listAction($filter, $pager);
-			$this->unimpersonate();
-			
-			/* @var $entries KalturaBaseEntryListResponse */
-			if(!$entries->totalCount)
-				throw new KalturaBatchException("Reference id [$referenceId] not found", KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
-				
-			$existingEntry = reset($entries->objects);
-			$entryId = $existingEntry->id;
+			$entryId = $this->getEntryIdFromReference("{$item->referenceId}");
+			if(!$entryId)
+				throw new KalturaBatchException("Reference id [{$item->referenceId}] not found", KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
 		}
 		else
 		{
