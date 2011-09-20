@@ -45,7 +45,12 @@ class KalturaCaptionAssetItemFilter extends KalturaCaptionAssetFilter
 	{
 		return array_merge(parent::getOrderByMap(), $this->order_by_map);
 	}
-
+	
+	protected function validateEntryIdFiltered()
+	{
+		// do nothing, just overwrite parent validations
+	}
+	
 	/**
 	 * @var string
 	 */
