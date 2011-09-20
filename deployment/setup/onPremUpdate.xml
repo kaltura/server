@@ -56,7 +56,7 @@
               <equals arg1="${properties.gener}" arg2="true" />
          <then>
               <echo msg="replacing generate config file..." />
-			  <copy file="/opt/kaltura/app/generator/config.template.dev.ini" tofile="/opt/kaltura/app/app/generator/config.template.ini" overwrite="true"/>
+			  <copy file="/opt/kaltura/app/generator/config.template.dev.ini" tofile="/opt/kaltura/app/generator/config.template.ini" overwrite="true"/>
          </then>
          </if>
     </target>
