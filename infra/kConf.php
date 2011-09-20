@@ -23,7 +23,7 @@ class kConf
 		$configDir = realpath(dirname(__file__) . '/../configurations');
 		$baseConfig = parse_ini_file("$configDir/base.ini", true);
 		$localConfig = parse_ini_file("$configDir/local.ini", true);
-		$config = array_merge($baseConfig, $localConfig);
+		$config = array_merge_recursive($baseConfig, $localConfig);
 		
 		self::$map = $config;
 		
