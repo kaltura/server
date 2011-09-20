@@ -103,9 +103,10 @@ class KalturaRequestDeserializer
 				}
 				
 				if ($actionParam->isOptional())
+				{
 					$serviceArguments[] = $this->castSimpleType("int", $actionParam->getDefaultValue());
-				
-				continue;
+					continue;
+				}
 			}
 			
 			if ($actionParam->isStringEnum()) // string enum or dynamic
