@@ -202,9 +202,9 @@ class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPer
 	{
 		$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 		/* @var $distributionProfile DoubleClickDistributionProfile */
-		$mrss->addChild('ChannelTitle', $distributionProfile->getChannelTitle());
-		$mrss->addChild('ChannelDescription', $distributionProfile->getChannelDescription());
-		$mrss->addChild('ChannelLink', $distributionProfile->getChannelLink());
+		$mrss->addChild('ChannelTitle', htmlentities($distributionProfile->getChannelTitle()));
+		$mrss->addChild('ChannelDescription', htmlentities($distributionProfile->getChannelDescription()));
+		$mrss->addChild('ChannelLink', htmlentities($distributionProfile->getChannelLink()));
 	}
 	
 	/**

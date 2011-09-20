@@ -18,9 +18,10 @@ class DoubleClickService extends KalturaBaseService
 	 * @param int $distributionProfileId
 	 * @param string $hash
 	 * @param int $page
+	 * @param int $period
 	 * @return file
 	 */
-	public function getFeedAction($distributionProfileId, $hash, $page)
+	public function getFeedAction($distributionProfileId, $hash, $page = 1, $period = -1)
 	{
 		if (!$this->getPartnerId() || !$this->getPartner())
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $this->getPartnerId());
@@ -35,7 +36,7 @@ class DoubleClickService extends KalturaBaseService
 		if ($profile->getUniqueHashForFeedUrl() != $hash)
 			throw new KalturaAPIException(DoubleClickDistributionErrors::INVALID_FEED_URL);
 
-		if (!$page)
+		if (!$page || $page < 1)
 			$page = 1;
 
 		// "Creates advanced filter on distribution profile
@@ -53,6 +54,9 @@ class DoubleClickService extends KalturaBaseService
 		$entryFilter->setPartnerIdEquel($this->getPartnerId());
 		$entryFilter->setAdvancedSearch($distributionAdvancedSearch);
 		$entryFilter->set('_order_by', '-created_at');
+		
+		if ($period && $period > 0)
+			$entryFilter->set('_gte_created_at', time() - 24*60*60); // last 24 hours
 
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$baseCriteria->setLimit($profile->getItemsPerPage());
@@ -64,9 +68,9 @@ class DoubleClickService extends KalturaBaseService
 		$feed = new DoubleClickFeed('doubleclick_template.xml', $profile);
 		$feed->setTotalResult($totalCount);
 		$feed->setStartIndex(($page - 1) * $totalCount + 1);
-		$feed->setSelfLink($this->getUrl($distributionProfileId, $hash, $page));
+		$feed->setSelfLink($this->getUrl($distributionProfileId, $hash, $page, $period));
 		if ($totalCount > $page * $profile->getItemsPerPage())
-			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1));
+			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1, $period));
 		
 		foreach($entries as $entry)
 		{
@@ -108,7 +112,7 @@ class DoubleClickService extends KalturaBaseService
 	 * @param string $hash
 	 * @param int $page
 	 */
-	protected function getUrl($distributionProfileId, $hash, $page)
+	protected function getUrl($distributionProfileId, $hash, $page, $period)
 	{
 		$urlParams = array(
 			'service' => 'doubleclickdistribution_doubleclick',
@@ -117,6 +121,7 @@ class DoubleClickService extends KalturaBaseService
 			'distributionProfileId' => $distributionProfileId,
 			'hash' => $hash,
 			'page' => $page,
+			'period' => $period,
 		);
 		return requestUtils::getRequestHost() . '/api_v3/index.php?' . http_build_query($urlParams, null, '&');	
 	}
