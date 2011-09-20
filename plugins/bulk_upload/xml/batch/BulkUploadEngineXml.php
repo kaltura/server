@@ -1550,9 +1550,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function setMediaElementValues(KalturaMediaEntry $media, SimpleXMLElement $itemElement)
 	{
+		if(!isset($itemElement->media))
+			return;
+		
 		$mediaElement = $itemElement->media;
-		$media->mediaType = (int)$mediaElement->mediaType;
-		$this->validateMediaTypes($media->mediaType);
+		if(isset($mediaElement->mediaType))
+		{
+			$media->mediaType = (int)$mediaElement->mediaType;
+			$this->validateMediaTypes($media->mediaType);
+		}
 	}
 
 	/**
