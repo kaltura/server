@@ -36,9 +36,9 @@ class KalturaSyndicationFeedRenderer
 	
 	/**
 	 * The int id of last entry
-	 * @var int
+	 * @var array
 	 */
-	private $lastEntryIntId = null;
+	private $lastEntryIds = array();
 	
 	/**
 	 * The created at of last entry
@@ -216,7 +216,7 @@ class KalturaSyndicationFeedRenderer
 		if(!$this->executed)
 		{
 			$this->entriesCurrentPage = array();
-			$this->lastEntryIntId = 0;
+			$this->lastEntryIds = array();
 			$this->lastEntryCreatedAt = 0;
 		}
 		
@@ -228,7 +228,10 @@ class KalturaSyndicationFeedRenderer
 		if($entry)
 		{
 			next($this->entriesCurrentPage);
-			$this->lastEntryIntId = $entry->getIntId();
+			if ($this->lastEntryCreatedAt > $entry->getCreatedAt(null))
+				$this->lastEntryIds = array();
+			
+			$this->lastEntryIds[] = $entry->getId();
 			$this->lastEntryCreatedAt = $entry->getCreatedAt(null);
 			return $entry;
 		}
@@ -236,7 +239,7 @@ class KalturaSyndicationFeedRenderer
 		$this->fetchNextPage();
 		if(!$this->entriesCurrentPage)
 		{
-			$this->lastEntryIntId = null;
+			$this->lastEntryIds = array();
 			$this->lastEntryCreatedAt = null;
 			return false;
 		}
@@ -245,12 +248,15 @@ class KalturaSyndicationFeedRenderer
 		if($entry)
 		{
 			next($this->entriesCurrentPage);
-			$this->lastEntryIntId = $entry->getIntId();
+			if ($this->lastEntryCreatedAt > $entry->getCreatedAt(null))
+				$this->lastEntryIds = array();
+			
+			$this->lastEntryIds[] = $entry->getId();
 			$this->lastEntryCreatedAt = $entry->getCreatedAt(null);
 		}
 		else
 		{
-			$this->lastEntryIntId = null;
+			$this->lastEntryIds = array();
 			$this->lastEntryCreatedAt = null;
 		}
 			
@@ -264,10 +270,14 @@ class KalturaSyndicationFeedRenderer
 		
 		if($this->currentCriteria)
 		{
-			if($this->lastEntryIntId && $this->lastEntryCreatedAt)
+			if($this->lastEntryCreatedAt)
 			{
-				$this->currentCriteria->add(entryPeer::INT_ID, $this->lastEntryIntId, Criteria::LESS_THAN);
 				$this->currentCriteria->add(entryPeer::CREATED_AT, $this->lastEntryCreatedAt, Criteria::LESS_EQUAL);
+			}
+			
+			if (count($this->lastEntryIds))
+			{
+				$this->currentCriteria->add(entryPeer::ID, $this->lastEntryIds, Criteria::NOT_IN);
 			}
 		}
 		else
@@ -375,7 +385,9 @@ class KalturaSyndicationFeedRenderer
 	private function stringToSafeXml($string, $now = false)
 	{
 		$string = @iconv('utf-8', 'utf-8', $string);
-		$safe = kString::xmlEncode($string);
+		$partially_safe = kString::xmlEncode($string);
+		$safe = str_replace(array('*', '/', '[', ']'), '',$partially_safe);
+		
 		return $safe;
 	}
 	
@@ -422,7 +434,6 @@ class KalturaSyndicationFeedRenderer
 			//syndication parameters to pass to XSLT
 			$xslParams = array();	
 			$xslParams[XsltParameterName::KALTURA_HAS_NEXT_ITEM] = $nextEntry ? true : false;
-			$xslParams[XsltParameterName::KALTURA_SYNDICATION_FEED_FLAVOR_PARAM_ID] = $syndicationFeedDB->getFlavorParamId();
 			
 			echo kSyndicationFeedManager::getMrssEntry($entry, $syndicationFeedDB, $this->syndicationFeed->landingPage, $xslParams);				
 		}
@@ -537,7 +548,7 @@ class KalturaSyndicationFeedRenderer
 		$url = $urlManager->getFlavorAssetUrl($flavorAsset);
 		$url = $this->cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
-			
+			
 		return $this->protocol . '://' . $url;
 	}
 	
