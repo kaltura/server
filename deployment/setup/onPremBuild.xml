@@ -152,6 +152,17 @@
 			  <copy file="${installationLoc}${installationDir}/package/app/app/generator/config.template.dev.ini" tofile="${installationLoc}${installationDir}/package/app/app/generator/config.template.ini" overwrite="true"/>
          </then>
          </if>
+         
+         <property name="properties.watch.daemon"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh.onprem" property="properties.watch.daemon" />
+         
+         <if>
+              <equals arg1="${properties.watch.daemon}" arg2="true" />
+         <then>
+              <echo msg="replacing watch.daemon config file..." />
+			  <copy file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh.onprem" tofile="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh" overwrite="true"/>
+         </then>
+         </if>
     </target>
 
 
