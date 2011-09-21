@@ -33,9 +33,10 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 		$this->outFilePath = basename($this->outFilePath);
 		$this->inFilePath = realpath(dirname($this->inFilePath))."\\".basename($this->inFilePath);
 		KalturaLog::info("outFilePath(dirname($this->outFilePath)),auxPath($outDir)");
-//		$xml = str_replace(KDLCmdlinePlaceholders::OutDir, $outPath, $this->operator->config);
-		file_put_contents($this->configFilePath, $this->operator->config);
-//		$this->operator->command = KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName;
+			// Add slashes to solve JSON serialization issue
+		$xmlStr = str_replace ('\"' , '"' ,  $this->operator->config);
+		file_put_contents($this->configFilePath, $xmlStr);
+
 		$exeCmd =  parent::getCmdLine();
 		KalturaLog::info(print_r($this,true));
 		return $exeCmd;
@@ -50,7 +51,6 @@ class KOperationEngineExpressionEncoder  extends KSingleOutputOperationEngine
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		parent::operate($operator, $inFilePath, $configFilePath);
-//		KalturaLog::info("operator($operator), inFilePath($inFilePath), configFilePath($configFilePath)");
 	}
 	
 }
