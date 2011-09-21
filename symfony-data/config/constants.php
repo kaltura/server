@@ -28,7 +28,7 @@ sfConfig::add(array(
   'sf_bin_dir'        => $sf_root_dir.DIRECTORY_SEPARATOR.$sf_bin_dir_name,
   'sf_web_dir'        => $sf_root_dir.DIRECTORY_SEPARATOR.$sf_web_dir_name,
   'sf_upload_dir'     => $sf_root_dir.DIRECTORY_SEPARATOR.$sf_web_dir_name.DIRECTORY_SEPARATOR.$sf_upload_dir_name,
-  'sf_root_cache_dir' => $sf_root_cache_dir = $sf_root_dir.DIRECTORY_SEPARATOR.$sf_cache_dir_name,
+  'sf_root_cache_dir' => $sf_root_cache_dir = realpath(kConf::get("cache_root_path")) . '/alpha',
   'sf_base_cache_dir' => $sf_base_cache_dir = $sf_root_cache_dir.DIRECTORY_SEPARATOR.$sf_app,
   'sf_cache_dir'      => $sf_cache_dir      = $sf_base_cache_dir.DIRECTORY_SEPARATOR.$sf_environment,
   'sf_log_dir'        => $sf_root_dir.DIRECTORY_SEPARATOR.$sf_log_dir_name,
