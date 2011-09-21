@@ -68,6 +68,16 @@ class KalturaSyndicationFeedRenderer
 	 */
 	private $mimeType = null;
 	
+	/**
+	 * @var bool
+	 */
+	private $staticPlaylist = false;
+					
+	/**
+	 * @var string
+	 */
+	private $staticPlaylistEntriesIdsOrder = '';
+	
 	public function __construct($feedId)
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
@@ -115,6 +125,16 @@ class KalturaSyndicationFeedRenderer
 		if($this->syndicationFeed->playlistId)
 		{
 			$this->entryFilters = myPlaylistUtils::getPlaylistFiltersById($this->syndicationFeed->playlistId);
+
+			$playlist = entryPeer::retrieveByPK( $this->syndicationFeed->playlistId );
+			if ($playlist)
+			{
+				if($playlist->getMediaType() != entry::ENTRY_MEDIA_TYPE_XML)
+				{
+					$this->staticPlaylist = true;
+					$this->staticPlaylistEntriesIdsOrder = explode(',', $playlist->getDataContent());
+				}
+			}
 		}
 		else
 		{
@@ -301,6 +321,19 @@ class KalturaSyndicationFeedRenderer
 		if(!count($nextPage)) // finished all criterias and pages
 			return;
 		
+		if ($this->staticPlaylist)
+		{
+			//order the entries by static (AKA manual) entries order
+			$nextPageEntries = array();
+			
+			foreach ($nextPage as $entry)
+				$nextPageEntries[$entry->getId()] = $entry;
+			
+			$nextPage = array();
+			foreach ($this->staticPlaylistEntriesIdsOrder as $entryId) 	
+				$nextPage[] = $nextPageEntries[$entryId];
+		} 
+			
 		$this->entriesCurrentPage = $nextPage;
 	}
 	
