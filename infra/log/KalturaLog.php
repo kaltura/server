@@ -8,6 +8,7 @@ class KalturaLog
 	private static $_logger;
 	private static $_initialized = false;
 	private static $_instance = null;
+	private static $_enableTests = false;
 	
     const EMERG   = Zend_Log::EMERG;
     const ALERT   = Zend_Log::ALERT;
@@ -32,6 +33,8 @@ class KalturaLog
 	{
 		if (self::$_initialized)
 			return;
+		
+		self::$_enableTests = isset($config->enableTests) ? $config->enableTests : false;
 		
 		self::$_logger = KalturaLogFactory::getLogger($config);
 		self::$_initialized = true;
@@ -114,6 +117,11 @@ class KalturaLog
 	{
 		self::initLog();
 		self::$_logger->setEventItem("context", $context);
+	}
+	
+	static function getEableTests()
+	{
+		return self::$_enableTests;
 	}
 }
 
