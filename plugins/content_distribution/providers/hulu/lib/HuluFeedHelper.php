@@ -69,8 +69,6 @@ class HuluFeedHelper
 		$this->setNodeValueFieldConfigId('/content/metadata/video/episodeNumber', KalturaHuluDistributionField::VIDEO_EPISODE_NUMBER);
 		$this->setNodeValueFieldConfigId('/content/metadata/video/rating', KalturaHuluDistributionField::VIDEO_RATING);
 		$this->setNodeValueFieldConfigId('/content/metadata/video/contentRatingReason', KalturaHuluDistributionField::VIDEO_CONTENT_RATING_REASON);
-		$this->setNodeValueFieldConfigId('/content/metadata/video/availableDate', KalturaHuluDistributionField::VIDEO_AVAILABLE_DATE);
-		$this->setNodeValueFieldConfigId('/content/metadata/video/expirationDate', KalturaHuluDistributionField::VIDEO_EXPIRATION_DATE);
 		$this->setNodeValueFieldConfigId('/content/metadata/video/description', KalturaHuluDistributionField::VIDEO_DESCRIPTION);
 		$this->setNodeValueFieldConfigId('/content/metadata/video/fullDescription', KalturaHuluDistributionField::VIDEO_FULL_DESCRIPTION);
 		$this->setNodeValueFieldConfigId('/content/metadata/video/copyright', KalturaHuluDistributionField::VIDEO_COPYRIGHT);
@@ -78,11 +76,14 @@ class HuluFeedHelper
 		$this->setNodeValueFieldConfigId('/content/metadata/video/language', KalturaHuluDistributionField::VIDEO_LANGUAGE);
 		$this->setNodeValueFieldConfigId('/content/metadata/video/programmingType', KalturaHuluDistributionField::VIDEO_PROGRAMMING_TYPE);
 		$this->setNodeValueFieldConfigId('/content/metadata/video/externalId', KalturaHuluDistributionField::VIDEO_EXTERNAL_ID);
-		$this->setNodeValueFieldConfigId('/content/metadata/video/originalPremiereDate', KalturaHuluDistributionField::VIDEO_ORIGINAL_PREMIERE_DATE);
+		
+		$this->setNodeValueFullDateFieldConfigId('/content/metadata/video/availableDate', KalturaHuluDistributionField::VIDEO_AVAILABLE_DATE);
+		$this->setNodeValueFullDateFieldConfigId('/content/metadata/video/expirationDate', KalturaHuluDistributionField::VIDEO_EXPIRATION_DATE);
+		$this->setNodeValueShortDateFieldConfigId('/content/metadata/video/originalPremiereDate', KalturaHuluDistributionField::VIDEO_ORIGINAL_PREMIERE_DATE);
 		
 		$this->addFileNode('Mezzanine video', $this->_providerData->fileBaseName.'.'.pathinfo($this->_providerData->videoAssetFilePath, PATHINFO_EXTENSION));
 		$this->addFileNode('Mezzanine thumbnail', $this->_providerData->fileBaseName.'.'.pathinfo($this->_providerData->thumbAssetFilePath, PATHINFO_EXTENSION));
-
+		
 		$this->setCuePoints($this->_providerData->cuePoints);
 	}
 	
@@ -159,6 +160,18 @@ class HuluFeedHelper
 			$element = $this->_doc->createElement($elementName, date(DATE_ATOM, $this->_fieldValues[$fieldConfigId]));
 			$this->appendElement($xpath, $element);
 		}
+	}
+	
+	protected function setNodeValueFullDateFieldConfigId($xpath, $fieldConfigId)
+	{
+		if (isset($this->_fieldValues[$fieldConfigId]))
+			$this->setNodeValue($xpath, date('c', $this->_fieldValues[$fieldConfigId]));
+	}
+	
+	protected function setNodeValueShortDateFieldConfigId($xpath, $fieldConfigId)
+	{
+		if (isset($this->_fieldValues[$fieldConfigId]))
+			$this->setNodeValue($xpath, date('Y-m-d', $this->_fieldValues[$fieldConfigId]));
 	}
 	
 	/**
