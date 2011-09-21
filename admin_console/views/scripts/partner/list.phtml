@@ -225,6 +225,7 @@ function configure(partnerId)
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery('.ui-widget-overlay').css('z-index', 1003 );
 				jQuery('#loader').show();
+				changeEmptyStringsTo0();
 				jQuery(this).find('#frmPartnerConfigure').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
@@ -240,6 +241,36 @@ function configure(partnerId)
 			jQuery(this).find('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess); 
 		}
 	);
+}
+
+function changeEmptyStringsTo0(){
+	$("#fieldset-publisherSpecificDeliverySettings input").each(function(inx, value){
+		var $input = $(value);
+		if( $input.attr('type') == 'text') {	
+			if ($input.val() == '') {
+				$input.val("0");
+		    }
+		} 
+	});
+
+	$("#extended_free_trail").each(function(inx, value){
+		var $input = $(value);
+
+		var $expiry_date = $('#extended_free_trail_expiry_date');
+		var $expiry_reason = $('#extended_free_trail_expiry_reason');
+		
+		if ($(this).attr("checked") == false) {
+	    	$expiry_date.val('0');
+	    	$expiry_reason.val('0');
+	    } 
+	});
+
+	$("#partner_group_type-element select").each(function(inx, value){
+		var $partner_parent_id = $('#partner_parent_id');
+		if ($(this).val() != 1){
+			$partner_parent_id.val('0');
+	    } 
+	});
 }
 
 function block(partnerId)
