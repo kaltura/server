@@ -64,6 +64,7 @@ class myStatisticsMgr
 	//- will increment kuser.entries, kshow.entries & kshow.contributors
 	public static function addEntry ( entry $entry )
 	{
+		return;
 		$kshow = $entry->getkshow();
 		if ( $kshow )
 		{
