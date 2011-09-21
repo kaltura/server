@@ -56,7 +56,7 @@ class DoubleClickService extends KalturaBaseService
 		$entryFilter->set('_order_by', '-created_at');
 		
 		if ($period && $period > 0)
-			$entryFilter->set('_gte_created_at', time() - 24*60*60); // last 24 hours
+			$entryFilter->set('_gte_updated_at', time() - 24*60*60); // last 24 hours
 
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$baseCriteria->setLimit($profile->getItemsPerPage());
