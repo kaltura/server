@@ -208,6 +208,9 @@ define('SF_DEBUG',       false);
 
 define('MODULES' , SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR."modules".DIRECTORY_SEPARATOR);
 
+$zendIncludePath = realpath(dirname(__FILE__) . '/../../vendor/ZendFramework/library');
+set_include_path("$zendIncludePath;" . get_include_path());
+
 require_once(SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 DbManager::setConfig(kConf::getDB());
