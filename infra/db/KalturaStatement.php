@@ -65,9 +65,6 @@ class KalturaStatement extends PDOStatement
 		KalturaLog::debug($sql);
 		KalturaLog::logByType($sql, KalturaLog::LOG_TYPE_TESTS);
 		
-		$comment = self::getComment();
-		$sql = "/* $comment */ $sql";
-		
 		$sqlStart = microtime(true);
 		if(self::$dryRun)
 		{

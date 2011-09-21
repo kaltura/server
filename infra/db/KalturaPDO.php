@@ -5,12 +5,29 @@
  */
 class KalturaPDO extends PropelPDO
 {
+	/* (non-PHPdoc)
+	 * @see PDO::__construct()
+	 */
 	public function __construct($dsn, $username = null, $password = null, $driver_options = array())
 	{
 		parent::__construct($dsn, $username, $password, $driver_options);
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('KalturaStatement'));
 	}
 	
+	/* (non-PHPdoc)
+	 * @see PropelPDO::prepare()
+	 */
+	public function prepare($sql, $driver_options = array())
+	{
+		$comment = KalturaStatement::getComment();
+		$sql = "/* $comment */ $sql";
+		
+		return parent::prepare($sql, $driver_options);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see PDO::exec()
+	 */
 	public function exec($sql)
 	{
 		KalturaLog::debug($sql);
@@ -29,9 +46,8 @@ class KalturaPDO extends PropelPDO
 		}
 	}
 
-	/**
+	/* (non-PHPdoc)
 	 * @see PDO::query()
-	 * @return KalturaStatement
 	 */
 	public function query()
 	{
