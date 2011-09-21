@@ -90,6 +90,9 @@ class addentryAction extends defPartnerservices2Action
         $show_entry_id = $this->getP ( "show_entry_id" );
         $conversion_quality = $this->getP ( "conversionquality" ); // must be all lower case
         
+        // for now - by default use quick_edit
+		$partner = PartnerPeer::retrieveByPK( $partner_id );
+		
 		for ( $i=0 ; $i<= $partner->getAddEntryMaxFiles() ; ++$i )
 		{
 			if ( $i == 0 )
@@ -175,9 +178,6 @@ class addentryAction extends defPartnerservices2Action
 		$permissions = $kshow->getPermissions();
 		
         $kuser_id = $puser_kuser->getKuserId();
-
-        // for now - by default use quick_edit
-		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		
 		// TODO - once the CW 
         $quick_edit = myPolicyMgr::getPolicyFor( "allowQuickEdit" , /*$this->getP ( "quick_edit" , null ),*/ $kshow, $partner );
