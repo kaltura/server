@@ -90,6 +90,29 @@ class addentryAction extends defPartnerservices2Action
         $show_entry_id = $this->getP ( "show_entry_id" );
         $conversion_quality = $this->getP ( "conversionquality" ); // must be all lower case
         
+		for ( $i=0 ; $i<= $partner->getAddEntryMaxFiles() ; ++$i )
+		{
+			if ( $i == 0 )
+				$prefix = $this->getObjectPrefix() . "_";
+			else
+				$prefix = $this->getObjectPrefix() . "$i" . "_";
+			
+			$source = $this->getP($prefix . "source");
+			$filename = $this->getP($prefix . "filename") . '.flv';
+			if ($source != entry::ENTRY_MEDIA_SOURCE_WEBCAM || !$filename)
+				continue;
+			
+			if(!file_exists($filename))
+			{
+				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
+				if($remoteDCHost)
+					kFile::dumpApiRequest($remoteDCHost);
+				
+				$this->addError(APIErrors::INVALID_FILE_NAME, $filename);
+				return ;
+			}
+		}
+        
         if( strpos($kshow_id, 'entry-') !== false && !$show_entry_id )
         {
         	$show_entry_id = substr($kshow_id, 6);

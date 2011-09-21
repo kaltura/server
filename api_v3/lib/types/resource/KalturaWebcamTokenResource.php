@@ -21,7 +21,7 @@ class KalturaWebcamTokenResource extends KalturaDataCenterContentResource
 		if(file_exists($entryFullPath))
 			return kDataCenterMgr::getCurrentDcId();
 			
-		return -1; // none existing dc
+		return (1 - kDataCenterMgr::getCurrentDcId()); // other dc
 	}
 	
 	public function validateEntry(entry $dbEntry)
