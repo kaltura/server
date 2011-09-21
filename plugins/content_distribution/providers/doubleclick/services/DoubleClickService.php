@@ -67,7 +67,7 @@ class DoubleClickService extends KalturaBaseService
 		
 		$feed = new DoubleClickFeed('doubleclick_template.xml', $profile);
 		$feed->setTotalResult($totalCount);
-		$feed->setStartIndex(($page - 1) * $totalCount + 1);
+		$feed->setStartIndex(($page - 1) * $profile->getItemsPerPage() + 1);
 		$feed->setSelfLink($this->getUrl($distributionProfileId, $hash, $page, $period));
 		if ($totalCount > $page * $profile->getItemsPerPage())
 			$feed->setNextLink($this->getUrl($distributionProfileId, $hash, $page + 1, $period));
