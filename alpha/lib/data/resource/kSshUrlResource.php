@@ -24,12 +24,7 @@ class kSshUrlResource extends kUrlResource
 	 * @var string
 	 */
 	private $keyPassphrase;
-	
-	public function getType()
-	{
-		return 'kUrlResource';
-	}
-	
+		
 	/**
      * @return the $privateKey
      */
