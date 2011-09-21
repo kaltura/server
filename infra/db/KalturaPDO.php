@@ -55,7 +55,6 @@ class KalturaPDO extends PropelPDO
 		
 		$sql = $args[0];
 		KalturaLog::debug($sql);
-		KalturaLog::logByType($sql, KalturaLog::LOG_TYPE_TESTS);
 		
 		$comment = KalturaStatement::getComment();
 		$sql = "/* $comment */ $sql";
