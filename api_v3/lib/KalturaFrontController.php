@@ -43,7 +43,7 @@ class KalturaFrontController
 			'time' => $this->requestStart,
 			'service' => $service, 
 			'action' => $action, 
-			'params' => http_build_query($params), 
+			'params' => '"' . http_build_query($params) . '"', 
 			'requestIndex' => $requestIndex,
 		));
 	}
@@ -55,7 +55,7 @@ class KalturaFrontController
 		
 		KalturaLog::analytics(array(
 			'request_end',
-			'diration' => $duration,
+			'duration' => $duration,
 			'success' => intval($success),
 			'errorCode' => $errorCode,
 			'requestIndex' => $requestIndex,
