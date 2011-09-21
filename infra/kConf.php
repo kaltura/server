@@ -71,6 +71,8 @@ class kConf
 		
 	public static function getMap($mapName)
 	{
+		self::init();
+		
 		if(isset(self::$map[$mapName]))
 			return self::$map[$mapName];
 		
