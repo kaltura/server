@@ -285,6 +285,9 @@ class KalturaSyndicationFeedRenderer
 	
 	private function fetchNextPage()
 	{
+		if($this->executed && $this->staticPlaylist)
+			return;
+
 		$this->entriesCurrentPage = null;
 		kMemoryManager::clearMemory();
 		
@@ -330,6 +333,7 @@ class KalturaSyndicationFeedRenderer
 				$nextPageEntries[$entry->getId()] = $entry;
 			
 			$nextPage = array();
+			var_dump($this->staticPlaylistEntriesIdsOrder);
 			foreach ($this->staticPlaylistEntriesIdsOrder as $entryId) 	
 				$nextPage[] = $nextPageEntries[$entryId];
 		} 
