@@ -119,7 +119,7 @@ class KalturaLog
 		self::$_logger->setEventItem("context", $context);
 	}
 	
-	static function getEableTests()
+	static function getEnableTests()
 	{
 		return self::$_enableTests;
 	}
