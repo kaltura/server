@@ -8,7 +8,7 @@ class KDLOperatorExpressionEncoder extends KDLOperatorBase {
     	parent::__construct($id,$name,$sourceBlacklist,$targetBlacklist);
     }
 
-    public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target, $extra=null)
+    public function GenerateConfigData(KDLFlavor $design, KDLFlavor $target)
 	{
 /*		
 $tryXML = "<StreamInfo
@@ -149,10 +149,10 @@ $tryXML = "<StreamInfo
 			unset($fileFormat->AudioProfile->AacAudioProfile);					
 			unset($fileFormat->AudioProfile);							
 		}
-//$stream = clone $streams->StreamInfo;
-//		$streams[1] = $stream;
-		//		print_r($xml);
-		return $xml->asXML();
+				// Remove slaches that were added to solve
+				// JSON serialization issue
+		$xmlStr=str_replace ('"' , '\"' ,  $xml->asXML());
+		return $xmlStr;
 	}
 
     public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra=null)
