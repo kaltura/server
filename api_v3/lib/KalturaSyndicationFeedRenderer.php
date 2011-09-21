@@ -450,6 +450,8 @@ class KalturaSyndicationFeedRenderer
 	
 	private function renderKalturaFeed()
 	{
+		header ("content-type: text/xml; charset=utf-8");
+
 		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($this->syndicationFeed->id);
 		if( !$syndicationFeedDB )
 			throw new Exception("Feed Id not found");
