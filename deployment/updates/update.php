@@ -1,9 +1,18 @@
 <?php
+define('KALTURA_ROOT_PATH', realpath(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.".."));
+define('KALTURA_INFRA_PATH', KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."infra");
 
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."infra".DIRECTORY_SEPARATOR."kConf.php");
+require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."kConf.php");
 		
 ini_set("memory_limit", "512M");
 error_reporting(E_ALL);
+
+
+require_once(KALTURA_INFRA_PATH.DIRECTORY_SEPARATOR."KAutoloader.php");
+KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "ZendFramework", "*"));
+KAutoloader::register();
+
+
 $code = array();
 
 $ignoreErrors = false;
