@@ -153,6 +153,18 @@
          </then>
          </if>
          
+         <property name="properties.gener1"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}/package/app/app/configurations/generator.template.dev.ini" property="properties.gener1" />
+         <!--echo message="value is ${properties.gener}" /-->
+
+         <if>
+              <equals arg1="${properties.gener1}" arg2="true" />
+         <then>
+              <echo msg="replacing generate config file..." />
+			  <copy file="${installationLoc}${installationDir}/package/app/app/configurations/generator.template.dev.ini" tofile="${installationLoc}${installationDir}/package/app/app/configurations/generator.template.ini" overwrite="true"/>
+         </then>
+         </if>
+         
          <property name="properties.watch.daemon"  value="null" override="false" />
          <available file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh.onprem" property="properties.watch.daemon" />
          
