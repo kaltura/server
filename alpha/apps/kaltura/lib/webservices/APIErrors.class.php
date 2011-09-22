@@ -150,6 +150,8 @@ class APIErrors
 	
 	const ROUGHCUT_NOT_FOUND = "ROUGHCUT_NOT_FOUND,Roughcut not found";
 	
+	const FEATURE_FORBIDDEN = "FEATURE_FORBIDDEN,The usage to feature [%s] is forbidden";
+	
 	const SERVICE_FORBIDDEN = "SERVICE_FORBIDDEN,The access to service [%s] is forbidden";
 	
 	const SERVICE_FORBIDDEN_CONTENT_BLOCKED = "SERVICE_FORBIDDEN_CONTENT_BLOCKED,The access to this service is forbidden since the specified partner is blocked";
