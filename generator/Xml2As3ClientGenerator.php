@@ -200,8 +200,9 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	{
 		foreach($xml->children() as $child)
 		{
-			if($child->result->attributes()->type == 'file')
-				continue;
+			if($child->result->attributes()->type == 'file') {
+				// continue;
+			}
 				
 			$const_props = "";
 			$const_doc_params = array();
@@ -432,8 +433,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 	{
 		foreach($xml->children() as $child)
 		{
-			if($child->result->attributes()->type == 'file')
-				continue;
+			
 				
 			$fileAttributesNames = array();
 			foreach($child->children() as $prop)
@@ -538,22 +538,28 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 			if(count($fileAttributesNames))
 			{
 				$str .= "		override protected function sendRequest():void {\n";
-				$str .= "			//construct the loader\n";
-				$str .= "			createURLLoader();\n";
-				$str .= "			\n";
-				$str .= "			//create the service request for normal calls\n";
-				$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
-				$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
-				$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
-				$str .= "				(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
-				$str .= "				var urlRequest:URLRequest = new URLRequest(req);\n";
-				$str .= "				((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName as FileReference).upload(urlRequest,\"" . $fileAttributeName . "\");\n";
-				$str .= "			}\n";
-				$str .= "			else{\n";
-				$str .= "				mrloader.addFile(((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName as ByteArray), UIDUtil.createUID(), '$fileAttributeName');	\n";
-				$str .= "				mrloader.dataFormat = URLLoaderDataFormat.TEXT;\n";
-				$str .= "				mrloader.load(req);\n";
-				$str .= "			}\n";
+				if ($child->result->attributes()->type == "file") {
+					$str .= "			call.handleResult(getServeUrl(call));\n";
+				
+				}
+				else {
+					$str .= "			//construct the loader\n";
+					$str .= "			createURLLoader();\n";
+					$str .= "			\n";
+					$str .= "			//create the service request for normal calls\n";
+					$str .= "			var variables:String = decodeURIComponent(call.args.toString());\n";
+					$str .= "			var req:String = _config.protocol + _config.domain + \"/\" + _config.srvUrl + \"?service=\" + call.service + \"&action=\" + call.action + \"&\" + variables;\n";
+					$str .= "			if ((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName is FileReference) {\n";
+					$str .= "				(call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,onDataComplete);\n";
+					$str .= "				var urlRequest:URLRequest = new URLRequest(req);\n";
+					$str .= "				((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName as FileReference).upload(urlRequest,\"" . $fileAttributeName . "\");\n";
+					$str .= "			}\n";
+					$str .= "			else{\n";
+					$str .= "				mrloader.addFile(((call as " . $this->toUpperCamaleCase($xml->attributes()->name) . $this->toUpperCamaleCase( $child->attributes()->name ) . ").$fileAttributeName as ByteArray), UIDUtil.createUID(), '$fileAttributeName');	\n";
+					$str .= "				mrloader.dataFormat = URLLoaderDataFormat.TEXT;\n";
+					$str .= "				mrloader.load(req);\n";
+					$str .= "			}\n";
+				}
 				$str .= "		}\n\n";
 			
 				$str .= "		// Event Handlers\n";
@@ -577,6 +583,11 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				$str .= "		override protected function createURLLoader():void {\n";
 				$str .= "			mrloader = new MultipartURLLoader();\n";
 				$str .= "			mrloader.addEventListener(Event.COMPLETE, onDataComplete);\n";
+				$str .= "		}\n\n";
+			}
+			else if ($child->result->attributes()->type == "file") {
+				$str .= "		override protected function sendRequest():void {\n";
+				$str .= "			call.handleResult(getServeUrl(_call));\n";
 				$str .= "		}\n\n";
 			}
 
