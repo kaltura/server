@@ -272,16 +272,31 @@ class SphinxCriterion extends KalturaCriterion
 			}
 		}
 		
+		if ($thisClause && !$queryHasOr)
+		{
+			$whereClause[] = $thisClause;
+			$thisClause = null;
+		}
+			
+		if ($thisClause && !$depth)
+		{
+			$expSimplifications = array(
+				"(($sphinxField <> 0 AND $sphinxField <= $value) OR ($sphinxField = 0))"	=> "$sphinxField <= $value",
+				"(($sphinxField <> 0 AND $sphinxField < $value) OR ($sphinxField = 0))"		=> "$sphinxField < $value",
+			);
+
+			if (array_key_exists($thisClause, $expSimplifications))
+			{
+				KalturaLog::debug("Simplifying expression [$thisClause] => [{$expSimplifications[$thisClause]}]");
+				
+				$whereClause[] = $expSimplifications[$thisClause];
+				$thisClause = null;
+			}
+		}
+		
 		if ($thisClause)
 		{
-			if ($queryHasOr)
-			{
-				$conditionClause = $thisClause;
-			}
-			else
-			{
-				$whereClause[] = $thisClause;
-			}
+			$conditionClause = $thisClause;
 		}
 		
 		return true;
