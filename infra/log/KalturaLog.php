@@ -20,7 +20,6 @@ class KalturaLog
     const DEBUG   = Zend_Log::DEBUG;
     
     const LOG_TYPE_ANALYTICS = 'LOG_TYPE_ANALYTICS';
-    const LOG_TYPE_TESTS = 'LOG_TYPE_TESTS';
 	
 	public static function getInstance ()
 	{
