@@ -28,13 +28,16 @@ $c->add(assetParamsPeer::TAGS, 'pdf-readonly', Criteria::LIKE);
 $c->setLimit ( $countLimitEachLoop );
 
 $assetParams = assetParamsPeer::doSelect ( $c, $con );
-echo 'found: ' . count($assetParams) . PHP_EOL;
-while ( count ( $assetParams ) ) {
-	echo 'found: ' . count($assetParams) . PHP_EOL;
-	foreach ( $assetParams as $assetParam ) {
-		if (!$assetParam->getFromCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, null,false))
+while ( count ( $assetParams ) ) 
+{
+	foreach ( $assetParams as $assetParam ) 
+	{
+		if(!($assetParam instanceof PdfFlavorParams))
+			continue;
+		
+		if (!$assetParam->getReadonly())
 		{
-			$assetParam->putInCustomData(PdfFlavorParams::CUSTOM_DATA_FIELD_READONLY, true);
+			$assetParam->setReadonly(true);
 			$assetParam->save();
 			$assetParamsChanged++;
 			echo $assetParamsChanged . ': Set readonly to asset param id: ' . $assetParam->getId() . PHP_EOL;
@@ -47,6 +50,5 @@ while ( count ( $assetParams ) ) {
 	$offset += $countLimitEachLoop;
 	sleep ( 1 );
 }
-
 
 echo "done. updated $assetParamsChanged asset params" . PHP_EOL;
