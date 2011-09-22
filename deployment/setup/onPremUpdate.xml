@@ -40,7 +40,17 @@
     <!-- ============================================  -->
     <target name="replaceNonRootFiles" depends="restartApache,clearCache">
          <echo msg="replacing non root files..." />
-         <copy file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh" tofile="/opt/kaltura/app/plugins/sphinx_search/scripts/watch.daemon.sh" overwrite="true"/>
+         <property name="properties.watch.daemon.sh"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh" property="properties.watch.daemon.sh" />
+         
+         <if>
+              <equals arg1="${properties.watch.daemon.sh}" arg2="true" />
+         <then>
+              <echo msg="replacing watch.daemon.sh file..." />
+			  <copy file="${installationLoc}${installationDir}/package/app/app/plugins/sphinx_search/scripts/watch.daemon.sh" tofile="/opt/kaltura/app/plugins/sphinx_search/scripts/watch.daemon.sh" overwrite="true"/>
+         </then>
+         </if>
+         
     </target>
     
     <!-- ============================================  -->
