@@ -215,7 +215,7 @@ DbManager::initialize();
 
 
 // Logger
-$loggerConfigPath = realpath(dirname(__FILE__) . "/../configurations/logger.ini");
+$loggerConfigPath = realpath(dirname(__FILE__) . "/../../configurations/logger.ini");
 try // we don't want to fail when logger is not configured right
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
