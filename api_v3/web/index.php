@@ -18,7 +18,7 @@ KalturaLog::analytics(array(
 	'time' => $start,
 	'agent' => '"' . (isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : null) . '"',
 	'host' => (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null),
-	'clientTag' => '"' . isset($_REQUEST['clientTag']) ? $_REQUEST['clientTag'] : null . '"',
+	'clientTag' => '"' . (isset($_REQUEST['clientTag']) ? $_REQUEST['clientTag'] : null) . '"',
 ));
 
 KalturaLog::debug(">------------------------------------- api_v3 -------------------------------------");
