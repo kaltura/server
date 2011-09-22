@@ -85,18 +85,25 @@ function doCurl($url, $params = array(), $files = array())
 
 function stripXMLInvalidChars($value) 
 {
-	return preg_replace ( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', "", $value );
-}	
+	preg_match_all( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', $value, $invalidChars );
+	$invalidChars = reset($invalidChars);
+	if (count($invalidChars))
+	{
+		$value = str_replace($invalidChars, "", $value);
+	}
+	return $value;
+}
 
 function xmlToArray($xmlstring)
 {
 	// fix the xml if it's invalid
+	$xmlstring = @iconv('utf-8', 'utf-8', $xmlstring);
 	$xmlstring = stripXMLInvalidChars($xmlstring);
 	$xmlstring = str_replace('&', '&amp;', $xmlstring);
 	$xmlstring = str_replace(array('&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;amp;', '&amp;apos;'), array('&lt;', '&gt;', '&quot;', '&amp;', '&apos;'), $xmlstring);
 	
 	// parse the xml
-	$xml = simplexml_load_string($xmlstring);
+	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
 	$array = json_decode($json,TRUE);
 	return $array;
@@ -104,6 +111,8 @@ function xmlToArray($xmlstring)
 
 function compareArrays($resultNew, $resultOld, $path)
 {
+	global $serviceUrlNew, $serviceUrlOld;
+	
 	$errors = array();
 	foreach ($resultOld as $key => $oldValue)
 	{
@@ -120,7 +129,7 @@ function compareArrays($resultNew, $resultOld, $path)
 		}
 		else
 		{
-			if ($newValue != $oldValue)
+			if (str_replace($serviceUrlNew, $serviceUrlOld, $newValue) != $oldValue)
 			{
 				$errors[] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
 			}
@@ -130,13 +139,31 @@ function compareArrays($resultNew, $resultOld, $path)
 	return $errors;
 }
 
+function removeChangingFields(&$results)
+{
+	unset($results["executionTime"]);
+	unset($results["debug"]);
+	if (isset($results["result"]) && is_array(isset($results["result"])) && isset($results["result"]["serverTime"]))
+	{
+		$resultItem = $results["result"];
+		unset($resultItem["serverTime"]);
+		$results["result"] = $resultItem;
+	}
+}
+
 function compareResults($resultNew, $resultOld)
 {
 	$resultNew = xmlToArray($resultNew);
-	unset($resultNew["executionTime"]);
+	removeChangingFields($resultNew);
 
 	$resultOld = xmlToArray($resultOld);
-	unset($resultOld["executionTime"]);
+	removeChangingFields($resultOld);
+
+	if (!$resultNew || !$resultOld)
+	{
+		print "\nError: failed to parse XMLs\n";
+		return array();
+	}
 	
 	return compareArrays($resultNew, $resultOld, "");
 }
@@ -202,23 +229,30 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	print "Testing $fullActionName...";
 	
 	usleep(200000);         // sleep for 0.2 sec to avoid hogging the server
-	list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams);
-	list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams);
 	
-	if ($curlErrorNew || $curlErrorOld)
+	for ($retries = 0; $retries < 3; $retries++)
 	{
-		print "Curl error [$curlErrorNew] [$curlErrorOld]\n";
-		return;
+		list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams);
+		list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams);
+		
+		if ($curlErrorNew || $curlErrorOld)
+		{
+			print "Curl error [$curlErrorNew] [$curlErrorOld]\n";
+			return;
+		}
+		
+		$errors = compareResults($resultNew, $resultOld);
+		
+		if (!count($errors))
+		{
+			print sprintf("Ok (new=%.3f old=%.3f)\n", $newTime, $oldTime);
+			return;
+		}
+		
+		print "\nRetrying $fullActionName...";
+		usleep(1000000);
 	}
-	
-	$errors = compareResults($resultNew, $resultOld);
-	
-	if (!count($errors))
-	{
-		print sprintf("Ok (new=%.3f old=%.3f)\n", $newTime, $oldTime);
-		return;
-	}
-	
+		
 	print "\n-------------------------------------------------------------------------------\n";
 	print "\tAction = $fullActionName\n";
 	print "\tParams = ".print_r($parsedParams, true)."\n";
