@@ -22,7 +22,6 @@ KalturaLog::analytics(array(
 ));
 
 KalturaLog::debug(">------------------------------------- api_v3 -------------------------------------");
-KalturaLog::logByType(">------------------------------------- api_v3 -------------------------------------", KalturaLog::LOG_TYPE_TESTS);
 KalturaLog::info("API-start ");
 
 $controller = KalturaFrontController::getInstance();
@@ -31,7 +30,6 @@ $controller->run();
 $end = microtime(true);
 KalturaLog::info("API-end [".($end - $start)."]");
 KalturaLog::debug("<------------------------------------- api_v3 -------------------------------------");
-KalturaLog::logByType("<------------------------------------- api_v3 -------------------------------------", KalturaLog::LOG_TYPE_TESTS);
 
 KalturaLog::analytics(array(
 	'session_end',
