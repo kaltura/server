@@ -1389,7 +1389,7 @@ class kFlowHelper
 		KalturaLog::debug("Convert Profile finished");
 
 		$originalflavorAsset = assetPeer::retrieveOriginalByEntryId($dbBatchJob->getEntryId());
-		if($originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
+		if($originalflavorAsset && $originalflavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_TEMP)
 		{
 			$originalflavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 			$originalflavorAsset->setDeletedAt(time());
