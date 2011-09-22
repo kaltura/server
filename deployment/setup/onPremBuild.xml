@@ -277,15 +277,15 @@
     <target name="genActivationKey" >
          <echo msg="generate activation key ..." />
 
-         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" overwrite="true">
+         <copy file="/opt/kaltura/app/configurations/local.ini" tofile="/opt/kaltura/app/configurations/local.ini.bak" overwrite="true">
               <filterchain>
                    <replaceregexp>
-                        <regexp pattern='"kaltura_activation_key" => false,' replace='"kaltura_activation_key" => "NjkwNTkzMTg5NWJjM2YyNzg0ZjFlNjViZDIzNzA0NDJ8MXxuZXZlcnww",'/>
+                        <regexp pattern='kaltura_activation_key = false' replace='kaltura_activation_key = NjkwNTkzMTg5NWJjM2YyNzg0ZjFlNjViZDIzNzA0NDJ8MXxuZXZlcnww'/>
                    </replaceregexp>
               </filterchain>
          </copy>
 
-         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php" overwrite="true"/>
+         <copy file="/opt/kaltura/app/configurations/local.ini.bak" tofile="/opt/kaltura/app/configurations/local.ini" overwrite="true"/>
 
     </target>
 
@@ -294,7 +294,7 @@
     <!-- ============================================  -->
     <target name="changeLogLevel">
          <echo msg="changing log level..." />
-         <copy file="/opt/kaltura/app/api_v3/config/logger.ini" tofile="/opt/kaltura/app/api_v3/config/logger.ini.1" overwrite="true">
+         <copy file="/opt/kaltura/app/configurations/logger.ini" tofile="/opt/kaltura/app/configurations/logger.ini.1" overwrite="true">
               <filterchain>
                    <replaceregexp>
                        <regexp pattern="writers.stream.filters.priority.priority = (\w+)" replace="writers.stream.filters.priority.priority = 7"/>
@@ -302,7 +302,7 @@
               </filterchain>
          </copy>
 
-         <copy file="/opt/kaltura/app/api_v3/config/logger.ini.1" tofile="/opt/kaltura/app/api_v3/config/logger.ini" overwrite="true"/>
+         <copy file="/opt/kaltura/app/configurations/logger.ini.1" tofile="/opt/kaltura/app/configurations/logger.ini" overwrite="true"/>
     </target>
     
     <!-- ============================================  -->
