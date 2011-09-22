@@ -38,7 +38,12 @@ class KalturaSshUrlResource extends KalturaUrlResource
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-
+	
+	public function validateAsset(asset $dbAsset)
+	{
+		if(!($dbAsset instanceof flavorAsset))
+			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
+	}
 
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{

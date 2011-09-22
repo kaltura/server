@@ -119,7 +119,7 @@ class MediaService extends KalturaEntryService
 			if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT))
 			{
 				KalturaLog::notice("Replacement is not allowed to the partner permission [FEATURE_ENTRY_REPLACEMENT] is needed");
-				return;
+				throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PermissionName::FEATURE_ENTRY_REPLACEMENT);
 			}
 			
 			if($dbEntry->getReplacingEntryId())
@@ -178,7 +178,6 @@ class MediaService extends KalturaEntryService
 				return $this->attachAssetParamsResourceContainer($resource, $dbEntry, $dbAsset);
 				
 			case 'kUrlResource':
-			case 'kSshUrlResource':
 				return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
 				
 			case 'kLocalFileResource':

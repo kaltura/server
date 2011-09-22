@@ -12,7 +12,7 @@ class KalturaResource extends KalturaObject
 	{
 		
 	}
-
+	
 	public function entryHandled(entry $dbEntry)
 	{
 		

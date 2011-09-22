@@ -96,6 +96,7 @@ class CaptionAssetService extends KalturaAssetService
 		
    		$previousStatus = $dbCaptionAsset->getStatus();
 		$contentResource->validateEntry($dbCaptionAsset->getentry());
+		$contentResource->validateAsset($dbCaptionAsset);
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbCaptionAsset, $kContentResource);
 		$contentResource->entryHandled($dbCaptionAsset->getentry());

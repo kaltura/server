@@ -135,6 +135,7 @@ class FlavorAssetService extends KalturaAssetService
 		
    		$previousStatus = $dbFlavorAsset->getStatus();
 		$contentResource->validateEntry($dbFlavorAsset->getentry());
+		$contentResource->validateAsset($dbFlavorAsset);
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbFlavorAsset, $kContentResource);
 		$contentResource->entryHandled($dbFlavorAsset->getentry());
@@ -354,7 +355,6 @@ class FlavorAssetService extends KalturaAssetService
     	switch($contentResource->getType())
     	{
 			case 'kUrlResource':
-			case 'kSshUrlResource':
 				return $this->attachUrlResource($flavorAsset, $contentResource);
 				
 			case 'kLocalFileResource':

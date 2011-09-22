@@ -8,4 +8,8 @@
  */
 class KalturaContentResource extends KalturaResource 
 {
+	public function validateAsset(asset $dbAsset)
+	{
+	
+	}
 }

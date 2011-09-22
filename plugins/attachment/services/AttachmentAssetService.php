@@ -98,6 +98,7 @@ class AttachmentAssetService extends KalturaAssetService
 		
    		$previousStatus = $dbAttachmentAsset->getStatus();
 		$contentResource->validateEntry($dbAttachmentAsset->getentry());
+		$contentResource->validateAsset($dbAttachmentAsset);
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbAttachmentAsset, $kContentResource);
 		$contentResource->entryHandled($dbAttachmentAsset->getentry());

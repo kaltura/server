@@ -101,6 +101,7 @@ class ThumbAssetService extends KalturaAssetService
 		
    		$previousStatus = $dbThumbAsset->getStatus();
 		$contentResource->validateEntry($dbThumbAsset->getentry());
+		$contentResource->validateAsset($dbThumbAsset);
 		$kContentResource = $contentResource->toObject();
     	$this->attachContentResource($dbThumbAsset, $kContentResource);
 		$contentResource->entryHandled($dbThumbAsset->getentry());
