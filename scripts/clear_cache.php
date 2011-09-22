@@ -11,10 +11,6 @@ askToDelete(fixPath(kConf::get('general_cache_dir')));
 askToDelete(fixPath(kConf::get('response_cache_dir')));
 askToDelete(fixPath(kConf::get('cache_root_path')));
 
-// clear symfony (alpha) cache
-system('php '.fixPath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
-system('php '.fixPath(kConf::get('sf_root_dir')).DIRECTORY_SEPARATOR.'symfony cc');
-
 // clear APC cache
 if (function_exists('apc_clear_cache'))
 {
