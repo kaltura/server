@@ -13,9 +13,6 @@ class KalturaCaptionAssetItemFilter extends KalturaCaptionAssetFilter
 		"startTimeLessThanOrEqual" => "_lte_start_time",
 		"endTimeGreaterThanOrEqual" => "_gte_end_time",
 		"endTimeLessThanOrEqual" => "_lte_end_time",
-		"tagsLike" => "_like_tags",
-		"tagsMultiLikeOr" => "_mlikeor_tags",
-		"tagsMultiLikeAnd" => "_mlikeand_tags",
 		"contentLike" => "_like_content",
 		"contentMultiLikeOr" => "_mlikeor_content",
 		"contentMultiLikeAnd" => "_mlikeand_content",
@@ -50,21 +47,6 @@ class KalturaCaptionAssetItemFilter extends KalturaCaptionAssetFilter
 	{
 		// do nothing, just overwrite parent validations
 	}
-	
-	/**
-	 * @var string
-	 */
-	public $tagsLike;
-
-	/**
-	 * @var string
-	 */
-	public $tagsMultiLikeOr;
-
-	/**
-	 * @var string
-	 */
-	public $tagsMultiLikeAnd;
 	
 	/**
 	 * @var string
