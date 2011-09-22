@@ -227,11 +227,7 @@ abstract public class KalturaClientBase {
         this.validateXmlResult(responseXml);
       
         Element resultXml = null;
-        try {
-        	resultXml = XmlUtils.getElementByXPath(responseXml, "/xml/result");
-        } catch (XPathExpressionException xee) {
-    		throw new KalturaApiException("XPath expression exception evaluating result");
-    	}	
+       	resultXml = getElementByXPath(responseXml, "/xml/result");
         
         this.throwExceptionOnAPIError(resultXml);
         
@@ -242,8 +238,30 @@ abstract public class KalturaClientBase {
         isMultiRequest = true;
     }
 
+    public Element getElementByXPath(Element element, String xPath) throws KalturaApiException
+    {
+	    try 
+	    {
+	    	return XmlUtils.getElementByXPath(element, xPath);
+	    }
+	    catch (XPathExpressionException xee)
+	    {
+			throw new KalturaApiException("XPath expression exception evaluating result");
+		}
+    }
     
-    public KalturaMultiResponse doMultiRequest() throws KalturaApiException 
+	public List<KalturaObjectBase> createArray(Element arrayNode) throws KalturaApiException
+	{
+		List<KalturaObjectBase> list = new ArrayList<KalturaObjectBase>();
+		for(int i = 0; i < arrayNode.getChildNodes().getLength(); i++)
+		{
+			Element node = (Element)arrayNode.getChildNodes().item(i);
+			list.add((KalturaObjectBase)KalturaObjectFactory.create(node));
+		}
+		return list;
+	}
+	
+    public KalturaMultiResponse doMultiRequest() throws KalturaApiException
     {
     	Element multiRequestResult = doQueue();
 
@@ -253,19 +271,30 @@ abstract public class KalturaClientBase {
         {
             Element arrayNode = (Element)multiRequestResult.getChildNodes().item(i);
             
-            KalturaApiException exception = getExceptionOnAPIError(arrayNode);
-            if (exception != null)
-            {
-            	multiResponse.add(exception);
-            }
-            else if (arrayNode.getElementsByTagName("objectType").getLength() == 0)
-            {
-            	multiResponse.add(arrayNode.getTextContent());
-            }
-            else
-            {
-            	multiResponse.add(KalturaObjectFactory.create(arrayNode));
-            }
+        	try
+        	{
+	            KalturaApiException exception = getExceptionOnAPIError(arrayNode);
+	            if (exception != null)
+	            {
+	            	multiResponse.add(exception);
+	            }	
+	            else if (getElementByXPath(arrayNode, "objectType") != null)
+	            {
+	           		multiResponse.add(KalturaObjectFactory.create(arrayNode));
+	            }
+	            else if (getElementByXPath(arrayNode, "item/objectType") != null)
+	            {
+	           		multiResponse.add(createArray(arrayNode));
+	            }
+	            else
+	            {
+	            	multiResponse.add(arrayNode.getTextContent());
+	            }
+        	}
+        	catch (KalturaApiException e)
+        	{
+        		multiResponse.add(e);
+        	}
        }
 	   return multiResponse;
     }
@@ -306,11 +335,7 @@ abstract public class KalturaClientBase {
     private void validateXmlResult(Element resultXml) throws KalturaApiException {
     	
     	Element resultElement = null;
-    	try {
-    		resultElement = XmlUtils.getElementByXPath(resultXml, "/xml/result");
-    	} catch (XPathExpressionException xee) {
-    		throw new KalturaApiException("XPath expression exception evaluating result");
-    	}
+   		resultElement = getElementByXPath(resultXml, "/xml/result");
     	                
         if (resultElement != null) {
             return;            
@@ -320,24 +345,20 @@ abstract public class KalturaClientBase {
     }
 
     private KalturaApiException getExceptionOnAPIError(Element result) throws KalturaApiException {
-    	try {
-	    	Element errorElement = XmlUtils.getElementByXPath(result, "error");
-	    	if (errorElement == null)
-	    	{
-	    		return null;
-	    	}
-	    	
-	    	Element messageElement = XmlUtils.getElementByXPath(errorElement, "message");
-	    	Element codeElement = XmlUtils.getElementByXPath(errorElement, "code");
-	    	if (messageElement == null || codeElement == null)
-	    	{
-	    		return null;
-	    	}
-	    	
-	    	return new KalturaApiException(messageElement.getTextContent(), codeElement.getTextContent());
-    	} catch (XPathExpressionException xee) {
-    		throw new KalturaApiException("XPath expression exception evaluating result");
+    	Element errorElement = getElementByXPath(result, "error");
+    	if (errorElement == null)
+    	{
+    		return null;
     	}
+    	
+    	Element messageElement = getElementByXPath(errorElement, "message");
+    	Element codeElement = getElementByXPath(errorElement, "code");
+    	if (messageElement == null || codeElement == null)
+    	{
+    		return null;
+    	}
+    	
+    	return new KalturaApiException(messageElement.getTextContent(), codeElement.getTextContent());
     }
 
     private void throwExceptionOnAPIError(Element result) throws KalturaApiException {

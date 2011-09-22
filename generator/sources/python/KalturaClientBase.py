@@ -46,7 +46,7 @@ def getChildNodeByXPath(node, nodePath):
                 break
         if nextChild == None:
             return None
-        node = childNode
+        node = nextChild
     return node
 
 # Request parameters container

@@ -303,6 +303,8 @@ class KalturaClient:
                 result.append(exceptionObj)
             elif getChildNodeByXPath(childNode, 'objectType') != None:
                 result.append(KalturaObjectFactory.create(childNode, KalturaObjectBase))
+            elif getChildNodeByXPath(childNode, 'item/objectType') != None:
+                result.append(KalturaObjectFactory.createArray(childNode, KalturaObjectBase))
             else:
                 result.append(getXmlNodeText(childNode))
         return result
