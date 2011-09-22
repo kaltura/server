@@ -26,7 +26,6 @@ class DocumentsService extends KalturaEntryService
 				return $this->attachAssetParamsResourceContainer($resource, $dbEntry, $dbAsset);
 				
 			case 'kUrlResource':
-			case 'kSshUrlResource':
 				return $this->attachUrlResource($resource, $dbEntry, $dbAsset);
 				
 			case 'kLocalFileResource':
