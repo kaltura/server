@@ -294,10 +294,13 @@ package com.kaltura.delegates {
 		public function getServeUrl(call:KalturaCall):URLRequest
 		{
 			var url : String = _config.protocol + _config.domain +"/"+_config.srvUrl+"?service="+call.service+"&action="+call.action;
+			for (var key:String in call.args) {
+				url += "&" + key + "=" + call.args[key];
+			}
 			var req:URLRequest = new URLRequest( url );
 			req.contentType = "application/x-www-form-urlencoded";
 			req.method = call.method; 
-			req.data = call.args; 
+//			req.data = call.args; 
 			return req;
 		}
 	}
