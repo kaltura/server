@@ -176,7 +176,10 @@ class KalturaPluginManager
 			
 			// check if the required plugin is configured to be loaded
 			if(!isset($availablePlugins[$pendingPluginName]))
+			{
+				KalturaLog::err("Pending plugin name [$pendingPluginName] is not available, plugin [$pluginClass] could not be loaded.");
 				return false;
+			}
 				
 			$pendingPluginClass = $availablePlugins[$pendingPluginName];
 			$pendingPluginReplection = new ReflectionClass($pendingPluginClass);
@@ -193,7 +196,10 @@ class KalturaPluginManager
 				$pendingPluginVersion = call_user_func(array($pendingPluginClass, 'getVersion'));
 //				$pendingPluginVersion = $pendingPluginClass::getVersion();
 				if(!$pendingPluginVersion->isCompatible($pendingPluginMinVersion))
+				{
+					KalturaLog::err("Pending plugin name [$pendingPluginName] version [$pendingPluginVersion] is not compatible with required version [$pendingPluginMinVersion], plugin [$pluginClass] could not be loaded.");
 					return false;
+				}
 			}
 			
 			// adds tested plugin name to the list of validated in order to avoid endless recursion
@@ -202,7 +208,10 @@ class KalturaPluginManager
 			$tempValidatedPlugins[] = call_user_func(array($pluginClass, 'getPluginName'));
 //			$tempValidatedPlugins[] = $pluginClass::getPluginName();
 			if(!self::isValid($pendingPluginClass, $tempValidatedPlugins))
+			{
+				KalturaLog::err("Plugin [$pluginClass] could not be loaded.");
 				return false;
+			}
 				
 			// adds the last tested dependency plugin to the valid list
 			$validatedPlugins[] = $pendingPluginName;
