@@ -1656,7 +1656,7 @@ class FlvMetaData
 		// lazy load from disk
 		if ( ! file_exists( $this->file_name ))
 		{
-			kLog::log( __METHOD__ . ": file [" . $this->file_name . "] does not exist" );
+			KalturaLog::info( __METHOD__ . ": file [" . $this->file_name . "] does not exist" );
 			return null;	
 		}
 		

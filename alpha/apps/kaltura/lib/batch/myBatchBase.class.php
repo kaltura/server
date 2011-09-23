@@ -2,31 +2,11 @@
 require_once( 'myConfigWrapper.class.php');
 ini_set( "memory_limit" , "256M" );
 
-$TRACE_INFO = false;
 $g_context = "";
 function SET_CONTEXT ( $str )
 {
 	global $g_context;
 	$g_context = $str;
-}
-
-function TRACE ( $str )
-{
-	global $g_context;
-	if ( $g_context === null ) return ;
-	$time = ( microtime(true) );
-	$milliseconds = (int)(($time - (int)$time) * 1000);  
-	if ( function_exists('memory_get_usage') )
-		$mem_usage = "{". memory_get_usage() . "}";
-	else
-		$mem_usage = ""; 
-	echo strftime( "%d/%m %H:%M:%S." , time() ) . $milliseconds . " " . $mem_usage . " " .$g_context . ": " . $str ."\n";
-}
-
-function INFO ( $str )
-{
-	global $TRACE_INFO;
-	if ( $TRACE_INFO ) TRACE ( $str );
 }
 
 abstract class myBatchBase
@@ -175,7 +155,7 @@ abstract class myBatchBase
 	
 	protected static function initDb( $should_perform_shutdown = false )
 	{
-		TRACE ( "----------------- Initializing DB ------------------- ");
+		KalturaLog::debug ( "----------------- Initializing DB ------------------- ");
 		if ( self::$s_databaseManager == NULL )
 		{
 			$dbConf = kConf::getDB();
@@ -184,7 +164,7 @@ abstract class myBatchBase
 		}
 		if ( $should_perform_shutdown )
 		{
-			TRACE ( "Attempting shutdown of DB due to errors" );
+			KalturaLog::debug ( "Attempting shutdown of DB due to errors" );
 			// All of this brutal shutdown & init is to release all DB connections and restart as clean as possible
 			//
 			//self::$s_databaseManager->shutdown();
@@ -202,10 +182,10 @@ abstract class myBatchBase
 	{
 		self::$s_failure_count++;
 
-		TRACE ( "Failed [" . self::$s_failure_count . "] times out of the allowed [" . self::MAX_FAILURES . "]" );
+		KalturaLog::debug ( "Failed [" . self::$s_failure_count . "] times out of the allowed [" . self::MAX_FAILURES . "]" );
 		if ( self::$s_failure_count >= self::MAX_FAILURES )
 		{
-			TRACE ( "Fatal error, failed too many times [" . self::$s_failure_count . "]" );
+			KalturaLog::debug ( "Fatal error, failed too many times [" . self::$s_failure_count . "]" );
 			exit ( );
 		}
 	}
@@ -222,10 +202,10 @@ abstract class myBatchBase
 			return true;
 		$mem_usage =  memory_get_usage() ;
 		$limit =  self::parseMemorySize ( ini_get( "memory_limit") );
-//		TRACE ( "shouldProceed: $mem_usage / $limit [" . ( $mem_usage < 0.8 * $limit ) . "]" );
+//		KalturaLog::debug ( "shouldProceed: $mem_usage / $limit [" . ( $mem_usage < 0.8 * $limit ) . "]" );
 		if  ( $mem_usage > ( 0.8 * $limit ) )
 		{
-	//		TRACE ( "shouldProceed - NO! memory: [$mem_usage] limit [$limit]" );
+	//		KalturaLog::debug ( "shouldProceed - NO! memory: [$mem_usage] limit [$limit]" );
 			return false;
 		}
 		
@@ -249,7 +229,7 @@ abstract class myBatchBase
 		{
 			if ( self::$s_pending_tasks == 0  )
 			{
-				TRACE ( "Gracefully exiting..." );
+				KalturaLog::debug ( "Gracefully exiting..." );
 				die();
 			}
 			else 
@@ -258,17 +238,17 @@ abstract class myBatchBase
 				{
 					// set the force_die_time 
 					self::$s_force_die_time = time() + self::SECONDS_TO_FORCE_DIE;
-					TRACE ( "Should exis but still exists [" . self::$s_pending_tasks . "] pending tasts ... Will FORCE DIE in [" . 
+					KalturaLog::debug ( "Should exis but still exists [" . self::$s_pending_tasks . "] pending tasts ... Will FORCE DIE in [" . 
 						self::SECONDS_TO_FORCE_DIE . "] seconds");
 				}
 				elseif ( time() > self::$s_force_die_time )
 				{
-					TRACE ( "FORCE DIE !!. There are still [" . self::$s_pending_tasks . "] pending tasts but their time has come !" );
+					KalturaLog::debug ( "FORCE DIE !!. There are still [" . self::$s_pending_tasks . "] pending tasts but their time has come !" );
 					die();
 				}
 				else
 				{
-					TRACE ( "Should exit but still exists [" . self::$s_pending_tasks . "] pending tasts ... Will FORCE DIE in [" . 
+					KalturaLog::debug ( "Should exit but still exists [" . self::$s_pending_tasks . "] pending tasts ... Will FORCE DIE in [" . 
 						(time() - self::$s_force_die_time ) . "] seconds");					
 				}
 			}

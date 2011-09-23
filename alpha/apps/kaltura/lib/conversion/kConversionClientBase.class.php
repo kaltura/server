@@ -35,11 +35,11 @@ abstract class kConversionClientBase extends myBatchBase
 		$this->server_cmd_path = realpath($server_cmd_path);	
 		$this->server_res_path = realpath($server_res_path);
 		$this->commercial_server_cmd_path = realpath ( $commercial_server_cmd_path );
-		TRACE ( "------------------- kConversionClient [$mode]----------------------");
-		TRACE ( "--- in_path: [" . $this->in_path . "] ---" );
-		TRACE ( "--- server_cmd_path: [" . $this->server_cmd_path . "] ---" );
-		TRACE ( "--- server_res_path: [" . $this->server_res_path . "] ---" );
-		TRACE ( "--- commercial_server_cmd_path: [" . $this->commercial_server_cmd_path . "] ---" );
+		KalturaLog::debug ( "------------------- kConversionClient [$mode]----------------------");
+		KalturaLog::debug ( "--- in_path: [" . $this->in_path . "] ---" );
+		KalturaLog::debug ( "--- server_cmd_path: [" . $this->server_cmd_path . "] ---" );
+		KalturaLog::debug ( "--- server_res_path: [" . $this->server_res_path . "] ---" );
+		KalturaLog::debug ( "--- commercial_server_cmd_path: [" . $this->commercial_server_cmd_path . "] ---" );
 		
 		$this->mode = $mode;
 //echo "<br>".__METHOD__ .":[$in_path][$server_cmd_path][$server_res_path]<br>"; 		
@@ -84,12 +84,12 @@ abstract class kConversionClientBase extends myBatchBase
 			throw new kConversionException ( "Cannot convert [$source_file] using a null ConversionProfile" );
 		}
 		
-		TRACE ( "ConversionProfile: " . print_r ( $conv_profile , true ));
+		KalturaLog::debug ( "ConversionProfile: " . print_r ( $conv_profile , true ));
 		
 		$fallback_mode = array();
 		$conv_params_list_from_db = $conv_profile->getConversionParams( $fallback_mode );
 		
-		TRACE ( "ConversionParams chosen by fallback_mode [" . print_r ( $fallback_mode, true ) . "]" );
+		KalturaLog::debug ( "ConversionParams chosen by fallback_mode [" . print_r ( $fallback_mode, true ) . "]" );
 		
 		if ( ! $conv_params_list_from_db || count ( $conv_params_list_from_db ) == 0 )
 		{
@@ -197,7 +197,7 @@ abstract class kConversionClientBase extends myBatchBase
 		catch ( Exception $ex )
 		{
 			// Do NOT fail the actual conversion
-			TRACE ( "Problem reporting conversion details to DB (part I) " . $ex->getTraceAsString() );
+			KalturaLog::debug ( "Problem reporting conversion details to DB (part I) " . $ex->getTraceAsString() );
 		}
 	}
 	
@@ -249,12 +249,12 @@ abstract class kConversionClientBase extends myBatchBase
 			}
 			else
 			{
-				TRACE ( "Cannot find conversion details for entry $entry_id" );
+				KalturaLog::debug ( "Cannot find conversion details for entry $entry_id" );
 			}
 		}
 		catch ( Exception $ex )
 		{
-			TRACE ( "Error reporting conversion details to DB (part II) " . $ex->getTraceAsString() );
+			KalturaLog::debug ( "Error reporting conversion details to DB (part II) " . $ex->getTraceAsString() );
 		}		
 	}
 	
@@ -314,18 +314,18 @@ abstract class kConversionClientBase extends myBatchBase
 	
 	protected function archiveFile ( $file_name  )
 	{
-		TRACE ( "Archiving file [" . $file_name . "]" );
+		KalturaLog::debug ( "Archiving file [" . $file_name . "]" );
 		$id = self::getEntryIdFromFileName ( $file_name );
 		$entry = entryPeer::retrieveByPKNoFilter($id);
 		$entry->setArchiveExtension(pathinfo ( $file_name , PATHINFO_EXTENSION ));
 		$sync_key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE);
 		$file_sync = kFileSyncUtils::createSyncFileForKey($sync_key, false, false);
 		$target = kFileSyncUtils::getLocalFilePathForKey($sync_key, false);
-		TRACE ( "Archiving file [" . $file_name . "] to [" . $target . "]}"  );
+		KalturaLog::debug ( "Archiving file [" . $file_name . "] to [" . $target . "]}"  );
 		// MOVE - there is no need to copy because we the ConvCommand will include the file path anyway
 		if ( $file_name == $target )
 		{
-			TRACE ( "File [$file_name] already archived" );
+			KalturaLog::debug ( "File [$file_name] already archived" );
 			return $file_sync;
 		}
 		
@@ -355,13 +355,13 @@ abstract class kConversionClientBase extends myBatchBase
 		$entry = entryPeer::retrieveByPK( $id );
 		if ( $entry )
 		{
-			TRACE  ("Found entry for file_name [$file_name] -> entry_id [$id]");
+			KalturaLog::debug  ("Found entry for file_name [$file_name] -> entry_id [$id]");
 			$int_id = $entry->getIntId();
 			$path_name = myContentStorage::dirForId ( $int_id , $id ). "." . pathinfo ( $file_name , PATHINFO_EXTENSION );	
 		}
 		else
 		{
-			TRACE  ("Did NOT find entry for file_name [$file_name] -> entry_id [$id]");
+			KalturaLog::debug  ("Did NOT find entry for file_name [$file_name] -> entry_id [$id]");
 			$path_name = "AZ/" . pathinfo ( $file_name , PATHINFO_BASENAME );
 			
 		}

@@ -54,7 +54,7 @@ class myObjectCache
 
 		$key = $parnet_clazz . "_" . $id . "_arr_$field_name";
 		
-		kLog::log (  __CLASS__ . ":putArray: $key" );
+		KalturaLog::info (  __CLASS__ . ":putArray: $key" );
 //		echo "putArray:" . $key . "(" . count ( $arr ) . ")\n" ;
 		
 		self::$s_memory_cache->put ( $key , $id_list , $this->m_expiry_in_seconds );
@@ -113,7 +113,7 @@ class myObjectCache
 		}
 
 		$key = $obj_clazz . "_" . $id . "_arr_$field_name";
-		kLog::log (  __CLASS__ . ":removeArray: $key" );
+		KalturaLog::info (  __CLASS__ . ":removeArray: $key" );
 		
 		 
 		self::$s_memory_cache->remove ( $key );

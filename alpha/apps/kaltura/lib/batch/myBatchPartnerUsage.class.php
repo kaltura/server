@@ -23,12 +23,12 @@ class myBatchPartnerUsage extends myBatchBase
 			$partners = PartnerPeer::doSelect($c);
 			if (!$partners)
 			{
-				TRACE( "No more partners. offset: $start_pos , limit: $bulk_size ." );
+				KalturaLog::debug( "No more partners. offset: $start_pos , limit: $bulk_size ." );
 				$partners_exists = false;
 			} 
 			else
 			{
-				TRACE( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
+				KalturaLog::debug( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
 				foreach($partners as $partner)
 				{
 					myPartnerUtils::doPartnerUsage($partner, true);

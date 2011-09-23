@@ -895,7 +895,7 @@ class myPartnerUtils
 		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
 		$percent = round( ($totalUsageGB / $partnerPackage['cycle_bw'])*100, 2);
 
-		TRACE("percent (".$partner->getId().") is: $percent");
+		KalturaLog::debug("percent (".$partner->getId().") is: $percent");
 		$email_link_hash = 'pid='.$partner->getId().'&h='.(self::getEmailLinkHash($partner->getId(), $partner->getSecret()));
 		$email_link_hash_adOpt = $email_link_hash.'&type=adOptIn';
 		/* mindtouch partners - extra mail parameter */
@@ -908,7 +908,7 @@ class myPartnerUtils
 			$percent < 100 &&
 			!$partner->getEightyPercentWarning())
 		{
-			TRACE("partner ". $partner->getId() ." reached 80% - setting first warning");
+			KalturaLog::debug("partner ". $partner->getId() ." reached 80% - setting first warning");
 				
 			/* prepare mail job, and set EightyPercentWarning() to true/date */
 			$partner->setEightyPercentWarning(time());
@@ -921,12 +921,12 @@ class myPartnerUtils
 			$partner->getEightyPercentWarning() &&
 			!$partner->getUsageLimitWarning())
 		{
-			TRACE("passed the 80%, assume notification sent, nothing to do.");
+			KalturaLog::debug("passed the 80%, assume notification sent, nothing to do.");
 		}
 		elseif ($percent < 80 &&
 				$partner->getEightyPercentWarning())
 		{
-			TRACE("partner ". $partner->getId() ." was 80%, now not. clearing warnings");
+			KalturaLog::debug("partner ". $partner->getId() ." was 80%, now not. clearing warnings");
 				
 			/* clear getEightyPercentWarning */
 			$partner->setEightyPercentWarning(0);
@@ -935,7 +935,7 @@ class myPartnerUtils
 		elseif ($percent >= 100 &&
 				!$partner->getUsageLimitWarning())
 		{
-			TRACE("partner ". $partner->getId() ." reached 100% - setting second warning");
+			KalturaLog::debug("partner ". $partner->getId() ." reached 100% - setting second warning");
 				
 			/* prepare mail job, and set getUsageLimitWarning() date */
 			$partner->setUsageLimitWarning(time());
@@ -952,7 +952,7 @@ class myPartnerUtils
 				$partner->getUsageLimitWarning() > $delete_grace &&
 				$partner->getStatus() != Partner::PARTNER_STATUS_CONTENT_BLOCK)
 		{
-			TRACE("partner ". $partner->getId() ." reached 100% $blocking_days_grace days ago - sending block email and blocking partner");
+			KalturaLog::debug("partner ". $partner->getId() ." reached 100% $blocking_days_grace days ago - sending block email and blocking partner");
 				
 			/* send block email and block partner */
 			$body_params = array ( $partner->getAdminName(), $mindtouch_notice, round($totalUsageGB, 2), $email_link_hash );
@@ -975,7 +975,7 @@ class myPartnerUtils
 				$partner->getUsageLimitWarning() <= $delete_grace &&
 				$partner->getStatus() == Partner::PARTNER_STATUS_CONTENT_BLOCK)
 		{
-			TRACE("partner ". $partner->getId() ." reached 100% a month ago - deleting partner");
+			KalturaLog::debug("partner ". $partner->getId() ." reached 100% a month ago - deleting partner");
 				
 			/* delete partner */
 			$body_params = array ( $partner->getAdminName() );
@@ -987,7 +987,7 @@ class myPartnerUtils
 		}
 		elseif($percent < 80 && ($partner->getUsageLimitWarning() || $partner->getEightyPercentWarning()))
 		{
-			TRACE("partner ". $partner->getId() ." OK");
+			KalturaLog::debug("partner ". $partner->getId() ." OK");
 			// PARTNER OK 
 			// resetting status and warnings should only be done manually
 			//$partner->setStatus(1);

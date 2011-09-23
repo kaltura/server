@@ -23,7 +23,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 	 */
 	public function doDailyStorageAggregation( $date )
 	{
-		TRACE("calculating storage agg. for date $date");
+		KalturaLog::debug("calculating storage agg. for date $date");
 		// set start points
 		$partners_exists = true;
 		$start_pos = 0;
@@ -40,13 +40,13 @@ class myNewBatchPartnerUsage extends myBatchBase
 			$partners = PartnerPeer::doSelect($c);
 			if (!$partners)
 			{
-				TRACE( "No more partners. offset: $start_pos , limit: $bulk_size ." );
+				KalturaLog::debug( "No more partners. offset: $start_pos , limit: $bulk_size ." );
 				// set flag to exit while loop
 				$partners_exists = false;
 			} 
 			else
 			{
-				TRACE( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
+				KalturaLog::debug( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
 				// loop bulk of partners
 				foreach($partners as $partner)
 				{
@@ -65,7 +65,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 					
 					while ($resultset->next()) { $total_hosting = $resultset->get('sumamount'); }
 					if ( !$total_hosting ) $total_hosting = 0;
-					TRACE('Partner '.$partner_id.' => has total hosting of '.$total_hosting.' as for ['.$date.']');
+					KalturaLog::debug('Partner '.$partner_id.' => has total hosting of '.$total_hosting.' as for ['.$date.']');
 
 					$setQuery = 'INSERT INTO partner_activity(partner_id,activity,sub_activity,activity_date,amount,amount1) ';
 					$setQuery .= " VALUES($partner_id , 3 , 301 , '$date' , 0 , $total_hosting) ON duplicate KEY UPDATE ";
@@ -76,7 +76,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 						//$result = $resultset->next();
 						//$result = '';
 						//var_dump($resultset);
-						TRACE("updated/added row for partner $partner_id, with amount1 $total_hosting ");
+						KalturaLog::debug("updated/added row for partner $partner_id, with amount1 $total_hosting ");
 					}
 					catch(Exception $ex)
 					{
@@ -93,7 +93,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 		}
 		if(count($errors))
 		{
-			TRACE("errors occurred: ".print_r($errors,true));
+			KalturaLog::debug("errors occurred: ".print_r($errors,true));
 		}
 	}
 	
@@ -128,7 +128,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 		
 		$firstOfMonth = $currentDate[0].'-'.$currentDate[1].'-01';		
 		$currentDate = implode('-', $currentDate);
-		TRACE("calculating monthly agg. for date $currentDate");
+		KalturaLog::debug("calculating monthly agg. for date $currentDate");
 		
 		// set start points
 		$partners_exists = true;
@@ -146,13 +146,13 @@ class myNewBatchPartnerUsage extends myBatchBase
 			$partners = PartnerPeer::doSelect($c);
 			if (!$partners)
 			{
-				TRACE( "No more partners. offset: $start_pos , limit: $bulk_size ." );
+				KalturaLog::debug( "No more partners. offset: $start_pos , limit: $bulk_size ." );
 				// set flag to exit while loop
 				$partners_exists = false;
 			} 
 			else
 			{		
-				TRACE( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
+				KalturaLog::debug( "Looping ". ($start_pos + $bulk_size -1) ." partners, offset: $start_pos ." );
 				// loop bulk of partners
 				foreach($partners as $partner)
 				{
@@ -160,7 +160,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 					if ($partner->getId() != 593 && $partner->getId() != 395 && $partner->getId() != 387 )
 						continue;
 
-					TRACE("testing... not skiping partner ".$partner->getId());
+					KalturaLog::debug("testing... not skiping partner ".$partner->getId());
 					*/
 					
 					// get row from partner_activity where date is 1st of current month and type is 6
@@ -171,7 +171,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 					$activityTotal = PartnerActivityPeer::doSelect( $partnerActivityCriteria );
 					if (count($activityTotal) > 1)
 					{
-						TRACE( "loaded more than one monthly aggregation row for partner. something went wrong. partner ".$partner->getID() );
+						KalturaLog::debug( "loaded more than one monthly aggregation row for partner. something went wrong. partner ".$partner->getID() );
 					}
 					elseif (count($activityTotal) == 0 || !$activityTotal)
 					{
@@ -225,7 +225,7 @@ class myNewBatchPartnerUsage extends myBatchBase
 		$partnerActivityCriteria->addAnd ( PartnerActivityPeer::SUB_ACTIVITY , PartnerActivity::PARTNER_SUB_ACTIVITY_STORAGE_SIZE );
 		$partnerActivityCriteria->addAnd ( PartnerActivityPeer::PARTNER_ID , $partnerId );
 		$activity = PartnerActivityPeer::doSelect( $partnerActivityCriteria );
-		//TRACE("$partnerId and $date resulted in ".count($activity). " rows");
+		//KalturaLog::debug("$partnerId and $date resulted in ".count($activity). " rows");
 		
 		if (count($activity))
 		{
@@ -246,24 +246,22 @@ class myNewBatchPartnerUsage extends myBatchBase
 		$partnerActivityCriteria->addAnd ( PartnerActivityPeer::PARTNER_ID , $partnerId );
 		$activity = PartnerActivityPeer::doSelect( $partnerActivityCriteria );
 
-		//TRACE("traffic ! $partnerId and $date resulted in ".count($activity). " rows");
+		//KalturaLog::debug("traffic ! $partnerId and $date resulted in ".count($activity). " rows");
 		$_traffic = 0;
 		if (count($activity) == 2)
 		{
 			$_traffic = $activity[0]->getAmount();
-			//TRACE("DB value (act[0]) = ".$activity[0]->getAmount().' my value = '.$_traffic);
+			//KalturaLog::debug("DB value (act[0]) = ".$activity[0]->getAmount().' my value = '.$_traffic);
 			$_traffic += $activity[1]->getAmount();
-			//TRACE("DB value (act[1]) = ".$activity[1]->getAmount().' my value = '.$_traffic);
+			//KalturaLog::debug("DB value (act[1]) = ".$activity[1]->getAmount().' my value = '.$_traffic);
 		}
 		elseif (count($activity) == 1)
 		{
 			$_traffic = $activity[0]->getAmount();
-			//TRACE("DB value (act[0] only) = ".$activity[0]->getAmount().' my value = '.$_traffic);
+			//KalturaLog::debug("DB value (act[0] only) = ".$activity[0]->getAmount().' my value = '.$_traffic);
 		}
 		
 		return $_traffic;
 	}	
 
 }
-
-?>

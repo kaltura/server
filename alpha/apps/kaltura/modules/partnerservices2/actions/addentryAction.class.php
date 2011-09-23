@@ -465,7 +465,7 @@ class addentryAction extends defPartnerservices2Action
 
             if ( $quick_edit )
             {
-            	kLog::log("quick edit with kshow_id [$kshow_id]");
+            	KalturaLog::info("quick edit with kshow_id [$kshow_id]");
                 if ( !$kshow) $kshow = kshowPeer::retrieveByPK( $kshow_id ); // this i
                 if ( !$kshow )
                 {
@@ -477,7 +477,7 @@ class addentryAction extends defPartnerservices2Action
                 $metadata = $kshow->getMetadata();
                 if ($metadata !== null) // probably the roughcut doesnt exist
                 {
-	            	kLog::log("Having metadata");
+	            	KalturaLog::info("Having metadata");
 	            	
 	                $relevant_kshow_version = 1 + $kshow->getVersion(); // the next metadata will be the first relevant version for this new entry
 	

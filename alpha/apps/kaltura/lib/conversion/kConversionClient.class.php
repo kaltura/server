@@ -53,7 +53,7 @@ class kConversionClient extends kConversionClientBase
 
 			if ( $temp_count == 0 )
 			{
-				TRACE ( "Ended conversion. sleeping for a while (" . $sleep_between_cycles .
+				KalturaLog::debug ( "Ended conversion. sleeping for a while (" . $sleep_between_cycles .
 				" seconds). Will write to the log in (" . ( $sleep_between_cycles * $number_of_times_to_skip_writing_sleeping ) . ") seconds" );
 			}
 
@@ -87,7 +87,7 @@ class kConversionClient extends kConversionClientBase
 			
 				if ( !$entry )
 				{
-					TRACE("entry id [$entry_id] not found!");
+					KalturaLog::debug("entry id [$entry_id] not found!");
 					return;
 				}
 				
@@ -113,7 +113,7 @@ class kConversionClient extends kConversionClientBase
 					
 					// TODO - check if there is a set of convParams for this FLV profile and manye some conversion should be done
 					// for the edit version ??
-					TRACE ( "Bypassing conversion for entry_id [$entry_id] file [$file_name]" );
+					KalturaLog::debug ( "Bypassing conversion for entry_id [$entry_id] file [$file_name]" );
 					$conv_res = new kConversionResult( $conv_cmd );
 					
 					$conv_res_info =  new kConvResInfo();
@@ -158,19 +158,19 @@ class kConversionClient extends kConversionClientBase
 				// first update the DB
 				$this->createConversionInDb( $entry_id , $archived_file_path , $conv_cmd );
 				
-				TRACE ( "Setting ConversionCommand for file [$file_name]\n" . print_r ($conv_cmd , true ) );	
+				KalturaLog::debug ( "Setting ConversionCommand for file [$file_name]\n" . print_r ($conv_cmd , true ) );	
 				
 			$debug [] = "before saveConversionCommand";			
 				// then save the conversion command
 				$cmd_file_path = $this->saveConversionCommand();
 				$this->removeInProc( $in_proc );
-				TRACE ( "Set ConversionCommand for file [$file_name] in [$cmd_file_path]" );
+				KalturaLog::debug ( "Set ConversionCommand for file [$file_name] in [$cmd_file_path]" );
 			$debug [] = "end";
 		}
 		catch ( kConversionException $kcoe )
 		{
 			$this->removeInProc( $in_proc );
-			TRACE ( "Error:\n" . $kcoe->getMessage() . "\n" . $kcoe->getTraceAsString(). "\n" . print_r ( $debug ) );
+			KalturaLog::debug ( "Error:\n" . $kcoe->getMessage() . "\n" . $kcoe->getTraceAsString(). "\n" . print_r ( $debug ) );
 			// update the entry with the error sttus and the error message to the conversion result
 			$conv_res = new kConversionResult( $conv_cmd );
 			$conv_res->appendResult( $kcoe->getMessage() );
@@ -180,10 +180,10 @@ class kConversionClient extends kConversionClientBase
 		catch ( Exception $ex )
 		{
 			$this->removeInProc( $in_proc );
-			TRACE ( "Error:\n" . $ex->getMessage() . "\n" . $ex->getTraceAsString(). "\n" . print_r ( $debug ) );
+			KalturaLog::debug ( "Error:\n" . $ex->getMessage() . "\n" . $ex->getTraceAsString(). "\n" . print_r ( $debug ) );
 			// if this failed for some unknown reason - set it for reconversion 
 			$indicator = $this->setFileToReConvert ( $before_archiving_file_path , $file_name );
-			TRACE ( "... will reconvert [" . print_r ( $indicator , true ) . "]" );
+			KalturaLog::debug ( "... will reconvert [" . print_r ( $indicator , true ) . "]" );
 			throw $ex; 
 		}
 	}
@@ -198,7 +198,7 @@ class kConversionClient extends kConversionClientBase
 		}
 		$entry_id = self::getEntryIdFromFileName ( $file_name );
 
-		TRACE ( "Updating entry [" . $entry_id ."]" );
+		KalturaLog::debug ( "Updating entry [" . $entry_id ."]" );
 		entryPeer::setUseCriteriaFilter( false ); // update the entry even if it's deleted
 //		$c = new Criteria();
 //		$c->add(entryPeer::ID, $entry_id);
@@ -220,7 +220,7 @@ class kConversionClient extends kConversionClientBase
 
 		$conv_res = kConversionResult::fromFile( $full_conv_res_path );
 
-		TRACE ( print_r ( $conv_res , true ) ) ;
+		KalturaLog::debug ( print_r ( $conv_res , true ) ) ;
 
 		// sleep a while for synching data on the disk
 		sleep ( 3 );
@@ -240,7 +240,7 @@ class kConversionClient extends kConversionClientBase
 		if ( $ok == true )
 		{
 			// TODO - write all targets not only primary one
-			TRACE ( "File [$file_before_conversion] converted OK to [$file_after_conversion]" );
+			KalturaLog::debug ( "File [$file_before_conversion] converted OK to [$file_after_conversion]" );
 			try 
 			{
 				// TODO - do we need to create the helpers eagerly ??
@@ -248,13 +248,13 @@ class kConversionClient extends kConversionClientBase
 			}
 			catch ( Exception $ex)
 			{
-				TRACE ( "Error while creating helper files for [$file_after_conversion]" );
+				KalturaLog::debug ( "Error while creating helper files for [$file_after_conversion]" );
 			} 
 			$entry->setStatusReady();
 		}
 		else
 		{
-			TRACE ( "Problem converting file [$file_before_conversion]" );
+			KalturaLog::debug ( "Problem converting file [$file_before_conversion]" );
 			$entry->setStatus ( entryStatus::ERROR_CONVERTING );
 		}	
 
@@ -267,8 +267,8 @@ class kConversionClient extends kConversionClientBase
 			
 			if ( !file_exists( $file_after_conversion ) || filesize ($file_after_conversion ) == 0 )
 			{
-//				TRACE ( "Entry id [" . $entry->getId() . "] printing file stats: " . print_r( stat ($file_after_conversion ) , true ) );
-				TRACE ( "Entry id [" . $entry->getId() . "]. no such file [$file_after_conversion]. Sleeping for 1 second for the [$i] time." );
+//				KalturaLog::debug ( "Entry id [" . $entry->getId() . "] printing file stats: " . print_r( stat ($file_after_conversion ) , true ) );
+				KalturaLog::debug ( "Entry id [" . $entry->getId() . "]. no such file [$file_after_conversion]. Sleeping for 1 second for the [$i] time." );
 				sleep ( 2 ) ;
 			}
 			else
@@ -277,9 +277,9 @@ class kConversionClient extends kConversionClientBase
 			}
 		}
 		
-		TRACE ( "Entry id [" . $entry->getId() . "] setting duration" );
+		KalturaLog::debug ( "Entry id [" . $entry->getId() . "] setting duration" );
 		$entry->setLengthInMsecs ( kConversionHelper::getFlvDuration ( $file_after_conversion ) );
-		TRACE ( "Entry id [" . $entry->getId() . "] duration [" . $entry->getLengthInMsecs() . "]" );
+		KalturaLog::debug ( "Entry id [" . $entry->getId() . "] duration [" . $entry->getLengthInMsecs() . "]" );
 
 		// how could it be otherwise ??
 		if ( $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO )
@@ -290,7 +290,7 @@ class kConversionClient extends kConversionClientBase
 			// TODO - make sure the width & height of the target are part of the kConversionReulst
 	//			if ( $conversion_info ) $entry->setDimensions ( $conversion_info->video_width , $conversion_info->video_height );
 			$offset = $entry->getBestThumbOffset( $partner->getDefThumbOffset() );
-			TRACE ( "Entry id [" . $entry->getId() . "] Thumb offset: [$offset]" );
+			KalturaLog::debug ( "Entry id [" . $entry->getId() . "] Thumb offset: [$offset]" );
 			// first create the thumb for the entry
 			
 			myEntryUtils::createThumbnailFromEntry ( $entry , $entry , $offset );
@@ -298,7 +298,7 @@ class kConversionClient extends kConversionClientBase
 			myEntryUtils::createRoughcutThumbnailFromEntry ( $entry , false );
 
 			$entry->updateVideoDimensions();
-			TRACE ( "Entry id [" . $entry->getId() . "] dimensions: [" . $entry->getWidth() . "x" . $entry->getHeight() . "]" );
+			KalturaLog::debug ( "Entry id [" . $entry->getId() . "] dimensions: [" . $entry->getWidth() . "x" . $entry->getHeight() . "]" );
 			
 		}
 		

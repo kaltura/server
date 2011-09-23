@@ -19,7 +19,6 @@ try // we don't want to fail when logger is not configured right
 	$config = new Zend_Config_Ini($loggerConfigPath);
 	$ps2 = $config->ps2_dev;
 	KalturaLog::initLog($ps2);
-	kLog::setLogger(KalturaLog::getInstance());
 }
 catch(Zend_Config_Exception $ex)
 {

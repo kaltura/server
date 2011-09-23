@@ -104,9 +104,3 @@ class conversionParamsAction extends kalturaSystemAction
 		
 	}
 }
-
-function TRACE ( $str )
-{
-	
-}
-?>

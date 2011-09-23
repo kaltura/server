@@ -65,7 +65,7 @@ class kConversionEngineMgr
 			}
 			else
 			{
-				TRACE("using ON2 because: cli_encode_count [$cli_encode_count] and forceOn2 [".$conv_cmd->forceOn2."]");
+				KalturaLog::debug("using ON2 because: cli_encode_count [$cli_encode_count] and forceOn2 [".$conv_cmd->forceOn2."]");
 				// try flix  
 				$converter = kConversionEngine::getInstance( kConversionEngine::ENGINE_TYPE_FLIX );
 			}
@@ -117,7 +117,7 @@ class kConversionEngineMgr
 	
 	private static function failed ( kConversionEngine $converter , kConversionCommand $conv_cmd, $first_failed_index )
 	{
-		TRACE ( "Error: Engine [" . $converter->getName() . "] failed to convert [$first_failed_index]" );
+		KalturaLog::debug ( "Error: Engine [" . $converter->getName() . "] failed to convert [$first_failed_index]" );
 	}
 }
 ?>

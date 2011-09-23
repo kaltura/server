@@ -46,9 +46,9 @@ class kConversionServer extends myBatchBase
 	public function convert (  )
 	{
 		SET_CONTEXT ( "KCS($this->server_id)");
-		TRACE ( "----------------- kConversionServer ------------------- ");
-		TRACE ( "------ cmd_path [{$this->cmd_path}] ------");
-		TRACE ( "------ res_path [{$this->res_path}] ------");
+		KalturaLog::debug ( "----------------- kConversionServer ------------------- ");
+		KalturaLog::debug ( "------ cmd_path [{$this->cmd_path}] ------");
+		KalturaLog::debug ( "------ res_path [{$this->res_path}] ------");
 //		self::init();
 
 		list ( $sleep_between_cycles ,
@@ -67,12 +67,12 @@ class kConversionServer extends myBatchBase
 			{
 				// TODO - log exceptions !!!
 				// try to recover !!
-				TRACE ( $ex->getTraceAsString() );
+				KalturaLog::debug ( $ex->getTraceAsString() );
 			}
 
 			if ( $temp_count == 0 )
 			{
-				TRACE ( "Ended conversion of all files in queue. Resting for a while (" . $sleep_between_cycles . ") seconds. " .
+				KalturaLog::debug ( "Ended conversion of all files in queue. Resting for a while (" . $sleep_between_cycles . ") seconds. " .
 				"Will write to the log in (" . ( $sleep_between_cycles * $number_of_times_to_skip_writing_sleeping ) . ") seconds");
 			}
 
@@ -114,7 +114,7 @@ class kConversionServer extends myBatchBase
 		else
 			$path = $this->res_path . "/" . $file_name;
 			
-		TRACE ( "Writing ConvResult to [$path]\n" . print_r ( $conv_res ,true ) );			
+		KalturaLog::debug ( "Writing ConvResult to [$path]\n" . print_r ( $conv_res ,true ) );			
 		$conv_res->toFile ( $path , true );
 	}
 	

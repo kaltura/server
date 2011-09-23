@@ -68,7 +68,7 @@ class kFile
 		// create a handler for the directory
 		$handler = @opendir($directory);
 		if(! $handler)
-			kLog::log("dirList $directory does not exist");
+			KalturaLog::info("dirList $directory does not exist");
 		
 		// keep going until all files in directory have been read
 		while($file = readdir($handler))
@@ -467,11 +467,11 @@ class kFile
 		if(curl_exec($ch))
 		{
 			$result = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			kLog::log("curl_exec result [$result]");
+			KalturaLog::info("curl_exec result [$result]");
 		}
 		else
 		{
-			kLog::log("curl_exec failed [$sourceUrl]");
+			KalturaLog::info("curl_exec failed [$sourceUrl]");
 		}
 		
 		curl_close($ch);

@@ -31,7 +31,6 @@ try // we don't want to fail when logger is not configured right
 	$api_v3 = $config->api_v3;
 	
 	KalturaLog::initLog($api_v3);
-	kLog::setLogger(KalturaLog::getInstance());
 }
 catch(Zend_Config_Exception $ex)
 {

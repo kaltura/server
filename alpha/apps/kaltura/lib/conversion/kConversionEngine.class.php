@@ -21,7 +21,7 @@ abstract class kConversionEngine
 		if ( $type == self::ENGINE_TYPE_FLIX ) $engine = new kConversionEngineFlix();
 		if ( $type == self::ENGINE_TYPE_ENCODINGCOM ) $engine = new kConversionEngineEncodingCom();
 		
-		TRACE ( "Using conversion engine: [" . $engine->getName() . "]" );
+		KalturaLog::debug ( "Using conversion engine: [" . $engine->getName() . "]" );
 		return $engine;
 	}
 
@@ -48,7 +48,7 @@ abstract class kConversionEngine
 	{
 		if ( ! file_exists ( $conv_cmd->source_file ) )
 		{
-			TRACE ( "File [{$conv_cmd->source_file} does not exist" );
+			KalturaLog::debug ( "File [{$conv_cmd->source_file} does not exist" );
 			return array ( false , 0 );
 		}
 
@@ -91,11 +91,11 @@ abstract class kConversionEngine
 			$return_value = "";
 
 			$conv_result->appendResult( $this->getName() . ": " . $execution_command_str );
-	TRACE ( $execution_command_str );
+	KalturaLog::debug ( $execution_command_str );
 			$start = microtime(true);
 			exec ( $execution_command_str , $output , $return_value );
 			$end = microtime(true);
-	TRACE ( $this->getName() . ": [$return_value]" );
+	KalturaLog::debug ( $this->getName() . ": [$return_value]" );
 			// $return_value == 0 is success. if not - return the index of the failed conversion 
 			$conv_result->appendResult( $this->getName() . ": [$return_value]" );
 			$conv_res_info->duration = ( $end - $start );
@@ -150,9 +150,9 @@ abstract class kConversionEngine
 		$conv_params_list = $conv_cmd->conversion_params_list;
 		foreach ( $conv_params_list as $conv_params )
 		{
-TRACE ( "Before fix: " . print_r ( $conv_params , true ));			
+KalturaLog::debug ( "Before fix: " . print_r ( $conv_params , true ));			
 			kConversionHelper::fillConversionParams( $conv_cmd->source_file , $conv_params );
-TRACE ( "After fix: " . print_r ( $conv_params , true ));			
+KalturaLog::debug ( "After fix: " . print_r ( $conv_params , true ));			
 		}
 	}
 }

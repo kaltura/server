@@ -17,7 +17,7 @@ class kConversionHelper
 		$count = count ( $indicators );
 		if ( $count > 0 || $log_number_of_files )
 		{
-			TRACE ( "[" . $count . "] indicator in directory [" . $path . "]" );
+			KalturaLog::debug ( "[" . $count . "] indicator in directory [" . $path . "]" );
 		}
 		
 		if ( $indicators == null || count ( $indicators ) == 0 ) return null;
@@ -42,7 +42,7 @@ class kConversionHelper
 			}
 			else
 			{
-				TRACE ( "[$indicator] grabbed by other process");
+				KalturaLog::debug ( "[$indicator] grabbed by other process");
 			}
 			
 			// keep on trying ...

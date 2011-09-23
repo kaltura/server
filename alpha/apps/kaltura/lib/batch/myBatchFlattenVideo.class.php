@@ -122,7 +122,7 @@ class myBatchFlattenServer extends myBatchBase
 						// close job as failed
 						$job->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
 						$job->setDescription("could not retrieve entry, probably deleted");
-						TRACE("could not retrieve entry $entry_id , probably deleted");
+						KalturaLog::debug("could not retrieve entry $entry_id , probably deleted");
 						$job->save();
 						continue;
 					}
@@ -137,22 +137,22 @@ class myBatchFlattenServer extends myBatchBase
 					$older_files = glob($wildcardFinalPath);
 					foreach($older_files as $older_file)
 					{
-						TRACE("removing old file: [$older_file]");
+						KalturaLog::debug("removing old file: [$older_file]");
 						@unlink($older_file);
 					}
 					
-					TRACE("Downloading: $fullFinalPath");
+					KalturaLog::debug("Downloading: $fullFinalPath");
 					kFile::downloadUrlToFile($data["serverUrl"], $fullFinalPath);
 					if (!file_exists($fullFinalPath))
 					{
-						TRACE("file doesnt exist: ". $data["serverUrl"]);
+						KalturaLog::debug("file doesnt exist: ". $data["serverUrl"]);
 						$job->setDescription("file doesnt exist: ". $data["serverUrl"]);
 						$job->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
 					}
 					else if (filesize($fullFinalPath) < 100000)
 					{
 						@unlink($fullFinalPath);
-						TRACE("file too small: ". $data["serverUrl"]);
+						KalturaLog::debug("file too small: ". $data["serverUrl"]);
 						$job->setDescription("file too small: ". $data["serverUrl"]);
 						$job->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
 					}
@@ -173,7 +173,7 @@ class myBatchFlattenServer extends myBatchBase
 								array($data['email'] , $downloadLink));
 						}
 						
-						TRACE("Deleting: ".$data["deleteUrl"]);
+						KalturaLog::debug("Deleting: ".$data["deleteUrl"]);
 						kFile::downloadUrlToString($data["deleteUrl"]);
 						
 						myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry );
@@ -188,25 +188,25 @@ class myBatchFlattenServer extends myBatchBase
 							}
 							catch(Exception $ex) // hack for the case where the file sync already exists and we re-flattened a mix
 							{
-								TRACE ( "ignore ERROR: " . $ex->getMessage() );
+								KalturaLog::debug ( "ignore ERROR: " . $ex->getMessage() );
 							}
 						}							
 						else
-							TRACE("The file [$filePath] doesn't exists, not creating FileSync");
+							KalturaLog::debug("The file [$filePath] doesn't exists, not creating FileSync");
 					}
 					$job->save();
 				}
 			}	
 			catch ( Exception $ex )
 			{
-				TRACE ( "ERROR: " . $ex->getMessage() );
+				KalturaLog::debug ( "ERROR: " . $ex->getMessage() );
 				self::initDb( true );
 				self::failed();
 			}
 			
 			if ( $temp_count == 0 )
 			{
-				TRACE ( "Ended conversion. sleeping for a while (" . $sleep_between_cycles .
+				KalturaLog::debug ( "Ended conversion. sleeping for a while (" . $sleep_between_cycles .
 				" seconds). Will write to the log in (" . ( $sleep_between_cycles * $number_of_times_to_skip_writing_sleeping ) . ") seconds" );
 			}
 

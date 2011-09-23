@@ -42,7 +42,7 @@ class myCache
 			}
 			if ( !$res )
 			{
-				kLog::log( "ERROR: Error while trying to connect to memcache. Make sure it is properly running on " . 
+				KalturaLog::info( "ERROR: Error while trying to connect to memcache. Make sure it is properly running on " . 
 					kConf::get ( "memcache_host") . ":" . kConf::get ( "memcache_port" ) );
 				//throw new Exception ("Error while trying to connect to memcache. Make sure it is properly running on " . self::SERVER . ":" . self::PORT );
 			}
