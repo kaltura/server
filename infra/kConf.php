@@ -68,15 +68,27 @@ class kConf
 		
 		return $returnedConfig;
 	}
+	
+	public static function getAll()
+	{
+		self::init();
+		return self::$map;
+	}
 		
 	public static function getMap($mapName)
 	{
 		self::init();
 		
+		if($mapName == 'local')
+			return self::$map;
+		
 		if(isset(self::$map[$mapName]))
 			return self::$map[$mapName];
 		
 		$configDir = realpath(dirname(__file__) . '/../configurations');
+		if(!file_exists("$configDir/$mapName.ini"))
+			throw new Exception("Cannot find map [$mapName] in config folder");
+		
 		$config = new Zend_Config_Ini("$configDir/$mapName.ini");
 		self::$map[$mapName] = $config->toArray();
 		
