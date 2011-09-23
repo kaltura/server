@@ -25,16 +25,15 @@ date_default_timezone_set(kConf::get("date_default_timezone")); // America/New_Y
 
 
 // Logger
-$loggerConfigPath = KALTURA_GENERATOR_PATH.DIRECTORY_SEPARATOR."logger.ini";
+$loggerConfigPath = KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR.'configurations'.DIRECTORY_SEPARATOR."logger.ini";
 
 try // we don't want to fail when logger is not configured right
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
+	KalturaLog::initLog($config->generator);
+	KalturaLog::setContext("GENERATOR");
 }
 catch(Zend_Config_Exception $ex)
 {
-	$config = null;
 }
 
-KalturaLog::initLog($config);
-KalturaLog::setContext("GENERATOR");

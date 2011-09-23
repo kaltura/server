@@ -6,23 +6,6 @@ print("In Order to run a real run just type realRun in the end\n");
 
 require_once(dirname(__FILE__).'/../bootstrap.php');
 
-//Set the log to be a file so i can create a new one every 50 Mega's
-try // we don't want to fail when logger is not configured right
-{
-	$dirname = dirname(__FILE__);
-	print("$dirname/logger.ini");
-	$config = new Zend_Config_Ini("$dirname/logger.ini");
-}
-catch(Zend_Config_Exception $ex)
-{
-	$config = null;
-}
-//$log = new KalturaLog();
-//KalturaLog::setLogger($log);
-
-KalturaLog::initLog($config);
-//KalturaLog::setLogger(new KalturaStdoutLogger());
-
 /**
  * 
  * Holds all neccessary puser details

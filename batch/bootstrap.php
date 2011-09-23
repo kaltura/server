@@ -26,16 +26,15 @@ KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/batch/classMa
 KAutoloader::register();
 
 // Logger
-$loggerConfigPath = KALTURA_BATCH_PATH . "/logger.ini";
+$loggerConfigPath = KALTURA_ROOT_PATH . "/configurations/logger.ini";
 
 try // we don't want to fail when logger is not configured right
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
+	KalturaLog::initLog($config->batch);
+	KalturaLog::setContext("BATCH");
 }
 catch(Zend_Config_Exception $ex)
 {
-	$config = null;
 }
 
-KalturaLog::initLog($config);
-KalturaLog::setContext("BATCH");
