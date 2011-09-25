@@ -245,7 +245,7 @@ namespace Kaltura
 
         public string GenerateSession(string adminSecretForSigning, string userId, KalturaSessionType type, int partnerId, int expiry, string privileges)
         {
-            string ks = string.Format("{0};{0};{1};{2};{3};{4};{5};", _Config.PartnerId, ConvertToUnixTimestamp(DateTime.Now) + expiry, type.GetHashCode(), DateTime.Now.Ticks, userId, privileges);
+            string ks = string.Format("{0};{0};{1};{2};{3};{4};{5};", partnerId, ConvertToUnixTimestamp(DateTime.Now) + expiry, type.GetHashCode(), DateTime.Now.Ticks, userId, privileges);
 
             SHA1 sha = new SHA1CryptoServiceProvider();
 
