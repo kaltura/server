@@ -237,7 +237,7 @@ foreach($config as $name => $item)
 	if ($mainOutput) 
 		$outputPath = $outputPathBase;
 	else
-		$outputPath = $outputPathBase.DIRECTORY_SEPARATOR.$name;
+		$outputPath = $outputPathBase."/".$name;
 	KalturaLog::info("Saving client library to [$outputPath]");
 	if (realpath($outputPath) === false)
 	{
@@ -249,7 +249,7 @@ foreach($config as $name => $item)
 	$files = $instance->getOutputFiles();
 	foreach($files as $file => $data)
 	{
-		$filePath = realpath($outputPath).DIRECTORY_SEPARATOR.$file;
+		$filePath = realpath($outputPath)."/".$file;
 		$dirName = pathinfo($filePath, PATHINFO_DIRNAME);
 		if (!file_exists($dirName))
 		{
@@ -265,7 +265,7 @@ foreach($config as $name => $item)
 		{
 			# save the schema also in a filename containing the generation date
 			# KalturaClient.xml will always contain the most recent schema so that it can be served by api_schema.php
-			$filePath = realpath($outputPath).DIRECTORY_SEPARATOR."KalturaClient_$generatedDate.xml";
+			$filePath = realpath($outputPath)."/"."KalturaClient_$generatedDate.xml";
 			file_put_contents($filePath, $data);
 		}
 	}
@@ -291,7 +291,7 @@ foreach($config as $name => $item)
 }
 
 //write the summary file (will be used by the generator UI)
-file_put_contents($outputPathBase.DIRECTORY_SEPARATOR.$summaryFileName, serialize($generatedClients));
+file_put_contents($outputPathBase."/".$summaryFileName, serialize($generatedClients));
 
 /**
  * Build a packaged tarball for the client library.
@@ -312,8 +312,8 @@ function createPackage($outputPath, $generatorName, $overrideGenDate = null)
 	{
 		if ($overrideGenDate == null) $overrideGenDate = $generatedDate;
 		$fileName = "{$generatorName}_{$overrideGenDate}.tar.gz";
-		$gzipOutputPath = "..".DIRECTORY_SEPARATOR.$fileName;
-		$cmd = "tar -czf \"$gzipOutputPath\" ..".DIRECTORY_SEPARATOR.$generatorName;
+		$gzipOutputPath = "../".$fileName;
+		$cmd = "tar -czf \"$gzipOutputPath\" ../".$generatorName;
 		$oldDir = getcwd();
 		
 		$outputPath = realpath($outputPath);
