@@ -551,13 +551,13 @@ class KalturaClientBase
 		return $params;
 	}
 	
-	public function generateSession($adminSecretForSigning, $userId = "", $type = KalturaSessionType::USER, $partnerId = -1, $expiry = 86400, $privileges = '')
+	public function generateSession($adminSecretForSigning, $userId, $type, $partnerId, $expiry = 86400, $privileges = '')
 	{
 		$rand = rand(0, 32000);
 		$expiry = time()+$expiry;
 		$fields = array ( 
-			$this->config->partnerId , 
-			$this->config->partnerId , 
+			$partnerId , 
+			$partnerId , 
 			$expiry , 
 			$type, 
 			$rand , 
