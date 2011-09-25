@@ -1013,7 +1013,7 @@ class MediaService extends KalturaEntryService
 	protected function prepareEntryForInsert(KalturaBaseEntry $entry, entry $dbEntry = null)
 	{
 		if(!($entry instanceof KalturaMediaEntry))
-			throw new KalturaClientException("Invalid object type", KalturaClientException::ERROR_INVALID_OBJECT_TYPE);
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_TYPE,$entry->id, $entry->getType(), entryType::MEDIA_CLIP);
 		$entry->validatePropertyNotNull("mediaType");
 		
 		$conversionQuality = $this->getConversionQuality($entry);
