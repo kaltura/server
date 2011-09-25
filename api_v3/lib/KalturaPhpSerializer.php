@@ -43,30 +43,21 @@ class KalturaPhpSerializer
 	    if (is_object($object))
     	{
     		if ($object instanceof KalturaTypedArray)
-    		{
-	    		$array = array();
-	    		foreach($object as $item)
-	    		{
-	    			$array[] = $this->convertTypedArraysToPhpArrays($item);					
-	    		}
-	    		$object = $array;
-    		}
-    		else 
-    		{
-    			foreach($object as $key => $value)
-        	    {
-        	        $object->$key = $this->convertTypedArraysToPhpArrays($value);
-        	    }
-    		}
+    			return $object->toArray();
+    			
+			foreach($object as $key => $value)
+				$object->$key = $this->convertTypedArraysToPhpArrays($value);
+				
+			return $object;
     	}
-    	else if (is_array($object))
+    	
+    	if (is_array($object))
     	{
     		$array = array();
     		foreach($object as $item)
-    		{
-    			$array[] = $this->convertTypedArraysToPhpArrays($item);					
-    		}
-    		$object = $array;
+    			$array[] = $this->convertTypedArraysToPhpArrays($item);
+    			
+    		return $array;
     	}
     	
     	return $object;

@@ -83,4 +83,9 @@ class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, 
 	{
 		return count($this->array);
 	}
+	
+	public function toArray()
+	{
+		return $this->array;
+	}
 }
