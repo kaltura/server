@@ -98,6 +98,9 @@ function configure(profileId) {
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
 			}
+		},
+		close: function() {
+			jQuery(this).dialog('destroy').remove();
 		}
 	});
 	
@@ -201,6 +204,9 @@ function newDistributionProfile(partnerId, providerType) {
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
 			}
+		},
+		close: function() {
+			jQuery(this).dialog('destroy').remove();
 		}
 	});	
 	dialogDiv.load(
@@ -213,7 +219,7 @@ function newDistributionProfile(partnerId, providerType) {
 }
 
 function newDistributionProfileSuccess(html) {
-	if (jQuery(html).parent().find('#frmDistributionProfileConfig').hasClass('valid')) 
+	if (jQuery(html).filter('#frmDistributionProfileConfig').hasClass('valid')) 
 	{
 		dialogDiv.dialog('close');
 		jQuery('#frmPaginator1').submit();
