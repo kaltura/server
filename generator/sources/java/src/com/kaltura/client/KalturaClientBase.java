@@ -411,21 +411,6 @@ abstract public class KalturaClientBase {
 		
     }
     
-    public String generateSession(String adminSecretForSigning) throws Exception
-    {
-    	return this.generateSession(adminSecretForSigning, "");
-    }
-    
-    public String generateSession(String adminSecretForSigning, String userId) throws Exception
-    {
-    	return this.generateSession(adminSecretForSigning, userId, KalturaSessionType.USER);
-    }
-    
-    public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type) throws Exception
-    {
-    	return this.generateSession(adminSecretForSigning, userId, type, -1);
-    }
-    
     public String generateSession(String adminSecretForSigning, String userId, KalturaSessionType type, int partnerId) throws Exception
     {
     	return this.generateSession(adminSecretForSigning, userId, type, partnerId, 86400);
@@ -446,8 +431,8 @@ abstract public class KalturaClientBase {
 			
 			// build info string
 			StringBuilder sbInfo = new StringBuilder();
-			sbInfo.append(this.kalturaConfiguration.partnerId).append(";"); // index 0 - partner ID
-			sbInfo.append(this.kalturaConfiguration.partnerId).append(";"); // index 1 - partner pattern - using partner ID
+			sbInfo.append(partnerId).append(";"); // index 0 - partner ID
+			sbInfo.append(partnerId).append(";"); // index 1 - partner pattern - using partner ID
 			sbInfo.append(expiry).append(";"); // index 2 - expiration timestamp
 			sbInfo.append(type.getHashCode()).append(";"); // index 3 - session type
 			sbInfo.append(rand).append(";"); // index 4 - random number
