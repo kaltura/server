@@ -21,10 +21,22 @@ class kConf
 		}
 		
 		$configDir = realpath(dirname(__file__) . '/../configurations');
-		$baseConfig = parse_ini_file("$configDir/base.ini", true);
-		$localConfig = parse_ini_file("$configDir/local.ini", true);
-		$config = array_merge_recursive($baseConfig, $localConfig);
+		$config = parse_ini_file("$configDir/base.ini", true);
 		
+		$localConfig = parse_ini_file("$configDir/local.ini", true);
+		$config = array_merge_recursive($config, $localConfig);
+		
+		if(isset($_SERVER["HOSTNAME"]))
+		{
+			$hostName = $_SERVER["HOSTNAME"];
+			$localConfigFile = "$configDir/hosts/$hostName.ini";
+			if(file_exists($localConfigFile))
+			{
+				$localConfig = parse_ini_file($localConfigFile, true);
+				$config = array_merge_recursive($config, $localConfig);
+			}
+		}
+			
 		self::$map = $config;
 		
 		if(function_exists('apc_store'))
@@ -91,6 +103,17 @@ class kConf
 		
 		$config = new Zend_Config_Ini("$configDir/$mapName.ini");
 		self::$map[$mapName] = $config->toArray();
+	
+		if(isset($_SERVER["HOSTNAME"]))
+		{
+			$hostName = $_SERVER["HOSTNAME"];
+			$localConfigFile = "$configDir/hosts/$mapName/$hostName.ini";
+			if(file_exists($localConfigFile))
+			{
+				$config = new Zend_Config_Ini($localConfigFile);
+				self::$map[$mapName] = array_merge_recursive(self::$map[$mapName], $config->toArray());
+			}
+		}
 		
 		if(function_exists('apc_store'))
 			apc_store(self::APC_CACHE_MAP, self::$map);
