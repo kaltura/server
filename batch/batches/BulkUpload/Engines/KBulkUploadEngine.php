@@ -359,6 +359,14 @@ abstract class KBulkUploadEngine
 		{
 			$bulkUploadResult = $bulkUploadResults[$index];
 			
+			if(is_array($requestResult) && isset($requestResult['code']))
+			{
+				$bulkUploadResult->entryStatus = $requestResult['code'];
+				$bulkUploadResult->errorDescription = $requestResult['message'];
+				$this->addBulkUploadResult($bulkUploadResult);
+				continue;
+			}
+			
 			if($requestResult instanceof Exception)
 			{
 				$bulkUploadResult->entryStatus = KalturaEntryStatus::ERROR_IMPORTING;
