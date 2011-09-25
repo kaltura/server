@@ -28,7 +28,7 @@ CONFIG_FILE=$BATCHDIR/config/`hostname`_config.ini
 
 default_config=0
 if [ ! -f $CONFIG_FILE ]; then
-     CONFIG_FILE=$BATCHDIR/batch_config.ini
+     CONFIG_FILE=$APP_DIR/configurations/batch.ini
      default_config=1
 fi
 
