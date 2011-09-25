@@ -1,5 +1,5 @@
 #!/bin/bash
-source ../configurations/system.ini
+source $APP_DIR/configurations/system.ini
 
 #
 # serviceBatchMgr      This shell script takes care of starting and stopping a Kaltura Batch Service
