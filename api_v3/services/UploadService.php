@@ -5,6 +5,7 @@
  * @service upload
  * @package api
  * @subpackage services
+ * @deprecated Please use UploadToken service
  */
 class UploadService extends KalturaEntryService
 {
