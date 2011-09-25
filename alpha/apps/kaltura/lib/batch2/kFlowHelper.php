@@ -1782,6 +1782,10 @@ class kFlowHelper
 				KalturaLog::err("Entry id [" . $uploadToken->getObjectId() . "] not found");
 				return;
 			}
+			
+			// increments version
+			$dbEntry->setData('100000.jpg');
+			$dbEntry->save();
 
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
 			try
