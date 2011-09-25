@@ -109,6 +109,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->save();
 		}
 			
+		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$resource->attachCreatedObject($dbEntry);
@@ -155,6 +156,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachFile($entryFullPath, entry $dbEntry, asset $dbAsset = null, $copyOnly = false)
 	{
+		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$exifImageType = @exif_imagetype($entryFullPath);
@@ -168,7 +170,7 @@ class KalturaEntryService extends KalturaBaseService
 			
 			if(in_array($exifImageType, $validTypes))
 			{
-				$exifData = @exif_read_data($entry_fullPath);
+				$exifData = @exif_read_data($entryFullPath);
 				if ($exifData && isset($exifData["DateTimeOriginal"]) && $exifData["DateTimeOriginal"])
 				{
 					$mediaDate = $exifData["DateTimeOriginal"];
@@ -270,6 +272,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachFileSync(FileSyncKey $srcSyncKey, entry $dbEntry, asset $dbAsset = null)
 	{
+		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
@@ -380,6 +383,7 @@ class KalturaEntryService extends KalturaBaseService
 		$resources = $resource->getResources();
 		$dbEntry->setSource(KalturaSourceType::URL);
 	
+		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
 			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
@@ -468,6 +472,7 @@ class KalturaEntryService extends KalturaBaseService
 		
 		if (!$resource->forceAsyncDownload())
 		{
+			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.jpg';
