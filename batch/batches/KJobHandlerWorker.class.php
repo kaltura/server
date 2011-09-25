@@ -211,7 +211,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 		$filter = $this->getQueueFilter($jobType);
 		
 		$dir = $this->taskConfig->getQueueFiltersDir();
-		$type = $this->taskConfig->type;
+		$type = $this->taskConfig->name;
 		$res = self::createDir($dir);
 		if(! $res)
 			return;
