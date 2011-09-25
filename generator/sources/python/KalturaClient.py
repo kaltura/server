@@ -3,6 +3,9 @@ from KalturaClientBase import *
 from xml.parsers.expat import ExpatError
 from xml.dom import minidom
 from threading import Timer
+import hashlib
+import random
+import base64
 import socket
 import urllib
 import time
@@ -318,6 +321,25 @@ class KalturaClient:
     def log(self, msg):
         if self.shouldLog:
             self.config.getLogger().log(msg)
+
+    @staticmethod
+    def generateSession(adminSecretForSigning, userId, type, partnerId, expiry = 86400, privileges = ''):
+        rand = random.randint(0, 0x10000)
+        expiry = int(time.time()) + expiry
+        fields = [partnerId, partnerId, expiry, type, rand, userId, privileges]
+        fields = map(lambda x: str(x), fields)
+        info = ';'.join(fields)
+        signature = KalturaClient.hash(adminSecretForSigning, info)
+        decodedKS = signature + "|" + info
+        KS = base64.b64encode(decodedKS)
+        return KS
+
+    @staticmethod
+    def hash(salt, msg):
+        m = hashlib.sha1()
+        m.update(salt)
+        m.update(msg)
+        return m.digest().encode('hex')
 
 class KalturaServiceActionCall:
     def __init__(self, service, action, params = KalturaParams(), files = KalturaFiles()):

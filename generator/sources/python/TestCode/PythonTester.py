@@ -44,7 +44,7 @@ def SampleMetadataOperations():
     client = KalturaClient(GetConfig())
 
     # start new session (client session is enough when we do operations in a users scope)
-    ks = client.session.start(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
+    ks = client.generateSession(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
     client.setKs(ks)
 
     # Setup a pager and search to use
@@ -168,7 +168,7 @@ def AdvancedMultiRequestExample():
 # create session
 client = KalturaClient(GetConfig())
 
-ks = client.session.start(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
+ks = client.generateSession(ADMIN_SECRET, USER_NAME, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "")
 client.setKs(ks)
 
 # add media
