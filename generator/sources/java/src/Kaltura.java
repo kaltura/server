@@ -44,7 +44,7 @@ public class Kaltura {
 
 		try
 		{
-			String ks = client.generateSession(adminSecret, userId, type, partnerId, 86400, "");
+			String ks = client.generateSession(adminSecret, userId, type, partnerId);
 			System.out.print("generated KS locally: ["+ks+"]");
 			client.setSessionId(ks);
 		}
