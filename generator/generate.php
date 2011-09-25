@@ -46,15 +46,30 @@ ini_set( "memory_limit","512M" );
 //bootstrap connects the generator to the rest of Kaltura system
 require_once("bootstrap.php");
 
-$root = myContentStorage::getFSContentRootPath();
-$outputPathBase = "$root/content/clientlibs";
-kFile::fullMkdir($outputPathBase);
 //the name of the summary file that will be used by the UI -
 $summaryFileName = 'summary.kinf';
 
 //pass the name of the generator as the first argument of the command line to
-//generate a single library. if this argument is empty, generator will create all libs.
+//generate a single library. if this argument is empty or 'all', generator will create all libs.
 $generateSingle = isset($argv[1]) ? $argv[1] : null;
+if (strtolower($generateSingle) == 'all')
+{
+	$generateSingle = null;
+}
+
+//second command line argument specifies the output path, if not specified will default to 
+//<content root>/content/clientlibs
+if (isset($argv[2]))
+{
+	$outputPathBase = $argv[2];
+}
+else
+{
+	$root = myContentStorage::getFSContentRootPath();
+	$outputPathBase = "$root/content/clientlibs";
+}
+
+kFile::fullMkdir($outputPathBase);
 
 //pull the generator config ini
 $config = new Zend_Config_Ini("../configurations/generator.ini", null, array('allowModifications' => true));
