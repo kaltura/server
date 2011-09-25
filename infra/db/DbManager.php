@@ -71,7 +71,7 @@ class DbManager
 		
 		try
 		{
-			return new KalturaPDO($dsn);
+			return new PropelPDO($dsn);
 		}
 		catch(PropelException $pex)
 		{
