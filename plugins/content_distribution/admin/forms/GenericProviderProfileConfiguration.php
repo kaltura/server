@@ -269,7 +269,7 @@ class Form_GenericProviderProfileConfiguration extends Form_ProviderProfileConfi
 		}
 	}
 	
-	public function resetUnUpdatebleAttributes(KalturaDistributionProfile $distributionProfile)
+	public function resetUnUpdatebleAttributes(Kaltura_Client_ContentDistribution_Type_DistributionProfile $distributionProfile)
 	{
 		parent::resetUnUpdatebleAttributes($distributionProfile);
 		
