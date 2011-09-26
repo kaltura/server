@@ -292,22 +292,18 @@ class KalturaResponseCacher
 		// force caching of actions listed in kConf even if admin ks is used
 		if(kConf::hasParam('v3cache_ignore_admin_ks'))
 		{
-			foreach(kConf::get('v3cache_ignore_admin_ks') as $ignoreParams)
+			foreach(kConf::get('v3cache_ignore_admin_ks') as $partnerId => $params)
 			{
+				if ($ks->partner_id != $partnerId)
+					continue;
+					
+				$ignoreParams = null;
+				parse_str($params, $ignoreParams);
+
 				$matches = 0;
-				
 				foreach($ignoreParams as $key => $value)
-				{
-					if ($key == 'partner_id')
-					{
-						if ($ks->partner_id != $value)
-							break;
-					}
-					else if (!isset($this->_params[$key]) || $this->_params[$key] != $value)
-						break;
-						
-					$matches++;
-				}
+					if (isset($this->_params[$key]) && $this->_params[$key] == $value)
+						$matches++;
 				
 				if ($matches == count($ignoreParams))
 					return true;
