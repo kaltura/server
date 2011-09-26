@@ -41,9 +41,6 @@ catch(Zend_Config_Exception $ex)
 KalturaLog::initLog($config);
 KalturaLog::setContext("tests");
 
-// for places where kLog is used
-kLog::setLogger(KalturaLog::getInstance());
-
 // set DB
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
