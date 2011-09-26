@@ -192,7 +192,7 @@ function shouldProcessRequest($fullActionName, $parsedParams)
 		$testedActions[$fullActionName] = 0;
 	}
 	
-	if ($testedActions[$fullActionName] > $maxTestsPerActionType)
+	if ($maxTestsPerActionType && $testedActions[$fullActionName] > $maxTestsPerActionType)
 	{
 		return 'no';
 	}
