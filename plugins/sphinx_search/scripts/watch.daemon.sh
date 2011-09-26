@@ -1,5 +1,5 @@
 #!/bin/bash
-source ../../../configurations/system.ini
+source @APP_DIR@/configurations/system.ini
 
 MAILTO="$ADMIN_CONSOLE_ADMIN_MAIL"
 MAINT=$BASE_DIR/maintenance
