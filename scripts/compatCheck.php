@@ -271,7 +271,7 @@ function processRequest($parsedParams)
 	}
 
 	$service = $parsedParams['service'];
-	if ($service == "multirequest")
+	if (beginsWith(strtolower($service), "multirequest"))
 	{
 		return;
 	}
