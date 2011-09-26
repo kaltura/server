@@ -47,6 +47,9 @@ class getallentriesAction extends defPartnerservices2Action
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		if (!$partner_id)
+	        die;
+	        		
 		$entry_id = $this->getP ( "entry_id" );
 		
 		// if the entry_type was sent by the client - make sure it's of type  ENTRY_TYPE_SHOW.
