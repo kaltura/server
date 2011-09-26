@@ -668,8 +668,17 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId);
 			
 			$conversionProfileId = $conversionProfile->getId();
+		} 
+
+		else {
+			//The search is with the entry's partnerId. so if conversion profile wasn't found it means that the 
+			//conversionId is not exist or the conversion profileId does'nt belong to this partner.
+			$conversionProfile = ConversionProfilePeer::retrieveByPK ( $conversionProfileId );
+			if (is_null ( $conversionProfile )) {
+				throw new KalturaAPIException ( KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId );
+			}
 		}
-			
+		
 		$srcSyncKey = $srcFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
 		// if the file sync isn't local (wasn't synced yet) proxy request to other datacenter
