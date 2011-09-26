@@ -149,16 +149,8 @@ function newStorage(partnerId) {
 }
 
 function newStorageSuccess(html) {
-	if (jQuery(html).parent().find('form').hasClass('valid')) 
-	{
-		dialogDiv.dialog('close');
-		jQuery('#frmPaginator1').submit();
-	}
-	else
-	{
-		jQuery('#frmStorageConfig').replaceWith(html);
-		jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
-	}
+	jQuery('#frmStorageConfig').replaceWith(html);
+	jQuery('#frmStorageConfig').ajaxForm(newStorageSuccess);
 }
 function configure(storageId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'configure-storage', 'storageId' => '')); ?>' + storageId;
@@ -176,8 +168,6 @@ function configure(storageId) {
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('#frmStorageConfig').submit();
-				jQuery(this).dialog('close');
-				jQuery('#frmPaginator1').submit();
 			},
 			'<?php echo $this->translate('Close'); ?>': function() {
 				jQuery(this).dialog('close');
