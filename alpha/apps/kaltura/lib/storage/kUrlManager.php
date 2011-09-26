@@ -52,7 +52,7 @@ class kUrlManager
 		$cdnHost = preg_replace('/https?:\/\//', '', $cdnHost);
 		$params = null;
 	
-		$urlManagers = kConf::get('url_managers');
+		$urlManagers = kConf::getMap('url_managers');
 		if(isset($urlManagers[$cdnHost]))
 		{
 			$class = $urlManagers[$cdnHost]["class"];
@@ -289,7 +289,7 @@ class kUrlManager
 	 */
 	public static function getUrlManagerIdentifyRequest()
 	{
-		$urlManagers = kConf::get('url_managers');
+		$urlManagers = kConf::getMap('url_managers');
 		foreach($urlManagers as $cdnHost => $data)
 		{
 			$class = $data["class"];
