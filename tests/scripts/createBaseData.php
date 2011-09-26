@@ -144,7 +144,7 @@ class KalturaTestDeploymentHelper
 		$partnerId = $client->getConfig()->partnerId;
 		
 		//Get the admin partner id and secret from the application.ini
-		$adminConsoleIniPath = KALTURA_ROOT_PATH . "/admin_console/configs/application.ini";
+		$adminConsoleIniPath = KALTURA_ROOT_PATH . "/configurations/admin.ini";
 		$adminIni = new Zend_Config_Ini($adminConsoleIniPath);
 		$adminProductionSettings = $adminIni->get('production');
 		$adminConsolePartnerId = $adminProductionSettings->settings->partnerId;
