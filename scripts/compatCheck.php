@@ -85,7 +85,7 @@ function doCurl($url, $params = array(), $files = array())
 
 function stripXMLInvalidChars($value) 
 {
-	preg_match_all( '/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', $value, $invalidChars );
+	preg_match_all('/[^\t\n\r\x{20}-\x{d7ff}\x{e000}-\x{fffd}\x{10000}-\x{10ffff}]/u', $value, $invalidChars);
 	$invalidChars = reset($invalidChars);
 	if (count($invalidChars))
 	{
@@ -262,6 +262,33 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	}
 }
 
+function isRequestExpired($parsedParams)
+{
+	if (!array_key_exists('ks', $parsedParams))
+	{
+		return false;
+	}
+	
+	$ks = $parsedParams['ks'];
+	$ks = base64_decode($ks, true);
+	@list($hash, $ks) = @explode ("|", $ks, 2);
+	$ksParts = explode(";", $ks);
+	if (count($ksParts) < 5)
+	{
+		return true;
+	}
+	
+	list(
+		$partnerId, 
+		$partnerPattern, 
+		$validUntil, 
+		$type, 
+		$rand, 
+	) = $ksParts;
+	
+	return (time() >= $validUntil);
+}
+
 function processRequest($parsedParams)
 {
 	if (!array_key_exists('service', $parsedParams))
@@ -292,6 +319,11 @@ function processRequest($parsedParams)
 		!beginsWith($action, 'get') &&
 		!beginsWith($action, 'list') &&
 		!beginsWith($action, 'count'))
+	{
+		return;
+	}
+	
+	if (isRequestExpired($parsedParams))
 	{
 		return;
 	}
