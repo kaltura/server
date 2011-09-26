@@ -358,18 +358,33 @@ class PartnerController extends Zend_Controller_Action
 		$client->startMultiRequest();
 		$filter = new Kaltura_Client_Audit_Type_AuditTrailFilter();
 		$filter->objectIdEqual = $partnerId;
-		
+		$filter->auditObjectTypeEqual = "Partner";
 		$auditPlugin->auditTrail->listAction($filter);
 		
+		$extendedFreeTrailHistoryObjects = array();
 		try{
 			$result = $client->doMultiRequest();
-			$this->view->auditList = isset($result[0]) ? $result[0] : array() ;
+			if (isset($result[0])) {
+				foreach($this->auditList->objects as $audit) {
+					$isExtendedFreeTrailHistory = false;
+					foreach($audit->data->changedItems as $changedItem){
+						if ($changedItem->descriptor == 'extendedFreeTrailExpiryDate' || $changedItem->descriptor == 'extendedFreeTrailExpiryReason'){ 
+					 		$isExtendedFreeTrailHistory = true; 
+						 	break;	
+					 	}
+					}
+					if ($isExtendedFreeTrailHistory) {
+						$extendedFreeTrailHistoryObjects[] = $audit;
+					}
+				}
+			}
+			$this->view->auditList = $extendedFreeTrailHistoryObjects;
 		}
 		catch (Exception $e){
 			$this->view->errMessage = $e->getMessage();
 		}
 							
-		$this->view->history = isset($result[0]) ? $result[0] : array() ;
+		$this->view->history = $extendedFreeTrailHistoryObjects;
 		$this->view->form = $form;
 		$this->view->partnerId = $partnerId;
 	}
