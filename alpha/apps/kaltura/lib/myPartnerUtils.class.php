@@ -855,7 +855,7 @@ class myPartnerUtils
 	public static function doPartnerUsage(Partner $partner)
 	{
 		if($partner->getExtendedFreeTrail())
-		{	
+		{
 			if($partner->getExtendedFreeTrailExpiryDate() < time())
 			{
 				//ExtendedFreeTrail ended
@@ -864,7 +864,7 @@ class myPartnerUtils
 				$partner->setExtendedFreeTrailExpiryReason('');
 			}else{
 				//ExtendedFreeTrail
-				if (($partner->getExtendedFreeTrailExpiryDate() > (time() - (dateUtils::DAY * 7))) && !$partner->getExtendedFreeTrailEndsWarning())
+				if (($partner->getExtendedFreeTrailExpiryDate() < (time() + (dateUtils::DAY * 7))) && !$partner->getExtendedFreeTrailEndsWarning())
 				{
 					$partner->setExtendedFreeTrailEndsWarning(true);
 					$partner->save();
