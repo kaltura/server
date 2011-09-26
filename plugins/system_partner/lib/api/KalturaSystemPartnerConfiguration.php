@@ -224,6 +224,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $bulkUploadNotificationsEmail;
 	
+	/**
+	 * 
+	 * @var bool
+	 */
+	public $internalUse;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -269,7 +275,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"partnerPackageClassOfService",
 		"enableBulkUploadNotificationsEmails",
 		"deliveryRestrictions",
-		"bulkUploadNotificationsEmail"
+		"bulkUploadNotificationsEmail",
+		"internalUse"
 	);
 
 	public function getMapBetweenObjects()
