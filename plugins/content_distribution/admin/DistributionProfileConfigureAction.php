@@ -97,6 +97,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 						$distributionProfile = $contentDistributionPlugin->distributionProfile->update($profileId, $distributionProfile);
 						$form->saveProviderAdditionalObjects($distributionProfile);
 						$form->setAttrib('class', 'valid');
+						$action->view->formValid = true;
 					}
 				}
 				else
@@ -139,6 +140,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 					Infra_ClientHelper::unimpersonate();
 					$form->saveProviderAdditionalObjects($distributionProfile);
 					$form->setAttrib('class', 'valid');
+					$action->view->formValid = true;
 				}
 				else 
 				{

@@ -100,4 +100,15 @@ if (typeof(jQuery) != 'undefined') {
 	});
 }
 
+jQuery(document).ready(function() {
+	<?php if ($this->formValid): ?>
+		console.log('form valid');
+		jQuery('#partner-configure-dialog').dialog('close');
+		jQuery('#frmPaginator1').submit();
+	<?php else: ?>
+	console.log('not form is valid');
+		jQuery('#frmPartnerConfigure').ajaxForm(configurePartnerSuccess);
+	<?php endif; ?>
+});
+
 </script>
