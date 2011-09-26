@@ -62,8 +62,11 @@ if ($limit)
 
 $partnerId = $syndicationFeedDB->getPartnerId();
 $expiryArr = kConf::hasParam("v3cache_getfeed_expiry") ? kConf::get("v3cache_getfeed_expiry") : array();
-foreach($expiryArr as $item)
+foreach($expiryArr as $params)
 {
+	$item = null;
+	parse_str($params, $item);
+	
 	if ($item["key"] == "partnerId" && $item["value"] == $partnerId ||
 		$item["key"] == "feedId" && $item["value"] == $feedId)
 	{
