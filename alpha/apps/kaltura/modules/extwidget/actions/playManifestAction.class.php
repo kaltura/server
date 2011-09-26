@@ -911,7 +911,8 @@ class playManifestAction extends kalturaAction
 			$optimizedPlayback = kConf::get("optimized_playback");
 			if (isset($optimizedPlayback[$partnerId]))
 			{
-				$params = $optimizedPlayback[$partnerId];
+				$params = null;
+				parse_str($optimizedPlayback[$partner_id], $params);
 				if (isset($params['cache_playmanifest']) && $params['cache_playmanifest'])
 					requestUtils::sendCachingHeaders(60);
 			}
