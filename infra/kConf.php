@@ -29,56 +29,26 @@ class kConf
 		if(isset($_SERVER["HOSTNAME"]))
 		{
 			$hostName = $_SERVER["HOSTNAME"];
-			$localConfigFile = "$configDir/hosts/$hostName.ini";
-			if(file_exists($localConfigFile))
+			$localConfigFile = "$hostName.ini";
+			
+			$configPath = "$configDir/hosts";
+			$configDir = dir($configPath);
+			while (false !== ($iniFile = $configDir->read())) 
 			{
-				$localConfig = parse_ini_file($localConfigFile, true);
+				$iniFileMatch = str_replace('#', '*', $iniFile);
+				if(!fnmatch($iniFileMatch, $localConfigFile))
+					continue;
+					
+				$localConfig = parse_ini_file("$configPath/$iniFile", true);
 				$config = array_merge_recursive($config, $localConfig);
 			}
+			$configDir->close();
 		}
 			
 		self::$map = $config;
 		
 		if(function_exists('apc_store'))
 			apc_store(self::APC_CACHE_MAP, self::$map);
-	}
-	
-	/**
-	* @param Iterator $srcConfig
-	* @param Iterator $newConfig
-	* @param bool $valuesOnly
-	* @return Iterator
-	*/
-	public static function mergeConfigItem(Iterator $srcConfig, Iterator $newConfig, $valuesOnly = false)
-	{
-		$returnedConfig = $srcConfig;
-		
-		if($valuesOnly)
-		{
-			foreach($srcConfig as $key => $value)
-			{
-				if(!$newConfig->$key) // nothing to append
-					continue;
-				elseif($value instanceof Iterator)
-					$returnedConfig->$key = self::mergeConfigItem($srcConfig->$key, $newConfig->$key, $valuesOnly);
-				else
-					$returnedConfig->$key = $srcConfig->$key . ',' . $newConfig->$key;
-			}
-		}
-		else
-		{
-			foreach($newConfig as $key => $value)
-			{
-				if(!$srcConfig->$key)
-					$returnedConfig->$key = $newConfig->$key;
-				elseif($value instanceof Iterator)
-					$returnedConfig->$key = self::mergeConfigItem($srcConfig->$key, $newConfig->$key, $valuesOnly);
-				else
-					$returnedConfig->$key = $srcConfig->$key . ',' . $newConfig->$key;
-			}
-		}
-		
-		return $returnedConfig;
 	}
 	
 	public static function getAll()
@@ -107,12 +77,20 @@ class kConf
 		if(isset($_SERVER["HOSTNAME"]))
 		{
 			$hostName = $_SERVER["HOSTNAME"];
-			$localConfigFile = "$configDir/hosts/$mapName/$hostName.ini";
-			if(file_exists($localConfigFile))
+			$localConfigFile = "$hostName.ini";
+			
+			$configPath = "$configDir/hosts/$mapName";
+			$configDir = dir($configPath);
+			while (false !== ($iniFile = $configDir->read())) 
 			{
-				$config = new Zend_Config_Ini($localConfigFile);
+				$iniFileMatch = str_replace('#', '*', $iniFile);
+				if(!fnmatch($iniFileMatch, $localConfigFile))
+					continue;
+					
+				$config = new Zend_Config_Ini("$configPath/$iniFile");
 				self::$map[$mapName] = array_merge_recursive(self::$map[$mapName], $config->toArray());
 			}
+			$configDir->close();
 		}
 		
 		if(function_exists('apc_store'))
