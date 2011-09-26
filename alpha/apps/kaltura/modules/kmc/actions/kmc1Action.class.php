@@ -119,8 +119,8 @@ class kmc1Action extends kalturaAction
 		$this->kmc_rna_version 		= 'v1.0.5';
 		$this->kmc_dashboard_version 	= 'v1.0.1';
 		
-		$this->jw_uiconfs_array = $this->getJWPlayerUIConfs();
-		$this->jw_uiconf_playlist = $this->getJWPlaylistUIConfs();
+		$this->jw_uiconfs_array = array();
+		$this->jw_uiconf_playlist = array();
 		
 		if ( ! $this->module )
 		{
@@ -132,7 +132,7 @@ class kmc1Action extends kalturaAction
 	function getJWPlayerUIConfs()
 	{
 		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
+		$c->addAnd ( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
 		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
 		$c->addAnd ( uiConfPeer::TAGS, 'jwplayer', Criteria::LIKE);
@@ -166,7 +166,7 @@ class kmc1Action extends kalturaAction
 	function getJWPlaylistUIConfs()
 	{
 		$c = new Criteria();
-		$c->addAnd( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
+		$c->addAnd ( uiConfPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK , Criteria::GREATER_EQUAL );
 		$c->addAnd ( uiConfPeer::STATUS , uiConf::UI_CONF_STATUS_READY );
 		$c->addAnd ( uiConfPeer::OBJ_TYPE , uiConf::UI_CONF_TYPE_WIDGET );
 		$c->addAnd ( uiConfPeer::TAGS, 'jwplaylist', Criteria::LIKE);
