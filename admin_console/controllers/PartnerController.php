@@ -226,7 +226,7 @@ class PartnerController extends Zend_Controller_Action
 				$form->populateFromObject($storage, false);
 		}
 		
-		$this->view->formValid = true;
+		
 		if ($request->isPost())
 		{
 			$request = $this->getRequest();
@@ -234,6 +234,7 @@ class PartnerController extends Zend_Controller_Action
 			
 			if ($form->isValid($formData))
 			{
+				$this->view->formValid = true;
 				KalturaLog::log('Request: ' . print_r($request->getPost(), true));
 				$form->populate($request->getPost());
 				$storage = $form->getObject("Kaltura_Client_Type_StorageProfile", $request->getPost(), false, true);
