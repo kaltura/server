@@ -43,7 +43,6 @@ class KalturaFrontController
 			'time' => $this->requestStart,
 			'service' => $service, 
 			'action' => $action, 
-			'params' => '"' . http_build_query($params) . '"', 
 			'requestIndex' => $requestIndex,
 		));
 	}
