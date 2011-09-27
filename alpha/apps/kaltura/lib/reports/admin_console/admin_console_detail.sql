@@ -2,7 +2,7 @@ SELECT
 	aggr_p.STATUS STATUS,
 	aggr_p.partner_id id,
 	aggr_p.partner_name "partner name",
-	aggr_p.created_at "created at",
+	UNIX_TIMESTAMP(aggr_p.created_at) "created at",
 	aggr_p.partner_package "partner package",
 	aggr_p.count_loads "count loads",
 	aggr_p.count_plays "count plays",
