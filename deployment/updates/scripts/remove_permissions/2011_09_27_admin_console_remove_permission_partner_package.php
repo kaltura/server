@@ -11,40 +11,32 @@
 
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
-//remove from all roles other than 'System Administrator' the permission systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE
-$permissionRoleMap = array(
-	'System Administrator' => 'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE',
-);
+$permissionToRemove = 'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_OPTIONS_MONITOR_USAGE';
+$userRoleNameToKeepPermission = 'System Administrator';
 
-foreach ($permissionRoleMap as $roleName => $permissionList)
+
+$userRoles = getUserRolesToRemovePermission($userRoleNameToKeepPermission, -2);
+foreach ($userRoles as $userRole)
 {
-	echo "get  permissions $roleName" . PHP_EOL;
-	$role = getByNameAndPartnerId($roleName, -2);
-	if (!$role) {
-		KalturaLog::err('ERROR - Cannot find role with name ['.$roleName.']');
-	}
-	else {
-		echo "remove permissions to $roleName" . PHP_EOL;
-		removePermissionsToRole($role, $permissionList);
-	}
+	echo "remove permissions to " . $userRole->getName() .  ' role id: ' . $userRole->getId() . PHP_EOL;
+	removePermissionsToRole($userRole, $permissionToRemove);
 }
 
-function getByNameAndPartnerId($roleName, $partnerId)
+function getUserRolesToRemovePermission($userRoleNameToKeepPermission, $partnerId)
 {
 	$c = new Criteria();
 	$c->addAnd(UserRolePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-	$c->addAnd(UserRolePeer::NAME, $roleName, Criteria::NOT_EQUAL);
+	$c->addAnd(UserRolePeer::NAME, $userRoleNameToKeepPermission, Criteria::NOT_EQUAL);
 	UserRolePeer::setUseCriteriaFilter(false);
-	$userRole = UserRolePeer::doSelectOne($c);
+	$userRole = UserRolePeer::doSelect($c);
 	UserRolePeer::setUseCriteriaFilter(true);
 	return $userRole;
 }
 
-function removePermissionsToRole($role, $permissionList)
+function removePermissionsToRole($role, $permissionToRemove)
 {
 	$currentPermissions = $role->getPermissionNames();
 	$currentPermissionsArray = explode(',', $currentPermissions);
-	$permissionsToRemoveArray = explode(',', $permissionList);
 	$tempArray = array();
 	foreach ($currentPermissionsArray as $key => $perm)
 	{
@@ -52,13 +44,9 @@ function removePermissionsToRole($role, $permissionList)
 		{
 			unset($currentPermissionsArray[$key]);
 		}
-		elseif (in_array($perm, $permissionsToRemoveArray)) 
+		elseif ($perm == $permissionToRemove) 
 		{
 			unset($currentPermissionsArray[$key]);
-		}
-		else 
-		{
-			KalturaLog::log('Role name ['.$role->getName().'] does nto have permission ['.$perm.']');
 		}
 	}
 	
