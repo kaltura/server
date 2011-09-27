@@ -847,10 +847,9 @@ class KalturaEntryService extends KalturaBaseService
 	/**
 	 * @param KalturaBaseEntryFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @param string $partnerIdForScope
 	 * @return KalturaCriteria
 	 */
-	protected function prepareEntriesCriteriaFilter(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, $partnerIdForScope)
+	protected function prepareEntriesCriteriaFilter(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 			$filter = new KalturaBaseEntryFilter();
@@ -870,14 +869,6 @@ class KalturaEntryService extends KalturaBaseService
 		$this->fixFilterDuration($filter);
 		
 		$entryFilter = new entryFilter();
-		if(is_null($partnerIdForScope))
-		{
-			$entryFilter->setPartnerSearchScope ( $this->getPartnerId() );
-		}
-		else
-		{
-			$entryFilter->setPartnerSearchScope ( $partnerIdForScope );
-		}
 		
 		$filter->toObject($entryFilter);
 
@@ -893,14 +884,14 @@ class KalturaEntryService extends KalturaBaseService
 		return $c;
 	}
 	
-	protected function listEntriesByFilter(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null, $partnerIdForScope = null)
+	protected function listEntriesByFilter(KalturaBaseEntryFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
 		if (!$pager)
 			$pager = new KalturaFilterPager();
 		
-		$c = $this->prepareEntriesCriteriaFilter($filter, $pager, $partnerIdForScope);
+		$c = $this->prepareEntriesCriteriaFilter($filter, $pager);
 		
 		$list = entryPeer::doSelect($c);
 		$totalCount = $c->getRecordsCount();
@@ -912,7 +903,7 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 
-		$c = $this->prepareEntriesCriteriaFilter($filter, null, null);
+		$c = $this->prepareEntriesCriteriaFilter($filter, null);
 		$c->applyFilters();
 		$totalCount = $c->getRecordsCount();
 		
