@@ -435,9 +435,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service'))){
 			$this->setPermissionGroupElementsToDisabled($configureAccountPackagesService);
 		}
-		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-usage'))){
-			$this->setPermissionGroupElementsToReadOnly($configureAccountsOptionsMonitorUsage);
-		}
+		//if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-usage'))){
+			$this->setPermissionGroupElementsToDisabled($configureAccountsOptionsMonitorUsage);
+	//	}
 		
 	}
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------		
