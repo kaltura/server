@@ -11,7 +11,7 @@
 
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
-$permissionToRemove = 'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE,systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_OPTIONS_MONITOR_USAGE';
+$permissionToRemove = array('systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE','systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_OPTIONS_MONITOR_USAGE');
 $userRoleNameToKeepPermission = 'System Administrator';
 
 
@@ -44,7 +44,7 @@ function removePermissionsToRole($role, $permissionToRemove)
 		{
 			unset($currentPermissionsArray[$key]);
 		}
-		elseif ($perm == $permissionToRemove) 
+		elseif (in_array($perm, $permissionToRemove))
 		{
 			unset($currentPermissionsArray[$key]);
 		}
