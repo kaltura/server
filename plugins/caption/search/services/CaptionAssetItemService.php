@@ -93,6 +93,9 @@ class CaptionAssetItemService extends KalturaBaseService
 			$entryCriteria->applyFilters();
 			
 			$entryIds = $entryCriteria->getFetchedIds();
+			if(!$entryIds || !count($entryIds))
+				$entryIds = array('NOT_EXIST');
+			
 			$captionAssetItemCoreFilter->setEntryIdIn($entryIds);
 		}
 		
