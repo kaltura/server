@@ -48,6 +48,10 @@ class listplaylistsAction extends listentriesAction
 	// kshows for the current user only 
 	protected function setExtraFilters ( entryFilter &$fields_set )
 	{
+		if (intval($fields_set->get("_in_moderation_status")) == moderation::MODERATION_STATUS_APPROVED)
+		{
+			$fields_set->set( "_in_moderation_status" , array(moderation::MODERATION_STATUS_APPROVED, moderation::MODERATION_STATUS_AUTO_APPROVED));
+		}
 		$fields_set->set( "_eq_type" , entryType::PLAYLIST );		
 		$fields_set->set( "_eq_status" , entryStatus::READY );  		// make sure will display only 
 		$this->setP ( "use_filter_puser_id" , "false" ); // don't mind filtering according to the puser/kuser
