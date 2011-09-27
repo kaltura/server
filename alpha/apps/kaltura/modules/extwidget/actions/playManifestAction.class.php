@@ -507,6 +507,18 @@ class playManifestAction extends kalturaAction
 									$finalFlavors = $storageFlavors;
 								}
 							}
+							
+							if (!count($finalFlavors) && $partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
+							{ //take flavors from kaltura storage
+								foreach($flavorAssets as $flavorAsset)
+								{
+									$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+									$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+									if($fileSync)
+										$finalFlavors[] = $flavorAsset;
+								}
+							}
+							
 							$flavorAssets = $finalFlavors;
 						}
 						else
