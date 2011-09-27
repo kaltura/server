@@ -366,7 +366,7 @@ class PartnerController extends Zend_Controller_Action
 		try{
 			$result = $client->doMultiRequest();
 			if (isset($result[0])) {
-				foreach($this->auditList->objects as $audit) {
+				foreach($result[0]->objects as $audit) {
 					$isExtendedFreeTrailHistory = false;
 					foreach($audit->data->changedItems as $changedItem){
 						if ($changedItem->descriptor == 'extendedFreeTrailExpiryDate' || $changedItem->descriptor == 'extendedFreeTrailExpiryReason'){ 
