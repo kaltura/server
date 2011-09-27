@@ -382,6 +382,28 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 	}
 	
+	/**
+	 * make permission group elements readonly and disabled.
+	 * @param unknown_type $dispalyGroupNames
+	 */
+	private function setPermissionGroupElementsToDisabled($permissionGroupName)
+	{
+		foreach ($permissionGroupName as $dispalyGroupName)
+		{
+			$displayGroupElements = $this->getDisplayGroup($dispalyGroupName)->getElements();
+			foreach ($displayGroupElements as $el)
+			{
+				$el->setAttrib('readonly', true);				
+				$el->setAttrib('disable', 'disable');
+				//disable links
+				if ($dispalyGroupName == 'enableDisableFeatures'){
+					$el->setDescription('<a class=linkToPage href=# onClick="return false;">(config)</a>');
+				}
+			}
+		}
+	}
+	
+	
 	public function handlePermissions()
 	{
 		//permissions groups 
@@ -411,7 +433,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			$this->setPermissionGroupElementsToReadOnly($configureGeneralInformation);
 		}
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-packages-service'))){
-			$this->setPermissionGroupElementsToReadOnly($configureAccountPackagesService);
+			$this->setPermissionGroupElementsToDisabled($configureAccountPackagesService);
 		}
 		if (!(Infra_AclHelper::isAllowed('partner', 'configure-account-options-monitor-usage'))){
 			$this->setPermissionGroupElementsToReadOnly($configureAccountsOptionsMonitorUsage);
