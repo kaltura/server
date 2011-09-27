@@ -11,9 +11,9 @@
 
 require_once(dirname(__FILE__).'/../../../bootstrap.php');
 
+//remove from all roles other than 'System Administrator' the permission systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE
 $permissionRoleMap = array(
-	'Support manager' => 'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE',
-	'Publishers Administrator' => 'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE'
+	'System Administrator' => 'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_PACKAGES_SERVICE',
 );
 
 foreach ($permissionRoleMap as $roleName => $permissionList)
@@ -33,7 +33,7 @@ function getByNameAndPartnerId($roleName, $partnerId)
 {
 	$c = new Criteria();
 	$c->addAnd(UserRolePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-	$c->addAnd(UserRolePeer::NAME, $roleName, Criteria::EQUAL);
+	$c->addAnd(UserRolePeer::NAME, $roleName, Criteria::NOT_EQUAL);
 	UserRolePeer::setUseCriteriaFilter(false);
 	$userRole = UserRolePeer::doSelectOne($c);
 	UserRolePeer::setUseCriteriaFilter(true);
