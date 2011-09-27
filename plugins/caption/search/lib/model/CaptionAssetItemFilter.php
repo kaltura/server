@@ -104,6 +104,15 @@ class CaptionAssetItemFilter extends baseObjectFilter
 	
 	public function setEntryIdIn(array $arr)
 	{
+		$ids = $this->get('_in_entry_id');
+		if($ids)
+		{
+			if(!is_array($ids))
+				$ids = explode(',', $ids);
+	
+			$arr = array_merge($ids, $arr);
+		}
+		
 		$this->set('_in_entry_id', $arr);
 	}
 }
