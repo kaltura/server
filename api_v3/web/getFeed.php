@@ -1,4 +1,7 @@
 <?php
+if(!isset($_GET['feedId']))
+	die('feedId not supplied');
+	
 ini_set( "memory_limit" , "256M" );
 $start = microtime(true);
 set_time_limit(0);
