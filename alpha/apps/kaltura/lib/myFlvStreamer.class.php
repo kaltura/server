@@ -666,6 +666,7 @@ self::log ( __METHOD__ , "in loop" , $asset_id );
 			}
 			
 			$use_multi_flavor = false;
+			$flv_file_name_edit = false;
 			$flavor_asset_edit = assetPeer::retrieveBestEditByEntryId($entry->getId());
 			if(!$flavor_asset_edit)
 			{
