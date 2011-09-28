@@ -18,7 +18,7 @@ class defPartnerservices2baseAction extends kalturaAction
 		$service_name = $this->getRequestParameter( "myaction" );
 
 		// remove all '_' and set to lowercase
-		$myaction_name = strtolower( str_replace ( "_" , "" , $service_name ) );
+		$myaction_name = trim( strtolower( str_replace ( "_" , "" , $service_name ) ) );
 		$clazz_name = $myaction_name . "Action";
 //		echo "[$myaction_name] [$clazz_name]<br>";
 
