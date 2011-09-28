@@ -324,6 +324,12 @@ class kFile
 	
 	private static function rename_wrap($src, $trg)
 	{
+		if(!file_exists($src))
+		{
+			KalturaLog::err("Source file doesn't exist [$src]");
+			return false;
+		}
+			
 //	KalturaLog::log("before rename");
 		if(rename($src, $trg)) 
 			return true;
