@@ -1620,7 +1620,7 @@ class kFlowHelper
 
 			$profile = null;
 			try{
-				$profile = myPartnerUtils::getConversionProfile2ForEntry($currentFlavorAsset->getEntryId());
+				$profile = myPartnerUtils::getConversionProfile2ForEntry($dbAsset->getEntryId());
 				KalturaLog::debug("profile [" . $profile->getId() . "]");
 			}
 			catch(Exception $e)
