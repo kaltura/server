@@ -98,7 +98,7 @@ class playManifestAction extends kalturaAction
 			$isMp3 = true;
 			foreach($flavors as $flavor)
 			{
-				if (strtolower($flavor['ext']) != 'mp3')
+				if (!isset($flavor['ext']) || strtolower($flavor['ext']) != 'mp3')
 					$isMp3 = false;
 			}
 			
