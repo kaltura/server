@@ -131,6 +131,9 @@ class SyndicationFeedService extends KalturaBaseService
 		$syndicationFeed->toUpdatableObject($syndicationFeedDB, array('type'));	
 		
 		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed) && ($syndicationFeed->xslt != null)){
+			if(!($syndicationFeed instanceof genericSyndicationFeed))
+				throw new KalturaAPIException(KalturaErrors::INVALID_FEED_TYPE, get_class($syndicationFeed));
+				
 			$syndicationFeedDB->incrementVersion();
 		}
 		$syndicationFeedDB->save();		

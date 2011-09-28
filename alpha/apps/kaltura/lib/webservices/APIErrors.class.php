@@ -321,4 +321,6 @@ class APIErrors
 	
 	const INVALID_FEED_ID = "INVALID_FEED_ID,Unknown feed [%s]" ;
 	
+	const INVALID_FEED_TYPE = "INVALID_FEED_TYPE,Wrong feed type [%s]" ;
+	
 }
