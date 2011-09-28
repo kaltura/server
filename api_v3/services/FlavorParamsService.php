@@ -176,7 +176,10 @@ class FlavorParamsService extends KalturaBaseService
 		$flavorParamsDb = array();
 		foreach($flavorParamsConversionProfilesDb as $item)
 		{
-			$flavorParamsDb[] = $item->getFlavorParams();
+			/* @var $item flavorParamsConversionProfile */
+			$flavorParamsItem = assetParamsPeer::retrieveByPK($item->getFlavorParamsId());
+			if($flavorParamsItem)
+				$flavorParamsDb[] = $flavorParamsItem;
 		}
 		
 		$flavorParams = KalturaFlavorParamsArray::fromDbArray($flavorParamsDb);
