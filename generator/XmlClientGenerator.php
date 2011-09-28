@@ -123,13 +123,29 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$this->addFile("KalturaClient.xml", $this->_doc->saveXML());
 	}
 	
+	private function pluginHasServices($pluginInstance)
+	{
+		$servicesInterface = $pluginInstance->getInstance('IKalturaServices');
+    	if (!$servicesInterface)
+    		return false;
+    		
+    	$pluginName = $pluginInstance->getPluginName();
+    	foreach($servicesInterface->getServicesMap() as $service => $serviceClass)
+	    {
+			if (isset($this->_includeList[strtolower("{$pluginName}_{$service}")]))
+				return true;
+		}
+		
+		return false;
+	}
+	
 	private function appendPlugins(DOMElement $pluginsElement)
 	{
 		// Add all the plugins that offer services to the list of required plugins
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlugin');
 		foreach($pluginInstances as $pluginInstance)
 		{
-    		if (!$pluginInstance->getInstance('IKalturaServices'))
+			if (!$this->pluginHasServices($pluginInstance))
     			continue;
 
     		$pluginName = $pluginInstance->getPluginName();
