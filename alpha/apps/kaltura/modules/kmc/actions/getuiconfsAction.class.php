@@ -47,6 +47,8 @@ class getuiconfsAction extends kalturaAction
 		{
 			$content_uiconfs_previewembed = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_previewembed_list", true, $kmcGeneralUiConf);
 		}
+		
+		$default_uiconfs_array = array();
 		foreach($content_uiconfs_previewembed as $uiconf)
 		{
 			$uiconf_array = array();
