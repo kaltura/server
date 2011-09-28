@@ -140,7 +140,7 @@ class kDataCenterMgr
 	 */
 	public static function retrieveFileFromRemoteDataCenter ( FileSync $file_sync )
 	{
-		KalturaLog::log(__METHOD__." - file_sync [{$file_sync->getId()}]");
+		KalturaLog::log("File sync [{$file_sync->getId()}]");
 		// LOG retrieval
 
 		$cmd_line = self::createCmdForRemoteDataCenter($file_sync);
@@ -148,11 +148,18 @@ class kDataCenterMgr
 		
 		if (!file_exists($local_file_path)) // don't need to fetch twice 
 		{ 
-			KalturaLog::log(__METHOD__." - executing " . $cmd_line);
+			KalturaLog::log("Executing " . $cmd_line);
 			exec($cmd_line);
+			
+			clearstatcache();
+			if (!file_exists($local_file_path))
+			{
+				KalturaLog::err("Temp file not retrieved [$local_file_path]");
+				return false;
+			}
 		}
 		else {
-			KalturaLog::log(__METHOD__." - already exists in temp folder [{$local_file_path}]");
+			KalturaLog::log("Already exists in temp folder [{$local_file_path}]");
 		}
 
 		return file_get_contents( $local_file_path );
