@@ -140,7 +140,8 @@ class myFlvHandler
 	public function seek($pos)
 	{
 		$this->pos = $pos;
-		fseek($this->fh, $pos, SEEK_SET);
+		if(is_resource($this->fh))
+			@fseek($this->fh, $pos, SEEK_SET);
 	}
 
 	public static function dumpTag($data, $timestamp_offset = 0)
