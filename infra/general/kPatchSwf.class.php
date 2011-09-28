@@ -85,7 +85,7 @@ class kPatchSwf
 		$swf = file_get_contents($this->filename);
 		$this->header = substr($swf, 0, 8);
 		$zdata = substr($swf, 8, strlen($swf) - 8);
-		$this->swfdata = gzuncompress($zdata);
+		$this->swfdata = @gzuncompress($zdata);
 		$this->reset();
 		$this->signature = "\0\0\0\0$signature";
 	}
