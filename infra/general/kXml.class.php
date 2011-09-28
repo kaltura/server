@@ -350,7 +350,7 @@ class kXml
 			$proc->setParameter( '', $key, $value);
 		}		
 	    $proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
-		$proc->importStyleSheet($xsl);
+		@$proc->importStyleSheet($xsl);
 		
 		$xml = $proc->transformToDoc($xml);
 
