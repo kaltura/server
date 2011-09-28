@@ -191,7 +191,7 @@ class kSyndicationFeedManager
 	private static function createKalturaItemXslt($xslt)
 	{
 		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($xslt))
+		if(!@$xsl->loadXML($xslt))
 		{
 			KalturaLog::debug("Could not load xslt");
 			return null;
@@ -253,7 +253,7 @@ class kSyndicationFeedManager
 	public static function validateXsl($xsltStr)
 	{
 		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($xsltStr))
+		if(!@$xsl->loadXML($xsltStr))
 		{
 			KalturaLog::debug("Could not load xslt");
 			throw new KalturaAPIException(KalturaErrors::INVALID_XSLT, $xsltStr);
