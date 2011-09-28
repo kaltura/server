@@ -72,8 +72,13 @@ class SyndicationFeedService extends KalturaBaseService
 				$fpc = new flavorParamsConversionProfile();
 				$fpc->setConversionProfileId($partner->getDefaultConversionProfileId());
 				$fpc->setFlavorParamsId($syndicationFeed->flavorParamId);
-				$fpc->setReadyBehavior($assetParams->getReadyBehavior());
-				$fpc->setSystemName($assetParams->getSystemName());
+				
+				if($assetParams)
+				{
+					$fpc->setReadyBehavior($assetParams->getReadyBehavior());
+					$fpc->setSystemName($assetParams->getSystemName());
+				}
+				
 				$fpc->save();
 			}
 		}
