@@ -213,7 +213,7 @@ class kSyndicationFeedManager
 	private static function createKalturaMrssXslt($xslt)
 	{
 		$xsl = new DOMDocument();
-		if(!$xsl->loadXML($xslt))
+		if(!@$xsl->loadXML($xslt))
 		{
 			KalturaLog::debug("Could not load xslt");
 			return null;
