@@ -87,14 +87,17 @@ class kmc2Action extends kalturaAction
 		
 		// 2009-08-27 is the date we added ON2 to KMC trial account
 		// TODO - should be depracated
-		if($partner && strtotime($partner->getCreatedAt()) >= strtotime('2009-08-27') ||
-		   $partner->getEnableAnalyticsTab())
+		if($partner)
 		{
-			$this->allow_reports = true;
-		}
-		if($partner->getEnableAnalyticsTab())
-		{
-			$this->allow_reports = true;
+			if(strtotime($partner->getCreatedAt()) >= strtotime('2009-08-27') ||
+			   $partner->getEnableAnalyticsTab())
+			{
+				$this->allow_reports = true;
+			}
+			if($partner->getEnableAnalyticsTab())
+			{
+				$this->allow_reports = true;
+			}
 		}
 		
 		// set content kdp version according to partner id
