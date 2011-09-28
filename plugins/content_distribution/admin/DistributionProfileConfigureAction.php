@@ -84,7 +84,7 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			Infra_ClientHelper::impersonate($partnerId);
 			$flavorParamsResponse = $this->client->flavorParams->listAction(null, $pager);
 			Infra_ClientHelper::unimpersonate();
-		
+			
 			if($profileId)
 			{
 				if ($request->isPost())
@@ -98,6 +98,29 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 						$form->saveProviderAdditionalObjects($distributionProfile);
 						$form->setAttrib('class', 'valid');
 						$action->view->formValid = true;
+					}
+					else
+					{
+						$form->populate($request->getPost());
+						$distributionProfile = $form->getObject($profileClass, $request->getPost());
+						$optionalFlavorParamsIds = array();
+						$requiredFlavorParamsIds = array();
+						if(!is_null($distributionProfile->optionalFlavorParamsIds) && strlen($distributionProfile->optionalFlavorParamsIds))
+							$optionalFlavorParamsIds = explode(',', $distributionProfile->optionalFlavorParamsIds);
+						if(!is_null($distributionProfile->requiredFlavorParamsIds) && strlen($distributionProfile->requiredFlavorParamsIds))
+							$requiredFlavorParamsIds = explode(',', $distributionProfile->requiredFlavorParamsIds);
+							
+						$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
+						
+						if(is_array($distributionProfile->requiredThumbDimensions))
+							foreach($distributionProfile->requiredThumbDimensions as $dimensions)
+								$form->addThumbDimensions($dimensions, true);
+								
+						if(is_array($distributionProfile->optionalThumbDimensions))
+							foreach($distributionProfile->optionalThumbDimensions as $dimensions)
+								$form->addThumbDimensions($dimensions, false);
+							
+						$form->addThumbDimensionsForm();
 					}
 				}
 				else
@@ -154,7 +177,26 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 		{
 			KalturaLog::err($e->getMessage() . "\n" . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
+			$optionalFlavorParamsIds = array();
+			$requiredFlavorParamsIds = array();
+			if(!is_null($distributionProfile->optionalFlavorParamsIds) && strlen($distributionProfile->optionalFlavorParamsIds))
+				$optionalFlavorParamsIds = explode(',', $distributionProfile->optionalFlavorParamsIds);
+			if(!is_null($distributionProfile->requiredFlavorParamsIds) && strlen($distributionProfile->requiredFlavorParamsIds))
+				$requiredFlavorParamsIds = explode(',', $distributionProfile->requiredFlavorParamsIds);
+				
+			$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
+			
+			if(is_array($distributionProfile->requiredThumbDimensions))
+				foreach($distributionProfile->requiredThumbDimensions as $dimensions)
+					$form->addThumbDimensions($dimensions, true);
+					
+			if(is_array($distributionProfile->optionalThumbDimensions))
+				foreach($distributionProfile->optionalThumbDimensions as $dimensions)
+					$form->addThumbDimensions($dimensions, false);
+					
+			$form->addThumbDimensionsForm();
 		}
+		
 		$action->view->form = $form;
 	}
 }
