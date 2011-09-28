@@ -33,7 +33,7 @@ class defPartnerservices2baseAction extends kalturaAction
 		}
 		else
 		{
-			$include_result = include_once ( "{$clazz_name}.class.php");
+			$include_result = @include_once ( "{$clazz_name}.class.php");
 			if ( $include_result )
 			{
 				$myaction = new $clazz_name( $this );
