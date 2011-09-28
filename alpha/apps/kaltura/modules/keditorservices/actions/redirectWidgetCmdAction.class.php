@@ -81,7 +81,8 @@ class redirectWidgetCmdAction extends kalturaAction
 				}
 			}
 		}
+		
+		die;
 	}
 }
 
-?>
