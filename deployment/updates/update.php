@@ -43,7 +43,7 @@ class ScriptsRunner {
 		$dbConf = kConf::getDB();
 		$dsn = $dbConf['datasources']['propel']['connection']['dsn'];
 		$dsn = explode(":", $dsn);
-		$dsnArray = explode(";", $dsn[1], -1);
+		$dsnArray = explode(";", $dsn[1]);
 		
 		// init with default port
 		$this->dbParams['port'] = '3306';
