@@ -11,6 +11,12 @@ require_once ( "defKeditorservicesAction.class.php");
  */
 class getEntryInfoAction extends defKeditorservicesAction
 {
+	public function execute()
+	{
+		$this->kuser = null;
+		return parent::execute();
+	}
+	
 	// here the $kshow will be null (thanks to fetchKshow=false) and entry will 
 	public  function executeImpl ( kshow $kshow, entry &$entry )
 	{
