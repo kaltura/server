@@ -164,8 +164,12 @@ class HuluFeedHelper
 	
 	protected function setNodeValueFullDateFieldConfigId($xpath, $fieldConfigId)
 	{
-		if (isset($this->_fieldValues[$fieldConfigId]))
-			$this->setNodeValue($xpath, date('c', $this->_fieldValues[$fieldConfigId]));
+		if (isset($this->_fieldValues[$fieldConfigId]) && $this->_fieldValues[$fieldConfigId]) 
+		{
+			$date = new DateTime('@'.$this->_fieldValues[$fieldConfigId], new DateTimeZone('UTC'));
+			$date = str_replace('+0000', '', $date->format(DateTime::ISO8601)); 
+			$this->setNodeValue($xpath, $date);
+		}
 	}
 	
 	protected function setNodeValueShortDateFieldConfigId($xpath, $fieldConfigId)
