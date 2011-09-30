@@ -34,7 +34,7 @@ class KalturaDropFolderFile extends KalturaObject implements IFilterable
 	public $fileName;
 	
 	/**
-	 * @var int
+	 * @var float
 	 * @filter order
 	 */
 	public $fileSize;
