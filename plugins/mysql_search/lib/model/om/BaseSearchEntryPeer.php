@@ -434,6 +434,9 @@ abstract class BaseSearchEntryPeer {
 		
 		$queryResult = SearchEntryPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
+		if($criteria instanceof KalturaCriteria)
+			$criteria->applyResultsSort($queryResult);
+		
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
