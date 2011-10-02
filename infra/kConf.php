@@ -80,8 +80,8 @@ class kConf
 			$localConfigFile = "$hostName.ini";
 			
 			$configPath = "$configDir/hosts/$mapName";
-			$configDir = dir($configPath);
 			if(file_exists($configPath) && is_dir($configPath)){			
+				$configDir = dir($configPath);
 				while (false !== ($iniFile = $configDir->read())) 
 				{
 					$iniFileMatch = str_replace('#', '*', $iniFile);
@@ -91,8 +91,8 @@ class kConf
 					$config = new Zend_Config_Ini("$configPath/$iniFile");
 					self::$map[$mapName] = array_merge_recursive(self::$map[$mapName], $config->toArray());
 				}
+				$configDir->close();
 			}
-			$configDir->close();
 		}
 		
 		if(function_exists('apc_store'))
