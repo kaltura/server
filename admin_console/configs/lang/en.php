@@ -1006,6 +1006,11 @@ return array(
 	// partner-configure
 	'indetic-distribution-note' => 'NOTE: You should choose one of the following flavors: mp4, mov, mpg, wmv, avi. ',
 
+	//user roles status
+	'Kaltura_Client_Enum_UserRoleStatus::ACTIVE' => 'active',
+	'Kaltura_Client_Enum_UserRoleStatus::BLOCKED' => 'blocked',
+	'Kaltura_Client_Enum_UserRoleStatus::DELETED' => 'deleted'
+	
 	
 );
 
