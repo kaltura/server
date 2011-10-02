@@ -21,6 +21,12 @@ class SymantecScanJavaEngine extends SymantecScanEngine
 		return true;
 	}
 	
+	function isEngineRunning()
+	{
+		exec('netstat -na | grep :1344 | grep LISTEN | grep -i tcp', $output);
+		return ($output ? true : false);
+	}
+
 	/**
 	 * Will execute the virus scan for the given file path and return the output from virus scanner program
 	 * and the error description
@@ -47,6 +53,12 @@ class SymantecScanJavaEngine extends SymantecScanEngine
 
 		$errorDescription = null;
 		$output = null;
+		
+		while (!$this->isEngineRunning())
+		{
+			KalturaLog::debug("Symantec engine not running, retrying in 10 seconds");
+			sleep(10);
+		}
 		
 		KalturaLog::debug("Executing - [$cmd]");
 		system($cmd, $return_value);
