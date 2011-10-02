@@ -28,6 +28,23 @@ class KalturaExtractMediaJobData extends KalturaConvartableJobData
 			
 		return parent::toObject($dbData);
 	}
+	
+	/**
+	 * @param string $subType
+	 * @return int
+	 */
+	public function toSubType($subType)
+	{
+		return kPluginableEnumsManager::apiToCore('mediaParserType', $subType);
+	}
+	
+	/**
+	 * @param int $subType
+	 * @return string
+	 */
+	public function fromSubType($subType)
+	{
+		return kPluginableEnumsManager::coreToApi('mediaParserType', $subType);
+	}
 }
 
-?>
