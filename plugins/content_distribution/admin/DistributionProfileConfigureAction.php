@@ -179,22 +179,26 @@ class DistributionProfileConfigureAction extends KalturaAdminConsolePlugin
 			$action->view->errMessage = $e->getMessage();
 			$optionalFlavorParamsIds = array();
 			$requiredFlavorParamsIds = array();
-			if(!is_null($distributionProfile->optionalFlavorParamsIds) && strlen($distributionProfile->optionalFlavorParamsIds))
-				$optionalFlavorParamsIds = explode(',', $distributionProfile->optionalFlavorParamsIds);
-			if(!is_null($distributionProfile->requiredFlavorParamsIds) && strlen($distributionProfile->requiredFlavorParamsIds))
-				$requiredFlavorParamsIds = explode(',', $distributionProfile->requiredFlavorParamsIds);
-				
-			$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
 			
-			if(is_array($distributionProfile->requiredThumbDimensions))
-				foreach($distributionProfile->requiredThumbDimensions as $dimensions)
-					$form->addThumbDimensions($dimensions, true);
+			if (isset($distributionProfile))
+			{
+				if(!is_null($distributionProfile->optionalFlavorParamsIds) && strlen($distributionProfile->optionalFlavorParamsIds))
+					$optionalFlavorParamsIds = explode(',', $distributionProfile->optionalFlavorParamsIds);
+				if(!is_null($distributionProfile->requiredFlavorParamsIds) && strlen($distributionProfile->requiredFlavorParamsIds))
+					$requiredFlavorParamsIds = explode(',', $distributionProfile->requiredFlavorParamsIds);
 					
-			if(is_array($distributionProfile->optionalThumbDimensions))
-				foreach($distributionProfile->optionalThumbDimensions as $dimensions)
-					$form->addThumbDimensions($dimensions, false);
-					
-			$form->addThumbDimensionsForm();
+				$form->addFlavorParamsFields($flavorParamsResponse, $optionalFlavorParamsIds, $requiredFlavorParamsIds);
+				
+				if(is_array($distributionProfile->requiredThumbDimensions))
+					foreach($distributionProfile->requiredThumbDimensions as $dimensions)
+						$form->addThumbDimensions($dimensions, true);
+						
+				if(is_array($distributionProfile->optionalThumbDimensions))
+					foreach($distributionProfile->optionalThumbDimensions as $dimensions)
+						$form->addThumbDimensions($dimensions, false);
+						
+				$form->addThumbDimensionsForm();
+			}
 		}
 		
 		$action->view->form = $form;
