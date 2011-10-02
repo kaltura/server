@@ -19,19 +19,8 @@ class PlaylistService extends KalturaEntryService
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::globalPartnerAllowed()
 	 */
-	protected function globalPartnerAllowed($actionName)
-	{
-		if($actionName == 'execute')
-			return true;
-		
-		return parent::globalPartnerAllowed($actionName);
-	}
-	
 	protected function kalturaNetworkAllowed($actionName)
 	{
-		if ($actionName === 'execute') {
-			return true;
-		}
 		if ($actionName === 'executeFromContent') {
 			return true;
 		}
