@@ -104,7 +104,13 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			{
 				KalturaLog::debug("Found engine [" . get_class($engine) . "]");
 				$mediaInfo = $engine->getMediaInfo();
-			}		
+			}
+			else
+			{
+				$err = "No media info parser engine found for job sub type [$job->jobSubType]";
+				KalturaLog::err($err);
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
+			}	
 		}
 		catch(Exception $ex)
 		{
