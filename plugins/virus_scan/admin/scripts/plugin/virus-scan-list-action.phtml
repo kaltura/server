@@ -1,5 +1,7 @@
-   <?php echo $this->virusScanFilterForm; ?>
-   <?php echo $this->newForm; ?>
+<p><?php echo $this->translate('virus scan intro text'); ?></p>
+<?php echo $this->virusScanFilterForm; ?>
+<?php echo $this->newForm; ?>
+   
 
 <div id="results" class="clear">
 	<table>
@@ -70,6 +72,10 @@
 </div>
 
 <script type="text/javascript">
+
+$(function(){
+	$("#sub-header").append('<ul class="sub-navigation"><li class="active"><a>Virus Scan Profiles</a></li></ul>');
+});
 
 function doAction(action, profileId) {
 	switch(action) {
@@ -188,6 +194,7 @@ function deleteProfile(profileId)
 	}
 	resetOptions();
 }
+
 
 
 
