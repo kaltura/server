@@ -219,7 +219,7 @@ class SyndicationFeedService extends KalturaBaseService
 	 */
 	public function getEntryCountAction($feedId)
 	{
-		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($$feedId);
+		$syndicationFeedDB = syndicationFeedPeer::retrieveByPK($feedId);
 		if (!$syndicationFeedDB)
 			throw new KalturaAPIException(KalturaErrors::INVALID_FEED_ID, $feedId);
 		
