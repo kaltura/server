@@ -43,6 +43,11 @@
 				<controller>user</controller>
 				<action>settings</action>
 			</change-my-settings>
+			<user-role>
+				<label>User Roles</label>
+				<controller>user</controller>
+				<action>user-role</action>
+			</user-role>
 		</pages>
 	</users>
 	<widgets>
