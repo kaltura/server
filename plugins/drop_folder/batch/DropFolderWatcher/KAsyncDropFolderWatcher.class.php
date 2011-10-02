@@ -367,10 +367,10 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 				// update the file to status PENDING (will raise an event)
 				try {
 					$updateDropFolderFile = new KalturaDropFolderFile();
-					$updateDropFolderFile->status = KalturaDropFolderFileStatus::PENDING;
 					$updateDropFolderFile->lastModificationTime = $lastModificationTime;
 					$this->impersonate($dropFolderFile->partnerId);
 					$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+					$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
 					$this->unimpersonate();
 					return true;
 				}
@@ -424,10 +424,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		if (!$delResult) {
 			KalturaLog::err("Cannot delete physical file at path [$physicalFilePath]");
 			try {
-				$updateDropFolderFile = new KalturaDropFolderFile();
-				$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_DELETING;
 				$this->impersonate($dropFolderFile->partnerId);
-				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+				$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING);
 				$this->unimpersonate();
 			}
 			catch (Exception $e) {
@@ -450,10 +448,8 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		// change status to PURGED
 		try {
-			$updateDropFolderFile = new KalturaDropFolderFile();
-			$updateDropFolderFile->status = KalturaDropFolderFileStatus::PURGED;
 			$this->impersonate($dropFolderFile->partnerId);
-			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+			$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
 			$this->unimpersonate();
 		}
 		catch (Exception $e) {
@@ -469,11 +465,11 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	{
 		try {
 			$updateDropFolderFile = new KalturaDropFolderFile();
-			$updateDropFolderFile->status = KalturaDropFolderFileStatus::ERROR_HANDLING;
 			$updateDropFolderFile->errorCode = $errorCode;
 			$updateDropFolderFile->errorDescription = $errorMessage;
 			$this->impersonate($dropFolderFile->partnerId);
 			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
+			$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING);
 			$this->unimpersonate();
 		}
 		catch (Exception $e) {

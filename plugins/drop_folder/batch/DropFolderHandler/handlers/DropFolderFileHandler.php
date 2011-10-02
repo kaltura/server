@@ -112,8 +112,9 @@ abstract class DropFolderFileHandler
 	 */
 	protected function updateDropFolderFile()
 	{
+		$dropFolderFilePlugin = KalturaDropFolderClientPlugin::get($this->kClient);
+		
 		$updateFile = new KalturaDropFolderFile();
-		$updateFile->status = $this->dropFolderFile->status;
 		$updateFile->fileSize = $this->dropFolderFile->fileSize;
 		$updateFile->parsedSlug = $this->dropFolderFile->parsedSlug;
 		$updateFile->parsedFlavor = $this->dropFolderFile->parsedFlavor;
@@ -121,7 +122,8 @@ abstract class DropFolderFileHandler
 		$updateFile->errorDescription = $this->dropFolderFile->errorDescription;		
 		
 		$this->impersonate($this->dropFolderFile->partnerId);
-		$updatedFile = $this->kClient->dropFolderFile->update($this->dropFolderFile->id, $updateFile);
+		$updatedFile = $dropFolderFilePlugin->dropFolderFile->update($this->dropFolderFile->id, $updateFile);
+		$updatedFile = $dropFolderFilePlugin->dropFolderFile->updateStatus($this->dropFolderFile->id, $this->dropFolderFile->status);
 		$this->unimpersonate();
 		
 		return $updatedFile;

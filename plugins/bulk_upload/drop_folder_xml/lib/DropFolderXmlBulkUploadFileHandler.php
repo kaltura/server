@@ -280,14 +280,12 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	 */
 	private function setAsHandled($idsArray)
 	{
-		$updateObj = new KalturaDropFolderFile();
-		$updateObj->status = KalturaDropFolderFileStatus::HANDLED;
-		
+		$dropFolderFilePlugin = KalturaDropFolderClientPlugin::get($this->kClient);
 		$this->kClient->startMultiRequest();
 		foreach ($idsArray as $id)
 		{
 			KalturaLog::debug('Updating drop folder file ['.$id.'] with status HANDLED');
-			$this->kClient->dropFolderFile->update($id, $updateObj);
+			$dropFolderFilePlugin->dropFolderFile->updateStatus($id, KalturaDropFolderFileStatus::HANDLED);
 		}
 		$this->kClient->doMultiRequest();		
 	}

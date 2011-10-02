@@ -113,6 +113,35 @@ class DropFolderFileService extends KalturaBaseService
 		
 		return $dropFolderFile;
 	}
+	
+
+	/**
+	 * Update status of KalturaDropFolderFile
+	 * 
+	 * @action updateStatus
+	 * @param int $dropFolderFileId
+	 * @param KalturaDropFolderFileStatus $status
+	 * @return KalturaDropFolderFile
+	 *
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 */	
+	public function updateStatusAction($dropFolderFileId, $status)
+	{
+		$dbDropFolderFile = DropFolderFilePeer::retrieveByPK($dropFolderFileId);
+		if (!$dbDropFolderFile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFileId);
+			
+		if ($status != KalturaDropFolderFileStatus::PURGED && $dbDropFolderFile->getStatus() == KalturaDropFolderFileStatus::DELETED)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFileId);
+		
+		$dbDropFolderFile->setStatus($status);
+		$dbDropFolderFile->save();
+	
+		$dropFolderFile = new KalturaDropFolderFile();
+		$dropFolderFile->fromObject($dbDropFolderFile);
+		
+		return $dropFolderFile;
+	}
 
 	/**
 	 * Mark the KalturaDropFolderFile object as deleted
