@@ -874,7 +874,7 @@ return array(
 
 
 	// external-storages
-	'external-storages intro text' => 'Here you can manage all remote storages used by the publishers registered on your Kaltura video platform deployment',
+	'external-storages intro text' => 'here you can manage the Remote Storage profiles on your Kaltura video platform deployment.',
 	'external-storages results count' => 'Results <span>(%s storages)</span>',
 
 	// partner-configure
@@ -953,10 +953,10 @@ return array(
 
 	// Distibution
 	'provider-list intro text'	=>	'From here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
-	'distribution-profiles intro text' =>	'From here you can define and manage specific distribution profiles for each publisher account.',
+	'distribution-profiles intro text' =>	'here you can manage the Distribution profiles on your Kaltura video platform deployment',
 
 	// Drop Folder
-	'drop folder list intro text' => 'Here you can manage all ingestion drop folders used by the publishers registered on your Kaltura video platform deployment',
+	'drop folder list intro text' => 'here you can manage the Drop Folder profiles on your Kaltura video platform deployment',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED' => 'Enabled',
@@ -990,6 +990,7 @@ return array(
 	'VIRUS_SCAN_ENTRY_TYPE_ALL' =>'All',
 
 	'Virus Scan Profile' => 'Virus Scan Profile',
+	'virus scan intro text' => 'here you can manage the Virus Scan profiles on your Kaltura video platform deployment',
 
 	//metadate profile
 	'Kaltura_Client_Metadata_Enum_MetadataProfileStatus::ACTIVE' => 'Active',
