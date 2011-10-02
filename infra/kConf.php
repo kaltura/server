@@ -81,14 +81,16 @@ class kConf
 			
 			$configPath = "$configDir/hosts/$mapName";
 			$configDir = dir($configPath);
-			while (false !== ($iniFile = $configDir->read())) 
-			{
-				$iniFileMatch = str_replace('#', '*', $iniFile);
-				if(!fnmatch($iniFileMatch, $localConfigFile))
-					continue;
-					
-				$config = new Zend_Config_Ini("$configPath/$iniFile");
-				self::$map[$mapName] = array_merge_recursive(self::$map[$mapName], $config->toArray());
+			if(file_exists($configPath) && is_dir($configPath)){			
+				while (false !== ($iniFile = $configDir->read())) 
+				{
+					$iniFileMatch = str_replace('#', '*', $iniFile);
+					if(!fnmatch($iniFileMatch, $localConfigFile))
+						continue;
+						
+					$config = new Zend_Config_Ini("$configPath/$iniFile");
+					self::$map[$mapName] = array_merge_recursive(self::$map[$mapName], $config->toArray());
+				}
 			}
 			$configDir->close();
 		}
