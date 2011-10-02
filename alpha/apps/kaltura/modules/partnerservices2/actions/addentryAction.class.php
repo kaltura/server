@@ -74,7 +74,7 @@ class addentryAction extends defPartnerservices2Action
      */
     public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
     {
-        $logger = sfLogger::getInstance();
+//        $logger = sfLogger::getInstance();
         self::$escape_text = true;
 
 /*		if ( !$puser_kuser )
@@ -101,11 +101,13 @@ class addentryAction extends defPartnerservices2Action
 				$prefix = $this->getObjectPrefix() . "$i" . "_";
 			
 			$source = $this->getP($prefix . "source");
-			$filename = $this->getP($prefix . "filename") . '.flv';
+			$filename = $this->getP($prefix . "filename");
 			if ($source != entry::ENTRY_MEDIA_SOURCE_WEBCAM || !$filename)
 				continue;
 			
-			if(!file_exists($filename))
+		    $content = myContentStorage::getFSContentRootPath();
+		    $entryFullPath = "$content/content/webcam/$filename.flv";
+			if(!file_exists($entryFullPath))
 			{
 				$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrlByDcId(1 - kDataCenterMgr::getCurrentDcId());
 				if($remoteDCHost)
