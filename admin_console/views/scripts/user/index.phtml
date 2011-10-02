@@ -47,6 +47,9 @@
 							<?php endif; ?>
 							<option value="remove"><?php echo $this->translate('Remove user'); ?></option>
 							<option value="change role"><?php echo $this->translate('Change role'); ?></option>
+							<?php if (Infra_AclHelper::isAllowed('user','assign')): ?>
+							<option value="assign partners"><?php echo $this->translate('Assign partners'); ?></option>
+							<?php endif; ?>
 						<?php endif; ?>
 					</select>
 				</td>
@@ -69,6 +72,9 @@ function doAction(action, userId) {
 			break;
 		case 'change role':
 			changeRole(userId);
+			break;
+		case 'assign partners':
+			assignPartners(userId);
 			break;
 	}
 }
@@ -94,6 +100,44 @@ function changeRole(userId) {
 		width: 500,
 		height: 300,
 		title: '<?php echo $this->translate('Change Role'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('form').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			jQuery('#frmPaginator1').submit();
+		}	
+	});
+	
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('form').ajaxForm(function() { 
+				dialogDiv.dialog('close');
+			}); 
+		}
+	);
+}
+
+function assignPartners(userId) {
+	var url = '<?php echo $this->url(array('controller' => 'user', 'action' => 'assign-partners', 'userId' => ''), null, true); ?>' + userId;
+	//document.location = url;
+
+	jQuery('#assign-partners-dialog').remove();
+	var dialogDiv = jQuery('<div id="assign-partners-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 500,
+		height: 400,
+		title: '<?php echo $this->translate('Assign Partners'); ?>',
 		buttons: {
 			'<?php echo $this->translate('Save'); ?>': function() {
 				jQuery(this).find('form').submit();

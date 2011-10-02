@@ -183,6 +183,32 @@ class UserController extends Zend_Controller_Action
 		
 	}
 	
+	public function assignPartnersAction()
+	{
+		$this->_helper->layout->disableLayout();
+		$request = $this->getRequest();
+		$userId = $this->_getParam('userId');
+		
+		$client = Infra_ClientHelper::getClient();
+		$user = $client->user->get($userId);
+		
+		$form = new Form_AssignPartners();
+		$client = Infra_ClientHelper::getClient();
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		
+		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package', $allowNonePackage);
+		
+		$form->getElement('name')->setValue($user->fullName);
+		$form->getElement('partners')->setValue($user->allowedPartnerIds);
+		$form->getElement('partner_package')->setValue(explode(",",$user->allowedPartnerPackages));		
+		if ($request->isPost())
+		{
+			$this->proccessAssignPartnersForm($form);
+		}
+		$this->view->form = $form;
+		
+	}
+	
 	private function proccessNewUserForm(Form_NewUser $form)
 	{
 		$request = $this->getRequest();
@@ -325,6 +351,50 @@ class UserController extends Zend_Controller_Action
 		}
 	}
 	
+	private function proccessAssignPartnersForm(Form_AssignPartners $form)
+	{
+		$request = $this->getRequest();
+		$formData = $request->getPost();
+		if ($form->isValid($formData))
+		{
+			try
+			{
+				$client = Infra_ClientHelper::getClient();
+				
+				$userId = $request->getParam('userId');
+				$partnerIds = $request->getPost('partners');
+				$partnerPackages = $request->getPost('partner_package');
+				$partnerPackagesStr = "";
+				if (isset($partnerPackages)) {
+					$partnerPackagesStr = implode(",", $partnerPackages);
+				}
+				$user = new Kaltura_Client_Type_User();
+				$user->allowedPartnerIds = $partnerIds;
+				$user->allowedPartnerPackages = $partnerPackagesStr;
+				$client->user->update($userId, $user); // call api user->update
+				$this->_helper->redirector('index');
+			}
+			catch(Exception $ex)
+			{
+				if ($ex->getCode() === 'INVALID_USER_ID')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'LOGIN_DATA_NOT_FOUND')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'USER_ROLE_NOT_FOUND')
+					$form->setDescription($ex->getMessage());
+				else if ($ex->getCode() === 'ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE')
+					$form->setDescription($ex->getMessage());
+				else
+					throw $ex;
+			}
+		}
+		else
+		{
+			$form->populate($formData);
+		}
+	}
 	
 	private function proccessResetPasswordLinkForm($form, $token)
 	{

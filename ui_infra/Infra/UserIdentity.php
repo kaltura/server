@@ -21,6 +21,17 @@ class Infra_UserIdentity
 	private $permissions = null;
 	
 	/**
+	 * Current user partners
+	 * @var array<string>
+	 */
+	private $partners = null;
+
+	/**
+	@var array<string>
+	 */
+	private $parterPackages = null;
+	
+	/**
 	 * Init a new UserIdentity instance with the given parameters
 	 * @param Kaltura_Client_Type_User $user
 	 * @param string $ks
@@ -61,5 +72,40 @@ class Infra_UserIdentity
 		$client = Infra_ClientHelper::getClient();
 		$permissions = $client->permission->getCurrentPermissions();
 		$this->permissions = array_map('trim', explode(',', $permissions));
+	}
+	
+	public function getAllowedPartners() {
+		if (is_null($this->partners)) {
+			$this->initPartners();
+		}
+		return $this->partners;
+	}
+	
+	public function getAllowedPartnerPackages() {
+		if (is_null($this->partnerPackages)) {
+			$this->initPartnerPackages();
+		}
+		return $this->partnerPackages;
+	}
+	
+	private function initPartnerPackages()
+	{
+		$client = Infra_ClientHelper::getClient();
+		$user = $client->user->get($this->user->id, -2);
+		$this->partnerPackages = array_map('trim', explode(',',$user->allowedPartnerPackages));
+	}
+	
+	private function initPartners()
+	{
+		$client = Infra_ClientHelper::getClient();
+		$user = $client->user->get($this->user->id);
+		$userPartners = array_map('trim', explode(',',$user->allowedPartnerIds));
+		$this->partners = $userPartners;
+	}
+	
+	
+	
+	public function refreshAllowedPartners() {
+		$this->initPartners();
 	}
 }

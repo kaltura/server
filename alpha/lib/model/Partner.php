@@ -887,9 +887,27 @@ class Partner extends BasePartner
 		$this->setEnabledPlugins = array();
 		$this->setEnabledServices = array();
 		
-		parent::postSave($con);
+		
+		
+		$ksObj = kSessionUtils::crackKs(kCurrentContext::$ks);
+		$currentKuser = kuserPeer::getKuserByEmail($ksObj->user, -2);
+		if ($currentKuser) 
+		{
+			$allowedPartners = $currentKuser->getAllowedPartners();
+			if (isset($allowedPartners) && !empty($allowedPartners)) {
+				$partnersArray = array_map('trim', explode(',', $allowedPartners));
+				if (!in_array($this->getId(), $partnersArray)) {
+					$currentKuser->setAllowedPartners($allowedPartners.','.$this->getId());
+				}
+			} else {
+				$currentKuser->setAllowedPartners($this->getId());
+			}
+			
+			$currentKuser->save();
+		}
+		
+		
 	}
-	
 	
 	public function postUpdate(PropelPDO $con = null)
 	{

@@ -199,8 +199,17 @@ class KalturaUser extends KalturaObject implements IFilterable
 	 */
 	public $isAccountOwner;
 
+	/**
+	 * @var string
+	 */
+	public $allowedPartnerIds;
 	
 
+	/**
+	 * @var string
+	 */
+	public $allowedPartnerPackages;
+	
 	private static $map_between_objects = array
 	(
 		"id" => "puserId", 
@@ -230,6 +239,8 @@ class KalturaUser extends KalturaObject implements IFilterable
 		"roleIds",
 		"roleNames" => "userRoleNames",
 		"isAccountOwner",
+		"allowedPartnerIds" => "allowedPartners",
+		"allowedPartnerPackages"
 	);
 
 	public function getMapBetweenObjects ( )

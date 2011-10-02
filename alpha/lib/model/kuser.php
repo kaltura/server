@@ -583,6 +583,40 @@ class kuser extends Basekuser
 		return $this->getFromCustomData('last_login_time');
 	}
 	
+	/**
+	 * Set allowed_partner_ids parameter to $allowedPartnerIds (in custom_data)
+	 * @param string $allowed_partner_ids
+	 */
+	public function setAllowedPartners($allowedPartnerIds)
+	{
+		$this->putInCustomData('allowed_partner_ids', $allowedPartnerIds);
+	}
+	
+	/**
+	 * @return allowed_partner_ids parameter from custom_data
+	 */
+	public function getAllowedPartners()
+	{
+		return $this->getFromCustomData('allowed_partner_ids');
+	}
+	
+	/**
+	 * Set allowed_partner_packages parameter to $allowedPartnerPackages (in custom_data)
+	 * @param string $allowed_partner_packages
+	 */
+	public function setAllowedPartnerPackages($allowedPartnerPackags)
+	{
+		$this->putInCustomData('allowed_partner_packages', $allowedPartnerPackags);
+	}
+	
+	/**
+	 * @return allowed_partner_packages parameter from custom_data
+	 */
+	public function getAllowedPartnerPackages()
+	{
+		return $this->getFromCustomData('allowed_partner_packages');
+	}
+	
 	//TODO: check if needed
 	public function getIsAdmin()
 	{

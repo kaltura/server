@@ -43,6 +43,31 @@ class Infra_AclHelper
 		return $allowed;
 	}
 	
+	public static function isAllowedPartner($partnerId, $partnerPackage) {
+		if (Zend_Auth::getInstance()->hasIdentity()) 
+		{
+			$partners = Zend_Auth::getInstance()->getIdentity()->getAllowedPartners();
+			if (in_array('*', $partners)) {
+				return true;
+			}
+			$packages = Zend_Auth::getInstance()->getIdentity()->getAllowedPartnerPackages();
+			if (in_array($partnerPackage, $packages)) {
+				return true;
+			}			
+			return in_array((string)$partnerId, $partners);
+		}
+		return false;
+	}
+	
+	public static function refreshCurrentUserAllowrdPartners() {
+		if (Zend_Auth::getInstance()->hasIdentity()) 
+		{
+			Zend_Auth::getInstance()->getIdentity()->refreshAllowedPartners();
+		}
+	}
+	
+	
+	
 	/**
 	 * 
      * @param  Zend_Acl_Resource_Interface|string $resource

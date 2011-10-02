@@ -474,7 +474,11 @@ body#index-testme-doc #wrapper { display:block;}
 #change-user-role-dialog input, 
 #change-user-role-dialog select { width: 200px}
 
-#change-user-role-dialog input { border:none; background:#fff; }
+#assign-partner-dialog form { width: auto; }
+#assign-partner-dialog input, 
+#assign-partner-dialog select { width: 200px;padding:5px;}
+
+#assign-partner-dialog input { border:none; background:#fff; }
 
 #list_kmc_users_panel button { position: static; }
 #list_kmc_users_panel table { width: 100%; min-width: 0px; }
