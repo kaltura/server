@@ -216,6 +216,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function getEntryIdFromReference($referenceId)
 	{
+		$existingEntry = $this->getEntryFromReference($referenceId);
+		if($existingEntry)
+			return $existingEntry->id;
+			
+		return null;
+	}
+
+	/**
+	 * @param string $referenceId
+	 * @return KalturaBaseEntry
+	 */
+	protected function getEntryFromReference($referenceId)
+	{
 		$filter = new KalturaBaseEntryFilter();
 		$filter->referenceIdEqual = $referenceId;
 		$filter->statusIn = implode(',', array(
@@ -231,15 +244,43 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$pager->pageSize = 1;
 		
 		$this->impersonate();
-		$entries = $this->kClient->baseEntry->listAction($filter, $pager);
+		$entries = null;
+		try
+		{
+			$entries = $this->kClient->baseEntry->listAction($filter, $pager);
+		}
+		catch (KalturaException $e)
+		{
+			KalturaLog::err($e->getMessage());
+		}
 		$this->unimpersonate();
 		
 		/* @var $entries KalturaBaseEntryListResponse */
-		if(!$entries->totalCount)
+		if(!$entries || !$entries->totalCount)
 			return null;
 		
-		$existingEntry = reset($entries->objects);
-		return $existingEntry->id;
+		return reset($entries->objects);
+	}
+
+	/**
+	 * @param string $entryId
+	 * @return KalturaBaseEntry
+	 */
+	protected function getEntry($entryId)
+	{
+		$entry = null;
+		$this->impersonate();
+		try
+		{
+			$entry = $this->kClient->baseEntry->get($entryId);
+		}
+		catch (KalturaException $e)
+		{
+			KalturaLog::err($e->getMessage());
+		}
+		$this->unimpersonate();
+		
+		return $entry;
 	}
 
 	/**
@@ -355,8 +396,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function removeNonUpdatbleFields(KalturaBaseEntry $entry)
 	{
-		$entry->conversionProfileId = null;
-		return $entry;
+		$retEntry = clone $entry;
+		$retEntry->conversionProfileId = null;
+		return $retEntry;
 	}
 	
 	/**
@@ -369,15 +411,25 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("xml [" . $item->asXML() . "]");
 		
 		$entryId = null;
+		$conversionProfileId = null;
 		if(isset($item->entryId))
 		{
 			$entryId = "{$item->entryId}";
+			
+			$existingEntry = $this->getEntry($entryId);
+			if(!$existingEntry)
+				throw new KalturaBatchException("Entry id [$entryId] not found", KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
+				
+			$conversionProfileId = $existingEntry->conversionProfileId;
 		}
 		elseif(isset($item->referenceId))
 		{
-			$entryId = $this->getEntryIdFromReference("{$item->referenceId}");
-			if(!$entryId)
+			$existingEntry = $this->getEntryFromReference("{$item->referenceId}");
+			if(!$existingEntry)
 				throw new KalturaBatchException("Reference id [{$item->referenceId}] not found", KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
+				
+			$entryId = $existingEntry->id;
+			$conversionProfileId = $existingEntry->conversionProfileId;
 		}
 		else
 		{
@@ -385,7 +437,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 
 		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
-		$entry = $this->removeNonUpdatbleFields($entry);
 		
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
 		KalturaLog::debug("current entry is: " . print_r($entry, true));
@@ -409,8 +460,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				continue;
 			}
 							
-			$flavorAsset = $this->getFlavorAsset($contentElement, $entry->conversionProfileId);
-			$flavorAssetResource = $this->getResource($contentElement, $entry->conversionProfileId);
+			$flavorAsset = $this->getFlavorAsset($contentElement, $conversionProfileId);
+			$flavorAssetResource = $this->getResource($contentElement, $conversionProfileId);
 			if(!$flavorAssetResource)
 				continue;
 			
@@ -449,8 +500,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			
 			KalturaLog::debug("thumbElement [" . print_r($thumbElement->asXml(), true). "]");
 						
-			$thumbAsset = $this->getThumbAsset($thumbElement, $entry->conversionProfileId);
-			$thumbAssetResource = $this->getResource($thumbElement, $entry->conversionProfileId);
+			$thumbAsset = $this->getThumbAsset($thumbElement, $conversionProfileId);
+			$thumbAssetResource = $this->getResource($thumbElement, $conversionProfileId);
 			if(!$thumbAssetResource)
 				continue;
 									
@@ -546,7 +597,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		KalturaLog::debug("Resource is: " . print_r($resource, true));
 		
 		$this->impersonate();
-		$updatedEntry = $this->kClient->baseEntry->update($entryId, $entry);
+		$updateEntry = $this->removeNonUpdatbleFields($entry);
+		$updatedEntry = $this->kClient->baseEntry->update($entryId, $updateEntry);
 		
 		$this->kClient->startMultiRequest();
 		
