@@ -289,8 +289,9 @@ class KDLOperationParams {
 				}
 			}
 			if($target->_container) {
+				$mdObj = $target->_container;
 				switch($key){
-					case 'format':
+					case 'container_format':
 						$mdObj->_id = $param;
 						break;
 					default:
