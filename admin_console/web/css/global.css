@@ -477,6 +477,7 @@ body#index-testme-doc #wrapper { display:block;}
 #assign-partner-dialog form { width: auto; }
 #assign-partner-dialog input, 
 #assign-partner-dialog select { width: 200px;padding:5px;}
+#assign-partner-dialog dd { float:none; }
 
 #assign-partner-dialog input { border:none; background:#fff; }
 
