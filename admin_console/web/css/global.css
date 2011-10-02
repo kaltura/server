@@ -470,16 +470,15 @@ body#index-apc #wrapper { display:block;}
 body#index-testme #wrapper { display:block;} 
 body#index-testme-doc #wrapper { display:block;}
 
-#change-user-role-dialog form { width: auto; }
-#change-user-role-dialog input, 
-#change-user-role-dialog select { width: 200px}
-
 #assign-partner-dialog form { width: auto; }
 #assign-partner-dialog input, 
 #assign-partner-dialog select { width: 200px;padding:5px;}
 #assign-partner-dialog dd { float:none; }
 
 #assign-partner-dialog input { border:none; background:#fff; }
+#user-role-configure-dialog input { border:none; background:#fff;}
+#user-role-configure-dialog dd input{ border:none; background:#fff;width: 368px}
+#user-role-configure-dialog form {width: 533px}
 
 #list_kmc_users_panel button { position: static; }
 #list_kmc_users_panel table { width: 100%; min-width: 0px; }
