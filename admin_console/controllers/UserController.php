@@ -396,6 +396,57 @@ class UserController extends Zend_Controller_Action
 		}
 	}
 	
+	
+	public function userRoleAction()
+	{
+		$client = Infra_ClientHelper::getClient();
+			
+		$page = $this->_getParam('page', 1);
+		$pageSize = $this->_getParam('pageSize', 10);
+		
+		$config = Zend_Registry::get('config');
+		
+		$filter = new Kaltura_Client_Type_UserFilter();
+		$filter->partnerIdEqual = $config->settings->partnerId;
+		$filter->orderBy = Kaltura_Client_Enum_UserOrderBy::CREATED_AT_DESC;
+		$paginatorAdapter = new Infra_FilterPaginator($client->userRole, "listAction", null, null);
+		$paginator = new Infra_Paginator($paginatorAdapter);
+		$paginator->setCurrentPageNumber($page);
+		$paginator->setItemCountPerPage($pageSize);
+		
+		$this->view->myEmail = Zend_Auth::getInstance()->getIdentity()->getUser()->email;
+		$this->view->paginator = $paginator;
+	}
+	
+	public function userRoleConfigureAction()
+	{
+		$this->_helper->layout->disableLayout();
+		$request = $this->getRequest();
+		$userId = $this->_getParam('userId');
+		$form = new Form_UserRoleConfiguration();
+		$client = Infra_ClientHelper::getClient();
+		
+		if ($request->isPost())
+		{
+			$form->populate($request->getPost());
+			$userRole = new Kaltura_Client_Type_UserRole();
+			$userRole->permissionNames = $form->getPermissionNames();
+			try{
+				$client->userRole->update($userId, $userRole);
+			}
+			catch (Exception $e){
+				$this->view->errMessage = $e->getMessage();
+			}
+		}else
+		{
+			
+			$user = $client->userRole->get($userId);
+			$form->populateFromObject($user);
+		}
+		$this->view->form = $form;
+	}
+	
+	
 	private function proccessResetPasswordLinkForm($form, $token)
 	{
 		$request = $this->getRequest();
