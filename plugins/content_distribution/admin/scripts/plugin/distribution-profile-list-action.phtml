@@ -52,8 +52,9 @@
 
 <script type="text/javascript">
 $(function(){
-	$("#sub-header").append('<ul class="sub-navigation"><li class="active"><a>Distribution Profiles</a></li></ul>');
+	addSubTitle('Distribution Profiles');
 });
+
 
 jQuery('#filter_type').change(function() {
 	if(this.value == "none") {
