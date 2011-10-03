@@ -334,8 +334,11 @@ class KalturaSyndicationFeedRenderer
 			
 			$nextPage = array();
 			
-			foreach ($this->staticPlaylistEntriesIdsOrder as $entryId) 	
-				$nextPage[] = $nextPageEntries[$entryId];
+			foreach ($this->staticPlaylistEntriesIdsOrder as $entryId)
+			{
+				if (isset($nextPageEntries[$entryId])) 	
+					$nextPage[] = $nextPageEntries[$entryId];
+			}
 		} 
 			
 		$this->entriesCurrentPage = $nextPage;
