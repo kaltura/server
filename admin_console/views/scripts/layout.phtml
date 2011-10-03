@@ -16,6 +16,13 @@
 	<title>Kaltura Admin Console</title>
 <?php echo $this->headLink()->toString().PHP_EOL; ?>
 <?php echo $this->headScript()->toString().PHP_EOL;?>
+
+<script type="text/javascript">
+function addSubTitle(subTitle) {
+	$("#sub-header").append('<ul class="sub-navigation"><li class="active"><a>' + subTitle + '</a></li></ul>');
+}
+
+</script>
 </head> 
 <body id="<?php echo $this->cssId(); ?>">
 <div id="kmcHeader">
