@@ -28,7 +28,7 @@
 				<td>
 					<select class="options" onchange="doAction(this.value, '<?php echo $user->id; ?>') ">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
-							<?php if ($user->status === Kaltura_Client_Enum_UserRoleStatus::ACTIVE): ?>
+							<?php if (Infra_AclHelper::isAllowed('user','change-role')): ?>
 							<option value="configure" ><?php echo $this->translate('configure'); ?></option>
 							<?php endif; ?>
 					</select>
