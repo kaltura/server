@@ -80,23 +80,57 @@ class category extends Basecategory
 			$this->moveEntriesToParent();
 		}
 		
+		$updateEntriesCount = false;
 		if ($this->isColumnModified(categoryPeer::PARENT_ID) && !$this->isNew())
 		{
-			// decrease for the old parent category
-			if($this->old_parent_id)
-				$oldParentCat = categoryPeer::retrieveByPK($this->old_parent_id);
-			if ($oldParentCat)
-				$oldParentCat->decrementEntriesCount($this->entries_count);
-			
-			// increase for the new parent category
-			$newParentCat = categoryPeer::retrieveByPK($this->parent_id);
-			if ($newParentCat)
-				$newParentCat->incrementEntriesCount($this->entries_count);
-			
+			$updateEntriesCount = true;
+			$oldParentId = $this->old_parent_id;
+			$newParentId = $this->parent_id;
 			$this->old_parent_id = null;
 		}
 				
 		parent::save($con);
+		
+		if ($updateEntriesCount)
+		{
+			// decrease for the old parent category
+			if($oldParentId)
+				$oldParentCat = categoryPeer::retrieveByPK($oldParentId);
+			if ($oldParentCat)
+				$this->updateCategoryCount($oldParentCat);
+									
+			// increase for the new parent category
+			$newParentCat = categoryPeer::retrieveByPK($newParentId);
+			if ($newParentCat)			
+				$this->updateCategoryCount($newParentCat);
+		}			
+	}
+	
+	private function updateCategoryCount($category)
+	{
+		$allChildren = $category->getAllChildren();
+		$allSubCategoriesIds = array();
+		$allSubCategoriesIds[] = $category->getId();
+		
+		if (count($allChildren))
+		{
+			foreach ($allChildren as $child)
+				$allSubCategoriesIds[] = $child->getId();	
+		}
+
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$entryFilter = new entryFilter();
+		$entryFilter->set("_matchor_categories_ids", implode(',',$allSubCategoriesIds));
+		$entryFilter->attachToCriteria($c);
+		$entries = entryPeer::doSelect($c);
+
+		$category->setEntriesCount(count($entries));
+		$category->save();
+		
+		//update parents count
+		$parentCategory = $category->getParentCategory();
+		if ($parentCategory)
+			$parentCategory->updateCategoryCount($parentCategory);
 	}
 
 	/* (non-PHPdoc)
@@ -415,9 +449,9 @@ class category extends Basecategory
 		$parentsIds = array();
 		if ($this->getParentId()){
 			$parentsIds[] = $this->getParentId();
-			array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
+			$parentsIds = array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
 		}
-		
+		KalturaLog::debug('### inc get all parent: ' . print_r($parentsIds,true));
 		return $parentsIds; 
 	}
 	
@@ -433,6 +467,25 @@ class category extends Basecategory
 		$c = new Criteria();
 		$c->add(categoryPeer::PARENT_ID, $this->getId());
 		return categoryPeer::doSelect($c);
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getAllChildren()
+	{
+		$children = $this->getChilds();
+		if (!count($children))
+			return array();
+		
+		$allChildren = $children;
+		foreach ($children as $childCategory)
+		{
+			$subChildAllChildren = $childCategory->getAllChildren();
+			$allChildren = array_merge($allChildren, $subChildAllChildren);
+		}
+		
+		return $allChildren;
 	}
 	
 	/**
