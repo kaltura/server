@@ -799,7 +799,7 @@ class playManifestAction extends kalturaAction
 		if (!$this->flavorId) // in case a flavorId wasnt specified checking for a flavorParamId 
 		{ 
 			$flavorParamId = $this->getRequestParameter ( "flavorParamId", null );
-			if ($flavorParamId)
+			if ($flavorParamId || $flavorParamId === "0")
 			{
 				$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->entry->getId(), $flavorParamId);
 				if(!$flavorAsset)
