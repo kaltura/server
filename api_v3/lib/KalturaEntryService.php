@@ -673,7 +673,7 @@ class KalturaEntryService extends KalturaBaseService
 		else {
 			//The search is with the entry's partnerId. so if conversion profile wasn't found it means that the 
 			//conversionId is not exist or the conversion profileId does'nt belong to this partner.
-			$conversionProfile = ConversionProfilePeer::retrieveByPK ( $conversionProfileId );
+			$conversionProfile = conversionProfile2Peer::retrieveByPK ( $conversionProfileId );
 			if (is_null ( $conversionProfile )) {
 				throw new KalturaAPIException ( KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $conversionProfileId );
 			}
