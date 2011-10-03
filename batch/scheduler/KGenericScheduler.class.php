@@ -73,7 +73,6 @@ class KGenericScheduler
 	
 	public function __destruct()
 	{
-		KalturaLog::debug("__destruct()");
 		$this->_cleanup();
 	}
 	
@@ -156,23 +155,42 @@ class KGenericScheduler
 		
 		$configItems = $this->createConfigItem($this->schedulerConfig->getScheduler()->toArray());
 		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
+		
+		$this->logDir = $this->schedulerConfig->getLogDir();
+		$this->maxExecutionTime = $this->schedulerConfig->getMaxExecutionTime();
+		$this->statusInterval = $this->schedulerConfig->getStatusInterval();
+		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
+		
+		$taskConfigsValidations = array();
 		foreach($taskConfigs as $taskConfig)
 		{
+			/* @var $taskConfig KSchedularTaskConfig */
+			
 			if(is_null($taskConfig->type)) // is the scheduler itself
 				continue;
 				
+			if(isset($taskConfigsValidations[$taskConfig->id]))
+			{
+				KalturaLog::err("Duplicated worker id [$taskConfig->id] in worker names [$taskConfig->name] and [" . $taskConfigsValidations[$taskConfig->id] . "]");
+				$this->keepRunning = false;
+				return;
+			}
+			
+			if(in_array($taskConfig->name, $taskConfigsValidations))
+			{
+				KalturaLog::err("Duplicated worker name [$taskConfig->name] in worker ids [$taskConfig->id] and [" . array_search($taskConfig->name, $taskConfigsValidations) . "]");
+				$this->keepRunning = false;
+				return;
+			}
+			
+			$taskConfigsValidations[$taskConfig->id] = $taskConfig->name;
 			$vars = get_object_vars($taskConfig);
 			$subConfigItems = $this->createConfigItem($vars, $taskConfig->id, $taskConfig->name);
 			$configItems = array_merge($configItems, $subConfigItems);
 		}
 		KalturaLog::info("sending configuration to the server");
 		KScheduleHelperManager::saveConfigItems($this->schedulerConfig->getConfigItemsFilePath(), $configItems);
-		
-		$this->logDir = $this->schedulerConfig->getLogDir();
-		$this->maxExecutionTime = $this->schedulerConfig->getMaxExecutionTime();
-		$this->statusInterval = $this->schedulerConfig->getStatusInterval();
-		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
-				
+					
 		set_time_limit($this->maxExecutionTime);
 		
 		$this->initAllWorkers();
@@ -185,7 +203,7 @@ class KGenericScheduler
 	
 	public function run()
 	{
-		KalturaLog::debug("run()");
+		KalturaLog::debug("Running");
 		$startTime = time();
 		
 		while($this->keepRunning)
@@ -280,7 +298,6 @@ class KGenericScheduler
 		
 		KalturaLog::info("-- Done --");
 		KalturaLog::debug("ended after [" . (time() - $startTime) . "] seconds");
-		die();
 	}
 	
 	/**
@@ -290,7 +307,6 @@ class KGenericScheduler
 	private function shouldExecute(KSchedularTaskConfig $taskConfig)
 	{
 		$runningBatches = $this->numberOfRunningTasks($taskConfig->name);
-		//KalturaLog::debug("[$runningBatches] of tasks [{$taskConfig->name}] can reach [{$taskConfig->maxInstances}]");
 		
 		if($taskConfig->startForQueueSize)
 		{
@@ -468,8 +484,6 @@ class KGenericScheduler
 	
 	private function _cleanup()
 	{
-		KalturaLog::debug("_cleanup()");
-		
 		foreach($this->runningTasks as $taskName => &$tasks)
 		{
 			if(!count($tasks))
