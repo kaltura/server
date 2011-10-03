@@ -869,6 +869,7 @@ class KalturaEntryService extends KalturaBaseService
 		$this->fixFilterDuration($filter);
 		
 		$entryFilter = new entryFilter();
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		
 		$filter->toObject($entryFilter);
 
