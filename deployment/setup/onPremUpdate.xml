@@ -69,6 +69,17 @@
 			  <copy file="/opt/kaltura/app/generator/config.template.dev.ini" tofile="/opt/kaltura/app/generator/config.template.ini" overwrite="true"/>
          </then>
          </if>
+         
+         <available file="/opt/kaltura/app/configurations/generator.template.dev.ini" property="properties.generate" />
+         <!--echo message="value is ${properties.generate}" /-->
+
+         <if>
+              <equals arg1="${properties.generate}" arg2="true" />
+         <then>
+              <echo msg="replacing generate config file..." />
+			  <copy file="/opt/kaltura/app/configurations/generator.template.dev.ini" tofile="/opt/kaltura/app/configurations/generator.template.ini" overwrite="true"/>
+         </then>
+         </if>
     </target>
     
     
@@ -97,15 +108,15 @@
     <target name="genActivationKey" depends="update">
          <echo msg="generate activation key ..." />
 
-         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" overwrite="true">
+         <copy file="/opt/kaltura/app/configurations/local.ini" tofile="/opt/kaltura/app/configurations/local.ini.bak" overwrite="true">
               <filterchain>
                    <replaceregexp>
-                        <regexp pattern='"kaltura_activation_key" => false,' replace='"kaltura_activation_key" => "NjkwNTkzMTg5NWJjM2YyNzg0ZjFlNjViZDIzNzA0NDJ8MXxuZXZlcnww",'/>
+                        <regexp pattern='kaltura_activation_key = false' replace='kaltura_activation_key = NjkwNTkzMTg5NWJjM2YyNzg0ZjFlNjViZDIzNzA0NDJ8MXxuZXZlcnww'/>
                    </replaceregexp>
               </filterchain>
          </copy>
 
-         <copy file="/opt/kaltura/app/alpha/config/kConfLocal.php.bak" tofile="/opt/kaltura/app/alpha/config/kConfLocal.php" overwrite="true"/>
+         <copy file="/opt/kaltura/app/configurations/local.ini.bak" tofile="/opt/kaltura/app/configurations/local.ini" overwrite="true"/>
 
     </target>
 
