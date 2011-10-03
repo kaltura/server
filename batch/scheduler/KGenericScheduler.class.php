@@ -323,10 +323,13 @@ class KGenericScheduler
 			return true;
 		}
 			
-		$lastExecution = $this->getLastExecutionTime($taskConfig->name);
-		$nextExecution = $lastExecution + $taskConfig->sleepBetweenStopStart;
-		if($nextExecution < time())
-			return true;
+		if($taskConfig->sleepBetweenStopStart)
+		{
+			$lastExecution = $this->getLastExecutionTime($taskConfig->name);
+			$nextExecution = $lastExecution + $taskConfig->sleepBetweenStopStart;
+			if($nextExecution < time())
+				return true;
+		}
 			
 		return false;
 	}
