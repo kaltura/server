@@ -21,8 +21,18 @@ class kConf
 		}
 		
 		$configDir = realpath(dirname(__file__) . '/../configurations');
+		if(!file_exists("$configDir/base.ini"))
+		{
+			error_log("Base configuration not found [$configDir/base.ini]");
+			die("Base configuration not found [$configDir/base.ini]");
+		}
 		$config = parse_ini_file("$configDir/base.ini", true);
-		
+	
+		if(!file_exists("$configDir/local.ini"))
+		{
+			error_log("Local configuration not found [$configDir/local.ini]");
+			die("Local configuration not found [$configDir/local.ini]");
+		}		
 		$localConfig = parse_ini_file("$configDir/local.ini", true);
 		$config = array_merge_recursive($config, $localConfig);
 		
