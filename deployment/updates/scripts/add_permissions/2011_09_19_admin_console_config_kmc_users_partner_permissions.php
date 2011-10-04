@@ -19,6 +19,7 @@ $publisherAdminRole = getBySystemNameAndPartnerId('Publishers Administrator', -2
 if ($publisherAdminRole) {
 	$publisherAdminRole->setName('Publisher Administrator');
 	$publisherAdminRole->setSystemName('Publisher Administrator');
+	$publisherAdminRole->save();
 }
 
 $permissionRoleMap = array(
