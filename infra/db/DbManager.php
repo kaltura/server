@@ -120,7 +120,7 @@ class DbManager
 						throw new Exception("DB Config [$key] not found");
 
 					$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-					self::$sphinxConnection = new KalturaPDO($dataSource);
+					self::$sphinxConnection = new PropelPDO($dataSource);
 
 					KalturaLog::debug("getSphinxConnection: connected to $key");
 					return self::$sphinxConnection;
