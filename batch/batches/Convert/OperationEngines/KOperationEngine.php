@@ -47,6 +47,11 @@ abstract class KOperationEngine
 	 */
 	protected $mediaInfoEnabled = false;
 	
+	/**
+	 * @var KalturaClient
+	 */
+	protected $client;
+	
 	protected function __construct($cmd = null)
 	{
 		$this->cmd = $cmd;
@@ -54,8 +59,9 @@ abstract class KOperationEngine
 	
 	abstract protected function getCmdLine();
 	
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
 	{
+		$this->client = $client;
 		$this->setMediaInfoEnabled($taskConfig->params->mediaInfoEnabled);
 	}
 	

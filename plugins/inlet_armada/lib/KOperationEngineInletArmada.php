@@ -165,9 +165,9 @@ $trgPrefixWindows;
 	/*************************************
 	 * 
 	 */
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
 	{
-		parent::configure($taskConfig, $data);
+		parent::configure($taskConfig, $data, $client);
 		
 		$this->taskConfig = $taskConfig;
 		
