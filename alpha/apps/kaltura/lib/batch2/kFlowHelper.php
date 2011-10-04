@@ -337,10 +337,14 @@ class kFlowHelper
 		{
 			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
 		}
-		else
+		elseif($flavorParamsOutput->getRemoteStorageProfileIds())
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
-			kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $storageProfile);
+			$remoteStorageProfileIds = explode(',', $flavorParamsOutput->getRemoteStorageProfileIds());
+			foreach($remoteStorageProfileIds as $remoteStorageProfileId)
+			{
+				$storageProfile = StorageProfilePeer::retrieveByPK($remoteStorageProfileId);
+				kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $storageProfile);
+			}
 		}
 
 		// creats the file sync

@@ -81,6 +81,13 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 	public $sourceRemoteStorageProfileId;
 
 	/**
+	 * Comma seperated ids of remote storage profiles that the flavor distributed to, the distribution done by the conversion engine
+	 *  
+	 * @var int
+	 */
+	public $remoteStorageProfileIds;
+
+	/**
 	 * Media parser type to be used for post-conversion validation
 	 *  
 	 * @var KalturaMediaParserType
@@ -98,6 +105,7 @@ class KalturaAssetParams extends KalturaObject implements IFilterable
 		"isSystemDefault" => "isDefault",
 		"tags",
 		"sourceRemoteStorageProfileId",
+		"remoteStorageProfileIds",
 		"mediaParserType",
 	);
 	

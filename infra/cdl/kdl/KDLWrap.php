@@ -179,6 +179,7 @@ KalturaLog::log(__METHOD__."==>\n");
 		{
 			$flavor->setReadyBehavior($target->_cdlObject->getReadyBehavior());
 			$flavor->setSourceRemoteStorageProfileId($target->_cdlObject->getSourceRemoteStorageProfileId());
+			$flavor->setRemoteStorageProfileIds($target->_cdlObject->getRemoteStorageProfileIds());
 			$flavor->setMediaParserType($target->_cdlObject->getMediaParserType());
 		}
 		
