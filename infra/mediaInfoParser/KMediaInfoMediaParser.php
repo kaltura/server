@@ -7,6 +7,11 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 {
 	protected $cmdPath;
 	
+	const SrteamGeneral = "general";
+	const SrteamVideo = "video";
+	const SrteamAudio = "audio";
+	const SrteamImage = "image";
+	
 	/**
 	 * @param string $filePath
 	 * @param string $cmdPath
@@ -30,13 +35,18 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		$mediaInfo->rawData = $output;
 		
 		$fieldCnt = 0;
-		$section = "general";
+		$section = self::SrteamGeneral;
 		$sectionID = 0;
+		$mediaInfo->streamArray = array();
+		$streamMediaInfo = null;
 		while ($tokenizer->hasMoreTokens()) 
 		{
 			$tok = strtolower(trim($tokenizer->nextToken()));
 			if (strrpos($tok, ":") == false) 
 			{
+				if(isset($streamMediaInfo))
+					$mediaInfo->streamArray[$section][]=$streamMediaInfo;
+				$streamMediaInfo = new KalturaMediaInfo();
 				$sectionID = strchr($tok,"#");
 				if($sectionID) {
 					$sectionID = trim($sectionID,"#"); 
@@ -44,12 +54,12 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				else
 					$sectionID = 0;
 
-					if(strstr($tok,"general")==true)
-						$section = "general";
-					else if(strstr($tok,"video")==true)
-						$section = "video";
-					else if(strstr($tok,"audio")==true)
-						$section = "audio";
+					if(strstr($tok,self::SrteamGeneral)==true)
+						$section = self::SrteamGeneral;
+					else if(strstr($tok,self::SrteamVideo)==true)
+						$section = self::SrteamVideo;
+					else if(strstr($tok,self::SrteamAudio)==true)
+						$section = self::SrteamAudio;
 //					else if(strstr($tok,"image")==true)
 //						$section = "image";
 					else
@@ -57,29 +67,43 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			} 
 			else if($sectionID<=1)
 			{
-				$key = trim(substr($tok, 0, strpos($tok, ":")));
-				$val = trim(substr(strstr($tok, ":"), 1));
-				switch ($section) 
-				{
-					case "general" :
-						$this->loadContainerSet($mediaInfo, $key, $val);
-						break;
-					case "video" :
-						$this->loadVideoSet($mediaInfo, $key, $val);
-						break;
-					case "audio" :
-						$this->loadAudioSet($mediaInfo, $key, $val);
-						break;
-				}
+				self::loadStreamMedia($mediaInfo, $section, $tok);
 				$fieldCnt++;
 			}
+			self::loadStreamMedia($streamMediaInfo, $section, $tok);
 		}
 
+		if(isset($streamMediaInfo))
+			$mediaInfo->streamArray[$section][]=$streamMediaInfo;
+		
 			// On no-content return null
 		if($fieldCnt<5)
 			return null; 
 		else 
 			return $mediaInfo;
+	}
+
+	/**
+	 * @param $mediaInfo
+	 * @param string $section
+	 * @param string $tok
+	 */
+	private static function loadStreamMedia(KalturaMediaInfo $mediaInfo, $section, $tok) 
+	{
+		$key = trim(substr($tok, 0, strpos($tok, ":")));
+		$val = trim(substr(strstr($tok, ":"), 1));
+		switch ($section) 
+		{
+			case self::SrteamGeneral :
+				self::loadContainerSet($mediaInfo, $key, $val);
+				break;
+			case self::SrteamVideo :
+				self::loadVideoSet($mediaInfo, $key, $val);
+				break;
+			case self::SrteamAudio :
+				self::loadAudioSet($mediaInfo, $key, $val);
+				break;
+		}
 	}
 	
 	/**
@@ -87,7 +111,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	 * @param string $key
 	 * @param string $val
 	 */
-	private function loadAudioSet(KalturaMediaInfo $mediaInfo, $key, $val) 
+	private static function loadAudioSet(KalturaMediaInfo $mediaInfo, $key, $val) 
 	{
 		switch($key) 
 		{
@@ -98,24 +122,24 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->audioCodecId = $val;
 				break;
 			case "duration":
-				$mediaInfo->audioDuration = $this->convertDuration2msec($val);
+				$mediaInfo->audioDuration = self::convertDuration2msec($val);
 				break;
 			case "bit rate":
-				$mediaInfo->audioBitRate = $this->convertValue2kbits($this->trima($val));
+				$mediaInfo->audioBitRate = self::convertValue2kbits(self::trima($val));
 				break;
 			case "bit rate mode": 
 				$mediaInfo->audioBitRateMode; // FIXME
 				break;
 			case "channel(s)":
-				$mediaInfo->audioChannels = (int)$this->trima($val);
+				$mediaInfo->audioChannels = (int)self::trima($val);
 				break;
 			case "sampling rate":
-				$mediaInfo->audioSamplingRate = (float)$this->trima($val);
+				$mediaInfo->audioSamplingRate = (float)self::trima($val);
 				if ($mediaInfo->audioSamplingRate < 1000)
 					$mediaInfo->audioSamplingRate *= 1000;
 				break;
 			case "resolution":
-				$mediaInfo->audioResolution = (int)$this->trima($val);
+				$mediaInfo->audioResolution = (int)self::trima($val);
 				break;
 		}
 	}
@@ -125,7 +149,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	 * @param string $key
 	 * @param string $val
 	 */
-	private function loadVideoSet(KalturaMediaInfo $mediaInfo, $key, $val) 
+	private static function loadVideoSet(KalturaMediaInfo $mediaInfo, $key, $val) 
 	{
 		switch($key) 
 		{
@@ -136,25 +160,25 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->videoCodecId = $val;
 				break;
 			case "duration":
-				$mediaInfo->videoDuration = $this->convertDuration2msec($val);
+				$mediaInfo->videoDuration = self::convertDuration2msec($val);
 				break;
 			case "bit rate":
-				$mediaInfo->videoBitRate = $this->convertValue2kbits($this->trima($val));
+				$mediaInfo->videoBitRate = self::convertValue2kbits(self::trima($val));
 				break;
 			case "bit rate mode": 
 				$mediaInfo->videoBitRateMode; // FIXME
 				break; 
 			case "width":
-				$mediaInfo->videoWidth = (int)$this->trima($val);
+				$mediaInfo->videoWidth = (int)self::trima($val);
 				break;
 			case "height":
-				$mediaInfo->videoHeight = (int)$this->trima($val);
+				$mediaInfo->videoHeight = (int)self::trima($val);
 				break;
 			case "frame rate":
-				$mediaInfo->videoFrameRate = (float)$this->trima($val);
+				$mediaInfo->videoFrameRate = (float)self::trima($val);
 				break;
 			case "display aspect ratio":
-				$val = $this->trima($val);
+				$val = self::trima($val);
 				if(strstr($val, ":")==true){
 					$darW = trim(substr($val, 0, strpos($val, ":")));
 					$darH = trim(substr(strstr($val, ":"),1));
@@ -179,7 +203,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->videoRotation = (int)$this->trima($val);
 				break;
 			case "scan type":
-				$scanType = $this->trima($val);
+				$scanType = self::trima($val);
 				if($scanType!="progressive") {
 					$mediaInfo->scanType=1;
 				}
@@ -195,12 +219,12 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	 * @param $key
 	 * @param $val
 	 */
-	private function loadContainerSet(KalturaMediaInfo $mediaInfo, $key, $val) 
+	private static function loadContainerSet(KalturaMediaInfo $mediaInfo, $key, $val) 
 	{
 		switch($key) 
 		{
 			case "file size":
-				$mediaInfo->fileSize = $this->convertValue2kbits($this->trima($val));
+				$mediaInfo->fileSize = self::convertValue2kbits(self::trima($val));
 				break;
 			case "format":
 				$mediaInfo->containerFormat = $val;
@@ -209,21 +233,21 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				$mediaInfo->containerId = $val;
 				break;
 			case "duration":
-				$mediaInfo->containerDuration = $this->convertDuration2msec($val);
+				$mediaInfo->containerDuration = self::convertDuration2msec($val);
 				break;
 			case "overall bit rate":
-				$mediaInfo->containerBitRate = $this->convertValue2kbits($this->trima($val));
+				$mediaInfo->containerBitRate = self::convertValue2kbits(self::trima($val));
 				break;
 		}
 	}
 	
-	private function trima($str)
+	private static function trima($str)
 	{
 		$str = str_replace(array("\n", "\r", "\t", " ", "\o", "\xOB"), '', $str);
 		return $str;
 	}
 	
-	private function convertDuration2msec($str)
+	private static function convertDuration2msec($str)
 	{
 		preg_match_all("/(([0-9]*)h ?)?(([0-9]*)mn ?)?(([0-9]*)s ?)?(([0-9]*)ms ?)?/",
 			$str, $res);
@@ -238,7 +262,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		return (int)$rv;
 	}
 	
-	private function convertValue2kbits($str)
+	private static function convertValue2kbits($str)
 	{
 		preg_match_all("/(([0-9.]*)b ?)?(([0-9.]*)k ?)?(([0-9.]*)m ?)?(([0-9.]*)g ?)?/",
 			$str, $res);
