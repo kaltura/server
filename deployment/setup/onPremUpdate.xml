@@ -84,9 +84,38 @@
     
     
     <!-- ============================================  -->
+    <!-- Target: init user_input file                  -->
+    <!-- ============================================  -->
+    <target name="initUserInputFile" depends="replaceGenerateConfig">
+         <echo msg="init user_input file ..." />
+
+         <copy file="${installationLoc}/on-premise/installer/user_input.bak" tofile="${installationLoc}/on-premise/installer/user_input.ini" overwrite="true">
+              <filterchain>
+                   <replacetokens begintoken="@@" endtoken="@@">
+                        <token key="REPORT_MAIL" value="guyguy" />
+                        <token key="HTTPD_BIN" value="/usr/sbin/apachectl" />
+                        <token key="PHP_BIN" value="/usr/bin/php" />
+                        <token key="BASE_DIR" value="/opt/kaltura" />
+                        <token key="KALTURA_FULL_VIRTUAL_HOST_NAME" value="${server}" />
+                        <token key="ADMIN_CONSOLE_ADMIN_MAIL" value="admin@kaltura.com" />
+                        <token key="ADMIN_CONSOLE_PASSWORD" value="admin" />
+                        <token key="DB1_HOST" value="localhost" />
+                        <token key="DB1_PORT" value="3306" />
+                        <token key="DB1_NAME" value="kaltura" />
+                        <token key="DB1_USER" value="root" />
+                        <token key="DB1_PASS" value="" />
+                        <token key="XYMON_URL" value="http://www.xymondomain.com/xymon/" />
+                   </replacetokens>
+              </filterchain>
+         </copy>
+
+    </target>
+    
+    
+    <!-- ============================================  -->
     <!-- Target: Update                                -->
     <!-- ============================================  -->
-    <target name="update" depends="replaceNonRootFiles,restartApache,clearCache,replaceGenerateConfig">
+    <target name="update" depends="replaceNonRootFiles,restartApache,clearCache,initUserInputFile">
          <echo msg="update..." />
          <exec command="php updateConfigFiles.php -s" dir="${installationLoc}/on-premise/installer/" />
     </target>
