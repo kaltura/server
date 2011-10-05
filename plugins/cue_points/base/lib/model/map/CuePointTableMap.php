@@ -38,8 +38,8 @@ class CuePointTableMap extends TableMap {
 		$this->setUseIdGenerator(true);
 		// columns
 		$this->addColumn('INT_ID', 'IntId', 'INTEGER', true, null, null);
-		$this->addPrimaryKey('ID', 'Id', 'VARCHAR', true, 255, null);
-		$this->addColumn('PARENT_ID', 'ParentId', 'VARCHAR', false, 255, null);
+		$this->addPrimaryKey('ID', 'Id', 'VARCHAR', true, 31, null);
+		$this->addColumn('PARENT_ID', 'ParentId', 'VARCHAR', false, 31, null);
 		$this->addColumn('ENTRY_ID', 'EntryId', 'VARCHAR', true, 31, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
