@@ -8,6 +8,8 @@ print ("For example: php createBaseData http:/devtests.kaltura.dev admin@kaltura
 
 KalturaTestDeploymentHelper::handleInput($argv);	
 
+print ("Input handled\n");
+
 $config = new KalturaConfiguration();
 $config->serviceUrl = KalturaTestDeploymentHelper::$serviceUrl;
 
