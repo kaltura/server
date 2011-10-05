@@ -101,10 +101,9 @@ class flavorAsset extends asset
 	const CUSTOM_DATA_FIELD_FRAME_RATE = "FlavorFrameRate";
 	const CUSTOM_DATA_FIELD_VIDEO_CODEC_ID = "FlavorVideoCodecId";
 	
-//	Should be uncommented after migration script executed
-//	public function getBitrate()			{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_BITRATE);}
-//	public function getFrameRate()			{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATEF);}
-//	public function getVideoCodecId()		{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_VIDEO_CODEC_ID);}
+	public function getBitrate()			{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_BITRATE);}
+	public function getFrameRate()			{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATEF);}
+	public function getVideoCodecId()		{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_VIDEO_CODEC_ID);}
 	
 	public function setBitrate($v)			{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_BITRATE, $v); return parent::setBitrate($v);}
 	public function setFrameRate($v)		{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATE, $v); return parent::setFrameRate($v);}
