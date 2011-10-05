@@ -106,20 +106,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	protected $height;
 
 	/**
-	 * The value for the bitrate field.
-	 * Note: this column has a database default value of: 0
-	 * @var        int
-	 */
-	protected $bitrate;
-
-	/**
-	 * The value for the frame_rate field.
-	 * Note: this column has a database default value of: 0
-	 * @var        double
-	 */
-	protected $frame_rate;
-
-	/**
 	 * The value for the size field.
 	 * Note: this column has a database default value of: 0
 	 * @var        int
@@ -144,12 +130,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $container_format;
-
-	/**
-	 * The value for the video_codec_id field.
-	 * @var        string
-	 */
-	protected $video_codec_id;
 
 	/**
 	 * The value for the type field.
@@ -232,8 +212,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	{
 		$this->width = 0;
 		$this->height = 0;
-		$this->bitrate = 0;
-		$this->frame_rate = 0;
 		$this->size = 0;
 		$this->is_original = false;
 		$this->type = 0;
@@ -480,26 +458,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [bitrate] column value.
-	 * 
-	 * @return     int
-	 */
-	public function getBitrate()
-	{
-		return $this->bitrate;
-	}
-
-	/**
-	 * Get the [frame_rate] column value.
-	 * 
-	 * @return     double
-	 */
-	public function getFrameRate()
-	{
-		return $this->frame_rate;
-	}
-
-	/**
 	 * Get the [size] column value.
 	 * 
 	 * @return     int
@@ -537,16 +495,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	public function getContainerFormat()
 	{
 		return $this->container_format;
-	}
-
-	/**
-	 * Get the [video_codec_id] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getVideoCodecId()
-	{
-		return $this->video_codec_id;
 	}
 
 	/**
@@ -981,52 +929,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	} // setHeight()
 
 	/**
-	 * Set the value of [bitrate] column.
-	 * 
-	 * @param      int $v new value
-	 * @return     asset The current object (for fluent API support)
-	 */
-	public function setBitrate($v)
-	{
-		if(!isset($this->oldColumnsValues[assetPeer::BITRATE]))
-			$this->oldColumnsValues[assetPeer::BITRATE] = $this->bitrate;
-
-		if ($v !== null) {
-			$v = (int) $v;
-		}
-
-		if ($this->bitrate !== $v || $this->isNew()) {
-			$this->bitrate = $v;
-			$this->modifiedColumns[] = assetPeer::BITRATE;
-		}
-
-		return $this;
-	} // setBitrate()
-
-	/**
-	 * Set the value of [frame_rate] column.
-	 * 
-	 * @param      double $v new value
-	 * @return     asset The current object (for fluent API support)
-	 */
-	public function setFrameRate($v)
-	{
-		if(!isset($this->oldColumnsValues[assetPeer::FRAME_RATE]))
-			$this->oldColumnsValues[assetPeer::FRAME_RATE] = $this->frame_rate;
-
-		if ($v !== null) {
-			$v = (double) $v;
-		}
-
-		if ($this->frame_rate !== $v || $this->isNew()) {
-			$this->frame_rate = $v;
-			$this->modifiedColumns[] = assetPeer::FRAME_RATE;
-		}
-
-		return $this;
-	} // setFrameRate()
-
-	/**
 	 * Set the value of [size] column.
 	 * 
 	 * @param      int $v new value
@@ -1119,29 +1021,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	} // setContainerFormat()
 
 	/**
-	 * Set the value of [video_codec_id] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     asset The current object (for fluent API support)
-	 */
-	public function setVideoCodecId($v)
-	{
-		if(!isset($this->oldColumnsValues[assetPeer::VIDEO_CODEC_ID]))
-			$this->oldColumnsValues[assetPeer::VIDEO_CODEC_ID] = $this->video_codec_id;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->video_codec_id !== $v) {
-			$this->video_codec_id = $v;
-			$this->modifiedColumns[] = assetPeer::VIDEO_CODEC_ID;
-		}
-
-		return $this;
-	} // setVideoCodecId()
-
-	/**
 	 * Set the value of [type] column.
 	 * 
 	 * @param      int $v new value
@@ -1202,14 +1081,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 				return false;
 			}
 
-			if ($this->bitrate !== 0) {
-				return false;
-			}
-
-			if ($this->frame_rate !== 0) {
-				return false;
-			}
-
 			if ($this->size !== 0) {
 				return false;
 			}
@@ -1258,15 +1129,12 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			$this->description = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
 			$this->width = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
 			$this->height = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-			$this->bitrate = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
-			$this->frame_rate = ($row[$startcol + 15] !== null) ? (double) $row[$startcol + 15] : null;
-			$this->size = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-			$this->is_original = ($row[$startcol + 17] !== null) ? (boolean) $row[$startcol + 17] : null;
-			$this->file_ext = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-			$this->container_format = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-			$this->video_codec_id = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-			$this->type = ($row[$startcol + 21] !== null) ? (int) $row[$startcol + 21] : null;
-			$this->custom_data = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->size = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+			$this->is_original = ($row[$startcol + 15] !== null) ? (boolean) $row[$startcol + 15] : null;
+			$this->file_ext = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+			$this->container_format = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+			$this->type = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+			$this->custom_data = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1276,7 +1144,7 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 23; // 23 = assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 20; // 20 = assetPeer::NUM_COLUMNS - assetPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating asset object", $e);
@@ -1844,30 +1712,21 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 				return $this->getHeight();
 				break;
 			case 14:
-				return $this->getBitrate();
-				break;
-			case 15:
-				return $this->getFrameRate();
-				break;
-			case 16:
 				return $this->getSize();
 				break;
-			case 17:
+			case 15:
 				return $this->getIsOriginal();
 				break;
-			case 18:
+			case 16:
 				return $this->getFileExt();
 				break;
-			case 19:
+			case 17:
 				return $this->getContainerFormat();
 				break;
-			case 20:
-				return $this->getVideoCodecId();
-				break;
-			case 21:
+			case 18:
 				return $this->getType();
 				break;
-			case 22:
+			case 19:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1905,15 +1764,12 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 			$keys[11] => $this->getDescription(),
 			$keys[12] => $this->getWidth(),
 			$keys[13] => $this->getHeight(),
-			$keys[14] => $this->getBitrate(),
-			$keys[15] => $this->getFrameRate(),
-			$keys[16] => $this->getSize(),
-			$keys[17] => $this->getIsOriginal(),
-			$keys[18] => $this->getFileExt(),
-			$keys[19] => $this->getContainerFormat(),
-			$keys[20] => $this->getVideoCodecId(),
-			$keys[21] => $this->getType(),
-			$keys[22] => $this->getCustomData(),
+			$keys[14] => $this->getSize(),
+			$keys[15] => $this->getIsOriginal(),
+			$keys[16] => $this->getFileExt(),
+			$keys[17] => $this->getContainerFormat(),
+			$keys[18] => $this->getType(),
+			$keys[19] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1988,30 +1844,21 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 				$this->setHeight($value);
 				break;
 			case 14:
-				$this->setBitrate($value);
-				break;
-			case 15:
-				$this->setFrameRate($value);
-				break;
-			case 16:
 				$this->setSize($value);
 				break;
-			case 17:
+			case 15:
 				$this->setIsOriginal($value);
 				break;
-			case 18:
+			case 16:
 				$this->setFileExt($value);
 				break;
-			case 19:
+			case 17:
 				$this->setContainerFormat($value);
 				break;
-			case 20:
-				$this->setVideoCodecId($value);
-				break;
-			case 21:
+			case 18:
 				$this->setType($value);
 				break;
-			case 22:
+			case 19:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -2052,15 +1899,12 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[11], $arr)) $this->setDescription($arr[$keys[11]]);
 		if (array_key_exists($keys[12], $arr)) $this->setWidth($arr[$keys[12]]);
 		if (array_key_exists($keys[13], $arr)) $this->setHeight($arr[$keys[13]]);
-		if (array_key_exists($keys[14], $arr)) $this->setBitrate($arr[$keys[14]]);
-		if (array_key_exists($keys[15], $arr)) $this->setFrameRate($arr[$keys[15]]);
-		if (array_key_exists($keys[16], $arr)) $this->setSize($arr[$keys[16]]);
-		if (array_key_exists($keys[17], $arr)) $this->setIsOriginal($arr[$keys[17]]);
-		if (array_key_exists($keys[18], $arr)) $this->setFileExt($arr[$keys[18]]);
-		if (array_key_exists($keys[19], $arr)) $this->setContainerFormat($arr[$keys[19]]);
-		if (array_key_exists($keys[20], $arr)) $this->setVideoCodecId($arr[$keys[20]]);
-		if (array_key_exists($keys[21], $arr)) $this->setType($arr[$keys[21]]);
-		if (array_key_exists($keys[22], $arr)) $this->setCustomData($arr[$keys[22]]);
+		if (array_key_exists($keys[14], $arr)) $this->setSize($arr[$keys[14]]);
+		if (array_key_exists($keys[15], $arr)) $this->setIsOriginal($arr[$keys[15]]);
+		if (array_key_exists($keys[16], $arr)) $this->setFileExt($arr[$keys[16]]);
+		if (array_key_exists($keys[17], $arr)) $this->setContainerFormat($arr[$keys[17]]);
+		if (array_key_exists($keys[18], $arr)) $this->setType($arr[$keys[18]]);
+		if (array_key_exists($keys[19], $arr)) $this->setCustomData($arr[$keys[19]]);
 	}
 
 	/**
@@ -2086,13 +1930,10 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(assetPeer::DESCRIPTION)) $criteria->add(assetPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(assetPeer::WIDTH)) $criteria->add(assetPeer::WIDTH, $this->width);
 		if ($this->isColumnModified(assetPeer::HEIGHT)) $criteria->add(assetPeer::HEIGHT, $this->height);
-		if ($this->isColumnModified(assetPeer::BITRATE)) $criteria->add(assetPeer::BITRATE, $this->bitrate);
-		if ($this->isColumnModified(assetPeer::FRAME_RATE)) $criteria->add(assetPeer::FRAME_RATE, $this->frame_rate);
 		if ($this->isColumnModified(assetPeer::SIZE)) $criteria->add(assetPeer::SIZE, $this->size);
 		if ($this->isColumnModified(assetPeer::IS_ORIGINAL)) $criteria->add(assetPeer::IS_ORIGINAL, $this->is_original);
 		if ($this->isColumnModified(assetPeer::FILE_EXT)) $criteria->add(assetPeer::FILE_EXT, $this->file_ext);
 		if ($this->isColumnModified(assetPeer::CONTAINER_FORMAT)) $criteria->add(assetPeer::CONTAINER_FORMAT, $this->container_format);
-		if ($this->isColumnModified(assetPeer::VIDEO_CODEC_ID)) $criteria->add(assetPeer::VIDEO_CODEC_ID, $this->video_codec_id);
 		if ($this->isColumnModified(assetPeer::TYPE)) $criteria->add(assetPeer::TYPE, $this->type);
 		if ($this->isColumnModified(assetPeer::CUSTOM_DATA)) $criteria->add(assetPeer::CUSTOM_DATA, $this->custom_data);
 
@@ -2175,10 +2016,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 
 		$copyObj->setHeight($this->height);
 
-		$copyObj->setBitrate($this->bitrate);
-
-		$copyObj->setFrameRate($this->frame_rate);
-
 		$copyObj->setSize($this->size);
 
 		$copyObj->setIsOriginal($this->is_original);
@@ -2186,8 +2023,6 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 		$copyObj->setFileExt($this->file_ext);
 
 		$copyObj->setContainerFormat($this->container_format);
-
-		$copyObj->setVideoCodecId($this->video_codec_id);
 
 		$copyObj->setType($this->type);
 

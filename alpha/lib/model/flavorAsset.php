@@ -105,9 +105,9 @@ class flavorAsset extends asset
 	public function getFrameRate()			{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATEF);}
 	public function getVideoCodecId()		{return $this->getFromCustomData(flavorAsset::CUSTOM_DATA_FIELD_VIDEO_CODEC_ID);}
 	
-	public function setBitrate($v)			{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_BITRATE, $v); return parent::setBitrate($v);}
-	public function setFrameRate($v)		{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATE, $v); return parent::setFrameRate($v);}
-	public function setVideoCodecId($v)		{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_VIDEO_CODEC_ID, $v); return parent::setVideoCodecId($v);}
+	public function setBitrate($v)			{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_BITRATE, $v);}
+	public function setFrameRate($v)		{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_FRAME_RATE, $v);}
+	public function setVideoCodecId($v)		{$this->putInCustomData(flavorAsset::CUSTOM_DATA_FIELD_VIDEO_CODEC_ID, $v);}
 	
 	public function getIsWeb()
 	{
