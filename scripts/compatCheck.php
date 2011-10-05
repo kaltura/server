@@ -94,6 +94,25 @@ function stripXMLInvalidChars($value)
 	return $value;
 }
 
+function printStringDiff($string1, $string2)
+{
+	for ($i = 0; $i < strlen($string1); $i++)
+	{
+		if ($string1[$i] == $string2[$i])
+			continue;
+			
+		print "Byte offset: $i\n";
+		print "Char1: " . ord($string1[$i]) . "\n";
+		print "Char2: " . ord($string2[$i]) . "\n";
+		$start = 0;
+		if ($i > 100)
+			$start = $i - 100;
+		print "String1: " . substr($string1, $start, 200) . "\n";
+		print "String2: " . substr($string2, $start, 200) . "\n";
+		break;
+	}
+}
+
 function xmlToArray($xmlstring)
 {
 	// fix the xml if it's invalid
@@ -104,6 +123,7 @@ function xmlToArray($xmlstring)
 	$xmlstring = str_replace(array('&amp;#', '&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;amp;', '&amp;apos;'), array('&#', '&lt;', '&gt;', '&quot;', '&amp;', '&apos;'), $xmlstring);
 	if ($xmlstring != $origstring)
 	{
+		printStringDiff($xmlstring, $origstring);
 		return null;
 	}
 
