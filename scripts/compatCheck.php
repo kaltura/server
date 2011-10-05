@@ -97,11 +97,16 @@ function stripXMLInvalidChars($value)
 function xmlToArray($xmlstring)
 {
 	// fix the xml if it's invalid
+	$origstring = $xmlstring;
 	$xmlstring = @iconv('utf-8', 'utf-8', $xmlstring);
 	$xmlstring = stripXMLInvalidChars($xmlstring);
 	$xmlstring = str_replace('&', '&amp;', $xmlstring);
-	$xmlstring = str_replace(array('&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;amp;', '&amp;apos;'), array('&lt;', '&gt;', '&quot;', '&amp;', '&apos;'), $xmlstring);
-	
+	$xmlstring = str_replace(array('&amp;#', '&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;amp;', '&amp;apos;'), array('&#', '&lt;', '&gt;', '&quot;', '&amp;', '&apos;'), $xmlstring);
+	if ($xmlstring != $origstring)
+	{
+		return null;
+	}
+
 	// parse the xml
 	$xml = @simplexml_load_string($xmlstring);
 	$json = json_encode($xml);
@@ -143,7 +148,7 @@ function removeChangingFields(&$results)
 {
 	unset($results["executionTime"]);
 	unset($results["debug"]);
-	if (isset($results["result"]) && is_array(isset($results["result"])) && isset($results["result"]["serverTime"]))
+	if (isset($results["result"]) && is_array($results["result"]) && isset($results["result"]["serverTime"]))
 	{
 		$resultItem = $results["result"];
 		unset($resultItem["serverTime"]);
@@ -161,8 +166,7 @@ function compareResults($resultNew, $resultOld)
 
 	if (!$resultNew || !$resultOld)
 	{
-		print "\nError: failed to parse XMLs\n";
-		return array();
+		return array('failed to parse XMLs');
 	}
 	
 	return compareArrays($resultNew, $resultOld, "");
@@ -254,8 +258,8 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	}
 		
 	print "\n-------------------------------------------------------------------------------\n";
-	print "\tAction = $fullActionName\n";
-	print "\tParams = ".print_r($parsedParams, true)."\n";
+	print "\tUrl = $serviceUrlNew$uri\n";
+	print "\tPostParams = ".var_export($postParams, true)."\n";
 	foreach ($errors as $error)
 	{
 		print "\tError: $error\n";
@@ -394,6 +398,10 @@ function processPS2Request($parsedParams)
 	$action = $parsedParams['action'];
 	unset($parsedParams['module']);
 	unset($parsedParams['action']);
+	if (isset($parsedParams['format']) && is_numeric($parsedParams['format']))
+	{
+		$parsedParams['format'] = '2';          # XML
+	}
 	
 	if (strtolower($module) == 'partnerservices2' &&
 		strtolower($action) == 'defpartnerservices2base')
