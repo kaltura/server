@@ -7,15 +7,16 @@ print ("Usage: php createBaseData serviceUrl adminConsoleLoginId adminConsoleLog
 print ("For example: php createBaseData http:/devtests.kaltura.dev admin@kaltura.com admin\n");
 
 KalturaTestDeploymentHelper::handleInput($argv);	
-
 print ("Input handled\n");
 
 $config = new KalturaConfiguration();
 $config->serviceUrl = KalturaTestDeploymentHelper::$serviceUrl;
 
 $client = new KalturaClient($config);
+print ("Got client instance\n");
 
 $partner = KalturaTestDeploymentHelper::createTestPartner();
+print ("Partner created\n");
 $cmsPassword = 'Roni123!';
 $newPartner = $client->partner->register($partner, $cmsPassword); //create the new test partner
 
