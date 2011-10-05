@@ -22,25 +22,46 @@ class kBusinessConvertDL
 		$newAssets = array();
 		foreach($tempAssets as $newAsset)
 		{
-			if($newAsset->getStatus() == asset::FLAVOR_ASSET_STATUS_READY)
+			if($newAsset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
+			{
+				KalturaLog::debug("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
+				continue;	
+			}
+			
+			if($newAsset->getFlavorParamsId() || $newAsset instanceof flavorAsset)
 			{
 				$newAssets[$newAsset->getFlavorParamsId()] = $newAsset;
-				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "]");
+				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] for asset params [" . $newAsset->getFlavorParamsId() . "]");
 			}
 			else
 			{
-				KalturaLog::debug("Do not add new asset [" . $newAsset->getId() . "] to flavor [" . $newAsset->getFlavorParamsId() . "] status [" . $newAsset->getStatus() . "]");
+				$newAssets['asset_' . count($newAssets)] = $newAsset;
+				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] with no asset params");
 			}
 		}
 		
 		$saveEntry = false;
 		foreach($oldAssets as $oldAsset)
 		{
+			/* @var $oldAsset asset */
 			if(isset($newAssets[$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getFlavorParamsId()];
+				/* @var $newAsset asset */
 				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 				
+				if($oldAsset instanceof flavorAsset)
+				{
+					$oldAsset->setBitrate($newAsset->getBitrate());
+					$oldAsset->setFrameRate($newAsset->getFrameRate());
+					$oldAsset->setVideoCodecId($newAsset->getVideoCodecId());
+				}
+				$oldAsset->setWidth($newAsset->getWidth());
+				$oldAsset->setHeight($newAsset->getHeight());
+				$oldAsset->setContainerFormat($newAsset->getContainerFormat());
+				$oldAsset->setSize($newAsset->getSize());
+				$oldAsset->setFileExt($newAsset->getFileExt());
+					
 				$oldAsset->incrementVersion();
 				$oldAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 				$oldAsset->save();
