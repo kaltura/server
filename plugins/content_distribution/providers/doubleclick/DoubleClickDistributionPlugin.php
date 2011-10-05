@@ -73,10 +73,6 @@ class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPer
 			}
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(DoubleClickDistributionProviderType::DOUBLECLICK))
 		{
 			$reflect = new ReflectionClass('KalturaDoubleClickDistributionJobProviderData');
@@ -151,10 +147,6 @@ class DoubleClickDistributionPlugin extends KalturaPlugin implements IKalturaPer
 				return 'Kaltura_Client_DoubleClickDistribution_Type_DoubleClickDistributionProfile';
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(DoubleClickDistributionProviderType::DOUBLECLICK))
 			return 'KalturaDoubleClickDistributionJobProviderData';
 	

@@ -96,10 +96,6 @@ class ExampleDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 			}
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(ExampleDistributionProviderType::EXAMPLE))
 		{
 			$reflect = new ReflectionClass('KalturaExampleDistributionJobProviderData');
@@ -168,10 +164,6 @@ class ExampleDistributionPlugin extends KalturaPlugin implements IKalturaPermiss
 				return 'Kaltura_Client_ExampleDistribution_Type_ExampleDistributionProfile';
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(ExampleDistributionProviderType::EXAMPLE))
 			return 'KalturaExampleDistributionJobProviderData';
 	

@@ -102,10 +102,6 @@ class FreewheelDistributionPlugin extends KalturaPlugin implements IKalturaPermi
 			}
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(FreewheelDistributionProviderType::FREEWHEEL))
 		{
 			$reflect = new ReflectionClass('KalturaFreewheelDistributionJobProviderData');
@@ -180,10 +176,6 @@ class FreewheelDistributionPlugin extends KalturaPlugin implements IKalturaPermi
 				return 'Kaltura_Client_FreewheelDistribution_Type_FreewheelDistributionProfile';
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(FreewheelDistributionProviderType::FREEWHEEL))
 			return 'KalturaFreewheelDistributionJobProviderData';
 	

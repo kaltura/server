@@ -100,10 +100,6 @@ class SynacorHboDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 				return 'Kaltura_Client_SynacorHboDistribution_Type_SynacorHboDistributionProfile';
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionProfile' && $enumValue == self::getDistributionProviderTypeCoreValue(SynacorHboDistributionProviderType::SYNACOR_HBO))
 			return 'KalturaSynacorHboDistributionProfile';
 			

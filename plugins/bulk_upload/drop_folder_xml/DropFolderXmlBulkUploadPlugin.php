@@ -79,12 +79,9 @@ class DropFolderXmlBulkUploadPlugin extends KalturaPlugin implements IKalturaBul
 		if ($baseClass == 'DropFolderFileHandler' && $enumValue == KalturaDropFolderFileHandlerType::XML)
 				return new DropFolderXmlBulkUploadFileHandler();
 		
-		// drop folder does not work in partner services 2 context because it uses dynamic enums
-		if (class_exists('kCurrentContext') && kCurrentContext::$ps_vesion == 'ps3')
-		{			
-			if ($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
-				return new KalturaDropFolderXmlBulkUploadFileHandlerConfig();
-		}
+		
+		if ($baseClass == 'KalturaDropFolderFileHandlerConfig' && $enumValue == self::getFileHandlerTypeCoreValue(DropFolderXmlFileHandlerType::XML))
+			return new KalturaDropFolderXmlBulkUploadFileHandlerConfig();
 	}
 	
 	/* (non-PHPdoc)
