@@ -22,6 +22,13 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 	 */
 	public function getRawMediaInfo()
 	{
+		// For example:
+		// url = http://url.to.my_domain/and/path?file=
+		// filePath = /web/contnet/file.flv
+		// resulted url is http://url.to.my_domain/and/path?file=L3dlYi9jb250bmV0L2ZpbGUuZmx2 
+		$url = $this->url . base64_encode($this->filePath);
+		return file_get_contents($url);
+		
 	$mediaInfoSample = "
 General
 Complete name                    : C:\\xampp\htdocs\mvdr6t454m.mov
