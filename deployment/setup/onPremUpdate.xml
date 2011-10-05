@@ -14,7 +14,7 @@
     <!-- ============================================  -->
 	<target name="stopBatch">
         <echo msg="Stopping batch..." />
-        <exec command="sh /opt/kaltura/app/scripts/serviceBatchMgr.sh stop" escape="false"/>
+        <exec command="sh /opt/kaltura/app/scripts/serviceBatchMgr.sh stop" escape="false" dir="/opt/kaltura/app/scripts/"/>
     </target>
 
     <!-- ============================================  -->
@@ -22,7 +22,7 @@
     <!-- ============================================  -->
 	<target name="clearCache" depends="stopBatch">
         <echo msg="Clearing cache..." />
-        <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false"/>
+        <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false" dir="/opt/kaltura/app/scripts/"/>
         <exec command="rm -rf /opt/kaltura/app/cache/*" escape="false"/>
     </target>
     
@@ -88,7 +88,7 @@
     <!-- ============================================  -->
     <target name="update" depends="replaceNonRootFiles,restartApache,clearCache,replaceGenerateConfig">
          <echo msg="update..." />
-         <exec command="php updateConfigFiles.php -s" dir="${installationLoc}${installationDir}" />
+         <exec command="php updateConfigFiles.php -s" dir="${installationLoc}/on-premise/installer/" />
     </target>
 
 
@@ -126,7 +126,7 @@
     <!-- ============================================  -->
 	<target name="clearCachee" depends="genActivationKey">
         <echo msg="Clearing cache..." />
-        <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false"/>
+        <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false" dir="/opt/kaltura/app/scripts/"/>
         <exec command="rm -rf /opt/kaltura/app/cache/*" escape="false"/>
     </target>
     
