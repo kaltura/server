@@ -51,13 +51,10 @@ class assetTableMap extends TableMap {
 		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 255, null);
 		$this->addColumn('WIDTH', 'Width', 'INTEGER', true, null, 0);
 		$this->addColumn('HEIGHT', 'Height', 'INTEGER', true, null, 0);
-		$this->addColumn('BITRATE', 'Bitrate', 'INTEGER', true, null, 0);
-		$this->addColumn('FRAME_RATE', 'FrameRate', 'FLOAT', true, null, 0);
 		$this->addColumn('SIZE', 'Size', 'INTEGER', true, null, 0);
 		$this->addColumn('IS_ORIGINAL', 'IsOriginal', 'BOOLEAN', false, null, false);
 		$this->addColumn('FILE_EXT', 'FileExt', 'VARCHAR', false, 4, null);
 		$this->addColumn('CONTAINER_FORMAT', 'ContainerFormat', 'VARCHAR', false, 127, null);
-		$this->addColumn('VIDEO_CODEC_ID', 'VideoCodecId', 'VARCHAR', false, 127, null);
 		$this->addColumn('TYPE', 'Type', 'INTEGER', true, null, 0);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
