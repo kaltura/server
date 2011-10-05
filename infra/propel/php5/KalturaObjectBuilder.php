@@ -215,6 +215,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	 */
 	public function postSave(PropelPDO \$con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent(\$this));
 		\$this->oldColumnsValues = array();";
 		
 		if($customDataColumn)
@@ -223,6 +224,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
     	";
 				
 		$script .= " 
+		parent::postSave(\$con);
 	}
 	
 	/**
@@ -243,7 +245,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		\$this->setUpdatedAt(time());";
 		
 		$script .= "
-		return true;
+		return parent::preInsert(\$con);
 	}
 	";
 
@@ -267,6 +269,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		";
 		}
 		$script .= "
+		parent::postInsert(\$con);
 	}
 
 	/**
@@ -294,6 +297,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		";
 		}
 		$script .= "
+		parent::postUpdate(\$con);
 	}
 	";
 		
@@ -356,7 +360,7 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$script .= "
 		
 		\$this->tempModifiedColumns = \$this->modifiedColumns;
-		return true;
+		return parent::preUpdate(\$con);
 	}
 	";
 		
