@@ -129,11 +129,19 @@
         <exec command="php /opt/kaltura/app/scripts/clear_cache.php" escape="false"/>
         <exec command="rm -rf /opt/kaltura/app/cache/*" escape="false"/>
     </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: restart apache                        -->
+    <!-- ============================================  -->
+    <target name="restartApachee" depends="clearCachee">
+         <echo msg="restart apache..." />
+         <exec command="apachectl restart" dir="." />
+    </target>
 
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="clearCachee">
+    <target name="seccess" depends="restartApachee">
          <echo msg="Done" />
     </target>
 
