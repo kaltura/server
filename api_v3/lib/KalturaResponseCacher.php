@@ -114,6 +114,14 @@ class KalturaResponseCacher
 	}
 	
 	/**
+	* This function checks whether the cache is disabled and returns the result.
+	 */	
+	public static function isCacheDisabled()
+	{
+		return count(self::$_useCache);
+	}
+	
+	/**
 	 * This functions checks if a certain response resides in cache.
 	 * In case it dose, the response is returned from cache and a response header is added.
 	 * There are two possibilities on which this function is called:
