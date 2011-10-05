@@ -309,7 +309,6 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
     		$newDropFolderFile->fileName = $fileName;
     		$newDropFolderFile->fileSize = $this->getFileSize($fullPath);
     		$newDropFolderFile->lastModificationTime = $lastModificationTime ? $lastModificationTime : $this->getModificationTime($fullPath);
-    		$newDropFolderFile->status = KalturaDropFolderFileStatus::UPLOADING;
 			$this->dropFolderPlugin->dropFolderFile->add($newDropFolderFile);
 		}
 		catch (Exception $e) {
