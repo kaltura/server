@@ -1344,13 +1344,10 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="255" />
 		<column primaryKey="false" lazyLoad="false" name="width" type="integer" required="true" default="0" />
 		<column primaryKey="false" lazyLoad="false" name="height" type="integer" required="true" default="0" />
-		<column primaryKey="false" lazyLoad="false" name="bitrate" type="integer" required="true" default="0" />
-		<column primaryKey="false" lazyLoad="false" name="frame_rate" type="float" required="true" default="0" />
 		<column primaryKey="false" lazyLoad="false" name="size" type="integer" required="true" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="is_original" type="boolean" default="" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="file_ext" type="varchar" size="4" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="container_format" type="varchar" size="127" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="video_codec_id" type="varchar" size="127" />
 		<column primaryKey="false" lazyLoad="false" name="type" type="integer" required="true" inheritance="single" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="entry">
