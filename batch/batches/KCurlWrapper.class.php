@@ -96,13 +96,31 @@ class KCurlWrapper
 	 */
 	public $ch;
 	
-	public $protocol ;
+	public $protocol;
+	
+	private static $headers;
+	private static $lastHeader;
+	
+	private static function read_header($ch, $string) {
+		self::$headers .= $string;
+		if ($string == "\r\n") // mark when we get to the last header so we can abort the curl
+			self::$lastHeader = true;
+		$length = strlen ( $string );
+		return $length;
+	}
+	
+	private static function read_body($ch, $string) {
+		if (self::$lastHeader) // if we read the last header abort the curl
+			return 0;
+		
+		$length = strlen ( $string );
+		return $length;
+	}
 	
 	/**
 	 * @param string $url
 	 */
-	public function __construct($url)
-	{
+	public function __construct($url) {
 		$url = trim($url);
 
 		// this is the default - will change only in very specific conditions (bellow)
@@ -200,6 +218,10 @@ class KCurlWrapper
 		curl_setopt($this->ch, CURLOPT_HEADER, true);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
+		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header');
+		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
+            
+		
 
 		if($this->protocol == self::HTTP_PROTOCOL_FTP)
 			$noBody = true;
@@ -213,17 +235,20 @@ class KCurlWrapper
 			curl_setopt($this->ch, CURLOPT_RANGE, '0-0');
 		}
 				
-		$headers = curl_exec($this->ch);
-		if(!$headers)
-			return false;
+		self::$headers = "";
+        self::$lastHeader = false;
+        curl_exec($this->ch);
+        if(!self::$headers)
+           return false;
+		
 
-		$headers = explode("\r\n", $headers);
+		self::$headers = explode("\r\n", self::$headers);
 
 		$curlHeaderResponse = new KCurlHeaderResponse();
 		
 		if ( $this->protocol == self::HTTP_PROTOCOL_HTTP )
 		{
-			$header = reset($headers);
+			$header = reset(self::$headers);
 			
 			// this line is true if the protocol is HTTP (or HTTPS);
 			$matches = null;
@@ -233,7 +258,7 @@ class KCurlWrapper
 				$curlHeaderResponse->codeName = $matches[2];
 			}
 			
-			foreach ( $headers as $header )
+			foreach ( self::$headers as $header )
 			{
 				if(!strstr($header, ':'))
 				{
@@ -265,7 +290,7 @@ class KCurlWrapper
 		else
 		{
 		// 	for now - assume FTP
-			foreach ( $headers as $header )
+			foreach ( self::$headers as $header )
 			{
 				$headerParts = explode(':', $header, 2);
 				if(count($headerParts) < 2)
