@@ -12,12 +12,13 @@
 
 	<target name="clearCache">
         <echo msg="Clearing server cache..." />
-        <exec command="php ${sdir}/scripts/clear_cache.php" escape="false"/>
+        <exec command="php ${sdir}/scripts/clear_cache.php" dir="${sdir}/scripts/" escape="false"/>
+        <exec command="apachectl restart" dir="." />
     </target>
     
     <target name="generateClients">
         <echo msg="Generating clients..." />
-        <exec command=".${sdir}/generator/generate.sh" escape="false"/>
+        <exec command=".${sdir}/generator/generate.sh" dir=".${sdir}/generator/" escape="false"/>
     </target>
     
     <target name="prepare">
