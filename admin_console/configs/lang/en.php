@@ -272,6 +272,7 @@ return array(
 	'invalid password' => 'Invalid password',
 	'credentials saved' => 'Your credentials were successfully changed',
 	'user change role' => 'Here you can change the role of an admin console user.',
+	'user assign partners' => 'Here you can assign partners for an admin console user',
 
 	// widgets
 	 'uiconf-list intro text' => 'Here you can manage all the UI Configuration objects in your deployment.  UI Conf objects that are associated with Publisher 0 are applicable to all accounts in your platform and UI Conf objects associated with Publisher 99 are used as templates and cloned upon the creation of new accounts<br/><br/>
@@ -874,7 +875,7 @@ return array(
 
 
 	// external-storages
-	'external-storages intro text' => 'here you can manage the Remote Storage profiles on your Kaltura video platform deployment.',
+	'external-storages intro text' => 'Here you can manage the Remote Storage profiles on your Kaltura video platform deployment',
 	'external-storages results count' => 'Results <span>(%s storages)</span>',
 
 	// partner-configure
@@ -953,10 +954,10 @@ return array(
 
 	// Distibution
 	'provider-list intro text'	=>	'From here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
-	'distribution-profiles intro text' =>	'here you can manage the Distribution profiles on your Kaltura video platform deployment',
+	'distribution-profiles intro text' =>	'Here you can manage the Distribution profiles on your Kaltura video platform deployment',
 
 	// Drop Folder
-	'drop folder list intro text' => 'here you can manage the Drop Folder profiles on your Kaltura video platform deployment',
+	'drop folder list intro text' => 'Here you can manage the Drop Folder profiles on your Kaltura video platform deployment',
 
 	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED' => 'Enabled',
@@ -990,7 +991,8 @@ return array(
 	'VIRUS_SCAN_ENTRY_TYPE_ALL' =>'All',
 
 	'Virus Scan Profile' => 'Virus Scan Profile',
-	'virus scan intro text' => 'here you can manage the Virus Scan profiles on your Kaltura video platform deployment',
+	'virus scan intro text' => 'Here you can manage the Virus Scan profiles on your Kaltura video platform deployment',
+
 
 	//metadate profile
 	'Kaltura_Client_Metadata_Enum_MetadataProfileStatus::ACTIVE' => 'Active',
