@@ -13,8 +13,8 @@ DROP TABLE IF EXISTS `cue_point`;
 CREATE TABLE `cue_point`
 (
 	`int_id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`id` VARCHAR(255)  NOT NULL,
-	`parent_id` VARCHAR(255),
+	`id` VARCHAR(31)  NOT NULL,
+	`parent_id` VARCHAR(31),
 	`entry_id` VARCHAR(31)  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
 	`created_at` DATETIME  NOT NULL,
