@@ -18,7 +18,7 @@
     
     <target name="generateClients">
         <echo msg="Generating clients..." />
-        <exec command=".${sdir}/generator/generate.sh" dir=".${sdir}/generator/" escape="false"/>
+        <exec command=".${sdir}/generator/generate.sh" dir="${sdir}/generator/" escape="false"/>
     </target>
     
     <target name="prepare">
