@@ -268,7 +268,7 @@ class KalturaServiceReflector
 				$paramInfo->setOptional(true);
 			}
 			
-			$actionParams[] = $paramInfo;
+			$actionParams[$name] = $paramInfo;
 		}
 		
 		return $actionParams;

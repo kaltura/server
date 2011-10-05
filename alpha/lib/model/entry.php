@@ -7,7 +7,7 @@
  * @package Core
  * @subpackage model
  */
-class entry extends Baseentry implements ISyncableFile, IIndexable
+class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 {
 	private $previous_status ;
 	protected $old_categories;

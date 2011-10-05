@@ -75,9 +75,20 @@ class KalturaDispatcher
 		
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 		kPermissionManager::init(kConf::get('enable_cache'));
+		
+		$actionInfo = $reflector->getActionInfo($action);
+		if($actionInfo->validateUserObjectClass && $actionInfo->validateUserIdParamName && isset($actionParams[$actionInfo->validateUserIdParamName]))
+		{
+//			// TODO maybe if missing should throw something, maybe a bone?
+//			if(!isset($actionParams[$actionInfo->validateUserIdParamName]))
+//				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $actionInfo->validateUserIdParamName);
 				
+			$objectId = $actionParams[$actionInfo->validateUserIdParamName];
+			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege);
+		}
+		
 		// initialize the service before invoking the action on it
-		$serviceInstance->initService ($reflector->getServiceId(), $reflector->getServiceName(), $action);
+		$serviceInstance->initService($reflector->getServiceId(), $reflector->getServiceName(), $action);
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");
@@ -90,6 +101,48 @@ class KalturaDispatcher
 		kMemoryManager::clearMemory();
 		
 		return $res;
+	}
+
+	/**
+	 * @param string $objectClass
+	 * @param string $objectId
+	 * @param string $privilege optional
+	 * @throws KalturaAPIException
+	 */
+	private function validateUser($objectClass, $objectId, $privilege = null)
+	{
+		// don't allow operations without ks
+		if (!kCurrentContext::$ks_object)
+			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+
+		// if admin always allowed
+		if (kCurrentContext::$is_admin_session)
+			return;
+
+		if($privilege)
+		{
+			// check if all ids are privileged
+			if (kCurrentContext::$ks_object->verifyPrivileges($privilege, ks::PRIVILEGE_WILDCARD))
+				return;
+				
+			// check if object id is privileged
+			if (kCurrentContext::$ks_object->verifyPrivileges($privilege, $objectId))
+				return;
+		}
+
+		if(!is_subclass_of($objectClass, 'IOwnable'))
+			return;
+
+		$objectClassPeer = "{$objectClass}Peer";
+		if(!class_exists($objectClassPeer))
+			return;
+			
+		$dbObject = $objectClassPeer::retrieveByPK($objectId);
+		if(!($dbObject instanceof IOwnable))
+			return;
+		
+		if ($dbObject->getPuserId() != kCurrentContext::$uid)
+			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 	}
 }
 

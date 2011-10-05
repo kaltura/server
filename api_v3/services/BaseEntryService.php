@@ -332,6 +332,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntry The updated entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @validateUser entry entryId edit
 	 */
 	function updateAction($entryId, KalturaBaseEntry $baseEntry)
 	{

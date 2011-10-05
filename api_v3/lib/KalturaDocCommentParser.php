@@ -40,6 +40,8 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_PERMISSIONS = "/\\@requiresPermission ([\\w\\,\\s]*)/";
     
+    const DOCCOMMENT_VALIDATE_USER = "/\\@validateUser\\s+(\\w+)\\s+(\\w+)\\s*(\\w*)/";
+    
     /**
      * @var bool
      */
@@ -146,6 +148,21 @@ class KalturaDocCommentParser
     public $permissions;
     
     /**
+     * @var string
+     */
+    public $validateUserObjectClass = null;
+    
+    /**
+     * @var string
+     */
+    public $validateUserIdParamName = null;
+    
+    /**
+     * @var string
+     */
+    public $validateUserPrivilege = null;
+    
+    /**
      * Parse a docComment
      *
      * @param string $comment
@@ -235,6 +252,15 @@ class KalturaDocCommentParser
         $result = null;
         if (preg_match(self::DOCCOMMENT_PERMISSIONS, $comment, $result))
         	$this->permissions = $result[1]; 
+            
+        $result = null;
+        if (preg_match(self::DOCCOMMENT_VALIDATE_USER, $comment, $result))
+        {
+        	$this->validateUserObjectClass = $result[1];
+        	$this->validateUserIdParamName = $result[2];
+        	if(isset($result[3]) && strlen($result[3]))
+        		$this->validateUserPrivilege = $result[3];
+        } 
             
         $result = null;
         $error_array = array();
