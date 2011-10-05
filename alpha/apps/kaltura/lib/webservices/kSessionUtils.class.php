@@ -509,8 +509,12 @@ class ks
 					//If $exPrivileges[1] is a valid IP address - return value.
 					return $exPrivileges[1];
 				}
+				else
+				{
+					throw new KalturaAPIException ( APIErrors::PRIVILEGE_IP_RESTRICTION);
+				}
 		}
-		throw new KalturaAPIException ( APIErrors::PRIVILEGE_IP_RESTRICTION);
+		
 		return false;
 	}
 	
