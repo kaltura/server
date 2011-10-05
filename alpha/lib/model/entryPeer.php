@@ -377,7 +377,7 @@ class entryPeer extends BaseentryPeer
 		$entry->save();
 		return true;
 	}
-	
+	 
 	public static function updateAccessControl($partnerId, $oldAccessControlId, $newAccessControlId)
 	{
 		$selectCriteria = new Criteria();

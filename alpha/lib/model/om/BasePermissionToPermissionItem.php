@@ -675,7 +675,9 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array(); 
+		parent::postSave($con);
 	}
 	
 	/**
@@ -688,7 +690,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
     	$this->setCreatedAt(time());
     	
 		$this->setUpdatedAt(time());
-		return true;
+		return parent::preInsert($con);
 	}
 	
 	/**
@@ -704,6 +706,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
 		
+		parent::postInsert($con);
 	}
 
 	/**
@@ -726,6 +729,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 			
 		$this->tempModifiedColumns = array();
 		
+		parent::postUpdate($con);
 	}
 	
 	/**
@@ -778,7 +782,7 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 			$this->setUpdatedAt(time());
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
-		return true;
+		return parent::preUpdate($con);
 	}
 	
 	/**

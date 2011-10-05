@@ -629,6 +629,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				case ks::EXCEEDED_ACTIONS_LIMIT:
 					KalturaLog::err('KS exceeded number of actions limit');
 					break;
+					
+				case ks::EXCEEDED_RESTRICTED_IP:
+					KalturaLog::err('IP does not match KS restriction');
+					break;
 			}
 			throw new KalturaAPIException (APIErrors::INVALID_KS ,self::$ksString ,$res ,ks::getErrorStr($res));
 		}

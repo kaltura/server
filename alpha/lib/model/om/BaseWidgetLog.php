@@ -1151,7 +1151,9 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array(); 
+		parent::postSave($con);
 	}
 	
 	/**
@@ -1164,7 +1166,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
     	$this->setCreatedAt(time());
     	
 		$this->setUpdatedAt(time());
-		return true;
+		return parent::preInsert($con);
 	}
 	
 	/**
@@ -1180,6 +1182,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
 		
+		parent::postInsert($con);
 	}
 
 	/**
@@ -1202,6 +1205,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 			
 		$this->tempModifiedColumns = array();
 		
+		parent::postUpdate($con);
 	}
 	
 	/**
@@ -1254,7 +1258,7 @@ abstract class BaseWidgetLog extends BaseObject  implements Persistent {
 			$this->setUpdatedAt(time());
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
-		return true;
+		return parent::preUpdate($con);
 	}
 	
 	/**

@@ -718,7 +718,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array(); 
+		parent::postSave($con);
 	}
 	
 	/**
@@ -728,7 +730,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-		return true;
+		return parent::preInsert($con);
 	}
 	
 	/**
@@ -744,6 +746,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
 		
+		parent::postInsert($con);
 	}
 
 	/**
@@ -766,6 +769,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 			
 		$this->tempModifiedColumns = array();
 		
+		parent::postUpdate($con);
 	}
 	
 	/**
@@ -815,7 +819,7 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 		
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
-		return true;
+		return parent::preUpdate($con);
 	}
 	
 	/**

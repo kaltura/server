@@ -835,7 +835,9 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array(); 
+		parent::postSave($con);
 	}
 	
 	/**
@@ -848,7 +850,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
     	$this->setCreatedAt(time());
     	
 		$this->setUpdatedAt(time());
-		return true;
+		return parent::preInsert($con);
 	}
 	
 	/**
@@ -859,6 +861,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	{
 		kQueryCache::invalidateQueryCache($this);
 		
+		parent::postInsert($con);
 	}
 
 	/**
@@ -874,6 +877,7 @@ abstract class BaseflavorParamsConversionProfile extends BaseObject  implements 
 	
 		kQueryCache::invalidateQueryCache($this);
 		
+		parent::postUpdate($con);
 	}
 	
 	/**

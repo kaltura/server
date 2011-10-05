@@ -235,6 +235,7 @@ class ks
 	const EXPIRED = -5;
 	const LOGOUT = -6;
 	const EXCEEDED_ACTIONS_LIMIT = -8;
+	const EXCEEDED_RESTRICTED_IP = -9;
 	const OK = 1;
 
 	const INVALID_LKS = -7;
@@ -253,6 +254,7 @@ class ks
 	const PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST = "sviewplaylist";
 	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
 	const PRIVILEGE_SET_ROLE = "setrole";
+	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
 
 	public $partner_id = null;
 	public $master_partner_id = null;
@@ -274,7 +276,7 @@ class ks
 		if ( self::$ERROR_MAP == null )
 		{
 			self::$ERROR_MAP  = array ( self::INVALID_STR => "INVALID_STR" , self::INVALID_PARTNER => "INVALID_PARTNER" , self::INVALID_USER => "INVALID_USER" ,
-				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED", self::EXCEEDED_ACTIONS_LIMIT => 'EXCEEDED_ACTIONS_LIMIT');
+				self::INVALID_TYPE => "INVALID_TYPE" , self::EXPIRED => "EXPIRED" , self::LOGOUT => "LOGOUT" , Partner::VALIDATE_LKS_DISABLED => "LKS_DISABLED", self::EXCEEDED_ACTIONS_LIMIT => 'EXCEEDED_ACTIONS_LIMIT',self::EXCEEDED_RESTRICTED_IP=>'EXCEEDED_RESTRICTED_IP');
 		}
 		
 		$str =  @self::$ERROR_MAP[$code];
@@ -379,6 +381,16 @@ class ks
 			invalidSessionPeer::actionsLimitKs($this, $limit);		
 	}
 	
+	public function setIPRestriction()
+	{
+		$ipRestrict = $this->isSetIPRestriction();
+		
+		if ($ipRestrict)
+		{
+			//invalidSessionPeer::ipRestrictKS($this, $ipRestrict);
+		}
+	}
+	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
 		if ( ! $this->valid_string ) return self::INVALID_STR;
@@ -394,9 +406,16 @@ class ks
 			if ($this->isSetLimitAction()){
 				$isValidCctionLimit = invalidSessionPeer::isValidActionsLimit($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 				if (!$isValidCctionLimit){
-					KalturaLog::debug("actionLimits: EXCEEDED_ACTIONS_LIMIT");
+					KalturaLog::err("actionLimits: EXCEEDED_ACTIONS_LIMIT");
 					return self::EXCEEDED_ACTIONS_LIMIT;
 				} 
+			}
+			$allowedIPRestriction = $this->isSetIPRestriction();
+			
+			if ($allowedIPRestriction && $allowedIPRestriction != kCurrentContext::$user_ip)
+			{
+				KalturaLog::err("ipRestriction: EXCEEDED_RESTRICTED_IP");
+				return self::EXCEEDED_RESTRICTED_IP;
 			}
 			
 			$invalid = invalidSessionPeer::isInvalid($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
@@ -473,6 +492,25 @@ class ks
 				}
 		}
 		
+		return false;
+	}
+	
+	public function isSetIPRestriction()
+	{
+		$allPrivileges = explode(',', $this->privileges);
+		// for each pair - check privileges
+		foreach($allPrivileges as $priv)
+		{
+			// extract privilege ID from pair
+			$exPrivileges = explode(':', $priv);
+			if ($exPrivileges[0] == self::PRIVILEGE_IP_RESTRICTION)
+				if ( preg_match( "/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/", $exPrivileges[1]) )
+				{	
+					//If $exPrivileges[1] is a valid IP address - return value.
+					return $exPrivileges[1];
+				}
+		}
+		throw new KalturaAPIException ( APIErrors::PRIVILEGE_IP_RESTRICTION);
 		return false;
 	}
 	

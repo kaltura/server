@@ -21,6 +21,8 @@ class APIErrors
 
 	const INVALID_ACTIONS_LIMIT = "INVALID_ACTIONS_LIMIT,Invalid actions limit";
 	
+	const PRIVILEGE_IP_RESTRICTION = "INVALID_IP_ADDRESS_RESTRICTION, Invalid IP address restriction";
+	
 	const INVALID_SET_ROLE = "INVALID_SET_ROLE,Invalid set role id";
 	
 	// $s - media source

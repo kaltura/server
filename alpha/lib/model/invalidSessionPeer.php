@@ -68,6 +68,8 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		
 		return $invalidSession;
 	}
+
+	
 	
 	/**
 	 * @param      ks $ks

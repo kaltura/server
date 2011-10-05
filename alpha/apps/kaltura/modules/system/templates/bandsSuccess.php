@@ -19,7 +19,7 @@ foreach ( $band_list as $band ) {
 <tr <?php echo ($odd ? "style='background-color:#eee'" : "" ); ?>>
 	<td><?php echo $i ?></td> 
 	<td><?php echo $band->getId() ; ?></td>
-	<td><a href="javascript:goto ( 	<?php echo  "'" . $band_id . "' , 1 , '" . $hash . "'"  ?>	) >Kaltura's <?php echo  $band_id; ?></a></td>
+	<td><a href="javascript:goto ( 	<?php echo  "'" . $band_id . "' , 1 , '" . $hash . "'"  ?>	)" >Kaltura's <?php echo  $band_id; ?></a></td>
 	<td><a href="javascript:goto (	<?php echo  "'" . $band_id . "' , 2 , '" . $hash . "'"  ?>	)">Myspace's profile <?php echo  $band_id; ?></a></td>
 	<td><a href="javascript:goto (	<?php echo  "'" . $band_id . "' , 3 , '" . $hash . "'"  ?>	 )">Myspace's message <?php echo  $band_id; ?></a></td>
 	<td><?php echo $band->getKuser()->getScreenName() ; ?></td>

@@ -150,8 +150,7 @@ if ( $kshow ) { ?>
 Kshow:
 <br>
 
-<table border=1 cellspacing=0	<?php echo investigate::printKshowHeader() . " " . investigate::printKshow( $kshow ) ?> 
-</table>
+<table border=1 cellspacing=0	<?php echo investigate::printKshowHeader() . " " . investigate::printKshow( $kshow ) ?>></table>
 
 <br>
 <table border=1 cellspacing=0	>

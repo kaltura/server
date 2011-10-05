@@ -935,9 +935,11 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array();
 		$this->oldCustomDataValues = array();
     	 
+		parent::postSave($con);
 	}
 	
 	/**
@@ -950,7 +952,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
     	$this->setCreatedAt(time());
     	
 		$this->setUpdatedAt(time());
-		return true;
+		return parent::preInsert($con);
 	}
 	
 	/**
@@ -966,6 +968,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
 		
+		parent::postInsert($con);
 	}
 
 	/**
@@ -988,6 +991,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 			
 		$this->tempModifiedColumns = array();
 		
+		parent::postUpdate($con);
 	}
 	
 	/**
@@ -1040,7 +1044,7 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 			$this->setUpdatedAt(time());
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
-		return true;
+		return parent::preUpdate($con);
 	}
 	
 	/**
