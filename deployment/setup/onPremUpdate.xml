@@ -166,11 +166,19 @@
          <echo msg="restart apache..." />
          <exec command="apachectl restart" dir="." />
     </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: start batch proccess                  -->
+    <!-- ============================================  -->
+	<target name="startBatch" depends="restartApachee">
+        <echo msg="Starting batch..." />
+        <exec command="sh /opt/kaltura/app/scripts/serviceBatchMgr.sh start" escape="false" dir="/opt/kaltura/app/scripts/"/>
+    </target>
 
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartApachee">
+    <target name="seccess" depends="startBatch">
          <echo msg="Done" />
     </target>
 
