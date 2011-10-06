@@ -271,13 +271,14 @@ class thumbnailAction extends sfAction
 						}
 					}
 				}
-			} 
-			else
-			{
-				// file does not exist on any DC - die
-				KalturaLog::log( "Error - no FileSync for entry [$entry_id]");
-				KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 			}
+		}
+		
+		if ( ! $file_sync ) 
+		{
+			// file does not exist on any DC - die
+			KalturaLog::err( "Error - no FileSync for entry [$entry_id]");
+			KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 		}
 		
 		if ( !$local && !$tempThumbPath)
