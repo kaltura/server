@@ -488,7 +488,7 @@ class ks
 				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] > 0)){
 					return $exPrivileges[1];
 				}else{
-					throw new KalturaAPIException ( APIErrors::INVALID_ACTIONS_LIMIT);
+					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::INVALID_ACTIONS_LIMIT);
 				}
 		}
 		
@@ -511,7 +511,7 @@ class ks
 				}
 				else
 				{
-					throw new KalturaAPIException ( APIErrors::PRIVILEGE_IP_RESTRICTION);
+					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::PRIVILEGE_IP_RESTRICTION);
 				}
 		}
 		
@@ -531,7 +531,7 @@ class ks
 			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE) 
 			{
 				if ((is_numeric($exPrivileges[1])) && ($exPrivileges[1] < 0)){
-					throw new KalturaAPIException ( APIErrors::INVALID_SET_ROLE);
+					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::INVALID_SET_ROLE);
 				}
 				return $exPrivileges[1];
 			}
@@ -562,7 +562,7 @@ class ks
 					$roleIds = $roleId->getId();
 				}else{
 					KalturaLog::debug("Role id [$exPrivileges[1]] does not exists");
-					throw new KalturaAPIException ( APIErrors::UNKNOWN_ROLE_ID ,$exPrivileges[1]);
+					throw new kCoreException(kCoreException::INTERNAL_SERVER_ERROR, APIErrors::UNKNOWN_ROLE_ID ,$exPrivileges[1]);
 				}
 			}
 		}
