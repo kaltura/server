@@ -82,7 +82,7 @@ class KalturaDispatcher
 //			// TODO maybe if missing should throw something, maybe a bone?
 //			if(!isset($actionParams[$actionInfo->validateUserIdParamName]))
 //				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $actionInfo->validateUserIdParamName);
-				
+			
 			$objectId = $actionParams[$actionInfo->validateUserIdParamName];
 			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege);
 		}
@@ -119,6 +119,42 @@ class KalturaDispatcher
 		if (kCurrentContext::$is_admin_session)
 			return;
 
+		KalturaLog::
+			
+		$objectGetters = null;
+		if(strstr($objectClass, '::'))
+		{
+			$objectGetters = explode('::', $objectClass);
+			$objectClass = array_shift($objectGetters);
+		}
+			
+		$objectClassPeer = "{$objectClass}Peer";
+		if(!class_exists($objectClassPeer))
+			return;
+			
+		$dbObject = $objectClassPeer::retrieveByPK($objectId);
+		
+		if($objectGetters)
+		{
+			foreach($objectGetters as $objectGetter)
+			{
+				$getterMethod = "get{$objectGetter}";
+				
+				$reflector = new ReflectionObject($dbObject); 
+				
+				if (! $reflector->hasMethod($getterMethod))
+				{
+					KalturaLog::err("Method ".$getterMethod. " does not exist for class ".$reflector->getName());
+					return;
+				}
+				
+				$dbObject = $dbObject->$getterMethod();
+			}
+		}
+		
+		if(!($dbObject instanceof IOwnable))
+			return;
+	
 		if($privilege)
 		{
 			// check if all ids are privileged
@@ -126,21 +162,10 @@ class KalturaDispatcher
 				return;
 				
 			// check if object id is privileged
-			if (kCurrentContext::$ks_object->verifyPrivileges($privilege, $objectId))
+			if (kCurrentContext::$ks_object->verifyPrivileges($privilege, $dbObject->getId()))
 				return;
 		}
-
-		if(!is_subclass_of($objectClass, 'IOwnable'))
-			return;
-
-		$objectClassPeer = "{$objectClass}Peer";
-		if(!class_exists($objectClassPeer))
-			return;
-			
-		$dbObject = $objectClassPeer::retrieveByPK($objectId);
-		if(!($dbObject instanceof IOwnable))
-			return;
-		
+				
 		if ($dbObject->getPuserId() != kCurrentContext::$uid)
 			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 	}
