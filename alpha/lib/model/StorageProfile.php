@@ -15,6 +15,7 @@ class StorageProfile extends BaseStorageProfile
 	const PLAY_FORMAT_SILVER_LIGHT = 'sl';
 	const PLAY_FORMAT_APPLE_HTTP = 'applehttp';
 	const PLAY_FORMAT_RTSP = 'rtsp';
+	const PLAY_FORMAT_AUTO = 'auto';
 	
 	const STORAGE_SERVE_PRIORITY_KALTURA_ONLY = 1;
 	const STORAGE_SERVE_PRIORITY_KALTURA_FIRST = 2;
