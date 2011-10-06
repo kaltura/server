@@ -48,6 +48,7 @@ class AttachmentAssetService extends KalturaAssetService
 	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
+	 * @validateUser entry entryId edit
      */
     function addAction($entryId, KalturaAttachmentAsset $attachmentAsset)
     {
@@ -55,7 +56,7 @@ class AttachmentAssetService extends KalturaAssetService
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
 		
     	$dbAttachmentAsset = new AttachmentAsset();
     	$dbAttachmentAsset = $attachmentAsset->toInsertableObject($dbAttachmentAsset);
@@ -84,6 +85,7 @@ class AttachmentAssetService extends KalturaAssetService
 	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED 
+	 * @validateUser asset::entry id edit
      */
     function setContentAction($id, KalturaContentResource $contentResource)
     {
@@ -94,7 +96,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$dbEntry = $dbAttachmentAsset->getentry();
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
 		
    		$previousStatus = $dbAttachmentAsset->getStatus();
 		$contentResource->validateEntry($dbAttachmentAsset->getentry());
@@ -126,6 +128,7 @@ class AttachmentAssetService extends KalturaAssetService
      * @param KalturaAttachmentAsset $attachmentAsset
      * @return KalturaAttachmentAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+     * @validateUser asset::entry id edit
      */
     function updateAction($id, KalturaAttachmentAsset $attachmentAsset)
     {
@@ -136,7 +139,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$dbEntry = $dbAttachmentAsset->getentry();
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
 		
     	$dbAttachmentAsset = $attachmentAsset->toUpdatableObject($dbAttachmentAsset);
     	$dbAttachmentAsset->save();
@@ -474,6 +477,7 @@ class AttachmentAssetService extends KalturaAssetService
 	 * @param string $attachmentAssetId
 	 * 
 	 * @throws KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND
+	 * @validateUser asset::entry attachmentAssetId edit
 	 */
 	public function deleteAction($attachmentAssetId)
 	{
@@ -484,7 +488,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$dbEntry = $attachmentAssetDb->getentry();
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $attachmentAssetDb->getEntryId());
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
 		
 		$attachmentAssetDb->setStatus(AttachmentAsset::ASSET_STATUS_DELETED);
 		$attachmentAssetDb->setDeletedAt(time());

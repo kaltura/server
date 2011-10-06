@@ -263,6 +263,7 @@ class DocumentsService extends KalturaEntryService
 	 * @return KalturaDocumentEntry The updated document entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @validateUser entry entryId edit
 	 */
 	function updateAction($entryId, KalturaDocumentEntry $documentEntry)
 	{
@@ -276,6 +277,7 @@ class DocumentsService extends KalturaEntryService
 	 * @param string $entryId Document entry id to delete
 	 * 
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+ 	 * @validateUser entry entryId edit
 	 */
 	function deleteAction($entryId)
 	{
