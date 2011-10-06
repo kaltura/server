@@ -71,6 +71,7 @@ class MediaService extends KalturaEntryService
      * @return KalturaMediaEntry
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::ENTRY_ALREADY_WITH_CONTENT
+     * @validateUser entry entryId edit
      */
     function addContentAction($entryId, KalturaResource $resource = null)
     {
@@ -82,7 +83,7 @@ class MediaService extends KalturaEntryService
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
 			
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
     	$resource->validateEntry($dbEntry);
     	$kResource = $resource->toObject();
@@ -642,6 +643,7 @@ class MediaService extends KalturaEntryService
 	 * @param KalturaMediaEntry $mediaEntry Media entry metadata to update
 	 * @return KalturaMediaEntry The updated media entry
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @validateUser entry entryId edit
 	 */
 	function updateAction($entryId, KalturaMediaEntry $mediaEntry)
 	{
@@ -666,6 +668,7 @@ class MediaService extends KalturaEntryService
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_REPLACEMENT_ALREADY_EXISTS
      * @throws KalturaErrors::INVALID_OBJECT_ID
+     * @validateUser entry entryId edit
 	 */
 	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null)
 	{
@@ -674,7 +677,7 @@ class MediaService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
 		$this->replaceResource($resource, $dbEntry, $conversionProfileId);
 				
@@ -688,6 +691,7 @@ class MediaService extends KalturaEntryService
 	 * @param string $entryId Media entry id to delete
 	 * 
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+ 	 * @validateUser entry entryId edit
 	 */
 	function deleteAction($entryId)
 	{

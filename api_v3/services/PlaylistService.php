@@ -126,6 +126,7 @@ class PlaylistService extends KalturaEntryService
 	 *
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
+	 * @validateUser entry id edit
 	 */	
 	function updateAction( $id , KalturaPlaylist $playlist , $updateStats = false )
 	{
@@ -147,7 +148,7 @@ class PlaylistService extends KalturaEntryService
 		$playlistUpdate = $playlist->toUpdatableObject($playlistUpdate);
 
 		
-		$this->checkIfUserAllowedToUpdateEntry($playlistUpdate);
+		
 		$this->checkAndSetValidUserUpdate($playlist, $playlistUpdate);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
@@ -188,6 +189,7 @@ class PlaylistService extends KalturaEntryService
 	 *
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
+	 * @validateUser entry id edit
 	 */		
 	function deleteAction(  $id )
 	{

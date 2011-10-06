@@ -655,7 +655,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		$this->checkIfUserAllowedToUpdateEntry($entry);
+		
 			
 		$srcFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if(!$srcFlavorAsset)
@@ -1133,7 +1133,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$dbEntry || ($entryType !== null && $dbEntry->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$this->checkAndSetValidUserUpdate($entry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($entry);
 		$this->validateAccessControlId($entry);
@@ -1168,7 +1168,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$entryToDelete || ($entryType !== null && $entryToDelete->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$this->checkIfUserAllowedToUpdateEntry($entryToDelete);
+		
 		
 		myEntryUtils::deleteEntry($entryToDelete);
 		

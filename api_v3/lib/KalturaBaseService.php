@@ -305,35 +305,4 @@ abstract class KalturaBaseService
 		}	
 	}
 	
-	/**
-	 * Throws an error if the user is trying to update entry that doesn't belong to him and the session is not admin
-	 *
-	 * @param entry $dbEntry
-	 */
-	protected function checkIfUserAllowedToUpdateEntry(entry $dbEntry)
-	{
-		// don't allow any update operations without ks
-		if (!$this->getKs())
-			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-
-		// if admin -> allowed
-		if ($this->getKs()->isAdmin())
-			return;
-
-		// check if wildcard on 'edit'
-		if ($this->getKs()->verifyPrivileges(ks::PRIVILEGE_EDIT, ks::PRIVILEGE_WILDCARD))
-			return;
-			
-		// check if entryID on 'edit'
-		if ($this->getKs()->verifyPrivileges(ks::PRIVILEGE_EDIT, $dbEntry->getId()))
-			return;
-
-		// check if entryID in playlist and 'editplaylist' privilege
-		if ($this->getKs()->verifyPlaylistPrivileges(ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST, $dbEntry->getId(), $this->getPartnerId()))
-			return;
-		
-		// if user is not the entry owner, and the KS is user type - do not allow update
-		if ($dbEntry->getKuserId() != $this->getKuser()->getId())
-			throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
-	}
 }

@@ -83,6 +83,7 @@ class DataService extends KalturaEntryService
 	 * @return KalturaDataEntry The updated data entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * validateUser entry $entryId edit
 	 */
 	function updateAction($entryId, KalturaDataEntry $documentEntry)
 	{
@@ -96,6 +97,7 @@ class DataService extends KalturaEntryService
 	 * @param string $entryId Data entry id to delete
 	 * 
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+ 	 * @validateUser entry entryId edit
 	 */
 	function deleteAction($entryId)
 	{

@@ -95,6 +95,7 @@ class MixingService extends KalturaEntryService
 	 * @param string $entryId Mix entry id to update
 	 * @param KalturaMixEntry $mixEntry Mix entry metadata to update
 	 * @return KalturaMixEntry The updated mix entry
+	 * @validateUser entry entryId edit
 	 */
 	function updateAction($entryId, KalturaMixEntry $mixEntry)
 	{
@@ -105,7 +106,7 @@ class MixingService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MIX)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		$this->checkAndSetValidUserUpdate($mixEntry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($mixEntry);
 		$this->validateAccessControlId($mixEntry);
@@ -132,6 +133,7 @@ class MixingService extends KalturaEntryService
 	 *
 	 * @action delete
 	 * @param string $entryId Mix entry id to delete
+	 * @validateUser entry entryId edit
 	 */
 	function deleteAction($entryId)
 	{

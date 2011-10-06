@@ -41,6 +41,7 @@ class FlavorAssetService extends KalturaAssetService
      * @return KalturaFlavorAsset
      * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
      * @throws KalturaErrors::FLAVOR_ASSET_ALREADY_EXISTS
+     * @validateUser entry entryId edit
      */
     function addAction($entryId, KalturaFlavorAsset $flavorAsset)
     {
@@ -48,7 +49,7 @@ class FlavorAssetService extends KalturaAssetService
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
     	if(!is_null($flavorAsset->flavorParamsId))
     	{
@@ -85,6 +86,7 @@ class FlavorAssetService extends KalturaAssetService
      * @param KalturaFlavorAsset $flavorAsset
      * @return KalturaFlavorAsset
      * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
+     * @validateUser asset::entry id edit
      */
     function updateAction($id, KalturaFlavorAsset $flavorAsset)
     {
@@ -96,7 +98,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbFlavorAsset->getEntryId());
 			
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
     	$dbFlavorAsset = $flavorAsset->toUpdatableObject($dbFlavorAsset);
    		$dbFlavorAsset->save();
@@ -120,6 +122,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * @throws KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED 
+	 * @validateUser asset::entry id edit
      */
     function setContentAction($id, KalturaContentResource $contentResource)
     {
@@ -131,7 +134,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbFlavorAsset->getEntryId());
 			
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
    		$previousStatus = $dbFlavorAsset->getStatus();
 		$contentResource->validateEntry($dbFlavorAsset->getentry());
@@ -514,6 +517,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * @action convert
 	 * @param string $entryId
 	 * @param int $flavorParamsId
+	 * @validateUser entry entryId edit
 	 */
 	public function convertAction($entryId, $flavorParamsId)
 	{
@@ -521,7 +525,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
 		$flavorParamsDb = assetParamsPeer::retrieveByPK($flavorParamsId);
 		assetParamsPeer::setUseCriteriaFilter(false);
@@ -550,6 +554,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * 
 	 * @action reconvert
 	 * @param string $id Flavor Asset ID
+	 * @validateUser asset::entry id edit
 	 */
 	public function reconvertAction($id)
 	{
@@ -571,6 +576,7 @@ class FlavorAssetService extends KalturaAssetService
 	 * 
 	 * @action delete
 	 * @param string $id
+	 * @validateUser asset::entry id edit
 	 */
 	public function deleteAction($id)
 	{
@@ -582,7 +588,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $flavorAssetDb->getEntryId());
 			
-		$this->checkIfUserAllowedToUpdateEntry($entry);
+		
 		
 		$flavorAssetDb->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$flavorAssetDb->setDeletedAt(time());

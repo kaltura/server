@@ -100,6 +100,7 @@ class LiveStreamService extends KalturaEntryService
 	 * @return KalturaLiveStreamAdminEntry The updated live stream entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @validateUser entry entryId edit
 	 */
 	function updateAction($entryId, KalturaLiveStreamAdminEntry $liveStreamEntry)
 	{
@@ -113,6 +114,7 @@ class LiveStreamService extends KalturaEntryService
 	 * @param string $entryId Live stream entry id to delete
 	 * 
  	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+ 	 * @validateUser entry entryId edit
 	 */
 	function deleteAction($entryId)
 	{

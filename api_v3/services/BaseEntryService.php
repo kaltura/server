@@ -74,6 +74,7 @@ class BaseEntryService extends KalturaEntryService
      * @param KalturaResource $resource
      * @return KalturaBaseEntry
      * @throws KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED
+     * @validateUser entry entryId edit
      */
     function addContentAction($entryId, KalturaResource $resource)
     {
@@ -82,7 +83,7 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
 		$kResource = $resource->toObject();
     	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
@@ -354,6 +355,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @return KalturaBaseEntry The updated entry
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @validateUser entry entryId edit
 	 */
 	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null)
 	{
@@ -361,7 +363,7 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	
-		$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
 		$baseEntry = new KalturaBaseEntry();
 		$baseEntry->fromObject($dbEntry);
@@ -425,6 +427,7 @@ class BaseEntryService extends KalturaEntryService
 	 *
 	 * @action delete
 	 * @param string $entryId Entry id to delete
+	 * @validateUser entry entryId edit
 	 */
 	function deleteAction($entryId)
 	{
@@ -692,23 +695,8 @@ class BaseEntryService extends KalturaEntryService
 			
 		}
 		
-		if($contextDataParams->streamerType && $contextDataParams->streamerType == StorageProfile::PLAY_FORMAT_RTMP){
-			//support streamerType only to be set rtmp
-			//$contextDataParams->streamerType is RTMP and therefore $result->mediaProtocol should be RTMP as well
-			$result->streamerType = $contextDataParams->streamerType;
-			$result->mediaProtocol = StorageProfile::PLAY_FORMAT_RTMP;
-		}
-		else
-		{
-			$result->streamerType = $this->getPartner()->getStreamerType();
-			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
-		}
-			
-		
-		
 		$partner = PartnerPeer::retrieveByPK($dbEntry->getPartnerId());
-		if($result->streamerType == StorageProfile::PLAY_FORMAT_RTMP && 
-			PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $dbEntry->getPartnerId()) &&
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_DELIVERY_PRIORITY, $dbEntry->getPartnerId()) &&
 			$partner->getStorageServePriority() != StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 		{
 			if (is_null($contextDataParams->flavorAssetId)){
@@ -729,13 +717,47 @@ class BaseEntryService extends KalturaEntryService
 			$assetSyncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSyncs = kFileSyncUtils::getAllReadyExternalFileSyncsForKey($assetSyncKey);
 		
-			$storageProfileIds = array();
-			foreach ($fileSyncs as $fileSync)
-				$storageProfileIds[] = $fileSync->getDc();
+			//$storageProfileIds = array();
 			
-			$result->storageProfileIds = implode(',',$storageProfileIds);
+			$storageProfilesXML = new SimpleXMLElement("<StorageProfiles/>");
+			foreach ($fileSyncs as $fileSync)
+			{
+				$storageProfileId = $fileSync->getDc();
+				
+				$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+				
+				if ( !$storageProfile->getDeliveryRmpBaseUrl() 
+					&& (!$contextDataParams->streamerType || $contextDataParams->streamerType == StorageProfile::PLAY_FORMAT_AUTO))
+				{
+					$contextDataParams->streamerType = StorageProfile::PLAY_FORMAT_HTTP;
+					$contextDataParams->mediaProtocol = StorageProfile::PLAY_FORMAT_HTTP;
+
+				}
+				$storageProfileXML = new SimpleXMLElement('<StorageProfile/>');
+				
+				$storageProfileXML->addAttribute("storageProfileId",$storageProfileId);
+				$storageProfileXML->addChild("Name", $storageProfile->getNam);
+				$storageProfileXML->addChild("SystemName", $storageProfile->getSystemName());
+				
+				$storageProfilesXML->addChild($storageProfileXML);
+				
+			}
+
+			$result->storageProfilesXML = $storageProfilesXML->saveXML();
+			
 		}
 		
+		if($contextDataParams->streamerType && $contextDataParams->streamerType != StorageProfile::PLAY_FORMAT_AUTO)
+		{
+			$result->streamerType = $contextDataParams->streamerType;
+			$result->mediaProtocol = $contextDataParams->mediaProtocol;
+		}
+		else
+		{
+			$result->streamerType = $this->getPartner()->getStreamerType();
+			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
+			
+		}		
 		return $result;
 	}
 	
