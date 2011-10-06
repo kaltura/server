@@ -1,6 +1,6 @@
 <?php
 
-class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer
+class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer
 {
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
@@ -254,5 +254,51 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			}
 		}
 		return true;
+	}
+	
+	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		/* @var $object FileSync */
+		$syncKey = kFileSyncUtils::getKeyForFileSync($object);
+		$entryId = null;
+		switch ($object->getObjectType())
+		{
+			case FileSyncObjectType::ENTRY:
+				$entryId = $object->getObjectId();
+				break;
+				
+			case FileSyncObjectType::BATCHJOB:
+				$batchJob = BatchJobPeer::retrieveByPK($object->getObjectId());
+				$entryId = $batchJob->getEntryId();
+				break;
+				
+			case FileSyncObjectType::ASSET:
+				$asset = assetPeer::retrieveByPK($object->getObjectId());
+				$entryId = $asset->getEntryId();
+				break;
+		}
+		
+		kJobsManager::addStorageDeleteJob($raisedJob, $entryId, $object->getPartnerId(), $syncKey);		
+	}
+	
+	/**
+	 * @param BaseObject $object
+	 * @return bool true if the consumer should handle the event
+	 */
+	public function shouldConsumeDeletedEvent(BaseObject $object)
+	{
+		if ($object instanceof FileSync)
+		{
+			if ($object->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			{
+				$storage = StorageProfilePeer::retrieveByPK($object->getDc());
+				if ($storage->getStatus() == StorageProfile::STORAGE_STATUS_AUTOMATIC)
+				{
+					return true;
+				}
+				KalturaLog::debug('Unable to consume deleted event; storageProfile status is not equal to '. StorageProfile::STORAGE_STATUS_AUTOMATIC );
+			}
+		}
+		return false;
 	}
 }
