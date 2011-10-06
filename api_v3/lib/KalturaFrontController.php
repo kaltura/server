@@ -326,28 +326,39 @@ class KalturaFrontController
 			switch($ex->getCode())
 			{
 				case kCoreException::MAX_CATEGORY_DEPTH_REACHED:
-		    		KalturaLog::err($ex);
 					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORY_DEPTH_REACHED, category::MAX_CATEGORY_DEPTH);
 					break;
 					
 				case kCoreException::MAX_NUMBER_OF_CATEGORIES_REACHED:
-		    		KalturaLog::err($ex);
 					$object = new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_CATEGORIES_REACHED, Partner::MAX_NUMBER_OF_CATEGORIES);
 					break;
 					
 				case kCoreException::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED:
-		    		KalturaLog::err($ex);
 					$object = new KalturaAPIException(KalturaErrors::MAX_NUMBER_OF_ACCESS_CONTROLS_REACHED, Partner::MAX_ACCESS_CONTROLS);
 					break;
 					
 				case kCoreException::MAX_CATEGORIES_PER_ENTRY:
-		    		KalturaLog::err($ex);
 					$object = new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, entry::MAX_CATEGORIES_PER_ENTRY);
 					break;
 					
 				case kCoreException::SOURCE_FILE_NOT_FOUND:
-		    		KalturaLog::err($ex);
 					$object = new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
+					break;
+					
+				case APIErrors::INVALID_ACTIONS_LIMIT:
+					$object = new KalturaAPIException(APIErrors::INVALID_ACTIONS_LIMIT);
+					break;
+					
+				case APIErrors::PRIVILEGE_IP_RESTRICTION:
+					$object = new KalturaAPIException(APIErrors::PRIVILEGE_IP_RESTRICTION);
+					break;
+					
+				case APIErrors::INVALID_SET_ROLE:
+					$object = new KalturaAPIException(APIErrors::INVALID_SET_ROLE);
+					break;
+					
+				case APIErrors::UNKNOWN_ROLE_ID:
+					$object = new KalturaAPIException(APIErrors::UNKNOWN_ROLE_ID);
 					break;
 					
 				default:
