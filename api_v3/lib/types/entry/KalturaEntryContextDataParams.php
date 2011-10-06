@@ -19,4 +19,9 @@ class KalturaEntryContextDataParams extends KalturaObject
 	 * @var string
 	 */
 	public $streamerType;
+	
+	/**
+	 * @var string
+	 */
+	public $mediaProtocol;
 }
