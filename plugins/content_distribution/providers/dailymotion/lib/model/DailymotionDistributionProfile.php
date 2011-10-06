@@ -3,24 +3,20 @@
  * @package plugins.dailymotionDistribution
  * @subpackage model
  */
-class DailymotionDistributionProfile extends DistributionProfile
+class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 {
 	const CUSTOM_DATA_USER = 'user';
 	const CUSTOM_DATA_PASSWORD = 'password';
-	const CUSTOM_DATA_METADATA_PROFILE_ID = 'metadataProfileId';	
-
 
 	const METADATA_FIELD_CATEGORY = 'DailymotionCategory';
 	const METADATA_FIELD_DESCRIPTION = 'DailymotionDescription';
 	const METADATA_FIELD_TAGS = 'DailymotionKeywords';
 
-	const ENTRY_NAME_MINIMUM_LENGTH = 1;
-	const ENTRY_NAME_MAXIMUM_LENGTH = 255;
-	const ENTRY_DESCRIPTION_MINIMUM_LENGTH = 1;
-	const ENTRY_DESCRIPTION_MAXIMUM_LENGTH = 2000;
-	const ENTRY_TAGS_MINIMUM_COUNT = 2;
-	const ENTRY_TAGS_MAXIMUM_LENGTH = 250;
-	const ENTRY_TAG_MINIMUM_LENGTH = 3;
+	const VIDEO_TITLE_MAXIMUM_LENGTH = 255;
+	const VIDEO_DESCRIPTION_MAXIMUM_LENGTH = 2000;
+	const VIDEO_TAGS_MINIMUM_COUNT = 2;
+	const VIDEO_TAGS_MAXIMUM_LENGTH = 250;
+	const VIDEO_TAG_MINIMUM_LENGTH = 3;
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -29,138 +25,14 @@ class DailymotionDistributionProfile extends DistributionProfile
 	{
 		return DailymotionDistributionPlugin::getProvider();
 	}
-			
-	/**
-	 * @param EntryDistribution $entryDistribution
-	 * @param int $action enum from DistributionAction
-	 * @param array $validationErrors
-	 * @param bool $validateDescription
-	 * @param bool $validateTags
-	 * @return array
-	 */
-	public function validateMetadataForSubmission(EntryDistribution $entryDistribution, $action, array $validationErrors, &$validateDescription, &$validateTags)
-	{
-		$validateDescription = true;
-		$validateTags = true;
-		
-		if(!class_exists('MetadataProfile'))
-			return $validationErrors;
-			
-		$metadataProfileId = $this->getMetadataProfileId();
-		if(!$metadataProfileId)
-		{
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY, '');
-			return $validationErrors;
-		}
-		
-		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, self::METADATA_FIELD_CATEGORY);
-		if(!$metadataProfileCategoryField)
-		{
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY, '');
-			return $validationErrors;
-		}
-		
-		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryDistribution->getEntryId());
-		if(!$metadata)
-		{
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY);
-			return $validationErrors;
-		}
-		
-		$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_CATEGORY);
-		
-		if(!count($values))
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, self::METADATA_FIELD_CATEGORY, '');
-			
-		foreach($values as $value)
-		{
-			if(!strlen($value))
-			{
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_CATEGORY, '');
-				return $validationErrors;
-			}
-		}
-		
-		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, self::METADATA_FIELD_DESCRIPTION);
-		if($metadataProfileCategoryField)
-		{
-			$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_DESCRIPTION);
-			
-			if(count($values))
-			{	
-				foreach($values as $value)
-				{
-					if(!strlen($value))
-						continue;
-				
-					$validateDescription = false;
-					
-					// validate entry description minumum length of 1 character
-					if(strlen($value) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
-					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_DESCRIPTION, 'Dailymotion description is too short');
-						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
-						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
-						$validationErrors[] = $validationError;
-					}
-					
-					// validate entry description minumum length of 1 character
-					if(strlen($value) > self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH)
-					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_DESCRIPTION, 'Dailymotion description is too long');
-						$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
-						$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH);
-						$validationErrors[] = $validationError;
-					}
-				}
-			}
-		}
-		
-		$metadataProfileCategoryField = MetadataProfileFieldPeer::retrieveByMetadataProfileAndKey($metadataProfileId, self::METADATA_FIELD_TAGS);
-		if($metadataProfileCategoryField)
-		{
-			$values = $this->findMetadataValue(array($metadata), self::METADATA_FIELD_TAGS);
-			
-			if(count($values) && strlen(implode('', $values)))
-			{	
-				$tags = implode(',', $values);
-				$tags = explode(',', $tags);
-				foreach($tags as &$temptag)
-					$temptag = trim($temptag);
-				unset($temptag);
-				
-				$tagsStr = implode(' , ', $tags);
-				$validateTags = false;
-			
-				if(strlen($tagsStr) > self::ENTRY_TAGS_MAXIMUM_LENGTH)
-				{
-					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tags is too long');
-					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
-					$validationError->setValidationErrorParam(self::ENTRY_TAGS_MAXIMUM_LENGTH);
-					$validationErrors[] = $validationError;
-				}
-				if(count($tags) < self::ENTRY_TAGS_MINIMUM_COUNT)
-				{
-					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, 'Dailymotion tags must contain at least ' . self::ENTRY_TAGS_MINIMUM_COUNT . ' tags');
-					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-					$validationError->setValidationErrorParam('Dailymotion tags must contain at least ' . self::ENTRY_TAGS_MINIMUM_COUNT . ' tags');
-					$validationErrors[] = $validationError;
-				}
-				foreach($tags as $tag)
-				{
-					if(strlen($tag) < self::ENTRY_TAG_MINIMUM_LENGTH)
-					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, self::METADATA_FIELD_TAGS, "Dailymotion tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
-						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-						$validationError->setValidationErrorParam("Dailymotion tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
-						$validationErrors[] = $validationError;
-					}
-				}
-			}
-		}
-		
-		return $validationErrors;
-	}
+	
+	public function getUser()			{return $this->getFromCustomData(self::CUSTOM_DATA_USER);}
+	public function getPassword()		{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
+
+	public function setUser($v)			{$this->putInCustomData(self::CUSTOM_DATA_USER, $v);}
+	public function setPassword($v)		{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
+	
+	
 			
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::validateForSubmission()
@@ -169,106 +41,140 @@ class DailymotionDistributionProfile extends DistributionProfile
 	{
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
 
-		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
-		if(!$entry)
-		{
-			KalturaLog::err("Entry [" . $entryDistribution->getEntryId() . "] not found");
-			$validationErrors[] = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, 'entry', 'entry not found');
-			return $validationErrors;
+		$maxLengthFields = array (
+		    DailymotionDistributionField::VIDEO_TITLE => self::VIDEO_TITLE_MAXIMUM_LENGTH,
+		    DailymotionDistributionField::VIDEO_DESCRIPTION => self::VIDEO_DESCRIPTION_MAXIMUM_LENGTH,
+		);
+		
+		$allFieldValues = $this->getAllFieldValues($entryDistribution);
+		if (!$allFieldValues || !is_array($allFieldValues)) {
+		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
+		    return $validationErrors;
 		}
 		
-		// validate entry name minumum length of 1 character
-		if(strlen($entry->getName()) < self::ENTRY_NAME_MINIMUM_LENGTH)
-		{
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, 'Name is too short');
-			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
-			$validationError->setValidationErrorParam(self::ENTRY_NAME_MINIMUM_LENGTH);
-			$validationErrors[] = $validationError;
-		}
-		
-		if(strlen($entry->getName()) > self::ENTRY_NAME_MAXIMUM_LENGTH)
-		{
-			$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::NAME, 'Name is too long');
-			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
-			$validationError->setValidationErrorParam(self::ENTRY_NAME_MAXIMUM_LENGTH);
-			$validationErrors[] = $validationError;
-		}
-		
-		$validateDescription = true;
-		$validateTags = true;
-		$validationErrors = $this->validateMetadataForSubmission($entryDistribution, $action, $validationErrors, $validateDescription, $validateTags);
-		
-		if($validateDescription)
-		{
-			if(!strlen($entry->getDescription()))
-			{
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, entryPeer::DESCRIPTION, 'Description is empty');
-			}
-			elseif(strlen($entry->getDescription()) < self::ENTRY_DESCRIPTION_MINIMUM_LENGTH)
-			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::DESCRIPTION, 'Description is too short');
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_SHORT);
-				$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MINIMUM_LENGTH);
-				$validationErrors[] = $validationError;
-			}
-			elseif(strlen($entry->getDescription()) > self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH)
-			{
-				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::DESCRIPTION, 'Description is too long');
-				$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
-				$validationError->setValidationErrorParam(self::ENTRY_DESCRIPTION_MAXIMUM_LENGTH);
-				$validationErrors[] = $validationError;
-			}
-		}
+		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
+	    
+		$videoTagsValue = isset($allFieldValues[DailymotionDistributionField::VIDEO_TAGS]) ? $allFieldValues[DailymotionDistributionField::VIDEO_TAGS] : null;
+		$validationErrors = array_merge($validationErrors, $this->validateTags($videoTagsValue, $action));
 	
-		if($validateTags)
-		{
-			if(!strlen($entry->getTags()))
-			{
-				$validationErrors[] = $this->createValidationError($action, DistributionErrorType::MISSING_METADATA, entryPeer::TAGS, 'Tags is empty');
-			}
-			else
-			{
-				$tags = explode(',', $entry->getTags());
-				foreach($tags as &$temptag)
-					$temptag = trim($temptag);
-				unset($temptag);
-				$tagsStr = implode(' , ', $tags);
-				
-				if(strlen($tagsStr) > self::ENTRY_TAGS_MAXIMUM_LENGTH)
-				{
-					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Entry tags is too long');
-					$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
-					$validationError->setValidationErrorParam(self::ENTRY_TAGS_MAXIMUM_LENGTH);
-					$validationErrors[] = $validationError;
-				}
-				if(count($tags) < self::ENTRY_TAGS_MINIMUM_COUNT)
-				{
-					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, 'Entry tags must contain at least ' . self::ENTRY_TAGS_MINIMUM_COUNT . ' tags');
-					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-					$validationError->setValidationErrorParam('Entry tags must contain at least ' . self::ENTRY_TAGS_MINIMUM_COUNT . ' tags');
-					$validationErrors[] = $validationError;
-				}
-				foreach($tags as $tag)
-				{
-					if(strlen($tag) < self::ENTRY_TAG_MINIMUM_LENGTH)
-					{
-						$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, entryPeer::TAGS, "Entry tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
-						$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
-						$validationError->setValidationErrorParam("Entry tag [$tag] must contain at least " . self::ENTRY_TAG_MINIMUM_LENGTH . " characters");
-						$validationErrors[] = $validationError;
-					}
-				}
-			}
-		}
-		
 		return $validationErrors;
 	}
 	
-	public function getUser()					{return $this->getFromCustomData(self::CUSTOM_DATA_USER);}
-	public function getPassword()				{return $this->getFromCustomData(self::CUSTOM_DATA_PASSWORD);}
-	public function getMetadataProfileId()		{return $this->getFromCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID);}
 	
-	public function setUser($v)				{$this->putInCustomData(self::CUSTOM_DATA_USER, $v);}
-	public function setPassword($v)				{$this->putInCustomData(self::CUSTOM_DATA_PASSWORD, $v);}
-	public function setMetadataProfileId($v)	{$this->putInCustomData(self::CUSTOM_DATA_METADATA_PROFILE_ID, $v);}
+	protected function validateTags($videoTagsValue, $action)
+	{
+	    $validationErrors = array();
+	    if (!empty($videoTagsValue) && strlen($videoTagsValue) > 0)
+		{
+		    $userFriendlyTagsFieldName = $this->getUserFriendlyFieldName(DailymotionDistributionField::VIDEO_TAGS);
+		    $tagsArray = array_map('trim', explode(',', $videoTagsValue));
+            $tagsStr = implode(' , ', $tagsArray);
+            
+		    if(strlen($tagsStr) > self::VIDEO_TAGS_MAXIMUM_LENGTH)
+			{
+			    $validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $userFriendlyTagsFieldName);
+    			$validationError->setValidationErrorType(DistributionValidationErrorType::STRING_TOO_LONG);
+    			$validationError->setValidationErrorParam(self::VIDEO_TAGS_MAXIMUM_LENGTH);
+    			$validationErrors[] = $validationError;
+			}
+			if(count($tagsArray) < self::VIDEO_TAGS_MINIMUM_COUNT)
+			{
+			    $errorDescription = $userFriendlyTagsFieldName.' must contain at least ' . self::VIDEO_TAGS_MINIMUM_COUNT . ' tags';
+				$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $userFriendlyTagsFieldName, $errorDescription);
+				$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+				$validationError->setValidationErrorParam($errorDescription);
+				$validationErrors[] = $validationError;
+			}
+			
+		    foreach($tagsArray as $tag)
+			{
+				if(strlen($tag) < self::VIDEO_TAG_MINIMUM_LENGTH)
+				{
+				    $errorDescription = $userFriendlyTagsFieldName.' ['.$tag.'] must contain at least '.self::VIDEO_TAG_MINIMUM_LENGTH.' characters';
+					$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $userFriendlyTagsFieldName, $errorDescription);
+					$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+					$validationError->setValidationErrorParam($errorDescription);
+					$validationErrors[] = $validationError;
+				}
+			}
+		    
+		}
+		return $validationErrors;
+	}
+
+	
+	protected function getDefaultFieldConfigArray()
+	{	    
+	    $fieldConfigArray = array();
+	      
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_TITLE);
+	    $fieldConfig->setUserFriendlyFieldName('Entry name');
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
+	    $fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_DESCRIPTION);
+	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_DESCRIPTION.' / Entry description');
+	    $fieldConfig->setEntryMrssXslt('
+        			<xsl:choose>
+                    	<xsl:when test="'.self::METADATA_FIELD_DESCRIPTION.' != \'\'">
+                    		<xsl:value-of select="'.self::METADATA_FIELD_DESCRIPTION.'" />
+                    	</xsl:when>
+                    	<xsl:otherwise>
+                    		<xsl:value-of select="string(description)" />
+                    	</xsl:otherwise>
+                    </xsl:choose>');
+	    $fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_TAGS);
+	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_TAGS.' / Entry tags');
+	    $fieldConfig->setEntryMrssXslt(
+	                '<xsl:choose>
+                    	<xsl:when test="'.self::METADATA_FIELD_TAGS.' != \'\'">
+                    		<xsl:value-of select="normalize-space('.self::METADATA_FIELD_TAGS.')" />
+                    	</xsl:when>
+                    	<xsl:otherwise>
+                    		<xsl:for-each select="tags/tag">
+                    			<xsl:if test="position() &gt; 1">
+                    				<xsl:text>,</xsl:text>
+                    			</xsl:if>
+                    			<xsl:value-of select="normalize-space(.)" />
+                    		</xsl:for-each>
+                    	</xsl:otherwise>
+                    </xsl:choose>');
+	    $fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setUpdateParams(array(entryPeer::TAGS));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_CHANNEL);
+	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_CATEGORY);
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_CATEGORY.'" />');
+	    $fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_CATEGORY."']"));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_LANGUAGE);
+	    $fieldConfig->setUserFriendlyFieldName('Video language');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text>en</xsl:text>');
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+
+	    return $fieldConfigArray;
+	}
 }

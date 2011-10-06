@@ -3,20 +3,18 @@
  * @package plugins.dailymotionDistribution
  * @subpackage api.objects
  */
-class KalturaDailymotionDistributionJobProviderData extends KalturaDistributionJobProviderData
+class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableDistributionJobProviderData
 {
 	/**
 	 * @var string
 	 */
 	public $videoAssetFilePath;
 	
-	/**
-	 * @var string
-	 */
-	public $thumbAssetFilePath;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
+	    parent::__construct($distributionJobData);
+	    
 		if(!$distributionJobData)
 			return;
 			
@@ -35,12 +33,6 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaDistributionJ
 			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
 		}
 		
-		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
-		if(count($thumbAssets))
-		{
-			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
-		}
 	}
 
 
@@ -48,7 +40,6 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaDistributionJ
 	private static $map_between_objects = array
 	(
 		"videoAssetFilePath",
-		"thumbAssetFilePath"	
 	);
 
 	public function getMapBetweenObjects ( )
@@ -65,26 +56,10 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaDistributionJ
 	}
 
 	/**
-	 * @return string $thumbAssetFilePath
-	 */
-	public function getThumbAssetFilePath()
-	{
-		return $this->thumbAssetFilePath;
-	}
-
-	/**
 	 * @param string $videoAssetFilePath
 	 */
 	public function setVideoAssetFilePath($videoAssetFilePath)
 	{
 		$this->videoAssetFilePath = $videoAssetFilePath;
 	}
-
-	/**
-	 * @param string $thumbAssetFilePath
-	 */
-	public function setThumbAssetFilePath($thumbAssetFilePath)
-	{
-		$this->thumbAssetFilePath = $thumbAssetFilePath;
-	}	
 }

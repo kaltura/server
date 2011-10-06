@@ -3,10 +3,13 @@
  * @package plugins.dailymotionDistribution
  * @subpackage admin
  */
-class Form_DailymotionProfileConfiguration extends Form_ProviderProfileConfiguration
+class Form_DailymotionProfileConfiguration extends Form_ConfigurableProfileConfiguration
 {
 	protected function addProviderElements()
 	{
+	    $this->setDescription(null);
+	    
+	    
 		$element = new Zend_Form_Element_Hidden('providerElements');
 		$element->setLabel('Dailymotion Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
@@ -20,8 +23,6 @@ class Form_DailymotionProfileConfiguration extends Form_ProviderProfileConfigura
 		$this->addElement('text', 'password', array(
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addMetadataProfile();		
+		));		
 	}
 }

@@ -3,7 +3,7 @@
  * @package plugins.dailymotionDistribution
  * @subpackage api.objects
  */
-class KalturaDailymotionDistributionProfile extends KalturaDistributionProfile
+class KalturaDailymotionDistributionProfile extends KalturaConfigurableDistributionProfile
 {
 	/**
 	 * @var string
@@ -14,12 +14,6 @@ class KalturaDailymotionDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $password;
-
-	/**
-	 * @var int
-	 */
-	public $metadataProfileId;
-	
 			
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -28,7 +22,6 @@ class KalturaDailymotionDistributionProfile extends KalturaDistributionProfile
 	(
 		'user',
 		'password',
-		'metadataProfileId'
 	);
 		 
 	public function getMapBetweenObjects()

@@ -3,7 +3,7 @@
  * @package plugins.dailymotionDistribution
  * @subpackage lib
  */
-class DailymotionDistributionProvider implements IDistributionProvider
+class DailymotionDistributionProvider extends ConfigurableDistributionProvider
 {
 	/**
 	 * @var DailymotionDistributionProvider
@@ -123,25 +123,5 @@ class DailymotionDistributionProvider implements IDistributionProvider
 	public function getJobIntervalBeforeSunset()
 	{
 		return 0;
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
-	 */
-	public function getUpdateRequiredEntryFields($distributionProfileId = null)
-	{
-		return array(entryPeer::NAME, entryPeer::DESCRIPTION, entryPeer::TAGS);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getUpdateRequiredMetadataXPaths()
-	 */
-	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
-	{
-		return array(
-			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_CATEGORY."']",
-			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_DESCRIPTION."']",
-			"/*[local-name()='metadata']/*[local-name()='".DailymotionDistributionProfile::METADATA_FIELD_TAGS."']",
-		);
 	}
 }

@@ -9,11 +9,6 @@ class kDailymotionDistributionJobProviderData extends kDistributionJobProviderDa
 	 * @var string
 	 */
 	public $videoAssetFilePath;
-	
-	/**
-	 * @var string
-	 */
-	public $thumbAssetFilePath;
 
 		/**
 	 * @return string $videoAssetFilePath
@@ -24,27 +19,10 @@ class kDailymotionDistributionJobProviderData extends kDistributionJobProviderDa
 	}
 
 	/**
-	 * @return string $thumbAssetFilePath
-	 */
-	public function getThumbAssetFilePath()
-	{
-		return $this->thumbAssetFilePath;
-	}
-
-	/**
 	 * @param string $videoAssetFilePath
 	 */
 	public function setVideoAssetFilePath($videoAssetFilePath)
 	{
 		$this->videoAssetFilePath = $videoAssetFilePath;
 	}
-
-	/**
-	 * @param string $thumbAssetFilePath
-	 */
-	public function setThumbAssetFilePath($thumbAssetFilePath)
-	{
-		$this->thumbAssetFilePath = $thumbAssetFilePath;
-	}	
-
 }

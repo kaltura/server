@@ -2,7 +2,7 @@
 /**
  * @package plugins.dailymotionDistribution
  */
-class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
+class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'dailymotionDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
@@ -102,10 +102,6 @@ class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPer
 			}
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(DailymotionDistributionProviderType::DAILYMOTION))
 		{
 			$reflect = new ReflectionClass('KalturaDailymotionDistributionJobProviderData');
@@ -180,10 +176,6 @@ class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPer
 				return 'Kaltura_Client_DailymotionDistribution_Type_DailymotionDistributionProfile';
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(DailymotionDistributionProviderType::DAILYMOTION))
 			return 'KalturaDailymotionDistributionJobProviderData';
 	
@@ -247,5 +239,16 @@ class DailymotionDistributionPlugin extends KalturaPlugin implements IKalturaPer
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }

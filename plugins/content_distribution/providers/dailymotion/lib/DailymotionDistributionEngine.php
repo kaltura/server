@@ -19,6 +19,8 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	
 	protected $connectTimeout = 15;
 	
+	protected $fieldValues;
+	
 	/* (non-PHPdoc)
 	 * @see DistributionEngine::configure()
 	 */
@@ -62,29 +64,17 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	 * @param KalturaDailymotionDistributionProfile $distributionProfile
 	 * @return array()
 	 */
-	public function getDailymotionProps(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaDailymotionDistributionProfile $distributionProfile, $enabled = null)
-	{	
-		$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, KalturaMetadataObjectType::ENTRY, $distributionProfile->metadataProfileId);
-	
-		$description = $entry->description;
-		$metadataDescription = $this->findMetadataValue($metadataObjects, 'DailymotionDescription');
-		if($metadataDescription && strlen($metadataDescription))
-			$description = $metadataDescription;
-	
-		$tags = $entry->tags;
-		$metadataTags = $this->findMetadataValue($metadataObjects, 'DailymotionKeywords');
-		if($metadataTags && strlen($metadataTags))
-			$tags = $metadataTags;
-		
+	public function getDailymotionProps($enabled = null)
+	{
 		$props = array();
-		$props['tags'] = str_replace(',', ' , ', $tags);
-		$props['title'] = $entry->name;
-		$props['channel'] = $this->getCategory($metadataObjects);
-		$props['description'] = $description;
+		$props['tags'] = str_replace(',', ' , ', $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_TAGS));
+		$props['title'] = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_TITLE);
+		$props['channel'] = $this->translateCategory($this->getValueForField(KalturaDailymotionDistributionField::VIDEO_CHANNEL));
+		$props['description'] = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_DESCRIPTION);
 		//$props['date'] = time();
-		$props['language'] = 'en';
-		$props['published']= true;
+		$props['language'] = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_LANGUAGE);
 		
+		$props['published']= true;
 		if(!is_null($enabled))
 			$props['private']= !$enabled;
 
@@ -105,20 +95,19 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		return $category;
 	}
 	
-	protected function getCategory($metadataObjects)
-	{
-		return $this->translateCategory($this->findMetadataValue($metadataObjects, 'DailymotionCategory'));
-	}
 	
 	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaDailymotionDistributionProfile $distributionProfile)
 	{	
+	    $this->fieldValues = unserialize($data->providerData->fieldValues);
+	    
 		$enabled = false;
 		if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 			$enabled = true;
 		
 		$needDel = false;
-		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getDailymotionProps($entry, $data, $distributionProfile, $enabled);
+
+		$props = $this->getDailymotionProps($enabled);
+		
 		if($data->entryDistribution->remoteId)
 		{
 			$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
@@ -234,8 +223,9 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	
 	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaDailymotionDistributionProfile $distributionProfile, $enabled = null)
 	{
-		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getDailymotionProps($entry, $data, $distributionProfile, $enabled);
+	    $this->fieldValues = unserialize($data->providerData->fieldValues);
+	    
+		$props = $this->getDailymotionProps($enabled);
 	
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
 		$this->configureTimeouts($dailyMotionImpl);
@@ -275,5 +265,14 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$dailyMotionImpl->setOption('connectionTimeout', $this->connectTimeout);
 		KalturaLog::info('Setting request timeout to ' . $this->requestTimeout . ' seconds');
 		$dailyMotionImpl->setOption('timeout', $this->requestTimeout);
+	}
+	
+	
+	private function getValueForField($fieldName)
+	{
+	    if (isset($this->fieldValues[$fieldName])) {
+	        return $this->fieldValues[$fieldName];
+	    }
+	    return null;
 	}
 }
