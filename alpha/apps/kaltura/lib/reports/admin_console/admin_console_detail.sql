@@ -6,12 +6,12 @@ SELECT
 	aggr_p.partner_package "partner package",
 	aggr_p.count_loads "count loads",
 	aggr_p.count_plays "count plays",
-	(aggr_p.count_video + aggr_p.count_audio + aggr_p.count_image) "count media",
+	(aggr_p.new_videos + aggr_p.new_audios + aggr_p.new_images) "count media",
 	all_time_aggr.count_media_all_time "count media all time",
-	aggr_p.count_video "count video",
-	aggr_p.count_image "count image",
-	aggr_p.count_audio "count audio",
-	aggr_p.count_mix "count mix",
+	aggr_p.new_videos "count video",
+	aggr_p.new_images "count image",
+	aggr_p.new_audios "count audio",
+	0 "count mix",
 	FLOOR(aggr_p.count_bandwidth / 1024) "count bandwidth mb",
 	aggr_p.count_storage "count storage mb",
 	IFNULL(kalturadw.calc_partner_storage_data_time_range({FROM_DATE_ID}, {TO_DATE_ID}, aggr_p.partner_id), 0) "storage all time mb"
@@ -24,17 +24,16 @@ FROM
 	media_usage.partner_id, 
 	count_loads, 
 	count_plays, 
-	count_video, 
-	count_audio, 
-	count_mix, 
-	count_image, 
+	new_videos, 
+	new_audios, 
+	new_images, 
 	count_bandwidth, 
 	count_storage FROM 
 	(	SELECT	partner_status_id STATUS, partner_name, created_at, partner_package,
 	    	dim_partner.partner_id partner_id,	IFNULL(SUM(count_loads), 0) count_loads,
-			IFNULL(SUM(count_plays), 0) count_plays, IFNULL(SUM(count_video), 0) count_video,
-			IFNULL(SUM(count_audio), 0) count_audio, IFNULL(SUM(count_mix), 0) count_mix,
-			IFNULL(SUM(count_image), 0) count_image
+			IFNULL(SUM(count_plays), 0) count_plays, IFNULL(SUM(new_videos), 0) new_videos,
+			IFNULL(SUM(new_audios), 0) new_audios,
+			IFNULL(SUM(new_images), 0) new_images
 		FROM kalturadw.dwh_dim_partners dim_partner 
 		LEFT JOIN kalturadw.dwh_hourly_partner aggr_partner  
 		ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id BETWEEN {FROM_DATE_ID} AND {TO_DATE_ID})
@@ -55,8 +54,8 @@ FROM
 ) aggr_p,
 (
 	SELECT	dim_partner.partner_id, 
-		SUM(IFNULL(count_video, 0) + IFNULL(count_audio, 0) + IFNULL(count_image, 0)) count_media_all_time
-	FROM kalturadw.dwh_hourly_partner aggr_partner RIGHT JOIN kalturadw.dwh_dim_partners dim_partner ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id <= 20110101)
+		SUM(IFNULL(new_videos, 0) + IFNULL(new_audios, 0) + IFNULL(new_images, 0)) count_media_all_time
+	FROM kalturadw.dwh_hourly_partner aggr_partner RIGHT JOIN kalturadw.dwh_dim_partners dim_partner ON (aggr_partner.partner_id = dim_partner.partner_id AND aggr_partner.date_id <= {TO_DATE_ID})
 	WHERE {OBJ_ID_CLAUSE} AND
 	dim_partner.created_date_id <= {TO_DATE_ID}
 	GROUP BY dim_partner.partner_id
