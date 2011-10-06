@@ -1335,8 +1335,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$conversionProfileFilter = new KalturaConversionProfileAssetParamsFilter();
 		$conversionProfileFilter->conversionProfileIdEqual = $conversionProfileId;
 		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		
 		$this->impersonate();
-		$allFlavorParams = $this->kClient->conversionProfileAssetParams->listAction($conversionProfileFilter);
+		$allFlavorParams = $this->kClient->conversionProfileAssetParams->listAction($conversionProfileFilter, $pager);
 		$this->unimpersonate();
 		$allFlavorParams = $allFlavorParams->objects;
 		
