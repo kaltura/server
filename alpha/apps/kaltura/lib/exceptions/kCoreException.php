@@ -6,7 +6,7 @@ class kCoreException extends Exception
 {
 	public function __construct($message, $code)
 	{
-		KalturaLog::err($message);
+		KalturaLog::err('Message: '. $message .' \nCode: '.$code);
 		$this->message = $message;
 		$this->code = $code;
 	}
