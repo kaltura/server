@@ -79,7 +79,7 @@ class kDataCenterMgr
 	
 	public static function getRemoteDcExternalUrl ( FileSync $file_sync )
 	{
-		KalturaLog::log(__METHOD__." - file_sync [{$file_sync->getId()}]]");
+		KalturaLog::log("File Sync [{$file_sync->getId()}]]");
 		$dc_id = $file_sync->getDc();
 		$dc = self::getDcById ( $dc_id );
 		$external_url = $dc["external_url"];
@@ -88,7 +88,7 @@ class kDataCenterMgr
 
 	public static function getRemoteDcExternalUrlByDcId ( $dc_id )
 	{
-		KalturaLog::log(__METHOD__." - dc_id [{$dc_id}]]");
+		KalturaLog::log("DC id [{$dc_id}]]");
 		$dc = self::getDcById ( $dc_id );
 		$external_url = $dc["external_url"];
 		return $external_url;
@@ -98,14 +98,14 @@ class kDataCenterMgr
 	{
 		$remote_external_url = self::getRemoteDcExternalUrl ( $file_sync );
 		$remote_url =  $remote_external_url . $_SERVER['REQUEST_URI'];
-		KalturaLog::log ( __METHOD__ . ": URL to redirect to [$remote_url]" );
+		KalturaLog::log ("URL to redirect to [$remote_url]" );
 		
 		return $remote_url;
 	}
 	
 	public static function createCmdForRemoteDataCenter(FileSync $fileSync)
 	{
-		KalturaLog::log(__METHOD__." - fileSync [{$fileSync->getId()}]");
+		KalturaLog::log("File Sync [{$fileSync->getId()}]");
 		$remoteUrl = self::getInternalRemoteUrl($fileSync); 
 		$locaFilePath = self::getLocalTempPathForFileSync($fileSync);
 		$cmdLine = kConf::get( "bin_path_curl" ) . ' -L -o"'.$locaFilePath.'" "'.$remoteUrl.'"';
@@ -119,7 +119,7 @@ class kDataCenterMgr
 	
 	public static function getInternalRemoteUrl(FileSync $file_sync)
 	{
-		KalturaLog::log(__METHOD__." - file_sync [{$file_sync->getId()}]");
+		KalturaLog::log("File Sync [{$file_sync->getId()}]");
 		// LOG retrieval
 
 		$dc =  self::getDcById ( $file_sync->getDc() );
@@ -170,7 +170,7 @@ class kDataCenterMgr
 	 */
 	public static function serveFileToRemoteDataCenter ( $file_sync_id , $file_hash, $file_name )
 	{
-		KalturaLog::log(__METHOD__." - file_sync_id [$file_sync_id], file_hash [$file_hash], file_name [$file_name]");
+		KalturaLog::log("File sync id [$file_sync_id], file_hash [$file_hash], file_name [$file_name]");
 		// TODO - verify security
 		
 		$current_dc = self::getCurrentDc();
@@ -180,14 +180,14 @@ class kDataCenterMgr
 		if ( ! $file_sync )
 		{
 			$error = "DC[$current_dc_id]: Cannot find FileSync with id [$file_sync_id]";
-			KalturaLog::log(__METHOD__." - $error");
+			KalturaLog::err($error);
 			throw new Exception ($error);
 		}
 		
 		if ( $file_sync->getDc() != $current_dc_id )
 		{
 			$error = "DC[$current_dc_id]: FileSync with id [$file_sync_id] does not belong to this DC";
-			KalturaLog::log(__METHOD__." - $error"); 
+			KalturaLog::err($error); 
 			throw new Exception ( $error );
 		}
 		
@@ -209,7 +209,7 @@ class kDataCenterMgr
 		{
 			$file_name_msg = $file_name ? "file name [$file_name] " : '';
 			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist";
-			KalturaLog::log(__METHOD__." - $error"); 
+			KalturaLog::err($error); 
 			throw new Exception ( $error );	
 		}
 		
@@ -218,13 +218,13 @@ class kDataCenterMgr
 		if ( $file_hash != $expected_file_hash )  
 		{
 			$error = "DC[$current_dc_id]: FileSync with id [$file_sync_id] - invalid hash";
-			KalturaLog::log(__METHOD__." - $error"); 
+			KalturaLog::err($error); 
 			throw new Exception ( $error );			
 		}
 				
 		if ($fileSyncIsDir && is_dir($resolvedPath))
 		{
-			KalturaLog::log(__METHOD__." - serving directory content from [".$resolvedPath."]");
+			KalturaLog::log("Serving directory content from [".$resolvedPath."]");
 			$contents = kFile::listDir($resolvedPath);
 			sort($contents, SORT_STRING);
 			$contents = serialize($contents);
@@ -234,7 +234,7 @@ class kDataCenterMgr
 		}
 		else
 		{
-			KalturaLog::log(__METHOD__." - serving file from [".$resolvedPath."]");
+			KalturaLog::log("Serving file from [".$resolvedPath."]");
 			kFile::dumpFile( $resolvedPath );
 		}
 		
