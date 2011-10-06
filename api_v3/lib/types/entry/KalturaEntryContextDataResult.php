@@ -61,5 +61,5 @@ class KalturaEntryContextDataResult extends KalturaObject
 	 *
 	 * @var string
 	 */
-	public $storageProfileIds;
+	public $storageProfilesXML;
 }
