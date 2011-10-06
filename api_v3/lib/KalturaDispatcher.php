@@ -119,7 +119,7 @@ class KalturaDispatcher
 		if (kCurrentContext::$is_admin_session)
 			return;
 
-		KalturaLog::
+		KalturaLog::debug("user validation running");
 			
 		$objectGetters = null;
 		if(strstr($objectClass, '::'))
