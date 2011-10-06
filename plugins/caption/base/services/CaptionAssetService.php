@@ -47,7 +47,7 @@ class CaptionAssetService extends KalturaAssetService
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
     	
-		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 			
     	if($captionAsset->captionParamsId)
     	{
@@ -94,7 +94,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbEntry = $dbCaptionAsset->getentry();
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
-		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
    		$previousStatus = $dbCaptionAsset->getStatus();
 		$contentResource->validateEntry($dbCaptionAsset->getentry());
@@ -137,7 +137,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbEntry = $dbCaptionAsset->getentry();
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
-		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
     	$dbCaptionAsset = $captionAsset->toUpdatableObject($dbCaptionAsset);
     	$dbCaptionAsset->save();
@@ -478,7 +478,7 @@ class CaptionAssetService extends KalturaAssetService
 		$entry = $captionAsset->getentry();
     	if(!$entry || $entry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($entry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
-		//$this->checkIfUserAllowedToUpdateEntry($entry);
+		
 		
 		$entryKuserId = $entry->getKuserId();
 		$thisKuserId = $this->getKuser()->getId();
@@ -576,7 +576,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbEntry = $captionAssetDb->getentry();
     	if(!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAssetDb->getEntryId());
-		//$this->checkIfUserAllowedToUpdateEntry($dbEntry);
+		
 		
 		$captionAssetDb->setStatus(CaptionAsset::ASSET_STATUS_DELETED);
 		$captionAssetDb->setDeletedAt(time());
