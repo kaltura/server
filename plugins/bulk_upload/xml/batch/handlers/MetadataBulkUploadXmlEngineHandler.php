@@ -103,6 +103,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		$metadataFilter = new KalturaMetadataFilter();
 		$metadataFilter->metadataObjectTypeEqual = $this->objectType;
 		$metadataFilter->objectIdEqual = $objectId;
+		$metadataFilter->metadataProfileIdEqual = $metadataProfileId;
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 1;
