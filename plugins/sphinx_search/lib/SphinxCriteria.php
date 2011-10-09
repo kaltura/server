@@ -153,8 +153,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 		$stmt = $pdo->query($sql);
 		if(!$stmt)
 		{
-			KalturaLog::err("Invalid sphinx query [$sql]");
-			return;
+			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
+			throw new kCoreException("Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 		}
 		
 		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 2);

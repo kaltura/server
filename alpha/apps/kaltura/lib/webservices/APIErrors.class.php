@@ -10,6 +10,8 @@ class APIErrors
 	
 	const INTERNAL_DATABASE_ERROR = "INTERNAL_DATABASE_ERROR,Internal database error";
 	
+	const SEARCH_ENGINE_QUERY_FAILED = "SEARCH_ENGINE_QUERY_FAILED,Search engine query failed";
+	
 	const SERVERL_ERROR = "SERVERL_ERROR,Server error %s";
 	
 	const MISSING_KS ="MISSING_KS,Missing KS. Session not established";

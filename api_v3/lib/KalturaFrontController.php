@@ -361,6 +361,10 @@ class KalturaFrontController
 					$object = new KalturaAPIException(APIErrors::UNKNOWN_ROLE_ID);
 					break;
 					
+				case APIErrors::SEARCH_ENGINE_QUERY_FAILED:
+					$object = new KalturaAPIException(APIErrors::SEARCH_ENGINE_QUERY_FAILED);
+					break;
+					
 				default:
 		    		KalturaLog::crit($ex);
 					$object = new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
