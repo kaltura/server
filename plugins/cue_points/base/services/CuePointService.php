@@ -216,6 +216,7 @@ class CuePointService extends KalturaBaseService
 	 * @param KalturaCuePoint $cuePoint
 	 * @return KalturaCuePoint
 	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
+	 * @validateUser CuePoint id editcuepoint
 	 */
 	function updateAction($id, KalturaCuePoint $cuePoint)
 	{
@@ -249,6 +250,7 @@ class CuePointService extends KalturaBaseService
 	 * @action delete
 	 * @param string $id 
 	 * @throws KalturaCuePointErrors::INVALID_CUE_POINT_ID
+	 * @validateUser CuePoint id editcuepoint
 	 */		
 	function deleteAction($id)
 	{
