@@ -82,7 +82,7 @@ class KalturaDispatcher
 //			// TODO maybe if missing should throw something, maybe a bone?
 //			if(!isset($actionParams[$actionInfo->validateUserIdParamName]))
 //				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $actionInfo->validateUserIdParamName);
-			
+			KalturaLog::debug("validateUserIdParamName: ".$actionInfo->validateUserIdParamName);
 			$objectId = $actionParams[$actionInfo->validateUserIdParamName];
 			$this->validateUser($actionInfo->validateUserObjectClass, $objectId, $actionInfo->validateUserPrivilege);
 		}
@@ -120,7 +120,7 @@ class KalturaDispatcher
 			return;
 
 		KalturaLog::debug("user validation running");
-			
+		KalturaLog::debug($objectClass);
 		$objectGetters = null;
 		if(strstr($objectClass, '::'))
 		{
@@ -164,6 +164,13 @@ class KalturaDispatcher
 			// check if object id is privileged
 			if (kCurrentContext::$ks_object->verifyPrivileges($privilege, $dbObject->getId()))
 				return;
+				
+			if ($privilege == ks::PRIVILEGE_EDIT)
+			{
+				// check if entryID in playlist and 'editplaylist' privilege
+				if ($this->getKs()->verifyPlaylistPrivileges(ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST, $dbObject->getId(), $dbObject->getPartnerId()))
+					return;
+			}
 		}
 				
 		if ($dbObject->getPuserId() != kCurrentContext::$uid)
