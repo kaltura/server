@@ -444,10 +444,20 @@ class ks
 			return strpos ( $this->privileges,  $required_priv_name ) !== FALSE ;
 
 		// either the original privileges were general - with a value of a wildcard
-		return
-			( $this->privileges == self::PRIVILEGE_WILDCARD ) ||
-			( strpos ( $this->privileges,  $required_priv_name . ":" . self::PRIVILEGE_WILDCARD ) !== FALSE ) ||
-			( strpos ( $this->privileges,  $required_priv_name . ":" . $required_priv_value ) !== FALSE );
+		if ( ( $this->privileges == self::PRIVILEGE_WILDCARD ) || 
+			 ( strpos ( $this->privileges,  $required_priv_name . ":" . self::PRIVILEGE_WILDCARD ) !== FALSE ) ||
+			 ( strpos ( $this->privileges,  $required_priv_name . ":" . $required_priv_value ) !== FALSE ) )
+			 {
+			 	return true;
+			 }
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		if ( $required_priv_name == ks::PRIVILEGE_EDIT && 
+			$this->verifyPlaylistPrivileges(ks::PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST, $required_priv_value, $partnerId))
+		{
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public function verifyPlaylistPrivileges($required_priv_name, $entryId, $partnerId)
