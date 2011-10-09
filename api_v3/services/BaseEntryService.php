@@ -750,7 +750,7 @@ class BaseEntryService extends KalturaEntryService
 		if($contextDataParams->streamerType && $contextDataParams->streamerType != StorageProfile::PLAY_FORMAT_AUTO)
 		{
 			$result->streamerType = $contextDataParams->streamerType;
-			$result->mediaProtocol = $contextDataParams->mediaProtocol;
+			$result->mediaProtocol = $contextDataParams->mediaProtocol ? $contextDataParams->mediaProtocol : $contextDataParams->streamerType;
 		}
 		else
 		{
