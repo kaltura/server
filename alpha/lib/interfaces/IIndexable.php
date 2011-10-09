@@ -10,12 +10,6 @@ interface IIndexable extends IBaseObject
 	const FIELD_TYPE_DATETIME = 'datetime';
 	
 	/**
-	 * Is the id as used and know by Kaltura
-	 * @return string
-	 */
-	public function getId();
-	
-	/**
 	 * Is the id as used and know by the indexing server
 	 * @return int
 	 */

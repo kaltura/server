@@ -8,11 +8,6 @@ interface IOwnable extends IBaseObject
 	/**
 	 * @return string
 	 */
-	public function getId();
-	
-	/**
-	 * @return string
-	 */
 	public function getPuserId();
 	
 	/**
