@@ -1102,7 +1102,7 @@ class kJobsManager
 		{
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entryId);
-			$batchJob->setPartnerId($partner);
+			$batchJob->setPartnerId($partner->getId());
 		}
 		
 		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath()); 

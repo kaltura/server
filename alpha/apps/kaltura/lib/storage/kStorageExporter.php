@@ -278,7 +278,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				break;
 		}
 		
-		kJobsManager::addStorageDeleteJob($raisedJob, $entryId, $object->getPartnerId(), $syncKey);		
+		$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
+		
+		kJobsManager::addStorageDeleteJob($raisedJob, $entryId ,$partner, $syncKey);		
 	}
 	
 	/**
