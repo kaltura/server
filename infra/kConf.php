@@ -1,6 +1,11 @@
 <?php
 setlocale(LC_ALL, 'en_US.UTF-8');
 
+/**
+ * Manages all Kaltura configurations
+ * @package infra
+ * @subpackage Configuration
+ */
 class kConf
 {
 	const APC_CACHE_MAP = 'kConf';
