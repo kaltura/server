@@ -689,8 +689,8 @@ class myEntryUtils
 		
 		
 		// remark added so ffmpeg will try to load the thumbnail from the original source
-		//if (!file_exists($orig_image_path))
-		//	KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !file_exists($orig_image_path))
+			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 		
 		// check a request for animated thumbs without a concrete vid_slice
 		// in which case we'll create all the frames as one wide image
