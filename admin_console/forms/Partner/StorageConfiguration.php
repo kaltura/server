@@ -20,6 +20,12 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('text', 'systemName', array(
+			'label' 		=> 'System Name:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		 
 		$deliveryStatus = new Kaltura_Form_Element_EnumSelect('deliveryStatus', array('enum' => 'Kaltura_Client_Enum_StorageProfileDeliveryStatus'));
 		$deliveryStatus->setLabel('Delivery Status:');
