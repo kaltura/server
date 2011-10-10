@@ -98,13 +98,8 @@ class kEventsManager
 			if($event->consume(new $consumerClass()) || !($event instanceof IKalturaCancelableEvent))
 				continue;
 				
-			if($event instanceof IKalturaCancelableEvent)
-			{
-				KalturaLog::notice("Event [" . get_class($event) . "] paused by consumer [$consumerClass]");
-				break;
-			}
-			
-			KalturaLog::debug("Event [" . get_class($event) . "] is not cancelable event");
+			KalturaLog::notice("Event [" . get_class($event) . "] paused by consumer [$consumerClass]");
+			break;
 		}
 	}
 
