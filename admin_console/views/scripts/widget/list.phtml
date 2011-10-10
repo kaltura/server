@@ -203,16 +203,8 @@ function duplicateWidget(id) {
 }
 
 function formSubmit(html) {
-	if (jQuery(html).parent().find('form').hasClass('valid')) 
-	{
-		dialogDiv.dialog('close');
-		jQuery('#frmPaginator1').submit();
-	}
-	else
-	{
-		jQuery('#widget-dialog').find('form').replaceWith(html);
-		jQuery('#widget-dialog').find('form').ajaxForm(formSubmit);
-	}
+	jQuery('#widget-dialog').find('form').replaceWith(html);
+	jQuery('#widget-dialog').find('form').ajaxForm(formSubmit);
 }
 
 jQuery(function() {

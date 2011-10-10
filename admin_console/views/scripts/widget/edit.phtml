@@ -135,4 +135,18 @@ jQuery(function() {
 	jQuery('#conf_file, #conf_file_features').parent().find('.open-editor').click(openEditor);
 	jQuery('#conf_file, #conf_file_features').parent().find('.open-visual-editor').click(openVisualEditor);
 });
+
+jQuery(document).ready(function() {
+	<?php if ($this->formValid): ?>
+		dialogDiv.dialog('close');
+		jQuery('#widget-dialog').dialog('close')
+		jQuery('#frmPaginator1').submit();
+		
+	<?php else: ?>
+		jQuery('#widget-dialog').find('form').replaceWith(html);
+		jQuery('#widget-dialog').find('form').ajaxForm(formSubmit);
+		
+	<?php endif; ?>
+});
+
 </script>
