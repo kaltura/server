@@ -592,11 +592,22 @@ kmc.preview_embed = {
 		return html;
 	},
 		
-	buildHTML5Option : function(entry_id, name, is_playlist, partner_id, uiconf_id, has_mobile_flavors, is_video) {
+	buildHTML5Option : function(entry_id, name, is_playlist, previewOnly, partner_id, uiconf_id, has_mobile_flavors, is_video) {
 		kmc.log('buildHTML5Option');
 		kmc.log(arguments);
 
-		var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/entry_id/' + entry_id + '/uiconf_id/' + uiconf_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
+		// If preview, return nothing
+		if( previewOnly ) {
+			return '';
+		}
+
+		// Base preview url
+		var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/uiconf_id/' + uiconf_id;
+		if( is_playlist ) {
+			long_url += '/playlist_id/' + entry_id + '/playlist_name/' + name;
+		} else {
+			long_url += '/entry_id/' + entry_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
+		}
 		kmc.client.getShortURL(long_url);
 
 		var description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
@@ -609,6 +620,7 @@ kmc.preview_embed = {
 
 		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support iPhone' +
 		' &amp; iPad with HTML5</label></div><br />' + description + '<br />';
+
 		return html;
 	},
 
