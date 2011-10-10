@@ -84,7 +84,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			return;
 			
 		$this->entryId = $object->id;
-		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($client);
+		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 		
 		$this->xmlBulkUploadEngine->impersonate();
 		$this->xmlBulkUploadEngine->getClient()->startMultiRequest();
