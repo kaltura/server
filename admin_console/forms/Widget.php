@@ -175,7 +175,7 @@ class Form_Widget extends Infra_Form
 		$confFileButtons = array();
 		$confFileButtons[] = $openEditorButton;
 		$enableVisualEditor = Zend_Registry::get('config')->settings->enableKCWVisualEditor;
-		if (($this->getValue('obj_type') == KalturaUiConfObjType::CONTRIBUTION_WIZARD) && ( is_null($enableVisualEditor) || $enableVisualEditor)) 
+		if (($this->getValue('obj_type') == Kaltura_Client_Enum_UiConfObjType::CONTRIBUTION_WIZARD) && ( is_null($enableVisualEditor) || $enableVisualEditor)) 
 			$confFileButtons[] = $openVisualEditorButton;
 		$confFileFeaturesButtons = array();
 		$confFileFeaturesButtons[] = $openEditorButton;
