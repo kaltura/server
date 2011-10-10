@@ -32,6 +32,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$this->bootstrap('autoloaders');
 		$this->bootstrap('config');
+		$this->bootstrap('timezone');
 		
 		$loggerConfigPath = realpath(APPLICATION_PATH . '/../configurations/logger.ini');
 		$config = new Zend_Config_Ini($loggerConfigPath);
