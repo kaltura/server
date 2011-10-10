@@ -40,7 +40,7 @@
 				<td><?php echo $item->partnerName; ?></td>
 				<td><?php echo $item->partnerId; ?></td>
 				<td><?php $d = (new Zend_Date($item->partnerCreatedAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
-				<td><?php echo $this->translate($this->packageNameById($item->partnerPackage)); ?></td>
+				<td><?php echo isset($this->partnerPackages[$item->partnerPackage]) ? $this->partnerPackages[$item->partnerPackage] : $item->partnerPackage; ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->views); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->plays); ?></td>
 				<td><?php echo Zend_Locale_Format::toNumber((int)$item->entriesCount); ?></td>
