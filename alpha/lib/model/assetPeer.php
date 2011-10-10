@@ -303,9 +303,8 @@ class assetPeer extends BaseassetPeer
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
-		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
 		
-		return self::doSelect($c);
+		return self::doSelectAscendingBitrate($c);
 	}
 
 	public static function retrieveReadyFlavorsByEntryId($entryId, array $paramsIds = null)
@@ -317,12 +316,10 @@ class assetPeer extends BaseassetPeer
 		if(count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 		
-		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
-		
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
-		return self::doSelect($c);
+		return self::doSelectAscendingBitrate($c);
 	}
 	
 	public static function retrieveReadyFlavorsIdsByEntryId($entryId, array $paramsIds = null)
@@ -334,8 +331,6 @@ class assetPeer extends BaseassetPeer
 		
 		if(count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
-		
-		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
 		
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
@@ -353,8 +348,6 @@ class assetPeer extends BaseassetPeer
 		if(count($paramsIds))
 			$c->add(assetPeer::FLAVOR_PARAMS_ID, $paramsIds, Criteria::IN);
 			
-		$c->addAscendingOrderByColumn(assetPeer::BITRATE);
-		
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::THUMBNAIL);
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		
@@ -382,10 +375,24 @@ class assetPeer extends BaseassetPeer
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY);
 		$c->add(assetPeer::FLAVOR_PARAMS_ID, $flavorParamsIds, Criteria::IN);
 		
-		// The client will most probably expect the list to be ordered by bitrate
-		$c->addAscendingOrderByColumn ( assetPeer::BITRATE ); /// TODO - should be server side ?
-		
-		return assetPeer::doSelect($c);
+		return assetPeer::doSelectAscendingBitrate($c);
+	}
+	
+	public static function doSelectAscendingBitrate(Criteria $criteria, PropelPDO $con = null)
+	{
+		$assets = assetPeer::doSelect($criteria);
+		usort($assets, array(self, 'compareBitrate'));
+	}
+	
+	public static function compareBitrate(asset $a, asset $b)
+	{
+		if(!($a instanceof flavorAsset) || !($b instanceof flavorAsset))
+			return 0;
+			
+		if ($a->getBitrate() == $b->getBitrate())
+            return 0;
+            
+        return ($a->getBitrate() > $b->getBitrate()) ? +1 : -1;
 	}
 	
 	public static function retrieveReadyByEntryIdAndTag($entryId, $tag)
