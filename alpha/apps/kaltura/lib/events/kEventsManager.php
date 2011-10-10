@@ -93,24 +93,18 @@ class kEventsManager
 		foreach($consumers as $consumerClass)
 		{
 			if (!class_exists($consumerClass))
+				continue;
+			
+			if($event->consume(new $consumerClass()) || !($event instanceof IKalturaCancelableEvent))
+				continue;
+				
+			if($event instanceof IKalturaCancelableEvent)
 			{
-				return;
+				KalturaLog::notice("Event [" . get_class($event) . "] paused by consumer [$consumerClass]");
+				break;
 			}
 			
-			$continue = $event->consume(new $consumerClass());
-				
-			if(!$continue)
-			{
-				if($event instanceof IKalturaCancelableEvent)
-				{
-					KalturaLog::notice("Event [" . get_class($event) . "] paused by consumer [$consumerClass]");
-					break;
-				}
-				else
-				{
-					KalturaLog::debug("Event [" . get_class($event) . "] is not cancelable event");
-				}
-			}
+			KalturaLog::debug("Event [" . get_class($event) . "] is not cancelable event");
 		}
 	}
 
