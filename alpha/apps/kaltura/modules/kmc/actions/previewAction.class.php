@@ -19,8 +19,9 @@ class previewAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
 
 		$this->entry_id = $this->getRequestParameter('entry_id');
-		if(!$this->entry_id)
-			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'entry_id');
+
+		$this->playlist_id = $this->getRequestParameter('playlist_id');
+		$this->playlist_name = $this->getRequestParameter('playlist_name');
 
 		$this->delivery_type = $this->getRequestParameter('delivery');
 

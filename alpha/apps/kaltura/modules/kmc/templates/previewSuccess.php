@@ -8,23 +8,41 @@ $swfUrl = $partner_host ."/index.php/kwidget";
 $swfUrl .= "/cache_st/" . (time()+(60*15));
 $swfUrl .= "/wid/_" . $partner_id;
 $swfUrl .= "/uiconf_id/" . $uiconf_id;
-$swfUrl .= "/entry_id/" . $entry_id;
+if( $entry_id ) {
+	$swfUrl .= "/entry_id/" . $entry_id;
+}
 
-// Build Thumbnail URL
-$thumbnailUrl = $partner_cdnHost ."/p/". $partner_id ."/sp/". $partner_id ."00/thumbnail". $entry_id ."/width/120/height/90/bgcolor/000000/type/2";
+// Array to contain flash vars
+$flashVars = array();
 
 // Set the current flash vars for delivery type
 switch($delivery_type) {
 
     case "rtmp":
-	$flash_vars = "streamerType=rtmp&amp;";
-	break;
+		$flashVars["streamerType"] = "rtmp";
+		break;
+
     case "akamai":
-	$flash_vars = "mediaProtocol=hdnetwork&amp;";
-	break;
+		$flashVars["mediaProtocol"] = "hdnetwork";
+		break;
+
     default:
-	$flash_vars = "";
-	break;
+		$flash_vars = "";
+		break;
+}
+
+if( $playlist_id ) {
+
+	// build playlist url
+	$playlist_url = $partner_host ."/index.php/partnerservices2/executeplaylist?";
+	$playlist_url .= "partner_id=" . $partner_id . "&subp_id=" . $partner_id . "00&format=8&playlist_id=" . $playlist_id;
+
+	// Add playlist flashVars
+	$flashVars["playlistAPI.autoInsert"] = "true";
+	$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
+	$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+
+	$flashVars = http_build_query($flashVars, '', '&amp;');
 }
 ?>
 <!doctype html>
@@ -56,13 +74,12 @@ switch($delivery_type) {
 				<param name="allowNetworking" value="all" />
 				<param name="allowScriptAccess" value="always" />
 				<param name="bgcolor" value="#000000" />
-				<param name="flashVars" value="<?php echo $flash_vars; ?>" />
+				<param name="flashVars" value="<?php echo $flashVars; ?>" />
 				<param name="movie" value="<?php echo $swfUrl; ?>" />
 				<a href="http://corp.kaltura.com">video platform</a> 
 				<a href="http://corp.kaltura.com/video_platform/video_management">video management</a> 
 				<a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a> 
 				<a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a> 
-				<a rel="media:thumbnail" href="<?php echo $thumbnailUrl; ?>"></a>
 				<span property="dc:description" content=""></span>
 				<span property="media:title" content="Kaltura Video"></span>
 				<span property="media:width" content="400"></span>

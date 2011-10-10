@@ -483,13 +483,12 @@ kmc.mediator =  {
 
 kmc.preview_embed = {
 	// Should be changed to accept object with parameters
-	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, html5_compatible) {
+	doPreviewEmbed : function(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video) {
 		kmc.log('doPreviewEmbed', arguments);
 
 		var has_mobile_flavors = kmc.preview_embed.hasMobileFlavors( entry_flavors );
-		// default value for html5_compatible
-		html5_compatible = (html5_compatible) ? html5_compatible : false;
-		html5_compatible = (previewOnly) ? false : html5_compatible;
+		// default value for is_video
+		is_video = (is_video) ? is_video : false;
 
 		if(id != "multitab_playlist") {
 			name = (name) ? kmc.utils.escapeQuotes(name) : '';
@@ -521,7 +520,7 @@ kmc.preview_embed = {
 		'<div id="player_wrap">' + preview_player + '</div>' +
 		((id == "multitab_playlist") ? '' : kmc.preview_embed.buildSelect(is_playlist, uiconf_id)) +
 		((live_bitrates) ? '' : kmc.preview_embed.buildRtmpOptions()) +
-		((html5_compatible) ? kmc.preview_embed.buildHTML5Option(id, kmc.vars.partner_id, uiconf_id, has_mobile_flavors) : '') +
+		kmc.preview_embed.buildHTML5Option(id, name, is_playlist, previewOnly, kmc.vars.partner_id, uiconf_id, has_mobile_flavors, is_video) +
 		'<div class="embed_code_div"><div class="label embedcode">Embed Code:</div> <div class="right"><textarea id="embed_code" rows="5" cols=""' +
 		'readonly="true">' + embed_code + '</textarea></div><br class="clear" />' +
 		'<div id="copy_msg">Press Ctrl+C to copy embed code (Command+C on Mac)</div><div class="center"><button id="select_code">' +
@@ -545,10 +544,10 @@ kmc.preview_embed = {
 
 		$("#delivery_type").change(function(){
 			kmc.vars.embed_code_delivery_type = this.value;
-			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, html5_compatible);
+			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, uiconf_id, live_bitrates, entry_flavors, is_video);
 		});
 		$("#player_select").change(function(){
-			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates, entry_flavors, html5_compatible);
+			kmc.preview_embed.doPreviewEmbed(id, name, description, previewOnly, is_playlist, this.value, live_bitrates, entry_flavors, is_video);
 		});
 			
 		$("#html5_support").change(function(){
@@ -561,8 +560,9 @@ kmc.preview_embed = {
 		if (previewOnly==false) {
 			$('.embed_code_div').show();
 		}
-		if(has_mobile_flavors) {
-			$('#html5_support').attr('disabled', null);
+		// Disable checkbox if no mobile flavors
+		if(is_video && ! has_mobile_flavors) {
+			$('#html5_support').attr('disabled', 'disabled');
 		}
 	}, // doPreviewEmbed
 
@@ -592,20 +592,22 @@ kmc.preview_embed = {
 		return html;
 	},
 		
-	buildHTML5Option : function(entry_id, partner_id, uiconf_id, has_mobile_flavors) {
+	buildHTML5Option : function(entry_id, name, is_playlist, partner_id, uiconf_id, has_mobile_flavors, is_video) {
 		kmc.log('buildHTML5Option');
 		kmc.log(arguments);
-			
+
 		var long_url = kmc.vars.service_url + '/index.php/kmc/preview/partner_id/' + partner_id + '/entry_id/' + entry_id + '/uiconf_id/' + uiconf_id + '/delivery/' + kmc.vars.embed_code_delivery_type;
 		kmc.client.getShortURL(long_url);
-			
-		var description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a></div>';
-		if(has_mobile_flavors) {
-			description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
-			' <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a>' +
-			'<br class"clear" />View player outside KMC: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
+
+		var description = '<div class="note">If you enable the HTML5 player, the viewer device will be automatically detected.' +
+		' <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a>' +
+		'<br class"clear" />View player outside KMC: <span class="preview_url"><img src="/lib/images/kmc/url_loader.gif" alt="loading..." /> Updating Short URL...</span></div>';
+
+		if( is_video && ! has_mobile_flavors) {
+			description = '<div class="note red">This video does not have video flavors compatible with IPhone & IPad. <a target="_blank" href="' + kmc.vars.help_url + '#section1432">Read more</a></div>';
 		}
-		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" disabled="disabled" /> <label for="html5_support">Support iPhone' +
+
+		var html = '<div class="label checkbox"><input id="html5_support" type="checkbox" /> <label for="html5_support">Support iPhone' +
 		' &amp; iPad with HTML5</label></div><br />' + description + '<br />';
 		return html;
 	},
@@ -686,13 +688,6 @@ kmc.preview_embed = {
 		if(is_playlist && id != "multitab_playlist") {	// playlist (not multitab)
 			embed_code = embed_code.replace(/{ENTRY_ID}/g,"");
 			embed_code = embed_code.replace("{FLASHVARS}",kmc.preview_embed.embed_code_template.playlist_flashvars);
-			//				kmc.log(uiconf_details.swf_version); alert("uiconf_details.swf_version logged");
-			if(uiconf_details.swf_version.indexOf("v3") == -1) { // not kdp3
-				embed_code = embed_code.replace("playlistAPI.autoContinue","k_pl_autoContinue");
-				embed_code = embed_code.replace("playlistAPI.autoInsert","k_pl_autoInsertMedia");
-				embed_code = embed_code.replace("playlistAPI.kpl0Name","k_pl_0_name");
-				embed_code = embed_code.replace("playlistAPI.kpl0Url","k_pl_0_url");
-			}
 		}
 		else {											// player and multitab playlist
 			embed_code = embed_code.replace("{SEO}", (is_playlist ? "" : kmc.preview_embed.embed_code_template.media_seo_info));
