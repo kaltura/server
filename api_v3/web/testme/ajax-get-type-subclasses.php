@@ -1,4 +1,5 @@
 <?php
+ini_set("memory_limit","128M");
 require_once("../../bootstrap.php");
 KalturaLog::setContext("TESTME");
 $type = $_GET["type"];
