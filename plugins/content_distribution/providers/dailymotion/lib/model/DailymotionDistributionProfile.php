@@ -130,7 +130,7 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
                     	</xsl:otherwise>
                     </xsl:choose>');
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION));
+	    $fieldConfig->setUpdateParams(array(entryPeer::DESCRIPTION,"/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_DESCRIPTION."']"));
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
@@ -153,7 +153,7 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
                     	</xsl:otherwise>
                     </xsl:choose>');
 	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::TAGS));
+	    $fieldConfig->setUpdateParams(array(entryPeer::TAGS,"/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_TAGS."']"));
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
