@@ -78,7 +78,8 @@ class assetPeer extends BaseassetPeer
 	{
 		if($row)
 		{
-			$assetType = $row[$colnum + 21]; // type column
+			$typeField = self::translateFieldName(assetPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
+			$assetType = $row[$typeField];
 			if(isset(self::$class_types_cache[$assetType]))
 				return self::$class_types_cache[$assetType];
 				
@@ -381,7 +382,8 @@ class assetPeer extends BaseassetPeer
 	public static function doSelectAscendingBitrate(Criteria $criteria, PropelPDO $con = null)
 	{
 		$assets = assetPeer::doSelect($criteria);
-		usort($assets, array(self, 'compareBitrate'));
+		usort($assets, array('assetPeer', 'compareBitrate'));
+		return $assets;
 	}
 	
 	public static function compareBitrate(asset $a, asset $b)
