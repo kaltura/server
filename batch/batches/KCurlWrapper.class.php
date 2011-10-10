@@ -216,7 +216,6 @@ class KCurlWrapper
 	public function getHeader($noBody = false)
 	{
 		curl_setopt($this->ch, CURLOPT_HEADER, true);
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header');
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
