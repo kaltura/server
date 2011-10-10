@@ -92,8 +92,13 @@ class kEventsManager
 		$consumers = self::getConsumers($consumerInterface);
 		foreach($consumers as $consumerClass)
 		{
-			$continue = $event->consume(new $consumerClass());
+			if (!class_exists($consumerClass))
+			{
+				return;
+			}
 			
+			$continue = $event->consume(new $consumerClass());
+				
 			if(!$continue)
 			{
 				if($event instanceof IKalturaCancelableEvent)
