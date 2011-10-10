@@ -14,7 +14,13 @@ class PartnerUsageController extends Zend_Controller_Action
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
 		
 		$form = new Form_PartnerUsageFilter();
-		Form_PackageHelper::addPackagesToForm($form, $systemPartnerPlugin->systemPartner->getPackages(), 'partner_package');
+		$partnerPackages = $systemPartnerPlugin->systemPartner->getPackages();
+		Form_PackageHelper::addPackagesToForm($form, $partnerPackages, 'partner_package');
+		
+		$this->view->partnerPackages = array();
+		foreach($partnerPackages as $package)
+			$this->view->partnerPackages[$package->id] = $package->name;
+		
 		$form->populate($request->getParams());
 		
 		// when no statuses selected
