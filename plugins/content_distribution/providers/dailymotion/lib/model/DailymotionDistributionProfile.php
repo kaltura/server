@@ -122,8 +122,8 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_DESCRIPTION.' / Entry description');
 	    $fieldConfig->setEntryMrssXslt('
         			<xsl:choose>
-                    	<xsl:when test="'.self::METADATA_FIELD_DESCRIPTION.' != \'\'">
-                    		<xsl:value-of select="'.self::METADATA_FIELD_DESCRIPTION.'" />
+                    	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_DESCRIPTION.' != \'\'">
+                    		<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_DESCRIPTION.'" />
                     	</xsl:when>
                     	<xsl:otherwise>
                     		<xsl:value-of select="string(description)" />
@@ -140,8 +140,8 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_TAGS.' / Entry tags');
 	    $fieldConfig->setEntryMrssXslt(
 	                '<xsl:choose>
-                    	<xsl:when test="'.self::METADATA_FIELD_TAGS.' != \'\'">
-                    		<xsl:value-of select="normalize-space('.self::METADATA_FIELD_TAGS.')" />
+                    	<xsl:when test="customData/metadata/'.self::METADATA_FIELD_TAGS.' != \'\'">
+                    		<xsl:value-of select="normalize-space(customData/metadata/'.self::METADATA_FIELD_TAGS.')" />
                     	</xsl:when>
                     	<xsl:otherwise>
                     		<xsl:for-each select="tags/tag">
