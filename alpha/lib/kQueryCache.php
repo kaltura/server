@@ -4,6 +4,7 @@ class kQueryCache
 {
 	const INVALIDATION_TIME_MARGIN_SEC = 300;		// When comparing the invalidation key timestamp to the query timestamp, 
 													// the query timestamp should be greater by this value to use the cache
+	const QUERY_MASTER_TIME_MARGIN_SEC = 300;		// The time frame after a change to a row during which we should query the master
 	const MAX_CACHED_OBJECT_COUNT = 100;			// Select queries that return more objects than this const will not be cached
 	const CACHED_QUERIES_EXPIRY_SEC = 86400;		// The expiry of the query keys in the memcache 	
 
@@ -44,6 +45,7 @@ class kQueryCache
 
 	public static function getCachedQueryResults(Criteria $criteria, $queryType, $peerClassName, &$cacheKey)
 	{
+		// initialize
 		if (!kConf::get("query_cache_enabled"))
 		{
 			return null;
@@ -61,6 +63,7 @@ class kQueryCache
 			return null;
 		}
 		
+		// build memcache query
 		foreach ($invalidationKeys as $index => $invalidationKey)
 		{
 			$invalidationKeys[$index] = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
@@ -69,24 +72,42 @@ class kQueryCache
 		
 		$keysToGet = $invalidationKeys;
 		$keysToGet[] = $cacheKey;
+		
+		$queryStart = microtime(true);
 		$cacheResult = self::$s_memcache->get($keysToGet);
-		if (!array_key_exists($cacheKey, $cacheResult))
+		KalturaLog::debug("kQueryCache: query took " . (microtime(true) - $queryStart) . " seconds");
+		
+		// get the cached query
+		$queryResult = null;
+		if (array_key_exists($cacheKey, $cacheResult))
+		{
+			$queryResult = $cacheResult[$cacheKey];
+			unset($cacheResult[$cacheKey]);
+		}
+		
+		// check whether we should query the master
+		$currentTime = time();
+		foreach ($cacheResult as $invalidationKey => $invalidationTime)
+		{
+			if ($currentTime < $invalidationTime + self::QUERY_MASTER_TIME_MARGIN_SEC)
+			{
+				KalturaLog::debug("kQueryCache: changed recently -> query master, peer=$peerClassName, invkey=$invalidationKey querytime=$currentTime invtime=$invalidationTime");
+				return null;
+			}
+		}
+		
+		// check whether we have a valid cached query
+		if (!$queryResult)
 		{	
 			KalturaLog::debug("kQueryCache: cache miss, peer=$peerClassName, key=$cacheKey");
 			return null;
 		}
 		
-		list($queryResult, $queryTime) = $cacheResult[$cacheKey];
+		list($queryResult, $queryTime) = $queryResult;
 		
 		$existingInvKeys = array();
-		foreach ($invalidationKeys as $invalidationKey)
+		foreach ($cacheResult as $invalidationKey => $invalidationTime)
 		{
-			if (!array_key_exists($invalidationKey, $cacheResult))
-			{
-				continue;
-			}
-			
-			$invalidationTime = $cacheResult[$invalidationKey];
 			$existingInvKeys[] = "$invalidationKey:$invalidationTime";
 			
 			if ($queryTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
@@ -96,6 +117,7 @@ class kQueryCache
 			}
 		}
 		
+		// return from memcache
 		$existingInvKeys = implode(',', $existingInvKeys);
 		
 		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$cacheKey queryTime=$queryTime invkeys=[$existingInvKeys]");
