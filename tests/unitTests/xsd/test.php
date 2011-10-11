@@ -9,7 +9,7 @@ class thumbnailTest extends PHPUnit_Framework_TestCase
 		$xsdDir = dir($path);
 		while (false !== ($entry = $xsdDir->read())) 
 		{
-			if($entry == '.' || $entry == '..')
+			if($entry == '.' || $entry == '..' || $entry == '.svn')
 				continue;
 				
 			if(is_dir("$path/$entry"))
