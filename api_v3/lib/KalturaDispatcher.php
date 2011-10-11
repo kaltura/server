@@ -119,8 +119,7 @@ class KalturaDispatcher
 		if (kCurrentContext::$is_admin_session)
 			return;
 
-		KalturaLog::debug("user validation running");
-		KalturaLog::debug($objectClass);
+		
 		$objectGetters = null;
 		if(strstr($objectClass, '::'))
 		{
@@ -153,13 +152,17 @@ class KalturaDispatcher
 		}
 		
 		if(!($dbObject instanceof IOwnable))
+		{
 			return;
+		}
 	
 		if($privilege)
 		{
 			// check if all ids are privileged
 			if (kCurrentContext::$ks_object->verifyPrivileges($privilege, ks::PRIVILEGE_WILDCARD))
+			{
 				return;
+			}
 				
 			// check if object id is privileged
 			if (kCurrentContext::$ks_object->verifyPrivileges($privilege, $dbObject->getId()))
