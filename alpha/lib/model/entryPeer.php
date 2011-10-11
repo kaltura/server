@@ -478,6 +478,14 @@ class entryPeer extends BaseentryPeer
 		
 		return array("entry:id=".$criterion->getValue());
 	}
+	
+	/* (non-PHPdoc)
+	 * @see BaseentryPeer::getAtomicColumns()
+	 */
+	public static function getAtomicColumns()
+	{
+		return array(entryPeer::STATUS);
+	}
 }
 
 class entryPool
