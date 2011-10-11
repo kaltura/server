@@ -1,0 +1,264 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="metadata">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element id="md_5791B9DB-169B-E8E1-514E-D59D947712D5" name="Title" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Title</label>
+              <key>Title</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_C81025CB-5AAE-14CD-9D89-BB5D41CC0525" name="Caption" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Caption</label>
+              <key>Caption</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_5017C6D7-26FF-4358-AE2E-BB599C6FD9C4" name="FormatType" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Format Type</label>
+              <key>Format Type</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="Short Form"/>
+              <xsd:enumeration value="Long Form"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element id="md_65860D1C-8C33-46B3-5A68-BB63D3D51A23" name="SourceType" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Source Type</label>
+              <key>Source Type</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="FHA"/>
+              <xsd:enumeration value="SD"/>
+              <xsd:enumeration value="HD"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element id="md_C26D854C-586F-B5C7-B27E-BB5AB955199B" name="SourceVideoFile" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Source Video File</label>
+              <key>Source Video File</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_BF9BC617-AA9C-C33B-5E39-BB5E3944633C" name="ImageAltText" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Image Alt Text</label>
+              <key>Image Alt Text</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_086B3AC9-A04D-BEFD-BFEA-BB5F32A2DE27" name="RelatedStoryTitle" minOccurs="0" maxOccurs="unbounded" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Related Story Title</label>
+              <key>Related Story Title</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_0B587747-16BE-8C0B-1FDA-BB60B20448AD" name="RelatedStoryURL" minOccurs="0" maxOccurs="unbounded" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Related Story URL</label>
+              <key>Related Story URL</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_B2CE09F7-1B8D-BA75-80DD-BB6101FCAA39" name="RelatedVideos" minOccurs="0" maxOccurs="unbounded" type="objectType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Related Videos</label>
+              <key>Related Videos</key>
+              <searchable>false</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_9230F702-8C41-BB8F-2158-BB624D14D903" name="Author" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Author</label>
+              <key>Author</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_99FC07B6-3B78-9394-ED4E-BB621862A7EA" name="Copyright" minOccurs="0" maxOccurs="1" type="textType">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Copyright</label>
+              <key>Copyright</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element id="md_74BB273B-10C9-E9D6-9702-BB6331245E38" name="AdFlag" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Ad Flag</label>
+              <key>Ad Flag</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="True"/>
+              <xsd:enumeration value="False"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element id="md_B4A84FD6-0A90-A349-A3A7-BB64E2DEBF96" name="IsPremium" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Is Premium?</label>
+              <key>Is Premium?</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="False"/>
+              <xsd:enumeration value="True"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element id="md_7AA02103-C9A7-75AC-B8A6-BB67AB2693ED" name="UseEmbed" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Use Embed?</label>
+              <key>Use Embed?</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="True"/>
+              <xsd:enumeration value="False"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element id="md_753AA589-5A68-FD4A-1AFE-BB6C52B53AB0" name="AssignmentChecklist" minOccurs="0" maxOccurs="unbounded">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Assignment Checklist</label>
+              <key>Assignment Checklist</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="Sections"/>
+              <xsd:enumeration value="Player Nodes"/>
+              <xsd:enumeration value="Ad Tags"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element id="md_B6C3B410-5141-C357-DF45-BB6E6919E339" name="ConEdSyncStatus" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>ConEd Sync Status</label>
+              <key>ConEd Sync Status</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="Auto sync"/>
+              <xsd:enumeration value="Sync done"/>
+              <xsd:enumeration value="Manual sync"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element id="md_6B95A310-D168-97FD-E183-BBE47ED09BB1" name="Environment" minOccurs="0" maxOccurs="1">
+          <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+            <xsd:appinfo>
+              <label>Environment</label>
+              <key>Environment</key>
+              <searchable>true</searchable>
+              <description></description>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="listType">
+              <xsd:enumeration value="Production"/>
+              <xsd:enumeration value="QA"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="textType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="dateType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:long"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="objectType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:simpleType name="listType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+</xsd:schema>
