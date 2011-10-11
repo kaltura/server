@@ -23,6 +23,18 @@ class MultiRequestSubResult
 }
 
 /**
+ * Private class for null value
+ */
+class KalturaNull 
+{
+	function __toString()
+	{
+        return '';
+	}
+	
+}
+
+/**
  * @package Kaltura
  * @subpackage Client
  */
@@ -68,6 +80,11 @@ class KalturaClientBase
 	 * @var array<KalturaServiceBase>
 	 */
 	protected $pluginServices = array();
+	
+	/**
+	 * @var KalturaNull
+	 */
+	private static $nullValue;
 	
 	public function __get($serviceName)
 	{
@@ -419,6 +436,11 @@ class KalturaClientBase
 		if ($paramValue === null)
 			return;
 			
+		if ($paramValue instanceof KalturaNull) {
+			$params[$paramName . '__null'] = '';
+			return;
+		}
+		
 		if(is_object($paramValue) && $paramValue instanceof KalturaObjectBase)
 		{
 			$this->addParam($params, "$paramName:objectType", get_class($paramValue));
@@ -577,6 +599,19 @@ class KalturaClientBase
 	{
 		return sha1($salt.$str);
 	}
+	
+	/**
+	 * @return KalturaNull
+	 */
+	public static function getKalturaNullValue()
+	{
+		 if (!isset(self::$nullValue)) {
+            
+            self::$nullValue = new KalturaNull;
+        }
+        return self::$nullValue;
+	}
+	
 }
 
 /**
@@ -851,3 +886,5 @@ interface IKalturaLogger
 {
 	function log($msg); 
 }
+
+

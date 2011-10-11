@@ -1,4 +1,17 @@
 <?php
+
+/**
+ * Private class for null value
+ */
+class KalturaNull 
+{
+	function __toString()
+	{
+        return '';
+	}
+	
+}
+
 /**
  * @package Kaltura
  * @subpackage Client
@@ -38,6 +51,11 @@ class Kaltura_Client_ClientBase
 	 * @var array<Kaltura_Client_ServiceActionCall>
 	 */
 	private $callsQueue = array();
+	
+	/**
+	 * @var KalturaNull
+	 */
+	private static $nullValue;
 
 	/**
 	 * Kaltura client constructor
@@ -389,6 +407,11 @@ class Kaltura_Client_ClientBase
 		if ($paramValue === null)
 			return;
 			
+		if ($paramValue instanceof KalturaNull) {
+			$params[$paramName . '__null'] = '';
+			return;
+		}
+			
 		if(is_object($paramValue) && $paramValue instanceof Kaltura_Client_ObjectBase)
 		{
 			$this->addParam($params, "$paramName:objectType", $paramValue->getKalturaObjectType());
@@ -536,5 +559,17 @@ class Kaltura_Client_ClientBase
 	private function hash ( $salt , $str )
 	{
 		return sha1($salt.$str);
-	}	
+	}
+
+	/**
+	 * @return KalturaNull
+	 */
+	public static function getKalturaNullValue()
+	{
+		 if (!isset(self::$nullValue)) {
+            
+            self::$nullValue = new KalturaNull;
+        }
+        return self::$nullValue;
+	}
 }
