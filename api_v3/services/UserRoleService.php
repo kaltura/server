@@ -131,12 +131,13 @@ class UserRoleService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::ROLE_NAME_ALREADY_EXISTS);
 			}
 		}
-		
-		try { PermissionPeer::checkValidPermissionsForRole($userRole->permissionNames, $this->getPartnerId());	}
-		catch (kPermissionException $e) {
-			$code = $e->getCode();
-			if ($code == kPermissionException::PERMISSION_NOT_FOUND) {
-				throw new KalturaAPIException(KalturaErrors::PERMISSION_NOT_FOUND, $e->getMessage());
+		if (!is_null($userRole->permissionNames) && !($userRole->permissionNames instanceof KalturaNullField)) {
+			try { PermissionPeer::checkValidPermissionsForRole($userRole->permissionNames, $this->getPartnerId());	}
+			catch (kPermissionException $e) {
+				$code = $e->getCode();
+				if ($code == kPermissionException::PERMISSION_NOT_FOUND) {
+					throw new KalturaAPIException(KalturaErrors::PERMISSION_NOT_FOUND, $e->getMessage());
+				}
 			}
 		}
 		
