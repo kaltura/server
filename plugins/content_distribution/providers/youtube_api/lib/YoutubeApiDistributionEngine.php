@@ -249,4 +249,12 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	{
 		return array('timeout' => $this->timeout);
 	}
+	
+	private function getValueForField($fieldName)
+	{
+	    if (isset($this->fieldValues[$fieldName])) {
+	        return $this->fieldValues[$fieldName];
+	    }
+	    return null;
+	}
 }
