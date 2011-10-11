@@ -304,7 +304,10 @@ class KalturaPluginManager
 		foreach($plugins as $pluginClass)	
 		{
 			if(!class_exists($pluginClass))
+			{
+				KalturaLog::err("Plugin [$pluginClass] could - class not found.");
 				continue;
+			}
 				
 			// TODO remove call_user_func after moving to php 5.3
 			$pluginName = call_user_func(array($pluginClass, 'getPluginName'));
