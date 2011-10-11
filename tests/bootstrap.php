@@ -27,19 +27,17 @@ if($isTimeZone)
 	date_default_timezone_set($timeZone); // America/New_York
 
 // Logger
-$loggerConfigPath = KALTURA_TESTS_PATH.DIRECTORY_SEPARATOR."base".DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."logger.ini";
+$loggerConfigPath = KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR.'configurations'.DIRECTORY_SEPARATOR."logger.ini";
 
 try // we don't want to fail when logger is not configured right
 {
 	$config = new Zend_Config_Ini($loggerConfigPath);
+	KalturaLog::initLog($config->tests);
+	KalturaLog::setContext("tests");
 }
 catch(Zend_Config_Exception $ex)
 {
-	$config = null;
 }
-
-KalturaLog::initLog($config);
-KalturaLog::setContext("tests");
 
 // set DB
 DbManager::setConfig(kConf::getDB());
