@@ -2578,26 +2578,4 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$copyObj->setCopiedFrom($this);
 		return $copyObj;
 	}
-
-	/* (non-PHPdoc)
-	 * @see Baseentry::buildPkeyCriteria()
-	 */
-	public function buildPkeyCriteria()
-	{
-		$criteria = parent::buildPkeyCriteria();
-		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(entryPeer::UPDATED_AT))
-		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != entryPeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = entryPeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
-		
-		return $criteria;
-	}
 }

@@ -4173,7 +4173,19 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$criteria = new Criteria(entryPeer::DATABASE_NAME);
 
 		$criteria->add(entryPeer::ID, $this->id);
-
+		
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(entryPeer::UPDATED_AT))
+		{
+			$theModifiedColumn = null;
+			foreach($this->modifiedColumns as $modifiedColumn)
+				if($modifiedColumn != entryPeer::UPDATED_AT)
+					$theModifiedColumn = $modifiedColumn;
+					
+			$atomicColumns = entryPeer::getAtomicColumns();
+			if(in_array($theModifiedColumn, $atomicColumns))
+				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+		}
+		
 		return $criteria;
 	}
 
