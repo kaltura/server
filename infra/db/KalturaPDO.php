@@ -1,17 +1,42 @@
 <?php
+
 /**
  *  @package infra
  *  @subpackage DB
  */
 class KalturaPDO extends PropelPDO
 {
+	/**
+	 * Attribute to use to set logged info for Kaltura logger
+	 */
+	const KALTURA_ATTR_NAME = -1001;
+	
+	protected static $comment = null;
+	
+	protected $connectionName = null;
+	
 	/* (non-PHPdoc)
 	 * @see PDO::__construct()
 	 */
 	public function __construct($dsn, $username = null, $password = null, $driver_options = array())
-	{
+	{	
+		if(isset($driver_options[self::KALTURA_ATTR_NAME]))
+			$this->connectionName = $driver_options[self::KALTURA_ATTR_NAME];
+			
 		parent::__construct($dsn, $username, $password, $driver_options);
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('KalturaStatement'));
+	}
+
+	protected function getComment() 
+	{
+		if(!self::$comment)
+		{
+			$uniqueId = new UniqueId();
+			self::$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : '');
+			self::$comment .= "[$uniqueId]";
+		}
+		
+		return self::$comment . "[$this->connectionName]";
 	}
 	
 	/* (non-PHPdoc)
@@ -19,7 +44,7 @@ class KalturaPDO extends PropelPDO
 	 */
 	public function prepare($sql, $driver_options = array())
 	{
-		$comment = KalturaStatement::getComment();
+		$comment = $this->getComment();
 		$sql = "/* $comment */ $sql";
 		
 		return parent::prepare($sql, $driver_options);
@@ -32,7 +57,7 @@ class KalturaPDO extends PropelPDO
 	{
 		KalturaLog::debug($sql);
 		
-		$comment = KalturaStatement::getComment();
+		$comment = $this->getComment();
 		$sql = "/* $comment */ $sql";
 		
 		try
@@ -56,7 +81,7 @@ class KalturaPDO extends PropelPDO
 		$sql = $args[0];
 		KalturaLog::debug($sql);
 		
-		$comment = KalturaStatement::getComment();
+		$comment = $this->getComment();
 		$sql = "/* $comment */ $sql";
 		
 		try

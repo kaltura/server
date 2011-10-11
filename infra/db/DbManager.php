@@ -19,6 +19,17 @@ class DbManager
 	
 	public static function setConfig(array $config)
 	{
+		foreach ($config['datasources'] as $connectionName => $connectionConfig) 
+		{
+			if(!is_array($connectionConfig) || !isset($connectionConfig['connection']))
+				continue;
+				
+			if(!isset($config['datasources'][$connectionName]['connection']['options']))
+				$config['datasources'][$connectionName]['connection']['options'] = array();
+				
+			$config['datasources'][$connectionName]['connection']['options']['KalturaPDO::KALTURA_ATTR_NAME'] = array('value' => $connectionName);
+		}
+		
 		self::$config = $config;
 	}
 	

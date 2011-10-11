@@ -6,7 +6,6 @@
 class KalturaStatement extends PDOStatement
 {
 	protected static $dryRun = false;
-	protected static $comment = null;
 	
 	protected $values = array();
 	
@@ -24,18 +23,6 @@ class KalturaStatement extends PDOStatement
 		$this->values[":p{$index}"] = "'$value'";
 		
 		return parent::bindValue ($parameter, $value, $data_type);
-	}
-
-	public static function getComment() 
-	{
-		if(!self::$comment)
-		{
-			$uniqueId = new UniqueId();
-			self::$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : '');
-			self::$comment .= "[$uniqueId]";
-		}
-		
-		return self::$comment;
 	}
 
 	public function execute ($input_parameters = null) 
