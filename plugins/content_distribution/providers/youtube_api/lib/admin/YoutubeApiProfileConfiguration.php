@@ -3,10 +3,12 @@
  * @package plugins.youtubeApiDistribution
  * @subpackage admin
  */
-class Form_YoutubeApiProfileConfiguration extends Form_ProviderProfileConfiguration
+class Form_YoutubeApiProfileConfiguration extends Form_ConfigurableProfileConfiguration
 {
 	protected function addProviderElements()
 	{
+	    $this->setDescription(null);
+	    
 		$element = new Zend_Form_Element_Hidden('providerElements');
 		$element->setLabel('YouTube Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
@@ -32,8 +34,6 @@ class Form_YoutubeApiProfileConfiguration extends Form_ProviderProfileConfigurat
 			array('legend' => 'General', 'decorators' => array('FormElements', 'Fieldset'))
 		);
 				
-		$this->addMetadataProfile(true);
-		
 		// taken from http://gdata.youtube.com/schemas/2007/categories.cat
 		$youTubeCategories = array(
 			'Film' => 'Film & Animation',
@@ -58,13 +58,7 @@ class Form_YoutubeApiProfileConfiguration extends Form_ProviderProfileConfigurat
 			'label' => 'Default Category:',
 			'multioptions' => $youTubeCategories,
 		));
-		
-		$this->addDisplayGroup(
-			array('default_category', 'metadata_profile_id'), 
-			'metadata',
-			array('legend' => 'Metadata', 'decorators' => array('FormElements', 'Fieldset'))
-		);
-		
+				
 		// Community
 		$this->addElement('select', 'allow_comments', array(
 			'label' => 'Allow Comments:',

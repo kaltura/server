@@ -3,7 +3,7 @@
  * @package plugins.youtubeApiDistribution
  * @subpackage api.objects
  */
-class KalturaYoutubeApiDistributionJobProviderData extends KalturaDistributionJobProviderData
+class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDistributionJobProviderData
 {
 	/**
 	 * @var string
@@ -15,16 +15,14 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaDistributionJo
 	 */
 	public $thumbAssetFilePath;
 
-	/**
-	 * @var string
-	 */
-	public $playlists;
 	
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
+		parent::__construct($distributionJobData);
+	    
 		if(!$distributionJobData)
 			return;
-			
+		
 		if(!($distributionJobData->distributionProfile instanceof KalturaYoutubeApiDistributionProfile))
 			return;
 			
@@ -49,13 +47,6 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaDistributionJo
 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
 		}
 		
-		$this->loadPlaylistsFromMetadata($distributionJobData->entryDistribution->entryId, $distributionJobData->distributionProfile);
-		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);
-//		if ($entryDistributionDb)
-//			$this->currentPlaylists = $entryDistributionDb->getFromCustomData('currentPlaylists');
-//		else
-//			KalturaLog::err('Entry distribution ['.$distributionJobData->entryDistributionId.'] not found');
-		
 	}
 
 
@@ -63,75 +54,12 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaDistributionJo
 	private static $map_between_objects = array
 	(
 		"videoAssetFilePath",
-		"thumbAssetFilePath",
-		"playlists",	
+		"thumbAssetFilePath",	
 	);
 
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
-	
-	/**
-	 * @return string $videoAssetFilePath
-	 */
-	public function getVideoAssetFilePath()
-	{
-		return $this->videoAssetFilePath;
-	}
-
-	/**
-	 * @return string $thumbAssetFilePath
-	 */
-	public function getThumbAssetFilePath()
-	{
-		return $this->thumbAssetFilePath;
-	}
-
-	/**
-	 * @param string $videoAssetFilePath
-	 */
-	public function setVideoAssetFilePath($videoAssetFilePath)
-	{
-		$this->videoAssetFilePath = $videoAssetFilePath;
-	}
-
-	/**
-	 * @param string $thumbAssetFilePath
-	 */
-	public function setThumbAssetFilePath($thumbAssetFilePath)
-	{
-		$this->thumbAssetFilePath = $thumbAssetFilePath;
-	}	
-	
-	protected function loadPlaylistsFromMetadata($entryId, KalturaYoutubeApiDistributionProfile $distributionProfile)
-	{
-		$playlists = array();
-		$metadataProfileId = $distributionProfile->metadataProfileId; 
-		$metadata = MetadataPeer::retrieveByObject($metadataProfileId, Metadata::TYPE_ENTRY, $entryId);
-		if ($metadata)
-		{
-			$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-			$xmlContent = kFileSyncUtils::file_get_contents($key, true, false);
-			$xml = new DOMDocument();
-			$xml->loadXML($xmlContent);
 			
-			// first metada field
-			$nodes = $xml->getElementsByTagName(YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLIST);
-			foreach($nodes as $node)
-			{
-				$playlists[] = $node->textContent;
-			}
-			
-			// second metadata field
-			$nodes = $xml->getElementsByTagName(YoutubeApiDistributionProfile::METADATA_FIELD_PLAYLISTS);
-			foreach($nodes as $node)
-			{
-				$playlists[] = $node->textContent;
-			}
-		}
-		
-		$this->playlists = implode(',', $playlists);
-	}
-	
 }

@@ -58,52 +58,21 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	 * @param KalturaYoutubeApiDistributionProfile $distributionProfile
 	 * @return array()
 	 */
-	public function getYoutubeApiProps(KalturaBaseEntry $entry, KalturaDistributionJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
-	{	
-		$entryId = $data->entryDistribution->entryId;
-		$entry = $this->kalturaClient->media->get($entryId);
-	
-		$category = $distributionProfile->defaultCategory;
-		$description = $entry->description;
-		$tags = $entry->tags;
-		try{
-			$metadataObjects = $this->getMetadataObjects($data->entryDistribution->partnerId, $data->entryDistribution->entryId, KalturaMetadataObjectType::ENTRY, $distributionProfile->metadataProfileId);
-			if(count($metadataObjects))
-			{
-				$metadataCategory = $this->findMetadataValue($metadataObjects, 'YoutubeCategory');
-				if($metadataCategory)
-					$category = $metadataCategory;
-					
-				$category = $this->translateCategory($category);
-				$metadataDescription = $this->findMetadataValue($metadataObjects, 'YoutubeDescription');
-				if($metadataDescription && strlen($metadataDescription))
-					$description = $metadataDescription;
-					
-				$metadataTags = $this->findMetadataValue($metadataObjects, 'YoutubeKeywords');
-				if($metadataTags && strlen($metadataTags))
-					$tags = $metadataTags;
-			}
-		}
-		catch (Exception $e){}
-		
+	protected function getYoutubeApiProps()
+	{			
 		$props = array();
-		$props['keywords'] = $tags;
-		$props['title'] = $entry->name;
-		$props['category'] = $category;
-		$props['description'] = $description;
+		$props['keywords'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_KEYWORDS);
+		$props['title'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_TITLE);
+		$props['category'] = $this->translateCategory($this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_CATEGORY));
+		$props['description'] = $this->getValueForField(KalturaYouTubeApiDistributionField::MEDIA_DESCRIPTION);
 		
-//		affects nothing
-//		$props['start_date'] = $data->entryDistribution->sunrise;
-//		$props['end_date'] = $data->entryDistribution->sunset;
+		$props['start_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::START_DATE);
+		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
 		
-		$props['start_date'] = time();
-		$props['end_date'] = time();
-		
-//		$props['playlists']= $data->providerData->playlists;
-		$props['comment']= $distributionProfile->allowComments;
-		$props['rate']= $distributionProfile->allowEmbedding;
-		$props['commentVote']= $distributionProfile->allowRatings;
-		$props['videoRespond']= $distributionProfile->allowResponses;
+		$props['comment'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_COMMENTS);
+		$props['rate'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RATINGS);
+		$props['commentVote'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_COMMENTS);
+		$props['videoRespond'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RESPONSES);
 		
 		KalturaLog::debug("Props [" . print_r($props, true) . "]");
 
@@ -126,13 +95,15 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 	public function doSubmit(KalturaDistributionSubmitJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile)
 	{	
+	    $this->fieldValues = unserialize($data->providerData->fieldValues);
+	    
 		$private = true;
 		if($data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE)
 			$private = false;
 		
 		$needDel = false;
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
+		$props = $this->getYoutubeApiProps();
 		if($data->entryDistribution->remoteId)
 		{
 			$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
@@ -153,16 +124,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if (FALSE === strstr($videoFilePath, "."))
 		{
 			$videoFilePathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
-/*			try
-			{
-    		KalturaLog::debug("DM : before " . $videoFilePathNew);
-    			@symlink ($videoFilePath, $videoFilePathNew);
-    		KalturaLog::debug("DM : after");
-    		}
-    		catch(Exception $ex)
-    		{
-    		KalturaLog::debug("DM : exception");
-    		}*/
+
 			if (!file_exists($videoFilePathNew))
 			{
 				copy($videoFilePath,$videoFilePathNew);
@@ -244,18 +206,17 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	
 	public function doUpdate(KalturaDistributionUpdateJobData $data, KalturaYoutubeApiDistributionProfile $distributionProfile, $enabled = null)
 	{
+	    $this->fieldValues = unserialize($data->providerData->fieldValues);
+	    	    
 		$private = true;
 		if($enabled === true || (is_null($enabled) && $data->entryDistribution->sunStatus == KalturaEntryDistributionSunStatus::AFTER_SUNRISE))
 			$private = false;
 		
 		$entry = $this->getEntry($data->entryDistribution->partnerId, $data->entryDistribution->entryId);
-		$props = $this->getYoutubeApiProps($entry, $data, $distributionProfile);
+		$props = $this->getYoutubeApiProps();
 	
 		$youTubeApiImpl = new YouTubeApiImpl($distributionProfile->username, $distributionProfile->password, $this->getHttpClientConfig());
 		$youTubeApiImpl->updateEntry($data->remoteId, $props, $private);
-		
-//		$data->sentData = $youtubeApiMediaService->request;
-//		$data->results = $youtubeApiMediaService->response;
 		
 		return true;
 	}

@@ -3,7 +3,7 @@
  * @package plugins.youtubeApiDistribution
  * @subpackage api.objects
  */
-class KalturaYoutubeApiDistributionProfile extends KalturaDistributionProfile
+class KalturaYoutubeApiDistributionProfile extends KalturaConfigurableDistributionProfile
 {
 	/**
 	 * @var string
@@ -44,11 +44,7 @@ class KalturaYoutubeApiDistributionProfile extends KalturaDistributionProfile
 	 * @var string
 	 */
 	public $allowResponses;
-		
-	/**
-	 * @var int
-	 */
-	public $metadataProfileId;
+
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -62,7 +58,6 @@ class KalturaYoutubeApiDistributionProfile extends KalturaDistributionProfile
 		'allowEmbedding',
 		'allowRatings',
 		'allowResponses',
-		'metadataProfileId',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -3,7 +3,7 @@
  * @package plugins.youtubeApiDistribution
  * @subpackage lib
  */
-class YoutubeApiDistributionProvider implements IDistributionProvider
+class YoutubeApiDistributionProvider extends ConfigurableDistributionProvider
 {
 	/**
 	 * @var YoutubeApiDistributionProvider
@@ -123,25 +123,5 @@ class YoutubeApiDistributionProvider implements IDistributionProvider
 	{
 		return 0;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getUpdateRequiredEntryFields()
-	 */
-	public function getUpdateRequiredEntryFields($distributionProfileId = null)
-	{
-		return array(entryPeer::NAME, entryPeer::DESCRIPTION, entryPeer::TAGS);
-	}
-
-	/* (non-PHPdoc)
-	 * @see IDistributionProvider::getUpdateRequiredMetadataXPaths()
-	 */
-	public function getUpdateRequiredMetadataXPaths($distributionProfileId = null)
-	{
-		return array(
-			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_DESCRIPTION."']",
-			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_TAGS."']",
-			"/*[local-name()='metadata']/*[local-name()='".YoutubeApiDistributionProfile::METADATA_FIELD_CATEGORY."']",
-		);	
-	}
-	
+		
 }

@@ -124,8 +124,8 @@ class YouTubeApiImpl
 		{   */
 			$newEntry = $this->yt->insertEntry($myVideoEntry, $uploadUrl, 'Zend_Gdata_YouTube_VideoEntry'); 
 			$newEntry -> setMajorProtocolVersion(2);
-			if(isset($props['playlists']))
-				$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
+			//if(isset($props['playlists']))
+				//$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
 			
 			return $newEntry->getVideoId();
 /*		}
@@ -291,7 +291,7 @@ class YouTubeApiImpl
 
 	function updateEntry($remoteId, $props, $private = false)
 	{
-		$videoEntry = $this->yt->getVideoEntry($remoteId,null, true); 
+		$videoEntry = $this->yt->getVideoEntry($remoteId, null, true); 
 		$putUrl = $videoEntry->getEditLink()->getHref();
 
 		$videoEntry->setVideoTitle($props['title']); 
@@ -316,7 +316,7 @@ class YouTubeApiImpl
 		
 		$newEntry = $this->yt->updateEntry($videoEntry, $putUrl);
 		$newEntry->setMajorProtocolVersion(2);
-		$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
+		//$this->handlePlaylists($newEntry, explode(',', $props['playlists']));
 	}
 
 	function deleteEntry($remoteId)

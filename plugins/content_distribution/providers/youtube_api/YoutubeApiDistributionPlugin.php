@@ -2,7 +2,7 @@
 /**
  * @package plugins.youtubeApiDistribution
  */
-class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider
+class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'youtubeApiDistribution';
 	const CONTENT_DSTRIBUTION_VERSION_MAJOR = 2;
@@ -102,10 +102,6 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 			}
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(YoutubeApiDistributionProviderType::YOUTUBE_API))
 		{
 			$reflect = new ReflectionClass('KalturaYoutubeApiDistributionJobProviderData');
@@ -180,10 +176,6 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 				return 'Kaltura_Client_YoutubeApiDistribution_Type_YoutubeApiDistributionProfile';
 		}
 		
-		// content distribution does not work in partner services 2 context because it uses dynamic enums
-		if (!class_exists('kCurrentContext') || kCurrentContext::$ps_vesion != 'ps3')
-			return null;
-
 		if($baseClass == 'KalturaDistributionJobProviderData' && $enumValue == self::getDistributionProviderTypeCoreValue(YoutubeApiDistributionProviderType::YOUTUBE_API))
 			return 'KalturaYoutubeApiDistributionJobProviderData';
 	
@@ -229,7 +221,14 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-		
+	    // append YouTube specific report statistics
+	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+		$mrss->addChild('account_username', $distributionProfile->getUsername());
+		$mrss->addChild('default_category', $distributionProfile->getDefaultCategory());
+	    $mrss->addChild('allow_comments', $distributionProfile->getAllowComments());
+		$mrss->addChild('allow_responses', $distributionProfile->getAllowResponses());
+		$mrss->addChild('allow_ratings', $distributionProfile->getAllowRatings());
+		$mrss->addChild('allow_embedding', $distributionProfile->getAllowEmbedding());	
 	}
 	
 	/**
@@ -247,5 +246,16 @@ class YoutubeApiDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+			
+		return null;
 	}
 }

@@ -3,17 +3,18 @@
  * @package plugins.youtubeApiDistribution
  * @subpackage model.data
  */
-class kYoutubeApiDistributionJobProviderData extends kDistributionJobProviderData
+class kYoutubeApiDistributionJobProviderData extends kConfigurableDistributionJobProviderData
 {
 	/**
 	 * @var string
 	 */
-	public $videoAssetFilePath;
+	private $videoAssetFilePath;
 	
 	/**
 	 * @var string
 	 */
-	public $thumbAssetFilePath;
+	private $thumbAssetFilePath;
+		
 
 		/**
 	 * @return string $videoAssetFilePath
@@ -24,19 +25,19 @@ class kYoutubeApiDistributionJobProviderData extends kDistributionJobProviderDat
 	}
 
 	/**
-	 * @return string $thumbAssetFilePath
-	 */
-	public function getThumbAssetFilePath()
-	{
-		return $this->thumbAssetFilePath;
-	}
-
-	/**
 	 * @param string $videoAssetFilePath
 	 */
 	public function setVideoAssetFilePath($videoAssetFilePath)
 	{
 		$this->videoAssetFilePath = $videoAssetFilePath;
+	}
+	
+	/**
+	 * @return string $thumbAssetFilePath
+	 */
+	public function getThumbAssetFilePath()
+	{
+		return $this->thumbAssetFilePath;
 	}
 
 	/**
@@ -46,7 +47,8 @@ class kYoutubeApiDistributionJobProviderData extends kDistributionJobProviderDat
 	{
 		$this->thumbAssetFilePath = $thumbAssetFilePath;
 	}	
-
+	
+    
 	public function __construct(kDistributionJobData $distributionJobData = null)
 	{
 		parent::__construct($distributionJobData);
