@@ -26,33 +26,6 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		return true;
 	}
 	
-		
-	protected function updatedImportMetadata(BatchJob $dbBatchJob, kImportMetadataJobData $data, BatchJob $twinJob = null)
-	{
-		switch($dbBatchJob->getStatus())
-		{
-			case BatchJob::BATCHJOB_STATUS_FINISHED:
-				return $this->updatedImportMetadataFinished($dbBatchJob, $data, $twinJob);
-			case BatchJob::BATCHJOB_STATUS_FAILED:
-			case BatchJob::BATCHJOB_STATUS_FATAL:
-				return $this->updatedImportMetadataFailed($dbBatchJob, $data, $twinJob);
-			default:
-				return $dbBatchJob;
-		}
-	}
-	
-	protected function updatedImportMetadataFinished(BatchJob $dbBatchJob, kImportMetadataJobData $data, BatchJob $twinJob = null)
-	{
-		// TODO - update the metadata file sync
-		return $dbBatchJob;
-	}
-	
-	protected function updatedImportMetadataFailed(BatchJob $dbBatchJob, kImportMetadataJobData $data, BatchJob $twinJob = null)
-	{
-		// TODO - set the metadata status to invalid
-		return $dbBatchJob;
-	}
-	
 	protected function updatedTransformMetadata(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
 	{
 		switch($dbBatchJob->getStatus())
@@ -71,18 +44,24 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 	
 	protected function updatedTransformMetadataPending(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
 	{
-		$metadataProfile = MetadataProfilePeer::retrieveById($data->getMetadataProfileId());
-		$metadataProfile->setStatus(MetadataProfile::STATUS_TRANSFORMING);
-		$metadataProfile->save();
+		if($data->getSrcXslPath())
+		{
+			$metadataProfile = MetadataProfilePeer::retrieveById($data->getMetadataProfileId());
+			$metadataProfile->setStatus(MetadataProfile::STATUS_TRANSFORMING);
+			$metadataProfile->save();
+		}
 		
 		return $dbBatchJob;
 	}
 	
 	protected function updatedTransformMetadataFinished(BatchJob $dbBatchJob, kTransformMetadataJobData $data, BatchJob $twinJob = null)
 	{
-		$metadataProfile = MetadataProfilePeer::retrieveById($data->getMetadataProfileId());
-		$metadataProfile->setStatus(MetadataProfile::STATUS_ACTIVE);
-		$metadataProfile->save();
+		if($data->getSrcXslPath())
+		{
+			$metadataProfile = MetadataProfilePeer::retrieveById($data->getMetadataProfileId());
+			$metadataProfile->setStatus(MetadataProfile::STATUS_ACTIVE);
+			$metadataProfile->save();
+		}
 		
 		return $dbBatchJob;
 	}
@@ -96,8 +75,11 @@ class kMetadataFlowManager implements kBatchJobStatusEventConsumer, kObjectDataC
 		if(!$metadataProfile)
 			return $dbBatchJob;
 	
-		$metadataProfile->setStatus(MetadataProfile::STATUS_DEPRECATED);
-		$metadataProfile->save();
+		if($data->getSrcXslPath())
+		{
+			$metadataProfile->setStatus(MetadataProfile::STATUS_DEPRECATED);
+			$metadataProfile->save();
+		}
 		
 		return $dbBatchJob;
 	}

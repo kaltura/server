@@ -340,22 +340,42 @@ class kMetadataManager
 	 * @param MetadataProfile $metadataProfile
 	 * @param int $prevVersion
 	 * @param string $prevXsdPath
-	 * 
-	 * @return BatchJob
 	 */
 	public static function diffMetadataProfile(MetadataProfile $metadataProfile, $prevVersion, $prevXsdPath, $newVersion, $newXsdPath)
 	{
-		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_VALIDATION, $metadataProfile->getPartnerId()))
-			return;
-		
-		$xsl = kXsd::compareXsd($prevXsdPath, $newXsdPath);
-		if(!$xsl)
-			return;
+		$xsl = true;
+		if(!PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_VALIDATION, $metadataProfile->getPartnerId()))
+		{
+			$xsl = kXsd::compareXsd($prevXsdPath, $newXsdPath);
+			if(!$xsl)
+				return;
+		}
 			
 		if(is_bool($xsl))
-			return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion);
+			return self::upgradeMetadataObjects($metadataProfile->getId(), $prevVersion, $newVersion);
 		
 		return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion, $xsl);
+	}
+
+	/**
+	 * batch getTransformMetadataObjects action retrieve all metadata objects that requires upgrade and the total count 
+	 * 
+	 * @param int $metadataProfileId The id of the metadata profile
+	 * @param int $srcVersion The old metadata profile version
+	 * @param int $destVersion The new metadata profile version
+	 */
+	private static function upgradeMetadataObjects($metadataProfileId, $srcVersion, $destVersion)
+	{
+		$c = new Criteria();
+		$c->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
+		$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $srcVersion);
+		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::VALID);
+		
+		$update = new Criteria();
+		$update->add(MetadataPeer::METADATA_PROFILE_VERSION, $destVersion);
+			
+		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+		BasePeer::doUpdate($c, $update, $con);
 	}
 	
 	/**
@@ -397,7 +417,7 @@ class kMetadataManager
 			return true;
 		}
 		
-		$errorMessage = kXml::getLibXmlErrorDescription(file_get_contents($xmlPath));
+		$errorMessage = kXml::getLibXmlErrorDescription($metadata);
 		KalturaLog::err("Metadata is invalid:\n$errorMessage");
 		return false;
 	}

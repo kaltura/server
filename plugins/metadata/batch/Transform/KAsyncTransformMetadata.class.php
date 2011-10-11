@@ -7,6 +7,11 @@
  */
 class KAsyncTransformMetadata extends KJobHandlerWorker
 {
+	/**
+	 * @var int
+	 */
+	protected $multiRequestSize = 20;
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -49,8 +54,13 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		return 1;
 	}
 	
-	private function transform(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
+	private function upgrade(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
 	{
+		KalturaLog::debug("transform($job->id)");
+		
+		if($this->taskConfig->params->multiRequestSize)
+			$this->multiRequestSize = $this->taskConfig->params->multiRequestSize;
+		
 		$pager = new KalturaFilterPager();
 		$pager->maxPageSize = 40;
 		if($this->taskConfig->params && $this->taskConfig->params->maxObjectsEachRun)
@@ -61,7 +71,7 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 			$data->srcVersion,
 			$data->destVersion,
 			$pager
-			);
+		);
 			
 		if(!$transformList->totalCount) // if no metadata objects returned
 		{
@@ -80,10 +90,10 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
 		}
 			
+		$this->kClient->startMultiRequest();
 		foreach($transformList->objects as $object)
 		{
 			$xml = kXsd::transformXmlData($object->xml, $data->destXsdPath, $data->srcXslPath);
-			
 			if($xml)
 			{
 				$this->kClient->metadata->update($object->id, $xml);
@@ -92,63 +102,17 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 			{
 				$this->kClient->metadata->invalidate($object->id);				
 			}
+				    
+			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)
+			{
+				$this->kClient->doMultiRequest();
+				$this->kClient->startMultiRequest();
+			}
 		}
+		$this->kClient->doMultiRequest();
 		
 		$this->closeJob($job, null, null, "Metadata objects [" . count($transformList->objects) . "] transformed", KalturaBatchJobStatus::RETRY);
 		
-		return $job;
-	}
-	
-	private function increaseVersion(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
-	{
-		$transformList = $this->kClient->metadataBatch->upgradeMetadataObjects(
-			$data->metadataProfileId,
-			$data->srcVersion,
-			$data->destVersion
-			);
-			
-		if(!$transformList->totalCount) // if no metadata objects returned
-		{
-			if(!$transformList->lowerVersionCount) // if no metadata objects of lower version exist
-			{
-				$this->closeJob($job, null, null, 'All metadata upgraded', KalturaBatchJobStatus::FINISHED);
-				return $job;
-			}
-			
-			$this->closeJob($job, null, null, "Waiting for metadata objects [$transformList->lowerVersionCount] of lower versions", KalturaBatchJobStatus::RETRY);
-			return $job;
-		}
-		
-		if($transformList->lowerVersionCount) // another retry will be needed later
-		{
-			$this->kClient->batch->resetJobExecutionAttempts($job->id, $this->getExclusiveLockKey(), $job->jobType);
-		}
-		
-		$this->closeJob($job, null, null, "Metadata objects [$transformList->totalCount] upgraded", KalturaBatchJobStatus::RETRY);
-		return $job;
-	}
-	
-	private function upgrade(KalturaBatchJob $job, KalturaTransformMetadataJobData $data)
-	{
-		KalturaLog::debug("transform($job->id)");
-		
-		try
-		{
-			if($data->srcXslPath)
-			{
-				KalturaLog::debug("source XSL [$data->srcXslPath]");
-				return $this->transform($job, $data);
-			}
-			else 
-			{
-				KalturaLog::debug("No XSL supplied, just updating the profile version");
-				return $this->increaseVersion($job, $data);
-			}
-		}
-		catch(Exception $ex)
-		{
-			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: " . $ex->getMessage(), KalturaBatchJobStatus::FAILED);
-		}
 		return $job;
 	}
 }

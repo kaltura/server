@@ -81,39 +81,6 @@ class MetadataBatchService extends BatchService
 		return $response;
 	}
 
-	
-	/**
-	 * batch getTransformMetadataObjects action retrieve all metadata objects that requires upgrade and the total count 
-	 * 
-	 * @action upgradeMetadataObjects
-	 * @param int $metadataProfileId The id of the metadata profile
-	 * @param int $srcVersion The old metadata profile version
-	 * @param int $destVersion The new metadata profile version
-	 * @return KalturaUpgradeMetadataResponse
-	 */
-	function upgradeMetadataObjectsAction($metadataProfileId, $srcVersion, $destVersion, KalturaFilterPager $pager = null)
-	{
-		$response = new KalturaUpgradeMetadataResponse();
-		
-		$c = new Criteria();
-		$c->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
-		$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $srcVersion, Criteria::LESS_THAN);
-		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::VALID);
-		$response->lowerVersionCount = MetadataPeer::doCount($c);
-		
-		$c = new Criteria();
-		$c->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
-		$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $srcVersion);
-		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::VALID);
-		
-		$update = new Criteria();
-		$update->add(MetadataPeer::METADATA_PROFILE_VERSION, $destVersion);
-			
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		$response->totalCount = BasePeer::doUpdate($c, $update, $con);
-		
-		return $response;
-	}
 // --------------------------------- TransformMetadataJob functions 	--------------------------------- //
 	
 }
