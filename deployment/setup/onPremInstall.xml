@@ -1,17 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="onPremInstall" default="seccess" >
+<project name="onPremBuild" default="seccess" >
+    <!-- ============================================  -->
+    <!-- Properties                                    -->
+    <!-- ============================================  -->
+    <property name="installationZip"  value="TM-v5.0.0-beta.zip" override="true" />
+    <property name="installationDir"  value="Kaltura-TM-v5.0.0" override="true" />
+    <property name="installationLoc"  value="/web/content/kaltura_packages/drops/" override="true" />
+    <property name="kalturaDir"  value="/opt/kaltura" override="true" />
+    <property name="phpMemLimit"  value="128M" override="true" />
+    <property name="logLevel"  value="7" override="true" />
+    <property name="server"  value="hudsontest2.kaltura.dev" override="true" />
+    <property name="installOnWindows"  value="false" override="true" />
+
+
+    <!-- ============================================  -->
+    <!-- Target: set properties per OS                 -->
+    <!-- ============================================  -->
+    <target name="setProperties">
+         <if>
+         	<equals arg1="${installOnWindows}" arg2="true" />
+         <then>
+         	<property name="apacheDir"  value="\xampp\apache\" override="false" />		
+         	<property name="delCommand"  value="del" override="false" />		
+         	<property name="phpIniDir"  value="\xampp\php\" override="false" />		
+         	<property name="httpdBin"  value="\xampp\apache\bin\httpd.exe" override="false" />		
+         	<property name="phpBin"  value="\xampp\php\php.exe" override="false" />		
+         	<property name="slash"  value="\" override="false" />		
+         	<property name="mkdirCommand"  value="mkdir" override="false" />		
+         	<property name="domainFolder"  value="\Windows\System32\drivers\etc\" override="false" />		
+         </then>
+         <else>
+         	<property name="apacheDir"  value="/etc/httpd/" override="false" />		
+         	<property name="delCommand"  value="rm -rf" override="false" />		
+         	<property name="phpIniDir"  value="/etc/" override="false" />		
+         	<property name="httpdBin"  value="/usr/sbin/apachectl" override="false" />		
+         	<property name="phpBin"  value="/usr/bin/php" override="false" />		
+         	<property name="slash"  value="/" override="false" />		
+         	<property name="mkdirCommand"  value="mkdir -p" override="false" />		
+         	<property name="domainFolder"  value="/etc/" override="false" />		
+         </else>
+         </if>
+         
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: run uninstall                         -->
+    <!-- ============================================  -->
+    <target name="uninstall" depends="setProperties">
+         <!--echo msg="uninstall..." /-->
+         <property name="properties.unins"  value="null" override="false" />
+         <available file="${kalturaDir}${slash}uninstaller" type="dir" property="properties.unins" />
+         <!--echo message="value is ${properties.unins}" /-->
+
+         <if>
+              <equals arg1="${properties.unins}" arg2="true" />
+         <then>
+              <echo msg="uninstall..." />
+              <exec command="php uninstall.php -s" dir="${kalturaDir}${slash}uninstaller" />
+         </then>
+         </if>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: uninclude kaltura                     -->
+    <!-- ============================================  -->
+    <target name="unincludeKaltura" depends="uninstall,setProperties">
+         <echo msg="uninclude kaltura ..." />
+         
+         <copy file="${apacheDir}conf${slash}httpd.conf" tofile="${apacheDir}conf${slash}httpd.conf.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="Include \/opt\/kaltura\/app\/configurations\/apache\/my_kaltura.conf" replace="# Dynamic Shared Object (DSO) Support"/>
+                       <regexp pattern="LoadModule filter_module modules\/mod_filter.so" replace="# LoadModule foo_module modules/mod_foo.so"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+         <copy file="${apacheDir}conf${slash}httpd.conf.bak" tofile="${apacheDir}conf${slash}httpd.conf" overwrite="true"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: delete Kaltura folder                 -->
+    <!-- ============================================  -->
+    <target name="deleteKalturaFolder">
+         <echo msg="delete Kaltura Folder..." />
+         <exec command="${delCommand} kaltura" dir="${kalturaDir}${slash}.." />
+         <exec command="${delCommand} instlBkgrndRun.log" dir="${kalturaDir}${slash}.." />
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: restart apache                        -->
+    <!-- ============================================  -->
+    <target name="restartApache" depends="uninstall,unincludeKaltura,deleteKalturaFolder">
+         <echo msg="restart apache..." />
+         <if>
+         	<equals arg1="${installOnWindows}" arg2="true" />
+         <then>
+         	<exec command="apache_stop.bat" dir="/xampp/" />		
+         	<exec command="apache_start.bat" dir="/xampp/" />		
+         </then>
+         <else>
+         	<exec command="apachectl restart" dir="." />		
+         </else>
+         </if>
+    </target>
+
 
     <!-- ============================================  -->
     <!-- Target: unzip installtion package             -->
     <!-- ============================================  -->
-    <target name="unzipPackage">
+    <target name="unzipPackage" depends="restartApache">
          <echo msg="delete before unzip..." />
-         <exec command="rm -rf Kaltura-TM-v4.0.0" dir="/web/content/kaltura_packages/drops/" />
-         <exec command="rm -rf Kaltura-TM-v5.0.0" dir="/web/content/kaltura_packages/drops/" />
+         <exec command="${delCommand} Kaltura-TM-v4.0.0" dir="${installationLoc}" />
+         <exec command="${delCommand} Kaltura-TM-v5.0.0" dir="${installationLoc}" />
+         <exec command="${delCommand} Kaltura-TM-v0.0.0" dir="${installationLoc}" />
+         <exec command="${delCommand} Kaltura-CM-v4.0.0" dir="${installationLoc}" />
+         <exec command="${delCommand} Kaltura-CM-v5.0.0" dir="${installationLoc}" />
+         <exec command="${delCommand} Kaltura-CM-v0.0.0" dir="${installationLoc}" />
 
          <echo msg="unzip..." />
-         <exec command="unzip /web/content/kaltura_packages/drops/TM-v5.0.0-beta.zip" dir="/web/content/kaltura_packages/drops/" />
+         <if>
+         	<equals arg1="${installOnWindows}" arg2="true" />
+         <then>
+         	<unzip file="${installationZip}" todir="${installationLoc}">
+  				<fileset dir="${installationLoc}">
+    				<include name="*.zip"/>
+  				</fileset>
+			</unzip>		
+         </then>
+         <else>
+	         <exec command="unzip -q ${installationLoc}${installationZip}" dir="${installationLoc}" />
+         </else>
+         </if>
+         
     </target>
 
 
@@ -21,38 +143,42 @@
     <target name="setTimeZone">
          <echo msg="setting time zone ..." />
 
-         <copy file="/etc/php.ini" tofile="/etc/php.ini.1" overwrite="true">
+         <copy file="${phpIniDir}php.ini" tofile="${phpIniDir}php.ini.1" overwrite="true">
               <filterchain>
                    <replaceregexp>
-                        <regexp pattern=";date.timezone =$" replace="date.timezone = 'America/New_York'" ignoreCase="true"  modifiers="m" />
+                        <regexp pattern=";date.timezone =$" replace="date.timezone = America/New_York" ignoreCase="true"  modifiers="m" />
+                        <regexp pattern="date.timezone =$" replace="date.timezone = America/New_York" ignoreCase="true" modifiers="m"/>
                    </replaceregexp>
               </filterchain>
          </copy>
-         <copy file="/etc/php.ini.1" tofile="/etc/php.ini" overwrite="true">
-              <filterchain>
-                   <replaceregexp>
-                        <regexp pattern="date.timezone =$" replace="date.timezone = 'America/New_York'" ignoreCase="true" modifiers="m"/>
-                   </replaceregexp>
-              </filterchain>
-         </copy>
+         <copy file="${phpIniDir}php.ini.1" tofile="${phpIniDir}php.ini" overwrite="true"/>
 
-         <exec command="apachectl restart" dir="." />
+         <if>
+         	<equals arg1="${installOnWindows}" arg2="true" />
+         <then>
+         	<exec command="apache_stop.bat" dir="/xampp/" />		
+         	<exec command="apache_start.bat" dir="/xampp/" />		
+         </then>
+         <else>
+         	<exec command="apachectl restart" dir="." />		
+         </else>
+         </if>
     </target>
 
     <!-- ============================================  -->
     <!-- Target: init user_input file                  -->
     <!-- ============================================  -->
-    <target name="initUserInputFile">
+    <target name="initUserInputFile" depends="unzipPackage,setProperties">
          <echo msg="init user_input file ..." />
-
-         <copy file="/web/content/kaltura_packages/drops/Kaltura-TM-v5.0.0/user_input.bak" tofile="/web/content/kaltura_packages/drops/Kaltura-TM-v5.0.0/user_input.ini" overwrite="true">
+         
+         <copy file="${installationLoc}${installationDir}${slash}user_input.bak" tofile="${installationLoc}${installationDir}${slash}user_input.ini" overwrite="true">
               <filterchain>
                    <replacetokens begintoken="@@" endtoken="@@">
                         <token key="REPORT_MAIL" value="guyguy" />
-                        <token key="HTTPD_BIN" value="/usr/sbin/apachectl" />
-                        <token key="PHP_BIN" value="/usr/bin/php" />
-                        <token key="BASE_DIR" value="/opt/kaltura" />
-                        <token key="KALTURA_FULL_VIRTUAL_HOST_NAME" value="hudsontest1.kaltura.dev" />
+                        <token key="HTTPD_BIN" value="${httpdBin}" />
+                        <token key="PHP_BIN" value="${phpBin}" />
+                        <token key="BASE_DIR" value="${kalturaDir}" />
+                        <token key="KALTURA_FULL_VIRTUAL_HOST_NAME" value="${server}" />
                         <token key="ADMIN_CONSOLE_ADMIN_MAIL" value="admin@kaltura.com" />
                         <token key="ADMIN_CONSOLE_PASSWORD" value="admin" />
                         <token key="DB1_HOST" value="localhost" />
@@ -66,6 +192,48 @@
          </copy>
 
     </target>
+    
+    
+    <!-- ============================================  -->
+    <!-- Target: replace generate config file          -->
+    <!-- ============================================  -->
+    <target name="replaceGenerateConfig,setProperties">
+         <echo msg="replacing generate config file if needed..." />
+         <property name="properties.gener"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}generator${slash}config.template.dev.ini" property="properties.gener" />
+         <!--echo message="value is ${properties.gener}" /-->
+
+         <if>
+              <equals arg1="${properties.gener}" arg2="true" />
+         <then>
+              <echo msg="replacing generate config file..." />
+			  <copy file="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}generator${slash}config.template.dev.ini" tofile="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}generator${slash}config.template.ini" overwrite="true"/>
+         </then>
+         </if>
+         
+         <property name="properties.gener1"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}configurations${slash}generator.template.dev.ini" property="properties.gener1" />
+         <!--echo message="value is ${properties.gener}" /-->
+
+         <if>
+              <equals arg1="${properties.gener1}" arg2="true" />
+         <then>
+              <echo msg="replacing generate config file..." />
+			  <copy file="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}configurations${slash}generator.template.dev.ini" tofile="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}configurations${slash}generator.template.ini" overwrite="true"/>
+         </then>
+         </if>
+         
+         <property name="properties.watch.daemon"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}plugins${slash}sphinx_search${slash}scripts${slash}watch.daemon.sh.onprem" property="properties.watch.daemon" />
+         
+         <if>
+              <equals arg1="${properties.watch.daemon}" arg2="true" />
+         <then>
+              <echo msg="replacing watch.daemon config file..." />
+			  <copy file="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}plugins${slash}sphinx_search${slash}scripts${slash}watch.daemon.sh.onprem" tofile="${installationLoc}${installationDir}${slash}package${slash}app${slash}app${slash}plugins${slash}sphinx_search${slash}scripts${slash}watch.daemon.sh" overwrite="true"/>
+         </then>
+         </if>
+    </target>
 
 
     <!-- ============================================  -->
@@ -73,28 +241,182 @@
     <!-- ============================================  -->
     <target name="mysqlUpgrade">
          <echo msg="upgrading Mysql..." />
-         <exec command="mysql_upgrade" dir="/web/content/kaltura_packages/drops" />
+         <exec command="mysql_upgrade" dir="${installationLoc}" />
+    </target>
+    
+    
+    <!-- ============================================  -->
+    <!-- Target: check for sphinx log dir              -->
+    <!-- ============================================  -->
+    <target name="sphinxLogDir,setProperties">
+         <property name="properties.sphinxdir"  value="null" override="false" />
+         <available file="/usr/local/var/data" type="dir" property="properties.sphinxdir" />
+
+         <if>
+              <equals arg1="${properties.sphinxdir}" arg2="false" />
+         <then>
+              <echo msg="creating sphinx log dir..." />
+              <exec command="${mkdirCommand} ${slash}usr${slash}local${slash}var${slash}data" dir="${slash}" />
+         </then>
+         </if>
     </target>
 
 
     <!-- ============================================  -->
     <!-- Target: Installation                          -->
     <!-- ============================================  -->
-    <target name="install" depends="setTimeZone,initUserInputFile,mysqlUpgrade">
+    <target name="install" depends="unzipPackage,setTimeZone,initUserInputFile,mysqlUpgrade,sphinxLogDir,replaceGenerateConfig,setProperties">
          <echo msg="install..." />
-         <exec command="php install.php -s;" dir="/web/content/kaltura_packages/drops/Kaltura-TM-v5.0.0" />
+         <property name="properties.instl"  value="null" override="false" />
+         <available file="${installationLoc}${installationDir}${slash}preInstallation.php" property="properties.instl" />
+         <!--echo message="value is ${properties.instl}" /-->
+
+         <if>
+              <equals arg1="${properties.instl}" arg2="true" />
+         <then>
+              <echo msg="preinstallation..." />
+	          <exec command="php preInstallation.php -s kaltura" dir="${installationLoc}${installationDir}" />
+         </then>
+         <else>
+			  <echo msg="installation..." />
+	          <exec command="php install.php -s" dir="${installationLoc}${installationDir}" />
+         </else>
+         </if>
+         
          <echo msg="Done" />
     </target>
 
+
+
+    <!-- ============================================  -->
+    <!-- Target: set domain at etc/hosts               -->
+    <!-- ============================================  -->
+    <target name="setDomain" depends="install">
+         <echo msg="setting domain ..." />
+
+         <copy file="${domainFolder}hosts" tofile="${domainFolder}hosts.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                        <regexp pattern="127.0.0.1" replace="xxxchangexxx127.0.0.1"/>
+                        <regexp pattern="127.0.0.1(.+)" replace="\1 ${server}"/>
+                        <regexp pattern="xxxchangexxx" replace="127.0.0.1"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="${domainFolder}hosts.bak" tofile="${domainFolder}hosts" overwrite="true"/>
+
+    </target>
+
+
+
+    <!-- ============================================  -->
+    <!-- Target: include kaltura                       -->
+    <!-- ============================================  -->
+    <target name="includeKaltura" depends="install">
+         <echo msg="include kaltura ..." />
+
+         <copy file="${apacheDir}conf${slash}httpd.conf" tofile="${apacheDir}conf${slash}httpd.conf.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <!--token key="Include conf.d/*.conf" value="Include ${kalturaDir}/app/configurations/apache/my_kaltura.conf" /-->
+                       <regexp pattern="# Dynamic Shared Object \(DSO\) Support" replace="Include ${kalturaDir}/app/configurations/apache/my_kaltura.conf"/>
+                       <regexp pattern="# LoadModule foo_module modules\/mod_foo.so" replace="LoadModule filter_module modules/mod_filter.so"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="${apacheDir}conf${slash}httpd.conf.bak" tofile="${apacheDir}conf${slash}httpd.conf" overwrite="true"/>
+
+    </target>
+
+
+
+    <!-- ============================================  -->
+    <!-- Target: restart apache                        -->
+    <!-- ============================================  -->
+    <target name="restartServer" depends="setDomain,includeKaltura">
+         <echo msg="restart apache..." />
+         <if>
+         	<equals arg1="${installOnWindows}" arg2="true" />
+         <then>
+         	<exec command="apache_stop.bat" dir="/xampp/" />		
+         	<exec command="apache_start.bat" dir="/xampp/" />		
+         </then>
+         <else>
+         	<exec command="apachectl restart" dir="." />		
+         </else>
+         </if>
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: generate activation key               -->
+    <!-- ============================================  -->
+    <target name="genActivationKey" >
+         <echo msg="generate activation key ..." />
+
+         <copy file="${kalturaDir}${slash}app${slash}configurations${slash}local.ini" tofile="${kalturaDir}${slash}app${slash}configurations${slash}local.ini.bak" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                        <regexp pattern='kaltura_activation_key = false' replace='kaltura_activation_key = NjkwNTkzMTg5NWJjM2YyNzg0ZjFlNjViZDIzNzA0NDJ8MXxuZXZlcnww'/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="${kalturaDir}${slash}app${slash}configurations${slash}local.ini.bak" tofile="${kalturaDir}${slash}app${slash}configurations${slash}local.ini" overwrite="true"/>
+
+    </target>
+
+	<!-- ============================================  -->
+    <!-- Target: change log level                      -->
+    <!-- ============================================  -->
+    <target name="changeLogLevel">
+         <echo msg="changing log level..." />
+         <copy file="${kalturaDir}${slash}app${slash}configurations${slash}logger.ini" tofile="${kalturaDir}${slash}app${slash}configurations${slash}logger.ini.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="writers.stream.filters.priority.priority = (\w+)" replace="writers.stream.filters.priority.priority = ${logLevel}"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="${kalturaDir}${slash}app${slash}configurations${slash}logger.ini.1" tofile="${kalturaDir}${slash}app${slash}configurations${slash}logger.ini" overwrite="true"/>
+    </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: change memory limit                   -->
+    <!-- ============================================  -->
+    <target name="changeMemoryLimit">
+         <echo msg="changing memory limit..." />
+         <copy file="${kalturaDir}${slash}app${slash}configurations${slash}apache${slash}my_kaltura.conf" tofile="${kalturaDir}${slash}app${slash}configurations${slash}apache${slash}my_kaltura.conf.1" overwrite="true">
+              <filterchain>
+                   <replaceregexp>
+                       <regexp pattern="php_value memory_limit (\w+)" replace="php_value memory_limit ${phpMemLimit}"/>
+                   </replaceregexp>
+              </filterchain>
+         </copy>
+
+         <copy file="${kalturaDir}${slash}app${slash}configurations${slash}apache${slash}my_kaltura.conf.1" tofile="${kalturaDir}${slash}app${slash}configurations${slash}apache${slash}my_kaltura.conf" overwrite="true"/>
+    </target>
+    
+    <!-- ============================================  -->
+    <!-- Target: unit tests (not running)              -->
+    <!-- ============================================  -->
+    <target name="unitTest">
+         <echo msg="creating base data for tests..." />
+         <exec command="php ${kalturaDir}${slash}app${slash}tests${slash}scripts${slash}createBaseData.php" dir="${kalturaDir}${slash}app${slash}tests${slash}scripts" />
+         <echo msg="running unit tests..." />
+         <exec command="phpunit ${kalturaDir}${slash}app${slash}tests${slash}api" dir="${kalturaDir}${slash}app${slash}tests" />
+    </target>
 
 
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="install">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
          <echo msg="Done" />
     </target>
-
 
 
 </project>
