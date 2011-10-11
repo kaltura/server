@@ -579,6 +579,25 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 	}";
 	}
 
+	/* (non-PHPdoc)
+	 * @see PHP5PeerBuilder::addDoUpdate()
+	 */
+	protected function addDoUpdate(&$script)
+	{
+		parent::addDoUpdate($script);
+		
+		$script .= "	
+	/**
+	 * Return array of columns that should change only if there is a real change.
+	 * @return array
+	 */
+	public static function getAtomicColumns()
+	{
+		return array();
+	}
+";
+	}
+	
 	/**
 	 * Adds the doSelectJoin*() methods.
 	 * @param      string &$script The script will be modified in this method.

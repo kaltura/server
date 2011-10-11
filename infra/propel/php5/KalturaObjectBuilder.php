@@ -165,6 +165,225 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 			$this->getPeerClassname() . "::setUseCriteriaFilter(true);" .
 			substr($parentReload, $doSelectPos + strlen($doSelectStmt));
 	}
+
+	/* (non-PHPdoc)
+	 * @see PHP5ObjectBuilder::addAlreadyInSaveAttribute($script)
+	 */
+	protected function addAlreadyInSaveAttribute(&$script)
+	{
+		$script .= "
+	/**
+	 * Flag to prevent endless save loop, if this object is referenced
+	 * by another object which falls in this transaction.
+	 * @var        boolean
+	 */
+	protected \$alreadyInSave = false;
+
+	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected \$objectSaved = false;
+";
+	}
+
+
+	/* (non-PHPdoc)
+	 * @see PHP5ObjectBuilder::addSave($script)
+	 */
+	protected function addSave(&$script)
+	{
+		parent::addSave($script);
+		
+		$script .= "	
+	public function wasObjectSaved()
+	{
+		return \$this->objectSaved;
+	}
+";
+	}
+	
+	/* (non-PHPdoc)
+	 * @see PHP5ObjectBuilder::addDoSave($script)
+	 */
+	protected function addDoSave(&$script)
+	{
+		$table = $this->getTable();
+
+		$reloadOnUpdate = $table->isReloadOnUpdate();
+		$reloadOnInsert = $table->isReloadOnInsert();
+
+		$script .= "
+	/**
+	 * Performs the work of inserting or updating the row in the database.
+	 *
+	 * If the object is new, it inserts it; otherwise an update is performed.
+	 * All related objects are also updated in this method.
+	 *
+	 * @param      PropelPDO \$con";
+		if ($reloadOnUpdate || $reloadOnInsert) {
+			$script .= "
+	 * @param      boolean \$skipReload Whether to skip the reload for this object from database.";
+		}
+		$script .= "
+	 * @return     int The number of rows affected by this insert/update and any referring fk objects' save() operations.
+	 * @throws     PropelException
+	 * @see        save()
+	 */
+	protected function doSave(PropelPDO \$con".($reloadOnUpdate || $reloadOnInsert ? ", \$skipReload = false" : "").")
+	{
+		\$affectedRows = 0; // initialize var to track total num of affected rows
+		if (!\$this->alreadyInSave) {
+			\$this->alreadyInSave = true;
+";
+		if ($reloadOnInsert || $reloadOnUpdate) {
+			$script .= "
+			\$reloadObject = false;
+";
+		}
+
+		if (count($table->getForeignKeys())) {
+
+			$script .= "
+			// We call the save method on the following object(s) if they
+			// were passed to this object by their coresponding set
+			// method.  This object relates to these object(s) by a
+			// foreign key reference.
+";
+
+			foreach ($table->getForeignKeys() as $fk)
+			{
+				$aVarName = $this->getFKVarName($fk);
+				$script .= "
+			if (\$this->$aVarName !== null) {
+				if (\$this->".$aVarName."->isModified() || \$this->".$aVarName."->isNew()) {
+					\$affectedRows += \$this->".$aVarName."->save(\$con);
+				}
+				\$this->set".$this->getFKPhpNameAffix($fk, $plural = false)."(\$this->$aVarName);
+			}
+";
+			} // foreach foreign k
+		} // if (count(foreign keys))
+		
+		if ($table->hasAutoIncrementPrimaryKey() ) {
+		$script .= "
+			if (\$this->isNew() ) {
+				\$this->modifiedColumns[] = " . $this->getColumnConstant($table->getAutoIncrementPrimaryKey() ) . ";
+			}";
+		}
+
+		$script .= "
+
+			// If this object has been modified, then save it to the database.
+			\$this->objectSaved = false;
+			if (\$this->isModified()";
+
+		$script .= ") {
+				if (\$this->isNew()) {
+					\$pk = ".$this->getPeerClassname()."::doInsert(\$this, \$con);";
+		if ($reloadOnInsert) {
+			$script .= "
+					if (!\$skipReload) {
+						\$reloadObject = true;
+					}";
+		}
+		$script .= "
+					\$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
+										 // should always be true here (even though technically
+										 // BasePeer::doInsert() can insert multiple rows).
+";
+		if ($table->getIdMethod() != IDMethod::NO_ID_METHOD) {
+
+			if (count($pks = $table->getPrimaryKey())) {
+				foreach ($pks as $pk) {
+					if ($pk->isAutoIncrement()) {
+						$script .= "
+					\$this->set".$pk->getPhpName()."(\$pk);  //[IMV] update autoincrement primary key
+";
+					}
+				}
+			}
+		} // if (id method != "none")
+
+		$script .= "
+					\$this->setNew(false);
+					\$this->objectSaved = true;
+				} else {";
+		if ($reloadOnUpdate) {
+			$script .= "
+					if (!\$skipReload) {
+						\$reloadObject = true;
+					}";
+		}
+		$script .= "
+					\$affectedObjects = ".$this->getPeerClassname()."::doUpdate(\$this, \$con);
+					if(\$affectedObjects)
+						\$this->objectSaved = true;
+						
+					\$affectedRows += \$affectedObjects;
+				}
+";
+
+		// We need to rewind any LOB columns
+		foreach ($table->getColumns() as $col) {
+			$clo = strtolower($col->getName());
+			if ($col->isLobType()) {
+				$script .= "
+				// Rewind the $clo LOB column, since PDO does not rewind after inserting value.
+				if (\$this->$clo !== null && is_resource(\$this->$clo)) {
+					rewind(\$this->$clo);
+				}
+";
+			}
+		}
+
+		$script .= "
+				\$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
+			}
+";
+
+		foreach ($table->getReferrers() as $refFK) {
+
+			if ($refFK->isLocalPrimaryKey()) {
+				$varName = $this->getPKRefFKVarName($refFK);
+				$script .= "
+			if (\$this->$varName !== null) {
+				if (!\$this->{$varName}->isDeleted()) {
+						\$affectedRows += \$this->{$varName}->save(\$con);
+				}
+			}
+";
+			} else {
+				$collName = $this->getRefFKCollVarName($refFK);
+				$script .= "
+			if (\$this->$collName !== null) {
+				foreach (\$this->$collName as \$referrerFK) {
+					if (!\$referrerFK->isDeleted()) {
+						\$affectedRows += \$referrerFK->save(\$con);
+					}
+				}
+			}
+";
+			} // if refFK->isLocalPrimaryKey()
+
+		} /* foreach getReferrers() */
+		$script .= "
+			\$this->alreadyInSave = false;
+";
+		if ($reloadOnInsert || $reloadOnUpdate) {
+			$script .= "
+			if (\$reloadObject) {
+				\$this->reload(\$con);
+			}
+";
+		}
+		$script .= "
+		}
+		return \$affectedRows;
+	} // doSave()
+";
+
+	}
 	
 	/**
 	 * Adds the save hook methods.
@@ -665,5 +884,32 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 	";
 		
 	} // addCustomDataMethods()
-	
+
+	/* (non-PHPdoc)
+	 * @see PHP5ObjectBuilder::addBuildPkeyCriteriaClose($script)
+	 */
+	protected function addBuildPkeyCriteriaClose(&$script) 
+	{
+		$table = $this->getTable();
+		if(!$table->getColumn(self::KALTURA_COLUMN_UPDATED_AT))
+			return parent::addBuildPkeyCriteriaClose($script);
+			
+		$script .= "
+		
+		if(\$this->alreadyInSave && count(\$this->modifiedColumns) == 2 and \$this->isColumnModified(".$this->getPeerClassname()."::UPDATED_AT))
+		{
+			\$theModifiedColumn = null;
+			foreach(\$this->modifiedColumns as \$modifiedColumn)
+				if(\$modifiedColumn != ".$this->getPeerClassname()."::UPDATED_AT)
+					\$theModifiedColumn = \$modifiedColumn;
+					
+			\$atomicColumns = ".$this->getPeerClassname()."::getAtomicColumns();
+			if(in_array(\$theModifiedColumn, \$atomicColumns))
+				\$criteria->add(\$theModifiedColumn, \$this->getByName(\$theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+		}
+
+		return \$criteria;
+	}
+";
+	}
 }
