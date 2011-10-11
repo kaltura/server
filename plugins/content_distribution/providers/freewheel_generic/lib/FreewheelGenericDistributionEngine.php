@@ -57,11 +57,11 @@ class FreewheelGenericDistributionEngine extends DistributionEngine implements
 		
 		$stream = fopen("ssh2.sftp://$sftp_id/$filename", 'r');
 		if (!$stream)
-			throw new Exception('Distribution failed with error [Could not open stream to FTP server]');
+			return false; // file doesn't exist yet
 		
 		$contents = fread($stream, 4096);
 		if (!$contents)
-			throw new Exception('Distribution failed with error [Could not read from FTP server]');
+			return false; // count empty content as the file was not writed to the ftp yet
 			
 		$parser = xml_parser_create ();
 		xml_parse_into_struct ( $parser, $contents, $values, $tags );
