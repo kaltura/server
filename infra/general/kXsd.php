@@ -78,7 +78,8 @@ class kXsd
 					$xsl .= '
 			' . $tabs . '<xsl:element name="' . $toName . '">' . $to->getAttribute('default') . '</xsl:element>';
 					
-			$isIdentical = false;	
+			$isIdentical = false;
+			KalturaLog::info("Node [$toName] minimum occurs changed from [" . $from->getAttribute('minOccurs') . "] to [" . $to->getAttribute('minOccurs') . "]");
 		}
 		
 		if($isIdentical)
@@ -130,30 +131,36 @@ class kXsd
 		$toChildren = $to->childNodes;
 		
 		$fromChildrenArr = array();
-		foreach($fromChildren as $index => $child)
+		if($fromChildren)
 		{
-			if($child->nodeType == XML_COMMENT_NODE || $child->nodeType == XML_TEXT_NODE)
-				continue;
-				
-			$childName = strtolower($child->localName);
-			if($childName == 'annotation')
-				continue;
-				
-			$fromChildrenArr[] = $child;
+			foreach($fromChildren as $index => $child)
+			{
+				if($child->nodeType == XML_COMMENT_NODE || $child->nodeType == XML_TEXT_NODE)
+					continue;
+					
+				$childName = strtolower($child->localName);
+				if($childName == 'annotation')
+					continue;
+					
+				$fromChildrenArr[] = $child;
+			}
 		}
 		KalturaLog::debug("From nodes [" . count($fromChildrenArr) . "]");
 		
 		$toChildrenArr = array();
-		foreach($toChildren as $index => $child)
+		if($toChildren)
 		{
-			if($child->nodeType == XML_COMMENT_NODE || $child->nodeType == XML_TEXT_NODE)
-				continue;
-				
-			$childName = strtolower($child->localName);
-			if($childName == 'annotation')
-				continue;
-				
-			$toChildrenArr[] = $child;
+			foreach($toChildren as $index => $child)
+			{
+				if($child->nodeType == XML_COMMENT_NODE || $child->nodeType == XML_TEXT_NODE)
+					continue;
+					
+				$childName = strtolower($child->localName);
+				if($childName == 'annotation')
+					continue;
+					
+				$toChildrenArr[] = $child;
+			}
 		}
 		KalturaLog::debug("To nodes [" . count($toChildrenArr) . "]");
 		
@@ -184,6 +191,7 @@ class kXsd
 						}
 						else
 						{
+							KalturaLog::info("Node [$id] name changed from [$fromElementName] to [$elementName]");
 							$isIdentical = false;
 							$xsl .= '
 			' . $tabs . '<xsl:element name="' . $elementName . '">
@@ -191,6 +199,10 @@ class kXsd
 			' . $tabs . '</xsl:element>';
 						}
 						continue;
+					}
+					else 
+					{
+						KalturaLog::debug("Node [$id] is new");
 					}
 				}
 				
@@ -220,7 +232,7 @@ class kXsd
 						throw new kXsdException(kXsdException::CAN_NOT_ADD_REQUIRED_ELEMENT, $toChild->hasAttribute('minOccurs'), $xPath);
 					
 					$isIdentical = false;
-						
+					KalturaLog::info("Node [" . $toChild->getAttribute('name') . "] added with minimum occurs [" . $toChild->getAttribute('minOccurs') . "]");
 						$xsl .= '
 			' . $tabs . '<xsl:element name="' . $elementName . '">' . $toChild->getAttribute('default') . '</xsl:element>';	
 				}
@@ -241,6 +253,7 @@ class kXsd
 					if(!$toChild)
 					{
 						$isIdentical = false;
+						KalturaLog::info("Node [$id] deleted");
 						continue;
 					}
 				}
@@ -258,9 +271,10 @@ class kXsd
 					$toChildFound = $toChild;
 				}
 				
-				if(!$fromChildFound)
+				if(!$toChildFound)
 				{
 					$isIdentical = false;
+					KalturaLog::info("Node [$id] deleted");
 					continue;
 				}
 			}
@@ -290,7 +304,10 @@ class kXsd
 						{
 							KalturaLog::debug("Found element by id [$toChildId]");
 							if($fromChild !== $tmpFromChild)
+							{
 								$isIdentical = false;
+								KalturaLog::info("Node [$toChildId] appear more than once");
+							}
 							$fromChild = $tmpFromChild;
 						}
 						else
@@ -314,7 +331,7 @@ class kXsd
 					{
 						$xsl .= $childXsl;
 						$isIdentical = false;
-						KalturaLog::debug("Elements [$toChildName] [$fromChildName] are different");
+						KalturaLog::info("Elements [$toChildName] [$fromChildName] are different");
 					}
 					continue;
 				}
@@ -332,7 +349,7 @@ class kXsd
 				{
 					$xsl .= $childXsl;
 					$isIdentical = false;
-					KalturaLog::debug("Nodes [$fromName] [$toName] are different");
+					KalturaLog::info("Nodes [$fromName] [$toName] are different");
 				}
 			}
 		}
