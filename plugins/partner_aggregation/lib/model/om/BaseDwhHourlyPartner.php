@@ -400,6 +400,12 @@ abstract class BaseDwhHourlyPartner extends BaseObject  {
 	protected $alreadyInSave = false;
 
 	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected $objectSaved = false;
+
+	/**
 	 * Flag to prevent endless validation loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean

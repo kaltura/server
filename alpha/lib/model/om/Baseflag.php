@@ -80,6 +80,12 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 	protected $alreadyInSave = false;
 
 	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected $objectSaved = false;
+
+	/**
 	 * Flag to prevent endless validation loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -631,6 +637,11 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 			throw $e;
 		}
 	}
+	
+	public function wasObjectSaved()
+	{
+		return $this->objectSaved;
+	}
 
 	/**
 	 * Performs the work of inserting or updating the row in the database.
@@ -666,6 +677,7 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 			}
 
 			// If this object has been modified, then save it to the database.
+			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
 					$pk = flagPeer::doInsert($this, $con);
@@ -676,8 +688,13 @@ abstract class Baseflag extends BaseObject  implements Persistent {
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
 					$this->setNew(false);
+					$this->objectSaved = true;
 				} else {
-					$affectedRows += flagPeer::doUpdate($this, $con);
+					$affectedObjects = flagPeer::doUpdate($this, $con);
+					if($affectedObjects)
+						$this->objectSaved = true;
+						
+					$affectedRows += $affectedObjects;
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'

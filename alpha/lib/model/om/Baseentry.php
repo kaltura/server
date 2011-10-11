@@ -4185,7 +4185,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			if(in_array($theModifiedColumn, $atomicColumns))
 				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
 		}
-		
+
 		return $criteria;
 	}
 

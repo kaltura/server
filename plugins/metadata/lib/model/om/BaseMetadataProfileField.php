@@ -99,6 +99,12 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 	protected $alreadyInSave = false;
 
 	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected $objectSaved = false;
+
+	/**
 	 * Flag to prevent endless validation loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -834,6 +840,11 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			throw $e;
 		}
 	}
+	
+	public function wasObjectSaved()
+	{
+		return $this->objectSaved;
+	}
 
 	/**
 	 * Performs the work of inserting or updating the row in the database.
@@ -857,6 +868,7 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 			}
 
 			// If this object has been modified, then save it to the database.
+			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
 					$pk = MetadataProfileFieldPeer::doInsert($this, $con);
@@ -867,8 +879,13 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
 					$this->setNew(false);
+					$this->objectSaved = true;
 				} else {
-					$affectedRows += MetadataProfileFieldPeer::doUpdate($this, $con);
+					$affectedObjects = MetadataProfileFieldPeer::doUpdate($this, $con);
+					if($affectedObjects)
+						$this->objectSaved = true;
+						
+					$affectedRows += $affectedObjects;
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
@@ -1330,6 +1347,18 @@ abstract class BaseMetadataProfileField extends BaseObject  implements Persisten
 		$criteria = new Criteria(MetadataProfileFieldPeer::DATABASE_NAME);
 
 		$criteria->add(MetadataProfileFieldPeer::ID, $this->id);
+		
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(MetadataProfileFieldPeer::UPDATED_AT))
+		{
+			$theModifiedColumn = null;
+			foreach($this->modifiedColumns as $modifiedColumn)
+				if($modifiedColumn != MetadataProfileFieldPeer::UPDATED_AT)
+					$theModifiedColumn = $modifiedColumn;
+					
+			$atomicColumns = MetadataProfileFieldPeer::getAtomicColumns();
+			if(in_array($theModifiedColumn, $atomicColumns))
+				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+		}
 
 		return $criteria;
 	}

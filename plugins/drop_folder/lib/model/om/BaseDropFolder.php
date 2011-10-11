@@ -129,6 +129,12 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 	protected $alreadyInSave = false;
 
 	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected $objectSaved = false;
+
+	/**
 	 * Flag to prevent endless validation loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -1031,6 +1037,11 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			throw $e;
 		}
 	}
+	
+	public function wasObjectSaved()
+	{
+		return $this->objectSaved;
+	}
 
 	/**
 	 * Performs the work of inserting or updating the row in the database.
@@ -1054,6 +1065,7 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 			}
 
 			// If this object has been modified, then save it to the database.
+			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
 					$pk = DropFolderPeer::doInsert($this, $con);
@@ -1064,8 +1076,13 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
 					$this->setNew(false);
+					$this->objectSaved = true;
 				} else {
-					$affectedRows += DropFolderPeer::doUpdate($this, $con);
+					$affectedObjects = DropFolderPeer::doUpdate($this, $con);
+					if($affectedObjects)
+						$this->objectSaved = true;
+						
+					$affectedRows += $affectedObjects;
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
@@ -1576,6 +1593,18 @@ abstract class BaseDropFolder extends BaseObject  implements Persistent {
 		$criteria = new Criteria(DropFolderPeer::DATABASE_NAME);
 
 		$criteria->add(DropFolderPeer::ID, $this->id);
+		
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(DropFolderPeer::UPDATED_AT))
+		{
+			$theModifiedColumn = null;
+			foreach($this->modifiedColumns as $modifiedColumn)
+				if($modifiedColumn != DropFolderPeer::UPDATED_AT)
+					$theModifiedColumn = $modifiedColumn;
+					
+			$atomicColumns = DropFolderPeer::getAtomicColumns();
+			if(in_array($theModifiedColumn, $atomicColumns))
+				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+		}
 
 		return $criteria;
 	}

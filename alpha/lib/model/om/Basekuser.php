@@ -455,6 +455,12 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	protected $alreadyInSave = false;
 
 	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected $objectSaved = false;
+
+	/**
 	 * Flag to prevent endless validation loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -2528,6 +2534,11 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			throw $e;
 		}
 	}
+	
+	public function wasObjectSaved()
+	{
+		return $this->objectSaved;
+	}
 
 	/**
 	 * Performs the work of inserting or updating the row in the database.
@@ -2551,6 +2562,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			}
 
 			// If this object has been modified, then save it to the database.
+			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
 					$pk = kuserPeer::doInsert($this, $con);
@@ -2561,8 +2573,13 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
 					$this->setNew(false);
+					$this->objectSaved = true;
 				} else {
-					$affectedRows += kuserPeer::doUpdate($this, $con);
+					$affectedObjects = kuserPeer::doUpdate($this, $con);
+					if($affectedObjects)
+						$this->objectSaved = true;
+						
+					$affectedRows += $affectedObjects;
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
@@ -3567,6 +3584,18 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$criteria = new Criteria(kuserPeer::DATABASE_NAME);
 
 		$criteria->add(kuserPeer::ID, $this->id);
+		
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(kuserPeer::UPDATED_AT))
+		{
+			$theModifiedColumn = null;
+			foreach($this->modifiedColumns as $modifiedColumn)
+				if($modifiedColumn != kuserPeer::UPDATED_AT)
+					$theModifiedColumn = $modifiedColumn;
+					
+			$atomicColumns = kuserPeer::getAtomicColumns();
+			if(in_array($theModifiedColumn, $atomicColumns))
+				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+		}
 
 		return $criteria;
 	}

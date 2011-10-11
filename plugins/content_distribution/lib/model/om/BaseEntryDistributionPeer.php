@@ -865,6 +865,15 @@ abstract class BaseEntryDistributionPeer {
 
 		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
 	}
+	
+	/**
+	 * Return array of columns that should change only if there is a real change.
+	 * @return array
+	 */
+	public static function getAtomicColumns()
+	{
+		return array();
+	}
 
 	/**
 	 * Method to DELETE all rows from the entry_distribution table.
