@@ -54,11 +54,11 @@ class CuePointPeer extends BaseCuePointPeer
 		$partnerId = kCurrentContext::$ks_partner_id;
 		if ($puserId && $partnerId)
 		{
-			$kuserId = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-		    if (! $kuserId) {
-				throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID );
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		    if (! $kuser) {
+				$kuser = kuserPeer::createKuserForPartner($partnerId, $puserId);
 			}
-			$c->addAnd(CuePointPeer::KUSER_ID, $kuserId->getId());
+			$c->addAnd(CuePointPeer::KUSER_ID, $kuser->getId());
 		}
 		self::$s_criteria_filter->setFilter($c);
 	}
