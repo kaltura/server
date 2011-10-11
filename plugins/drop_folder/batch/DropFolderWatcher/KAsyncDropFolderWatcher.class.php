@@ -419,7 +419,14 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 	private function purgeFile(KalturaDropFolderFile $dropFolderFile, $physicalFilePath)
 	{
 		// physicaly delete the file
-		$delResult = $this->fileTransferMgr->delFile($physicalFilePath);
+		$delResult = null;
+		try {
+		    $delResult = $this->fileTransferMgr->delFile($physicalFilePath);
+		}
+		catch (Exception $e) {
+		    KalturaLog::err('Cannot delete physical file ['.$physicalFilePath.'] for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
+		    return false;
+		}
 		if (!$delResult) {
 			KalturaLog::err("Cannot delete physical file at path [$physicalFilePath]");
 			try {
