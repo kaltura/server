@@ -70,6 +70,16 @@ class PermissionPeer extends BasePermissionPeer
 		}
 	}
 	
+	public static function setDefaultCriteriaFilter ()
+	{
+		if(is_null(self::$s_criteria_filter))
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria(); 
+		$c->add(self::STATUS, PermissionStatus::DELETED,criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
 	
 	public static function removePermissionFromPartner($permissionName, $partnerId)
 	{
