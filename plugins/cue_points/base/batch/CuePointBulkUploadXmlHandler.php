@@ -121,6 +121,9 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		
 		foreach($results as $index => $cuePoint)
 		{
+			if(is_array($cuePoint) && isset($cuePoint['code']))
+				throw new Exception($cuePoint['message'], $cuePoint['code']);
+			
 			foreach($pluginsInstances as $pluginsInstance)
 			{
 				/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
