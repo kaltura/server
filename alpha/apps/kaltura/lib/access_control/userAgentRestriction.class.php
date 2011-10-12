@@ -93,7 +93,7 @@ class userAgentRestriction extends baseRestriction
 		$userAgentRegexs = explode(self::USER_AGENT_REGEX_LIST_DELIMETER, $this->getUserAgentRegexList());
 		foreach ($userAgentRegexs as $regex)
 		{
-			if ($regex && preg_match('/'.$regex.'/', $userAgent))
+			if ($regex && preg_match("/$regex/i", $userAgent))
 			{
 				return true;
 			}
