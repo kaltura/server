@@ -392,7 +392,8 @@ class ks
 		}
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 	
-		if($this->original_str)
+		if($this->original_str && 
+			$partner_id != Partner::BATCH_PARTNER_ID)		// Avoid querying the database on batch KS, since they are never invalidated
 		{
 			if ($this->isSetLimitAction()){
 				$isValidCctionLimit = invalidSessionPeer::isValidActionsLimit($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
