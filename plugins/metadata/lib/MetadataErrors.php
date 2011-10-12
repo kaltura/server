@@ -9,6 +9,8 @@ class MetadataErrors extends KalturaErrors
 	
 	const INVALID_METADATA_OBJECT = "INVALID_METADATA_OBJECT,invalid metadata object [%s]";
 	
+	const INVALID_METADATA_VERSION = "INVALID_METADATA_VERSION,invalid metadata version [%s]";
+	
 	const INVALID_METADATA_DATA = "INVALID_METADATA_DATA,invalid metadata data: %s";
 	
 	const METADATA_FILE_NOT_FOUND = "METADATA_FILE_NOT_FOUND,Metadata file not found [%s]";

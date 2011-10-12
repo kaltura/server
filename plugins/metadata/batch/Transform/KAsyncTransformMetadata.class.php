@@ -93,14 +93,15 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 		$this->kClient->startMultiRequest();
 		foreach($transformList->objects as $object)
 		{
+			/* @var $object KalturaMetadata */
 			$xml = kXsd::transformXmlData($object->xml, $data->destXsdPath, $data->srcXslPath);
 			if($xml)
 			{
-				$this->kClient->metadata->update($object->id, $xml);
+				$this->kClient->metadata->update($object->id, $xml, $object->version);
 			}
 			else 
 			{
-				$this->kClient->metadata->invalidate($object->id);				
+				$this->kClient->metadata->invalidate($object->id, $object->version);				
 			}
 				    
 			if($this->kClient->getMultiRequestQueueSize() >= $this->multiRequestSize)

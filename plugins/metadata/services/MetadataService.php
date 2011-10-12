@@ -198,19 +198,24 @@ class MetadataService extends KalturaBaseService
 	 * @action update
 	 * @param int $id 
 	 * @param string $xmlData XML metadata
+	 * @param int $version Enable update only if the metadata object version did not change by other process
 	 * @return KalturaMetadata
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws MetadataErrors::INVALID_METADATA_DATA
+	 * @throws MetadataErrors::INVALID_METADATA_VERSION
 	 */	
-	function updateAction($id, $xmlData = null)
+	function updateAction($id, $xmlData = null, $version = null)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
 		if(!$dbMetadata)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+			
+		if($version && $dbMetadata->getVersion() != $version)
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_VERSION, $dbMetadata->getVersion());
 		
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($dbMetadata->getMetadataProfileId());
 		if(!$dbMetadataProfile)
-			throw new KalturaAPIException(KalturaErrors::INVALID_METADATA_PROFILE, $dbMetadata->getMetadataProfileId());
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $dbMetadata->getMetadataProfileId());
 		
 		$previousVersion = null;
 		if($dbMetadata->getStatus() == Metadata::STATUS_VALID)
@@ -353,15 +358,19 @@ class MetadataService extends KalturaBaseService
 	 * 
 	 * @action invalidate
 	 * @param int $id
+	 * @param int $version Enable update only if the metadata object version did not change by other process
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws MetadataErrors::INVALID_METADATA_VERSION
 	 */		
-	function invalidateAction($id)
+	function invalidateAction($id, $version = null)
 	{
 		$dbMetadata = MetadataPeer::retrieveByPK($id);
-		
 		if(!$dbMetadata)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-		
+
+		if($version && $dbMetadata->getVersion() != $version)
+			throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_VERSION, $dbMetadata->getVersion());
+
 		$dbMetadata->setStatus(KalturaMetadataStatus::INVALID);
 		$dbMetadata->save();
 	}
