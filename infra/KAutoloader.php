@@ -297,7 +297,7 @@ class KAutoloader
 				{
 					$folderPermission = substr(decoct(fileperms(dirname(self::$_classMapFileLocation))), 2);
 					error_log("PHP Class map could not be saved to path [" . self::$_classMapFileLocation . "] folder permisisons [$folderPermission]");
-					die("PHP Class map could be saved");
+					die("PHP Class map could not be saved");
 				}
 			}
 		}
@@ -310,7 +310,7 @@ class KAutoloader
 			{
 				$permission = substr(decoct(fileperms(self::$_classMapFileLocation)), 2);
 				error_log("PHP Class map could not be loaded from path [" . self::$_classMapFileLocation . "] file permisisons [$permission]");
-				die('PHP Class map could be loaded');
+				die('PHP Class map could not be loaded');
 			}
 		}
 	}
