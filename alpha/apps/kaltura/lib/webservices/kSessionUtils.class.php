@@ -381,15 +381,6 @@ class ks
 			invalidSessionPeer::actionsLimitKs($this, $limit);		
 	}
 	
-	public function setIPRestriction()
-	{
-		$ipRestrict = $this->isSetIPRestriction();
-		
-		if ($ipRestrict)
-		{
-			//invalidSessionPeer::ipRestrictKS($this, $ipRestrict);
-		}
-	}
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
