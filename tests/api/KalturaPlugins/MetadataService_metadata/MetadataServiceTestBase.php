@@ -133,22 +133,23 @@ abstract class MetadataServiceTestBase extends KalturaApiTestCase
 	 * Tests metadata->update action
 	 * @param int $id 
 	 * @param string $xmlData XML metadata
+	 * @param int $version Enable update only if the metadata object version did not change by other process
 	 * @param KalturaMetadata $reference 
 	 * @depends testAdd
 	 * @dataProvider provideData
 	 */
-	public function testUpdate($id, $xmlData = "", KalturaMetadata $reference)
+	public function testUpdate($id, $xmlData = "", $version = "", KalturaMetadata $reference)
 	{
-		$resultObject = $this->client->metadata->update($id, $xmlData);
+		$resultObject = $this->client->metadata->update($id, $xmlData, $version);
 		$this->assertInstanceOf('KalturaMetadata', $resultObject);
 		$this->compareApiObjects($reference, $resultObject, array('createdAt', 'updatedAt', 'id', 'thumbnailUrl', 'downloadUrl', 'rootEntryId', 'operationAttributes', 'deletedAt', 'statusUpdatedAt', 'widgetHTML', 'totalCount', 'objects', 'cropDimensions', 'dataUrl', 'requiredPermissions', 'confFilePath', 'feedUrl'));
-		$this->validateUpdate($id, $xmlData, $reference);
+		$this->validateUpdate($id, $xmlData, $version, $reference);
 	}
 
 	/**
 	 * Validates testUpdate results
 	 */
-	protected function validateUpdate($id, $xmlData = "", KalturaMetadata $reference)
+	protected function validateUpdate($id, $xmlData = "", $version = "", KalturaMetadata $reference)
 	{
 	}
 
