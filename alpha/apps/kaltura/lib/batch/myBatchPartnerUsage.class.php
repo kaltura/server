@@ -18,6 +18,7 @@ class myBatchPartnerUsage extends myBatchBase
 			// get only free partners
 			$c->addAnd(PartnerPeer::PARTNER_PACKAGE, 1);
 			$c->addAnd(PartnerPeer::MONITOR_USAGE, 1);
+			$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_DELETED, CRITERIA::NOT_EQUAL);
 			$c->setOffset($start_pos);
 			$c->setLimit($bulk_size);
 			$partners = PartnerPeer::doSelect($c);

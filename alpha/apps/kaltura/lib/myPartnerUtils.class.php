@@ -959,7 +959,7 @@ class myPartnerUtils
 			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_PACKAGE_LIMIT_WARNING_2, $partner, $body_params);
 			if($should_block_delete_partner)
 			{
-				$partner->setStatus(2);
+				$partner->setStatus(Partner::PARTNER_STATUS_CONTENT_BLOCK);
 			}
 		}
 		elseif ($percent >= 120 &&
@@ -982,7 +982,7 @@ class myPartnerUtils
 			myPartnerUtils::notifiyPartner(myPartnerUtils::KALTURA_DELETE_ACCOUNT, $partner, $body_params);
 			if($should_block_delete_partner)
 			{
-				$partner->setStatus(0);
+				$partner->setStatus(Partner::PARTNER_STATUS_DELETED);
 			}
 		}
 		elseif($percent < 80 && ($partner->getUsageLimitWarning() || $partner->getEightyPercentWarning()))
