@@ -1,0 +1,278 @@
+<?php
+/**
+ * @package plugins.yahooDistribution
+ * @subpackage lib
+ */
+class YahooDistributionEngine extends DistributionEngine implements 
+	IDistributionEngineUpdate,
+	IDistributionEngineSubmit,
+	//IDistributionEngineReport,
+	IDistributionEngineDelete,
+	IDistributionEngineCloseUpdate,
+	IDistributionEngineCloseSubmit,
+	IDistributionEngineCloseDelete
+{
+	const TEMP_DIRECTORY = 'yahoo_distribution';
+	const FEED_TEMPLATE = 'feed_template.xml';
+	const DELETE_FEED_TEMPLATE = 'feed_template_delete.xml';
+	
+	protected $tempXmlPath;
+
+	/* (non-PHPdoc)
+	 * @see DistributionEngine::configure()
+	 */
+	public function configure(KSchedularTaskConfig $taskConfig)
+	{
+		$this->tempXmlPath = sys_get_temp_dir();
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineSubmit::submit()
+	 */
+	public function submit(KalturaDistributionSubmitJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYahooDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaYahooDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaYahooDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaYahooDistributionJobProviderData");
+
+		return $this->handleSubmit($data, $data->distributionProfile, $data->providerData);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseSubmit::closeSubmit()
+	 */
+	public function closeSubmit(KalturaDistributionSubmitJobData $data)
+	{
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineDelete::delete()
+	 */
+	public function delete(KalturaDistributionDeleteJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYahooDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaYahooDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaYahooDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaYahooDistributionJobProviderData");
+		
+		return $this->handleDelete($data, $data->distributionProfile, $data->providerData);
+		
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseDelete::closeDelete()
+	 */
+	public function closeDelete(KalturaDistributionDeleteJobData $data)
+	{
+		
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineUpdate::update()
+	 */
+	public function update(KalturaDistributionUpdateJobData $data)
+	{
+		if(!$data->distributionProfile || !($data->distributionProfile instanceof KalturaYahooDistributionProfile))
+			KalturaLog::err("Distribution profile must be of type KalturaYahooDistributionProfile");
+	
+		if(!$data->providerData || !($data->providerData instanceof KalturaYahooDistributionJobProviderData))
+			KalturaLog::err("Provider data must be of type KalturaYahooDistributionJobProviderData");
+		
+		return $this->handleSubmit($data, $data->distributionProfile, $data->providerData);
+	
+	}
+
+	/* (non-PHPdoc)
+	 * @see IDistributionEngineCloseUpdate::closeUpdate()
+	 */
+	public function closeUpdate(KalturaDistributionUpdateJobData $data)
+	{
+		
+	}
+
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaYahooDistributionProfile $distributionProfile
+	 * @param KalturaYahooDistributionJobProviderData $providerData
+	 */
+	protected function handleSubmit(KalturaDistributionJobData $data, KalturaYahooDistributionProfile $distributionProfile, KalturaYahooDistributionJobProviderData $providerData)
+	{
+		KalturaLog::debug("Yahoo: submit");
+		$distributionProfile = $data->distributionProfile;
+		$providerData = $data->providerData;
+		$entryDistribution = $data->entryDistribution;
+
+		$this->fieldValues = unserialize($providerData->fieldValues);
+		if (!$this->fieldValues) {
+			KalturaLog::err("fieldValues array is empty or null");
+			throw new Exception("fieldValues array is empty or null");	
+		}			
+		//xml creation
+		$flavorAssets = $this->getFlavorAssets($entryDistribution);		
+		$thumbAssets = $this->getThumbAssets($entryDistribution);
+		$feed = new YahooDistributionFeedHelper(self::FEED_TEMPLATE, $distributionProfile, $providerData, $entryDistribution, $flavorAssets);		
+		$feed->setFieldsForSubmit();		
+		//create unique name for thumbnails 
+		$currentTime = time();		
+		$smallThumbDestFileName = $currentTime.'_'.basename($providerData->smallThumbPath); 
+		$largeThumbDestFileName = $currentTime.'_'.basename($providerData->largeThumbPath);
+		
+		$feed->setThumbnailsPath($smallThumbDestFileName, $largeThumbDestFileName);	
+		
+		//create unique names for flavor assets 
+		$feed->setStreams($flavorAssets, $currentTime);		
+		$remoteId = $this->fieldValues[KalturaYahooDistributionField::VIDEO_FEEDITEM_ID];
+		$fileName = $remoteId .'_'. $currentTime . '.xml';
+		$srcFile = $this->tempXmlPath . '/' . $fileName;
+		$path = $distributionProfile->ftpPath;
+		$destFile = "{$path}/{$fileName}";
+			
+		file_put_contents($srcFile, $feed->getXmlString());	
+		KalturaLog::debug("XML written to file [$srcFile]");
+		//upload file to FTP
+		$ftpManager = $this->getFTPManager($distributionProfile);
+		//upload flavors and thumbnails to FTP
+		$this->uploadThumbAssetsFiles($path, $providerData, $ftpManager, $smallThumbDestFileName, $largeThumbDestFileName);				
+		$this->uploadFlavorAssetsFiles($path, $feed, $providerData, $ftpManager, $flavorAssets, $currentTime);	
+		//upload feed to FTP
+		$ftpManager->putFile($destFile, $srcFile, true);		
+		if ($remoteId){
+			return true;
+		}
+		else{
+			return false;
+		}		
+	}
+	
+	/**
+	 * @param KalturaDistributionJobData $data
+	 * @param KalturaYahooDistributionProfile $distributionProfile
+	 * @param KalturaYahooDistributionJobProviderData $providerData
+	 */
+	protected function handleDelete(KalturaDistributionJobData $data, KalturaYahooDistributionProfile $distributionProfile, KalturaYahooDistributionJobProviderData $providerData)
+	{	
+		$this->fieldValues = unserialize($providerData->fieldValues);
+		if (!$this->fieldValues) {
+			KalturaLog::err("fieldValues array is empty or null");
+			throw new Exception("fieldValues array is empty or null");	
+		}		
+		KalturaLog::debug("Yahoo: delete");
+		$entryDistribution = $data->entryDistribution;	
+		$feed = new YahooDistributionFeedHelper(self::DELETE_FEED_TEMPLATE, $distributionProfile, $providerData, $entryDistribution, null);			
+		//create a feed with expiration time set to yesterday
+		$feed->setFieldsForDelete();
+		$currentTime = time();
+	
+		$remoteId = $this->fieldValues[KalturaYahooDistributionField::VIDEO_FEEDITEM_ID];				
+		$fileName = $remoteId .'_'. $currentTime. '.xml';
+		$srcFile = $this->tempXmlPath . '/' . $fileName;
+		$path = $distributionProfile->ftpPath;
+		$destFile = "{$path}/{$fileName}";
+				
+		$ftpManager = $this->getFTPManager($distributionProfile);
+		if(!$ftpManager)
+			throw new Exception("FTP manager not loaded");
+	
+		file_put_contents($srcFile, $feed->getXmlString());
+		KalturaLog::debug("XML written to file [$srcFile]");
+		//upload file to FTP
+		$ftpManager = $this->getFTPManager($distributionProfile);
+		$ftpManager->putFile($destFile, $srcFile, true);
+				
+		if ($remoteId){
+			return true;
+		}
+		else{
+			return false;
+		}		
+	}
+				
+	/**
+	 * 
+	 * @param KalturaYahooDistributionProfile $distributionProfile
+	 * @return sftpMgr
+	 */
+	protected function getFTPManager(KalturaYahooDistributionProfile $distributionProfile)
+	{
+		$ftpHost = $distributionProfile->ftpHost;
+		$ftpUsername = $distributionProfile->ftpUsername;
+		$ftpPassword = $distributionProfile->ftpPassword;
+		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		if(!$ftpManager){
+			throw new Exception("FTP manager not loaded");
+		}
+		$ftpManager->login($ftpHost, $ftpUsername, $ftpPassword, null, true);
+		return $ftpManager;
+	}
+	
+	protected function getFlavorAssets(KalturaEntryDistribution $entryDistribution)
+	{
+		$flavorAssetFilter = new KalturaFlavorAssetFilter();
+		$flavorAssetFilter->entryIdEqual = $entryDistribution->entryId;
+		$flavorAssetFilter->idIn = $entryDistribution->flavorAssetIds;
+		
+		try {
+			$this->impersonate($entryDistribution->partnerId);
+			$flavorAssets = $this->kalturaClient->flavorAsset->listAction($flavorAssetFilter);
+			$this->unimpersonate();
+		}
+		catch (Exception $e) {
+			$this->unimpersonate();
+			throw $e;
+		}
+		
+		return $flavorAssets->objects;		
+	}
+	
+	protected function getThumbAssets(KalturaEntryDistribution $entryDistribution)
+	{
+		$thumbAssetFilter = new KalturaThumbAssetFilter();
+		$thumbAssetFilter->entryIdEqual = $entryDistribution->entryId;
+		$thumbAssetFilter->idIn = $entryDistribution->thumbAssetIds;
+		
+		try {
+			$this->impersonate($entryDistribution->partnerId);
+			$thumbAssets = $this->kalturaClient->thumbAsset->listAction($thumbAssetFilter);
+			$this->unimpersonate();
+		}
+		catch (Exception $e) {
+			$this->unimpersonate();
+			throw $e;
+		}
+		
+		return $thumbAssets->objects;		
+	}
+	
+	/**
+	 * upload all flavor assets files to FTP
+	 * @param KalturaYahooDistributionJobProviderData $providerData
+	 * @param YahooDistributionFeedHelper $feed
+	 */
+	protected function uploadFlavorAssetsFiles($path, $feed, $providerData, $ftpManager, $flavorAssets, $currentTime)
+	{
+		/* @var $feed YahooDistributionFeedHelper */
+		/* @var $providerData KalturaYahooDistributionJobProviderData */
+		foreach ($flavorAssets as $asset)
+		{
+			$destName = $feed->flavorAssetUniqueName($asset, $currentTime);
+			$destName = "{$path}/{$destName}";
+			$videoAssetFilePathArray = unserialize($providerData->videoAssetFilePath);
+			$sourceName = $videoAssetFilePathArray[$asset->id];
+			$ftpManager->putFile($destName, $sourceName, true);
+		}
+	}
+		
+	protected function uploadThumbAssetsFiles($path, $providerData, $ftpManager, $smallThumbDestFileName, $largeThumbDestFileName)
+	{			
+			$smallThumbDestFileName = "{$path}/{$smallThumbDestFileName}";
+			$largeThumbDestFileName	= "{$path}/{$largeThumbDestFileName}";			
+			$ftpManager->putFile($smallThumbDestFileName, $providerData->smallThumbPath, true);
+			$ftpManager->putFile($largeThumbDestFileName, $providerData->largeThumbPath, true);
+	}
+	
+	
+}
