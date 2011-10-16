@@ -369,18 +369,24 @@ class kMetadataManager
 		$affectedRows = null;
 		do
 		{
-			$c = new Criteria();
-			$c->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
-			$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $srcVersion);
-			$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::VALID);
-			$c->addAscendingOrderByColumn(MetadataPeer::ID);
-			$c->setLimit(10000);
+			$table = MetadataPeer::TABLE_NAME;
+			$colId = MetadataPeer::ID;
+			$colMetadataProfileId = MetadataPeer::METADATA_PROFILE_ID;
+			$colMetadataProfileVersion = MetadataPeer::METADATA_PROFILE_VERSION;
+			$colStatus = MetadataPeer::STATUS;
+			$validStatus = Metadata::STATUS_VALID;
 			
-			$update = new Criteria();
-			$update->add(MetadataPeer::METADATA_PROFILE_VERSION, $destVersion);
-				
-			$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
-			$affectedRows = BasePeer::doUpdate($c, $update, $con);
+			$sql = "UPDATE $table ";
+			$sql .= "SET $colMetadataProfileVersion = $destVersion ";
+			$sql .= "WHERE $colMetadataProfileId = $metadataProfileId ";
+			$sql .= "AND $colMetadataProfileVersion = $srcVersion ";
+			$sql .= "AND $colStatus = $validStatus ";
+			$sql .= "ORDER BY $colId ";
+			$sql .= "LIMIT 10000";
+			
+			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+			$affectedRows = $con->query($sql);
+			KalturaLog::debug("Affected rows [$affectedRows]");
 		}
 		while($affectedRows);
 	}
