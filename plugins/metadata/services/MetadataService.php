@@ -245,8 +245,11 @@ class MetadataService extends KalturaBaseService
 					throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
 				}
 			}
+			else
+			{
+				$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
+			}
 			
-			$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			$dbMetadata->incrementVersion();
 			$dbMetadata->save();
 		
