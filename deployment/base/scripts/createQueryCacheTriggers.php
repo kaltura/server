@@ -2,14 +2,20 @@
 
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
-	array('table' => "flavor_asset", 		'key' => array("'flavorAsset:entryId='", '@OBJ@.entry_id')),
-	array('table' => "kuser", 				'key' => array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id')),
-	array('table' => "entry", 				'key' => array("'entry:id='", '@OBJ@.id')),
-	array('table' => "access_control", 		'key' => array("'accessControl:id='", '@OBJ@.id')),
-	array('table' => "permission", 			'key' => array("'permission:partnerId='", '@OBJ@.partner_id')),
-	array('table' => "kuser_to_user_role", 	'key' => array("'kuserToUserRole:kuserId='", '@OBJ@.kuser_id')),
-	array('table' => "category", 			'key' => array("'category:partnerId='", '@OBJ@.partner_id')),
-	array('table' => "file_sync", 			'key' => array("'fileSync:objectId='", '@OBJ@.object_id')),
+	array('table' => "flavor_asset", 			'keys' => array(array("'flavorAsset:entryId='", '@OBJ@.entry_id'), array("'flavorAsset:id='", '@OBJ@.id'))),
+	array('table' => "kuser", 					'keys' => array(array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
+	array('table' => "entry", 					'keys' => array(array("'entry:id='", '@OBJ@.id'))),
+	array('table' => "access_control", 			'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
+	array('table' => "permission", 				'keys' => array(array("'permission:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "kuser_to_user_role",	 	'keys' => array(array("'kuserToUserRole:kuserId='", '@OBJ@.kuser_id'))),
+	array('table' => "category", 				'keys' => array(array("'category:partnerId='", '@OBJ@.partner_id'))),
+	array('table' => "file_sync", 				'keys' => array(array("'fileSync:objectId='", '@OBJ@.object_id'))),
+	array('table' => "media_info", 				'keys' => array(array("'mediaInfo:flavorAssetId='", '@OBJ@.flavor_asset_id'))),
+	array('table' => "storage_profile", 		'keys' => array(array("'storageProfile:partnerId='", '@OBJ@.partner_id'), array("'storageProfile:id='", '@OBJ@.id'))),
+	array('table' => "ui_conf", 				'keys' => array(array("'uiConf:id='", '@OBJ@.id'))),
+	array('table' => "widget", 					'keys' => array(array("'widget:id='", '@OBJ@.id'))),
+	array('table' => "metadata", 				'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id'))),
+	array('table' => "metadata_profile_field", 	'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id'))),
 );
 
 // Default parameters
@@ -71,35 +77,53 @@ if ($line[0] <= 0)
 
 mysql_free_result($result);
 
+mysql_query("DELIMITER //") or die('Error: Failed to set delimiter: ' . mysql_error() . "\n");
+
 // Install / remove triggers
 foreach ($INVALIDATION_KEYS as $invalidationKey)
 {
 	$tableName = $invalidationKey['table'];
 	
 	$sqlCommands = array(
-		"DROP TRIGGER IF EXISTS {$tableName}_insert_memcache;",
-		"DROP TRIGGER IF EXISTS {$tableName}_update_memcache;",
-		"DROP TRIGGER IF EXISTS {$tableName}_delete_memcache;",
+		"DROP TRIGGER IF EXISTS {$tableName}_insert_memcache//",
+		"DROP TRIGGER IF EXISTS {$tableName}_update_memcache//",
+		"DROP TRIGGER IF EXISTS {$tableName}_delete_memcache//",
 		);
 	
 	if ($ACTION == 'create')
 	{
-		// build the invalidation key
-		$curKey = array("'QCI-'");
-		foreach ($invalidationKey['key'] as $curStr)
+		// build the invalidation keys
+		$triggerBody = array();
+		foreach ($invalidationKey['keys'] as $curKeyStrings)
 		{
-			if (strpos($curStr, '@OBJ@') === false)
-				$curKey[] = $curStr;
-			else 
-				$curKey[] = "IF($curStr IS NULL,'',$curStr)";
+			$curKey = array("'QCI-'");
+			foreach ($curKeyStrings as $curStr)
+			{
+				if (strpos($curStr, '@OBJ@') === false)
+					$curKey[] = $curStr;
+				else 
+					$curKey[] = "IF($curStr IS NULL,'',$curStr)";
+			}
+			$curKey = 'concat(' . implode(', ', $curKey) . ')';
+			
+			$triggerBody[] = "DO memc_set($curKey, UNIX_TIMESTAMP(NOW()));";
 		}
-		$curKey = 'concat(' . implode(', ', $curKey) . ')';
-		$insertUpdateKey = str_replace('@OBJ@', 'NEW', $curKey);
-		$deleteKey = str_replace('@OBJ@', 'OLD', $curKey);
 		
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, UNIX_TIMESTAMP(NOW()));";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW DO memc_set($insertUpdateKey, UNIX_TIMESTAMP(NOW()));";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW DO memc_set($deleteKey, UNIX_TIMESTAMP(NOW()));";
+		if (count($triggerBody) > 1)
+		{
+			$triggerBody = 'BEGIN ' . implode(' ', $triggerBody) . ' END';
+		}
+		else
+		{
+			$triggerBody = implode(' ', $triggerBody);
+		}
+		
+		$insertUpdateBody = str_replace('@OBJ@', 'NEW', $triggerBody);
+		$deleteBody = str_replace('@OBJ@', 'OLD', $triggerBody);
+		
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW $insertUpdateBody//";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW $insertUpdateBody//";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW $deleteBody//";
 		
 		print "Creating triggers on {$tableName}...\n";
 	}
@@ -116,6 +140,8 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 		}
 	}
 }
+
+mysql_query("DELIMITER ;");
 
 // Close database connection
 mysql_close($link);
