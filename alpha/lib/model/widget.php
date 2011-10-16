@@ -256,4 +256,9 @@ class widget extends Basewidget
 	{
 		if ( $uiconf_id )	$this->ui_conf_id = $uiconf_id;
 	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("widget:id=".$this->getId());
+	}
 }

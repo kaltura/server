@@ -11,5 +11,10 @@
 class mediaInfo extends BasemediaInfo
 {
 	const MEDIA_INFO_BIT_RATE_MODE_CBR = 1;
-	const MEDIA_INFO_BIT_RATE_MODE_VBR = 2; 
+	const MEDIA_INFO_BIT_RATE_MODE_VBR = 2;
+	 
+	public function getCacheInvalidationKeys()
+	{
+		return array("mediaInfo:flavorAssetId=".$this->getFlavorAssetId());
+	}
 }

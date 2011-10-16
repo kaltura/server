@@ -740,4 +740,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function getAutomuted ()	{		return $this->getFromCustomData( "automuted" , null , false );	}
 	public function setAutomuted( $v )	{		return $this->putInCustomData( "automuted", $v );	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("uiConf:id=".$this->getId());
+	}
 }

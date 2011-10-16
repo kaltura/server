@@ -48,5 +48,15 @@ class widgetPeer extends BasewidgetPeer
 		return $res;
 	}
 
-	
+	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	{
+		$criterion = $criteria->getCriterion(self::ID);
+		if (!$criterion || 
+			$criterion->getComparison() != Criteria::EQUAL)
+		{
+			return array();				
+		}
+		
+		return array("widget:id=".$criterion->getValue());
+	}
 }

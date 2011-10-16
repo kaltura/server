@@ -38,4 +38,16 @@ class mediaInfoPeer extends BasemediaInfoPeer
 
 		return mediaInfoPeer::doSelectOne($criteria);
 	}
+
+	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	{
+		$criterion = $criteria->getCriterion(self::FLAVOR_ASSET_ID);
+		if (!$criterion || 
+			$criterion->getComparison() != Criteria::EQUAL)
+		{
+			return array();				
+		}
+		
+		return array("mediaInfo:flavorAssetId=".$criterion->getValue());
+	}
 }

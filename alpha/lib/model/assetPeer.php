@@ -528,13 +528,20 @@ class assetPeer extends BaseassetPeer
 
 	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
 	{
-		$criterion = $criteria->getCriterion(self::ENTRY_ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::EQUAL)
+		$criterion = $criteria->getCriterion(self::ID);
+		if ($criterion && 
+			$criterion->getComparison() == Criteria::EQUAL)
 		{
-			return array();				
+			return array("flavorAsset:id=".$criterion->getValue());
 		}
 		
-		return array("flavorAsset:entryId=".$criterion->getValue());
+		$criterion = $criteria->getCriterion(self::ENTRY_ID);
+		if ($criterion && 
+			$criterion->getComparison() == Criteria::EQUAL)
+		{
+			return array("flavorAsset:entryId=".$criterion->getValue());
+		}
+
+		return array();				
 	}
 }
