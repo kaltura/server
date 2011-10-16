@@ -366,16 +366,23 @@ class kMetadataManager
 	 */
 	private static function upgradeMetadataObjects($metadataProfileId, $srcVersion, $destVersion)
 	{
-		$c = new Criteria();
-		$c->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
-		$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $srcVersion);
-		$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::VALID);
-		
-		$update = new Criteria();
-		$update->add(MetadataPeer::METADATA_PROFILE_VERSION, $destVersion);
+		$affectedRows = null;
+		do
+		{
+			$c = new Criteria();
+			$c->add(MetadataPeer::METADATA_PROFILE_ID, $metadataProfileId);
+			$c->add(MetadataPeer::METADATA_PROFILE_VERSION, $srcVersion);
+			$c->add(MetadataPeer::STATUS, KalturaMetadataStatus::VALID);
+			$c->addAscendingOrderByColumn(MetadataPeer::ID);
+			$c->setLimit(10000);
 			
-		$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
-		BasePeer::doUpdate($c, $update, $con);
+			$update = new Criteria();
+			$update->add(MetadataPeer::METADATA_PROFILE_VERSION, $destVersion);
+				
+			$con = Propel::getConnection(MetadataPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+			$affectedRows = BasePeer::doUpdate($c, $update, $con);
+		}
+		while($affectedRows);
 	}
 	
 	/**
@@ -384,10 +391,11 @@ class kMetadataManager
 	 * @param int $metadataProfileId
 	 * @param string $metadata
 	 * @param string $errorMessage
+	 * @param int $metadataProfileVersion leave it null to use the latest
 	 * 
 	 * returns bool
 	 */
-	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage)
+	public static function validateMetadata($metadataProfileId, $metadata, &$errorMessage, $metadataProfileVersion = null)
 	{
 		KalturaLog::debug("Validating metadata [$metadata]");
 		$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
@@ -398,7 +406,7 @@ class kMetadataManager
 			return false;
 		}
 		
-		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
+		$metadataProfileKey = $metadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION, $metadataProfileVersion);
 		$xsdPath = kFileSyncUtils::getLocalFilePathForKey($metadataProfileKey);
 		if(!file_exists($xsdPath))
 		{
