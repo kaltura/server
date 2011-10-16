@@ -77,17 +77,15 @@ if ($line[0] <= 0)
 
 mysql_free_result($result);
 
-mysql_query("DELIMITER //") or die('Error: Failed to set delimiter: ' . mysql_error() . "\n");
-
 // Install / remove triggers
 foreach ($INVALIDATION_KEYS as $invalidationKey)
 {
 	$tableName = $invalidationKey['table'];
 	
 	$sqlCommands = array(
-		"DROP TRIGGER IF EXISTS {$tableName}_insert_memcache//",
-		"DROP TRIGGER IF EXISTS {$tableName}_update_memcache//",
-		"DROP TRIGGER IF EXISTS {$tableName}_delete_memcache//",
+		"DROP TRIGGER IF EXISTS {$tableName}_insert_memcache",
+		"DROP TRIGGER IF EXISTS {$tableName}_update_memcache",
+		"DROP TRIGGER IF EXISTS {$tableName}_delete_memcache",
 		);
 	
 	if ($ACTION == 'create')
@@ -121,9 +119,9 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 		$insertUpdateBody = str_replace('@OBJ@', 'NEW', $triggerBody);
 		$deleteBody = str_replace('@OBJ@', 'OLD', $triggerBody);
 		
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW $insertUpdateBody//";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW $insertUpdateBody//";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW $deleteBody//";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW $insertUpdateBody";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW $insertUpdateBody";
+		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW $deleteBody";
 		
 		print "Creating triggers on {$tableName}...\n";
 	}
@@ -140,8 +138,6 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 		}
 	}
 }
-
-mysql_query("DELIMITER ;");
 
 // Close database connection
 mysql_close($link);
