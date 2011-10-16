@@ -385,7 +385,7 @@ class kMetadataManager
 			$sql .= "LIMIT 10000";
 			
 			$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-			$affectedRows = $con->query($sql);
+			$affectedRows = $con->exec($sql);
 			KalturaLog::debug("Affected rows [$affectedRows]");
 		}
 		while($affectedRows);
