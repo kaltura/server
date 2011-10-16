@@ -107,9 +107,16 @@ class thumbnailAction extends sfAction
 		}
 		
 		
-		$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
-		
-		if ( ! $entry )
+		if ($entry_id)
+		{
+			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
+			if ( ! $entry )
+			{ 
+				// problem could be due to replocation lag
+				kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+			}
+		}
+		else
 		{	
 			// get the widget
 			$widget = widgetPeer::retrieveByPK( $widget_id );
@@ -240,34 +247,30 @@ class thumbnailAction extends sfAction
 				//header("Xkaltura-app: entry [$entry_id] in conversion, returning template broken thumb");
 				//KalturaLog::log( "Entry in conversion, no thumbnail yet [$entry_id], created dynamic 1x1 jpg");
 				//kFile::dumpFile($msgPath, null, 0);
-				try
+				try {
+					$tempThumbPath = myEntryUtils::resizeEntryImage ( $entry, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices );
+				} catch ( Exception $ex ) 
 				{
-					$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices);
-				}
-				catch( Exception $ex ) {
-					if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) {
+					if ($ex->getCode () == kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC) 
+					{
 						// get original flavor asset
 						$origFlavorAsset = assetPeer::retrieveOriginalByEntryId ( $entry_id );
-						if ($origFlavorAsset) {
+						if ($origFlavorAsset) 
+						{
 							$syncKey = $origFlavorAsset->getSyncKey ( flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
 							$remoteFileSync = kFileSyncUtils::getOriginFileSyncForKey ( $syncKey, false );
 							
-							if ($remoteFileSync && $remoteFileSync->getDc () == kDataCenterMgr::getCurrentDcId ()) {
+							if ($remoteFileSync && $remoteFileSync->getDc () == kDataCenterMgr::getCurrentDcId ()) 
+							{
 								KalturaLog::log ( "ERROR - Trying to redirect to myself - stop here." );
 								KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 							}
 						}
-						// problem could be due to replocation lag
-						kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 					}
+					// problem could be due to replocation lag
+					kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 				}
 			}
-		}
-		if ( ! $file_sync ) 
-		{
-			// file does not exist on any DC - die
-			KalturaLog::err( "Error - no FileSync for entry [$entry_id]");
-			KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 		}
 		
 		if ( !$local && !$tempThumbPath)
