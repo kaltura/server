@@ -736,7 +736,7 @@ class BaseEntryService extends KalturaEntryService
 				$storageProfileXML = new SimpleXMLElement('<StorageProfile/>');
 				
 				$storageProfileXML->addAttribute("storageProfileId",$storageProfileId);
-				$storageProfileXML->addChild("Name", $storageProfile->getNam);
+				$storageProfileXML->addChild("Name", $storageProfile->getName());
 				$storageProfileXML->addChild("SystemName", $storageProfile->getSystemName());
 				
 				$storageProfilesXML->addChild($storageProfileXML);
