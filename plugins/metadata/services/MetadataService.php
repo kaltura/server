@@ -230,7 +230,21 @@ class MetadataService extends KalturaBaseService
 			
 			$errorMessage = '';
 			if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessage))
-				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
+			{
+				// if metadata profile is transforming, and metadata profile version is not the latest, try to validate againts previous version
+				if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_TRANSFORMING || $dbMetadata->getMetadataProfileVersion() >= $dbMetadataProfile->getVersion())
+					throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
+					
+				// validates against previous version
+				$errorMessagePrevVersion = '';
+				if(!kMetadataManager::validateMetadata($dbMetadata->getMetadataProfileId(), $xmlData, $errorMessagePrevVersion, $dbMetadata->getMetadataProfileVersion()))
+				{
+					KalturaLog::err("Failed to validate metadata object [$id] against metadata profile previous version [" . $dbMetadata->getMetadataProfileVersion() . "] error: $errorMessagePrevVersion");
+
+					// throw the error with the original error message
+					throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_DATA, $errorMessage);
+				}
+			}
 			
 			$dbMetadata->setMetadataProfileVersion($dbMetadataProfile->getVersion());
 			$dbMetadata->incrementVersion();
