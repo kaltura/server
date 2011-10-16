@@ -82,7 +82,8 @@ class DbManager
 		
 		try
 		{
-			return new PropelPDO($dsn);
+			$con = new KalturaPDO($dsn);
+			$con->setCommentsEnabled(false);
 		}
 		catch(PropelException $pex)
 		{
@@ -131,7 +132,8 @@ class DbManager
 						throw new Exception("DB Config [$key] not found");
 
 					$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-					self::$sphinxConnection = new PropelPDO($dataSource);
+					self::$sphinxConnection = new KalturaPDO($dataSource);
+					self::$sphinxConnection->setCommentsEnabled(false);
 
 					KalturaLog::debug("getSphinxConnection: connected to $key");
 					return self::$sphinxConnection;
