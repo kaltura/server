@@ -16,7 +16,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	const SPHINX_EXPENDER_FIELD_INT = 'int_';
 	
 	const PLUGIN_VERSION_MAJOR = 2;
-	const PLUGIN_VERSION_MINOR = 0;
+	const PLUGIN_VERSION_MINOR = 1;
 	const PLUGIN_VERSION_BUILD = 0;
 	
 	const METADATA_FLOW_MANAGER_CLASS = 'kMetadataFlowManager';
