@@ -536,7 +536,7 @@ class kFile
 		if (isset($_SERVER["HTTP_X_KALTURA_PROXY"]))
 			KExternalErrors::dieError(KExternalErrors::PROXY_LOOPBACK);
 			
-		$post_params = array();
+		$get_params = $post_params = array();
 		
 		// pass uploaded files by adding them as post data with curl @ prefix
 		// signifying a file. the $_FILES[xxx][tmp_name] points to the location
