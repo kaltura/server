@@ -38,7 +38,7 @@ KalturaLog::analytics(array(
 	'masterPartnerId' => kCurrentContext::$master_partner_id,
 	'ks' => kCurrentContext::$ks,
 	'isAdmin' => kCurrentContext::$is_admin_session,
-	'kuserId' => '"' . (kCurrentContext::$uid ? kCurrentContext::$uid : kCurrentContext::$ks_uid) . '"',
+	'kuserId' => '"' . str_replace('"', '\\"', (kCurrentContext::$uid ? kCurrentContext::$uid : kCurrentContext::$ks_uid)) . '"',
 ));
 
 $cache->end();
