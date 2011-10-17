@@ -19,4 +19,8 @@ class MetadataProfileField extends BaseMetadataProfileField {
 	const STATUS_DEPRECATED = 2;
 	const STATUS_NONE_SEARCHABLE = 3;
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("metadataProfileField:metadataProfileId=".$this->getMetadataProfileId());
+	}
 } // MetadataProfileField

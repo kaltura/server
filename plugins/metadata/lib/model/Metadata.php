@@ -156,4 +156,9 @@ class Metadata extends BaseMetadata implements ISyncableFile
 			
 		return $this->aMetadataProfile;
 	}
+
+	public function getCacheInvalidationKeys()
+	{
+		return array("metadata:objectId=".$this->getObjectId());
+	}
 } // Metadata

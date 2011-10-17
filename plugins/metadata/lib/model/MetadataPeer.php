@@ -110,4 +110,15 @@ class MetadataPeer extends BaseMetadataPeer {
 		return MetadataPeer::doSelect($criteria, $con);
 	}
 	
+	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	{
+		$criterion = $criteria->getCriterion(self::OBJECT_ID);
+		if (!$criterion || 
+			$criterion->getComparison() != Criteria::EQUAL)
+		{
+			return array();				
+		}
+		
+		return array("metadata:objectId=".$criterion->getValue());
+	}
 } // MetadataPeer
