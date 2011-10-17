@@ -73,7 +73,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 		$customData->addAttribute('metadataProfileId', $metadata->getMetadataProfileId());
 		$customData->addAttribute('metadataProfileVersion', $metadata->getMetadataProfileVersion());
 		
-		$this->contributeMetadataObject($customData, $metadataXml, $mrssParams, $metadata->getMetadataProfileId(), $metadata->getMetadataProfileVersion());
+		$this->contributeMetadataObject($customData, $metadataXml, $mrssParams, '');
 	}
 	
 	/**
@@ -82,45 +82,41 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	 * @param kMrssParameters $mrssParams
 	 * @return SimpleXMLElement
 	 */
-	public function contributeMetadataObject(SimpleXMLElement $mrss, SimpleXMLElement $metadata, kMrssParameters $mrssParams = null, $metadataProfileId = null, $metadataProfileVersion = null)
+	public function contributeMetadataObject(SimpleXMLElement $mrss, SimpleXMLElement $metadata, kMrssParameters $mrssParams = null, $currentXPath)
 	{
+		$currentXPath .= "/*[local-name()='" . $metadata->getName() . "'";
+		
 		$metadataObject = $mrss->addChild($metadata->getName());
 		foreach($metadata->attributes() as $attributeField => $attributeValue)
 			$metadataObject->addAttribute($attributeField, $attributeValue);
-				
+
 		foreach($metadata as $metadataField => $metadataValue)
 		{
-			if($metadataValue instanceof SimpleXMLElement && count($metadataValue)) {
-				$this->contributeMetadataObject($metadataObject, $metadataValue);
+			if($metadataValue instanceof SimpleXMLElement && count($metadataValue))
+			{
+				$this->contributeMetadataObject($metadataObject, $metadataValue, $mrssParams, $currentXPath);
 			}
-			else{
+			else
+			{
 				$metadataObject->addChild($metadataField, kString::stringToSafeXml($metadataValue));
-				//$metadataObject->addChild($metadataField, $metadataValue);
-				if ($mrssParams)
+				
+				$itemXPath = $currentXPath . "/*[local-name()='$metadataField'";
+				if ($mrssParams && is_array($mrssParams->getItemXpathsToExtend()) &&
+					in_array($itemXPath, $mrssParams->getItemXpathsToExtend()))
 				{
-					$itemXpathsToExtend = $mrssParams->getItemXpathsToExtend();
-					$c = new Criteria();
-					$c->addAnd(MetadataProfileFieldPeer::METADATA_PROFILE_ID, $metadataProfileId, Criteria::EQUAL);
-					$c->addAnd(MetadataProfileFieldPeer::METADATA_PROFILE_VERSION, $metadataProfileVersion, Criteria::EQUAL);	
-					$c->addAnd(MetadataProfileFieldPeer::KEY, $metadataField, Criteria::EQUAL);		
-					$metadataFieldDb = MetadataProfileFieldPeer::doSelectOne($c);
-					
-					if ($metadataFieldDb && is_array($itemXpathsToExtend) && in_array($metadataFieldDb->getXpath(), $itemXpathsToExtend))
-					{						
-						$relatedEntry = entryPeer::retrieveByPK($metadataValue);
-						if ($relatedEntry)
+					$relatedEntry = entryPeer::retrieveByPK($metadataValue);
+					if ($relatedEntry)
+					{
+						$relatedItemField = $metadataObject->addChild($metadataField.'_item');
+						$recursionMrssParams = null;
+						if ($mrssParams)
 						{
-							$relatedItemField = $metadataObject->addChild($metadataField.'_item');
-							$recursionMrssParams = null;
-							if ($mrssParams)
-							{
-								$recursionMrssParams = clone $mrssParams;
-								$recursionMrssParams->setItemXpathsToExtend(null);			// stop the recursion
-							}
-							$relatedEntryMrss = kMrssManager::getEntryMrssXml($relatedEntry, $relatedItemField, $recursionMrssParams);
-						}			
-					}
-				}			
+							$recursionMrssParams = clone $mrssParams;
+							$recursionMrssParams->setItemXpathsToExtend(null);			// stop the recursion
+						}
+						$relatedEntryMrss = kMrssManager::getEntryMrssXml($relatedEntry, $relatedItemField, $recursionMrssParams);
+					}			
+				}
 			}					
 		}				
 	}
