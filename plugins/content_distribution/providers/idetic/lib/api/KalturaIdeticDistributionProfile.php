@@ -4,7 +4,11 @@
  * @subpackage api.objects
  */
 class KalturaIdeticDistributionProfile extends KalturaConfigurableDistributionProfile
-{
+{	
+	/**
+	 * @var string
+	 */	
+	public $ftpPath;
 	/**
 	 * @var string
 	 */
@@ -26,6 +30,7 @@ class KalturaIdeticDistributionProfile extends KalturaConfigurableDistributionPr
 	 */
 	private static $map_between_objects = array 
 	(
+		'ftpPath',
 		'username',
 		'password',
 		'domain',

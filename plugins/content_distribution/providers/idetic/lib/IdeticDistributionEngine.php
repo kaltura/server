@@ -25,11 +25,6 @@ class IdeticDistributionEngine extends DistributionEngine implements
 
 	
 	private $domain = 'jukebox.mobitv.com';
-	private $submitPath = '/';
-	private $updatePath = '';
-	private $deletePath = '/';
-
-	private $path = '';
 	
 	protected $tempXmlPath;
 	protected $fieldValues;
@@ -42,16 +37,6 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	public function configure(KSchedularTaskConfig $taskConfig)
 	{
 		$this->tempXmlPath = sys_get_temp_dir();
-	
-		if($taskConfig->params->ideticSubmitPath)
-			$this->submitPath = $taskConfig->params->ideticSubmitPath;
-			
-		if($taskConfig->params->ideticUpdatePath)
-			$this->updatePath = $taskConfig->params->ideticUpdatePath;
-			
-		if($taskConfig->params->ideticDeletePath)
-			$this->deletePath = $taskConfig->params->ideticDeletePath;
-			
 		if($taskConfig->params->ideticFetchReportPath)
 			$this->fetchReportPath = $taskConfig->params->ideticFetchReportPath;
 	}
@@ -68,7 +53,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaIdeticDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaIdeticDistributionJobProviderData");
 		
-		$data->remoteId = $this->handleSend($this->submitPath, $data);
+		$data->remoteId = $this->handleSend($data);
 		
 		return true;
 	}
@@ -80,11 +65,12 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	 * @param KalturaIdeticDistributionJobProviderData $providerData
 	 * @throws Exception
 	 */
-	public function handleDelete($path, KalturaDistributionJobData $data, KalturaIdeticDistributionProfile $distributionProfile, KalturaIdeticDistributionJobProviderData $providerData)
+	public function handleDelete(KalturaDistributionJobData $data, KalturaIdeticDistributionProfile $distributionProfile, KalturaIdeticDistributionJobProviderData $providerData)
 	{
 		$domain = $distributionProfile->domain;
 		$username = $distributionProfile->username;
 		$password = $distributionProfile->password;
+		$path = $distributionProfile->ftpPath;
 		
 		KalturaLog::debug("idetic: delete");
 		if (!isset($data->remoteId) || $data->remoteId == "")
@@ -117,10 +103,11 @@ class IdeticDistributionEngine extends DistributionEngine implements
 	 * @param KalturaDistributionJobData $data
 	 * @throws Exception
 	 */
-	public function handleSend($path, KalturaDistributionJobData $data)
+	public function handleSend(KalturaDistributionJobData $data)
 	{
 		$distributionProfile = $data->distributionProfile;
 		$providerData = $data->providerData;
+		$path = $distributionProfile->ftpPath;
 		
 		$this->fieldValues = unserialize($providerData->fieldValues);
 		if (!$this->fieldValues) {
@@ -289,7 +276,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaIdeticDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaIdeticDistributionJobProviderData");
 			
-		$this->handleDelete($this->deletePath, $data, $data->distributionProfile, $data->providerData);
+		$this->handleDelete($data, $data->distributionProfile, $data->providerData);
 		
 		return true;
 	}
@@ -416,7 +403,7 @@ class IdeticDistributionEngine extends DistributionEngine implements
 		if(!$data->providerData || !($data->providerData instanceof KalturaIdeticDistributionJobProviderData))
 			KalturaLog::err("Provider data must be of type KalturaIdeticDistributionJobProviderData");
 		
-		$this->handleSend($this->updatePath, $data);
+		$this->handleSend($data);
 		
 		return true;
 	}

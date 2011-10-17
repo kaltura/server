@@ -17,6 +17,11 @@ class Form_IdeticProfileConfiguration extends Form_ConfigurableProfileConfigurat
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
 		$this->addElements(array($element));
 		
+		$this->addElement('text', 'ftp_path', array(
+			'label'			=> 'FTP Path:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('text', 'username', array(
 			'label'			=> 'Username:',
 			'filters'		=> array('StringTrim'),
