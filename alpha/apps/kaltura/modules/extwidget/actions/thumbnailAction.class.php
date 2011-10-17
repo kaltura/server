@@ -112,7 +112,7 @@ class thumbnailAction extends sfAction
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
 			if ( ! $entry )
 			{ 
-				// problem could be due to replocation lag
+				// problem could be due to replication lag
 				kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			}
 		}
@@ -267,7 +267,7 @@ class thumbnailAction extends sfAction
 							}
 						}
 					}
-					// problem could be due to replocation lag
+					// problem could be due to replication lag
 					kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 				}
 			}
