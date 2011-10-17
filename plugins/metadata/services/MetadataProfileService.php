@@ -196,7 +196,8 @@ class MetadataProfileService extends KalturaBaseService
 		return $metadataProfile;
 	}	
 	
-/**
+	
+	/**
 	 * List metadata profile objects by filter and pager
 	 * 
 	 * @action list
@@ -246,7 +247,7 @@ class MetadataProfileService extends KalturaBaseService
 		return $response;
 	}
 	
-		/**
+	/**
 	 * Delete an existing metadata profile
 	 * 
 	 * @action delete
