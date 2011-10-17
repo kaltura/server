@@ -717,7 +717,6 @@ class BaseEntryService extends KalturaEntryService
 			$assetSyncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSyncs = kFileSyncUtils::getAllReadyExternalFileSyncsForKey($assetSyncKey);
 		
-			//$storageProfileIds = array();
 			
 			$storageProfilesXML = new SimpleXMLElement("<StorageProfiles/>");
 			foreach ($fileSyncs as $fileSync)
@@ -726,20 +725,18 @@ class BaseEntryService extends KalturaEntryService
 				
 				$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 				
-				if ( !$storageProfile->getDeliveryRmpBaseUrl() 
+				if ( !$storageProfile->getDeliveryRmpBaseUrl()
 					&& (!$contextDataParams->streamerType || $contextDataParams->streamerType == StorageProfile::PLAY_FORMAT_AUTO))
 				{
 					$contextDataParams->streamerType = StorageProfile::PLAY_FORMAT_HTTP;
 					$contextDataParams->mediaProtocol = StorageProfile::PLAY_FORMAT_HTTP;
 
 				}
-				$storageProfileXML = new SimpleXMLElement('<StorageProfile/>');
+				$storageProfileXML = $storageProfilesXML->addChild("StorageProfile");
 				
 				$storageProfileXML->addAttribute("storageProfileId",$storageProfileId);
 				$storageProfileXML->addChild("Name", $storageProfile->getName());
 				$storageProfileXML->addChild("SystemName", $storageProfile->getSystemName());
-				
-				$storageProfilesXML->addChild($storageProfileXML);
 				
 			}
 
