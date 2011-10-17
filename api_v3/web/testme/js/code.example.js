@@ -76,16 +76,18 @@ KCodeExampleBase.prototype.onParamsChange = function (){
 		return;
 	scope.jqParams.empty();
 	
-	var ksField = jQuery("input:text[name=ks]");
 	var ksCheckBox = jQuery("input:checkbox[id=chk-ks]");
-	var value = ksField.val();
 	if (ksCheckBox.attr("checked")){
+
+		var ksField = jQuery("input:text[name=ks]");
+		var ks = ksField.val();
+		
 		if(scope.getKsMethod()){
-			var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(value)]);
+			var jqSetKs = scope.codeUserFunction(scope.getKsMethod(), [scope.codeString(ks)]);
 			scope.addCode(scope.codeObjectMethod(scope.jqClientObject.clone(true), jqSetKs), scope.jqParams);
 		}
 		else if(scope.getKsVar()){
-			scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(true), scope.getKsVar()), scope.codeString(value)), scope.jqParams);
+			scope.addCode(scope.codeAssign(scope.codeObjectAttribute(scope.jqClientObject.clone(true), scope.getKsVar()), scope.codeString(ks)), scope.jqParams);
 		}
 	}
 	
