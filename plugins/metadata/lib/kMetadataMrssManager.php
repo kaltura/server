@@ -84,7 +84,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 	 */
 	public function contributeMetadataObject(SimpleXMLElement $mrss, SimpleXMLElement $metadata, kMrssParameters $mrssParams = null, $currentXPath)
 	{
-		$currentXPath .= "/*[local-name()='" . $metadata->getName() . "'";
+		$currentXPath .= "/*[local-name()='" . $metadata->getName() . "']";
 		
 		$metadataObject = $mrss->addChild($metadata->getName());
 		foreach($metadata->attributes() as $attributeField => $attributeValue)
@@ -100,7 +100,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 			{
 				$metadataObject->addChild($metadataField, kString::stringToSafeXml($metadataValue));
 				
-				$itemXPath = $currentXPath . "/*[local-name()='$metadataField'";
+				$itemXPath = $currentXPath . "/*[local-name()='$metadataField']";
 				if ($mrssParams && is_array($mrssParams->getItemXpathsToExtend()) &&
 					in_array($itemXPath, $mrssParams->getItemXpathsToExtend()))
 				{
