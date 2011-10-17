@@ -888,8 +888,8 @@ class myPartnerUtils
 		$partnerPackage = $packages->getPackageDetails($partner->getPartnerPackage());
 		
 		$report_date = date('Y-m').'-01';
-                // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
-                $report_date = dateUtils::todayOffset(-3);
+        // We are now working with the DWH and a stored-procedure, and not with record type 6 on partner_activity.
+        $report_date = dateUtils::todayOffset(-1);
 
 		list ( $totalStorage , $totalUsage , $totalTraffic ) = myPartnerUtils::collectPartnerUsageFromDWH($partner, $partnerPackage, $report_date);
 		$totalUsageGB = $totalUsage/1024/1024; // from KB to GB
