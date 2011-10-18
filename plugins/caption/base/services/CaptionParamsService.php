@@ -49,7 +49,7 @@ class CaptionParamsService extends KalturaBaseService
 	{
 		$captionParams->validatePropertyMinLength("name", 1);
 		
-		$captionParamsDb = new captionParams();
+		$captionParamsDb = new CaptionParams();
 		$captionParams->toObject($captionParamsDb);
 		
 		$captionParamsDb->setPartnerId($this->getPartnerId());
@@ -143,7 +143,7 @@ class CaptionParamsService extends KalturaBaseService
 		$captionParamsFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		
-		$captionTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, assetType::captionNAIL);
+		$captionTypes = KalturaPluginManager::getExtendedTypes(assetParamsPeer::OM_CLASS, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 		$c->add(assetParamsPeer::TYPE, $captionTypes, Criteria::IN);
 		
 		$dbList = assetParamsPeer::doSelect($c);
