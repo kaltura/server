@@ -35,15 +35,20 @@ class KalturaFrontController
 		return self::$instance;
 	}
 	
-	public function onRequestStart($service, $action, array $params, $requestIndex = 0)
+	public function onRequestStart($service, $action, array $params, $requestIndex = 0, $isInMultiRequest = false)
 	{
 		$this->requestStart = microtime(true);
 		KalturaLog::analytics(array(
 			'request_start',
+			'pid' => getmypid(),
+			'agent' => '"' . (isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : null) . '"',
+			'host' => (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : null),
+			'clientTag' => '"' . (isset($_REQUEST['clientTag']) ? $_REQUEST['clientTag'] : null) . '"',
 			'time' => $this->requestStart,
 			'service' => $service, 
 			'action' => $action, 
 			'requestIndex' => $requestIndex,
+			'isInMultiRequest' => intval($isInMultiRequest)
 		));
 	}
 	
@@ -54,6 +59,11 @@ class KalturaFrontController
 		
 		KalturaLog::analytics(array(
 			'request_end',
+			'partnerId' => kCurrentContext::$partner_id,
+			'masterPartnerId' => kCurrentContext::$master_partner_id,
+			'ks' => kCurrentContext::$ks,
+			'isAdmin' => intval(kCurrentContext::$is_admin_session),
+			'kuserId' => '"' . str_replace('"', '\\"', (kCurrentContext::$uid ? kCurrentContext::$uid : kCurrentContext::$ks_uid)) . '"',
 			'duration' => $duration,
 			'success' => intval($success),
 			'errorCode' => $errorCode,
@@ -225,7 +235,7 @@ class KalturaFrontController
 	        		$cache->setKS(kCurrentContext::$ks);
 	        	}
 	        	
-	        	$this->onRequestStart($currentService, $currentAction, $currentParams, $i);
+	        	$this->onRequestStart($currentService, $currentAction, $currentParams, $i, true);
 				$cachedResult = $cache->checkCache('X-Kaltura-Part-Of-MultiRequest');
 				if ($cachedResult)
 				{
