@@ -40,9 +40,10 @@ class VirusScanListAction extends KalturaAdminConsolePlugin implements IKalturaA
 		$virusScanFilterForm = new Form_VirusScanFilter ();
 		$virusScanFilterFormAction = $action->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
   		$virusScanFilterForm->setAction($virusScanFilterFormAction);
-		
+		$virusScanFilterForm->populate ( $request->getParams () );
 		$virusScanFilter = $this->getVirusScanFilterFromRequest ( $request );
 		
+		$newForm->getElement("newPartnerId")->setValue($virusScanFilter->partnerIdEqual);
 		//filter also by partnerId
 		if (! is_null ( $partnerId )) {
 			$virusScanFilter->partnerIdEqual = $partnerId;
@@ -53,7 +54,6 @@ class VirusScanListAction extends KalturaAdminConsolePlugin implements IKalturaA
 		$paginator->setCurrentPageNumber ( $page );
 		$paginator->setItemCountPerPage ( $pageSize );
 		
-		$virusScanFilterForm->populate ( $request->getParams () );
 		$action->view->virusScanFilterForm = $virusScanFilterForm;
 		$action->view->newForm = $newForm;
 		$action->view->paginator = $paginator;

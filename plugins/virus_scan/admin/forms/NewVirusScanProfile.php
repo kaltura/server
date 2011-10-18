@@ -10,6 +10,12 @@ class Form_NewVirusScanProfile extends Zend_Form
 			array('Form', array('class' => 'simple')),
 		));
 		
+		$this->addElement('text', 'newPartnerId', array(
+			'label'			=> 'Publisher ID:',
+			'filters'		=> array('StringTrim'),
+			'value'         => $this->filer_input,
+		));
+		
 				
 		// submit button
 		$this->addElement('button', 'newVirusScanProfile', array(

@@ -10,6 +10,7 @@ class WidgetController extends Zend_Controller_Action
 		$action = $this->view->url(array('controller' => $request->getControllerName(), 'action' => $request->getActionName()), null, true);
 
 		$newButton = new Form_NewButton();
+		$newButton->populate($request->getParams());
 		
 		$form = new Form_WidgetFilter();
 		$form->setAction($action);
@@ -18,6 +19,7 @@ class WidgetController extends Zend_Controller_Action
 		$uiConfFilter = $this->getUiConfFilterFromRequest($request);
 		$uiConfFilter->orderBy = Kaltura_Client_Enum_UiConfOrderBy::CREATED_AT_DESC;
 		
+		$newButton->getElement('newPartnerId')->setValue($uiConfFilter->partnerIdIn);
 		// get results and paginate
 		$paginatorAdapter = new Infra_FilterPaginatorWithPartnerLoader(null, $uiConfFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
@@ -51,6 +53,9 @@ class WidgetController extends Zend_Controller_Action
 				$form->setAttrib('class', 'valid');
 				$this->view->formValid = true;
 			}
+		} else 
+		{
+				$form->getElement('partner_id')->setAttrib('readonly',true);
 		}
 		$form->populate($request->getParams());
 		$form->setEditorButtons();
@@ -192,7 +197,7 @@ class WidgetController extends Zend_Controller_Action
 			case 'by-uiconf-id':
 				$uiConfFilter->idIn = $filterInput;
 				break;
-			case 'by-partner-id':
+			case 'byid':
 				$uiConfFilter->partnerIdIn = $filterInput;
 				break;
 			case 'by-partner-name':
@@ -204,7 +209,9 @@ class WidgetController extends Zend_Controller_Action
 				$partnerFilter->statusIn = implode(',', $statuses);
 				$partnerFilter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
 				$client = Infra_ClientHelper::getClient();
-				$partnersResponse = $client->systemPartner->listAction($partnerFilter);
+				$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+				$partnersResponse = $systemPartnerPlugin->systemPartner->listAction($partnerFilter);
+		
 				if (count($partnersResponse->objects) == 0)
 				{
 					$uiConfFilter->idEqual = -1; // nothing should be found

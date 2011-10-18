@@ -420,6 +420,9 @@ body#monitoring-xymon {}
    #partner-configure-dialog select { width:156px; height:24px; padding:1px;}
   
 #partner-external-storages #addNewStorage { margin-left:20px; }
+#partner-external-storages #addNewStorage dd, 
+#partner-external-storages #addNewStorage dt { float: left; }
+
 #partner-external-storages table#newStorageTable tbody td {min-width:0; max-width: 800px; border:0;}
 #partner-external-storages table#newStorageTable tbody td dt label { display: block; width:150px; float:left;}
 #partner-external-storages table#newStorageTable tbody td dt input { display: block; width:150px; }
@@ -618,3 +621,12 @@ form#frmCreateDropFolder dt { float: left; }
 #provider-configure-dialog .hint { color: #FF3200; }
 
 #loader {position:absolute; z-index:3000; top:50%; left:50%; width:50px; height:50px; display:none; background: url(../images/ajax-loader.gif)};
+
+form#addNewVirusScanProfile { margin-left: 20px; }
+form#addNewVirusScanProfile dd, 
+form#addNewVirusScanProfile dt { float: left; }
+
+form#addNewForm { margin-left: 20px; }
+form#addNewForm dd, 
+form#addNewForm dt { float: left; }
+form#addNewForm #newPartnerId { width: 60px; }

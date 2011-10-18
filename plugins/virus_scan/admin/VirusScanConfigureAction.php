@@ -77,30 +77,35 @@ class VirusScanConfigureAction extends KalturaAdminConsolePlugin
 			else
 			{
 				$form->populate($formData);
+				$form->getElement('partnerId')->setValue($this->_getParam('new_partner_id'));
 			}	
 		}
 		else
 		{
-			if ($editMode)
+			$partnerId = $request->getParam('new_partner_id');
+			if ($editMode || $partnerId)
 			{
 				//disable field if $editMode, so partnerId won't change
 				$form->getElement('partnerId')->setAttrib('readonly', true);
 				$form->getElement('partnerId')->setAttrib('class', 'readonly');
-				$profile = $virusScanPlugin->virusScanProfile->get($profileId);	
-				$form->populateFromObject($profile, false);
-					
-				//setting multicheck drop down list values
-				$typesArr = array();
-				if (!empty($profile->entryFilter->typeEqual)) {
-					$typesArr[] = $profile->entryFilter->typeEqual;
+				
+				$form->getElement('partnerId')->setValue($request->getParam('new_partner_id'));
+				if ($profileId != null) {
+					$profile = $virusScanPlugin->virusScanProfile->get($profileId);	
+					$form->populateFromObject($profile, false);
+						
+					//setting multicheck drop down list values
+					$typesArr = array();
+					if (!empty($profile->entryFilter->typeEqual)) {
+						$typesArr[] = $profile->entryFilter->typeEqual;
+					}
+					else if (!empty($profile->entryFilter->typeIn)) {
+						$typesArr = array_map('trim', explode(',', $profile->entryFilter->typeIn));
+					}
+					$form->getElement('entryTypeToFilter')->setValue($typesArr);
 				}
-				else if (!empty($profile->entryFilter->typeIn)) {
-					$typesArr = array_map('trim', explode(',', $profile->entryFilter->typeIn));
-				}
-				$form->getElement('entryTypeToFilter')->setValue($typesArr);
 			}
 		}
-		
 		$action->view->form = $form;
 	}		
 

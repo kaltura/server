@@ -207,13 +207,4 @@ function formSubmit(html) {
 	jQuery('#widget-dialog').find('form').ajaxForm(formSubmit);
 }
 
-jQuery(function() {
-	jQuery('#new_button').click(function() {
-		var partnerId = '';
-		if (jQuery('#filter_type').val() == 'by-partner-id') {
-			partnerId = jQuery('#filter_input').val();
-		}
-		doAction('newForm', partnerId);
-	});
-});
 </script>

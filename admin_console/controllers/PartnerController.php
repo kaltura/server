@@ -196,6 +196,8 @@ class PartnerController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		
 		$form = new Form_Partner_StorageConfiguration();
+		$request = $this->getRequest();
+		$form->populate($request->getParams());
 		Form_Partner_StorageHelper::addProtocolsToForm($form);
 		Form_Partner_StorageHelper::addPathManagersToForm($form);
 		Form_Partner_StorageHelper::addUrlManagersToForm($form);
@@ -208,6 +210,8 @@ class PartnerController extends Zend_Controller_Action
 		{
 			$flavorParamsResponse = $client->flavorParams->listAction();
 			$form->addFlavorParamsFields($flavorParamsResponse);
+			$form->getElement('partnerId')->setAttrib('readonly',true);
+			$form->getElement('partnerId')->setValue($request->getParam('new_partner_id'));
 		}
 		else  
 		{			
@@ -442,8 +446,10 @@ class PartnerController extends Zend_Controller_Action
 		$pageSize = $this->_getParam('pageSize', 10);
 		
 		$client = Infra_ClientHelper::getClient();
-		$form = new Form_PartnerId();
+		$form = new Form_PartnerIdFilter();
+		$form->populate($request->getParams());
 		$newForm = new Form_NewStorage();
+		$newForm->populate($request->getParams());
 		
 		$action = $this->view->url(array('controller' => 'partner', 'action' => 'external-storages'), null, true);
 		$form->setAction($action);
@@ -451,8 +457,10 @@ class PartnerController extends Zend_Controller_Action
 		// init filter
 		$filter = new Kaltura_Client_Type_StorageProfileFilter();
 		
-		if ($request->getParam('filter_input') != '')
+		if ($request->getParam('filter_input') != '') {
 			$filter->partnerIdEqual = $request->getParam('filter_input');
+			$newForm->getElement('newPartnerId')->setValue($request->getParam('filter_input'));
+		}
 		
 		// get results and paginate
 		$paginatorAdapter = new Infra_FilterPaginator($client->storageProfile, "listAction", null, $filter);

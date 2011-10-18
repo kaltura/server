@@ -157,7 +157,7 @@ function kmcUsers(partnerId) {
 }
 
 function widgets(partnerId) {
-	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'list'), null, true); ?>' + '/filter_type/by-partner-id/filter_input/' + partnerId;
+	var url = '<?php echo $this->url(array('controller' => 'widget', 'action' => 'list'), null, true); ?>' + '/filter_type/byid/filter_input/' + partnerId;
 	window.location = url;
 }
 

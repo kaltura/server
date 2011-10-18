@@ -88,7 +88,7 @@ function doAction(action, profileId) {
 			configure(profileId);
 			break;
 		case 'newVirusScanProfile':
-			configure(null);
+			addNew(profileId);
 			break;
 		case 'Delete':
 			deleteProfile(profileId);
@@ -133,6 +133,45 @@ function configure(profileId) {
 	else{
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'virus-scan-configure-action', 'profileId' => '')); ?>' + profileId;
 	}
+		url = url + '/new_partner_id/' + partnerId
+	
+	jQuery('#virus-scan-configure-dialog').remove();
+	dialogDiv = jQuery('<div id="virus-scan-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+	
+	dialogDiv.dialog({
+		bgiframe: true,
+		modal: true,
+		resizable: false,
+		width: 500,
+		height: 400,
+		title: '<?php echo $this->translate('Virus Scan Profile'); ?>',
+		buttons: {
+			'<?php echo $this->translate('Save'); ?>': function() {
+				jQuery(this).find('#frmVirusScanProfileConfig').submit();
+			},
+			'<?php echo $this->translate('Close'); ?>': function() {
+				jQuery(this).dialog('close');
+			}
+		},
+		close: function() {
+			resetOptions();
+		}	
+	});
+	dialogDiv.load(
+		url, 
+		null, 
+		function() {
+			jQuery(this).find('#frmVirusScanProfileConfig').ajaxForm(
+					configureVirusScanProfileSuccess
+			);
+		}
+	);
+}
+
+function addNew(partnerId) {
+	
+	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'virus-scan-configure-action')); ?>' + '/new_partner_id/' + partnerId;
+	
 	jQuery('#virus-scan-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="virus-scan-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 	
