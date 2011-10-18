@@ -84,6 +84,7 @@ class DbManager
 		{
 			$con = new KalturaPDO($dsn);
 			$con->setCommentsEnabled(false);
+			return $con;
 		}
 		catch(PropelException $pex)
 		{
