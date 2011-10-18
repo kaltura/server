@@ -13,7 +13,7 @@ class KalturaCaptionParamsArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-			$nObj = KalturaFlavorParamsFactory::getFlavorParamsInstance($obj->getType());
+			$nObj = KalturaAssetParamsFactory::getAssetParamsInstance($obj->getType());
 			$nObj->fromObject($obj);
 			$newArr[] = $nObj;
 		}
