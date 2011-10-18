@@ -49,7 +49,9 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin implements
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		
-		$form = new Form_PartnerBaseFilter();
+		$form = new Form_PartnerIdFilter();
+		$form->populate($request->getParams());
+		
 		$newForm = new Form_NewDistributionProfile();
 		
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'DistributionProfileListAction'), null, true);
@@ -86,6 +88,7 @@ class DistributionProfileListAction extends KalturaAdminConsolePlugin implements
 			}
 		}
 		$newForm->setProviders($providers);
+		$newForm->getElement('newPartnerId')->setValue($partnerFilter->idIn);
 		
 		// set view
 		$action->view->form = $form;
