@@ -804,22 +804,22 @@ kmc.preview_embed = {
 		for(var i=0; i<entry_flavors.length; i++) {
 			var asset = entry_flavors[i];
 			// Add iPad Akamai flavor to iPad flavor Ids list
-			if( asset.fileExt == 'mp4' && asset.tags.indexOf('ipadnew') != -1 ){
+			if( asset.tags.indexOf('ipadnew') != -1 ){
 				return true;
 			}
 
 			// Add iPhone Akamai flavor to iPad&iPhone flavor Ids list
-			if( asset.fileExt == 'mp4' && asset.tags.indexOf('iphonenew') != -1 ){
+			if( asset.tags.indexOf('iphonenew') != -1 ){
 				return true;
 			}
 
 			// Check the tags to read what type of mp4 source
-			if( asset.fileExt == 'mp4' && asset.tags.indexOf('ipad') != -1 ){
+			if( asset.tags.indexOf('ipad') != -1 ){
 				return true;
 			}
 
 			// Check for iPhone src
-			if( asset.fileExt == 'mp4' && asset.tags.indexOf('iphone') != -1 ){
+			if( asset.tags.indexOf('iphone') != -1 ){
 				return true;
 			}
 		}
