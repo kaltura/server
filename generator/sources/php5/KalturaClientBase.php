@@ -27,6 +27,22 @@ class MultiRequestSubResult
  */
 class KalturaNull 
 {
+	private static $instance;
+	
+	private function __construct()
+	{
+        
+	}
+	
+	public static function getInstance() 
+	{
+		if (!isset(self::$instance)) {
+			$c = __CLASS__;
+			self::$instance = new $c();
+		}
+		return self::$instance;
+	}
+	
 	function __toString()
 	{
         return '';
@@ -80,11 +96,6 @@ class KalturaClientBase
 	 * @var array<KalturaServiceBase>
 	 */
 	protected $pluginServices = array();
-	
-	/**
-	 * @var KalturaNull
-	 */
-	private static $nullValue;
 	
 	public function __get($serviceName)
 	{
@@ -605,11 +616,8 @@ class KalturaClientBase
 	 */
 	public static function getKalturaNullValue()
 	{
-		 if (!isset(self::$nullValue)) {
-            
-            self::$nullValue = new KalturaNull;
-        }
-        return self::$nullValue;
+		
+        return KalturaNull::getInstance();
 	}
 	
 }

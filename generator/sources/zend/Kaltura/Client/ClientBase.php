@@ -5,10 +5,27 @@
  */
 class KalturaNull 
 {
+	private static $instance;
+	
+	private function __construct()
+	{
+        
+	}
+	
+	public static function getInstance() 
+	{
+		if (!isset(self::$instance)) {
+			$c = __CLASS__;
+			self::$instance = new $c();
+		}
+		return self::$instance;
+	}
+	
 	function __toString()
 	{
         return '';
 	}
+	
 	
 }
 
@@ -52,11 +69,6 @@ class Kaltura_Client_ClientBase
 	 */
 	private $callsQueue = array();
 	
-	/**
-	 * @var KalturaNull
-	 */
-	private static $nullValue;
-
 	/**
 	 * Kaltura client constructor
 	 *
@@ -566,10 +578,6 @@ class Kaltura_Client_ClientBase
 	 */
 	public static function getKalturaNullValue()
 	{
-		 if (!isset(self::$nullValue)) {
-            
-            self::$nullValue = new KalturaNull;
-        }
-        return self::$nullValue;
+        return KalturaNull::getInstance();
 	}
 }
