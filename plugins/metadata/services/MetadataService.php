@@ -423,7 +423,7 @@ class MetadataService extends KalturaBaseService
         $result = null;
 	    $metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId); 
 	    if (!$metadataProfile) {
-	        KalturaLog::err('Cannot find metadata profile for metadata id ['.$dbMetadata->getId().']');
+	        KalturaLog::err('Cannot find metadata profile id ['.$metadataProfileId.']');
 	        return null;
 	    }
 	    
