@@ -102,6 +102,9 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		$res = parent::save( $con );
 		if($this->should_call_set_data_content2 || $this->should_call_set_data_content)
 		{
+			$confFile = $this->getConfFile();
+			$confFile2 = $this->getConfFile2();
+			
 			if($isClone)
 			{
 				$this->setVersion(1);
@@ -112,17 +115,13 @@ class uiConf extends BaseuiConf implements ISyncableFile
 				if ( ! is_numeric( $version ) ) $this->setVersion(1);
 				else $this->setVersion($version+1);
 			}
-		}
-		if ( $this->should_call_set_data_content )
-		{
-			$this->saveConfFileToDisk($this->getConfFile(), null, $isClone); // save uiConf.xml
-		}
-		if ( $this->should_call_set_data_content2 )
-		{
-			$this->saveConfFileToDisk($this->getConfFile2(), self::FILE_NAME_FEATURES, $isClone); // save uiConf.xml.features
-		}
-		if($this->should_call_set_data_content2 || $this->should_call_set_data_content)
-		{
+
+			if ($confFile)
+				$this->saveConfFileToDisk($confFile, null, $isClone); // save uiConf.xml
+				
+			if ($confFile2)
+				$this->saveConfFileToDisk($confFile2, self::FILE_NAME_FEATURES, $isClone); // save uiConf.xml.features
+
 			$this->should_call_set_data_content = false; // clear dirty flag
 			$this->should_call_set_data_content2 = false; // clear dirty flag
 			$res = parent::save( $con );
@@ -375,7 +374,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 		
 	public function setConfFile ( $v /*, $increment_version = true */ )
 	{
-		if ( $v != null )
+		if ( $v !== null )
 		{
 			$this->data_content = $v;
 			$this->should_call_set_data_content = true;
@@ -434,7 +433,7 @@ class uiConf extends BaseuiConf implements ISyncableFile
 
 	public function setConfFile2 ( $v /*, $increment_version = true */ )
 	{
-		if ( $v != null )
+		if ( $v !== null )
 		{
 			$this->data_content_2 = $v;
 			$this->should_call_set_data_content2 = true;
