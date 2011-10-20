@@ -25,10 +25,6 @@ switch($delivery_type) {
     case "akamai":
 		$flashVars["mediaProtocol"] = "hdnetwork";
 		break;
-
-    default:
-		$flash_vars = "";
-		break;
 }
 
 if( $playlist_id ) {
