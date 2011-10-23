@@ -601,7 +601,7 @@ class KalturaEntryService extends KalturaBaseService
 		$this->checkAndSetValidUserInsert($entry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($entry);
 		$this->validateAccessControlId($entry);
-		$this->validateEntryScheduleDates($entry);
+		$this->validateEntryScheduleDates($entry, $dbEntry); 
 			
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
@@ -1092,20 +1092,25 @@ class KalturaEntryService extends KalturaBaseService
 	 * 
 	 * @param KalturaBaseEntry $entry
 	 */
-	protected function validateEntryScheduleDates(KalturaBaseEntry $entry)
+	protected function validateEntryScheduleDates(KalturaBaseEntry $entry, entry $dbEntry)
 	{
-		if ($entry->startDate <= -1)
-			$entry->startDate = -1;
-			
-		if ($entry->endDate <= -1)
-			$entry->endDate = -1;
+		if(is_null($entry->startDate) && is_null($entry->endDate))
+			return; // no update
+
+		// if input is null and this is an update pick the current db value 
+		$startDate = is_null($entry->startDate) ?  $dbEntry->getStartDate(null) : $entry->startDate;
+		$endDate = is_null($entry->endDate) ?  $dbEntry->getEndDate(null) : $entry->endDate;
 		
-		if ($entry->startDate !== -1 && $entry->endDate !== -1)
+		// normalize values for valid comparison later 
+		if ($startDate < 0)
+			$startDate = null;
+		
+		if ($endDate < 0)
+			$endDate = null;
+		
+		if ($startDate && $endDate && $startDate >= $endDate)
 		{
-			if ($entry->startDate >= $entry->endDate)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_SCHEDULE_DATES);
-			}
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_SCHEDULE_DATES);
 		}
 	}
 	
@@ -1137,16 +1142,7 @@ class KalturaEntryService extends KalturaBaseService
 		$this->checkAndSetValidUserUpdate($entry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($entry);
 		$this->validateAccessControlId($entry);
-		
-		if(!is_null($entry->startDate) || !is_null($entry->endDate))
-		{
-			if(is_null($entry->startDate))
-				$entry->startDate = $dbEntry->getStartDate(null);
-			if(is_null($entry->endDate))
-				$entry->endDate = $dbEntry->getEndDate(null);
-			
-			$this->validateEntryScheduleDates($entry);
-		}
+		$this->validateEntryScheduleDates($entry, $dbEntry); 
 		
 		$dbEntry = $entry->toUpdatableObject($dbEntry);
 		
