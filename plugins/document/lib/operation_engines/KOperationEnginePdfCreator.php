@@ -12,9 +12,9 @@ class KOperationEnginePdfCreator extends KSingleOutputOperationEngine
 	 */
 	private $flavorParamsOutput;
 
-	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data)
+	public function configure(KSchedularTaskConfig $taskConfig, KalturaConvartableJobData $data, KalturaClient $client)
 	{
-		parent::configure($taskConfig, $data);
+		parent::configure($taskConfig, $data, $client);
 		
 		$this->flavorParamsOutput = $data->flavorParamsOutput;
 		KalturaLog::debug("document : this [". print_r($this, true)."]"); 
