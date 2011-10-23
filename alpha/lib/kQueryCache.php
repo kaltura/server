@@ -35,7 +35,9 @@ class kQueryCache
 
 		//self::$s_memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
 		
-		$res = @self::$s_memcache->pconnect(kConf::get("global_memcache_host"), kConf::get("global_memcache_port"));
+		$connStart = microtime(true);
+		$res = @self::$s_memcache->connect(kConf::get("global_memcache_host"), kConf::get("global_memcache_port"));
+		KalturaLog::debug("kQueryCache: connect took - ". (microtime(true) - $connStart). " seconds to ".kConf::get("global_memcache_host"));
 		if (!$res)
 		{
 			KalturaLog::err("kQueryCache: failed to connect to global memcache");
