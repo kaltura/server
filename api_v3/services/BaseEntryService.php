@@ -46,7 +46,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
     /**
-     * Generic add entry, should be used when the uploaded entry type is not known
+     * Generic add entry, should be used when the uploaded entry type is not known.
      *
      * @action add
      * @param KalturaBaseEntry $entry
@@ -67,7 +67,7 @@ class BaseEntryService extends KalturaEntryService
     }
 	
     /**
-     * Generic add entry, should be used when the uploaded entry type is not known
+     * Generic add entry, should be used when the uploaded entry type is not known.
      *
      * @action addContent
 	 * @param string $entryId
@@ -202,7 +202,7 @@ class BaseEntryService extends KalturaEntryService
     }
     
     /**
-     * Generic add entry using an uploaded file, should be used when the uploaded entry type is not known
+     * Generic add entry using an uploaded file, should be used when the uploaded entry type is not known.
      *
      * @action addFromUploadedFile
      * @param KalturaBaseEntry $entry
@@ -310,7 +310,7 @@ class BaseEntryService extends KalturaEntryService
     }
 
     /**
-     * Get remote storage existing paths for the asset
+     * Get remote storage existing paths for the asset.
      *
      * @action getRemotePaths
      * @param string $entryId
@@ -497,7 +497,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Update entry thumbnail using a raw jpeg file
+	 * Update entry thumbnail using a raw jpeg file.
 	 * 
 	 * @action updateThumbnailJpeg
 	 * @param string $entryId Media entry id
@@ -513,7 +513,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Update entry thumbnail using url
+	 * Update entry thumbnail using url.
 	 * 
 	 * @action updateThumbnailFromUrl
 	 * @param string $entryId Media entry id
@@ -529,7 +529,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Update entry thumbnail from a different entry by a specified time offset (In seconds)
+	 * Update entry thumbnail from a different entry by a specified time offset (In seconds).
 	 * 
 	 * @action updateThumbnailFromSourceEntry
 	 * @param string $entryId Media entry id
@@ -546,7 +546,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Flag inappropriate entry for moderation
+	 * Flag inappropriate entry for moderation.
 	 *
 	 * @action flag
 	 * @param string $entryId
@@ -561,7 +561,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Reject the entry and mark the pending flags (if any) as moderated (this will make the entry non playable)
+	 * Reject the entry and mark the pending flags (if any) as moderated (this will make the entry non playable).
 	 *
 	 * @action reject
 	 * @param string $entryId
@@ -574,7 +574,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Approve the entry and mark the pending flags (if any) as moderated (this will make the entry playable) 
+	 * Approve the entry and mark the pending flags (if any) as moderated (this will make the entry playable). 
 	 *
 	 * @action approve
 	 * @param string $entryId
@@ -587,7 +587,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * List all pending flags for the entry
+	 * List all pending flags for the entry.
 	 *
 	 * @action listFlags
 	 * @param string $entryId
@@ -601,7 +601,7 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Anonymously rank an entry, no validation is done on duplicate rankings
+	 * Anonymously rank an entry, no validation is done on duplicate rankings.
 	 *  
 	 * @action anonymousRank
 	 * @param string $entryId
