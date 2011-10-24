@@ -152,7 +152,7 @@ class PlaylistService extends KalturaEntryService
 		$this->checkAndSetValidUserUpdate($playlist, $playlistUpdate);
 		$this->checkAdminOnlyUpdateProperties($playlist);
 		$this->validateAccessControlId($playlist);
-		$this->validateEntryScheduleDates($playlist);
+		$this->validateEntryScheduleDates($playlist, $dbPlaylist);
 
 		$allowEmpty = true ; // TODO - what is the policy  ? 
 		if ( $playlistUpdate->getMediaType() && ($playlistUpdate->getMediaType() != $dbPlaylist->getMediaType() ) )
