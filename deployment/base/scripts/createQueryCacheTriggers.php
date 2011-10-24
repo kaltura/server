@@ -16,7 +16,8 @@ $INVALIDATION_KEYS = array(
 	array('table' => "widget", 					'keys' => array(array("'widget:id='", '@OBJ@.id'))),
 	array('table' => "metadata", 				'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id'))),
 	array('table' => "metadata_profile_field", 	'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id'))),
-);
+	array('table' => "partner", 				'keys' => array(array("'partner:id='", '@OBJ@.id'))),
+	);
 
 // Default parameters
 $ACTION = 'create';
