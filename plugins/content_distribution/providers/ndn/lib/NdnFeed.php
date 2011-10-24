@@ -155,7 +155,6 @@ class NdnFeed
 		$mediaType = $this->getMediaTypeString($entry->getMediaType());	
 		if (empty($mediaType))	
 		{
-			throw new Exception('Unknown media type');
 			//TODO: throw exception, invalid media type
 		}
 		$this->setNodeValue('guid', $values[NdnDistributionField::ITEM_GUID], $item);
@@ -192,7 +191,7 @@ class NdnFeed
 		$mediaTypeString=null;
 		switch($mediaType){
 			case(1):
-				//$mediaTypeString = 'video';
+				$mediaTypeString = 'video';
 				break;			
 			case(5):
 				$mediaTypeString = 'audio';
