@@ -14,7 +14,7 @@ class KalturaTypedArray extends KalturaObject implements ArrayAccess, Iterator, 
 	 */	
 	public $count;
 	
-	public function __construct($class)
+	public function __construct($class = 'KalturaObject')
 	{
 		$this->class = $class;
 		$this->dummyClass = new $class;		
