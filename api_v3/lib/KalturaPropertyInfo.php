@@ -18,6 +18,7 @@ class KalturaPropertyInfo
 	private $_dynamicType = null;
 	private $_permissions = array();
 	private $_deprecated = false;
+	private $_deprecationMessage = null;
 	private $_serverOnly = false;
 	
 	const READ_PERMISSION_NAME = 'read';
@@ -205,6 +206,16 @@ class KalturaPropertyInfo
 	public function isDeprecated()
 	{
 		return $this->_deprecated;
+	}
+	
+	public function setDeprecationMessage($value)
+	{
+		$this->_deprecationMessage = $value;
+	}
+	
+	public function getDeprecationMessage()
+	{
+		return $this->_deprecationMessage;
 	}
 	
 	public function setServerOnly($value)

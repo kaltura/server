@@ -219,6 +219,7 @@ class KalturaTypeReflector
 								$prop->setDynamicType($parsedDocComment->dynamicType);
 								$prop->setServerOnly($parsedDocComment->serverOnly);
 								$prop->setDeprecated($parsedDocComment->deprecated);
+								$prop->setDeprecationMessage($parsedDocComment->deprecationMessage);
 								
 								$this->_properties[$name] = $prop;
 								
@@ -607,6 +608,21 @@ class KalturaTypeReflector
 	{
 		$reflectionClass = new ReflectionClass($this->_type);
 		return $reflectionClass->implementsInterface("IFilterable");
+	}
+	
+	/**
+	 * @return string plugin name
+	 */
+	public function getPlugin()
+	{
+		if(!is_string($this->_package))
+			return null;
+			
+		$packages = explode('.', $this->_package, 2);
+		if(count($packages) != 2 || $packages[0] != 'plugins')
+			return null;
+			
+		return $packages[1];
 	}
 	
 	/**
