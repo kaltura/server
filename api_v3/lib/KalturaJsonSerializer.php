@@ -72,6 +72,7 @@ class KalturaJsonSerializer
     		$object = $array;
     	}
     	
+		$object->objectType = get_class($object);
     	return $object;
 	}
 	
