@@ -33,7 +33,7 @@ class DataService extends KalturaEntryService
 		$this->checkAndSetValidUserInsert($dataEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($dataEntry);
 		$this->validateAccessControlId($dataEntry);
-		$this->validateEntryScheduleDates($dataEntry);
+		$this->validateEntryScheduleDates($dataEntry, $dbEntry);
 		
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);

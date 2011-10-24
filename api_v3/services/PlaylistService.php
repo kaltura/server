@@ -63,7 +63,7 @@ class PlaylistService extends KalturaEntryService
 		$this->checkAndSetValidUserInsert($playlist, $dbPlaylist);
 		$this->checkAdminOnlyInsertProperties($playlist);
 		$this->validateAccessControlId($playlist);
-		$this->validateEntryScheduleDates($playlist);
+		$this->validateEntryScheduleDates($playlist, $dbPlaylist);
 		
 		$dbPlaylist->setPartnerId ( $this->getPartnerId() );
 		$dbPlaylist->setStatus ( entryStatus::READY );

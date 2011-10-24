@@ -37,7 +37,7 @@ class MixingService extends KalturaEntryService
 		$this->checkAndSetValidUserInsert($mixEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($mixEntry);
 		$this->validateAccessControlId($mixEntry);
-		$this->validateEntryScheduleDates($mixEntry);
+		$this->validateEntryScheduleDates($mixEntry, $dbEntry);
 		
 		$kshow = $this->createDummyKShow();
 
@@ -110,7 +110,7 @@ class MixingService extends KalturaEntryService
 		$this->checkAndSetValidUserUpdate($mixEntry, $dbEntry);
 		$this->checkAdminOnlyUpdateProperties($mixEntry);
 		$this->validateAccessControlId($mixEntry);
-		$this->validateEntryScheduleDates($mixEntry);
+		$this->validateEntryScheduleDates($mixEntry, $dbEntry);
 		
 		$dbEntry = $mixEntry->toUpdatableObject($dbEntry);
 		

@@ -197,7 +197,7 @@ class LiveStreamService extends KalturaEntryService
 		$this->checkAndSetValidUserInsert($liveStreamEntry, $dbEntry);
 		$this->checkAdminOnlyInsertProperties($liveStreamEntry);
 		$this->validateAccessControlId($liveStreamEntry);
-		$this->validateEntryScheduleDates($liveStreamEntry);
+		$this->validateEntryScheduleDates($liveStreamEntry, $dbEntry);
 		
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);

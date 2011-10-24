@@ -195,7 +195,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 			$this->checkAndSetValidUserInsert($mediaEntry, $dbEntry);
 			$this->checkAdminOnlyInsertProperties($mediaEntry);
 			$this->validateAccessControlId($mediaEntry);
-			$this->validateEntryScheduleDates($mediaEntry);
+			$this->validateEntryScheduleDates($mediaEntry, $dbEntry);
 	
 			$dbEntry->setPartnerId($this->getPartnerId());
 			$dbEntry->setSubpId($this->getPartnerId() * 100);

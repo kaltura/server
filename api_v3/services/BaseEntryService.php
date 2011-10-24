@@ -252,7 +252,7 @@ class BaseEntryService extends KalturaEntryService
 	    $this->checkAndSetValidUserInsert($entry, $dbEntry);
 	    $this->checkAdminOnlyInsertProperties($entry);
 	    $this->validateAccessControlId($entry);
-	    $this->validateEntryScheduleDates($entry);
+	    $this->validateEntryScheduleDates($entry, $dbEntry);
 	    
 	    $dbEntry->setPartnerId($this->getPartnerId());
 	    $dbEntry->setSubpId($this->getPartnerId() * 100);
