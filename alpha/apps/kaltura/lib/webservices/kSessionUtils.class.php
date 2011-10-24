@@ -381,6 +381,10 @@ class ks
 			invalidSessionPeer::actionsLimitKs($this, $limit);		
 	}
 	
+	public function isWidgetSession()
+	{
+		return ($this->type == ks::TYPE_KS) && ($this->user == 0) && ($this->privileges == "view:*");
+	}
 	
 	public function isValid( $partner_id , $puser_id , $type = false)
 	{
@@ -393,7 +397,8 @@ class ks
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 	
 		if($this->original_str && 
-			$partner_id != Partner::BATCH_PARTNER_ID)		// Avoid querying the database on batch KS, since they are never invalidated
+			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
+			!$this->isWidgetSession())								// Since anyone can create a widget session, no need to check for invalidation
 		{
 			if ($this->isSetLimitAction()){
 				$isValidCctionLimit = invalidSessionPeer::isValidActionsLimit($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
