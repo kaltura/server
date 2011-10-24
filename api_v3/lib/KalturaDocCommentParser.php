@@ -13,7 +13,7 @@ class KalturaDocCommentParser
     
     const DOCCOMMENT_VAR_TYPE = "/\\@var (\\w*)/";
     const DOCCOMMENT_LINK = "/\\@link (.*)/";
-    const DOCCOMMENT_DESCRIPTION = "/\\* [a-zA-Z\\-\\s].*/";
+    const DOCCOMMENT_DESCRIPTION = "/\\* [a-zA-Z\\-\\s].*\\./";
     const DOCCOMMENT_RETURN_TYPE = "/\\@return (\\w*)/";
     
     const DOCCOMMENT_SERVICE_NAME =  "/\\@service\\s?(\\w*)/";
@@ -128,6 +128,11 @@ class KalturaDocCommentParser
     public $deprecated = false;
     
     /**
+     * @var string
+     */
+    public $deprecationMessage = null;
+
+    /**
      * @var bool
      */
     public $serverOnly = false;
@@ -199,18 +204,9 @@ class KalturaDocCommentParser
             
         if ($this->deprecated)
         {
-			$this->description = trim($this->description);
-			if ($this->description)
-			{
-				$this->description .= "\n";
-			}
-			$this->description .= "DEPRECATED";
         	$result = null;
 	        if (preg_match( self::DOCCOMMENT_DEPRECATION_MESSAGE, $comment, $result))
-	        {
-	        	$deprecationMessage = $result[1];
-	        	$this->description .= " - $deprecationMessage";
-	        }
+	        	$this->deprecationMessage = $result[1];
         }
             
         $result = null;
