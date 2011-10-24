@@ -23,7 +23,7 @@ class varpartnerlistAction extends kalturaAction
 		
 		$ks = kSessionUtils::crackKs($this->getP('ks'));
 		$user = $ks->user;
-		$res = kSessionUtils::validateKSession2(ks::TYPE_KAS, $partner_id, $user, $this->getP('ks'), $ks);
+		$res = kSessionUtils::validateKSession2(kSessionUtils::REQUIED_TICKET_ADMIN, $partner_id, $user, $this->getP('ks'), $ks);
 		if($res != ks::OK)
 		{
 			header("Location: /index.php/kmc/varlogin");
