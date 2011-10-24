@@ -6,11 +6,13 @@
 class VirusScanEntryStatus implements IKalturaPluginEnum, entryStatus
 {
 	const INFECTED = 'Infected';
+	const SCAN_FALIURE = 'ScanFailure';
 	
 	public static function getAdditionalValues()
 	{
 		return array(
-			'INFECTED' => self::INFECTED
+			'INFECTED' => self::INFECTED,
+		    'SCAN_FAILURE' => self::SCAN_FAILURE,
 		);
 	}
 	
