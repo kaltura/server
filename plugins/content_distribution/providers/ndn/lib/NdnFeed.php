@@ -153,10 +153,6 @@ class NdnFeed
 			$thumbnailUrl = $entry->getThumbnailUrl();
 		}
 		$mediaType = $this->getMediaTypeString($entry->getMediaType());	
-		if (empty($mediaType))	
-		{
-			//TODO: throw exception, invalid media type
-		}
 		$this->setNodeValue('guid', $values[NdnDistributionField::ITEM_GUID], $item);
 		$this->setNodeValue('title', $values[NdnDistributionField::ITEM_TITLE], $item);
 		$this->setNodeValue('link', $values[NdnDistributionField::ITEM_LINK], $item);
