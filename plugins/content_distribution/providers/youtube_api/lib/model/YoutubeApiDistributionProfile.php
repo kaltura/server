@@ -24,6 +24,11 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 	const MEDIA_EACH_KEYWORD_MAXIMUM_LENGTH = 30;
 	const MEDIA_KEYWORDS_FORBIDDEN_CHARS = '"';
 	
+	const ALLOW_COMMENTS_VALID_VALUES = 'allowed,denied,moderated';
+	const ALLOW_RESPONSES_VALID_VALUES = 'allowed,denied,moderated';
+	const ALLOW_EMBEDDING_VALID_VALUES = 'allowed,denied';
+	const ALLOW_RATINGS_VALID_VALUES = 'allowed,denied';
+	
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -48,6 +53,13 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		    YouTubeApiDistributionField::MEDIA_KEYWORDS => self::MEDIA_KEYWORDS_MAXIMUM_LENGTH
 		);
 		
+		$inListOrNullFields = array (
+		    YouTubeApiDistributionField::ALLOW_COMMENTS => explode(',', self::ALLOW_COMMENTS_VALID_VALUES),
+		    YouTubeApiDistributionField::ALLOW_EMBEDDING => explode(',', self::ALLOW_EMBEDDING_VALID_VALUES),
+		    YouTubeApiDistributionField::ALLOW_RATINGS => explode(',', self::ALLOW_RATINGS_VALID_VALUES),
+		    YouTubeApiDistributionField::ALLOW_RESPONSES => explode(',', self::ALLOW_RESPONSES_VALID_VALUES),
+		);
+		
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if (!$allFieldValues || !is_array($allFieldValues)) {
 		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
@@ -55,7 +67,8 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		}
 		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
-	    
+	    $validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
+				
 		$videoTagsValue = isset($allFieldValues[YouTubeApiDistributionField::MEDIA_KEYWORDS]) ? $allFieldValues[YouTubeApiDistributionField::MEDIA_KEYWORDS] : null;
 		$validationErrors = array_merge($validationErrors, $this->validateTags($videoTagsValue, $action));
 	
