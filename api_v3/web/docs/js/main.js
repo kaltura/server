@@ -399,6 +399,9 @@ var KDoc = {
 		});
 		new KCodeExample(codeExamplePanel, new KCodeExamplePHP());
 		new KCodeExample(codeExamplePanel, new KCodeExampleJava());
+		new KCodeExample(codeExamplePanel, new KCodeExampleCsharp());
+		new KCodeExample(codeExamplePanel, new KCodeExamplePython());
+		new KCodeExample(codeExamplePanel, new KCodeExampleJavascript());
 
 		KDoc.testmePropertiesPanel = Ext.create('Ext.panel.Panel', {
 			region : 'west',
