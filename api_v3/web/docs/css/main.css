@@ -1,0 +1,226 @@
+body,html {
+	font: normal 12px verdana;
+	margin: 0;
+	padding: 0;
+	border: 0 none;
+	overflow: hidden;
+	height: 100%;
+}
+
+pre {
+	background-color: #F9F9F9;
+	border: 1px dashed #4F81BD;
+	color: black;
+	line-height: 1.1em;
+	padding: 1em;
+}
+
+/* api documents */
+.api-doc{
+}
+
+.api-info{
+	text-align: left;
+	padding: 25px;
+	max-width: 800px;
+}
+
+.api-info h2{
+	color: #0000AA;
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+.api-info .box{
+	padding-top: 10px;
+}
+
+.api-info .box h3{
+	border-bottom: 2px solid #999999;
+    color: #999999;
+    font-size: 14pt;
+    font-weight: normal;
+    margin: 1em 0 0;
+}
+
+.api-info .box h4{
+	padding-top: 5px;	
+	padding-bottom: 1px;
+}
+
+.api-info .box h4 img{
+	cursor: pointer;	
+}
+
+.api-info .box p{
+    color: #999999;
+    font-size: 12pt;
+    font-weight: normal;
+}
+
+.api-info .box ul, .api-info .box ol{
+	color: #666666;
+    padding-left: 0;
+}
+
+.api-info .box li{
+    margin-left: 2em;	
+    list-style-type: square;
+}
+
+.api-info .box li.choice{
+    list-style-type: decimal;
+}
+
+/* api notifications documents */
+table#notifications_table {
+	width: 900px;
+}
+
+table#notifications_table th {
+	background-color: #4F81BD;
+	color: #FFFFFF;
+	text-align: left;
+}
+
+table#notifications_table th.center {
+	text-align: center;
+}
+
+table#notifications_table td,table#notifications_table th,table#general_errors td,table#general_errors th{
+	border: 1px solid #4F81BD;
+	padding: 2px 3px;
+	vertical-align: top;
+}
+
+table#notifications_table td {
+	background-color: #F9F9F9;
+}
+
+table#notifications_table td.property_yes {
+	background: #F9F9F9 url(../images/checked.gif) no-repeat center;
+}
+
+/* testme console */
+#action-params,.param,.object {
+	margin-bottom: 15px;
+}
+
+.param label,.object-name,.array-name {
+	display: block;
+	padding-bottom: 2px;
+	font-size: 10px;
+	color: #666;
+}
+
+.param select,.param input[type="text"] {
+	font-size: 12px;
+	padding: 2px;
+	border: 1px solid #D7D7D7;
+}
+
+.param select {
+	width: 206px;
+}
+
+.param input[type="text"] {
+	width: 200px;
+}
+
+.param {
+	color: #666;
+}
+
+.param .help {
+	margin-top: 3px;
+	cursor: help;
+}
+
+button {
+	background-color: #A0A0A0;
+	border-color: #DEDEDE #202020 #202020 #DEDEDE;
+	border-style: solid;
+	border-width: 1px;
+	color: #FFFFFF;
+	font-size: 12px;
+	padding: 2px 10px;
+	text-align: center;
+	cursor: pointer;
+}
+
+.array-button {
+	font-size: 9px
+}
+
+.object-name {
+	cursor: pointer;
+}
+
+.object-type {
+	font-size: 9px
+}
+
+.object-properties {
+	background-color: #F7F7F7;
+}
+
+/* ui icons */
+.nav {
+	background-image: url(../images/navigate.png) !important;
+}
+
+.icon-docs-folder {
+	background-image: url(../images/docs_folder.png) !important;
+}
+
+.icon-doc {
+	background-image: url(../images/doc.png) !important;
+}
+
+.icon-service {
+	background-image: url(../images/service.png) !important;
+}
+
+.icon-action {
+	background-image: url(../images/action.png) !important;
+}
+
+.icon-object {
+	background-image: url(../images/object.png) !important;
+}
+
+.icon-schema {
+	background-image: url(../images/schema.png) !important;
+}
+
+/* xsd doc */
+
+
+.xml-element{
+	color: blue;
+}
+.xml-element-value{
+	color: gray;
+}
+.xml-attribute{
+	color: red;
+}
+.xml-attribute-value{
+	color: gray;
+}
+.indent{
+	padding: 8px;
+}
+
+.element-title{
+}
+.child-elements{
+}
+.child-attributes{
+}
+.element-example-title{
+}
+.element-example{
+}
+.extensions-title{
+}
