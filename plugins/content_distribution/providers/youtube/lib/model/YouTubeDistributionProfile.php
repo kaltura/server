@@ -35,10 +35,10 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const TV_METADATA_EPISODE_TITLE_MAXIMUM_LENGTH = 64;
 	const TV_METADATA_SHOW_TITLE_MAXIMUM_LENGTH = 64;
 	const MEDIA_RATING_VALID_VALUES = 'adult,nonadult';
-	const ALLOW_COMMENTS_VALID_VALUES = 'Always,Approve,Never';
-	const ALLOW_RESPONSES_VALID_VALUES = 'Always,Approve,Never';
-	const ALLOW_EMBEDDING_VALID_VALUES = 'true,false';
-	const ALLOW_RATINGS_VALID_VALUES = 'true,false';
+	const ALLOW_COMMENTS_VALID_VALUES = 'allowed,denied,moderated';
+	const ALLOW_RESPONSES_VALID_VALUES = 'allowed,denied,moderated';
+	const ALLOW_EMBEDDING_VALID_VALUES = 'allowed,denied';
+	const ALLOW_RATINGS_VALID_VALUES = 'allowed,denied';
 	
 	
 	
