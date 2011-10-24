@@ -399,11 +399,32 @@ class KalturaFrontController
 		$start = microtime(true);
 		KalturaLog::debug("Serialize start");
 		$format = isset($this->params["format"]) ? $this->params["format"] : KalturaResponseType::RESPONSE_TYPE_XML;
+	
+		if(isset($this->params['content-type']))
+		{
+			header('Content-Type: ' . $this->params['content-type']);
+		}
+		else
+		{
+			switch($format)
+			{
+				case KalturaResponseType::RESPONSE_TYPE_XML:
+					header("Content-Type: text/xml");
+					break;
+					
+				case KalturaResponseType::RESPONSE_TYPE_JSON:
+					header("Content-Type: application/json");
+					break;
+				    
+				case KalturaResponseType::RESPONSE_TYPE_JSONP:
+					header("Content-Type: application/javascript");
+					break;
+			}
+		}
 		
 		switch($format)
 		{
 			case KalturaResponseType::RESPONSE_TYPE_XML:
-				header("Content-Type: text/xml");
 				$serializer = new KalturaXmlSerializer($ignoreNull);
 				$serializer->serialize($object);
 				
@@ -423,7 +444,6 @@ class KalturaFrontController
 				break;
 				
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
-				header("Content-Type: application/json");
 				$serializer = new KalturaJsonSerializer($ignoreNull);
 				$serializer->serialize($object);
 				echo $serializer->getSerializedData();
@@ -433,7 +453,6 @@ class KalturaFrontController
 				$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
 				if (is_null($callback))
 					die("Expecting \"callback\" parameter for jsonp format");
-				header("Content-Type: application/javascript");
 				$serializer = new KalturaJsonSerializer($ignoreNull);
 				$serializer->serialize($object);
 				$response = array();
