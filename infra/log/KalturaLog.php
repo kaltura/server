@@ -228,3 +228,25 @@ class LogIp
 		return self::$_ip;
 	}
 }
+
+/**
+ * @package infra
+ * @subpackage log
+ */
+class LogDuration
+{
+	static $_lastMicroTime = null;
+	public function __toString()
+	{
+		$curTime = microtime(true);
+
+		if (self::$_lastMicroTime === null)
+			$result = "0";
+		else		
+			$result = sprintf("%.6f", $curTime - self::$_lastMicroTime);
+			
+		self::$_lastMicroTime = $curTime;
+		
+		return $result;
+	}
+}
