@@ -205,7 +205,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 					KalturaLog::debug('FlavorAsset ['.$flavorAsset->getId().'] marked as deleted');
 					$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 					$flavorAsset->setDeletedAt(time());
-					$flavorAsset->save();					
+					$flavorAsset->save();
 					KalturaLog::debug('Physically deleting file ['.$filePath.']');
 					unlink($filePath);
 					if ($entry)	{
@@ -232,6 +232,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		{
 			$entry->setStatus(VirusScanPlugin::getEntryStatusCoreValue(VirusScanEntryStatus::SCAN_FAILURE));
 			$entry->save();
+			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
 		}
 		else
 		{
