@@ -1127,4 +1127,8 @@ class Partner extends BasePartner
 	// -- end of enabled special features
 	// ----------------------------------
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("partner:id=".$this->getId());
+	}	
 }
