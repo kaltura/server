@@ -11,7 +11,8 @@ class MediaInfoService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		myPartnerUtils::addPartnerToCriteria(new mediaInfoPeer(), $this->getPartnerId(), $this->private_partner_data, $this->partnerGroup());	
+		parent::applyPartnerFilterForClass(new mediaInfoPeer());
+		parent::applyPartnerFilterForClass(new assetPeer());
     }
 	
 	/**
@@ -24,6 +25,8 @@ class MediaInfoService extends KalturaBaseService
 	 */
 	function listAction(KalturaMediaInfoFilter $filter = null, KalturaFilterPager $pager = null)
 	{
+	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
+	    
 		if (!$filter)
 			$filter = new KalturaMediaInfoFilter();
 
@@ -33,6 +36,13 @@ class MediaInfoService extends KalturaBaseService
 		$mediaInfoFilter = new MediaInfoFilter();
 		
 		$filter->toObject($mediaInfoFilter);
+		
+		if ($filter->flavorAssetIdEqual)
+		{
+			// Since media_info table does not have partner_id column, enforce partner by getting the asset
+			if (!assetPeer::retrieveById($filter->flavorAssetIdEqual))
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $filter->flavorAssetIdEqual);
+		}
 
 		$c = new Criteria();
 		$mediaInfoFilter->attachToCriteria($c);
