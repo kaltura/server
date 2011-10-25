@@ -25,7 +25,12 @@ class KalturaPDO extends PropelPDO
 		if(isset($driver_options[self::KALTURA_ATTR_NAME]))
 			$this->connectionName = $driver_options[self::KALTURA_ATTR_NAME];
 			
+		$connStart = microtime(true);
+
 		parent::__construct($dsn, $username, $password, $driver_options);
+
+		KalturaLog::debug("conn took - ". (microtime(true) - $connStart). " seconds to $dsn");
+
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('KalturaStatement'));
 	}
 
