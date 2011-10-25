@@ -3,6 +3,7 @@
  * @package infra
  * @subpackage utils
  */
+
 class kXsd
 {
 	/**
@@ -184,18 +185,24 @@ class kXsd
 					if($fromChild)
 					{
 						$fromElementName = $fromChild->getAttribute('name');
+						
+						$restriction = self::getNodeRestrictions($toChild, $fromChild);
+							KalturaLog::info("Node [$id] name changed from [$fromElementName] to [$elementName]");
+							if (strlen($restriction))
+								$isIdentical = false;
+						
 						if($fromElementName == $elementName)
 						{
 							$xsl .= '
-			' . $tabs . '<xsl:copy-of select="' . $xPath . '/*[local-name()=\'' . $elementName . '\']"/>';
+			' . $tabs . '<xsl:copy-of select="' . $xPath . $restriction . '/*[local-name()=\'' . $elementName . '\']"/>';
 						}
 						else
 						{
-							KalturaLog::info("Node [$id] name changed from [$fromElementName] to [$elementName]");
-							$isIdentical = false;
+							
+								
 							$xsl .= '
 			' . $tabs . '<xsl:element name="' . $elementName . '">
-			' . $tabs . '	<xsl:copy-of select="' . $xPath . '/*[local-name()=\'' . $elementName . '\']"/>
+			' . $tabs . '	<xsl:copy-of select="' . $xPath .  $restriction . '/*[local-name()=\'' . $elementName . '\']"/>
 			' . $tabs . '</xsl:element>';
 						}
 						continue;
@@ -237,7 +244,7 @@ class kXsd
 			' . $tabs . '<xsl:element name="' . $elementName . '">' . $toChild->getAttribute('default') . '</xsl:element>';	
 				}
 			}
-			
+						
 			foreach($fromChildrenArr as $fromChild)
 			{
 				$fromChildName = strtolower($fromChild->localName);
@@ -324,8 +331,13 @@ class kXsd
 						
 						$elementName = $fromChild->getAttribute('name');
 						KalturaLog::debug("Element [$elementName] is identical");
+						$restriction = self::getNodeRestrictions($toChild, $fromChild);
+						if (strlen($restriction)){
+							$isIdentical = false;
+						}
+
 						$xsl .= '
-		' . $tabs . '<xsl:copy-of select="' . $xPath . '/*[local-name()=\'' . $elementName . '\']"/>';
+		' . $tabs . '<xsl:copy-of select="' . $xPath . $restriction .'/*[local-name()=\'' . $elementName . '\']"/>';
 					}
 					else
 					{
@@ -361,6 +373,59 @@ class kXsd
 	}
 	
 	/**
+	 * @param DOMNode $toNode
+	 * @param DOMNode $fromNode
+	 * @return string xsl - the restriction for the toNode if changed from the fromNode
+	 */
+	public static function getNodeRestrictions(DOMNode $toNode, DOMNode $fromNode)
+	{
+		// toNode
+		$simpleType = $toNode->getElementsByTagName('simpleType');
+		
+		if(!$simpleType || !$simpleType->item(0))
+			return;
+			
+		$restrictions = $simpleType->item(0)->getElementsByTagName('restriction');
+				
+		$enumerationsValueToNode = array();
+		
+		foreach($restrictions as $restriction)
+		{
+			$enumerations =  $restriction->getElementsByTagName('enumeration');
+			foreach($enumerations as $enumeration)
+			{
+				$enumerationsValueToNode[] = $enumeration->getAttribute('value');
+			}			
+		}
+		
+		$simpleType = $fromNode->getElementsByTagName('simpleType');
+		
+		if(!$simpleType || !$simpleType->item(0))
+			return;
+			
+		$restrictions = $simpleType->item(0)->getElementsByTagName('restriction');
+				
+		$enumerationsValueFromNode = array();
+		
+		foreach($restrictions as $restriction)
+		{
+			$enumerations =  $restriction->getElementsByTagName('enumeration');
+			foreach($enumerations as $enumeration)
+			{
+				$enumerationsValueFromNode[] = $enumeration->getAttribute('value');
+			}			
+		}
+		
+		if (!count(array_diff($enumerationsValueFromNode, $enumerationsValueToNode)))
+			return '';
+		
+		if (!count($enumerationsValueToNode))
+			return '';
+		
+		return '[' . $toNode->getAttribute('name') . '=\'' . implode('\' or ' . $toNode->getAttribute('name') . '=\'', $enumerationsValueToNode) . '\']';
+	}
+	
+	/**
 	 * @param string $fromXsd old xsd path
 	 * @param string $toXsd new xsd path
 	 * @return bool|string true if no change required, or, xsl text if transform required
@@ -368,6 +433,7 @@ class kXsd
 	 */
 	public static function compareXsd($fromXsd, $toXsd)
 	{
+		KalturaLog::debug('in xsl');
 		$from = new DOMDocument();
 		$from->load($fromXsd);
 		
