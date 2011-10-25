@@ -221,6 +221,13 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(NdnDistributionField::ITEM_MEDIA_COPYRIGHT_URL);
+		$fieldConfig->setUserFriendlyFieldName('Ndn media copyright url');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/NdnMediaCopyrightUrl" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
 		//attributes
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(NdnDistributionField::ITEM_THUMBNAIL_CREDIT);
