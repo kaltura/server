@@ -5,7 +5,7 @@
  */
 class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 {
-	protected $url;
+	protected $taskConfig;
 	
 	/**
 	 * @param string $filePath
@@ -13,8 +13,28 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 	 */
 	public function __construct($filePath, KSchedularTaskConfig $taskConfig)
 	{
-		$this->url = $taskConfig->params->remoteMediaInfoUrl;
+		$this->taskConfig = $taskConfig;
 		$this->filePath = $filePath;
+		
+		$errStr=null;
+		if(!$taskConfig->params->AlldigitalApiUrl)
+			$errStr="AlldigitalApiUrl";
+		if(!$taskConfig->params->AlldigitalApiUser){
+			if($errStr) 
+				$errStr.=",";
+			$errStr.="AlldigitalApiUser";
+		}
+		if(!$taskConfig->params->AlldigitalApiPassword){
+			if($errStr) 
+				$errStr.=",";
+			$errStr.="AlldigitalApiPassword";
+		}
+		
+		KalturaLog::info("taskConfig-->".print_r($taskConfig,true));
+		if($errStr) {
+			KalturaLog::info("AlldigitalApi failure: missing credentials - $errStr");
+			throw new KOperationEngineException("AlldigitalApi failure: missing credentials - $errStr");
+		}
 	}
 	
 	/**
@@ -22,14 +42,17 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 	 */
 	public function getRawMediaInfo()
 	{
-		// For example:
-		// url = http://url.to.my_domain/and/path?file=
-		// filePath = /web/contnet/file.flv
-		// resulted url is http://url.to.my_domain/and/path?file=L3dlYi9jb250bmV0L2ZpbGUuZmx2 
-		$url = $this->url . base64_encode($this->filePath);
-		return file_get_contents($url);
-		
-	$mediaInfoSample = "
+		$adApi=new ADContentAPI;
+		$adApi->setUser($this->taskConfig->params->AlldigitalApiUser);
+		$adApi->setPassw($this->taskConfig->params->AlldigitalApiPassword);
+		$adApi->setUrl($this->taskConfig->params->AlldigitalApiUrl);
+KalturaLog::info("adApi-->".print_r($adApi,true));
+
+		$mi=$adApi->MediaInfoToText("input",'ABCNEWS_SD_CONSMEDIA_e.mxf', $err);
+KalturaLog::info("mediaInfo-->\n".$mi);
+
+		return $mi;
+		$mediaInfoSample = "
 General
 Complete name                    : C:\\xampp\htdocs\mvdr6t454m.mov
 Format                           : MPEG-4
