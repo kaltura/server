@@ -24,11 +24,6 @@ class NdnFeed
 	/**
 	 * @var DOMElement
 	 */
-	protected $content;
-	
-	/**
-	 * @var DOMElement
-	 */
 	protected $thumbnail;
 	
 	/**
@@ -64,11 +59,6 @@ class NdnFeed
 		$this->item = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
 
-		// content node template
-		$node = $this->xpath->query('media:content', $this->item)->item(0);
-		$this->content = $node->cloneNode(true);
-		$node->parentNode->removeChild($node);
-		
 		// category node template
 		$node = $this->xpath->query('media:category', $this->item)->item(0);
 		$this->category = $node->cloneNode(true);
@@ -161,7 +151,8 @@ class NdnFeed
 		$this->setNodeValue('pubDate', $pubDate, $item);
 		$endTime = date('r', $values[NdnDistributionField::ITEM_EXPIRATION_DATE]);
 		$this->setNodeValue('expirationDate', $endTime, $item);
-		$this->setNodeValue('live:origReleaseDate', $values[NdnDistributionField::ITEM_LIVE_ORIGINAL_RELEASE_DATE], $item);
+		$origReleaseDate = date('r', $values[NdnDistributionField::ITEM_LIVE_ORIGINAL_RELEASE_DATE]);
+		$this->setNodeValue('live:origReleaseDate',$origReleaseDate, $item);
 		$this->setNodeValue('media:title', $values[NdnDistributionField::ITEM_MEDIA_TITLE], $item);
 		$this->setNodeValue('media:description', $values[NdnDistributionField::ITEM_MEDIA_DESCRIPTION], $item);
 		$this->setNodeValue('media:keywords', $values[NdnDistributionField::ITEM_MEDIA_KEYWORDS], $item);
@@ -179,7 +170,8 @@ class NdnFeed
 			$this->setThumbAssetUrl($item, $thumbnailUrl, $values[NdnDistributionField::ITEM_THUMBNAIL_CREDIT]);
 		}		
 		$this->addCategory($item,$values[NdnDistributionField::ITEM_MEDIA_CATEGORY]);
-		$this->setNodeValue('media:copyright', $values[NdnDistributionField::ITEM_MEDIA_COPYRIGHT], $item);		
+		$this->setNodeValue('media:copyright', $values[NdnDistributionField::ITEM_MEDIA_COPYRIGHT], $item);	
+		$this->setNodeValue('media:copyright/@url', $values[NdnDistributionField::ITEM_MEDIA_COPYRIGHT_URL], $item);			
 	}
 	
 	private function getMediaTypeString($mediaType)
@@ -217,21 +209,27 @@ class NdnFeed
 	
 	public function addCategory($item, $categoryValue)
 	{	
-		$categoryNode = $this->category->cloneNode(true);
-		$categoryNode->nodeValue = $categoryValue;	
-		$beforeNode = $this->xpath->query('media:content', $item)->item(0);		
-		$item->insertBefore($categoryNode, $beforeNode);	
+		$categories = explode(',', $categoryValue);
+		if ($categories)
+		{			
+			foreach ($categories as $category)
+			{				
+				if ($category){	
+					$categoryNode = $this->category->cloneNode(true);				
+					$categoryNode->nodeValue = $category;	
+					$beforeNode = $this->xpath->query('media:copyright', $item)->item(0);		
+					$item->insertBefore($categoryNode, $beforeNode);
+				}
+			}
+		}	
 	}
 	
 	public function setFlavorAsset(DOMElement $item, array $flavorAssets, $mediaType, $flavorLang)
 	{
 		$flavorAsset = $flavorAssets[0];		
 		/* @var $flavorAsset flavorAsset */
-		$content = $this->content->cloneNode(true);
-		$beforeNode = $this->xpath->query('media:content', $item)->item(0);	
-		$item->insertBefore($content, $beforeNode);
 		$url = $this->getAssetUrl($flavorAsset);
-		$this->setNodeValue('@url', $url, $content);
+		$this->setNodeValue('media:content/@url', $url, $item);
 		$this->setNodeValue('media:content/@width', $flavorAsset->getWidth(), $item);
 		$this->setNodeValue('media:content/@height', $flavorAsset->getHeight(), $item);
 		$this->setNodeValue('media:content/@type', $mediaType, $item);
