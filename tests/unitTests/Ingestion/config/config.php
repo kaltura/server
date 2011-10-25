@@ -13,10 +13,10 @@
 <?php
 	class Config
 	{
-		const SERVER_URL = "http://kaltura";
+		const SERVER_URL = "";
 		
-		const PARTNER_ID = "106";
-		const PARTNER_ADMIN_SECRET = "106";
+		const PARTNER_ID = "";
+		const PARTNER_ADMIN_SECRET = "";
 		const PARTNER_USER_ID = 'IngestionTestUser';
 		
 		const FULL_CONVERSION_PROFILE_NAME = 'Full Conversion Profile';
