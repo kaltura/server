@@ -37,6 +37,7 @@ var KCodeExample = function(container, codeGenerator){
 
 var KDoc = {
 	mainWindow : null,
+	testmePanel: null,
 	testmeResultsTab : null,
 	testmePropertiesPanel : null,
 	apiDocumentsStore : null,
@@ -84,6 +85,7 @@ var KDoc = {
 	onTestmeResults : function(json) {
 		var data = KDoc.jsonToStore(json);
 
+		KDoc.testmePanel.show();
 		KDoc.testmeResultsTab.store.tree.root.removeAll(false);
 		KDoc.testmeResultsTab.store.tree.root.appendChild(data);
 		KDoc.testmeResultsTab.expandAll(function(){
@@ -412,7 +414,7 @@ var KDoc = {
 			layout : 'accordion'
 		});
 
-		var testmePanel = Ext.create('Ext.panel.Panel', {
+		KDoc.testmePanel = Ext.create('Ext.panel.Panel', {
 			title : 'Console Results',
 			closable : false,
 			autoScroll : false,
@@ -430,7 +432,7 @@ var KDoc = {
 					anchor : '100%'
 				}
 			},
-			items : [ testmePanel ]
+			items : [ KDoc.testmePanel ]
 		});
 
 		var testmeForm = Ext.create('Ext.panel.Panel', {
