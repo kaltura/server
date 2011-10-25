@@ -195,8 +195,8 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(NdnDistributionField::ITEM_LIVE_ORIGINAL_RELEASE_DATE);
-		$fieldConfig->setUserFriendlyFieldName('Ndn item live original release date');
-		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/NdnLiveOriginalReleaseDate" />');
+		$fieldConfig->setUserFriendlyFieldName('Ndn item original release date');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/NdnOriginalReleaseDate" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
@@ -217,7 +217,7 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(NdnDistributionField::ITEM_MEDIA_COPYRIGHT);
 		$fieldConfig->setUserFriendlyFieldName('Ndn media copyright');
-		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/NdnItemMediaCopyright" />');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/NdnMediaCopyright" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
