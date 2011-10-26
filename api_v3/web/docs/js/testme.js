@@ -295,10 +295,12 @@ KTestMe.prototype = {
 		
 		var jqObject = jQuery("<div class=\"object\">");
 		jqObject.attr("id", "object-" + param.name);
+		jqObject.attr("title", "Edit the action's input parameters and objects.");
 		var jqObjectTitle = jQuery("<div>");
 		var jqObjectName = jQuery("<span class=\"object-name\">temp</span>"); // temp required by IE
 		jqObjectName.html(param.name + " ");
 		var jqEdit = jQuery("<button class=\"edit-button\">Edit</button>");
+		jqEdit.attr("title", "Edit the action's input parameters and objects.");
 		
 		jqObjectTitle.append(jqObjectName);
 		jqObjectTitle.append(jqEdit);

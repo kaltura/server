@@ -43,12 +43,14 @@
 	<div class="param">
 		<label for="history">History: </label>
 		<select name="history"></select>
+		<img id="actionHelp" src="images/help.png" class="help" title="After you send an API call, you can see the history of the API calls of the current session." />
 	</div>
 
 	<div class="param">
 		<label for="ks">KS (string):</label>
 		<input type="text" class="" name="ks" size="30" />
 		<input id="chk-ks" type="checkbox" checked="checked" />
+		<img id="actionHelp" src="images/help.png" class="help" title="Kaltura Session string." />
 	</div>
 		
 	<?php if($indexConfig->noCache): ?>
@@ -81,6 +83,7 @@
 				}
 			?>
 		</select>
+		<img id="actionHelp" src="images/help.png" class="help" title="Select an API service to display. Click the arrow for the full list of services." />
 	</div>
 	
 	<div class="param">
@@ -88,7 +91,7 @@
 		<select name="action">
 			<option>Select a service...</option>
 		</select>
-		<img id="actionHelp" src="images/help.png" class="help" title="" />
+		<img id="actionHelp" src="images/help.png" class="help" title="Select one of the service's available actions. Click the arrow for the full list of actions." />
 	</div>
 
 	<div>
@@ -97,7 +100,7 @@
 	</div>
 	
 	<div>
-		<button id="send" type="button">Send</button>
+		<button id="send" type="button" title="Send an API call.">Send</button>
 	</div>
 		
 	<input type="hidden" name="format" value="<?php echo KalturaResponseType::RESPONSE_TYPE_JSON; ?>"/>
