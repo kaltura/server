@@ -29,7 +29,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if($object instanceof entry)
 		{
-			if(in_array(entryPeer::STATUS, $modifiedColumns))
+			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 				return self::onEntryReady($object);
 			else
 				return self::onEntryChanged($object, $modifiedColumns);
@@ -1514,7 +1514,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
 					
-					if(!count($validationErrors))
+					if(!count($validationErrors) && $entry->getStatus() == entryStatus::READY)
 						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
 					break;
 				
