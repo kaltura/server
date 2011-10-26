@@ -45,21 +45,43 @@ if (! isObjectNameValid ( $object )) {
 $typeReflector = KalturaTypeReflectorCacher::get ( $object );
 $type = $typeReflector->getType ();
 $description = trim ( formatDescription ( $typeReflector->getDescription () ) );
+$plugin = $typeReflector->getPlugin();
 $classHierarchy = getClassHierarchy($typeReflector->getType());
 ?>
 <h2><img src="images/object.png" align="middle"/> <?php echo $type; ?></h2>
-<div class="box">
-	<h3>Description</h3>
-	<?php 
-		if ($description)
-			echo "<p>$description</p>";
+<?php 
+	if($description || $plugin || $typeReflector->isArray())
+	{
+		?>
+		<div class="box">
+			<h3>Description</h3>
+			<?php 
+				if ($description)
+					echo "<p>$description</p>";
+					
+				echo "<ul>";
 			
-		echo "<ul>";
+				if ($plugin) 
+					echo "<li>Plugin: $plugin</li>";
+				
+				if ($typeReflector->isArray()) 
+				{
+					$arrayType = $typeReflector->getArrayType();
+					echo "<li>Array type: <a href=\"#\" onclick=\"KDoc.openObject('$arrayType')\">$arrayType</a></li>";
+				}
+					
+				echo "</ul>";
+			?>
+		</div>
+		<?php
+	}
+?>
+
+<div class="box">
+	<h3>Class Hierarchy</h3>
+	<ul>
+	<?php 
 	
-		$plugin = $typeReflector->getPlugin();
-		if ($plugin) 
-			echo "<li>Plugin: $plugin</li>";
-		
 		$classProperties = array ();
 		foreach ( $classHierarchy as $curClass ) 
 		{
@@ -82,20 +104,13 @@ $classHierarchy = getClassHierarchy($typeReflector->getType());
 			$classPath[] = $curReflector->getType();
 			$classPath = implode('.', $classPath);
 				
-			echo "<li>$classPath<ul>";
+			echo "<li><a href=\"#\" onclick=\"KDoc.openObject('" . $curReflector->getType() . "')\">$classPath</a><ul>";
 		}
 		echo str_repeat("</ul></li>", count($classHierarchy));
-		
-		if ($typeReflector->isArray ()) 
-		{
-			$arrayType = $typeReflector->getArrayType();
-			echo "<li>Array type: <a href=\"#\" onclick=\"KDoc.openObject('$arrayType')\">$arrayType</a></li>";
-		}
-			
-		echo "</ul>";
-	
-?>
+	?>
+	</ul>
 </div>
+
 <?php 
 
 
@@ -260,15 +275,29 @@ if (!$typeReflector->isArray ())
 				foreach($properties as $property)
 				{
 					/* @var $property KalturaPropertyInfo */
+				
+					$description = formatDescription($property->getDescription());
+					if ($property->getName() == "orderBy")
+						$description = "This parameter sets the order criteria by which objects will be retrieved. ";
+					
 					?>
 					<h4><a name="<?php echo $type . '-' . $property->getName(); ?>"></a><?php echo $property->getName(); ?></h4>
 					<?php 
-						if($property->getDescription())
-							echo "<p>" . formatDescription($property->getDescription()) . "</p>";
+						if($description)
+							echo "<p>$description</p>";
 					?>
 					<ul>
 						<?php 
-							if($property->isArray())
+				
+							if($property->getName() == "orderBy")
+							{
+								$filterEnumOrder = str_replace("Filter", "OrderBy", $type);
+								if (class_exists($filterEnumOrder))
+									echo "<li>Enumerator type: <a href=\"#\" onclick=\"KDoc.openObject('$filterEnumOrder')\">$filterEnumOrder</a></li>";
+								else
+									echo "<li>Type: <a href=\"#\" onclick=\"KDoc.openObject('" . $property->getType() . "')\">" . $property->getType() . "</a></li>";
+							}
+							elseif($property->isArray())
 							{
 								if($property->getArrayType())
 									echo "<li>Array of type: <a href=\"#\" onclick=\"KDoc.openObject('" . $property->getArrayType() . "')\">" . $property->getArrayType() . "</a></li>";

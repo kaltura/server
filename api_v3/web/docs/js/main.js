@@ -154,6 +154,7 @@ var KDoc = {
 		var tabId = KDoc.base64_encode(url);
 		var tab = Ext.getCmp(tabId);
 		if (!tab) {
+
 			tab = KDoc.mainWindow.add({
 				title : title,
 				iconCls : iconCls,
@@ -432,7 +433,8 @@ var KDoc = {
 					anchor : '100%'
 				}
 			},
-			items : [ KDoc.testmePanel ]
+			items : [ KDoc.testmePanel ],
+	        plugins: [Ext.create('Ext.ux.TabCloseMenu'), Ext.create('Ext.ux.TabReorderer')]
 		});
 
 		var testmeForm = Ext.create('Ext.panel.Panel', {
@@ -459,6 +461,7 @@ var KDoc = {
 			store : KDoc.apiDocumentsStore,
 			rootVisible : false,
 			iconCls : 'nav',
+			autoScroll : true,
 			collapsible : true
 		});
 
@@ -468,6 +471,7 @@ var KDoc = {
 			store : KDoc.xsdDocumentsStore,
 			rootVisible : false,
 			iconCls : 'nav',
+			autoScroll : true,
 			collapsible : true
 		});
 
