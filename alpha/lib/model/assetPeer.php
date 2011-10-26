@@ -424,9 +424,12 @@ class assetPeer extends BaseassetPeer
 	public static function retrieveReadyWebByEntryId($entryId)
 	{
 		$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_MBR);
-		// TODO - until now production was searching by tag 'mbr',
-		// until we test this deeper, we keep MBR.
-//		$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_WEB);
+		
+		//Requirement for manatis 13058: if there are no flavors tagged as MBR, fallback to flavors tagged as WEB
+		if ( !count($flavorAssets) )
+		{	
+			$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_WEB);
+		}
 		return $flavorAssets;
 	}
 	
