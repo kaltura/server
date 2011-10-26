@@ -348,12 +348,12 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 				$updateDropFolderFile->lastModificationTime = $lastModificationTime;
 				$this->impersonate($dropFolderFile->partnerId);
 				$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
-				$this->unimpersonate();				
 			}
 			catch (Exception $e) {
 				KalturaLog::err('Cannot update file size for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
 				return; // error - can't update drop folder file object's file size
 			}
+			$this->unimpersonate();		
 		}
 		else // file sizes are equal
 		{
@@ -370,13 +370,14 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 					$this->impersonate($dropFolderFile->partnerId);
 					$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 					$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
-					$this->unimpersonate();
+					
 					return true;
 				}
 				catch (Exception $e) {
 					KalturaLog::err('Cannot update status to PENDING for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
 					return; // error - can't update drop folder file object's status
 				}
+				$this->unimpersonate();
 			}
 			else {
 				// not enough time passed - continue to next file
@@ -432,11 +433,11 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			try {
 				$this->impersonate($dropFolderFile->partnerId);
 				$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING);
-				$this->unimpersonate();
 			}
 			catch (Exception $e) {
 				KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
 			}
+			$this->unimpersonate();
 			return false;
 		}
 		
@@ -456,13 +457,13 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		try {
 			$this->impersonate($dropFolderFile->partnerId);
 			$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PURGED);
-			$this->unimpersonate();
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
 			return false;
 		}
 		
+		$this->unimpersonate();
 		return true;
 	}
 	
@@ -476,13 +477,13 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$this->impersonate($dropFolderFile->partnerId);
 			$this->dropFolderPlugin->dropFolderFile->update($dropFolderFile->id, $updateDropFolderFile);
 			$this->dropFolderPlugin->dropFolderFile->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING);
-			$this->unimpersonate();
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot update status for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
 			return false;
 		}
 		
+		$this->unimpersonate();
 		return true;
 	}
 		
