@@ -425,7 +425,7 @@ class assetPeer extends BaseassetPeer
 	{
 		$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_MBR);
 		
-		//Requirement for manatis 13058: if there are no flavors tagged as MBR, fallback to flavors tagged as WEB
+		//Requirement for mantis 13058: if there are no flavors tagged as MBR, fallback to flavors tagged as WEB
 		if ( !count($flavorAssets) )
 		{	
 			$flavorAssets = self::retrieveReadyByEntryIdAndTag($entryId, flavorParams::TAG_WEB);
