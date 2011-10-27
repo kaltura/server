@@ -12,7 +12,8 @@ class StorageProfileService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
-		if(kCurrentContext::$master_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if(kCurrentContext::$master_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID &&
+			kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID )
 		{
 			if(!$this->getPartner()->getEnabledService(PermissionName::FEATURE_REMOTE_STORAGE))
 				throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, $this->serviceName.'->'.$this->actionName);
