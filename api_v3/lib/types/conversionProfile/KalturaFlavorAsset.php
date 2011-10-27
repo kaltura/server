@@ -105,4 +105,18 @@ class KalturaFlavorAsset extends KalturaAsset
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+	
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if (!is_null($this->flavorParamsId))
+		{
+			$dbAssetParams = assetParamsPeer::retrieveByPK($this->flavorParamsId);
+			if ($dbAssetParams)
+			{
+				$object_to_fill->setFromAssetParams($dbAssetParams);
+			}
+		}
+		
+		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
+	}
 }

@@ -50,4 +50,18 @@ class KalturaThumbAsset extends KalturaAsset
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
+
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if (!is_null($this->thumbParamsId))
+		{
+			$dbAssetParams = assetParamsPeer::retrieveByPK($this->thumbParamsId);
+			if ($dbAssetParams)
+			{
+				$object_to_fill->setFromAssetParams($dbAssetParams);
+			}
+		}
+		
+		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
+	}
 }
