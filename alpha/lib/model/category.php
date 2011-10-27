@@ -451,7 +451,7 @@ class category extends Basecategory
 			$parentsIds[] = $this->getParentId();
 			$parentsIds = array_merge($parentsIds, $this->getParentCategory()->getAllParentsIds());
 		}
-		KalturaLog::debug('### inc get all parent: ' . print_r($parentsIds,true));
+
 		return $parentsIds; 
 	}
 	
