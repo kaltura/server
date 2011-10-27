@@ -56,4 +56,12 @@ class CaptionAsset extends asset
 		
 		return $downloadUrl;
 	}
+	
+	public function setFromAssetParams($dbAssetParams)
+	{
+		parent::setFromAssetParams($dbAssetParams);
+		
+		$this->setLanguage($dbAssetParams->getLanguage());
+		$this->setLabel($dbAssetParams->getLabel());
+	}
 }

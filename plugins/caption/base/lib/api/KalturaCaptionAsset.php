@@ -90,4 +90,18 @@ class KalturaCaptionAsset extends KalturaAsset
 			
 		return $ret;
 	}
+
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		if (!is_null($this->captionParamsId))
+		{
+			$dbAssetParams = assetParamsPeer::retrieveByPK($this->captionParamsId);
+			if ($dbAssetParams)
+			{
+				$object_to_fill->setFromAssetParams($dbAssetParams);
+			}
+		}
+		
+		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
+	}
 }
