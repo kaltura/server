@@ -23,7 +23,9 @@ switch($delivery_type) {
 		break;
 
     case "akamai":
-		$flashVars["mediaProtocol"] = "hdnetwork";
+		$flashVars["streamerType"] = "hdnetwork";
+		$flashVars["akamaiHD.loadingPolicy"] = "preInitialize";
+		$flashVars["akamaiHD.asyncInit"] = "true";
 		break;
 }
 
@@ -37,9 +39,9 @@ if( $playlist_id ) {
 	$flashVars["playlistAPI.autoInsert"] = "true";
 	$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
 	$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
-
-	$flashVars = http_build_query($flashVars, '', '&amp;');
 }
+// Transform flashvars array to string
+$flashVars = http_build_query($flashVars, '', '&amp;');
 ?>
 <!doctype html>
 <html>

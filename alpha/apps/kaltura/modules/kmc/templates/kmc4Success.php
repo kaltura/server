@@ -86,4 +86,4 @@ if( count($allowedPartners) > 1 ) {
          <iframe frameborder="0" id="server_frame" height="100%" width="100%"></iframe>
         </div> <!-- server_wrap -->
 	</div><!-- main -->
-<script type="text/javascript" src="/lib/js/kmc5.js"></script>
+<script type="text/javascript" src="/lib/js/kmc5.js?v=<?php echo $kmc_swf_version; ?>"></script>
