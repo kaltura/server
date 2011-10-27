@@ -139,7 +139,7 @@
 				<action>client-libs</action>
 			</client-libs>
 			<xsd-doc>
-				<label>Xml Schema</label>
+				<label>XML Schema</label>
 				<controller>index</controller>
 				<action>xsd-doc</action>
 			</xsd-doc>
