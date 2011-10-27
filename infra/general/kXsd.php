@@ -433,7 +433,6 @@ class kXsd
 	 */
 	public static function compareXsd($fromXsd, $toXsd)
 	{
-		KalturaLog::debug('in xsl');
 		$from = new DOMDocument();
 		$from->load($fromXsd);
 		
