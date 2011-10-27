@@ -113,4 +113,13 @@ class flavorAsset extends asset
 	{
 		return $this->hasTag(flavorParams::TAG_WEB);
 	}
+
+	public function setFromAssetParams($dbAssetParams)
+	{
+		parent::setFromAssetParams($dbAssetParams);
+		
+		$this->setBitrate($dbAssetParams->getVideoBitrate());
+		$this->setFrameRate($dbAssetParams->getFrameRate());
+		$this->setVideoCodecId($dbAssetParams->getVideoCodec());
+	}
 }

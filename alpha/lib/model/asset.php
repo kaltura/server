@@ -479,5 +479,12 @@ class asset extends Baseasset implements ISyncableFile
 	
 	public function getPartnerData()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DATA);}
 	public function setPartnerData($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DATA, $v);}
-	
+
+	public function setFromAssetParams($dbAssetParams)
+	{
+		$this->setContainerFormat($dbAssetParams->getFormat());
+		$this->setHeight($dbAssetParams->getHeight());
+		$this->setWidth($dbAssetParams->getWidth());
+		$this->addTags($dbAssetParams->getTagsArray());
+	}
 }
