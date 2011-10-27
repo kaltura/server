@@ -506,13 +506,17 @@ class kFileSyncUtils
 		}
 		
 		$criteria = new Criteria();
-		$criteria->addSelectColumn(StorageProfilePeer::ID);
 		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
 		$criteria->add(StorageProfilePeer::DELIVERY_STATUS, StorageProfileDeliveryStatus::BLOCKED, Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(StorageProfilePeer::DELIVERY_PRIORITY);
 
-		$stmt = StorageProfilePeer::doSelectStmt($criteria);
-		self::$storageProfilesOrder = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		// Using doSelect instead of doSelectStmt for the ID column so that we can take adavntage of the query cache
+		self::$storageProfilesOrder = array();
+		$results = StorageProfilePeer::doSelect($criteria);
+		foreach ($results as $result)
+		{
+			self::$storageProfilesOrder[] = $result->getId();
+		}
 	}
 
 	/**
