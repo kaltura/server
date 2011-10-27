@@ -16,8 +16,7 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_CHANNEL_IMAGE_URL = 'channelImageUrl';
 	const CUSTOM_DATA_CHANNEL_IMAGE_LINK = 'channelImageLink';	
 	const CUSTOM_DATA_ITEM_MEDIA_RATING = 'itemMediaRating';
-		
-	
+			
 	protected $maxLengthValidation= array (
 		NdnDistributionField::ITEM_TITLE => 500,
 		NdnDistributionField::ITEM_DESCRIPTION => 1000,
@@ -25,8 +24,7 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 		NdnDistributionField::ITEM_MEDIA_TITLE => 500,
 		NdnDistributionField::ITEM_MEDIA_DESCRIPTION => 1000,	
 		NdnDistributionField::ITEM_MEDIA_KEYWORDS => 1000,
-	);
-	
+	);	
 
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -34,7 +32,6 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 	public function getProvider()
 	{
 		return NdnDistributionPlugin::getProvider();
-
 	}
 	
 	public function preSave(PropelPDO $con = null)
@@ -42,8 +39,7 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 		if ($this->isNew())
 		{
 			$this->setUniqueHashForFeedUrl(md5(time().rand(0, time())));
-		}
-		
+		}		
 		return parent::preSave($con);
 	}
 	
