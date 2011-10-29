@@ -59,6 +59,31 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 	<!-- ' . self::getPluginName() . ' -->
 	
+		<xs:complexType name="T_subTitles">
+		<xs:sequence>
+			<xs:element name="action" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The action to apply:<br/>
+						Add - Add a new subtitles<br/>
+						Update - Update existing subtitles<br/>
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="add" />
+						<xs:enumeration value="update" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element ref="subTitle" maxOccurs="unbounded" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>All subTitles elemets</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
 	<xs:complexType name="T_subTitle">
 		<xs:sequence>
 			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags">
@@ -136,7 +161,22 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	</xs:complexType>
 	
 	<xs:element name="subtitle-extension" />
-	<xs:element name="subTitle" type="T_subTitle" substitutionGroup="item-extension">
+	<xs:element name="subTitles" type="T_subTitles" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>All subTitles elemets</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<subTitles>
+						<action>update</action>
+						<subTitle>...</subTitle>
+						<subTitle>...</subTitle>
+						<subTitle>...</subTitle>
+					</subTitles>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="subTitle" type="T_subTitle">
 		<xs:annotation>
 			<xs:documentation>A single caption asset element</xs:documentation>
 			<xs:appinfo>
@@ -172,16 +212,18 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	{
 		if(!($object instanceof KalturaBaseEntry))
 			return;
-		  
-		if(empty($item->subTitle))
+		
+		if(!isset($item->subTitles))
+			return;
+		
+		if(empty($item->subTitles->subTitle))
 			return;
 		
 		$this->xmlBulkUploadEngine->impersonate();
-		
-		foreach($item->subTitle as $caption)
+		foreach($item->subTitles->subTitle as $caption)
 			$this->handleCaptionAsset($object->id, $object->conversionProfileId, $caption);
 		
-		$this->xmlBulkUploadEngine->unimpersonate();
+		$this->xmlBulkUploadEngine->unimpersonate();		
 	}
 
 	private function handleCaptionAsset($entryId, $conversionProfileId, SimpleXMLElement $caption)
@@ -192,11 +234,20 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		$captionAsset->flavorParamsId = $this->xmlBulkUploadEngine->getAssetParamsId($caption, $conversionProfileId, true, 'caption');
 		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($caption->tags);
 		
+		$this->xmlBulkUploadEngine->impersonate(); //needed since $this->xmlBulkUploadEngine->getAssetParamsId calles to unimpersonate
+		
 		if(isset($caption->captionAssetId))
 			$captionAsset->id = $caption->captionAssetId;
 		
+		if(isset($caption['captionParamsId']))
+			$captionAsset->captionParamsId = $caption['captionParamsId'];
+			
 		if(isset($caption['isDefault']))
-		$captionAsset->isDefault = $caption['isDefault'];
+			if($caption['isDefault'] == 'true'){
+				$captionAsset->isDefault = KalturaNullableBoolean::TRUE_VALUE;
+			}else{
+				$captionAsset->isDefault = KalturaNullableBoolean::FALSE_VALUE;
+			}
 		
 		if(isset($caption['format']))
 			$captionAsset->format = $caption['format'];
@@ -209,6 +260,28 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		{
 			$captionAssetId = $caption['captionAssetId'];
 			$captionAssetPlugin->captionAsset->update($captionAssetId, $captionAsset);
+		}
+		elseif(isset($caption['captionParamsId']))
+		{
+			$filter = new KalturaCaptionAssetItemFilter();
+			$filter->entryIdEqual = $entryId;
+			$currentCaptionAssets = $captionAssetPlugin->captionAsset->listAction($filter);
+			
+			if(is_array($currentCaptionAssets->objects))
+				foreach ($currentCaptionAssets->objects as $currentCaptionAsset)
+				{
+					if($currentCaptionAsset->captionParamsId == $caption['captionParamsId'])
+					{
+						$captionAssetId = $currentCaptionAsset->id;
+						$captionAssetPlugin->captionAsset->update($captionAssetId, $captionAsset);
+					}
+				}
+			
+			if(!$captionAssetId)
+			{
+				$captionAsset = $captionAssetPlugin->captionAsset->add($entryId, $captionAsset);
+				$captionAssetId = $captionAsset->id;
+			}
 		}
 		else
 		{
@@ -226,7 +299,25 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	*/
 	public function handleItemUpdated(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
-		$this->handleItemAdded($object, $item);
+		if(!$item->subTitles)
+			return;
+			
+		if(empty($item->subTitles))
+			return;
+		
+		$action = KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE];
+		if(isset($item->subTitles->action))
+			$action = strtolower($item->subTitles->action);
+			
+		switch ($action)
+		{
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::ADD]:
+				$this->handleItemAdded($object, $item);
+				break;
+			default:
+				throw new KalturaBatchException("subTitles->action: {$item->subTitles->action} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+		}
 	}
 
 	/* (non-PHPdoc)
