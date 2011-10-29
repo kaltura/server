@@ -459,6 +459,12 @@ var KDoc = {
 					var iconCls = record.data.iconCls;
 					var toolTip = record.data.text;
 					KDoc.openTab(url, title, iconCls, toolTip);
+				},
+				beforeload: function(store, operation, eOpts){
+					apiDocuments.setLoading(true);
+				},
+				load: function(store, operation, eOpts){
+					apiDocuments.setLoading(false);
 				}
 			},
 			searchFilter : null,
