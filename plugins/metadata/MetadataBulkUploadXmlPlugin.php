@@ -73,10 +73,51 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 				<xs:documentation>The schema profile identifier of the custom metadata</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		
 	</xs:complexType>
 	
-	<xs:element name="customData" type="T_customData" substitutionGroup="item-extension">
+	<xs:complexType name="T_customDataItems">
+		<xs:sequence>
+			<xs:element name="action" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The action to apply:<br/>
+						Add - Add a new entry<br/>
+						Update - Update an existing entry<br/>
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="add" />
+						<xs:enumeration value="update" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element ref="customData" maxOccurs="unbounded" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>All custom data elemets</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	
+	<xs:element name="customDataItems" type="T_customDataItems" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>All custom metadata elemets</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<customDataItems>
+						<action>update</action>
+						<customData>...</customData>
+						<customData>...</customData>
+						<customData>...</customData>
+					</customDataItems>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:element name="customData" type="T_customData">
 		<xs:annotation>
 			<xs:documentation>XML for custom metadata</xs:documentation>
 			<xs:appinfo>
