@@ -31,6 +31,11 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	 */
 	protected $operations = array();
 	
+	/**
+	 * @var array of existing Cue Points with systemName
+	 */
+	protected $existingCuePointsBySystemName = null;
+	
 	protected function __construct()
 	{
 	}
@@ -82,17 +87,34 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			
 		if(empty($item->scenes))
 			return;
+
+		$action = KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE];
+		if(isset($item->scenes->action))
+			$action = strtolower($item->scenes->action);
+			
+		switch ($action)
+		{
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::ADD]:
+				break;
+			default:
+				throw new KalturaBatchException("scenes->action: {$item->scenes->action} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+		}
 			
 		$this->entryId = $object->id;
 		$this->cuePointPlugin = KalturaCuePointClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 		
 		$this->xmlBulkUploadEngine->impersonate();
+		
+		$this->getExistingCuePointsBySystemName($this->entryId);
 		$this->xmlBulkUploadEngine->getClient()->startMultiRequest();
 		
 		$items = array();
 		foreach($item->scenes->children() as $scene)
+		{
 			if($this->updateCuePoint($scene))
 				$items[] = $scene;
+		}
 			
 		$results = $this->xmlBulkUploadEngine->getClient()->doMultiRequest();
 		$this->xmlBulkUploadEngine->unimpersonate();
@@ -109,6 +131,31 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		// No handling required
 	}
 
+	/**
+	 * @param string $entryId
+	 * @return array of cuepoint that have systemName
+	 */
+	protected function getExistingCuePointsBySystemName($entryId)
+	{
+		if (is_array($this->existingCuePointsBySystemName))
+			return;
+		
+		$filter = new KalturaCuePointFilter();
+		$filter->entryIdEqual = $entryId;
+		$cuePoints = $this->cuePointPlugin->cuePoint->listAction($filter);
+		$this->existingCuePointsBySystemName = array();
+		
+		if (!isset($cuePoints->objects))
+			return;
+
+		foreach ($cuePoints->objects as $cuePoint)
+		{
+			if($cuePoint->systemName != '')
+				$this->existingCuePointsBySystemName[$cuePoint->systemName] = $cuePoint;
+		}
+	}
+	
+	
 	protected function handleResults(array $results, array $items)
 	{
 		if(count($results) != count($this->operations) || count($this->operations) != count($items))
@@ -196,14 +243,20 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		$cuePoint = $this->parseCuePoint($scene);
 		if(!$cuePoint)
 			return false;
-			
+
 		if(isset($scene['sceneId']) && $scene['sceneId'])
 		{
 			$cuePointId = $scene['sceneId'];
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
 			$this->operations[] = KalturaBulkUploadAction::UPDATE;
 		}
-		else 
+		elseif(isset($cuePoint->systemName) && isset($this->existingCuePointsBySystemName[$cuePoint->systemName]))
+		{
+			$cuePointId = $this->existingCuePointsBySystemName[$cuePoint->systemName]->id;
+			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
+			$this->operations[] = KalturaBulkUploadAction::UPDATE;
+		}
+		else
 		{
 			$cuePoint->entryId = $this->entryId;
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->add($cuePoint);

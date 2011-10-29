@@ -46,6 +46,21 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	
 	<xs:complexType name="T_scenes">
 		<xs:sequence>
+			<xs:element name="action" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The action to apply from the item element:<br/>
+						Add - Add a new entry<br/>
+						Update - Update an existing entry<br/>
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="add" />
+						<xs:enumeration value="update" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
 			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>A cue point element</xs:documentation>
@@ -97,6 +112,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 			<xs:appinfo>
 				<example>
 					<scenes>
+						<action>update</action>
 						<scene-ad-cue-point entryId="{entry id}" systemName="MY_AD_CUE_POINT_SYSTEM_NAME">...</scene-ad-cue-point>
 						<scene-annotation entryId="{entry id}" systemName="MY_ANNOTATION_PARENT_SYSTEM_NAME">...</scene-annotation>
 						<scene-annotation entryId="{entry id}">...</scene-annotation>
