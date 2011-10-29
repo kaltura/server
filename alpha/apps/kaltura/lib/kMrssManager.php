@@ -8,6 +8,18 @@ class kMrssManager
 	 */
 	private static $mrssContributors = null;
 	
+	private static $storageId = null;
+	
+	public static function setStorageId($v)
+	{
+		self::$storageId = $v;
+	}
+	
+	public static function getStorageId()
+	{
+		return self::$storageId;
+	}
+	
 	/**
 	 * @param string $string
 	 * @return string
@@ -132,11 +144,11 @@ class kMrssManager
 		if(!$partner->getStorageServePriority() || $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 			return null;
 			
-		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
+		if(is_null(self::$storageId) && $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
 			if(kFileSyncUtils::getReadyInternalFileSyncForKey($key)) // check if having file sync on kaltura dcs
 				return null;
 				
-		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
+		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, self::$storageId);
 		if(!$fileSync)
 			return null;
 			

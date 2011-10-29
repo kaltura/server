@@ -848,4 +848,31 @@ class KalturaSyndicationFeedRenderer
 		}
 		$this->writeClosingXmlNode('urlset');
 	}
+	
+	public function setStorageId($storageId)
+	{
+		if (!$storageId)
+			return;
+			
+		$storage = StorageProfilePeer::retrieveByPK($storageId);
+		if(!$storage)
+			die('Invalid storage id [ERR-KSFR-1]');
+		
+		$partner = PartnerPeer::retrieveByPK($this->syndicationFeed->partnerId);
+		
+		// partner configured to use kaltura data centers only
+		if($partner->getStorageServePriority() ==  StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
+			die('Invalid storage id [ERR-KSFR-2]');
+				 
+		// storage doesn't belong to the partner
+		if($storage->getPartnerId() != $partner->getId())
+			die('Invalid storage id [ERR-KSFR-3]');
+			
+		kMrssManager::setStorageId($storageId);
+	}
+	
+	public function getStorageId()
+	{
+		return kMrssManager::getStorageId();
+	}
 }
