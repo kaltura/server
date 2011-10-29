@@ -444,13 +444,11 @@ var KDoc = {
 		
 		var apiDocuments = Ext.create('Ext.tree.Panel', {
 			flex: 1,
-			title : 'API',
 			viewType: 'kalturaview',
 			store : apiDocumentsStore,
 			rootVisible : false,
-			iconCls : 'nav',
 			autoScroll : true,
-			collapsible : true,
+			collapsible : false,
 			listeners: {
 				itemclick: function(view, record, item, index, e, eOpts) {
 					if (!record.data.leaf && record.data.parentId != 'services')
@@ -525,6 +523,8 @@ var KDoc = {
 		});
 
 		var apiDocumentsPanel = Ext.create('Ext.Panel', {
+			title : 'API',
+			iconCls : 'nav',
             layout: {
                 type:'vbox',
                 padding:'0',
