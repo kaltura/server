@@ -15,6 +15,12 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	 */
 	private $objectClass = 'KalturaBaseEntry';
 	
+	
+	/**
+	 * @var string XML node name
+	 */
+	private $containerName = 'customDataItems';
+	
 	/**
 	 * @var string XML node name
 	 */
@@ -30,10 +36,11 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	 */
 	private $xmlBulkUploadEngine = null;
 	
-	public function __construct($objectType, $objectClass, $nodeName = 'customData')
+	public function __construct($objectType, $objectClass, $nodeName, $containerName = null)
 	{
 		$this->objectType = $objectType;
 		$this->objectClass = $objectClass;
+		$this->containerName = $containerName;
 		$this->nodeName = $nodeName;
 	} 
 	
@@ -71,18 +78,29 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	 */
 	public function handleItemAdded(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
-		if(!is_a($object, $this->objectClass))
+		if(!($object instanceof $this->objectClass))
 			return;
-			
+
+		$metadataItems = $item;
+		if($this->containerName)
+		{	
+			$containerName = $this->containerName;
+			if(empty($item->$containerName))
+				return;
+				
+			$metadataItems = $item->$containerName;
+		}
+				
 		$nodeName = $this->nodeName;
-		if(empty($item->$nodeName)) // if there is no costum data then we exit
+		if(empty($metadataItems->$nodeName)) // if there is no costum data then we exit
 			return;
 			
 		KalturaLog::debug("Handles custom metadata for object type [$this->objectType] class [$this->objectClass] id [$object->id] partner id [$object->partnerId]");
 			
 		$this->xmlBulkUploadEngine->impersonate();
-		foreach($item->$nodeName as $customData)
+		foreach($metadataItems->$nodeName as $customData)
 			$this->handleCustomData($object->id, $customData);
+		
 		$this->xmlBulkUploadEngine->unimpersonate();
 	}
 
@@ -131,7 +149,28 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	 */
 	public function handleItemUpdated(KalturaObjectBase $object, SimpleXMLElement $item)
 	{
-		$this->handleItemAdded($object, $item);
+		if(!$this->containerName)
+			return;
+		
+		$containerName = $this->containerName;
+		if(empty($item->$containerName))
+			return;
+			
+		$metadataItems = $item->$containerName;
+		
+		$action = KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE];
+		if(isset($metadataItems->action))
+			$action = strtolower($metadataItems->action);
+			
+		switch (strtolower($metadataItems->action))
+		{
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::ADD]:
+				$this->handleItemAdded($object, $item);
+				break;
+			default:
+				throw new KalturaBatchException($containerName . "->action: {$metadataItems->action} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+		}
 	}
 
 	/* (non-PHPdoc)

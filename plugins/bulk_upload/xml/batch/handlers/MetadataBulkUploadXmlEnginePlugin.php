@@ -19,7 +19,7 @@ class MetadataBulkUploadXmlEnginePlugin extends KalturaPlugin implements IKaltur
 			return $this;
 			
 		if($interface == 'IKalturaBulkUploadXmlHandler')
-			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::ENTRY, 'KalturaBaseEntry');
+			return new MetadataBulkUploadXmlEngineHandler(KalturaMetadataObjectType::ENTRY, 'KalturaBaseEntry', 'customData', 'customDataItems');
 			
 		return null;
 	}
