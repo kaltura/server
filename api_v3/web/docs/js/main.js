@@ -36,20 +36,17 @@ var KCodeExample = function(container, codeGenerator){
 };
 
 var KDoc = {
-	mainWindow : null,
-	testmePanel: null,
-	testmeResultsTab : null,
+	testmeResults : null,
 	testmePropertiesPanel : null,
-	apiDocumentsStore : null,
-	xsdDocumentsStore : null,
-
+	openTab : null,
+	
 	jsonToStore : function(json, data) {
 
 		if (!data) {
 			data = {
 				objectName : 'results',
 				objectType : 'array',
-				expanded : false,
+				expanded : true,
 				children : []
 			};
 		}
@@ -82,50 +79,109 @@ var KDoc = {
 		return data;
 	},
 
-	onTestmeResults : function(json) {
+	onTestmeResults : function(service, action, json) {
 		var data = KDoc.jsonToStore(json);
 
-		KDoc.testmePanel.show();
-		KDoc.testmeResultsTab.store.tree.root.removeAll(false);
-		KDoc.testmeResultsTab.store.tree.root.appendChild(data);
-		KDoc.testmeResultsTab.expandAll(function(){
-			KDoc.testmeResultsTab.doComponentLayout();
+		var store = Ext.create('Ext.data.TreeStore', {
+			fields : [ {
+				name : 'objectName',
+				type : 'string'
+			}, {
+				name : 'objectType',
+				type : 'string'
+			}, {
+				name : 'objectValue',
+				type : 'string'
+			} ],
+			root : {
+				objectName : '.',
+				children : data
+			}
 		});
-	},
 
-	loadStores : function() {
+		var testmeResultsSelector = {
+			selectedText : null,
+			selector : Ext.create('Ext.selection.CellModel', {
+				mode : 'SIMPLE',
+				allowDeselect : true,
+				listeners : {
+					select : function(selectionModel, record, row, column, eOpts) {
+						testmeResultsSelector.selectedText = null;
+						if(!record)
+							return;
+						
+						var treeColumn = testmeResultsTab.columns[column];
+						testmeResultsSelector.selectedText = record.data[treeColumn.dataIndex];
+					}
+				}
+			})
+		};
 		
-		KDoc.apiDocumentsStore = Ext.create('Ext.data.TreeStore', {
-			proxy : {
-				type : 'ajax',
-				url : 'testmeDoc/doc.js.php'
-			},
-			root : {
-				id : 'main',
-				expanded : false
-			},
-			folderSort : true,
-			sorters : [ {
-				property : 'text',
-				direction : 'ASC'
+		var testmeResultsTab = Ext.create('Ext.tree.Panel', {
+			title : service + '::' + action,
+			closable : true,
+			region : 'center',
+			rootVisible : false,
+			autoScroll : true,
+			store : store,
+			selModel : testmeResultsSelector.selector,
+			columns : [ {
+				xtype : 'treecolumn',
+				text : 'Name',
+				flex : 2,
+				sortable : true,
+				dataIndex : 'objectName'
+			}, {
+				text : 'Value',
+				flex : 1,
+				sortable : false,
+				dataIndex : 'objectValue',
+				align : 'left'
+			}, {
+				text : 'Type',
+				flex : 1,
+				dataIndex : 'objectType',
+				sortable : false
 			} ]
 		});
 
-		KDoc.xsdDocumentsStore = Ext.create('Ext.data.TreeStore', {
-			proxy : {
-				type : 'ajax',
-				url : 'xsdDoc/doc.js.php'
-			},
-			root : {
-				id : 'main',
-				expanded : false
-			},
-			folderSort : true,
-			sorters : [ {
-				property : 'text',
-				direction : 'ASC'
+		var testmeResultsContextMenu = new Ext.menu.Menu({
+			items : [ {
+				text : 'Copy',
+				iconCls : 'copy',
+				handler : function() {
+			        if (window.clipboardData) { // Internet Explorer
+						window.clipboardData.setData('Text', testmeResultsSelector.selectedText);
+					} else if (window.netscape) { // Mozilla
+						try {
+							netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+
+							var gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+									.getService(Components.interfaces.nsIClipboardHelper);
+
+							gClipboardHelper.copyString(testmeResultsSelector.selectedText);
+						} catch (e) {
+							alert(e + '\n\nPlease type: "about:config" in your address bar.\nThen filter by "signed".\nChange the value of "signed.applets.codebase_principal_support" to true.\nYou should then be able to use this feature.');
+						}
+					} else {
+						alert("Your browser does not support this feature");
+					}
+				}
 			} ]
 		});
+
+		testmeResultsTab.on('itemcontextmenu', function(view, record, item, index, e, eOpts) {
+			e.preventDefault();
+			testmeResultsContextMenu.setPosition(e.xy[0], e.xy[1]);
+			testmeResultsContextMenu.show();
+		});
+
+		testmeResultsTab.on('sortchange', function(container, column, direction, eOpts) {
+			testmeResultsTab.doComponentLayout();
+		});
+		
+		var tab = KDoc.testmeResults.add(testmeResultsTab);
+		tab.show();
 	},
 
 	toggleItem : function(className) {
@@ -148,40 +204,6 @@ var KDoc = {
 		var iconCls = 'icon-action';
 		var toolTip = title;
 		KDoc.openTab(url, title, iconCls, toolTip);
-	},
-
-	openTab : function(url, title, iconCls, toolTip) {
-		var tabId = KDoc.base64_encode(url);
-		var tab = Ext.getCmp(tabId);
-		if (!tab) {
-
-			tab = KDoc.mainWindow.add({
-				title : title,
-				iconCls : iconCls,
-				id : tabId,
-				closable : true,
-				autoScroll : true,
-				bodyPadding : 8,
-				bodyCls: 'api-doc',
-				loader : {
-					url : url,
-					renderer : 'html',
-					autoLoad : true,
-					scripts : true
-				}
-			});
-
-			if(toolTip){
-				Ext.create('Ext.tip.ToolTip', {
-					target : tab.tab.id,
-					html : toolTip,
-					width : 'auto',
-					height : 'auto'
-				});
-			}
-		}
-
-		tab.show();
 	},
 
 	utf8_encode: function (argString) {
@@ -291,105 +313,51 @@ var KDoc = {
 	    
 	    return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
 	},
-	
-	load : function() {
 
-		KDoc.loadStores();
+	loadClientLibs : function() {
+		var clientLibsPanel = Ext.create('Ext.panel.Panel', {
+			title: 'Clinet Libraries'
+		});
+		
+		return clientLibsPanel;
+	},
 
-		var store = Ext.create('Ext.data.TreeStore', {
-			fields : [ {
-				name : 'objectName',
-				type : 'string'
-			}, {
-				name : 'objectType',
-				type : 'string'
-			}, {
-				name : 'objectValue',
-				type : 'string'
-			} ],
-			root : {
-				objectName : '.'
+	loadTestConsole : function() {
+
+		var testmeForm = Ext.create('Ext.panel.Panel', {
+			region : 'center',
+			autoScroll : true,
+			border : false,
+			bodyPadding : 8,
+			collapsible : false,
+			loader : {
+				url : 'testme/form.php',
+				renderer : 'html',
+				autoLoad : true,
+				listeners : {
+					load : function() {
+						kTestMe = new KTestMe();
+					}
+				}
 			}
 		});
 
-		var testmeResultsSelector = {
-			selectedText : null,
-			selector : Ext.create('Ext.selection.CellModel', {
-				mode : 'SIMPLE',
-				allowDeselect : true,
-				listeners : {
-					select : function(selectionModel, record, row, column, eOpts) {
-						testmeResultsSelector.selectedText = null;
-						if(!record)
-							return;
-						
-						var treeColumn = KDoc.testmeResultsTab.columns[column];
-						testmeResultsSelector.selectedText = record.data[treeColumn.dataIndex];
-					}
-				}
-			})
-		};
+		KDoc.testmePropertiesPanel = Ext.create('Ext.panel.Panel', {
+			region : 'east',
+			split : true,
+			collapsible : true,
+			collapsed : true,
+			preventHeader: true,
+			width: 270,
+			resizable: false,
+			layout : 'accordion'
+		});
 
-		KDoc.testmeResultsTab = Ext.create('Ext.tree.Panel', {
+		KDoc.testmeResults = Ext.create('Ext.tab.Panel', {
 			region : 'center',
-			rootVisible : false,
-			autoScroll : true,
-			store : store,
-			selModel : testmeResultsSelector.selector,
-			listeners: {
-				sortchange: function(container, column, direction, eOpts){
-					KDoc.testmeResultsTab.doComponentLayout();
-				}
-			},
-			columns : [ {
-				xtype : 'treecolumn',
-				text : 'Name',
-				flex : 2,
-				sortable : true,
-				dataIndex : 'objectName'
-			}, {
-				text : 'Value',
-				flex : 1,
-				sortable : false,
-				dataIndex : 'objectValue',
-				align : 'left'
-			}, {
-				text : 'Type',
-				flex : 1,
-				dataIndex : 'objectType',
-				sortable : false
-			} ]
-		});
-
-		var testmeResultsContextMenu = new Ext.menu.Menu({
-			items : [ {
-				text : 'Copy',
-				iconCls : 'copy',
-				handler : function() {
-			        if (window.clipboardData) { // Internet Explorer
-						window.clipboardData.setData('Text', testmeResultsSelector.selectedText);
-					} else if (window.netscape) { // Mozilla
-						try {
-							netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
-
-							var gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-									.getService(Components.interfaces.nsIClipboardHelper);
-
-							gClipboardHelper.copyString(testmeResultsSelector.selectedText);
-						} catch (e) {
-							alert(e + '\n\nPlease type: "about:config" in your address bar.\nThen filter by "signed".\nChange the value of "signed.applets.codebase_principal_support" to true.\nYou should then be able to use this feature.');
-						}
-					} else {
-						alert("Your browser does not support this feature");
-					}
-				}
-			} ]
-		});
-
-		KDoc.testmeResultsTab.on('itemcontextmenu', function(view, record, item, index, e, eOpts) {
-			e.preventDefault();
-			testmeResultsContextMenu.setPosition(e.xy[0], e.xy[1]);
-			testmeResultsContextMenu.show();
+			autoScroll : false,
+			collapsible : false,
+	        plugins: [Ext.create('Ext.ux.TabCloseMenu'), Ext.create('Ext.ux.TabReorderer')]
 		});
 
 		var codeExamplePanel = Ext.create('Ext.tab.Panel', {
@@ -406,119 +374,280 @@ var KDoc = {
 		new KCodeExample(codeExamplePanel, new KCodeExamplePython());
 		new KCodeExample(codeExamplePanel, new KCodeExampleJavascript());
 
-		KDoc.testmePropertiesPanel = Ext.create('Ext.panel.Panel', {
-			region : 'west',
-			split : true,
-			collapsible : true,
-			collapsed : true,
-			minWidth : 270,
-			layout : 'accordion'
-		});
-
-		KDoc.testmePanel = Ext.create('Ext.panel.Panel', {
-			title : 'Console Results',
-			closable : false,
-			autoScroll : false,
+		var testConsole = Ext.create('Ext.Panel', {
+			title: 'Test Console',
 			layout : 'border',
-			items : [ KDoc.testmeResultsTab, codeExamplePanel, KDoc.testmePropertiesPanel ]
+			items : [Ext.create('Ext.Panel', {
+				region : 'west',
+				layout : 'border',
+				collapsed : false,
+				collapsible : true,
+				split : true,
+				minWidth: 290,
+				width: 540,
+				maxWidth: 550,
+				items : [testmeForm, KDoc.testmePropertiesPanel]
+			}),KDoc.testmeResults, codeExamplePanel]
+		});
+		
+		return testConsole;
+	},
+
+	loadReferenceDocuments : function() {
+
+		var apiDocumentsStore = Ext.create('Ext.data.TreeStore', {
+			proxy : {
+				type : 'ajax',
+				url : 'testmeDoc/doc.js.php'
+			},
+			root : {
+				id : 'main',
+				expanded : false
+			},
+			folderSort : true,
+			sorters : [ {
+				property : 'text',
+				direction : 'ASC'
+			} ]
 		});
 
-		KDoc.mainWindow = Ext.create('Ext.tab.Panel', {
-			region : 'center',
-			margins : '5 5 5 0',
+		var xsdDocumentsStore = Ext.create('Ext.data.TreeStore', {
+			proxy : {
+				type : 'ajax',
+				url : 'xsdDoc/doc.js.php'
+			},
+			root : {
+				id : 'main',
+				expanded : false
+			},
+			folderSort : true,
+			sorters : [ {
+				property : 'text',
+				direction : 'ASC'
+			} ]
+		});
+
+		Ext.define('Kaltura.tree.View', {
+		    extend: 'Ext.tree.View',
+		    alias: 'widget.kalturaview',
+		    
+		    expand: function(record, deep, callback, scope) {
+
+		    	if(!callback)
+		    		callback = function(){
+			    		apiDocuments.filterNode(record);
+			    	};
+		    	
+		    	return record.expand(deep, callback, scope);
+		    } 
+		});
+		
+		var apiDocuments = Ext.create('Ext.tree.Panel', {
+			flex: 1,
+			title : 'API',
+			viewType: 'kalturaview',
+			store : apiDocumentsStore,
+			rootVisible : false,
+			iconCls : 'nav',
 			autoScroll : true,
-			defaults : {
-				layout : 'anchor',
-				defaults : {
-					anchor : '100%'
+			collapsible : true,
+			listeners: {
+				itemclick: function(view, record, item, index, e, eOpts) {
+					if (!record.data.leaf && record.data.parentId != 'services')
+						return;
+	
+					var url = 'testmeDoc/page.php?' + record.data.id;
+					var title = (record.data.qtip ? record.data.qtip : record.data.text);
+					var iconCls = record.data.iconCls;
+					var toolTip = record.data.text;
+					KDoc.openTab(url, title, iconCls, toolTip);
 				}
 			},
-			items : [ KDoc.testmePanel ],
-	        plugins: [Ext.create('Ext.ux.TabCloseMenu'), Ext.create('Ext.ux.TabReorderer')]
+			searchFilter : null,
+			matchesFilter : function(text){
+				return (!apiDocuments.searchFilter || text.toLowerCase().indexOf(apiDocuments.searchFilter) >= 0);
+			},
+			filterNode : function(node){
+
+				if(node.parentNode){
+					var parentId = node.parentNode.internalId;
+					if(parentId == 'services'
+							|| parentId == 'objects'
+								|| parentId == 'filters'
+									|| parentId == 'arrays'
+										|| parentId == 'enums'
+						){
+						
+						var element = apiDocuments.getView().getNode(node);
+						if(element){
+							var $jq = $(element);
+							if(apiDocuments.matchesFilter(node.data.text)){
+								$jq.show();
+							}
+							else{
+								$jq.hide();
+							}
+						}
+					}
+				}
+				
+				node.eachChild(apiDocuments.filterNode);
+			},
+			applyFilter : function(value){
+				
+				apiDocuments.searchFilter = null;
+				if(value.length)
+					apiDocuments.searchFilter = value.toLowerCase();
+
+				apiDocuments.filterNode(apiDocuments.getRootNode());
+			}
+		});
+		
+		var apiDocumentsForm = Ext.create('Ext.form.Panel', {
+			bodyPadding: 8,
+	        frame:false,
+	        defaultType: 'textfield',
+	        defaults: {
+	            anchor: '100%'
+	        },
+	        items: [{
+	            fieldLabel: 'Search',
+		        enableKeyEvents: true,
+		        listeners: {
+		        	keyup: {
+		        		buffer : 800,
+		        		fn: function(textField, e, eOpts){
+		        			apiDocuments.applyFilter(textField.getValue());
+		        		}
+		        	}
+		        }
+	        }]
 		});
 
-		var testmeForm = Ext.create('Ext.panel.Panel', {
-			title : 'Test Console',
-			autoScroll : true,
-			border : false,
+		var apiDocumentsPanel = Ext.create('Ext.Panel', {
+            layout: {
+                type:'vbox',
+                padding:'0',
+                align:'stretch'
+            },
+            items:[apiDocumentsForm, apiDocuments]
+		});
+		
+		var xsdDocuments = Ext.create('Ext.tree.Panel', {
+			title : 'XML Schema',
+			store : xsdDocumentsStore,
+			rootVisible : false,
 			iconCls : 'nav',
-			bodyPadding : 8,
-			loader : {
-				url : 'testme/form.php',
-				renderer : 'html',
-				autoLoad : true,
-				listeners : {
-					load : function() {
-						kTestMe = new KTestMe();
-					}
+			autoScroll : true,
+			collapsible : true,
+			listeners: {
+				itemclick: function(view, record, item, index, e, eOpts) {
+					if (!record.data.leaf)
+						return;
+		
+					var url = 'xsdDoc/page.php?' + record.data.id;
+					var title = (record.data.qtip ? record.data.qtip : record.data.text);
+					var iconCls = record.data.iconCls;
+					KDoc.openTab(url, title, iconCls);
 				}
 			}
 		});
 
-		var apiDocuments = Ext.create('Ext.tree.Panel', {
-			id : 'apiDocumentsTree',
-			title : 'API',
-			store : KDoc.apiDocumentsStore,
-			rootVisible : false,
-			iconCls : 'nav',
-			autoScroll : true,
-			collapsible : true
+		var referenceMenu = Ext.create('Ext.panel.Panel', {
+			region : 'west',
+			width : 200,
+			minSize : 175,
+			maxSize : 400,
+			collapsible : true,
+			split : true,
+			layout : 'accordion',
+			layoutConfig : {
+				animate : true
+			},
+			items : [ apiDocumentsPanel, xsdDocuments ]
 		});
 
-		var xsdDocuments = Ext.create('Ext.tree.Panel', {
-			id : 'xsdDocumentsTree',
-			title : 'XML Schema',
-			store : KDoc.xsdDocumentsStore,
-			rootVisible : false,
-			iconCls : 'nav',
-			autoScroll : true,
-			collapsible : true
+		var referenceDocuments = Ext.create('Ext.tab.Panel', {
+			region : 'center',
+			autoScroll : false,
+			collapsible : false,
+			defaults : {
+				layout : 'anchor',
+				defaults : {
+					anchor : '100%',
+					autoScroll : true
+				}
+			},
+	        plugins: [Ext.create('Ext.ux.TabCloseMenu'), Ext.create('Ext.ux.TabReorderer')]
 		});
-
-		apiDocuments.addListener('itemclick', function(view, record, item,
-				index, e, eOpts) {
-
-			if (!record.data.leaf && record.data.parentId != 'services')
-				return;
-
-			var url = 'testmeDoc/page.php?' + record.data.id;
-			var title = (record.data.qtip ? record.data.qtip : record.data.text);
-			var iconCls = record.data.iconCls;
-			var toolTip = record.data.text;
-			KDoc.openTab(url, title, iconCls, toolTip);
-		});
-
-		xsdDocuments.addListener('itemclick', function(view, record, item,
-				index, e, eOpts) {
-
-			if (!record.data.leaf)
-				return;
-
-
-			var url = 'xsdDoc/page.php?' + record.data.id;
-			var title = (record.data.qtip ? record.data.qtip : record.data.text);
-			var iconCls = record.data.iconCls;
-			KDoc.openTab(url, title, iconCls);
-		});
-
-		Ext.create('Ext.Viewport', {
+		
+		var referencePanel = Ext.create('Ext.Panel', {
+			title: 'Documentation',
 			layout : 'border',
-			items : [ {
-				region : 'west',
-				id : 'west-panel',
-				width : 200,
-				minSize : 175,
-				maxSize : 400,
-				collapsible : true,
-				split : true,
-				margins : '5 0 5 5',
-				cmargins : '5 5 5 5',
-				layout : 'accordion',
-				layoutConfig : {
-					animate : true
+			items : [referenceMenu, referenceDocuments]
+		});
+		
+
+		KDoc.openTab = function(url, title, iconCls, toolTip) {
+			var tabId = KDoc.base64_encode(url);
+			var tab = Ext.getCmp(tabId);
+			if (!tab) {
+
+				tab = referenceDocuments.add({
+					title : title,
+					iconCls : iconCls,
+					id : tabId,
+					closable : true,
+					autoScroll : true,
+					bodyPadding : 8,
+					bodyCls: 'api-doc',
+					loader : {
+						url : url,
+						renderer : 'html',
+						autoLoad : true,
+						scripts : true
+					}
+				});
+
+				if(toolTip){
+					Ext.create('Ext.tip.ToolTip', {
+						target : tab.tab.id,
+						html : toolTip,
+						width : 'auto',
+						height : 'auto'
+					});
+				}
+			}
+
+			tab.show();
+			referencePanel.show();
+		};
+		
+		return referencePanel;
+	},
+
+	load : function() {
+
+		var testConsoleTab = KDoc.loadTestConsole();
+		var apiDocTab = KDoc.loadReferenceDocuments();
+		var clientLibs = KDoc.loadClientLibs();
+		
+		Ext.create('Ext.Viewport', {
+			layout : 'fit',
+			items : [ Ext.create('Ext.tab.Panel', {
+				autoScroll : false,
+				defaults : {
+					layout : 'anchor',
+					defaults : {
+						anchor : '100% 100%',
+						closable : false,
+						autoScroll : false,
+						padding : 0		,
+						bodyPadding : 0					
+					}
 				},
-				items : [ testmeForm, apiDocuments, xsdDocuments ]
-			}, KDoc.mainWindow ]
+				items : [ testConsoleTab, apiDocTab, clientLibs ]
+			}) ]
 		});
 	}
 };

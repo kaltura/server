@@ -236,8 +236,11 @@ KTestMe.prototype = {
 	},
 	
 	onResultIframeLoadHandler: function(json) {
+
+		var service = jQuery("select[name=service]").val();
+		var action = jQuery("select[name=action]").val();
 		
-		KDoc.onTestmeResults(json);
+		KDoc.onTestmeResults(service, action, json);
 		
 		if ((this.jqServices.val() == "session") && (this.jqActions.val() == "start")) {
 			this.jqKs
@@ -451,8 +454,11 @@ KTestMe.prototype = {
 		jQuery.each(param.constants, function(i, constant) {
 			jqSelect.append("<option value=\""+constant.defaultValue+"\">"+constant.name+"</option>");
 		});
-		
+
 		jqSelect.focus(delegate(this, this.enableField));
+		jqSelect.click(function(){
+			this.loadActionCodeExample();
+		});
 		
 		jQuery("<div class=\"param enum\">")
 			.append("<label for=\""+param.name+"\">"+param.name+" (<span class=\"enum-type\">"+param.type+"</span>):</label>")
@@ -527,6 +533,8 @@ KTestMe.prototype = {
 			field.addClass("disabled");
 		else
 			field.removeClass("disabled");
+		
+		this.loadActionCodeExample();
 	},
 	
 	saveToHistory: function() {
@@ -588,6 +596,8 @@ KTestMe.prototype = {
 		
 		jQuery(e.target).removeAttr("readonly").removeClass("disabled")
 		.siblings("input[type=checkbox]").attr("checked", true);
+			
+		this.loadActionCodeExample();
 	},
 	
 	initCodeExample: function(generator) {
@@ -596,7 +606,7 @@ KTestMe.prototype = {
 	},
 	
 	loadActionCodeExample: function() {
-		if(!this.actionInfo)
+		if(!this.actionInfo || !this.codeGenerator)
 			return;
 
 		var plugin = null;
@@ -612,8 +622,7 @@ KTestMe.prototype = {
 			
 		}
 		
-		if(this.codeGenerator)
-			this.codeGenerator.setAction(service, action, this.actionInfo.actionParams, plugin);
+		this.codeGenerator.setAction(service, action, this.actionInfo.actionParams, plugin);
 	}
 };
 
