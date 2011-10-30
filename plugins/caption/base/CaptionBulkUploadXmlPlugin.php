@@ -65,20 +65,18 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply:<br/>
-						Add - Add a new subtitles<br/>
 						Update - Update existing subtitles<br/>
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="add" />
 						<xs:enumeration value="update" />
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
 			<xs:element ref="subTitle" maxOccurs="unbounded" minOccurs="1">
 				<xs:annotation>
-					<xs:documentation>All subTitles elemets</xs:documentation>
+					<xs:documentation>All subTitles elements</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -163,7 +161,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	<xs:element name="subtitle-extension" />
 	<xs:element name="subTitles" type="T_subTitles" substitutionGroup="item-extension">
 		<xs:annotation>
-			<xs:documentation>All subTitles elemets</xs:documentation>
+			<xs:documentation>All subTitles elements</xs:documentation>
 			<xs:appinfo>
 				<example>
 					<subTitles>
@@ -312,7 +310,6 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		switch ($action)
 		{
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::ADD]:
 				$this->handleItemAdded($object, $item);
 				break;
 			default:
