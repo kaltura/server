@@ -11,4 +11,9 @@ interface IRemoteStorageResource
 	 * @return array<kRemoteStorageResource>
 	 */
 	public function getResources();
+
+	/**
+	 * @return string
+	 */
+	public function getFileExt();  
 }

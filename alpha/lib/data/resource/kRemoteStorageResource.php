@@ -36,4 +36,13 @@ class kRemoteStorageResource extends kUrlResource implements IRemoteStorageResou
 	{
 		return array($this);
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getFileExt()  
+	{
+		$parsedUrl = parse_url($this->getUrl());
+		return pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
+	}
 }
