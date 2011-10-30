@@ -875,7 +875,7 @@ class BatchController extends Zend_Controller_Action
 		
 		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 		
-		$uiConfId = $settings = Zend_Registry::get('config')->settings->defaultUiConfId;
+		$uiConfId = Zend_Registry::get('config')->settings->defaultUiConfId;
 		if($uiConfId)
 		{
 			$this->view->uiConf = $adminConsolePlugin->uiConfAdmin->get($uiConfId);
