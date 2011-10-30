@@ -97,7 +97,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
 				break;
 			default:
-				throw new KalturaBatchException("scenes->action: {$item->scenes->action} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+				throw new KalturaBatchException("scenes->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
 			
 		$this->entryId = $object->id;
@@ -141,7 +141,11 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		
 		$filter = new KalturaCuePointFilter();
 		$filter->entryIdEqual = $entryId;
-		$cuePoints = $this->cuePointPlugin->cuePoint->listAction($filter);
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		
+		$cuePoints = $this->cuePointPlugin->cuePoint->listAction($filter, $pager);
 		$this->existingCuePointsBySystemName = array();
 		
 		if (!isset($cuePoints->objects))
@@ -150,7 +154,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		foreach ($cuePoints->objects as $cuePoint)
 		{
 			if($cuePoint->systemName != '')
-				$this->existingCuePointsBySystemName[$cuePoint->systemName] = $cuePoint;
+				$this->existingCuePointsBySystemName[$cuePoint->systemName] = $cuePoint->id;
 		}
 	}
 	
@@ -251,7 +255,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		}
 		elseif(isset($cuePoint->systemName) && isset($this->existingCuePointsBySystemName[$cuePoint->systemName]))
 		{
-			$cuePointId = $this->existingCuePointsBySystemName[$cuePoint->systemName]->id;
+			$cuePointId = $this->existingCuePointsBySystemName[$cuePoint->systemName];
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
 			$this->operations[] = KalturaBulkUploadAction::UPDATE;
 		}

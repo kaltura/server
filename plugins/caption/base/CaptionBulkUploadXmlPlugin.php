@@ -306,7 +306,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				$this->handleItemAdded($object, $item);
 				break;
 			default:
-				throw new KalturaBatchException("subTitles->action: {$item->subTitles->action} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+				throw new KalturaBatchException("subTitles->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
 	}
 
