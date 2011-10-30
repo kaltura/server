@@ -100,7 +100,7 @@
 
 	function playEntry ( entry_id ){
 		//alert ( "playEntry:" + entry_id );
-		player = document.getElementById("kaltura_player");
+		var player = document.getElementById("kaltura_player");
 		if ( player ){
 			if ( player.insertMedia ){
 				player.insertMedia ( "-1" , entry_id , true );		
