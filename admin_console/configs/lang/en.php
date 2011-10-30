@@ -148,7 +148,15 @@ return array(
 	'Kaltura_Client_Enum_EntryStatus::MODERATE' => 'Modarated',
 	'Kaltura_Client_Enum_EntryStatus::BLOCKED' => 'Blocked',
 	'Kaltura_Client_Enum_EntryStatus::NO_CONTENT' => 'No content',
+	'Kaltura_Client_Enum_EntryStatus::INFECTED' => 'Infected',
+	'Kaltura_Client_Enum_EntryStatus::SCAN_FAILURE' => 'Virus scan failure',
 
+	'Kaltura_Client_Enum_EntryModerationStatus::PENDING_MODERATION' => 'Pending moderation',
+	'Kaltura_Client_Enum_EntryModerationStatus::APPROVED' => 'Approved',
+	'Kaltura_Client_Enum_EntryModerationStatus::REJECTED' => 'Rejected',
+	'Kaltura_Client_Enum_EntryModerationStatus::FLAGGED_FOR_REVIEW' => 'Flagged for review',
+	'Kaltura_Client_Enum_EntryModerationStatus::AUTO_APPROVED' => 'Auto approved',
+	
 	'Kaltura_Client_Enum_EntryType::AUTOMATIC' => 'Automatic',
 	'Kaltura_Client_Enum_EntryType::MEDIA_CLIP' => 'Media Clip',
 	'Kaltura_Client_Enum_EntryType::MIX' => 'Mix',
@@ -160,7 +168,10 @@ return array(
 	'Kaltura_Client_Enum_MediaType::VIDEO' => 'Video',
 	'Kaltura_Client_Enum_MediaType::IMAGE' => 'Image',
 	'Kaltura_Client_Enum_MediaType::AUDIO' => 'Audio',
-	'Kaltura_Client_Enum_MediaType::LIVE_STREAM_FLASH' => 'Flash',
+	'Kaltura_Client_Enum_MediaType::LIVE_STREAM_FLASH' => 'Flash live stream',
+	'Kaltura_Client_Enum_MediaType::LIVE_STREAM_WINDOWS_MEDIA' => 'Windows media live stream',
+	'Kaltura_Client_Enum_MediaType::LIVE_STREAM_REAL_MEDIA' => 'Real media live stream',
+	'Kaltura_Client_Enum_MediaType::LIVE_STREAM_QUICKTIME' => 'Quicktime live stream',
 	
 	'Kaltura_Client_Enum_SourceType::FILE' => 'File',
 	'Kaltura_Client_Enum_SourceType::WEBCAM' => 'Webcam',
