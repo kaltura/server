@@ -47,7 +47,7 @@ class DoubleClickDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isDeleteEnabled()
 	{
-		return false;
+		return true;
 	}
 
 	/* (non-PHPdoc)
