@@ -15,7 +15,7 @@
     	
 		foreach($reflect->getConstants() as $const)
 		{
-	        $field = str_replace('-', '_', "{$fieldName}_{$const}");
+	        $field = Form_Batch_SearchEntries::getFieldId("{$fieldName}_{$const}");
 	        $label = $this->enumTranslate($enumClass, $const);
 	        
 	        echo "<li><label>{$this->$field} $label ($const)</label>";

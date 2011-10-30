@@ -869,6 +869,20 @@ class BatchController extends Zend_Controller_Action
 		$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 16);
 		$paginator->setAction($action);
 		$this->view->paginator = $paginator;
+		$this->view->uiConf = null;
+		
+		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
+		
+		$uiConfFilter = new Kaltura_Client_Type_UiConfFilter();
+		$uiConfFilter->partnerIdIn = 0;
+		$uiConfFilter->objTypeEqual = Kaltura_Client_Enum_UiConfObjType::PLAYER_V3;
+		$uiConfFilter->orderBy = Kaltura_Client_Enum_UiConfOrderBy::CREATED_AT_DESC;
+		$uiConfPager = new Kaltura_Client_Type_FilterPager();
+		$uiConfPager->pageSize = 1;
+		$uiConfList = $adminConsolePlugin->uiConfAdmin->listAction($uiConfFilter, $uiConfPager);
+		/* @var $uiConfList Kaltura_Client_AdminConsole_Type_UiConfAdminListResponse */
+		if(count($uiConfList->objects))
+			$this->view->uiConf = reset($uiConfList->objects);
 	}
 	
 	public function entryInvestigationAction()

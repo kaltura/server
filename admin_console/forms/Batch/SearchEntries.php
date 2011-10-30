@@ -3,6 +3,11 @@ class Form_Batch_SearchEntries extends Form_Base
 {
 	private $enumFields = array();
 	
+    public static function getFieldId($id)
+    {
+    	return str_replace(array('-', '.'), array('_', '_'), $id);
+    }
+    
     public function getFilter(array $properties)
     {
     	if(!isset($properties['partnerId']) || !strlen($properties['partnerId']))
@@ -21,7 +26,7 @@ class Form_Batch_SearchEntries extends Form_Base
     		$reflect = new ReflectionClass($enumClass);
     		$values = array();
     		foreach($reflect->getConstants() as $const)
-				if($properties[$field] || $properties["{$field}_{$const}"])
+				if($properties[$field] || $properties[Form_Batch_SearchEntries::getFieldId("{$field}_{$const}")])
     				$values[] = $const;
 					
     		if(count($values))
@@ -50,7 +55,7 @@ class Form_Batch_SearchEntries extends Form_Base
     	$reflect = new ReflectionClass($enum);
     	foreach($reflect->getConstants() as $const)
     	{
-	        $this->addElement('checkbox', str_replace('-', '_', "{$name}_{$const}"), array(
+	        $this->addElement('checkbox', Form_Batch_SearchEntries::getFieldId("{$name}_{$const}"), array(
 	            'required'   => false,
 	            'value' => (is_array($selected) && in_array($const, $selected)),
 	        ));

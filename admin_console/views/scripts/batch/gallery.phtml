@@ -47,10 +47,18 @@
 						$recordsFound = true;
 						?>
 							<td>
-								<img src="<?php echo $entry->thumbnailUrl; ?>" width="120" />
+								<table>
+									<tr>
+										<td><?php echo $entry->id; ?>: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->name; ?></a></td>
+									</tr>
+									<tr>
+										<td style="cursor: pointer;" onclick="playEntry('<?php echo $entry->id; ?>')"><img style="" src="<?php echo $entry->thumbnailUrl; ?>" width="120" /></td>
+									</tr>
+								</table>
+								<br/>
 							</td>
 						<?php
-						if(!($index % 4))
+						if(!(($index + 1) % 4))
 							echo "</tr><tr>";
 					}
 					if(!$recordsFound)
@@ -63,9 +71,47 @@
 			</tr>
 		</tbody>
 	</table>
+	
+	<?php 
+		if($this->uiConf)
+		{
+			$uiConf = $this->uiConf;
+			/* @var $uiConf Kaltura_Client_AdminConsole_Type_UiConfAdmin */
+			?>
+			<object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="<?php echo $uiConf->height; ?>" width="<?php echo $uiConf->width; ?>" bgcolor="#000000" xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:video" resource="/index.php/kwidget/cache_st/<?php echo time(); ?>/uiconf_id/<?php echo $uiConf->id; ?>" data="/index.php/kwidget/cache_st/<?php echo time(); ?>/uiconf_id/<?php echo $uiConf->id; ?>">
+				<param name="allowFullScreen" value="true" />
+				<param name="allowNetworking" value="all" />
+				<param name="allowScriptAccess" value="always" />
+				<param name="bgcolor" value="#000000" />
+				<param name="flashVars" value="&" />
+				<param name="movie" value="/index.php/kwidget/cache_st/<?php echo time(); ?>/uiconf_id/<?php echo $uiConf->id; ?>" />
+				<span property="media:width" content="<?php echo $uiConf->width; ?>"></span>
+				<span property="media:height" content="<?php echo $uiConf->height; ?>"></span>
+				<span property="media:type" content="application/x-shockwave-flash"></span>
+			</object>
+			<?php
+		}
+	?>
 </div>
 
 <script type="text/javascript">
+
+
+	function playEntry ( entry_id ){
+		//alert ( "playEntry:" + entry_id );
+		player = document.getElementById("kaltura_player");
+		if ( player ){
+			if ( player.insertMedia ){
+				player.insertMedia ( "-1" , entry_id , true );		
+			}
+			else{
+				alert ( "Player loading..." );
+			}
+		}
+		else{
+			alert ( "No player" );
+		}
+	}
 
 	var intervalPointer = null;
 	
