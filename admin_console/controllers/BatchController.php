@@ -867,22 +867,35 @@ class BatchController extends Zend_Controller_Action
 		$partnerId = $request->getParam('partnerId', -2);
 		$paginatorAdapter = new Infra_FilterPaginator($client->media, "listAction", $partnerId, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 16);
+		$paginator->setAvailablePageSizes(array(12, 16, 24, 40));
 		$paginator->setAction($action);
 		$this->view->paginator = $paginator;
 		$this->view->uiConf = null;
+		$this->view->swfUrl = null;
 		
 		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 		
-		$uiConfFilter = new Kaltura_Client_Type_UiConfFilter();
-		$uiConfFilter->partnerIdIn = 0;
-		$uiConfFilter->objTypeEqual = Kaltura_Client_Enum_UiConfObjType::PLAYER_V3;
-		$uiConfFilter->orderBy = Kaltura_Client_Enum_UiConfOrderBy::CREATED_AT_DESC;
-		$uiConfPager = new Kaltura_Client_Type_FilterPager();
-		$uiConfPager->pageSize = 1;
-		$uiConfList = $adminConsolePlugin->uiConfAdmin->listAction($uiConfFilter, $uiConfPager);
-		/* @var $uiConfList Kaltura_Client_AdminConsole_Type_UiConfAdminListResponse */
-		if(count($uiConfList->objects))
-			$this->view->uiConf = reset($uiConfList->objects);
+		$uiConfId = $settings = Zend_Registry::get('config')->settings->defaultUiConfId;
+		if($uiConfId)
+		{
+			$this->view->uiConf = $adminConsolePlugin->uiConfAdmin->get($uiConfId);
+		}
+		else
+		{
+			$uiConfFilter = new Kaltura_Client_Type_UiConfFilter();
+			$uiConfFilter->partnerIdIn = 0;
+			$uiConfFilter->objTypeEqual = Kaltura_Client_Enum_UiConfObjType::PLAYER_V3;
+			$uiConfFilter->orderBy = Kaltura_Client_Enum_UiConfOrderBy::CREATED_AT_DESC;
+			$uiConfPager = new Kaltura_Client_Type_FilterPager();
+			$uiConfPager->pageSize = 1;
+			$uiConfList = $adminConsolePlugin->uiConfAdmin->listAction($uiConfFilter, $uiConfPager);
+			/* @var $uiConfList Kaltura_Client_AdminConsole_Type_UiConfAdminListResponse */
+			if(count($uiConfList->objects))
+				$this->view->uiConf = reset($uiConfList->objects);
+		}
+		
+		if($this->view->uiConf)
+			$this->view->swfUrl = "/index.php/kwidget/wid/_{$partnerId}/nowrapper/1/uiconf_id/" . $this->view->id;
 	}
 	
 	public function entryInvestigationAction()
