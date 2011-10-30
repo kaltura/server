@@ -1632,6 +1632,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$entry->endDate = self::parseFormatedDate((string)$item->endDate);
 		if(isset($item->conversionProfileId) || isset($item->conversionProfile))
 			$entry->conversionProfileId = $this->getConversionProfileId($item);
+		if(($entry instanceof KalturaPlayableEntry) && isset($item->msDuration))
+			$entry->msDuration = (int)$item->msDuration;
 		
 		return $entry;
 	}
