@@ -852,10 +852,10 @@ class BatchController extends Zend_Controller_Action
 		$action = $this->view->url(array('controller' => 'batch', 'action' => 'gallery'), null, true);
 				
 		$this->view->searchEntriesForm = new Form_Batch_SearchEntries();
-		$this->view->searchEntriesForm->populate($request->getParams());
         $this->view->searchEntriesForm->setAction($action);
 		
         $filter = $this->view->searchEntriesForm->getFilter($request->getParams());
+		$this->view->searchEntriesForm->populate($request->getParams());
 	
 		$client = Infra_ClientHelper::getClient();
 		if(!$client)
@@ -864,7 +864,8 @@ class BatchController extends Zend_Controller_Action
 			return;
 		}
 		
-		$paginatorAdapter = new Infra_FilterPaginator($client->media, "listAction", null, $filter);
+		$partnerId = $request->getParam('partnerId', -2);
+		$paginatorAdapter = new Infra_FilterPaginator($client->media, "listAction", $partnerId, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 16);
 		$paginator->setAction($action);
 		$this->view->paginator = $paginator;

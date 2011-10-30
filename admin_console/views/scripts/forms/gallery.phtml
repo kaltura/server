@@ -1,19 +1,21 @@
 
-<label title="<?php echo $this->translate('gallery filter partner tooltip') ?>"><?php echo $this->translate('gallery filter partner label'); ?><?php echo $this->partnerIdEqual; ?></label>
-<label title="<?php echo $this->translate('gallery filter entry tooltip') ?>"><?php echo $this->translate('gallery filter entry label'); ?><?php echo $this->idIn; ?></label>
-	
+<div>
+<label title="<?php echo $this->translate('gallery filter partner tooltip') ?>"><?php echo $this->translate('gallery filter partner label'); ?><?php echo $this->partnerId; ?></label>
+<label title="<?php echo $this->translate('gallery filter entry tooltip') ?>"><?php echo $this->translate('gallery filter entry label'); ?><?php echo $this->id_in; ?></label>
+</div>
+
 <?php 
 	foreach($this->enumFields as $fieldName => $enumClass)
 	{
     	$reflect = new ReflectionClass($enumClass);
     	
-    	echo '<div><hr noshade="noshade" size="1" />';
-    	echo $this->$fieldName . ' ' . $this->translate("gallery filter $fieldName");
+    	echo '<hr noshade="noshade" size="1" /><div>';
+    	echo "<label>{$this->$fieldName} " . $this->translate("gallery filter $fieldName") . '</label>';
     	echo "<ul id=\"{$fieldName}_list\">";
     	
 		foreach($reflect->getConstants() as $const)
 		{
-	        $field = "{$fieldName}_{$const}";
+	        $field = str_replace('-', '_', "{$fieldName}_{$const}");
 	        $label = $this->enumTranslate($enumClass, $const);
 	        
 	        echo "<li><label>{$this->$field} $label ($const)</label>";

@@ -5,7 +5,30 @@ class Form_Batch_SearchEntries extends Form_Base
 	
     public function getFilter(array $properties)
     {
+    	if(!isset($properties['partnerId']) || !strlen($properties['partnerId']))
+    		return null;
+    		
     	$filter = $this->getObject('Kaltura_Client_Type_MediaEntryFilter', $properties);
+    	
+    	foreach($this->enumFields as $field => $enumClass)
+    	{
+			$parts = explode('_', strtolower($field));
+			$prop = '';
+			foreach ($parts as $part) 
+				$prop .= ucfirst(trim($part));
+			$prop[0] = strtolower($prop[0]);
+			
+    		$reflect = new ReflectionClass($enumClass);
+    		$values = array();
+    		foreach($reflect->getConstants() as $const)
+				if($properties[$field] || $properties["{$field}_{$const}"])
+    				$values[] = $const;
+					
+    		if(count($values))
+    			$filter->$prop = implode(',', $values);
+    		else
+    			$filter->$prop = null;
+    	}
     	return $filter;
     }
     
@@ -27,7 +50,7 @@ class Form_Batch_SearchEntries extends Form_Base
     	$reflect = new ReflectionClass($enum);
     	foreach($reflect->getConstants() as $const)
     	{
-	        $this->addElement('checkbox', "{$name}_{$const}", array(
+	        $this->addElement('checkbox', str_replace('-', '_', "{$name}_{$const}"), array(
 	            'required'   => false,
 	            'value' => (is_array($selected) && in_array($const, $selected)),
 	        ));
@@ -43,21 +66,21 @@ class Form_Batch_SearchEntries extends Form_Base
         $this->setMethod('post');
         $this->setAttrib('id', 'frmSearch');
 
-        $this->addElement('text', 'partnerIdEqual', array(
+        $this->addElement('text', 'partnerId', array(
             'required'   => true,
             'filters'    => array('StringTrim'),
             'validators' => array(),
         ));
         
-        $this->addElement('text', 'idIn', array(
+        $this->addElement('text', 'id_in', array(
             'required'   => false,
             'filters'    => array('StringTrim'),
             'validators' => array(),
         ));
         
-		$this->addEmumElemets('mediaTypeIn', 'Kaltura_Client_Enum_MediaType', 'all');
-		$this->addEmumElemets('statusIn', 'Kaltura_Client_Enum_EntryStatus', array(Kaltura_Client_Enum_EntryStatus::READY));
-		$this->addEmumElemets('moderationStatusIn', 'Kaltura_Client_Enum_EntryModerationStatus', 'all');
+		$this->addEmumElemets('media_type_in', 'Kaltura_Client_Enum_MediaType', 'all');
+		$this->addEmumElemets('status_in', 'Kaltura_Client_Enum_EntryStatus', array(Kaltura_Client_Enum_EntryStatus::READY));
+		$this->addEmumElemets('moderation_status_in', 'Kaltura_Client_Enum_EntryModerationStatus', 'all');
 	    
         // Add the search button
         $this->addElement('button', 'search', array(

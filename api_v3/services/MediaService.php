@@ -29,6 +29,12 @@ class MediaService extends KalturaEntryService
 		if ($actionName === 'updateContent') {
 			return true;
 		}
+	
+		// admin and batch
+		if ($actionName === 'list' && kCurrentContext::$master_partner_id < 0) {
+			return true;
+		}
+		
 		return parent::kalturaNetworkAllowed($actionName);
 	}
 	
