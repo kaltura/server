@@ -45,6 +45,11 @@ class KalturaPostConvertJobData extends KalturaConvartableJobData
 	 */
 	public $thumbBitrate;
 		
+	/**
+	 * @var string
+	 */
+	public $customData;
+	
 	private static $map_between_objects = array
 	(
 		"flavorAssetId" ,
@@ -53,6 +58,7 @@ class KalturaPostConvertJobData extends KalturaConvartableJobData
 		"thumbOffset" ,
 		"thumbHeight" ,
 		"thumbBitrate" ,
+		"customData",
 	);
 
 	public function getMapBetweenObjects ( )
