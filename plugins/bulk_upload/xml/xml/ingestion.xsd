@@ -230,7 +230,14 @@
 				<xs:element ref="liveStream" minOccurs="1" maxOccurs="1" />
 				-->
 			</xs:choice>
-
+			
+			<xs:element name="msDuration" minOccurs="0" maxOccurs="1" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>
+						The duration in miliseconds
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element ref="contentAssets" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
