@@ -50,13 +50,11 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply from the item element:<br/>
-						Add - Add a new entry<br/>
 						Update - Update an existing entry<br/>
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="add" />
 						<xs:enumeration value="update" />
 					</xs:restriction>
 				</xs:simpleType>

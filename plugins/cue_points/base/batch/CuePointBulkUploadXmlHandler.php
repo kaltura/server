@@ -95,7 +95,6 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		switch ($action)
 		{
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::ADD]:
 				break;
 			default:
 				throw new KalturaBatchException("scenes->action: {$item->scenes->action} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);

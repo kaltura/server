@@ -81,18 +81,16 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply:<br/>
-						Add - Add a new entry<br/>
-						Update - Update an existing entry<br/>
+						Update - Update metadata for existing entry<br/>
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="add" />
 						<xs:enumeration value="update" />
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="customData" maxOccurs="unbounded" minOccurs="1">
+			<xs:element ref="customData" maxOccurs="unbounded" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>All custom data elemets</xs:documentation>
 				</xs:annotation>
