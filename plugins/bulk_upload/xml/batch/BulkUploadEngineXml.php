@@ -651,7 +651,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$updatedEntryId = $updatedEntry->replacingEntryId;
 					
 		if($resource)
-			$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource); //to creates a temporery entry.
+			$this->kClient->baseEntry->updateContent($updatedEntryId ,$resource); //to create a temporery entry.
 		
 		foreach($noParamsFlavorAssets as $index => $flavorAsset) // Adds all the entry flavors
 		{
@@ -966,7 +966,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(is_null($createdFlavorAsset->flavorParamsId)) //no flavor params to the flavor asset
 				continue;
 				
-			$existingflavorAssets[$createdFlavorAsset->flavorParamsId] = $createdFlavorAsset;
+			$existingflavorAssets[$createdFlavorAsset->flavorParamsId] = $createdFlavorAsset->id;
 		}
 		
 		$this->kClient->startMultiRequest();
@@ -977,7 +977,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->kClient->flavorAsset->add($entryId, $flavorAssets[$flavorParamsId]);
 				$this->kClient->flavorAsset->setContent($this->kClient->getMultiRequestResult()->id, $flavorAssetsResource);
 			}else{
-				$this->kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId]->id, $flavorAssetsResource);
+				$this->kClient->flavorAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
+				$this->kClient->flavorAsset->setContent($existingflavorAssets[$flavorParamsId], $flavorAssetsResource);
 			}			
 		}
 		

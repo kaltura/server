@@ -165,7 +165,6 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		switch (strtolower($metadataItems->action))
 		{
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::ADD]:
 				$this->handleItemAdded($object, $item);
 				break;
 			default:

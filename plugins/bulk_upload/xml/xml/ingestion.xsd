@@ -231,14 +231,14 @@
 				-->
 			</xs:choice>
 
-			<xs:element ref="contentAssets" minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="contentAssets" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies media/flavor asset information, such as location of media files to upload, type of ingestion, and related transcoding flavor settings
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element ref="thumbnails" minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="thumbnails" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>
 						Specifies thumbnail-related information, such as location of media files and related thumbnail flavor settings
@@ -625,14 +625,12 @@
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply from the item element:<br/>
-						Add - Add a new entry<br/>
-						Update - Update an existing entry<br/>
-						Delete - Delete an existing entry
+						Update - Update existing assets for entry<br/>
+						replace - replace an existing assets for entry
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="add" />
 						<xs:enumeration value="update" />
 						<xs:enumeration value="replace" />
 					</xs:restriction>
@@ -746,13 +744,12 @@
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply from the item element:<br/>
-						Add - Add a new entry<br/>
-						Update - Update an existing entry<br/>
+						Update - Update existing thumbnails<br/>
+						Replace - Replace an existing thumbnails
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="add" />
 						<xs:enumeration value="update" />
 						<xs:enumeration value="replace" />
 					</xs:restriction>
@@ -855,7 +852,7 @@
 							<mediaType>1</mediaType> 
 						</media>
 						<contentAssets>...</contentAssets>
-						<thumbnail isDefault="true">...</thumbnail>
+						<thumbnails>...</thumbnails>
 					</item>
 				</example>
 				<example title="XML Example 2: Adding a new media entry: Adding multiple previously transcoded files as flavors and multiple thumbnails">
@@ -994,7 +991,7 @@
 	</xs:element>
 	<xs:element name="thumbnails" type="T_thumbnails">
 		<xs:annotation>
-			<xs:documentation>All content assets</xs:documentation>
+			<xs:documentation>All thumbnail assets</xs:documentation>
 			<xs:appinfo>
 			<example>
 				<item>
