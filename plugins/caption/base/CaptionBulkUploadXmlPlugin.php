@@ -16,6 +16,11 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	 * @var BulkUploadEngineXml
 	 */
 	private $xmlBulkUploadEngine = null;
+	
+	/**
+	 * @var array
+	 */
+	protected $currentCaptionAssets = null;
 
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -218,6 +223,8 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 			return;
 		
 		$this->xmlBulkUploadEngine->impersonate();
+		$this->getCurrentCaptionAssets($object->id);
+		
 		foreach($item->subTitles->subTitle as $caption)
 			$this->handleCaptionAsset($object->id, $object->conversionProfileId, $caption);
 		
@@ -259,16 +266,8 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		}
 		elseif(isset($caption['captionParamsId']))
 		{
-			$filter = new KalturaCaptionAssetItemFilter();
-			$filter->entryIdEqual = $entryId;
-			$currentCaptionAssets = $captionAssetPlugin->captionAsset->listAction($filter);
-			
-			if(is_array($currentCaptionAssets->objects))
-				foreach ($currentCaptionAssets->objects as $currentCaptionAsset)
-				{
-					if($currentCaptionAsset->captionParamsId == $caption['captionParamsId'])
-						$captionAssetId = $currentCaptionAsset->id;
-				}
+			if(isset($this->currentCaptionAssets[$caption['captionParamsId']]))
+				$captionAssetId = $this->currentCaptionAssets[$caption['captionParamsId']];
 		}
 		
 		if($captionAssetId)
@@ -310,6 +309,28 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		}
 	}
 
+	private function getCurrentCaptionAssets($entryId)
+	{
+		$filter = new KalturaCaptionAssetItemFilter();
+		$filter->entryIdEqual = $entryId;
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$captionAssetPlugin = KalturaCaptionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		$captions = $captionAssetPlugin->captionAsset->listAction($filter, $pager);
+		
+		$this->currentCaptionAssets = array();
+		
+		if (!isset($captions->objects))
+			return;
+
+		foreach ($captions->objects as $caption)
+		{
+			if($caption->captionParamsId != 0) //there could be multiple captions with captionParamsId=0
+				$this->currentCaptionAssets[$caption->captionParamsId] = $caption->id;
+		}
+	}
+	
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemDeleted()
 	*/
