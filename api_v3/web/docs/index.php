@@ -6,6 +6,8 @@
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 	<link rel="stylesheet" type="text/css" href="css/code.example.css" />
 	<link rel="stylesheet" type="text/css" href="css/jquery.tooltip.css" />
+	<link rel="stylesheet" type="text/css" href="css/sdk-page.css" />
+	<link rel="stylesheet" type="text/css" href="css/jquery.tweet.css" media="all" />
 	
 	<script type="text/javascript" src="js/bootstrap.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
@@ -18,6 +20,7 @@
 	<script type="text/javascript" src="js/jquery.json.min.js"></script>
 	<script type="text/javascript" src="js/code.example.js"></script>
 	<script type="text/javascript" src="js/testme.js"></script>
+	<script type="text/javascript" src="js/jquery.tweet.js" type="text/javascript"></script>
 	
 </head>
 <body>

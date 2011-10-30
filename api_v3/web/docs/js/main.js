@@ -316,7 +316,17 @@ var KDoc = {
 
 	loadClientLibs : function() {
 		var clientLibsPanel = Ext.create('Ext.panel.Panel', {
-			title: 'Clinet Libraries'
+			title: 'Clinet Libraries',
+			closable : true,
+			autoScroll : true,
+			bodyPadding : 8,
+			bodyCls: 'api-doc',
+			loader : {
+				url : 'client-libs.php',
+				renderer : 'html',
+				autoLoad : true,
+				scripts : true
+			}
 		});
 		
 		return clientLibsPanel;
