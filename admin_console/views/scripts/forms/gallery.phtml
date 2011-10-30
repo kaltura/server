@@ -7,7 +7,7 @@
 	{
     	$reflect = new ReflectionClass($enumClass);
     	
-    	echo '<hr noshade="noshade" size="1" />';
+    	echo '<div><hr noshade="noshade" size="1" />';
     	echo $this->$fieldName . ' ' . $this->translate("gallery filter $fieldName");
     	echo "<ul id=\"{$fieldName}_list\">";
     	
@@ -19,10 +19,13 @@
 	        echo "<li><label>{$this->$field} $label ($const)</label>";
 		}
 
-		echo "</ul>";
+		echo "</ul></div>";
 	}
 ?>
 
+<div>
+<?php echo $this->search; ?>
+</div>
 
 <script type="text/javascript">
 
