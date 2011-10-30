@@ -39,11 +39,16 @@ class Form_UserRoleConfiguration extends Zend_Form
 			$permissions = explode(',', $adminUserRole->permissionNames);
 			sort($permissions);
 			foreach ($permissions as $permission)
+			{
 				if ($permission != '')
-					$this->addElement('checkbox', $permission, array(
+				{
+					$permissionId = str_replace(".", "___", $permission);
+					$this->addElement('checkbox', $permissionId, array(
 						'label'=> $permission,
 						'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('class' => 'partner_configuration_checkbox_field_only'))
 					)));
+				}
+			}
 		}
 	}
 	
@@ -57,7 +62,10 @@ class Form_UserRoleConfiguration extends Zend_Form
 		foreach ($permissions as $permission)
 		{
 			if ($permission != '')
+			{
+				$permission = str_replace(".", "___", $permission);
 				$this->setDefault($permission, true);
+			}
 		}
 	}
 	
@@ -72,7 +80,10 @@ class Form_UserRoleConfiguration extends Zend_Form
 			if ($element instanceof Zend_Form_Element_Checkbox)
 			{
 				if ($element->isChecked())
-					$permissionNames .=',' . $element->getId();
+				{
+					$permission = str_replace("___", ".", $element->getId());
+					$permissionNames .=',' . $permission;
+				}
 			}
 		}
 		
