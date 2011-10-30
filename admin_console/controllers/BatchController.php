@@ -895,7 +895,7 @@ class BatchController extends Zend_Controller_Action
 		}
 		
 		if($this->view->uiConf)
-			$this->view->swfUrl = "/index.php/kwidget/wid/_{$partnerId}/nowrapper/1/uiconf_id/" . $this->view->id;
+			$this->view->swfUrl = "/index.php/kwidget/wid/_{$partnerId}/nowrapper/1/uiconf_id/" . $this->view->uiConf->id;
 	}
 	
 	public function entryInvestigationAction()
