@@ -381,6 +381,7 @@ class KalturaEntryService extends KalturaBaseService
 	protected function attachRemoteStorageResource(IRemoteStorageResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
 		$resources = $resource->getResources();
+		$fileExt = $resource->getFileExt();
 		$dbEntry->setSource(KalturaSourceType::URL);
 	
 		// TODO - move image handling to media service
@@ -428,6 +429,8 @@ class KalturaEntryService extends KalturaBaseService
 			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
 		}
 
+		$dbAsset->setFileExt($fileExt);
+				
 		if($dbAsset instanceof flavorAsset && !$dbAsset->getIsOriginal())
 			$dbAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 			

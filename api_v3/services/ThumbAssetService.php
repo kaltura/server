@@ -303,6 +303,7 @@ class ThumbAssetService extends KalturaAssetService
 	{
 		$resources = $contentResource->getResources();
 		
+		$thumbAsset->setFileExt($contentResource->getFileExt());
         $thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
         $thumbAsset->save();

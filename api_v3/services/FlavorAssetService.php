@@ -312,6 +312,7 @@ class FlavorAssetService extends KalturaAssetService
 	protected function attachRemoteStorageResource(flavorAsset $flavorAsset, IRemoteStorageResource $contentResource)
 	{
 		$resources = $contentResource->getResources();
+		$flavorAsset->setFileExt($contentResource->getFileExt());
 		$flavorAsset->incrementVersion();
 		$flavorAsset->save();
 		
@@ -604,7 +605,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
-			throw new KalturaAPIEXception(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
@@ -628,7 +629,7 @@ class FlavorAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
-			throw new KalturaAPIEXception(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 
 		$c = new Criteria();
 		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::FLAVOR_ASSET);
