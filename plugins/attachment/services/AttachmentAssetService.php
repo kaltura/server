@@ -278,6 +278,7 @@ class AttachmentAssetService extends KalturaAssetService
 	{
 		$resources = $contentResource->getResources();
 		
+		$attachmentAsset->setFileExt($contentResource->getFileExt());
         $attachmentAsset->incrementVersion();
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
         $attachmentAsset->save();

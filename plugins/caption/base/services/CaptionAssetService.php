@@ -279,7 +279,8 @@ class CaptionAssetService extends KalturaAssetService
 	{
 		$resources = $contentResource->getResources();
 		
-        $captionAsset->incrementVersion();
+		$captionAsset->setFileExt($contentResource->getFileExt());
+		$captionAsset->incrementVersion();
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);
         $captionAsset->save();
         	
