@@ -579,14 +579,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		switch($contentAssetsAction)
 		{
 			case self::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-				$this->sendItemUpdateData($entryId, $flavorAssets, $flavorAssetsResources, $thumbAssets, $thumbAssetsResources);
+				$entry = $this->sendItemUpdateData($entryId, $entry, $flavorAssets, $flavorAssetsResources, $thumbAssets, $thumbAssetsResources);
 				break;
 			case self::$actionsMap[KalturaBulkUploadAction::REPLACE]:
-				$updatedEntry = $this->sendItemReplaceData($entryId, $entry, $resource, 
+				$entry = $this->sendItemReplaceData($entryId, $entry, $resource, 
 												  $noParamsFlavorAssets, $noParamsFlavorResources, 
 												  $noParamsThumbAssets, $noParamsThumbResources);
-				$entryId = $updatedEntry->id;
-				$entry = $updatedEntry;								
 				break;
 			default :
 				throw new KalturaBatchException("Action: {$contentAssetsAction} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
@@ -940,13 +938,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	
 	/**
 	 * Handles the adding of additional data to the preciously created flavors and thumbs 
-	 * @param int $createdEntryId
+	 * @param int $entryId
+	 * @param KalturaBaseEntry $entry
 	 * @param array $flavorAssets
+	 * @param array $flavorAssetsResources
 	 * @param array $thumbAssets
+	 * @param array $thumbAssetsResources
 	 */
-	protected function sendItemUpdateData($entryId, array $flavorAssets, array $flavorAssetsResources, array $thumbAssets, array $thumbAssetsResources)
+	protected function sendItemUpdateData($entryId, $entry, array $flavorAssets, array $flavorAssetsResources, array $thumbAssets, array $thumbAssetsResources)
 	{
 		$this->impersonate();
+		$updateEntry = $this->removeNonUpdatbleFields($entry);
+		$updatedEntry = $this->kClient->baseEntry->update($entryId, $updateEntry);
+		
 		$this->kClient->startMultiRequest();
 		$this->kClient->flavorAsset->getByEntryId($entryId);
 		$this->kClient->thumbAsset->getByEntryId($entryId);

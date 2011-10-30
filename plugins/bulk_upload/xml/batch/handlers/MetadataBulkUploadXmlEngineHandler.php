@@ -162,13 +162,13 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		if(isset($metadataItems->action))
 			$action = strtolower($metadataItems->action);
 			
-		switch (strtolower($metadataItems->action))
+		switch ($action)
 		{
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
 				$this->handleItemAdded($object, $item);
 				break;
 			default:
-				throw new KalturaBatchException($containerName . "->action: {$metadataItems->action} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+				throw new KalturaBatchException($containerName . "->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		}
 	}
 
