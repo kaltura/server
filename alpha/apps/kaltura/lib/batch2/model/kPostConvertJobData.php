@@ -53,6 +53,11 @@ class kPostConvertJobData extends kConvartableJobData
 	private $postConvertAssetType;
 
 	/**
+	 * @var string
+	 */
+	private $customData;
+
+	/**
 	 * @param $thumbBitrate the $thumbBitrate to set
 	 */
 	public function setThumbBitrate($thumbBitrate)
@@ -179,4 +184,21 @@ class kPostConvertJobData extends kConvartableJobData
 	{
 		return $this->postConvertAssetType;
 	}
+
+	/**
+	 * @param $customData the $customData to set
+	 */
+	public function setCustomData($customData)
+	{
+		$this->customData = $customData;
+	}
+
+	/**
+	 * @return the $customData
+	 */
+	public function getCustomData()
+	{
+		return $this->customData;
+	}
+
 }
