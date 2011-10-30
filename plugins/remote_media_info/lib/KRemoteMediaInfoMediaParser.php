@@ -11,10 +11,10 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 	 * @param string $filePath
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
-	public function __construct($filePath, KSchedularTaskConfig $taskConfig)
+	public function __construct($job, KSchedularTaskConfig $taskConfig)
 	{
 		$this->taskConfig = $taskConfig;
-		$this->filePath = $filePath;
+		$this->job = $job;
 		
 		$errStr=null;
 		if(!$taskConfig->params->AlldigitalApiUrl)
@@ -30,10 +30,11 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 			$errStr.="AlldigitalApiPassword";
 		}
 		
-		KalturaLog::info("taskConfig-->".print_r($taskConfig,true));
+//KalturaLog::info("taskConfig-->".print_r($taskConfig,true));
+//KalturaLog::info("job-->".print_r($job,true));
 		if($errStr) {
-			KalturaLog::info("AlldigitalApi failure: missing credentials - $errStr");
-			throw new KOperationEngineException("AlldigitalApi failure: missing credentials - $errStr");
+			KalturaLog::info("AlldigitalApi: missing credentials - $errStr");
+			throw new KOperationEngineException("AlldigitalApi: missing credentials - $errStr");
 		}
 	}
 	
@@ -47,8 +48,22 @@ class KRemoteMediaInfoMediaParser  extends KMediaInfoMediaParser
 		$adApi->setPassw($this->taskConfig->params->AlldigitalApiPassword);
 		$adApi->setUrl($this->taskConfig->params->AlldigitalApiUrl);
 KalturaLog::info("adApi-->".print_r($adApi,true));
-
-		$mi=$adApi->MediaInfoToText("input",'ABCNEWS_SD_CONSMEDIA_e.mxf', $err);
+		
+		$fileName=$this->job->data->srcFileSyncLocalPath;
+			// Calls from PostConvertJob represent 'output' AD location,
+			// while calls from ExtractMediaJob represnt 'input' AD location
+		if($this->job->data instanceof KalturaPostConvertJobData){
+			$location='output';
+			$folder=str_replace ("-", "/", $this->job->data->srcFileSyncRemoteUrl);
+			$fileName="$folder/encode/$fileName";
+		}
+		else // if($this->job->data instanceof KalturaExtractMediaJobData)
+			$location='input';
+		$mi=$adApi->MediaInfoToText($location,$fileName, $err);
+		if(!isset($mi)){
+			KalturaLog::info("AlldigitalApi: mediainfo failure(location:$location,fileName:$fileName) - $err");
+			throw new KOperationEngineException("AlldigitalApi: mediainfo failure(location:$location,fileName:$fileName) - $err");
+		}
 KalturaLog::info("mediaInfo-->\n".$mi);
 
 		return $mi;
