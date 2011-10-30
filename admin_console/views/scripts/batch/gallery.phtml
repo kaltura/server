@@ -1,0 +1,111 @@
+
+<p><?php echo $this->translate('gallery intro text'); ?></p>
+<br />
+<?php if(count($this->errors)): ?>
+		<div class="error">
+			<ul>
+				<?php foreach($this->errors as $error): ?>
+				<li><?php echo $this->translate($error); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+<?php endif; ?>
+		
+	<div id="filters" class="clear">
+		<h2><?php echo $this->translate('gallery filter title'); ?></h2>
+		<?php echo $this->searchEntriesForm; ?>
+	</div>
+
+ <div id="results">
+	<h2>&nbsp;</h2>
+	<ul id="summary">
+		<li><?php echo $this->translate('gallery auto refresh'); ?> <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
+			onclick="toggleRefresh();return false;"><?php echo $this->translate('jobs in-progress refresh pause label'); ?></a> &nbsp;|&nbsp;
+			<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('jobs in-progress refresh now label'); ?></a></li>
+		<li><?php echo $this->translate('gallery also see'); ?>:&nbsp; <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks')); ?>#a_in_queue"><?php echo $this->translate('gallery links in-queue label'); ?></a>
+			&nbsp; | &nbsp;<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks')); ?>#a_in_progress"><?php echo $this->translate('gallery links in-progress label'); ?></a></li>
+	</ul>
+			
+	<h2><?php echo $this->translate('gallery grid title'); ?> <span>(<?php echo $this->paginator->getItemsCount() . $this->translate('gallery grid sum'); ?>)</span></h2>
+
+	<table>
+		<thead>
+		</thead>
+		<tfoot>
+		<tr>
+			<td colspan="11">
+			<?php echo $this->paginator; ?>
+			</td>
+		</tr>
+		</tfoot>
+		<tbody>
+			<tr>
+				<?php 
+					$recordsFound = false;
+					foreach($this->paginator as $index => $entry)
+					{
+						/* @var $entry Kaltura_Client_Type_MediaEntry */
+						
+						$recordsFound = true;
+						?>
+							<td>
+								<img src="<?php echo $entry->thumbnailUrl; ?>" width="120" />
+							</td>
+						<?php
+						if(!($index % 4))
+							echo "</tr><tr>";
+					}
+					if(!$recordsFound)
+					{
+						?>
+							<td colspan="4"><?php echo $this->translate('no results'); ?></td>
+						<?php
+					} 
+				?>
+			</tr>
+		</tbody>
+	</table>
+
+</div>
+
+<script type="text/javascript">
+
+	var intervalPointer = null;
+	
+	function refreshPage() {
+		pauseRefresh();
+		
+		var frm = document.getElementById("frmTasksFailed");
+		frm.reset();
+		frm.submit();
+	}
+	
+	function setRefreshTimer() {
+		intervalPointer = setTimeout(refreshPage, <?php echo $this->getConfigValue('refreshIntervalSec'); ?> * 1000);
+	}
+
+	function pauseRefresh()	{
+		clearTimeout(intervalPointer);
+		intervalPointer = null;
+	}
+
+	function toggleRefresh() {
+		if(intervalPointer == null) {
+			setRefreshTimer();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('gallery refresh pause label'); ?>";
+		}
+		else {
+			pauseRefresh();
+			document.getElementById("cmdToggleRefresh").innerHTML = "<?php echo $this->translate('gallery refresh resume label'); ?>";
+		}
+	}
+
+	setRefreshTimer();
+
+	$("#wrapper").css("width", 3333 + "px");
+	$(window).load(function(){
+		var extra = $.browser.safari ? 51 : 30;
+		var width = $("#filters").width() + $("#results").width();
+		$("#wrapper").css("width", ( width + extra ) + "px");
+	});
+</script>

@@ -1,0 +1,18 @@
+<fieldset>
+	<?php echo $this->partnerIdEqual; ?>
+	<?php echo $this->idIn; ?> 
+</fieldset>
+
+
+<script type="text/javascript">
+
+	function checkAll(check) {
+		var $chk = $('.jobAction');
+		var values = new Array();
+		$chk.each(function(){
+			var chk = $(this).get(0);
+			chk.checked = check;
+		});
+	}
+	
+</script>

@@ -72,9 +72,7 @@ class BatchController extends Zend_Controller_Action
 		$filter->jobTypeNotIn = Kaltura_Client_Enum_BatchJobType::DELETE;
 		$filter->entryIdEqual = $entryId;
 		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $filter);
-		$paginator = new Infra_Paginator($paginatorAdapter, $request);
-		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
-		$paginator->setItemCountPerPage(20);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 20);
 		$paginator->setAction($action);
 		
 		$this->view->paginator = $paginator;
@@ -231,8 +229,6 @@ class BatchController extends Zend_Controller_Action
 		$inProgressFilter->statusIn = implode(',', $inProgressStatuses);
 		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $inProgressFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request, 'inProgressPage');
-		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
-		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
 		$paginator->setAction($action);
 		$this->view->inProgressPaginator = $paginator;
 		
@@ -240,8 +236,6 @@ class BatchController extends Zend_Controller_Action
 		$inQueueFilter->statusIn = implode(',', $inQueueStatuses);
 		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $inQueueFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request, 'inQueuePage');
-		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
-		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
 		$paginator->setAction($action);
 		$this->view->inQueuePaginator = $paginator;
 	}
@@ -432,8 +426,6 @@ class BatchController extends Zend_Controller_Action
 		
 		$paginatorAdapter = new Infra_FilterPaginator($client->jobs, "listBatchJobs", null, $filter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
-		$paginator->setCurrentPageNumber($this->_getParam($paginator->pageFieldName));
-		$paginator->setItemCountPerPage($this->_getParam('pageSize', 10));
 		$paginator->setAction($action);
 		$this->view->paginator = $paginator;
 	}
@@ -849,6 +841,33 @@ class BatchController extends Zend_Controller_Action
 		$investigateData->thumbAssets = $thumbsData;
 		
 		return $investigateData;
+	}
+	
+	public function galleryAction()
+	{
+		$request = $this->getRequest();
+
+		$this->view->errors = array();
+		
+		$action = $this->view->url(array('controller' => 'batch', 'action' => 'gallery'), null, true);
+				
+		$this->view->searchEntriesForm = new Form_Batch_SearchEntries();
+		$this->view->searchEntriesForm->populate($request->getParams());
+        $this->view->searchEntriesForm->setAction($action);
+		
+        $filter = $this->view->searchEntriesForm->getFilter($request->getParams());
+	
+		$client = Infra_ClientHelper::getClient();
+		if(!$client)
+		{
+			$this->view->errors[] = 'init client failed';
+			return;
+		}
+		
+		$paginatorAdapter = new Infra_FilterPaginator($client->media, "listAction", null, $filter);
+		$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 16);
+		$paginator->setAction($action);
+		$this->view->paginator = $paginator;
 	}
 	
 	public function entryInvestigationAction()
