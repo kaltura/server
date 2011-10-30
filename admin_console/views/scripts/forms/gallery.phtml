@@ -1,18 +1,36 @@
-<fieldset>
-	<?php echo $this->partnerIdEqual; ?>
-	<?php echo $this->idIn; ?> 
-</fieldset>
+
+<label title="<?php echo $this->translate('gallery filter partner tooltip') ?>"><?php echo $this->translate('gallery filter partner label'); ?><?php echo $this->partnerIdEqual; ?></label>
+<label title="<?php echo $this->translate('gallery filter entry tooltip') ?>"><?php echo $this->translate('gallery filter entry label'); ?><?php echo $this->idIn; ?></label>
+	
+<?php 
+	foreach($this->enumFields as $fieldName => $enumClass)
+	{
+    	$reflect = new ReflectionClass($enumClass);
+    	
+    	echo '<hr noshade="noshade" size="1" />';
+    	echo $this->$fieldName . ' ' . $this->translate("gallery filter $fieldName");
+    	echo "<ul id=\"{$fieldName}_list\">";
+    	
+		foreach($reflect->getConstants() as $const)
+		{
+	        $field = "{$fieldName}_{$const}";
+	        $label = $this->enumTranslate($enumClass, $const);
+	        
+	        echo "<li><label>{$this->$field} $label ($const)</label>";
+		}
+
+		echo "</ul>";
+	}
+?>
 
 
 <script type="text/javascript">
 
-	function checkAll(check) {
-		var $chk = $('.jobAction');
-		var values = new Array();
-		$chk.each(function(){
-			var chk = $(this).get(0);
-			chk.checked = check;
-		});
-	}
+function toogleAll(fieldName){
+	var $field = $('#' + fieldName);
+	var checked = $field.attr('checked');
+	var $inputs = $('#' + fieldName + '_list').find('input[type=checkbox]');
+	$inputs.attr('checked', checked);
+}
 	
 </script>

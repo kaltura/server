@@ -1,6 +1,8 @@
 <?php 
 class Form_Batch_SearchEntries extends Form_Base
 {
+	private $enumFields = array();
+	
     public function getFilter(array $properties)
     {
     	$filter = $this->getObject('Kaltura_Client_Type_MediaEntryFilter', $properties);
@@ -14,9 +16,12 @@ class Form_Batch_SearchEntries extends Form_Base
      */
     protected function addEmumElemets($name, $enum, $selected = null)
     {
+    	$this->enumFields[$name] = $enum;
+    	
         $this->addElement('checkbox', $name, array(
             'required'   => false,
             'value' => ($selected == 'all'),
+        	'onclick' => "toogleAll('$name')",
         ));
         
     	$reflect = new ReflectionClass($enum);
@@ -60,5 +65,7 @@ class Form_Batch_SearchEntries extends Form_Base
             'ignore'   => true,
             'label'    => 'gallery search button',
         ));
+        
+        $this->addViewParam('enumFields', $this->enumFields);
     }
 }

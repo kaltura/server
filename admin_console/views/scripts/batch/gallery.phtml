@@ -11,19 +11,17 @@
 		</div>
 <?php endif; ?>
 		
-	<div id="filters" class="clear">
-		<h2><?php echo $this->translate('gallery filter title'); ?></h2>
-		<?php echo $this->searchEntriesForm; ?>
-	</div>
+<div id="filters" class="clear">
+	<h2><?php echo $this->translate('gallery filter title'); ?></h2>
+	<?php echo $this->searchEntriesForm; ?>
+</div>
 
  <div id="results">
 	<h2>&nbsp;</h2>
 	<ul id="summary">
 		<li><?php echo $this->translate('gallery auto refresh'); ?> <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
-			onclick="toggleRefresh();return false;"><?php echo $this->translate('jobs in-progress refresh pause label'); ?></a> &nbsp;|&nbsp;
-			<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('jobs in-progress refresh now label'); ?></a></li>
-		<li><?php echo $this->translate('gallery also see'); ?>:&nbsp; <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks')); ?>#a_in_queue"><?php echo $this->translate('gallery links in-queue label'); ?></a>
-			&nbsp; | &nbsp;<a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'in-progress-tasks')); ?>#a_in_progress"><?php echo $this->translate('gallery links in-progress label'); ?></a></li>
+			onclick="toggleRefresh();return false;"><?php echo $this->translate('gallery refresh pause label'); ?></a> &nbsp;|&nbsp;
+			<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('gallery refresh now label'); ?></a></li>
 	</ul>
 			
 	<h2><?php echo $this->translate('gallery grid title'); ?> <span>(<?php echo $this->paginator->getItemsCount() . $this->translate('gallery grid sum'); ?>)</span></h2>
@@ -65,7 +63,6 @@
 			</tr>
 		</tbody>
 	</table>
-
 </div>
 
 <script type="text/javascript">

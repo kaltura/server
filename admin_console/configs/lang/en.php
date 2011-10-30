@@ -579,7 +579,24 @@ return array(
 	'entry-investigate history retry' => 'Retry',
 
 
+	// entries gallery
+	'gallery intro text' => 'In this page you can view partner entries gallery.',
+	'gallery filter title' => 'Filters',
 
+	'gallery auto refresh' => 'Auto Refresh',
+	'gallery refresh pause label' => 'Pause Auto-Refresh',
+	'gallery refresh resume label' => 'Resume Auto-Refresh',
+	'gallery refresh now label' => 'Refresh Now',
+	'gallery grid title' => 'Entries',
+	'gallery grid sum' => 'entries; Filtered',
+
+	'gallery filter partner tooltip' => 'Partner id',
+	'gallery filter partner label' => 'Partner id',
+	'gallery filter entry tooltip' => 'Comma seperated entry ids',
+	'gallery filter entry label' => 'Entry ids',
+	'gallery filter mediaTypeIn' => 'All media types',
+	'gallery filter statusIn' => 'All entry statuses',
+	'gallery filter moderationStatusIn' => 'All moderation statuses',
 
 	//batch jobs in-progress
 	'jobs in-progress intro text' => 'In this page you can view and manage the tasks that are either currently in process or waiting to be processed.',
