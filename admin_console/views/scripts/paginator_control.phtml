@@ -26,10 +26,12 @@
 		<?php endif; ?>
 		<form method="post" id="frmPaginator<?php echo $this->index; ?>" action="<?php echo $this->action; ?>" style="display: inline; ">
 			<select id="pageSize" name="pageSize" onchange="gotoPage(<?php echo $this->index; ?>, 1);">
-				<option <?php echo ($this->itemCountPerPage == 10) ? 'selected="selected"' : ''; ?>>10</option>
-				<option <?php echo ($this->itemCountPerPage == 25) ? 'selected="selected"' : ''; ?>>25</option>
-				<option <?php echo ($this->itemCountPerPage == 50) ? 'selected="selected"' : ''; ?>>50</option>
-				<option <?php echo ($this->itemCountPerPage == 100) ? 'selected="selected"' : ''; ?>>100</option>
+				<?php 
+					foreach($this->pageSizes as $pageSize)
+					{
+						echo "<option " . ($this->itemCountPerPage == $pageSize) ? 'selected="selected"' : '' . ">$pageSize</option>";
+					}
+				?>
 			</select>
 			<?php $params = ($this->request) ? $this->request->getParams() : array(); ?>
 			<?php if (count($params)): ?>

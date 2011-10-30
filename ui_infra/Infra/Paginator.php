@@ -7,6 +7,7 @@ class Infra_Paginator extends Zend_Paginator
 	public $defaultPageSize = 10;
 	private $request = array();
 	private $action = '';
+	public $pageSizes = array(10, 25, 50, 100);
 	
     /**
      * Constructor.
@@ -42,6 +43,11 @@ class Infra_Paginator extends Zend_Paginator
     	self::$index = $index;
     }
     
+    public function setAvailablePageSizes(array $pageSizes)
+    {
+    	$this->pageSizes = $pageSizes;
+    }
+    
     /**
      * Renders the paginator.
      *
@@ -61,6 +67,7 @@ class Infra_Paginator extends Zend_Paginator
         	'request' => $this->request,
         	'action' => $this->action,
         	'index' => self::$index,
+        	'pageSizes' => $this->pageSizes,
         );
         self::$index ++;
         
