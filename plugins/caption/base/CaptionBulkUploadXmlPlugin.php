@@ -229,7 +229,6 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		$captionAssetPlugin = KalturaCaptionClientPlugin::get($this->xmlBulkUploadEngine->getClient());
 		
 		$captionAsset = new KalturaCaptionAsset();
-		$captionAsset->flavorParamsId = $this->xmlBulkUploadEngine->getAssetParamsId($caption, $conversionProfileId, true, 'caption');
 		$captionAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($caption->tags);
 		
 		$this->xmlBulkUploadEngine->impersonate(); //needed since $this->xmlBulkUploadEngine->getAssetParamsId calles to unimpersonate
@@ -237,11 +236,11 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if(isset($caption->captionAssetId))
 			$captionAsset->id = $caption->captionAssetId;
 		
-		if(isset($caption['captionParamsId']))
-			$captionAsset->captionParamsId = $caption['captionParamsId'];
+		if(isset($caption['captionParamsId']) || isset($caption['captionParams']))
+			$captionAsset->captionParamsId = $this->xmlBulkUploadEngine->getAssetParamsId($caption, $conversionProfileId, true, 'caption');
 			
 		if(isset($caption['isDefault']))
-			if($caption['isDefault'] == 'true'){
+			if(strtolower($caption['isDefault']) == 'true'){
 				$captionAsset->isDefault = KalturaNullableBoolean::TRUE_VALUE;
 			}else{
 				$captionAsset->isDefault = KalturaNullableBoolean::FALSE_VALUE;
@@ -257,7 +256,6 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		if(isset($caption['captionAssetId']))
 		{
 			$captionAssetId = $caption['captionAssetId'];
-			$captionAssetPlugin->captionAsset->update($captionAssetId, $captionAsset);
 		}
 		elseif(isset($caption['captionParamsId']))
 		{
@@ -269,19 +267,14 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				foreach ($currentCaptionAssets->objects as $currentCaptionAsset)
 				{
 					if($currentCaptionAsset->captionParamsId == $caption['captionParamsId'])
-					{
 						$captionAssetId = $currentCaptionAsset->id;
-						$captionAssetPlugin->captionAsset->update($captionAssetId, $captionAsset);
-					}
 				}
-			
-			if(!$captionAssetId)
-			{
-				$captionAsset = $captionAssetPlugin->captionAsset->add($entryId, $captionAsset);
-				$captionAssetId = $captionAsset->id;
-			}
 		}
-		else
+		
+		if($captionAssetId)
+		{
+			$captionAssetPlugin->captionAsset->update($captionAssetId, $captionAsset);
+		}else
 		{
 			$captionAsset = $captionAssetPlugin->captionAsset->add($entryId, $captionAsset);
 			$captionAssetId = $captionAsset->id;
