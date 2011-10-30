@@ -198,8 +198,7 @@ class kXsd
 						}
 						else
 						{
-							
-								
+							$isIdentical = false;
 							$xsl .= '
 			' . $tabs . '<xsl:element name="' . $elementName . '">
 			' . $tabs . '	<xsl:copy-of select="' . $xPath .  $restriction . '/*[local-name()=\'' . $elementName . '\']"/>
