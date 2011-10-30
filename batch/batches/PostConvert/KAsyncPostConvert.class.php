@@ -84,7 +84,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 		$mediaInfo = null;
 		try
 		{
-			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig);
+			$engine = KBaseMediaParser::getParser($job->jobSubType, realpath($mediaFile), $this->taskConfig, $job);
 			if($engine)
 			{
 				KalturaLog::info("Media info engine [" . get_class($engine) . "]");
@@ -92,7 +92,7 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			}
 			else 
 			{
-				$err = "Media info engine not found for job subtype [$job->jobSubType]";
+				$err = "Media info engine not found for job subtype [".$job->jobSubType."]";
 				KalturaLog::info($err);
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
 			}
