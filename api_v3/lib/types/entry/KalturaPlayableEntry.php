@@ -52,7 +52,6 @@ class KalturaPlayableEntry extends KalturaBaseEntry
 	 * The duration in miliseconds
 	 * 
 	 * @var int
-	 * @readonly
 	 * @filter lt,gt,lte,gte,order
 	 */
 	public $msDuration;
