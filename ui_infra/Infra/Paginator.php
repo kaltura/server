@@ -4,6 +4,7 @@ class Infra_Paginator extends Zend_Paginator
 	private static $index = 1;
 	
 	public $pageFieldName = 'page';
+	public $defaultPageSize = 10;
 	private $request = array();
 	private $action = '';
 	
@@ -12,15 +13,23 @@ class Infra_Paginator extends Zend_Paginator
      *
      * @param Zend_Paginator_Adapter_Interface|Zend_Paginator_AdapterAggregate $adapter
      */
-    public function __construct($adapter, $request = null, $pageFieldName = null)
+    public function __construct($adapter, $request = null, $pageFieldName = null, $defaultPageSize = null)
     {
     	parent::__construct($adapter);
     	
-    	if(!is_null($request))
-    		$this->request = $request;
-    	
     	if(!is_null($pageFieldName))
     		$this->pageFieldName = $pageFieldName;
+    		
+    	if(!is_null($defaultPageSize))
+    		$this->defaultPageSize = $defaultPageSize;
+    		
+    	if(!is_null($request))
+    	{
+    		$this->request = $request;
+	    	
+			$this->setCurrentPageNumber($request->getParam($this->pageFieldName));
+			$this->setItemCountPerPage($request->getParam('pageSize', $this->defaultPageSize));
+    	}
     }
     
     public function setAction($action)
