@@ -21,7 +21,7 @@
 		<h2>&nbsp;</h2>
 		<ul id="summary">
 			<li><?php echo $this->translate('gallery auto refresh'); ?> <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
-				onclick="toggleRefresh();return false;"><?php echo $this->translate('gallery refresh pause label'); ?></a> &nbsp;|&nbsp;
+				onclick="toggleRefresh();return false;"><?php echo $this->translate('gallery refresh resume label'); ?></a> &nbsp;|&nbsp;
 				<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('gallery refresh now label'); ?></a></li>
 		</ul>
 				
@@ -225,7 +225,7 @@
 		}
 	}
 
-	setRefreshTimer();
+	//setRefreshTimer();
 
 	$("#wrapper").css("width", 3333 + "px");
 	$(window).load(function(){
