@@ -8,69 +8,69 @@ class KalturaThumbParams extends KalturaAssetParams
 	/**
 	 * @var KalturaThumbCropType
 	 */
-	public $cropType = 1;
+	public $cropType;
 	
 	/**
 	 * @var int
 	 */
-	public $quality = 100;
+	public $quality;
 	
 	/**
 	 * @var int
 	 */
-	public $cropX = 0;
+	public $cropX;
 	
 	/**
 	 * @var int
 	 */
-	public $cropY = 0;
+	public $cropY;
 	
 	/**
 	 * @var int
 	 */
-	public $cropWidth = 0;
+	public $cropWidth;
 	
 	/**
 	 * @var int
 	 */
-	public $cropHeight = 0;
+	public $cropHeight;
 	
 	/**
 	 * @var float
 	 */
-	public $videoOffset = 3;
+	public $videoOffset;
 	
 	/**
 	 * @var int
 	 */
-	public $width = 0;
+	public $width;
 	
 	/**
 	 * @var int
 	 */
-	public $height = 0;
+	public $height;
 	
 	/**
 	 * @var float
 	 */
-	public $scaleWidth = 0;
+	public $scaleWidth;
 	
 	/**
 	 * @var float
 	 */
-	public $scaleHeight = 0;
+	public $scaleHeight;
 	
 	/**
 	 * Hexadecimal value
 	 * @var string
 	 */
-	public $backgroundColor = 0;
+	public $backgroundColor;
 	
 	/**
 	 * Id of the flavor params or the thumbnail params to be used as source for the thumbnail creation
 	 * @var int
 	 */
-	public $sourceParamsId = 0;
+	public $sourceParamsId;
 
 	/**
 	 * The container format of the Flavor Params
