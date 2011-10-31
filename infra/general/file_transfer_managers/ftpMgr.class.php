@@ -159,10 +159,12 @@ class ftpMgr extends kFileTransferMgr
 	{
 	    $remote_file = ltrim($remote_file,'/');
 	    $size = ftp_size($this->getConnection(), $remote_file);
-	    if($size)
+		KalturaLog::debug("size [" . print_r($size, true) . "]");
+	    if($size > 0)
 	    	return $size;
 	    	
 	    $filesInfo = ftp_rawlist($this->getConnection(), dirname($remote_file));
+		KalturaLog::debug("ftp rawlist [" . print_r($filesInfo, true) . "]");
 	    
 	    // -rw-r--r-- 1 kaltura kaltura 1876084736 Oct 31 14:31 1615.mpeg
 	    $regexUnix = '^(?P<permissions>[-drw]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})\s+(?P<file>.+)\s*$';
@@ -177,11 +179,11 @@ class ftpMgr extends kFileTransferMgr
 	    	if(!preg_match("/$regexUnix/", $fileInfo, $matches))
 	    	{
 	    		KalturaLog::err("Unix regex does not match ftp rawlist output [$fileInfo]");
-	    	}
-	    	elseif(!preg_match("/$regexWindows/", $fileInfo, $matches))
-	    	{
-	    		KalturaLog::err("Windows regex does not match ftp rawlist output [$fileInfo]");
-	    		continue;
+				if(!preg_match("/$regexWindows/", $fileInfo, $matches))
+				{
+					KalturaLog::err("Windows regex does not match ftp rawlist output [$fileInfo]");
+					continue;
+				}
 	    	}
 	    	
 	    	if($matches['file'] == basename($remote_file))
@@ -215,4 +217,3 @@ class ftpMgr extends kFileTransferMgr
 	}
 
 }
-?>
