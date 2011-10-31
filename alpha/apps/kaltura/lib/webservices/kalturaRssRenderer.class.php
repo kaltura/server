@@ -53,12 +53,29 @@ class kalturaRssRenderer
 		$entry_id = $entry->getId();
 		
 		$kaltura_elements =
-			"<kaltura:entryId>" . $entry->getId() . "</kaltura:entryId>" .
-			"<kaltura:views>" . ($entry->getViews() ? $entry->getViews() : "0"). "</kaltura:views>" .  
-			"<kaltura:plays>" . ($entry->getPlays() ? $entry->getPlays() : "0"). "</kaltura:plays>" .
-			"<kaltura:userScreenName>" . $entry->getUserScreenName() . "</kaltura:userScreenName>" . 
-			"<kaltura:puserId>" . $entry->getPuserId() . "</kaltura:puserId>" .
-			"<kaltura:userLandingPage>" . $entry->getUserLandingPage() . "</kaltura:userLandingPage>" .
+			"<kaltura:entryId>" . $entry->getId() . "</kaltura:entryId>";
+		
+		if (isset(kCurrentContext::$partner_id) &&
+			!PermissionPeer::isValidForPartner(PermissionName::FEATURE_HIDE_SENSITIVE_DATA_IN_RSS_FEED, kCurrentContext::$partner_id))
+		{
+			$kaltura_elements .=
+				"<kaltura:views>" . ($entry->getViews() ? $entry->getViews() : "0"). "</kaltura:views>" .  
+				"<kaltura:plays>" . ($entry->getPlays() ? $entry->getPlays() : "0"). "</kaltura:plays>" .
+				"<kaltura:userScreenName>" . $entry->getUserScreenName() . "</kaltura:userScreenName>" . 
+				"<kaltura:puserId>" . $entry->getPuserId() . "</kaltura:puserId>" .
+				"<kaltura:userLandingPage>" . $entry->getUserLandingPage() . "</kaltura:userLandingPage>";
+		}
+		else
+		{
+			$kaltura_elements .=
+				"<kaltura:views>0</kaltura:views>" .  
+				"<kaltura:plays>0</kaltura:plays>" .
+				"<kaltura:userScreenName></kaltura:userScreenName>" . 
+				"<kaltura:puserId></kaltura:puserId>" .
+				"<kaltura:userLandingPage></kaltura:userLandingPage>";
+		}
+		
+		$kaltura_elements .=
 			"<kaltura:partnerLandingPage>" . $entry->getPartnerLandingPage() . "</kaltura:partnerLandingPage>" .
 			"<kaltura:tags>" . $entry->getTags() . "</kaltura:tags>" .
 			"<kaltura:adminTags>" . $entry->getAdminTags() . "</kaltura:adminTags>" .
