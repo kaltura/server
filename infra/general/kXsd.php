@@ -378,41 +378,29 @@ class kXsd
 	 */
 	public static function getNodeRestrictions(DOMNode $toNode, DOMNode $fromNode)
 	{
-		// toNode
-		$simpleType = $toNode->getElementsByTagName('simpleType');
 		
-		if(!$simpleType || !$simpleType->item(0))
-			return;
-			
-		$restrictions = $simpleType->item(0)->getElementsByTagName('restriction');
-				
+		$xpathTo = new DOMXPath($toNode->ownerDocument);
+		
+		$xpathTo->registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema");		
+		$enumerations = $xpathTo->query("xsd:simpleType/xsd:restriction/xsd:enumeration", $toNode);
+
 		$enumerationsValueToNode = array();
 		
-		foreach($restrictions as $restriction)
+		foreach($enumerations as $enumeration)
 		{
-			$enumerations =  $restriction->getElementsByTagName('enumeration');
-			foreach($enumerations as $enumeration)
-			{
-				$enumerationsValueToNode[] = $enumeration->getAttribute('value');
-			}			
-		}
+			$enumerationsValueToNode[] = $enumeration->getAttribute('value');
+		}			
 		
-		$simpleType = $fromNode->getElementsByTagName('simpleType');
 		
-		if(!$simpleType || !$simpleType->item(0))
-			return;
-			
-		$restrictions = $simpleType->item(0)->getElementsByTagName('restriction');
-				
+		$xpathFrom = new DOMXPath($fromNode->ownerDocument);
+		$xpathFrom->registerNamespace("xsd", "http://www.w3.org/2001/XMLSchema");	
+		$enumerations = $xpathFrom->query("xsd:simpleType/xsd:restriction/xsd:enumeration", $fromNode);
+
 		$enumerationsValueFromNode = array();
 		
-		foreach($restrictions as $restriction)
+		foreach($enumerations as $enumeration)
 		{
-			$enumerations =  $restriction->getElementsByTagName('enumeration');
-			foreach($enumerations as $enumeration)
-			{
-				$enumerationsValueFromNode[] = $enumeration->getAttribute('value');
-			}			
+			$enumerationsValueFromNode[] = $enumeration->getAttribute('value');
 		}
 		
 		if (!count(array_diff($enumerationsValueFromNode, $enumerationsValueToNode)))
