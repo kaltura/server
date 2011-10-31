@@ -80,7 +80,12 @@ class Infra_FilterPaginator implements Zend_Paginator_Adapter_Interface
 		$action = $this->action;
 		$params = $this->args;
 		$params[] = $pager;
-		$response = call_user_func_array(array($this->service, $action), $params);
+		try{
+			$response = call_user_func_array(array($this->service, $action), $params);
+		}
+		catch(Kaltura_Client_Exception $e){
+			KalturaLog::err($e->getMessage());
+		}
 		$this->totalCount = $response->totalCount;
 		
 		if(!$response->objects)
