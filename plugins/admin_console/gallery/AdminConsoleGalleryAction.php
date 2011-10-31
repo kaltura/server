@@ -31,7 +31,7 @@ class AdminConsoleGalleryAction extends KalturaAdminConsolePlugin
 
 		$action->view->errors = array();
 		
-		$formAction = $action->view->url(array('controller' => 'batch', 'action' => 'gallery'), null, true);
+		$formAction = $action->view->url(array('controller' => 'plugin', 'action' => 'AdminConsoleGalleryAction'), null, true);
 				
 		$action->view->searchEntriesForm = new Form_Batch_SearchEntries();
         $action->view->searchEntriesForm->setAction($formAction);
