@@ -92,7 +92,10 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		foreach($pluginAdminConsolePages as $pluginAdminConsolePage)
 		{
 			if(!($pluginAdminConsolePage instanceof KalturaAdminConsolePlugin))
+			{
+				KalturaLog::err("Class [" . get_class($pluginAdminConsolePage) . "] is not instance of KalturaAdminConsolePlugin");
 				continue;
+			}
 			
 			$resource = get_class($pluginAdminConsolePage);
 			
@@ -102,6 +105,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			if(!($pluginAdminConsolePage->accessCheck(Infra_AclHelper::getCurrentPermissions())))
 			{
 				$acl->deny(Infra_AclHelper::getCurrentRole(), $resource);
+				KalturaLog::err("Class [" . get_class($pluginAdminConsolePage) . "] requires permissions [" . print_r($pluginAdminConsolePage->getRequiredPermissions(), true) . "]");
 				continue;
 			}
 			
