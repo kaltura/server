@@ -46,11 +46,28 @@
 							/* @var $entry Kaltura_Client_Type_MediaEntry */
 							
 							$recordsFound = true;
+							$status = $this->enumTranslate('Kaltura_Client_Enum_EntryStatus', $entry->status);
+							if($entry->status == Kaltura_Client_Enum_EntryStatus::READY)
+								$status = "<font color=\"green\">$status</font>";
+							elseif($entry->status < 0)
+								$status = "<font color=\"red\">$status</font>";
 							?>
 								<td>
 									<table>
 										<tr>
-											<td><?php echo $entry->id; ?>: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->name; ?></a></td>
+											<td>ID: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->id; ?></a></td>
+										</tr>
+										<tr>
+											<td>Name: <?php echo $entry->name; ?></td>
+										</tr>
+										<tr>
+											<td>Status: <?php echo $status; ?></td>
+										</tr>
+										<tr>
+											<td>Creation time: <?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
+										</tr>
+										<tr>
+											<td>last update: <?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
 										</tr>
 										<tr>
 											<td style="cursor: pointer;" onclick="playEntry('<?php echo $entry->id; ?>')"><img style="" src="<?php echo $entry->thumbnailUrl; ?>" width="120" /></td>
