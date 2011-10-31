@@ -12,7 +12,8 @@ abstract class KBulkUploadEngine
 		KalturaBulkUploadAction::ADD => 'add',
 		KalturaBulkUploadAction::UPDATE => 'update',
 		KalturaBulkUploadAction::DELETE => 'delete',
-		KalturaBulkUploadAction::REPLACE => 'replace'
+		KalturaBulkUploadAction::REPLACE => 'replace',
+		KalturaBulkUploadAction::TRANSFORM_XSLT => 'transformxslt'
 	);
 	
 	const BULK_UPLOAD_DATE_FORMAT = '%Y-%m-%dT%H:%i:%s';
