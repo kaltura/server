@@ -439,7 +439,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			// error fetching headers
 			$msg = 'Error: ' . $curlWrapper->getError();
 			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), $msg, KalturaBatchJobStatus::FAILED);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $curlWrapper->getErrorNumber(), $msg, KalturaBatchJobStatus::RETRY);
 			return false;
 		}
 			
@@ -448,7 +448,7 @@ class KAsyncFileSyncImport extends KJobHandlerWorker
 			// some error exists in the response
 			$msg = 'HTTP Error: ' . $curlHeaderResponse->code . ' ' . $curlHeaderResponse->codeName;
 			KalturaLog::err($msg);
-			$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, $msg, KalturaBatchJobStatus::FAILED);
+			$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, $msg, KalturaBatchJobStatus::RETRY);
 			return false;
 		}
 		
