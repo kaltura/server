@@ -158,7 +158,26 @@ class ftpMgr extends kFileTransferMgr
 	protected function doFileSize($remote_file)
 	{
 	    $remote_file = ltrim($remote_file,'/');
-	    return ftp_size($this->getConnection(), $remote_file);
+	    $size = ftp_size($this->getConnection(), $remote_file);
+	    if($size)
+	    	return $size;
+	    	
+	    $filesInfo = ftp_rawlist($this->getConnection(), dirname($remote_file));
+	    // -rw-r--r-- 1 kaltura kaltura 1876084736 Oct 31 14:31 1615.mpeg
+	    $regex = '^(?P<permissions>[-drw]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})\s+(?P<file>.+)$';
+	    foreach($filesInfo as $fileInfo)
+	    {
+	    	$matches = null;
+	    	if(!preg_match("/$regex/", $fileInfo, $matches))
+	    	{
+	    		KalturaLog::err("Regex does not match ftp rawlist output [$fileInfo]");
+	    		continue;
+	    	}
+	    	
+	    	if($matches['file'] == basename($remote_file))
+	    		return $matches['fileSize'];
+	    }
+	    return false;
 	}
 	
 	protected function doModificationTime($remote_file)
