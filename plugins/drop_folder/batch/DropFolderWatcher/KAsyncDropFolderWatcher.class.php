@@ -74,6 +74,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$dropFolders = $this->dropFolderPlugin->dropFolder->listAction($filter);
 		}
 		catch (Exception $e) {
+			$this->unimpersonate();
 			KalturaLog::err('Cannot get drop folder list - '.$e->getMessage());
 			return;
 		}
@@ -87,6 +88,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			    $this->watchFolder($folder);
 		    }
 		    catch (Exception $e) {
+			$this->unimpersonate();
 		        KalturaLog::err('Unknown error with folder id ['.$folder->id.'] - '.$e->getMessage());			
 		    }
 		}
@@ -107,6 +109,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		    $this->fileTransferMgr = DropFolderBatchUtils::getFileTransferManager($folder);
 		}
 	    catch (Exception $e) {
+			$this->unimpersonate();
 			KalturaLog::err('Cannot initialize file transfer manager for folder ['.$folder->id.'] - '.$e->getMessage());
 			return; // skipping to next folder
 		}
@@ -118,6 +121,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$dropFolderFiles = $this->getDropFolderFileObjects($folder->id);
 		}
 		catch (Exception $e) {
+			$this->unimpersonate();
 			KalturaLog::err('Cannot get drop folder file list from the server for drop folder id ['.$folder->id.'] - '.$e->getMessage());
 			return; // skipping to next folder
 		}
@@ -129,6 +133,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$physicalFiles = $this->getPhysicalFileList($folder);
 		}
 		catch (Exception $e) {
+			$this->unimpersonate();
 			$physicalFiles = null;
 		}
 		if (!$physicalFiles) {
@@ -212,6 +217,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 				        $lastModificationTime = $this->getModificationTime($fullPath);
 				    }
 				    catch (Exception $e) {
+					$this->unimpersonate();
 				        KalturaLog::err('Cannot get modification time for file in path ['.$fullPath.'] - '.$e->getMessage());
 				        continue; // skipping to next file
 				    }
@@ -245,6 +251,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			}
 			catch (Exception $e)
 			{
+				$this->unimpersonate();
 				KalturaLog::err("Error handling drop folder file [$physicalFileName] " . $e->getMessage());
 			}
 		}
@@ -317,6 +324,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			$this->dropFolderPlugin->dropFolderFile->add($newDropFolderFile);
 		}
 		catch (Exception $e) {
+			$this->unimpersonate();
 			KalturaLog::err("Cannot add new drop folder file [$fileName] - ".$e->getMessage());
 		}	
 	}
@@ -433,6 +441,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 		    $delResult = $this->fileTransferMgr->delFile($physicalFilePath);
 		}
 		catch (Exception $e) {
+		    $this->unimpersonate();
 		    KalturaLog::err('Cannot delete physical file ['.$physicalFilePath.'] for drop folder file id ['.$dropFolderFile->id.'] - '.$e->getMessage());
 		    return false;
 		}
