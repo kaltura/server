@@ -29,7 +29,7 @@
 				<?php 
 					foreach($this->pageSizes as $pageSize)
 					{
-						echo "<option " . ($this->itemCountPerPage == $pageSize) ? 'selected="selected"' : '' . ">$pageSize</option>";
+						echo "<option " . (($this->itemCountPerPage == $pageSize) ? 'selected="selected"' : '') . ">$pageSize</option>";
 					}
 				?>
 			</select>
