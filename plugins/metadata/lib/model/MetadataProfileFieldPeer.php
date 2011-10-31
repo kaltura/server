@@ -119,15 +119,8 @@ class MetadataProfileFieldPeer extends BaseMetadataProfileFieldPeer {
 		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
 	
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::METADATA_PROFILE_ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		return array("metadataProfileField:metadataProfileId=".$criterion->getValue());
+		return array(array("metadataProfileField:metadataProfileId=%s", self::METADATA_PROFILE_ID));		
 	}
 } // MetadataProfileFieldPeer
