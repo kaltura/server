@@ -324,21 +324,9 @@ class PermissionPeer extends BasePermissionPeer
 		return PermissionPeer::doSelect($criteria, $con);
 	}
 	
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::PARTNER_ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::IN)
-		{
-			return array();				
-		}
-		
-		$result = array();
-		foreach ($criterion->getValue() as $partnerId)
-		{
-			$result[] = "permission:partnerId=$partnerId";
-		}
-		return $result;
+		return array(array("permission:partnerId=%s", self::PARTNER_ID));		
 	}
 } // PermissionPeer
 

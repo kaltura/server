@@ -99,20 +99,8 @@ class categoryPeer extends BasecategoryPeer
 		return categoryPeer::doSelect($c, $con);
 	}
 
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::PARTNER_ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::IN)
-		{
-			return array();				
-		}
-		
-		$result = array();
-		foreach ($criterion->getValue() as $partnerId)
-		{
-			$result[] = "category:partnerId=$partnerId";
-		}
-		return $result;
+		return array(array("category:partnerId=%s", self::PARTNER_ID));		
 	}
 }

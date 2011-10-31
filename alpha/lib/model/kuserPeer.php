@@ -562,23 +562,9 @@ class kuserPeer extends BasekuserPeer
 		);
 	}
 			
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$partnerIdCriterion = $criteria->getCriterion(self::PARTNER_ID);
-		if (!$partnerIdCriterion || 
-			$partnerIdCriterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		$puserIdCriterion = $criteria->getCriterion(self::PUSER_ID);
-		if (!$puserIdCriterion || 
-			$puserIdCriterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		return array("kuser:partnerId=".$partnerIdCriterion->getValue().",puserid=".$puserIdCriterion->getValue());
+		return array(array("kuser:partnerId=%s,puserid=%s", self::PARTNER_ID, self::PUSER_ID));		
 	}
 	
 	public static function retrieveByPKNoFilter($pk, PropelPDO $con = null)

@@ -529,22 +529,8 @@ class assetPeer extends BaseassetPeer
 		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
 
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::ID);
-		if ($criterion && 
-			$criterion->getComparison() == Criteria::EQUAL)
-		{
-			return array("flavorAsset:id=".$criterion->getValue());
-		}
-		
-		$criterion = $criteria->getCriterion(self::ENTRY_ID);
-		if ($criterion && 
-			$criterion->getComparison() == Criteria::EQUAL)
-		{
-			return array("flavorAsset:entryId=".$criterion->getValue());
-		}
-
-		return array();				
+		return array(array("flavorAsset:id=%s", self::ID), array("flavorAsset:entryId=%s", self::ENTRY_ID));		
 	}
 }

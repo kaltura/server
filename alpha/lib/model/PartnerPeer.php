@@ -131,15 +131,8 @@ class PartnerPeer extends BasePartnerPeer
 		$cache->remove ( self::CLZZ , $id );
 	}
 
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		return array("partner:id=".$criterion->getValue());
+		return array(array("partner:id=%s", self::ID));		
 	}
 }

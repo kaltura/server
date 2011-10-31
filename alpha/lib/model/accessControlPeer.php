@@ -76,15 +76,8 @@ class accessControlPeer extends BaseaccessControlPeer
 		return $curretProfiles;
 	}
 	
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		return array("accessControl:id=".$criterion->getValue());
+		return array(array("accessControl:id=%s", self::ID));		
 	}
 }

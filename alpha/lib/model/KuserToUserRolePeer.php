@@ -30,16 +30,8 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer
 		return self::doSelect($c);
 	}
 	
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::KUSER_ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		return array("kuserToUserRole:kuserId=".$criterion->getValue());
+		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID));		
 	}
-	
 } // KuserToUserRolePeer

@@ -8,11 +8,17 @@ class kQueryCache
 	const MAX_CACHED_OBJECT_COUNT = 100;			// Select queries that return more objects than this const will not be cached
 	const CACHED_QUERIES_EXPIRY_SEC = 86400;		// The expiry of the query keys in the memcache 	
 
+	const MAX_IN_CRITERION_INVALIDATION_KEYS = 5;	// Maximum number of allowed elements in 'IN' to use the query cache
+	
 	const CACHE_PREFIX_QUERY = 'QCQ-';				// = Query Cache - Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCI-';	// = Query Cache - Invalidation key
 	
 	const QUERY_TYPE_SELECT = 'sel-';
 	const QUERY_TYPE_COUNT =  'cnt-';
+	
+	const QUERY_DB_UNDEFINED = 0;
+	const QUERY_DB_MASTER = 1;
+	const QUERY_DB_SLAVE = 2;
 	
 	protected static $s_memcache = null;
 	protected static $s_memcacheInited = false;
@@ -44,8 +50,69 @@ class kQueryCache
 			self::$s_memcache = null;
 		}
 	}
+	
+	protected static function replaceVariable($formatString, $variableValue)
+	{
+		$firstVarPos = strpos($formatString, '%s');
+		if ($firstVarPos === false)
+		{
+			return $formatString;
+		}
+		
+		return substr_replace($formatString, $variableValue, $firstVarPos, 2);
+	}
+	
+	protected static function getInvalidationKeysForQuery($invalidationKeyRules, Criteria $criteria)
+	{
+		foreach ($invalidationKeyRules as $invalidationKeyRule)
+		{
+			$invalidationKeys = array($invalidationKeyRule[0]);
+			for ($colIndex = 1; $colIndex < count($invalidationKeyRule); $colIndex++)
+			{
+				$columnName = $invalidationKeyRule[$colIndex];
+				$criterion = $criteria->getCriterion($columnName);
+				if (!$criterion)
+				{
+					$invalidationKeys = null;
+					break;
+				}
+				
+				if ($criterion->getComparison() == Criteria::EQUAL)
+				{
+					$values = array($criterion->getValue());
+				}
+				else if ($criterion->getComparison() == Criteria::IN && 
+					count($criterion->getValue()) < self::MAX_IN_CRITERION_INVALIDATION_KEYS)
+				{
+					$values = $criterion->getValue();
+				}
+				else
+				{
+					$invalidationKeys = null;
+					break;
+				}
+				
+				$newInvalidationKeys = array(); 
+				foreach ($invalidationKeys as $invalidationKey)
+				{
+					foreach ($values as $value)
+					{
+						$newInvalidationKeys[] = self::replaceVariable($invalidationKey, $value);
+					}
+				}
+				$invalidationKeys = $newInvalidationKeys;
+			}
+			
+			if (!is_null($invalidationKeys))
+			{
+				return $invalidationKeys;
+			}
+		}
+			
+		return array();
+	}
 
-	public static function getCachedQueryResults(Criteria $criteria, $queryType, $peerClassName, &$cacheKey)
+	public static function getCachedQueryResults(Criteria $criteria, $queryType, $peerClassName, &$cacheKey, &$queryDB)
 	{
 		// initialize
 		if (!kConf::get("query_cache_enabled"))
@@ -53,7 +120,8 @@ class kQueryCache
 			return null;
 		}
 		
-		$invalidationKeys = call_user_func(array($peerClassName, 'getCacheInvalidationKeys'), $criteria, $queryType);
+		$invalidationKeyRules = call_user_func(array($peerClassName, 'getCacheInvalidationKeys'));
+		$invalidationKeys = self::getInvalidationKeysForQuery($invalidationKeyRules, $criteria);
 		if (!$invalidationKeys)
 		{
 			return null;
@@ -94,9 +162,13 @@ class kQueryCache
 			if ($currentTime < $invalidationTime + self::QUERY_MASTER_TIME_MARGIN_SEC)
 			{
 				KalturaLog::debug("kQueryCache: changed recently -> query master, peer=$peerClassName, invkey=$invalidationKey querytime=$currentTime invtime=$invalidationTime");
+				$queryDB = self::QUERY_DB_MASTER;
+				$cacheKey = null;		// No reason to cache the query since it won't be used anyway 
 				return null;
 			}
 		}
+
+		$queryDB = self::QUERY_DB_SLAVE;
 		
 		// check whether we have a valid cached query
 		if (!$queryResult)

@@ -467,16 +467,9 @@ class entryPeer extends BaseentryPeer
 		return entry::ENTRY_DURATION_TYPE_NOTAVAILABLE;
 	}
 	
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		return array("entry:id=".$criterion->getValue());
+		return array(array("entry:id=%s", self::ID));		
 	}
 	
 	/* (non-PHPdoc)

@@ -32,15 +32,8 @@ class uiConfPeer extends BaseuiConfPeer
 		self::$s_criteria_filter->setFilter($c);
 	}
 		
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
-		$criterion = $criteria->getCriterion(self::ID);
-		if (!$criterion || 
-			$criterion->getComparison() != Criteria::EQUAL)
-		{
-			return array();				
-		}
-		
-		return array("uiConf:id=".$criterion->getValue());
+		return array(array("uiConf:id=%s", self::ID));		
 	}
 }

@@ -212,19 +212,21 @@ abstract class BaseSchedulerPeer {
 		
 		SchedulerPeer::attachCriteriaFilter($criteria);
 
+		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_COUNT,
 			'SchedulerPeer', 
-			$cacheKey);
+			$cacheKey, 
+			$queryDB);
 		if ($cachedResult !== null)
 		{
 			return $cachedResult;
 		}
 		
-		// set the connection to slave server
-		$con = SchedulerPeer::alternativeCon ($con);
+		// select the connection for the query
+		$con = SchedulerPeer::alternativeCon ($con, $queryDB);
 		
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
@@ -270,12 +272,10 @@ abstract class BaseSchedulerPeer {
 	 * is compared to the time saved in the invalidation key.
 	 * A cached query will only be used if it's newer than the matching invalidation key.
 	 *  
-	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
-	 * @param      string $queryType The type of the query: select / count.
-	 * @return     string The invalidation key that should be checked before returning a cached result for this criteria.
-	 *		 if null is returned, the query cache won't be used - the query will be performed on the DB.
+	 * @return     array The invalidation keys that should be checked before returning a cached result for this criteria.
+	 *		 if an empty array is returned, the query cache won't be used - the query will be performed on the DB.
 	 */
-	public static function getCacheInvalidationKeys(Criteria $criteria, $queryType)
+	public static function getCacheInvalidationKeys()
 	{
 		return array();
 	}
@@ -337,20 +337,22 @@ abstract class BaseSchedulerPeer {
 	{		
 		$criteria = SchedulerPeer::prepareCriteriaForSelect($criteria);
 		
+		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
 			$criteria, 
 			kQueryCache::QUERY_TYPE_SELECT,
 			'SchedulerPeer', 
-			$cacheKey);
+			$cacheKey, 
+			$queryDB);
 		if ($cachedResult !== null)
 		{
 			SchedulerPeer::filterSelectResults($cachedResult);
 			SchedulerPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
-
-		$con = SchedulerPeer::alternativeCon($con);
+		
+		$con = SchedulerPeer::alternativeCon($con, $queryDB);
 		
 		$queryResult = SchedulerPeer::populateObjects(BasePeer::doSelect($criteria, $con));
 		
@@ -367,8 +369,22 @@ abstract class BaseSchedulerPeer {
 		return $queryResult;
 	}
 
-	public static function alternativeCon($con)
+	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
 	{
+		if ($con === null)
+		{
+			switch ($queryDB)
+			{
+			case QUERY_DB_MASTER:
+				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+				break;
+
+			case QUERY_DB_SLAVE:
+				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+				break;
+			}
+		}
+	
 		if($con === null)
 			$con = myDbHelper::alternativeCon($con);
 			
@@ -451,7 +467,7 @@ abstract class BaseSchedulerPeer {
 		// attach default criteria
 		SchedulerPeer::attachCriteriaFilter($criteria);
 		
-		// set the connection to slave server
+		// select the connection for the query
 		$con = SchedulerPeer::alternativeCon ( $con );
 		
 		// BasePeer returns a PDOStatement
