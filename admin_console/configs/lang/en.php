@@ -599,7 +599,7 @@ return array(
 	'gallery refresh resume label' => 'Resume Auto-Refresh',
 	'gallery refresh now label' => 'Refresh Now',
 	'gallery grid title' => 'Entries',
-	'gallery grid sum' => 'entries; Filtered',
+	'gallery grid sum' => ' entries; Filtered',
 
 	'gallery filter partner tooltip' => 'Partner id',
 	'gallery filter partner label' => 'Partner id',
