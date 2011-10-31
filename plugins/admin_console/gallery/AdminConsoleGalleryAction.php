@@ -31,10 +31,10 @@ class AdminConsoleGalleryAction extends KalturaAdminConsolePlugin
 
 		$action->view->errors = array();
 		
-		$action = $action->view->url(array('controller' => 'batch', 'action' => 'gallery'), null, true);
+		$formAction = $action->view->url(array('controller' => 'batch', 'action' => 'gallery'), null, true);
 				
 		$action->view->searchEntriesForm = new Form_Batch_SearchEntries();
-        $action->view->searchEntriesForm->setAction($action);
+        $action->view->searchEntriesForm->setAction($formAction);
 		
         $filter = $action->view->searchEntriesForm->getFilter($request->getParams());
 		$action->view->searchEntriesForm->populate($request->getParams());
@@ -52,7 +52,7 @@ class AdminConsoleGalleryAction extends KalturaAdminConsolePlugin
 			$paginatorAdapter = new Infra_FilterPaginator($client->media, "listAction", $partnerId, $filter);
 			$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 30);
 			$paginator->setAvailablePageSizes(array(15, 30, 60, 100));
-			$paginator->setAction($action);
+			$paginator->setAction($formAction);
 			$action->view->paginator = $paginator;
 			$action->view->playerPartnerId = $partnerId;
 			$action->view->uiConf = null;
