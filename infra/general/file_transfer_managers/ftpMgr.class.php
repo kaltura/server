@@ -163,14 +163,24 @@ class ftpMgr extends kFileTransferMgr
 	    	return $size;
 	    	
 	    $filesInfo = ftp_rawlist($this->getConnection(), dirname($remote_file));
+	    
 	    // -rw-r--r-- 1 kaltura kaltura 1876084736 Oct 31 14:31 1615.mpeg
-	    $regex = '^(?P<permissions>[-drw]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})\s+(?P<file>.+)$';
+	    $regexUnix = '^(?P<permissions>[-drw]{10})\s+(?P<number>\d{1})\s+(?P<owner>[\d\w]+)\s+(?P<group>[\d\w]+)\s+(?P<fileSize>\d*)\s+(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})\s+(?P<file>.+)\s*$';
+	    
+		// 08/08/2011  08:52 PM               174 .buildpath
+		// 08/08/2011  08:52 PM               706 .project
+		// 08/08/2011  08:52 PM    <DIR>          .settings
+	    $regexWindows = '^(?P<month>\d{2})-(?P<day>\d{2})-(?P<year>\d{2})\s+(?P<hour>\d{2}):(?P<minute>\d{2})(?P<apm>AM|PM)\s+(?P<size>\d+|<DIR>)\s+(?P<file>.+)\s*$';
 	    foreach($filesInfo as $fileInfo)
 	    {
 	    	$matches = null;
-	    	if(!preg_match("/$regex/", $fileInfo, $matches))
+	    	if(!preg_match("/$regexUnix/", $fileInfo, $matches))
 	    	{
-	    		KalturaLog::err("Regex does not match ftp rawlist output [$fileInfo]");
+	    		KalturaLog::err("Unix regex does not match ftp rawlist output [$fileInfo]");
+	    	}
+	    	elseif(!preg_match("/$regexWindows/", $fileInfo, $matches))
+	    	{
+	    		KalturaLog::err("Windows regex does not match ftp rawlist output [$fileInfo]");
 	    		continue;
 	    	}
 	    	
