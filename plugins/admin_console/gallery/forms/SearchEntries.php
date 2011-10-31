@@ -1,4 +1,8 @@
-<?php 
+<?php
+/**
+ * @package plugins.adminConsoleGallery
+ * @subpackage admin
+ */ 
 class Form_Batch_SearchEntries extends Form_Base
 {
 	private $enumFields = array();
