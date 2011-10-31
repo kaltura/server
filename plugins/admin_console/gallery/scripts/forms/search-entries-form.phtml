@@ -9,7 +9,7 @@
 	{
     	$reflect = new ReflectionClass($enumClass);
     	
-    	echo '<hr noshade="noshade" size="1" /><div>';
+    	echo '<div>';
     	echo "<label>{$this->$fieldName} " . $this->translate("gallery filter $fieldName") . '</label>';
     	echo "<ul id=\"{$fieldName}_list\">";
     	
@@ -18,7 +18,7 @@
 	        $field = Form_Batch_SearchEntries::getFieldId("{$fieldName}_{$const}");
 	        $label = $this->enumTranslate($enumClass, $const);
 	        
-	        echo "<li><label>{$this->$field} $label ($const)</label>";
+	        echo "<li><label>{$this->$field} $label</label>";
 		}
 
 		echo "</ul></div>";

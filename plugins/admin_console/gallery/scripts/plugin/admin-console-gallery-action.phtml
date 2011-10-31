@@ -52,22 +52,19 @@
 							elseif($entry->status < 0)
 								$status = "<font color=\"red\">$status</font>";
 							?>
-								<td style="padding: 1px;">
+								<td style="padding: 1px;" valign="top">
 									<table cellpadding="0" cellspacing="0" style="border: 0px; margin: 0px;">
 										<tr>
-											<td style="border: 0px; padding: 0px;"><?php echo $entry->name; ?></td>
+											<td style="border: 0px; padding: 0px;"><?php echo (strlen($entry->name) > 23 ? substr($entry->name, 0, 20) . '...' : $entry->name); ?></td>
 										</tr>
 										<tr>
-											<td style="border: 0px; padding: 0px;">ID: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->id; ?></a></td>
+											<td style="border: 0px; padding: 0px;">ID: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->id; ?></a> (<?php echo $status; ?>)</td>
 										</tr>
 										<tr>
-											<td style="border: 0px; padding: 0px;">Status: <?php echo $status; ?></td>
+											<td style="border: 0px; padding: 0px;">Created: <?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
 										</tr>
 										<tr>
-											<td style="border: 0px; padding: 0px;">Creation time: <?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
-										</tr>
-										<tr>
-											<td style="border: 0px; padding: 0px;">last update: <?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
+											<td style="border: 0px; padding: 0px;">Updated: <?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
 										</tr>
 										<tr>
 											<td style="border: 0px; padding: 0px; cursor: pointer;" onclick="playEntry('<?php echo $entry->id; ?>')"><img style="border: 0px;" src="<?php echo $entry->thumbnailUrl; ?>" width="120" /></td>
@@ -75,7 +72,7 @@
 									</table>
 								</td>
 							<?php
-							if(!(($index + 1) % 5))
+							if(!(($index + 1) % 8))
 								echo "</tr><tr>";
 						}
 						if(!$recordsFound)

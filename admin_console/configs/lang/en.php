@@ -605,9 +605,9 @@ return array(
 	'gallery filter partner label' => 'Partner id',
 	'gallery filter entry tooltip' => 'Comma seperated entry ids',
 	'gallery filter entry label' => 'Entry ids',
-	'gallery filter mediaTypeIn' => 'All media types',
-	'gallery filter statusIn' => 'All entry statuses',
-	'gallery filter moderationStatusIn' => 'All moderation statuses',
+	'gallery filter media_type_in' => 'All media types',
+	'gallery filter status_in' => 'All entry statuses',
+	'gallery filter moderation_status_in' => 'All moderation statuses',
 
 	//batch jobs in-progress
 	'jobs in-progress intro text' => 'In this page you can view and manage the tasks that are either currently in process or waiting to be processed.',
