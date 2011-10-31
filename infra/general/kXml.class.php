@@ -367,4 +367,11 @@ class kXml
 		return $xml->saveXML();
 	}
 	
+	public static function decodeXml($encodeXml)
+	{
+		$from = array ('&lt;',	'&gt;',	'&quot;');
+		$to   = array ('<',		'>',	'"');
+		return str_replace($from, $to, $encodeXml);
+	}
+	
 }
