@@ -16,84 +16,86 @@
 	<?php echo $this->searchEntriesForm; ?>
 </div>
 
- <div id="results">
-	<h2>&nbsp;</h2>
-	<ul id="summary">
-		<li><?php echo $this->translate('gallery auto refresh'); ?> <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
-			onclick="toggleRefresh();return false;"><?php echo $this->translate('gallery refresh pause label'); ?></a> &nbsp;|&nbsp;
-			<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('gallery refresh now label'); ?></a></li>
-	</ul>
-			
-	<h2><?php echo $this->translate('gallery grid title'); ?> <span>(<?php echo $this->paginator->getItemsCount() . $this->translate('gallery grid sum'); ?>)</span></h2>
-
-	<table>
-		<thead>
-		</thead>
-		<tfoot>
-		<tr>
-			<td colspan="11">
-			<?php echo $this->paginator; ?>
-			</td>
-		</tr>
-		</tfoot>
-		<tbody>
-			<tr>
-				<?php 
-					$recordsFound = false;
-					foreach($this->paginator as $index => $entry)
-					{
-						/* @var $entry Kaltura_Client_Type_MediaEntry */
-						
-						$recordsFound = true;
-						?>
-							<td>
-								<table>
-									<tr>
-										<td><?php echo $entry->id; ?>: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->name; ?></a></td>
-									</tr>
-									<tr>
-										<td style="cursor: pointer;" onclick="playEntry('<?php echo $entry->id; ?>')"><img style="" src="<?php echo $entry->thumbnailUrl; ?>" width="120" /></td>
-									</tr>
-								</table>
-								<br/>
-							</td>
-						<?php
-						if(!(($index + 1) % 4))
-							echo "</tr><tr>";
-					}
-					if(!$recordsFound)
-					{
-						?>
-							<td colspan="4"><?php echo $this->translate('no results'); ?></td>
-						<?php
-					} 
-				?>
-			</tr>
-		</tbody>
-	</table>
+<?php if($this->playerPartnerId): ?>
+	<div id="results">
+		<h2>&nbsp;</h2>
+		<ul id="summary">
+			<li><?php echo $this->translate('gallery auto refresh'); ?> <span>(every <?php echo $this->getConfigValue('refreshIntervalSec'); ?> seconds)</span>:&nbsp; <a href="#" id="cmdToggleRefresh"
+				onclick="toggleRefresh();return false;"><?php echo $this->translate('gallery refresh pause label'); ?></a> &nbsp;|&nbsp;
+				<a href="#" onclick="refreshPage();return false;"><?php echo $this->translate('gallery refresh now label'); ?></a></li>
+		</ul>
+				
+		<h2><?php echo $this->translate('gallery grid title'); ?> <span>(<?php echo $this->paginator->getItemsCount() . $this->translate('gallery grid sum'); ?>)</span></h2>
 	
-	<?php 
-		if($this->uiConf)
-		{
-			$uiConf = $this->uiConf;
-			$swfUrl = $this->swfUrl;
-			/* @var $uiConf Kaltura_Client_AdminConsole_Type_UiConfAdmin */
-			?>
-			<object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="<?php echo $uiConf->height; ?>" width="<?php echo $uiConf->width; ?>" bgcolor="#000000" xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:video" resource="<?php echo $swfUrl; ?>" data="<?php echo $swfUrl; ?>">
-				<param name="allowFullScreen" value="true" />
-				<param name="allowNetworking" value="all" />
-				<param name="allowScriptAccess" value="always" />
-				<param name="bgcolor" value="#000000" />
-				<param name="flashVars" value="externalInterfaceDisabled=false&partnerId=<?php echo $this->playerPartnerId; ?>" />
-				<param name="movie" value="<?php echo $swfUrl; ?>" />
-				<span property="media:width" content="<?php echo $uiConf->width; ?>"></span>
-				<span property="media:height" content="<?php echo $uiConf->height; ?>"></span>
-				<span property="media:type" content="application/x-shockwave-flash"></span>
-			</object>
-			<?php
-		}
-	?>
-</div>
+		<table>
+			<thead>
+			</thead>
+			<tfoot>
+			<tr>
+				<td colspan="11">
+				<?php echo $this->paginator; ?>
+				</td>
+			</tr>
+			</tfoot>
+			<tbody>
+				<tr>
+					<?php 
+						$recordsFound = false;
+						foreach($this->paginator as $index => $entry)
+						{
+							/* @var $entry Kaltura_Client_Type_MediaEntry */
+							
+							$recordsFound = true;
+							?>
+								<td>
+									<table>
+										<tr>
+											<td><?php echo $entry->id; ?>: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->name; ?></a></td>
+										</tr>
+										<tr>
+											<td style="cursor: pointer;" onclick="playEntry('<?php echo $entry->id; ?>')"><img style="" src="<?php echo $entry->thumbnailUrl; ?>" width="120" /></td>
+										</tr>
+									</table>
+									<br/>
+								</td>
+							<?php
+							if(!(($index + 1) % 4))
+								echo "</tr><tr>";
+						}
+						if(!$recordsFound)
+						{
+							?>
+								<td colspan="4"><?php echo $this->translate('no results'); ?></td>
+							<?php
+						} 
+					?>
+				</tr>
+			</tbody>
+		</table>
+		
+		<?php 
+			if($this->uiConf)
+			{
+				$uiConf = $this->uiConf;
+				$swfUrl = $this->swfUrl;
+				/* @var $uiConf Kaltura_Client_AdminConsole_Type_UiConfAdmin */
+				?>
+				<object id="kaltura_player" name="kaltura_player" type="application/x-shockwave-flash" allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" height="<?php echo $uiConf->height; ?>" width="<?php echo $uiConf->width; ?>" bgcolor="#000000" xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:video" resource="<?php echo $swfUrl; ?>" data="<?php echo $swfUrl; ?>">
+					<param name="allowFullScreen" value="true" />
+					<param name="allowNetworking" value="all" />
+					<param name="allowScriptAccess" value="always" />
+					<param name="bgcolor" value="#000000" />
+					<param name="flashVars" value="externalInterfaceDisabled=false&partnerId=<?php echo $this->playerPartnerId; ?>" />
+					<param name="movie" value="<?php echo $swfUrl; ?>" />
+					<span property="media:width" content="<?php echo $uiConf->width; ?>"></span>
+					<span property="media:height" content="<?php echo $uiConf->height; ?>"></span>
+					<span property="media:type" content="application/x-shockwave-flash"></span>
+				</object>
+				<?php
+			}
+		?>
+	</div>
+<?php endif; ?>
 
 <script type="text/javascript">
 
