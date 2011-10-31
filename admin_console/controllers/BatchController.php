@@ -843,65 +843,6 @@ class BatchController extends Zend_Controller_Action
 		return $investigateData;
 	}
 	
-	public function galleryAction()
-	{
-		$request = $this->getRequest();
-
-		$this->view->errors = array();
-		
-		$action = $this->view->url(array('controller' => 'batch', 'action' => 'gallery'), null, true);
-				
-		$this->view->searchEntriesForm = new Form_Batch_SearchEntries();
-        $this->view->searchEntriesForm->setAction($action);
-		
-        $filter = $this->view->searchEntriesForm->getFilter($request->getParams());
-		$this->view->searchEntriesForm->populate($request->getParams());
-	
-		$client = Infra_ClientHelper::getClient();
-		if(!$client)
-		{
-			$this->view->errors[] = 'init client failed';
-			return;
-		}
-		
-		$partnerId = $request->getParam('partnerId');
-		if($partnerId > 0)
-		{
-			$paginatorAdapter = new Infra_FilterPaginator($client->media, "listAction", $partnerId, $filter);
-			$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 30);
-			$paginator->setAvailablePageSizes(array(15, 30, 60, 100));
-			$paginator->setAction($action);
-			$this->view->paginator = $paginator;
-			$this->view->playerPartnerId = $partnerId;
-			$this->view->uiConf = null;
-			$this->view->swfUrl = null;
-			
-			$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-			
-			$uiConfId = Zend_Registry::get('config')->settings->defaultUiConfId;
-			if($uiConfId)
-			{
-				$this->view->uiConf = $adminConsolePlugin->uiConfAdmin->get($uiConfId);
-			}
-			else
-			{
-				$uiConfFilter = new Kaltura_Client_Type_UiConfFilter();
-				$uiConfFilter->partnerIdIn = 0;
-				$uiConfFilter->objTypeEqual = Kaltura_Client_Enum_UiConfObjType::PLAYER_V3;
-				$uiConfFilter->orderBy = Kaltura_Client_Enum_UiConfOrderBy::CREATED_AT_DESC;
-				$uiConfPager = new Kaltura_Client_Type_FilterPager();
-				$uiConfPager->pageSize = 1;
-				$uiConfList = $adminConsolePlugin->uiConfAdmin->listAction($uiConfFilter, $uiConfPager);
-				/* @var $uiConfList Kaltura_Client_AdminConsole_Type_UiConfAdminListResponse */
-				if(count($uiConfList->objects))
-					$this->view->uiConf = reset($uiConfList->objects);
-			}
-			
-			if($this->view->uiConf)
-				$this->view->swfUrl = "/index.php/kwidget/wid/_{$partnerId}/cache_st/" . time() . "/uiconf_id/" . $this->view->uiConf->id;
-		}
-	}
-	
 	public function entryInvestigationAction()
 	{
 		$request = $this->getRequest();

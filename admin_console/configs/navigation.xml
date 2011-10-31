@@ -92,11 +92,6 @@
 				<controller>batch</controller>
 				<action>entry-investigation</action>
 			</entry-investigation>
-			<gallery>
-				<label>Gallery</label>
-				<controller>batch</controller>
-				<action>gallery</action>
-			</gallery>
 		</pages>
 	</batch-proccess-control>
 	<monitoring>

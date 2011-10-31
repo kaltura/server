@@ -65,7 +65,7 @@ class Form_Batch_SearchEntries extends Form_Base
     public function init()
     {
     	$this->setAttrib('class', 'simple');
-		$this->setTemplatePath('forms/gallery.phtml');
+		$this->setTemplatePath('forms/search-entries-form.phtml');
 		
         // Set the method for the display form to POST
         $this->setMethod('post');
