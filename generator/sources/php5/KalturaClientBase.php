@@ -23,7 +23,8 @@ class MultiRequestSubResult
 }
 
 /**
- * Private class for null value
+ * @package Kaltura
+ * @subpackage Client
  */
 class KalturaNull 
 {
@@ -356,7 +357,21 @@ class KalturaClientBase
 		{
 			$cookiesStr = http_build_query($cookies, null, '; ');
 			curl_setopt($ch, CURLOPT_COOKIE, $cookiesStr);
-		} 
+		}
+
+		if (isset($this->config->proxyHost)) {
+			curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, true);
+			curl_setopt($ch, CURLOPT_PROXY, $this->config->proxyHost);
+			if (isset($this->config->proxyPort)) {
+				curl_setopt($ch, CURLOPT_PROXYPORT, $this->config->proxyPort);
+			}
+			if (isset($this->config->proxyUser)) {
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->config->proxyUser.':'.$this->config->proxyPassword);
+			}
+			if (isset($this->config->proxyType) && $this->config->proxyType === 'SOCKS5') {
+				curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+			}	
+		}
 
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
@@ -383,7 +398,23 @@ class KalturaClientBase
 					"Content-type: application/x-www-form-urlencoded\r\n",
 					"content" => $formattedData
 		          ));
-
+		          
+		if (isset($this->config->proxyType) && $this->config->proxyType === 'SOCKS5') {
+			throw new KalturaClientException("Cannot use SOCKS5 without curl installed.", KalturaClientException::ERROR_CONNECTION_FAILED);
+		}
+		if (isset($this->config->proxyHost)) {
+			$proxyhost = 'tcp://' . $this->config->proxyHost;
+			if (isset($this->config->proxyPort)) {
+				$proxyhost = $proxyhost . ":" . $this->config->proxyPort;
+			}
+			$params['http']['proxy'] = $proxyhost; 
+			$params['http']['request_fulluri'] = true;
+			if (isset($this->config->proxyUser)) {
+				$auth = base64_encode($this->config->proxyUser.':'.$this->config->proxyPassword);
+				$params['http']['header'] = 'Proxy-Authorization: Basic ' . $auth;
+			}	
+		}
+		          
 		$ctx = stream_context_create($params);
 		$fp = @fopen($url, 'rb', false, $ctx);
 		if (!$fp) {
@@ -850,6 +881,14 @@ class KalturaConfiguration
 	public $curlTimeout   				= 10;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;
+	public $proxyHost                    = null;
+	public $proxyPort                   = null;
+	public $proxyType                   = 'HTTP';
+	public $proxyUser                   = null;
+	public $proxyPassword               = '';
+
+	
+	
 	
 	/**
 	 * Constructs new Kaltura configuration object
