@@ -46,13 +46,32 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 	
 	<xs:complexType name="T_customData">
 		<xs:sequence>
-			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
+			<xs:element name="action" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
-					<xs:documentation>The XML for custom metadata according to a schema profile</xs:documentation>
-				</xs:annotation>		
-			</xs:any>
+					<xs:documentation>
+						The action to apply:<br/>
+						transformXslt - transform metadata object using Xslt<br/>
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="transformXslt" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="xslt" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The xslt to transform on the current metadata object
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="xmlData" maxOccurs="1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>metadata xml Data</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
-		
 		<xs:attribute name="metadataId" use="optional" type="xs:int">
 			<xs:annotation>
 				<xs:documentation>The identifier of the custom metadata object that an update/delete action applies to</xs:documentation>
@@ -75,6 +94,15 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 		</xs:attribute>
 	</xs:complexType>
 	
+	<xs:complexType name="T_xmlData">
+		<xs:sequence>
+			<xs:any namespace="##local" processContents="skip" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The XML for custom metadata according to a schema profile</xs:documentation>
+				</xs:annotation>		
+			</xs:any>
+		</xs:sequence>
+	</xs:complexType>
 	<xs:complexType name="T_customDataItems">
 		<xs:sequence>
 			<xs:element name="action" minOccurs="0" maxOccurs="1">
@@ -124,15 +152,39 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 								metadataProfile="MY_METADATA_PROFILE_SYSTEM_NAME}"  
 								metadataProfileId="{metadata profile id}"  
 					>
-						<metadata>
-							<TextFieldName>entry field value</TextFieldName>
-							<MultipleTextFieldName>entry multiple text field value1</MultipleTextFieldName>
-							<MultipleTextFieldName>entry multiple text field value2</MultipleTextFieldName>
-							<TextSelectionListFieldName>entry selected text value</TextSelectionListFieldName>
-							<DateFieldName>21741540</DateFieldName>
-							<EntryIDFieldName>0_5b3t2c8z</EntryIDFieldName>
-						</metadata>
+						<action>transformXslt</action>
+						<xslt></xslt>
+						<xmlData>
+							<metadata>
+								<TextFieldName>entry field value</TextFieldName>
+								<MultipleTextFieldName>entry multiple text field value1</MultipleTextFieldName>
+								<MultipleTextFieldName>entry multiple text field value2</MultipleTextFieldName>
+								<TextSelectionListFieldName>entry selected text value</TextSelectionListFieldName>
+								<DateFieldName>21741540</DateFieldName>
+								<EntryIDFieldName>0_5b3t2c8z</EntryIDFieldName>
+							</metadata>
+						</xmlData>
 					</customData>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:element name="xmlData" type="T_xmlData">
+		<xs:annotation>
+			<xs:documentation>XML data for custom metadata</xs:documentation>
+			<xs:appinfo>
+				<example>
+						<xmlData>
+							<metadata>
+								<TextFieldName>entry field value</TextFieldName>
+								<MultipleTextFieldName>entry multiple text field value1</MultipleTextFieldName>
+								<MultipleTextFieldName>entry multiple text field value2</MultipleTextFieldName>
+								<TextSelectionListFieldName>entry selected text value</TextSelectionListFieldName>
+								<DateFieldName>21741540</DateFieldName>
+								<EntryIDFieldName>0_5b3t2c8z</EntryIDFieldName>
+							</metadata>
+						</xmlData>
 				</example>
 			</xs:appinfo>
 		</xs:annotation>
