@@ -334,6 +334,27 @@
     </target>
     
     <!-- ============================================  -->
+    <!-- Target: grant remote DB access                -->
+    <!-- ============================================  -->
+    <target name="grantRemoteDBaccess">
+         <echo msg="grant remote DB access..." />
+         <property name="properties.grant"  value="null" override="false" />
+         <available file="${installationLoc}grant.sql" property="properties.grant" />
+         <!--echo message="value is ${properties.grant}" /-->
+
+         <if>
+              <equals arg1="${properties.grant}" arg2="true" />
+         <then>
+              <echo msg="creating file..." />
+       	      <touch file="${installationLoc}grant.sql" />
+              <append destFile="${installationLoc}grant.sql" text="GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '';" />
+         </then>
+         </if>
+         <exec command="mysql -uroot &lt; ${installationLoc}grant.sql" dir="${installationLoc}" />
+    </target>
+
+
+    <!-- ============================================  -->
     <!-- Target: unit tests (not running)              -->
     <!-- ============================================  -->
     <target name="unitTest">
@@ -347,7 +368,7 @@
     <!-- ============================================  -->
     <!-- Target: Success                               -->
     <!-- ============================================  -->
-    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit">
+    <target name="seccess" depends="restartServer,genActivationKey,changeLogLevel,changeMemoryLimit,grantRemoteDBaccess">
          <echo msg="Done" />
     </target>
 
