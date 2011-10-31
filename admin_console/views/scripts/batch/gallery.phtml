@@ -52,31 +52,30 @@
 							elseif($entry->status < 0)
 								$status = "<font color=\"red\">$status</font>";
 							?>
-								<td>
-									<table>
+								<td style="padding: 1px;">
+									<table cellpadding="0" cellspacing="0" style="border: 0px; margin: 0px;">
 										<tr>
-											<td>ID: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->id; ?></a></td>
+											<td style="border: 0px; padding: 0px;"><?php echo $entry->name; ?></td>
 										</tr>
 										<tr>
-											<td>Name: <?php echo $entry->name; ?></td>
+											<td style="border: 0px; padding: 0px;">ID: <a href="<?php echo $this->url(array('controller' => 'batch', 'action' => 'entry-investigation', 'entryId' => $entry->id)); ?>" target="_blank"><?php echo $entry->id; ?></a></td>
 										</tr>
 										<tr>
-											<td>Status: <?php echo $status; ?></td>
+											<td style="border: 0px; padding: 0px;">Status: <?php echo $status; ?></td>
 										</tr>
 										<tr>
-											<td>Creation time: <?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
+											<td style="border: 0px; padding: 0px;">Creation time: <?php echo date($this->translate('time format'), $entry->createdAt); ?></td>
 										</tr>
 										<tr>
-											<td>last update: <?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
+											<td style="border: 0px; padding: 0px;">last update: <?php echo date($this->translate('time format'), $entry->updatedAt); ?></td>
 										</tr>
 										<tr>
-											<td style="cursor: pointer;" onclick="playEntry('<?php echo $entry->id; ?>')"><img style="" src="<?php echo $entry->thumbnailUrl; ?>" width="120" /></td>
+											<td style="border: 0px; padding: 0px; cursor: pointer;" onclick="playEntry('<?php echo $entry->id; ?>')"><img style="border: 0px;" src="<?php echo $entry->thumbnailUrl; ?>" width="120" /></td>
 										</tr>
 									</table>
-									<br/>
 								</td>
 							<?php
-							if(!(($index + 1) % 4))
+							if(!(($index + 1) % 5))
 								echo "</tr><tr>";
 						}
 						if(!$recordsFound)

@@ -868,8 +868,8 @@ class BatchController extends Zend_Controller_Action
 		if($partnerId > 0)
 		{
 			$paginatorAdapter = new Infra_FilterPaginator($client->media, "listAction", $partnerId, $filter);
-			$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 16);
-			$paginator->setAvailablePageSizes(array(12, 16, 24, 40));
+			$paginator = new Infra_Paginator($paginatorAdapter, $request, null, 30);
+			$paginator->setAvailablePageSizes(array(15, 30, 60, 100));
 			$paginator->setAction($action);
 			$this->view->paginator = $paginator;
 			$this->view->playerPartnerId = $partnerId;
