@@ -870,6 +870,7 @@ class BatchController extends Zend_Controller_Action
 		$paginator->setAvailablePageSizes(array(12, 16, 24, 40));
 		$paginator->setAction($action);
 		$this->view->paginator = $paginator;
+		$this->view->playerPartnerId = $partnerId;
 		$this->view->uiConf = null;
 		$this->view->swfUrl = null;
 		
@@ -895,7 +896,8 @@ class BatchController extends Zend_Controller_Action
 		}
 		
 		if($this->view->uiConf)
-			$this->view->swfUrl = "/index.php/kwidget/wid/_{$partnerId}/nowrapper/1/uiconf_id/" . $this->view->uiConf->id;
+			$this->view->swfUrl = "/index.php/kwidget/wid/_{$partnerId}/cache_st/" . time() . "/uiconf_id/" . $this->view->uiConf->id;
+//			$this->view->swfUrl = "/index.php/kwidget/wid/_{$partnerId}/nowrapper/1/uiconf_id/" . $this->view->uiConf->id;
 	}
 	
 	public function entryInvestigationAction()

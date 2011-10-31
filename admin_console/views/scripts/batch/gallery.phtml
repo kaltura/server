@@ -84,7 +84,7 @@
 				<param name="allowNetworking" value="all" />
 				<param name="allowScriptAccess" value="always" />
 				<param name="bgcolor" value="#000000" />
-				<param name="flashVars" value="&" />
+				<param name="flashVars" value="externalInterfaceDisabled=false&partnerId=<?php echo $this->playerPartnerId; ?>" />
 				<param name="movie" value="<?php echo $swfUrl; ?>" />
 				<span property="media:width" content="<?php echo $uiConf->width; ?>"></span>
 				<span property="media:height" content="<?php echo $uiConf->height; ?>"></span>
@@ -102,8 +102,8 @@
 		//alert ( "playEntry:" + entry_id );
 		var player = document.getElementById("kaltura_player");
 		if ( player ){
-			if ( player.insertMedia ){
-				player.insertMedia ( "-1" , entry_id , true );		
+			if ( player.sendNotification ){
+				player.sendNotification ('changeMedia', {entryId: entry_id});
 			}
 			else{
 				alert ( "Player loading..." );
