@@ -20,15 +20,17 @@ $ignoreErrors = false;
 if($argc > 1 && $argv[1] == 'ignore')
 	$ignoreErrors = true;
 
+$cwd = OsUtils::getCurrentDir();
+
 $updateRunner = new ScriptsRunner();
 $updateRunner->init($ignoreErrors);
 	
 // create version_management table
-$updateRunner->runSqlScript(dirname(__FILE__).DIRECTORY_SEPARATOR."create_version_mng_table.sql");
-$sqlDir = dirname(__FILE__).DIRECTORY_SEPARATOR."sql";
+$updateRunner->runSqlScript($cwd.DIRECTORY_SEPARATOR."create_version_mng_table.sql");
+$sqlDir = $cwd.DIRECTORY_SEPARATOR."sql";
 $updateRunner->runSqlScripts($sqlDir);
 
-$phpDir = dirname(__FILE__).DIRECTORY_SEPARATOR."scripts";
+$phpDir = $cwd.DIRECTORY_SEPARATOR."scripts";
 $updateRunner->runPhpScripts($phpDir);
 
 
@@ -202,3 +204,25 @@ class ScriptsRunner {
 	
 }
 
+class OsUtils {
+	const WINDOWS_OS = 'Windows';
+	const LINUX_OS   = 'linux';
+	public static function getOsName() {		
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			return self::WINDOWS_OS;
+		} else if (strtoupper(substr(PHP_OS, 0, 5)) === 'LINUX') {
+			return self::LINUX_OS;
+		} else {
+			echo "OS not recognized: ".PHP_OS.PHP_EOL ;
+			return "";
+		}
+	}
+	
+	public static function getCurrentDir() {
+		if (OsUtils::getOsName() === self::LINUX_OS) {
+			return exec('pwd');
+		}
+		return dirname(__FILE__);
+	}
+
+}
