@@ -258,7 +258,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 		if(isset($caption['lang']))
 			$captionAsset->language = $caption['lang'];
-				
+			
 		$captionAssetId = null;
 		if(isset($caption['captionAssetId']))
 		{
@@ -266,8 +266,8 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		}
 		elseif(isset($captionAsset->captionParamsId))
 		{
-			if(isset($this->currentCaptionAssets[$caption['captionParamsId']]))
-				$captionAssetId = $this->currentCaptionAssets[$caption['captionParamsId']];
+			if(isset($this->currentCaptionAssets[$captionAsset->captionParamsId]))
+				$captionAssetId = $this->currentCaptionAssets[$captionAsset->captionParamsId];
 		}
 		
 		if($captionAssetId)
