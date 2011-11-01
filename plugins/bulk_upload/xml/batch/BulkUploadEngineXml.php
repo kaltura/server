@@ -827,6 +827,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->handleFlavorAndThumbsAdditionalData($createdEntry->id, $flavorAssets, $thumbAssets);
 				
 		//Handles the plugin added data
+		$pluginsErrorResults = array();
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
 		foreach($pluginsInstances as $pluginsInstance)
 		{
