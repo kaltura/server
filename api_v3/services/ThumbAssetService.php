@@ -844,7 +844,7 @@ class ThumbAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
-			throw new KalturaAPIEXception(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
@@ -868,7 +868,7 @@ class ThumbAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_ID_NOT_FOUND, $id);
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
-			throw new KalturaAPIEXception(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 
 		$c = new Criteria();
 		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);

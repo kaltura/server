@@ -819,7 +819,7 @@ class KalturaEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		if ($dbEntry->getStatus() != entryStatus::READY)
-			throw new KalturaAPIEXception(KalturaErrors::ENTRY_NOT_READY, $entryId);
+			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $entryId);
 
 		$c = new Criteria();
 		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ENTRY);

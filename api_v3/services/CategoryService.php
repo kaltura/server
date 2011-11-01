@@ -27,7 +27,7 @@ class CategoryService extends KalturaBaseService
 		$category->validateParentId($category);
 
 		if ($this->getPartner()->isCategoriesLocked())
-			throw new KalturaAPIEXception(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
+			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED, Partner::CATEGORIES_LOCK_TIMEOUT);
 			
 		try
 		{
