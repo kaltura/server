@@ -582,7 +582,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->sendItemUpdateData($entryId, $entry, $flavorAssets, $flavorAssetsResources, $thumbAssets, $thumbAssetsResources);
 				break;
 			case self::$actionsMap[KalturaBulkUploadAction::REPLACE]:
-				$entry = $this->sendItemReplaceData($entryId, $entry, $resource, 
+				$updatedEntry = $this->sendItemReplaceData($entryId, $entry, $resource, 
 												  $noParamsFlavorAssets, $noParamsFlavorResources, 
 												  $noParamsThumbAssets, $noParamsThumbResources);
 				$entryId = $updatedEntry->id;
@@ -595,13 +595,23 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
 				
 		//Handles the plugin added data
+		$pluginsErrorResults = array();
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
 		foreach($pluginsInstances as $pluginsInstance)
 		{
 			/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
-			$pluginsInstance->configureBulkUploadXmlHandler($this);
-			$pluginsInstance->handleItemUpdated($entry, $item);
+			try {
+				$pluginsInstance->configureBulkUploadXmlHandler($this);
+				$pluginsInstance->handleItemUpdated($entry, $item);
+			}catch (Exception $e)
+			{
+				KalturaLog::err($pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage());
+				$pluginsErrorResults[] = $pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage();
+			}
 		}
+		
+		if(count($pluginsErrorResults))
+			throw new Exception(implode(', ', $pluginsErrorResults));
 	
 		//Throw exception in case of max proccessed items and handle all exceptions there
 		$updatedEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::UPDATE);
@@ -669,9 +679,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
 		
-		foreach($requestResults as $requestResult)
-			if($requestResult instanceof Exception)
-				throw $requestResult;
+		if(is_array($requestResults))
+			foreach($requestResults as $requestResult)
+				if($requestResult instanceof Exception)
+					throw $requestResult;
 		
 		return $updatedEntry;
 	}
@@ -820,9 +831,19 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach($pluginsInstances as $pluginsInstance)
 		{
 			/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
-			$pluginsInstance->configureBulkUploadXmlHandler($this);
-			$pluginsInstance->handleItemAdded($createdEntry, $item);
+			try {
+				$pluginsInstance->configureBulkUploadXmlHandler($this);
+				$pluginsInstance->handleItemAdded($createdEntry, $item);
+			}catch (Exception $e)
+			{
+				KalturaLog::err($pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage());
+				$pluginsErrorResults[] = $pluginsInstance->getContainerName() . ' failed: ' . $e->getMessage();
+			}
 		}
+		
+		if(count($pluginsErrorResults))
+			throw new Exception(implode(', ', $pluginsErrorResults));
+	
 	}
 	
 	/**
@@ -929,10 +950,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
-		
-		foreach($requestResults as $requestResult)
-			if($requestResult instanceof Exception)
-				throw $requestResult;
+
+		if(is_array($requestResults))
+			foreach($requestResults as $requestResult)
+				if($requestResult instanceof Exception)
+					throw $requestResult;
 		
 		return $requestResults;
 	}

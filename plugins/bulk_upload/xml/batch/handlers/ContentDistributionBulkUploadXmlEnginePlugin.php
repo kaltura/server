@@ -205,4 +205,12 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 			
 		return null;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getContainerName()
+	*/
+	public function getContainerName()
+	{
+		return 'distribution';
+	}
 }

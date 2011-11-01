@@ -196,4 +196,12 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 	{
 		// No handling required
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getContainerName()
+	*/
+	public function getContainerName()
+	{
+		return 'customDataItems';
+	}
 }

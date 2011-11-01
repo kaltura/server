@@ -34,7 +34,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	/**
 	 * @var array of existing Cue Points with systemName
 	 */
-	protected $existingCuePointsBySystemName = null;
+	protected static $existingCuePointsBySystemName = null;
 	
 	protected function __construct()
 	{
@@ -136,7 +136,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	 */
 	protected function getExistingCuePointsBySystemName($entryId)
 	{
-		if (is_array($this->existingCuePointsBySystemName))
+		if (is_array(self::$existingCuePointsBySystemName))
 			return;
 		
 		$filter = new KalturaCuePointFilter();
@@ -146,7 +146,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		$pager->pageSize = 500;
 		
 		$cuePoints = $this->cuePointPlugin->cuePoint->listAction($filter, $pager);
-		$this->existingCuePointsBySystemName = array();
+		self::$existingCuePointsBySystemName = array();
 		
 		if (!isset($cuePoints->objects))
 			return;
@@ -154,7 +154,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		foreach ($cuePoints->objects as $cuePoint)
 		{
 			if($cuePoint->systemName != '')
-				$this->existingCuePointsBySystemName[$cuePoint->systemName] = $cuePoint->id;
+				self::$existingCuePointsBySystemName[$cuePoint->systemName] = $cuePoint->id;
 		}
 	}
 	
@@ -253,9 +253,9 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
 			$this->operations[] = KalturaBulkUploadAction::UPDATE;
 		}
-		elseif(isset($cuePoint->systemName) && isset($this->existingCuePointsBySystemName[$cuePoint->systemName]))
+		elseif(isset($cuePoint->systemName) && isset(self::$existingCuePointsBySystemName[$cuePoint->systemName]))
 		{
-			$cuePointId = $this->existingCuePointsBySystemName[$cuePoint->systemName];
+			$cuePointId = self::$existingCuePointsBySystemName[$cuePoint->systemName];
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
 			$this->operations[] = KalturaBulkUploadAction::UPDATE;
 		}
@@ -306,5 +306,13 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 //			return $cuePointListResponce->objects[0]->id;
 //			
 //		return null;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getContainerName()
+	*/
+	public function getContainerName()
+	{
+		return 'scenes';
 	}
 }

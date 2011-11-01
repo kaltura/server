@@ -349,4 +349,12 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 
 		return null;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getContainerName()
+	*/
+	public function getContainerName()
+	{
+		return 'subTitles';
+	}
 }

@@ -37,4 +37,9 @@ interface IKalturaBulkUploadXmlHandler
 	 * @throws KalturaBulkUploadXmlException  
 	 */
 	public function handleItemDeleted(KalturaObjectBase $object, SimpleXMLElement $item);
+	
+	/**
+	 * Return the container name to be handeled
+	 */
+	public function getContainerName();
 }
