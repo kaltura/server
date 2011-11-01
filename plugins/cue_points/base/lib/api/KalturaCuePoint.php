@@ -62,7 +62,7 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 	public $tags;
 
 	/**
-	 * Start tim ein milliseconds
+	 * Start time in milliseconds
 	 * @var int 
 	 * @filter gte,lte,order
 	 */
