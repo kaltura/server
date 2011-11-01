@@ -1,6 +1,3 @@
-CREATE DATABASE kaltura_sphinx_log;
-
-USE kaltura_sphinx_log;
 
 DROP TABLE IF EXISTS `sphinx_log`;
 
@@ -30,9 +27,3 @@ CREATE TABLE `sphinx_log_server` (
   PRIMARY KEY (`id`),
   KEY `sphinx_log_server_FI_1` (`last_log_id`)
 ) ENGINE=MYISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
-
-INSERT INTO `kaltura_sphinx_log`.`sphinx_log` SELECT * FROM `kaltura`.`sphinx_log`;
-INSERT INTO `kaltura_sphinx_log`.`sphinx_log_server` SELECT * FROM `kaltura`.`sphinx_log_server`;
-
-DROP TABLE `kaltura`.`sphinx_log`;
-DROP TABLE `kaltura`.`sphinx_log_server`;

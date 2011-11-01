@@ -1,2 +1,0 @@
-UPDATE flavor_params SET system_name = replace(name, ' ', '') WHERE is_default=1 and partner_id=0 and system_name='';
-update flavor_params_conversion_profile SET origin=1 where flavor_params_id=0 and origin<>1;

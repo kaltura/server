@@ -1,2 +1,0 @@
-insert into user_role (str_id, name, system_name, description, partner_id, status, permission_names, tags, custom_data) VALUES
-('BULK_LOG_VIEWER', 'Bulk Log Viewer Role', 'BULK_LOG_VIEWER', 'Bulk Log Viewer Role', 0, 1, 'BULK_LOG_DOWNLOAD_EMAIL', NULL, NULL)

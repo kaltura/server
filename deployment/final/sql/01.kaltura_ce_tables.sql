@@ -1929,6 +1929,8 @@ CREATE TABLE `storage_profile` (
   `custom_data` text,
   `path_manager_class` varchar(127) DEFAULT NULL,
   `url_manager_class` varchar(127) NOT NULL,
+  `delivery_priority` INTEGER DEFAULT 1,
+  `delivery_status` INTEGER DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
 
@@ -2140,6 +2142,7 @@ CREATE TABLE `user_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `str_id` varchar(100) NOT NULL,
   `name` varchar(100) NOT NULL,
+  `system_name` VARCHAR(128) NULL,
   `description` text,
   `partner_id` int(11) NOT NULL,
   `status` int(11) NOT NULL,
