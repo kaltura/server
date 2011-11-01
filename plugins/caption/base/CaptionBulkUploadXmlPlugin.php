@@ -264,7 +264,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		{
 			$captionAssetId = $caption['captionAssetId'];
 		}
-		elseif(isset($caption['captionParamsId']))
+		elseif(isset($captionAsset->captionParamsId))
 		{
 			if(isset($this->currentCaptionAssets[$caption['captionParamsId']]))
 				$captionAssetId = $this->currentCaptionAssets[$caption['captionParamsId']];
