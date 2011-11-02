@@ -14,26 +14,14 @@ class kXsd
 	 * @return bool|string true if no change required, or, xsl text if transform required
 	 * @throws kXsdException
 	 */
-	public static function compareElement(DOMNode $from, DOMNode $to, $xPath = '', $level = 1)
+	public static function compareElement(DOMNode $from, DOMNode $to, $parentXPath = '', $level = 1)
 	{
 		$toName = $to->getAttribute('name');
 		$fromName = $from->getAttribute('name');
 		KalturaLog::debug("Compare elements [$fromName] [$toName]");
 		
-		$xPath .= "/*[local-name()='$fromName']";
-			
-		if($from->getAttribute('id') != $to->getAttribute('id'))
-		{
-			KalturaLog::debug("Elements ids are different [" . $from->getAttribute('id') . "] [" . $to->getAttribute('id') . "]");
-			return '';
-		}
-			
-		if(!$from->hasAttribute('id') && $fromName != $toName)
-		{
-			KalturaLog::debug("Elements names are different [$fromName] [$toName]");
-			return '';
-		}
-			
+		$xPath = $parentXPath . "/*[local-name()='$fromName']";
+						
 		if($from->getAttribute('type') != $to->getAttribute('type'))
 		{
 			KalturaLog::debug("Elements types are different [" . $from->getAttribute('type') . "] [" . $to->getAttribute('type') . "]");
@@ -48,18 +36,28 @@ class kXsd
 			
 		$tabs = str_repeat("\t", $level);
 		
+		
 		$isIdentical = true;
-		$xsl = self::compareNode($from, $to, $xPath, $level);
+		
+		$restriction = self::getNodeRestrictions($to, $from);
+		if (strlen($restriction)){
+			$isIdentical = false;
+		}
+		
+		$xsl = self::compareNode($from, $to, $xPath, $level + 1);
 		if(is_bool($xsl))
 		{
 			if(!$xsl)
 				return false;
 				
-			$xsl = '<xsl:value-of select="' . $xPath . '"/>';
+			$xsl = '<xsl:value-of select="' . $parentXPath . $restriction .'/*[local-name()=\'' . $fromName . '\']"/>';
 		}
 		else 
 		{
 			$isIdentical = false;
+			$xsl = '
+		' . $tabs . '<xsl:element name="' . $toName . '">' . $xsl . '
+		' . $tabs . '</xsl:element>';
 		}
 		
 		if($fromName != $toName)
@@ -77,7 +75,8 @@ class kXsd
 				
 			for($i = $from->getAttribute('minOccurs'); $i < $to->getAttribute('minOccurs'); $i++)
 					$xsl .= '
-			' . $tabs . '<xsl:element name="' . $toName . '">' . $to->getAttribute('default') . '</xsl:element>';
+			' . $tabs . '<xsl:element name="' . $toName . '">' . $to->getAttribute('default') . '
+			' . $tabs . '</xsl:element>';
 					
 			$isIdentical = false;
 			KalturaLog::info("Node [$toName] minimum occurs changed from [" . $from->getAttribute('minOccurs') . "] to [" . $to->getAttribute('minOccurs') . "]");
@@ -85,9 +84,10 @@ class kXsd
 		
 		if($isIdentical)
 			return true;
+
+		//$xsl =  $tabs . $xsl;
 			
-		$xsl = '
-		' . $tabs . '<xsl:element name="' . $toName . '">' . $xsl . '</xsl:element>';
+		
 		
 		return $xsl;
 	}
@@ -105,6 +105,40 @@ class kXsd
 		foreach ($elements as $element)
 			return $element;
 	}
+	
+	protected static function getMatchingElement($childrenArr, $element, &$index)
+	{
+		// try matching by id
+		foreach($childrenArr as $curIndex => $curChild)
+		{
+			if(strtolower($curChild->localName) != strtolower($element->localName))
+				continue;
+				
+			if($curChild->getAttribute('id') && 
+				$curChild->getAttribute('id') != $element->getAttribute('id'))
+				continue;
+				
+			$index = $curIndex;
+			return $curChild;
+		}
+		
+		// try matching by id
+		foreach($childrenArr as $curIndex => $curChild)
+		{
+			if(strtolower($curChild->localName) != strtolower($element->localName))
+				continue;
+				
+			if($curChild->getAttribute('name') && 
+				$curChild->getAttribute('name') != $element->getAttribute('name'))
+				continue;
+				
+			$index = $curIndex;
+			return $curChild;
+		}
+		
+		return null;
+	}
+	
 	
 	/**
 	 * @param DOMNode $from old node
@@ -128,9 +162,8 @@ class kXsd
 		
 		$isIdentical = true;
 		
-		$fromChildren = $from->childNodes;
-		$toChildren = $to->childNodes;
-		
+		// build an array of from children
+		$fromChildren = $from->childNodes;		
 		$fromChildrenArr = array();
 		if($fromChildren)
 		{
@@ -148,6 +181,8 @@ class kXsd
 		}
 		KalturaLog::debug("From nodes [" . count($fromChildrenArr) . "]");
 		
+		// build an array of to children
+		$toChildren = $to->childNodes;
 		$toChildrenArr = array();
 		if($toChildren)
 		{
@@ -165,192 +200,21 @@ class kXsd
 		}
 		KalturaLog::debug("To nodes [" . count($toChildrenArr) . "]");
 		
-		if(count($toChildrenArr) != count($fromChildrenArr))
+		// detect new nodes + order change
+		$lastFromIndex = null;
+		foreach($toChildrenArr as $toChild)
 		{
-			KalturaLog::debug("From and To nodes count are different");
-			foreach($toChildrenArr as $toChild)
-			{
-				$toChildName = strtolower($toChild->localName);
-				
-				if($toChildName != 'element' && $toChildName != 'attribute')
-					continue;
-					
-				$elementName = $toChild->getAttribute('name');
-				
-				if($toChild->hasAttribute('id'))
-				{
-					$id = $toChild->getAttribute('id');
-					$fromDoc = $from->ownerDocument;
-					$fromChild = self::getElementById($fromDoc, $id);
-					if($fromChild)
-					{
-						$fromElementName = $fromChild->getAttribute('name');
-						
-						$restriction = self::getNodeRestrictions($toChild, $fromChild);
-							KalturaLog::info("Node [$id] name changed from [$fromElementName] to [$elementName]");
-							if (strlen($restriction))
-								$isIdentical = false;
-						
-						if($fromElementName == $elementName)
-						{
-							$xsl .= '
-			' . $tabs . '<xsl:copy-of select="' . $xPath . $restriction . '/*[local-name()=\'' . $elementName . '\']"/>';
-						}
-						else
-						{
-							$isIdentical = false;
-							$xsl .= '
-			' . $tabs . '<xsl:element name="' . $elementName . '">
-			' . $tabs . '	<xsl:copy-of select="' . $xPath .  $restriction . '/*[local-name()=\'' . $elementName . '\']"/>
-			' . $tabs . '</xsl:element>';
-						}
-						continue;
-					}
-					else 
-					{
-						KalturaLog::debug("Node [$id] is new");
-					}
-				}
-				
-				$fromChildFound = false;
-				foreach($fromChildrenArr as $fromChild)
-				{
-					$fromChildName = strtolower($fromChild->localName);
-					if($fromChildName != $toChildName)
-						continue;
-						
-					if($fromChild->getAttribute('name') != $toChild->getAttribute('name'))
-						continue;
-						
-					$fromChildFound = $fromChild;
-				}
-				
-				if($fromChildFound)
-				{
-					$xsl .= '
-			' . $tabs . '<xsl:copy-of select="' . $xPath . '/*[local-name()=\'' . $elementName . '\']"/>';
-					continue;
-				}
-				
-				if($toChild->hasAttribute('minOccurs') && $toChild->getAttribute('minOccurs') > 0)
-				{
-					if(!$toChild->hasAttribute('default'))
-						throw new kXsdException(kXsdException::CAN_NOT_ADD_REQUIRED_ELEMENT, $toChild->hasAttribute('minOccurs'), $xPath);
-					
-					$isIdentical = false;
-					KalturaLog::info("Node [" . $toChild->getAttribute('name') . "] added with minimum occurs [" . $toChild->getAttribute('minOccurs') . "]");
-						$xsl .= '
-			' . $tabs . '<xsl:element name="' . $elementName . '">' . $toChild->getAttribute('default') . '</xsl:element>';	
-				}
-			}
-						
-			foreach($fromChildrenArr as $fromChild)
-			{
-				$fromChildName = strtolower($fromChild->localName);
-				
-				if($fromChildName != 'element' && $fromChildName != 'attribute')
-					continue;
-					
-				if($fromChild->hasAttribute('id'))
-				{
-					$id = $fromChild->getAttribute('id');
-					$toDoc = $to->ownerDocument;
-					$toChild = self::getElementById($toDoc, $id);
-					if(!$toChild)
-					{
-						$isIdentical = false;
-						KalturaLog::info("Node [$id] deleted");
-						continue;
-					}
-				}
-				
-				$toChildFound = false;
-				foreach($toChildrenArr as $toChild)
-				{
-					$toChildName = strtolower($toChild->localName);
-					if($toChildName != $fromChildName)
-						continue;
-						
-					if($toChild->getAttribute('name') != $fromChild->getAttribute('name'))
-						continue;
-						
-					$toChildFound = $toChild;
-				}
-				
-				if(!$toChildFound)
-				{
-					$isIdentical = false;
-					KalturaLog::info("Node [$id] deleted");
-					continue;
-				}
-			}
-		}
-		else
-		{
-			KalturaLog::debug("From and To nodes count are the same");
-			foreach($toChildrenArr as $index => $toChild)
-			{
-				$fromChild = $fromChildrenArr[$index];
-	
-				$toChildName = strtolower($toChild->localName);
-				$fromChildName = strtolower($fromChild->localName);
-				KalturaLog::debug("Compare child nodes [$toChildName] [$fromChildName]");
-		
-				if($toChildName != $fromChildName)
-					throw new kXsdException(kXsdException::CAN_NOT_CHANGE_NODE, $fromChildName, $toChildName, $xPath);
+			$toChildName = strtolower($toChild->localName);
 			
-				if($toChildName == 'element')
-				{
-					if($toChild->hasAttribute('id'))
-					{
-						$toChildId = $toChild->getAttribute('id');
-						$fromDoc = $from->ownerDocument;
-						$tmpFromChild = self::getElementById($fromDoc, $toChildId);
-						if($tmpFromChild)
-						{
-							KalturaLog::debug("Found element by id [$toChildId]");
-							if($fromChild !== $tmpFromChild)
-							{
-								$isIdentical = false;
-								KalturaLog::info("Node [$toChildId] appear more than once");
-							}
-							$fromChild = $tmpFromChild;
-						}
-						else
-						{
-							KalturaLog::debug("Coudnt find element by id [$toChildId]");
-						}
-					}
-					
-					$childXsl = self::compareElement($fromChild, $toChild, $xPath, $level);
-					if(is_bool($childXsl))
-					{
-						if(!$childXsl)
-							return false;
-						
-						$elementName = $fromChild->getAttribute('name');
-						KalturaLog::debug("Element [$elementName] is identical");
-						$restriction = self::getNodeRestrictions($toChild, $fromChild);
-						if (strlen($restriction)){
-							$isIdentical = false;
-						}
+			if($toChildName == 'attribute')
+				throw new kXsdException(kXsdException::CAN_NOT_CHANGE_ATTRIBUTE, $xPath);
+			
+			$fromIndex = null;
+			$fromChild = self::getMatchingElement($fromChildrenArr, $toChild, $fromIndex);
 
-						$xsl .= '
-		' . $tabs . '<xsl:copy-of select="' . $xPath . $restriction .'/*[local-name()=\'' . $elementName . '\']"/>';
-					}
-					else
-					{
-						$xsl .= $childXsl;
-						$isIdentical = false;
-						KalturaLog::info("Elements [$toChildName] [$fromChildName] are different");
-					}
-					continue;
-				}
-				
-				if($toChildName == 'attribute')
-					throw new kXsdException(kXsdException::CAN_NOT_CHANGE_ATTRIBUTE, $xPath);
-			
-				$childXsl = self::compareNode($fromChild, $toChild, $xPath, $level);
+			if($toChildName != 'element')
+			{
+				$childXsl = self::compareNode($fromChild, $toChild, $xPath, $level + 1);
 				if(is_bool($childXsl))
 				{
 					if(!$childXsl)
@@ -362,8 +226,104 @@ class kXsd
 					$isIdentical = false;
 					KalturaLog::info("Nodes [$fromName] [$toName] are different");
 				}
+				continue;
+			}
+			
+			if($fromChild)
+			{
+				$fromChildName = strtolower($toChild->localName);
+				
+				$toElementName = $toChild->getAttribute('name');
+				$fromElementName = $fromChild->getAttribute('name');
+				
+				if (!is_null($lastFromIndex) && $fromIndex < $lastFromIndex)
+				{
+					KalturaLog::info("Node id=[". $toChild->getAttribute('id') ."] name=[$toElementName] index changed from original schema");
+					$isIdentical = false;
+				}
+				
+				$lastFromIndex = $fromIndex;
+				
+
+				$childXsl = self::compareElement($fromChild, $toChild, $xPath, $level);
+				if(is_bool($childXsl))
+				{
+					if(!$childXsl)
+						return false;
+					
+					KalturaLog::debug("Element [$fromElementName] is identical");
+
+					$xsl .= '
+	' . $tabs . '<xsl:copy-of select="' . $xPath  .'/*[local-name()=\'' . $fromElementName . '\']"/>';
+				}
+				else
+				{
+					$xsl .= $childXsl;
+					$isIdentical = false;
+					KalturaLog::info("Elements [$toChildName] [$fromChildName] are different");
+				}
+				
+							
+				
+				/*
+				
+				$restriction = self::getNodeRestrictions($toChild, $fromChild);					
+				if (strlen($restriction))
+					$isIdentical = false;
+				
+				if($fromElementName == $toElementName)
+				{
+					$xsl .= '
+	' . $tabs . '<xsl:copy-of select="' . $xPath . $restriction . '/*[local-name()=\'' . $toElementName . '\']"/>';
+				}
+				else
+				{
+					KalturaLog::info("Node [". $toChild->getAttribute('id') ."] name changed from [$fromElementName] to [$toElementName]");
+					$isIdentical = false;
+					$xsl .= '
+	' . $tabs . '<xsl:element name="' . $toElementName . '">
+	' . $tabs . '	<xsl:copy-of select="' . $xPath .  $restriction . '/*[local-name()=\'' . $fromElementName . '\']"/>
+	' . $tabs . '</xsl:element>';
+				}*/
+				continue;
+			}
+			else 
+			{
+				KalturaLog::debug("Node [". $toChild->getAttribute('id') ."] is new");
+				
+				if($toChild->hasAttribute('minOccurs') && $toChild->getAttribute('minOccurs') > 0)
+				{
+					if(!$toChild->hasAttribute('default'))
+						throw new kXsdException(kXsdException::CAN_NOT_ADD_REQUIRED_ELEMENT, $toChild->hasAttribute('minOccurs'), $xPath);
+					
+					$isIdentical = false;
+					KalturaLog::info("Node [" . $toChild->getAttribute('name') . "] added with minimum occurs [" . $toChild->getAttribute('minOccurs') . "]");
+						$xsl .= '
+			' . $tabs . '<xsl:element name="' . $toElementName . '">' . $toChild->getAttribute('default') . '</xsl:element>';	
+				}
 			}
 		}
+
+		// detect deleted nodes
+		$lastToIndex = null;
+		foreach($fromChildrenArr as $fromChild)
+		{
+			$fromChildName = strtolower($fromChild->localName);
+			
+			if($fromChildName != 'element' && $fromChildName != 'attribute')
+				continue;
+
+			$toIndex = null;
+			$toChild = self::getMatchingElement($toChildrenArr, $fromChild, $toIndex);
+			
+			if (!$toChild)
+			{
+				$isIdentical = false;
+				KalturaLog::info("Node [". $fromChild->getAttribute('id') ."] deleted");
+				continue;
+			}
+		}
+		
 		
 		if($isIdentical)
 			return true;
