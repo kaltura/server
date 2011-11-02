@@ -133,7 +133,6 @@ function configure(profileId) {
 	else{
 		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'virus-scan-configure-action', 'profileId' => '')); ?>' + profileId;
 	}
-		url = url + '/new_partner_id/' + partnerId
 	
 	jQuery('#virus-scan-configure-dialog').remove();
 	dialogDiv = jQuery('<div id="virus-scan-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
