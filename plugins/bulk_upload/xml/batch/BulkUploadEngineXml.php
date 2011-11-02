@@ -464,7 +464,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(isset($item->thumbnails->action))
 			$thumbnailsAction = strtolower($item->thumbnails->action);
 		
-		if ($contentAssetsAction != $thumbnailsAction)
+		if (isset($item->contentAssets->action) && isset($item->thumbnails->action) && ($contentAssetsAction != $thumbnailsAction))
 			throw new KalturaBatchException("ContentAsset->action: {$contentAssetsAction} must be the same as thumbnails->action: {$thumbnailsAction}", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 		
 		
