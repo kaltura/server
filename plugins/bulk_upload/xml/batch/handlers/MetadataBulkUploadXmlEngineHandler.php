@@ -140,8 +140,6 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 			$metadataId = $metadata->id;
 		}
 		
-		$metadataXmlObject = $customData->xmlData->children();
-		$metadataXml = $metadataXmlObject->asXML();
 		if($metadataId)
 		{
 			switch ($action)
@@ -149,13 +147,16 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 				case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::TRANSFORM_XSLT]:
 					$decodedXslt = kxml::decodeXml($customData->xslt);
 					$metadataXml = kXml::transformXmlUsingXslt($metadata->xml, $decodedXslt); 
-					//should not break
+					break;
 				case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-					$metadataPlugin->metadata->update($metadataId, $metadataXml);;
-				break;
+					$metadataXmlObject = $customData->xmlData->children();
+					$metadataXml = $metadataXmlObject->asXML();
+					break;
 				default:
 					throw new KalturaBatchException($this->containerName . '->' . $this->nodeName . "->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
 			}
+			
+			$metadataPlugin->metadata->update($metadataId, $metadataXml);
 		}
 		else
 			$metadataPlugin->metadata->add($metadataProfileId, $this->objectType, $objectId, $metadataXml);
