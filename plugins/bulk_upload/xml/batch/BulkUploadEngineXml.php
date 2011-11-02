@@ -579,13 +579,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		switch($contentAssetsAction)
 		{
 			case self::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-				$this->sendItemUpdateData($entryId, $entry, $flavorAssets, $flavorAssetsResources, $thumbAssets, $thumbAssetsResources);
+				$entry = $this->sendItemUpdateData($entryId, $entry, $flavorAssets, $flavorAssetsResources, $thumbAssets, $thumbAssetsResources);
 				break;
 			case self::$actionsMap[KalturaBulkUploadAction::REPLACE]:
-				$updatedEntry = $this->sendItemReplaceData($entryId, $entry, $resource, 
+				$entry = $this->sendItemReplaceData($entryId, $entry, $resource, 
 												  $noParamsFlavorAssets, $noParamsFlavorResources, 
 												  $noParamsThumbAssets, $noParamsThumbResources);
-				$entryId = $updatedEntry->id;
+				$entryId = $entry->id;
 				break;
 			default :
 				throw new KalturaBatchException("Action: {$contentAssetsAction} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
@@ -1033,11 +1033,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
 		
-		foreach($requestResults as $requestResult)
-			if($requestResult instanceof Exception)
-				throw $requestResult;
-		
-		return $requestResults;
+		return $updatedEntry;
 	}
 	
 	/**
