@@ -112,9 +112,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 		
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
-	
 			
-		
 		$this->xmlBulkUploadEngine->unimpersonate();
 	}
 
