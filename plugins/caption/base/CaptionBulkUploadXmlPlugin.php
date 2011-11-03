@@ -225,8 +225,21 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		$this->xmlBulkUploadEngine->impersonate();
 		$this->getCurrentCaptionAssets($object->id);
 		
+		$pluginsErrorResults = array();
 		foreach($item->subTitles->subTitle as $caption)
-			$this->handleCaptionAsset($object->id, $object->conversionProfileId, $caption);
+		{
+			try {
+				$this->handleCaptionAsset($object->id, $object->conversionProfileId, $caption);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err($this->getContainerName() . ' failed: ' . $e->getMessage());
+				$pluginsErrorResults[] = $e->getMessage();
+			}
+		}
+		
+		if(count($pluginsErrorResults))
+			throw new Exception(implode(', ', $pluginsErrorResults));
 		
 		$this->xmlBulkUploadEngine->unimpersonate();		
 	}
