@@ -650,7 +650,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		
 		$this->impersonate();
 		$updateEntry = $this->removeNonUpdatbleFields($entry);
-		$updatedEntry = $this->kClient->baseEntry->update($entryId, $updateEntry);
+		$updatedEntry = $this->kClient->baseEntry->get($entryId);
 		
 		$this->kClient->startMultiRequest();
 		
@@ -674,6 +674,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$thumb = $this->kClient->thumbAsset->add($updatedEntryId, $thumbAsset);
 			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);		// TODO: use thumb instead of getMultiRequestResult
 		}
+		
+		//update is after add content since in case entry replacement we want the duration to be set on the new entry.
+		$updatedEntry = $this->kClient->baseEntry->update($entryId, $updateEntry);
 		
 		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
