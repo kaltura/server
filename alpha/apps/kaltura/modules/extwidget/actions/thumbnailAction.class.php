@@ -275,6 +275,11 @@ class thumbnailAction extends sfAction
 		
 		if ( !$local && !$tempThumbPath)
 		{
+			if (!in_array($file_sync->getDc(), kDataCenterMgr::getDcIds()))
+			{
+				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+			}
+			
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $file_sync , $_SERVER['REQUEST_URI'] );
 			kFile::dumpUrl($remoteUrl);
 		}
@@ -314,6 +319,12 @@ class thumbnailAction extends sfAction
 							KalturaLog::log("ERROR - Trying to redirect to myself - stop here.");
 							KExternalErrors::dieError(KExternalErrors::MISSING_THUMBNAIL_FILESYNC);
 						}
+						
+						if (!in_array($remoteFileSync->getDc(), kDataCenterMgr::getDcIds()))
+						{
+							KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+						}
+						
 						$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($remoteFileSync);
 						kFile::dumpUrl($remoteUrl);
 					}

@@ -56,6 +56,13 @@ class kDataCenterMgr
 		return $dc;
 //		return array ( $dc_id , $dc );
 	}
+	
+	public static function getDcIds()
+	{
+		$dc_config = kConf::getMap("dc_config");
+		$dc_list = $dc_config["list"];
+		return array_keys($dc_list);
+	}
 		
 	public static function getAllDcs( $include_current = false )
 	{
@@ -80,7 +87,7 @@ class kDataCenterMgr
 	public static function getRemoteDcExternalUrl ( FileSync $file_sync )
 	{
 		KalturaLog::log("File Sync [{$file_sync->getId()}]]");
-		$dc_id = $file_sync->getDc();
+		$dc_id = $file_sync->getDc();		
 		$dc = self::getDcById ( $dc_id );
 		$external_url = $dc["external_url"];
 		return $external_url;
