@@ -212,25 +212,25 @@ class kXsd
 			$fromIndex = null;
 			$fromChild = self::getMatchingElement($fromChildrenArr, $toChild, $fromIndex);
 
-			if($toChildName != 'element')
-			{
-				$childXsl = self::compareNode($fromChild, $toChild, $xPath, $level + 1);
-				if(is_bool($childXsl))
-				{
-					if(!$childXsl)
-						return false;
-				}
-				else 
-				{
-					$xsl .= $childXsl;
-					$isIdentical = false;
-					KalturaLog::info("Nodes [$fromName] [$toName] are different");
-				}
-				continue;
-			}
 			
 			if($fromChild)
 			{
+				if($toChildName != 'element')
+				{
+					$childXsl = self::compareNode($fromChild, $toChild, $xPath, $level + 1);
+					if(is_bool($childXsl))
+					{
+						if(!$childXsl)
+							return false;
+					}
+					else 
+					{
+						$xsl .= $childXsl;
+						$isIdentical = false;
+						KalturaLog::info("Nodes [$fromName] [$toName] are different");
+					}
+					continue;
+				}
 				$fromChildName = strtolower($toChild->localName);
 				
 				$toElementName = $toChild->getAttribute('name');
@@ -262,29 +262,7 @@ class kXsd
 					$isIdentical = false;
 					KalturaLog::info("Elements [$toChildName] [$fromChildName] are different");
 				}
-				
-							
-				
-				/*
-				
-				$restriction = self::getNodeRestrictions($toChild, $fromChild);					
-				if (strlen($restriction))
-					$isIdentical = false;
-				
-				if($fromElementName == $toElementName)
-				{
-					$xsl .= '
-	' . $tabs . '<xsl:copy-of select="' . $xPath . $restriction . '/*[local-name()=\'' . $toElementName . '\']"/>';
-				}
-				else
-				{
-					KalturaLog::info("Node [". $toChild->getAttribute('id') ."] name changed from [$fromElementName] to [$toElementName]");
-					$isIdentical = false;
-					$xsl .= '
-	' . $tabs . '<xsl:element name="' . $toElementName . '">
-	' . $tabs . '	<xsl:copy-of select="' . $xPath .  $restriction . '/*[local-name()=\'' . $fromElementName . '\']"/>
-	' . $tabs . '</xsl:element>';
-				}*/
+
 				continue;
 			}
 			else 
