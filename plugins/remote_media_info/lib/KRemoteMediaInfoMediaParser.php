@@ -54,8 +54,9 @@ KalturaLog::info("adApi-->".print_r($adApi,true));
 			// while calls from ExtractMediaJob represnt 'input' AD location
 		if($this->job->data instanceof KalturaPostConvertJobData){
 			$location='output';
-			$folder=str_replace ("-", "/", $this->job->data->customData);
-			$fileName="$folder/encode/$fileName";
+//			$folder=str_replace ("-", "/", $this->job->data->customData);
+//			$fileName="$folder/encode/$fileName";
+			$fileName=$this->job->data->customData;
 		}
 		else // if($this->job->data instanceof KalturaExtractMediaJobData)
 			$location='input';
