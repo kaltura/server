@@ -307,8 +307,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->currentItem++; //move to the next item (first item is 1)
 			try
 			{
-				$this->validateItem($item);
-			
 				$this->checkAborted();
 				
 				$actionToPerform = self::$actionsMap[KalturaBulkUploadAction::ADD];
@@ -331,6 +329,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				switch($actionToPerform)
 				{
 					case self::$actionsMap[KalturaBulkUploadAction::ADD]:
+						$this->validateItem($item);
 						$this->handleItemAdd($item);
 						$action = KalturaBulkUploadAction::ADD;
 						break;
@@ -434,7 +433,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		}
 
-		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
+		$entry = $this->createEntryFromItem($item, $existingEntry->type); //Creates the entry from the item element
 		
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
 		KalturaLog::debug("current entry is: " . print_r($entry, true));
@@ -1617,12 +1616,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
   	 * Creates and returns a new media entry for the given job data and bulk upload result object
 	 * @param SimpleXMLElement $bulkUploadResult
+	 * @param int $type
 	 * @return KalturaBaseEntry
 	 */
-	protected function createEntryFromItem(SimpleXMLElement $item)
+	protected function createEntryFromItem(SimpleXMLElement $item, $type = null)
 	{
 		//Create the new media entry and set basic values
-		$entry = $this->getEntryInstanceByType($item->type);
+		if(isset($item->type))
+			$entryType = $item->type;
+		elseif($type)
+			$entryType = $type;
+		else 
+			throw new KalturaBulkUploadXmlException("entry type must be set to a value on item [$item->name] ", KalturaBatchJobAppErrors::BULK_ITEM_VALIDATION_FAILED);
+		
+		$entry = $this->getEntryInstanceByType($entryType);
 
 		$entry->type = (int)$item->type;
 		
