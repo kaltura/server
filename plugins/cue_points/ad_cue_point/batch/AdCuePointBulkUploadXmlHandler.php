@@ -54,4 +54,15 @@ class AdCuePointBulkUploadXmlHandler extends CuePointBulkUploadXmlHandler
 			
 		return $cuePoint;
 	}
+	
+	/**
+	 * Removes all non updatble fields from the cuepoint
+	 * @param KalturaCuePoint $entry
+	 */
+	protected function removeNonUpdatbleFields(KalturaCuePoint $cuePoint)
+	{
+		$retCuePoint = clone $cuePoint;
+		$retCuePoint->protocolType = null;
+		return $retCuePoint;
+	}
 }

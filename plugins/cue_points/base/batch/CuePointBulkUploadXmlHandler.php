@@ -255,6 +255,7 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 		}
 		elseif(isset($cuePoint->systemName) && isset(self::$existingCuePointsBySystemName[$cuePoint->systemName]))
 		{
+			$cuePoint = $this->removeNonUpdatbleFields($cuePoint);
 			$cuePointId = self::$existingCuePointsBySystemName[$cuePoint->systemName];
 			$ingestedCuePoint = $this->cuePointPlugin->cuePoint->update($cuePointId, $cuePoint);
 			$this->operations[] = KalturaBulkUploadAction::UPDATE;
@@ -314,5 +315,14 @@ abstract class CuePointBulkUploadXmlHandler implements IKalturaBulkUploadXmlHand
 	public function getContainerName()
 	{
 		return 'scenes';
+	}
+	
+	/**
+	 * Removes all non updatble fields from the cuepoint
+	 * @param KalturaCuePoint $entry
+	 */
+	protected function removeNonUpdatbleFields(KalturaCuePoint $cuePoint)
+	{
+		return $cuePoint;
 	}
 }
