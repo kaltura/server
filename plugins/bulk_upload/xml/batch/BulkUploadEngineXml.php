@@ -329,17 +329,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				switch($actionToPerform)
 				{
 					case self::$actionsMap[KalturaBulkUploadAction::ADD]:
+						$action = KalturaBulkUploadAction::ADD;
 						$this->validateItem($item);
 						$this->handleItemAdd($item);
-						$action = KalturaBulkUploadAction::ADD;
 						break;
 					case self::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-						$this->handleItemUpdate($item);
 						$action = KalturaBulkUploadAction::UPDATE;
+						$this->handleItemUpdate($item);						
 						break;
 					case self::$actionsMap[KalturaBulkUploadAction::DELETE]:
-						$this->handleItemDelete($item);
 						$action = KalturaBulkUploadAction::DELETE;
+						$this->handleItemDelete($item);					
 						break;
 					default :
 						throw new KalturaBatchException("Action: {$actionToPerform} is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
