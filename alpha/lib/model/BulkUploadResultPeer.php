@@ -45,16 +45,25 @@ class BulkUploadResultPeer extends BaseBulkUploadResultPeer
 		
 		return self::doSelectOne($criteria);
 	}
-	
+	/**
+	 * function to retrieve the number of BulkUploadResults with type ENTRY,and objectId<>null
+	 * @param int $bulkUploadId
+	 * @return int
+	 */
 	public static function countWithEntryByBulkUploadId($bulkUploadId)
 	{
 		$criteria = new Criteria();
 		$criteria->add(BulkUploadResultPeer::BULK_UPLOAD_JOB_ID, $bulkUploadId);
 		$criteria->add(BulkUploadResultPeer::OBJECT_ID, null, Criteria::ISNOTNULL);
+		$criteria->add(BulkUploadResultPeer::OBJECT_TYPE, BulkUploadResultObjectType::ENTRY);
 		
 		return self::doCount($criteria);
 	}
-	
+	/**
+	 * function to retrieve the BulkUploadResults with type ENTRY,and objectId<>null
+	 * @param int $bulkUploadId
+	 * @return array
+	 */
 	public static function retrieveWithEntryByBulkUploadId($bulkUploadId)
 	{
 		$criteria = new Criteria();
