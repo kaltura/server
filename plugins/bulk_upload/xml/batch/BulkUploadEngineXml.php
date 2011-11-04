@@ -675,10 +675,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbResource);		// TODO: use thumb instead of getMultiRequestResult
 		}
 		
+		$requestResults = $this->kClient->doMultiRequest();
+		
 		//update is after add content since in case entry replacement we want the duration to be set on the new entry.
 		$updatedEntry = $this->kClient->baseEntry->update($entryId, $updateEntry);
 		
-		$requestResults = $this->kClient->doMultiRequest();
 		$this->unimpersonate();
 		
 		if(is_array($requestResults))
