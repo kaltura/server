@@ -752,8 +752,11 @@ class BaseEntryService extends KalturaEntryService
 		else
 		{
 			$result->streamerType = $this->getPartner()->getStreamerType();
+			if (!$result->streamerType)
+				$result->streamerType = StorageProfile::PLAY_FORMAT_HTTP;
 			$result->mediaProtocol = $this->getPartner()->getMediaProtocol();
-			
+			if (!$result->mediaProtocol)
+				$result->mediaProtocol = StorageProfile::PLAY_FORMAT_HTTP;
 		}		
 		return $result;
 	}
