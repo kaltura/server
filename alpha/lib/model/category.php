@@ -58,6 +58,10 @@ class category extends Basecategory
 			$this->updateFullName();
 			$this->renameOnEntries();
 		}
+		else if ($this->isColumnModified(categoryPeer::FULL_NAME))
+		{
+			$this->renameOnEntries();
+		}
 
 		
 		// happens in 3 cases:
@@ -159,6 +163,12 @@ class category extends Basecategory
 		
 		$v = categoryPeer::getParsedName($v);
 		parent::setName($v);
+	}
+	
+	public function setFullName($v)
+	{
+		$this->old_full_name = $this->getFullName();				
+		parent::setFullName($v);
 	}
 	
 	public function setParentId($v)
