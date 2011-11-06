@@ -7,7 +7,7 @@ class KalturaAssetFilter extends KalturaAssetBaseFilter
 {
 	protected function validateEntryIdFiltered()
 	{
-		if(is_null($this->entryIdEqual) && is_null($this->entryIdIn) )
+		if(!$this->entryIdEqual && !$this->entryIdIn)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, $this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
 	}
 	
