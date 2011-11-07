@@ -152,29 +152,35 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 			$metadataId = $metadata->id;
 		}
 				
+		switch ($action)
+		{
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::TRANSFORM_XSLT]:
+				if(!isset($customData->xslt))
+					throw new KalturaBatchException($this->containerName . '->' . $this->nodeName . "->xslt element is missing", KalturaBatchJobAppErrors::BULK_ELEMENT_NOT_FOUND);
+				
+				if($metadata)
+					$metadataXml = $metadata->xml;
+				else
+					$metadataXml = '<metadata></metadata>';
+					
+				$decodedXslt = kxml::decodeXml($customData->xslt);					
+				$metadataXml = kXml::transformXmlUsingXslt($metadataXml, $decodedXslt); 
+				break;
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
+				if(!isset($customData->xmlData))
+					throw new KalturaBatchException($this->containerName . '->' . $this->nodeName . "->xmlData element is missing", KalturaBatchJobAppErrors::BULK_ELEMENT_NOT_FOUND);
+				
+				$metadataXmlObject = $customData->xmlData->children();
+				$metadataXml = $metadataXmlObject->asXML();
+				break;
+			default:
+				throw new KalturaBatchException($this->containerName . '->' . $this->nodeName . "->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+		}
+		
 		if($metadataId)
-		{
-			switch ($action)
-			{
-				case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::TRANSFORM_XSLT]:
-					$decodedXslt = kxml::decodeXml($customData->xslt);
-					$metadataXml = kXml::transformXmlUsingXslt($metadata->xml, $decodedXslt); 
-					break;
-				case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-					$metadataXmlObject = $customData->xmlData->children();
-					$metadataXml = $metadataXmlObject->asXML();
-					break;
-				default:
-					throw new KalturaBatchException($this->containerName . '->' . $this->nodeName . "->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
-			}
 			$metadataPlugin->metadata->update($metadataId, $metadataXml);
-		}
 		else
-		{
-			$metadataXmlObject = $customData->xmlData->children();
-			$metadataXml = $metadataXmlObject->asXML();
 			$metadataPlugin->metadata->add($metadataProfileId, $this->objectType, $objectId, $metadataXml);
-		}
 	}
 
 	/* (non-PHPdoc)
