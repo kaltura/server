@@ -348,11 +348,11 @@ abstract class ".$this->getClassname(). $extendingPeerClass . " {
 		{
 			switch (\$queryDB)
 			{
-			case QUERY_DB_MASTER:
+			case kQueryCache::QUERY_DB_MASTER:
 				\$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
 				break;
 
-			case QUERY_DB_SLAVE:
+			case kQueryCache::QUERY_DB_SLAVE:
 				\$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 				break;
 			}
