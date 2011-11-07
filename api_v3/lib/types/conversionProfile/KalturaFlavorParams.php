@@ -132,6 +132,16 @@ class KalturaFlavorParams extends KalturaAssetParams
 	 */
 	public $forceFrameToMultiplication16;
 
+	/**
+	 * @var int
+	 */
+	public $videoConstantBitrate;
+
+	/**
+	 * @var int
+	 */
+	public $videoBitrateTolerance;
+
 	private static $map_between_objects = array
 	(
 		"videoCodec",
@@ -154,6 +164,8 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"format",
 		"aspectRatioProcessingMode",
 		"forceFrameToMultiplication16",
+		"videoConstantBitrate",
+		"videoBitrateTolerance",
 	);
 	
 	public function getMapBetweenObjects()
