@@ -89,19 +89,17 @@ class kEventsManager
 	
 	public static function flushEvents()
 	{	
-		KalturaLog::debug('### flushEvents');
+		
 		while (count(self::$deferredEvents))
 		{
 			usort(self::$deferredEvents,  array('kEventsManager', 'sortEventsByPriority'));
 			$deferredEvent = array_shift(self::$deferredEvents);			
-			KalturaLog::debug('### flushEvents - raiseEvenet');
 			self::raiseEvent($deferredEvent);
 		}
 	}
 	
 	public static function raiseEventDeferred(KalturaEvent $event)
 	{
-		KalturaLog::debug('### raiseEventDeferred');
 		$eventKey = $event->getKey();
 		$eventPriority = $event->getPriority();
 		
