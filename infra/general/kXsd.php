@@ -109,27 +109,45 @@ class kXsd
 	protected static function getMatchingElement($childrenArr, $element, &$index)
 	{
 		// try matching by id
-		foreach($childrenArr as $curIndex => $curChild)
+		if ($element->getAttribute('id'))
 		{
-			if(strtolower($curChild->localName) != strtolower($element->localName))
-				continue;
-				
-			if($curChild->getAttribute('id') && 
-				$curChild->getAttribute('id') != $element->getAttribute('id'))
-				continue;
-				
-			$index = $curIndex;
-			return $curChild;
+			foreach($childrenArr as $curIndex => $curChild)
+			{
+				if(strtolower($curChild->localName) != strtolower($element->localName))
+					continue;
+					
+				if(!$curChild->getAttribute('id') || 
+					$curChild->getAttribute('id') != $element->getAttribute('id'))
+					continue;
+					
+				$index = $curIndex;
+				return $curChild;
+			}
+			
+			return null;
 		}
 		
-		// try matching by id
+		// try matching by name
+		if ($element->getAttribute('name'))
+		{
+			foreach($childrenArr as $curIndex => $curChild)
+			{
+				if(strtolower($curChild->localName) != strtolower($element->localName))
+					continue;
+					
+				if(!$curChild->getAttribute('name') || 
+					$curChild->getAttribute('name') != $element->getAttribute('name'))
+					continue;
+					
+				$index = $curIndex;
+				return $curChild;
+			}
+		}
+		
+		// try matching by local name only
 		foreach($childrenArr as $curIndex => $curChild)
 		{
 			if(strtolower($curChild->localName) != strtolower($element->localName))
-				continue;
-				
-			if($curChild->getAttribute('name') && 
-				$curChild->getAttribute('name') != $element->getAttribute('name'))
 				continue;
 				
 			$index = $curIndex;
