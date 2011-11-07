@@ -136,7 +136,6 @@ class FlavorAssetService extends KalturaAssetService
 			
 		
 		
-   		$previousStatus = $dbFlavorAsset->getStatus();
 		$contentResource->validateEntry($dbFlavorAsset->getentry());
 		$contentResource->validateAsset($dbFlavorAsset);
 		$kContentResource = $contentResource->toObject();
@@ -150,7 +149,7 @@ class FlavorAssetService extends KalturaAssetService
     		flavorAsset::FLAVOR_ASSET_STATUS_TEMP,
     	);
     	
-    	if($previousStatus == flavorAsset::FLAVOR_ASSET_STATUS_QUEUED && in_array($dbFlavorAsset->getStatus(), $newStatuses))
+    	if(in_array($dbFlavorAsset->getStatus(), $newStatuses))
    			kEventsManager::raiseEvent(new kObjectAddedEvent($dbFlavorAsset));
    		
 		$flavorAsset = new KalturaFlavorAsset();
