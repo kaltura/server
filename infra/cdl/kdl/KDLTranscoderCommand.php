@@ -264,14 +264,30 @@ $acodec = "libmp3lam";
 				case KDLVideoTarget::VP8:
 					$vcodecParams = "libvpx";
 					break; 
+				case KDLVideoTarget::MPEG2:
+					$vcodecParams = "mpeg2video";
+					break;
 				case KDLVideoTarget::COPY:
 					$vcodecParams = "copy";
 					break; 
 			}
-			
+$vidObj = $this->_target->_video;
 			$cmdStr = $cmdStr." -vcodec ".$vcodecParams;
 			if($this->_vidBr){
 				$cmdStr = $cmdStr." -b ".$this->_vidBr."k";
+			}
+$bt=0;
+			if(isset($vidObj->_cbr) && $vidObj->_cbr>0) {
+				$bt = round($this->_vidBr/10);
+				$cmdStr.= " -minrate ".$this->_vidBr."k";
+				$cmdStr.= " -maxrate ".$this->_vidBr."k";
+				$cmdStr.= " -bufsize ".round($this->_vidBr/5)."k";
+			}
+			if(isset($vidObj->_bt) && $vidObj->_bt>0) {
+				$cmdStr.= " -bt ".$vidObj->_bt."k";
+			}
+			else if($bt>0){
+				$cmdStr.= " -bt $bt"."k";
 			}
 			if($this->_vidWid!=null && $this->_vidHgt!=null){
 				$cmdStr = $cmdStr." -s ".$this->_vidWid."x".$this->_vidHgt;
@@ -307,6 +323,9 @@ $acodec = "libmp3lam";
 				case KDLAudioTarget::AMRNB:
 					// common settings - -ab 12.2k -ar 8000 -ac 1
 					$acodec = "libopencore_amrnb";
+					break;
+				case KDLAudioTarget::MPEG2:
+					$acodec = "mp2";
 					break;
 				case KDLAudioTarget::COPY:
 					$acodec = "copy";
