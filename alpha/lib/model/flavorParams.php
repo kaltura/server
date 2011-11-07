@@ -47,6 +47,7 @@ class flavorParams extends assetParams
 	const AUDIO_CODEC_VORBIS = "vorbis";
 	const AUDIO_CODEC_WMA = "wma";
 	const AUDIO_CODEC_AMRNB = "amrnb";
+	const AUDIO_CODEC_MPEG2 = "mpeg2";
 	const AUDIO_CODEC_COPY = "copy";
 	
 	const CUSTOM_DATA_FIELD_VIDEO_CODEC = "FlavorVideoCodec";
@@ -97,4 +98,10 @@ class flavorParams extends assetParams
 	
 	public function setForceFrameToMultiplication16($v)	{$this->putInCustomData('ForceFrameToMultiplication16', $v);}
 	public function getForceFrameToMultiplication16()	{return $this->getFromCustomData('ForceFrameToMultiplication16', null, 1);}
+	
+	public function setVideoConstantBitrate($v)	{$this->putInCustomData('VideoConstantBitrate', $v);}
+	public function getVideoConstantBitrate()	{return $this->getFromCustomData('VideoConstantBitrate', null, 0);}
+	
+	public function setVideoBitrateTolerance($v)	{$this->putInCustomData('VideoBitrateTolerance', $v);}
+	public function getVideoBitrateTolerance()	{return $this->getFromCustomData('VideoBitrateTolerance', null, 0);}
 }
