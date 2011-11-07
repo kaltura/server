@@ -205,6 +205,8 @@ include_once("KDLCommon.php");
 			   $_scanType=0; // 0:progressive, 1:interlaced
 		public $_arProcessingMode = 0; //0: fix mode (original), 1: preserve ar (relevant when both wid and hgt are set)
 		public $_forceMult16 = 1;
+		public $_cbr=0;		// Constant bit rate, when set - -b 50M -minrate 50M -maxrate 50M -bt 5M -bufsize 10M 
+		public $_bt=0;		// bitrate tolerance
 			   
 		public function GetSectionEnum() { return KDLConstants::VideoIndex; }
 		
