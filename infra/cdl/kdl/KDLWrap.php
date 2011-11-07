@@ -333,6 +333,10 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 			$kdlFlavor->_isTwoPass = $cdlFlavor->getTwoPass();
 			$kdlFlavor->_video->_arProcessingMode = $cdlFlavor->getAspectRatioProcessingMode();
 			$kdlFlavor->_video->_forceMult16 = $cdlFlavor->getForceFrameToMultiplication16();
+			if($cdlFlavor instanceof flavorParams) {
+				$kdlFlavor->_video->_cbr = $cdlFlavor->getVideoConstantBitrate();
+				$kdlFlavor->_video->_bt = $cdlFlavor->getVideoBitrateTolerance();
+			}
 			//		$flavor->_video->_dar = $api->getVideoDar();
 			if($kdlFlavor->_video->IsDataSet()==false)
 				$kdlFlavor->_video = null;
