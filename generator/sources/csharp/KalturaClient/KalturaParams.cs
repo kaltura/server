@@ -70,5 +70,12 @@ namespace Kaltura
             if (value.HasValue)
                 this.Add(key, (value.Value) ? "1" : "0");
         }
+
+        public void AddReplace(string key, string value)
+        {
+            if (this.Keys.Contains(key))
+                this.Remove(key);
+            this.Add(key, value);
+        }
     }
 }

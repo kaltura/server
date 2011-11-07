@@ -318,6 +318,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("		public override KalturaParams ToParams()");
 		$this->appendLine("		{");
 		$this->appendLine("			KalturaParams kparams = base.ToParams();");
+		$this->appendLine("			kparams.AddReplace(\"objectType\", \"$type\");");
 		foreach($classNode->childNodes as $propertyNode)
 		{
 			if ($propertyNode->nodeType != XML_ELEMENT_NODE)
