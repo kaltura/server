@@ -41,6 +41,7 @@ class SyndicationFeedService extends KalturaBaseService
 	public function addAction(KalturaBaseSyndicationFeed $syndicationFeed)
 	{
 		$syndicationFeed->validatePlaylistId();
+		$syndicationFeed->validateStorageId($this->getPartnerId());
 		
 		if ($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed ){
 			$syndicationFeed->validatePropertyNotNull('xslt');				
@@ -128,6 +129,7 @@ class SyndicationFeedService extends KalturaBaseService
 		if (!$syndicationFeedDB)
 			throw new KalturaAPIException(KalturaErrors::INVALID_FEED_ID, $id);
 		
+		$syndicationFeed->validateStorageId($this->getPartnerId());
 		$syndicationFeed->toUpdatableObject($syndicationFeedDB, array('type'));	
 		
 		if (($syndicationFeed instanceof KalturaGenericXsltSyndicationFeed) && ($syndicationFeed->xslt != null)){

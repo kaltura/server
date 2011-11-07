@@ -118,7 +118,13 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 	 */
 	public $categories;
 	
-	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories");
+	/**
+	 *
+	 * @var int
+	 */
+	public $storageId;
+	
+	private static $mapBetweenObjects = array("id", "partnerId", "playlistId", "name", "status", "type", "landingPage", "createdAt", "playerUiconfId", "allowEmbed", "flavorParamId", "transcodeExistingContent", "addToDefaultConversionProfile", "categories", "storageId");
 	
 	public function getMapBetweenObjects()
 	{
@@ -143,6 +149,26 @@ class KalturaBaseSyndicationFeed extends KalturaObject implements IFilterable
 		$playlistEntry = entryPeer::retrieveByPK($this->playlistId);
 		if(! $playlistEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->playlistId);
+	}
+	
+	public function validateStorageId($partnerId)
+	{
+		if (is_null($this->storageId) || $this->storageId instanceof KalturaNullField)
+			return;
+			
+		$storage = StorageProfilePeer::retrieveByPK($this->storageId);
+		if(!$storage)
+			throw new KalturaAPIException(KalturaErrors::SYNDICATION_FEED_INVALID_STORAGE_ID);
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		
+		// storage doesn't belong to the partner
+		if($storage->getPartnerId() != $partner->getId())
+			throw new KalturaAPIException(KalturaErrors::SYNDICATION_FEED_INVALID_STORAGE_ID);
+			
+		// partner configured to use kaltura data centers only
+		if($partner->getStorageServePriority() ==  StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
+			throw new KalturaAPIException(KalturaErrors::SYNDICATION_FEED_KALTURA_DC_ONLY);
 	}
 	
 	public function fromObject($source_object)

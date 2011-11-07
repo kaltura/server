@@ -76,6 +76,7 @@ class kSyndicationFeedManager
 		$mrssParams->setFilterByFlavorParams($syndicationFeed->getFlavorParamId());
 		$mrssParams->setIncludePlayerTag(true);
 		$mrssParams->setPlayerUiconfId($syndicationFeed->getPlayerUiconfId());
+		$mrssParams->setStorageId($syndicationFeed->getStorageId());
 		
 		$mrss = kMrssManager::getEntryMrssXml($entry, null, $mrssParams);
 		

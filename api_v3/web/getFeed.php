@@ -23,11 +23,9 @@ KalturaLog::info("syndicationFeedRenderer-start ");
 $feedId = $_GET['feedId'];
 $entryId = (isset($_GET['entryId']) ? $_GET['entryId'] : null);
 $limit = (isset($_GET['limit']) ? $_GET['limit'] : null);
-$storageId = (isset($_GET['storageId']) ? $_GET['storageId'] : null);
 try
 {
 	$syndicationFeedRenderer = new KalturaSyndicationFeedRenderer($feedId);
-	$syndicationFeedRenderer->setStorageId($storageId);
 	$syndicationFeedRenderer->addFlavorParamsAttachedFilter();
 	
 	if (isset($entryId))

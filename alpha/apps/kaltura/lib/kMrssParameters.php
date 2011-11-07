@@ -21,6 +21,8 @@ class kMrssParameters
 	
 	private $playerUiconfId;
 	
+	private $storageId;
+	
 	/**
 	 * @return the $itemXpathsToExtend
 	 */
@@ -75,5 +77,15 @@ class kMrssParameters
 	public function setPlayerUiconfId($playerUiconfId)
 	{
 		$this->playerUiconfId = $playerUiconfId;
+	}
+	
+	public function getStorageId()
+	{
+		return $this->storageId;
+	}
+	
+	public function setStorageId($storageId)
+	{
+		$this->storageId = $storageId;
 	}
 }

@@ -326,6 +326,10 @@ class KalturaErrors extends APIErrors
 	
 	const INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM = "INVALID_XSLT_MISSING_APPLY_TEMPLATES_ITEM,Invalid xslt, missing apply-template tag for item's template with the following convention: xsl:apply-templates name=\"item\"";
 	
+	const SYNDICATION_FEED_INVALID_STORAGE_ID = "SYNDICATION_FEED_INVALID_STORAGE_ID,Invalid storage id";
+	
+	const SYNDICATION_FEED_KALTURA_DC_ONLY = "SYNDICATION_FEED_KALTURA_DC_ONLY,Partner configured to use Kaltura data centers only";
+	
 	/*
 	 * file sync
 	 */

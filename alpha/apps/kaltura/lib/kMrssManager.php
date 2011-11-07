@@ -8,18 +8,6 @@ class kMrssManager
 	 */
 	private static $mrssContributors = null;
 	
-	private static $storageId = null;
-	
-	public static function setStorageId($v)
-	{
-		self::$storageId = $v;
-	}
-	
-	public static function getStorageId()
-	{
-		return self::$storageId;
-	}
-	
 	/**
 	 * @param string $string
 	 * @return string
@@ -139,16 +127,16 @@ class kMrssManager
 		}*/
 	}
 
-	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key)
+	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $storageId = null)
 	{
 		if(!$partner->getStorageServePriority() || $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY)
 			return null;
 			
-		if(is_null(self::$storageId) && $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
+		if(is_null($storageId) && $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
 			if(kFileSyncUtils::getReadyInternalFileSyncForKey($key)) // check if having file sync on kaltura dcs
 				return null;
 				
-		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, self::$storageId);
+		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageId);
 		if(!$fileSync)
 			return null;
 			
@@ -167,14 +155,14 @@ class kMrssManager
 	 * @param asset $asset
 	 * @return string
 	 */
-	public static function getAssetUrl(asset $asset)
+	public static function getAssetUrl(asset $asset, $storageId = null)
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
 			return null;
 	
 		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey);
+		$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey, $storageId);
 		if($externalStorageUrl)
 			return $externalStorageUrl;
 			
@@ -236,13 +224,13 @@ class kMrssManager
 	 * @param SimpleXMLElement $mrss
 	 * @return SimpleXMLElement
 	 */
-	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null)
+	protected static function appendFlavorAssetMrss(flavorAsset $flavorAsset, SimpleXMLElement $mrss = null, kMrssParameters $mrssParams = null)
 	{
 		if(!$mrss)
 			$mrss = new SimpleXMLElement('<item/>');
 		
 		$content = $mrss->addChild('content');
-		$content->addAttribute('url', self::getAssetUrl($flavorAsset));
+		$content->addAttribute('url', self::getAssetUrl($flavorAsset, ($mrssParams) ? $mrssParams->getStorageId() : null));
 		$content->addAttribute('flavorAssetId', $flavorAsset->getId());
 		$content->addAttribute('isSource', $flavorAsset->getIsOriginal() ? 'true' : 'false');
 		$content->addAttribute('containerFormat', $flavorAsset->getContainerFormat());
@@ -389,7 +377,7 @@ class kMrssManager
 				continue;
 
 			if($asset instanceof flavorAsset)
-				self::appendFlavorAssetMrss($asset, $mrss);
+				self::appendFlavorAssetMrss($asset, $mrss, $mrssParams);
 				
 			if($asset instanceof thumbAsset)
 				self::appendThumbAssetMrss($asset, $mrss);
