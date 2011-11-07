@@ -118,7 +118,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 
 	public function handleCustomData($objectId, SimpleXMLElement $customData)
 	{
-		$action = KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE];
+		$action = KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE];
 		if(isset($customData->action))
 			$action = strtolower($customData->action);
 					
@@ -166,7 +166,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 				$decodedXslt = kxml::decodeXml($customData->xslt);					
 				$metadataXml = kXml::transformXmlUsingXslt($metadataXml, $decodedXslt); 
 				break;
-			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE]:
 				if(!isset($customData->xmlData))
 					throw new KalturaBatchException($this->containerName . '->' . $this->nodeName . "->xmlData element is missing", KalturaBatchJobAppErrors::BULK_ELEMENT_NOT_FOUND);
 				

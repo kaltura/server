@@ -56,7 +56,7 @@ class MetadataBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
 						<xs:enumeration value="transformXslt" />
-						<xs:enumeration value="update" />
+						<xs:enumeration value="replace" />
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
