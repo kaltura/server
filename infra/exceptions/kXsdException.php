@@ -15,4 +15,5 @@ class kXsdException extends kException
 	const CAN_NOT_CHANGE_ATTRIBUTE = "CAN_NOT_CHANGE_ATTRIBUTE,Attribute changed in path [%s]";
 	
 	const CAN_NOT_CHANGE_NODE = "CAN_NOT_CHANGE_NODE,Different nodes [%s != %s] in path [%s]";
+	const MATCHED_MORE_THAN_ONE_NODE = "MATCHED_MORE_THAN_ONE_NODE, More than one match found for [%s]";
 }

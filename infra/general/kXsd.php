@@ -111,6 +111,8 @@ class kXsd
 		// try matching by id
 		if ($element->getAttribute('id'))
 		{
+			$result = null;
+			
 			foreach($childrenArr as $curIndex => $curChild)
 			{
 				if(strtolower($curChild->localName) != strtolower($element->localName))
@@ -120,34 +122,50 @@ class kXsd
 					$curChild->getAttribute('id') != $element->getAttribute('id'))
 					continue;
 					
+				if ($result)
+					throw new kXsdException(kXsdException::MATCHED_MORE_THAN_ONE_NODE, $element->getAttribute('id'));
+					
 				$index = $curIndex;
-				return $curChild;
+				$result = $curChild;
 			}
 			
-			return null;
+			return $result;
 		}
 		
 		// try matching by name
 		if ($element->getAttribute('name'))
 		{
+			$result = null;
+			
 			foreach($childrenArr as $curIndex => $curChild)
 			{
 				if(strtolower($curChild->localName) != strtolower($element->localName))
+					continue;
+					
+				if ($curChild->getAttribute('id'))
 					continue;
 					
 				if(!$curChild->getAttribute('name') || 
 					$curChild->getAttribute('name') != $element->getAttribute('name'))
 					continue;
 					
+				if ($result)
+					throw new kXsdException(kXsdException::MATCHED_MORE_THAN_ONE_NODE, $element->getAttribute('name'));
+					
 				$index = $curIndex;
-				return $curChild;
+				$result = $curChild;
 			}
+
+			return $result;
 		}
 		
 		// try matching by local name only
 		foreach($childrenArr as $curIndex => $curChild)
 		{
 			if(strtolower($curChild->localName) != strtolower($element->localName))
+				continue;
+
+			if ($curChild->getAttribute('id') || $curChild->getAttribute('name'))
 				continue;
 				
 			$index = $curIndex;
