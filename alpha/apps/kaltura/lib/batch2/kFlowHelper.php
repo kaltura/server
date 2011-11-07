@@ -1828,7 +1828,7 @@ class kFlowHelper
 		switch($entry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
-				kBusinessConvertDL::replaceEntry($entry, $tempEntry);
+				kEventsManager::raiseEventDeferred(new kObjectReadyForReplacmentEvent($tempEntry));
 				break;
 
 			case entryReplacementStatus::READY_BUT_NOT_APPROVED:

@@ -8,7 +8,7 @@
  * @subpackage Batch
  *
  */
-class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer, kObjectDeletedEventConsumer
+class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectReadyForReplacmentEventConsumer
 {
 	public final function __construct()
 	{
@@ -524,6 +524,38 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			
 		return false;
 	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeReadyForReplacmentEvent()
+	 */
+	public function shouldConsumeReadyForReplacmentEvent(BaseObject $object)
+	{
+		if($object instanceof entry)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectReadyForReplacment()
+	 */
+	public function objectReadyForReplacment(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		if(!($object instanceof entry))
+			return false;
+		
+		$entry = entryPeer::retrieveByPK($object->getReplacedEntryId());
+		if(!$entry)
+		{
+			KalturaLog::err("Real entry id [" . $object->getReplacedEntryId() . "] not found");
+			myEntryUtils::deleteEntry($object);
+			return true;
+		}
+		
+		kBusinessConvertDL::replaceEntry($entry, $object);
+		return true;
+	}
+	
 
 	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::objectDeleted()
