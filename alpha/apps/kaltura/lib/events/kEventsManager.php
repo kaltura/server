@@ -6,6 +6,8 @@ class kEventsManager
 	
 	protected static $consumers = array();
 	
+	protected static $deferredEvents = array();
+	
 	protected static function loadConsumers()
 	{
 		$cachePath = kConf::get('cache_root_path') . '/EventConsumers.cache';
@@ -85,6 +87,34 @@ class kEventsManager
 		return array();
 	}
 	
+	public static function flushEvents()
+	{	
+		KalturaLog::debug('### flushEvents');
+		while (count(self::$deferredEvents))
+		{
+			usort(self::$deferredEvents,  array('kEventsManager', 'sortEventsByPriority'));
+			$deferredEvent = array_shift(self::$deferredEvents);			
+			KalturaLog::debug('### flushEvents - raiseEvenet');
+			self::raiseEvent($deferredEvent);
+		}
+	}
+	
+	public static function raiseEventDeferred(KalturaEvent $event)
+	{
+		KalturaLog::debug('### raiseEventDeferred');
+		$eventKey = $event->getKey();
+		$eventPriority = $event->getPriority();
+		
+		if (!isset($eventPriority)){
+			$eventPriority = eventPriority::NORMAL;
+		}
+
+		if (!is_null($eventKey))
+			self::$deferredEvents[$eventKey] = $event;
+		else
+			self::$deferredEvents[] = $event;
+	}
+	
 	public static function raiseEvent(KalturaEvent $event)
 	{
 		$consumerInterface = $event->getConsumerInterface();
@@ -145,5 +175,16 @@ class kEventsManager
 				}
 			}
 		}
+	}
+	
+	public static function sortEventsByPriority($a, $b)
+	{
+		$aPriority = $a->getPriority();
+		$bPriority = $b->getPriority();
+		
+		if ($aPriority == $bPriority)
+			return 0;
+		
+		return ($aPriority < $bPriority) ? -1 : 1;
 	}
 }

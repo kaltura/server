@@ -27,4 +27,14 @@ abstract class KalturaEvent
 			
 		return true;
 	}
+	
+	public function getKey()
+	{
+		return null;
+	}
+	
+	public function getPriority()
+	{
+		return eventPriority::NORMAL;
+	}
 }
