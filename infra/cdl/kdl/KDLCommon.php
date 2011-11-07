@@ -237,6 +237,7 @@
 		const WMA = "wma";
 		const VORBIS = "vorbis";
 		const AMRNB = "amrnb";
+		const MPEG2= "mpeg2";
 		const COPY = "copy";
 	};
 	
