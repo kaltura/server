@@ -1,6 +1,6 @@
 <?php
 
-class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer
+class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedEventConsumer, kObjectReadyForIndexEventConsumer
 {
 	const SPHINX_INDEX_NAME = 'kaltura';
 	const SPHINX_MAX_RECORDS = 1000;
@@ -103,9 +103,29 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	}
 	
 	/* (non-PHPdoc)
+	 * @see kObjectReadyForIndexEventConsumer::shouldConsumeReadyForIndexEvent()
+	 */
+	public function shouldConsumeReadyForIndexEvent(BaseObject $object)
+	{
+		if($object instanceof IIndexable)
+			return true;
+			
+		return false;
+	}
+	
+	/* (non-PHPdoc)
 	 * @see kObjectUpdatedEventConsumer::objectUpdated()
 	 */
 	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
+	{
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($object));
+		return true;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see kObjectReadyForIndexEventConsumer::objectReadyForIndex()
+	 */
+	public function objectReadyForIndex(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		$this->saveToSphinx($object);
 		return true;
@@ -127,7 +147,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$this->saveToSphinx($object, true);
+		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($object));
 		return true;
 	}
 	

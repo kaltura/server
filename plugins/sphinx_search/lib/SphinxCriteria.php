@@ -541,7 +541,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 	/* (non-PHPdoc)
 	 * @see Criteria::getNewCriterion()
 	 */
-	public function getNewCriterion($column, $value, $comparison = null)
+	public function getNewCriterion($column, $value = null, $comparison = self::EQUAL)
 	{
 		return new SphinxCriterion($this, $column, $value, $comparison);
 	}
