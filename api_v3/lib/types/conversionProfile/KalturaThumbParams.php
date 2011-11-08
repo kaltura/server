@@ -80,6 +80,8 @@ class KalturaThumbParams extends KalturaAssetParams
 	 */
 	public $format;
 	
+	public $density;
+	
 	
 //	Maybe support will be added in the future
 //	
@@ -110,6 +112,7 @@ class KalturaThumbParams extends KalturaAssetParams
 		"backgroundColor",
 		"sourceParamsId",
 		"format",
+		"density"
 	
 //		Maybe support will be added in the future
 //		"cropProvider",

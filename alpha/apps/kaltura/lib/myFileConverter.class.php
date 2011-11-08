@@ -384,7 +384,7 @@ class myFileConverter
 	 */
 	static public function convertImage($source_file, $target_file,	$width = self::DEFAULT_THUMBNAIL_WIDTH, $height = self::DEFAULT_THUMBNAIL_HEIGHT,
 		$crop_type = self::CROP_TYPE_ORIGINAL_ASPECT_RATIO, $bgcolor = 0xffffff, $force_jpeg = false, $quality = 0,
-		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
+		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 72)
 	{
 		
 		if (is_string($bgcolor) && strpos($bgcolor, '0x') === false)
@@ -412,7 +412,7 @@ class myFileConverter
 		// do convertion
 		$status = null;
 		$imageCropper = new KImageMagickCropper($source_file, $target_file);
-		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor);
+		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor, $density);
 		if (!$status)
 			return null;
 		return $target_file;

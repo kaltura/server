@@ -2022,6 +2022,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return $offset;
 	}
 	
+	public function getThumbDensity()
+	{ 	
+		return $partner->getDefThumbDensity();
+	}
+	
 	public function setThumbOffset ( $v ) { 	$this->putInCustomData ( "thumb_offset" , $v ); }
 
 	public function getBestThumbOffset( $default_offset = 3 ) 

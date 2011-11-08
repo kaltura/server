@@ -390,6 +390,9 @@ class Partner extends BasePartner
 	public function getDefThumbOffset()	{		return $this->getFromCustomData( "defThumbOffset" , false  );	}
 	public function setDefThumbOffset( $v )	{		return $this->putInCustomData( "defThumbOffset", $v );	}
 	
+	public function getDefThumbDensity()	{		return $this->getFromCustomData( "defThumbDensity" , false  );	}
+	public function setDefThumbDensity( $v )	{		return $this->putInCustomData( "defThumbDensity", $v );	}
+	
 	public function getHost()	{		return $this->getFromCustomData( "host" , null, false  );	}
 	public function setHost( $v )	{		return $this->putInCustomData( "host", $v );	}
 		

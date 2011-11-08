@@ -51,12 +51,16 @@ class KImageMagickCropper extends KBaseCropper
 		parent::__construct($srcPath, $targetPath);
 	}
 	
-	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff)
+	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0)
 	{
 		$attributes = array();
 
 		$exifData = @exif_read_data($this->srcPath);
 		$orientation = isset($exifData["Orientation"]) ? $exifData["Orientation"] : 1;
+
+		if($density == 0) $density = 72;
+		$attributes[] = "-density ".$density;
+		$attributes[] = "-units PixelsPerInch ";
 		
 		switch($orientation)
 		{

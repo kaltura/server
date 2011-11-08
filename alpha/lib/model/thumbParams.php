@@ -39,6 +39,7 @@ class thumbParams extends assetParams
 	const CUSTOM_DATA_FIELD_SCALE_WIDTH = "ThumbScaleWidth";
 	const CUSTOM_DATA_FIELD_SCALE_HEIGHT = "ThumbScaleHeight";
 	const CUSTOM_DATA_FIELD_BACKGROUND_COLOR = "ThumbBackgroundColor";
+	const CUSTOM_DATA_FIELD_DENSITY = "ThumbDensity";
 
 	public function getSourceParamsId()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID);}
 	public function getCropType()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_TYPE);}
@@ -53,7 +54,8 @@ class thumbParams extends assetParams
 	public function getScaleWidth()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_WIDTH);}
 	public function getScaleHeight()			{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_HEIGHT);}
 	public function getBackgroundColor()		{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_BACKGROUND_COLOR);}
-
+	public function getDensity()				{return $this->getFromCustomData(thumbParams::CUSTOM_DATA_FIELD_DENSITY);}
+	
 	public function setSourceParamsId($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID, $v);}
 	public function setCropType($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_CROP_TYPE, $v);}
 	public function setQuality($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_QUALITY, $v);}
@@ -67,4 +69,5 @@ class thumbParams extends assetParams
 	public function setScaleWidth($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_WIDTH, $v);}
 	public function setScaleHeight($v)			{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_SCALE_HEIGHT, $v);}
 	public function setBackgroundColor($v)		{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_BACKGROUND_COLOR, $v);}
+	public function setDensity($v)				{return $this->putInCustomData(thumbParams::CUSTOM_DATA_FIELD_DENSITY, $v);}
 }

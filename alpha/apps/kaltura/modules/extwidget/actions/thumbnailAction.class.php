@@ -47,6 +47,7 @@ class thumbnailAction extends sfAction
 		$vid_sec = $this->getRequestParameter( "vid_sec" , -1);
 		$vid_slice = $this->getRequestParameter( "vid_slice" , -1);
 		$vid_slices = $this->getRequestParameter( "vid_slices" , -1);
+		$density = $this->getRequestParameter( "density" , 72);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
@@ -96,7 +97,7 @@ class thumbnailAction extends sfAction
 					}
 						
 					// and resize it
-					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h);
+					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density);
 					kFile::dumpFile($thumb_full_path);
 				} else {
 					KalturaLog::debug ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
