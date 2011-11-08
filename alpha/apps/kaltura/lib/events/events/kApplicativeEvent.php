@@ -31,4 +31,12 @@ abstract class kApplicativeEvent extends KalturaEvent implements IKalturaContinu
 			
 		KalturaLog::debug("Event [" . get_class($this) . "] object type [" . get_class($object) . "]" . $additionalLog);
 	}
+	
+	public function getKey()
+	{
+		if(method_exists($this->object, 'getId'))
+			return $this->object->getId();
+		
+		return null;
+	}
 }

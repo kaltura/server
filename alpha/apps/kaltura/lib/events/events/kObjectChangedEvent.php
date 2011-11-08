@@ -52,5 +52,14 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 		KalturaLog::debug(get_class($this) . ' event consumed by ' . get_class($consumer) . ' object type [' . get_class($this->object) . '] ' . $additionalLog);
 		return $consumer->objectChanged($this->object, $this->modifiedColumns);
 	}
+	
+	public function getKey()
+	{
+		if(method_exists($this->object, 'getId'))
+			return $this->object->getId();
+		
+		return null;
+	}
+	
 
 }

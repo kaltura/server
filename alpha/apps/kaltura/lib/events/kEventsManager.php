@@ -89,7 +89,6 @@ class kEventsManager
 	
 	public static function flushEvents()
 	{	
-		
 		while (count(self::$deferredEvents))
 		{
 			usort(self::$deferredEvents,  array('kEventsManager', 'sortEventsByPriority'));
