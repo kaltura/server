@@ -95,6 +95,8 @@ class KalturaDispatcher
 		
 		$res =  $reflector->invoke($action, $arguments);
 		
+		kEventsManager::flushEvents();
+		
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Disptach took - " . (microtime(true) - $start) . " seconds");		
 				
