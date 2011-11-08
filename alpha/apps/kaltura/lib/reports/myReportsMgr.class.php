@@ -344,6 +344,7 @@ class myReportsMgr
 			kFile::fullMkfileDir($fullPath, 0777, true);
 			
 		$fileName = "{$file_name}_{$time_suffix}";
+		//url is built with DC url in order to be directed to the same DC of the saved file
 		$url = kDataCenterMgr::getCurrentDcUrl(). "$folderPath/$fileName";
 		$file_path = "$fullPath/$fileName";
 		
