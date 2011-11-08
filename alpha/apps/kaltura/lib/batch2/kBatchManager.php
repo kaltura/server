@@ -183,7 +183,8 @@ class kBatchManager
 				$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfoDb, $tagsArray);
 				$finalTags = join(',', array_unique($finalTagsArray));
 				KalturaLog::log("Flavor asset tags from KDL [$finalTags]");
-				$flavorAsset->setTags($finalTags);
+//KalturaLog::log("Flavor asset tags [".print_r($flavorAsset->setTags(),1)."]");
+				$flavorAsset->addTags($finalTagsArray);
 			}
 		}
 		else 
