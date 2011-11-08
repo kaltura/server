@@ -15,7 +15,7 @@
  */
 class DwhHourlyPartnerPeer extends BaseDwhHourlyPartnerPeer {
 
-	public static function alternativeCon($con)
+	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
 	{
 		return myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_DWH);
 	}
