@@ -163,7 +163,7 @@ class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
 				else
 					$metadataXml = '<metadata></metadata>';
 					
-				$decodedXslt = kxml::decodeXml($customData->xslt);					
+				$decodedXslt = kXml::decodeXml($customData->xslt);					
 				$metadataXml = kXml::transformXmlUsingXslt($metadataXml, $decodedXslt); 
 				break;
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE]:
