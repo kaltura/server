@@ -180,7 +180,7 @@ class assetParamsPeer extends BaseassetParamsPeer
 			array('assetParamsPeer', 'filterSelectResultsCallback'));
 	}
 		
-	public static function alternativeCon($con)
+	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
 	{
 		if($con === null)
 			$con = myDbHelper::alternativeCon($con);
