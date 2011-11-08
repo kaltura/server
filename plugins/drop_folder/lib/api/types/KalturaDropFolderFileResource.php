@@ -89,7 +89,11 @@ class KalturaDropFolderFileResource extends KalturaDataCenterContentResource
 		
 		if ($dropFolder->getType() == DropFolderType::LOCAL)
 		{
-		    $object_to_fill->setKeepOriginalFile(true);
+			// if the drop folder is set to automatic with immidate deletion of files (days = 0) move the files instead of copying them.
+			// this will result in fast handling of drop folder files
+			$deleteOriginalFile = ($dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE && $dropFolder->getAutoFileDeleteDays() == 0);
+			
+		    $object_to_fill->setKeepOriginalFile(!$deleteOriginalFile);
 		    $object_to_fill->setIsReady(true);
 		}
 		else /* ($dropFolder instanceof RemoteDropFolder) */
