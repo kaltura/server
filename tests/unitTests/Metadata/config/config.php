@@ -19,7 +19,8 @@
 		const PARTNER_ADMIN_SECRET = "";
 		const PARTNER_USER_ID = 'MetadataProfileUser';
 		
-		const METADATA_NAME = 'my profile - unitest';
+		const METADATA_NAME = 'my-profile-unitest-1';
+		const METADATA_NAME_2 = 'my-profile-unitest-2';
 		const METADATA_XSD_DATA_ADD = '<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <xsd:element name="metadata">
     <xsd:complexType>
@@ -160,6 +161,7 @@
 </xsd:schema>';
 		
 		const ENTRY_ID = 'ENTRY_ID';
+		const ENTRY_REFERENCE_ID = 'abc123';
 		const ENTRY_METADATA = 'ENTRY_METADATA';
 		const ENTRY_METADATA_TRANSFORMED = 'ENTRY_METADATA_TRANSFORMED';
 		const METADATA = 'METADATA';
@@ -185,6 +187,13 @@
   <MyText2>my test 3</MyText2>
 </metadata>'),
 		);
+		
+		static $metadatasByProfileSystemName = array (
+			self::METADATA_NAME => '<?xml version="1.0"?><metadata><MyText1>my text 1</MyText1><MyText2>My new text 2</MyText2><MyList1>a</MyList1></metadata>',
+			self::METADATA_NAME_2 => '<metadata><MyText1>my new metadata</MyText1><MyList1>a</MyList1></metadata>');
+		
+		
+		const BULK_UPLOAD_FILE = 'testsData/bulkUpload.xml';
 	
 	}
 
