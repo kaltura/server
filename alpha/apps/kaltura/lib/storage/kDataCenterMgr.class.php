@@ -31,7 +31,13 @@ class kDataCenterMgr
 		$dc = self::getCurrentDc();
 		return $dc["id"];
 	}
-	
+		
+	public static function getCurrentDcUrl () 
+	{
+		$dc = self::getCurrentDc();
+		return $dc["url"];
+	}
+		
 	public static function getCurrentDc () 
 	{
 		$dc_config = kConf::getMap("dc_config");

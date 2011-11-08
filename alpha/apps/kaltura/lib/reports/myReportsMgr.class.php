@@ -344,7 +344,7 @@ class myReportsMgr
 			kFile::fullMkfileDir($fullPath, 0777, true);
 			
 		$fileName = "{$file_name}_{$time_suffix}";
-		$url = requestUtils::getHost() . "$folderPath/$fileName";
+		$url = kDataCenterMgr::getCurrentDcUrl(). "$folderPath/$fileName";
 		$file_path = "$fullPath/$fileName";
 		
 //		$path = "/content/reports/$partner_id/{$file_name}_{$time_suffix}";
