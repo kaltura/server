@@ -33,10 +33,7 @@ class myCsvWrapper
 		else
 		{
 			if ( !$this->new_line ) $this->data .= self::CELL_SEPARATOR;
-			if ( strpos ( $this->data , self::CELL_SEPARATOR ) !== null )
-				$this->data .= '"' . $obj . '"';
-			else
-				$this->data .= $obj;				
+			$this->data .= '"' . str_replace('"', '""', $obj) . '"';	
 		}
 		
 		$this->new_line = false;		
