@@ -63,7 +63,7 @@ class kObjectCopiedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	public function getKey()
 	{
 		if(method_exists($this->toObject, 'getId'))
-			return $this->toObject->getId();
+			return get_class($this->object).$this->toObject->getId();
 		
 		return null;
 	}

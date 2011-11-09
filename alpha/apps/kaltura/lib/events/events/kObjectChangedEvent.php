@@ -56,7 +56,7 @@ class kObjectChangedEvent extends KalturaEvent implements IKalturaDatabaseEvent
 	public function getKey()
 	{
 		if(method_exists($this->object, 'getId'))
-			return $this->object->getId();
+			return get_class($this->object).$this->object->getId();
 		
 		return null;
 	}

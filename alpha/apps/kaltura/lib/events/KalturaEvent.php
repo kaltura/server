@@ -35,6 +35,6 @@ abstract class KalturaEvent
 	
 	public function getPriority()
 	{
-		return eventPriority::NORMAL;
+		return EventPriority::NORMAL;
 	}
 }

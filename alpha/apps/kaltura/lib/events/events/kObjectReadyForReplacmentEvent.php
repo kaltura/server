@@ -1,6 +1,6 @@
 <?php
 /**
- * Applicative event that raised implicitly by the developer
+ * Applicative event that raised explicitly by the developer
  */
 class kObjectReadyForReplacmentEvent extends kApplicativeEvent
 {
@@ -12,7 +12,7 @@ class kObjectReadyForReplacmentEvent extends kApplicativeEvent
 	}
 	
 	/**
-	 * @param kObjectAddedEventConsumer $consumer
+	 * @param kObjectReadyForReplacmentEventConsumer $consumer
 	 * @return bool true if should continue to the next consumer
 	 */
 	protected function doConsume(KalturaEventConsumer $consumer)
