@@ -643,7 +643,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="content" maxOccurs="unbounded" minOccurs="1">
+			<xs:element ref="content" maxOccurs="unbounded" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>All Content Assets</xs:documentation>
 				</xs:annotation>
@@ -762,7 +762,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="thumbnail" maxOccurs="unbounded" minOccurs="1">
+			<xs:element ref="thumbnail" maxOccurs="unbounded" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>All Thumbnails Assets</xs:documentation>
 				</xs:annotation>
@@ -777,7 +777,7 @@
 
 	<xs:complexType name="T_tags">
 		<xs:sequence>
-			<xs:element name="tag" minOccurs="1" maxOccurs="unbounded">
+			<xs:element name="tag" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>Specifies a single tag to set for a related object</xs:documentation>
 				</xs:annotation>
@@ -792,7 +792,7 @@
 
 	<xs:complexType name="T_categories">
 		<xs:sequence>
-			<xs:element name="category" type="xs:string" minOccurs="1" maxOccurs="32">
+			<xs:element name="category" type="xs:string" minOccurs="0" maxOccurs="32">
 				<xs:annotation>
 					<xs:documentation>Specifies a single category assigned to an entry. Use the &gt; character (`&amp;gt;`) to indicate the position of the category in the category tree hierarchy</xs:documentation>
 				</xs:annotation>
