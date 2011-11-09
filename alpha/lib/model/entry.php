@@ -2024,6 +2024,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 	
 	public function getThumbDensity()
 	{ 	
+		$partner = $this->getPartner();
 		return $partner->getDefThumbDensity();
 	}
 	
