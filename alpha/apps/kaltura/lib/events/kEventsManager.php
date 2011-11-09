@@ -89,27 +89,38 @@ class kEventsManager
 	
 	public static function flushEvents()
 	{	
+		
 		while (count(self::$deferredEvents))
 		{
-			usort(self::$deferredEvents,  array('kEventsManager', 'sortEventsByPriority'));
-			$deferredEvent = array_shift(self::$deferredEvents);			
+			$deferredEvent = self::popNextDeferredEvent();
 			self::raiseEvent($deferredEvent);
 		}
+	}
+	
+	private static function popNextDeferredEvent()
+	{
+		$deferredEvent = null;
+		$deferredEventKey = null;
+		
+		foreach(self::$deferredEvents as $key => $event)
+		{
+			if (!$deferredEvent || $deferredEvent->getPriority() > $event->getPriority())
+				$deferredEvent = $event;
+				$deferredEventKey = $key;
+		}
+		
+		unset(self::$deferredEvents[$deferredEventKey]);
+		return $deferredEvent;
 	}
 	
 	public static function raiseEventDeferred(KalturaEvent $event)
 	{
 		$eventKey = $event->getKey();
-		$eventPriority = $event->getPriority();
 		
-		if (!isset($eventPriority)){
-			$eventPriority = eventPriority::NORMAL;
-		}
-
 		if (!is_null($eventKey))
 			self::$deferredEvents[$eventKey] = $event;
 		else
-			self::$deferredEvents[] = $event;
+			self::$deferredEvents['unkeyed_'.count(self::$deferredEvents)] = $event;
 	}
 	
 	public static function raiseEvent(KalturaEvent $event)
@@ -172,16 +183,5 @@ class kEventsManager
 				}
 			}
 		}
-	}
-	
-	public static function sortEventsByPriority($a, $b)
-	{
-		$aPriority = $a->getPriority();
-		$bPriority = $b->getPriority();
-		
-		if ($aPriority == $bPriority)
-			return 0;
-		
-		return ($aPriority < $bPriority) ? -1 : 1;
 	}
 }
