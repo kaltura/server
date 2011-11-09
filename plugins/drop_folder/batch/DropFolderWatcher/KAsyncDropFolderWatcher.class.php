@@ -141,7 +141,9 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			return; // skipping to next folder
 		}	
 
-		
+		// with local drop folder, file may have been moved (hence deleted) immidiately upon ingestion
+		$autoDeleteOriginalFile = $folder->fileDeletePolicy == KalturaDropFolderFileDeletePolicy::AUTO_DELETE && $folder->autoFileDeleteDays == 0;
+				
 		$dropFolderFileMapByName = array();
 		
 		foreach ($dropFolderFiles as $dropFolderFile)
@@ -150,7 +152,11 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 			{
 				if (!in_array($dropFolderFile->fileName, $physicalFiles))
 				{
-					$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 'Cannot find file with name ['.$dropFolderFile->fileName.']');
+					if ($autoDeleteOriginalFile)
+        				$this->setFileAsPurged($dropFolderFile);
+					else
+						$this->errorWithFile($dropFolderFile, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 'Cannot find file with name ['.$dropFolderFile->fileName.']');
+						
 					continue;
 				}				
 				$dropFolderFileMapByName[$dropFolderFile->fileName] = $dropFolderFile;
