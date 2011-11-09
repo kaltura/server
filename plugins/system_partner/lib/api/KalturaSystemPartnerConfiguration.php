@@ -90,6 +90,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var int
 	 */
+	public $defThumbDensity;
+	
+	/**
+	 * @var int
+	 */
 	public $userSessionRoleId;
 	
 	/**
@@ -249,7 +254,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"storageServePriority",
 		"kmcVersion",
 		"defThumbOffset",
-		//"adminLoginUsersQuota",
+		"defThumbDensity",
+	//"adminLoginUsersQuota",
 		"userSessionRoleId",
 		"adminSessionRoleId",
 		"alwaysAllowedPermissionNames",
