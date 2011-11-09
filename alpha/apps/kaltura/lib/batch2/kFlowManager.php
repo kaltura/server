@@ -541,14 +541,11 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectReadyForReplacment(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if(!($object instanceof entry))
-			return false;
 		
 		$entry = entryPeer::retrieveByPK($object->getReplacedEntryId());
 		if(!$entry)
 		{
 			KalturaLog::err("Real entry id [" . $object->getReplacedEntryId() . "] not found");
-			myEntryUtils::deleteEntry($object);
 			return true;
 		}
 		
