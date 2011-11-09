@@ -79,7 +79,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="subTitle" maxOccurs="unbounded" minOccurs="1">
+			<xs:element ref="subTitle" maxOccurs="unbounded" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>All subTitles elements</xs:documentation>
 				</xs:annotation>
