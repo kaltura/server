@@ -47,7 +47,7 @@ class thumbnailAction extends sfAction
 		$vid_sec = $this->getRequestParameter( "vid_sec" , -1);
 		$vid_slice = $this->getRequestParameter( "vid_slice" , -1);
 		$vid_slices = $this->getRequestParameter( "vid_slices" , -1);
-		$density = $this->getRequestParameter( "density" , 72);
+		$density = $this->getRequestParameter( "density" , 0);
 		
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
@@ -66,12 +66,18 @@ class thumbnailAction extends sfAction
 			
 				
 		$bgcolor = $this->getRequestParameter( "bgcolor", "ffffff" );
+		$partner = null;
 		
 		if ($upload_token_id)
 		{
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
 			if ($upload_token)
 			{
+				$partner = $upload_token->getPartnerId();
+				if($density == 0) {
+					$density = $partner->getDefThumbDensity();
+					if($density == 0) $density = 72;
+				}
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
 				kFile::fullMkdir($thumb_full_path);
 				if (file_exists($upload_token->getUploadTempPath()))
@@ -146,6 +152,10 @@ class thumbnailAction extends sfAction
 		}
 		
 		$partner = $entry->getPartner();
+		if($density == 0) {
+			$density = $partner->getDefThumbDensity();
+			if($density == 0) $density = 72;
+		}
 		
 		//checks whether the thumbnail display should be restricted by KS
 		if($partner->getRestrictThumbnailByKs()) {
@@ -218,7 +228,7 @@ class thumbnailAction extends sfAction
 				}
 				$contentPath = myContentStorage::getFSContentRootPath();
 				$msgPath = $contentPath."content/templates/entry/thumbnail/audio_thumb.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath);
+				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
 				//kFile::dumpFile($tempThumbPath, null, 0);
 			}
 			elseif($entry->getType() == entryType::LIVE_STREAM)
@@ -230,13 +240,13 @@ class thumbnailAction extends sfAction
 				}
 				$contentPath = myContentStorage::getFSContentRootPath();
 				$msgPath = $contentPath."content/templates/entry/thumbnail/live_thumb.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath);
+				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
 			}
 			elseif($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_SHOW) // roughcut without any thumbnail, probably just created
 			{
 				$contentPath = myContentStorage::getFSContentRootPath();
 				$msgPath = $contentPath."content/templates/entry/thumbnail/auto_edit.jpg";
-				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath);
+				$tempThumbPath = myEntryUtils::resizeEntryImage( $entry, $version , $width , $height , $type , $bgcolor , $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density);
 				//kFile::dumpFile($tempThumbPath, null, 0);
 			}
 			//elseif($entry->getType() == entryType::MEDIA_CLIP && ($entry->getStatus() == entryStatus::PRECONVERT || $entry->getStatus() == entryStatus::IMPORT))
