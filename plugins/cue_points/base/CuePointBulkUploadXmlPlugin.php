@@ -59,7 +59,7 @@ class CuePointBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendi
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element ref="scene" minOccurs="1" maxOccurs="unbounded">
+			<xs:element ref="scene" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation>A cue point element</xs:documentation>
 				</xs:annotation>
