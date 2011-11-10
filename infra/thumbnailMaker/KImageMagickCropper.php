@@ -58,9 +58,10 @@ class KImageMagickCropper extends KBaseCropper
 		$exifData = @exif_read_data($this->srcPath);
 		$orientation = isset($exifData["Orientation"]) ? $exifData["Orientation"] : 1;
 
-		if($density == 0) $density = 72;
-		$attributes[] = "-density ".$density;
-		$attributes[] = "-units PixelsPerInch ";
+		if($density != 0) {
+			$attributes[] = "-density ".$density;
+			$attributes[] = "-units PixelsPerInch ";
+		}
 		
 		switch($orientation)
 		{

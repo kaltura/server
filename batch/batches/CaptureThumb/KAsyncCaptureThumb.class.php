@@ -135,8 +135,8 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$density = $thumbParamsOutput->density;
 			if($density == 0) {
 				$entry = entryPeer::retrieveByPKNoFilter( $job->entryId );
-				$density = $entry->getThumbDensity();
-				if($density == 0) $density = 72;
+				$partner = $entry->getPartner();
+				$density = $partner->getDefThumbDensity();
 			}
 			
 			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);

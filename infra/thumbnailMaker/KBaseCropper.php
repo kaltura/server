@@ -90,5 +90,5 @@ abstract class KBaseCropper
 	/**
 	 * @return string
 	 */
-	protected abstract function getCommand($quality, $cropType, $width = 1, $height = 1, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 0, $scaleHeight = 0, $bgcolor = 0xffffff, $density);
+	protected abstract function getCommand($quality, $cropType, $width = 1, $height = 1, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 0, $scaleHeight = 0, $bgcolor = 0xffffff, $density = 0);
 }

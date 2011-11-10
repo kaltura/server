@@ -80,6 +80,12 @@ class KalturaThumbParams extends KalturaAssetParams
 	 */
 	public $format;
 	
+	/**
+	 * The image density (dpi)
+	 * 
+	 * Decimal value
+	 * @var string
+	 */
 	public $density;
 	
 	
