@@ -335,9 +335,11 @@ $this->benchmarkEnd( "signature" );
 	$this->benchmarkEnd( "beforeImpl" );
 
 				// ----------------------------- impl --------------------------
+				
 				$start_impl = microtime( true );
 				$result = $this->executeImpl( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser );
 				$end_impl = microtime( true );
+				kEventsManager::flushEvents();
 			}
 			else
 			{
