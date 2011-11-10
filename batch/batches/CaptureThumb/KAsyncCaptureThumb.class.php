@@ -133,10 +133,6 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$scaleWidth = $thumbParamsOutput->scaleWidth;
 			$scaleHeight = $thumbParamsOutput->scaleHeight;
 			$density = $thumbParamsOutput->density;
-			if($density == 0) {
-				$partner = PartnerPeer::retrieveByPK( $job->partnerId );
-				$density = $partner->getDefThumbDensity();
-			}
 			
 			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density);
