@@ -850,8 +850,8 @@ class KalturaEntryService extends KalturaBaseService
 		// because by default we will display only READY entries, and when deleted status is requested, we don't want this to disturb
 		entryPeer::allowDeletedInCriteriaFilter(); 
 		
-		// when session is not admin, allow access to user entries only
-		if (!$this->getKs() || !$this->getKs()->isAdmin())
+		// when session is not admin and without list:* privilege, allow access to user entries only
+		if (!$this->getKs() || (!$this->getKs()->isAdmin() && !$this->getKs()->verifyPrivileges(ks::PRIVILEGE_LIST, ks::PRIVILEGE_WILDCARD)))
 		{
 			$filter->userIdEqual = $this->getKuser()->getPuserId();
 		}

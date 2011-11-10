@@ -249,6 +249,7 @@ class ks
 	
 	const PRIVILEGE_EDIT = "edit";
 	const PRIVILEGE_VIEW = "sview";
+	const PRIVILEGE_LIST = "list"; // used to bypass the user filter in entry list
 	const PRIVILEGE_DOWNLOAD = "download";
 	const PRIVILEGE_EDIT_ENTRY_OF_PLAYLIST = "editplaylist";
 	const PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST = "sviewplaylist";
