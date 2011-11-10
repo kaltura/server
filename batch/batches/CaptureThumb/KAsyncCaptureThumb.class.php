@@ -134,8 +134,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$scaleHeight = $thumbParamsOutput->scaleHeight;
 			$density = $thumbParamsOutput->density;
 			if($density == 0) {
-				$entry = entryPeer::retrieveByPKNoFilter( $job->entryId );
-				$partner = $entry->getPartner();
+				$partner = PartnerPeer::retrieveByPK( $job->partnerId );
 				$density = $partner->getDefThumbDensity();
 			}
 			

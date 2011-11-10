@@ -30,7 +30,7 @@ abstract class KBaseCropper
 		$this->targetPath = str_replace($search, $replace ,$targetPath);
 	}
 	
-	public function crop($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 72)
+	public function crop($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0)
 	{
 		if(is_null($quality))
 			$quality = 100;

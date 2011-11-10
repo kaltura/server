@@ -76,7 +76,6 @@ class thumbnailAction extends sfAction
 				$partner = $upload_token->getPartnerId();
 				if($density == 0) {
 					$density = $partner->getDefThumbDensity();
-					if($density == 0) $density = 72;
 				}
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
 				kFile::fullMkdir($thumb_full_path);
@@ -154,7 +153,6 @@ class thumbnailAction extends sfAction
 		$partner = $entry->getPartner();
 		if($density == 0) {
 			$density = $partner->getDefThumbDensity();
-			if($density == 0) $density = 72;
 		}
 		
 		//checks whether the thumbnail display should be restricted by KS
