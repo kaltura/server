@@ -50,7 +50,8 @@ class kXsd
 			if(!$xsl)
 				return false;
 				
-			$xsl = '<xsl:value-of select="' . $parentXPath . $restriction .'/*[local-name()=\'' . $fromName . '\']"/>';
+			$xsl = '
+	' . $tabs . '<xsl:copy-of select="' . $parentXPath . $restriction .'/*[local-name()=\'' . $fromName . '\']"/>';
 		}
 		else 
 		{
