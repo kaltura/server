@@ -51,7 +51,7 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 	public function testRandomProfileSchema()
 	{
 		$this->performedActions = array();
-		for ($i=0; $i<1000; $i++)		
+		for ($i=0; $i<10000; $i++)		
 		{
 			$this->runOnce();
 		}
@@ -59,8 +59,6 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 	
 	public function runOnce()
 	{
-		echo "Running\n";
-		
 		$this->config = new Config();
 		
 		$this->schemaArray = $this->config->schemaArray();
@@ -68,11 +66,7 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 		$this->schema = $this->generateXSD($this->schemaArray);
 		
 		$this->testXML = $this->generateTestXML($this->schemaArray);
-		
-		//save generated XML to a file
-		$generatedFileName = "/generatedXML.log";
-		file_put_contents($generatedFileName,$this->testXML);
-		
+				
 		$numOfRuns = rand(1,3);
 
 		for ($i=1; $i<=$numOfRuns; $i++)
@@ -85,8 +79,6 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
  		$this->transSchema = $this->generateXSD($this->schemaArray);
 		
 		//save transformed xsd to a file
-		$transformedFileName = "/transformedXSD.log";
-		file_put_contents($transformedFileName, $this->transSchema);
 		
 		
 		$this->metadataTransformed();
@@ -101,8 +93,6 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 		$randAct = rand(1, 5);
 		
 		$this->performedActions[] = $randAct;
-		
-		echo "Staring action: $randAct\r\n";
 		
 		switch ($randAct)
 		{
@@ -122,8 +112,6 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 				$this->schemaArray = XSDEditor::changeListValues($this->schemaArray, Config::$newListVals);
 				break;
 		}
-
-		echo "Done action: $randAct\r\n";
 	}
 	
 	
@@ -178,31 +166,32 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 	 */
 	private function generateTestXML ($schemaArray)
 	{
-		$testXML = "<metadata>";
+		$testXML = "<metadata>\n";
 		foreach ($schemaArray as $schemaElement)
 		{
 			/* @var $schemaElement MetadataField */
-			$testXML.= $schemaElement->getXML();
+			$testXML.= "\t" . $schemaElement->getXML() . "\n";
 		}
-		$testXML .= "</metadata>";
+		$testXML .= "</metadata>\n";
 		
 		return $testXML;
 	}
 	
 	private function metadataTransformed()
 	{
+		file_put_contents("source.xsd", $this->schema);
+		file_put_contents("target.xsd", $this->transSchema);
+		file_put_contents("source.xml", $this->testXML);
 		
 		$xsl = XSDEditor::compareXsd($this->schema, $this->transSchema);
 		
-		$xslFile = "/transformXSL.xsl";
-		file_put_contents($xslFile,$xsl);
-		
+		file_put_contents("transform.xsl",$xsl);
+				
 		if (!is_bool($xsl))
 		{
 			$transXML = XSDEditor::transformXmlData($this->testXML, $xsl);
 			
-			$transformedFileName = "/transformXML.log";
-			file_put_contents($transformedFileName,$transXML);
+			file_put_contents("transform.xml",$transXML);
 			
 			$domXML = new DOMDocument();
 			$domXML->loadXML($transXML);

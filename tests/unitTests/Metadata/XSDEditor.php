@@ -73,9 +73,9 @@ class XSDEditor
 				break;
 		}
 		
-		$randIndex = rand (0, count($schemaArray)-1);
+		$randIndex = rand (0, count($schemaArray));
 		
-		$shiftedVals = array_splice($schemaArray, $randIndex, 0, array($addElement));
+		array_splice($schemaArray, $randIndex, 0, array($addElement));
 
 		return $schemaArray;
 	}
@@ -149,8 +149,6 @@ class XSDEditor
 				$elementToChange->valueList = $newValues;
 				break;
 		}
-		
-		$elementToChange->valueList = $newValues;
 		
 		return $schemaArray;
 	}
