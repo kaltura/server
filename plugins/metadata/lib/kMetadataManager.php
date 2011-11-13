@@ -309,7 +309,7 @@ class kMetadataManager
 		
 		foreach($searchItems as $key => $searchItem)
 			foreach($searchItem as $searchPhrase)
-				$searchTexts[] = MetadataPlugin::PLUGIN_NAME . '_' . "$key $searchPhrase " . kMetadataManager::SEARCH_TEXT_SUFFIX;
+				$searchTexts[] = MetadataPlugin::PLUGIN_NAME . '_' . "$key $searchPhrase " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_' . $key;
 				
 		if(count($textItems))
 		{
@@ -317,7 +317,7 @@ class kMetadataManager
 				$searchTexts['text'] = MetadataPlugin::PLUGIN_NAME . '_text';
 				 
 			$searchTexts['text'] .= ' ' . implode(' ', $textItems);
-			$searchTexts['text'] .= ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX;
+			$searchTexts['text'] .= ' ' . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
 		}
 		
 		
