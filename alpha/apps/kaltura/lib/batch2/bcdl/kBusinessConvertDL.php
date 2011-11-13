@@ -8,6 +8,8 @@ class kBusinessConvertDL
 	 */
 	public static function replaceEntry(entry $entry, entry $tempEntry = null)
 	{
+		KalturaLog::debug("in replaceEntry");
+		
 		if(!$tempEntry)
 			$tempEntry = entryPeer::retrieveByPK($entry->getReplacingEntryId());
 			
@@ -16,10 +18,16 @@ class kBusinessConvertDL
 			KalturaLog::err("Temp entry id [" . $entry->getReplacingEntryId() . "] not found");
 			return;
 		}
-		
+		//Extract all assets of the temp entry
 		$tempAssets = assetPeer::retrieveByEntryId($tempEntry->getId());
+		
+		
+		//Extract all assets of the existing entry
 		$oldAssets = assetPeer::retrieveByEntryId($entry->getId());
+		KalturaLog::debug("num of old assets: ".count($oldAssets));
 		$newAssets = array();
+		
+		//Loop which creates a mapping between the new assets' paramsId and their type to the asset itself
 		foreach($tempAssets as $newAsset)
 		{
 			if($newAsset->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
@@ -28,14 +36,20 @@ class kBusinessConvertDL
 				continue;	
 			}
 			
+			//If doesn't exist - create a new array for the current asset's type.
+			if (!isset($newAssets[$newAsset->getType()]))
+			{
+				$newAssets[$newAsset->getType()] = array();
+			}
+			
 			if($newAsset->getFlavorParamsId() || $newAsset instanceof flavorAsset)
 			{
-				$newAssets[$newAsset->getFlavorParamsId()] = $newAsset;
+				$newAssets[$newAsset->getType()][$newAsset->getFlavorParamsId()] = $newAsset;
 				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] for asset params [" . $newAsset->getFlavorParamsId() . "]");
 			}
 			else
 			{
-				$newAssets['asset_' . count($newAssets)] = $newAsset;
+				$newAssets[$newAsset->getType()]['asset_' . count($newAssets[$newAsset->getType()])] = $newAsset;
 				KalturaLog::debug("Added new asset [" . $newAsset->getId() . "] with no asset params");
 			}
 		}
@@ -44,9 +58,12 @@ class kBusinessConvertDL
 		foreach($oldAssets as $oldAsset)
 		{
 			/* @var $oldAsset asset */
-			if(isset($newAssets[$oldAsset->getFlavorParamsId()]))
+			
+			//If the newAssets map contains an asset of the same type and paramsId as the current old asset,
+			// re-link the old asset to the new asset.
+			if(isset($newAssets[$oldAsset->getType()]) && isset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]))
 			{
-				$newAsset = $newAssets[$oldAsset->getFlavorParamsId()];
+				$newAsset = $newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()];
 				/* @var $newAsset asset */
 				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 				
@@ -71,11 +88,12 @@ class kBusinessConvertDL
 				
 				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);
 				
-				unset($newAssets[$oldAsset->getFlavorParamsId()]);
+				unset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]);
 			}	
-			elseif($oldAsset instanceof flavorAsset)
+			//If the old asset is not set for replacement by its paramsId and type, delete it.
+			elseif($oldAsset instanceof flavorAsset || $oldAsset instanceof thumbAsset)
 			{
-				KalturaLog::debug("Delete old flavor asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
+				KalturaLog::debug("Delete old asset [" . $oldAsset->getId() . "] for paramsId [" . $oldAsset->getFlavorParamsId() . "]");
 				
 				$oldAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 				$oldAsset->setDeletedAt(time());
@@ -86,10 +104,13 @@ class kBusinessConvertDL
 			}		
 		}
 		
-		foreach($newAssets as $newAsset)
+		foreach($newAssets as $newAssetsByTypes)
 		{
-			$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
-			KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
+			foreach ($newAssetsByTypes as $newAsset)
+			{
+				$createdAsset = $newAsset->copyToEntry($entry->getId(), $entry->getPartnerId());
+				KalturaLog::debug("Copied from new asset [" . $newAsset->getId() . "] to copied asset [" . $createdAsset->getId() . "] for flavor [" . $newAsset->getFlavorParamsId() . "]");
+			}
 		}
 		
 		$entry->setLengthInMsecs($tempEntry->getLengthInMsecs());
