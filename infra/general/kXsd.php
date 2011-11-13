@@ -51,7 +51,15 @@ class kXsd
 				return false;
 				
 			$xsl = '
-	' . $tabs . '<xsl:copy-of select="' . $parentXPath . $restriction .'/*[local-name()=\'' . $fromName . '\']"/>';
+	' . $tabs . '<xsl:for-each select="' . $parentXPath . '/*[local-name()=\'' . $fromName . '\']">
+	' . $tabs . '	<xsl:choose>
+	' . $tabs . '		<xsl:when test="' . $restriction . '">
+	' . $tabs . '			<xsl:element name="' . $toName . '">
+	' . $tabs . '				<xsl:value-of select="."/>
+	' . $tabs . '			</xsl:element>
+	' . $tabs . '		</xsl:when>
+	' . $tabs . '	</xsl:choose>
+	' . $tabs . '</xsl:for-each>';				
 		}
 		else 
 		{
@@ -383,8 +391,8 @@ class kXsd
 		
 		if (!count($enumerationsValueToNode))
 			return '';
-		
-		return '[' . $toNode->getAttribute('name') . '=\'' . implode('\' or ' . $toNode->getAttribute('name') . '=\'', $enumerationsValueToNode) . '\']';
+					
+		return '.=\'' . implode('\' or .=\'', $enumerationsValueToNode) . '\'';
 	}
 	
 	/**
