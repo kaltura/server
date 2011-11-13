@@ -70,9 +70,10 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		$props['end_date'] = $this->getValueForField(KalturaYouTubeApiDistributionField::END_DATE);
 		
 		$props['comment'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_COMMENTS);
-		$props['rate'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING);
+		$props['rate'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RATINGS);
 		$props['commentVote'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RATINGS);
 		$props['videoRespond'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_RESPONSES);
+		$props['embed'] = $this->getValueForField(KalturaYouTubeApiDistributionField::ALLOW_EMBEDDING);		
 		
 		KalturaLog::debug("Props [" . print_r($props, true) . "]");
 

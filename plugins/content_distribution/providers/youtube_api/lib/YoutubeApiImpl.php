@@ -103,6 +103,7 @@ class YouTubeApiImpl
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('rate',$props['rate']);
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('commentVote',$props['commentVote']);
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('videoRespond',$props['videoRespond']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('embed',$props['embed']);
 		
 		$myVideoEntry->setAccess($access);
 		
@@ -306,6 +307,7 @@ class YouTubeApiImpl
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('rate',$props['rate']);
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('commentVote',$props['commentVote']);
 		$access[] = new Zend_Gdata_YouTube_Extension_Access('videoRespond',$props['videoRespond']);
+		$access[] = new Zend_Gdata_YouTube_Extension_Access('embed',$props['embed']);
 		
 		$videoEntry->setAccess($access);
 		
@@ -330,34 +332,5 @@ class YouTubeApiImpl
 		return self::$categoriesMap;
 	}
 }
-/*
-$impl = new YouTubeApiImpl('kalturasb', '250vanil');
 
-$props = Array();
-$props['title'] = 'My Test Movie';
-$props['description'] = 'My Test Movie';
-$props['category'] = 'Education';
-$props['keywords'] = 'cars, funny';
-$props['playlists'] ='';
-$props['comment']= 'denied';
-$props['rate']= 'denied';
-$props['commentVote']= 'denied';
-$props['videoRespond']= 'allowed';
-//print $impl -> uploadVideo('sizeme.flv','sizeme.flv', $props);
-
-
-$newEntry = $impl -> uploadVideo('snake.wmv','snake.wmv', $props);*/
-//$newEntry -> setMajorProtocolVersion(2);
-//$impl->getEntry('bYuqjJWRi1w');
-//$impl->updateEntry('GYgYuLRf8Dc', $props);
-
-//echo  $newEntry->getVideoId();
-
-//deleteEntry($yt, '1rzHS0G9B-Q');
-
-//if (!empty($newEntry))
-{
-//	$newEntry -> setMajorProtocolVersion(2);
-//	$remoteId = $newEntry -> getVideoId();
-}
 ?>
