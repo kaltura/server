@@ -49,8 +49,9 @@ class kXsd
 		{
 			if(!$xsl)
 				return false;
-				
-			$xsl = '
+
+			if (strlen($restriction)){
+				$xsl = '
 	' . $tabs . '<xsl:for-each select="' . $parentXPath . '/*[local-name()=\'' . $fromName . '\']">
 	' . $tabs . '	<xsl:choose>
 	' . $tabs . '		<xsl:when test="' . $restriction . '">
@@ -59,7 +60,17 @@ class kXsd
 	' . $tabs . '			</xsl:element>
 	' . $tabs . '		</xsl:when>
 	' . $tabs . '	</xsl:choose>
-	' . $tabs . '</xsl:for-each>';				
+	' . $tabs . '</xsl:for-each>';
+			}
+			else 
+			{
+				$xsl = '
+	' . $tabs . '<xsl:for-each select="' . $parentXPath . '/*[local-name()=\'' . $fromName . '\']">
+	' . $tabs . '	<xsl:element name="' . $toName . '">
+	' . $tabs . '		<xsl:value-of select="."/>
+	' . $tabs . '	</xsl:element>
+	' . $tabs . '</xsl:for-each>';
+			}
 		}
 		else 
 		{
