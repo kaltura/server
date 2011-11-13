@@ -85,17 +85,22 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 
 	    $fieldName = YouTubeDistributionField::NOTIFICATION_EMAIL;
 		$value = $allFieldValues[$fieldName];
-		if (!is_null($value) && !kString::isEmailString($value))
+		//multiple email support
+		$values = explode(' ',$value);
+		foreach ($values as $val)
 		{
-		    $validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));
-			$validationError->setValidationErrorType(DistributionValidationErrorType::INVALID_FORMAT);
-			$validationError->setValidationErrorParam('email');
-			$validationError->setDescription('Not an email string');
-			$validationErrors[] = $validationError;
+			if (!is_null($val) && !kString::isEmailString($val))
+			{
+				$errorMsg = $this->getUserFriendlyFieldName($fieldName).' value must be an email string [value:'.$val.']';
+			    $validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA, $this->getUserFriendlyFieldName($fieldName));
+				$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+				$validationError->setValidationErrorParam($errorMsg);
+				$validationErrors[] = $validationError;
+			}
 		}
 		
 		//TODO: check if MEDIA_CATEGORY is a valid YouTube category according to YouTube's XML.
-						
+								
 		return $validationErrors;
 	}
 	
