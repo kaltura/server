@@ -4,6 +4,8 @@ require_once('config/config_rand_test.php');
 
 class XSDEditor
 {
+	public static $shouldTransform = false;
+
 	/**
 	 * 
 	 * Static function to delete an element by a provided ID.
@@ -13,12 +15,19 @@ class XSDEditor
 	 */
 	public static function deleteElement ($schemaArray)
 	{
+		if (!count($schemaArray))
+		{
+			return $schemaArray;
+		}
+
 		$deleteIndex = rand (0, count($schemaArray)-1);
 		
-		echo "Delete element $deleteIndex\n";
+		echo "  Deleting element idx=$deleteIndex id={$schemaArray[$deleteIndex]->id}\n";
 
-		array_splice($schemaArray, $deleteIndex, 1);	
+		array_splice($schemaArray, $deleteIndex, 1);
 		
+		self::$shouldTransform = true;
+				
 		return $schemaArray;
 	}
 	
@@ -30,15 +39,32 @@ class XSDEditor
 	 */
 	public static function reorderSchema ($schemaArray )
 	{
+		if (count($schemaArray) < 2)
+		{
+			return $schemaArray;
+		}
+	
 		$firstSwap = rand (0, count($schemaArray)-1);
-		
 		$secondSwap = rand (0, count($schemaArray)-1);
+		if ($firstSwap == $secondSwap)
+		{
+			if ($firstSwap == 0)
+			{
+				$secondSwap = 1;
+			}
+			else
+			{
+				$secondSwap = $firstSwap - 1;
+			}
+		}
 		
-		$temp = $schemaArray[$firstSwap];
+		echo "  Swapping elements idx1=$firstSwap id1={$schemaArray[$firstSwap]->id} idx2=$secondSwap id2={$schemaArray[$secondSwap]->id}\n";
 		
+		$temp = $schemaArray[$firstSwap];	
 		$schemaArray[$firstSwap] = $schemaArray[$secondSwap];
-		
 		$schemaArray[$secondSwap] = $temp;
+		
+		self::$shouldTransform = true;
 		
 		return $schemaArray;
 	}
@@ -53,66 +79,51 @@ class XSDEditor
 	 */
 	public static function addElement ($schemaArray)
 	{
-
-		
-		$randType = rand (1,4);
-		
-		switch ($randType)
-		{
-			case 1:
-				$addElement = new MetadataTextField(uniqid("id_"), uniqid("name_"), "1", "true");
-				break;
-			case 2:
-				$addElement = new MetadataDateField(uniqid("id_"), uniqid("name_"), "1", "true");
-				break;
-			case 3:
-				$addElement = new MetadataListField(uniqid("id_"), uniqid("name_"), MetadataField::UNBOUNDED, "true", Config::$newListVals);
-				break;
-			case 4:
-				$addElement = new MetadataEntryListField(uniqid("id_"), uniqid("name_"), "1", "true");
-				break;
-		}
+		$addElement = Config::getRandomField(uniqid("id_"), uniqid("name_"));
 		
 		$randIndex = rand (0, count($schemaArray));
 		
 		array_splice($schemaArray, $randIndex, 0, array($addElement));
 
+		echo "  Adding element idx=$randIndex id={$addElement->id}\n";
+		
 		return $schemaArray;
 	}
 	
 	/**
 	 *
 	 * @param array $schemaArray
-	 * @param string $elementNameChangeTo
 	 * @return array
 	 */
-	public static function changeFieldName ($schemaArray, $elementNameChangeTo)
+	public static function changeFieldName ($schemaArray)
 	{
+		if (!count($schemaArray))
+		{
+			return $schemaArray;
+		}
+		
 		$indexToChange = rand (0, count($schemaArray)-1);
-		
-		echo "Rename element $indexToChange\n";
-		
 		
 		/* @var $schemaElement MetadataField */
 		$schemaElement = $schemaArray[$indexToChange];
-		$schemaElement->label = $elementNameChangeTo;
+		$schemaElement->name = uniqid("name_");
+		
+		echo "  Changing element name idx=$indexToChange id={$schemaElement->id}\n";
+		
+		self::$shouldTransform = true;
 		
 		return $schemaArray;
-		
 	}
 	
 	/**
 	 * 
 	 * @param array $schemaArray
 	 * @param string $elementId
-	 * @param array $newValues
 	 * @return array
 	 */
-	public static function changeListValues ($schemaArray, $newValues)
+	public static function changeListValues ($schemaArray)
 	{
-		
 		$indexArr = array();
-		
 		
 		foreach ($schemaArray as $index => $schemaElement)
 		{
@@ -127,9 +138,8 @@ class XSDEditor
 			return $schemaArray;
 		}
 		
-		$indexToChange = rand(0, count($indexArr)-1);
-		
-		$elementToChange = $schemaArray[$indexArr[$indexToChange]];
+		$indexToChange = $indexArr[rand(0, count($indexArr)-1)];
+		$elementToChange = $schemaArray[$indexToChange];
 		
 		/* @var $elementToChange MetadataListField */
 		
@@ -140,13 +150,18 @@ class XSDEditor
 			case 0:
 				$randIndex = rand (0, count($elementToChange->valueList)-1);
 				array_splice($elementToChange->valueList, $randIndex, 0, uniqid('res_'));
+				echo "  Adding list value fieldIdx=$indexToChange fieldId={$elementToChange->id} valIdx=$randIndex\n";
 				break;
 			case 1:
 				$randIndex = rand (0, count($elementToChange->valueList)-1);
 				array_splice($elementToChange->valueList, $randIndex, 1);
+				echo "  Removing list value fieldIdx=$indexToChange fieldId={$elementToChange->id} valIdx=$randIndex\n";
+				self::$shouldTransform = true;
 				break;
 			case 2:
-				$elementToChange->valueList = $newValues;
+				$elementToChange->valueList = Config::getNewListVals();
+				echo "  Replacing list values fieldIdx=$indexToChange fieldId={$elementToChange->id}\n";
+				self::$shouldTransform = true;
 				break;
 		}
 		
@@ -170,14 +185,14 @@ class XSDEditor
 		
 		$proc = new XSLTProcessor();
 		
-		try {
+		try
+		{
 			$proc->importStyleSheet($xsl);
 			
 			$output = $proc->transformToXML($from);
 		}
 		catch (Exception $e)
 		{
-			
 			return null;
 		}
 		

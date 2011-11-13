@@ -30,14 +30,6 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 	 */
 	private $testXML;
 	
-	private $config;
-	
-	/**
-	 * @var array
-	 */
-	private $performedActions;
-	
-	
 	const DELETE_ACTION = 1;
 	
 	const EDIT_ACTION = 2;
@@ -50,49 +42,39 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 	
 	public function testRandomProfileSchema()
 	{
-		$this->performedActions = array();
 		for ($i=0; $i<10000; $i++)		
 		{
+			echo "Starting $i\n";
 			$this->runOnce();
+			echo "Done $i\n";
 		}
 	}
 	
 	public function runOnce()
 	{
-		$this->config = new Config();
+		XSDEditor::$shouldTransform	 = false;
 		
-		$this->schemaArray = $this->config->schemaArray();
+		$this->schemaArray = Config::schemaArray();
 		
 		$this->schema = $this->generateXSD($this->schemaArray);
 		
 		$this->testXML = $this->generateTestXML($this->schemaArray);
 				
-		$numOfRuns = rand(1,3);
+		$numOfActions = rand(1,4);
 
-		for ($i=1; $i<=$numOfRuns; $i++)
+		for ($i=1; $i<=$numOfActions; $i++)
 		{
-			
 			$this->randomizeAction();
 		}
 		
-		
  		$this->transSchema = $this->generateXSD($this->schemaArray);
 		
-		//save transformed xsd to a file
-		
-		
 		$this->metadataTransformed();
-
 	}
 	
 	private function randomizeAction ()
 	{
-		
-		//Randomize an action on the XSD
-		
 		$randAct = rand(1, 5);
-		
-		$this->performedActions[] = $randAct;
 		
 		switch ($randAct)
 		{
@@ -106,10 +88,10 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 				$this->schemaArray = XSDEditor::reorderSchema($this->schemaArray);
 				break;				
 			case self::RENAME_ELEMENT:
-				$this->schemaArray = XSDEditor::changeFieldName($this->schemaArray, uniqid("name_"));
+				$this->schemaArray = XSDEditor::changeFieldName($this->schemaArray);
 				break;
 			case self::CHANGE_LIST_VALUES:
-				$this->schemaArray = XSDEditor::changeListValues($this->schemaArray, Config::$newListVals);
+				$this->schemaArray = XSDEditor::changeListValues($this->schemaArray);
 				break;
 		}
 	}
@@ -189,6 +171,8 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 				
 		if (!is_bool($xsl))
 		{
+			$this->assertTrue(XSDEditor::$shouldTransform, 'transform was done unnecessarily');
+		
 			$transXML = XSDEditor::transformXmlData($this->testXML, $xsl);
 			
 			file_put_contents("transform.xml",$transXML);
@@ -197,8 +181,7 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 			$domXML->loadXML($transXML);
 			
 			try 
-			{
-				
+			{				
 				$result = $domXML->schemaValidateSource($this->transSchema);
 			}
 			catch (Exception $e)
@@ -221,6 +204,5 @@ class RandomProfileSchemaTest extends PHPUnit_Framework_TestCase
 				$this->assertTrue(false, 'failed to validate XML');
 			}
 		}
-		
 	}
 }

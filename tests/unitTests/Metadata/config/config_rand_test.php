@@ -13,38 +13,56 @@
 <?php
 	class Config
 	{
-
-		static $newListVals = array ('a','b','c');
-
-		/**
-		 * @return MetadataField
-		 */
-		public function getElementToAdd ()
+		public static function getNewListVals()
 		{
-			return new MetadataTextField('id5', 'Field5', "1", "true");
+			$valueCount = rand(1,6);
+			$result = array();
+			for ($i = 0; $i < $valueCount; $i++)
+				$result[] = "new_$i";
+				
+			return $result;
 		}
 		
 		/**
-		 * 
 		 * @return array
 		 */
-		public function schemaArray ()
+		public static function schemaArray ()
 		{
-			$var = array(new MetadataTextField('id1', 'Field1', "1", "true"),
-						 new MetadataTextField('id2', 'Field2', MetadataField::UNBOUNDED, "true"),
-						 new MetadataDateField('id3', 'Field3', "1", "true"),
-						 new MetadataListField('id4', 'Field4', MetadataField::UNBOUNDED, "true", array(1,2,3)),);
+			$result = array();
+			
+			$fieldCount = rand(1,10);
+			for ($i = 0; $i < $fieldCount; $i++)
+			{
+				$result[] = self::getRandomField("id$i", "Field$i");
+			}
 						 
-			return $var;
+			return $result;
 		}
 	
+		public static function getRandomField($id, $name)
+		{
+			$fieldType = rand(1,4);
+			switch($fieldType)
+			{
+			case 1:
+				return new MetadataTextField($id, $name);
+				
+			case 2:
+				return new  MetadataDateField($id, $name);
+
+			case 3:
+				return new  MetadataListField($id, $name);
+
+			case 4:
+				return new  MetadataEntryListField($id, $name);
+			}
+		}
 	}
 	
-class MetadataField
+abstract class MetadataField
 {
-	const TYPE = "objectType";
-	
 	const UNBOUNDED = "unbounded";
+	
 	/**
 	 * @var string
 	 */
@@ -56,68 +74,96 @@ class MetadataField
 	/**
 	 * @var string
 	 */
-	public $limited;
+	public $minOccurs;
+	/**
+	 * @var string
+	 */
+	public $maxOccurs;
 	/**
 	 * @var boolean
 	 */
-	public $searchable;
-	
+	public $searchable;	
+	/**
+	 * @var string
+	 */
 	public $label;
 	 
-	public function __construct($id, $name, $limited, $searchable)
+	public function __construct($id, $name)
 	{
-		
 		$this->id = $id;
 		$this->name = $name;
-		$this->limited = $limited;
-		$this->searchable = $searchable;
-		$this->label = strtolower($this->name);
+		$this->minOccurs = 0;
+		$this->maxOccurs = rand(0, 1) ? self::UNBOUNDED : '1';
+		$this->searchable = 'true';
+		$this->label = strtolower($name);
+	}
+	
+	protected function getAnnotation()
+	{
+		return 
+		"<xsd:annotation>
+			<xsd:documentation></xsd:documentation>
+			<xsd:appinfo>
+				<label>{$this->label}</label>
+				<key>{$this->label}</key>
+				<searchable>{$this->searchable}</searchable>
+				<timeControl>false</timeControl>
+				<description></description>
+			</xsd:appinfo>
+        </xsd:annotation>";
+	}
+	
+	protected function getSingleValueXML($value)
+	{
+		return "<{$this->name}>{$value}</{$this->name}>";
+	}
+	
+	protected function getRandomValueCount()
+	{
+		$randMin = $this->minOccurs;
+		if ($this->maxOccurs == self::UNBOUNDED)
+		{
+			$randMax = 5;
+		}
+		else 
+		{
+			$randMax = $this->maxOccurs;
+		}
+		
+		return rand($randMin, $randMax);
+	}
+
+	protected function getBasicElementAttributes()
+	{
+		return "id='{$this->id}' name='{$this->name}' minOccurs='{$this->minOccurs}' maxOccurs='{$this->maxOccurs}'";
 	}
 	
 	/**
 	 * 
 	 * @return string
 	 */
-	public function getXSD ()
-	{
-		
-	}
+	abstract public function getXSD ();
+
 	/**
 	 * 
 	 * @return string
 	 */
-	public function getXML ()
-	{
-		
-	}
-
+	abstract public function getXML ();
 }
 
 class MetadataTextField extends MetadataField
 {	
 	const TYPE = "textType";
 	
-	public function __construct($id, $name, $limited, $searchable)
+	public function __construct($id, $name)
 	{
-		parent::__construct($id, $name, $limited, $searchable);
-		
-		
+		parent::__construct($id, $name);
 	}
 	
 	public function getXSD()
 	{
-
-		$xsd = "<xsd:element id='{$this->id}' name='{$this->name}' minOccurs='0' maxOccurs='{$this->limited}' type='textType'>
-          <xsd:annotation>
-            <xsd:documentation></xsd:documentation>
-            <xsd:appinfo>
-              <label>{$this->label}</label>
-              <key>{$this->label}</key>
-              <searchable>{$this->searchable}</searchable>
-              <timeControl>false</timeControl>
-              <description></description>
-            </xsd:appinfo>
-          </xsd:annotation>
+		$xsd = "<xsd:element " . $this->getBasicElementAttributes() . " type='" . self::TYPE . "'>
+		".$this->getAnnotation()."
         </xsd:element>";
 		
 		return $xsd;
@@ -125,68 +171,43 @@ class MetadataTextField extends MetadataField
 	
 	public function getXML()
 	{
+		$howMany = $this->getRandomValueCount();
+		
 		$xml = "";
-		if ($this->limited == "1")
+		for ($i=0; $i<$howMany; $i++)
 		{
-			$xml = "<{$this->name}>". rand(0,24) ."</{$this->name}>";
-		}
-		else 
-		{
-			$howMany = rand (0,5);
-			for ($i=0; $i<=$howMany; $i++)
-			{
-				$xml .= "<{$this->name}>". rand(0,24) ."</{$this->name}>";
-			}
+			$xml .= $this->getSingleValueXML("val_". rand(0,24));
 		}
 		
 		return $xml;
 	}
-	
-
 }
 
 class MetadataDateField extends MetadataField
 {
 	const TYPE = "dateType";
 	
-	public function __construct($id, $name, $limited, $searchable)
+	public function __construct($id, $name)
 	{
-		parent::__construct($id, $name, $limited, $searchable);
-
+		parent::__construct($id, $name);
 	}
 	
 	public function getXSD ()
 	{
-		
-		$xsd = "<xsd:element id='{$this->id}' name='{$this->name}' minOccurs='0' maxOccurs='{$this->limited}' type='dateType'>
-          <xsd:annotation>
-            <xsd:documentation></xsd:documentation>
-            <xsd:appinfo>
-              <label>{$this->label}</label>
-              <key>{$this->label}</key>
-              <searchable>{$this->searchable}</searchable>
-              <timeControl>false</timeControl>
-              <description></description>
-            </xsd:appinfo>
-          </xsd:annotation>
+		$xsd = "<xsd:element " . $this->getBasicElementAttributes() . " type='" . self::TYPE . "'>
+		".$this->getAnnotation()."
         </xsd:element>";
 		return $xsd;
 	}
 	
 	public function getXML ()
 	{
+		$howMany = $this->getRandomValueCount();
+
 		$xml = "";
-		if ($this->limited == "1")
+		for ($i=0; $i<$howMany; $i++)
 		{
-			$xml = "<{$this->name}>". rand(0,24) ."</{$this->name}>";
-		}
-		else 
-		{
-			$howMany = rand (0,5);
-			for ($i=0; $i<=$howMany; $i++)
-			{
-				$xml .= "<{$this->name}>". rand(0,24) ."</{$this->name}>";
-			}
+			$xml .= $this->getSingleValueXML(rand(0,24));
 		}
 		
 		return $xml;
@@ -195,39 +216,28 @@ class MetadataDateField extends MetadataField
 
 class MetadataListField extends MetadataField
 {
-	const TYPE = "objectType";
+	const TYPE = "listType";
 	/**
 	 * @var array
 	 */
 	public $valueList;
 	
-	
-	
-	public function __construct($id, $name, $limited, $searchable, $valueList)
+	public function __construct($id, $name)
 	{
-		parent::__construct($id, $name, $limited, $searchable);
+		parent::__construct($id, $name);
 		
-		$this->valueList = $valueList;
-
-        
+		$valueCount = rand(1,6);
+		$this->valueList = array();
+		for ($i = 0; $i < $valueCount; $i++)
+			$this->valueList[] = "val_$i";
 	}
 	
 	public function getXSD()
 	{
-		
-		$xsd="<xsd:element id='{$this->id}' name='{$this->name}' minOccurs='0' maxOccurs='{$this->limited}'>
-          <xsd:annotation>
-            <xsd:documentation></xsd:documentation>
-            <xsd:appinfo>
-              <label>{$this->label}</label>
-              <key>{$this->label}</key>
-              <searchable>{$this->searchable}</searchable>
-              <timeControl>false</timeControl>
-              <description></description>
-            </xsd:appinfo>
-          </xsd:annotation>
+		$xsd="<xsd:element " . $this->getBasicElementAttributes() . ">
+		".$this->getAnnotation()."
           <xsd:simpleType>
-            <xsd:restriction base='listType'>";
+            <xsd:restriction base='" . self::TYPE . "'>";
 		
 		foreach ($this->valueList as $value)
 		{
@@ -244,9 +254,9 @@ class MetadataListField extends MetadataField
 	public function getXML()
 	{
 		$xml = "";
-        if ($this->limited == "1")
+        if ($this->maxOccurs == "1")
         {
-        	$xml.=  "<{$this->name}>" . $this->valueList[rand(0, count($this->valueList)-1)] . "</{$this->name}>";
+        	$xml .=  $this->getSingleValueXML($this->valueList[rand(0, count($this->valueList)-1)]);
         }
         else
         {
@@ -256,9 +266,8 @@ class MetadataListField extends MetadataField
         		
         		if ($choose)
         		{
-        			 $xml .= "<{$this->name}>$value</{$this->name}>";
+        			 $xml .= $this->getSingleValueXML($value);
         		}
-        		
         	}
         }
         return $xml;
@@ -269,49 +278,30 @@ class MetadataEntryListField extends MetadataField
 {
 	const TYPE = "objectType";
 	
-	public function __construct($id, $name, $limited, $searchable)
+	public function __construct($id, $name)
 	{
-		parent::__construct($id, $name, $limited, $searchable);
-		
-
-		
+		parent::__construct($id, $name);
 	}
 	
 	public function getXSD()
 	{
 		$nameLS = strtolower($this->name);
 		
-		$xsd = "<xsd:element id='{$this->id}' name='{$this->name}' minOccurs='0' maxOccurs='{$this->limited}' type='objectType'>
-          <xsd:annotation>
-            <xsd:documentation></xsd:documentation>
-            <xsd:appinfo>
-              <label>{$this->label}</label>
-              <key>{$this->label}</key>
-              <searchable>{$this->searchable}</searchable>
-              <timeControl>false</timeControl>
-              <description></description>
-            </xsd:appinfo>
-          </xsd:annotation>
+		$xsd = "<xsd:element " . $this->getBasicElementAttributes() . " type='" . self::TYPE . "'>
+		".$this->getAnnotation()."
         </xsd:element>";
 		
-		return $xsd;
-		
+		return $xsd;		
 	}
 	
 	public function getXML ()
 	{
+		$howMany = $this->getRandomValueCount();
+
 		$xml = "";
-		if ($this->limited == "1")
+		for ($i=0; $i<$howMany; $i++)
 		{
-			$xml = "<{$this->name}>". rand(0,24) ."</{$this->name}>";
-		}
-		else 
-		{
-			$howMany = rand (0,5);
-			for ($i=0; $i<=$howMany; $i++)
-			{
-				$xml .= "<{$this->name}>". rand(0,24) ."</{$this->name}>";
-			}
+			$xml .= $this->getSingleValueXML(rand(0,24));
 		}
 		
 		return $xml;
