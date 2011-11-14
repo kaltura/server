@@ -275,6 +275,7 @@ abstract class KalturaBaseService
 	 */
 	protected function serveFile(ISyncableFile $syncable, $fileSubType, $fileName, $forceProxy = false)
 	{
+		/* @var $fileSync FileSync */
 		$syncKey = $syncable->getSyncKey($fileSubType);
 		if(!kFileSyncUtils::fileSync_exists($syncKey))
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
@@ -287,21 +288,27 @@ abstract class KalturaBaseService
 		{
 			$filePath = $fileSync->getFullPath();
 			$mimeType = kFile::mimeType($filePath);
-			kFile::dumpFile($filePath, $mimeType);
+			kFile::dumpFile($filePath, $mimeType); 
 		}
-		else
+		else if ( in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) )
 		{
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			KalturaLog::info("Redirecting to [$remoteUrl]");
 			if($forceProxy)
 			{
-				kFile::dumpUrl($remoteUrl);
+				kFile::dumpApiRequest($remoteUrl);
 			}
 			else
 			{
+				//TODO find or build function which redurects the API request with all its parameters without using curl.
 				// or redirect if no proxy
 				header("Location: $remoteUrl");
 			}
+		}
+		else
+		{
+			$remoteUrl =  $fileSync->getExternalUrl();
+			header("Location: $remoteUrl");
 		}	
 	}
 	
