@@ -1914,6 +1914,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function createUploadResult(SimpleXMLElement $item, $action)
 	{
+		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
+		{
+			$this->exceededMaxRecordsEachRun = true;
+			return;
+		}
+		$this->handledRecordsThisRun++;
+		
 		//TODO: What should we write in the bulk upload result for update? 
 		//only the changed parameters or just the one theat was changed
 //		KalturaLog::debug("Creating upload result");
