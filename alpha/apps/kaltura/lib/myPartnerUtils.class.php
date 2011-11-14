@@ -118,6 +118,8 @@ class myPartnerUtils
 		{
 			$peer->setDefaultCriteriaFilter();
 		}
+		
+		self::$s_filterred_peer_list = array();
 	}
 	
 	/**
