@@ -103,7 +103,8 @@ class DbManager
 
 		$sphinxDS = isset(self::$config['sphinx_datasources']['datasources']) ? self::$config['sphinx_datasources']['datasources'] : array(self::DB_CONFIG_SPHINX);
 		$cacheExpiry = isset(self::$config['sphinx_datasources']['cache_expiry']) ? self::$config['sphinx_datasources']['cache_expiry'] : 300;
-
+		$connectTimeout = isset(self::$config['sphinx_datasources']['connect_timeout']) ? self::$config['sphinx_datasources']['connect_timeout'] : 1;
+		
 		// loop twice, on first iteration try only connections not marked as failed
 		// in case all connections failed, try all connections on second iteration
 
@@ -133,16 +134,12 @@ class DbManager
 						throw new Exception("DB Config [$key] not found");
 
 					$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
-					self::$sphinxConnection = new KalturaPDO($dataSource);
+					self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout));
+					
 					self::$sphinxConnection->setCommentsEnabled(false);
 
 					KalturaLog::debug("getSphinxConnection: connected to $key");
 					return self::$sphinxConnection;
-				}
-				catch(PropelException $pex)
-				{
-					KalturaLog::alert($pex->getMessage());
-					throw new PropelException("Database error");
 				}
 				catch(Exception $ex)
 				{
