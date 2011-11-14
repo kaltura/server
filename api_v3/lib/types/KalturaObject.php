@@ -72,7 +72,7 @@ class KalturaObject
             	KalturaLog::alert("getter for property [$object_prop] was not found on object class [" . get_class($source_object) . "]");
             }
                 
-            if (in_array($this_prop, array("createdAt", "updatedAt")))
+            if (in_array($this_prop, array("createdAt", "updatedAt", "deletedAt")))
             {
                 $this->$this_prop = call_user_func_array($getter_callback, array(null)); // when passing null to getCreatedAt, timestamp will be returned
             }
