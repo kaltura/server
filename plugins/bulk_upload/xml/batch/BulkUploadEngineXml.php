@@ -459,13 +459,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$contentAssetsAction = strtolower($item->contentAssets->action);
 		
 		//action to perfom for assets - default = replace
-		$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
+		$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::UPDATE];
 		if(isset($item->thumbnails->action))
 			$thumbnailsAction = strtolower($item->thumbnails->action);
 		
 		if (isset($item->contentAssets->action) && isset($item->thumbnails->action) && ($contentAssetsAction != $thumbnailsAction))
 			throw new KalturaBatchException("ContentAsset->action: {$contentAssetsAction} must be the same as thumbnails->action: {$thumbnailsAction}", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
-		
 		
 		//For each content in the item element we add a new flavor asset
 		if(isset($item->contentAssets))
