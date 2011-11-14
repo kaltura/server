@@ -286,7 +286,8 @@ class thumbnailAction extends sfAction
 		{
 			if (!in_array($file_sync->getDc(), kDataCenterMgr::getDcIds()))
 			{
-				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
+				$remoteUrl =  $file_sync->getExternalUrl();
+   				header("Location: $remoteUrl");
 			}
 			
 			$remoteUrl = kDataCenterMgr::getRedirectExternalUrl ( $file_sync , $_SERVER['REQUEST_URI'] );
