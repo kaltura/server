@@ -70,6 +70,17 @@ class kFileSyncUtils
 		
 		if ( $fetch_from_remote_if_no_local )
 		{
+			if (!in_array($file_sync->getDc(), kDataCenterMgr::getDcIds()))
+			{
+				if ( $strict )
+				{
+					throw new Exception ( "File sync is remote - cannot get contents, id = [" . $file_sync->getId() . "]" );
+				}
+				else
+				{
+					return null;
+				}
+			}
 			// if $fetch_from_remote_if_no_local is false - $file_sync shoule be null , this if is in fact redundant
 			// TODO - curl to the remote 
 			$content = kDataCenterMgr::retrieveFileFromRemoteDataCenter( $file_sync );
@@ -643,7 +654,8 @@ class kFileSyncUtils
 				$local = true;
 				break;
 			}
-			else if ( $fetch_from_remote_if_no_local == true && $desired_file_sync == null )
+			else if ( $fetch_from_remote_if_no_local == true && 
+					($desired_file_sync == null || $tmp_file_sync->getDc() < $desired_file_sync->getDc()) )			// prefer local file syncs if they exist
 			{
 				$desired_file_sync = $tmp_file_sync;
 			}
