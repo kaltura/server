@@ -13,3 +13,4 @@ How to create a plugin test:
 12.   Replace global results with token (like partnerId)
 13.   Until you get no failures go to 10
 14.   At the end check the data file and commit only the data, config, .ini files. The tests are not checked in.
+//Test QC Commit!
