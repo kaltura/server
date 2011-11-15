@@ -747,7 +747,9 @@ class Partner extends BasePartner
     public function getMaxLoginAttemptsOverageUnit()    {return $this->getFromCustomData('login_attempts_overage_unit');}
     public function getMaxBulkSizeOverageUnit()         {return $this->getFromCustomData('bulk_size_overage_unit');}
 	
-	
+	public function getAutoModerateEntryFilter()         {return $this->getFromCustomData('auto_moderate_entry_filter');}
+	public function setAutoModerateEntryFilter($v)       {$this->putInCustomData('auto_moderate_entry_filter', $v);}
+    
 	/**
 	 * @return kAkamaiLiveParams
 	 */
