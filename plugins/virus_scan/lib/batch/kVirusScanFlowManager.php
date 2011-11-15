@@ -183,6 +183,22 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		{
 			case KalturaVirusScanJobResult::FILE_WAS_CLEANED:									
 			case KalturaVirusScanJobResult::FILE_IS_CLEAN:
+			    $entry = $flavorAsset->getentry();
+			    if ($entry->getStatus() == VirusScanPlugin::getEntryStatusCoreValue(VirusScanEntryStatus::SCAN_FAILURE))
+			    {
+			        $entryStatusBeforeScanFailure = self::getEntryStatusBeforeScanFailure($entry);
+			        if (!is_null($entryStatusBeforeScanFailure)) {
+			            $entry->setStatus($entryStatusBeforeScanFailure);
+			            self::setEntryStatusBeforeScanFailure($entry, null);
+			            $entry->save();
+			        }
+			        $flavorAssetStatusBeforeScanFailure = self::getFlavorAssetStatusBeforeScanFailure($flavorAsset);    
+			        if (!is_null($flavorAssetStatusBeforeScanFailure)) {
+    			        $flavorAsset->setStatus($flavorAssetStatusBeforeScanFailure);
+    			        self::setFlavorAssetStatusBeforeScanFailure($flavorAsset, null);
+    			        $flavorAsset->save();
+			        }
+			    }
 				$this->resumeEvents($flavorAsset, $dbBatchJob);
 				break;
 				
@@ -230,6 +246,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
 		if ($entry)
 		{
+		    self::setEntryStatusBeforeScanFailure($entry, $entry->getStatus());
 			$entry->setStatus(VirusScanPlugin::getEntryStatusCoreValue(VirusScanEntryStatus::SCAN_FAILURE));
 			$entry->save();
 			myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
@@ -242,6 +259,7 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		if ($flavorAsset)
 		{
+		    self::setFlavorAssetStatusBeforeScanFailure($flavorAsset, $flavorAsset->getStatus());
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$flavorAsset->save();
 		}
@@ -253,4 +271,29 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		// do not resume flavor asset added event consumption
 		return $dbBatchJob;
 	}
+	
+	
+	const CUSTOM_DATA_STATUS_BEFORE_SCAN_FAILURE = 'status_before_scan_failure';
+	
+	
+	protected static function setEntryStatusBeforeScanFailure(entry $entry, $status)
+	{
+	    $entry->putInCustomData(VirusScanPlugin::getPluginName().'_'.self::CUSTOM_DATA_STATUS_BEFORE_SCAN_FAILURE, $status);
+	}
+	
+	protected static function getEntryStatusBeforeScanFailure(entry $entry)
+	{
+	    return $entry->getFromCustomData(VirusScanPlugin::getPluginName().'_'.self::CUSTOM_DATA_STATUS_BEFORE_SCAN_FAILURE);
+	}
+	
+    protected static function setFlavorAssetStatusBeforeScanFailure(flavorAsset $flavorAsset, $status)
+	{
+	    $flavorAsset->putInCustomData(VirusScanPlugin::getPluginName().'_'.self::CUSTOM_DATA_STATUS_BEFORE_SCAN_FAILURE, $status);
+	}
+	
+	protected static function getFlavorAssetStatusBeforeScanFailure(flavorAsset $flavorAsset)
+	{
+	    return $flavorAsset->getFromCustomData(VirusScanPlugin::getPluginName().'_'.self::CUSTOM_DATA_STATUS_BEFORE_SCAN_FAILURE);
+	}
+	
 }
