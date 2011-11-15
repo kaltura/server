@@ -53,6 +53,10 @@ class BulkUploadEngineCsv extends KBulkUploadEngine
 		$values = fgetcsv($fileHandle);
 		while($values)
 		{
+			//removing UTF-8 BOM if exists
+			if(substr($values[0], 0,3) == pack('CCC',0xef,0xbb,0xbf)) { 
+       			 $values[0]=substr($values[0], 3); 
+    		} 
 			// use version 3 (dynamic columns cassiopeia) identified by * in first char
 			if(substr(trim($values[0]), 0, 1) == '*') // is a remark
 			{
