@@ -94,6 +94,6 @@ class StorageProfile extends BaseStorageProfile
 	
 	public function getCacheInvalidationKeys()
 	{
-		return array("storageProfile:partnerId=".$this->getPartnerId(), "storageProfile:id=".$this->getId());
+		return array("storageProfile:id=".$this->getId(), "storageProfile:partnerId=".$this->getPartnerId());
 	}
 }

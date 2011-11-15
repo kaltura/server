@@ -471,7 +471,7 @@ class asset extends Baseasset implements ISyncableFile
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("flavorAsset:entryId=".$this->getEntryId(), "flavorAsset:id=".$this->getId());
+		return array("flavorAsset:id=".$this->getId(), "flavorAsset:entryId=".$this->getEntryId());
 	}
 	
 	public function getPartnerDescription()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_PARTNER_DESCRIPTION);}
