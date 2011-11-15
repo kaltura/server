@@ -1028,7 +1028,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->kClient->thumbAsset->add($entryId, $thumbAssets[$thumbParamsId]);
 				$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbAssetsResource);				
 			}else{
-				$this->kClient->thumbAsset->update($existingflavorAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
+				$this->kClient->thumbAsset->update($existingthumbAssets[$flavorParamsId], $flavorAssets[$flavorParamsId]);
 				$this->kClient->thumbAsset->setContent($existingthumbAssets[$thumbParamsId]->id, $thumbAssetsResource);
 			}	
 		}
