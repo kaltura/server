@@ -25,12 +25,11 @@ function fileDeletePolicy() {
 			var $autoFileDeleteDaysLabel = $('#autoFileDeleteDays-label');
 			
 			if ($input.val() == 1) {
-				$autoFileDeleteDays.attr("hidden", false);
-				$autoFileDeleteDaysLabel.attr("hidden", false);
+				$autoFileDeleteDays.attr("hidden", true);
+				$autoFileDeleteDaysLabel.attr("hidden", true);
 		    }else{
-		    	$autoFileDeleteDays.attr("hidden", true);
-		    	$autoFileDeleteDaysLabel.attr("hidden", true);
-				$autoFileDeleteDays.val('0');
+		    	$autoFileDeleteDays.attr("hidden", false);
+		    	$autoFileDeleteDaysLabel.attr("hidden", false);
 		    }
 		});
 
@@ -39,12 +38,11 @@ function fileDeletePolicy() {
 		
 		if( $input.attr('type') == 'select-one'){
 			if ($input.val() == 1) {
-				$autoFileDeleteDays.attr("hidden", false);
-				$autoFileDeleteDaysLabel.attr("hidden", false);
+				$autoFileDeleteDays.attr("hidden", true);
+				$autoFileDeleteDaysLabel.attr("hidden", true);
 		    }else{
-		    	$autoFileDeleteDays.attr("hidden", true);
-		    	$autoFileDeleteDaysLabel.attr("hidden", true);
-				$autoFileDeleteDays.val('0');
+		    	$autoFileDeleteDays.attr("hidden", false);
+		    	$autoFileDeleteDaysLabel.attr("hidden", false);
 		    }
 		}
 	});}
