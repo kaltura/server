@@ -2,7 +2,7 @@
 
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
-	array('table' => "flavor_asset", 			'keys' => array(array("'flavorAsset:entryId='", '@OBJ@.entry_id'), array("'flavorAsset:id='", '@OBJ@.id'))),
+	array('table' => "flavor_asset", 			'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 	'class' => 'asset'),
 	array('table' => "kuser", 					'keys' => array(array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
 	array('table' => "entry", 					'keys' => array(array("'entry:id='", '@OBJ@.id'))),
 	array('table' => "access_control", 			'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
@@ -11,16 +11,155 @@ $INVALIDATION_KEYS = array(
 	array('table' => "category", 				'keys' => array(array("'category:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "file_sync", 				'keys' => array(array("'fileSync:objectId='", '@OBJ@.object_id'))),
 	array('table' => "media_info", 				'keys' => array(array("'mediaInfo:flavorAssetId='", '@OBJ@.flavor_asset_id'))),
-	array('table' => "storage_profile", 		'keys' => array(array("'storageProfile:partnerId='", '@OBJ@.partner_id'), array("'storageProfile:id='", '@OBJ@.id'))),
+	array('table' => "storage_profile", 		'keys' => array(array("'storageProfile:id='", '@OBJ@.id'), array("'storageProfile:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "ui_conf", 				'keys' => array(array("'uiConf:id='", '@OBJ@.id'))),
 	array('table' => "widget", 					'keys' => array(array("'widget:id='", '@OBJ@.id'))),
-	array('table' => "metadata", 				'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id'))),
-	array('table' => "metadata_profile_field", 	'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id'))),
+	array('table' => "metadata", 				'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id')), 												'plugin' => 'metadata'),
+	array('table' => "metadata_profile_field", 	'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),				'plugin' => 'metadata'),
 	array('table' => "partner", 				'keys' => array(array("'partner:id='", '@OBJ@.id'))),
 	);
 
+	
+	
+function generateInvalidationKeyCode($invalidationKey)
+{
+	$objKeys = array();
+	$peerKeys = array();
+	foreach ($invalidationKey['keys'] as $curKeyStrings)
+	{
+		$objArrayElems = array();
+		$peerArrayElems = array('');
+		foreach ($curKeyStrings as $curStr)
+		{
+			if (strpos($curStr, '@OBJ@') === false)
+			{
+				$peerArrayElems[0] .= str_replace("'", "", $curStr);
+				$objArrayElems[] = str_replace("'", '"', $curStr);
+			}
+			else 
+			{
+				$curStr = str_replace("@OBJ@.", "", $curStr);
+				$peerArrayElems[0] .= "%s";
+				$peerArrayElems[] = "self::" . strtoupper($curStr);
+				$curStrUpperCamel = str_replace(' ', '', ucwords(str_replace('_', ' ', $curStr)));
+				$objArrayElems[] = '$this->get' . $curStrUpperCamel . '()';
+			}
+		}
+		
+		$peerArrayElems[0] = '"' . $peerArrayElems[0] . '"';
+		$peerArrayElems = implode(', ', $peerArrayElems);
+		
+		$peerKeys[] = "array($peerArrayElems)";
+		
+		$objArrayElems = implode('.', $objArrayElems);
+		
+		$objKeys[] = $objArrayElems;
+	}
+	
+	$objKeys = implode(', ', $objKeys);
+	$peerKeys = implode(', ', $peerKeys);
+	
+		$objFunc = 
+	"public function getCacheInvalidationKeys()
+	{
+		return array($objKeys);
+	}";
+			
+			$peerFunc = 
+	"public static function getCacheInvalidationKeys()
+	{
+		return array($peerKeys);		
+	}";
+	
+	return array($objFunc, $peerFunc);
+}
+
+function getFuncEnd($fileData, $funcPos)
+{
+	$braceCount = 0;
+	for (;; $funcPos++)
+	{
+		switch ($fileData[$funcPos])
+		{
+		case '{':
+			$braceCount++;
+			break;
+
+		case '}':
+			$braceCount--;
+			if ($braceCount == 0)
+			{
+				return $funcPos + 1;
+			}
+			break;
+		}
+	}
+}
+
+function updateInvalidationFunc($fileName, $newFunc, $funcSpec)
+{
+	$newFunc = str_replace("\r\n", "\n", $newFunc);
+	$fileData = file_get_contents($fileName);
+	$funcPos = strpos($fileData, "$funcSpec function getCacheInvalidationKeys()");
+	if ($funcPos !== false)
+	{
+		print "$fileName - replacing existing func\n";
+		$funcEnd = getFuncEnd($fileData, $funcPos);
+		$oldFunc = substr($fileData, $funcPos, $funcEnd - $funcPos);
+		$fileData = str_replace($oldFunc, $newFunc, $fileData);
+	}
+	else
+	{
+		print "$fileName - adding new func\n";
+		$funcPos = strrpos($fileData, "}");
+		$fileData = substr($fileData, 0, $funcPos) . "\t" . $newFunc . "\n" . substr($fileData, $funcPos); 
+	}
+	file_put_contents($fileName, $fileData);
+}
+
+function updateTableCode($invalidationKey, $objFunc, $peerFunc)
+{
+	$serverRoot = realpath(dirname(__FILE__)."/../../..");
+	
+	if (array_key_exists('plugin', $invalidationKey))
+	{
+		$modelPath = "$serverRoot/plugins/" . $invalidationKey['plugin'] . "/lib/model/";
+	}
+	else
+	{
+		$modelPath = "$serverRoot/alpha/lib/model/";
+	}
+	
+	if (array_key_exists('class', $invalidationKey))
+	{
+		$className = $invalidationKey['class'];
+	}
+	else
+	{
+		$className = str_replace("_", "", $invalidationKey['table']);
+	}
+
+	$objClassFile = $modelPath . $className . ".php";
+	updateInvalidationFunc($objClassFile, $objFunc, "public");
+	
+	$peerClassFile = $modelPath . $className . "Peer.php";
+	updateInvalidationFunc($peerClassFile, $peerFunc, "public static");
+}
+
+function generateCode()
+{
+	global $INVALIDATION_KEYS;
+	
+	foreach ($INVALIDATION_KEYS as $invalidationKey)
+	{
+		list($objFunc, $peerFunc) = generateInvalidationKeyCode($invalidationKey);
+		updateTableCode($invalidationKey, $objFunc, $peerFunc);
+	}
+}
+	
+	
 // Default parameters
-$ACTION = 'create';
+$ACTION = 'help';
 $HOST_NAME = '127.0.0.1';
 $USER_NAME = 'root';
 $PASSWORD = '';
@@ -32,8 +171,15 @@ if ($argc > 1)
 if ($ACTION == 'help')
 	die("Usage:\n\tphp query_cache_triggers [<action> [<hostname> [<username> [<password>]]]]\n");
 
-if (!in_array($ACTION, array('create', 'remove')))
-	die("Error: Invalid action $ACTION\n");
+$ALLOWED_ACTIONS = array('create', 'remove', 'gencode');
+if (!in_array($ACTION, $ALLOWED_ACTIONS))
+	die("Error: Invalid action $ACTION possible actions: " . implode(', ', $ALLOWED_ACTIONS) . "\n");
+
+if ($ACTION == 'gencode')
+{
+	generateCode();
+	die();
+}
 	
 if ($argc > 2)
 	$HOST_NAME = $argv[2];
