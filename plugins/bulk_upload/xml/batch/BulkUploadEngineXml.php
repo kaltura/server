@@ -459,7 +459,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$contentAssetsAction = strtolower($item->contentAssets->action);
 		
 		//action to perfom for assets - default = replace
-		$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::UPDATE];
+		$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
 		if(isset($item->thumbnails->action))
 			$thumbnailsAction = strtolower($item->thumbnails->action);
 		
@@ -1017,7 +1017,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			if(is_null($createdThumbAsset->thumbParamsId))
 				continue;
 				
-			$existingthumbAssets[$createdThumbAsset->thumbParamsId] = $createdThumbAsset;
+			$existingthumbAssets[$createdThumbAsset->thumbParamsId] = $createdThumbAsset->id;
 		}
 		
 		
@@ -1029,7 +1029,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 				$this->kClient->thumbAsset->setContent($this->kClient->getMultiRequestResult()->id, $thumbAssetsResource);				
 			}else{
 				$this->kClient->thumbAsset->update($existingthumbAssets[$thumbParamsId], $flavorAssets[$flavorParamsId]);
-				$this->kClient->thumbAsset->setContent($existingthumbAssets[$thumbParamsId]->id, $thumbAssetsResource);
+				$this->kClient->thumbAsset->setContent($existingthumbAssets[$thumbParamsId], $thumbAssetsResource);
 			}	
 		}
 		
