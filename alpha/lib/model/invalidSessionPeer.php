@@ -22,10 +22,13 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	 */
 	public static function isInvalid($ks, PropelPDO $con = null)
 	{
+		$ksDecoded = base64_decode($ks);
+		list ( $hash , $real_str) = explode ( "|" , $ksDecoded , 2 );
+			
 		$criteria = new Criteria();
-		$criteria->add(invalidSessionPeer::KS, base64_decode($ks));
+		$criteria->add(invalidSessionPeer::KS, $hash);
 		$criteria->addAnd(invalidSessionPeer::KS_VALID_UNTIL, null, Criteria::NOT_EQUAL);
-		$cnt = invalidSessionPeer::doCount($criteria, $con);
+		$cnt = invalidSessionPeer::doCount($criteria, false, $con);
 		return ($cnt > 0);
 	}
 	
@@ -36,8 +39,11 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	 */
 	public static function isValidActionsLimit($ks, PropelPDO $con = null)
 	{
+		$ksDecoded = base64_decode($ks);
+		list ( $hash , $real_str) = explode ( "|" , $ksDecoded , 2 );
+		
 		$criteria = new Criteria();
-		$criteria->add(invalidSessionPeer::KS, base64_decode($ks));
+		$criteria->add(invalidSessionPeer::KS, $hash);
 		$cnt = invalidSessionPeer::doSelectOne($criteria, $con);
 		
 		if ($cnt){
@@ -62,7 +68,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	public static function actionsLimitKs(ks $ks, $limit)
 	{
 		$invalidSession = new invalidSession();
-		$invalidSession->setKs(base64_decode($ks->toSecureString()));
+		$invalidSession->setKs($ks->getHash());
 		$invalidSession->setActionsLimit($limit);
 		$invalidSession->save();
 		
@@ -78,12 +84,12 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 	public static function invalidateKs(ks $ks, PropelPDO $con = null)
 	{
 		$criteria = new Criteria();
-		$criteria->add(invalidSessionPeer::KS, base64_decode($ks->toSecureString()));
+		$criteria->add(invalidSessionPeer::KS, $ks->getHash());
 		$invalidSession = invalidSessionPeer::doSelectOne($criteria, $con);
 		
 		if(!$invalidSession){
 			$invalidSession = new invalidSession();
-			$invalidSession->setKs(base64_decode($ks->getOriginalString()));
+			$invalidSession->setKs($ks->getHash());
 		}
 				
 		$invalidSession->setKsValidUntil($ks->valid_until);
