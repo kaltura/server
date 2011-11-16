@@ -728,6 +728,8 @@ class kFile
 		else
 			infraRequestUtils::sendCdnHeaders($ext, $range_length, $max_age);
 
+		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
+					
 		// return "Accept-Ranges: bytes" header. Firefox looks for it when playing ogg video files
 		// upon detecting this header it cancels its original request and starts sending byte range requests
 		header("Accept-Ranges: bytes");
