@@ -359,21 +359,8 @@ class DocumentsService extends KalturaEntryService
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($sync_key, true, true);
 			if(!$local)
 			{
-				// take input params and add to URL
-				$queryArr = array(
-					'service' => 'document',
-					'action' => 'convertPptToSwf',
-					'entryId' => $entryId,
-					'format' => $this->params["format"],
-					'ks' => $this->getKs()->toSecureString()
-				);
-				$get_query = http_build_query($queryArr, '', '&');
-
-				$remote_url = kDataCenterMgr::getRedirectExternalUrl ( $fileSync , $_SERVER['REQUEST_URI'] );
-				$url = (strpos($remote_url, '?') === FALSE)? $remote_url.'?'.$get_query: $remote_url.'&'.$get_query;
-				// prxoy request to other DC
-				KalturaLog::log ( __METHOD__ . ": redirecting to [$url]" );
-				kFile::dumpUrl($url);
+    			$remoteDCHost = kDataCenterMgr::getRemoteDcExternalUrl($fileSync);
+				kFile::dumpApiRequest($remoteDCHost);
 			}
 			
 			KalturaLog::log("convertPptToSwf sync key doesn't exists");
