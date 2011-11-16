@@ -114,11 +114,37 @@ class ContentDistributionBulkUploadXmlPlugin extends KalturaPlugin implements IK
 			<xs:annotation>
 				<xs:documentation>Indicates that the entry should be submitted when it is possible</xs:documentation>
 			</xs:annotation>
-		</xs:attribute>
-		
+		</xs:attribute>		
+	</xs:complexType>
+
+	<xs:complexType name="T_distributions">
+		<xs:sequence>
+			<xs:element ref="distribution" maxOccurs="unbounded" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>All distributions</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:element name="distribution" type="T_distribution" substitutionGroup="item-extension">
+	<xs:element name="distributions" type="T_distributions" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>All custom metadata elemets</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<distributions>
+						<distribution>
+							<distributionProfile>MY_DISTRIBUTION_PROFILE</distributionProfile>
+							<sunrise>2011-10-26T21:32:52</sunrise>
+							<sunset>2011-12-26T21:32:52</sunset>
+						</distribution>
+					</distributions>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	
+	<xs:element name="distribution" type="T_distribution">
 		<xs:annotation>
 			<xs:documentation>Details related to a content distribution submission</xs:documentation>
 			<xs:appinfo>
