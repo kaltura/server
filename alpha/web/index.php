@@ -9,6 +9,22 @@ function checkCache()
 	$uri = $_SERVER["REQUEST_URI"];
 	$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 
+	if (function_exists('apc_fetch'))
+	{
+		$url = apc_fetch("redirect-".$_SERVER["REQUEST_URI"]);
+		if ($url)
+		{
+			$max_age = 60;
+			header("Cache-Control: private, max-age=$max_age, max-stale=0");
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $max_age) . ' GMT');
+			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
+
+			header("X-Kaltura:cached-dispatcher-redirect");
+			header("Location:$url");
+			die;
+		}
+	}
+
 	if (strpos($uri, "/partnerservices2") !== false)
 	{
 		$params = $_GET + $_POST;
