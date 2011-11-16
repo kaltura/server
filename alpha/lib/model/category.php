@@ -128,7 +128,7 @@ class category extends Basecategory
 		$entryFilter->attachToCriteria($c);
 		$entries = entryPeer::doSelect($c);
 
-		$category->setEntriesCount(count($entries));
+		$category->setEntriesCount($c->getRecordsCount());
 		$category->save();
 		
 		//update parents count
