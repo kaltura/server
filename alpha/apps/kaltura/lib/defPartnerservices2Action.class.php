@@ -457,6 +457,7 @@ $this->benchmarkEnd( "signature" );
 			}
 		}
 
+		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 		$this->setContentType( $content_type );
 
 		// while testing our system - will match each service agains its description
