@@ -145,6 +145,9 @@ class downloadAction extends sfAction
 			}
 				
 			$url .= "/relocate/" . $this->encodeUrl($file_name);
+
+			kFile::cacheRedirect($url);
+
 			header("Location: {$url}");
 			die;
 		}
