@@ -4,6 +4,20 @@ require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/requestUtils.cla
 
 class KalturaResponseCacher
 {
+	// warm cache constatns
+	// cache warming is used to maintain continous use of the request caching while preventing a load once the cache expires
+	// during WARM_CACHE_INTERVAL before the cache expiry a single request will be allowed to get through and renew the cache
+	// this request named warm cache request will block other such requests for WARM_CACHE_TTL seconds
+
+	// header to mark the request is due to cache warming. the header holds the original request protocol http/https
+        const WARM_CACHE_HEADER = "X-KALTURA-WARM-CACHE";
+
+	// interval before cache expiry in which to try and warm the cache
+	const WARM_CACHE_INTERVAL = 60;
+
+	// time in which a warm cache request will block another request from warming the cache
+        const WARM_CACHE_TTL = 10;
+
 	protected $_params = array();
 	protected $_cacheFilePrefix = "cache_v3-";
 	protected $_cacheDirectory = "/tmp/";
@@ -42,9 +56,8 @@ class KalturaResponseCacher
 			$params = requestUtils::getRequestParams();
 		}
 		
-		if(kConf::hasParam('v3cache_ignore_params'))
-			foreach(kConf::get('v3cache_ignore_params') as $name)
-				unset($params[$name]);
+		foreach(kConf::get('v3cache_ignore_params') as $name)
+			unset($params[$name]);
 		
 		// check the clientTag parameter for a cache start time (cache_st:<time>) directive
 		if (isset($params['clientTag']))
@@ -79,6 +92,7 @@ class KalturaResponseCacher
 		unset($params['ks']);
 		unset($params['kalsig']);
 		unset($params['clientTag']);
+		unset($params['callback']);
 		
 		$this->_params = $params;
 		$this->setKS($ks);
@@ -112,9 +126,9 @@ class KalturaResponseCacher
 	{
 		self::$_useCache = array();
 	}
-	
+
 	/**
-	* This function checks whether the cache is disabled and returns the result.
+	 * This function checks whether the cache is disabled and returns the result.
 	 */	
 	public static function isCacheDisabled()
 	{
@@ -138,7 +152,7 @@ class KalturaResponseCacher
 	{
 		if (!in_array($this->_instanceId, self::$_useCache))
 			return false;
-			
+		
 		$startTime = microtime(true);
 		if ($this->hasCache())
 		{
@@ -183,7 +197,18 @@ class KalturaResponseCacher
 				header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0", true);
 				header("Pragma: no-cache", true);
 			}
-			
+	
+			// for jsonp ignore the callback argument and replace it in result (e.g. callback_4([{...}]);
+			if (@$_REQUEST["format"] == 9)
+			{
+				$callback = @$_REQUEST["callback"];
+				$pos = strpos($response, "(");
+				if ($pos)
+				{
+					$response = $callback.substr($response, $pos);
+				}
+			}
+
 			echo $response;
 			die;
 		}
@@ -222,6 +247,24 @@ class KalturaResponseCacher
 	{
 		if (!$this->shouldCache())
 			return;
+
+		// provide cache key in header unless the X-Kaltura header was already set with a value
+		// such as an error code. the header is used for debugging but it also appears in the access_log
+		// and there we rather show the error than the cach key
+
+		$headers = headers_list();
+		$foundHeader = false;
+		foreach($headers as $header)
+		{
+			if (strpos($header, 'X-Kaltura') === 0)
+			{
+				$foundHeader = true;
+				break;
+			}
+		}
+
+		if (!$foundHeader)
+			header("X-Kaltura:cache-key,".$this->_cacheKey);
 	
 		$this->createDirForPath($this->_cacheLogFilePath);
 		$this->createDirForPath($this->_cacheDataFilePath);
@@ -234,6 +277,17 @@ class KalturaResponseCacher
 		}
 
 		// store specific expiry shorter than the default one
+		if ($this->_expiry == $this->_defaultExpiry)
+		{
+			if (kConf::hasParam("v3cache_expiry"))
+			{
+				$partnerId = $this->_params["___cache___partnerId"];
+				$expiryArr = kConf::get("v3cache_expiry");
+				if (array_key_exists($partnerId, $expiryArr))
+					$this->_expiry = $expiryArr[$partnerId];
+			}
+		}
+
 		if ($this->_expiry != $this->_defaultExpiry)
 			file_put_contents($this->_cacheExpiryFilePath, time() + $this->_expiry);
 	}
@@ -252,24 +306,45 @@ class KalturaResponseCacher
 		}
 	}
 	
-	
+
 	private function hasCache()
 	{
+                // if the request is for warming the cache, disregard the cache and run the request
+		$warmCacheHeader = self::getRequestHeaderValue(self::WARM_CACHE_HEADER);
+
+                if ($warmCacheHeader !== false)
+                {
+			// if the request triggering the cache warmup was an https request, fool the code to treat the current request as https as well 
+			if ($warmCacheHeader == "https")
+				$_SERVER["HTTPS"] = "on";
+						
+			// make a trace in the access log of this being a warmup call
+			header("X-Kaltura:cached-warmup-$warmCacheHeader,".$this->_cacheKey);
+			return false;
+                }
+
 		if (file_exists($this->_cacheDataFilePath))
 		{
 			// check for a specific expiry 
 			$fileExpiry = @file_get_contents($this->_cacheExpiryFilePath);
 			if ($fileExpiry)
 			{
-				$useCache = $fileExpiry > time(); 
+				$cacheTTL = $fileExpiry - time(); 
 			}
 			else // otherwise check for the "default" expiry
 			{
-				$useCache = filemtime($this->_cacheDataFilePath) + $this->_expiry > time();
+				$cacheTTL = filemtime($this->_cacheDataFilePath) + $this->_expiry - time(); 
 			}
 
-			if($useCache)
+			if($cacheTTL > 0)
+			{
+				if ($cacheTTL < self::WARM_CACHE_INTERVAL) // 1 minute left for cache, lets warm it
+				{
+					self::warmCache($this->_cacheDataFilePath);	
+				}
+				
 				return true;
+			}
 
 			@unlink($this->_cacheDataFilePath);
 			@unlink($this->_cacheHeadersFilePath);
@@ -318,6 +393,7 @@ class KalturaResponseCacher
 			}
 		}
         
+        
 		if ($ks->isAdmin())
 			return false;
 	
@@ -347,4 +423,104 @@ class KalturaResponseCacher
 		}
 		return array("partnerId" => $partnerId, "userId" => $userId, "validUntil" => $validUntil );
 	}
+
+	private static function getRequestHeaderValue($headerName)
+	{
+		$headerName = "HTTP_".str_replace("-", "_", strtoupper($headerName));
+
+		if (!isset($_SERVER[$headerName]))
+			return false;
+
+		return $_SERVER[$headerName];
+	}
+
+
+	private static function getRequestHeaders()
+	{
+		if(function_exists('apache_request_headers'))
+			return apache_request_headers();
+		
+		foreach($_SERVER as $key => $value)
+		{
+			if(substr($key, 0, 5) == "HTTP_")
+			{
+				$key = str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", substr($key, 5)))));
+				$out[$key] = $value;
+			}
+		}
+		return $out;
+	}
+
+	// warm cache by sending the current request asynchronously via a socket to localhost
+	// apc is used to flag that an existing warmup request is already running. The flag has a TTL of 10 seconds, 
+	// so in the case the warmup request failed another one can be ran after 10 seconds.
+	// finalize IP passing (use getRemoteAddr code)
+	// can the warm cache header get received via a warm request passed from the other DC?
+        private function warmCache($key)
+        {
+                // require apc for checking whether warmup is already in progress
+                if (!function_exists('apc_fetch'))
+                        return;
+
+                $key = "cache-warmup-$key";
+
+                // abort warming if a previous warmup started less than 10 seconds ago
+                if (apc_fetch($key) !== false)
+                        return;
+
+                // flag we are running a warmup for the current request
+                apc_store($key, true, self::WARM_CACHE_TTL);
+
+                $uri = $_SERVER["REQUEST_URI"];
+
+                $fp = fsockopen('127.0.0.1', 80, $errno, $errstr, 1);
+
+                if ($fp === false)
+                {
+                        error_log("warmCache - Couldn't open a socket [".$uri."]", 0);
+                        return;
+                }
+
+                $method = $_SERVER["REQUEST_METHOD"];
+
+                $out = "$method $uri HTTP/1.1\r\n";
+
+                $sentHeaders = self::getRequestHeaders();
+                $sentHeaders["Connection"] = "Close";
+
+		// mark request as a warm cache request in order to disable caching and pass the http/https protocol (the warmup always uses http)
+		$sentHeaders[self::WARM_CACHE_HEADER] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+				
+
+                // if the request wasn't proxied pass the ip on the X-FORWARDED-FOR header
+                if (!isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+                {
+                        $sentHeaders["X-FORWARDED-FOR"] = $_SERVER['REMOTE_ADDR'];
+                        $sentHeaders["X-FORWARDED-SERVER"] = kConf::get('remote_addr_header_server');
+                }
+
+                foreach($sentHeaders as $header => $value)
+                {
+                        $out .= "$header:$value\r\n";
+                }
+
+                $out .= "\r\n";
+
+                if ($method == "POST")
+                {
+                                $postParams = array();
+                                foreach ($_POST as $key => &$val) {
+                                        if (is_array($val)) $val = implode(',', $val);
+                                        {
+                                                $postParams[] = $key.'='.urlencode($val);
+                                        }
+                                }
+
+                                $out .= implode('&', $postParams);
+                }
+
+                fwrite($fp, $out);
+                fclose($fp);
+        }
+
 }
