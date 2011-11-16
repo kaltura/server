@@ -78,7 +78,6 @@ class kSessionUtils
 			$ks->privileges = $privileges;
 			$ks->additional_data = $additional_data;
 			$ks_str = $ks->toSecureString();
-			$ks->setActionsLimit();
 			return 0;
 		}
 		else
@@ -269,6 +268,7 @@ class ks
 	public $additional_data = null;
 
 	private $original_str = "";
+	private $hash = null;
 
 	private $valid_string=false;
 
@@ -306,7 +306,7 @@ class ks
 		@list ( $hash , $real_str) = @explode ( "|" , $str , 2 );
 
 //		echo "[$str]<br>[$hash]<br>[$real_str]<br>[" . self::hash ( $real_str ) . "]<br>";
-
+		$ks->hash = $hash;
 		$ks->original_str = $encoded_str;
 
 		$parts = explode(self::SEPARATOR, $real_str);
@@ -358,6 +358,20 @@ class ks
 	{
 		return $this->partner_id . $this->rand;
 	}
+	
+	public function getHash()
+	{
+		if ($this->hash)
+			return $this->hash;
+			
+		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id , $this->additional_data);
+		$str = implode ( self::SEPARATOR , $fields );
+		
+		$salt = $this->getSalt();
+		$this->hash = self::hash ( $salt , $str );
+		
+		return $this->hash;
+	}
 
 	public function toSecureString ()
 	{
@@ -397,26 +411,41 @@ class ks
 		}
 		if ( $this->expired ( ) ) return self::EXPIRED ;
 	
+		$allowedIPRestriction = $this->isSetIPRestriction();			
+		if ($allowedIPRestriction && $allowedIPRestriction != kCurrentContext::$user_ip)
+		{
+			KalturaLog::err("ipRestriction: EXCEEDED_RESTRICTED_IP");
+			return self::EXCEEDED_RESTRICTED_IP;
+		}
+		
 		if($this->original_str && 
 			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
 			!$this->isWidgetSession())								// Since anyone can create a widget session, no need to check for invalidation
 		{
-			if ($this->isSetLimitAction()){
-				$isValidCctionLimit = invalidSessionPeer::isValidActionsLimit($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-				if (!$isValidCctionLimit){
-					KalturaLog::err("actionLimits: EXCEEDED_ACTIONS_LIMIT");
-					return self::EXCEEDED_ACTIONS_LIMIT;
-				} 
-			}
-			$allowedIPRestriction = $this->isSetIPRestriction();
+			$limit = $this->isSetLimitAction();
+			if ($limit){
+				$criteria = new Criteria();
+				$criteria->add(invalidSessionPeer::KS, $this->getHash());
+				$cnt = invalidSessionPeer::doSelectOne($criteria, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+				
+				if ($cnt){
+					$currentActionLimit = $cnt->getActionsLimit();
+					
+					if (!is_null($currentActionLimit) && $currentActionLimit <= 1)
+					{
+						KalturaLog::err("actionLimits: EXCEEDED_ACTIONS_LIMIT");
+						return self::EXCEEDED_ACTIONS_LIMIT;
+					}
+					$cnt->setActionsLimit($currentActionLimit - 1);
+					$cnt->save();
+				}
+				else
+				{//if the ks was created on the client side
+					invalidSessionPeer::actionsLimitKs($this, $limit);
+				}
+			}		
 			
-			if ($allowedIPRestriction && $allowedIPRestriction != kCurrentContext::$user_ip)
-			{
-				KalturaLog::err("ipRestriction: EXCEEDED_RESTRICTED_IP");
-				return self::EXCEEDED_RESTRICTED_IP;
-			}
-			
-			$invalid = invalidSessionPeer::isInvalid($this->original_str, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+			$invalid = invalidSessionPeer::isInvalid($this->getHash(), myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 			if($invalid)
 				return self::LOGOUT;
 		}
