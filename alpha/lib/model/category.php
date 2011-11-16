@@ -126,6 +126,7 @@ class category extends Basecategory
 		$entryFilter = new entryFilter();
 		$entryFilter->set("_matchor_categories_ids", implode(',',$allSubCategoriesIds));
 		$entryFilter->attachToCriteria($c);
+		$c->setLimit(0);
 		$entries = entryPeer::doSelect($c);
 
 		$category->setEntriesCount($c->getRecordsCount());
