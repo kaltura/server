@@ -752,11 +752,13 @@
 					<xs:documentation>
 						The action to apply from the item element:<br/>
 						Update - Update existing thumbnails<br/>
+						Replace - Replace all thumbnails
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
 						<xs:enumeration value="update" />
+						<xs:enumeration value="replace" />
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
