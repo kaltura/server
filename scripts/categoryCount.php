@@ -36,8 +36,8 @@ foreach ($allCats as $cat)
 	$entryFilter = new entryFilter();
 	$entryFilter->set("_matchor_categories_ids", implode(',',$allSubCatsIds));
 	$entryFilter->attachToCriteria($c);
-	$entries = entryPeer::doSelect($c);
+	$entriesCount = entryPeer::doCount($c);
 
-	$cat->setEntriesCount(count($entries));
+	$cat->setEntriesCount($entriesCount);
 	$cat->save();
 }
