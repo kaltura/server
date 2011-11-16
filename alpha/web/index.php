@@ -39,6 +39,7 @@ function checkCache()
             	$response = @file_get_contents("/tmp/cache-$key");
                 if ($response)
                 {
+                	header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 					if (strpos($uri, "/partnerservices2/executeplaylist") !== false) // for now cache only playlist on cdn
 					{
 						$max_age = 60;
