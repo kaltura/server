@@ -272,7 +272,8 @@ class kMetadataManager
 
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE){
 				foreach($nodes as $node){
-					$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE) . $profileField->getSearchIndex()] = $node->nodeValue;
+					if(!is_null($profileField->getSearchIndex()))
+						$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE) . $profileField->getSearchIndex()] = $node->nodeValue;
 					break;
 				}
 				continue;
@@ -280,7 +281,8 @@ class kMetadataManager
 
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
 				foreach($nodes as $node){
-					$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $profileField->getSearchIndex()] = $node->nodeValue;
+					if(!is_null($profileField->getSearchIndex()))
+						$searchValues[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $profileField->getSearchIndex()] = $node->nodeValue;
 					break;
 				}
 				continue;
