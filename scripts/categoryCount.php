@@ -36,9 +36,9 @@ foreach ($allCats as $cat)
 	$entryFilter = new entryFilter();
 	$entryFilter->set("_matchor_categories_ids", implode(',',$allSubCatsIds));
 	$entryFilter->attachToCriteria($c);
-	$entriesCount = entryPeer::doCount($c);
+	$entriesCount = count (entryPeer::doSelect($c));
 	
-	echo "Number od entries in category <". $cat->getName().">: ". $entriesCount ."\r\n";
+	echo "Number of entries in category <". $cat->getName().">: ". $entriesCount ."\r\n";
 	
 	$cat->setEntriesCount($entriesCount);
 	$cat->save();
