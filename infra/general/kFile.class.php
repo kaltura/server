@@ -598,7 +598,13 @@ class kFile
 		}
 		return $out;
 	}
-	
+
+	public static function cacheRedirect($url)
+	{
+		if (function_exists('apc_store'))
+			apc_store("redirect-".$_SERVER["REQUEST_URI"], $url, 60);
+	}
+
 	public static function dumpUrl($url, $allowRange = true, $passHeaders = false)
 	{
 		self::closeDbConnections();
@@ -655,7 +661,7 @@ class kFile
 		
 		//curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 		
-
+		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 		header("X-Kaltura:dumpUrl");
 		// grab URL and pass it to the browser
 		$content = curl_exec($ch);
