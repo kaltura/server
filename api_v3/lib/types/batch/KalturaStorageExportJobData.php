@@ -5,11 +5,6 @@
  */
 class KalturaStorageExportJobData extends KalturaStorageJobData
 {
-
-	/**
-	 * @var string
-	 */   	
-    public $destFileSyncStoredPath;
     
 	/**
 	 * @var bool
@@ -20,7 +15,6 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
     
 	private static $map_between_objects = array
 	(
-	    "destFileSyncStoredPath" ,
 	    "force" ,
 	);
 

@@ -36,6 +36,12 @@ class KalturaStorageJobData extends KalturaJobData
 	 */   
 	public $srcFileSyncId;
 	
+	/**
+	 * @var string
+	 */   	
+    public $destFileSyncStoredPath;
+    
+	
 	private static $map_between_objects = array
 	(
 	    "serverUrl" , 
@@ -44,6 +50,7 @@ class KalturaStorageJobData extends KalturaJobData
 	    "ftpPassiveMode" ,
 	    "srcFileSyncLocalPath" ,
 		"srcFileSyncId" ,
+		"destFileSyncStoredPath",
 	);
 
 	public function getMapBetweenObjects ( )
