@@ -84,6 +84,13 @@ class kBusinessPreConvertDL
 		}
 		$destThumbParamsOutput->setVideoOffset(min($destThumbParamsOutput->getVideoOffset(), $entry->getDuration()));
 		
+		if (!$destThumbParamsOutput->getDensity())
+		{
+			$partner = $entry->getPartner();
+			if (!is_null($partner))
+				$destThumbParamsOutput->setDensity($partner->getDefThumbDensity());
+		}
+		
 		$thumbAsset = assetPeer::retrieveByEntryIdAndParams($entry->getId(), $destThumbParams->getId());
 		if($thumbAsset)
 		{
