@@ -66,13 +66,13 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 		
 		$srcFile = str_replace('//', '/', trim($data->srcFileSyncLocalPath));
 		$destFile = str_replace('//', '/', trim($data->destFileSyncStoredPath));
-		$this->updateJob($job, "Deleteing $srcFile to $destFile", KalturaBatchJobStatus::QUEUED, 1);
+		$this->updateJob($job, "Deleting $srcFile to $destFile", KalturaBatchJobStatus::QUEUED, 1);
 
 		$engine = kFileTransferMgr::getInstance($job->jobSubType);
 		
 		try{
 			$engine->login($data->serverUrl, $data->serverUsername, $data->serverPassword, null, $data->ftpPassiveMode);
-			$engine->delFile($srcFile);
+			$engine->delFile($destFile);
 		}
 		catch(kFileTransferMgrException $ke)
 		{
@@ -90,11 +90,11 @@ class KAsyncStorageDelete extends KJobHandlerWorker
 	 * @return string
 	 */
 	protected function getSupportedProtocols()
-	{
+	{ 
 		$supported_engines_arr = array();
-		if  ( $this->taskConfig->params->useFTP ) $supported_engines_arr[] = KalturaDeleteProtocol::FTP;
-		if  ( $this->taskConfig->params->useSCP ) $supported_engines_arr[] = KalturaDeleteProtocol::SCP;
-		if  ( $this->taskConfig->params->useSFTP ) $supported_engines_arr[] = KalturaDeleteProtocol::SFTP;
+		if  ( $this->taskConfig->params->useFTP ) $supported_engines_arr[] = KalturaStorageProfileProtocol::FTP;
+		if  ( $this->taskConfig->params->useSCP ) $supported_engines_arr[] = KalturaStorageProfileProtocol::SCP;
+		if  ( $this->taskConfig->params->useSFTP ) $supported_engines_arr[] = KalturaStorageProfileProtocol::SFTP;
 		
 		return join(',', $supported_engines_arr);
 	}
