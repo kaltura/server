@@ -1029,7 +1029,7 @@ class kFileSyncUtils
 		}
 		
 		// first check if fileSync is source or link
-		$file = self::getLocalFileSyncForKey($key, $strict);
+		$file = FileSyncPeer::retrieveByFileSyncKey($key);
 		if(!$file)
 		{
 			return null;

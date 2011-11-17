@@ -1083,18 +1083,41 @@ class kJobsManager
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
 	}
 	
-	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, FileSyncKey $syncKey)
+	public static function addStorageDeleteJob(BatchJob $parentJob = null, $entryId = null, StorageProfile $storage, FileSyncKey $syncKey)
 	{
 		$srcFileSyncLocalPath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($syncKey, false);
+		$fileSync = FileSyncPeer::retrieveByFileSyncKey($syncKey);
 		
 		$netStorageDeleteData = new kStorageDeleteJobData();
-	    $netStorageDeleteData->setServerUrl($partner->getStorageAddress()); 
-	    $netStorageDeleteData->setServerUsername($partner->getStorageUsername()); 
-	    $netStorageDeleteData->setServerPassword($partner->getStoragePassword());
-	    $netStorageDeleteData->setFtpPassiveMode($partner->getStorageFtpPassive());
+	    $netStorageDeleteData->setServerUrl($storage->getStorageUrl()); 
+	    $netStorageDeleteData->setServerUsername($storage->getStorageUsername()); 
+	    $netStorageDeleteData->setServerPassword($storage->getStoragePassword());
+	    $netStorageDeleteData->setFtpPassiveMode($storage->getStorageFtpPassiveMode());
 	    $netStorageDeleteData->setSrcFileSyncLocalPath($srcFileSyncLocalPath);
 		$netStorageDeleteData->setSrcFileSyncId($fileSync->getId());
+		$netStorageDeleteData->setDestFileSyncStoredPath($storage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
+		if ($parentJob)
+		{
+			$batchJob = $parentJob->createChild(false);
+		}
+		else
+		{
+			$batchJob = new BatchJob();
+			$batchJob->setEntryId($entryId);
+			$batchJob->setPartnerId($storage->getPartnerId());
+		}
+		
+		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath()); 
+		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
+	}
+	
+	public static function addFutureDeletionJob(BatchJob $parentJob = null, $entryId = null, Partner $partner, $syncKey, $localFileSyncPath, $dc)
+	{
+		$deleteFileData = new kDeleteFileJobData();
+		
+		$deleteFileData->setLocalFileSyncPath($localFileSyncPath);
+		
+		$deleteFileData->setSyncKey($syncKey);
 		
 		if ($parentJob)
 		{
@@ -1107,9 +1130,15 @@ class kJobsManager
 			$batchJob->setPartnerId($partner->getId());
 		}
 		
-		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath()); 
-		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $partner->getStorageProtocol());
+		$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_RETRY);
+		$batchJob->setCheckAgainTimeout(12*60*60);
+		$batchJob->setDc($dc);
+		
+		KalturaLog::log("Creating File Delete job, from data center id: ". $deleteFileData->getDC() ." with source file: " . $deleteFileData->getLocalFileSyncPath()); 
+		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
+		
 	}
+	
 	
 	public static function addExtractMediaJob(BatchJob $parentJob, $inputFileSyncLocalPath, $flavorAssetId)
 	{
@@ -1166,6 +1195,7 @@ class kJobsManager
 			
 		return $batchJob;
 	}
+	
 	
 	/**
 	 * @param BatchJob $batchJob
