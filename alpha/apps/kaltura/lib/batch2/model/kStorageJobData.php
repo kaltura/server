@@ -34,6 +34,11 @@ class kStorageJobData extends kJobData
 	 * @var string
 	 */   
 	private $srcFileSyncId;
+	
+	/**
+	 * @var string
+	 */   	
+    private $destFileSyncStoredPath;
     
     
 	/**
@@ -130,5 +135,21 @@ class kStorageJobData extends kJobData
 	public function setSrcFileSyncId($srcFileSyncId)
 	{
 		$this->srcFileSyncId = $srcFileSyncId;
+	}
+	
+	/**
+	 * @return the $destFileSyncStoredPath
+	 */
+	public function getDestFileSyncStoredPath()
+	{
+		return $this->destFileSyncStoredPath;
+	}
+
+	/**
+	 * @param $destFileSyncStoredPath the $destFileSyncStoredPath to set
+	 */
+	public function setDestFileSyncStoredPath($destFileSyncStoredPath)
+	{
+		$this->destFileSyncStoredPath = $destFileSyncStoredPath;
 	}
 }
