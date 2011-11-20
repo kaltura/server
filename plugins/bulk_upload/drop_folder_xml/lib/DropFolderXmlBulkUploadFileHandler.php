@@ -97,7 +97,6 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 			return false;
 		}
 		
-		$addtionalDropFolderFileIds = array();
 		$replaceResources = array();
 		
 		$localResourcesLength = $localResources->length;
@@ -123,8 +122,7 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 				$this->updateDropFolderFile();
 				return false;
 			}
-			$replaceResources[] = array($local, $dropFolderFileId);
-			$addtionalDropFolderFileIds[] = $dropFolderFileId;
+			$replaceResources[] = array($local, $dropFolderFileId);;
 		}
 		
 		foreach ($replaceResources as $replace)
@@ -169,10 +167,8 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 		//delete the temporary file
 		@unlink($tempFileRealPath);
 	
-		// update all relevant drop folder files
-		$addtionalDropFolderFileIds[] = $this->dropFolderFile->id;
-		$this->setAsHandled($addtionalDropFolderFileIds);
-		
+		$dropFolderFilePlugin = KalturaDropFolderClientPlugin::get($this->kClient);
+		$dropFolderFilePlugin->dropFolderFile->updateStatus($this->dropFolderFile->id, KalturaDropFolderFileStatus::HANDLED);
 		KalturaLog::debug('Drop folder file ['.$this->dropFolderFile->id.'] handled successfully');
 		
 		return true; // file handled
@@ -272,22 +268,6 @@ class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
 	private function replaceResource(DOMElement $localResource, $dropFolderFileId, DOMDocument $xmlDoc)
 	{
 		$localResource->setAttribute(self::DROP_FOLDER_RESOURCE_FILE_ID_ATTRIBUTE, $dropFolderFileId);
-	}
-	
-	/**
-	 * Update the status of all drop folder files with the given ids to be KalturaDropFolderFileStatus::HANDLED
-	 * @param array $idsArray array of drop folder file ids
-	 */
-	private function setAsHandled($idsArray)
-	{
-		$dropFolderFilePlugin = KalturaDropFolderClientPlugin::get($this->kClient);
-		$this->kClient->startMultiRequest();
-		foreach ($idsArray as $id)
-		{
-			KalturaLog::debug('Updating drop folder file ['.$id.'] with status HANDLED');
-			$dropFolderFilePlugin->dropFolderFile->updateStatus($id, KalturaDropFolderFileStatus::HANDLED);
-		}
-		$this->kClient->doMultiRequest();		
 	}
 	
 	

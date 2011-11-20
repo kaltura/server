@@ -104,16 +104,16 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 				return false;
 		}
 
-		// update file with all changes that were done during the handling process
+		// update file with all changes that were done during the handling process except for the status which will is already updated by the addContent/updateContent API call
 		try {
-			$this->updateDropFolderFile();
+			$this->updateDropFolderFile(false);
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Cannot update file - '.$e->getMessage());
 			return false;			
 		}
 		
-		return ($this->dropFolderFile->status === KalturaDropFolderFileStatus::HANDLED); // return true if handled, false otherwise
+		return in_array($this->dropFolderFile->status, array(KalturaDropFolderFileStatus::HANDLED, KalturaDropFolderFileStatus::DOWNLOADING)); // return true if handled, false otherwise
 	}
 	
 	/**
@@ -167,7 +167,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 	 */
 	private function addAsNewContent()
 	{ 
-		$addionnalFileIds = null;
 		$resource = null;
 		
 		$conversionProfile = null;
@@ -184,12 +183,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 				KalturaLog::debug('Some required flavors do not exist in the drop folder - changing status to WAITING');
 				$this->dropFolderFile->status = KalturaDropFolderFileStatus::WAITING;
 				return true;
-			}
-			$addionnalFileIds = array();
-			foreach ($resource->resources as $assetContainer) {
-				if ($assetContainer->resource->dropFolderFileId != $this->dropFolderFile->id) {
-					$addionnalFileIds[] = $assetContainer->resource->dropFolderFileId;
-				}
 			}
 		}
 		
@@ -214,14 +207,7 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			$this->impersonate($this->dropFolderFile->partnerId);
 			$addedEntry = $this->kClient->baseEntry->add($newEntry, null);
 			$addedEntry = $this->kClient->baseEntry->addContent($addedEntry->id, $resource);			
-			$this->unimpersonate();
-			
-			// set all addional files as handled
-			if ($addionnalFileIds) {
-				$this->setAsHandled($addionnalFileIds);
-			}
-			$this->dropFolderFile->status = KalturaDropFolderFileStatus::HANDLED;
-		
+			$this->unimpersonate();		
 		}
 		catch (Exception $e)
 		{
@@ -284,29 +270,12 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 			return false;
 		}
 		
-		$addionnalFileIds = array();
-		if (isset($resource->resources))
-		{
-    		foreach ($resource->resources as $assetContainer) {
-    			if ($assetContainer->resource->dropFolderFileId != $this->dropFolderFile->id) {
-    				$addionnalFileIds[] = $assetContainer->resource->dropFolderFileId;
-    			}
-    		}
-		}
-		
 		try 
 		{
 			$this->impersonate($this->dropFolderFile->partnerId);
 			$conversionProfile = $this->getConversionProfile();
 			$updatedEntry = $this->kClient->baseEntry->updateContent($matchedEntry->id, $resource, $conversionProfile->id);
-			$this->unimpersonate();
-			
-			// set all addional files as handled
-			if ($addionnalFileIds) {
-				$this->setAsHandled($addionnalFileIds);
-			}
-			$this->dropFolderFile->status = KalturaDropFolderFileStatus::HANDLED;
-		
+			$this->unimpersonate();		
 		}
 		catch (Exception $e)
 		{
