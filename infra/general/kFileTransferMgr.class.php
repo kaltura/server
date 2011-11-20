@@ -389,7 +389,12 @@ abstract class kFileTransferMgr
 
 		// create remote directory if necessary
 		if (!$this->fileExists(dirname($remote_file))) {
-			$this->mkDir(dirname($remote_file));
+			try {
+			    @$this->mkDir(dirname($remote_file));
+			}
+			catch (Exception $e) {
+			    KalturaLog::log('Error creating directory ['.dirname($remote_file).'] - ['.$e->getMessage().'] - proceeding anyway');
+			}
 		}
 
 		// try to upload file
