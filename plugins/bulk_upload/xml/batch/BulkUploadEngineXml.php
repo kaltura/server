@@ -199,6 +199,8 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function parse()
 	{
+		$this->currentItem = 0;
+		
 		$xdoc = new SimpleXMLElement($this->xslTransform($this->data->filePath));
 		
 		foreach( $xdoc->channel as $channel)
@@ -288,18 +290,15 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function handleChannel(SimpleXMLElement $channel)
 	{
-		$this->currentItem = 0;
 		$startIndex = $this->getStartIndex();
 		KalturaLog::debug("startIndex [$startIndex]");
 		
 		//Gets all items from the channel
 		foreach( $channel->item as $item)
 		{
+			$this->currentItem++;
 			if($this->currentItem < $startIndex)
-			{
-				$this->currentItem++;
 				continue;
-			}
 			
 			if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 				return;
@@ -432,6 +431,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		}
+		
+		//Throw exception in case of max proccessed items and handle all exceptions there
+		$updatedEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::UPDATE);
+		
+		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
+			return;
 
 		$entry = $this->createEntryFromItem($item, $existingEntry->type); //Creates the entry from the item element
 		
@@ -611,9 +616,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		if(count($pluginsErrorResults))
 			throw new Exception(implode(', ', $pluginsErrorResults));
 	
-		//Throw exception in case of max proccessed items and handle all exceptions there
-		$updatedEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::UPDATE);
-		
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$this->updateEntriesResults(array($entry), array($updatedEntryBulkUploadResult));
 	}
@@ -717,6 +719,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->unimpersonate();
 		
 		$bulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::DELETE);
+		
+		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
+			return;
+		
 		$bulkUploadResult->entryId = $entryId;
 		$this->addBulkUploadResult($bulkUploadResult);
 	}
@@ -728,7 +734,13 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function handleItemAdd(SimpleXMLElement $item)
 	{
 		KalturaLog::debug("xml [" . $item->asXML() . "]");
-			
+		
+		//Throw exception in case of  max proccessed items and handle all exceptions there
+		$createdEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::ADD);
+
+		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
+			return;
+		
 		$entry = $this->createEntryFromItem($item); //Creates the entry from the item element
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
 		KalturaLog::debug("current entry is: " . print_r($entry, true));
@@ -800,12 +812,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 
-		//Throw exception in case of  max proccessed items and handle all exceptions there
-		$createdEntryBulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::ADD);
-
-		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
-			return;
-			
 		if(!count($resource->resources))
 		{
 			if (count($noParamsFlavorResources) == 1)
