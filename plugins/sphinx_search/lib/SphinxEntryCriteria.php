@@ -397,4 +397,34 @@ class SphinxEntryCriteria extends SphinxCriteria
 	{
 		return entryPeer::ID;
 	}
+	
+	public function hasPeerFieldName($fieldName)
+	{
+		if(strpos($fieldName, '.') === false)
+		{
+			$fieldName = strtoupper($fieldName);
+			$fieldName = "entry.$fieldName";
+		}
+		
+		$entryFields = entryPeer::getFieldNames(BasePeer::TYPE_COLNAME);
+		foreach ($entryFields as $entryField)
+			if($entryField == $fieldName) 
+				return true;
+
+		return false;
+	}
+	
+	public function fieldShouldNotRunOnSphinx($fieldName)
+	{
+		if(strpos($fieldName, '.') === false)
+		{
+			$fieldName = strtoupper($fieldName);
+			$fieldName = "entry.$fieldName";
+		}
+		
+		if ($fieldName == entryPeer::ID)
+			return true;
+		
+		return false;
+	}
 }

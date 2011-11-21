@@ -46,6 +46,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 */
 	protected $ids = array();
 	
+	protected $mustExecuteOnSphinx = false;
+	
 	protected function applyIds(array $ids)
 	{
 		if(!count($this->ids))
@@ -213,6 +215,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		KalturaLog::debug("Applies " . count($this->filters) . " filters");
 		
+		
 		foreach($this->filters as $index => $filter)
 		{
 			KalturaLog::debug("Applies filter $index");
@@ -221,6 +224,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 		
 		// attach all default criteria from peer
 		$this->getDefaultCriteriaFilter()->applyFilter($this);
+		
+		if($this->shouldSkipSphinx() && !$this->mustExecuteOnSphinx)
+			return;
 		
 		// go over all criterions and try to move them to the sphinx
 		foreach($this->getMap() as $field => $criterion)
@@ -507,6 +513,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 			KalturaLog::debug('Apply advanced filter [' . get_class($advancedSearch) . ']');
 			if($advancedSearch instanceof AdvancedSearchFilterItem)
 				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause, $this->conditionClause, $this->orderByClause);
+				
+			$this->mustExecuteOnSphinx = true;
 		}
 		else
 		{
@@ -544,5 +552,57 @@ abstract class SphinxCriteria extends KalturaCriteria
 	public function getNewCriterion($column, $value = null, $comparison = self::EQUAL)
 	{
 		return new SphinxCriterion($this, $column, $value, $comparison);
+	}
+	
+	private function shouldSkipSphinx()
+	{
+		$fieldShouldNotRunOnSphinx = false;
+		$hasPeerFieldsOnly = true;
+		$fields = array();
+		
+		foreach($this->getMap() as $field => $criterion)
+		{
+			if(!($criterion instanceof SphinxCriterion))
+				continue;
+			
+			$fields[] = $criterion->getTable() . '.' . $criterion->getColumn();
+		}
+		
+		$orderByColumns = $this->getOrderByColumns();
+		$orderByColumns = array_unique($orderByColumns);
+		
+		$fields = array_merge($fields, $orderByColumns);
+		
+		foreach($fields as $field)
+		{
+			if($this->fieldShouldNotRunOnSphinx($field))
+			{
+				KalturaLog::debug('Field should not run on sphinx [' . print_r($field,true) . ']');
+				$fieldShouldNotRunOnSphinx = true;
+			}
+			
+			if(!$this->hasPeerFieldName($field)){
+				KalturaLog::debug('Peer does not have the field [' . print_r($field,true) .']');
+				$hasPeerFieldsOnly = false;
+			}
+		}
+		
+		if($fieldShouldNotRunOnSphinx && $hasPeerFieldsOnly)
+		{
+			KalturaLog::debug('Skip Sphinx');
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public function hasPeerFieldName($field)
+	{
+		return false;
+	}
+	
+	public function fieldShouldNotRunOnSphinx($field)
+	{
+		return false;
 	}
 }
