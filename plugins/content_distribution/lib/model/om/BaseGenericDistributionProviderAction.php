@@ -1133,10 +1133,9 @@ abstract class BaseGenericDistributionProviderAction extends BaseObject  impleme
 			return;
 		}
 	
-		kQueryCache::invalidateQueryCache($this);
-		
 		if($this->isModified())
 		{
+			kQueryCache::invalidateQueryCache($this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
 		}
 			
