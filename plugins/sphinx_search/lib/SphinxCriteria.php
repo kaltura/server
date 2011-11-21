@@ -579,7 +579,6 @@ abstract class SphinxCriteria extends KalturaCriteria
 	{
 		$pkCrit = $this->getCriterion($this->getIdField());
 		if(!$pkCrit || ($pkCrit && (($pkCrit->getComparison() != Criteria::EQUAL) && ($pkCrit->getComparison() != Criteria::IN))))
-
 			return false;
 
 			
