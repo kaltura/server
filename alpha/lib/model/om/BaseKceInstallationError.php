@@ -777,10 +777,9 @@ abstract class BaseKceInstallationError extends BaseObject  implements Persisten
 			return;
 		}
 	
-		kQueryCache::invalidateQueryCache($this);
-		
 		if($this->isModified())
 		{
+			kQueryCache::invalidateQueryCache($this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
 		}
 			

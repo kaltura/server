@@ -1118,10 +1118,9 @@ abstract class BaseConversionProfile extends BaseObject  implements Persistent {
 			return;
 		}
 	
-		kQueryCache::invalidateQueryCache($this);
-		
 		if($this->isModified())
 		{
+			kQueryCache::invalidateQueryCache($this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
 		}
 			

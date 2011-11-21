@@ -999,10 +999,9 @@ abstract class BaseEmailIngestionProfile extends BaseObject  implements Persiste
 			return;
 		}
 	
-		kQueryCache::invalidateQueryCache($this);
-		
 		if($this->isModified())
 		{
+			kQueryCache::invalidateQueryCache($this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
 		}
 			

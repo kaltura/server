@@ -737,10 +737,9 @@ abstract class BasePermissionToPermissionItem extends BaseObject  implements Per
 			return;
 		}
 	
-		kQueryCache::invalidateQueryCache($this);
-		
 		if($this->isModified())
 		{
+			kQueryCache::invalidateQueryCache($this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
 		}
 			

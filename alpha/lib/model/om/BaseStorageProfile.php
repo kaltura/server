@@ -174,13 +174,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	 * @var        int
 	 */
 	protected $delivery_status;
-	
-	/**
-	 * Flag for determining whether the external storage allows the Kaltura
-	 * system to delete from it.
-	 * @var boolean
-	 */
-	protected $allow_auto_delete = false;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced
@@ -535,16 +528,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 	{
 		return $this->delivery_status;
 	}
-	
-	/**
-	 * 
-	 * Get the allow_auto_delete parameter value
-	 */
-	public function getAllowAutoDelete() 
-	{ 
-		return (bool)$this->getFromCustomData("allow_auto_delete", null, false); 
-	} // if not set to true explicitly, default will be false
-	 
 
 	/**
 	 * Set the value of [id] column.
@@ -1192,12 +1175,6 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setDeliveryStatus()
-	
-	
-	public function setAllowAutoDelete( $v )
-	{ 
-		$this->putInCustomData("allow_auto_delete", (bool)$v); 
-	}
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -1556,10 +1533,9 @@ abstract class BaseStorageProfile extends BaseObject  implements Persistent {
 			return;
 		}
 	
-		kQueryCache::invalidateQueryCache($this);
-		
 		if($this->isModified())
 		{
+			kQueryCache::invalidateQueryCache($this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
 		}
 			
