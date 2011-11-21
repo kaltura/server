@@ -161,7 +161,20 @@ function generateCode()
 		updateTableCode($invalidationKey, $objFunc, $peerFunc);
 	}
 }
-	
+
+function stripTrailingSemicolon($str)
+{
+	if (strlen($str) && $str[strlen($str) - 1] == ';')
+	{
+		return substr($str, 0, strlen($str) - 1);
+	}
+	return $str;
+}
+
+function compareTriggerBodies($body1, $body2)
+{
+	return stripTrailingSemicolon($body1) == stripTrailingSemicolon($body2);
+}
 	
 // Default parameters
 $ACTION = 'help';
@@ -291,9 +304,9 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 		$updateTriggerName = "{$tableName}_update_memcache";
 		$deleteTriggerName = "{$tableName}_delete_memcache";
 		
-		if (array_key_exists($insertTriggerName, $triggers) && $insertUpdateBody == $triggers[$insertTriggerName] &&
-			array_key_exists($updateTriggerName, $triggers) && $insertUpdateBody == $triggers[$updateTriggerName] &&
-			array_key_exists($deleteTriggerName, $triggers) && $deleteBody == $triggers[$deleteTriggerName])
+		if (array_key_exists($insertTriggerName, $triggers) && compareTriggerBodies($insertUpdateBody, $triggers[$insertTriggerName]) &&
+			array_key_exists($updateTriggerName, $triggers) && compareTriggerBodies($insertUpdateBody, $triggers[$updateTriggerName]) &&
+			array_key_exists($deleteTriggerName, $triggers) && compareTriggerBodies($deleteBody, $triggers[$deleteTriggerName]))
 		{
 			print "Skipping {$tableName} - no changes detected...\n";
 			continue;
