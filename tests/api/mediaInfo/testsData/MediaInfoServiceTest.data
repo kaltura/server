@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<TestCaseData testCaseName='MediaInfoServiceTest'>
+<TestProcedureData testProcedureName='testListAction'>
+	<TestCaseData testCaseInstanceName='testListAction with data set #0'>
+		<Input name = 'filter' type = 'KalturaMediaInfoFilter' key = ''>
+			<orderBy></orderBy>
+			<advancedSearch>KalturaSearchItem</advancedSearch>
+			<flavorAssetIdEqual></flavorAssetIdEqual>
+		</Input>
+		<Input name = 'pager' type = 'KalturaFilterPager' key = ''>
+			<pageSize></pageSize>
+			<pageIndex></pageIndex>
+		</Input>
+		<OutputReference name = 'output' type = 'KalturaMediaInfoListResponse' key = 'object key'>
+		</OutputReference>
+	</TestCaseData>
+</TestProcedureData>
+</TestCaseData>
