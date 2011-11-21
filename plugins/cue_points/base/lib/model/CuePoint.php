@@ -309,4 +309,8 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 
 	public function setForceStop($v)	{return $this->putInCustomData(self::CUSTOM_DATA_FIELD_FORCE_STOP, (bool)$v);}
 	
+	public function getCacheInvalidationKeys()
+	{
+		return array("cuePoint:id=".$this->getId(), "cuePoint:entryId=".$this->getEntryId());
+	}
 } // CuePoint

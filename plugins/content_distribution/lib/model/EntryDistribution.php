@@ -438,4 +438,8 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_MEDIA_FILES, $mediaFiles);
 		return $this;
 	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("entryDistribution:entryId=".$this->getEntryId());
+	}
 } // EntryDistribution

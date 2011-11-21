@@ -49,4 +49,8 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer
 	}
 	
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("dropFolderFile:id=%s", self::ID), array("dropFolderFile:dropFolderId=%s", self::DROP_FOLDER_ID));		
+	}
 } // DropFolderFilePeer

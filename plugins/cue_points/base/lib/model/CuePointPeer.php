@@ -137,4 +137,8 @@ class CuePointPeer extends BaseCuePointPeer
 
 		return CuePointPeer::doSelect($criteria, $con);
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("cuePoint:id=%s", self::ID), array("cuePoint:entryId=%s", self::ENTRY_ID));		
+	}
 }

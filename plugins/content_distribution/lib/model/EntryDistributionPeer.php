@@ -98,4 +98,8 @@ class EntryDistributionPeer extends BaseEntryDistributionPeer
 		return parent::doSelect($c, $con);
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("entryDistribution:entryId=%s", self::ENTRY_ID));		
+	}
 } // EntryDistributionPeer
