@@ -142,7 +142,6 @@ class NdnFeed
 		{
 			$thumbnailUrl = $entry->getThumbnailUrl();
 		}
-		$mediaType = $this->getMediaTypeString($entry->getMediaType());	
 		$this->setNodeValue('guid', $values[NdnDistributionField::ITEM_GUID], $item);
 		$this->setNodeValue('title', $values[NdnDistributionField::ITEM_TITLE], $item);
 		$this->setNodeValue('link', $values[NdnDistributionField::ITEM_LINK], $item);
@@ -159,7 +158,7 @@ class NdnFeed
 		$this->setNodeValue('media:rating', $values[NdnDistributionField::ITEM_MEDIA_RATING], $item);		
 		if (!is_null($flavorAssets) && is_array($flavorAssets) && count($flavorAssets)>0)
 		{
-			$this->setFlavorAsset($item, $flavorAssets, $mediaType, $values[NdnDistributionField::ITEM_CONTENT_LANG]);
+			$this->setFlavorAsset($item, $flavorAssets, $values[NdnDistributionField::ITEM_CONTENT_LANG]);
 		}			
 		if (!is_null($thumbAssets) && is_array($thumbAssets) && count($thumbAssets)>0)
 		{
@@ -224,7 +223,7 @@ class NdnFeed
 		}	
 	}
 	
-	public function setFlavorAsset(DOMElement $item, array $flavorAssets, $mediaType, $flavorLang)
+	public function setFlavorAsset(DOMElement $item, array $flavorAssets, $flavorLang)
 	{
 		$flavorAsset = $flavorAssets[0];		
 		/* @var $flavorAsset flavorAsset */
@@ -232,7 +231,15 @@ class NdnFeed
 		$this->setNodeValue('media:content/@url', $url, $item);
 		$this->setNodeValue('media:content/@width', $flavorAsset->getWidth(), $item);
 		$this->setNodeValue('media:content/@height', $flavorAsset->getHeight(), $item);
-		$this->setNodeValue('media:content/@type', $mediaType, $item);
+		//setting mime type
+		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		if(kFileSyncUtils::fileSync_exists($syncKey))
+		{
+			$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$mimeType = kFile::mimeType($filePath);
+		}				
+		$this->setNodeValue('media:content/@type', $mimeType, $item);
+							
 		if (!empty($flavorLang))
 		{
 			$this->setNodeValue('media:content/@lang', $flavorLang, $item);
@@ -263,27 +270,7 @@ class NdnFeed
 			$this->setNodeValue('media:thumbnail/@credit', $thumbnailCredit, $item);
 		}
 	}
-	
-	protected function getContentTypeFromUrl($url)
-	{
-		$this->ch = curl_init();
-		curl_setopt($this->ch, CURLOPT_URL, $url);
-		curl_setopt($this->ch, CURLOPT_HEADER, true);
-		curl_setopt($this->ch, CURLOPT_NOBODY, true);
-		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-		$headers = curl_exec($this->ch);
-		if (preg_match('/Content-Type: (.*)/', $headers, $matched))
-		{
-			return trim($matched[1]);
-		}
-		else
-		{
-			KalturaLog::alert('"Content-Type" header was not found for the following URL: '. $url);
-			return null;
-		}
-	}
-	
+		
 	/**
 	 * ndn used Z for UTC timezone in their example (2008-04-11T12:30:00Z)
 	 * @param int $time
