@@ -46,7 +46,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 */
 	protected $ids = array();
 	
-	protected $mustExecuteOnSphinx = false;
+	protected $hasAdvancedSearchFilter = false;
+	
+	protected $sphinxSkiped = false;
 	
 	protected function applyIds(array $ids)
 	{
@@ -225,8 +227,12 @@ abstract class SphinxCriteria extends KalturaCriteria
 		// attach all default criteria from peer
 		$this->getDefaultCriteriaFilter()->applyFilter($this);
 		
-		if($this->shouldSkipSphinx() && !$this->mustExecuteOnSphinx)
+		if($this->shouldSkipSphinx() && !$this->hasAdvancedSearchFilter && !count($this->matchClause))
+		{
+			KalturaLog::debug('Skip Sphinx');
+			$this->sphinxSkiped = true;
 			return;
+		}
 		
 		// go over all criterions and try to move them to the sphinx
 		foreach($this->getMap() as $field => $criterion)
@@ -514,7 +520,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 			if($advancedSearch instanceof AdvancedSearchFilterItem)
 				$advancedSearch->apply($filter, $this, $this->matchClause, $this->whereClause, $this->conditionClause, $this->orderByClause);
 				
-			$this->mustExecuteOnSphinx = true;
+			$this->hasAdvancedSearchFilter = true;
 		}
 		else
 		{
@@ -554,44 +560,51 @@ abstract class SphinxCriteria extends KalturaCriteria
 		return new SphinxCriterion($this, $column, $value, $comparison);
 	}
 	
+	private function getAllCriterionFileds($criterion)
+	{
+		$criterionFields = array();
+		if(!($criterion instanceof SphinxCriterion))
+				return $criterionFields;
+		
+		$criterionFields[] = $criterion->getTable() . '.' . $criterion->getColumn();
+		
+		$clauses = $criterion->getClauses();
+		foreach($clauses as $index => $clause)
+			$criterionFields = array_merge($criterionFields, $this->getAllCriterionFileds($clauses));
+		
+		return $criterionFields;
+	}
+	
 	private function shouldSkipSphinx()
 	{
-		$fieldShouldNotRunOnSphinx = false;
 		$hasPeerFieldsOnly = true;
 		$fields = array();
 		
-		foreach($this->getMap() as $field => $criterion)
-		{
-			if(!($criterion instanceof SphinxCriterion))
-				continue;
-			
-			$fields[] = $criterion->getTable() . '.' . $criterion->getColumn();
-		}
+		foreach($this->getMap() as $criterion)
+			$fields = array_merge($fields, $this->getAllCriterionFileds($criterion));
 		
-		$orderByColumns = $this->getOrderByColumns();
-		$orderByColumns = array_unique($orderByColumns);
-		
-		$fields = array_merge($fields, $orderByColumns);
+		$orderByColumns = $this->getOrderByColumns();		
+		$fields = array_unique(array_merge($fields, $orderByColumns));
 		
 		foreach($fields as $field)
-		{
-			if($this->fieldShouldNotRunOnSphinx($field))
+		{	
+			$fieldName = $this->getSphinxFieldName($field);
+					
+			if(!$this->hasPeerFieldName($field))
 			{
-				KalturaLog::debug('Field should not run on sphinx [' . print_r($field,true) . ']');
-				$fieldShouldNotRunOnSphinx = true;
-			}
-			
-			if(!$this->hasPeerFieldName($field)){
 				KalturaLog::debug('Peer does not have the field [' . print_r($field,true) .']');
+				$hasPeerFieldsOnly = false;
+			}
+			elseif($this->getSphinxFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING && $fieldName != $this->getIdField())
+			{
+				KalturaLog::debug('Field is textual [' . print_r($fieldName,true) .']');
 				$hasPeerFieldsOnly = false;
 			}
 		}
 		
-		if($fieldShouldNotRunOnSphinx && $hasPeerFieldsOnly)
-		{
-			KalturaLog::debug('Skip Sphinx');
+		$pkCrit = $this->getCriterion($this->getIdField());
+		if($hasPeerFieldsOnly && $pkCrit && (($pkCrit->getComparison() == Criteria::EQUAL) || ($pkCrit->getComparison() == Criteria::IN)))
 			return true;
-		}
 		
 		return false;
 	}
@@ -600,9 +613,21 @@ abstract class SphinxCriteria extends KalturaCriteria
 	{
 		return false;
 	}
-	
-	public function fieldShouldNotRunOnSphinx($field)
+
+	/**
+	 * @return int $recordsCount
+	 */
+	public function getRecordsCount() 
 	{
-		return false;
+		if (!$this->sphinxSkiped)
+			return $this->recordsCount;
+		
+		$c = clone $this;
+		$c->setLimit(null);
+		$c->setOffset(null);
+		$this->recordsCount = $this->doCountOnPeer($c);
+
+		return $this->recordsCount;
+		
 	}
 }
