@@ -2,7 +2,7 @@
 
 // Invalidation keys table
 $INVALIDATION_KEYS = array(
-	array('table' => "flavor_asset", 			'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 	'class' => 'asset'),
+	array('table' => "flavor_asset", 			'keys' => array(array("'flavorAsset:id='", '@OBJ@.id'), array("'flavorAsset:entryId='", '@OBJ@.entry_id')), 							'class' => 'asset'),
 	array('table' => "kuser", 					'keys' => array(array("'kuser:partnerId='", '@OBJ@.partner_id', "',puserid='", '@OBJ@.puser_id'))),
 	array('table' => "entry", 					'keys' => array(array("'entry:id='", '@OBJ@.id'))),
 	array('table' => "access_control", 			'keys' => array(array("'accessControl:id='", '@OBJ@.id'))),
@@ -14,9 +14,14 @@ $INVALIDATION_KEYS = array(
 	array('table' => "storage_profile", 		'keys' => array(array("'storageProfile:id='", '@OBJ@.id'), array("'storageProfile:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "ui_conf", 				'keys' => array(array("'uiConf:id='", '@OBJ@.id'))),
 	array('table' => "widget", 					'keys' => array(array("'widget:id='", '@OBJ@.id'))),
-	array('table' => "metadata", 				'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id')), 												'plugin' => 'metadata'),
-	array('table' => "metadata_profile_field", 	'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),				'plugin' => 'metadata'),
+	array('table' => "metadata", 				'keys' => array(array("'metadata:objectId='", '@OBJ@.object_id')), 																		'plugin' => 'metadata'),
+	array('table' => "metadata_profile_field", 	'keys' => array(array("'metadataProfileField:metadataProfileId='", '@OBJ@.metadata_profile_id')),										'plugin' => 'metadata'),
 	array('table' => "partner", 				'keys' => array(array("'partner:id='", '@OBJ@.id'))),
+	array('table' => "cue_point", 				'keys' => array(array("'cuePoint:id='", '@OBJ@.id'), array("'cuePoint:entryId='", '@OBJ@.entry_id')),									'plugin' => 'cue_points/base'),
+	array('table' => "drop_folder_file", 		'keys' => array(array("'dropFolderFile:id='", '@OBJ@.id'), array("'dropFolderFile:dropFolderId='", '@OBJ@.drop_folder_id')),			'plugin' => 'drop_folder'),
+	array('table' => "flavor_params_output", 	'keys' => array(array("'flavorParamsOutput:id='", '@OBJ@.id'), array("'flavorParamsOutput:flavorAssetId='", '@OBJ@.flavor_asset_id')),	'class' => 'assetParamsOutput'),
+	array('table' => "entry_distribution", 		'keys' => array(array("'entryDistribution:entryId='", '@OBJ@.entry_id')),																'plugin' => 'content_distribution'),
+	array('table' => "flavor_params", 			'keys' => array(array("'flavorParams:id='", '@OBJ@.id')),																				'class' => 'assetParams'),
 	);
 
 	
@@ -224,6 +229,22 @@ if ($line[0] <= 0)
 
 mysql_free_result($result);
 
+// Get list of installed triggers
+$triggers = array();
+$query = "SHOW TRIGGERS";
+$result = mysql_query($query) or die('Error: Show triggers failed: ' . mysql_error() . "\n");
+for(;;)
+{
+        $curRes = mysql_fetch_array($result, MYSQL_ASSOC);
+        if (!$curRes)
+                break;
+		$triggerName = $curRes["Trigger"];
+		$triggerStatement = $curRes["Statement"];
+		
+		$triggers[$triggerName] = $triggerStatement;
+}
+mysql_free_result($result);
+
 // Install / remove triggers
 foreach ($INVALIDATION_KEYS as $invalidationKey)
 {
@@ -266,16 +287,29 @@ foreach ($INVALIDATION_KEYS as $invalidationKey)
 		$insertUpdateBody = str_replace('@OBJ@', 'NEW', $triggerBody);
 		$deleteBody = str_replace('@OBJ@', 'OLD', $triggerBody);
 		
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_insert_memcache AFTER INSERT ON {$tableName} FOR EACH ROW $insertUpdateBody";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_update_memcache AFTER UPDATE ON {$tableName} FOR EACH ROW $insertUpdateBody";
-		$sqlCommands[] = "CREATE TRIGGER {$tableName}_delete_memcache AFTER DELETE ON {$tableName} FOR EACH ROW $deleteBody";
+		$insertTriggerName = "{$tableName}_insert_memcache";
+		$updateTriggerName = "{$tableName}_update_memcache";
+		$deleteTriggerName = "{$tableName}_delete_memcache";
 		
+		if (array_key_exists($insertTriggerName, $triggers) && $insertUpdateBody == $triggers[$insertTriggerName] &&
+			array_key_exists($updateTriggerName, $triggers) && $insertUpdateBody == $triggers[$updateTriggerName] &&
+			array_key_exists($deleteTriggerName, $triggers) && $deleteBody == $triggers[$deleteTriggerName])
+		{
+			print "Skipping {$tableName} - no changes detected...\n";
+			continue;
+		}
+		
+		$sqlCommands[] = "CREATE TRIGGER {$insertTriggerName} AFTER INSERT ON {$tableName} FOR EACH ROW $insertUpdateBody";
+		$sqlCommands[] = "CREATE TRIGGER {$updateTriggerName} AFTER UPDATE ON {$tableName} FOR EACH ROW $insertUpdateBody";
+		$sqlCommands[] = "CREATE TRIGGER {$deleteTriggerName} AFTER DELETE ON {$tableName} FOR EACH ROW $deleteBody";
+				
 		print "Creating triggers on {$tableName}...\n";
 	}
 	else
 	{
 		print "Removing triggers on {$tableName}...\n";
 	}
+	
 	foreach ($sqlCommands as $sqlCommand)
 	{
 		$result = mysql_query($sqlCommand) or die('Error: Trigger query failed: ' . mysql_error() . "\n");
