@@ -42,7 +42,7 @@ class kContentDistributionManager
 		$batchJob->setEntryId($asset->getEntryId());
 		$batchJob->setPartnerId($asset->getPartnerId());
 		
-		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT);
+		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::IMPORT);
 	}
 	
 	/**
