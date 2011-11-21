@@ -178,4 +178,8 @@ class assetParams extends BaseassetParams
 	{
 		return $this->getFromCustomData('mediaParserType', null, mediaParserType::MEDIAINFO);
 	}
+	public function getCacheInvalidationKeys()
+	{
+		return array("flavorParams:id=".$this->getId());
+	}
 }

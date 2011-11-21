@@ -119,4 +119,8 @@ class assetParamsOutputPeer extends BaseassetParamsOutputPeer
 			
 		return parent::OM_CLASS;
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("flavorParamsOutput:id=%s", self::ID), array("flavorParamsOutput:flavorAssetId=%s", self::FLAVOR_ASSET_ID));		
+	}
 }

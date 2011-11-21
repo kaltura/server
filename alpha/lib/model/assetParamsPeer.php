@@ -275,4 +275,8 @@ class assetParamsPeer extends BaseassetParamsPeer
 		$stmt = assetParamsPeer::doSelectStmt($criteria, $con);
 		return $stmt->fetchAll(PDO::FETCH_COLUMN);
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("flavorParams:id=%s", self::ID));		
+	}
 }
