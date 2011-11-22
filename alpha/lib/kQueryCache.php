@@ -114,12 +114,22 @@ class kQueryCache
 
 	public static function getCachedQueryResults(Criteria $criteria, $queryType, $peerClassName, &$cacheKey, &$queryDB)
 	{
-		// initialize
 		if (!kConf::get("query_cache_enabled"))
 		{
 			return null;
 		}
 		
+		// if the criteria has an empty IN, no need to go to the DB or memcache - return an empty array
+		foreach ($criteria->getMap() as $criterion)
+		{
+			if ($criterion->getComparison() == Criteria::IN && !$criterion->getValue())
+			{
+				KalturaLog::debug("kQueryCache: criteria has empty IN, returning empty result set, peer=$peerClassName");
+				return array();
+			}
+		}
+		
+		// initialize
 		$invalidationKeyRules = call_user_func(array($peerClassName, 'getCacheInvalidationKeys'));
 		$invalidationKeys = self::getInvalidationKeysForQuery($invalidationKeyRules, $criteria);
 		if (!$invalidationKeys)
