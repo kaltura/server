@@ -496,8 +496,10 @@ class DocumentsService extends KalturaEntryService
 		
 		if(!$fileSync)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY, $flavorAsset->getId());
-			
-		header("Content-Disposition: attachment; filename=\"$fileName\"");
+
+		/* @var $fileSync FileSync */
+		if ($fileSync->getFileExt() != assetParams::CONTAINER_FORMAT_SWF)	
+		    header("Content-Disposition: attachment; filename=\"$fileName\"");
 		
 		if($local)
 		{
