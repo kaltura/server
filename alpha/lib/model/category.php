@@ -492,6 +492,7 @@ class category extends Basecategory
 		$allChildren = $children;
 		foreach ($children as $childCategory)
 		{
+		    /* @var $childCategory category */
 			$subChildAllChildren = $childCategory->getAllChildren();
 			$allChildren = array_merge($allChildren, $subChildAllChildren);
 		}
