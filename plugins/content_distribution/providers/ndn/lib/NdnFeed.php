@@ -63,7 +63,7 @@ class NdnFeed
 		$node = $this->xpath->query('media:category', $this->item)->item(0);
 		$this->category = $node->cloneNode(true);
 		$node->parentNode->removeChild($node);
-
+				
 	}
 	
 	/**
@@ -248,16 +248,24 @@ class NdnFeed
 	
 	public function setThumbAsset(DOMElement $item, array $thumbAssets, $thumbnailCredit)
 	{
-		/** @var $thumbAsset thumbAsset */ 
-		$thumbAsset = $thumbAssets[0];
-		$url = $this->getAssetUrl($thumbAsset);
-		$this->setNodeValue('media:thumbnail/@url', $url, $item);
-		$this->setNodeValue('media:thumbnail/@width', $thumbAsset->getWidth(), $item);
-		$this->setNodeValue('media:thumbnail/@height', $thumbAsset->getHeight(), $item);
-		if (!empty($thumbnailCredit))
+		$templateNode = $this->xpath->query('./media:thumbnail', $item)->item(0);
+		$parentNode = $templateNode->parentNode;		
+		foreach ($thumbAssets as $thumbAsset)
 		{
-			$this->setNodeValue('media:thumbnail/@credit', $thumbnailCredit, $item);
+			if ($thumbAsset){
+				$url = $this->getAssetUrl($thumbAsset);
+				$thumbnailNode = $templateNode->cloneNode(true);	
+				$this->setNodeValue('./@url', $url, $thumbnailNode);
+				$this->setNodeValue('./@width', $thumbAsset->getWidth(), $thumbnailNode);
+				$this->setNodeValue('./@height', $thumbAsset->getHeight(), $thumbnailNode);
+				if (!empty($thumbnailCredit))
+				{
+					$this->setNodeValue('./@credit', $thumbnailCredit, $item);
+				}													
+				$parentNode->insertBefore($thumbnailNode,$templateNode);
+			}
 		}
+		$parentNode->removeChild($templateNode);
 	}
 	
 	public function setThumbAssetUrl($item, $thumbnailUrl, $thumbnailCredit)
