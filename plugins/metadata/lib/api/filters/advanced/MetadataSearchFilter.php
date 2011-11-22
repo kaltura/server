@@ -205,8 +205,6 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			
 		switch ($xPaths[$field]->getType()){
 			case MetadataSearchFilter::KMC_FIELD_TYPE_DATE:
-				$metadataField = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_DATE) . $xPaths[$field]->getSearchIndex();
-				break;
 			case MetadataSearchFilter::KMC_FIELD_TYPE_INT:
 				$metadataField = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $xPaths[$field]->getSearchIndex();
 				break;
