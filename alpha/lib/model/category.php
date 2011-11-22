@@ -97,21 +97,38 @@ class category extends Basecategory
 		
 		if ($updateEntriesCount)
 		{
+			$parentsCategories = array();
 			// decrease for the old parent category
 			if($oldParentId)
 				$oldParentCat = categoryPeer::retrieveByPK($oldParentId);
 			if ($oldParentCat)
-				$this->updateCategoryCount($oldParentCat);
-									
+			{
+				$parentsCategories[] = $oldParentCat->getId();
+				$parentsCategories = array_merge($parentsCategories, $oldParentCat->getAllParentsIds());
+			}						
 			// increase for the new parent category
 			$newParentCat = categoryPeer::retrieveByPK($newParentId);
-			if ($newParentCat)			
-				$this->updateCategoryCount($newParentCat);
+			if ($newParentCat)
+			{			
+				$parentsCategories[] = $newParentCat->getId();
+				$parentsCategories = array_merge($parentsCategories, $newParentCat->getAllParentsIds());
+			}
+
+			$parentsCategories = array_unique($parentsCategories);
+				
+			foreach($parentsCategories as $parentsCategoryId)
+			{
+				$this->updateCategoryCount($parentsCategoryId);
+			}
 		}			
 	}
 	
-	private function updateCategoryCount($category)
+	private function updateCategoryCount($categoryId)
 	{
+		$category = categoryPeer::retrieveByPK($categoryId);
+		if(!$category)
+			return;
+		
 		$allChildren = $category->getAllChildren();
 		$allSubCategoriesIds = array();
 		$allSubCategoriesIds[] = $category->getId();
@@ -121,7 +138,7 @@ class category extends Basecategory
 			foreach ($allChildren as $child)
 				$allSubCategoriesIds[] = $child->getId();	
 		}
-
+		
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$entryFilter = new entryFilter();
 		$entryFilter->set("_matchor_categories_ids", implode(',',$allSubCategoriesIds));
@@ -131,11 +148,6 @@ class category extends Basecategory
 
 		$category->setEntriesCount($c->getRecordsCount());
 		$category->save();
-		
-		//update parents count
-		$parentCategory = $category->getParentCategory();
-		if ($parentCategory)
-			$parentCategory->updateCategoryCount($parentCategory);
 	}
 
 	/* (non-PHPdoc)
@@ -485,19 +497,9 @@ class category extends Basecategory
 	 */
 	public function getAllChildren()
 	{
-		$children = $this->getChilds();
-		if (!count($children))
-			return array();
-		
-		$allChildren = $children;
-		foreach ($children as $childCategory)
-		{
-		    /* @var $childCategory category */
-			$subChildAllChildren = $childCategory->getAllChildren();
-			$allChildren = array_merge($allChildren, $subChildAllChildren);
-		}
-		
-		return $allChildren;
+		$c = new Criteria();
+		$c->add(categoryPeer::FULL_NAME, $this->getFullName() . '%', Criteria::LIKE);
+		return categoryPeer::doSelect($c);
 	}
 	
 	/**
