@@ -150,6 +150,18 @@ abstract class SphinxCriteria extends KalturaCriteria
 	{
 		$sphinxIdField = $this->getSphinxIdField();
 		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION max_matches=$maxMatches";
+
+		$badSphinxQueries = kConf::hasParam("sphinx_bad_queries") ? kConf::get("sphinx_bad_queries") : array();
+
+		foreach($badSphinxQueries as $badQuery)
+		{
+			if (strpos($sql, $badQuery) !== false)
+			{
+				KalturaLog::log("bad sphinx query: [$badQuery] $sql");
+				KExternalErrors::dieError(KExternalErrors::BAD_QUERY);
+			}
+		}
+
 		
 		//debug query
 		//echo $sql."\n"; die;
