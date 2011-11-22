@@ -56,6 +56,9 @@ class KAsyncNotifierParamsUtils
 	 */
 	public static function getDataAsArray($serialized_data)
 	{
+		if (empty($serialized_data))
+			return null;
+		
 		if(is_array($serialized_data))
 			return $serialized_data;
 			
