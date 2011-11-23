@@ -363,37 +363,28 @@ class ks
 	{
 		if ($this->hash)
 			return $this->hash;
-			
-		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id , $this->additional_data);
-		$str = implode ( self::SEPARATOR , $fields );
 		
 		$salt = $this->getSalt();
-		$this->hash = self::hash ( $salt , $str );
+		$this->hash = self::hash($salt, $this->getSecureFields());
 		
 		return $this->hash;
 	}
-
-	public function toSecureString ()
+	
+	private function getSecureFields()
 	{
 		$fields = array ( $this->partner_id , $this->partner_pattern , $this->valid_until , $this->type , $this->rand , $this->user , $this->privileges , $this->master_partner_id , $this->additional_data);
 		$str = implode ( self::SEPARATOR , $fields );
+		
+		return $str;
+	}
 
+	public function toSecureString()
+	{
 		$salt = $this->getSalt();
-		$hashed_str = self::hash ( $salt , $str ) . "|" . $str ;
+		$hashed_str = $this->getHash() . "|" . $this->getSecureFields() ;
 		$decoded_str = base64_encode( $hashed_str );
 
 		return $decoded_str;
-	}
-
-	/**
-	 * 
-	 * @param string $ks_str
-	 */
-	public function setActionsLimit()
-	{
-		$limit = $this->isSetLimitAction();
-		if ($limit)
-			invalidSessionPeer::actionsLimitKs($this, $limit);		
 	}
 	
 	public function isWidgetSession()
@@ -422,32 +413,26 @@ class ks
 			$partner_id != Partner::BATCH_PARTNER_ID &&		// Avoid querying the database on batch KS, since they are never invalidated
 			!$this->isWidgetSession())								// Since anyone can create a widget session, no need to check for invalidation
 		{
-			$limit = $this->isSetLimitAction();
-			if ($limit){
-				$criteria = new Criteria();
-				$criteria->add(invalidSessionPeer::KS, $this->getHash());
-				$cnt = invalidSessionPeer::doSelectOne($criteria, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-				
-				if ($cnt){
-					$currentActionLimit = $cnt->getActionsLimit();
-					
-					if (!is_null($currentActionLimit) && $currentActionLimit <= 1)
-					{
-						KalturaLog::err("actionLimits: EXCEEDED_ACTIONS_LIMIT");
-						return self::EXCEEDED_ACTIONS_LIMIT;
-					}
-					$cnt->setActionsLimit($currentActionLimit - 1);
-					$cnt->save();
-				}
-				else
-				{//if the ks was created on the client side
-					invalidSessionPeer::actionsLimitKs($this, $limit);
-				}
-			}		
-			
-			$invalid = invalidSessionPeer::isInvalid($this->getHash(), myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-			if($invalid)
-				return self::LOGOUT;
+			$criteria = new Criteria();
+			$criteria->add(invalidSessionPeer::KS, $this->getHash());
+			$dbKs = invalidSessionPeer::doSelectOne($criteria);
+			if ($dbKs)
+			{
+				$currentActionLimit = $dbKs->getActionsLimit();
+				if(is_null($currentActionLimit))
+					return self::LOGOUT;
+				elseif($currentActionLimit <= 0)
+					return self::EXCEEDED_ACTIONS_LIMIT;
+
+				$dbKs->setActionsLimit($currentActionLimit - 1);
+				$dbKs->save();
+			}
+			else
+			{
+				$limit = $this->isSetLimitAction();
+				if ($limit)
+					invalidSessionPeer::actionsLimitKs($this, $limit - 1);
+			}
 		}
 		
 		return self::OK;
