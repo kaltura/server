@@ -590,11 +590,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 	private function shouldSkipSphinx()
 	{
 		$pkCrit = $this->getCriterion($this->getIdField());
-		if(!$pkCrit || ($pkCrit && (($pkCrit->getComparison() != Criteria::EQUAL) && ($pkCrit->getComparison() != Criteria::IN))))
+		if(!$pkCrit || (($pkCrit->getComparison() != Criteria::EQUAL) && ($pkCrit->getComparison() != Criteria::IN)))
 			return false;
 
-			
-		$hasPeerFieldsOnly = true;
 		$fields = array();
 		
 		foreach($this->getMap() as $criterion)
@@ -614,19 +612,16 @@ abstract class SphinxCriteria extends KalturaCriteria
 			elseif(!$this->hasPeerFieldName($field))
 			{
 				KalturaLog::debug('Peer does not have the field [' . print_r($field,true) .']');
-				$hasPeerFieldsOnly = false;
+				return false;
 			}
 			elseif($this->getSphinxFieldType($fieldName) == IIndexable::FIELD_TYPE_STRING)
 			{
 				KalturaLog::debug('Field is textual [' . print_r($fieldName,true) .']');
-				$hasPeerFieldsOnly = false;
+				return false;
 			}
 		}
-		
-		if($hasPeerFieldsOnly)
-			return true;
-		
-		return false;
+
+		return true;
 	}
 	
 	public function hasPeerFieldName($field)
