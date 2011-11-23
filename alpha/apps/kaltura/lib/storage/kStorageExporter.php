@@ -283,6 +283,15 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				if ($asset)
 				{
 					$entryId = $asset->getEntryId();
+					//the next piece of code checks whether the entry to which
+					//the deleted asset belongs to is a "replacement" entry
+                    $entry = entryPeer::retrieveByPK($entryId);
+                    if ($entry->getReplacedEntryId())
+                    {
+                        KalturaLog::info("Will not handle event - deleted asset belongs to replacement entry");
+                        return;
+                    }
+					
 				}
 				assetPeer::setUseCriteriaFilter(true);
 				break;
@@ -299,13 +308,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
-		KalturaLog::debug("should consume deleted event?");
 		
 		if ($object instanceof FileSync)
 		{
 			if ($object->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
 				$storage = StorageProfilePeer::retrieveByPK($object->getDc());
+				KalturaLog::debug("storage auto delete policy: ".$storage->getAllowAutoDelete());
 				if ($storage->getStatus() == StorageProfile::STORAGE_STATUS_AUTOMATIC && $storage->getAllowAutoDelete())
 				{
 					return true;
