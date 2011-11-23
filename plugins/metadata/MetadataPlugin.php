@@ -552,9 +552,8 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$searchIndexes = kConf::get('search_indexes');
 		
 		foreach ($searchIndexes as $indexName => $indexLimit)
-			
-		for ($i=0; $i < $searchIndexes; $i++)
-			$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_UINT;
+			for ($i=0; $i < $indexLimit; $i++)
+				$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_UINT;
 		
 		$sphinxSchema[kSphinxSearchManager::getSphinxIndexName($indexName)]['fields'] = $kalturaEntryFields;
 		return $sphinxSchema;
