@@ -14,20 +14,6 @@
  * @subpackage model
  */
 class invalidSessionPeer extends BaseinvalidSessionPeer {
-
-	/**
-	 * @param      string $hash
-	 * @param      PropelPDO $con the connection to use
-	 * @return     bool
-	 */
-	public static function isInvalid($hash, PropelPDO $con = null)
-	{
-		$criteria = new Criteria();
-		$criteria->add(invalidSessionPeer::KS, $hash);
-		$criteria->addAnd(invalidSessionPeer::KS_VALID_UNTIL, null, Criteria::NOT_EQUAL);
-		$cnt = invalidSessionPeer::doCount($criteria, false, $con);
-		return ($cnt > 0);
-	}
 	
 	/**
 	 * @param      ks $ks
@@ -39,6 +25,7 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		$invalidSession = new invalidSession();
 		$invalidSession->setKs($ks->getHash());
 		$invalidSession->setActionsLimit($limit);
+		$invalidSession->setKsValidUntil($ks->valid_until);
 		$invalidSession->save();
 		
 		return $invalidSession;
@@ -57,9 +44,10 @@ class invalidSessionPeer extends BaseinvalidSessionPeer {
 		if(!$invalidSession){
 			$invalidSession = new invalidSession();
 			$invalidSession->setKs($ks->getHash());
+			$invalidSession->setKsValidUntil($ks->valid_until);
 		}
-				
-		$invalidSession->setKsValidUntil($ks->valid_until);
+		
+		$invalidSession->setActionsLimit(null);
 		$invalidSession->save();
 		
 		return $invalidSession;
