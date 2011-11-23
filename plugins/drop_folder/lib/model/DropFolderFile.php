@@ -20,10 +20,10 @@ class DropFolderFile extends BaseDropFolderFile
 	
 	public function setFileSize($size)
 	{
-		parent::setFileSize($size);
 		if ($size !== $this->getFileSize()) {
 		    self::setFileSizeLastSetAt(time());
 		}
+		parent::setFileSize($size);
 	}
 	
 	public function getFileSizeLastSetAt($format = null)
