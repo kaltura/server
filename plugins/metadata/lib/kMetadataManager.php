@@ -198,7 +198,7 @@ class kMetadataManager
 				return $i;
 		}
 		
-		throw new Exception('could not find available search index');
+		throw new APIException(MetadataErrors::EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT);
 	}
 	
 	/**
