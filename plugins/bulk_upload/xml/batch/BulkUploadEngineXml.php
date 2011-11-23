@@ -1924,7 +1924,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$this->exceededMaxRecordsEachRun = true;
 			return;
 		}
-		$this->handledRecordsThisRun++;
 		
 		//TODO: What should we write in the bulk upload result for update? 
 		//only the changed parameters or just the one theat was changed
