@@ -462,15 +462,30 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$resource = new KalturaAssetsParamsResourceContainers(); // holds all teh needed resources for the conversion
 		$resource->resources = array();
 		
-		//action to perfom for assets - default = replace
-		$contentAssetsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
-		if(isset($item->contentAssets->action))
-			$contentAssetsAction = strtolower($item->contentAssets->action);
 		
-		//action to perfom for assets - default = replace
-		$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
-		if(isset($item->thumbnails->action))
+		if(isset($item->contentAssets->action) && (isset($item->thumbnails->action)))
+		{
+			$contentAssetsAction = strtolower($item->contentAssets->action);
 			$thumbnailsAction = strtolower($item->thumbnails->action);
+		}
+		elseif (isset($item->contentAssets->action))
+		{
+			$contentAssetsAction = strtolower($item->contentAssets->action);
+			$thumbnailsAction = strtolower($item->contentAssets->action);
+		}
+		elseif (isset($item->thumbnails->action))
+		{
+			$contentAssetsAction = strtolower($item->thumbnails->action);
+			$thumbnailsAction = strtolower($item->thumbnails->action);
+		}
+		else
+		{
+			//default action to perfom for assets and thumbnails is replace
+			$contentAssetsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
+			$thumbnailsAction = self::$actionsMap[KalturaBulkUploadAction::REPLACE];
+		}
+		
+		
 		
 		if (isset($item->contentAssets->action) && isset($item->thumbnails->action) && ($contentAssetsAction != $thumbnailsAction))
 			throw new KalturaBatchException("ContentAsset->action: {$contentAssetsAction} must be the same as thumbnails->action: {$thumbnailsAction}", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
