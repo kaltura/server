@@ -122,7 +122,8 @@ class KalturaClient:
     def queueServiceActionCall(self, service, action, params = KalturaParams(), files = KalturaFiles()):
         # in start session partner id is optional (default -1). if partner id was not set, use the one in the config
         if not params.get().has_key("partnerId") or params.get()["partnerId"] == -1:
-            params.put("partnerId", self.config.partnerId)
+            if self.config.partnerId != None:
+                params.put("partnerId", self.config.partnerId)
         params.addStringIfDefined("ks", self.ks)
         call = KalturaServiceActionCall(service, action, params, files)
         self.callsQueue.append(call)

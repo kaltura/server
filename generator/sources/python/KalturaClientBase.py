@@ -229,15 +229,15 @@ class KalturaClientException(Exception):
 # Client configuration class
 class KalturaConfiguration:
     # Constructs new Kaltura configuration object
-    def __init__(self, partnerId = -1):
-        self.logger                     = None
-        self.serviceUrl                 = "http://www.kaltura.com"
+    def __init__(self, partnerId = -1, serviceUrl = "http://www.kaltura.com", logger = None):
+        self.logger                     = logger
+        self.serviceUrl                 = serviceUrl
         self.partnerId                  = None
         self.format                     = KALTURA_SERVICE_FORMAT_XML
         self.clientTag                  = "python"
         self.requestTimeout             = 10
         
-        if type(partnerId) != int:
+        if partnerId != None and type(partnerId) != int:
             raise KalturaClientException("Invalid partner id", KalturaClientException.ERROR_INVALID_PARTNER_ID)
         self.partnerId = partnerId
         
