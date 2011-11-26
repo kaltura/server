@@ -230,6 +230,9 @@ function compareArrays($resultNew, $resultOld, $path)
 
 function compareResults($resultNew, $resultOld)
 {
+	if ($resultNew == $resultOld)
+		return array();
+		
 	$resultNew = xmlToArray($resultNew);
 	$resultOld = xmlToArray($resultOld);
 
