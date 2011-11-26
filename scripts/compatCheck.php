@@ -134,9 +134,64 @@ function xmlToArray($xmlstring)
 	return $array;
 }
 
-function compareArrays($resultNew, $resultOld, $path)
+$IGNORED_FIELDS = array(
+	'/executionTime', 
+	'/result/serverTime',
+	'/debug/execute_impl_time', 
+	'/debug/execute_time', 
+	'/debug/total_time', 
+	'/entry/@attributes/server_time', 
+	);
+	
+function normalizeKS($value)
+{
+	$ksPos1 = strpos($value, '/ks/');
+	$ksPos2 = strpos($value, '&ks=');
+	if ($ksPos1 !== false)
+	{
+		$ksStartPos = $ksPos1;
+		$endDelim = '/';
+	}
+	else if ($ksPos2 !== false)
+	{
+		$ksStartPos = $ksPos2;
+		$endDelim = '&';
+	}
+	else
+		return $value;
+		
+	$ksStartPos += 4;
+	$ksEndPos = strpos($value, $endDelim, $ksStartPos);
+	if ($ksEndPos == false)
+	{
+		$ksEndPos = strlen($value);
+	}
+	
+	$ks = substr($value, $ksStartPos, $ksEndPos - $ksStartPos);
+	$decodedKs = base64_decode($ks);
+	list($sig, $ksFields) = explode('|', $decodedKs);
+	$ksFields = explode(';', $ksFields);
+	unset($ksFields[2]);		// valid until
+	unset($ksFields[4]);		// rand
+	$ksFields = implode(';', $ksFields);
+	return str_replace($ks, $ksFields, $value);
+}
+
+function compareValues($newValue, $oldValue)
 {
 	global $serviceUrlNew, $serviceUrlOld;
+	
+	$newValue = str_replace($serviceUrlNew, $serviceUrlOld, $newValue);
+	
+	$newValue = normalizeKS($newValue);
+	$oldValue = normalizeKS($oldValue);
+
+	return $newValue == $oldValue;
+}	
+	
+function compareArrays($resultNew, $resultOld, $path)
+{
+	global $IGNORED_FIELDS;
 	
 	$errors = array();
 	foreach ($resultOld as $key => $oldValue)
@@ -154,7 +209,12 @@ function compareArrays($resultNew, $resultOld, $path)
 		}
 		else
 		{
-			if (str_replace($serviceUrlNew, $serviceUrlOld, $newValue) != $oldValue)
+			if (in_array("$path/$key", $IGNORED_FIELDS))
+			{
+				continue;
+			}
+			
+			if (!compareValues($newValue, $oldValue))
 			{
 				$errors[] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
 			}
@@ -164,25 +224,10 @@ function compareArrays($resultNew, $resultOld, $path)
 	return $errors;
 }
 
-function removeChangingFields(&$results)
-{
-	unset($results["executionTime"]);
-	unset($results["debug"]);
-	if (isset($results["result"]) && is_array($results["result"]) && isset($results["result"]["serverTime"]))
-	{
-		$resultItem = $results["result"];
-		unset($resultItem["serverTime"]);
-		$results["result"] = $resultItem;
-	}
-}
-
 function compareResults($resultNew, $resultOld)
 {
 	$resultNew = xmlToArray($resultNew);
-	removeChangingFields($resultNew);
-
 	$resultOld = xmlToArray($resultOld);
-	removeChangingFields($resultOld);
 
 	if (!$resultNew || !$resultOld)
 	{
