@@ -203,11 +203,11 @@ function compareArrays($resultNew, $resultOld, $path)
 		}
 		
 		$newValue = $resultNew[$key];
-		if (is_array($oldValue))
+		if (is_array($oldValue) && is_array($newValue))
 		{
 			$errors = array_merge($errors, compareArrays($newValue, $oldValue, "$path/$key"));
 		}
-		else
+		else if (is_string($oldValue) && is_string($newValue))
 		{
 			if (in_array("$path/$key", $IGNORED_FIELDS))
 			{
@@ -218,6 +218,10 @@ function compareArrays($resultNew, $resultOld, $path)
 			{
 				$errors[] = "field $key has different value (path=$path new=$newValue old=$oldValue)";
 			}
+		}
+		else
+		{
+			$errors[] = "field $key has different type (path=$path new=$newValue old=$oldValue)";
 		}
 	}
 	
