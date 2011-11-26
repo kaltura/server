@@ -329,6 +329,7 @@ function testAction($fullActionName, $parsedParams, $uri, $postParams = array())
 	print "\n-------------------------------------------------------------------------------\n";
 	print "\tUrl = $serviceUrlNew$uri\n";
 	print "\tPostParams = ".var_export($postParams, true)."\n";
+	print "\tTestUrl = $serviceUrlNew$uri&".http_build_query($postParams)."\n";	
 	foreach ($errors as $error)
 	{
 		print "\tError: $error\n";
