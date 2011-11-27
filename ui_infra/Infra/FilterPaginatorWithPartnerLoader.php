@@ -1,14 +1,6 @@
 <?php
 class Infra_FilterPaginatorWithPartnerLoader extends Infra_FilterPaginator
 {
-	public function __construct($impersonatedPartnerId/* $args*/)
-	{
-		$client = Infra_ClientHelper::getClient();
-		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-		parent::__construct($adminConsolePlugin->uiConfAdmin, "listAction", $impersonatedPartnerId);
-		$this->args = array_slice(func_get_args(), 1);
-	}
-	
 	/**
 	 * 
 	 * @param int $offset
