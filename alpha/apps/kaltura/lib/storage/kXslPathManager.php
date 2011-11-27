@@ -39,7 +39,7 @@ class kXslPathManager extends kPathManager
 		$xslStr = $this->getXsl($pathXsl, $xslVariables);
 		
 		$path = $this->getPathValue($entry, $xslStr);
-		if (is_null($path)) {
+		if (empty($path)) {
 		    throw new Exception('Cannot get path value by XSL');
 		}
 		
