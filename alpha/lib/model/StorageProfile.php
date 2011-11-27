@@ -74,6 +74,21 @@ class StorageProfile extends BaseStorageProfile
 	public function setPathFormat($v) { $this->putInCustomData('path_format', $v);}
 	public function getPathFormat() { return $this->getFromCustomData('path_format', null);}
 	
+	/**
+	 * 
+	 * Get the allow_auto_delete parameter value
+	 */
+	public function getAllowAutoDelete() 
+	{ 
+		return (bool)$this->getFromCustomData("allow_auto_delete", null, false); 
+	} // if not set to true explicitly, default will be false
+	
+
+	public function setAllowAutoDelete( $v )
+	{ 
+		$this->putInCustomData("allow_auto_delete", (bool)$v); 
+	}
+	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
 	
 	/* URL Manager Params */
