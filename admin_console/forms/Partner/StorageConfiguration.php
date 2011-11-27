@@ -132,7 +132,14 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('textarea', 'urlManagerParamsJson', array(
-			'label'			=> 'URL Manager Params:',
+			'label'			=> 'URL Manager Params (JSON):',
+			'cols'			=> 48,
+			'rows'			=> 2,
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('textarea', 'pathManagerParamsJson', array(
+			'label'			=> 'Path Manager Params (JSON):',
 			'cols'			=> 48,
 			'rows'			=> 2,
 			'filters'		=> array('StringTrim'),
@@ -157,12 +164,14 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 	{
 	    parent::populateFromObject($object, $add_underscore);
 	    $this->setDefault('urlManagerParamsJson', json_encode($object->urlManagerParams));
+	    $this->setDefault('pathManagerParamsJson', json_encode($object->pathManagerParams));
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		$object->urlManagerParams = json_decode($properties['urlManagerParamsJson'], true);
+		$object->pathManagerParams = json_decode($properties['pathManagerParamsJson'], true);
 		return $object;
 	}
 }

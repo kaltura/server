@@ -17,6 +17,7 @@ class Form_Partner_StorageHelper
 		$arr = array(
 			'kPathManager' => 'Kaltura Path',
 			'kExternalPathManager' => 'External Path',
+		    'kXslPathManager' => 'XSL Path',
 		);
 		$form->getElement('pathManagerClass')->setMultiOptions($arr);
 	}

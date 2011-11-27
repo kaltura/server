@@ -36,6 +36,7 @@ class StorageProfile extends BaseStorageProfile
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';
 	
 	const CUSTOM_DATA_URL_MANAGER_PARAMS = 'url_manager_params';
+	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
 	
 	/**
 	 * @return kPathManager
@@ -91,6 +92,25 @@ class StorageProfile extends BaseStorageProfile
 	    }
 	    return $params;
 	}
+	
+	/* Path Manager Params */
+	
+    public function setPathManagerParams($params)
+	{
+	    $this->putInCustomData(self::CUSTOM_DATA_PATH_MANAGER_PARAMS, serialize($params));
+	}
+	
+	public function getPathManagerParams()
+	{
+	    $params = $this->getFromCustomData(self::CUSTOM_DATA_PATH_MANAGER_PARAMS);
+	    $params = unserialize($params);
+	    if (!$params) {
+	        return array();
+	    }
+	    return $params;
+	}
+	
+	/* Cache Invalidation */
 	
 	public function getCacheInvalidationKeys()
 	{

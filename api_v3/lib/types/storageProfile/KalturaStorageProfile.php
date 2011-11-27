@@ -127,6 +127,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	public $pathManagerClass;
 	
 	/**
+	 * @var KalturaKeyValueArray
+	 */
+	public $pathManagerParams;
+	
+	/**
 	 * @var string
 	 */
 	public $urlManagerClass;
@@ -211,10 +216,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		if(is_null($object_to_fill))
 			$object_to_fill = new StorageProfile();
 		
-		// url manager params
-		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
-		$dbUrlManagerParams = $object_to_fill->getUrlManagerParams();
 		
+		$object_to_fill =  parent::toObject($object_to_fill, $props_to_skip);
+		
+		// url manager params
+		$dbUrlManagerParams = $object_to_fill->getUrlManagerParams();
 		if (!is_null($this->urlManagerParams) && count($this->urlManagerParams) > 0)
 		{
     		foreach ($this->urlManagerParams as $param)
@@ -222,8 +228,18 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
     		    $dbUrlManagerParams[$param->key] = $param->value;
     		}
 		}
-		
 		$object_to_fill->setUrlManagerParams($dbUrlManagerParams);
+		
+		// path manager params
+		$dbPathManagerParams = $object_to_fill->getPathManagerParams();
+		if (!is_null($this->pathManagerParams) && count($this->pathManagerParams) > 0)
+		{
+    		foreach ($this->pathManagerParams as $param)
+    		{
+    		    $dbPathManagerParams[$param->key] = $param->value;
+    		}
+		}
+		$object_to_fill->setPathManagerParams($dbPathManagerParams);
 		
 		return $object_to_fill;
 	}
@@ -232,9 +248,8 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	{
 	    parent::fromObject($source_object);
 	    
-	    // url manager params
-	    $urlManagerParams = $source_object->getUrlManagerParams();
-	    $this->urlManagerParams = KalturaKeyValueArray::fromKeyValueArray($urlManagerParams);
+	    $this->urlManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getUrlManagerParams());
+	    $this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
 	}
 	
 	public function getExtraFilters()
