@@ -630,3 +630,9 @@ form#addNewForm { margin-left: 20px; }
 form#addNewForm dd, 
 form#addNewForm dt { float: left; }
 form#addNewForm #newPartnerId { width: 60px; }
+
+/* report */
+#report-dialog dt { margin: 3px 0 10px; width: 288px; float: left; }
+#report-dialog dd { margin-bottom: 5px; }
+#report-dialog dd input { height: 22px; }
+#report-dialog .CodeMirror-wrapping { border: 1px solid #AAAAAA; }

@@ -7,7 +7,18 @@
  */
 class ReportService extends KalturaBaseService
 {
-	
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+		
+		if (in_array(strtolower($actionName), array('execute', 'getcsv'), true))
+		{
+			$partnerGroup = $this->partnerGroup . ',0';
+			
+			parent::applyPartnerFilterForClass(new ReportPeer(), $partnerGroup);
+		}
+	}
+		
 	/**
 	 * report getGraphs action allows to get a graph data for a specific report. 
 	 * 
@@ -107,6 +118,89 @@ class ReportService extends KalturaBaseService
 			$dimension , 
 			$objectIds ,
 			$pager->pageSize , $pager->pageIndex , $order ); 
+	}
+	
+	/**
+	 * @action execute
+	 * @param int $id
+	 * @param KalturaKeyValueArray $params
+	 * @return KalturaReportResponse
+	 */
+	function executeAction($id, KalturaKeyValueArray $params = null)
+	{
+		$dbReport = ReportPeer::retrieveByPK($id);
+		if (is_null($dbReport))
+			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+			
+		$query = $dbReport->getQuery();
+		
+		$this->addPartnerIdToParams($params);
+		
+		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
+		
+		$kReportsManager = new kReportManager($dbReport);
+		list($columns, $rows) = $kReportsManager->execute($execParams);
+		
+		$reportResponse = KalturaReportResponse::fromColumnsAndRows($columns, $rows);
+		
+		return $reportResponse;
+	}
+	
+	/**
+	 * @action getCsv
+	 * @param int $id
+	 * @param KalturaKeyValueArray $params
+	 * @return file
+	 */
+	function getCsvAction($id, KalturaKeyValueArray $params = null)
+	{
+		$dbReport = ReportPeer::retrieveByPK($id);
+		if (is_null($dbReport))
+			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
+			
+		$query = $dbReport->getQuery();
+		
+		$this->addPartnerIdToParams($params);
+		
+		$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
+		
+		$kReportsManager = new kReportManager($dbReport);
+		list($columns, $rows) = $kReportsManager->execute($execParams);
+		
+		$fileName = array('Report', $id, $this->getPartnerId());
+		foreach($params as $param)
+		{
+			$fileName[] = $param->key;
+			$fileName[] = $param->value;
+		}
+		$fileName = implode('_', $fileName) . '.csv';
+		header('Content-Type: text/csv');
+		header("Content-Disposition: attachment; filename=\"$fileName\"");
+		echo "\xEF\xBB\xBF"; // a fix for excel, copied from myReportsMgr
+		echo implode(',', $columns) . "\n";
+		foreach($rows as $row) 
+		{
+			echo implode(',', $row) . "\n";
+		}
+		die;
+	}
+	
+	protected function addPartnerIdToParams($params)
+	{
+		// remove partner id parameter
+		foreach($params as $param)
+		{
+			if (strtolower($param->key) == 'partner_id')
+			{
+				$param->key = '';
+				$param->value = '';
+			}
+		}
+		// force partner id parameter
+		$partnerIdParam = new KalturaKeyValue();
+		$partnerIdParam->key = 'partner_id';
+		$partnerIdParam->value = $this->getPartnerId();
+		$params[] = $partnerIdParam;
 	}
 }
 ?>

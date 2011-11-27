@@ -203,5 +203,8 @@ return array (
     'KuserToUserRoleTableMap' => 'lib/model/map/KuserToUserRoleTableMap.php',
     'KuserToUserRolePeer' => 'lib/model/KuserToUserRolePeer.php',
     'KuserToUserRole' => 'lib/model/KuserToUserRole.php',
+    'ReportTableMap' => 'lib/model/map/ReportTableMap.php',
+    'ReportPeer' => 'lib/model/ReportPeer.php',
+    'Report' => 'lib/model/Report.php',
   ),
 );

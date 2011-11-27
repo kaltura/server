@@ -1,0 +1,2 @@
+insert into user_role (str_id, name, system_name, description, partner_id, status, permission_names, tags, custom_data) VALUES
+('REPORT_VIEWER_ROLE', 'Report Viewer Role', 'Report Viewer Role', 'Report Viewer Role', 0, 1, 'ANALYTICS_BASE', NULL, NULL);

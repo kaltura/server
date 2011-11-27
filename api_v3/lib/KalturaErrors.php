@@ -13,6 +13,9 @@ class KalturaErrors extends APIErrors
 	//
 	const INTERNAL_SERVERL_ERROR = "INTERNAL_SERVERL_ERROR,Internal server error occured";
 	
+	// should be used for internal actions only
+	const INTERNAL_SERVERL_ERROR_DEBUG = "INTERNAL_SERVERL_ERROR,Internal server error occured \"%s\"";
+	
 	//
 	const MISSING_KS ="MISSING_KS,Missing KS, session not established";
 	
@@ -341,4 +344,11 @@ class KalturaErrors extends APIErrors
 	 * resetUserPassword
 	 */
 	const CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER = "CANNOT_RESET_PASSWORD_FOR_SYSTEM_PARTNER,Password cannot be reset for system partner";
+	
+	/*
+	 * Report service
+	 */
+	const REPORT_NOT_FOUND = "REPORT_NOT_FOUND,Report id \"%s\" not found";
+	
+	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING,Parameter \"%s\" is missing";
 }

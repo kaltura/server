@@ -1694,4 +1694,15 @@
 			<reference local="user_role_id" foreign="id" />
 		</foreign-key>
 	</table>
+	<table skipSql="false" abstract="false" name="report">
+		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+		<column primaryKey="false" lazyLoad="false" name="partner_id" type="integer" required="true" />
+		<column primaryKey="false" lazyLoad="false" name="name" type="varchar" required="true" default="" size="128" />
+		<column primaryKey="false" lazyLoad="false" name="system_name" type="varchar" required="true" default="" size="128" />
+		<column primaryKey="false" lazyLoad="false" name="description" type="varchar" required="true" default="" size="1024" />
+		<column primaryKey="false" lazyLoad="false" name="query" type="longvarchar" required="true" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="deleted_at" type="timestamp" />
+	</table>
 </database>
