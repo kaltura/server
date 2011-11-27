@@ -42,14 +42,9 @@ class kXslPathManager extends kPathManager
 		if (empty($path)) {
 		    throw new Exception('Cannot get path value by XSL');
 		}
+		$path = trim($path);
 		
-		KalturaLog::debug('Path value before character replacement ['.$path.']');
-		
-        $path = str_replace(' ', '_', $path);  // convert spaces to underscores
-        $path = preg_replace(self::PATH_CHARS_TO_REMOVE_REGEX, '', $path);  // remove invalid characters
-        $path = trim($path);
-        
-        KalturaLog::debug('Path value after character replacement ['.$path.']');
+		KalturaLog::debug('Path value ['.$path.']');
 		
 		$root = '/';
 		return array($root, $path);
@@ -63,7 +58,7 @@ class kXslPathManager extends kPathManager
 	protected function getDefaultPathXsl()
 	{
 	   // the default xsl will set the path to be {year}{month}{day}/{partnerDir}/{defaultFileName}
-	   $xsl = '<xsl:value-of select="php:function(\'date\', \'Y-m-d\', $currentTime)" />';
+	   $xsl = '<xsl:value-of select="php:function(\'date\', \'Ymd\', $currentTime)" />';
 	   $xsl .= '<xsl:text>/</xsl:text>';
 	   $xsl .= '<xsl:value-of select="floor($partnerId div 1000)"/>';
 	   $xsl .= '<xsl:text>/</xsl:text>';
