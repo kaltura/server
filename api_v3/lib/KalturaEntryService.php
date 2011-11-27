@@ -225,6 +225,14 @@ class KalturaEntryService extends KalturaBaseService
 		$dbAsset->setFileExt($ext);
 		$dbAsset->save();
 		
+		if($dbAsset && ($dbAsset instanceof thumbAsset))
+		{
+			list($width, $height, $type, $attr) = getimagesize($entryFullPath);
+			$dbAsset->setWidth($width);
+			$dbAsset->setHeight($height);
+			$dbAsset->save();
+		}
+		
 		$syncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
 		try {
