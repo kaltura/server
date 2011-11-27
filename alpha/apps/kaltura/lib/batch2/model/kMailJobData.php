@@ -90,7 +90,7 @@ class kMailJobData extends kJobData
     /**
  	* @var bool
  	*/
-    private $isHtml;
+    private $isHtml = true;
     
 	/**
 	 * @return the $mailType

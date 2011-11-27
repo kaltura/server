@@ -79,7 +79,7 @@ class KalturaMailJobData extends KalturaJobData
     /**
      * @var bool
      */
-    public $isHtml;
+    public $isHtml=true;
     
 	private static $map_between_objects = array
 	(

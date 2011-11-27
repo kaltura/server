@@ -175,6 +175,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		$this->mail->Subject = $this->getSubjectByType( $type, $culture, $subjectParams  ) ;
 		$this->mail->Body = $this->getBodyByType( $type, $culture, $bodyParams, $recipientemail, $isHtml ) ;
 			
+		$this->mail->HeaderLine($name, $value);
 //		$this->mail->setContentType( "text/plain; charset=\"utf-8\"" ) ; //; charset=utf-8" );
 		// definition of the required parameters
 		
@@ -243,10 +244,14 @@ class KAsyncMailer extends KJobHandlerWorker
 		KalturaLog::debug("footer [$footer]");
 		$body = vsprintf( $body, $bodyParamsArray );
 		if ($isHtml)
+		{
 			$body = str_replace( "<BR>", "<br />", $body );
+			$body = '<p align="left" dir="ltr">'.$body.'</p>';
+		}
 		else
+		{
 			$body = str_replace( "<BR>", chr(13).chr(10), $body );
-			
+		}	
 		$body = str_replace( "<EQ>", "=", $body );
 		$body = str_replace( "<EM>", "!", $body ); // exclamation mark
 		
