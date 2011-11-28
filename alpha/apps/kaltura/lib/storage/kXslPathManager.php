@@ -40,7 +40,8 @@ class kXslPathManager extends kPathManager
 		
 		$path = $this->getPathValue($entry, $xslStr);
 		if (empty($path)) {
-		    throw new Exception('Cannot get path value by XSL');
+		    KalturaLog::log('Empty path recieved - using parent\'s path instead');
+		    return parent::generateFilePathArr($object, $subType, $version, $storageProfileId);
 		}
 		$path = trim($path);
 		
