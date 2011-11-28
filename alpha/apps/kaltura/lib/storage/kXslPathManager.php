@@ -165,7 +165,7 @@ class kXslPathManager extends kPathManager
 		
 		if(!$xslObj->loadXML($xslStr))
 		{
-		    KalturaLog::err('Error loading distribution profile XSLT for profile ID ['.$this->getId().']');
+		    KalturaLog::err('Error loading XSL');
 			return null;
 		}
 		
@@ -175,7 +175,7 @@ class kXslPathManager extends kPathManager
 		
 		$resultXmlObj = $proc->transformToDoc($mrssObj);
 		if (!$resultXmlObj) {
-		    KalturaLog::err('Error transforming XML for distribution profile ['.$this->getId().'] and entry id ['.$entry->getId().']');
+		    KalturaLog::err('Error transforming XML for entry id ['.$entry->getId().']');
 		    return null;
 		}
 		
