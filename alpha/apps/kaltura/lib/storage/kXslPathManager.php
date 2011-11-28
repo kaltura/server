@@ -1,9 +1,6 @@
 <?php
 class kXslPathManager extends kPathManager
 {
-    const PATH_CHARS_TO_REMOVE_REGEX = '/[^0-9^a-z^A-Z^_^.^\/]/';
-    
-    
 	/**
 	 * will return a pair of file_root and file_path
 	 * This is the only function that should be extended for building a different path
