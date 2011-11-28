@@ -3,6 +3,8 @@
 class SymantecScanJavaEngine extends SymantecScanEngine
 {
 	const STATUS_PREFIX = 'Scan Status: ';
+	const UNABLE_TO_SEND_DATA_TO_THE_SERVER = 'ERROR: Unknown error in execution : Unable to send data to the server.';
+	const NUM_OF_ATTEMPS = 5;
 	
 	private $binFile = 'java -jar /opt/SYMCScan/ssecls/ssecls.jar';
 	
@@ -63,6 +65,14 @@ class SymantecScanJavaEngine extends SymantecScanEngine
 		KalturaLog::debug("Executing - [$cmd]");
 		system($cmd, $return_value);
 		$output = file($logFile);
+		
+		for($tries = 0; $tries < self::NUM_OF_ATTEMPS; ++ $tries) {
+			if (count ( $output ) && ! strcmp ( $output [0], self::UNABLE_TO_SEND_DATA_TO_THE_SERVER ))
+				break;
+			sleep ( 10 );
+			system($cmd, $return_value);
+			$output = file($logFile);
+		}
 		
 		$found = false;
 		foreach ($output as $line)
