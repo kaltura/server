@@ -35,7 +35,13 @@ class kXslPathManager extends kPathManager
 		$xslVariables = $this->getXslVariables($storageProfile, $object, $subType, $version, $entry);
 		$xslStr = $this->getXsl($pathXsl, $xslVariables);
 		
-		$path = $this->getPathValue($entry, $xslStr);
+		try {
+		    $path = $this->getPathValue($entry, $xslStr);
+		}
+		catch (Exception $e) {
+		    KalturaLog::err('Error executing XSL - '.$e->getMessage());
+		    $path = null;
+		}
 		if (empty($path)) {
 		    KalturaLog::log('Empty path recieved - using parent\'s path instead');
 		    return parent::generateFilePathArr($object, $subType, $version, $storageProfileId);
