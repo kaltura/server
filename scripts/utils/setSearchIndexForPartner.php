@@ -1,7 +1,7 @@
 <?php
 
 /**
- * add sub partner to existing partner group (as adding it to the master partner's group). 
+ * set search index for a partner. 
  */
 require_once '../bootstrap.php';
 
