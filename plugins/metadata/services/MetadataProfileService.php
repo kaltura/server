@@ -138,10 +138,12 @@ class MetadataProfileService extends KalturaBaseService
 		
 		if(!$dbMetadataProfile)
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
-
+		
 		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
-			
+
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData);	
+		
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
 		$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_DEFINITION);
