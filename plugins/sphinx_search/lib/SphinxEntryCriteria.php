@@ -131,7 +131,12 @@ class SphinxEntryCriteria extends SphinxCriteria
 	 */
 	protected function getSphinxIndexName()
 	{
-		$partner = PartnerPeer::retrieveByPK ( kCurrentContext::$master_partner_id );
+		if (!is_null(kCurrentContext::$partner_id) && kCurrentContext::$partner_id !== '') 
+			$partnerId = kCurrentContext::$partner_id;
+		else
+			$partnerId = kCurrentContext::$ks_partner_id;
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner)
 			return kSphinxSearchManager::getSphinxIndexName(entryPeer::TABLE_NAME);
 		
