@@ -565,8 +565,11 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	 * return number of fields in kaltura_entry index (in sphinx) for given type
 	 * @param int $type
 	 */
-	public static function getAdditionalSearchableFieldsLimit($partnerId)
+	public static function getAdditionalSearchableFieldsLimit($partnerId, $obejctType)
 	{
+		if ($obejctType != MetadataObjectType::ENTRY)
+			return 0;
+		
 		$partner = PartnerPeer::retrieveByPK ( $partnerId );
 		if (!$partner)
 			throw new APIException(APIErrors::INVALID_PARTNER_ID, $partnerId);
@@ -575,7 +578,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$partnerSearchIndex = $partner->getSearchIndex(entryPeer::TABLE_NAME);
 		
 		if(!isset($searchIndexes[$partnerSearchIndex]))
-			throw new Exception('could not find partner\'s search index' . $partnerSearchIndex);
+			throw new Exception('could not find partner\'s search index ' . $partnerSearchIndex);
 			
 		return $searchIndexes[$partnerSearchIndex];
 	}

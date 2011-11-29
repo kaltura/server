@@ -32,7 +32,7 @@ class MetadataProfileService extends KalturaBaseService
 	 */
 	function addAction(KalturaMetadataProfile $metadataProfile, $xsdData, $viewsData = null)
 	{
-		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData);
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $metadataProfile->metadataObjectType);
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
 		$dbMetadataProfile->setPartnerId($this->getPartnerId());
@@ -72,7 +72,7 @@ class MetadataProfileService extends KalturaBaseService
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsdFile['name']);
 		
-		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdFile);
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdFile, false, $metadataProfile->metadataObjectType);
 		$dbMetadataProfile = $metadataProfile->toInsertableObject();
 		$dbMetadataProfile->setStatus(KalturaMetadataProfileStatus::ACTIVE);
 		$dbMetadataProfile->setPartnerId($this->getPartnerId());
@@ -142,7 +142,7 @@ class MetadataProfileService extends KalturaBaseService
 		if($dbMetadataProfile->getStatus() != MetadataProfile::STATUS_ACTIVE)
 			throw new KalturaAPIException(MetadataErrors::METADATA_TRANSFORMING);
 
-		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData);	
+		kMetadataManager::validateMetadataProfileField($this->getPartnerId(), $xsdData, false, $dbMetadataProfile->getObjectType(), $id);	
 		
 		$dbMetadataProfile = $metadataProfile->toUpdatableObject($dbMetadataProfile);
 		
