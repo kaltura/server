@@ -175,7 +175,6 @@ class KAsyncMailer extends KJobHandlerWorker
 		$this->mail->Subject = $this->getSubjectByType( $type, $culture, $subjectParams  ) ;
 		$this->mail->Body = $this->getBodyByType( $type, $culture, $bodyParams, $recipientemail, $isHtml ) ;
 			
-		$this->mail->HeaderLine($name, $value);
 //		$this->mail->setContentType( "text/plain; charset=\"utf-8\"" ) ; //; charset=utf-8" );
 		// definition of the required parameters
 		
