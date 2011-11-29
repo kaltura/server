@@ -713,6 +713,7 @@ class Partner extends BasePartner
 	public function setLoginUsersOverageUnit($v)          {$this->putInCustomData('login_users_overage_unit', $v);}
     public function setMaxLoginAttemptsOverageUnit($v)    {$this->putInCustomData('login_attempts_overage_unit', $v);}
     public function setMaxBulkSizeOverageUnit($v)         {$this->putInCustomData('bulk_size_overage_unit', $v);}
+    public function setAutoModerateEntryFilter($v)       {$this->putInCustomData('auto_moderate_entry_filter', $v);}
     
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -749,10 +750,9 @@ class Partner extends BasePartner
 	public function getLoginUsersOverageUnit()          {return $this->getFromCustomData('login_users_overage_unit');}
     public function getMaxLoginAttemptsOverageUnit()    {return $this->getFromCustomData('login_attempts_overage_unit');}
     public function getMaxBulkSizeOverageUnit()         {return $this->getFromCustomData('bulk_size_overage_unit');}
-	
 	public function getAutoModerateEntryFilter()         {return $this->getFromCustomData('auto_moderate_entry_filter');}
-	public function setAutoModerateEntryFilter($v)       {$this->putInCustomData('auto_moderate_entry_filter', $v);}
-    
+	
+	
 	/**
 	 * @return kAkamaiLiveParams
 	 */

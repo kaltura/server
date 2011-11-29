@@ -272,11 +272,21 @@ class myPartnerUtils
 		return array ( $partner->getNotify() , $partner->getNotificationsConfig() ) ;
 	}
 
-	public static function shouldModerate ( $partner_id )
+	public static function shouldModerate ( $partner_id, $entry = null )
 	{
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		if ( !$partner ) return false;
-		return $partner->getModerateContent();
+		$should_moderate = $partner->getModerateContent();
+		if ($should_moderate && !is_null($entry))
+		{
+			$autoModerateEntryFilter = $partner->getAutoModerateEntryFilter();
+			//filter exists and entry doesn't match filter
+			if ($autoModerateEntryFilter && !$autoModerateEntryFilter->typeMatches($entry))
+			{
+				$should_moderate = false;
+			}				
+		}
+		return $should_moderate;		
 	}
 	
 	// if the host of the partner is false or null or an empty string - ignore it

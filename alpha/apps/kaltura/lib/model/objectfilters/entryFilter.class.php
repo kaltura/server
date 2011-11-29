@@ -442,19 +442,18 @@ class entryFilter extends baseObjectFilter
 	}
 	
 	public function typeMatches(entry $entry)
-	{
-	 	// check if type equals
-		if ($entry->getType() == $this->get('_eq_type'))
+	{		
+		if ($this->get('_eq_type') && $entry->getType() != $this->get('_eq_type'))
 		{
-			return true;
-		}		
-		// check if type in		
-		if (in_array($entry->getType(), explode(',', $this->get('_in_type'))) )
-		{
-			return true;
+			return false;
 		}
 		
-		return false;
+		if ($this->get('_in_type') && !in_array($entry->getType(), explode(',', $this->get('_in_type'))))
+		{
+			return false;
+		}
+		
+		return true;
 	}
 	
 }

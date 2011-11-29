@@ -360,17 +360,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 		else
 		{
-			$should_moderate = myPartnerUtils::shouldModerate( $this->getPartnerId() );
-			if ($should_moderate)
-			{
-				$partner = $this->getPartner();
-				$autoModerateEntryFilter = $partner->getAutoModerateEntryFilter();
-				//filter exists and entry doesn't match filter
-				if ($autoModerateEntryFilter && !$autoModerateEntryFilter->typeMatches($this))
-				{
-					$should_moderate = false;
-				}				
-			}
+			$should_moderate = myPartnerUtils::shouldModerate( $this->getPartnerId(), $this);
 		}
 
 		if( $should_moderate )
