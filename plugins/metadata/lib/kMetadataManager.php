@@ -538,17 +538,6 @@ class kMetadataManager
 	{
 		$additionalSearchableFieldsCounter = 0;
 		
-		MetadataProfileFieldPeer::setUseCriteriaFilter(false);
-		$profileFields = MetadataProfileFieldPeer::retrieveByPartnerAndActive($partnerId);
-		MetadataProfileFieldPeer::setUseCriteriaFilter(true);
-		
-		foreach($profileFields as $profileField)
-		{		
-			$type = $profileField->getType();
-			if($type == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || $type == MetadataSearchFilter::KMC_FIELD_TYPE_INT)
-				$additionalSearchableFieldsCounter++;
-		}
-
 		$xPaths = kXsd::findXpathsByAppInfo($xsdData , kMetadataManager::APP_INFO_SEARCH, 'true', $isPath);
 		foreach($xPaths as $xPath => $xPathData)
 		{		
