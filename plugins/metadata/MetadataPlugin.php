@@ -12,8 +12,7 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 	const PLUGIN_NAME = 'metadata';
 	
 	const SPHINX_EXPANDER_FIELD_DATA = 'data';
-	const SPHINX_EXPENDER_FIELD_DATE = 'date_'; 
-	const SPHINX_EXPENDER_FIELD_INT = 'int_';
+	const SPHINX_EXPENDER_FIELD_INT = 'date_'; //for backward compatibility, all partners in production are using int field for date.
 	
 	const PLUGIN_VERSION_MAJOR = 2;
 	const PLUGIN_VERSION_MINOR = 1;
@@ -552,10 +551,13 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$searchIndexes = kConf::get('search_indexes');
 		
 		foreach ($searchIndexes as $indexName => $indexLimit)
+		{
 			for ($i=0; $i < $indexLimit; $i++)
 				$kalturaEntryFields[MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPENDER_FIELD_INT) . $i] = SphinxFieldType::RT_ATTR_UINT;
 		
-		$sphinxSchema[kSphinxSearchManager::getSphinxIndexName($indexName)]['fields'] = $kalturaEntryFields;
+			$sphinxSchema[kSphinxSearchManager::getSphinxIndexName($indexName)]['fields'] = $kalturaEntryFields;
+		}
+		
 		return $sphinxSchema;
 	}
 
