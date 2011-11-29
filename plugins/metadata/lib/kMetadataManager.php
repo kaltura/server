@@ -198,7 +198,7 @@ class kMetadataManager
 				return $i;
 		}
 		
-		throw new APIException(MetadataErrors::EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT);
+		throw new APIException(MetadataErrors::EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT, $fieldsLimit);
 	}
 	
 	/**
@@ -546,7 +546,8 @@ class kMetadataManager
 				$additionalSearchableFieldsCounter++;
 		}
 		
-		if ($additionalSearchableFieldsCounter > MetadataPlugin::getAdditionalSearchableFieldsLimit($partnerId))
-			throw new APIException(MetadataErrors::EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT);
+		$partnerLimit = MetadataPlugin::getAdditionalSearchableFieldsLimit($partnerId);
+		if ($additionalSearchableFieldsCounter >= $partnerLimit)
+			throw new APIException(MetadataErrors::EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT, $partnerLimit);
 	}
 }
