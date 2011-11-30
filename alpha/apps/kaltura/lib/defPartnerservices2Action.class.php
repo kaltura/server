@@ -301,6 +301,7 @@ $this->benchmarkStart( "beforeImpl" );
 			}
 			catch (Exception $ex)
 			{
+				KalturaLog::log('validateTicketSetPartner failed - not caching response');
 				defPartnerservices2baseAction::disableCache();
 				throw $ex;
 			}
