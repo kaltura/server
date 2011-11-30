@@ -168,7 +168,7 @@ class VerizonVcastDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setFieldName(VerizonVcastDistributionField::DOWNLOAD_PRICE_CODE);
 		$fieldConfig->setUserFriendlyFieldName('Download price code');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/DownloadPriceCode" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		//$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER); vcast said that this value should be empty 
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 		$fieldConfig = new DistributionFieldConfig();

@@ -86,6 +86,7 @@ class VerizonVcastFeedHelper
 		$this->setNodeValueFieldConfigId('//ns2:rating', KalturaVerizonVcastDistributionField::RATING);
 		$this->setNodeValueFieldConfigId('//ns2:copyright', KalturaVerizonVcastDistributionField::COPYRIGHT);
 		$this->setNodeValueFieldConfigId('//ns2:entitlement', KalturaVerizonVcastDistributionField::ENTITLEMENT);
+		
 		$this->setNodeValueFullDateFieldConfigId('//ns2:liveDate', KalturaVerizonVcastDistributionField::LIVE_DATE);
 		$this->setNodeValueFullDateFieldConfigId('//ns2:endDate', KalturaVerizonVcastDistributionField::END_DATE);
 		$this->setNodeValueFieldConfigId('//ns2:priority', KalturaVerizonVcastDistributionField::PRIORITY);
@@ -95,7 +96,7 @@ class VerizonVcastFeedHelper
 		$this->setNodeValueFieldConfigId('//ns2:downloadPriceCode', KalturaVerizonVcastDistributionField::DOWNLOAD_PRICE_CODE);
 		$this->setNodeValueFieldConfigId('//ns2:provider', KalturaVerizonVcastDistributionField::PROVIDER);
 		$this->setNodeValueFieldConfigId('//ns2:providerid', KalturaVerizonVcastDistributionField::PROVIDER_ID);
-		$this->setNodeValueFieldConfigId('//ns2:alertCode', KalturaVerizonVcastDistributionField::ALERT_CODE);
+		$this->setOrRemoveNodeValueFieldConfigId('//ns2:alertCode', KalturaVerizonVcastDistributionField::ALERT_CODE);
 		
 		foreach($thumbnailAssets as $thumbnailAsset)
 		{
@@ -132,7 +133,8 @@ class VerizonVcastFeedHelper
 		$url = $urlManager->getAssetUrl($asset);
 		$url = $cdnHost . $url;
 		$url = preg_replace('/^https?:\/\//', '', $url);
-		return 'http://' . $url;
+		$url = 'http://' . $url . '/ext/' . $asset->getId() . '.' . $asset->getFileExt(); 
+		return $url;
 	}
 	
 	protected function shouldIngestFlavor(asset $flavorAsset)
@@ -201,7 +203,10 @@ class VerizonVcastFeedHelper
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]) && $this->_fieldValues[$fieldConfigId]) 
 		{
-			$date = date('c', $this->_fieldValues[$fieldConfigId]);
+			$dateTime = new DateTime('@'.$this->_fieldValues[$fieldConfigId]);
+			// force time zone to EST
+			$dateTime->setTimezone(new DateTimeZone('EST'));
+			$date = $dateTime->format('c');
 			$this->setNodeValue($xpath, $date);
 		}
 	}
@@ -220,6 +225,24 @@ class VerizonVcastFeedHelper
 	{
 		if (isset($this->_fieldValues[$fieldConfigId]))
 			$this->setNodeValue($xpath, $this->_fieldValues[$fieldConfigId]);
+	}
+	
+	/**
+	 * @param string $xpath
+	 * @param string $fieldConfigId
+	 */
+	public function setOrRemoveNodeValueFieldConfigId($xpath, $fieldConfigId)
+	{
+		if (isset($this->_fieldValues[$fieldConfigId]) && $this->_fieldValues[$fieldConfigId])
+		{
+			$this->setNodeValue($xpath, $this->_fieldValues[$fieldConfigId]);
+		}
+		else 
+		{
+			$node = $this->_xpath->query($xpath)->item(0);
+			if ($node)
+				$node->parentNode->removeChild($node);
+		}
 	}
 	
 	/**

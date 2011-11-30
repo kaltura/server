@@ -33,6 +33,9 @@ class VerizonVcastDistributionEngine extends DistributionEngine implements
 	{
 		$this->validateJobDataObjectTypes($data);
 		
+		// verizon didn't approve that this logic does work, for now just mark every submited xml as successful
+		return true;
+		
 		$publishState = $this->fetchStatus($data);
 		switch($publishState)
 		{
