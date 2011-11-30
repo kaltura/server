@@ -542,7 +542,7 @@ class kMetadataManager
 		
 		foreach($profileFields as $profileField)
 		{		
-			if (!is_null($metadataProfileId) || $profileField->getMetadataProfileId() == $metadataProfileId)
+			if ($profileField->getMetadataProfileId() == $metadataProfileId)
 				continue;
 				
 			$type = $profileField->getType();
