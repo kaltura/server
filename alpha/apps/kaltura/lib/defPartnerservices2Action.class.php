@@ -252,11 +252,6 @@ public function INFO__allowEmptyPuser () { return $this->allowEmptyPuser (); }
 		$start_time = microtime(true);
 		$start = microtime( true );
 $this->benchmarkStart( "beforeImpl" );		
-$this->benchmarkStart( "signature" );		
-		$sig_type = $this->getP ( "sigtype" , self::SIG_TYPE_POST );
-		$signature_params = self::getParamsFromSigType ( $sig_type );
-		$signatura_valid = self::validateSignature( $signature_params );
-$this->benchmarkEnd( "signature" );
 		$this->response_type = $this->getP ( "format" , self::DEFAULT_FORMAT ); //
 
 /*
@@ -265,6 +260,11 @@ $this->benchmarkEnd( "signature" );
  */
 		if ( $this->should_debug && $add_extra_debug_data )
 		{
+			$this->benchmarkStart( "signature" );		
+			$sig_type = $this->getP ( "sigtype" , self::SIG_TYPE_POST );
+			$signature_params = self::getParamsFromSigType ( $sig_type );
+			$signatura_valid = self::validateSignature( $signature_params );
+			$this->benchmarkEnd( "signature" );
 			$this->addDebug( "sigtype" , $sig_type );
 			$this->addDebug( "validateSignature" , $signatura_valid );
 			$this->addDebug( "signature" , self::signature( $signature_params ) );
@@ -295,7 +295,15 @@ $this->benchmarkEnd( "signature" );
 		
 		try
 		{
-			$arr = list ( $partner_id , $subp_id , $uid , $private_partner_data ) = $this->validateTicketSetPartner ( $partner_id , $subp_id , $puser_id , $ks_str );
+			try
+			{
+				$arr = list ( $partner_id , $subp_id , $uid , $private_partner_data ) = $this->validateTicketSetPartner ( $partner_id , $subp_id , $puser_id , $ks_str );
+			}
+			catch (Exception $ex)
+			{
+				defPartnerservices2baseAction::disableCache();
+				throw $ex;
+			}
 			
 			// if PS2 permission validation is enabled for the current partner, only the actions defined in kConf's parameter "ps2_actions_not_blocked_by_permissions" will be allowed
 			$currentPartner = $this->getPartner();
