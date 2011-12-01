@@ -52,6 +52,9 @@ class SymantecScanEnginePlugin extends KalturaPlugin implements IKalturaPending,
 		
 			if($enumValue == KalturaVirusScanEngineType::SYMANTEC_SCAN_JAVA_ENGINE)
 				return new SymantecScanJavaEngine();
+
+			if($enumValue == KalturaVirusScanEngineType::SYMANTEC_SCAN_DIRECT_ENGINE)
+				return new SymantecScanDirectEngine();
 		}
 		
 		return null;
@@ -71,6 +74,9 @@ class SymantecScanEnginePlugin extends KalturaPlugin implements IKalturaPending,
 			
 			if($enumValue == KalturaVirusScanEngineType::SYMANTEC_SCAN_JAVA_ENGINE)
 				return 'SymantecScanJavaEngine';
+
+			if($enumValue == KalturaVirusScanEngineType::SYMANTEC_SCAN_DIRECT_ENGINE)
+				return 'SymantecScanDirectEngine';
 		}
 
 		return null;
