@@ -73,8 +73,9 @@ class thumbnailAction extends sfAction
 			$upload_token = UploadTokenPeer::retrieveByPK($upload_token_id);
 			if ($upload_token)
 			{
-				$partner = $upload_token->getPartnerId();
+				$partnerId = $upload_token->getPartnerId();
 				if($density == 0) {
+				    $partner = PartnerPeer::retrieveByPK($partnerId);
 					$density = $partner->getDefThumbDensity();
 				}
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
@@ -183,6 +184,7 @@ class thumbnailAction extends sfAction
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
 			
+		KalturaLog::debug("In thumbnail action - get thumbnail filesyncs");
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
 		
