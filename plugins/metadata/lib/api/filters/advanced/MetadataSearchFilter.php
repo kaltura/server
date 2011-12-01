@@ -257,7 +257,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		
 			$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
 			foreach($freeTextsArr as $valIndex => $valValue)
-				if(!is_numeric($valValue) && strlen($valValue) <= 1)
+				if(!is_numeric($valValue) && strlen($valValue) <= 0)
 					unset($freeTextsArr[$valIndex]);
 					
 			foreach($freeTextsArr as $freeText)
@@ -268,7 +268,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		
 		$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
 		foreach($freeTextsArr as $valIndex => $valValue)
-			if(!is_numeric($valValue) && strlen($valValue) <= 1)
+			if(!is_numeric($valValue) && strlen($valValue) <= 0)
 				unset($freeTextsArr[$valIndex]);
 				
 		$freeTextsArr = array_unique($freeTextsArr);
