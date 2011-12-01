@@ -264,7 +264,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 					$freeTextsArr = explode(baseObjectFilter::IN_SEPARATOR, $freeTexts);
 					foreach($freeTextsArr as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($freeTextsArr[$valIndex]);
 						else
 							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
@@ -280,7 +280,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 					$freeTextsArr = explode(baseObjectFilter::AND_SEPARATOR, $freeTexts);
 					foreach($freeTextsArr as $valIndex => $valValue)
 					{
-						if(!is_numeric($valValue) && strlen($valValue) <= 1)
+						if(!is_numeric($valValue) && strlen($valValue) <= 0)
 							unset($freeTextsArr[$valIndex]);
 						else
 							$freeTextsArr[$valIndex] = SphinxUtils::escapeString($valValue);
