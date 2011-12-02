@@ -56,8 +56,6 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 			if ($filemtime > $now - $secondsOld) 
 				continue;
 			
-			$deletedCount++;
-			
 			if ( $simulateOnly )
 			{
 				KalturaLog::debug( "Simulating: Deleting file [$file], it's last modification time was " . date('c', $filemtime)); 
@@ -66,8 +64,11 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 			
 			KalturaLog::debug("Deleting file [$file], it's last modification time was " . date('c', $filemtime));
 			$res = @unlink ( $file );
-			if ( ! $res )
+			if ( ! $res ){
 				KalturaLog::debug("Error: problem while deleting [$file]");
+				continue;	
+			}
+			$deletedCount++;
 		}
 		KalturaLog::debug("Deleted $deletedCount files");
 	}
