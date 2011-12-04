@@ -25,9 +25,9 @@ class KalturaAssetService extends KalturaBaseService
 	* @param bool $forceProxy
 	* @throws KalturaErrors::FILE_DOESNT_EXIST
 	*/
-	protected function serveAsset(asset $asset, $fileName, $forceProxy = false)
+	protected function serveAsset(asset $asset, $fileName, $forceProxy = false, $version = null)
 	{
-		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $version);
 		
 		$fileSync = null;
 		$serveRemote = false;
