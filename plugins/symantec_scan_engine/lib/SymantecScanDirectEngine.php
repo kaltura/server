@@ -25,7 +25,7 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 			return false;
 		}
 
-		if (!socket_connect($engineSocket, SCAN_ENGINE_HOST, SCAN_ENGINE_PORT))
+		if (!socket_connect($engineSocket, self::SCAN_ENGINE_HOST, self::SCAN_ENGINE_PORT))
 		{
 			$errorCode = socket_last_error($engineSocket);
 			KalturaLog::err("Failed to connect to scan engine: [$errorCode] " . socket_strerror($errorCode));
@@ -109,7 +109,8 @@ Encapsulated: null-body=0
 				continue;
 			}
 			
-			$statusCode = explode(' ', $response)[1];
+			$statusCode = explode(' ', $response);
+			$statusCode = $statusCode[1];
 			$statusCode = substr($statusCode, 0, 3);
 			switch ($statusCode)
 			{
