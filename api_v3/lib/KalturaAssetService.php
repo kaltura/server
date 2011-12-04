@@ -23,6 +23,7 @@ class KalturaAssetService extends KalturaBaseService
 	* @param asset $asset
 	* @param string $fileName
 	* @param bool $forceProxy
+	* @param int $version
 	* @throws KalturaErrors::FILE_DOESNT_EXIST
 	*/
 	protected function serveAsset(asset $asset, $fileName, $forceProxy = false, $version = null)
