@@ -264,6 +264,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		foreach($dataInts as $key => $value)
 		{
 			$value = (int)$value;
+			if($value < 0)
+        		$value += 0x100000000;
+        	
 			$data[$key] = $value;
 		}
 		
@@ -277,11 +280,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$fields = implode(',', array_keys($data));
 		
 		$index = kSphinxSearchManager::getSphinxIndexName($object->getObjectIndexName());
-		$command = 'insert';
-		if(!$isInsert)
-			$command = 'replace';
 		
-		return "$command into $index ($fields) values($values)";
+		return "replace into $index ($fields) values($values)";
 	}
 		
 	/**
