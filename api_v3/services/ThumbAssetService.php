@@ -395,12 +395,13 @@ class ThumbAssetService extends KalturaAssetService
 	 *  
 	 * @action serve
 	 * @param string $thumbAssetId
+	 * @param int $version
 	 * @return file
 	 *  
 	 * @throws KalturaErrors::THUMB_ASSET_IS_NOT_READY
 	 * @throws KalturaErrors::THUMB_ASSET_ID_NOT_FOUND
 	 */
-	public function serveAction($thumbAssetId)
+	public function serveAction($thumbAssetId, $version = null)
 	{
 		$thumbAsset = assetPeer::retrieveById($thumbAssetId);
 		if (!$thumbAsset || !($thumbAsset instanceof thumbAsset))
@@ -412,7 +413,7 @@ class ThumbAssetService extends KalturaAssetService
 			
 		$fileName = $thumbAsset->getEntryId()."_" . $thumbAsset->getId() . ".$ext";
 		
-		return $this->serveAsset($thumbAsset, $fileName);
+		return $this->serveAsset($thumbAsset, $fileName, $version);
 	}
 	
 	/**
