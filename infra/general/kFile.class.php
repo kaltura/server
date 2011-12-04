@@ -541,11 +541,10 @@ class kFile
 		// pass uploaded files by adding them as post data with curl @ prefix
 		// signifying a file. the $_FILES[xxx][tmp_name] points to the location
 		// of the uploaded file.
-		// we dont care about the original file name here. if we would, we should have
-		// moved it to a temp folder and set it to its original name
+		// we preserve the original file name by passing the extra ;filename=$_FILES[xxx][name]
 		foreach($_FILES as $key => $value)
 		{
-			$post_params[$key] = "@".$value['tmp_name'];
+			$post_params[$key] = "@".$value['tmp_name'].";filename=".$value['name'];
 		}
 		
 		foreach($_POST as $key => $value)
