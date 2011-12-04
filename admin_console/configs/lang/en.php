@@ -1016,6 +1016,7 @@ return array(
 
 	'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::SYMANTEC_SCAN_ENGINE' => 'Symantec',
 	'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::SYMANTEC_SCAN_JAVA_ENGINE' => 'Symantec-Java',
+	'Kaltura_Client_VirusScan_Enum_VirusScanEngineType::SYMANTEC_SCAN_DIRECT_ENGINE' => 'Symantec-Direct',
 	'VIRUS_SCAN_ENTRY_TYPE_ALL' =>'All',
 
 	'Virus Scan Profile' => 'Virus Scan Profile',
