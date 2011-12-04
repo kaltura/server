@@ -143,6 +143,9 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
 			return true;
 		
+		if($dbBatchJob->getJobType() == BatchJobType::IMPORT)
+		    return true;
+		
 		return false;
 	}
 	
@@ -165,7 +168,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_ENABLE))
 			self::onDistributionEnableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
-		
+		 
 		if($dbBatchJob->getJobType() == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_DISABLE))
 			self::onDistributionDisableJobUpdated($dbBatchJob, $dbBatchJob->getData(), $twinJob);
 		
