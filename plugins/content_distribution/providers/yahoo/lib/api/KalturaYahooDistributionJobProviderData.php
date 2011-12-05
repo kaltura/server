@@ -54,9 +54,6 @@ class KalturaYahooDistributionJobProviderData extends KalturaConfigurableDistrib
 		$c->addAscendingOrderByColumn(assetPeer::ID);
 		$thumbAssets = assetPeer::doSelect($c);		
 		//$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
-		//TODO: erase
-		KalturaLog::debug('NOGAAAAA -'.print_r($thumbAssets, true));
-		KalturaLog::debug('NOGAAAAA -'.print_r($distributionJobData->entryDistribution, true));
 		
 		
 		if(count($thumbAssets)>=2)
