@@ -501,18 +501,23 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		{
 			return;
 		}
-	
-		kQueryCache::invalidateQueryCache(\$this);
-		";
+	";
 		if ($this->shouldRaiseEvents())
 		{
 			$script .= "
 		if(\$this->isModified())
 		{
+			kQueryCache::invalidateQueryCache(\$this);
 			kEventsManager::raiseEvent(new kObjectChangedEvent(\$this, \$this->tempModifiedColumns));
 		}
 			
 		\$this->tempModifiedColumns = array();
+		";
+		}
+		else
+		{
+			$script .= "
+		kQueryCache::invalidateQueryCache(\$this);
 		";
 		}
 		$script .= "
