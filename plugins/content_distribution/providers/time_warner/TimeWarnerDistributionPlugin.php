@@ -2,7 +2,7 @@
 /**
  * @package plugins.timeWarnerDistribution
  */
-class TimeWarnerDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices
+class TimeWarnerDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'timeWarnerDistribution';
 	const TIME_WARNER_EVENT_CONSUMER = "kTimeWarnerFlowManager";
@@ -179,4 +179,14 @@ class TimeWarnerDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 		);
 	}
 
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'testme')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
+			
+		return null;
+	}
 }

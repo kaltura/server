@@ -2,7 +2,7 @@
 /**
  * @package plugins.synacorHboDistribution
  */
-class SynacorHboDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices
+class SynacorHboDistributionPlugin extends KalturaPlugin implements IKalturaPermissions, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader, IKalturaContentDistributionProvider, IKalturaEventConsumers, IKalturaServices, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'synacorHboDistribution';
 	const SYNACOR_HBO_EVENT_CONSUMER = 'kSynacorHboFlowManager';
@@ -184,4 +184,14 @@ class SynacorHboDistributionPlugin extends KalturaPlugin implements IKalturaPerm
 		);
 	}
 
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	 */
+	public static function getConfig($configName)
+	{
+		if($configName == 'testme')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/testme.ini');
+			
+		return null;
+	}
 }
