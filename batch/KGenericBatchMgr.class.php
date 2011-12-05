@@ -10,6 +10,10 @@ if(strtoupper(PHP_SAPI) != 'CLI' && strtoupper(PHP_SAPI) != 'CGI-FCGI')
 	exit;
 }
 
+// Make sure no other scheduler is running on this machine
+$lock_socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create lock socket\n");
+socket_bind($lock_socket, "127.0.0.1", 31212) or die("Could not bind to lock socket\n");
+
 $phpPath = 'php';
 if(isset($argc) && $argc > 1)
 {
