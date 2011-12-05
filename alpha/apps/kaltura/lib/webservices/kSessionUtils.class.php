@@ -380,7 +380,6 @@ class ks
 
 	public function toSecureString()
 	{
-		$salt = $this->getSalt();
 		$hashed_str = $this->getHash() . "|" . $this->getSecureFields() ;
 		$decoded_str = base64_encode( $hashed_str );
 
