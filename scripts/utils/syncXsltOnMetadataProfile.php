@@ -1,8 +1,8 @@
 <?php
 
 // ---------------------------------------------------------------------------
-$xsltFilePath = 'history_modify_5.xsl';         //TODO: change to valid xslt file path
-$metadataProfileId = 9;    //TODO: change to a valid metadata profile id
+$xsltFilePath = '';         //TODO: change to valid xslt file path
+$metadataProfileId = null;    //TODO: change to a valid metadata profile id
 // ---------------------------------------------------------------------------
 
 if (!$xsltFilePath) {
