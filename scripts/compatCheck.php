@@ -491,6 +491,7 @@ function processPS2Request($parsedParams)
 		'keditorservices.getentryinfo', 
 		'partnerservices2.executeplaylist',
 		'partnerservices2.getentries',
+		'partnerservices2.getallentries',
 		'partnerservices2.getentry',
 		'partnerservices2.getentryroughcuts',
 		'partnerservices2.getkshow',
