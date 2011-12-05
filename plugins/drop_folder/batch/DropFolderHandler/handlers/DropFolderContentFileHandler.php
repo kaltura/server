@@ -140,25 +140,6 @@ class DropFolderContentFileHandler extends DropFolderFileHandler
 		KalturaLog::debug('Parsed slug ['.$this->dropFolderFile->parsedSlug.'], Parsed flavor ['.$this->dropFolderFile->parsedFlavor.']');
 		return true; // file name matches the defined regex
 	}
-
-	/**
-	 * Update the status of all drop folder files with the given ids to be KalturaDropFolderFileStatus::HANDLED
-	 * @param array $idsArray array of drop folder file ids
-	 */
-	private function setAsHandled($idsArray)
-	{
-		$dropFolderFilePlugin = KalturaDropFolderClientPlugin::get($this->kClient);
-		
-		$this->impersonate($this->dropFolderFile->partnerId);
-		$this->kClient->startMultiRequest();
-		foreach ($idsArray as $id)
-		{
-			KalturaLog::debug('Updating additional drop folder file ['.$id.'] with status HANDLED');
-			$dropFolderFilePlugin->dropFolderFile->updateStatus($id, KalturaDropFolderFileStatus::HANDLED);
-		}
-		$this->kClient->doMultiRequest();		
-		$this->unimpersonate();
-	}
 	
 	/**
 	 * Add the new file to a new entry, together with all other relevant drop folder files, according to the ingestion profile
