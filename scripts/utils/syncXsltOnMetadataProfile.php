@@ -1,8 +1,8 @@
 <?php
 
 // ---------------------------------------------------------------------------
-$xsltFilePath = null;         //TODO: change to valid xslt file path
-$metadataProfileId = null;    //TODO: change to a valid metadata profile id
+$xsltFilePath = 'history_modify_5.xsl';         //TODO: change to valid xslt file path
+$metadataProfileId = 9;    //TODO: change to a valid metadata profile id
 // ---------------------------------------------------------------------------
 
 if (!$xsltFilePath) {
@@ -25,7 +25,7 @@ KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "
 KAutoloader::setClassMapFilePath(KALTURA_ROOT_PATH.'/cache/scripts/classMap'.uniqid().'.cache');
 KAutoloader::register();
 
-
+KalturaPluginManager::addPlugin('MetadataPlugin');
 $dbMetadataProfile = MetadataProfilePeer::retrieveById($metadataProfileId);
 if (!$dbMetadataProfile) {
     die('ERROR - Cannot find metadata profile with id ['.$metadataProfileId.']'.PHP_EOL);
