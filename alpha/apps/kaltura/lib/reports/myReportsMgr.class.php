@@ -439,20 +439,54 @@ class myReportsMgr
 				}
 				$file_path = dirname(__FILE__)."/". $report_type . ".sql";
 			}
-			
+
 			$sql_raw_content = file_get_contents( $file_path );
 			if ( ! $sql_raw_content )
 			{
 				throw new kCoreException("Cannot find sql for [$report_type] [$report_flavor] at [$file_path]", kCoreException::INVALID_QUERY);
 			}
 			
-			if ( $object_ids )
+			$entryFilter = new entryFilter();
+			$shouldSelectFromDb = false;
+			
+			if ($input_filter->categories)
+			{
+				$input_filter->categories = '';
+				$entryFilter->set("_matchand_categories", $input_filter->categories);
+				$shouldSelectFromDb = true;
+			}
+			
+			if ($input_filter->keywords)
+			{
+				if($input_filter->search_in_tags)
+					$entryFilter->set("_matchor_search_text", $input_filter->keywords);
+				else
+					$entryFilter->set("_like_admin_tags", $input_filter->keywords);
+				
+				$input_filter->keywords = '';
+				$shouldSelectFromDb = true;
+			}
+			
+			$entryIdsFromDB = array();
+			
+			if ($shouldSelectFromDb)
+			{
+				$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+				$entryFilter->attachToCriteria($c);
+				$c->applyFilters();
+				
+				$entryIdsFromDB = $c->getFetchedIds();
+			}
+						
+			$obj_ids_clause = null;
+			
+			if($object_ids)
 			{
 				//the object ids are not supposed to include single quotes - if they do have them - remove them
 				$object_ids = str_replace ( "'" , '' , $object_ids ) ; 
 				// quote all the objects with SINGLE-QUOTES			
 				$object_ids_str = "'" . str_replace ( "," , "','" , $object_ids ) . "'";
-	
+				
 				if ( $report_type == self::REPORT_TYPE_CONTENT_CONTRIBUTIONS )
 				{
 					$obj_ids_clause = "entry_media_source_id in ( $object_ids_str)";
@@ -471,12 +505,15 @@ class myReportsMgr
 				}		
 				else
 				{
-					$obj_ids_clause = "ev.entry_id in ( $object_ids_str )";
+					$objectIds = explode(',', $object_ids);
+					$entryIds = "'" . implode("','", array_merge($objectIds, $entryIdsFromDB)) . "'";
+					$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 				}
 			}
-			else
+			elseif (count($entryIdsFromDB))
 			{
-				$obj_ids_clause = null;
+				$entryIds = "'" . implode("','", $entryIdsFromDB) . "'";
+				$obj_ids_clause = "ev.entry_id in ( $entryIds )";
 			}
 			
 			if ( is_numeric( $report_type ))
