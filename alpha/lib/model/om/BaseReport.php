@@ -84,6 +84,12 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 	protected $alreadyInSave = false;
 
 	/**
+	 * Flag to indicate if save action actually affected the db.
+	 * @var        boolean
+	 */
+	protected $objectSaved = false;
+
+	/**
 	 * Flag to prevent endless validation loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -811,6 +817,11 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 			throw $e;
 		}
 	}
+	
+	public function wasObjectSaved()
+	{
+		return $this->objectSaved;
+	}
 
 	/**
 	 * Performs the work of inserting or updating the row in the database.
@@ -834,6 +845,7 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 			}
 
 			// If this object has been modified, then save it to the database.
+			$this->objectSaved = false;
 			if ($this->isModified()) {
 				if ($this->isNew()) {
 					$pk = ReportPeer::doInsert($this, $con);
@@ -844,8 +856,13 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
 					$this->setNew(false);
+					$this->objectSaved = true;
 				} else {
-					$affectedRows += ReportPeer::doUpdate($this, $con);
+					$affectedObjects = ReportPeer::doUpdate($this, $con);
+					if($affectedObjects)
+						$this->objectSaved = true;
+						
+					$affectedRows += $affectedObjects;
 				}
 
 				$this->resetModified(); // [HL] After being saved an object is no longer 'modified'
@@ -887,7 +904,9 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 	 */
 	public function postSave(PropelPDO $con = null) 
 	{
+		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
 		$this->oldColumnsValues = array(); 
+		parent::postSave($con);
 	}
 	
 	/**
@@ -900,7 +919,7 @@ abstract class BaseReport extends BaseObject  implements Persistent {
     	$this->setCreatedAt(time());
     	
 		$this->setUpdatedAt(time());
-		return true;
+		return parent::preInsert($con);
 	}
 	
 	/**
@@ -916,6 +935,7 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
 		
+		parent::postInsert($con);
 	}
 
 	/**
@@ -937,6 +957,7 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 			
 		$this->tempModifiedColumns = array();
 		
+		parent::postUpdate($con);
 	}
 	
 	/**
@@ -989,7 +1010,7 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 			$this->setUpdatedAt(time());
 		
 		$this->tempModifiedColumns = $this->modifiedColumns;
-		return true;
+		return parent::preUpdate($con);
 	}
 	
 	/**
@@ -1275,6 +1296,18 @@ abstract class BaseReport extends BaseObject  implements Persistent {
 		$criteria = new Criteria(ReportPeer::DATABASE_NAME);
 
 		$criteria->add(ReportPeer::ID, $this->id);
+		
+		if($this->alreadyInSave && count($this->modifiedColumns) == 2 and $this->isColumnModified(ReportPeer::UPDATED_AT))
+		{
+			$theModifiedColumn = null;
+			foreach($this->modifiedColumns as $modifiedColumn)
+				if($modifiedColumn != ReportPeer::UPDATED_AT)
+					$theModifiedColumn = $modifiedColumn;
+					
+			$atomicColumns = ReportPeer::getAtomicColumns();
+			if(in_array($theModifiedColumn, $atomicColumns))
+				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+		}
 
 		return $criteria;
 	}
