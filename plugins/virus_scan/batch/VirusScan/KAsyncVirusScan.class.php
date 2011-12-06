@@ -31,14 +31,6 @@ class KAsyncVirusScan extends KJobHandlerWorker
 		return $this->scan($job, $job->data);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see KJobHandlerWorker::getMaxJobsEachRun()
-	 */
-	protected function getMaxJobsEachRun()
-	{
-		return 1;
-	}
-	
 	protected function scan(KalturaBatchJob $job, KalturaVirusScanJobData $data)
 	{
 		KalturaLog::debug("scan($job->id)");

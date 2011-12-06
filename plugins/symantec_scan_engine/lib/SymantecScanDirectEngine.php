@@ -5,6 +5,9 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	const SCAN_ENGINE_HOST = "127.0.0.1";
 	const SCAN_ENGINE_PORT = 1344;
 
+	protected $sleepBetweenScanRetries = 2;
+	protected $maxScanRetries = 15;
+	
 	/**
 	 * This function should be used to let the engine take specific configurations from the batch job parameters.
 	 * For example - command line of the relevant binary file.
@@ -12,6 +15,16 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	 */
 	public function config($paramsObject)
 	{
+		if (isset($paramsObject->sleepBetweenScanRetries))
+		{
+			$this->sleepBetweenScanRetries = $paramsObject->sleepBetweenScanRetries;
+		}
+		
+		if (isset($paramsObject->maxScanRetries))
+		{
+			$this->maxScanRetries = $paramsObject->maxScanRetries;
+		}
+		
 		return true;
 	}
 	
@@ -92,7 +105,7 @@ Encapsulated: null-body=0
 
 ";
 		
-		for ($scanAttempts = 0; $scanAttempts < 5; sleep(10))
+		for ($scanAttempts = 0; $scanAttempts < $this->maxScanRetries; sleep($this->sleepBetweenScanRetries))
 		{
 			$response = $this->sendCommandToScanEngine($scanCommand);
 			if ($response === false)
