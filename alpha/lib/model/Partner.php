@@ -51,6 +51,7 @@ class Partner extends BasePartner
 	const PARTNER_TYPE_JOOMLA = 106;
 	const PARTNER_TYPE_BLACKBOARD = 107;
 	const PARTNER_TYPE_SAKAI = 108;
+	const PARTNER_TYPE_ADMIN_CONSOLE = 109;
 	
 	public static $s_content_root ;
 	
