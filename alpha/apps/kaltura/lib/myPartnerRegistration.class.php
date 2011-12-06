@@ -208,6 +208,8 @@ class myPartnerRegistration
 	 		
 	 	if ($newPartner->getType() == Partner::PARTNER_TYPE_WORDPRESS)
 	 		kPermissionManager::setPs2Permission($newPartner);
+	 	elseif ($newPartner->getType() == Partner::PARTNER_TYPE_ADMIN_CONSOLE)
+	 		kPermissionManager::setV2FlavorSet($newPartner);
 		
 		$newPartner->setKmcVersion(kConf::get('new_partner_kmc_version'));
 		$newPartner->save();
