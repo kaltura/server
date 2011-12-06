@@ -22,13 +22,18 @@ $dbConf = kConf::getDB ();
 DbManager::setConfig ( $dbConf );
 DbManager::initialize ();
 
-if ($argc !== 2)
-{
-	die('pleas provide partner id as input' . PHP_EOL . 
-		'to run script: ' . basename(__FILE__) . ' X' . PHP_EOL . 
-		'whereas X is partner id' . PHP_EOL);
-}
+$availModes = array('gensqls', 'execute');
+
+if ($argc < 2)
+	die('Usage: ' . basename(__FILE__) . ' <partner id> [<mode: ' . implode('/', $availModes) . '>]' . PHP_EOL);
+
 $partnerId = @$argv[1];
+$mode = 'execute';
+if ($argc > 2)
+	$mode = $argv[2];
+
+if (!in_array($mode, $availModes))
+	die('Invalid mode, should be one of ' . implode(',', $availModes) . PHP_EOL);
 
 $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
@@ -36,14 +41,39 @@ DbManager::initialize();
 
 $sphinx = new kSphinxSearchManager();
 
-$c = new Criteria();
-$c->add(entryPeer::PARTNER_ID, $partnerId);
+$lastEntryCreatedAt = null;
+
 entryPeer::setUseCriteriaFilter(false);
-$entries = entryPeer::doSelect($c);
-foreach($entries as $entry)
+for (;;)
 {
-	usleep(100);
-	$sphinx->saveToSphinx($entry, false, true);
-	echo $entry->getId() . "Saved\n";
+	$c = new Criteria();
+	$c->add(entryPeer::PARTNER_ID, $partnerId);
+	if ($lastEntryCreatedAt)
+		$c->add(entryPeer::CREATED_AT, $lastEntryCreatedAt, Criteria::LESS_EQUAL);
+	$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+	$c->setLimit(500);
+	
+	$entries = entryPeer::doSelect($c);
+	if (!$entries)
+		break;
+	
+	foreach($entries as $entry)
+	{
+		usleep(100);
+		if ($mode == 'execute')
+		{
+			$sphinx->saveToSphinx($entry, false, true);
+			echo $entry->getId() . "Saved\n";
+		}
+		else
+		{
+			print $sphinx->getSphinxSaveSql($entry, false, true) . PHP_EOL;
+		}
+		
+		$lastEntryCreatedAt = $entry->getCreatedAt(null);
+	}
+	
+    entryPeer::clearInstancePool();
 }
+
 echo "Done\n";
