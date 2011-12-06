@@ -38,6 +38,7 @@ if (!in_array($mode, $availModes))
 $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
+myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 
 $sphinx = new kSphinxSearchManager();
 
@@ -54,8 +55,6 @@ for (;;)
 	$c->setLimit(500);
 	
 	$entries = entryPeer::doSelect($c);
-	if (!$entries)
-		break;
 	
 	foreach($entries as $entry)
 	{
@@ -74,6 +73,9 @@ for (;;)
 	}
 	
     entryPeer::clearInstancePool();
+
+	if (count($entries) < 500)
+		break;
 }
 
 echo "Done\n";
