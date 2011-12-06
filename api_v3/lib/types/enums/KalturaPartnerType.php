@@ -15,5 +15,6 @@ class KalturaPartnerType extends KalturaEnum
 	const JOOMLA = 106;
 	const BLACKBOARD = 107;
 	const SAKAI = 108;
+	const ADMIN_CONSOLE = 109;
 }
 ?>
