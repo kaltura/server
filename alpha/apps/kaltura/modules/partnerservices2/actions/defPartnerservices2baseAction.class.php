@@ -39,6 +39,7 @@ class defPartnerservices2baseAction extends kalturaAction
 				$myaction = new $clazz_name( $this );
 				$myaction->setInputParams ( $_REQUEST );
 				$response = $myaction->execute( );
+				kEventsManager::flushEvents();
 			}
 			else
 			{
