@@ -124,8 +124,8 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$feed->setThumbnailsPath($smallThumbDestFileName, $largeThumbDestFileName);	
 		
 		//create unique names for flavor assets 
-		$feed->setStreams($flavorAssets, $currentTime);		
-		$remoteId = $this->fieldValues[KalturaYahooDistributionField::VIDEO_FEEDITEM_ID];
+		$feed->setStreams($flavorAssets, $currentTime);	
+		$remoteId = $entryDistribution->entryId;
 		$fileName = $remoteId .'_'. $currentTime . '.xml';
 		$srcFile = $this->tempXmlPath . '/' . $fileName;
 		$path = $distributionProfile->ftpPath;
@@ -167,7 +167,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$feed->setFieldsForDelete();
 		$currentTime = time();
 	
-		$remoteId = $this->fieldValues[KalturaYahooDistributionField::VIDEO_FEEDITEM_ID];				
+		$remoteId = $entryDistribution->entryId;			
 		$fileName = $remoteId .'_'. $currentTime. '.xml';
 		$srcFile = $this->tempXmlPath . '/' . $fileName;
 		$path = $distributionProfile->ftpPath;
