@@ -264,9 +264,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		foreach($dataInts as $key => $value)
 		{
 			$value = (int)$value;
-			if($value < 0)
-        		$value += 0x100000000;
-        	
 			$data[$key] = $value;
 		}
 		
