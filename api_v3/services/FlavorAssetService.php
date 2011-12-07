@@ -410,12 +410,34 @@ class FlavorAssetService extends KalturaAssetService
 	 */
 	public function getByEntryIdAction($entryId)
 	{
-		$dbEntry = entryPeer::retrieveByPK($entryId);
+		// entry could be "display_in_search = 2" - in that case we want to pull it although KN is off in services.ct for this action
+		$c = new Criteria();
+		$c->addAnd(entryPeer::ID, $entryId);
+		$criterionPartnerOrKn = $c->getNewCriterion(entryPeer::PARTNER_ID, $this->getPartnerId());
+		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
+		$c->addAnd($criterionPartnerOrKn);
+		// there could only be one entry because the query is by primary key.
+		// so using doSelectOne is safe.
+		$dbEntry = entryPeer::doSelectOne($c);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+					
+		// if the entry does not belong to the partner but "display_in_search = 2"
+		// we want to turn off the criteria over the assetPeer
+		if($dbEntry->getPartnerId() != $this->getPartnerId() &&
+		   $dbEntry->getDisplayInSearch() == mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK)
+		{
+			assetPeer::setUseCriteriaFilter(false);
+		}
 			
 		$flavorAssetsDb = assetPeer::retrieveFlavorsByEntryId($entryId);
+
+		// re-set default criteria to avoid fetching "private" flavors in laetr queries.
+		// this should be also set in baseService, but we better do it anyway.
+		assetPeer::setUseCriteriaFilter(true);
+		
 		$flavorAssets = KalturaFlavorAssetArray::fromDbArray($flavorAssetsDb);
+		
 		return $flavorAssets;
 	}
 	
@@ -577,13 +599,14 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$entry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $flavorAssetDb->getEntryId());
 			
-		
-		
 		$flavorAssetDb->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_DELETED);
 		$flavorAssetDb->setDeletedAt(time());
 		$flavorAssetDb->save();
 		
 		$entry->removeFlavorParamsId($flavorAssetDb->getFlavorParamsId());
+		$entryFlavors = assetPeer::retrieveFlavorsByEntryId($entry->getId());
+		if (!$entryFlavors)
+			$entry->setStatus(entryStatus::NO_CONTENT);
 		$entry->save();
 	}
 	
