@@ -927,10 +927,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * add ps2 permission for given partner
 	 * @param Partner $partner
 	 */
-	public static function setV2FlavorSetPermission(Partner $partner)
+	public static function setFlavorVersionPermission(Partner $partner, $permission)
  	{		
  		$ps2Permission = new Permission();
- 		$ps2Permission->setName(PermissionName::FEATURE_V2_FLAVORS);
+ 		$ps2Permission->setName($permission);
  		$ps2Permission->setPartnerId($partner->getId());
  		$ps2Permission->setStatus(PermissionStatus::ACTIVE);
  		$ps2Permission->setType(PermissionType::SPECIAL_FEATURE);
