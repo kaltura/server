@@ -371,26 +371,43 @@ class requestUtils
 		
 		if ( $mime == null )
 		{
-			if ($ext == "flv")
-				$content_type ="video/x-flv";
-			elseif ($ext == "mp4")
-				$content_type ="video/mp4";
-			elseif ($ext == "webm")
-				$content_type ="video/webm";
-			elseif ($ext == "ogg")
-				$content_type ="video/ogg";
-			elseif ($ext == "mp3")
-				$content_type ="audio/mpeg";
-			elseif ($ext == "jpg")
-				$content_type ="image/jpeg";
-			elseif ($ext == "swf")
-				$content_type ="application/x-shockwave-flash";
-			elseif ($ext == "m3u8")
-				$content_type ="application/x-mpegURL";
-			elseif ($ext == "ts")
-				$content_type ="video/MP2T";
-			else
-				$content_type ="image/$ext";
+			switch ($ext)
+			{
+			    case "flv":
+    				$content_type ="video/x-flv";
+    				break;
+			    case "mp4":
+			        $content_type ="video/mp4";
+			        break;
+    			case "mov": 
+    			case "qt":
+    				$content_type ="video/quicktime";
+    				break;
+    			case "webm":
+    				$content_type ="video/webm";
+    				break;
+    			case "ogg":
+    				$content_type ="video/ogg";
+    				break;
+    			case "mp3":
+    				$content_type ="audio/mpeg";
+    				break;
+    			case "jpg":
+    				$content_type ="image/jpeg";
+    				break;
+    			case "swf":
+    				$content_type ="application/x-shockwave-flash";
+    				break;
+    			case "m3u8":
+    				$content_type ="application/x-mpegURL";
+    				break;
+    			case "ts":
+    				$content_type ="video/MP2T";
+    				break;
+    			default:
+    				$content_type ="image/$ext";
+    				break;
+			}
 		}
 		else
 		{
