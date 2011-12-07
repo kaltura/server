@@ -95,6 +95,16 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		self::BATCHJOB_STATUS_DONT_PROCESS => 'Dont Process',
 	);
 	
+	private static $LOCK_VERSION_AFFECTED_BY_COLUMNS_NAMES = array(
+		BatchJobPeer::STATUS,
+		BatchJobPeer::SCHEDULER_ID,
+		BatchJobPeer::WORKER_ID,
+		BatchJobPeer::BATCH_INDEX, 
+		BatchJobPeer::EXECUTION_ATTEMPTS, 
+		BatchJobPeer::CHECK_AGAIN_TIMEOUT, 
+		BatchJobPeer::PROCESSOR_EXPIRATION
+	);
+	
 	public static function getStatusName($status)
 	{
 		$status = (int) $status;
@@ -150,7 +160,12 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 				$this->setStatus(self::BATCHJOB_STATUS_PENDING);
 			}
 		}
+				
+		$result = array_intersect(self::$LOCK_VERSION_AFFECTED_BY_COLUMNS_NAMES, $this->getModifiedColumns());
+		if (count($result) > 0) 
+			$this->setLockVersion($this->getLockVersion() + 1);
 			
+		
 		$res = parent::save( $con );
 		
 		if($is_new && !$this->root_job_id && $this->id)
