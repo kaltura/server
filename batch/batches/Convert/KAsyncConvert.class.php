@@ -77,15 +77,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			
 		return $filter;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see KJobHandlerWorker::getMaxJobsEachRun()
-	 */
-	protected function getMaxJobsEachRun()
-	{
-		return 1;
-	}
-	
+		
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::run()
 	 */
