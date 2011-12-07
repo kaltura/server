@@ -102,6 +102,8 @@ class infraRequestUtils
 				$content_type ="video/x-flv";
 			elseif ($ext == "mp4")
 				$content_type ="video/mp4";
+			elseif ($ext == "mov")
+				$content_type ="video/quicktime";
 			elseif ($ext == "webm")
 				$content_type ="video/webm";
 			elseif ($ext == "ogg")
