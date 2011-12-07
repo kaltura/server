@@ -447,13 +447,13 @@ class myReportsMgr
 			}
 			
 			$entryFilter = new entryFilter();
-			$shouldSelectFromDb = false;
+			$shouldSelectFromSearchEngine = false;
 			
 			if ($input_filter->categories)
 			{
-				$input_filter->categories = '';
 				$entryFilter->set("_matchand_categories", $input_filter->categories);
-				$shouldSelectFromDb = true;
+				$input_filter->categories = '';
+				$shouldSelectFromSearchEngine = true;
 			}
 			
 			if ($input_filter->keywords)
@@ -464,12 +464,12 @@ class myReportsMgr
 					$entryFilter->set("_like_admin_tags", $input_filter->keywords);
 				
 				$input_filter->keywords = '';
-				$shouldSelectFromDb = true;
+				$shouldSelectFromSearchEngine = true;
 			}
 			
 			$entryIdsFromDB = array();
 			
-			if ($shouldSelectFromDb)
+			if ($shouldSelectFromSearchEngine)
 			{
 				$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 				$entryFilter->attachToCriteria($c);
