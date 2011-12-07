@@ -530,6 +530,8 @@ class kFile
 	
 	public static function dumpApiRequest($host)
 	{
+		if (kCurrentContext::$multiRequest_index > 1)
+                        KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
 		self::closeDbConnections();
 		
 		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
@@ -552,17 +554,11 @@ class kFile
 			$post_params[$key] = $value;
 		}
 		
-		foreach($_GET as $key => $value)
-		{
-			$get_params[$key] = $value;
-		}
-		
 		$url = $_SERVER['REQUEST_URI'];
-		$getQuery = http_build_query($get_params);
 		
 		$ch = curl_init();
 		// set URL and other appropriate options
-		curl_setopt($ch, CURLOPT_URL, $host . $url . '?' . $getQuery);
+		curl_setopt($ch, CURLOPT_URL, $host . $url );
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("X-Kaltura-Proxy: dumpApiRequest"));
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);

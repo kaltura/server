@@ -24,6 +24,7 @@ class KExternalErrors
 	const WIDGET_NOT_FOUND = 21;
 	const UI_CONF_NOT_FOUND = 22;
 	const PROXY_LOOPBACK = 23;
+	const MULTIREQUEST_PROXY_FAILED = 24;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
@@ -49,6 +50,7 @@ class KExternalErrors
 			self::WIDGET_NOT_FOUND => "requested widget not found",
 			self::UI_CONF_NOT_FOUND => "requested ui_conf not found",
 			self::PROXY_LOOPBACK => "proxied request is being looped back",
+			self::MULTIREQUEST_PROXY_FAILED => "tried to dump not the first request",
 			
 		);
 	

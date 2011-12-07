@@ -191,6 +191,7 @@ class KalturaFrontController
 	    $i = 1;
 	    foreach($listOfRequests as $currentRequest)
 	    {
+	    	kCurrentContext::$multiRequest_index = $i;
 	        $currentService = $currentRequest["service"];
 	        $currentAction = $currentRequest["action"];
 	        $currentParams = $currentRequest["params"];

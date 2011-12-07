@@ -90,6 +90,11 @@ class kCurrentContext
 	 */
 	public static $ksPartnerUserInitialized = false;
 	
+	/**
+	 * @var int
+	 */
+	public static $multiRequest_index = 1;
+	
 	public static function getEntryPoint()
 	{
 		if(self::$service && self::$action)
