@@ -63,6 +63,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
+		$validationErrors = array_merge($validationErrors, $this->validateTwoThumbnailsExist($entryDistribution, $action));
 		//$validationErrors = array_merge($validationErrors, $this->validateVideoStreamFormatAndBitrate($entryDistribution, $action));
 		//$validationErrors = array_merge($validationErrors, $this->validateThumbnailsDimensions($entryDistribution, $action));
 		//TODO: validate only video stream formats and remove bitrate and thumb dimensions	
@@ -92,6 +93,34 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 							
 		return $validationErrors;
 	}
+	
+	/**
+	 * Validate two thumbnails exist
+	 * @param $entryDistribution
+	 * @param $action
+	 */
+	private function validateTwoThumbnailsExist($entryDistribution, $action)
+	{
+		$validationErrors = array();		
+		//Validating thumbnails
+		$c = new Criteria();
+		$c->addAnd(assetPeer::ID, explode(',',$entryDistribution->getThumbAssetIds()), Criteria::IN);
+		$c->addAscendingOrderByColumn(assetPeer::ID);
+		$thumbAssets = assetPeer::doSelect($c);		
+		if (!count($thumbAssets)|| count($thumbAssets)<2)
+		{
+			KalturaLog::debug('Two thumbnails are required');
+			$errorMsg = 'two thumbnails are required';			
+    		$validationError = $this->createValidationError($action, DistributionErrorType::INVALID_DATA);    		
+    		$validationError->setValidationErrorType(DistributionValidationErrorType::CUSTOM_ERROR);
+    		$validationError->setValidationErrorParam($errorMsg);
+    		$validationError->setDescription($errorMsg);
+    		$validationErrors[] = $validationError;
+		}
+		return $validationErrors;			
+	}	
+			
+
 	
 	/**
 	 * Validate video format and video bitrate
