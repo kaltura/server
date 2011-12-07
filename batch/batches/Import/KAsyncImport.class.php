@@ -70,9 +70,8 @@ class KAsyncImport extends KJobHandlerWorker
 			KalturaLog::debug("sourceUrl [$sourceUrl]");
 			
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED, 1);
-			
-			//According to Eran K, no point in the following few paragraphs of code unless the file already exists on 
-			//Kaltura.
+			$fileSize = null;
+			$resumeOffset = 0;
 			if ($data->destFileLocalPath && file_exists($data->destFileLocalPath) )
 			{ 
     			$curlWrapper = new KCurlWrapper($sourceUrl);
@@ -89,13 +88,11 @@ class KAsyncImport extends KJobHandlerWorker
     				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, $curlHeaderResponse->code, "HTTP Error: " . $curlHeaderResponse->code . " " . $curlHeaderResponse->codeName, KalturaBatchJobStatus::FAILED);
     				return $job;
     			}
-    			$fileSize = null;
+    			
     			if(isset($curlHeaderResponse->headers['content-length']))
     				$fileSize = $curlHeaderResponse->headers['content-length'];
     			$curlWrapper->close();
-    				
-    			$resumeOffset = 0;
-    				
+    			
     			if( $fileSize )
     			{
     				clearstatcache();
