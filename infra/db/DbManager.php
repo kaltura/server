@@ -96,7 +96,7 @@ class DbManager
 	/**
 	 * @return KalturaPDO
 	 */
-	public static function getSphinxConnection()
+	public static function getSphinxConnection($read = true)
 	{
 		if(self::$sphinxConnection)
 			return self::$sphinxConnection;
@@ -107,13 +107,16 @@ class DbManager
 		$stickySessionExpiry = isset(self::$config['sphinx_datasources']['sticky_session_timeout']) ? self::$config['sphinx_datasources']['sticky_session_timeout'] : 600;
 		
 		$stickySessionKey = 'StickySession:'.kCurrentContext::$user_ip;
-		if (function_exists('apc_store'))
+		if (function_exists('apc_fetch'))
 		{
 			$key = apc_fetch($stickySessionKey);
-			$connection = self::getConnection($key, $cacheExpiry, $connectTimeout, $stickySessionKey, $stickySessionExpiry);
-				
-			if (!is_null($connection))
-				return $connection;
+			if($key)
+			{
+				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout);
+					
+				if (!is_null($connection))
+					return $connection;
+			}
 		}
 		
 		// loop twice, on first iteration try only connections not marked as failed
@@ -140,11 +143,13 @@ class DbManager
 						continue;
 				}
 
-				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout, $stickySessionKey, $stickySessionExpiry);
+				$connection = self::getConnection($key, $cacheExpiry, $connectTimeout);
 				
+				if (!$read && function_exists('apc_store'))
+					apc_store($stickySessionKey, $key, $stickySessionExpiry);
+					
 				if (!is_null($connection))
 					return $connection;
-					
 			}
 		}
 
@@ -152,7 +157,7 @@ class DbManager
 		throw new Exception('Failed to connect to any Sphinx config');
 	}
 	
-	private static function getConnection($key, $cacheExpiry, $connectTimeout, $stickySessionKey, $stickySessionExpiry)
+	private static function getConnection($key, $cacheExpiry, $connectTimeout)
 	{
 		try {
 			if(!isset(self::$config['datasources'][$key]['connection']['dsn']))
@@ -162,9 +167,6 @@ class DbManager
 			self::$sphinxConnection = new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout));
 					
 			self::$sphinxConnection->setCommentsEnabled(false);
-			
-			if (function_exists('apc_store'))
-				apc_store($stickySessionKey, $key, $stickySessionExpiry);
 			
 			KalturaLog::debug("getSphinxConnection: connected to $key");
 			return self::$sphinxConnection;

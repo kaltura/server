@@ -299,7 +299,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		if(!kConf::hasParam('exec_sphinx') || !kConf::get('exec_sphinx'))
 			return true;
 			
-		$con = DbManager::getSphinxConnection();
+		$con = DbManager::getSphinxConnection(false);
 		$ret = $con->exec($sql);
 		if($ret)
 			return true;
