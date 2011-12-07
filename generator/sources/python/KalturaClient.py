@@ -78,7 +78,7 @@ class KalturaClient:
         
         pluginClassType = getattr(pluginModule, pluginClass)
 
-        plugin = pluginClassType.get(self)
+        plugin = pluginClassType.get()
         if not isinstance(plugin, IKalturaClientPlugin):
             return
 

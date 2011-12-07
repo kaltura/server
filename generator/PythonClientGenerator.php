@@ -141,14 +141,11 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('    instance = None');
 		$this->appendLine('');
 		
-		$this->appendLine('    def __init__(self, client):');
-		$this->appendLine('        KalturaClientPlugin.__init__(self, client)');
-		$this->appendLine('');
 		$this->appendLine("    # @return $pluginClassName");
 		$this->appendLine('    @staticmethod');
-		$this->appendLine('    def get(client):');
+		$this->appendLine('    def get():');
 		$this->appendLine("        if $pluginClassName.instance == None:");
-		$this->appendLine("            $pluginClassName.instance = $pluginClassName(client)");
+		$this->appendLine("            $pluginClassName.instance = $pluginClassName()");
 		$this->appendLine("        return $pluginClassName.instance");
 		$this->appendLine('');
 		$this->appendLine('    # @return array<KalturaServiceBase>');

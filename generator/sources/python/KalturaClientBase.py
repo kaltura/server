@@ -253,7 +253,7 @@ class KalturaConfiguration:
 class IKalturaClientPlugin:
     # @return KalturaClientPlugin
     @staticmethod
-    def get(client):
+    def get():
         raise NotImplementedError
         
     # @return array<KalturaServiceBase>
@@ -266,8 +266,7 @@ class IKalturaClientPlugin:
         
 # Client plugin base class
 class KalturaClientPlugin(IKalturaClientPlugin):
-    def __init__(self, client):
-        pass
+    pass
 
 # Kaltura enums factory
 class KalturaEnumsFactory:
