@@ -33,7 +33,7 @@ class PartnerController extends Zend_Controller_Action
 					
 				$partner->adminName = $partner->name;
 				$partner->description = "Admin Console";
-				$partner->type = KalturaPartnerType::ADMIN_CONSOLE;
+				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
 				$client->startMultiRequest();
 				
 				$client->partner->register($partner);
