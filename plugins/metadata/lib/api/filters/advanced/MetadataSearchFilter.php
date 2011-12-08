@@ -112,7 +112,16 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					}
 				
 					if (!is_numeric($item->getValue()))
+					{
+						if ($xPaths[$field]->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || $xPaths[$field]->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT)
+						{
+							$this->conditionClause[] = '1 <> 1';
+							KalturaLog::ERR("wrong search value: $field is numeric. search value: " . print_r($item->getValue(),true));
+							continue;
+						}
+						
 						$value = SphinxUtils::escapeString($item->getValue());
+					}
 					else
 						$value = $item->getValue();
 						
