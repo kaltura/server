@@ -682,7 +682,7 @@ class Form_PartnerConfiguration extends Infra_Form
     	if (isset($data['extended_free_trail']) && $data['extended_free_trail']){
 		    $extended_free_trail_expiry_date = $this->getElement('extended_free_trail_expiry_date');
 		    $extended_free_trail_expiry_date->setRequired(true);
-		    $date = new Zend_Validate_Date('MM/dd/YY');
+		    $date = new Zend_Validate_Date('M/d/Y');
 		    $extended_free_trail_expiry_date->addValidator($date);
 		    $extended_free_trail_expiry_reason = $this->getElement('extended_free_trail_expiry_reason');
     		$extended_free_trail_expiry_reason->setRequired(true);
