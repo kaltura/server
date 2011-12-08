@@ -3,12 +3,10 @@
  * @package api
  * @subpackage enum
  */
-class KalturaSourceType extends KalturaEnum
+class KalturaSourceType extends KalturaDynamicEnum implements EntrySourceType
 {
-	const FILE = 1;
-	const WEBCAM = 2;
-	const URL = 5;
-	const SEARCH_PROVIDER = 6;
-	
-	const AKAMAI_LIVE = 29;
+	public static function getEnumClass()
+	{
+		return 'EntrySourceType';
+	}
 }

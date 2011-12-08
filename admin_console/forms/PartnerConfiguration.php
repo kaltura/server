@@ -261,6 +261,20 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
  	
 		
+	//--------------- Live Stream Params ----------------------------
+		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live', Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE => 'Lime Light Live');
+		
+		$this->addElement('select', 'default_live_stream_entry_source_type', array(
+		   'label'   => 'Live Stream source type:',
+		   'filters'  => array('StringTrim')));
+		$this->getElement('default_live_stream_entry_source_type')->setMultiOptions($sourceTypes);
+		
+		$this->addElement('text', 'live_stream_provision_params', array(
+			'label'			=> 'Provision parameters (JSON format)',
+			'filters'		=> array('StringTrim'),
+		));	
+		
+		
 //-----------------------------------------------------------------------	
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
@@ -638,7 +652,15 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overagePrice',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overageUnit',
-									'crossLine'), 'includedUsageSecondPart');	
+									'crossLine'), 'includedUsageSecondPart');
+
+		$this->addDisplayGroup(
+			array_merge(
+				array('default_live_stream_entry_source_type', 'live_stream_provision_params'), 
+				array('crossLine')), 
+			'liveStreamConfig', 
+			array('legend' => 'Live Stream Config')
+		);	
 									
 	}
 	

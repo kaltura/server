@@ -771,7 +771,42 @@ class Partner extends BasePartner
 		$content = serialize($akamaiLiveParams);
 		$this->putInCustomData('akamai_live_params', $content);
 	}
-		
+	
+	
+	const CUSTOM_DATA_DEFAULT_LIVE_STREAM_ENTRY_SOURCE_TYPE = 'default_live_stream_entry_source_type';
+	
+	public function setDefaultLiveStreamEntrySourceType($v)	
+		{$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_LIVE_STREAM_ENTRY_SOURCE_TYPE, $v);}
+    
+	public function getDefaultLiveStreamEntrySourceType()
+    {
+        $defaultSourceType = $this->getFromCustomData(self::CUSTOM_DATA_DEFAULT_LIVE_STREAM_ENTRY_SOURCE_TYPE, null, null);
+        if (is_null($defaultSourceType)) {
+            $kc = kConf::get('default_live_stream_entry_source_type');
+            $evalResult= eval("\$defaultSourceType = $kc;");
+            if ($evalResult === false){
+            	$defaultSourceType = EntrySourceType::AKAMAI_LIVE;
+            } 
+        }
+        return $defaultSourceType;
+    }
+    
+
+    const CUSTOM_DATA_LIVE_STREAM_PROVISION_PARAMS = 'live_stream_provision_params';
+    
+	public function setLiveStreamProvisionParams($v)
+		{$this->putInCustomData(self::CUSTOM_DATA_LIVE_STREAM_PROVISION_PARAMS, $v);}
+    
+	public function getLiveStreamProvisionParams()
+    {
+        $provisionParams = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_PROVISION_PARAMS, null, null);
+        if (is_null($provisionParams)) {
+            $provisionParams = "";
+        }
+        return $provisionParams;
+    }
+	
+    
 	public function getAdminLoginUsersNumber()
 	{
 		$c = new Criteria();

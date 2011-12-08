@@ -235,6 +235,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $internalUse;
 	
+
+	/**
+	 * @var KalturaSourceType
+	 */
+	public $defaultLiveStreamEntrySourceType;
+
+	
+	/**
+	 * @var string
+	 */
+	public $liveStreamProvisionParams;
+	
+
 	/**
 	 * 
 	 * @var KalturaBaseEntryFilter
@@ -288,7 +301,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"enableBulkUploadNotificationsEmails",
 		"deliveryRestrictions",
 		"bulkUploadNotificationsEmail",
-		"internalUse"
+		"internalUse",
+		"defaultLiveStreamEntrySourceType",
+		"liveStreamProvisionParams",
 	);
 
 	public function getMapBetweenObjects()
