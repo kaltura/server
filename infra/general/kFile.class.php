@@ -531,7 +531,7 @@ class kFile
 	public static function dumpApiRequest($host)
 	{
 		if (kCurrentContext::$multiRequest_index > 1)
-                        KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
+            KExternalErrors::dieError(KExternalErrors::MULTIREQUEST_PROXY_FAILED);
 		self::closeDbConnections();
 		
 		// prevent loop back of the proxied request by detecting the "X-Kaltura-Proxy header
