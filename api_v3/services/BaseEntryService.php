@@ -643,7 +643,7 @@ class BaseEntryService extends KalturaEntryService
 		$result->isUserAgentRestricted = false;
 		$result->previewLength = -1;
 		$result->storageProfiles = null;
-				
+		
 		if ($accessControl && $accessControl->hasRestrictions())
 		{
 			// for now add caching headers only for specific partners listed in kConf
@@ -660,6 +660,15 @@ class BaseEntryService extends KalturaEntryService
 					if (array_key_exists('cache_kdp_acccess_control', $params) && $params['cache_kdp_acccess_control'])
 						$disableCache = false;
 				}
+			}
+			
+			// no need to disable caching if the access control has only site restriction and the referrer was 
+			// included the api cache key
+			if (count($accessControl->getRestrictions()) == 1 &&
+				$accessControl->hasSiteRestriction())
+			{
+				if ($ks && in_array($ks->partner_id, kConf::get('v3cache_include_referrer_in_key'))) 
+					$disableCache = false;
 			}
 			
 			if ($disableCache)

@@ -109,6 +109,19 @@ class KalturaResponseCacher
 		$this->_params["___cache___userId"] = $ksData["userId"];
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		
+		if (!in_array($ksData["partnerId"], kConf::get('v3cache_include_referrer_in_key')))
+		{
+			foreach ($this->_params as $key => $value)
+			{
+				if (strpos($key, 'contextDataParams:referrer') !== false)
+				{
+					unset($this->_params[$key]);
+					break;
+				}
+			}
+		}
+		
 		ksort($this->_params);
 
 		$this->_cacheKey = md5( http_build_query($this->_params) );
