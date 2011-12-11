@@ -120,7 +120,9 @@ class TVComFeed
 		$node = $this->setNodeValue('media:group/media:restriction/@relationship', $values[TVComDistributionField::MEDIA_RESTRICTION_TYPE], $item);
 		$node = $this->setNodeValue('media:group/media:restriction', $values[TVComDistributionField::MEDIA_RESTRICTION_COUNTRIES], $item);
 		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:show-tmsid\']', $values[TVComDistributionField::MEDIA_CATEGORY_SHOW_TMSID], $item);
+		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:show-tmsid\']/@label', $values[TVComDistributionField::MEDIA_CATEGORY_SHOW_TMSID_LABEL], $item);
 		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:episode-tmsid\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID], $item);
+		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:episode-tmsid\']/@label', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID_LABEL], $item);
 		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:episodetype\']', $values[TVComDistributionField::MEDIA_CATEGORY_EPISODE_TYPE], $item);
 		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:original_air_date\']', $values[TVComDistributionField::MEDIA_CATEGORY_ORIGINAL_AIR_DATE], $item);
 		$node = $this->setNodeValue('media:group/media:category[@scheme=\'urn:tvcom:video_format\']', $values[TVComDistributionField::MEDIA_CATEGORY_VIDEO_FORMAT], $item);

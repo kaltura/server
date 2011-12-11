@@ -143,9 +143,23 @@ class TVComDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(TVComDistributionField::MEDIA_CATEGORY_SHOW_TMSID_LABEL);
+		$fieldConfig->setUserFriendlyFieldName('TVComShowTMSIDLabel');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TVComShowTMSIDLabel" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID);
 		$fieldConfig->setUserFriendlyFieldName('TVComEpisodeTMSID');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TVComEpisodeTMSID" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(TVComDistributionField::MEDIA_CATEGORY_EPISODE_TMSID_LABEL);
+		$fieldConfig->setUserFriendlyFieldName('TVComEpisodeTMSIDLabel');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TVComEpisodeTMSIDLabel" />');
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
