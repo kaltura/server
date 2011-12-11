@@ -388,7 +388,7 @@ class Partner extends BasePartner
 	public function getMatchIp()	{		return $this->getFromCustomData( "matchIp" , null, false  );	}
 	public function setMatchIp( $v )	{		return $this->putInCustomData( "matchIp", $v );	}
 
-	public function getDefThumbOffset()	{		return $this->getFromCustomData( "defThumbOffset" , false  );	}
+	public function getDefThumbOffset()	{		return $this->getFromCustomData( "defThumbOffset" , false, 3 );	}
 	public function setDefThumbOffset( $v )	{		return $this->putInCustomData( "defThumbOffset", $v );	}
 	
 	public function getDefThumbDensity()	{		return $this->getFromCustomData( "defThumbDensity" , false  );	}
