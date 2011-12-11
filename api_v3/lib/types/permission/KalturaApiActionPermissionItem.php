@@ -5,8 +5,6 @@
  */
 class KalturaApiActionPermissionItem extends KalturaPermissionItem
 {
-	public $type = 'KalturaApiActionPermissionItem';
-	
 	/**
 	 * @var string
 	 */

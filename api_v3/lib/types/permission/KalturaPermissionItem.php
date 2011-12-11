@@ -52,13 +52,7 @@ class KalturaPermissionItem extends KalturaObject implements IFilterable
 	 */
 	public $updatedAt;
 	
-	
-	/**
-	 * @var string
-	 * @filter like
-	 */
-	private $value;
-	
+		
 	public function __construct()
 	{
 		$this->type = get_class($this);
@@ -66,10 +60,8 @@ class KalturaPermissionItem extends KalturaObject implements IFilterable
 	
 	private static $map_between_objects = array(
 		'id',
-		'permissionNames',
 		'partnerId',
 		'tags',
-		'value',
 		'createdAt',
 		'updatedAt',
 	 );

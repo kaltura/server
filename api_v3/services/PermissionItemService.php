@@ -38,11 +38,9 @@ class PermissionItemService extends KalturaBaseService
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_NOT_UPDATABLE
 	 */
 	public function addAction(KalturaPermissionItem $permissionItem)
-	{
-		$permissionItem->validatePropertyNotNull('permissionId');
-		$permissionItem->validatePropertyNotNull('type');
-							
-		$dbPermissionItem = $permissionItem->toInsertableObject();
+	{							    
+	    $dbPermissionItem = $permissionItem->toInsertableObject();
+	    $dbPermissionItem->setPartnerId($this->getPartnerId());
 		$dbPermissionItem->save();
 		
 		$permissionItem = new KalturaPermissionItem();
