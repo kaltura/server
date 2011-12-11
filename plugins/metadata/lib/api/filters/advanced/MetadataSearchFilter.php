@@ -111,19 +111,34 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 						continue;
 					}
 				
-					if (!is_numeric($item->getValue()))
+					$value = $item->getValue();
+					if (!is_numeric($value))
 					{
-						if ($xPaths[$field]->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || $xPaths[$field]->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT)
+						switch($value)
 						{
-							$this->conditionClause[] = '1 <> 1';
-							KalturaLog::ERR("wrong search value: $field is numeric. search value: " . print_r($item->getValue(),true));
-							continue;
+							case Criteria::CURRENT_DATE:
+								$d = getdate();
+								$value = mktime(0, 0, 0, $d['mon'], $d['mday'], $d['year']);
+								break;
+
+							case Criteria::CURRENT_TIME:
+							case Criteria::CURRENT_TIMESTAMP:
+								$value = time();
+								break;
+								
+							default:
+								if ($xPaths[$field]->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE || 
+									$xPaths[$field]->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT)
+								{
+									$this->conditionClause[] = '1 <> 1';
+									KalturaLog::ERR("wrong search value: $field is numeric. search value: " . print_r($item->getValue(),true));
+									continue;
+								}
+								
+								$value = SphinxUtils::escapeString($value);
+								break;
 						}
-						
-						$value = SphinxUtils::escapeString($item->getValue());
 					}
-					else
-						$value = $item->getValue();
 						
 					$newCondition = $metadataField . $comparison . $value;
 					
