@@ -362,17 +362,13 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 			
 		parent::toObject($dbObject, $skip);
 		
-		if ($this->name && strrpos($this->name, "/") !== false)
-		{
-		    throw new KalturaAPIException( KalturaErrors::INVALID_PARAMETER_CHAR, "name");    
-		}
-		
 		if ($this->startDate === -1) // save -1 as null
 			$dbObject->setStartDate(null);
 			
 		if ($this->endDate === -1) // save -1 as null
 			$dbObject->setEndDate(null);
-		    
+			
+		
 		if ($this->categoriesIds !== null && $this->categories === null)
 		{
 			$catsNames = array ();
