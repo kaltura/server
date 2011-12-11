@@ -39,7 +39,7 @@ class PermissionItemService extends KalturaBaseService
 	 */
 	public function addAction(KalturaPermissionItem $permissionItem)
 	{							    
-	    $dbPermissionItem = $permissionItem->toInsertableObject();
+	    $dbPermissionItem = $permissionItem->toInsertableObject(null, array('type'));
 	    $dbPermissionItem->setPartnerId($this->getPartnerId());
 		$dbPermissionItem->save();
 		
@@ -100,7 +100,7 @@ class PermissionItemService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionItemId);
 		}
 		
-		$dbPermissionItem = $permissionItem->toUpdatableObject($dbPermissionItem);
+		$dbPermissionItem = $permissionItem->toUpdatableObject($dbPermissionItem, array('type'));
 		$dbPermissionItem->save();
 	
 		$permissionItem = new KalturaPermissionItem();
