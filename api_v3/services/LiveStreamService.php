@@ -32,7 +32,7 @@ class LiveStreamService extends KalturaEntryService
 		}
 		else {
 			// default sourceType is AKAMAI_LIVE
-			$liveStreamEntry->sourceType = $this->getPartner()->getDefaultLiveStreamEntrySourceType();
+			$liveStreamEntry->sourceType = kPluginableEnumsManager::coreToApi('EntrySourceType', $this->getPartner()->getDefaultLiveStreamEntrySourceType());
 		}
 		
 		// if the given password is empty, generate a random 8-character string as the new password

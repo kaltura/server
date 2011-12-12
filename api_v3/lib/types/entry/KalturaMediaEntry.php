@@ -116,9 +116,10 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	{
 		parent::fromObject($entry);
 
-		$reflect = new ReflectionClass('KalturaSourceType');
-		$constants = $reflect->getConstants();
-		if(!in_array($entry->getSource(), $constants) || $entry->getSource() == KalturaSourceType::SEARCH_PROVIDER)
+		$reflect = KalturaTypeReflectorCacher::get('KalturaSourceType');
+		$constants = $reflect->getConstantsValues();
+		$sourceApi = kPluginableEnumsManager::coreToApi('EntrySourceType', $entry->getSource());
+		if(!in_array($sourceApi, $constants) || $sourceApi == EntrySourceType::SEARCH_PROVIDER)
 		{
 			$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
 			$this->searchProviderType = $entry->getSource();
@@ -146,7 +147,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 		}
 		else
 		{
-			$entry->setSource($this->sourceType);
+			$entry->setSource(kPluginableEnumsManager::apiToCore('EntrySourceType', $this->sourceType));
 		}
 		return $entry;
 	}

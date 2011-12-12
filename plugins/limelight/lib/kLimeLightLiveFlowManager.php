@@ -39,11 +39,7 @@ class kLimeLightLiveFlowManager implements kBatchJobStatusEventConsumer
 			
 			$limeLightLiveParamsJSON = $partner->getLiveStreamProvisionParams();
 			$limeLightLiveParams = json_decode($limeLightLiveParamsJSON);
-//			print_r($limeLightLiveParams);
-//			die();
-			
-			//$limeLightLiveParams = LimeLightPlugin::getLimeLightLiveParams($partner);
-			//if (is_null($limeLightLiveParams)){
+
 			if ((!isset($limeLightLiveParams->Limelight))
 				|| (!isset($limeLightLiveParams->Limelight->limelightPrimaryPublishUrl)) 
 				|| (!isset($limeLightLiveParams->Limelight->limelightSecondaryPublishUrl))
@@ -56,10 +52,6 @@ class kLimeLightLiveFlowManager implements kBatchJobStatusEventConsumer
 			$data->setPrimaryBroadcastingUrl($limeLightLiveParams->Limelight->limelightPrimaryPublishUrl);
 			$data->setSecondaryBroadcastingUrl($limeLightLiveParams->Limelight->limelightSecondaryPublishUrl);
 			$data->setRtmp($limeLightLiveParams->Limelight->limelightStreamUrl);
-			
-//			$data->setPrimaryBroadcastingUrl($limeLightLiveParams->getLimelightPrimaryPublishUrl());
-//			$data->setSecondaryBroadcastingUrl($limeLightLiveParams->getLimelightSecondaryPublishUrl());
-//			$data->setRtmp($limeLightLiveParams->getLimelightStreamUrl());
 			$data->setStreamName($entry->getId().'_%i');
 			
 			$dbBatchJob->setData($data);
