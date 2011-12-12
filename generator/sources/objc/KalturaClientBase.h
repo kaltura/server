@@ -1,6 +1,10 @@
 #import <Foundation/Foundation.h>
-#import <Foundation/NSXMLParser.h>
+#import "ASIHTTPRequestDelegate.h"
+#import "KalturaXmlParsers.h"
 
+/*
+ Constants
+ */
 #define KALTURA_UNDEF_BOOL      ((BOOL)CHAR_MIN)
 #define KALTURA_UNDEF_INT       INT_MIN
 #define KALTURA_UNDEF_FLOAT     NAN
@@ -11,7 +15,23 @@
 #define KALTURA_NULL_FLOAT  INFINITY
 #define KALTURA_NULL_STRING (@"__null_string__")
 
-@class ASIFormDataRequest;
+extern NSString* const KalturaClientErrorDomain;
+
+typedef enum {
+    KalturaClientErrorAPIException = 1,
+    KalturaClientErrorInvalidHttpCode = 2,
+    KalturaClientErrorUnknownObjectType = 3,
+    KalturaClientErrorXmlParsing = 4,
+    KalturaClientErrorUnexpectedTagInSimpleType = 5,
+    KalturaClientErrorUnexpectedArrayTag = 6,
+    KalturaClientErrorUnexpectedMultiReqTag = 7,
+    KalturaClientErrorMissingMultiReqItems = 8,
+    KalturaClientErrorMissingObjectTypeTag = 9,
+    KalturaClientErrorExpectedObjectTypeTag = 10,
+    KalturaClientErrorExpectedPropertyTag = 11,
+    KalturaClientErrorStartTagInSimpleType = 12,
+    KalturaClientErrorEmptyObject = 13,
+} KalturaClientErrorType;
 
 typedef enum 
 {
@@ -24,7 +44,21 @@ typedef enum
     KFT_Array,
 } KalturaFieldType;
 
+/*
+ Forward declarations
+ */
+@protocol KalturaXmlParserDelegate;
+@class ASIFormDataRequest;
+@class KalturaXmlParserBase;
+@class KalturaLibXmlWrapper;
 @class KalturaParams;
+@class KalturaClientBase;
+
+/*
+ Class KalturaClientException
+ */
+@interface KalturaClientException : NSException
+@end
 
 /*
  Class KalturaSimpleTypeParser
@@ -42,7 +76,6 @@ typedef enum
  */
 @interface KalturaObjectBase : NSObject
 
-- (void)setObjectProperty:(NSString*)aPropNameCap withValue:(id)aValue isSimple:(BOOL)aIsSimple;
 - (void)toParams:(KalturaParams*)aParams isSuper:(BOOL)aIsSuper;
 
 @end
@@ -55,6 +88,8 @@ typedef enum
 @property (nonatomic, copy) NSString* code;
 @property (nonatomic, copy) NSString* message;
 
+- (NSError*)error;
+
 @end
 
 /*
@@ -65,8 +100,6 @@ typedef enum
 + (KalturaObjectBase*)createByName:(NSString*)aName;
 
 @end
-
-///////////////////////// Request Building /////////////////////////
 
 /*
  Class KalturaParams
@@ -91,134 +124,14 @@ typedef enum
 - (void)addIfDefinedKey:(NSString*)aKey withArray:(NSArray*)aVal;
 - (void)sign;
 - (void)addToRequest:(ASIFormDataRequest*)aRequest;
-- (NSString*)getQueryString;
-
-@end
-
-
-///////////////////////// Response Parsing /////////////////////////
-
-/*
- Protocol KalturaXmlParserDelegate
- */
-@protocol KalturaXmlParserDelegate
-
-- (void)parsingComplete;
-
-@end
-
-/*
- Class KalturaXmlParserBase
- */
-@interface KalturaXmlParserBase : NSObject <NSXMLParserDelegate>
-{
-    id <NSXMLParserDelegate> _origDelegate;
-    BOOL _attached;
-}
-
-@property (nonatomic, assign) NSXMLParser* parser;
-@property (nonatomic, assign) id <KalturaXmlParserDelegate> delegate;
-
-- (void)attachToParser:(NSXMLParser*)aParser withDelegate:(id <KalturaXmlParserDelegate>)aDelegate;
-- (void)detach;
-- (id)result;
-
-@end
-
-/*
- Class KalturaXmlParserSkipTag
- */
-@interface KalturaXmlParserSkipTag : KalturaXmlParserBase
-{
-    int _level;
-}
-@end
-
-/*
- Class KalturaXmlParserException
- */
-@interface KalturaXmlParserException : KalturaXmlParserBase <KalturaXmlParserDelegate>
-
-- initWithSubParser:(KalturaXmlParserBase*)aSubParser;
-
-@property (nonatomic, assign) KalturaException* targetException;
-@property (nonatomic, assign) KalturaXmlParserBase* subParser;
-
-@end
-
-/*
- Class KalturaXmlParserSimpleType
- */
-@interface KalturaXmlParserSimpleType : KalturaXmlParserBase
-{
-    NSString* _value;
-}
-
-- (BOOL)boolResult;
-- (int)intResult;
-- (double)floatResult;
-
-@end
-
-/*
- Class KalturaXmlParserObject
- */
-@interface KalturaXmlParserObject : KalturaXmlParserBase <KalturaXmlParserDelegate>
-{
-    KalturaObjectBase* _targetObj;
-    KalturaXmlParserBase* _subParser;
-    NSString* _lastTagCap;
-    KalturaFieldType _lastPropType;
-}
-
-- (id)initWithObject:(KalturaObjectBase*)aObject;
-
-@end
-
-/*
- Class KalturaXmlParserArray
- */
-@interface KalturaXmlParserArray : KalturaXmlParserBase <KalturaXmlParserDelegate>
-{
-    NSMutableArray* _targetArr;
-    KalturaXmlParserBase* _subParser;
-}
-
-@end
-
-/*
- Class KalturaXmlParserMultirequest
- */
-@interface KalturaXmlParserMultirequest : KalturaXmlParserBase <KalturaXmlParserDelegate>
-{
-    NSMutableArray* _subParsers;
-    int _reqIndex;
-}
-
-- (void)addSubParser:(KalturaXmlParserBase*)aParser;
-- (int)reqCount;
-
-@end
-
-/*
- Class KalturaXmlParserSkipPath
- */
-@interface KalturaXmlParserSkipPath : KalturaXmlParserBase <KalturaXmlParserDelegate>
-{
-    KalturaXmlParserBase* _subParser;
-    NSArray* _path;
-    int _pathPosition;
-    int _skipLevel;
-}
-
-- initWithSubParser:(KalturaXmlParserBase*)aSubParser withPath:(NSArray*)aPath;
+- (void)appendQueryString:(NSMutableString*)output;
 
 @end
 
 /*
  Protocol KalturaLogger
  */
-@protocol KalturaLogger
+@protocol KalturaLogger <NSObject>
 
 - (void)logMessage:(NSString*)aMsg;
 
@@ -228,49 +141,6 @@ typedef enum
  Class KalturaNSLogger
  */
 @interface KalturaNSLogger: NSObject <KalturaLogger>
-
-@end
-
-/*
- Class KalturaClientConfiguration
- */
-@interface KalturaClientConfiguration : NSObject
-
-@property (nonatomic, copy) NSString* serviceUrl;
-@property (nonatomic, assign) int partnerId;
-@property (nonatomic, copy) NSString* clientTag;
-@property (nonatomic, assign) int requestTimeout;
-@property (nonatomic, assign) id<KalturaLogger> logger;
-
-@end
-
-/*
- Class KalturaClientBase
- */
-@interface KalturaClientBase : NSObject
-{
-    KalturaXmlParserMultirequest* _multiReqParser;
-}
-
-@property (nonatomic, retain) KalturaClientConfiguration* config;
-@property (nonatomic, copy) NSString* ks;
-@property (nonatomic, copy) NSString* apiVersion;
-@property (nonatomic, assign) KalturaParams* params;
-
-- (id)initWithConfig:(KalturaClientConfiguration*)aConfig;
-- (void)startMultiRequest;
-- (NSArray*)doMultiRequest;
-+ (NSString*)generateSessionWithSecret:(NSString*)aSecret withUserId:(NSString*)aUserId withType:(int)aType withPartnerId:(int)aPartnerId withExpiry:(int)aExpiry withPrivileges:(NSString*)aPrivileges;
-
-- (NSString*)queueServeService:(NSString*)aService withAction:(NSString*)aAction;
-- (void)queueVoidService:(NSString*)aService withAction:(NSString*)aAction;
-- (BOOL)queueBoolService:(NSString*)aService withAction:(NSString*)aAction;
-- (int)queueIntService:(NSString*)aService withAction:(NSString*)aAction;
-- (double)queueFloatService:(NSString*)aService withAction:(NSString*)aAction;
-- (NSString*)queueStringService:(NSString*)aService withAction:(NSString*)aAction;
-- (id)queueObjectService:(NSString*)aService withAction:(NSString*)aAction;
-- (NSMutableArray*)queueArrayService:(NSString*)aService withAction:(NSString*)aAction;
-+ (void)appendSessionSigWithSecret:(NSString*)aSecret withFields:(NSString*)aKsFields withOutput:(NSMutableString*)aOutput;
 
 @end
 
@@ -289,4 +159,66 @@ typedef enum
  Class KalturaClientPlugin
  */
 @interface KalturaClientPlugin : NSObject
+@end
+
+/*
+ Class KalturaClientConfiguration
+ */
+@interface KalturaClientConfiguration : NSObject
+
+@property (nonatomic, copy) NSString* serviceUrl;
+@property (nonatomic, copy) NSString* clientTag;
+@property (nonatomic, assign) int partnerId;
+@property (nonatomic, assign) int requestTimeout;
+@property (nonatomic, retain) id<KalturaLogger> logger;
+
+@end
+
+/*
+ Protocol KalturaClientDelegate
+ */
+@protocol KalturaClientDelegate
+
+- (void)requestFinished:(KalturaClientBase*)aClient withResult:(id)result;
+- (void)requestFailed:(KalturaClientBase*)aClient;
+
+@end
+
+/*
+ Class KalturaClientBase
+ */
+@interface KalturaClientBase : NSObject <ASIHTTPRequestDelegate, KalturaXmlParserDelegate>
+{
+    BOOL _isMultiRequest;
+    KalturaXmlParserBase* _reqParser;
+    KalturaXmlParserBase* _skipParser;
+    ASIFormDataRequest *_request;
+    KalturaLibXmlWrapper* _xmlParser;
+    NSDate* _apiStartTime;
+}
+
+@property (nonatomic, retain) KalturaClientConfiguration* config;
+@property (nonatomic, retain) NSError* error;
+@property (nonatomic, assign) id<KalturaClientDelegate> delegate;
+@property (nonatomic, copy) NSString* ks;
+@property (nonatomic, copy) NSString* apiVersion;
+@property (nonatomic, readonly) KalturaParams* params;
+
+    // public messages
+- (id)initWithConfig:(KalturaClientConfiguration*)aConfig;
+- (void)startMultiRequest;
+- (NSArray*)doMultiRequest;
+- (void)cancelRequest;
++ (NSString*)generateSessionWithSecret:(NSString*)aSecret withUserId:(NSString*)aUserId withType:(int)aType withPartnerId:(int)aPartnerId withExpiry:(int)aExpiry withPrivileges:(NSString*)aPrivileges;
+
+    // messages for use of auto-gen service code
+- (NSString*)queueServeService:(NSString*)aService withAction:(NSString*)aAction;
+- (void)queueVoidService:(NSString*)aService withAction:(NSString*)aAction;
+- (BOOL)queueBoolService:(NSString*)aService withAction:(NSString*)aAction;
+- (int)queueIntService:(NSString*)aService withAction:(NSString*)aAction;
+- (double)queueFloatService:(NSString*)aService withAction:(NSString*)aAction;
+- (NSString*)queueStringService:(NSString*)aService withAction:(NSString*)aAction;
+- (id)queueObjectService:(NSString*)aService withAction:(NSString*)aAction;
+- (NSMutableArray*)queueArrayService:(NSString*)aService withAction:(NSString*)aAction;
+
 @end

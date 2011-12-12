@@ -682,7 +682,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			foreach($dependencyNodes as $dependencyNode)
 			{
 				$curClassName = $this->getPluginClassName($dependencyNode->getAttribute("pluginName"));
-				$this->appendHLine("#import \"../$curClassName.h\"");
+				$this->appendHLine("#import \"$curClassName.h\"");
 			}
 		}
 		else 

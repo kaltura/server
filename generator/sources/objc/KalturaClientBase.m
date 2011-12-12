@@ -1,9 +1,20 @@
 #import <CommonCrypto/CommonDigest.h>
-#import "KalturaClientBase.h"
 #import "ASIFormDataRequest.h"
+#import "KalturaClientBase.h"
+#import "KalturaXmlParsers.h"
 
-static NSString* KALTURA_SERVICE_BASE_URL = @"/api_v3/index.php";
-static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
+/*
+ String constants
+ */
+static NSString* const KalturaServiceBaseUrl = @"/api_v3/index.php";
+static NSString* const KalturaServiceFormatXml = @"2";
+NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
+
+/*
+ Class KalturaClientException
+ */
+@implementation KalturaClientException
+@end
 
 /*
  Class KalturaSimpleTypeParser
@@ -31,7 +42,6 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
     if (aStr == nil)
         return 0.0;
     return [aStr doubleValue];
-
 }
 
 @end
@@ -40,18 +50,6 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
  Class KalturaObjectBase
  */
 @implementation KalturaObjectBase
-
-- (void)setObjectProperty:(NSString*)aPropNameCap withValue:(id)aValue isSimple:(BOOL)aIsSimple
-{
-    NSString* postFix = @"";
-    if (aIsSimple)
-        postFix = @"FromString";
-    NSMutableString* selName = [[NSMutableString alloc] initWithFormat:@"set%@%@:", aPropNameCap, postFix];
-    SEL sel = NSSelectorFromString(selName);
-    if (![self respondsToSelector:sel])
-        @throw @"Unexpected: object does not respond to setter";            // shoundn't happen since the property was already validated by getTypeOfProperty
-    [self performSelector:sel withObject:aValue];
-}
 
 - (void)toParams:(KalturaParams*)aParams isSuper:(BOOL)aIsSuper
 {
@@ -77,6 +75,11 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
     return KFT_String;
 }
 
+- (NSError*)error
+{
+    return [NSError errorWithDomain:KalturaClientErrorDomain code:KalturaClientErrorAPIException userInfo:[NSDictionary dictionaryWithObjectsAndKeys:self.message, NSLocalizedDescriptionKey, self.code, @"ExceptionCode", nil]];
+}
+
 @end
 
 /*
@@ -100,8 +103,6 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 
 @end
 
-///////////////////////// Request Building /////////////////////////
-
 /*
  Class KalturaParam
  */
@@ -122,11 +123,12 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 - initWithKey:(NSString*)aKey withValue:(NSString*)aValue
 {
     self = [super init];
-    if (self)
-    {
-        self.key = aKey;
-        self.value = aValue;
-    }
+    if (self == nil)
+        return nil;
+
+    self.key = aKey;
+    self.value = aValue;
+
     return self;
 }
 
@@ -161,11 +163,12 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 - initWithKey:(NSString*)aKey withFileName:(NSString*)aValue
 {
     self = [super init];
-    if (self)
-    {
-        self.key = aKey;
-        self.value = aValue;
-    }
+    if (self == nil)
+        return nil;
+
+    self.key = aKey;
+    self.value = aValue;
+
     return self;
 }
 
@@ -179,16 +182,18 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 - (id)init
 {
     self = [super init];
-    if (self) {
-        self->_params = [[NSMutableArray alloc] init];
-        self->_files = [[NSMutableArray alloc] init];
-        self->_prefix = [[NSMutableString alloc] init];
-    }
+    if (self == nil)
+        return nil;
+
+    self->_params = [[NSMutableArray alloc] init];
+    self->_files = [[NSMutableArray alloc] init];
+    self->_prefix = [[NSMutableString alloc] init];
     
     return self;
 }
 
-- (void)dealloc {
+- (void)dealloc 
+{
     [self->_prefix release];
     [self->_files release];
     [self->_params release];
@@ -204,7 +209,7 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 - (void)popKey:(NSString*)aKey
 {
     int curLength = self->_prefix.length;
-    NSRange range = NSMakeRange(curLength - aKey.length - 1, curLength);
+    NSRange range = NSMakeRange(curLength - aKey.length - 1, aKey.length + 1);
     [self->_prefix deleteCharactersInRange:range];
 }
 
@@ -227,31 +232,46 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 
 - (void)putKey:(NSString*)aKey withString:(NSString*)aVal
 {
+    KalturaParam* param = nil;
+    
     if (self->_prefix.length != 0)
     {
-        aKey = [NSString stringWithFormat:@"%@%@", self->_prefix, aKey];
+        aKey = [[NSString alloc] initWithFormat:@"%@%@", self->_prefix, aKey];
     }
-    KalturaParam* param = [[KalturaParam alloc] initWithKey:aKey withValue:aVal];
+    param = [[KalturaParam alloc] initWithKey:aKey withValue:aVal];
+    if (self->_prefix.length != 0)
+    {
+        [aKey release];
+    }
     [self->_params addObject:param];
+    [param release];
 }
 
 - (void)putNullKey:(NSString*)aKey
 {
-    NSString* nullKey = [NSString stringWithFormat:@"%@%@", aKey, @"__null"];
+    NSString* nullKey = [[NSString alloc] initWithFormat:@"%@%@", aKey, @"__null"];
     [self putKey:nullKey withString:@""];
+    [nullKey release];
 }
 
 - (void)addIfDefinedKey:(NSString*)aKey withFileName:(NSString*)aFileName;
 {
+    KalturaFile* param = nil;
+    
     if (aFileName == nil)
         return;
     
     if (self->_prefix.length != 0)
     {
-        aKey = [NSString stringWithFormat:@"%@%@", self->_prefix, aKey];
+        aKey = [[NSString alloc] initWithFormat:@"%@%@", self->_prefix, aKey];
     }
-    KalturaFile* param = [[KalturaFile alloc] initWithKey:aKey withFileName:aFileName];
-    [self->_files addObject:param];    
+    param = [[KalturaFile alloc] initWithKey:aKey withFileName:aFileName];
+    if (self->_prefix.length != 0)
+    {
+        [aKey release];
+    }
+    [self->_files addObject:param];
+    [param release];
 }
 
 - (void)addIfDefinedKey:(NSString*)aKey withBool:(BOOL)aVal
@@ -344,9 +364,10 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
     else
     {
         for (int index = 0; index < aVal.count; index++)
-        {            
-            [self addIfDefinedKey:[NSString stringWithFormat:@"%d", index] 
-                       withObject:[aVal objectAtIndex:index]];
+        {
+            NSString* curKey = [[NSString alloc] initWithFormat:@"%d", index];
+            [self addIfDefinedKey:curKey withObject:[aVal objectAtIndex:index]];
+            [curKey release];
         }
     }
     
@@ -370,11 +391,13 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
     }
     CC_MD5_Final(md5Hash, &md5Ctx);
 
-    NSMutableString* kalSig = [NSMutableString stringWithCapacity:(CC_MD5_DIGEST_LENGTH * 2)];
+    NSMutableString* kalSig = [[NSMutableString alloc] initWithCapacity:(CC_MD5_DIGEST_LENGTH * 2)];
     for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
         [kalSig appendFormat:@"%02x", md5Hash[i]];
     
     [self putKey:@"kalsig" withString:kalSig];
+    
+    [kalSig release];
 }
 
 - (void)addToRequest:(ASIFormDataRequest*)aRequest
@@ -394,9 +417,8 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
     }
 }
 
-- (NSString*)getQueryString
+- (void)appendQueryString:(NSMutableString*)output
 {
-    NSMutableString* result = [[NSMutableString alloc] init];
     while (self->_params.count)
     {
         KalturaParam* curParam = [self->_params lastObject];
@@ -406,466 +428,10 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
             NULL, 
             (CFStringRef)@"!*'();:@&=+$,/?%#[] \"\\<>{}|^~`", 
             kCFStringEncodingUTF8);
-        [result appendFormat:@"%@=%@&", curParam.key, encodedVal];
+        [output appendFormat:@"%@=%@&", curParam.key, encodedVal];
+        [encodedVal release];
         [self->_params removeLastObject];
     }
-    return result;
-}
-
-@end
-
-///////////////////////// Response Parsing /////////////////////////
-
-/*
- Class KalturaXmlParserBase
- */
-@implementation KalturaXmlParserBase
-
-@synthesize parser = _parser;
-@synthesize delegate = _delegate;
-
-- (void)dealloc 
-{
-    [self detach];
-    [super dealloc];
-}
-
-- (void)attachToParser:(NSXMLParser*)aParser withDelegate:(id <KalturaXmlParserDelegate>)aDelegate
-{
-    assert(!self->_attached);
-    
-    self.parser = aParser;
-    self.delegate = aDelegate;
-    
-    self->_origDelegate = self.parser.delegate;
-    self.parser.delegate = self;
-    self->_attached = YES;
-}
-
-- (void)detach
-{
-    if (self->_attached) {
-        self.parser.delegate = self->_origDelegate;
-        self->_origDelegate = nil;
-        self->_attached = NO;
-    }
-}
-
-- (id)result
-{
-    return nil;
-}
-
-@end
-
-/*
- Class KalturaXmlParserSkipTag
- */
-@implementation KalturaXmlParserSkipTag
-
-- init
-{
-    self = [super init];
-    if (self != nil)
-    {
-        self->_level = 1;
-    }
-    return self;
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
-{
-    self->_level++;
-}
-
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
-{
-    self->_level--;
-    if (self->_level != 0)
-        return;
-    
-    [self detach];
-    [self.delegate parsingComplete];
-}
-
-@end
-
-/*
- Class KalturaXmlParserException
- */
-@implementation KalturaXmlParserException
-
-@synthesize targetException = _targetException;
-@synthesize subParser = _subParser;
-
-- initWithSubParser:(KalturaXmlParserBase*)aSubParser
-{
-    self = [super init];
-    if (self != nil)
-    {
-        self.subParser = aSubParser;
-    }
-    
-    return self;
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
-{
-    if ([elementName compare:@"error"] == NSOrderedSame)
-    {
-        self.targetException = [[KalturaException alloc] init];
-        KalturaXmlParserBase* subParser = [[KalturaXmlParserObject alloc] initWithObject:self.targetException];
-        [subParser attachToParser:self.parser withDelegate:self];
-    }
-    else
-    {
-        [self.subParser attachToParser:self.parser withDelegate:self];
-        [self.subParser parser:parser didStartElement:elementName namespaceURI:namespaceURI qualifiedName:qName attributes:attributeDict];
-    }
-}
-
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
-{
-    [self detach];
-    [self.delegate parsingComplete];
-}
-
-- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
-{
-    [self.subParser attachToParser:self.parser withDelegate:self];
-    [self.subParser parser:parser foundCharacters:string];
-}
-
-- (void)parsingComplete
-{
-    [self detach];
-    [self.delegate parsingComplete];
-}
-
-- (id)result
-{
-    if (self.targetException != nil)
-    {
-        return self.targetException;
-    }
-    else
-    {
-        return self.subParser.result;
-    }
-}
-
-@end
-
-/*
- Class KalturaXmlParserSimpleType
- */
-@implementation KalturaXmlParserSimpleType
-
-- (id)result
-{
-    return self->_value;
-}
-
-- (BOOL)boolResult
-{
-    return [KalturaSimpleTypeParser parseBool:self->_value];
-}
-
-- (int)intResult
-{
-    return [KalturaSimpleTypeParser parseInt:self->_value];
-}
-
-- (double)floatResult
-{
-    return [KalturaSimpleTypeParser parseFloat:self->_value];
-}
-
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
-{
-    [self detach];
-    [self.delegate parsingComplete];
-}
-
-- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
-{
-    self->_value = [string copy];
-}
-
-@end
-
-/*
- Class KalturaXmlParserObject
- */
-@implementation KalturaXmlParserObject
-
-- (id)result
-{
-    return self->_targetObj;
-}
-
-- (id)initWithObject:(KalturaObjectBase*)aObject
-{
-    self = [super init];
-    if (self)
-    {
-        self->_targetObj = aObject;
-    }
-    return self;
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
-{
-    self->_lastTagCap = [[NSMutableString alloc] initWithFormat:@"%@%@", 
-                         [[elementName substringToIndex:1] uppercaseString],
-                         [elementName substringFromIndex:1]];
-    
-    if (self->_targetObj == nil)
-    {
-        return;
-    }
-    
-    NSString* getPropType = [[NSMutableString alloc] initWithFormat:@"getTypeOf%@", self->_lastTagCap];
-    SEL getPropTypeSel = NSSelectorFromString(getPropType);
-    self->_lastPropType = KFT_Invalid;
-    if ([self->_targetObj respondsToSelector:getPropTypeSel])
-    {
-        self->_lastPropType = (KalturaFieldType)[self->_targetObj performSelector:getPropTypeSel];
-    }
-    
-    switch (self->_lastPropType)
-    {
-        case KFT_Invalid:
-            self->_subParser = [[KalturaXmlParserSkipTag alloc] init];
-            [self->_subParser attachToParser:self.parser withDelegate:self];
-            break;
-            
-        case KFT_Object:
-            self->_subParser = [[KalturaXmlParserObject alloc] init];
-            [self->_subParser attachToParser:self.parser withDelegate:self];
-            break;
-            
-        case KFT_Array:
-            self->_subParser = [[KalturaXmlParserArray alloc] init];
-            [self->_subParser attachToParser:self.parser withDelegate:self];
-            break;
-            
-        default:;
-    }
-}
-
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
-{
-    if (self->_lastTagCap == nil)
-    {
-        [self detach];
-        [self.delegate parsingComplete];
-        return;
-    }
-    
-    self->_lastTagCap = nil;
-}
-
-- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
-{
-    if ([self->_lastTagCap compare:@"ObjectType"] == NSOrderedSame)
-    {
-        self->_targetObj = [KalturaObjectFactory createByName:string];
-    }
-    else
-    {
-        if (self->_lastPropType == KFT_String)
-            [self->_targetObj setObjectProperty:self->_lastTagCap withValue:string isSimple:NO];
-        else
-            [self->_targetObj setObjectProperty:self->_lastTagCap withValue:string isSimple:YES];
-    }
-}
-
-- (void)parsingComplete
-{
-    id parseResult = [self->_subParser result];
-    if (parseResult != nil)
-    {
-        [self->_targetObj setObjectProperty:self->_lastTagCap withValue:parseResult isSimple:NO];
-    }
-    [self->_subParser release];
-    self->_subParser = nil;
-    self->_lastTagCap = nil;
-}
-
-@end
-
-/*
- Class KalturaXmlParserArray
- */
-@implementation KalturaXmlParserArray
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        self->_targetArr = [[NSMutableArray alloc] init];
-    }
-    
-    return self;
-}
-
-- (void)dealloc
-{
-    [self->_targetArr release];
-    [super dealloc];
-}
-
-- (id)result
-{
-    return self->_targetArr;
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
-{
-    if ([elementName compare:@"item"] != NSOrderedSame)
-    {
-        @throw @"Unexpected tag";        // XXXXXX
-    }
-    
-    self->_subParser = [[KalturaXmlParserObject alloc] init];
-    [self->_subParser attachToParser:self.parser withDelegate:self];
-}
-
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
-{
-    [self detach];
-    [self.delegate parsingComplete];    
-}
-
-- (void)parsingComplete
-{
-    id parseResult = [self->_subParser result];
-    [self->_targetArr addObject:parseResult];
-    [self->_subParser release];
-    self->_subParser = nil;
-}
-
-@end
-
-/*
- Class KalturaXmlParserMultirequest
- */
-@implementation KalturaXmlParserMultirequest
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        self->_subParsers = [[NSMutableArray alloc] init];
-    }
-    
-    return self;
-}
-
-- (void)dealloc
-{
-    [self->_subParsers release];
-    [super dealloc];
-}
-
-- (void)addSubParser:(KalturaXmlParserBase*)aParser
-{
-    KalturaXmlParserException* excParser = [[KalturaXmlParserException alloc] initWithSubParser:aParser];
-    [self->_subParsers addObject:excParser];
-}
-
-- (int)reqCount
-{
-    return self->_subParsers.count;
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
-{
-    if ([elementName compare:@"item"] != NSOrderedSame ||
-        self->_reqIndex >= self->_subParsers.count)
-    {
-        @throw @"Unexpected tag";        // XXXXXX
-    }
-    
-    KalturaXmlParserBase* curParser = [self->_subParsers objectAtIndex:self->_reqIndex];
-    [curParser attachToParser:self.parser withDelegate:self];
-}
-
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
-{
-    [self detach];
-    [self.delegate parsingComplete];    
-}
-
-- (void)parsingComplete
-{
-    KalturaXmlParserBase* curParser = [self->_subParsers objectAtIndex:self->_reqIndex];
-    [curParser detach];
-    self->_reqIndex++;
-}
-
-- (id)result
-{
-    NSMutableArray* result = [[NSMutableArray alloc] init];
-    
-    for (KalturaXmlParserBase* curParser in self->_subParsers)
-    {
-        [result addObject:curParser.result];
-    }
-    
-    return result;
-}
-
-@end
-
-/*
- Class KalturaXmlParserSkipPath
- */
-@implementation KalturaXmlParserSkipPath
-
-- initWithSubParser:(KalturaXmlParserBase*)aSubParser withPath:(NSArray*)aPath
-{
-    self = [super init];
-    
-    self->_subParser = aSubParser;
-    self->_path = aPath;
-    
-    return self;
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
-{
-    NSString* expectedElem = (NSString*)[self->_path objectAtIndex:self->_pathPosition];
-    if (self->_skipLevel == 0 && [expectedElem compare:elementName] == NSOrderedSame)
-    {
-        self->_pathPosition++;
-        if (self->_pathPosition == self->_path.count)
-        {
-            [self->_subParser attachToParser:self.parser withDelegate:self];
-        }
-    }
-    else
-    {
-        self->_skipLevel++;
-    }
-}
-
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
-{
-    if (self->_skipLevel != 0)
-    {
-        self->_skipLevel--;
-    }
-    else
-    {
-        self->_pathPosition--;
-    }
-}
-
-- (void)parsingComplete
-{
-    self->_pathPosition--;
 }
 
 @end
@@ -883,27 +449,62 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 @end
 
 /*
+ Class KalturaServiceBase
+ */
+@implementation KalturaServiceBase
+
+@synthesize client = _client;
+
+- (id)initWithClient:(KalturaClientBase*)aClient
+{
+    self = [super init];
+    if (self == nil)
+        return nil;
+
+    self.client = aClient;
+    
+    return self;
+}
+
+@end
+
+/*
+ Class KalturaClientPlugin
+ */
+@implementation KalturaClientPlugin
+@end
+
+/*
  Class KalturaClientConfiguration
  */
 @implementation KalturaClientConfiguration
 
+@synthesize serviceUrl = _serviceUrl;
 @synthesize clientTag = _clientTag;
 @synthesize partnerId = _partnerId;
-@synthesize serviceUrl = _serviceUrl;
 @synthesize requestTimeout = _requestTimeout;
 @synthesize logger = _logger;
 
 - (id)init
 {
     self = [super init];
-    if (self) {
-        self.clientTag = @"objCLib";
-        self.partnerId = -1;
-        self.serviceUrl = @"http://www.kaltura.com";
-        self.requestTimeout = 10;
-    }
+    if (self == nil)
+        return nil;
+
+    self.clientTag = @"objCLib";
+    self.partnerId = -1;
+    self.serviceUrl = @"http://www.kaltura.com";
+    self.requestTimeout = 10;
     
     return self;
+}
+
+- (void)dealloc
+{
+    [self->_serviceUrl release];
+    [self->_clientTag release];
+    [self->_logger release];
+    [super dealloc];
 }
 
 @end
@@ -913,15 +514,18 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
  */
 @interface KalturaClientBase()
 
-- (void)queueService:(NSString*)aService withAction:(NSString*)aAction withParser:(KalturaXmlParserBase*)aParser;
-- (NSXMLParser*)issueRequestWithQuery:(NSString*)query;
+- (id)queueService:(NSString*)aService withAction:(NSString*)aAction withParser:(KalturaXmlParserBase*)aParser;
+- (id)issueRequestWithQuery:(NSString*)aFormat, ...;
 - (void)logFormat:(NSString *)aFormat, ...;
++ (void)appendSessionSigWithSecret:(NSString*)aSecret withFields:(NSString*)aKsFields withOutput:(NSMutableString*)aOutput;
 
 @end
 
 @implementation KalturaClientBase
 
 @synthesize config = _config;
+@synthesize error = _error;
+@synthesize delegate = _delegate;
 @synthesize ks = _ks;
 @synthesize apiVersion = _apiVersion;
 @synthesize params = _params;
@@ -929,17 +533,60 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 - (id)initWithConfig:(KalturaClientConfiguration*)aConfig
 {
     self = [super init];
-    if (self) {
-        self->_params = [[KalturaParams alloc] init];
-        self->_config = aConfig;
-    }
+    if (self == nil)
+        return nil;
+
+    self->_params = [[KalturaParams alloc] init];
+    self.config = aConfig;
     
     return self;
 }
 
-- (void)dealloc {
+- (void)dealloc 
+{
+    [self cancelRequest];
+    [self->_error release];
+    [self->_ks release];
+    [self->_apiVersion release];
     [self->_params release];
+    [self->_config release];
     [super dealloc];
+}
+
+- (void)cancelRequest
+{
+    [self->_request clearDelegatesAndCancel];
+    [self->_request release];
+    self->_request = nil;
+    [self->_apiStartTime release];
+    self->_apiStartTime = nil;
+    [self->_skipParser release];
+    self->_skipParser = nil;
+    [self->_reqParser release];
+    self->_reqParser = nil;
+    self->_xmlParser.delegate = nil;    // the xmlParser could be retained if we're in xmlParseChunk
+    [self->_xmlParser release];
+    self->_xmlParser = nil;
+    self->_isMultiRequest = NO;
+    [self->_params setPrefix:@""];
+}
+
+- (id)completeRequest
+{
+    if (self->_apiStartTime != nil)
+        [self logFormat:@"api call took %.2f seconds", -[self->_apiStartTime timeIntervalSinceNow]];
+    
+    id result = [[self->_reqParser result] retain];
+    [self cancelRequest];
+    [result autorelease];
+    
+    if ([result isKindOfClass:[NSError class]])
+    {
+        self.error = result;
+        return nil;
+    }
+    
+    return result;
 }
 
 - (void)addRequestDefaultParams
@@ -948,178 +595,251 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
     if ((paramsPartnerId == nil || [paramsPartnerId compare:@"-1"] == NSOrderedSame) &&
         self.config.partnerId != -1)
     {
-        NSString* strPartnerId = [NSString stringWithFormat:@"%d", self.config.partnerId];
+        NSString* strPartnerId = [[NSString alloc] initWithFormat:@"%d", self.config.partnerId];
         [self->_params addIfDefinedKey:@"partnerId" withString:strPartnerId];
+        [strPartnerId release];
     }
     [self->_params addIfDefinedKey:@"ks" withString:self.ks];
 }
 
-- (void)addGlobalDefaultParams
+- (void)addGlobalParamsAndSign
 {
+    [self->_params setPrefix:@""];
     [self->_params addIfDefinedKey:@"apiVersion" withString:self.apiVersion];
-    [self->_params addIfDefinedKey:@"format" withString:KALTURA_SERVICE_FORMAT_XML];
+    [self->_params addIfDefinedKey:@"format" withString:KalturaServiceFormatXml];
     [self->_params addIfDefinedKey:@"clientTag" withString:self.config.clientTag];
-}
-
-- (void)parseResponseWithXmlParser:(NSXMLParser*)aXmlParser withParser:(KalturaXmlParserBase*)aParser
-{
-    NSDate *parseStart = [NSDate date];
-    KalturaXmlParserSkipPath* skipParser = [[KalturaXmlParserSkipPath alloc] initWithSubParser:aParser withPath:
-                                            [NSArray arrayWithObjects: @"xml", @"result", nil]];        
-    [skipParser attachToParser:aXmlParser withDelegate:nil];
-    [aXmlParser parse];    
-    [self logFormat:@"response parsing took %.2f seconds", -[parseStart timeIntervalSinceNow]];
-}
-
-- (void)queueService:(NSString*)aService withAction:(NSString*)aAction withParser:(KalturaXmlParserBase*)aParser
-{
-    [self addRequestDefaultParams];
-    
-    if (self->_multiReqParser != nil)
-    {
-        [self->_params addIfDefinedKey:@"service" withString:aService];
-        [self->_params addIfDefinedKey:@"action" withString:aAction];
-        [self->_multiReqParser addSubParser:aParser];
-        [self->_params setPrefix:[NSString stringWithFormat:@"%d:", self->_multiReqParser.reqCount + 1]];
-        return;
-    }
-    
-    NSString* query = [NSString stringWithFormat:@"service=%@&action=%@", aService, aAction];
-    
-    NSXMLParser* xmlParser = [self issueRequestWithQuery:query];
-    
-    KalturaXmlParserException* excParser = [[KalturaXmlParserException alloc] initWithSubParser:aParser];
-    [self parseResponseWithXmlParser:xmlParser withParser:excParser];
-    
-    if (excParser.targetException != nil)
-    {
-        @throw excParser.targetException;
-    }
+    [self->_params addIfDefinedKey:@"ignoreNull" withString:@"1"];
+    [self->_params sign];
 }
 
 - (NSString*)queueServeService:(NSString*)aService withAction:(NSString*)aAction
 {
+    self.error = nil;
     [self->_params addIfDefinedKey:@"service" withString:aService];
     [self->_params addIfDefinedKey:@"action" withString:aAction];
     [self addRequestDefaultParams];
-    [self addGlobalDefaultParams];
-    NSString* query = [self->_params getQueryString];
-    NSString* url = [NSString stringWithFormat:@"%@%@?%@", self.config.serviceUrl, KALTURA_SERVICE_BASE_URL, query];
-    return url;
+    [self addGlobalParamsAndSign];
+    
+    NSMutableString* result = [[NSMutableString alloc] initWithFormat:@"%@%@?", self.config.serviceUrl, KalturaServiceBaseUrl];
+    [self->_params appendQueryString:result];
+    [result autorelease];
+    return result;
+}
+
+- (void)setupRequestWithQuery:(NSString*)aFormat withArguments:(va_list)vaArgs
+{
+    NSString* query = [[NSString alloc] initWithFormat:aFormat arguments:vaArgs];
+    NSString* urlStr = [[NSString alloc] initWithFormat:@"%@%@?%@", self.config.serviceUrl, KalturaServiceBaseUrl, query];
+    NSURL *url = [[NSURL alloc] initWithString:urlStr];
+
+    [self logFormat:@"request url: %@", urlStr];
+
+    self->_request = [[ASIFormDataRequest alloc] initWithURL:url];
+
+    [url release];
+    [urlStr release];
+    [query release];
+
+    self->_request.delegate = self;
+    self->_request.timeOutSeconds = self.config.requestTimeout;
+    self->_request.shouldWaitToInflateCompressedResponses = NO;
+
+    [self addGlobalParamsAndSign];
+    [self->_params addToRequest:self->_request];
+}
+
+- (void)setupXmlParser
+{
+    NSArray* path = [[NSArray alloc] initWithObjects: @"xml", @"result", nil];
+    self->_skipParser = [[KalturaXmlParserSkipPath alloc] initWithSubParser:self->_reqParser withPath:path];
+    [path release];
+    
+    self->_xmlParser = [[KalturaLibXmlWrapper alloc] init];
+    [self->_skipParser attachToParser:self->_xmlParser withDelegate:self];
+}
+
+- (id)issueRequestWithQuery:(NSString*)aFormat, ...
+{
+    [self setupXmlParser];    
+    
+    va_list vaArgs;
+    va_start(vaArgs, aFormat);
+    [self setupRequestWithQuery:aFormat withArguments:vaArgs];
+    va_end(vaArgs);
+    
+    self->_apiStartTime = [[NSDate alloc] init];
+    
+    if (self.delegate == nil)
+    {
+        [self->_request startSynchronous];
+        return [self completeRequest];
+    }
+    else
+    {
+        [self->_request startAsynchronous];
+        return nil;
+    }
+}
+
+- (void)queueMultiRequestService:(NSString*)aService withAction:(NSString*)aAction withParser:(KalturaXmlParserBase*)aParser
+{
+    KalturaXmlParserMultirequest* multiReqParser = (KalturaXmlParserMultirequest*)self->_reqParser;
+    [self->_params addIfDefinedKey:@"service" withString:aService];
+    [self->_params addIfDefinedKey:@"action" withString:aAction];
+    [multiReqParser addSubParser:aParser];
+    
+    NSString* newPrefix = [[NSString alloc] initWithFormat:@"%d:", multiReqParser.reqCount + 1];
+    [self->_params setPrefix:newPrefix];
+    [newPrefix release];
+}
+
+- (id)queueService:(NSString*)aService withAction:(NSString*)aAction withParser:(KalturaXmlParserBase*)aParser
+{
+    [self addRequestDefaultParams];
+    
+    KalturaXmlParserException* excParser = [[KalturaXmlParserException alloc] initWithSubParser:aParser];
+
+    if (self->_isMultiRequest)
+    {
+        [self queueMultiRequestService:aService withAction:aAction withParser:excParser];
+        [excParser release];
+        return nil;
+    }
+
+    self.error = nil;
+    self->_reqParser = [excParser retain];
+    [excParser release];
+    
+    return [self issueRequestWithQuery:@"service=%@&action=%@", aService, aAction];
+}
+
+- (void)startMultiRequest
+{
+    if (self->_isMultiRequest)
+    {
+        @throw [KalturaClientException exceptionWithName:@"DoubleStartMultiReq" reason:@"startMultiRequest called while already started" userInfo:nil];
+    }
+    
+    self.error = nil;
+    self->_reqParser = [[KalturaXmlParserMultirequest alloc] init];
+    [self->_params setPrefix:@"1:"];
+    self->_isMultiRequest = YES;
+}
+
+- (NSArray*)doMultiRequest
+{
+    if (!self->_isMultiRequest)
+    {
+        @throw [KalturaClientException exceptionWithName:@"EndWithoutMultiReq" reason:@"doMultiRequest called while not in multirequest" userInfo:nil];
+    }
+        
+    return [self issueRequestWithQuery:@"service=multirequest"];
 }
 
 - (void)queueVoidService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserSimpleType* parser = [[KalturaXmlParserSimpleType alloc] init];
     [self queueService:aService withAction:aAction withParser:parser];
+    [parser release];
 }
 
 - (BOOL)queueBoolService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserSimpleType* parser = [[KalturaXmlParserSimpleType alloc] init];
-    [self queueService:aService withAction:aAction withParser:parser];
-    return parser.boolResult;
+    id result = [self queueService:aService withAction:aAction withParser:parser];
+    [parser release];
+    return [KalturaSimpleTypeParser parseBool:result];
 }
 
 - (int)queueIntService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserSimpleType* parser = [[KalturaXmlParserSimpleType alloc] init];
-    [self queueService:aService withAction:aAction withParser:parser];
-    return parser.intResult;
+    id result = [self queueService:aService withAction:aAction withParser:parser];
+    [parser release];
+    return [KalturaSimpleTypeParser parseInt:result];
 }
 
 - (double)queueFloatService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserSimpleType* parser = [[KalturaXmlParserSimpleType alloc] init];
-    [self queueService:aService withAction:aAction withParser:parser];
-    return parser.floatResult;
+    id result = [self queueService:aService withAction:aAction withParser:parser];
+    [parser release];
+    return [KalturaSimpleTypeParser parseFloat:result];
 }
 
 - (NSString*)queueStringService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserSimpleType* parser = [[KalturaXmlParserSimpleType alloc] init];
-    [self queueService:aService withAction:aAction withParser:parser];
-    return [parser result];
+    id result = [self queueService:aService withAction:aAction withParser:parser];
+    [parser release];
+    return result;
 }
 
 - (id)queueObjectService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserObject* parser = [[KalturaXmlParserObject alloc] init];
-    [self queueService:aService withAction:aAction withParser:parser];
-    return parser.result;
+    id result = [self queueService:aService withAction:aAction withParser:parser];
+    [parser release];
+    return result;
 }
 
 - (NSMutableArray*)queueArrayService:(NSString*)aService withAction:(NSString*)aAction
 {
     KalturaXmlParserArray* parser = [[KalturaXmlParserArray alloc] init];
-    [self queueService:aService withAction:aAction withParser:parser];
-    return parser.result;
-}
-
-- (NSXMLParser*)issueRequestWithQuery:(NSString*)query
-{
-    [self->_params setPrefix:@""];
-    [self addGlobalDefaultParams];
-    [self->_params sign];
-    
-    NSString* urlStr = [NSString stringWithFormat:@"%@%@?%@", self.config.serviceUrl, KALTURA_SERVICE_BASE_URL, query];
-    [self logFormat:@"request url: %@", urlStr];
-    NSURL *url = [NSURL URLWithString:urlStr];
-    
-    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
-    request.timeOutSeconds = self.config.requestTimeout;
-    [self->_params addToRequest:request];
-    
-    NSDate *apiStart = [NSDate date];
-    [request startSynchronous];
-    [self logFormat:@"api call took %.2f seconds", -[apiStart timeIntervalSinceNow]];        
-    
-    NSError *error = [request error];
-    if (error)
-    {
-        // TODO: Handle this
-    }
-    
-    NSData* data = [request responseData];
-    if (data.length < 1024)
-        [self logFormat:@"response (xml): %@", data];
-    else
-        [self logFormat:@"response (xml): %d bytes", data.length];        
-    
-    NSXMLParser* xmlParser = [[NSXMLParser alloc] initWithData:data];
-    return xmlParser;
-}
-
-- (void)startMultiRequest
-{
-    if (self->_multiReqParser)
-    {
-        @throw @"Already in multirequest";
-    }
-    
-    self->_multiReqParser = [[KalturaXmlParserMultirequest alloc] init];
-    [self->_params setPrefix:@"1:"];
-}
-
-- (NSArray*)doMultiRequest
-{
-    if (self->_multiReqParser == nil)
-    {
-        @throw @"Not in multirequest";
-    }
-    
-    NSString* query = [NSString stringWithFormat:@"service=multirequest"];
-    
-    NSXMLParser* xmlParser = [self issueRequestWithQuery:query];
-    
-    [self parseResponseWithXmlParser:xmlParser withParser:self->_multiReqParser];
-    
-    id result = [self->_multiReqParser result];
-    
-    [self->_multiReqParser release];
-    self->_multiReqParser = nil;
-    
+    id result = [self queueService:aService withAction:aAction withParser:parser];
+    [parser release];
     return result;
+}
+
+- (void)failRequestWithError:(NSError*)aError
+{
+    self.error = aError;
+    [self cancelRequest];
+    [self.delegate requestFailed:self];
+}
+
+- (void)request:(ASIHTTPRequest *)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
+{
+    int statusCode = [request responseStatusCode];
+    
+    if (statusCode != 200)
+    {
+        NSNumber *statusCodeNum = [NSNumber numberWithInt:statusCode];
+        NSError *nsError = [NSError errorWithDomain:KalturaClientErrorDomain code:KalturaClientErrorInvalidHttpCode userInfo:[NSDictionary dictionaryWithObjectsAndKeys: @"Got invalid HTTP status", NSLocalizedDescriptionKey, statusCodeNum, @"StatusCode", nil]];         
+        [self failRequestWithError:nsError];
+    }
+}
+
+- (void)request:(ASIHTTPRequest *)request didReceiveData:(NSData *)data
+{
+    [self->_xmlParser processData:data];    
+}
+
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
+    [self->_xmlParser noMoreData];
+}
+
+- (void)requestFailed:(ASIHTTPRequest *)request
+{
+    [self failRequestWithError:[request error]];
+}
+
+- (void)parsingFinished:(KalturaXmlParserBase*)aParser
+{
+    if (self.delegate == nil)
+        return;
+    
+    id result = [self completeRequest];
+    if (self.error != nil)
+        [self.delegate requestFailed:self];
+    else
+        [self.delegate requestFinished:self withResult:result];
+}
+
+- (void)parsingFailed:(KalturaXmlParserBase*)aParser
+{
+    [self failRequestWithError:[aParser error]];
 }
 
 - (void)logFormat:(NSString *)aFormat, ...
@@ -1129,12 +849,10 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
         return;
     }
     
-    va_list argumentList;
-    va_start(argumentList, aFormat);
-    
-    NSString *string = [[NSString alloc] initWithFormat:aFormat arguments:argumentList];
-    
-    va_end(argumentList);
+    va_list vaArgs;
+    va_start(vaArgs, aFormat);    
+    NSString *string = [[NSString alloc] initWithFormat:aFormat arguments:vaArgs];
+    va_end(vaArgs);
     
     [self.config.logger logMessage:string];
     
@@ -1144,18 +862,20 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
 + (NSString*)generateSessionWithSecret:(NSString*)aSecret withUserId:(NSString*)aUserId withType:(int)aType withPartnerId:(int)aPartnerId withExpiry:(int)aExpiry withPrivileges:(NSString*)aPrivileges
 {
     int rand = arc4random() % 0x10000;
-    NSDate* date = [NSDate date];
-    NSTimeInterval ts = [date timeIntervalSince1970];
-    int ksExpiry = (int)ts + aExpiry;
-    NSString* ksFields = [NSString stringWithFormat:@"%d;%d;%d;%d;%d;%@;%@", aPartnerId, aPartnerId, ksExpiry, aType, rand, aUserId, aPrivileges];
+    int ksExpiry = (int)[[NSDate date] timeIntervalSince1970] + aExpiry;
+    NSString* ksFields = [[NSString alloc] initWithFormat:@"%d;%d;%d;%d;%d;%@;%@", aPartnerId, aPartnerId, ksExpiry, aType, rand, aUserId, aPrivileges];
         
-    NSMutableString* ksWithSig = [NSMutableString stringWithCapacity:(CC_SHA1_DIGEST_LENGTH * 2 + 1 + ksFields.length)];
+    NSMutableString* ksWithSig = [[NSMutableString alloc] initWithCapacity:(CC_SHA1_DIGEST_LENGTH * 2 + 1 + ksFields.length)];
     
     [KalturaClientBase appendSessionSigWithSecret:aSecret withFields:ksFields withOutput:ksWithSig];
     [ksWithSig appendString:@"|"];
     [ksWithSig appendString:ksFields];
     
+    [ksFields release];
+    
     NSString* result = [ASIHTTPRequest base64forData:[ksWithSig dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [ksWithSig release];
     
     return result;
 }
@@ -1177,29 +897,4 @@ static NSString* KALTURA_SERVICE_FORMAT_XML = @"2";
         [aOutput appendFormat:@"%02x", sha1Hash[i]];
 }
 
-@end
-
-/*
- Class KalturaServiceBase
- */
-@implementation KalturaServiceBase
-
-@synthesize client = _client;
-
-- (id)initWithClient:(KalturaClientBase*)aClient
-{
-    self = [super init];
-    if (self) {
-        self.client = aClient;
-    }
-    
-    return self;
-}
-
-@end
-
-/*
- Class KalturaClientPlugin
- */
-@implementation KalturaClientPlugin
 @end
