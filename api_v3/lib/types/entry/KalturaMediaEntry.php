@@ -122,11 +122,11 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 		if(!in_array($sourceApi, $constants) || $sourceApi == EntrySourceType::SEARCH_PROVIDER)
 		{
 			$this->sourceType = KalturaSourceType::SEARCH_PROVIDER;
-			$this->searchProviderType = $entry->getSource();
+			$this->searchProviderType = $sourceApi;
 		}
 		else
 		{
-			$this->sourceType = $entry->getSource();
+			$this->sourceType = $sourceApi;
 			$this->searchProviderType = null;
 		}
 	}
