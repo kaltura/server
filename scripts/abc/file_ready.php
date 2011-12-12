@@ -27,10 +27,11 @@ $filter->statusIn = implode(',', array(
 	KalturaEntryStatus::READY,
 ));
 $listResult = $client->media->listAction($filter);
-echo "Entries found by referenceIdEqual: $listResult->totalCount\r\n";
+echo "Entries found by referenceIdEqual:". ($listResult->totalCount) ."\r\n";
 if ($listResult->totalCount == 0)
+{
 	throw new Exception('unexpected number of entries');
-
+}
 $entry = reset($listResult->objects);
 echo "entry id: $entry->id\r\n";
 // Add or replace the content of the entry
