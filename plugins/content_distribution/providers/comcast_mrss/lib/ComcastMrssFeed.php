@@ -168,6 +168,7 @@ class ComcastMrssFeed
 		$this->setNodeValue('media:group/media:keywords', $values[ComcastMrssDistributionField::MEDIA_KEYWORDS], $item);
 		$this->setNodeValue('cim:link', $values[ComcastMrssDistributionField::COMCAST_LINK], $item);
 		$this->setNodeValue('cim:brand', $values[ComcastMrssDistributionField::COMCAST_BRAND], $item);
+		$this->setNodeValue('cim:videoContentType', $values[ComcastMrssDistributionField::COMCAST_VIDEO_CONTENT_TYPE], $item);
 		
 		/*
 		$categories = explode(',', $values[ComcastMrssDistributionField::MEDIA_CATEGORIES]);
@@ -226,10 +227,28 @@ class ComcastMrssFeed
 			$mediaGroup = $this->xpath->query('media:group', $item)->item(0);
 			$mediaGroup->appendChild($content);
 			$url = $this->getAssetUrl($flavorAsset);
-			$type = $this->getContentTypeFromUrl($url);
+			
+			// we don't have a way to identify the mime type of the file
+			// as there is no guarantee that the file exists in the current data center
+			// so we will just use those hardcoded conditions
+			switch($flavorAsset->getFileExt())
+			{
+				case 'flv':
+					$mimeType = 'video/x-flv';
+					break;
+				case 'mp4':
+					$mimeType = 'video/mp4';
+					break;
+				case 'mpeg':
+				case 'mpg':
+					$mimeType = 'video/mpeg';
+					break;
+				default:
+					$mimeType = '';
+			}
 			
 			$this->setNodeValue('@url', $url, $content);
-			$this->setNodeValue('@type', $type, $content);
+			$this->setNodeValue('@type', $mimeType, $content);
 			$this->setNodeValue('@fileSize', (int)$flavorAsset->getSize(), $content);
 			$this->setNodeValue('@duration', (int)$flavorAsset->getentry()->getDuration(), $content);
 			$this->setNodeValue('@width', $flavorAsset->getWidth(), $content);
@@ -254,26 +273,6 @@ class ComcastMrssFeed
 			$this->setNodeValue('@url', $url, $content);
 			$this->setNodeValue('@width', $thumbAsset->getWidth(), $content);
 			$this->setNodeValue('@height', $thumbAsset->getHeight(), $content);
-		}
-	}
-	
-	protected function getContentTypeFromUrl($url)
-	{
-		$this->ch = curl_init();
-		curl_setopt($this->ch, CURLOPT_URL, $url);
-		curl_setopt($this->ch, CURLOPT_HEADER, true);
-		curl_setopt($this->ch, CURLOPT_NOBODY, true);
-		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-		$headers = curl_exec($this->ch);
-		if (preg_match('/Content-Type: (.*)/', $headers, $matched))
-		{
-			return trim($matched[1]);
-		}
-		else
-		{
-			KalturaLog::alert('"Content-Type" header was not found for the following URL: '. $url);
-			return null;
 		}
 	}
 	

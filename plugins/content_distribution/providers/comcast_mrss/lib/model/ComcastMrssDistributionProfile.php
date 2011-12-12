@@ -158,6 +158,13 @@ class ComcastMrssDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(ComcastMrssDistributionField::COMCAST_VIDEO_CONTENT_TYPE);
+		$fieldConfig->setUserFriendlyFieldName('ComcastVideoContentType');
+		$fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		
+		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(ComcastMrssDistributionField::START_TIME);
 		$fieldConfig->setUserFriendlyFieldName('Distribution start date');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunrise" />');

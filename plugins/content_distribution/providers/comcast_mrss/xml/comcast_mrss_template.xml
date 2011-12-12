@@ -25,6 +25,7 @@
 			<cim:partnerType>External</cim:partnerType>
 			<cim:link></cim:link>
 			<cim:brand></cim:brand>
+			<cim:videoContentType></cim:videoContentType>
 		</item>
 	</channel>
 </rss>

@@ -19,4 +19,5 @@ interface ComcastMrssDistributionField extends BaseEnum
 	const COMCAST_TV_SERIES				= 'COMCAST_TV_SERIES';
 	const COMCAST_LINK					= 'COMCAST_LINK';
 	const COMCAST_BRAND					= 'COMCAST_BRAND';
+	const COMCAST_VIDEO_CONTENT_TYPE	= 'COMCAST_VIDEO_CONTENT_TYPE';
 }
