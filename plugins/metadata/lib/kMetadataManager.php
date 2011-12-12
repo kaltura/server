@@ -287,11 +287,16 @@ class kMetadataManager
 
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT)
 			{
-				$textItem = implode(' ', $searchItemValues);
-				$textItems[] = $textItem;
-				
-				if(iconv_strlen($textItem, 'UTF-8') < 128) 
-					$searchItems[$profileField->getId()] = $searchItemValues;
+				$textItems[] = implode(' ', $searchItemValues);
+
+				$searchItems[$profileField->getId()] = array();
+				foreach ($searchItemValues as $searchItemValue)
+				{
+					if(iconv_strlen($searchItemValue, 'UTF-8') >= 128)
+						continue;
+						
+					$searchItems[$profileField->getId()][] = $searchItemValue;
+				}
 			}
 			else
 			{
