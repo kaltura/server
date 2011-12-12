@@ -262,8 +262,11 @@ class Form_PartnerConfiguration extends Infra_Form
  	
 		
 	//--------------- Live Stream Params ----------------------------
-		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live', Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE => 'Lime Light Live');
-		
+		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live');
+		if (defined('Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE')) {
+		    $sourceTypes[Kaltura_Client_Enum_SourceType::LIMELIGHT_LIVE] = 'Lime Light Live';
+		}
+
 		$this->addElement('select', 'default_live_stream_entry_source_type', array(
 		   'label'   => 'Live Stream source type:',
 		   'filters'  => array('StringTrim')));
