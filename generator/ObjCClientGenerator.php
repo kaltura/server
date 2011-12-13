@@ -11,6 +11,8 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 	
 	protected $_outputFileBase = '';
 	
+	protected $_projectSections = array();
+	
 	function __construct($xmlPath, $sourcePath = null)
 	{
 		if(!$sourcePath)
@@ -826,11 +828,78 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		}
 		
 		$this->writePluginClass($pluginClassName, $services);
-				
-		$this->addFile("{$this->_outputFileBase}.h", $this->_hFileData);
-		$this->addFile("{$this->_outputFileBase}.m", $this->_mFileData);
+
+		if ($pluginName != '')
+		{
+			$this->addPluginFileToProject($pluginClassName, 'h');
+			$this->addPluginFileToProject($pluginClassName, 'm');
+		}
+		$this->addFile("KalturaClient/KalturaClient/{$this->_outputFileBase}.h", $this->_hFileData);
+		$this->addFile("KalturaClient/KalturaClient/{$this->_outputFileBase}.m", $this->_mFileData);
 		$this->_hFileData = '';
 		$this->_mFileData = '';
+	}
+	
+	function genRandomUid()
+	{
+		// generate a 96 bit random, as used in xCode projects
+		return strtoupper(substr(md5(uniqid(rand(),true)), 0, 24));
+	}
+	
+	function addPluginFileToProject($fileName, $fileExt)
+	{
+		$fileName .= ".$fileExt";
+		$fileID = $this->genRandomUid();
+		$fileRefID = $this->genRandomUid();
+		if ($fileExt == 'h')
+		{
+			$fileCat = 'Headers';
+			$fileType = 'h';
+			$buildPhase = 'PBXHeadersBuildPhase';
+		}
+		else
+		{
+			$fileCat = 'Sources';
+			$fileType = 'objc';
+			$buildPhase = 'PBXSourcesBuildPhase';
+		}
+		
+		$this->addLineToProjectSection(
+			"<<< PBXBuildFile plugins >>>",
+			"\t\t$fileID /* $fileName in $fileCat */ = {isa = PBXBuildFile; fileRef = $fileRefID /* $fileName */; };");
+
+		$this->addLineToProjectSection(
+			"<<< PBXFileReference plugins >>>",
+			"\t\t$fileRefID /* $fileName */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.$fileType; path = $fileName; sourceTree = \"<group>\"; };");
+
+		$this->addLineToProjectSection(
+			"<<< PBXGroup plugins >>>",
+			"\t\t\t\t$fileRefID /* $fileName */,");
+		
+		$this->addLineToProjectSection(
+			"<<< $buildPhase plugins >>>",
+			"\t\t\t\t$fileID /* $fileName in $fileCat */,");
+	}
+	
+	function addLineToProjectSection($sectionName, $line)
+	{
+		if (!array_key_exists($sectionName, $this->_projectSections))
+			$this->_projectSections[$sectionName] = "";
+		else
+			$this->_projectSections[$sectionName] .= "\n";
+		
+		$this->_projectSections[$sectionName] .= $line;
+	}
+	
+	function writeProjectFile()
+	{
+		$projectFilePath = 'KalturaClient/KalturaClient.xcodeproj/project.pbxproj';
+		$projectFileData = file_get_contents($this->_sourcePath . "/" . $projectFilePath);
+		foreach ($this->_projectSections as $sectionName => $sectionData)
+		{
+			$projectFileData = str_replace($sectionName, $sectionData, $projectFileData);
+		}
+		$this->addFile($projectFilePath, $projectFileData);
 	}
 
 	// main
@@ -856,5 +925,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$serviceNamesNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
 			$this->writePlugin($pluginName, $enumNodes, $classNodes, $serviceNodes, $serviceNamesNodes);
 		}
+		
+		$this->writeProjectFile();
 	}		
 }

@@ -7,67 +7,165 @@ namespace Kaltura
 {
     class KalturaClientTester
     {
-        private const int PARTNER_ID = 0000; //enter your partner id
-        private const string SECRET = "71asdac58a5a609a6bc628177bcasdad"; //enter your user secret
-        private const string ADMIN_SECRET = "94f7fc20b92510c31e7emansdmn280b55"; //enter your admin secret
+        private const int PARTNER_ID = 000; //enter your partner id
+        private const string SECRET = "1234567890qwertyuioplkjhgfdsa"; //enter your user secret
+        private const string ADMIN_SECRET = "1234567890qwertyuioplkjhgfdsa"; //enter your admin secret
         private const string SERVICE_URL = "http://www.kaltura.com";
 
         static void Main(string[] args)
         {
             Console.WriteLine("Starting C# Kaltura API Client Library");
 
-            Console.WriteLine("Test local video file upload");
-            FileStream fileStream = new FileStream("DemoVideo.flv", FileMode.Open, FileAccess.Read);
             try
             {
-                StartSessionAndUploadMedia(fileStream);
+                SampleReplaceVideoFlavorAndAddCaption();
             }
             catch (KalturaAPIException e1)
             {
-                Console.WriteLine("Upload media failed for local file [DemoVideo.flv] " + e1.Message);
+                Console.WriteLine("Failed SampleReplaceVideoFlavorAndAddCaption: " + e1.Message);
             }
 
-            Console.WriteLine("Test remote video file import");
-            try
-            {
-                StartSessionAndUploadMedia(new Uri("http://www.kaltura.org/kalorg/kaltura-api-clients-generators/trunk/sources/csharp/KalturaClientTester/DemoVideo.flv"));
-            }
-            catch (KalturaAPIException e2)
-            {
-                Console.WriteLine("Upload media failed for url [http://www.kaltura.org/kalorg/kaltura-api-clients-generators/trunk/sources/csharp/KalturaClientTester/DemoVideo.flv] " + e2.Message);
-            }
-
-            Console.WriteLine("Test Multirequest");
-            try
-            {
-                MultiRequestExample();
-            }
-            catch (KalturaAPIException e3)
-            {
-                Console.WriteLine("Multi request failed " + e3.Message);
-            }
-            Console.WriteLine("Test Multirequest with upload");
-            try
-            {
-                AdvancedMultiRequestExample(fileStream);
-            }
-            catch (KalturaAPIException e4)
-            {
-                Console.WriteLine("Advanced multi request failed " + e4.Message);
-            }
-
-            Console.WriteLine("Test MetaData operations");
             try
             {
                 SampleMetadataOperations();
             }
-            catch (KalturaAPIException e5)
+            catch (KalturaAPIException e1)
             {
-                Console.WriteLine("Metadata operations request failed " + e5.Message);
+                Console.WriteLine("Failed SampleMetadataOperations: " + e1.Message);
+            }
+
+            try
+            {
+                MultiRequestExample();
+            }
+            catch (KalturaAPIException e1)
+            {
+                Console.WriteLine("Failed MultiRequestExample: " + e1.Message);
+            }
+
+            try
+            {
+                AdvancedMultiRequestExample();
+            }
+            catch (KalturaAPIException e1)
+            {
+                Console.WriteLine("Failed AdvancedMultiRequestExample: " + e1.Message);
             }
 
             Console.WriteLine("Client testing is over, press any key to exit");	    
             Console.ReadKey();
+        }
+
+        static KalturaConfiguration GetConfig()
+        {
+            KalturaConfiguration config = new KalturaConfiguration(PARTNER_ID);
+            config.ServiceUrl = SERVICE_URL;
+            return config;
+        }
+        
+        // This will guide you through uploading a video, getting a specific transcoding flavor, replacing a flavor, and uploading a caption file.
+        static void SampleReplaceVideoFlavorAndAddCaption()
+        {
+            // Upload a file
+            Console.WriteLine("1. Upload a video file");
+            FileStream fileStream = new FileStream("DemoVideo.flv", FileMode.Open, FileAccess.Read);
+            KalturaClient client = new KalturaClient(GetConfig());
+            string ks = client.SessionService.Start(ADMIN_SECRET, "MY_USER_ID", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            client.KS = ks;
+            KalturaUploadToken uploadToken = client.UploadTokenService.Add();
+            client.UploadTokenService.Upload(uploadToken.Id, fileStream);
+            KalturaUploadedFileTokenResource mediaResource = new KalturaUploadedFileTokenResource();
+            mediaResource.Token = uploadToken.Id;
+            KalturaMediaEntry mediaEntry = new KalturaMediaEntry();
+            mediaEntry.Name = "Media Entry Using C#.Net Client To Test Flavor Replace";
+            mediaEntry.MediaType = KalturaMediaType.VIDEO;
+            mediaEntry = client.MediaService.Add(mediaEntry);
+            mediaEntry = client.MediaService.AddContent(mediaEntry.Id, mediaResource);
+
+            //verify that the account we're testing has the new iPad flavor enabled
+            Boolean doFlavorReplaceTest = false;
+            KalturaConversionProfile defaultConversionProfile = client.ConversionProfileService.GetDefault();
+            Console.WriteLine("Default conversion include the following flavors (ids): " + defaultConversionProfile.FlavorParamsIds);
+            if (defaultConversionProfile.FlavorParamsIds.Contains("301971") == true)
+            {
+                KalturaConversionProfileAssetParamsFilter filter = new KalturaConversionProfileAssetParamsFilter();
+                filter.AssetParamsIdEqual = 301971;
+                filter.SystemNameEqual = "iPad";
+                KalturaConversionProfileAssetParamsListResponse listConversionProfiles = client.ConversionProfileAssetParamsService.List(filter);
+                if (listConversionProfiles.TotalCount > 0)
+                {
+                    KalturaConversionProfileAssetParams conProfile = listConversionProfiles.Objects[0];
+                    KalturaFlavorParams flavorParams = client.FlavorParamsService.Get(conProfile.AssetParamsId);
+                    if (flavorParams.Tags.Contains("ipadnew"))
+                    {
+                        Console.WriteLine("** Default conversion includes the new iPad flavor");
+                        doFlavorReplaceTest = true;
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("!! Default conversion does NOT include the new iPad flavor");
+                Console.WriteLine("!! Skipping the iPad flavor replace test, make sure account has newiPad flavor enabled.");
+            }
+
+            if (doFlavorReplaceTest == true)
+            {
+                //Detect and Download the iPad flavor -
+                Boolean statusB = false;
+                KalturaFlavorAssetWithParams iPadFlavor = null;
+                while (statusB == false)
+                {
+                    Console.WriteLine("2. Waiting for the iPad flavor");
+                    System.Threading.Thread.Sleep(15000);
+                    IList<KalturaFlavorAssetWithParams> flavors = client.FlavorAssetService.GetFlavorAssetsWithParams(mediaEntry.Id);
+                    foreach (KalturaFlavorAssetWithParams flavor in flavors)
+                    {
+                        if (flavor.FlavorParams.SystemName == "iPad" && flavor.FlavorParams.Tags.Contains("ipadnew"))
+                        {
+                            if (flavor.FlavorAsset == null) continue;
+                            iPadFlavor = flavor;
+                            statusB = flavor.FlavorAsset.Status == KalturaFlavorAssetStatus.READY;
+                            if (flavor.FlavorAsset.Status == KalturaFlavorAssetStatus.NOT_APPLICABLE)
+                            {
+                                //in case the Kaltura Transcoding Decision Layer decided not to convert to this flavor, let's force it.
+                                client.FlavorAssetService.Convert(mediaEntry.Id, iPadFlavor.FlavorParams.Id);
+                            }
+                            Console.WriteLine("3. Found the iPad flavor (" + flavor.FlavorParams.Id + "), Status: " + (statusB ? "Ready to rock!" : "Not ready yet"));
+                        }
+                    }
+                }
+                //this is the download URL for the actual Video file of the iPad flavor
+                string iPadFlavorUrl = client.FlavorAssetService.GetDownloadUrl(iPadFlavor.FlavorAsset.Id);
+                Console.WriteLine("4. iPad Flavor URL is: " + iPadFlavorUrl);
+
+                //now let's replace the flavor with our video file (e.g. after processing the file outside of Kaltura)
+                FileStream fileStreamiPad = new FileStream("DemoVideoiPad.mp4", FileMode.Open, FileAccess.Read);
+                uploadToken = client.UploadTokenService.Add();
+                client.UploadTokenService.Upload(uploadToken.Id, fileStreamiPad);
+                mediaResource = new KalturaUploadedFileTokenResource();
+                mediaResource.Token = uploadToken.Id;
+                KalturaFlavorAsset newiPadFlavor = client.FlavorAssetService.SetContent(iPadFlavor.FlavorAsset.Id, mediaResource);
+                Console.WriteLine("5. iPad Flavor was replaced! id: " + newiPadFlavor.Id);
+            }
+
+            //now let's upload a new caption file to this entry
+            FileStream fileStreamCaption = new FileStream("DemoCaptions.srt", FileMode.Open, FileAccess.Read);
+            uploadToken = client.UploadTokenService.Add();
+            client.UploadTokenService.Upload(uploadToken.Id, fileStreamCaption);
+            KalturaCaptionAsset captionAsset = new KalturaCaptionAsset();
+            captionAsset.Label = "Test C# Uploaded Caption";
+            captionAsset.Language = KalturaLanguage.EN;
+            captionAsset.Format = KalturaCaptionType.SRT;
+            captionAsset.FileExt = "srt";
+            captionAsset = client.CaptionAssetService.Add(mediaEntry.Id, captionAsset);
+            Console.WriteLine("6. Added a new caption asset. Id: " + captionAsset.Id);
+            KalturaUploadedFileTokenResource captionResource = new KalturaUploadedFileTokenResource();
+            captionResource.Token = uploadToken.Id;
+            captionAsset = client.CaptionAssetService.SetContent(captionAsset.Id, captionResource);
+            Console.WriteLine("7. Uploaded a new caption file and attached to caption asset id: " + captionAsset.Id);
+            string captionUrl = client.CaptionAssetService.GetUrl(captionAsset.Id);
+            Console.WriteLine("7. Newly created Caption Asset URL is: " + captionUrl);
         }
 
         static void SampleMetadataOperations()
@@ -102,14 +200,30 @@ namespace Kaltura
             // for the first item returned by the previous listaction
             KalturaMetadataProfileFilter filter = new KalturaMetadataProfileFilter();
             IList<KalturaMetadataProfile> metadata = client.MetadataProfileService.List(filter, pager).Objects;
-            int profileId = metadata[0].Id;
-            string name = entries[0].Name;
-            string id = entries[0].Id;
-            if (metadata[0].Xsd != null) {
-                Console.WriteLine("1. There are custom fields for video: " + name + ", entryid: " + id);
-            } else {
-	            Console.WriteLine("1. There are no custom fields for video: " + name + ", entryid: " + id);
+            int profileId = 0;
+            string name = "";
+            string id = "";
+            
+            if (metadata.Count > 0)
+            {
+                profileId = metadata[0].Id;
+                name = entries[0].Name;
+                id = entries[0].Id;
+                if (metadata[0].Xsd != null)
+                {
+                    Console.WriteLine("1. There are custom fields for video: " + name + ", entryid: " + id);
+                }
+                else
+                {
+                    Console.WriteLine("1. There are no custom fields for video: " + name + ", entryid: " + id);
+                }
             }
+            else
+            {
+                Console.WriteLine("1. This publisher account doesn't have any custom metadata profiles enabled.");
+                Console.WriteLine("Existing the metadata test (enable customer metadata in Admin Console and create a profile in KMC first).");
+            }
+            
             // Add a custom data entry in the KMC  (Settings -> Custom Data)
             KalturaMetadataProfile profile = new KalturaMetadataProfile();
             profile.MetadataObjectType = KalturaMetadataObjectType.ENTRY;
@@ -167,11 +281,10 @@ namespace Kaltura
             }
         }
 
-        /// <summary>
-        /// Shows how to start session and upload media from a local file server
-        /// </summary>
-        /// <param name="fileStream"></param>
-        static void StartSessionAndUploadMedia(FileStream fileStream)
+        // this method is deprecated and should be avoided. 
+        // see above SampleReplaceVideoFlavorAndAddCaption for the current method of uploading media.
+        // new method should use the Add method along with specific appropriate Resource object and Upload Token.
+        static KalturaMediaEntry StartSessionAndUploadMedia(FileStream fileStream)
         {
             KalturaClient client = new KalturaClient(GetConfig());
 
@@ -189,12 +302,13 @@ namespace Kaltura
             mediaEntry = client.MediaService.AddFromUploadedFile(mediaEntry, uploadTokenId);
 
             Console.WriteLine("New media was created with the following id: " + mediaEntry.Id);
+
+            return mediaEntry;
         }
 
-        /// <summary>
-        /// Shows how to start session and upload media from a web accessible server
-        /// </summary>
-        /// <param name="fileStream"></param>
+        // this method is deprecated and should be avoided. 
+        // see above SampleReplaceVideoFlavorAndAddCaption for the current method of uploading media.
+        // new method should use the Add method along with specific appropriate Resource object.
         static void StartSessionAndUploadMedia(Uri url)
         {
             KalturaClient client = new KalturaClient(GetConfig());
@@ -253,7 +367,7 @@ namespace Kaltura
         /// <summary>
         /// Shows how to start session, create a mix, add media, and append it to a mix timeline using multi request
         /// </summary>
-        private static void AdvancedMultiRequestExample(FileStream fileStream)
+        private static void AdvancedMultiRequestExample()
         {
             KalturaClient client = new KalturaClient(GetConfig());
 
@@ -263,34 +377,28 @@ namespace Kaltura
             client.SessionService.Start(ADMIN_SECRET, "", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
             client.KS = "{1:result}"; // for the current multi request, the result of the first call will be used as the ks for next calls
 
-            KalturaMixEntry mixEntry = new KalturaMixEntry();
-            mixEntry.Name = ".Net Mix";
-            mixEntry.EditorType = KalturaEditorType.SIMPLE;
+            FileStream fileStream = new FileStream("DemoVideo.flv", FileMode.Open, FileAccess.Read);
 
             // Request 2
-            client.MixingService.Add(mixEntry);
-
+            KalturaUploadToken uploadToken = client.UploadTokenService.Add();
+            
             // Request 3
-            client.MediaService.Upload(fileStream);
-
-            KalturaMediaEntry mediaEntry = new KalturaMediaEntry();
-            mediaEntry.Name = "Media Entry For Mix";
-            mediaEntry.MediaType = KalturaMediaType.VIDEO;
-
+            uploadToken = client.UploadTokenService.Upload("{2:result}", fileStream);
+            
             // Request 4
-            client.MediaService.AddFromUploadedFile(mediaEntry, "");
+            KalturaMediaEntry mediaEntry = new KalturaMediaEntry();
+            mediaEntry.Name = "Media Entry Using C#.Net Client To Test Flavor Replace";
+            mediaEntry.MediaType = KalturaMediaType.VIDEO;
+            mediaEntry = client.MediaService.Add(mediaEntry);
 
             // Request 5
-            client.MixingService.AppendMediaEntry("", "");
-
-            // Map request 3 result to request 4 uploadTokeId param
-            client.MapMultiRequestParam(3, 4, "uploadTokenId");
-
-            // Map request 2 result.id to request 5 mixEntryId
-            client.MapMultiRequestParam(2, "id", 5, "mixEntryId");
-
-            // Map request 4 result.id to request 5 mediaEntryId
-            client.MapMultiRequestParam(4, "id", 5, "mediaEntryId");
+            KalturaUploadedFileTokenResource mediaResource = new KalturaUploadedFileTokenResource();
+            mediaResource.Token = "{2:result:id}";
+            mediaEntry = client.MediaService.AddContent("{4:result}", mediaResource);
+            
+            // map paramters from responses to requests according to response calling order and names to request calling order and C# method parameter name
+            client.MapMultiRequestParam(2, ":id", 3, "uploadTokenId");
+            client.MapMultiRequestParam(4, ":id", 5, "entryId");
 
             KalturaMultiResponse response = client.DoMultiRequest();
 
@@ -303,18 +411,11 @@ namespace Kaltura
             }
 
             // when accessing the response object we will use an index and not the response number (response number - 1)
-            if (response[1].GetType() == typeof(KalturaMixEntry))
+            if (response[4].GetType() == typeof(KalturaMediaEntry))
             {
-                mixEntry = (KalturaMixEntry)response[1];
-                Console.WriteLine("The new mix entry id is: " + mixEntry.Id);
+                KalturaMediaEntry newMediaEntry = (KalturaMediaEntry)response[4];
+                Console.WriteLine("Multirequest newly added entry id: " + newMediaEntry.Id);
             }
-        }
-
-        static KalturaConfiguration GetConfig()
-        {
-            KalturaConfiguration config = new KalturaConfiguration(PARTNER_ID);
-            config.ServiceUrl = SERVICE_URL;
-            return config;
         }
     }
 }
