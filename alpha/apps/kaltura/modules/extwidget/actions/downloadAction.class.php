@@ -128,7 +128,7 @@ class downloadAction extends sfAction
 	
 	private static function encodeUrl($url)
 	{
-		return str_replace(array(' ', '[', ']'), array('%20', '%5B', '%5D'), $url);
+		return str_replace(array('?', '|', '*', '\\', '/' , '>' , '<', '&', '[', ']'), '_', $url);
 	}
 	
 	private function dumpFile($file_path, $file_name)
