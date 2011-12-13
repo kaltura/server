@@ -49,8 +49,14 @@
     <Content Include="DemoVideo.flv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="DemoVideoiPad.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DemoCaptions.srt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="MetadataSchema.xsd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
