@@ -50,6 +50,7 @@ class kuserPeer extends BasekuserPeer
 			$c = new Criteria();
 			$c->add(self::PARTNER_ID, $partner_id);
 			$c->add(self::PUSER_ID, $puser_id);
+			$c->add(self::status, KuserStatus::ACTIVE);
 			return self::doSelectOne($c);			
 		}
 		
