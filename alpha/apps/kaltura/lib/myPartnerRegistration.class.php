@@ -39,6 +39,7 @@ class myPartnerRegistration
 	const KALTURAS_DEFAULT_REGISTRATION_CONFIRMATION = 54;
 	const KALTURAS_EXISTING_USER_REGISTRATION_CONFIRMATION = 55;
 	const KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION = 56;
+	const KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION = 57;
 	
 	public function sendRegistrationInformationForPartner ($partner, $skip_emails, $existingUser )
 	{
@@ -102,6 +103,17 @@ class myPartnerRegistration
 					$bodyParams = array($userName, $loginEmail, $partnerId, $resetPasswordLink, $kmcLink, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
 				}
 				break;
+			//blackboard
+			case Partner::PARTNER_TYPE_BLACKBOARD:
+				if ($existingUser) {
+					$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;
+					$bodyParams = array($userName, $loginEmail, $partnerId, $contactLink, $contactPhone, $beginnersGuideLink, $quickStartGuideLink);
+				}
+				else {
+					$mailType = self::KALTURAS_BLACKBOARD_DEFAULT_REGISTRATION_CONFIRMATION;
+					$bodyParams = array($resetPasswordLink, $loginEmail, $partnerId, $kmcLink);
+				}
+				break;	
 			default: // all others
 			 	if ($existingUser) {
 					$mailType = self::KALTURAS_DEFAULT_EXISTING_USER_REGISTRATION_CONFIRMATION;

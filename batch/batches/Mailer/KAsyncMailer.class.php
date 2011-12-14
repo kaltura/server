@@ -244,7 +244,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		$body = vsprintf( $body, $bodyParamsArray );
 		if ($isHtml)
 		{
-			$body = str_replace( "<BR>", "<br />", $body );
+			$body = str_replace( "<BR>", "<br />\n", $body );
 			$body = '<p align="left" dir="ltr">'.$body.'</p>';
 		}
 		else
