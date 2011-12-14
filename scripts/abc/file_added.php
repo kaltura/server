@@ -1,7 +1,7 @@
 <?php
 
 if ($argc < 2)
-	throw new Exception("Invalid argument. Usage: php new_file.php <full path>");
+	throw new Exception("Invalid argument. Usage: php new_file.php <full path> <conversion profile system name>");
 
 $conversionProfileName = null;
 if ($argc == 3)
@@ -44,6 +44,7 @@ $filter->statusIn = implode(',', array(
 	KalturaEntryStatus::READY,
 ));
 $listResult = $client->media->listAction($filter);
+$existingEntry = null;
 if ($listResult->totalCount != 0)
 {
     echo "Entry already exists. Replacing ". $listResult[0]->id;
@@ -80,7 +81,7 @@ if (!$existingEntry)
 	$adEntry = $client->media->add($entry);
     $meta = "<metadata><Title>$show</Title><FormatType>$contentType</FormatType><SourceType>$sourceType</SourceType><SourceVideoFile>".$path_parts['basename']."</SourceVideoFile></metadata>";
     $client->metadata->add($mdprof, KalturaMetadataObjectType::ENTRY, $adEntry->id, $meta); 
-    echo "Setting metadata profile $mdprof entryid $adEntry->id XMl $meta\r\n";
+    echo "Setting metadata profile $mdprof entryid ".$adEntry->id ."XML $meta\r\n";
 }
 else 
 {

@@ -22,7 +22,7 @@ $cps = $client->conversionProfile->listAction($filter);
 if ($cps->totalCount == 1)
 	$cpid = $cps->objects[0]->id;
 else 
-	throw new Exception("cannot find cpid sysname=$conversionProfileName");
+	throw new Exception("cannot find cpid sysname=$src");
 
 $cps->objects[0]->name = $dstnm;
 $cps->objects[0]->systemName = $dst;

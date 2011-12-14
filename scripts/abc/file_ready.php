@@ -1,9 +1,10 @@
 <?php
 
-if (count($argv) != 2)
+if ($argc != 2)
 	throw new Exception("Invalid argument. Usage: php new_file.php <full path>");
 
 $ini = parse_ini_file("abc.ini");
+
 require_once ($ini["CLIENT_LIBS"]."/php5/KalturaClient.php");
 $incomingFilename = $argv[1];
 $path_parts = pathinfo($incomingFilename);
@@ -33,10 +34,10 @@ if ($listResult->totalCount == 0)
 	throw new Exception('unexpected number of entries');
 }
 $entry = reset($listResult->objects);
-echo "entry id: $entry->id\r\n";
+echo "entry id: ". $entry->id."\r\n";
 // Add or replace the content of the entry
 $resource = new KalturaRemoteStorageResource();
 $resource->storageProfileId = $ini["ABC_SOURCE_STORAGE_PROFILE_ID"];
-$resource->url = $path_parts['basename'];//$ini["URL_BASE"].$path_parts['basename'];
-//echo "URL: $resource->url\r\n";
+$resource->url = $incomingFilename;
+
 $client->media->updateContent($entry->id, $resource);
