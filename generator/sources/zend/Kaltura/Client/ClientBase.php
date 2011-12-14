@@ -96,6 +96,7 @@ class Kaltura_Client_ClientBase
 		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
 		$this->addParam($params, "clientTag", $this->config->clientTag);
+		$this->addParam($params, "ignoreNull", true);
 		
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
@@ -146,6 +147,7 @@ class Kaltura_Client_ClientBase
 		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
 		$this->addParam($params, "clientTag", $this->config->clientTag);
+		$this->addParam($params, "ignoreNull", true);
 		
 		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
 		if ($this->isMultiRequest)
