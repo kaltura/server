@@ -96,7 +96,6 @@ class Kaltura_Client_ClientBase
 		$this->addParam($params, "apiVersion", $this->apiVersion);
 		$this->addParam($params, "format", $this->config->format);
 		$this->addParam($params, "clientTag", $this->config->clientTag);
-		$this->addParam($params, "ignoreNull", true);
 		
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
