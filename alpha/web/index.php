@@ -11,7 +11,7 @@ function checkCache()
 
 	if (function_exists('apc_fetch'))
 	{
-		$url = apc_fetch("redirect-".$_SERVER["REQUEST_URI"]);
+		$url = apc_fetch("redirect-".$protocol.$_SERVER["REQUEST_URI"]);
 		if ($url)
 		{
 			$max_age = 60;
