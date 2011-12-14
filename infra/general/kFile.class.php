@@ -597,7 +597,10 @@ class kFile
 	public static function cacheRedirect($url)
 	{
 		if (function_exists('apc_store'))
-			apc_store("redirect-".$_SERVER["REQUEST_URI"], $url, 60);
+		{
+			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+			apc_store("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
+		}
 	}
 
 	public static function dumpUrl($url, $allowRange = true, $passHeaders = false)
