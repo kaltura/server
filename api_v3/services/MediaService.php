@@ -654,7 +654,16 @@ class MediaService extends KalturaEntryService
 	function updateAction($entryId, KalturaMediaEntry $mediaEntry)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-
+		if (!$dbEntry)
+		{ 
+			$dcIndex = explode('_', $entryId);
+			$dcIndex = $dcIndex[0];
+			if (in_array($dcIndex, kDataCenterMgr::getDcIds()) && $dcIndex != kDataCenterMgr::getCurrentDcId())
+			{
+				kalturaLog::debug("EntryID [$entryId] wasn't found on current DC. dumping the request to DC id [$dcIndex]");
+				kFile::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ($dcIndex ) );
+			}
+		}
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
