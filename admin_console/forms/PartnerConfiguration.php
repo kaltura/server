@@ -142,12 +142,10 @@ class Form_PartnerConfiguration extends Infra_Form
 //--------------------------- Content Ingestion Options ---------------------------	
 		$this->addElement('text', 'def_thumb_offset', array(
 			'label'	  => 'Default Thumbnail Offset',
-			'required' 		=> true,
 		));	
 
 		$this->addElement('text', 'def_thumb_density', array(
 			'label'	  => 'Default Thumbnail Density',
-			'required' 		=> true,
 		));	
 
 		$this->addElement('checkbox', 'enable_bulk_upload_notifications_emails', array(
