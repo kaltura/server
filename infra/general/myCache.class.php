@@ -33,6 +33,7 @@ class myCache
 			if (!function_exists('memcache_connect')) return;
 						
 			self::$s_memcache = new Memcache;
+			$connStart = microtime(true);
 			//self::$s_memcache->pconnect(self::SERVER, self::PORT) // this will use a persistent connection 
 			try {
 				$res = @self::$s_memcache->connect( kConf::get ( "memcache_host") , kConf::get ( "memcache_port" ) );
@@ -40,6 +41,8 @@ class myCache
 			catch (Exception $e) {
 				$res = false;
 			}
+			KalturaLog::debug("myCache: connect took - ". (microtime(true) - $connStart). " seconds to ".kConf::get("memcache_host"));
+			
 			if ( !$res )
 			{
 				KalturaLog::info( "ERROR: Error while trying to connect to memcache. Make sure it is properly running on " . 
