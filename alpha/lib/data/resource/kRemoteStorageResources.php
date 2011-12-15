@@ -34,9 +34,9 @@ class kRemoteStorageResources extends kUrlResource implements IRemoteStorageReso
 	 */
 	public function getFileExt()  
 	{
-		if (!count($this->getResources()))
+		if (!count($this->resources))
 			return null;
 			
-		return reset($this->getResources())->getFileExt();
+		return reset($this->resources)->getFileExt();
 	}
 }
