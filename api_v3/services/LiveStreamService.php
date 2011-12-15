@@ -203,15 +203,24 @@ class LiveStreamService extends KalturaEntryService
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
 		$dbEntry->setKuserId($this->getKuser()->getId());
 		$dbEntry->setStatus(entryStatus::IMPORT);
-		$dbEntry->save();
 		
 		$te = new TrackEntry();
 		$te->setEntryId( $dbEntry->getId() );
 		$te->setTrackEventTypeId( TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY );
 		$te->setDescription(  __METHOD__ . ":" . __LINE__ . "::ENTRY_MEDIA_SOURCE_AKAMAI_LIVE" );
 		TrackEntry::addTrackEntry( $te );
-
-		kJobsManager::addProvisionProvideJob(null, $dbEntry);
+		
+		//if type is manual don't create batch job, just change entry status to ready
+		if ($liveStreamEntry->sourceType == KalturaSourceType::MANUAL_LIVE_STREAM)
+		{
+			$dbEntry->setStatus(entryStatus::READY);
+			$dbEntry->save();
+		}
+		else
+		{
+			$dbEntry->save();
+			kJobsManager::addProvisionProvideJob(null, $dbEntry);
+		}
  			
 		return $dbEntry;
 	}	

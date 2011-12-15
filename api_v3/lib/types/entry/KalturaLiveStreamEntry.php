@@ -50,6 +50,12 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 	 */
 	public $streamName;
 	
+	/**
+	 * The stream url
+	 * 
+	 * @var string
+	 */
+	public $streamUrl;
 	
 	private static $map_between_objects = array
 	(
@@ -59,6 +65,7 @@ class KalturaLiveStreamEntry extends KalturaMediaEntry
 		"primaryBroadcastingUrl",
 		"secondaryBroadcastingUrl",
 		"streamName",
+		"streamUrl",
 	);
 
 	public function __construct()

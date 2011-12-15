@@ -13,5 +13,5 @@ interface EntrySourceType extends BaseEnum
 	const SEARCH_PROVIDER = 6;
 
 	const AKAMAI_LIVE = 29;
-	
+	const MANUAL_LIVE_STREAM = 30;
 }
