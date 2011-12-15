@@ -2,7 +2,7 @@
 
 class kQueryCache 
 {
-	const INVALIDATION_TIME_MARGIN_SEC = 300;		// When comparing the invalidation key timestamp to the query timestamp, 
+	const INVALIDATION_TIME_MARGIN_SEC = 60;		// When comparing the invalidation key timestamp to the query timestamp, 
 													// the query timestamp should be greater by this value to use the cache
 	const QUERY_MASTER_TIME_MARGIN_SEC = 300;		// The time frame after a change to a row during which we should query the master
 	const MAX_CACHED_OBJECT_COUNT = 100;			// Select queries that return more objects than this const will not be cached
@@ -12,6 +12,7 @@ class kQueryCache
 	
 	const CACHE_PREFIX_QUERY = 'QCQ-';				// = Query Cache - Query
 	const CACHE_PREFIX_INVALIDATION_KEY = 'QCI-';	// = Query Cache - Invalidation key
+	const DONT_CACHE_KEY = 'QCC-DontCache';			// when set new queries won't be cached in the memcache
 	
 	const QUERY_TYPE_SELECT = 'sel-';
 	const QUERY_TYPE_COUNT =  'cnt-';
@@ -152,6 +153,7 @@ class kQueryCache
 		
 		$keysToGet = $invalidationKeys;
 		$keysToGet[] = $cacheKey;
+		$keysToGet[] = self::DONT_CACHE_KEY;
 		
 		$queryStart = microtime(true);
 		$cacheResult = self::$s_memcache->get($keysToGet);
@@ -165,20 +167,31 @@ class kQueryCache
 			unset($cacheResult[$cacheKey]);
 		}
 		
+		// don't cache the result if the 'dont cache' flag is enabled
+		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult) &&
+			$cacheResult[self::DONT_CACHE_KEY])
+		{
+			KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
+			$cacheKey = null;
+			unset($cacheResult[self::DONT_CACHE_KEY]);
+		}
+		
 		// check whether we should query the master
+		$queryDB = self::QUERY_DB_SLAVE;
 		$currentTime = time();
 		foreach ($cacheResult as $invalidationKey => $invalidationTime)
-		{
+		{			
 			if ($currentTime < $invalidationTime + self::QUERY_MASTER_TIME_MARGIN_SEC)
 			{
 				KalturaLog::debug("kQueryCache: changed recently -> query master, peer=$peerClassName, invkey=$invalidationKey querytime=$currentTime invtime=$invalidationTime");
 				$queryDB = self::QUERY_DB_MASTER;
-				$cacheKey = null;		// No reason to cache the query since it won't be used anyway 
-				return null;
+				if ($currentTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
+				{
+					$cacheKey = null;		// No reason to cache the query since it won't be used anyway
+					return null;
+				}
 			}
 		}
-
-		$queryDB = self::QUERY_DB_SLAVE;
 		
 		// check whether we have a valid cached query
 		if (!$queryResult)
