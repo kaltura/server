@@ -150,6 +150,7 @@ class kQueryCache
 			$invalidationKeys[$index] = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 		}
 		$cacheKey = self::CACHE_PREFIX_QUERY.$queryType.md5(serialize($criteria));
+		$origCacheKey = $cacheKey;
 		
 		$keysToGet = $invalidationKeys;
 		$keysToGet[] = $cacheKey;
@@ -196,7 +197,7 @@ class kQueryCache
 		// check whether we have a valid cached query
 		if (!$queryResult)
 		{	
-			KalturaLog::debug("kQueryCache: cache miss, peer=$peerClassName, key=$cacheKey");
+			KalturaLog::debug("kQueryCache: cache miss, peer=$peerClassName, key=$origCacheKey");
 			return null;
 		}
 		
@@ -209,7 +210,7 @@ class kQueryCache
 			
 			if ($queryTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
 			{
-				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$cacheKey, invkey=$invalidationKey querytime=$queryTime invtime=$invalidationTime");
+				KalturaLog::debug("kQueryCache: cached query invalid, peer=$peerClassName, key=$origCacheKey, invkey=$invalidationKey querytime=$queryTime invtime=$invalidationTime");
 				return null;
 			}
 		}
@@ -217,7 +218,7 @@ class kQueryCache
 		// return from memcache
 		$existingInvKeys = implode(',', $existingInvKeys);
 		
-		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$cacheKey queryTime=$queryTime invkeys=[$existingInvKeys]");
+		KalturaLog::debug("kQueryCache: returning from memcache, peer=$peerClassName, key=$origCacheKey queryTime=$queryTime invkeys=[$existingInvKeys]");
 		return $queryResult;
 	}
 	
