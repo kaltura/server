@@ -296,7 +296,7 @@ class kAkamaiUrlManager extends kUrlManager
 		$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 		if(!$storage)
 			return parent::getFileSyncUrl($fileSync);
-		
+	
 		$serverUrl = $storage->getDeliveryIisBaseUrl();
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
 		
@@ -305,6 +305,8 @@ class kAkamaiUrlManager extends kUrlManager
 		
 		if($fileSync->getObjectSubType() != entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
 			return parent::getFileSyncUrl($fileSync);
+
+		$serverUrl = myPartnerUtils::getIisHost($fileSync->getPartnerId(), "http");	
 		
 		$path = $partnerPath.'/serveIsm/objectId/' . $fileSync->getObjectId() . '_' . $fileSync->getObjectSubType() . '_' . $fileSync->getVersion() . '.' . pathinfo(kFileSyncUtils::resolve($fileSync)->getFilePath(), PATHINFO_EXTENSION) . '/manifest';
 //		$path = $partnerPath.'/serveIsm/objectId/'.pathinfo(kFileSyncUtils::resolve($fileSync)->getFilePath(), PATHINFO_BASENAME).'/manifest';		
@@ -320,7 +322,10 @@ class kAkamaiUrlManager extends kUrlManager
 		$window = $this->params['smooth_auth_seconds'];
 		$param = $this->params['smooth_auth_param'];
 		$salt = $this->params['smooth_auth_salt'];
-		$authPath = $this->urlauth_gen_url($path, $param, $window, $salt, null, null);
+		if ($salt)
+			$authPath = $this->urlauth_gen_url($path, $param, $window, $salt, null, null);
+		else
+			$authPath = $path;
 		
 		return $serverUrl . '/' . $authPath;
 	}
