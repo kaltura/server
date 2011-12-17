@@ -187,8 +187,6 @@ class QuickPlayDistributionPlugin extends KalturaPlugin implements IKalturaPermi
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-		$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
-		/* @var $distributionProfile QuickPlayDistributionProfile */
 	}
 	
 	/**

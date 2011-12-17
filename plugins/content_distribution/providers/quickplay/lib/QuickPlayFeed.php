@@ -3,8 +3,10 @@
  * @package plugins.quickPlayDistribution
  * @subpackage lib
  */
-class QuickPlayFeedHelper
+class QuickPlayFeed
 {
+	const TEMPLATE_XML = 'quickplay_template.xml';
+	
 	/**
 	 * @var DOMDocument
 	 */
@@ -50,12 +52,12 @@ class QuickPlayFeedHelper
 	 * @param KalturaQuickPlayDistributionProfile $distributionProfile
 	 * @param KalturaQuickPlayDistributionJobProviderData $providerData
 	 */
-	public function __construct($templateName, KalturaDistributionJobData $distributionJobData, KalturaQuickPlayDistributionJobProviderData $providerData, array $flavorAssets, array $thumbnailAssets, entry $entry)
+	public function __construct(KalturaDistributionJobData $distributionJobData, KalturaQuickPlayDistributionJobProviderData $providerData, array $flavorAssets, array $thumbnailAssets, entry $entry)
 	{
 		$this->_distributionJobData = $distributionJobData;
 		$this->_distributionProfile = $distributionJobData->distributionProfile;
 		$this->_providerData = $providerData;
-		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . $templateName;
+		$xmlTemplate = realpath(dirname(__FILE__) . '/../') . '/xml/' . self::TEMPLATE_XML;
 		$this->_doc = new DOMDocument();
 		$this->_doc->load($xmlTemplate);
 		$this->_xpath = new DOMXPath($this->_doc);
@@ -187,8 +189,8 @@ class QuickPlayFeedHelper
 	public function setNodeValueDate($xpath, $value, DOMNode $contextnode = null)
 	{
 		$dateTime = new DateTime('@'.$value);
-		// force time zone to EST
-		$dateTime->setTimezone(new DateTimeZone('EST'));
+		// force time zone to GMT
+		$dateTime->setTimezone(new DateTimeZone('GMT'));
 		$date = $dateTime->format('r');
 		$this->setNodeValue($xpath, $date, $contextnode);
 	}
@@ -234,7 +236,7 @@ class QuickPlayFeedHelper
 		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 		$headers = curl_exec($this->ch);
-		if (preg_match('/Content-Type: (.*)/', $headers, $matched))
+		if (preg_match('/Content-Type: ([^;]*)/', $headers, $matched))
 		{
 			return trim($matched[1]);
 		}

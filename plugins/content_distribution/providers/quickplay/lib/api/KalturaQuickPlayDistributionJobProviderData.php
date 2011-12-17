@@ -9,6 +9,16 @@ class KalturaQuickPlayDistributionJobProviderData extends KalturaConfigurableDis
 	 * @var string
 	 */
 	public $xml;
+	
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $videoFilePaths;
+
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $thumbnailFilePaths;
 
 	/**
 	 * Called on the server side and enables you to populate the object with any data from the DB
@@ -23,23 +33,39 @@ class KalturaQuickPlayDistributionJobProviderData extends KalturaConfigurableDis
 			
 		if(!($distributionJobData->distributionProfile instanceof KalturaQuickPlayDistributionProfile))
 			return;
+			
+		$this->videoFilePaths = new KalturaStringArray();
+		$this->thumbnailFilePaths = new KalturaStringArray();
 
 		// loads all the flavor assets that should be submitted to the remote destination site
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
 		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
-		$verizonFeed = new QuickPlayFeedHelper('quickplay_template.xml', $distributionJobData, $this, $flavorAssets, $thumbAssets, $entry);
-		$this->xml = $verizonFeed->getXml();
 		
-		// save the flavors & their versions that we are sending
-		$distributionJobData->mediaFiles = new KalturaDistributionRemoteMediaFileArray();
-		foreach($flavorAssets as $flavorAsset)
+		foreach($flavorAssets as $asset)
 		{
-			$mediaFile = new KalturaDistributionRemoteMediaFile();
-			$mediaFile->assetId = $flavorAsset->getId();
-			$mediaFile->version = $flavorAsset->getVersion();
-			$distributionJobData->mediaFiles[] = $mediaFile;
+			$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			if(kFileSyncUtils::fileSync_exists($syncKey))
+			{
+				$str = new KalturaString();
+				$str->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			    $this->videoFilePaths[] = $str;
+			}
 		}
+		
+		foreach($thumbAssets as $asset)
+		{
+			$syncKey = $asset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			if(kFileSyncUtils::fileSync_exists($syncKey))
+			{
+				$str = new KalturaString();
+				$str->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			    $this->thumbnailFilePaths[] = $str;
+			}
+		}
+		
+		$feed = new QuickPlayFeed($distributionJobData, $this, $flavorAssets, $thumbAssets, $entry);
+		$this->xml = $feed->getXml();
 	}
 		
 	/**

@@ -57,20 +57,37 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		
 		$fileName = $data->entryDistribution->entryId . '_' . date('Y-m-d_H-i-s') . '.xml';
 		KalturaLog::debug('Sending file '. $fileName);
-		die($providerData->xml);
-		$ftpManager = $this->getFTPManager($distributionProfile);
-		$tmpFile = tmpfile();
-		if ($tmpFile === false)
-			throw new Exception('Failed to create tmp file');
-		fwrite($tmpFile, $providerData->xml);
-		rewind($tmpFile);
-		$res = ftp_fput($ftpManager->getConnection(), $fileName, $tmpFile, FTP_ASCII);
-		fclose($tmpFile);
+		KalturaLog::debug('XML data:'. $providerData->xml);
 		
+		$sftpManager = $this->getSFTPManager($distributionProfile);
+		
+		// upload the thumbnails
+		foreach($providerData->thumbnailFilePaths as $thumbnailFilePath)
+		{
+			/* @var $thumbnailFilePath KalturaString */
+			if (!file_exists($thumbnailFilePath->value))
+				throw new KalturaDistributionException('Thumbnail file path ['.$thumbnailFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
+				
+			$sftpManager->putFile(pathinfo($thumbnailFilePath->value, PATHINFO_BASENAME), $thumbnailFilePath->value);
+		}
+		
+		// upload the video files
+		foreach($providerData->videoFilePaths as $videoFilePath)
+		{
+			/* @var $videoFilePath KalturaString */
+			if (!file_exists($videoFilePath->value))
+				throw new KalturaDistributionException('Video file path ['.$videoFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
+				
+			$sftpManager->putFile(pathinfo($videoFilePath->value, PATHINFO_BASENAME), $videoFilePath->value);
+		}
+		
+		// upload the metadata file
+		$res = $sftpManager->filePutContents($fileName, $providerData->xml);
+				
 		if ($res === false)
-			throw new Exception('Failed to upload tmp file to ftp');
+			throw new Exception('Failed to upload metadata file to sftp');
 			
-		KalturaLog::info('File was sent successfully');
+		KalturaLog::info('Package was sent successfully');
 			
 		$data->remoteId = $fileName;
 		$data->sentData = $providerData->xml;
@@ -86,15 +103,15 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 	/**
 	 * 
 	 * @param KalturaQuickPlayDistributionProfile $distributionProfile
-	 * @return ftpMgr
+	 * @return sftpMgr
 	 */
-	protected function getFTPManager(KalturaQuickPlayDistributionProfile $distributionProfile)
+	protected function getSFTPManager(KalturaQuickPlayDistributionProfile $distributionProfile)
 	{
-		$host = $distributionProfile->ftpHost;
-		$login = $distributionProfile->ftpLogin;
-		$pass = $distributionProfile->ftpPass;
-		$ftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
-		$ftpManager->login($host, $login, $pass);
-		return $ftpManager;
+		$host = $distributionProfile->sftpHost;
+		$login = $distributionProfile->sftpLogin;
+		$pass = $distributionProfile->sftpPass;
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$sftpManager->login($host, $login, $pass);
+		return $sftpManager;
 	}
 }
