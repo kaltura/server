@@ -68,7 +68,7 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 			if (!file_exists($thumbnailFilePath->value))
 				throw new KalturaDistributionException('Thumbnail file path ['.$thumbnailFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
 				
-			$sftpManager->putFile(pathinfo($thumbnailFilePath->value, PATHINFO_BASENAME), $thumbnailFilePath->value);
+			$sftpManager->putFile('/upload/'.pathinfo($thumbnailFilePath->value, PATHINFO_BASENAME), $thumbnailFilePath->value);
 		}
 		
 		// upload the video files
@@ -78,11 +78,11 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 			if (!file_exists($videoFilePath->value))
 				throw new KalturaDistributionException('Video file path ['.$videoFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
 				
-			$sftpManager->putFile(pathinfo($videoFilePath->value, PATHINFO_BASENAME), $videoFilePath->value);
+			$sftpManager->putFile('/upload/'.pathinfo($videoFilePath->value, PATHINFO_BASENAME), $videoFilePath->value);
 		}
 		
 		// upload the metadata file
-		$res = $sftpManager->filePutContents($fileName, $providerData->xml);
+		$res = $sftpManager->filePutContents('/upload/'.$fileName, $providerData->xml);
 				
 		if ($res === false)
 			throw new Exception('Failed to upload metadata file to sftp');
