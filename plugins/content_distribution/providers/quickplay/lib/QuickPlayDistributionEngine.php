@@ -110,7 +110,7 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		$host = $distributionProfile->sftpHost;
 		$login = $distributionProfile->sftpLogin;
 		$pass = $distributionProfile->sftpPass;
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::FTP);
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
 		$sftpManager->login($host, $login, $pass);
 		return $sftpManager;
 	}
