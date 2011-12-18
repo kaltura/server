@@ -18,10 +18,6 @@ KAutoloader::register();
 
 error_reporting ( E_ALL );
 
-$dbConf = kConf::getDB ();
-DbManager::setConfig ( $dbConf );
-DbManager::initialize ();
-
 $availModes = array('gensqls', 'execute');
 
 if ($argc < 2)
