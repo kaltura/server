@@ -73,9 +73,9 @@ class KalturaRequestDeserializer
 			
 			if ($actionParam->isFile())
 			{
-				if (isset($_FILES[$name])) // FIXME: KalturaRequestDeserializer doesn't depend on $_POST or $_GET, so its a not a good idea to access $_FILES here 
+				if (array_key_exists($name, $this->paramsGrouped)) 
 				{
-					$serviceArguments[]	= $_FILES[$name];
+					$serviceArguments[]	= $this->paramsGrouped[$name];
 					continue;
 				}
 				
@@ -260,9 +260,9 @@ class KalturaRequestDeserializer
 			
 			if ($property->isFile())
 			{
-				if (isset($_FILES["{$objectName}:$name"])) 
+				if (isset($params[$name]))
 				{
-					$obj->$name = $_FILES["{$objectName}:$name"];
+					$obj->$name = $params[$name];
 				}
 				continue;
 			}
