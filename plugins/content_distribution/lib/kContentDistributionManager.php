@@ -877,6 +877,6 @@ class kContentDistributionManager
 			foreach($validationErrors as $validationError)
 				$searchValues[] = self::getSearchStringDistributionValidationError($validationError->getErrorType(), $distributionProfileId);
 		}
-		return implode(',', $searchValues);
+		return implode(' ', $searchValues);
 	}
 }
