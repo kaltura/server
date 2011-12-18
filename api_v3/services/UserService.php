@@ -267,10 +267,23 @@ class UserService extends KalturaBaseUserService
 
 		$userFilter = new kuserFilter();
 		$filter->toObject($userFilter);
-	
+		
 		$c = new Criteria();
-		$c->addAnd(kuserPeer::PUSER_ID, NULL, Criteria::ISNOTNULL);
 		$userFilter->attachToCriteria($c);
+		
+		if (!is_null($filter->roleIdEqual))
+		{
+			$roleCriteria = new Criteria();
+			$roleCriteria->add ( KuserToUserRolePeer::USER_ROLE_ID , $filter->roleIdEqual );
+			$roleCriteria->addSelectColumn(KuserToUserRolePeer::KUSER_ID);
+			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
+			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
+						
+			$c->add(kuserPeer::ID, $kuserIds, Criteria::IN);
+		}
+		
+		$c->addAnd(kuserPeer::PUSER_ID, NULL, Criteria::ISNOTNULL);
+		
 		$totalCount = kuserPeer::doCount($c);
 		
 		$pager->attachToCriteria($c);

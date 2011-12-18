@@ -75,5 +75,10 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	 */
 	public $loginEnabledEqual;
 	
+	/**
+	 * @var string
+	 */
+	public $roleIdEqual;
+	
 	
 }

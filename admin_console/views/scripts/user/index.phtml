@@ -1,5 +1,6 @@
 
 <p><?php echo $this->translate('users intro text'); ?></p>
+<p><?php echo $this->form; ?></p>
 <div id="list_admins_panel" class="panel">
 	<table>
 		<thead>
@@ -78,6 +79,7 @@ function doAction(action, userId) {
 			break;
 	}
 }
+
 function block(userId) {
 	changeStatus(userId, 'block');
 }
@@ -248,4 +250,21 @@ $(function(){
 	<?php // reset the paginator form action, when trying to update or add new user the url will be wrong ?>
 	$("form#frmPaginator1").attr('action', '<?php echo $this->url(array('controller' => 'user', 'action' => 'index'), null, true); ?>');
 });
+
+jQuery('#filter_type').change(function() {
+	if(this.value == "none") {
+		$("#filter_text").css("display","none");
+		$("div.help").hide();
+	}
+	else {
+		$("#filter_text").css("display","inline");
+		$("#filter_text input").focus();
+		if(this.value == "free")
+			$("div.help").show();
+		else
+			$("div.help").hide();
+	}
+});
+
+jQuery('#filter_type').change();
 </script>

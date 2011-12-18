@@ -3,23 +3,69 @@ class UserController extends Zend_Controller_Action
 {
 	public function indexAction()
 	{
-		$client = Infra_ClientHelper::getClient();
-			
+		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
+		$client = Infra_ClientHelper::getClient();
+		
+		// reset form url
+		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')), null, true);
+		$form = new Form_UserFilter();
+		$form->setAction($action);
+		
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		$userRoles = $client->userRole->listAction();
+		Form_PackageHelper::addPackagesToForm($form, $userRoles->objects, 'user_roles', true, 'All Service Editions');
+		
+		$this->view->partnerPackages = array();
 		
 		$config = Zend_Registry::get('config');
 		
-		$filter = new Kaltura_Client_Type_UserFilter();
-		$filter->partnerIdEqual = $config->settings->partnerId;
-		$filter->orderBy = Kaltura_Client_Enum_UserOrderBy::CREATED_AT_DESC;
-		$paginatorAdapter = new Infra_FilterPaginator($client->user, "listAction", null, $filter);
+		// init filter
+		$userFilter = $this->getUserFilterFromRequest($request);
+		$userFilter->partnerIdEqual = $config->settings->partnerId;
+		$userFilter->orderBy = Kaltura_Client_Enum_UserOrderBy::CREATED_AT_DESC;
+		
+		$paginatorAdapter = new Infra_FilterPaginator($client->user, "listAction", null, $userFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
 		
 		$this->view->myEmail = Zend_Auth::getInstance()->getIdentity()->getUser()->email;
 		$this->view->paginator = $paginator;
+
+							
+		// populate the form
+		$form->populate($request->getParams());
+		
+		// set view
+		$this->view->form = $form;
+	}
+	
+	private function getUserFilterFromRequest(Zend_Controller_Request_Abstract $request)
+	{
+		$filter = new Kaltura_Client_Type_UserFilter();
+		$filterType = $request->getParam('filter_type');
+		$filterInput = $request->getParam('filter_input');
+		$user_roles = $request->getParam('user_roles');
+		
+		switch ($filterType)
+		{
+			case "byid":
+				$filter->idin = $filterInput;
+				break;
+			case "byname":
+				$filter->screenNameLike = $filterInput;
+				break;
+			case 'byemail':
+				$filter->emailLike = $filterInput;
+				break;
+		}
+		
+		if ($user_roles != '')
+			$filter->roleIdEqual = $user_roles;
+		
+		return $filter;
 	}
 	
 	public function createAction()
