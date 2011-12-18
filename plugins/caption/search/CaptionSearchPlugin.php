@@ -162,7 +162,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		
 		$dataField = CaptionSearchPlugin::getSearchFieldName(CaptionSearchPlugin::SEARCH_FIELD_DATA);
 		$searchValues = array(
-			$dataField => CaptionSearchPlugin::PLUGIN_NAME . ' ' . implode(',', $data) . ' ' . CaptionSearchPlugin::SEARCH_TEXT_SUFFIX
+			$dataField => CaptionSearchPlugin::PLUGIN_NAME . ' ' . implode(' ', $data) . ' ' . CaptionSearchPlugin::SEARCH_TEXT_SUFFIX
 		);
 		
 		return $searchValues;

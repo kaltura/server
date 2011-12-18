@@ -231,7 +231,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 				
 				foreach ($sphinxPluginData as $fieldName => $fieldValue){
 					if (isset($sphinxPluginsData[$fieldName]))
-						$sphinxPluginsData[$fieldName] .= ',' . $fieldValue;
+						$sphinxPluginsData[$fieldName] .= ' ' . $fieldValue;
 					else{
 						$sphinxPluginsData[$fieldName] = $fieldValue;
 					}				
