@@ -775,7 +775,7 @@ abstract class kFileTransferMgr
 	protected function writeFileInChunks($fileToReadHandle, $fileToWriteHandle)
 	{
 		$content = null;
-		$chunkSize = 4096; // how many bytes per chunk 
+		$chunkSize = 1024 * 1024; // how many bytes per chunk 
 		if (is_null($fileToReadHandle) || is_null($fileToWriteHandle)) 
 		{ 
 			return false;
