@@ -243,7 +243,7 @@
     
     // return: object, params: string, file
     NSString* uploadFilePath = [[NSBundle mainBundle] pathForResource:fileBase ofType:fileExt];
-    token = [self->_client.uploadToken uploadWithUploadTokenId:token.id withFileData:uploadFilePath];
+    [self->_client.uploadToken uploadWithUploadTokenId:token.id withFileData:uploadFilePath];
     assert(self->_client.error == nil);
     
     return entry;
@@ -370,7 +370,7 @@
     [self->_client.media deleteWithEntryId:entry.id];
     assert(self->_client.error == nil);
 
-    [NSThread sleepForTimeInterval:1];          // wait for the status to update
+    [NSThread sleepForTimeInterval:5];          // wait for the status to update
     entryCount = [self->_client.media countWithFilter:mediaFilter];
     assert(self->_client.error == nil);
     assert(entryCount == 0);

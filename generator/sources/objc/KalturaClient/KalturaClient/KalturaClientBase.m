@@ -65,6 +65,13 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 @synthesize code = _code;
 @synthesize message = _message;
 
+- (void)dealloc
+{
+    [self->_code release];
+    [self->_message release];
+    [super dealloc];
+}
+
 - (KalturaFieldType)getTypeOfCode
 {
     return KFT_String;
@@ -132,6 +139,13 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     return self;
 }
 
+- (void)dealloc
+{
+    [self->_key release];
+    [self->_value release];
+    [super dealloc];
+}
+
 - (NSComparisonResult)compare:(KalturaParam*)aOtherParam
 {
     NSComparisonResult keyCompare = [self.key compare:aOtherParam.key];
@@ -170,6 +184,13 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     self.value = aValue;
 
     return self;
+}
+
+- (void)dealloc
+{
+    [self->_key release];
+    [self->_value release];
+    [super dealloc];
 }
 
 @end
