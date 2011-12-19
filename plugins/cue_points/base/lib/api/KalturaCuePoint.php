@@ -142,7 +142,8 @@ class KalturaCuePoint extends KalturaObject implements IFilterable
 		
 		if($dbCuePoint->getKuserId() !== null){
 			$dbKuser = kuserPeer::retrieveByPK($dbCuePoint->getKuserId());
-			$this->userId = $dbKuser->getPuserId();
+			if($dbKuser)
+				$this->userId = $dbKuser->getPuserId();
 		}
 	}
 	
