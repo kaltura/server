@@ -19,6 +19,7 @@ KalturaLog::setContext("syndicationFeedRenderer");
 
 KalturaLog::debug(">------------------------------------- syndicationFeedRenderer -------------------------------------");
 KalturaLog::info("syndicationFeedRenderer-start ");
+KalturaLog::debug("getFeed Params [" . print_r(requestUtils::getRequestParams(), true) . "]");
 
 $feedId = $_GET['feedId'];
 $entryId = (isset($_GET['entryId']) ? $_GET['entryId'] : null);
