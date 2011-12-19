@@ -499,6 +499,7 @@ class category extends Basecategory
 	{
 		$c = new Criteria();
 		$c->add(categoryPeer::FULL_NAME, $this->getFullName() . '%', Criteria::LIKE);
+		$c->addAnd(categoryPeer::PARTNER_ID,$this->getPartnerId(),Criteria::EQUAL);
 		return categoryPeer::doSelect($c);
 	}
 	
