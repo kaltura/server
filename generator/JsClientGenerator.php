@@ -22,6 +22,11 @@ class JsClientGenerator extends ClientGeneratorFromXml
 		parent::ClientGeneratorFromXml($xmlPath, 'sources/js');
 	}
 	
+	function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
+	
 	/**
 	* Parses the higher-level of the schema, divide parsing to five steps:
 	* Enum creation, Object (VO) classes, Services and actions, Main, and project file.

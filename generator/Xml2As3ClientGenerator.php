@@ -9,6 +9,11 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 		parent::ClientGeneratorFromXml($xmlFilePath, "sources/as3");
 	}
 	
+	function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
+	
 	public function generate(  ) 
 	{
 		parent::generate();

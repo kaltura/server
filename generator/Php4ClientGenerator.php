@@ -13,6 +13,11 @@ class Php4ClientGenerator extends ClientGeneratorFromXml
 		$this->_doc->load($this->_xmlFile);
 	}
 	
+	function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
+	
 	function generate() 
 	{
 		parent::generate();

@@ -36,6 +36,11 @@ abstract class ClientGeneratorFromXml
 			
 		if (($sourcePath !== null) && !(file_exists($sourcePath)))
 			throw new Exception("Source path was not found [$sourcePath]");
+
+		$this->_licenseBuffer = file_get_contents(dirname(__FILE__).'/sources/license.txt');
+		$this->_licenseBuffer = str_replace('//', $this->getSingleLineCommentMarker(), $this->_licenseBuffer);
+
+		$this->addFile('agpl.txt', file_get_contents(dirname(__FILE__).'/sources/agpl.txt'), false);
 	}
 	
 	public function generate()
@@ -61,9 +66,14 @@ abstract class ClientGeneratorFromXml
 		return $this->_params[$key];
 	}
 	
-	protected function addFile($fileName, $fileContents)
+	protected function addFile($fileName, $fileContents, $addLicense = true)
 	{
-		 $this->_files[$fileName] = $fileContents;
+		if ($addLicense)
+		{
+			$fileContents = $this->_licenseBuffer . $fileContents;
+		}
+		
+		$this->_files[$fileName] = $fileContents;
 	}
 	
 	protected function addSourceFiles($directory)
@@ -72,7 +82,7 @@ abstract class ClientGeneratorFromXml
 		if (is_file($directory)) 
 		{
 			$file = str_replace($this->_sourcePath.DIRECTORY_SEPARATOR, "", $directory);
-			$this->addFile($file, file_get_contents($directory));
+			$this->addFile($file, file_get_contents($directory), false);
 			return;
 		}
 		
@@ -145,4 +155,11 @@ abstract class ClientGeneratorFromXml
 	{
 		return $this->_txt;
 	}
+
+	/* 
+	 * returns the symbol used for single line comments, e.g. //
+	 * 
+	 * @return string 
+	 */
+	protected abstract function getSingleLineCommentMarker();
 }

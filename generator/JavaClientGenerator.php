@@ -21,6 +21,11 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 		$this->_doc->load ( $this->_xmlFile );
 	}
 	
+	function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
+	
 	public function generate() 
 	{
 		parent::generate();

@@ -23,6 +23,11 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		$this->_doc->load($this->_xmlFile);
 	}
 	
+	function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
+	
 	// utility functions
 	function getObjCType($propType)
 	{
@@ -237,9 +242,9 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$propertyValue = $constNode->getAttribute("value");
 			if ($enumNode->getAttribute("enumType") == "string")
 			{
-				$this->appendHLine("+ (const NSString*)$propertyName;");
+				$this->appendHLine("+ (NSString*)$propertyName;");
 				
-				$this->appendMLine("+ (const NSString*)$propertyName");
+				$this->appendMLine("+ (NSString*)$propertyName");
 				$this->appendMLine('{');
 				$this->appendMLine("    return @\"$propertyValue\";");
 				$this->appendMLine('}');
@@ -646,7 +651,11 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 			$paramName = $paramNode->getAttribute("name");
 			$paramName = $this->upperCaseFirstLetter($paramName);
 			$paramType = $paramNode->getAttribute("type");
-			$paramType = $this->getObjCType($paramType);
+
+			if ($paramType == 'array')
+				$paramType = "NSArray*";
+			else
+				$paramType = $this->getObjCType($paramType);
 			
 			if ($paramIndex < $paramNodes->length - 1 && 
 				(is_null($paramCount) || $paramIndex < $paramCount - 1))

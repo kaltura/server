@@ -18,6 +18,11 @@ class PhpZendClientGenerator extends ClientGeneratorFromXml
 		$this->_doc->load($this->_xmlFile);
 	}
 	
+	function getSingleLineCommentMarker()
+	{
+		return '//';
+	}
+	
 	private function cacheEnum(DOMElement $enumNode)
 	{
 		$enumName = $enumNode->getAttribute('name');
