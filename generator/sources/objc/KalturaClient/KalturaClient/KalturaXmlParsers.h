@@ -1,5 +1,3 @@
-#import <libxml/parser.h>
-
 /*
  Forward declarations
  */
@@ -27,7 +25,8 @@
  */
 @interface KalturaLibXmlWrapper : NSObject
 {
-    xmlParserCtxtPtr _xmlCtx;
+    struct _xmlParserCtxt* _xmlCtx;
+    NSMutableString* _foundChars;
 }
 
 @property (nonatomic, assign) id<KalturaLibXmlWrapperDelegate> delegate;

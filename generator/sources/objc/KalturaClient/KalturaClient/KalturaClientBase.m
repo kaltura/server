@@ -25,7 +25,7 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
 {
     if (aStr == nil)
         return NO;
-    if ([aStr compare:@"1"] == NSOrderedSame)
+    if ([aStr compare:@"1"] != NSOrderedSame)
         return NO;
     return YES;
 }
@@ -343,11 +343,18 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     if (aVal == nil)
         return;
     
-    [self pushKey:aKey]; 
+    if ([aVal isMemberOfClass:[KalturaObjectBase class]])
+    {
+        [self putNullKey:aKey];
+    }
+    else
+    {
+        [self pushKey:aKey]; 
 
-    [aVal toParams:self isSuper:NO];
+        [aVal toParams:self isSuper:NO];
     
-    [self popKey:aKey]; 
+        [self popKey:aKey]; 
+    }
 }
 
 - (void)addIfDefinedKey:(NSString*)aKey withArray:(NSArray*)aVal
@@ -417,20 +424,27 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     }
 }
 
++ (NSString*)allocUrlEncodedString:(NSString*)origStr
+{
+    return (NSString*)CFURLCreateStringByAddingPercentEscapes(
+        NULL, 
+        (CFStringRef)origStr, 
+        NULL, 
+        (CFStringRef)@"!*'();:@&=+$,/?%#[] \"\\<>{}|^~`", 
+        kCFStringEncodingUTF8);
+}
+
 - (void)appendQueryString:(NSMutableString*)output
 {
     while (self->_params.count)
     {
         KalturaParam* curParam = [self->_params lastObject];
-        NSString *encodedVal = (NSString*)CFURLCreateStringByAddingPercentEscapes(
-            NULL, 
-            (CFStringRef)curParam.value, 
-            NULL, 
-            (CFStringRef)@"!*'();:@&=+$,/?%#[] \"\\<>{}|^~`", 
-            kCFStringEncodingUTF8);
-        [output appendFormat:@"%@=%@&", curParam.key, encodedVal];
+        NSString *encodedKey = [KalturaParams allocUrlEncodedString:curParam.key];
+        NSString *encodedVal = [KalturaParams allocUrlEncodedString:curParam.value];
+       [output appendFormat:@"%@=%@&", encodedKey, encodedVal];
         [encodedVal release];
-        [self->_params removeLastObject];
+        [encodedKey release];
+       [self->_params removeLastObject];
     }
 }
 
@@ -731,6 +745,22 @@ NSString* const KalturaClientErrorDomain = @"KalturaClientErrorDomain";
     if (!self->_isMultiRequest)
     {
         @throw [KalturaClientException exceptionWithName:@"EndWithoutMultiReq" reason:@"doMultiRequest called while not in multirequest" userInfo:nil];
+    }
+    
+    KalturaXmlParserMultirequest* multiReqParser = (KalturaXmlParserMultirequest*)self->_reqParser;
+    if (![multiReqParser reqCount])
+    {
+        [self cancelRequest];
+        
+        if (self.delegate == nil)
+        {
+            return [NSArray array];
+        }
+        else
+        {
+            [self.delegate requestFinished:self withResult:[NSArray array]];
+            return nil;
+        }
     }
         
     return [self issueRequestWithQuery:@"service=multirequest"];

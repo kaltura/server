@@ -9,11 +9,13 @@
 #define KALTURA_UNDEF_INT       INT_MIN
 #define KALTURA_UNDEF_FLOAT     NAN
 #define KALTURA_UNDEF_STRING    (nil)
+#define KALTURA_UNDEF_OBJECT    (nil)
 
 #define KALTURA_NULL_BOOL   ((BOOL)CHAR_MAX)
 #define KALTURA_NULL_INT    INT_MAX
 #define KALTURA_NULL_FLOAT  INFINITY
 #define KALTURA_NULL_STRING (@"__null_string__")
+#define KALTURA_NULL_OBJECT ([[[KalturaObjectBase alloc] init] autorelease])
 
 extern NSString* const KalturaClientErrorDomain;
 

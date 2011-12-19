@@ -1,5 +1,6 @@
 #import "KalturaXmlParsers.h"
 #import "KalturaClientBase.h"
+#import <libxml/parser.h>
 
 @interface KalturaLibXmlWrapper()
 
@@ -79,12 +80,13 @@ static void XMLCDECL saxCallbackError (void *ctx,
     tSaxHandler.initialized = XML_SAX2_MAGIC;
     
     self->_xmlCtx = xmlCreatePushParserCtxt(&tSaxHandler, self, NULL, 0, NULL);
-    
+        
     return self;
 }
 
 - (void)dealloc
 {
+    [self->_foundChars release];
     xmlFreeParserCtxt(self->_xmlCtx);
     [super dealloc];
 }
@@ -103,8 +105,23 @@ static void XMLCDECL saxCallbackError (void *ctx,
     [self release];
 }
 
+- (void)flushChars
+{
+    if (self->_foundChars == nil)
+        return;
+    
+    if ([self.delegate respondsToSelector:@selector(parser:foundCharacters:)])
+    {
+        [self.delegate parser:self foundCharacters:self->_foundChars];
+    }
+    [self->_foundChars release];
+    self->_foundChars = nil;
+}
+
 - (void)startElement:(const xmlChar *)aName
 {
+    [self flushChars];
+    
     if (![self.delegate respondsToSelector:@selector(parser:didStartElement:)])
         return;
     
@@ -117,6 +134,8 @@ static void XMLCDECL saxCallbackError (void *ctx,
 
 - (void)endElement:(const xmlChar *)aName
 {
+    [self flushChars];
+    
     if (![self.delegate respondsToSelector:@selector(parser:didEndElement:)])
         return;
     
@@ -129,18 +148,23 @@ static void XMLCDECL saxCallbackError (void *ctx,
 
 - (void)characters:(const xmlChar *)aChars withLength:(int)aLen
 {
-    if (![self.delegate respondsToSelector:@selector(parser:foundCharacters:)])
-        return;
+    NSMutableString* chars = [[NSMutableString alloc] initWithBytes:aChars length:aLen encoding:NSUTF8StringEncoding];
     
-    NSString* chars = [[NSString alloc] initWithBytes:aChars length:aLen encoding:NSUTF8StringEncoding];
-    
-    [self.delegate parser:self foundCharacters:chars];
-    
-    [chars release];
+    if (self->_foundChars != nil)
+    {
+        [self->_foundChars appendString:chars];
+        [chars release];
+    }
+    else
+    {
+        self->_foundChars = chars;
+    }
 }
 
 - (void)error:(const char *)aFormat withArgs:(va_list)aArgs
 {
+    [self flushChars];
+    
     if (![self.delegate respondsToSelector:@selector(parser:parseErrorOccurred:)])
         return;
     
@@ -338,6 +362,8 @@ static void XMLCDECL saxCallbackError (void *ctx,
     if (self->_targetException == nil && self->_subParser.result == nil)
     {
         self.error = [NSError errorWithDomain:KalturaClientErrorDomain code:KalturaClientErrorEmptyObject userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Got an empty object element", NSLocalizedDescriptionKey, nil]];        
+        [self.delegate parsingFailed:self];
+        return;
     }
     [self callDelegateAndDetach];
 }
