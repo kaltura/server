@@ -5,7 +5,7 @@
 class myPlaylistUtils
 {
 	// change the total results to 30 for performance reasons
-	const TOTAL_RESULTS = 50;//100;
+	const TOTAL_RESULTS = 200;
 	
 	private static $user_cache = null;
 	
