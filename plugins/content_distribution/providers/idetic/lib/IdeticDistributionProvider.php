@@ -95,6 +95,9 @@ class IdeticDistributionProvider extends ConfigurableDistributionProvider
 	 */
 	public function isLocalFileRequired($jobType)
 	{
+		if($jobType == ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT))
+			return true;
+		
 		return false;
 	}
 
