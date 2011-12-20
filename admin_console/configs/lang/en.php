@@ -981,7 +981,7 @@ return array(
 	'entry-investigate track entry userIp th' => 'User IP',
 
 	// Distibution
-	'provider-list intro text'	=>	'From here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
+	'provider-list intro text'	=>	'Here you can define and manage generic distribution settings to be used in several Distribution Profiles. To have these settings available for all publisher accounts, define the setting to publisher ID: 0',
 	'distribution-profiles intro text' =>	'Here you can manage the Distribution profiles on your Kaltura video platform deployment',
 
 	// Drop Folder
