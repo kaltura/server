@@ -55,8 +55,19 @@ while($line = stream_get_line($fp, 65535, "\n"))
 	$res2 = issueQuery($conn2, $query);
         $serverTime2 += microtime(true) - $startTime;
 	
+	if (strpos($query, 'ORDER BY ') === false && is_array($res1) && is_array($res2))
+	{
+		sort($res1);
+		sort($res2);
+	}
+
 	if ($res1 != $res2)
-		print "ERROR - $query\n";
+	{
+		$sev = 'ERROR';
+		if (strpos($query, 'ORDER BY ') === false && is_array($res1) && is_array($res2) && count($res1) == 1000 && count($res2) == 1000)
+			$sev = 'WARNING';
+		print "$sev - $query\n";
+	}
 	else
 		print '.';
 	sleep(.1);
