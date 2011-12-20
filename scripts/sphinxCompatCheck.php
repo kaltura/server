@@ -6,8 +6,7 @@ function createSphinxConnection($sphinxServer, $port = 9312)
 	
 	try
 	{
-		$con = new KalturaPDO($dsn);
-		$con->setCommentsEnabled(false);
+		$con = new PDO($dsn);
 		return $con;
 	}
 	catch(PropelException $pex)
@@ -44,10 +43,12 @@ while($line = stream_get_line($fp, 65535, "\n"))
 	if ($selectPos === false)
 		continue;
 	$query = substr($line, $selectPos);
-	$res1 = issueQuery($conn1);
-	$res2 = issueQuery($conn2);
+	$res1 = issueQuery($conn1, $query);
+	$res2 = issueQuery($conn2, $query);
 	
 	if ($res1 != $res2)
 		print "ERROR - $query\n";
+	else
+		print '.';
 }
 fclose($fp);
