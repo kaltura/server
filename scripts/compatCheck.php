@@ -2,6 +2,7 @@
 
 define('PS2_START_MARKER', 'symfony [info] {sfRequest} request parameters ');
 define('APIV3_START_MARKER', '[KalturaFrontController->run] DEBUG: Params [');
+define('APIV3_GETFEED_MARKER', '[syndicationFeedRenderer] [global] DEBUG: getFeed Params [');
 
 function print_r_reverse($in) {
     $lines = explode("\n", trim($in));
@@ -419,6 +420,29 @@ function processRequest($parsedParams)
 	testAction($fullActionName, $parsedParams, $uri, $parsedParams);
 }
 
+function processFeedRequest($parsedParams)
+{
+	$fullActionName = "getfeed";
+		
+	if (isRequestExpired($parsedParams))
+	{
+		return;
+	}
+	
+	switch (shouldProcessRequest($fullActionName, $parsedParams))
+	{
+	case 'quit':
+		return true;
+		
+	case 'no':
+		return;
+	}
+	
+	$uri = "/api_v3/getFeed.php?" . http_build_query($parsedParams, null, "&");
+	
+	testAction($fullActionName, $parsedParams, $uri);
+}
+
 function processApiV3Log($handle, $origSize)
 {
 	$inParams = false;
@@ -426,10 +450,21 @@ function processApiV3Log($handle, $origSize)
 		if (!$inParams)
 		{
 			$markerPos = strpos($buffer, APIV3_START_MARKER);
-			if ($markerPos === false)
+			if ($markerPos !== false)
+			{
+				$params = substr($buffer, $markerPos + strlen(APIV3_START_MARKER));
+				$inParams = true;
+				$isFeed = false;
 				continue;
-			$params = substr($buffer, $markerPos + strlen(APIV3_START_MARKER));
-			$inParams = true;
+			}
+			$markerPos = strpos($buffer, APIV3_GETFEED_MARKER);
+			if ($markerPos !== false)
+			{
+				$params = substr($buffer, $markerPos + strlen(APIV3_GETFEED_MARKER));
+				$inParams = true;
+				$isFeed = true;
+				continue;
+			}
 		}
 		else
 		{
@@ -442,7 +477,16 @@ function processApiV3Log($handle, $origSize)
 					continue;
 				}
 
-				if (processRequest($parsedParams))
+				if ($isFeed)
+				{
+					$shouldQuit = processFeedRequest($parsedParams);
+				}
+				else
+				{
+					$shouldQuit = processRequest($parsedParams);
+				}
+				
+				if ($shouldQuit)
 				{
 					break;
 				}
