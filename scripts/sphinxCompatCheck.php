@@ -36,6 +36,9 @@ if ($argc < 3)
 $conn1 = createSphinxConnection($argv[1]);
 $conn2 = createSphinxConnection($argv[2]);
 
+$serverTime1 = 0;
+$serverTime2 = 0;
+
 $fp = fopen("php://stdin","r");
 while($line = stream_get_line($fp, 65535, "\n"))
 {
@@ -43,12 +46,21 @@ while($line = stream_get_line($fp, 65535, "\n"))
 	if ($selectPos === false)
 		continue;
 	$query = substr($line, $selectPos);
+
+	$startTime = microtime(true);
 	$res1 = issueQuery($conn1, $query);
+	$serverTime1 += microtime(true) - $startTime;
+
+        $startTime = microtime(true);
 	$res2 = issueQuery($conn2, $query);
+        $serverTime2 += microtime(true) - $startTime;
 	
 	if ($res1 != $res2)
 		print "ERROR - $query\n";
 	else
 		print '.';
+	sleep(.1);
 }
 fclose($fp);
+
+print "\nDone\nServer1 took $serverTime1\nServer2 took $serverTime2\n";
