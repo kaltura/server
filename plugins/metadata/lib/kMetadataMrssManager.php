@@ -112,7 +112,7 @@ class kMetadataMrssManager implements IKalturaMrssContributor
 						if ($mrssParams)
 						{
 							$recursionMrssParams = clone $mrssParams;
-							$recursionMrssParams->setItemXpathsToExtend(null);			// stop the recursion
+							$recursionMrssParams->setItemXpathsToExtend(array());			// stop the recursion
 						}
 						$relatedEntryMrss = kMrssManager::getEntryMrssXml($relatedEntry, $relatedItemField, $recursionMrssParams);
 					}			
