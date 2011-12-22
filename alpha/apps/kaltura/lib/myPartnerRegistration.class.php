@@ -222,9 +222,9 @@ class myPartnerRegistration
 	 		kPermissionManager::setPs2Permission($newPartner);
 	 	
 	 	if ($newPartner->getType() == Partner::PARTNER_TYPE_ADMIN_CONSOLE)
-	 		kPermissionManager::setFlavorVersionPermission($newPartner, PermissionName::FEATURE_V2_FLAVORS);
+	 		kPermissionManager::sePermissionForPartner($newPartner, PermissionName::FEATURE_V2_FLAVORS);
 	 	else
-	 		kPermissionManager::setFlavorVersionPermission($newPartner, PermissionName::FEATURE_V1_FLAVORS);	
+	 		kPermissionManager::sePermissionForPartner($newPartner, PermissionName::FEATURE_V1_FLAVORS);	
 		
 		$newPartner->setKmcVersion(kConf::get('new_partner_kmc_version'));
 		$newPartner->save();

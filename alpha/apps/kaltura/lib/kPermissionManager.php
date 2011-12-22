@@ -927,7 +927,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * add ps2 permission for given partner
 	 * @param Partner $partner
 	 */
-	public static function setFlavorVersionPermission(Partner $partner, $permission)
+	public static function sePermissionForPartner(Partner $partner, $permission)
  	{		
  		$ps2Permission = new Permission();
  		$ps2Permission->setName($permission);
