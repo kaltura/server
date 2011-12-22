@@ -449,7 +449,7 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 			$compileElement->setAttribute("Include", str_replace("/","\\", $include));
 			$compileItemGroupElement->appendChild($compileElement);
 		}
-		$this->addFile("KalturaClient/KalturaClient.csproj", $csprojDoc->saveXML());
+		$this->addFile("KalturaClient/KalturaClient.csproj", $csprojDoc->saveXML(), false);
 	}
 	
 	function writeService(DOMElement $serviceNode)
@@ -903,10 +903,15 @@ class CSharpClientGenerator extends ClientGeneratorFromXml
 	 */
 	private function fixParamName($param)
 	{
-		if ($param == "event")
-			return "kevent";
-		else 
-			return $param;
+		switch ($param)
+		{
+			case "event":
+				return "kevent";
+			case "params":
+				return "params_";
+			default:
+				return $param;
+		}
 	}
 }
 ?>

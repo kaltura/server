@@ -1,4 +1,4 @@
-// ===================================================================================================
+﻿// ===================================================================================================
 //                           _  __     _ _
 //                          | |/ /__ _| | |_ _  _ _ _ __ _
 //                          | ' </ _` | |  _| || | '_/ _` |
@@ -25,7 +25,7 @@
 //
 // @ignore
 // ===================================================================================================
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -35,9 +35,10 @@ namespace Kaltura
     class KalturaClientTester
     {
         private const int PARTNER_ID = 000; //enter your partner id
-        private const string SECRET = "1234567890qwertyuioplkjhgfdsa"; //enter your user secret
-        private const string ADMIN_SECRET = "1234567890qwertyuioplkjhgfdsa"; //enter your admin secret
+        private const string SECRET = "0000000a5a609a6bc628177bcfdd5d"; //enter your user secret
+        private const string ADMIN_SECRET = "000000092510c31e7e6e3491280b55"; //enter your admin secret
         private const string SERVICE_URL = "http://www.kaltura.com";
+        private const string USER_ID = "UserWeKnow";
 
         static void Main(string[] args)
         {
@@ -89,6 +90,26 @@ namespace Kaltura
             config.ServiceUrl = SERVICE_URL;
             return config;
         }
+
+        //this function checks if a given flavor system name exist in the account.
+        static int? CheckIfFlavorExist(String name)
+        {
+            KalturaClient client = new KalturaClient(GetConfig());
+            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            client.KS = ks;
+			
+            //verify that the account we're testing has the new iPad flavor enabled on the default conversion profile
+            KalturaConversionProfile defaultProfile = client.ConversionProfileService.GetDefault();
+            KalturaConversionProfileAssetParamsFilter  flavorsListFilter = new KalturaConversionProfileAssetParamsFilter();
+            flavorsListFilter.SystemNameEqual = name;
+			flavorsListFilter.ConversionProfileIdEqual = defaultProfile.Id;
+			
+            KalturaConversionProfileAssetParamsListResponse list = client.ConversionProfileAssetParamsService.List(flavorsListFilter);
+            if (list.TotalCount > 0)
+                return list.Objects[0].AssetParamsId;
+            else
+                return null;
+        }
         
         // This will guide you through uploading a video, getting a specific transcoding flavor, replacing a flavor, and uploading a caption file.
         static void SampleReplaceVideoFlavorAndAddCaption()
@@ -97,7 +118,7 @@ namespace Kaltura
             Console.WriteLine("1. Upload a video file");
             FileStream fileStream = new FileStream("DemoVideo.flv", FileMode.Open, FileAccess.Read);
             KalturaClient client = new KalturaClient(GetConfig());
-            string ks = client.SessionService.Start(ADMIN_SECRET, "MY_USER_ID", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
             client.KS = ks;
             KalturaUploadToken uploadToken = client.UploadTokenService.Add();
             client.UploadTokenService.Upload(uploadToken.Id, fileStream);
@@ -109,70 +130,64 @@ namespace Kaltura
             mediaEntry = client.MediaService.Add(mediaEntry);
             mediaEntry = client.MediaService.AddContent(mediaEntry.Id, mediaResource);
 
-            //verify that the account we're testing has the new iPad flavor enabled
-            Boolean doFlavorReplaceTest = false;
-            KalturaConversionProfile defaultConversionProfile = client.ConversionProfileService.GetDefault();
-            Console.WriteLine("Default conversion include the following flavors (ids): " + defaultConversionProfile.FlavorParamsIds);
-            if (defaultConversionProfile.FlavorParamsIds.Contains("301971") == true)
+            //verify that the account we're testing has the iPad flavor enabled
+            int? flavorId = CheckIfFlavorExist("iPad");
+            if (flavorId == null)
             {
-                KalturaConversionProfileAssetParamsFilter filter = new KalturaConversionProfileAssetParamsFilter();
-                filter.AssetParamsIdEqual = 301971;
-                filter.SystemNameEqual = "iPad";
-                KalturaConversionProfileAssetParamsListResponse listConversionProfiles = client.ConversionProfileAssetParamsService.List(filter);
-                if (listConversionProfiles.TotalCount > 0)
-                {
-                    KalturaConversionProfileAssetParams conProfile = listConversionProfiles.Objects[0];
-                    KalturaFlavorParams flavorParams = client.FlavorParamsService.Get(conProfile.AssetParamsId);
-                    if (flavorParams.Tags.Contains("ipadnew"))
-                    {
-                        Console.WriteLine("** Default conversion includes the new iPad flavor");
-                        doFlavorReplaceTest = true;
-                    }
-                }
+                Console.WriteLine("!! Default conversion profile does NOT include the new iPad flavor");
+                Console.WriteLine("!! Skipping the iPad flavor replace test, make sure account has newiPad flavor enabled.");
             }
             else
             {
-                Console.WriteLine("!! Default conversion does NOT include the new iPad flavor");
-                Console.WriteLine("!! Skipping the iPad flavor replace test, make sure account has newiPad flavor enabled.");
-            }
-
-            if (doFlavorReplaceTest == true)
-            {
-                //Detect and Download the iPad flavor -
+                int iPadFlavorId = (int)flavorId; //C# failsafe from nullable int - we cast it to int
+                Console.WriteLine("** Default conversion profile includes the new iPad flavor, id is: " + iPadFlavorId);
+                
+                //Detect the conversion readiness status of the iPad flavor and download the file when ready -
                 Boolean statusB = false;
-                KalturaFlavorAssetWithParams iPadFlavor = null;
+                KalturaFlavorAsset iPadFlavor = null;
                 while (statusB == false)
                 {
-                    Console.WriteLine("2. Waiting for the iPad flavor");
-                    System.Threading.Thread.Sleep(15000);
-                    IList<KalturaFlavorAssetWithParams> flavors = client.FlavorAssetService.GetFlavorAssetsWithParams(mediaEntry.Id);
-                    foreach (KalturaFlavorAssetWithParams flavor in flavors)
+                    Console.WriteLine("2. Waiting for the iPad flavor to be available...");
+                    System.Threading.Thread.Sleep(5000);
+                    KalturaFlavorAssetFilter flavorAssetsFilter = new KalturaFlavorAssetFilter();
+                    flavorAssetsFilter.EntryIdEqual = mediaEntry.Id;
+                    KalturaFlavorAssetListResponse flavorAssets = client.FlavorAssetService.List(flavorAssetsFilter);
+                    foreach (KalturaFlavorAsset flavor in flavorAssets.Objects)
                     {
-                        if (flavor.FlavorParams.SystemName == "iPad" && flavor.FlavorParams.Tags.Contains("ipadnew"))
+                        if (flavor.FlavorParamsId == iPadFlavorId)
                         {
-                            if (flavor.FlavorAsset == null) continue;
                             iPadFlavor = flavor;
-                            statusB = flavor.FlavorAsset.Status == KalturaFlavorAssetStatus.READY;
-                            if (flavor.FlavorAsset.Status == KalturaFlavorAssetStatus.NOT_APPLICABLE)
+                            statusB = flavor.Status == KalturaFlavorAssetStatus.READY;
+                            if (flavor.Status == KalturaFlavorAssetStatus.NOT_APPLICABLE)
                             {
                                 //in case the Kaltura Transcoding Decision Layer decided not to convert to this flavor, let's force it.
-                                client.FlavorAssetService.Convert(mediaEntry.Id, iPadFlavor.FlavorParams.Id);
+                                client.FlavorAssetService.Convert(mediaEntry.Id, iPadFlavor.FlavorParamsId);
                             }
-                            Console.WriteLine("3. Found the iPad flavor (" + flavor.FlavorParams.Id + "), Status: " + (statusB ? "Ready to rock!" : "Not ready yet"));
+                            Console.WriteLine("3. iPad flavor (" + iPadFlavor.FlavorParamsId + "). It's " + (statusB ? "Ready to ROCK!" : "being converted. Waiting..."));
                         }
                     }
                 }
+
                 //this is the download URL for the actual Video file of the iPad flavor
-                string iPadFlavorUrl = client.FlavorAssetService.GetDownloadUrl(iPadFlavor.FlavorAsset.Id);
+                string iPadFlavorUrl = client.FlavorAssetService.GetDownloadUrl(iPadFlavor.Id);
                 Console.WriteLine("4. iPad Flavor URL is: " + iPadFlavorUrl);
 
+                //Alternatively, download URL for a given flavor id can also be retrived by creating the playManifest URL -
+                string playManifestURL = "http://www.kaltura.com/p/{partnerId}/sp/0/playManifest/entryId/{entryId}/format/url/flavorParamId/{flavorParamId}/ks/{ks}/{fileName}.mp4";
+                playManifestURL = playManifestURL.Replace("{partnerId}", PARTNER_ID.ToString());
+                playManifestURL = playManifestURL.Replace("{entryId}", mediaEntry.Id);
+                playManifestURL = playManifestURL.Replace("{flavorParamId}", iPadFlavor.FlavorParamsId.ToString());
+                playManifestURL = playManifestURL.Replace("{ks}", client.KS);
+                playManifestURL = playManifestURL.Replace("{fileName}", mediaEntry.Name);
+                Console.WriteLine("4. iPad Flavor playManifest URL is: " + playManifestURL);
+                
                 //now let's replace the flavor with our video file (e.g. after processing the file outside of Kaltura)
                 FileStream fileStreamiPad = new FileStream("DemoVideoiPad.mp4", FileMode.Open, FileAccess.Read);
                 uploadToken = client.UploadTokenService.Add();
                 client.UploadTokenService.Upload(uploadToken.Id, fileStreamiPad);
                 mediaResource = new KalturaUploadedFileTokenResource();
                 mediaResource.Token = uploadToken.Id;
-                KalturaFlavorAsset newiPadFlavor = client.FlavorAssetService.SetContent(iPadFlavor.FlavorAsset.Id, mediaResource);
+                KalturaFlavorAsset newiPadFlavor = client.FlavorAssetService.SetContent(iPadFlavor.Id, mediaResource);
                 Console.WriteLine("5. iPad Flavor was replaced! id: " + newiPadFlavor.Id);
             }
 
@@ -208,7 +223,7 @@ namespace Kaltura
             KalturaClient client = new KalturaClient(GetConfig());
 
             // start new session (client session is enough when we do operations in a users scope)
-            string ks = client.SessionService.Start(ADMIN_SECRET, "MY_USER_ID", KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
+            string ks = client.GenerateSession(ADMIN_SECRET, USER_ID, KalturaSessionType.ADMIN, PARTNER_ID, 86400, "");
             client.KS = ks;
 
             // Setup a pager and search to use
@@ -236,19 +251,13 @@ namespace Kaltura
                 profileId = metadata[0].Id;
                 name = entries[0].Name;
                 id = entries[0].Id;
-                if (metadata[0].Xsd != null)
-                {
-                    Console.WriteLine("1. There are custom fields for video: " + name + ", entryid: " + id);
-                }
-                else
-                {
-                    Console.WriteLine("1. There are no custom fields for video: " + name + ", entryid: " + id);
-                }
+                Console.WriteLine("1. There are custom fields for video: " + name + ", entryid: " + id);
             }
             else
             {
                 Console.WriteLine("1. This publisher account doesn't have any custom metadata profiles enabled.");
-                Console.WriteLine("Existing the metadata test (enable customer metadata in Admin Console and create a profile in KMC first).");
+                Console.WriteLine("Exiting the metadata test (enable customer metadata in Admin Console and create a profile in KMC first).");
+				return;
             }
             
             // Add a custom data entry in the KMC  (Settings -> Custom Data)
@@ -316,7 +325,7 @@ namespace Kaltura
             KalturaClient client = new KalturaClient(GetConfig());
 
             // start new session (client session is enough when we do operations in a users scope)
-            string ks = client.SessionService.Start(SECRET, "MY_USER_ID", KalturaSessionType.USER, PARTNER_ID, 86400, "");
+            string ks = client.GenerateSession(SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
             client.KS = ks;
 
             // upload the media
@@ -341,7 +350,7 @@ namespace Kaltura
             KalturaClient client = new KalturaClient(GetConfig());
 
             // start new session (client session is enough when we do operations in a users scope)
-            string ks = client.SessionService.Start(SECRET, "MY_USER_ID", KalturaSessionType.USER, PARTNER_ID, 86400, "");
+            string ks = client.GenerateSession(SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, 86400, "");
             client.KS = ks;
 
             KalturaMediaEntry mediaEntry = new KalturaMediaEntry();

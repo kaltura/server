@@ -908,7 +908,7 @@ class ObjCClientGenerator extends ClientGeneratorFromXml
 		{
 			$projectFileData = str_replace($sectionName, $sectionData, $projectFileData);
 		}
-		$this->addFile($projectFilePath, $projectFileData);
+		$this->addFile($projectFilePath, $projectFileData, false);
 	}
 
 	// main
