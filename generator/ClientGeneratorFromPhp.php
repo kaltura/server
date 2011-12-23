@@ -8,7 +8,7 @@ abstract class ClientGeneratorFromPhp
 	protected $_includeList = array();
 	protected $_sourcePath = "";
 	protected $_typesToIgnore = array();
-	protected $_classMap = array();
+	protected $_classMap = null;
 	protected $_excludePathList = array();
 	
 	protected $package = 'Kaltura';
@@ -141,11 +141,17 @@ abstract class ClientGeneratorFromPhp
 		$this->writeFooter();
 	}
 	
-	public function load()
+	protected function initClassMap()
 	{
+		if ($this->_classMap !== null)
+			return;
+		
 		$classMapFileLocation = KAutoloader::getClassMapFilePath();		
 		$this->_classMap = unserialize(file_get_contents($classMapFileLocation));
-
+	}
+	
+	public function load()
+	{
 		$this->loadServicesInfo();
 		
 		// load the filter order by string enums
@@ -229,6 +235,8 @@ abstract class ClientGeneratorFromPhp
 	 */
 	protected function loadServicesInfo() 
 	{
+		$this->initClassMap();
+		
 		$serviceMap = KalturaServicesMap::getMap();
 		foreach($serviceMap as $service => $serviceClass)
 		{
@@ -304,6 +312,7 @@ abstract class ClientGeneratorFromPhp
 		if(in_array($typeReflector->getType(), $this->_typesToIgnore))
 			return;
 
+		$this->initClassMap();
 		if ($this->isPathExcluded($this->_classMap[$typeReflector->getType()]))
 			return;
 			
@@ -334,6 +343,7 @@ abstract class ClientGeneratorFromPhp
 	
 	private function loadChildTypes(KalturaTypeReflector $typeReflector)
 	{
+		$this->initClassMap();
 		foreach($this->_classMap as $class => $path)
 		{
 			if (strpos($class, 'Kaltura') === 0 && strpos($class, '_') === false && strpos($path, 'api') !== false) // make sure the class is api object
