@@ -138,8 +138,8 @@ foreach($config as $name => $item)
 	
 	// get the API list to include in this client generate
 	$include = $item->get("include");
-	// get the API list to exclude in this client generate
 	$exclude = $item->get("exclude");
+	$excludePaths = $item->get("excludepaths");
 	// can only do either include or exclude
 	if ($include !== null && $exclude !== null)
 		throw new Exception("Only include or exclude should be declared");
@@ -174,10 +174,11 @@ foreach($config as $name => $item)
 		{
 			KalturaLog::info("Using code introspection to generate XML schema");
 			$xmlGenerator = new XmlClientGenerator();
-			$xmlGenerator->setIncludeOrExcludeList($include, $exclude);
+			$xmlGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
 			$xmlGenerator->setIgnoreList($ignore);
 			$xmlGenerator->setAdditionalList($additional);
 			$xmlGenerator->generate();
+
 			$files = $xmlGenerator->getOutputFiles();
 			//save a temp schema to the disk to be used by the xml generator
 			file_put_contents("temp.xml", $files["KalturaClient.xml"]);
@@ -216,7 +217,7 @@ foreach($config as $name => $item)
 	else if ($fromPhp)
 	{
 		$instance = $reflectionClass->newInstance();
-		$instance->setIncludeOrExcludeList($include, $exclude);
+		$instance->setIncludeOrExcludeList($include, $exclude, $excludePaths);
 		$instance->setIgnoreList($ignore);
 		$instance->setAdditionalList($additional);
 		

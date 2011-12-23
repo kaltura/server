@@ -8,6 +8,8 @@ abstract class ClientGeneratorFromPhp
 	protected $_includeList = array();
 	protected $_sourcePath = "";
 	protected $_typesToIgnore = array();
+	protected $_classMap = array();
+	protected $_excludePathList = array();
 	
 	protected $package = 'Kaltura';
 	protected $subpackage = 'Client';
@@ -96,7 +98,7 @@ abstract class ClientGeneratorFromPhp
 	 *
 	 */
 	public function generate() 
-	{
+	{		
 		$this->load();
 		
 		$this->writeHeader();
@@ -141,6 +143,9 @@ abstract class ClientGeneratorFromPhp
 	
 	public function load()
 	{
+		$classMapFileLocation = KAutoloader::getClassMapFilePath();		
+		$this->_classMap = unserialize(file_get_contents($classMapFileLocation));
+
 		$this->loadServicesInfo();
 		
 		// load the filter order by string enums
@@ -225,9 +230,14 @@ abstract class ClientGeneratorFromPhp
 	protected function loadServicesInfo() 
 	{
 		$serviceMap = KalturaServicesMap::getMap();
-		$services = array_keys($serviceMap);
-		foreach($services as $service)
+		foreach($serviceMap as $service => $serviceClass)
 		{
+			$servicePath = $this->_classMap[$serviceClass];			
+			if ($this->isPathExcluded($servicePath))
+			{
+				continue;
+			}
+			
 			$serviceReflector = new KalturaServiceReflector($service);
 			if (count($this->_includeList) > 0 && array_key_exists($service, $this->_includeList)) 
 			{
@@ -293,6 +303,9 @@ abstract class ClientGeneratorFromPhp
 	{
 		if(in_array($typeReflector->getType(), $this->_typesToIgnore))
 			return;
+
+		if ($this->isPathExcluded($this->_classMap[$typeReflector->getType()]))
+			return;
 			
 	    $parentTypeReflector = $typeReflector->getParentTypeReflector();
 	    if ($parentTypeReflector)
@@ -321,18 +334,11 @@ abstract class ClientGeneratorFromPhp
 	
 	private function loadChildTypes(KalturaTypeReflector $typeReflector)
 	{
-//		$typesDir = KALTURA_ROOT_PATH.DIRECTORY_SEPARATOR."api_v3".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."types".DIRECTORY_SEPARATOR;
-//		$typesDir = realpath($typesDir);
-		$classMapFileLcoation = KAutoloader::getClassMapFilePath();
-		
-		$classMap = unserialize(file_get_contents($classMapFileLcoation));
-		
-		foreach($classMap as $class => $path)
+		foreach($this->_classMap as $class => $path)
 		{
 			if (strpos($class, 'Kaltura') === 0 && strpos($class, '_') === false && strpos($path, 'api') !== false) // make sure the class is api object
 			{
 				$reflector = new ReflectionClass($class);
-//				if($class=='KalturaFileSyncFilter') continue;
 				if ($reflector->isSubclassOf('KalturaObject') && $reflector->isSubclassOf($typeReflector->getType()))
 				{
 					$classTypeReflector = KalturaTypeReflectorCacher::get($class);
@@ -375,9 +381,32 @@ abstract class ClientGeneratorFromPhp
 		if (!array_key_exists($type, $this->_types))
 			$this->_types[$type] = $objectReflector;
 	}
-
-	public function setIncludeOrExcludeList($include, $exclude)
+	
+	public function isPathExcluded($path)
 	{
+		$path = realpath($path);
+		foreach ($this->_excludePathList as $exclude)
+		{
+			if ($this->beginsWith($path, $exclude))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public function setIncludeOrExcludeList($include, $exclude, $excludePaths = null)
+	{
+		$this->_excludePathList = array();
+		if ($excludePaths !== null)
+		{
+			$tempList = explode(",", str_replace(" ", "", $excludePaths));
+			foreach($tempList as $item)
+			{
+				$this->_excludePathList[] = realpath(dirname(__FILE__)."/../$item");
+			}
+		}
+		
 		// load full list of actions and services
 		$fullList = array();
 		$serviceMap = KalturaServicesMap::getMap();
