@@ -407,6 +407,8 @@ abstract class ClientGeneratorFromPhp
 	
 	public function setIncludeOrExcludeList($include, $exclude, $excludePaths = null)
 	{
+		$this->initClassMap();
+		
 		$this->_excludePathList = array();
 		if ($excludePaths !== null)
 		{
@@ -420,9 +422,14 @@ abstract class ClientGeneratorFromPhp
 		// load full list of actions and services
 		$fullList = array();
 		$serviceMap = KalturaServicesMap::getMap();
-		$services = array_keys($serviceMap);
-		foreach($services as $service)
+		foreach($serviceMap as $service => $serviceClass)
 		{
+			$servicePath = $this->_classMap[$serviceClass];			
+			if ($this->isPathExcluded($servicePath))
+			{
+				continue;
+			}
+
 			$serviceReflector = new KalturaServiceReflector($service);
 			$actions = $serviceReflector->getActions();
 			foreach($actions as &$action) // we need only the keys
