@@ -40,6 +40,7 @@ namespace Kaltura
         private IKalturaLogger _Logger;
         private int _Timeout = 100000;
         private string _ClientTag = "dotnet";
+		private string _ProxyAddress = "";
 
         #endregion
 
@@ -79,6 +80,12 @@ namespace Kaltura
             set { _ClientTag = value; }
             get { return _ClientTag; }
         }
+
+		public string ProxyAddress 
+		{
+			set { _ProxyAddress = value; }
+			get { return _ProxyAddress; }
+		}
 
         #endregion
 

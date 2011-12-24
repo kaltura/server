@@ -172,6 +172,12 @@ namespace Kaltura
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
             request.Timeout = _Config.Timeout;
             request.Method = "POST";
+			
+			// Add proxy information if required
+			if( !_Config.ProxyAddress.Equals( "" ) && !_Config.ProxyAddress.Equals( null ) ) {
+				request.Proxy = new WebProxy( _Config.ProxyAddress );
+			}
+            			
             if (kfiles.Count > 0)
             {
                 this.PostMultiPartWithFiles(request, kparams, kfiles);
