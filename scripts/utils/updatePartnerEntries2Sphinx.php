@@ -21,12 +21,16 @@ error_reporting ( E_ALL );
 $availModes = array('gensqls', 'execute');
 
 if ($argc < 2)
-	die('Usage: ' . basename(__FILE__) . ' <partner id> [<mode: ' . implode('/', $availModes) . '>]' . PHP_EOL);
+	die('Usage: ' . basename(__FILE__) . ' <partner id> [<mode: ' . implode('/', $availModes) . '>] [peer name]' . PHP_EOL);
 
 $partnerId = @$argv[1];
 $mode = 'execute';
 if ($argc > 2)
 	$mode = $argv[2];
+
+$peerName = 'entryPeer';
+if ($argc > 3)
+	$peerName = $argv[3];
 
 if (!in_array($mode, $availModes))
 	die('Invalid mode, should be one of ' . implode(',', $availModes) . PHP_EOL);
@@ -38,39 +42,43 @@ myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 
 $sphinx = new kSphinxSearchManager();
 
-$lastEntryCreatedAt = null;
+$lastCreatedAt = null;
 
-entryPeer::setUseCriteriaFilter(false);
+$partnerIdField = call_user_func(array($peerName, 'translateFieldName'), 'PartnerId', BasePeer::TYPE_PHPNAME, BasePeer::TYPE_COLNAME);
+$createdAtField = call_user_func(array($peerName, 'translateFieldName'), 'CreatedAt', BasePeer::TYPE_PHPNAME, BasePeer::TYPE_COLNAME);
+
+call_user_func(array($peerName, 'setUseCriteriaFilter'), false);
 for (;;)
 {
 	$c = new Criteria();
-	$c->add(entryPeer::PARTNER_ID, $partnerId);
-	if ($lastEntryCreatedAt)
-		$c->add(entryPeer::CREATED_AT, $lastEntryCreatedAt, Criteria::LESS_EQUAL);
-	$c->addDescendingOrderByColumn(entryPeer::CREATED_AT);
+	if ($partnerId != -1)
+		$c->add($partnerIdField, $partnerId);
+	if ($lastCreatedAt)
+		$c->add($createdAtField, $lastCreatedAt, Criteria::LESS_EQUAL);
+	$c->addDescendingOrderByColumn($createdAtField);
 	$c->setLimit(500);
 	
-	$entries = entryPeer::doSelect($c);
+	$items = call_user_func(array($peerName, 'doSelect'), $c);
 	
-	foreach($entries as $entry)
+	foreach($items as $item)
 	{
 		usleep(100);
 		if ($mode == 'execute')
 		{
-			$sphinx->saveToSphinx($entry, false, true);
-			echo $entry->getId() . "Saved\n";
+			$sphinx->saveToSphinx($item, false, true);
+			echo $item->getId() . "Saved\n";
 		}
 		else
 		{
-			print $sphinx->getSphinxSaveSql($entry, false, true) . PHP_EOL;
+			print $sphinx->getSphinxSaveSql($item, false, true) . PHP_EOL;
 		}
 		
-		$lastEntryCreatedAt = $entry->getCreatedAt(null);
+		$lastCreatedAt = $item->getCreatedAt(null);
 	}
 	
-    entryPeer::clearInstancePool();
+    call_user_func(array($peerName, 'clearInstancePool'));
 
-	if (count($entries) < 500)
+	if (count($items) < 500)
 		break;
 }
 
