@@ -31,6 +31,8 @@ div#download-buttons { margin-top:30px; }
 .ruby-btn:hover { background:transparent url('../images/buttons/ruby.jpg') no-repeat left top; }
 .python-btn { background:transparent url('../images/buttons/python.jpg') no-repeat right top; }
 .python-btn:hover { background:transparent url('../images/buttons/python.jpg') no-repeat left top; }
+.objc-btn { background:transparent url('../images/buttons/objc.jpg') no-repeat right top; }
+.objc-btn:hover { background:transparent url('../images/buttons/objc.jpg') no-repeat left top; }
 .clear { clear:both; }
 div#notifications-box { float:left;color:#ffffff; }
 div#notifications-header { width:272px;height:55px;background-color:#000000;padding:5px; }
