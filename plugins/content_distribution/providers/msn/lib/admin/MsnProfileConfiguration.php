@@ -22,6 +22,28 @@ class Form_MsnProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		));
 	}
 	
+	public function isValid($data)
+	{
+		$valid = parent::isValid($data);
+		$flavors = array('source_flavor_params_id', 'wmv_flavor_params_id', 'wmv_flavor_params_id', 'flv_flavor_params_id', 'sl_flavor_params_id', 'sl_hd_flavor_params_id');
+		
+		$found = false;
+		foreach($flavors as $flavor)
+		{
+			if (isset($data[$flavor]) && $data[$flavor] != -1)
+			{
+				$found = true;
+			}
+		}
+		if (!$found)
+		{
+			// the exception will get catched "DistributionProfileConfigureAction"
+			throw new Exception('At least one flavor should be selected');
+		}
+		
+		return $valid;
+	}
+	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
 		$object = parent::getObject($objectType, $properties, $add_underscore, true);
@@ -71,7 +93,7 @@ class Form_MsnProfileConfiguration extends Form_ConfigurableProfileConfiguration
 		// save the profile on the form instance because addFlavorParamsFields is called after populateFromObject
 		$this->msnDistributionProfile = $object;
 		parent::populateFromObject($object, $add_underscore);
-	}	
+	}
 	
 	protected function addFlavorsSelect(Kaltura_Client_Type_FlavorParamsListResponse $flavorParams, $name, $label)
 	{
