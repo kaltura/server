@@ -28,6 +28,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace Kaltura
 {
@@ -70,6 +71,17 @@ namespace Kaltura
             multiRequestParams.Add(multiRequestNumber + ":service", this._Service);
             multiRequestParams.Add(multiRequestNumber + ":action", this._Action);
             foreach (KeyValuePair<string, string> param in this._Params)
+            {
+                multiRequestParams.Add(multiRequestNumber + ":" + param.Key, param.Value);
+            }
+
+            return multiRequestParams;
+        }
+
+        public KalturaFiles GetFilesForMultiRequest(int multiRequestNumber)
+        {
+            KalturaFiles multiRequestParams = new KalturaFiles();
+            foreach (KeyValuePair<string, FileStream> param in this._Files)
             {
                 multiRequestParams.Add(multiRequestNumber + ":" + param.Key, param.Value);
             }

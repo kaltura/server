@@ -167,8 +167,9 @@ class KalturaClient:
             i = 1
             for call in self.callsQueue:
                 callParams = call.getParamsForMultiRequest(i)
+                callFiles = call.getFilesForMultiRequest(i)
                 params.update(callParams)
-                files.update(call.files)
+                files.update(callFiles)
                 i += 1
         else:
             call = self.callsQueue[0]
@@ -382,5 +383,11 @@ class KalturaServiceActionCall:
         multiRequestParams.put("%s:service" % multiRequestIndex, self.service)
         multiRequestParams.put("%s:action" % multiRequestIndex, self.action)
         for (key, val) in self.params.get().items():
+            multiRequestParams.put("%s:%s" % (multiRequestIndex, key), val)
+        return multiRequestParams
+
+    def getFilesForMultiRequest(self, multiRequestIndex):
+        multiRequestParams = KalturaFiles()
+        for (key, val) in self.files.get().items():
             multiRequestParams.put("%s:%s" % (multiRequestIndex, key), val)
         return multiRequestParams

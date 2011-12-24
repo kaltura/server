@@ -66,6 +66,15 @@ public class KalturaServiceActionCall {
         return multiRequestParams;
     }
 
+    public KalturaFiles getFilesForMultiRequest(int multiRequestNumber) {
+        KalturaFiles multiRequestParams = new KalturaFiles();
+        for (String param : this.files.keySet()) {
+            multiRequestParams.put(multiRequestNumber + ":" + param, this.files.get(param));
+        }
+
+        return multiRequestParams;
+    }
+
     public KalturaServiceActionCall(String service, String action, KalturaParams kparams) {
         this(service, action, kparams, new KalturaFiles());
     }

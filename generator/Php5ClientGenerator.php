@@ -597,7 +597,7 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("}");
 	}
 	
-	protected function addFile($fileName, $fileContents)
+	protected function addFile($fileName, $fileContents, $addLicense = true)
 	{
 		$patterns = array(
 			'/@package\s+.+/',
@@ -608,6 +608,6 @@ class Php5ClientGenerator extends ClientGeneratorFromXml
 			'@subpackage ' . $this->subpackage,
 		);
 		$fileContents = preg_replace($patterns, $replacements, $fileContents);
-		parent::addFile($fileName, $fileContents);
+		parent::addFile($fileName, $fileContents, $addLicense);
 	}
 }

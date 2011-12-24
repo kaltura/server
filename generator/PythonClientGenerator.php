@@ -712,7 +712,7 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 		return $signature;
 	}	
 	
-	protected function addFile($fileName, $fileContents)
+	protected function addFile($fileName, $fileContents, $addLicense = true)
 	{
 		$patterns = array(
 			'/@package\s+.+/',
@@ -723,6 +723,6 @@ class PythonClientGenerator extends ClientGeneratorFromXml
 			'@subpackage ' . $this->subpackage,
 		);
 		$fileContents = preg_replace($patterns, $replacements, $fileContents);
-		parent::addFile($fileName, $fileContents);
+		parent::addFile($fileName, $fileContents, $addLicense);
 	}
 }

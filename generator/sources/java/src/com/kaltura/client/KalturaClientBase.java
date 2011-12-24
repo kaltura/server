@@ -145,9 +145,11 @@ abstract public class KalturaClientBase {
             url += "multirequest";
             int i = 1;
             for (KalturaServiceActionCall call : this.callsQueue) {
-                KalturaParams callParams = call.getParamsForMultiRequest(i++);
+                KalturaParams callParams = call.getParamsForMultiRequest(i);
                 kparams.add(callParams);
-                kfiles.add(call.getFiles());
+                KalturaFiles callFiles = call.getFilesForMultiRequest(i);
+                kfiles.add(callFiles);
+				i++;
             }
 
             // map params

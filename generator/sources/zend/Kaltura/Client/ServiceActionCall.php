@@ -1,3 +1,4 @@
+<?php
 // ===================================================================================================
 //                           _  __     _ _
 //                          | |/ /__ _| | |_ _  _ _ _ __ _
@@ -25,7 +26,6 @@
 //
 // @ignore
 // ===================================================================================================
-<?php
 /**
  * @package Kaltura
  * @subpackage Client
@@ -101,6 +101,21 @@ class Kaltura_Client_ServiceActionCall
 		$multiRequestParams[$multiRequestIndex.":service"] = $this->service;
 		$multiRequestParams[$multiRequestIndex.":action"] = $this->action;
 		foreach($this->params as $key => $val)
+		{
+			$multiRequestParams[$multiRequestIndex.":".$key] = $val;
+		}
+		return $multiRequestParams;
+	}
+
+	/**
+	 * Return the parameters for a multi request
+	 *
+	 * @param int $multiRequestIndex
+	 */
+	public function getFilesForMultiRequest($multiRequestIndex)
+	{
+		$multiRequestParams = array();
+		foreach($this->files as $key => $val)
 		{
 			$multiRequestParams[$multiRequestIndex.":".$key] = $val;
 		}

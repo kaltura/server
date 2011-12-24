@@ -1,3 +1,4 @@
+<?php
 // ===================================================================================================
 //                           _  __     _ _
 //                          | |/ /__ _| | |_ _  _ _ _ __ _
@@ -25,7 +26,6 @@
 //
 // @ignore
 // ===================================================================================================
-<?php
 
 /**
  * Private class for null value
@@ -182,9 +182,11 @@ class Kaltura_Client_ClientBase
 			$i = 1;
 			foreach ($this->callsQueue as $call)
 			{
-				$callParams = $call->getParamsForMultiRequest($i++);
+				$callParams = $call->getParamsForMultiRequest($i);
+				$callFiles = $call->getFilesForMultiRequest($i);
 				$params = array_merge($params, $callParams);
-				$files = array_merge($files, $call->files);
+				$files = array_merge($files, $callFiles);
+				$i++;
 			}
 		}
 		else

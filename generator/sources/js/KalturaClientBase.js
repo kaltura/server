@@ -250,6 +250,20 @@ KalturaServiceActionCall.prototype.getParamsForMultiRequest = function(multiRequ
 };
 
 /**
+ * Create files object for a multirequest call.
+ * @param int multiRequestIndex		the index of the call inside the multirequest.
+ */
+KalturaServiceActionCall.prototype.getFilesForMultiRequest = function(multiRequestIndex)
+{
+	var multiRequestFiles = new Object();
+	for(var key in this.files) {
+		var val = this.files[key];
+		multiRequestFiles[multiRequestIndex + ":" + key] = val;
+	}
+	return multiRequestFiles;
+};
+
+/**
  * Implement to get Kaltura Client logs
  * 
  */
@@ -350,12 +364,13 @@ KalturaClientBase.prototype.doQueue = function(callback)
 		$i = 1;
 		for(var v in this.callsQueue){
 			call = this.callsQueue[v];
-			var callParams = call.getParamsForMultiRequest($i++);
+			var callParams = call.getParamsForMultiRequest($i);
 			for(var sv1 in callParams)
 				params[sv1] = callParams[sv1];
-
-			for(var sv2 in call.files)
+			var callFiles = call.getFilesForMultiRequest($i);
+			for(var sv2 in callFiles)
 				files[sv2] = call.files[sv2];
+			$i++;
 		}
 	} else {
 		call = this.callsQueue[0];

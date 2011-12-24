@@ -39,7 +39,8 @@ abstract class ClientGeneratorFromXml
 
 		$this->_licenseBuffer = file_get_contents(dirname(__FILE__).'/sources/license.txt');
 		$this->_licenseBuffer = str_replace('//', $this->getSingleLineCommentMarker(), $this->_licenseBuffer);
-
+		$this->_licenseBuffer = str_replace("\r\n", "\n", $this->_licenseBuffer);
+		
 		$this->addFile('agpl.txt', file_get_contents(dirname(__FILE__).'/sources/agpl.txt'), false);
 	}
 	
@@ -70,7 +71,14 @@ abstract class ClientGeneratorFromXml
 	{
 		if ($addLicense)
 		{
-			$fileContents = $this->_licenseBuffer . $fileContents;
+			if ($this->beginsWith($fileContents, '<?php'))
+			{
+				$fileContents = "<?php\n" . $this->_licenseBuffer . substr($fileContents, 5);
+			}
+			else
+			{
+				$fileContents = $this->_licenseBuffer . $fileContents;
+			}
 		}
 		
 		$this->_files[$fileName] = $fileContents;

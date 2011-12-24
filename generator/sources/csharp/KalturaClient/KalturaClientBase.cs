@@ -132,9 +132,11 @@ namespace Kaltura
                 int i = 1;
                 foreach (KalturaServiceActionCall call in _CallsQueue)
                 {
-                    KalturaParams callParams = call.GetParamsForMultiRequest(i++);
+                    KalturaParams callParams = call.GetParamsForMultiRequest(i);
                     kparams.Add(callParams);
-                    kfiles.Add(call.Files);
+                    KalturaFiles callFiles = call.GetFilesForMultiRequest(i);
+                    kfiles.Add(callFiles);
+                    i++;
                 }
 
                 // map params
