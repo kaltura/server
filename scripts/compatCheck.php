@@ -443,27 +443,30 @@ function processFeedRequest($parsedParams)
 	testAction($fullActionName, $parsedParams, $uri);
 }
 
-function processApiV3Log($handle, $origSize)
+class LogProcessorApiV3
 {
-	$inParams = false;
-	while (ftell($handle) < $origSize && ($buffer = fgets($handle)) !== false) {
-		if (!$inParams)
+	protected $inParams = false;
+	protected $isFeed = false;
+	
+	function processLine($buffer)
+	{
+		if (!$this->inParams)
 		{
 			$markerPos = strpos($buffer, APIV3_START_MARKER);
 			if ($markerPos !== false)
 			{
 				$params = substr($buffer, $markerPos + strlen(APIV3_START_MARKER));
-				$inParams = true;
-				$isFeed = false;
-				continue;
+				$this->inParams = true;
+				$this->isFeed = false;
+				return false;
 			}
 			$markerPos = strpos($buffer, APIV3_GETFEED_MARKER);
 			if ($markerPos !== false)
 			{
 				$params = substr($buffer, $markerPos + strlen(APIV3_GETFEED_MARKER));
-				$inParams = true;
-				$isFeed = true;
-				continue;
+				$this->inParams = true;
+				$this->isFeed = true;
+				return false;
 			}
 		}
 		else
@@ -474,10 +477,10 @@ function processApiV3Log($handle, $origSize)
 				if (print_r($parsedParams, true) != $params)
 				{
 					print "print_r_reverse failed\n";
-					continue;
+					return false;
 				}
 
-				if ($isFeed)
+				if ($this->isFeed)
 				{
 					$shouldQuit = processFeedRequest($parsedParams);
 				}
@@ -488,10 +491,10 @@ function processApiV3Log($handle, $origSize)
 				
 				if ($shouldQuit)
 				{
-					break;
+					return true;
 				}
 						
-				$inParams = false;
+				$this->inParams = false;
 			}
 			else
 			{
@@ -499,6 +502,8 @@ function processApiV3Log($handle, $origSize)
 			}
 		}
 	}
+	
+	return false;
 }
 
 function processPS2Request($parsedParams)
@@ -563,20 +568,55 @@ function processPS2Request($parsedParams)
 	testAction($fullActionName, $parsedParams, $uri);
 }
 
-function processPS2Log($handle, $origSize)
-{
-	while (ftell($handle) < $origSize && ($buffer = fgets($handle)) !== false) {
+class LogProcessorPS2
+{	
+	function processLine($handle, $origSize)
+	{
 		$markerPos = strpos($buffer, PS2_START_MARKER);
 		if ($markerPos === false)
-			continue;
+			return false;
 		$params = substr($buffer, $markerPos + strlen(PS2_START_MARKER));
 		$parsedParams = eval('return ' . trim($params) . ';');
 
 		if (processPS2Request($parsedParams))
 		{
-			break;
+			return true;
 		}
 	}
+}
+
+function processRegularFile($apiLogPath, $logProcessor)
+{
+	$handle = @fopen($apiLogPath, "r");
+	if (!$handle)
+		die('Error: failed to open log file');
+
+	$logStats = fstat($handle);
+	$origSize = $logStats['size'];
+
+	while (ftell($handle) < $origSize && ($buffer = fgets($handle)) !== false) 
+	{
+		if ($logProcessor->processLine($buffer))
+			break;
+	}
+
+	fclose($handle);
+}
+
+function processGZipFile($apiLogPath, $logProcessor)
+{
+	$handle = @gzopen($apiLogPath, "r");
+	if (!$handle)
+		die('Error: failed to open log file');
+
+	while (!gzeof($handle))) 
+	{
+		$buffer = gzgets($handle, 4096);
+		if ($logProcessor->processLine($buffer))
+			break;
+	}
+
+	gzclose($handle);
 }
 
 // parse the command line
@@ -618,18 +658,15 @@ if ($argc > 7)
 $testedActions = array();
 $testedRequests = array();
 $requestNumber = 0;
-	
-// process the log file
-$handle = @fopen($apiLogPath, "r");
-if (!$handle)
-	die('Error: failed to open log file');
-
-$logStats = fstat($handle);
-$origSize = $logStats['size'];
 
 if ($logFormat == 'api_v3')
-	processApiV3Log($handle, $origSize);
+	$logProcessor = new LogProcessorApiV3();
 else
-	processPS2Log($handle, $origSize);
+	$logProcessor = new LogProcessorPS2();
 
-fclose($handle);
+$logFileInfo = pathinfo($apiLogPath);
+
+if ($logFileInfo['extension'] == 'gz')
+	processGZipFile($apiLogPath, $logProcessor);
+else
+	processRegularFile($apiLogPath, $logProcessor);
