@@ -571,7 +571,7 @@ function processPS2Request($parsedParams)
 
 class LogProcessorPS2
 {	
-	function processLine($handle, $origSize)
+	function processLine($buffer)
 	{
 		$markerPos = strpos($buffer, PS2_START_MARKER);
 		if ($markerPos === false)
