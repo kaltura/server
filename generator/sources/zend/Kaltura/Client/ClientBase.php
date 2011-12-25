@@ -197,11 +197,15 @@ class Kaltura_Client_ClientBase
 			$files = $call->files;
 		}
 		
+		// reset
+		$this->callsQueue = array();
+		$this->isMultiRequest = false; 
+		
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 		
 		list($postResult, $error) = $this->doHttpRequest($url, $params, $files);
-		
+						
 		if ($error)
 		{
 			throw new Kaltura_Client_ClientException($error, Kaltura_Client_ClientException::ERROR_GENERIC);
@@ -229,10 +233,6 @@ class Kaltura_Client_ClientBase
 				throw new Kaltura_Client_ClientException("unsupported format: $postResult", Kaltura_Client_ClientException::ERROR_FORMAT_NOT_SUPPORTED);
 			}
 		}
-		
-		// reset
-		$this->callsQueue = array();
-		$this->isMultiRequest = false; 
 		
 		$endTime = microtime (true);
 		
