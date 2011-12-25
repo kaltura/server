@@ -70,7 +70,7 @@ for (;;)
 		}
 		else
 		{
-			print $sphinx->getSphinxSaveSql($item, false, true) . PHP_EOL;
+			print $sphinx->getSphinxSaveSql($item, false, true) . ';' . PHP_EOL;
 		}
 		
 		$lastCreatedAt = $item->getCreatedAt(null);
@@ -82,4 +82,7 @@ for (;;)
 		break;
 }
 
-echo "Done\n";
+if ($mode == 'execute')
+{
+	echo "Done\n";
+}
