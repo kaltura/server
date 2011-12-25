@@ -121,18 +121,18 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$uniqid = uniqid('thumb_');
 			$thumbPath = realpath($rootPath) . "/$uniqid";
 			
-			$quality = $data->thumbParamsOutput->quality;
-			$cropType = $data->thumbParamsOutput->cropType;
-			$cropX = $data->thumbParamsOutput->cropX;
-			$cropY = $data->thumbParamsOutput->cropY;
-			$cropWidth = $data->thumbParamsOutput->cropWidth;
-			$cropHeight = $data->thumbParamsOutput->cropHeight;
-			$bgcolor = $data->thumbParamsOutput->backgroundColor;
-			$width = $data->thumbParamsOutput->width;
-			$height = $data->thumbParamsOutput->height;
-			$scaleWidth = $data->thumbParamsOutput->scaleWidth;
-			$scaleHeight = $data->thumbParamsOutput->scaleHeight;
-			$density = $data->thumbParamsOutput->density;
+			$quality = $thumbParamsOutput->quality;
+			$cropType = $thumbParamsOutput->cropType;
+			$cropX = $thumbParamsOutput->cropX;
+			$cropY = $thumbParamsOutput->cropY;
+			$cropWidth = $thumbParamsOutput->cropWidth;
+			$cropHeight = $thumbParamsOutput->cropHeight;
+			$bgcolor = $thumbParamsOutput->backgroundColor;
+			$width = $thumbParamsOutput->width;
+			$height = $thumbParamsOutput->height;
+			$scaleWidth = $thumbParamsOutput->scaleWidth;
+			$scaleHeight = $thumbParamsOutput->scaleHeight;
+			$density = $thumbParamsOutput->density;
 			
 			$cropper = new KImageMagickCropper($capturePath, $thumbPath, $this->taskConfig->params->ImageMagickCmd, true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density);
