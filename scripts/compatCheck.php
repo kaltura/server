@@ -585,8 +585,15 @@ if ($argc < 5)
 
 $serviceUrlOld = $argv[1];
 $serviceUrlNew = $argv[2];
-$apiV3LogPath = $argv[3];
+$apiLogPath = $argv[3];
 $logFormat = strtolower($argv[4]);
+
+if (strpos($apiLogPath, ':') !== false)
+{
+	$localLogPath = tempnam("/tmp", "CompatCheck");
+	passthru("rsync -zavx --progress $apiLogPath $localLogPath");
+	$apiLogPath = $localLogPath;
+}
 
 if (!in_array($logFormat, array('api_v3', 'ps2')))
 	die("Log format shoud be either api_v3 or ps2");
@@ -613,7 +620,7 @@ $testedRequests = array();
 $requestNumber = 0;
 	
 // process the log file
-$handle = @fopen($apiV3LogPath, "r");
+$handle = @fopen($apiLogPath, "r");
 if (!$handle)
 	die('Error: failed to open log file');
 
