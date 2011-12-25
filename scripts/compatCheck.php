@@ -501,9 +501,9 @@ class LogProcessorApiV3
 				$params .= $buffer;
 			}
 		}
-	}
 	
-	return false;
+		return false;
+	}
 }
 
 function processPS2Request($parsedParams)
@@ -582,6 +582,8 @@ class LogProcessorPS2
 		{
 			return true;
 		}
+
+		return false;
 	}
 }
 
