@@ -447,6 +447,7 @@ class LogProcessorApiV3
 {
 	protected $inParams = false;
 	protected $isFeed = false;
+	protected $params = '';
 	
 	function processLine($buffer)
 	{
@@ -455,7 +456,7 @@ class LogProcessorApiV3
 			$markerPos = strpos($buffer, APIV3_START_MARKER);
 			if ($markerPos !== false)
 			{
-				$params = substr($buffer, $markerPos + strlen(APIV3_START_MARKER));
+				$this->params = substr($buffer, $markerPos + strlen(APIV3_START_MARKER));
 				$this->inParams = true;
 				$this->isFeed = false;
 				return false;
@@ -463,7 +464,7 @@ class LogProcessorApiV3
 			$markerPos = strpos($buffer, APIV3_GETFEED_MARKER);
 			if ($markerPos !== false)
 			{
-				$params = substr($buffer, $markerPos + strlen(APIV3_GETFEED_MARKER));
+				$this->params = substr($buffer, $markerPos + strlen(APIV3_GETFEED_MARKER));
 				$this->inParams = true;
 				$this->isFeed = true;
 				return false;
@@ -473,8 +474,8 @@ class LogProcessorApiV3
 		{
 			if ($buffer[0] == ']')
 			{
-				$parsedParams = print_r_reverse($params);
-				if (print_r($parsedParams, true) != $params)
+				$parsedParams = print_r_reverse($this->params);
+				if (print_r($parsedParams, true) != $this->params)
 				{
 					print "print_r_reverse failed\n";
 					return false;
@@ -498,7 +499,7 @@ class LogProcessorApiV3
 			}
 			else
 			{
-				$params .= $buffer;
+				$this->params .= $buffer;
 			}
 		}
 	
@@ -611,7 +612,7 @@ function processGZipFile($apiLogPath, $logProcessor)
 	if (!$handle)
 		die('Error: failed to open log file');
 
-	while (!gzeof($handle))) 
+	while (!gzeof($handle)) 
 	{
 		$buffer = gzgets($handle, 4096);
 		if ($logProcessor->processLine($buffer))
