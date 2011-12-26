@@ -34,11 +34,12 @@ foreach ($entries as $deletedEntry)
 	
 	$entryFileSyncKey = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
 	
-	$entryFileSync = FileSyncPeer::retrieveByFileSyncKey($entryFileSyncKey);
+	$entryFileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($entryFileSyncKey);
+	foreach ($entryFileSyncs as $entryFileSync){
+		$entryFileSync->setStatus ( FileSync::FILE_SYNC_STATUS_READY );
+		$entryFileSync->save();
+	}
 	
-	$entryFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
-	
-	$entryFileSync->save();
 	//Restore assets
 	$assetCrit = new Criteria();
 	$assetCrit->add(assetPeer::ENTRY_ID, $deletedEntry->getId(), Criteria::EQUAL);
@@ -54,11 +55,14 @@ foreach ($entries as $deletedEntry)
 		$deletedAsset->save();
 		assetPeer::clearInstancePool();
 		$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$assetfileSync = FileSyncPeer::retrieveByFileSyncKey($assetSyncKey);
-		if ($assetfileSync->getStatus() == FileSync::FILE_SYNC_STATUS_DELETED)
+		$assetfileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($assetSyncKey);
+		foreach ( $assetfileSyncs as $assetfileSync ) 
 		{
-			$assetfileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+			if ($assetfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED) 
+			{
+				$assetfileSync->setStatus ( FileSync::FILE_SYNC_STATUS_READY );
+			}
+			$assetfileSync->save ();
 		}
-		$assetfileSync->save();
 	}
 }
