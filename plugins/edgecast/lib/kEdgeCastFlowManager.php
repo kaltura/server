@@ -117,6 +117,10 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
 	{        
         // get EdgeCast parameters
         $edgeCastParams = EdgeCastPlugin::getEdgeCastParams($partner);
+        if (!$edgeCastParams) {
+            KalturaLog::err('Partner ['.$partner->getId().'] does not have any edge cast parameters configured');
+            return false;
+        }
         $edgeAccountNumber = $edgeCastParams->getAccountNumber();
         $edgeApiToken = $edgeCastParams->getApiToken();
         
