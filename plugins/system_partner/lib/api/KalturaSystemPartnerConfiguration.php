@@ -42,6 +42,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $cdnHost;
 	
 	/**
+	 * @var string
+	 */
+	public $thumbnailHost;
+	
+	/**
 	 * @var int
 	 */
 	public $partnerPackage;
@@ -264,6 +269,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"adminEmail",
 		"host",
 		"cdnHost",
+	    "thumbnailHost",
 		//"maxBulkSize",
 		"partnerPackage",
 		"monitorUsage",

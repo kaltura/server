@@ -1058,7 +1058,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 			$path .= "/version/$version";
 		else
 			$path .= "/version/$current_version";
-		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $path ;
+		$url = myPartnerUtils::getThumbnailHost($this->getPartnerId()) . $path ;
 		return $url;
 	}
 
