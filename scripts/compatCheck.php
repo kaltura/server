@@ -438,6 +438,8 @@ function processFeedRequest($parsedParams)
 		return;
 	}
 	
+	$parsedParams['nocache'] = '1';
+	
 	$uri = "/api_v3/getFeed.php?" . http_build_query($parsedParams, null, "&");
 	
 	testAction($fullActionName, $parsedParams, $uri);
