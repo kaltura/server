@@ -25,6 +25,7 @@ class KExternalErrors
 	const UI_CONF_NOT_FOUND = 22;
 	const PROXY_LOOPBACK = 23;
 	const MULTIREQUEST_PROXY_FAILED = 24;
+	const BAD_QUERY = 25;
 	
 	private static $errorDescriptionMap = array(
 			self::ENTRY_NOT_FOUND => "requested entry not found",
