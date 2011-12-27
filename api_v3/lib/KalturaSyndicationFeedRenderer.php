@@ -125,7 +125,11 @@ class KalturaSyndicationFeedRenderer
 		if($this->syndicationFeed->playlistId)
 		{
 			$this->entryFilters = myPlaylistUtils::getPlaylistFiltersById($this->syndicationFeed->playlistId);
-
+			foreach($this->entryFilters as $entryFilter)
+			{
+				$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);		// partner scope already attached
+			}
+			
 			$playlist = entryPeer::retrieveByPK( $this->syndicationFeed->playlistId );
 			if ($playlist)
 			{
@@ -154,6 +158,7 @@ class KalturaSyndicationFeedRenderer
 			return;
 			
 		$entryFilter = new entryFilter();
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);		// partner scope already attached
 		$entryFilter->setFlavorParamsMatchOr($this->syndicationFeed->flavorParamId);
 		$entryFilter->attachToCriteria($this->baseCriteria);
 	}
@@ -173,6 +178,7 @@ class KalturaSyndicationFeedRenderer
 		if($this->executed)
 			return;
 			
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);		// partner scope already attached
 		$entryFilter->attachToCriteria($this->baseCriteria);
 	}
 	
