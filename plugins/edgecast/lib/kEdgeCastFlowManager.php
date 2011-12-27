@@ -84,9 +84,13 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
         }
 	    
 	    $mediaType = ($asset instanceof thumbAsset) ? self::EDGE_SERVICE_HTTP_SMALL_OBJECT_MEDIA_TYPE : self::EDGE_SERVICE_HTTP_LARGE_OBJECT_MEDIA_TYPE;
-	    $mediaTypePathList = array(
-	        array('MediaType' => $mediaType, 'MediaPath' => $asset->getDownloadUrl()),  // asset download url   
-	    );
+	    $mediaTypePathList = array();
+	    try {
+	        $mediaTypePathList[] = array('MediaType' => $mediaType, 'MediaPath' => $asset->getDownloadUrl());  // asset download url   
+	    }
+	    catch (Exception $e) {
+	        KalturaLog::err('Cannot get asset URL for asset id ['.$asset->getId().'] - '.$e->getMessage());
+	    }
 	    
 	    if ($asset instanceof flavorAsset)
 	    {
