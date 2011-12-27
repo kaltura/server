@@ -1,18 +1,20 @@
 <?php
 	class KDLSanityLimits {
 		const MinDuration = 100;
-		const MaxDuration = 360000000;	// 10h
+		const MaxDuration = 360000000;		// 10h
 		const MinBitrate = 1;
-		const MaxBitrate = 400000;		// 40MBps
+		const MaxBitrate = 400000;			// 40MBps
 		const MinFileSize = 1;
-		const MaxFileSize = 40000000000;		// 40GB
+		const MaxFileSize = 40000000000;	// 40GB
 		const MinDimension = 10;
-		const MaxDimension = 5000;		// 
+		const MaxDimension = 5000;			// 
 	
 		const MinFramerate = 2;
-		const MaxFramerate = 90;		// 
+		const MaxFramerate = 90;			// 
 		const MinDAR = 0.5;
-		const MaxDAR = 2.5;		// 
+		const MaxDAR = 2.5;					// 
+		const MinDurationFactor = 0.5;
+		const MaxDurationFactor = 1.5;
 	}
 
 	class KDLConstants {
@@ -235,6 +237,7 @@
 		const MP3 = "mp3";
 		const AAC = "aac";
 		const WMA = "wma";
+		const WMAPRO = "wmapro";
 		const VORBIS = "vorbis";
 		const AMRNB = "amrnb";
 		const MPEG2= "mpeg2";
@@ -247,6 +250,7 @@
 		const NoValidTranscoders = 1102;
 		const MissingMediaStream = 1103;
 		const NoValidMediaStream = 1104;
+		const InvalidDuration = 1105;
 		const Other = 1500;
 		
 		public static function ToString($err, $param1=null, $param2=null){
@@ -273,6 +277,9 @@
 					break;
 				case self::NoValidMediaStream:
 					$str = $err."#Invalid File - No media content.";
+					break;
+				case self::InvalidDuration:
+					$str = $err."#Product invalid duration - product($param1 sec), source($param2 sec).";
 					break;
 				case self::Other:
 				default:
