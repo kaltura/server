@@ -1,10 +1,5 @@
 <?php
 
-include_once("KDLCommon.php");
-include_once("KDLMediaDataSet.php");
-include_once("KDLFlavor.php");
-include_once("KDLOperatorBase.php");
-
 	/* ===========================
 	 * KDLOperatorWrapper
 	 */
@@ -76,6 +71,17 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 		 */
 		if(($this->_id==KDLTranscoders::ENCODING_COM || $this->_id==KDLTranscoders::FFMPEG || $this->_id==KDLTranscoders::FFMPEG_AUX)
 		&& $target->_video && $target->_video->_rotation) {
+			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
+				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
+			return true;
+		}
+		
+		/*
+		 * Remove On2
+		 * for 270 rotated videos
+		 */
+		if($this->_id==KDLTranscoders::ON2
+		&& $target->_video && $target->_video->_rotation==270) {
 			$warnings[KDLConstants::VideoIndex][] = //"The transcoder (".$key.") does not handle properly DAR<>PAR.";
 				KDLWarnings::ToString(KDLWarnings::TranscoderLimitation, $this->_id);
 			return true;
@@ -481,7 +487,8 @@ $format = "fl";
 					$cmdStr = $cmdStr.",flip";
 				else if($this->_vidRotation==90 || $this->_vidRotation==-90)
 					$cmdStr = $cmdStr.",rotate=1";
-				
+				else if($this->_vidRotation==270)
+					$cmdStr = $cmdStr.",rotate=3";
 			}
 		}
 		else {
@@ -664,117 +671,8 @@ $format = "fl";
 	 */
 	public function EE3($extra=null)
 	{
-/*		
-$tryXML = "<StreamInfo
-                Size=\"512, 384\">
-                <Bitrate>
-                  <ConstantBitrate
-                    Bitrate=\"1045\"
-                    IsTwoPass=\"False\"
-                    BufferWindow=\"00:00:05\" />
-                </Bitrate>
-              </StreamInfo>
-";
-		$xml = new SimpleXMLElement($tryXML);
-*/
-		if($this->_conId!="none") {
-			$pinfo = pathinfo(__FILE__);
-			$dir = $pinfo['dirname'];
-			switch($this->_conId){
-				case KDLContainerTarget::ISMV:
-					$xmlTemplate = $dir.'/ismPresetTemplate.xml';
-					break;
-				case KDLContainerTarget::MP4:
-				case KDLContainerTarget::WMV:
-				default:
-					$xmlTemplate = $dir.'/wmvPresetTemplate.xml';
-					break;
-			}
-			$xml = simplexml_load_file($xmlTemplate);
-		}
-		
-		$xml->Job['OutputDirectory']=KDLCmdlinePlaceholders::OutDir;
-		if($this->_inFileName){
-			$xml->Job['DefaultMediaOutputFileName']=$this->_outFileName.".{DefaultExtension}";
-		}
-		if($this->_vidId!="none"){
-$vidProfile=null;
-			switch($this->_vidId){
-				case KDLVideoTarget::WMV2:
-				case KDLVideoTarget::WMV3:
-				case KDLVideoTarget::WVC1A:
-				default:
-					$vidProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->MainH264VideoProfile);					
-					break;
-				case KDLVideoTarget::H264:
-				case KDLVideoTarget::H264B:
-				case KDLVideoTarget::H264M:
-				case KDLVideoTarget::H264H:				
-					$vidProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->MainH264VideoProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile);					
-					break;
-			}
-			$vFr = 30;
-			if($this->_vidFr!==null && $this->_vidFr>0){
-				$vFr = $this->_vidFr;
-				$vidProfile['FrameRate']=$this->_vidFr;
-			}
-			if($this->_vidGop!==null && $this->_vidGop>0){
-				$kFr = round($this->_vidGop/$vFr);
-				$mi = round($kFr/60);
-				$se = $kFr%60;
-				$vidProfile['KeyFrameDistance']=sprintf("00:%02d:%02d",$mi,$se);
-			}
-			if($this->_vidBr){
-				$this->_vidBr=max(100,$this->_vidBr); // The minimum video br for the SL is 100
-				$vidProfile->Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['PeakBitrate'] = round($this->_vidBr*1.3);
-				$vidProfile->Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate'] = $this->_vidBr;
-			}
-			if($this->_vidWid!=null && $this->_vidHgt!=null){
-				$vidProfile->Streams->StreamInfo['Size'] = $this->_vidWid.", ".$this->_vidHgt;
-			}
-			
-//			$strmInfo = clone ($vidProfile->Streams->StreamInfo[0]);
-//			KDLUtils::AddXMLElement($vidProfile->Streams, $vidProfile->Streams->StreamInfo[0]);
-			
-		}
-		else {
-			unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile);				
-		}
-
-		if($this->_audId!="none"){
-$audProfile=null;
-			switch($this->_audId){
-				case KDLAudioTarget::WMA:
-				default:
-					$audProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->WmaAudioProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->AacAudioProfile);					
-					break;
-				case KDLAudioTarget::AAC:
-					$audProfile = $xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->AacAudioProfile;
-					unset($xml->MediaFile->OutputFormat->WindowsMediaOutputFormat->AudioProfile->WmaAudioProfile);					
-					break;
-			}
-/*
-	Since there are certain constraints on those values for the EE3 presets, 
-	those values are set in the templates only
-	
-			if($this->_audBr!==null && $this->_audBr>0){
-				$audProfile->Bitrate->ConstantBitrate['Bitrate'] = $this->_audBr;
-			}
-			if($this->_audSr!==null && $this->_audSr>0){
-				$audProfile['SamplesPerSecond'] = $this->_audSr;
-			}
-			if($this->_audCh!==null && $this->_audCh>0){
-				$audProfile['Channels'] = $this->_audCh;
-			}
-*/
-		}
-//$stream = clone $streams->StreamInfo;
-//		$streams[1] = $stream;
-		//		print_r($xml);
-		return $xml->asXML();
+		$ee3 = new KDLExpressionEncoder3();
+		return $ee3->GeneratePresetFile($this->_target);
 	}
 
 	/* ---------------------------
@@ -963,467 +861,394 @@ $h264Codec = new KDLCodecH264($this->_target->_video);
 			break;
 		}
 	}
-	
 }
 
-abstract class KDLBaseCodec {
-	
-	public function __construct(KDLVideoData $vidObj=null){
-		if(isset($vidObj)){
-			$this->Evaluate($vidObj);
-		}
-	}
-	abstract public function Evaluate(KDLVideoData $vidObj);
-}
-	
-class KDLCodecH264 extends KDLBaseCodec{
-	public	$_crf;			/*	"Constant quality mode (also known as constant ratefactor). 
-								Bitrate corresponds approximately to that of constant quantizer, 
-								but gives better quality overall at little speed cost."
-								default=23
-								For presentation-style - 10
-							*/
-	public 	$_refs;			/*	reference frames*/
-	public	$_subq=2;		/* subpixel estimation complexity. Higher numbers are better */
-	public	$_coder=0;
-
-	public 	$_qcomp=0.6; 
-	public 	$_qmin=10;
-	public 	$_qmax=50;
-	public 	$_qdiff=4;
-	
-	public	$_bframes=3;	/* B-Frames */
-	
-	public	$_b_pyramid;	/* "it increases the DPB (decoding picture buffer) size required
-								for playback, so when encoding for hardware, disable"
-								to disable for mobiles
-							*/
-	public	$_weight_b=1; 	/* dragonfly - not set
-								x264 recommendation - no cost -> always enabled
-							*/
-	public	$_threads;
-	public	$_partitions;
-	public	$_level;		/* Represents minimal required decoder capability - frmSz/frmRt/br*/
-	public	$_global_header=1;/*"is used to force ffmpeg to spit out some important audio specifications"
-								Important for akmi-hd/hls. somehow related with vglobal/aglobal options
-								that i do not use here.
-							*/
-	public	$_trellis = 1;	/* "The main decision made in quantization is which coefficients 
-								to round up and which to round down. Trellis chooses the optimal 
-								rounding choices for the maximum rate-distortion score, 
-								to maximize PSNR relative to bitrate."
-								BP does not support it.
-							*/
-	public	$_chroma_me=1;	/* "Normally, motion estimation works off both the luma and 
-								chroma planes."
-								can be turned on to gain speed. relevant for mencoder
-							*/
-	public	$_dct8x8;		/* "the only reason to disable it is when one needs support 
-								on a device not compatible with High Profile."
-							*/
-	public	$_fastskip=0;	/* "By default, x264 will skip macroblocks in P-frames that 
-								don't appear to	have changed enough between two frames 
-								to justify encoding the difference. This considerably speeds
-								 up encoding. However, for a slight quality boost, 
-								P-skip can be disabled."
-								To turm on for 'presentation' assets
-							*/
-	public	$_mixed_refs;	/* "boosts quality with little speed impact. 
-								It should generally be used, though it 
-								obviously has no effect with only one reference frame."
-							*/
-	
-	public	$_me="umh";
-	public	$_loop;
-	public	$_mv4;
-	public	$_cmp;
-	public	$_me_range; 
-	public	$_keyint_min;	/* "Minimum GOP length, the minimum distance between I-frames. 
-								Recommended default: 25"
-								should match gop.
-							*/
-	public	$_sc_threshold; /* "Adjusts the sensitivity of x264's scenecut detection. Rarely needs to be adjusted. 
-								Recommended default: 40"
-							*/
-	public	$_i_qfactor; 
-	public	$_bt; 
-	public	$_maxrate; 
-	public	$_bufsize; 
-	public	$_rc_eq;
-
-	/* none h264 */
-	public	$_sws;			/*	0 (Fast bilinear), 
-								1 (Bilinear), 
-								2 (Bicubic (good quality)), 
-								3 (Experimental), 
-								4 (Nearest neighbour (bad quality)), 
-								5 (Area), 
-								6 (Luma bicubic / chroma bilinear), 
-								7 (Gauss), 
-								8 (SincR), 
-								9 (Lanczos), 
-								10 (Bicubic spline)
-							*/
-	
-	public	$_async; 
-	public	$_vsync;
-	
-	public	$_vidBr;
-	
-	/* ----------------------
-	 * Evaluate(KDLFlavor $target)
-	 */
-	public function Evaluate(KDLVideoData $vidObj){
-
+class KDLExpressionEncoder3 {
+const jobXml = '<?xml version="1.0"?>
+<!--Created with Kaltura Decision Layer module-->
+<Preset
+  Version="3.0">
+  <Job
+    OutputDirectory="C:\Tmp\Prod"
+    DefaultMediaOutputFileName="{OriginalFilename}.{DefaultExtension}" />
+  <MediaFile
+    VideoResizeMode="Letterbox"
+	ThumbnailCodec="Jpeg" 
+	ThumbnailTime="00:00:03"
+    ThumbnailMode="Custom">
+    <OutputFormat>
+    </OutputFormat>
+  </MediaFile>
+</Preset>';
 		
-			/*
-			 * From Eagle and on, the H264 should be generated to match Akami HD constarints 
-			 * for Apple HLS/adaptive playbck:
-			 * - aligned key frames across all bitrates
-			 * - same frame rate across all bitrates
-			 * 
-			 * '_h264ForMobile' flag rules the generation mode 
-			 */
-		$h264ForMobile = 0;
-		if(property_exists($vidObj,"_h264ForMobile")) {
-			$h264ForMobile = $vidObj->_h264ForMobile;
-		}
-			/*
-			 * Check for 'presentation-style' video mode
-			 */
-		$presentationStyleMode = 0;
-		if($vidObj->_bitRate<KDLConstants::LowBitrateThresHold) {
-			$presentationStyleMode=1;
-			$this->_crf=10;
-		}
-		
-		if(isset($vidObj)){
-			$this->_vidBr = $vidObj->_bitRate;
-		}
-/*
-			$this->_vidId = $target->_video->_id;
-			$this->_vidBr = $target->_video->_bitRate;
-			$this->_vidWid = $target->_video->_width;
-			$this->_vidHgt = $target->_video->_height;
-			$this->_vidFr = $target->_video->_frameRate;
-			$this->_vidGop = $target->_video->_gop;
-			$this->_vid2pass = $target->_isTwoPass;
-			$this->_vidRotation = $target->_video->_rotation;
-			$this->_vidScanType = $target->_video->_scanType;
+const vc1CodecXml = '<?xml version="1.0"?>
+<AdvancedVC1VideoProfile
+	SmoothStreaming="True"
+	ClosedGop="True"
+	OutputMode="ElementaryStreamSequenceHeader"
+	DifferentialQuantization="Off"
+	InLoopFilter="True"
+	MotionSearchRange="MacroblockAdaptive"
+	BFrameCount="1"
+	AdaptiveDeadZone="Conservative"
+	AdaptiveGop="True"
+	DenoiseFilter="False"
+	KeyFrameDistance="00:00:02"
+	MotionChromaSearch="LumaOnly"
+	MotionMatchMethod="SAD"
+	NoiseEdgeRemovalFilter="False"
+	OverlapSmoothingFilter="True"
+	AutoFit="True"
+	Force16Pixels="False"
+	Complexity="Normal"
+	FrameRate="0"
+	SeparateFilesPerStream="True"
+	NumberOfEncoderThreads="0">
+	<Streams
+		AutoSize="False"
+		FreezeSort="False">
+		<StreamInfo
+			Size="640, 480">
+		</StreamInfo>
+	</Streams>
+</AdvancedVC1VideoProfile>';
 
-ffmp - -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 -me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k -maxrate 1200k -bufsize 1200k -rc_eq 'blurCplx^(1-qComp)' -level 30 -async 2 -vsync 2 
- */
-		$h264params=null;
-		switch($vidObj->_id) {
-		case KDLVideoTarget::H264:
-			$this->_refs = 2;
-			$this->_coder = 0;
-			$this->_subq = 2;
-			$this->_bframes=3;
-			$this->_b_pyramid;
-			$this->_weight_b;
-			$this->_threads="auto";
-			$this->_partitions;
-			$this->_dct8x8=null;
+const h264CodecXml = '<?xml version="1.0"?>
+<MainH264VideoProfile
+	SmoothStreaming="False"
+	BFrameCount="1"
+	EntropyMode="Cabac"
+	RDOptimization="False"
+	KeyFrameDistance="00:00:05"
+	InLoopFilter="True"
+	MEPartitionLevel="EightByEight"
+	NumberOfReferenceFrames="4"
+	SearchRange="32"
+	AutoFit="True"
+	Force16Pixels="False"
+	Complexity="Normal"
+	FrameRate="0"
+	SeparateFilesPerStream="True"
+	NumberOfEncoderThreads="0">
+	<Streams
+		AutoSize="False"
+		FreezeSort="False">
+		<StreamInfo
+			Size="640, 480">
+		</StreamInfo>
+	</Streams>
+</MainH264VideoProfile>';
 
-			if($h264ForMobile) {
-				$this->forMobile();
-			}
-			break;
-		case KDLVideoTarget::H264B:
-			$this->_refs = 6; // ffm - 2
-			$this->_coder = 0;
-			$this->_sws = 9; // ffm - none
-			$this->_subq = 2;
-			$this->_bframes=0;
-			$this->_b_pyramid;
-			$this->_weight_b;
-			$this->_threads="auto";
-			$this->_level;
-			$this->_partitions;  // ffm - none/default
-			$this->_global_header=1;
-			$this->_trellis = 1;
-			$this->_chroma_me;
-			$this->_me="umh";
-			$this->_dct8x8=null;
+const audioBitrateXml = '<Bitrate>
+	<ConstantBitrate
+		Bitrate="96"
+		IsTwoPass="False"
+		BufferWindow="00:00:00" />
+</Bitrate>';
 
-			if($h264ForMobile) {
-				$this->forMobile();
-			}
-			break;
-		case KDLVideoTarget::H264M:
-			$this->_refs = 6;// ffm - 2
-			$this->_coder = 1;
-			$this->_sws = 9; // ffm - none
-			$this->_subq = 5;
-			$this->_bframes=3;
-			$this->_b_pyramid;
-			$this->_weight_b;
-			$this->_threads="auto";
-			$this->_level;
-			$this->_partitions="all";  // ffm - none/default
-			$this->_global_header=1;
-			$this->_trellis = 1;
-			$this->_chroma_me;
-			$this->_me="umh";
-			$this->_dct8x8=null;
+const videoConstantBitrateXml = '<Bitrate>
+                  <ConstantBitrate
+                    Bitrate="1111"
+                    IsTwoPass="False"
+                    BufferWindow="00:00:04" />
+			</Bitrate>
+';
 
-			if($h264ForMobile) {
-				$this->forMobile();
-			}
-			break;
-		case KDLVideoTarget::H264H:				
-			$this->_refs = 6;// ffm - 2
-			$this->_coder = 1;
-			$this->_sws = 9; // ffm - none
-			$this->_subq = 7;
-			$this->_bframes=3; //ffm - 16
-			$this->_b_pyramid=1;
-			$this->_weight_b=1; // ffmpeg - wpred
-			$this->_threads="auto";
-			$this->_level;
-			$this->_partitions="p8x8,b8x8,i8x8,i4x4";  // ffm - none/default
-			$this->_global_header=1;
-			$this->_trellis = 1;
-			$this->_chroma_me;
-			$this->_me="umh";
-			$this->_dct8x8=1;
-			$this->_fastskip=1;
-			$this->_mixed_refs=1;
-			
-			if($h264ForMobile) {
-				$this->forMobile();
-			}
-			break;
-		}
-		return true;
-	}
+const videoVariableBitrateXml = '<Bitrate>
+				<VariableConstrainedBitrate
+					PeakBitrate="1050"
+					PeakBufferWindow="00:00:04"
+					AverageBitrate="700" />
+			</Bitrate>
+';
 
-	/* ----------------------
-	 * forMobile
-	 */
-	private function forMobile(){
-//ffmp - -flags +loop+mv4 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -trellis 1 -refs 1 
-//-me_range 16 -keyint_min 20 -sc_threshold 40 -i_qfactor 0.71 -bt 800k 
-//-maxrate 1200k - 1200k -rc_eq 'blurCplx^(1-qComp)' -level 30 -async 2 -vsync 2 
-		$this->_cmp = 256;
-		$this->_partitions="p8x8,b8x8,i4x4";
-		$this->_loop=1;
-		$this->_mv4=1;
-		$this->_trellis = 1;
-		$this->_refs = 1;
-		$this->_me_range = 16;
-		$this->_keyint_min = 25; 	//should match gop
-		$this->_sc_threshold = 40; 	// x264 recommendation
-		$this->_i_qfactor = 0.71;
-		$this->_bt = 800;			// bit rate tolleranceto be relative to vidBr
-		$this->_maxrate = 1200;		//should match vidBr
-		$this->_bufsize = 1200;		//should match vidBr ??? "Depends on the profile level of the video being encoded. Set only if you're encoding for a hardware device"
-		$this->_rc_eq = '\'blurCplx^(1-qComp)\'';
-		$this->_level = 30; 		// to match iPhone processing constraints
-		$this->_vsync = 2;
-		$this->_async = 2;
-		
-		$this->_b_pyramid = null;
-		$this->_mixed_refs= null;
-		$this->_dct8x8=null;
-		$this->_bframes=0;
-	}
-	
-	/* ----------------------
-	 * FFmpeg
-	 */
-	public function FFmpeg()
+		/* ------------------------------
+		 * GeneratePresetFile
+		 */
+	public static function GeneratePresetFile($target, $outFileName=null)
 	{
-// main=" libx264 -subq 5".$ffQsettings." -coder 1 -refs 2";
-// High=" libx264 -subq 7".$ffQsettings." -bf 16 -coder 1 -refs 6 -flags2 +bpyramid+wpred+mixed_refs+dct8x8+fastpskip";
-		$params = " libx264";
-		if(isset($this->_subq)) 	$params.=" -subq $this->_subq";
-		$params.= " -qcomp $this->_qcomp -qmin $this->_qmin -qmax $this->_qmax -qdiff $this->_qdiff";
-		if(isset($this->_bframes)) 	$params.=" -bf $this->_bframes";
-		if(isset($this->_coder)) 	$params.=" -coder $this->_coder";
-		if(isset($this->_refs)) 	$params.=" -refs $this->_refs";
-		if(isset($this->_crf)) 		$params.=" -crf $this->_crf";
-		
-		if(isset($this->_partitions)){
-			$partArr = explode(",",$this->_partitions);
-			$partitions = null;
-			foreach ($partArr as $p) {
-				switch($p){
-				case "all":
-					$partitions.="+partp8x8+partp4x4+partb8x8+parti8x8+parti4x4";
+$fileFormat=null;
+$videoProfileElem=null;
+		if(isset($target->_video)){
+$vidObj = $target->_video;
+			$videoProfileElem = new SimpleXMLElement('<?xml version="1.0"?><VideoProfile></VideoProfile>');
+			$videoCodec=$videoProfileElem->addChild('VideoProfile');
+			switch($vidObj->_id){
+				case KDLVideoTarget::WMV2:
+				case KDLVideoTarget::WMV3:
+				case KDLVideoTarget::WVC1A:
+				default:
+					$videoCodec = new SimpleXMLElement(self::vc1CodecXml);
+					$fileFormat = 'wmv';
 					break;
-				case "p8x8":
-					$partitions.="+partp8x8";
+				case KDLVideoTarget::H264:
+				case KDLVideoTarget::H264B:
+				case KDLVideoTarget::H264M:
+				case KDLVideoTarget::H264H:				
+					$videoCodec = new SimpleXMLElement(self::h264CodecXml);
+					$fileFormat = 'mp4';
+					$cbr = 1;
 					break;
-				case "p4x4":
-					$partitions.="+partp4x4";
-					break;
-				case "b8x8":
-					$partitions.="+partb8x8";
-					break;
-				case "i8x8":
-					$partitions.="+parti8x8";
-					break;
-				case "i4x4":
-					$partitions.="+parti4x4";
-					break;
+			}
+			if($target->_container->_id==KDLContainerTarget::ISMV)
+				$videoCodec['SmoothStreaming'] = 'True';
+			else
+				$videoCodec['SmoothStreaming'] = 'False';
+				
+			$vFr = 30;
+			if($vidObj->_frameRate!==null && $vidObj->_frameRate>0){
+				$vFr = $vidObj->_frameRate;
+				$videoCodec['FrameRate']=$vidObj->_frameRate;
+			}
+			if($vidObj->_gop!==null && $vidObj->_gop>0){
+				$kFr = round($vidObj->_gop/$vFr);
+				$mi = round($kFr/60);
+				$se = $kFr%60;
+				$videoCodec['KeyFrameDistance']=sprintf("00:%02d:%02d",$mi,$se);
+			}
+
+			if(!isset($cbr)) {
+				if(isset($vidObj->_cbr))
+					$cbr = $vidObj->_cbr;
+				else
+					$cbr = 0;
+			}
+			if($vidObj->_bitRate){
+				if($target->_container->_id==KDLContainerTarget::ISMV)
+					$vbr=max(100,$vidObj->_bitRate); // The minimum video br for the SL is 100
+				else
+					$vbr=$vidObj->_bitRate;
+				if($cbr==0){
+					$videoBitrateElem = new SimpleXMLElement(self::videoVariableBitrateXml);
+					KDLUtils::AddXMLElement($videoCodec->Streams->StreamInfo, $videoBitrateElem);
+					$videoCodec->Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['PeakBitrate'] = round($vbr*1.3);
+					$videoCodec->Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate'] = $vbr;
+				}
+				else {
+					$videoBitrateElem = new SimpleXMLElement(self::videoConstantBitrateXml);
+					KDLUtils::AddXMLElement($videoCodec->Streams->StreamInfo, $videoBitrateElem);
+					$videoCodec->Streams->StreamInfo->Bitrate->ConstantBitrate['Bitrate'] = $vbr;
 				}
 			}
-			if(isset($partitions))	$params.=" -partitions $partitions";
-		}
-// ffmpeg -i <in file> -f mpegts -acodec libmp3lame -ar 48000 -ab 64k -s 320×240 -vcodec libx264 -b 96k 
-// -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -subq 5 -trellis 1 -refs 1 -coder 0 
-// -me_range 16 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -bt 200k 
-// -maxrate 96k -bufsize 96k -rc_eq 'blurCplx^(1-qComp)' 
-// -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 30 -aspect 320:240 -g 30 -async 2 
-		if(isset($this->_trellis))		$params.= " -trellis $this->_trellis";
-		if(isset($this->_keyint_min))	$params.= " -keyint_min $this->_keyint_min";
-		if(isset($this->_me_range))		$params.= " -me_range $this->_me_range";
-		if(isset($this->_sc_threshold))	$params.= " -sc_threshold $this->_sc_threshold";
-		if(isset($this->_i_qfactor))	$params.= " -i_qfactor $this->_i_qfactor";
-		if(isset($this->_bt))			$params.= " -bt $this->_bt";
-		if(isset($this->_maxrate))		$params.= " -maxrate $this->_maxrate";
-		if(isset($this->_bufsize))		$params.= " -bufsize $this->_bufsize";
-		if(isset($this->_rc_eq))		$params.= " -rc_eq $this->_rc_eq";
-		if(isset($this->_level))		$params.= " -level $this->_level";
-		
-		$flags=null;
-		{
-			if(isset($this->_loop)) {
-				if($this->_loop>0) $flags.= "+loop";
-				else $flags.= "-loop";
-			}
-			if(isset($this->_mv4)) {
-				if($this->_mv4>0) $flags.= "+mv4";
-				else $flags.= "-mv4";
-			}
-			if(isset($this->_global_header)) {
-				if($this->_global_header>0) $flags.= "+global_header";
-				else $flags.= "-global_header";
+			if($vidObj->_width!=null && $vidObj->_height!=null){
+				$videoCodec->Streams->StreamInfo['Size'] = $vidObj->_width.", ".$vidObj->_height;
 			}
 			
-			if(isset($flags))	$params.=" -flags $flags";
-		}
-		
-		$flags2=null;
-		{
-			if(isset($this->_b_pyramid)) 	$flags2.= "+bpyramid";
-			if(isset($this->_weight_b))		$flags2.= "+wpred";
-			if(isset($this->_mixed_refs))	$flags2.= "+mixed_refs";
-			if(isset($this->_dct8x8))		$flags2.= "+dct8x8";
-			if(isset($this->_fastpskip)) {
-				if($this->_fastpskip>0) $flags2.= "+fastpskip";
-				else $flags2.= "-fastpskip";
-			}
+//			$strmInfo = clone ($vidProfile->Streams->StreamInfo[0]);
+			KDLUtils::AddXMLElement($videoProfileElem->VideoProfile, $videoCodec);
 			
-			if(isset($flags2))	$params.=" -flags2 $flags2";
+		}
+
+$audioProfileElem=null;
+		if(isset($target->_audio)){
+$audObj = $target->_audio;
+			$aacBitrates = array(96,128,160,192);
+			$aacSampleRates = array(44100,48000);
+			$wmaBitrates = array(32,48,64,80,96,127,128,160,191,192,255,256,383,384,440,640,768);
+			$wmaSampleRates = array(44100,48000);
+			
+			$audioProfileElem = new SimpleXMLElement('<?xml version="1.0"?><AudioProfile></AudioProfile>');
+			switch($audObj->_id){
+				case KDLAudioTarget::AAC:
+					$audioCodec=$audioProfileElem->addChild('AacAudioProfile');
+					$audioCodec['Codec'] = 'AAC';
+					$codecBitrates = $aacBitrates;
+					$codecSampleRates = $aacSampleRates;
+					if(!isset($fileFormat)) $fileFormat = 'mp4';
+					break;
+				case KDLAudioTarget::WMAPRO:
+					$audioCodec=$audioProfileElem->addChild('WmaAudioProfile');
+					$audioCodec['Codec'] = 'WmaProfessional';
+					$codecBitrates = $wmaBitrates;
+					$codecSampleRates = $wmaSampleRates;
+					if(!isset($fileFormat)) $fileFormat = 'wmv';
+					break;
+				case KDLAudioTarget::WMA:
+				default:
+					$audioCodec=$audioProfileElem->addChild('WmaAudioProfile');
+					$audioCodec['Codec'] = 'Wma';
+					$codecBitrates = $wmaBitrates;
+					$codecSampleRates = $wmaSampleRates;
+					if(!isset($fileFormat)) $fileFormat = 'wmv';
+					break;
+			}
+			$audioBitrateElem = new SimpleXMLElement(self::audioBitrateXml);
+			if(isset($audObj->_bitRate))
+				$br = self::lookForClosest($audObj->_bitRate, $codecBitrates);
+			else
+				$br = 96;
+			if(isset($audObj->_sampleRate))
+				$sr = self::lookForClosest($audObj->_sampleRate, $codecSampleRates);
+			else
+				$sr = 44100;
+			$audioBitrateElem->ConstantBitrate['Bitrate'] = (string)$br;
+			KDLUtils::AddXMLElement($audioCodec, $audioBitrateElem);
+			if(isset($audObj->_channels))
+				$audioCodec['Channels']=(string)$audObj->_channels;
+			else
+				$audioCodec['Channels']="2";
+            $audioCodec['BitsPerSample']="16";
+            $audioCodec['SamplesPerSecond']=(string)$sr;
+		}
+
+$jobElem = null;
+$outputFormat=null;
+		if(isset($target->_container)) {
+$contObj = $target->_container;
+			switch($contObj->_id){
+				case KDLContainerTarget::ISMV:
+					if(isset($fileFormat) && $fileFormat=='mp4')
+						$formatName='MP4OutputFormat';
+					else
+						$formatName='WindowsMediaOutputFormat';
+					break;
+				case KDLContainerTarget::MP4:
+					$formatName='MP4OutputFormat';
+					break;
+				case KDLContainerTarget::WMV:
+				default:
+					$formatName='WindowsMediaOutputFormat';
+					break;
+			}
+			$jobElem = new SimpleXMLElement(self::jobXml);
+			$outputFormat=$jobElem->MediaFile->OutputFormat->addChild($formatName);
 		}
 		
-		if(isset($this->_vsync))		$params.= " -vsync $this->_vsync";
-		if(isset($this->_async))		$params.= " -async $this->_async";
+		if(isset($audioProfileElem)) {
+			KDLUtils::AddXMLElement($outputFormat, $audioProfileElem);
+		}
+		if(isset($videoProfileElem)) {
+			KDLUtils::AddXMLElement($outputFormat, $videoProfileElem->VideoProfile);
+		}
 		
-		return $params;
-	} 
-	
-	/* ----------------------
-	 * Mencoder
-	 */
-	public function Mencoder()
-	{
+		$jobElem->Job['OutputDirectory']=KDLCmdlinePlaceholders::OutDir;
+		if(isset($outFileName)){
+			$jobElem->Job['DefaultMediaOutputFileName']=$outFileName.".{DefaultExtension}";
+		}
 /*
-						$h264params = $h264params." -ovc x264 -x264encopts ";
-						if($this->_vidBr) {
-							$h264params .= "bitrate=".$this->_vidBr;
-							$h264params .= ":";
-							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-								$h264params .= "crf=30:";
-							}
-						}
-						$h264params .= "subq=2:8x8dct:frameref=2:bframes=3:b_pyramid=1:weight_b:threads=auto";
+	Since there are certain constraints on those values for the EE3 presets, 
+	those values are set in the templates only
+	
+			if($this->_audBr!==null && $this->_audBr>0){
+				$audProfile->Bitrate->ConstantBitrate['Bitrate'] = $this->_audBr;
+			}
+			if($this->_audSr!==null && $this->_audSr>0){
+				$audProfile['SamplesPerSecond'] = $this->_audSr;
+			}
+			if($this->_audCh!==null && $this->_audCh>0){
+				$audProfile['Channels'] = $this->_audCh;
+			}
 */
-/*
-						$h264params = $h264params." -ovc x264 -sws 9 -x264encopts ";
-						if($this->_vidBr) {
-							$h264params .= " bitrate=".$this->_vidBr;
-							$h264params .= ":";
-							if($this->_vidBr<KDLConstants::LowBitrateThresHold) {
-								$h264params .= "crf=30:";
-							}
-						}
-						$h264params .= "subq=2:frameref=6:bframes=0:threads=auto:nocabac:level_idc=30:
-						global_header:partitions=all:trellis=1:chroma_me:me=umh";
 
- */
-		$params = " -ovc x264";
-		if(isset($this->_sws))		$params.= " -sws $this->_sws";
-
-		$encopts = " qcomp=$this->_qcomp:qpmin=$this->_qmin:qpmax=$this->_qmax:qpstep=$this->_qdiff:";
-		{
-			if(isset($this->_vidBr)) {
-				$encopts.= "bitrate=$this->_vidBr:";
-				if(isset($this->_crf))	$encopts.= "crf=30:";
+//$stream = clone $streams->StreamInfo;
+//		$streams[1] = $stream;
+KalturaLog::log($jobElem->asXML());
+		return $jobElem->asXML();
+	}
+	
+		/* ------------------------------
+		 * GenerateSmoothStreamingPresetFile
+		 */
+	public static function GenerateSmoothStreamingPresetFile($flavors)
+	{
+		$rootFlavor=null;
+		$rootStreams=null;
+		foreach ($flavors as $flavor){
+			$ee3Id = KDLOperationParams::SearchInArray(KDLTranscoders::EE3, $flavor->_transcoders);
+			if(is_null($ee3Id)) {
+				continue;
 			}
-			if(isset($this->_subq))			$encopts.= "subq=$this->_subq:";
-			if(isset($this->_refs))			$encopts.= "frameref=$this->_refs:";
-			if(isset($this->_bframes))		$encopts.= "bframes=$this->_bframes:";
-			if(isset($this->_b_pyramid))	$encopts.= "b_pyramid=1:";
-			if(isset($this->_weight_b))		$encopts.= "weight_b=1:";
-			if(isset($this->_threads))		$encopts.= "threads=$this->_threads:";
-			if(isset($this->_coder) && $this->_coder==0) $encopts.= "nocabac:";
-			if(isset($this->_level))		$encopts.= "level_idc=$this->_level:";
-			if(isset($this->_global_header))$encopts.= "global_header:";
-			if(isset($this->_dct8x8))		$encopts.= "8x8dct:";
-			if(isset($this->_trellis))		$encopts.= "trellis=$this->_trellis:";
-			if(isset($this->_chroma_me))	$encopts.= "chroma_me=$this->_chroma_me:";
-
-			if(isset($this->_me))			$encopts.= "me=$this->_me:";
-			if(isset($this->_keyint_min))	$encopts.= "keyint_min=$this->_keyint_min:";
-			if(isset($this->_me_range))		$encopts.= "me_range=$this->_me_range:";
-			if(isset($this->_sc_threshold))	$encopts.= "scenecut=$this->_sc_threshold:";
-			if(isset($this->_i_qfactor))	$encopts.= "ipratio=$this->_i_qfactor:";
-			if(isset($this->_bt))			$encopts.= "ratetol=$this->_bt:";
-			if(isset($this->_maxrate))		$encopts.= "vbv-maxrate=$this->_maxrate:";
-			if(isset($this->_bufsize))		$encopts.= "vbv-bufsize=$this->_bufsize:";
-//			if(isset($this->_rc_eq))		$encopts.= " -rc_eq $this->_rc_eq";
 			
-			if(isset($this->_partitions)){
-				$partArr = explode(",",$this->_partitions);
-				$partitions = null;
-				foreach ($partArr as $p) {
-					switch($p){
-					case "all":
-						$partitions.="all";
-						break;
-					case "p8x8":
-						$partitions.="+p8x8";
-						break;
-					case "p4x4":
-						$partitions.="+p4x4";
-						break;
-					case "b8x8":
-						$partitions.="+b8x8";
-						break;
-					case "i8x8":
-						$partitions.="+i8x8";
-						break;
-					case "i4x4":
-						$partitions.="+i4x4";
-						break;
-					}
+$transcoderParams = $flavor->_transcoders[$ee3Id];
+KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
+			if(is_null($transcoderParams->_cmd)){
+				KalturaLog::log("ee3 cmd is null");
+				continue;
+			}
+			
+			$ee3 = new SimpleXMLElement($transcoderParams->_cmd);
+			if(isset($ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile))
+				$videoProfile = $ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile;
+			else if(isset($ee3->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile))
+				$videoProfile = $ee3->MediaFile->OutputFormat->MP4OutputFormat->VideoProfile;
+			if(!isset($videoProfile)){
+				continue;
+			}
+			switch($flavor->_video->_id){
+				case KDLVideoTarget::WVC1A:
+					$videoCodec = $videoProfile->AdvancedVC1VideoProfile;
+					break;
+				case KDLVideoTarget::H264:
+				case KDLVideoTarget::H264M:
+				case KDLVideoTarget::H264H:
+					$videoCodec = $videoProfile->MainH264VideoProfile;
+					break;
+				case KDLVideoTarget::H264B:
+					$videoCodec = $videoProfile->BaselineH264VideoProfile;
+					break;
+				default:
+					continue;
+			}
+			if(!isset($videoCodec) || !isset($videoCodec['SmoothStreaming']) 
+			|| ($videoCodec['SmoothStreaming']!='true' && $videoCodec['SmoothStreaming']!='True'))
+				continue;
+			$streams = $videoCodec->Streams;
+			if(!(isset($streams) && isset($streams->StreamInfo))) {
+				continue;
+			}
+
+			$flavorVideoBr = $flavor->_video->_bitRate;
+			$br = $streams->StreamInfo->Bitrate;
+			if(isset($br->ConstantBitrate)) {
+				if($br->ConstantBitrate['Bitrate']!=$flavorVideoBr){
+KalturaLog::log("-->xmlBR=".$br->ConstantBitrate['Bitrate'].", flavorBR=".$flavorVideoBr);
+					$br->ConstantBitrate['Bitrate']=$flavorVideoBr;
 				}
-				if(isset($partitions))	$encopts.="partitions=$partitions:";
+			}
+			else if(isset($br->VariableConstrainedBitrate)) {
+				if($br->VariableConstrainedBitrate['AverageBitrate']!=$flavorVideoBr){
+KalturaLog::log("-->xmlBR=".$br->VariableConstrainedBitrate['AverageBitrate'].", flavorBR=".$flavorVideoBr);
+					$br->VariableConstrainedBitrate['AverageBitrate']=$flavorVideoBr;
+					$br->VariableConstrainedBitrate['PeakBitrate']=round($flavorVideoBr*1.3);
+				}
 			}
 			
-			if(isset($encopts))	{
-				$encopts = rtrim($encopts,":");
-				$params.= " -x264encopts $encopts";
+			if($rootFlavor==null) {
+				$rootFlavor = $ee3;
+				$rootStreams = $streams;						
 			}
+			else if($streams && isset($streams->StreamInfo) && $rootStreams/*&& is_array($streams->StreamInfo)*/) {
+				KDLUtils::AddXMLElement($rootStreams, $streams->StreamInfo);
+			}
+			$br = null;
 		}
 		
-		
-		return $params;
+		if($rootFlavor)
+			return $rootFlavor->asXML();
+		else
+			return null;
+	}
+	
+	private static function lookForClosest($val, $valList)
+	{
+		$prev = null;
+		foreach ($valList as $v){
+			if($val==$v)
+				return $v;
+			if($val<$v){
+				if(!isset($prev)){
+					return $v;
+				}
+				if($v-$val<$val-$prev){
+					return $v;
+				}
+				else{
+					return $prev;
+				}
+			}	
+			$prev = $v;
+		}
+		return $prev;
 	}
 }
-
 ?>
