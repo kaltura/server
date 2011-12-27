@@ -135,49 +135,10 @@ KalturaLog::log("An invalid source RealMedia file thatfails to provide valid med
 		 */
 		public static function ProceessFlavorsForCollection($flavorList)
 		{
-			$rootFlavor=null;
-			$rootStreams=null;
-			foreach ($flavorList as $flavor){
-				$ee3Id = KDLOperationParams::SearchInArray(KDLTranscoders::EE3, $flavor->_transcoders);
-				if(!is_null($ee3Id)) {
-//				if(array_key_exists(KDLTranscoders::EE3, $flavor->_transcoders)) {
-$tr = $flavor->_transcoders[$ee3Id];
-//KalturaLog::log(__METHOD__."transcoders==>\n".print_r($trnsStr,true));
-KalturaLog::log(__METHOD__."\n"."transcoder==>\n".print_r($tr,true)."\n<--");
-if(is_null($tr->_cmd))
-	KalturaLog::log(__METHOD__." - ee3 cmd is null");
-//					KalturaLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_id."\n<--");
-//					KalturaLog::log(__METHOD__."-->\n".$flavor->_transcoders[$ee3Id]->_cmd."\n<--");
-					$ee3 = new SimpleXMLElement($flavor->_transcoders[$ee3Id]->_cmd);
-					$ee3Streams=null;
-					if(!is_null($ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile)) {
-						$ee3Streams = $ee3->MediaFile->OutputFormat->WindowsMediaOutputFormat->VideoProfile->AdvancedVC1VideoProfile->Streams;
-						if($ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']!=$flavor->_video->_bitRate) {
-KalturaLog::log(__METHOD__."-->xmlBR=".$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate'].", flavorBR=".$flavor->_video->_bitRate);
-							$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['AverageBitrate']=$flavor->_video->_bitRate;
-							$ee3Streams->StreamInfo->Bitrate->VariableConstrainedBitrate['PeakBitrate']=round($flavor->_video->_bitRate*1.3);
-						}
-					}
-					if($rootFlavor==null) {
-						$rootFlavor = $ee3;
-						$rootStreams = $ee3Streams;						
-					}
-					else {
-						$dest = $rootStreams;
-						if($ee3Streams) {
-							$src = $ee3Streams->StreamInfo[0];
-							if($dest && $src)
-								KDLUtils::AddXMLElement($dest, $src);
-						}
-					} 
-				}
-			}
-			if($rootFlavor)
-				return $rootFlavor->asXML();
-			else
-				return null;
+			$ee3obj = new KDLExpressionEncoder3();
+			return $ee3obj->GenerateSmoothStreamingPresetFile($flavorList);
 		}
-
+		
 		/* ------------------------------
 		 * ValidateProductFlavors
 		 */
