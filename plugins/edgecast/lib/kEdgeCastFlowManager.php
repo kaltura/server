@@ -192,6 +192,7 @@ class kEdgeCastFlowManager implements kObjectDeletedEventConsumer
             $results[$id] = array(
                 'result' => curl_multi_getcontent($ch),
                 'error' => curl_error($ch),
+                'http_code' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
             );  
             curl_multi_remove_handle($mh, $ch);
         }
