@@ -200,7 +200,7 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 				}
 				break;
 			case "rotation":
-				$mediaInfo->videoRotation = (int)$this->trima($val);
+				$mediaInfo->videoRotation = (int)self::trima($val);
 				break;
 			case "scan type":
 				$scanType = self::trima($val);
