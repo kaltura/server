@@ -141,7 +141,8 @@ class kBusinessPreConvertDL
 		}
 
 		$errDescription = null;
-		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $errDescription);
+		// Since this method is called when trying to crop an existing thumbnail, need to add this check - thumbAssets have no mediaInfo.
+		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $errDescription, $mediaInfo? $mediaInfo->getVideoRotation() : null);
 		
 		// failed
 		if(!$capturedPath)
@@ -242,7 +243,7 @@ class kBusinessPreConvertDL
 		}
 	}
 	
-	public static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription)
+	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription, $rotate=null)
 	{
 		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
@@ -300,7 +301,7 @@ class kBusinessPreConvertDL
 			$scaleHeight = $destThumbParamsOutput->getScaleHeight();
 			$density = $destThumbParamsOutput->getDensity();
 			
-			$cropper = new KImageMagickCropper($srcPath, $destPath, kConf::get('bin_path_imagemagick'), true);
+			$cropper = new KImageMagickCropper($srcPath, $destPath, kConf::get('bin_path_imagemagick'), true, $rotate);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor,$density);
 			if(!$cropped || !file_exists($destPath))
 			{
