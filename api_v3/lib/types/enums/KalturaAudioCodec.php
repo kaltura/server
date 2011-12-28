@@ -11,6 +11,7 @@ class KalturaAudioCodec extends KalturaStringEnum
 	const AAC = "aac";
 	const VORBIS = "vorbis";
 	const WMA = "wma";
+	const WMAPRO = "wmapro";
 	const AMRNB = "amrnb";
 	const MPEG2 = "mpeg2";
 	const COPY = "copy";
