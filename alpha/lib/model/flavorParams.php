@@ -46,6 +46,7 @@ class flavorParams extends assetParams
 	const AUDIO_CODEC_AAC = "aac";
 	const AUDIO_CODEC_VORBIS = "vorbis";
 	const AUDIO_CODEC_WMA = "wma";
+	const AUDIO_CODEC_WMAPRO = "wmapro";
 	const AUDIO_CODEC_AMRNB = "amrnb";
 	const AUDIO_CODEC_MPEG2 = "mpeg2";
 	const AUDIO_CODEC_COPY = "copy";
