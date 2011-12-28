@@ -1,5 +1,8 @@
 <?php
 
+/**
+*@package plugins.inletArmada
+*/
 class InletArmadaPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'inletArmada';
