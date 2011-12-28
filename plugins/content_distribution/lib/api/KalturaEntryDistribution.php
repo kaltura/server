@@ -132,7 +132,6 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 
 	/**
 	 * @var KalturaDistributionValidationErrorArray
-	 * @readonly
 	 */
 	public $validationErrors;
 
