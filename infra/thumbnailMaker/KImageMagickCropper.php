@@ -14,6 +14,8 @@ class KImageMagickCropper extends KBaseCropper
 	protected $srcWidth;
 	protected $srcHeight;
 
+	public $forceRotation = null;
+	
 	protected static $imageExtByType = array(
 		IMAGETYPE_GIF => 'gif',
 		IMAGETYPE_PNG => 'png',
@@ -25,8 +27,9 @@ class KImageMagickCropper extends KBaseCropper
 	 * @param string $filePath
 	 * @param string $cmdPath
 	 */
-	public function __construct($srcPath, $targetPath, $cmdPath = null, $forceJpeg = false)
+	public function __construct($srcPath, $targetPath, $cmdPath = null, $forceJpeg = false, $forceRotation = null)
 	{
+KalturaLog::info("forceRotation=$forceRotation");
 		if (is_null($cmdPath)) {
 			$cmdPath = kConf::get('bin_path_imagemagick');
 		}
@@ -47,17 +50,36 @@ class KImageMagickCropper extends KBaseCropper
 //			$ext = self::$imageExtByType[$type];
 //			
 //		$targetPath = kFile::replaceExt($targetPath, $ext);
+		$this->forceRotation = $forceRotation;
 			
 		parent::__construct($srcPath, $targetPath);
 	}
 	
 	protected function getCommand($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0)
 	{
+KalturaLog::info("forceRotation".$this->forceRotation);
 		$attributes = array();
 
 		$exifData = @exif_read_data($this->srcPath);
 		$orientation = isset($exifData["Orientation"]) ? $exifData["Orientation"] : 1;
 
+		if(isset($this->forceRotation)) {
+			switch($this->forceRotation){
+			case 0:  // do noting
+				break;
+			case 90:
+				$orientation = 6;
+				break;
+			case 180:
+				$orientation = 4;
+				break;
+			case 270:
+				$orientation = 7;
+				break;
+			}
+		}
+KalturaLog::info("orientation=$orientation");
+		
 		if($density != 0) {
 			$attributes[] = "-density ".$density;
 			$attributes[] = "-units PixelsPerInch ";
