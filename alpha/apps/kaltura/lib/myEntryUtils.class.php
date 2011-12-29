@@ -48,7 +48,7 @@ class myEntryUtils
 		$target->setViews ( 0 );
 		$target->setVotes ( 0 );
 		$target->setFavorites ( 0 );
-		$target->save();
+		$target->save(); 
 
 		if ($echo)
 			echo "Copied " . $source->getId() . " (from kshow [" . $source->getKshowId() . "]) -> " . $target->getId() . "\n";
@@ -746,10 +746,10 @@ class myEntryUtils
 					$cache->put($orig_image_path, true);
 					
 					$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entry->getId());
-					if(is_null($flavorAsset) || !($flavorAsset->hasTag(flavorParams::TAG_MBR) || $flavorAsset->hasTag(flavorParams::TAG_WEB)))
+					if(is_null($flavorAsset) || !$flavorAsset->hasTag(flavorParams::TAG_THUMBNAIL))
 					{
 						// try the best playable
-						$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId());
+						$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBNAIL);
 					}
 					if (is_null($flavorAsset))
 					{
