@@ -412,7 +412,9 @@ class AttachmentAssetService extends KalturaAssetService
 		if(is_null($ext))
 			$ext = 'txt';
 			
-		$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
+		$fileName = $attachmentAsset->getFilename();
+		if (!$fileName)	
+			$fileName = $attachmentAsset->getEntryId()."_" . $attachmentAsset->getId() . ".$ext";
 		
 		return $this->serveAsset($attachmentAsset, $fileName);
 	}
