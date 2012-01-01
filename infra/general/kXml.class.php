@@ -374,4 +374,13 @@ class kXml
 		return str_replace($from, $to, $encodeXml);
 	}
 	
+    /**
+	 * @param string $string
+	 * @return string
+	 */
+	public static function stringToUtf8($string)
+	{
+		return @iconv('utf-8', 'utf-8', $string);
+	}
+	
 }
