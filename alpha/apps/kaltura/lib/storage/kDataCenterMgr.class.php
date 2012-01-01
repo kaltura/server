@@ -1,4 +1,4 @@
-R<?php
+<?php
 class kDataCenterMgr
 {
 	private static $s_current_dc;
