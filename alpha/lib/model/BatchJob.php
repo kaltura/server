@@ -151,9 +151,27 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 			// all other jobs run from the same datacenter they were created on.
 			// setting the dc later results in a race condition were the job is picked up by the current datacenter before the dc value is changed 
 			if(is_null($this->dc) || !$this->isColumnModified(BatchJobPeer::DC))
+			{
 				$this->setDc ( kDataCenterMgr::getCurrentDcId());
-		
-			// if the status not set upon creation
+                if ($this->getEntryId())
+                {
+                	$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($this->entry_id);
+                    if ($flavorAsset)
+                    {
+                    	$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+                    	$flavorFileSync = FileSyncPeer::retrieveByFileSyncKey($flavorSyncKey);
+                    	if ($flavorFileSync && in_array($flavorFileSync->getDc(), kDataCenterMgr::getAllDcs()))
+                    		$this->setDc($flavorFileSync->getDc());
+                    }
+                    else
+                    {
+                    	$dcIndex = kDataCenterMgr::getDCByObjectId($this->entry_id);
+                    	if (in_array($dcIndex, kDataCenterMgr::getAllDcs()))
+                    		$this->setDc($dcIndex);
+                    }
+		    	}
+			}
+		    // if the status not set upon creation
 			if(is_null($this->status) || !$this->isColumnModified(BatchJobPeer::STATUS))
 			{
 				//echo "sets the status to " . self::BATCHJOB_STATUS_PENDING . "\n";

@@ -1,4 +1,4 @@
-<?php
+R<?php
 class kDataCenterMgr
 {
 	private static $s_current_dc;
@@ -251,6 +251,15 @@ class kDataCenterMgr
 			kFile::dumpFile( $resolvedPath );
 		}
 		
+	}
+	
+	/**
+	 * return the DC index from the objectId. (for example: for objectId='1_7hdf78fn' the function will return '1') 
+	 * @param string $objectId
+	 */
+	public static function getDCByObjectId($objectId){
+		$dcIndex = explode('_', $objectId);
+		return $dcIndex[0]; 
 	}
 	
 	/**
