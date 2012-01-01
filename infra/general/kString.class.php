@@ -274,6 +274,15 @@ class kString
 		return $safe;
 	}
 	
+    /**
+	 * @param string $string
+	 * @return string
+	 */
+	public static function stringToUtf8($string)
+	{
+		return @iconv('utf-8', 'utf-8', $string);
+	}
+	
 	public static function generateRandomString($minlength, $maxlength, $useupper, $usespecial, $usenumbers)
 	{
 		// copied from myPartnerRegistration.class.php
