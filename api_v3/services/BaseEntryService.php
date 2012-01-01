@@ -462,6 +462,44 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
+	 * List base entries by filter according to reference id
+	 * 
+	 * @action listByReferenceId
+	 * @param string $refId Entry Reference ID
+	 * @param KalturaFilterPager $pager Pager
+	 * @throws KalturaErrors::MISSING_MANDATORY_PARAMETER
+	 */
+	function listByReferenceId($refId, KalturaFilterPager $pager = null)
+	{
+		if (!$refId)
+		{
+			//if refId wasn't provided return an error of missing parameter
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $refId);
+		}
+				
+		if (!$pager){
+			$pager = new KalturaFilterPager();
+		}
+		$entryFilter = new entryFilter();
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
+		//setting reference ID	
+		$entryFilter->set('_eq_reference_id', $refId);
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);		
+		$pager->attachToCriteria($c);	
+		$entryFilter->attachToCriteria($c);		
+		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+				
+		$list = entryPeer::doSelect($c);
+		$totalCount = $c->getRecordsCount();
+				
+	    $newList = KalturaBaseEntryArray::fromEntryArray($list, false);
+		$response = new KalturaBaseEntryListResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		return $response;
+	}
+	
+	/**
 	 * Count base entries by filter.
 	 * 
 	 * @action count
