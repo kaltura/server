@@ -255,11 +255,18 @@ class kDataCenterMgr
 	
 	/**
 	 * return the DC index from the objectId. (for example: for objectId='1_7hdf78fn' the function will return '1') 
+	 * for old objects without a dc prefix return null or the current dc id according to the $useCurrentDcAsDefault parameter
 	 * @param string $objectId
+	 * @param boolean $useCurrentDcAsDefault
 	 */
-	public static function getDCByObjectId($objectId){
-		$dcIndex = explode('_', $objectId);
-		return $dcIndex[0]; 
+	public static function getDCByObjectId($objectId, $useCurrentDcAsDefault = false){
+		$objectIdDc = explode('_', $objectId);
+		$dcId = $objectIdDc[0];
+		if (!in_array($dcId, self::getDcIds())) {
+			$dcId = $useCurrentDcAsDefault ? self::getCurrentDcId() : null;
+		}
+		
+		return $dcId;
 	}
 	
 	/**
