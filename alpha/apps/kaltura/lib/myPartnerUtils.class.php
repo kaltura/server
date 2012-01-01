@@ -429,14 +429,10 @@ class myPartnerUtils
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		if ( ! $partner ) return null ; // VERY BAD !!		
 		
+		// will return the partner OLD default profile and if not found - the system default profile
 		$conversion_profile_id =  $partner->getCurrentConversionProfileType();
-		if( !$conversion_profile_id)
-		{
-			// will return the partner OLD default profile and if not found - the system default profile
-			$conversion_profile_id =  $partner->getCurrentConversionProfileType();
-			if ( ! $conversion_profile_id )
-				$conversion_profile_id =  $partner->getDefConversionProfileType();
-		}
+		if ( ! $conversion_profile_id )
+			$conversion_profile_id =  $partner->getDefConversionProfileType();
 		
 		return myConversionProfileUtils::getConversionProfile( $partner_id , $conversion_profile_id );
 	}
