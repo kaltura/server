@@ -238,8 +238,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	{
 		parent::fromObject($partner);
 		
-		$this->name = kString::stringToUtf8($this->name);
-		$this->description = kString::stringToUtf8($this->description);
+		$this->name = kString::stripUtf8InvalidChars($this->name);
+		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		
 		return $this;
