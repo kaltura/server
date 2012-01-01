@@ -30,7 +30,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable
 	
 	public function getPuserId()
 	{
-		$kuser =  KuserPeer::retrieveByPKNoFilter($this->getKuserId());
+		$kuser =  kuserPeer::retrieveByPKNoFilter($this->getKuserId());
 	    if(!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 			
