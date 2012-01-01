@@ -126,8 +126,7 @@ class PermissionItemService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $permissionItemId);
 		}
 		
-		$dbPermissionItem->setStatus(KalturaPermissionStatus::DELETED);
-		$dbPermissionItem->save();
+		$dbPermissionItem->delete();
 			
 		$permissionItem = new KalturaPermissionItem();
 		$permissionItem->fromObject($dbPermissionItem);
