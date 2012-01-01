@@ -1170,6 +1170,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$categories = explode(self::ENTRY_CATEGORY_SEPARATOR, $this->categories);
 		foreach($categories as &$category) 
 		{
+			$oldFullName = str_replace(array ('(', ')'), array ('\(', '\)'), $oldFullName);
 			$category = preg_replace("/^".$oldFullName."/", $newFullName, $category);
 		}
 		$this->categories = implode(self::ENTRY_CATEGORY_SEPARATOR, $categories);
