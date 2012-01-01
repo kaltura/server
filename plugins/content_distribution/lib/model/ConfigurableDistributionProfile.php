@@ -238,12 +238,21 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		entryPeer::setDefaultCriteriaFilter();
 		entryPeer::addPartnerToCriteria($entryDistribution->getPartnerId(), true);
 		
-		$mrss = null;
-		$mrssParams = new kMrssParameters();
-		if ($this->getItemXpathsToExtend())
-			$mrssParams->setItemXpathsToExtend($this->getItemXpathsToExtend());
-		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
-		$mrssStr = $mrss->asXML();
+		try
+		{
+    		$mrss = null;
+    		$mrssParams = new kMrssParameters();
+    		if ($this->getItemXpathsToExtend())
+    			$mrssParams->setItemXpathsToExtend($this->getItemXpathsToExtend());
+    		$mrss = kMrssManager::getEntryMrssXml($entry, $mrss, $mrssParams);
+    		$mrssStr = $mrss->asXML();
+		}
+		catch (Exception $e)
+		{
+		    // restore the original criteria so it will not get stuck due to the exception
+		    entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
+		    throw $e;
+		}
 		
 		// restore the original criteria
 		entryPeer::getCriteriaFilter()->setFilter($oldEntryCriteria);
