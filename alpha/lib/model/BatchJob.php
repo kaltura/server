@@ -170,9 +170,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
                     }
                     else
                     {
-                    	$dcIndex = kDataCenterMgr::getDCByObjectId($this->getEntryId());
-                    	if ($dcIndex !== null)
-                    		$dc = $dcIndex;
+                    	$dc = kDataCenterMgr::getDCByObjectId($this->getEntryId(), true);
                     }
 		    	}
 		    	
