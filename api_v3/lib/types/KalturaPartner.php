@@ -240,6 +240,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
+		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		
 		return $this;
