@@ -170,7 +170,11 @@ function normalizeKS($value)
 	
 	$ks = substr($value, $ksStartPos, $ksEndPos - $ksStartPos);
 	$decodedKs = base64_decode($ks);
-	list($sig, $ksFields) = explode('|', $decodedKs);
+	$explodedKs = explode('|', $decodedKs);
+	if (count($explodedKs) < 2)
+		return $value;
+	
+	list($sig, $ksFields) = $explodedKs;
 	$ksFields = explode(';', $ksFields);
 	unset($ksFields[2]);		// valid until
 	unset($ksFields[4]);		// rand
