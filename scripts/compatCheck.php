@@ -671,7 +671,7 @@ else
 
 $logFileInfo = pathinfo($apiLogPath);
 
-if ($logFileInfo['extension'] == 'gz')
+if (array_key_exists('extension', $logFileInfo) && $logFileInfo['extension'] == 'gz')
 	processGZipFile($apiLogPath, $logProcessor);
 else
 	processRegularFile($apiLogPath, $logProcessor);
