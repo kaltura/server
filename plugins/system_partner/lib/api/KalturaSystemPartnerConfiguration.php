@@ -330,7 +330,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		{
 			$this->autoModerateEntryFilter = new KalturaBaseEntryFilter();
 			$this->autoModerateEntryFilter->fromObject($dbAutoModerationEntryFilter);
-		}		
+		}
+
+		$this->partnerName = kString::stripUtf8InvalidChars($this->partnerName);
+		$this->description = kString::stripUtf8InvalidChars($this->description);
+		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
