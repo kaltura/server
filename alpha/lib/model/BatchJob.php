@@ -173,7 +173,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
                     	$dc = kDataCenterMgr::getDCByObjectId($this->getEntryId(), true);
                     }
 		    	}
-		    	
+		    	kalturaLog::debug("setting the job's DC to [$dc]");
 				$this->setDc ( $dc );
 			}
 		    // if the status not set upon creation
