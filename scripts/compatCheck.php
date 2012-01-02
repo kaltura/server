@@ -636,6 +636,7 @@ $logFormat = strtolower($argv[4]);
 if (strpos($apiLogPath, ':') !== false)
 {
 	$localLogPath = tempnam("/tmp", "CompatCheck");
+	print("Copying log file to $localLogPath...\n");
 	passthru("rsync -zavx --progress $apiLogPath $localLogPath");
 	$apiLogPath = $localLogPath;
 }
