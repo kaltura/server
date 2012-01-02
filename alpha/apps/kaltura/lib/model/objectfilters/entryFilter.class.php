@@ -10,9 +10,6 @@ class entryFilter extends baseObjectFilter
 	// allow only 256 charaters when creation a MATCH-AGAINST caluse
 	const MAX_SAERCH_TEXT_SIZE = 256;
 	
-	// allow no more than 100 values in IN and NOT_IN clause
-	const MAX_IN_VALUES = 100;
-	
 	// this flag will indicate if the uiser_id set in the _eq_user_id field shouyld be translated to kuser_id or not.
 	// if $user_id_is_kuser_id is true, the switch was already done   
 	public $user_id_is_kuser_id = false;
