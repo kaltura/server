@@ -46,10 +46,10 @@ class EntryDistributionService extends KalturaBaseService
 		$dbEntryDistribution = EntryDistributionPeer::retrieveByEntryAndProfileId($entryDistribution->entryId, $entryDistribution->distributionProfileId);
 		if($dbEntryDistribution)
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_ALREADY_EXISTS, $entryDistribution->entryId, $entryDistribution->distributionProfileId);
-		
-		$dbEntryDistribution = new EntryDistribution();
-		$dbEntryDistribution = $entryDistribution->toInsertableObject($dbEntryDistribution);
+
+		$entryDistribution->validateForInsert(array());
 		$dbEntryDistribution = kContentDistributionManager::addEntryDistribution($dbEntry, $dbDistributionProfile);
+		$entryDistribution->toInsertableObject($dbEntryDistribution);
 		$dbEntryDistribution->setPartnerId($this->getPartnerId());
 		$dbEntryDistribution->save();
 		
