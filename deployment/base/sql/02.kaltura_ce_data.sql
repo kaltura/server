@@ -403,7 +403,8 @@ insert into `permission`(`id`,`type`,`name`,`friendly_name`,`description`,`partn
 (175,1,'BULK_LOG_DOWNLOAD_EMAIL','Bulk upload log download','Permission to download bulk upload logs',0,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
 (176,1,'systemPartner.SYSTEM_ADMIN_PUBLISHER_CONFIG_ADMIN_KMC_USERS','System admin config publisher admin kmc user','System admin config publisher admin kmc user',-2,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
 (177,2,'FEATURE_CLIP_MEDIA','clipped media fature','Permission to use clipping feature',99,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
-(178,1,'ADMIN_USER_ASSIGN_PARNTERS','System admin assign partners to user','Permission to assign partners to user',-2,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}');
+(178,1,'ADMIN_USER_ASSIGN_PARNTERS','System admin assign partners to user','Permission to assign partners to user',-2,1,null,null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}'),
+(179,1,'dropFolder.CONTENT_INGEST_DROP_FOLDER_MATCH','Drop Folder Match','Permission to match drop folder file to entry',0,1,'CONTENT_INGEST_DROP_FOLDER_MATCH',null,now(),now(),'a:1:{s:13:"partner_group";s:0:"";}');
 
 insert into `permission_item`(`id`,`type`,`partner_id`,`param_1`,`param_2`,`param_3`,`param_4`,`param_5`,`tags`,`created_at`,`updated_at`,`custom_data`) values 
 (1,'kApiActionPermissionItem',0,'metadata_metadataprofile','list','','','',null,now(),now(),null),
