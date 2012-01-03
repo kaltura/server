@@ -126,7 +126,7 @@ abstract class kConversionEngine
 				self::addToLogFile ( $log_file ,"Cannot find file [$file]" ) ;
 			}
 		}
-		catch ( Exaption $ex ) { /* do nothing */ }		
+		catch ( Exception $ex ) { /* do nothing */ }		
 	}
 	
 	// ne = not- empty 
