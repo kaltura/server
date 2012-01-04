@@ -119,6 +119,22 @@ class Form_HuluProfileConfiguration extends Form_ConfigurableProfileConfiguratio
 				)
 			)
 		);
+		
+		$this->addElement('checkbox', 'disable_episode_number_custom_validation', array(
+			'label'			=> 'Disable Episode Number Custom Validation:'
+		));
+		
+		$this->addDisplayGroup(
+			array('disable_episode_number_custom_validation'), 
+			'custom_config_group', 
+			array(
+				'legend' => '', 
+				'decorators' => array(
+					'FormElements', 
+					'Fieldset'
+				)
+			)
+		);
 	}
 	
 	protected function getPrimaryCategoryList()

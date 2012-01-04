@@ -56,6 +56,12 @@ class KalturaHuluDistributionProfile extends KalturaConfigurableDistributionProf
 	 */
 	public $videoMediaType;
 	
+	/**
+	 * @var bool
+	 */
+	public $disableEpisodeNumberCustomValidation;
+	
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -69,7 +75,8 @@ class KalturaHuluDistributionProfile extends KalturaConfigurableDistributionProf
 		'seasonNumber',
 		'seasonSynopsis',
 		'seasonTuneInInformation',
-		'videoMediaType'
+		'videoMediaType',
+		'disableEpisodeNumberCustomValidation'
 	);
 		 
 	public function getMapBetweenObjects()

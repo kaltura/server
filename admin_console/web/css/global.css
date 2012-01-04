@@ -507,6 +507,7 @@ dd#Algorithm-element { clear: both; }
 #frmDistributionProfileConfig #fieldset-newThumbDimensionsButtonGroup { padding-right: 0; }
 #frmDistributionProfileConfig #frmGenericProviderConfig fieldset { width: 100%; padding-right: 0; }
 #frmDistributionProfileConfig ul.errors { margin-left: 15px; }
+#frmDistributionProfileConfig label { padding-left: 0; margin: 2px 0; }
 
 #frmDistributionProfileConfig .field-config-row { margin: 10px 0; }
 #frmDistributionProfileConfig .field-config-row input[type=checkbox] { margin: 0 5px 0 0;}

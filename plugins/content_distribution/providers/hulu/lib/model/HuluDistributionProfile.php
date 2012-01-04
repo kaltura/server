@@ -15,6 +15,7 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_SEASON_SYNOPSIS = 'seasonSynopsis';
 	const CUSTOM_DATA_SEASON_TUNE_IN_INFORMATION = 'seasonTuneInInformation';
 	const CUSTOM_DATA_VIDEO_MEDIA_TYPE = 'videoMediaType';
+	const CUSTOM_DATA_DISABLE_EPISODE_NUMBER_CUSTOM_VALIDATION= 'disableEpisodeNumberCustomValidation';
 	
 	protected $maxLengthValidation= array (
 		HuluDistributionField::SERIES_TITLE => 96,
@@ -283,7 +284,8 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($this->maxLengthValidation, $allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($this->inListOrNullValidation, $allFieldValues, $action));
-		$validationErrors = array_merge($validationErrors, $this->validateEpisodeNumber($allFieldValues, $action));
+		if ($this->getDisableEpisodeNumberCustomValidation() !== true)
+			$validationErrors = array_merge($validationErrors, $this->validateEpisodeNumber($allFieldValues, $action));
 		$validationErrors = array_merge($validationErrors, $this->validateContentRatingReason($allFieldValues, $action));
 
 		return $validationErrors;
@@ -526,6 +528,7 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 	public function getSeasonSynopsis()					{return $this->getFromCustomData(self::CUSTOM_DATA_SEASON_SYNOPSIS);}
 	public function getSeasonTuneInInformation()		{return $this->getFromCustomData(self::CUSTOM_DATA_SEASON_TUNE_IN_INFORMATION);}
 	public function getVideoMediaType()					{return $this->getFromCustomData(self::CUSTOM_DATA_VIDEO_MEDIA_TYPE);}
+	public function getDisableEpisodeNumberCustomValidation()	{return $this->getFromCustomData(self::CUSTOM_DATA_DISABLE_EPISODE_NUMBER_CUSTOM_VALIDATION);}
 	
 	public function setSftpHost($v)						{$this->putInCustomData(self::CUSTOM_DATA_SFTP_HOST, $v);}
 	public function setSftpLogin($v)					{$this->putInCustomData(self::CUSTOM_DATA_SFTP_LOGIN, $v);}
@@ -537,4 +540,5 @@ class HuluDistributionProfile extends ConfigurableDistributionProfile
 	public function setSeasonSynopsis ($v)				{$this->putInCustomData(self::CUSTOM_DATA_SEASON_SYNOPSIS, $v);}
 	public function setSeasonTuneInInformation ($v)		{$this->putInCustomData(self::CUSTOM_DATA_SEASON_TUNE_IN_INFORMATION, $v);}
 	public function setVideoMediaType ($v)				{$this->putInCustomData(self::CUSTOM_DATA_VIDEO_MEDIA_TYPE, $v);}
+	public function setDisableEpisodeNumberCustomValidation ($v)	{$this->putInCustomData(self::CUSTOM_DATA_DISABLE_EPISODE_NUMBER_CUSTOM_VALIDATION, $v);}
 }
