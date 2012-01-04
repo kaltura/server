@@ -116,7 +116,7 @@ class Xml2As3ClientGenerator extends ClientGeneratorFromXml
 				case "float" : $type = "Number = Number.NEGATIVE_INFINITY"; break;
 				case "int" : $type = "int = int.MIN_VALUE"; break;
 				case "bool" : $type = "Boolean"; break;
-				case "array" : $type = "Array = new Array()"; break;
+				case "array" : $type = "Array = null"; break;
 				default :
 					$type = $child->attributes()->type; 
 					$str = $this->addImport2String( "	import com.kaltura.vo." .  $type , $str );
