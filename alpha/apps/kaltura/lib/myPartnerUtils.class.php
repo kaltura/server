@@ -1421,4 +1421,22 @@ class myPartnerUtils
 			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
 		}
 	}
+	
+	public function getPartnersArray($partnerIds)
+	{
+		$partners = array();
+		$c = new Criteria();
+		$c->addAnd(PartnerPeer::ID, $partnerIds, Criteria::IN);
+		$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE, Criteria::EQUAL);
+		PartnerPeer::setUseCriteriaFilter(false);
+		$partners = PartnerPeer::doSelect($c);
+		PartnerPeer::setUseCriteriaFilter(true);
+		foreach ($partners as $partner)
+		{
+			if (!in_array($partner->getId(), array(PartnerPeer::GLOBAL_PARTNER, Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID))) {
+				$partners[] = $partner;
+			}
+		}
+		return $partners;
+	}
 }

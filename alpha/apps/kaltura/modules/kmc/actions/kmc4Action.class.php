@@ -10,24 +10,6 @@ class kmc4Action extends kalturaAction
 	
 	const SYSTEM_DEFAULT_PARTNER = 0;
 	
-	private function getPartnersArray($partnerIds)
-	{
-		$allowed = array();
-		$c = new Criteria();
-		$c->addAnd(PartnerPeer::ID, $partnerIds, Criteria::IN);
-		$c->addAnd(PartnerPeer::STATUS, Partner::PARTNER_STATUS_ACTIVE, Criteria::EQUAL);
-		PartnerPeer::setUseCriteriaFilter(false);
-		$partners = PartnerPeer::doSelect($c);
-		PartnerPeer::setUseCriteriaFilter(true);
-		foreach ($partners as $partner)
-		{
-			if (!in_array($partner->getId(), array(PartnerPeer::GLOBAL_PARTNER, Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID))) {
-				$allowed[] = array('id' => $partner->getId(), 'name' => $partner->getName());
-			}
-		}
-		return $allowed;
-	}
-	
 	public function execute ( ) 
 	{
 		
@@ -60,7 +42,10 @@ class kmc4Action extends kalturaAction
 	/** Get array of allowed partners for the current user **/
 		$currentUser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $ksObj->user, true);
 		if($currentUser) {
-			$this->allowedPartners = $this->getPartnersArray($currentUser->getAllowedPartnerIds());
+			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds());
+			foreach ($partners as $partner)
+				$this->allowedPartners[] = array('id' => $partner->getId(), 'name' => $partner->getName());
+				
 			$this->full_name = $currentUser->getFullName();
 		}
 

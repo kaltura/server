@@ -268,5 +268,32 @@ class PartnerService extends KalturaBaseService
 		
 		return $partnerUsage;
 	}
+	
+	/**
+	 * Retrieve partner secret and admin secret
+	 * 
+	 * @action listPartnersForUser
+	 * @return KalturaPartner
+	 * 
+	 */
+	function listPartnersForUserAction()
+	{	
+		$partnerId = kCurrentContext::$master_partner_id;
+		
+		if (isset(kCurrentContext::$partner_id))
+			$partnerId = kCurrentContext::$partner_id;
+		
+		$partners = array();
+		$currentUser = kuserPeer::getKuserByPartnerAndUid($partnerId, kCurrentContext::$ks_uid, true);
+		if($currentUser)
+			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds());	
+		
+		$kalturaPartners = KalturaPartnerArray::fromPartnerArray($partners );
+		$response = new KalturaPartnerListResponse();
+		$response->objects = $kalturaPartners;
+		$response->totalCount = count($partners);	
+		
+		return $response;
+	}
 
 }
