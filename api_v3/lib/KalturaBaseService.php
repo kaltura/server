@@ -303,12 +303,14 @@ abstract class KalturaBaseService
 				//TODO find or build function which redurects the API request with all its parameters without using curl.
 				// or redirect if no proxy
 				header("Location: $remoteUrl");
+				die;
 			}
 		}
 		else
 		{
 			$remoteUrl =  $fileSync->getExternalUrl();
 			header("Location: $remoteUrl");
+			die;
 		}	
 	}
 	
