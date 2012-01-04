@@ -34,7 +34,18 @@ class KalturaMsnDistributionJobProviderData extends KalturaConfigurableDistribut
 		$feed = new MsnDistributionFeed($distributionJobData, $this);
 		$feed->addFlavorAssetsByMsnId($flavorAssetsByMsnId);
 		$feed->addThumbnailAssets($thumbAssets);
-		$this->xml = $feed->getXml();
+		
+		if($distributionJobData instanceof KalturaDistributionSubmitJobData)
+		{
+			$this->xml = $feed->getXml();
+		}
+			
+		if($distributionJobData instanceof KalturaDistributionUpdateJobData)
+		{
+			$feed->setUUID($distributionJobData->remoteId);
+			$this->xml = $feed->getXml();
+		}
+		
 	}
 		
 	private static $map_between_objects = array

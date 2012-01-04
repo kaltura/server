@@ -57,12 +57,6 @@ class MsnDistributionFeed
 		if (!$this->_fieldValues) 
 			$this->_fieldValues = array();
 		
-		//$this->setNodeValue('/rss/channel/title', $this->_distributionProfile->elTitl);
-		
-		//$this->setNodeValue('/rss/channel/copyright', $this->_distributionProfile->channelCopyright);
-		//$this->setNodeValueDateFieldConfigId('/rss/channel/pubDate', KalturaQuickPlayDistributionField::PUB_DATE);
-		//$this->setNodeValueDate('/rss/channel/lastBuildDate', time());
-		
 		$this->setNodeValueFieldConfigId('/msn:video/msn:providerId', KalturaMsnDistributionField::PROVIDER_ID);
 		$this->setNodeValueFieldConfigId('/msn:video/msn:csId', KalturaMsnDistributionField::CSID);
 		$this->setNodeValueFieldConfigId('/msn:video/msn:source', KalturaMsnDistributionField::SOURCE);
@@ -70,10 +64,10 @@ class MsnDistributionFeed
 		$this->setNodeValueFieldConfigId('/msn:video/msn:pageGroup', KalturaMsnDistributionField::PAGE_GROUP);
 		$this->setNodeValueFieldConfigId('/msn:video/msn:title', KalturaMsnDistributionField::TITLE);
 		$this->setNodeValueFieldConfigId('/msn:video/msn:description', KalturaMsnDistributionField::DESCRIPTION);
-		$this->setNodeValueDateFieldConfigId('/msn:video/msn:startDate', KalturaMsnDistributionField::START_DATE);
-		$this->setNodeValueDateFieldConfigId('/msn:video/msn:activeEndDate', KalturaMsnDistributionField::ACTIVATE_END_DATE);
-		$this->setNodeValueDateFieldConfigId('/msn:video/msn:searchableEndDate', KalturaMsnDistributionField::SEARCHABLE_END_DATE);
-		$this->setNodeValueDateFieldConfigId('/msn:video/msn:archiveEndDate', KalturaMsnDistributionField::ARCHIVE_END_DATE);
+		$this->setNodeValueDateFieldConfigIdOrRemove('/msn:video/msn:startDate', KalturaMsnDistributionField::START_DATE);
+		$this->setNodeValueDateFieldConfigIdOrRemove('/msn:video/msn:activeEndDate', KalturaMsnDistributionField::ACTIVATE_END_DATE);
+		$this->setNodeValueDateFieldConfigIdOrRemove('/msn:video/msn:searchableEndDate', KalturaMsnDistributionField::SEARCHABLE_END_DATE);
+		$this->setNodeValueDateFieldConfigIdOrRemove('/msn:video/msn:archiveEndDate', KalturaMsnDistributionField::ARCHIVE_END_DATE);
 		
 		$this->addTagFieldConfig(KalturaMsnDistributionField::TAGS_MSNVIDEO_CAT, 'MSNVideo_Cat', 'us');
 		$this->addTagFieldConfig(KalturaMsnDistributionField::TAGS_MSNVIDEO_TOP, 'MSNVideo_Top', 'us');
@@ -106,6 +100,11 @@ class MsnDistributionFeed
 				$relatedLink[KalturaMsnDistributionField::RELATED_LINK_N_URL],
 				$relatedLink[KalturaMsnDistributionField::RELATED_LINK_N_TITLE]); 
 		}
+	}
+	
+	public function setUUID($uuid)
+	{
+		$this->setNodeValue('/msn:video/msn:uuid', $uuid);
 	}
 	
 	public function addFlavorAssetsByMsnId(array $flavorAssetsByMsnId)
@@ -237,6 +236,22 @@ class MsnDistributionFeed
 	
 	/**
 	 * @param string $xpath
+	 * @param string $fieldConfigId
+	 */
+	public function setNodeValueDateFieldConfigIdOrRemove($xpath, $fieldConfigId, DOMNode $contextnode = null)
+	{
+		if (isset($this->_fieldValues[$fieldConfigId]) && $this->_fieldValues[$fieldConfigId]) 
+		{
+			$this->setNodeValueDate($xpath, $this->_fieldValues[$fieldConfigId], $contextnode);
+		}
+		else
+		{
+			$this->removeNode($xpath, $contextnode);
+		}
+	}
+	
+	/**
+	 * @param string $xpath
 	 * @param string $value
 	 * @param DOMNode $contextnode
 	 */
@@ -256,6 +271,11 @@ class MsnDistributionFeed
 		}
 	}
 	
+	/**
+	 * @param string $xpath
+	 * @param string $value
+	 * @param DOMNode $contextnode
+	 */
 	public function setNodeValueDate($xpath, $value, DOMNode $contextnode = null)
 	{
 		$dateTime = new DateTime('@'.$value);
@@ -264,6 +284,26 @@ class MsnDistributionFeed
 		$date = $dateTime->format('c');
 		$date = str_replace('+00:00', 'Z', $date);
 		$this->setNodeValue($xpath, $date, $contextnode);
+	}
+	
+	/**
+	 * @param string $xpath
+	 * @param DOMNode $contextnode
+	 */
+	public function removeNode($xpath, DOMNode $contextnode = null)
+	{
+		if ($contextnode) 
+		{
+			$node = $this->_xpath->query($xpath, $contextnode)->item(0);
+		}
+		else 
+		{
+			$node = $this->_xpath->query($xpath)->item(0);
+		}
+		if (!is_null($node))
+		{
+			$node->parentNode->removeChild($node);
+		}
 	}
 	
 	/**
