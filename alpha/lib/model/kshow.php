@@ -802,15 +802,7 @@ class kshow extends Basekshow
 	}	
 	
 	// this will make sure that the extra data set in the search_text won't leak out 
-	public function getSearchText()
-	{
-		return mySearchUtils::removePartner( parent::getSearchText() );
-	}
-
-	public function getSearchTextRaw()
-	{
-		return parent::getSearchText();
-	}
+	public function getSearchText()	{	return '';	}
 
 	
 }
