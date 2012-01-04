@@ -13,6 +13,7 @@
 	
 	$include = $indexConfig->get("include");
 	$exclude = $indexConfig->get("exclude");
+	$excludePaths = $indexConfig->get("excludepaths");
 
 	$cacheFileName = kConf::get("cache_root_path").'/testme/services-'.$configSection;
 	
@@ -23,7 +24,7 @@
 	else
 	{
 		$clientGenerator = new DummyForDocsClientGenerator();
-		$clientGenerator->setIncludeOrExcludeList($include, $exclude);
+		$clientGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
 		$clientGenerator->load();
 		
 		$services = $clientGenerator->getServices();

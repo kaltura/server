@@ -123,10 +123,11 @@ if (! KalturaTypeReflector::hasClassInheritMapCache ())
 	
 	$include = $indexConfig->get ( "include" );
 	$exclude = $indexConfig->get ( "exclude" );
+	$excludePaths = $indexConfig->get("excludepaths");
 	$additional = $indexConfig->get ( "additional" );
 	
 	$clientGenerator = new DummyForDocsClientGenerator ();
-	$clientGenerator->setIncludeOrExcludeList ( $include, $exclude );
+	$clientGenerator->setIncludeOrExcludeList ( $include, $exclude, $excludePaths);
 	$clientGenerator->setAdditionalList ( $additional );
 	$clientGenerator->load ();
 	
