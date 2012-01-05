@@ -277,7 +277,7 @@ class kDataCenterMgr
 	{
 		$tempDc = null;
 		try { 
-			$tempDc = kDataCenterMgr::getDcById($dcId);
+			$tempDc = self::getDcById($dcId);
 		}
 		catch (Exception $e) {
 			$tempDc = null;
