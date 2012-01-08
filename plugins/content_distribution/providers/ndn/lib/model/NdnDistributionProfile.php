@@ -253,7 +253,6 @@ class NdnDistributionProfile extends ConfigurableDistributionProfile
 			return $validationErrors;
 		}
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($this->maxLengthValidation, $allFieldValues, $action));
-		$validationErrors = array_merge($validationErrors, $this->validateInListOrNull($this->inListOrNullValidation, $allFieldValues, $action));
 		
 		//validate required channel fields
 		$channelTitleValue = $this->getChannelTitle();
