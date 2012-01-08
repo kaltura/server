@@ -165,7 +165,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					}
 					else
 					{
-						$dataCondition = "{$pluginName}_{$fieldId} << $value << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
+						$dataCondition = "{$pluginName}_{$fieldId} << ( $value ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . "_{$fieldId}";
 					}
 					
 					kalturalog::debug("add $dataCondition");
@@ -270,7 +270,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 			$freeText = SphinxUtils::escapeString($freeText);
 			$freeText = "^$freeText$";
 			
-			$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTexts << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
+			$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << ( $freeTexts ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
 			
 			return $additionalConditions;
 		}
@@ -285,7 +285,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					unset($freeTextsArr[$valIndex]);
 					
 			foreach($freeTextsArr as $freeText)
-				$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeText << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
+				$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << ( $freeText ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
 			
 			return $additionalConditions;
 		}
@@ -297,7 +297,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				
 		$freeTextsArr = array_unique($freeTextsArr);
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
-		$additionalConditions[] = '@'. MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << $freeTextExpr << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
+		$additionalConditions[] = '@'. MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << ( $freeTextExpr ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
 		return $additionalConditions;
 	}
 	
