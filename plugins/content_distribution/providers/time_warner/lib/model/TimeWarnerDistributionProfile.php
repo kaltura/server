@@ -81,11 +81,12 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 	{
 		$fieldConfigArray = array();
 		
-		//$fieldConfig = new DistributionFieldConfig();
-		//$fieldConfig->setFieldName(TimeWarnerDistributionField::GUID);
-		//$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(entryId)" />');
-		//$fieldConfig->setIsRequired(DistributionFieldRequiredStatus:::NOT_REQUIRED);
-		//$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		$fieldConfig = new DistributionFieldConfig();
+		$fieldConfig->setFieldName(TimeWarnerDistributionField::GUID);
+		$fieldConfig->setUserFriendlyFieldName('Entry id');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(entryId)" />');
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(TimeWarnerDistributionField::TITLE);
