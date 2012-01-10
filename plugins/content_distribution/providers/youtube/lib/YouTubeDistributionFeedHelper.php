@@ -77,21 +77,18 @@ class YouTubeDistributionFeedHelper
 		$this->metadataTempFileName = 'youtube_' . $this->timestampName . '.xml';
 		
 		$startTime = $this->getValueForField(KalturaYouTubeDistributionField::START_TIME);
-		if (is_null($startTime)) {
-		    $startTime = time() - 24*60*60;  // yesterday, to make the video public by default
-		}
-		$this->setStartTime(date('c', intval($startTime)));
+		if ($startTime && intval($startTime))
+			$this->setStartTime(date('c', intval($startTime)));
 		
 		$endTime = $this->getValueForField(KalturaYouTubeDistributionField::END_TIME);
-		if ($endTime && intval($endTime)) {
-            $this->setEndTime(date('c', $endTime));
-		}		
+		if ($endTime && intval($endTime))
+			$this->setEndTime(date('c', $endTime));
 		
 		$this->setNotificationEmail($this->getValueForField(KalturaYouTubeDistributionField::NOTIFICATION_EMAIL));
 		$this->setUsername($this->getValueForField(KalturaYouTubeDistributionField::ACCOUNT_USERNAME));
+		$this->setPassword($this->getValueForField(KalturaYouTubeDistributionField::ACCOUNT_PASSWORD));
 		$this->setOwnerName($this->getValueForField(KalturaYouTubeDistributionField::OWNER_NAME));
 		$this->setTarget($this->getValueForField(KalturaYouTubeDistributionField::TARGET));
-		$this->setCategory($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_CATEGORY));
 		
 		// community
 		$this->setAllowComments($this->getValueForField(KalturaYouTubeDistributionField::ALLOW_COMMENTS));
@@ -102,7 +99,12 @@ class YouTubeDistributionFeedHelper
 		// policies
 		$this->setCommercialPolicy($this->getValueForField(KalturaYouTubeDistributionField::POLICY_COMMERCIAL));
 		$this->setUGCPolicy($this->getValueForField(KalturaYouTubeDistributionField::POLICY_UGC));
-		$this->setLanguage($this->getValueForField(KalturaYouTubeDistributionField::LANGUAGE));		
+
+		// urgent reference file
+		$this->setUrgentReferenceFile($this->getValueForField(KalturaYouTubeDistributionField::URGENT_REFERENCE_FILE));
+		
+		// keep fingerprint
+		$this->setKeepFingerprint($this->getValueForField(KalturaYouTubeDistributionField::KEEP_FINGERPRINT));
 	}
 	
 	private function getValueForField($fieldName)
@@ -122,6 +124,11 @@ class YouTubeDistributionFeedHelper
 		$xml = $this->doc->saveXML();
 		$path = $this->directoryName . '/' . $this->metadataTempFileName;
 		$sftpManager->filePutContents($path, $xml);
+	}
+	
+	public function getXml()
+	{
+		return $this->doc->saveXML();
 	}
 	
 	/**
@@ -169,6 +176,26 @@ class YouTubeDistributionFeedHelper
 	
 	/**
 	 * @param string $xpath
+	 * @param DOMNode $contextnode
+	 */
+	public function removeNode($xpath, DOMNode $contextnode = null)
+	{
+		if ($contextnode) 
+		{
+			$node = $this->xpath->query($xpath, $contextnode)->item(0);
+		}
+		else 
+		{
+			$node = $this->xpath->query($xpath)->item(0);
+		}
+		if (!is_null($node))
+		{
+			$node->parentNode->removeChild($node);
+		}
+	}
+	
+	/**
+	 * @param string $xpath
 	 * @param string $value
 	 */
 	public function getNodeValue($xpath)
@@ -178,6 +205,14 @@ class YouTubeDistributionFeedHelper
 			return $node->nodeValue;
 		else
 			return null;
+	}
+	
+	public function setNodeValueOrRemove($xpath, $value)
+	{
+		if ($value)
+			$this->setNodeValue($xpath, $value);
+		else
+			$this->removeNode($xpath);
 	}
 	
 	public function setAction($value)
@@ -204,6 +239,11 @@ class YouTubeDistributionFeedHelper
 	public function setUsername($value)
 	{
 		$this->setNodeValue('/rss/channel/yt:account/yt:username', $value);
+	}
+	
+	public function setPassword($value)
+	{
+		$this->setNodeValueOrRemove('/rss/channel/yt:account/yt:password', $value);
 	}
 	
 	public function setOwnerName($value)
@@ -236,6 +276,14 @@ class YouTubeDistributionFeedHelper
 		$this->setNodeValue('/rss/channel/item/media:content/media:keywords', $value);
 	}
 	
+	public function setDateRecorded($value)
+	{
+		if ($value)
+			$this->setNodeValueOrRemove('/rss/channel/item/yt:date_recorded', date('c', intval($value)));
+		else
+			$this->setNodeValueOrRemove('/rss/channel/item/yt:date_recorded', null);
+	}
+	
 	public function setCategory($value)
 	{
 		$this->setNodeValue('/rss/channel/item/media:content/media:category', $value);
@@ -254,6 +302,11 @@ class YouTubeDistributionFeedHelper
 	public function setWebCustomId($value)
 	{
 		$this->setNodeValue('/rss/channel/item/yt:web_metadata/yt:custom_id', $value);
+	}
+
+	public function setWebNotes($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:web_metadata/yt:notes', $value);
 	}
 	
 	public function setAllowComments($value)
@@ -311,11 +364,45 @@ class YouTubeDistributionFeedHelper
 		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:season', $value);
 	}	
 	
+	public function setTvNotes($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:notes', $value);
+	}
+	
+	public function setTvTmsId($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:tv_metadata/yt:tms_id', $value);
+	}
+	
+	public function setMovieCustomId($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:custom_id', $value);
+	}
+	
+	public function setMovieDirector($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:director', $value);
+	}
+	
+	public function setMovieNotes($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:notes', $value);
+	}
+	
+	public function setMovieTitle($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:title', $value);
+	}
+	
+	public function setMovieTmsId($value)
+	{
+		$this->setNodeValue('/rss/channel/item/yt:movie_metadata/yt:tms_id', $value);
+	}
+	
 	public function setCommercialPolicy($value)
 	{
 		$this->setPolicyById('commercial', $value);
 	}
-	
 
 	public function setUGCPolicy($value)
 	{
@@ -327,6 +414,36 @@ class YouTubeDistributionFeedHelper
 		$savedPolicyNode = $this->xpath->query("//*/yt:saved_policies/yt:saved_policy/yt:content_type[text()='".$id."']/..")->item(0);
 		$polocyIdNode = $this->xpath->query("yt:saved_policy_id", $savedPolicyNode)->item(0);
 		$polocyIdNode->nodeValue = $value;
+	}
+
+	public function setUrgentReferenceFile($value)
+	{
+		$this->setNodeValueOrRemove('/rss/channel/item/yt:urgent_reference_file', $value);
+	}
+
+	public function setKeepFingerprint($value)
+	{
+		$this->setNodeValueOrRemove('/rss/channel/item/yt:keep_fingerprint', $value);
+	}
+
+	public function setLocationCountry($value)
+	{
+		$this->setNodeValueOrRemove('/rss/channel/item/yt:location/yt:country', $value);
+	}
+
+	public function setLocationLocationText($value)
+	{
+		$this->setNodeValueOrRemove('/rss/channel/item/yt:location/yt:location_text', $value);
+	}
+
+	public function setLocationZipCode($value)
+	{
+		$this->setNodeValueOrRemove('/rss/channel/item/yt:location/yt:zip_code', $value);
+	}
+
+	public function setDistributionRestrictionRule($value)
+	{
+		$this->setNodeValueOrRemove('/rss/channel/item/yt:distribution_restriction/yt:distribution_rule', $value);
 	}
 	
 	public function setVideoId($value)
@@ -341,11 +458,31 @@ class YouTubeDistributionFeedHelper
 	public function setMetadataFromEntry()
 	{
 		$this->setTitle($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_TITLE));
-		$this->setWebCustomId($this->getValueForField(KalturaYouTubeDistributionField::WEB_METADATA_CUSTOM_ID));
 		$this->setDescription($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_DESCRIPTION));
 		$this->setRating($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_RATING));
 		$this->setKeywords($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_KEYWORDS));
+		$this->setDateRecorded($this->getValueForField(KalturaYouTubeDistributionField::DATE_RECORDED));
+		$this->setCategory($this->getValueForField(KalturaYouTubeDistributionField::MEDIA_CATEGORY));
+		$this->setLanguage($this->getValueForField(KalturaYouTubeDistributionField::LANGUAGE));
+				
+		// yt:location
+		$this->setLocationCountry($this->getValueForField(KalturaYouTubeDistributionField::LOCATION_COUNTRY));
+		$this->setLocationLocationText($this->getValueForField(KalturaYouTubeDistributionField::LOCATION_LOCATION_TEXT));
+		$this->setLocationZipCode($this->getValueForField(KalturaYouTubeDistributionField::LOCATION_ZIP_CODE));
+		
+		// yt:distribution_restriction
+		$this->setDistributionRestrictionRule($this->getValueForField(KalturaYouTubeDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE));
+		
+		// yt:*_metadata
+		$this->setWebMetadata();
 		$this->setTvMetadata();
+		$this->setMovieMetadata();
+	}
+	
+	protected function setWebMetadata()
+	{
+	    $this->setWebCustomId($this->getValueForField(KalturaYouTubeDistributionField::WEB_METADATA_CUSTOM_ID));
+	    $this->setWebNotes($this->getValueForField(KalturaYouTubeDistributionField::WEB_METADATA_NOTES));
 	}
 	
 	protected function setTvMetadata()
@@ -355,6 +492,17 @@ class YouTubeDistributionFeedHelper
 	    $this->setTvEpisodeTitle($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_EPISODE_TITLE));
 	    $this->setTvShowTitle($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_SHOW_TITLE));
 	    $this->setTvSeason($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_SEASON));
+	    $this->setTvNotes($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_NOTES));
+	    $this->setTvTmsId($this->getValueForField(KalturaYouTubeDistributionField::TV_METADATA_TMS_ID));
+	}
+	
+	protected function setMovieMetadata()
+	{
+	    $this->setMovieCustomId($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID));
+	    $this->setMovieDirector($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_DIRECTOR));
+	    $this->setMovieNotes($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_NOTES));
+	    $this->setMovieTitle($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_TITLE));
+	    $this->setMovieTmsId($this->getValueForField(KalturaYouTubeDistributionField::MOVIE_METADATA_TMS_ID));
 	}
 	
 	/**
@@ -421,21 +569,20 @@ class YouTubeDistributionFeedHelper
 	
 	public function setAdParams()
 	{
-	    if (!$this->distributionProfile->enableAdServer) {
-	        return null;
-	    }
-	    
 		$advertisingNode = $this->doc->createElement('yt:advertising');
 		
-		$thirdPartyAdsNode = $this->doc->createElement('yt:third_party_ads');
-		$adTypeNode = $this->doc->createElement('yt:ad_type_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE));
-		$partnerIdNode = $this->doc->createElement('yt:partner_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID));
-		$videoIdNode = $this->doc->createElement('yt:video_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
-		
-		$thirdPartyAdsNode->appendChild($adTypeNode);
-		$thirdPartyAdsNode->appendChild($partnerIdNode);
-		$thirdPartyAdsNode->appendChild($videoIdNode);
-		$advertisingNode->appendChild($thirdPartyAdsNode);
+		if ($this->distributionProfile->enableAdServer) 
+		{
+			$thirdPartyAdsNode = $this->doc->createElement('yt:third_party_ads');
+			$adTypeNode = $this->doc->createElement('yt:ad_type_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_AD_TYPE));
+			$partnerIdNode = $this->doc->createElement('yt:partner_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_PARTNER_ID));
+			$videoIdNode = $this->doc->createElement('yt:video_id', $this->getValueForField(KalturaYouTubeDistributionField::THIRD_PARTY_AD_SERVER_VIDEO_ID));
+			
+			$thirdPartyAdsNode->appendChild($adTypeNode);
+			$thirdPartyAdsNode->appendChild($partnerIdNode);
+			$thirdPartyAdsNode->appendChild($videoIdNode);
+			$advertisingNode->appendChild($thirdPartyAdsNode);
+		}
 		
 		$allowPreRolls = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ALLOW_PRE_ROLL_ADS);
 		$allowPostRolls = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ALLOW_POST_ROLL_ADS);
@@ -455,6 +602,22 @@ class YouTubeDistributionFeedHelper
 		    $advertisingNode->appendChild($inStreamAdsNode);
 		    $advertisingNode->appendChild($adSlotsNode);
 		}		 
+		
+		// yt:adsense_for_video
+		$adsenseForVideoValue = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
+		if ($adsenseForVideoValue)
+		{
+			$adsenseForVideoNode = $this->doc->createElement('yt:adsense_for_video', $adsenseForVideoValue);
+			$advertisingNode->appendChild($adsenseForVideoNode);
+		}
+		
+		// yt:invideo
+		$invideoValue = $this->getValueForField(KalturaYouTubeDistributionField::ADVERTISING_INVIDEO);
+		if ($invideoValue)
+		{
+			$invideoNode = $this->doc->createElement('yt:invideo', $invideoValue);
+			$advertisingNode->appendChild($invideoNode);
+		}
 		
         $itemNode = $this->xpath->query('/rss/channel/item')->item(0);
 		$itemNode->appendChild($advertisingNode);

@@ -34,11 +34,20 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const TV_METADATA_SEASON_MAXIMUM_LENGTH = 16;
 	const TV_METADATA_EPISODE_TITLE_MAXIMUM_LENGTH = 64;
 	const TV_METADATA_SHOW_TITLE_MAXIMUM_LENGTH = 64;
+	const TV_METADATA_TMS_ID_MAXIMUM_LENGTH = 14;
+	const MOVIE_METADATA_TITLE_MAXIMUM_LENGTH = 64;
+	const MOVIE_METADATA_TMS_ID_MAXIMUM_LENGTH = 14;
+	
 	const MEDIA_RATING_VALID_VALUES = 'adult,nonadult';
 	const ALLOW_COMMENTS_VALID_VALUES = 'Always,Approve,Never';
 	const ALLOW_RESPONSES_VALID_VALUES = 'Always,Approve,Never';
 	const ALLOW_EMBEDDING_VALID_VALUES = 'true,false';
 	const ALLOW_RATINGS_VALID_VALUES = 'true,false';
+	const ADVERTISING_INVIDEO_VALID_VALUES = 'Allow,Deny';
+	const ADVERTISING_ADSENSE_FOR_VIDEO_VALUES = 'Allow,Deny';
+	const DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE_VALUES = 'Allow,Deny';
+	const URGENT_REFERENCE_FILE_VALUES = 'yes,no';
+	const KEEP_FINGERPRINT_VALUES = 'yes,no';
 	
 	
 	
@@ -59,11 +68,15 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		    YouTubeDistributionField::MEDIA_DESCRIPTION => self::MEDIA_DESCRIPTION_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::MEDIA_TITLE => self::MEDIA_TITLE_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::WEB_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
+		    YouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::TV_METADATA_CUSTOM_ID => self::METADATA_CUSTOM_ID_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::TV_METADATA_EPISODE => self::TV_METADATA_EPISODE_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::TV_METADATA_EPISODE_TITLE => self::TV_METADATA_EPISODE_TITLE_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::TV_METADATA_SEASON => self::TV_METADATA_SEASON_MAXIMUM_LENGTH,
 		    YouTubeDistributionField::TV_METADATA_SHOW_TITLE => self::TV_METADATA_SHOW_TITLE_MAXIMUM_LENGTH,
+		    YouTubeDistributionField::TV_METADATA_TMS_ID => self::TV_METADATA_TMS_ID_MAXIMUM_LENGTH,
+		    YouTubeDistributionField::MOVIE_METADATA_TITLE => self::MOVIE_METADATA_TITLE_MAXIMUM_LENGTH,
+		    YouTubeDistributionField::MOVIE_METADATA_TMS_ID => self::MOVIE_METADATA_TMS_ID_MAXIMUM_LENGTH,
 		);
 		    		
 		$inListOrNullFields = array (
@@ -72,6 +85,11 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 		    YouTubeDistributionField::ALLOW_EMBEDDING => explode(',', self::ALLOW_EMBEDDING_VALID_VALUES),
 		    YouTubeDistributionField::ALLOW_RATINGS => explode(',', self::ALLOW_RATINGS_VALID_VALUES),
 		    YouTubeDistributionField::ALLOW_RESPONSES => explode(',', self::ALLOW_RESPONSES_VALID_VALUES),
+		    YouTubeDistributionField::ADVERTISING_INVIDEO => explode(',', self::ADVERTISING_INVIDEO_VALID_VALUES),
+		    YouTubeDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO => explode(',', self::ADVERTISING_ADSENSE_FOR_VIDEO_VALUES),
+		    YouTubeDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE => explode(',', self::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE_VALUES),
+		    YouTubeDistributionField::URGENT_REFERENCE_FILE => explode(',', self::URGENT_REFERENCE_FILE_VALUES),
+		    YouTubeDistributionField::KEEP_FINGERPRINT => explode(',', self::KEEP_FINGERPRINT_VALUES),
 		);
 		
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
@@ -207,9 +225,45 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::WEB_METADATA_NOTES);
+	    $fieldConfig->setUserFriendlyFieldName('Web metadata notes');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_CUSTOM_ID);
+	    $fieldConfig->setUserFriendlyFieldName('Movie metadata custom ID');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_DIRECTOR);
+	    $fieldConfig->setUserFriendlyFieldName('Movie metadata director');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_NOTES);
+	    $fieldConfig->setUserFriendlyFieldName('Movie metadata notes');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_TITLE);
+	    $fieldConfig->setUserFriendlyFieldName('Movie metadata title');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::MOVIE_METADATA_TMS_ID);
+	    $fieldConfig->setUserFriendlyFieldName('Movie metadata TMS ID');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(YouTubeDistributionField::DATE_RECORDED);
-	    $fieldConfig->setUserFriendlyFieldName('Entry createdAt');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(createdAt)" />');
+	    $fieldConfig->setUserFriendlyFieldName('Date recorded');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
         $fieldConfig = new DistributionFieldConfig();
@@ -222,6 +276,18 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(YouTubeDistributionField::END_TIME);
 	    $fieldConfig->setUserFriendlyFieldName('Distribution sunset');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunset" />');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::URGENT_REFERENCE_FILE);
+	    $fieldConfig->setUserFriendlyFieldName('Urgent reference file');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::KEEP_FINGERPRINT);
+	    $fieldConfig->setUserFriendlyFieldName('Keep fingerprint');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    // community fields
@@ -275,6 +341,12 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::ACCOUNT_PASSWORD);
+	    $fieldConfig->setUserFriendlyFieldName('Account password');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>'); // the password should not be added in contributeMRSS
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(YouTubeDistributionField::OWNER_NAME);
 	    $fieldConfig->setUserFriendlyFieldName('Account username');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/account_username" />');
@@ -323,11 +395,35 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_NOTES);
+	    $fieldConfig->setUserFriendlyFieldName('TV metadata notes');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::TV_METADATA_TMS_ID);
+	    $fieldConfig->setUserFriendlyFieldName('TV metadata TMS ID');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(YouTubeDistributionField::PLAYLISTS);
 	    $fieldConfig->setUserFriendlyFieldName('YouTube playlists');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/YouTubePlaylist" />');
 	    $fieldConfig->setUpdateOnChange(true);
 	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='YouTubePlaylist']"));
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_ADSENSE_FOR_VIDEO);
+	    $fieldConfig->setUserFriendlyFieldName('Advertising adsense for video');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::ADVERTISING_INVIDEO);
+	    $fieldConfig->setUserFriendlyFieldName('Advertising in video');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
@@ -363,6 +459,30 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName('Allow Post Roll Ads');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/allow_post_roll_ads" />');
 	    $fieldConfig->setUpdateOnChange(false);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::LOCATION_COUNTRY);
+	    $fieldConfig->setUserFriendlyFieldName('Location country');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::LOCATION_LOCATION_TEXT);
+	    $fieldConfig->setUserFriendlyFieldName('Location text');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::LOCATION_ZIP_CODE);
+	    $fieldConfig->setUserFriendlyFieldName('Location zip code');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(YouTubeDistributionField::DISTRIBUTION_RESTRICTION_DISTRIBUTION_RULE);
+	    $fieldConfig->setUserFriendlyFieldName('Distribution restriction rule');
+	    $fieldConfig->setEntryMrssXslt('<xsl:text></xsl:text>');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    return $fieldConfigArray;

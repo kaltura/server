@@ -2,10 +2,14 @@
 <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss" xmlns:yt="http://www.youtube.com/schemas/yt/0.2">
     <channel>
         <yt:notification_email></yt:notification_email>
-		<yt:account><yt:username></yt:username></yt:account>
+		<yt:account>
+			<yt:username></yt:username>
+			<yt:password></yt:password>
+		</yt:account>
 		<yt:owner_name></yt:owner_name>
         <item>
             <yt:action></yt:action>
+            <yt:date_recorded></yt:date_recorded>
             <media:title><![CDATA[]]></media:title>
             <media:content url="file://">
                 <media:description type="plain"><![CDATA[]]></media:description>
@@ -20,6 +24,7 @@
             <yt:target></yt:target>
 			<yt:web_metadata>
 				<yt:custom_id></yt:custom_id>
+				<yt:notes></yt:notes>
 			</yt:web_metadata>
 			<yt:tv_metadata>
 				<yt:custom_id></yt:custom_id>
@@ -27,7 +32,16 @@
 				<yt:episode_title></yt:episode_title>
 				<yt:show_title></yt:show_title>
 				<yt:season></yt:season>
+				<yt:notes></yt:notes>
+				<yt:tms_id></yt:tms_id>
 			</yt:tv_metadata>
+			<yt:movie_metadata>
+				<yt:custom_id></yt:custom_id>
+				<yt:director></yt:director>
+				<yt:notes></yt:notes>
+				<yt:title></yt:title>
+				<yt:tms_id></yt:tms_id>
+			</yt:movie_metadata>
             <yt:community>
                 <yt:allow_comments></yt:allow_comments>
                 <yt:allow_responses></yt:allow_responses>
@@ -44,6 +58,16 @@
 					<yt:saved_policy_id type="name"></yt:saved_policy_id>
 				</yt:saved_policy>
 			</yt:saved_policies>
+			<yt:urgent_reference_file></yt:urgent_reference_file>
+			<yt:location>
+				<yt:country></yt:country>
+				<yt:location_text></yt:location_text>
+				<yt:zip_code></yt:zip_code>
+			</yt:location>
+			<yt:distribution_restriction>
+				<yt:distribution_rule></yt:distribution_rule>
+			</yt:distribution_restriction>
+			<yt:keep_fingerprint></yt:keep_fingerprint>
         </item>
     </channel>
 </rss>

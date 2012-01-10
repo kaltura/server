@@ -189,6 +189,8 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		
 		$feed->sendFeed($sftpManager);
+		$data->sentData = $feed->getXml();
+		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 		
 		// upload the video
 		$videoSFTPPath = $feed->getDirectoryName() . '/' . pathinfo($videoFilePath, PATHINFO_BASENAME);
@@ -222,6 +224,8 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$sftpManager = $this->getSFTPManager($distributionProfile);
 		
 		$feed->sendFeed($sftpManager);
+		$data->sentData = $feed->getXml();
+		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 		$feed->setDeliveryComplete($sftpManager);
 		
 		$providerData->sftpDirectory = $feed->getDirectoryName();
@@ -258,6 +262,8 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		}
 		
 		$feed->sendFeed($sftpManager);
+		$data->sentData = $feed->getXml();
+		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 		$feed->setDeliveryComplete($sftpManager);
 		
 		$providerData->sftpDirectory = $feed->getDirectoryName();
@@ -289,6 +295,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		
 		KalturaLog::info('Status file was found');
 		
+		$data->results = $statusXml;
 		return $statusXml;
 	}
 	
