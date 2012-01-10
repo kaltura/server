@@ -48,7 +48,7 @@
 	unset($summary['generatedDate']);
 	unset($summary['apiVersion']);
 ?>
-<?php
+	<?php
 	if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
 		{
 			?>
@@ -66,7 +66,7 @@
 			<body>
 			<?php
 		}
-?>
+	?>
 		<div id="content">
 			<div id="header">
 				<h1>Kaltura API SDK - Native Client Libraries</h1>
@@ -90,8 +90,7 @@
 							{
 								?>
 									<div class="download-button <?php echo $clientName; ?>-btn">
-										<a href="http://<?php echo kConf::get('cdn_host'); ?>/content/clientlibs/<?php echo $clientName.'_'.$schemaGenDate; ?>.tar.gz" target="_blank" >
-											<button class="download-btn" title="Single class <?php echo $clientName; ?> client library"></button>
+										<a href="http://<?php echo kConf::get('cdn_host'); ?>/content/clientlibs/<?php echo $clientName.'_'.$schemaGenDate; ?>.tar.gz" target="_blank" title="Single class <?php echo $clientName; ?> client library" class="download-btn">
 										</a>
 									</div>
 								<?php 

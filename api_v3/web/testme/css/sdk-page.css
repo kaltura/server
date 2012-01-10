@@ -9,7 +9,7 @@ div#downloads-box { float:left;margin-right:50px; }
 .graytext { color:#8a8a8a; }
 div#download-buttons { margin-top:30px; }
 .download-button { float:left;width:71px;height:81px;margin: 0 20px 40px 0;cursor:pointer;cursor:hand; }
-.download-btn { background:transparent;border:none;width:71px;height:80px; }
+.download-btn { background:transparent;border:none;width:71px;height:80px;display:block; }
 .generator-btn { padding-left:8px;font-size:10px; }
 .php4-btn { background:transparent url('../images/buttons/php4.jpg') no-repeat right top; }
 .php4-btn:hover  { background:transparent url('../images/buttons/php4.jpg') no-repeat left top; }
