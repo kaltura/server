@@ -255,13 +255,18 @@ class KalturaClient:
         resultNode = getChildNodeByXPath(resultXml, 'xml/result')
         if resultNode == None:
             raise KalturaClientException('Could not find result node in response xml', KalturaClientException.ERROR_RESULT_NOT_FOUND)
-        
+
+        execTime = getChildNodeByXPath('xml/executionTime')
+        if execTime != None:
+            self.executionTime = getXmlNodeFloat(execTime)
+
         self.throwExceptionIfError(resultNode)
 
         return resultNode        
         
     # Call all API services that are in queue
     def doQueue(self):
+        self.executionTime = None        
         if len(self.callsQueue) == 0:
             self.multiRequest = False
             return None
