@@ -188,6 +188,11 @@ class KSecureEntryHelper
 				{
 					die("Invalid session [".$valid."]");
 				}
+				
+				if ($ks->partner_id != $this->_entry->getPartnerId())
+				{
+					return;
+				}
 					
 				$this->_ks = $ks;	
 			}
