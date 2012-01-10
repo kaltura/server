@@ -9,6 +9,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	(
 		"freeText" => "_free_text",
 		"isRoot" => "_is_root",
+		"categoriesFullNameIn" => "_in_categories_full_name",
 	);
 
 	public function getMapBetweenObjects()
@@ -25,4 +26,9 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @var KalturaNullableBoolean
 	 */
 	public $isRoot;
+	
+	/**
+	 * @var string
+	 */
+	public $categoriesFullNameIn;
 }

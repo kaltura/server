@@ -84,6 +84,7 @@ class entryFilter extends baseObjectFilter
 			"_matchor_search_text" ,
 			"_matchand_categories", // see alias (this filter also being used in category::save(), so make sure it is not changed or removed!)
 			"_matchor_categories", // see alias
+			"_in_categories_full_name",
 			"_matchand_categories_ids", // see alias
 			"_matchor_categories_ids", // see alias
 			"_matchand_flavor_params_ids",
@@ -245,6 +246,34 @@ class entryFilter extends baseObjectFilter
 		}
 		return implode(",", $catsIds);
 	}
+	
+	/**
+	 * Convert the categories to categories ids
+	 * 
+	 * @param string $cats Categories full names
+	 * @return string Categogories indexes ids
+	 */
+	public static function categoryFullNamesToIds($cats)
+	{
+		if ($cats === "")
+			$cats = array();
+		else
+			$cats = explode(",", $cats);
+		kArray::trim($cats);
+			
+		$catsIds = array();
+		foreach($cats as $cat)
+		{
+			$category = categoryPeer::getByFullNameExactMatch($cat);
+			$catsIds[] = $category->getId();
+			
+			$categories = categoryPeer::getByFullNameWildcardMatch($cat . categoryPeer::CATEGORY_SEPARATOR);
+			foreach($categories as $category)
+				$catsIds[] = $category->getId();
+		}
+
+		return implode(",", $catsIds);
+	}	
 	
 	/**
 	 * Convert the flavor params ids to indexed flavor params string
