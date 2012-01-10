@@ -23,6 +23,15 @@
 				template: function(i){return i["text"] + "<br>" + i["time"]}
 			});
 		});
+
+		function gotoTestMe() {
+			var isInIFrame = (window.location != window.parent.location) ? true : false;
+			if (isInIFrame) {
+				window.top.location = '/admin_console/index.php/index/testme';
+			} else {
+				window.location = '/api_v3/testme/index.php';
+			}
+		}
 	</script>
 </head>
 <?php 
@@ -39,12 +48,25 @@
 	unset($summary['generatedDate']);
 	unset($summary['apiVersion']);
 ?>
-	<body class="body-bg">
-		<ul id="kmcSubMenu">
-			<li><a href="index.php">Test Console</a></li>
-			<li><a href="../testmeDoc/index.php">API Documentation</a></li>
-			<li class="active"><a href="#">API Client Libraries</a></li>
-		</ul>	
+<?php
+	if(!isset($_REQUEST['hideMenu']) || !$_REQUEST['hideMenu'])
+		{
+			?>
+			<body class="body-bg">
+				<ul id="kmcSubMenu">
+					<li><a href="index.php">Test Console</a></li>
+					<li><a href="../testmeDoc/index.php">API Documentation</a></li>
+					<li class="active"><a href="#">API Client Libraries</a></li>
+				</ul>	
+			<?php
+		}
+		else 
+		{
+			?>
+			<body>
+			<?php
+		}
+?>
 		<div id="content">
 			<div id="header">
 				<h1>Kaltura API SDK - Native Client Libraries</h1>
@@ -52,7 +74,7 @@
 				<p style="margin-bottom:5px;">Below you can download the Client Library for the programming language of your choice.</p>
 				<p>Please note, the client libraries provided here have been generated for the Kaltura.com SaaS API.<br />
 				Users of self-hosted editions of Kaltura (On-Prem or CE) are encouraged to use their Kaltura Server Clients Generator for optimal compatibility.</p>
-				<p>To learn how to use the client libraries and see example code implementations, use the <a href="#" >API Test Console</a>.<br />
+				<p>To learn how to use the client libraries and see example code implementations, use the <a href="#" onclick="gotoTestMe();">API Test Console</a>.<br />
 				The Test Console automatically generates sample code based on the API actions and parameters you select.</p>
 			</div>
 			<div id="boxs">
