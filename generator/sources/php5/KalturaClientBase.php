@@ -125,6 +125,11 @@ class KalturaClientBase
 	 */
 	protected $pluginServices = array();
 	
+	/**
+	* @var Array of response headers
+	*/
+	private $responseHeaders = array();
+	
 	public function __get($serviceName)
 	{
 		if(isset($this->pluginServices[$serviceName]))
@@ -180,6 +185,19 @@ class KalturaClientBase
 		}
 	}
 
+	/* Store response headers into array */
+	public function readHeader($ch, $string)
+	{
+		array_push($this->responseHeaders, $string);
+		return strlen($string);	
+	}
+	
+	/* Retrive response headers */
+	public function getResponseHeaders()
+	{
+		return $this->responseHeaders;
+	}
+	
 	public function getServeUrl()
 	{
 		if (count($this->callsQueue) != 1)
@@ -352,6 +370,7 @@ class KalturaClientBase
 	 */
 	private function doCurl($url, $params = array(), $files = array())
 	{
+		$this->responseHeaders = array();
 		$cookies = array();
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -401,6 +420,15 @@ class KalturaClientBase
 				curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 			}	
 		}
+		
+		// Set SSL verification
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->config->verifySSL);
+		
+		// Set custom headers
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->requestHeaders );
+
+		// Save response headers
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
 
 		$result = curl_exec($ch);
 		$curlError = curl_error($ch);
@@ -423,6 +451,7 @@ class KalturaClientBase
 		$formattedData = http_build_query($params , "", "&");
 		$params = array('http' => array(
 					"method" => "POST",
+					"User-Agent: " . $this->config->userAgent . "\r\n".
 					"Accept-language: en\r\n".
 					"Content-type: application/x-www-form-urlencoded\r\n",
 					"content" => $formattedData
@@ -925,11 +954,13 @@ class KalturaConfiguration
 	public $curlTimeout   				= 10;
 	public $userAgent					= '';
 	public $startZendDebuggerSession 	= false;
-	public $proxyHost                    = null;
+	public $proxyHost                   = null;
 	public $proxyPort                   = null;
 	public $proxyType                   = 'HTTP';
 	public $proxyUser                   = null;
 	public $proxyPassword               = '';
+	public $verifySSL 					= true;
+	public $requestHeaders				= array();
 
 	
 	
