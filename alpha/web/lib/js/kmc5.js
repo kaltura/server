@@ -803,22 +803,15 @@ kmc.preview_embed = {
 		if( !entry_flavors ) { return false; }
 		for(var i=0; i<entry_flavors.length; i++) {
 			var asset = entry_flavors[i];
-			// Add iPad Akamai flavor to iPad flavor Ids list
-			if( asset.tags.indexOf('ipadnew') != -1 ){
+			
+			if( asset.tags.indexOf('applembr') != -1 ){
 				return true;
 			}
 
-			// Add iPhone Akamai flavor to iPad&iPhone flavor Ids list
-			if( asset.tags.indexOf('iphonenew') != -1 ){
-				return true;
-			}
-
-			// Check the tags to read what type of mp4 source
 			if( asset.tags.indexOf('ipad') != -1 ){
 				return true;
 			}
 
-			// Check for iPhone src
 			if( asset.tags.indexOf('iphone') != -1 ){
 				return true;
 			}
@@ -1068,8 +1061,10 @@ kmc.user = {
 			// In order to get the iframe content height the modal must be visible
 			kmc.layout.modal.show();
 			// Get iframe content height & update iframe
-			var iframe_height = $("#support")[0].contentWindow.document.body.scrollHeight;
-			$("#support").height( iframe_height );
+			if( ! kmc.vars.support_frame_height ) {
+				kmc.vars.support_frame_height = $("#support")[0].contentWindow.document.body.scrollHeight;
+			}
+			$("#support").height( kmc.vars.support_frame_height );
 			// Re-position the modal box
 			kmc.layout.modal.position();
 		});
@@ -1077,7 +1072,7 @@ kmc.user = {
 
 	logout: function() {
 		var message = kmc.functions.checkForOngoingProcess();
-		if( message ) { alert('message'); return false; }
+		if( message ) { alert( message ); return false; }
 		var expiry = new Date("January 1, 1970"); // "Thu, 01-Jan-70 00:00:01 GMT";
 		expiry = expiry.toGMTString();
 		document.cookie = "pid=; expires=" + expiry + "; path=/";
