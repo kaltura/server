@@ -632,7 +632,12 @@ class FlavorAssetService extends KalturaAssetService
 		if($storageId)
 			return $assetDb->getExternalUrl($storageId);
 			
-		return $assetDb->getDownloadUrl(true);
+		//files grater then 1.8GB can't be downloaded from cdn.
+		$flavorSizeKB = $assetDb->getSize();
+		$useCdn = true;
+		if ($flavorSizeKB > kConf::get("max_file_size_downloadable_from_cdn_in_KB"))
+			$useCdn = false;
+		return $assetDb->getDownloadUrl($useCdn);
 	}
 	
 	/**
