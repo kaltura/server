@@ -556,6 +556,17 @@ class FlavorAssetService extends KalturaAssetService
 		if (is_null($originalFlavorAsset) || $originalFlavorAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
 
+		$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		// if the file sync isn't local (wasn't synced yet) proxy request to other datacenter
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		if(!$local)
+		{
+			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
+		}
+		else if(!$fileSync)
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+		}	
 		$err = "";
 		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $flavorParamsId, $err);
 	}
