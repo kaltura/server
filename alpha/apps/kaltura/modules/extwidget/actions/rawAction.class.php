@@ -311,16 +311,18 @@ class rawAction extends sfAction
 				$ret_file_name = $entry_id;
 			}
 			
+			$ret_file_name_safe = str_replace(' ', '-', $ret_file_name); // spaces replace with "-"
+			$ret_file_name_safe = preg_replace('/[^a-zA-Z0-9-_]/', '', $ret_file_name_safe); // only "a-z", "A-Z", "0-9", "-" & "_" are left
+
 			if ( strpos ($url , "?" ) > 0 ) // replace BEFORE the query string
 			{
-				$url = str_replace( "?" , "/$ret_file_name.{$ext}?" ,  $url );
+				$url = str_replace( "?" , "/$ret_file_name_safe.{$ext}?" ,  $url );
 				$url .= "&relocate=f.{$ext}"; // add the ufname as a query parameter
 			}
 			else
 			{
-				$url .= "/$ret_file_name.{$ext}?relocate=f.{$ext}";   // add the ufname as a query parameter
+				$url .= "/$ret_file_name_safe.{$ext}?relocate=f.{$ext}";   // add the ufname as a query parameter
 			}
-					
 			
 			// redirect and create the url so it will have the ufname
 			header ( "Location: {$url}" );
