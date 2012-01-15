@@ -250,10 +250,6 @@ class YahooDistributionFeedHelper
 		}	
 	}
 	
-	public function setVideoStreamSecure($value)
-	{
-		$this->setNodeValue('/CMSFEED/FEEDITEM/STREAM/@SECURE', $value);
-	}
 	
 	public function setVideoValidTime($value)
 	{
@@ -298,8 +294,7 @@ class YahooDistributionFeedHelper
 				$videoBitrate = $flavorAsset->bitrate;
 				$this->setNodeValue('@FORMAT', strtoupper($fileExt), $streamContentNode);
 				$this->setNodeValue('@BITRATE', $videoBitrate, $streamContentNode);				
-				$this->setNodeValue('@SECURE', KalturaYahooDistributionField::VIDEO_STREAM_SECURE, $streamContentNode);	
-				
+								
 				$uniqueName = $this->flavorAssetUniqueName($flavorAsset, $currentTime);
 				$this->setNodeValue('.', $uniqueName, $streamContentNode);
 				//$this->setNodeValue('.', providerData->flavorAsset[id]);						

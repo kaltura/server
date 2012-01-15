@@ -32,7 +32,6 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 	const VIDEO_STREAM_BITRATE_VALID_VALUES = '8,14,16,20,28,32,48,56,64,80,96,100,115,128,150,250,300,319,350,500,600,700,1000,1200,1500,1800,2000';
 	const VIDEO_STREAM_FORMAT_VALID_VALUES = 'MP4,MOV';
 	
-	const VIDEO_STREAM_SECURE_VALID_VALUES = 'True,False';
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -51,9 +50,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 			YahooDistributionField::VIDEO_FEEDITEM_ID => self::FEED_ITEM_ID_MAXIMUM_LENGTH,		    		    
 		);
 		    		
-		$inListOrNullFields = array (  	    	    
-		    YahooDistributionField::VIDEO_STREAM_SECURE => self::VIDEO_STREAM_SECURE_VALID_VALUES,			
-		);		
+		$inListOrNullFields = array ();		
 
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if (!$allFieldValues || !is_array($allFieldValues)) {
@@ -352,13 +349,6 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(YahooDistributionField::VIDEO_EXPIRATION_TIME);
 	    $fieldConfig->setUserFriendlyFieldName('entry expiration time');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="distribution[@entryDistributionId=$entryDistributionId]/sunset" />');	    
-	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
-	    
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(YahooDistributionField::VIDEO_STREAM_SECURE);
-	    $fieldConfig->setUserFriendlyFieldName('video stream secure');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/YahooStreamSecure"/>');
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
