@@ -684,13 +684,13 @@ class KalturaEntryService extends KalturaBaseService
 		
 		// if the file sync isn't local (wasn't synced yet) proxy request to other datacenter
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
-		if(!$local)
-		{
-			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
-		}
-		else if(!$fileSync)
+		if(!$fileSync)
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+		}
+		else if(!$local)
+		{
+			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
 		}
 		
 		// even if it null
