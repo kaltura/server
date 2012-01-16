@@ -21,8 +21,26 @@ class kQueryCache
 	const QUERY_DB_MASTER = 1;
 	const QUERY_DB_SLAVE = 2;
 	
-	protected static $s_memcache = null;
+	protected static $s_memcacheKeys = null;
+	protected static $s_memcacheQueries = null;
 	protected static $s_memcacheInited = false;
+	
+	protected static function connectToMemcache($hostName, $port)
+	{
+		$memcache = new Memcache;
+
+		//$memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
+		
+		$connStart = microtime(true);
+		$res = @$memcache->connect($hostName, $port);
+		KalturaLog::debug("kQueryCache: connect took - ". (microtime(true) - $connStart). " seconds to $hostName:$port");
+		if (!$res)
+		{
+			KalturaLog::err("kQueryCache: failed to connect to global memcache");
+			return null;
+		}
+		return $memcache;
+	}
 	
 	protected static function initGlobalMemcache()
 	{
@@ -38,18 +56,14 @@ class kQueryCache
 			return;
 		}
 		
-		self::$s_memcache = new Memcache;
-
-		//self::$s_memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
-		
-		$connStart = microtime(true);
-		$res = @self::$s_memcache->connect(kConf::get("global_memcache_host"), kConf::get("global_memcache_port"));
-		KalturaLog::debug("kQueryCache: connect took - ". (microtime(true) - $connStart). " seconds to ".kConf::get("global_memcache_host"));
-		if (!$res)
+		self::$s_memcacheKeys = self::connectToMemcache(kConf::get("global_keys_memcache_host"), kConf::get("global_keys_memcache_port"));
+		if (self::$s_memcacheKeys === null)
 		{
-			KalturaLog::err("kQueryCache: failed to connect to global memcache");
-			self::$s_memcache = null;
+			// no reason to init the queries server, the query cache won't be used anyway
+			return;
 		}
+		
+		self::$s_memcacheQueries = self::connectToMemcache(kConf::get("global_queries_memcache_host"), kConf::get("global_queries_memcache_port"));
 	}
 	
 	protected static function replaceVariable($formatString, $variableValue)
@@ -139,7 +153,7 @@ class kQueryCache
 		}
 		
 		self::initGlobalMemcache();
-		if (self::$s_memcache === null)
+		if (self::$s_memcacheQueries === null)			// we must have both memcaches initialized
 		{
 			return null;
 		}
@@ -149,31 +163,21 @@ class kQueryCache
 		{
 			$invalidationKeys[$index] = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 		}
-		$cacheKey = self::CACHE_PREFIX_QUERY.$queryType.md5(serialize($criteria));
-		$origCacheKey = $cacheKey;
-		
+
 		$keysToGet = $invalidationKeys;
-		$keysToGet[] = $cacheKey;
 		$keysToGet[] = self::DONT_CACHE_KEY;
 		
 		$queryStart = microtime(true);
-		$cacheResult = self::$s_memcache->get($keysToGet);
-		KalturaLog::debug("kQueryCache: query took " . (microtime(true) - $queryStart) . " seconds");
-		
-		// get the cached query
-		$queryResult = null;
-		if (array_key_exists($cacheKey, $cacheResult))
-		{
-			$queryResult = $cacheResult[$cacheKey];
-			unset($cacheResult[$cacheKey]);
-		}
+		$cacheResult = self::$s_memcacheKeys->get($keysToGet);
+		KalturaLog::debug("kQueryCache: keys query took " . (microtime(true) - $queryStart) . " seconds");
 		
 		// don't cache the result if the 'dont cache' flag is enabled
+		$cacheQuery = true;
 		if (array_key_exists(self::DONT_CACHE_KEY, $cacheResult) &&
 			$cacheResult[self::DONT_CACHE_KEY])
 		{
 			KalturaLog::debug("kQueryCache: dontCache key is set -> not caching the result");
-			$cacheKey = null;
+			$cacheQuery = false;
 			unset($cacheResult[self::DONT_CACHE_KEY]);
 		}
 		
@@ -188,13 +192,22 @@ class kQueryCache
 				$queryDB = self::QUERY_DB_MASTER;
 				if ($currentTime < $invalidationTime + self::INVALIDATION_TIME_MARGIN_SEC)
 				{
-					$cacheKey = null;		// No reason to cache the query since it won't be used anyway
-					return null;
+					return null;			// The query won't be cached since cacheKey is null, it's ok cause it won't be used anyway
 				}
 			}
 		}
 		
 		// check whether we have a valid cached query
+		$origCacheKey = self::CACHE_PREFIX_QUERY.$queryType.md5(serialize($criteria));
+		if ($cacheQuery)
+		{
+			$cacheKey = $origCacheKey; 
+		}
+		
+		$queryStart = microtime(true);
+		$queryResult = self::$s_memcacheQueries->get($origCacheKey);
+		KalturaLog::debug("kQueryCache: query took " . (microtime(true) - $queryStart) . " seconds");
+		
 		if (!$queryResult)
 		{	
 			KalturaLog::debug("kQueryCache: cache miss, peer=$peerClassName, key=$origCacheKey");
@@ -224,7 +237,7 @@ class kQueryCache
 	
 	public static function cacheQueryResults($cacheKey, $queryResult)
 	{
-		if (self::$s_memcache === null || $cacheKey === null || 
+		if (self::$s_memcacheQueries === null || $cacheKey === null || 
 			(is_array($queryResult) && count($queryResult) > self::MAX_CACHED_OBJECT_COUNT))
 		{
 			return;
@@ -232,7 +245,7 @@ class kQueryCache
 		
 		$queryTime = time();
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$cacheKey queryTime=$queryTime");
-		self::$s_memcache->set($cacheKey, array($queryResult, $queryTime), MEMCACHE_COMPRESSED, self::CACHED_QUERIES_EXPIRY_SEC);
+		self::$s_memcacheQueries->set($cacheKey, array($queryResult, $queryTime), MEMCACHE_COMPRESSED, self::CACHED_QUERIES_EXPIRY_SEC);
 	}
 	
 	public static function invalidateQueryCache($object)
@@ -249,7 +262,7 @@ class kQueryCache
 		}
 		
 		self::initGlobalMemcache();
-		if (self::$s_memcache === null)
+		if (self::$s_memcacheKeys === null)			// The keys memcache suffices here
 		{
 			return null;
 		}
@@ -259,7 +272,10 @@ class kQueryCache
 		{
 			$invalidationKey = self::CACHE_PREFIX_INVALIDATION_KEY.$invalidationKey;
 			KalturaLog::debug("kQueryCache: updating invalidation key, invkey=$invalidationKey");
-			self::$s_memcache->set($invalidationKey, $currentTime);
+			if (!self::$s_memcacheKeys->set($invalidationKey, $currentTime))
+			{
+				KalturaLog::err("kQueryCache: failed to update invalidation key");
+			}
 		}
 	}
 }
