@@ -41,7 +41,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="search_text" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_data" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="puser_id" type="varchar" size="100" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="admin_tags" type="longvarchar" />
@@ -128,7 +127,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="subp_id" type="integer" default="0" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="search_text" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="permissions" type="varchar" size="1024" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="group_id" type="varchar" size="64" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="plays" type="integer" default="0" />
@@ -199,7 +197,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="display_in_search" type="tinyint" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="subp_id" type="integer" default="0" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="search_text" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="screen_name" type="varchar" size="20" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="site_url" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="permissions" type="integer" default="1" />
@@ -221,7 +218,6 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="categories_ids" type="varchar" size="1024" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="start_date" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="end_date" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="search_text_discrete" type="varchar" size="4096" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="flavor_params_ids" type="varchar" size="512" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="available_from" type="timestamp" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kshow">

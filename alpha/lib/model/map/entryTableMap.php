@@ -66,7 +66,6 @@ class entryTableMap extends TableMap {
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, null);
 		$this->addColumn('SUBP_ID', 'SubpId', 'INTEGER', false, null, 0);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('SEARCH_TEXT', 'SearchText', 'VARCHAR', false, 4096, null);
 		$this->addColumn('SCREEN_NAME', 'ScreenName', 'VARCHAR', false, 20, null);
 		$this->addColumn('SITE_URL', 'SiteUrl', 'VARCHAR', false, 256, null);
 		$this->addColumn('PERMISSIONS', 'Permissions', 'INTEGER', false, null, 1);
@@ -88,7 +87,6 @@ class entryTableMap extends TableMap {
 		$this->addColumn('CATEGORIES_IDS', 'CategoriesIds', 'VARCHAR', false, 1024, null);
 		$this->addColumn('START_DATE', 'StartDate', 'TIMESTAMP', false, null, null);
 		$this->addColumn('END_DATE', 'EndDate', 'TIMESTAMP', false, null, null);
-		$this->addColumn('SEARCH_TEXT_DISCRETE', 'SearchTextDiscrete', 'VARCHAR', false, 4096, null);
 		$this->addColumn('FLAVOR_PARAMS_IDS', 'FlavorParamsIds', 'VARCHAR', false, 512, null);
 		$this->addColumn('AVAILABLE_FROM', 'AvailableFrom', 'TIMESTAMP', false, null, null);
 		// validators

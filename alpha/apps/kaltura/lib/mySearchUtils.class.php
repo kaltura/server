@@ -213,70 +213,8 @@ class mySearchUtils
 			
 			$obj->setDisplayInSearch ( $res );
 		}
-		else
-		{
-			// if not new - use the value from the object
-			$res = $obj->getDisplayInSearch ( );
-		}
-		
-//	echo __METHOD__ . " (" . get_class ( $obj ) . ") res [$res]\n";
-	
-			$words = "";
-			$fields_to_use = $obj->getColumnNames();
-			foreach ( $fields_to_use  as $field )
-			{
-				$field_str = $obj->getByName ( $field , BasePeer::TYPE_FIELDNAME );//  call_user_func ( array ( $obj , $func_name ) );
-				$words .= " " . $field_str;
-			}
-			
-			$extra_invisible_data = null;
-			
-			if ( $obj instanceof kshow )
-			{
-				$type = $obj->getType();
-				if ( empty ( $type ) ) $type = kshow::KSHOW_TYPE_OTHER;
-				// add the category to the search
-				$words .= " _CAT_" . $type;
-			}
-			elseif ( $obj instanceof entry )
-			{
-				$extra_invisible_data = "_MEDIA_TYPE_" . $obj->getMediaType(); 
-				$type = $obj->getType();
-				// add the SEARCH_ENTRY_TYPE_RC to the words
-				if ( $type == entryType::MIX )	$extra_invisible_data .= " " . self::SEARCH_ENTRY_TYPE_RC ;
-			}			
-			$prepared_text = self::prepareSearchText ( $words );
-			
-			$partner_id = $obj->getPartnerId();
-			// if res == 1 - only for partner , if == 2 - also for kaltura network
-			$obj->setSearchText ( self::addPartner ( $partner_id , $prepared_text , $res , $extra_invisible_data ) );
-
 	}
 	
-	public static function setSearchTextDiscreteForEntry(entry $obj)
-	{
-		$searchText = array();
-		
-		// categories
-		if ($obj->getCategoriesIds())
-		{
-			$categories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $obj->getCategoriesIds());
-			foreach($categories as $category)
-				$searchText[] = self::ENTRY_CATEGORY_ID_PREFIX . $category;
-		}
-		
-		// duration type
-		$duration = $obj->getDurationInt();
-		$searchText[] = self::ENTRY_DURATION_TYPE_PREFIX . entryPeer::getDurationType($duration);
-
-		// flavor params ids
-		$getFlavorParamsIds = explode(",", $obj->getFlavorParamsIds());
-		foreach($getFlavorParamsIds as $getFlavorParamsIds)
-			$searchText[] = self::ENTRY_FLAVOR_PARAMS_PREFIX . $getFlavorParamsIds;
-
-		$obj->setSearchTextDiscrete(implode(" ", $searchText));
-	}
-
 	private static function setRes ( &$res , $new_value , $boolean_value= true )
 	{
 		if ( $boolean_value ) 
@@ -291,18 +229,7 @@ class mySearchUtils
 			if ( $res < 0 ) $res = 0;
 		}
 	}
-	
-	// don't insert doubles, or small words
-	// TODO !!
-	public static function prepareSearchText ( $words )
-	{ 
-		// a  single quote should be removed with no space replacer
-		$words = preg_replace ( "/[\r\n'\"]/" , "", $words );
-		// all other starnge characters will be ragrded as spaces
-		$words = preg_replace ( '/[ \r\t]{2,}/s' , " " , $words ) ; // get rid of multiple spaces
-		return $words;
-	}
-	
+		
 	// add to the kaltura network or only to the partner's search text
 	public static function addPartner ( $partner_id , $text , $res , $extra_invisible_data = null )
 	{

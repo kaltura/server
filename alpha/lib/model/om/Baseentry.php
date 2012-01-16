@@ -203,12 +203,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	protected $custom_data;
 
 	/**
-	 * The value for the search_text field.
-	 * @var        string
-	 */
-	protected $search_text;
-
-	/**
 	 * The value for the screen_name field.
 	 * @var        string
 	 */
@@ -335,12 +329,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	 * @var        string
 	 */
 	protected $end_date;
-
-	/**
-	 * The value for the search_text_discrete field.
-	 * @var        string
-	 */
-	protected $search_text_discrete;
 
 	/**
 	 * The value for the flavor_params_ids field.
@@ -880,16 +868,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	}
 
 	/**
-	 * Get the [search_text] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSearchText()
-	{
-		return $this->search_text;
-	}
-
-	/**
 	 * Get the [screen_name] column value.
 	 * 
 	 * @return     string
@@ -1217,16 +1195,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
-	}
-
-	/**
-	 * Get the [search_text_discrete] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSearchTextDiscrete()
-	{
-		return $this->search_text_discrete;
 	}
 
 	/**
@@ -2004,29 +1972,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	} // setCustomData()
 
 	/**
-	 * Set the value of [search_text] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     entry The current object (for fluent API support)
-	 */
-	public function setSearchText($v)
-	{
-		if(!isset($this->oldColumnsValues[entryPeer::SEARCH_TEXT]))
-			$this->oldColumnsValues[entryPeer::SEARCH_TEXT] = $this->search_text;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->search_text !== $v) {
-			$this->search_text = $v;
-			$this->modifiedColumns[] = entryPeer::SEARCH_TEXT;
-		}
-
-		return $this;
-	} // setSearchText()
-
-	/**
 	 * Set the value of [screen_name] column.
 	 * 
 	 * @param      string $v new value
@@ -2634,29 +2579,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 	} // setEndDate()
 
 	/**
-	 * Set the value of [search_text_discrete] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     entry The current object (for fluent API support)
-	 */
-	public function setSearchTextDiscrete($v)
-	{
-		if(!isset($this->oldColumnsValues[entryPeer::SEARCH_TEXT_DISCRETE]))
-			$this->oldColumnsValues[entryPeer::SEARCH_TEXT_DISCRETE] = $this->search_text_discrete;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->search_text_discrete !== $v) {
-			$this->search_text_discrete = $v;
-			$this->modifiedColumns[] = entryPeer::SEARCH_TEXT_DISCRETE;
-		}
-
-		return $this;
-	} // setSearchTextDiscrete()
-
-	/**
 	 * Set the value of [flavor_params_ids] column.
 	 * 
 	 * @param      string $v new value
@@ -2836,31 +2758,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$this->display_in_search = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
 			$this->subp_id = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
 			$this->custom_data = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
-			$this->search_text = ($row[$startcol + 29] !== null) ? (string) $row[$startcol + 29] : null;
-			$this->screen_name = ($row[$startcol + 30] !== null) ? (string) $row[$startcol + 30] : null;
-			$this->site_url = ($row[$startcol + 31] !== null) ? (string) $row[$startcol + 31] : null;
-			$this->permissions = ($row[$startcol + 32] !== null) ? (int) $row[$startcol + 32] : null;
-			$this->group_id = ($row[$startcol + 33] !== null) ? (string) $row[$startcol + 33] : null;
-			$this->plays = ($row[$startcol + 34] !== null) ? (int) $row[$startcol + 34] : null;
-			$this->partner_data = ($row[$startcol + 35] !== null) ? (string) $row[$startcol + 35] : null;
-			$this->int_id = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
-			$this->indexed_custom_data_1 = ($row[$startcol + 37] !== null) ? (int) $row[$startcol + 37] : null;
-			$this->description = ($row[$startcol + 38] !== null) ? (string) $row[$startcol + 38] : null;
-			$this->media_date = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
-			$this->admin_tags = ($row[$startcol + 40] !== null) ? (string) $row[$startcol + 40] : null;
-			$this->moderation_status = ($row[$startcol + 41] !== null) ? (int) $row[$startcol + 41] : null;
-			$this->moderation_count = ($row[$startcol + 42] !== null) ? (int) $row[$startcol + 42] : null;
-			$this->modified_at = ($row[$startcol + 43] !== null) ? (string) $row[$startcol + 43] : null;
-			$this->puser_id = ($row[$startcol + 44] !== null) ? (string) $row[$startcol + 44] : null;
-			$this->access_control_id = ($row[$startcol + 45] !== null) ? (int) $row[$startcol + 45] : null;
-			$this->conversion_profile_id = ($row[$startcol + 46] !== null) ? (int) $row[$startcol + 46] : null;
-			$this->categories = ($row[$startcol + 47] !== null) ? (string) $row[$startcol + 47] : null;
-			$this->categories_ids = ($row[$startcol + 48] !== null) ? (string) $row[$startcol + 48] : null;
-			$this->start_date = ($row[$startcol + 49] !== null) ? (string) $row[$startcol + 49] : null;
-			$this->end_date = ($row[$startcol + 50] !== null) ? (string) $row[$startcol + 50] : null;
-			$this->search_text_discrete = ($row[$startcol + 51] !== null) ? (string) $row[$startcol + 51] : null;
-			$this->flavor_params_ids = ($row[$startcol + 52] !== null) ? (string) $row[$startcol + 52] : null;
-			$this->available_from = ($row[$startcol + 53] !== null) ? (string) $row[$startcol + 53] : null;
+			$this->screen_name = ($row[$startcol + 29] !== null) ? (string) $row[$startcol + 29] : null;
+			$this->site_url = ($row[$startcol + 30] !== null) ? (string) $row[$startcol + 30] : null;
+			$this->permissions = ($row[$startcol + 31] !== null) ? (int) $row[$startcol + 31] : null;
+			$this->group_id = ($row[$startcol + 32] !== null) ? (string) $row[$startcol + 32] : null;
+			$this->plays = ($row[$startcol + 33] !== null) ? (int) $row[$startcol + 33] : null;
+			$this->partner_data = ($row[$startcol + 34] !== null) ? (string) $row[$startcol + 34] : null;
+			$this->int_id = ($row[$startcol + 35] !== null) ? (int) $row[$startcol + 35] : null;
+			$this->indexed_custom_data_1 = ($row[$startcol + 36] !== null) ? (int) $row[$startcol + 36] : null;
+			$this->description = ($row[$startcol + 37] !== null) ? (string) $row[$startcol + 37] : null;
+			$this->media_date = ($row[$startcol + 38] !== null) ? (string) $row[$startcol + 38] : null;
+			$this->admin_tags = ($row[$startcol + 39] !== null) ? (string) $row[$startcol + 39] : null;
+			$this->moderation_status = ($row[$startcol + 40] !== null) ? (int) $row[$startcol + 40] : null;
+			$this->moderation_count = ($row[$startcol + 41] !== null) ? (int) $row[$startcol + 41] : null;
+			$this->modified_at = ($row[$startcol + 42] !== null) ? (string) $row[$startcol + 42] : null;
+			$this->puser_id = ($row[$startcol + 43] !== null) ? (string) $row[$startcol + 43] : null;
+			$this->access_control_id = ($row[$startcol + 44] !== null) ? (int) $row[$startcol + 44] : null;
+			$this->conversion_profile_id = ($row[$startcol + 45] !== null) ? (int) $row[$startcol + 45] : null;
+			$this->categories = ($row[$startcol + 46] !== null) ? (string) $row[$startcol + 46] : null;
+			$this->categories_ids = ($row[$startcol + 47] !== null) ? (string) $row[$startcol + 47] : null;
+			$this->start_date = ($row[$startcol + 48] !== null) ? (string) $row[$startcol + 48] : null;
+			$this->end_date = ($row[$startcol + 49] !== null) ? (string) $row[$startcol + 49] : null;
+			$this->flavor_params_ids = ($row[$startcol + 50] !== null) ? (string) $row[$startcol + 50] : null;
+			$this->available_from = ($row[$startcol + 51] !== null) ? (string) $row[$startcol + 51] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2870,7 +2790,7 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 54; // 54 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 52; // 52 = entryPeer::NUM_COLUMNS - entryPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating entry object", $e);
@@ -3670,78 +3590,72 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				return $this->getCustomData();
 				break;
 			case 29:
-				return $this->getSearchText();
-				break;
-			case 30:
 				return $this->getScreenName();
 				break;
-			case 31:
+			case 30:
 				return $this->getSiteUrl();
 				break;
-			case 32:
+			case 31:
 				return $this->getPermissions();
 				break;
-			case 33:
+			case 32:
 				return $this->getGroupId();
 				break;
-			case 34:
+			case 33:
 				return $this->getPlays();
 				break;
-			case 35:
+			case 34:
 				return $this->getPartnerData();
 				break;
-			case 36:
+			case 35:
 				return $this->getIntId();
 				break;
-			case 37:
+			case 36:
 				return $this->getIndexedCustomData1();
 				break;
-			case 38:
+			case 37:
 				return $this->getDescription();
 				break;
-			case 39:
+			case 38:
 				return $this->getMediaDate();
 				break;
-			case 40:
+			case 39:
 				return $this->getAdminTags();
 				break;
-			case 41:
+			case 40:
 				return $this->getModerationStatus();
 				break;
-			case 42:
+			case 41:
 				return $this->getModerationCount();
 				break;
-			case 43:
+			case 42:
 				return $this->getModifiedAt();
 				break;
-			case 44:
+			case 43:
 				return $this->getPuserId();
 				break;
-			case 45:
+			case 44:
 				return $this->getAccessControlId();
 				break;
-			case 46:
+			case 45:
 				return $this->getConversionProfileId();
 				break;
-			case 47:
+			case 46:
 				return $this->getCategories();
 				break;
-			case 48:
+			case 47:
 				return $this->getCategoriesIds();
 				break;
-			case 49:
+			case 48:
 				return $this->getStartDate();
 				break;
-			case 50:
+			case 49:
 				return $this->getEndDate();
 				break;
-			case 51:
-				return $this->getSearchTextDiscrete();
-				break;
-			case 52:
+			case 50:
 				return $this->getFlavorParamsIds();
 				break;
-			case 53:
+			case 51:
 				return $this->getAvailableFrom();
 				break;
 			default:
@@ -3794,31 +3708,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 			$keys[26] => $this->getDisplayInSearch(),
 			$keys[27] => $this->getSubpId(),
 			$keys[28] => $this->getCustomData(),
-			$keys[29] => $this->getSearchText(),
-			$keys[30] => $this->getScreenName(),
-			$keys[31] => $this->getSiteUrl(),
-			$keys[32] => $this->getPermissions(),
-			$keys[33] => $this->getGroupId(),
-			$keys[34] => $this->getPlays(),
-			$keys[35] => $this->getPartnerData(),
-			$keys[36] => $this->getIntId(),
-			$keys[37] => $this->getIndexedCustomData1(),
-			$keys[38] => $this->getDescription(),
-			$keys[39] => $this->getMediaDate(),
-			$keys[40] => $this->getAdminTags(),
-			$keys[41] => $this->getModerationStatus(),
-			$keys[42] => $this->getModerationCount(),
-			$keys[43] => $this->getModifiedAt(),
-			$keys[44] => $this->getPuserId(),
-			$keys[45] => $this->getAccessControlId(),
-			$keys[46] => $this->getConversionProfileId(),
-			$keys[47] => $this->getCategories(),
-			$keys[48] => $this->getCategoriesIds(),
-			$keys[49] => $this->getStartDate(),
-			$keys[50] => $this->getEndDate(),
-			$keys[51] => $this->getSearchTextDiscrete(),
-			$keys[52] => $this->getFlavorParamsIds(),
-			$keys[53] => $this->getAvailableFrom(),
+			$keys[29] => $this->getScreenName(),
+			$keys[30] => $this->getSiteUrl(),
+			$keys[31] => $this->getPermissions(),
+			$keys[32] => $this->getGroupId(),
+			$keys[33] => $this->getPlays(),
+			$keys[34] => $this->getPartnerData(),
+			$keys[35] => $this->getIntId(),
+			$keys[36] => $this->getIndexedCustomData1(),
+			$keys[37] => $this->getDescription(),
+			$keys[38] => $this->getMediaDate(),
+			$keys[39] => $this->getAdminTags(),
+			$keys[40] => $this->getModerationStatus(),
+			$keys[41] => $this->getModerationCount(),
+			$keys[42] => $this->getModifiedAt(),
+			$keys[43] => $this->getPuserId(),
+			$keys[44] => $this->getAccessControlId(),
+			$keys[45] => $this->getConversionProfileId(),
+			$keys[46] => $this->getCategories(),
+			$keys[47] => $this->getCategoriesIds(),
+			$keys[48] => $this->getStartDate(),
+			$keys[49] => $this->getEndDate(),
+			$keys[50] => $this->getFlavorParamsIds(),
+			$keys[51] => $this->getAvailableFrom(),
 		);
 		return $result;
 	}
@@ -3938,78 +3850,72 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 				$this->setCustomData($value);
 				break;
 			case 29:
-				$this->setSearchText($value);
-				break;
-			case 30:
 				$this->setScreenName($value);
 				break;
-			case 31:
+			case 30:
 				$this->setSiteUrl($value);
 				break;
-			case 32:
+			case 31:
 				$this->setPermissions($value);
 				break;
-			case 33:
+			case 32:
 				$this->setGroupId($value);
 				break;
-			case 34:
+			case 33:
 				$this->setPlays($value);
 				break;
-			case 35:
+			case 34:
 				$this->setPartnerData($value);
 				break;
-			case 36:
+			case 35:
 				$this->setIntId($value);
 				break;
-			case 37:
+			case 36:
 				$this->setIndexedCustomData1($value);
 				break;
-			case 38:
+			case 37:
 				$this->setDescription($value);
 				break;
-			case 39:
+			case 38:
 				$this->setMediaDate($value);
 				break;
-			case 40:
+			case 39:
 				$this->setAdminTags($value);
 				break;
-			case 41:
+			case 40:
 				$this->setModerationStatus($value);
 				break;
-			case 42:
+			case 41:
 				$this->setModerationCount($value);
 				break;
-			case 43:
+			case 42:
 				$this->setModifiedAt($value);
 				break;
-			case 44:
+			case 43:
 				$this->setPuserId($value);
 				break;
-			case 45:
+			case 44:
 				$this->setAccessControlId($value);
 				break;
-			case 46:
+			case 45:
 				$this->setConversionProfileId($value);
 				break;
-			case 47:
+			case 46:
 				$this->setCategories($value);
 				break;
-			case 48:
+			case 47:
 				$this->setCategoriesIds($value);
 				break;
-			case 49:
+			case 48:
 				$this->setStartDate($value);
 				break;
-			case 50:
+			case 49:
 				$this->setEndDate($value);
 				break;
-			case 51:
-				$this->setSearchTextDiscrete($value);
-				break;
-			case 52:
+			case 50:
 				$this->setFlavorParamsIds($value);
 				break;
-			case 53:
+			case 51:
 				$this->setAvailableFrom($value);
 				break;
 		} // switch()
@@ -4065,31 +3971,29 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[26], $arr)) $this->setDisplayInSearch($arr[$keys[26]]);
 		if (array_key_exists($keys[27], $arr)) $this->setSubpId($arr[$keys[27]]);
 		if (array_key_exists($keys[28], $arr)) $this->setCustomData($arr[$keys[28]]);
-		if (array_key_exists($keys[29], $arr)) $this->setSearchText($arr[$keys[29]]);
-		if (array_key_exists($keys[30], $arr)) $this->setScreenName($arr[$keys[30]]);
-		if (array_key_exists($keys[31], $arr)) $this->setSiteUrl($arr[$keys[31]]);
-		if (array_key_exists($keys[32], $arr)) $this->setPermissions($arr[$keys[32]]);
-		if (array_key_exists($keys[33], $arr)) $this->setGroupId($arr[$keys[33]]);
-		if (array_key_exists($keys[34], $arr)) $this->setPlays($arr[$keys[34]]);
-		if (array_key_exists($keys[35], $arr)) $this->setPartnerData($arr[$keys[35]]);
-		if (array_key_exists($keys[36], $arr)) $this->setIntId($arr[$keys[36]]);
-		if (array_key_exists($keys[37], $arr)) $this->setIndexedCustomData1($arr[$keys[37]]);
-		if (array_key_exists($keys[38], $arr)) $this->setDescription($arr[$keys[38]]);
-		if (array_key_exists($keys[39], $arr)) $this->setMediaDate($arr[$keys[39]]);
-		if (array_key_exists($keys[40], $arr)) $this->setAdminTags($arr[$keys[40]]);
-		if (array_key_exists($keys[41], $arr)) $this->setModerationStatus($arr[$keys[41]]);
-		if (array_key_exists($keys[42], $arr)) $this->setModerationCount($arr[$keys[42]]);
-		if (array_key_exists($keys[43], $arr)) $this->setModifiedAt($arr[$keys[43]]);
-		if (array_key_exists($keys[44], $arr)) $this->setPuserId($arr[$keys[44]]);
-		if (array_key_exists($keys[45], $arr)) $this->setAccessControlId($arr[$keys[45]]);
-		if (array_key_exists($keys[46], $arr)) $this->setConversionProfileId($arr[$keys[46]]);
-		if (array_key_exists($keys[47], $arr)) $this->setCategories($arr[$keys[47]]);
-		if (array_key_exists($keys[48], $arr)) $this->setCategoriesIds($arr[$keys[48]]);
-		if (array_key_exists($keys[49], $arr)) $this->setStartDate($arr[$keys[49]]);
-		if (array_key_exists($keys[50], $arr)) $this->setEndDate($arr[$keys[50]]);
-		if (array_key_exists($keys[51], $arr)) $this->setSearchTextDiscrete($arr[$keys[51]]);
-		if (array_key_exists($keys[52], $arr)) $this->setFlavorParamsIds($arr[$keys[52]]);
-		if (array_key_exists($keys[53], $arr)) $this->setAvailableFrom($arr[$keys[53]]);
+		if (array_key_exists($keys[29], $arr)) $this->setScreenName($arr[$keys[29]]);
+		if (array_key_exists($keys[30], $arr)) $this->setSiteUrl($arr[$keys[30]]);
+		if (array_key_exists($keys[31], $arr)) $this->setPermissions($arr[$keys[31]]);
+		if (array_key_exists($keys[32], $arr)) $this->setGroupId($arr[$keys[32]]);
+		if (array_key_exists($keys[33], $arr)) $this->setPlays($arr[$keys[33]]);
+		if (array_key_exists($keys[34], $arr)) $this->setPartnerData($arr[$keys[34]]);
+		if (array_key_exists($keys[35], $arr)) $this->setIntId($arr[$keys[35]]);
+		if (array_key_exists($keys[36], $arr)) $this->setIndexedCustomData1($arr[$keys[36]]);
+		if (array_key_exists($keys[37], $arr)) $this->setDescription($arr[$keys[37]]);
+		if (array_key_exists($keys[38], $arr)) $this->setMediaDate($arr[$keys[38]]);
+		if (array_key_exists($keys[39], $arr)) $this->setAdminTags($arr[$keys[39]]);
+		if (array_key_exists($keys[40], $arr)) $this->setModerationStatus($arr[$keys[40]]);
+		if (array_key_exists($keys[41], $arr)) $this->setModerationCount($arr[$keys[41]]);
+		if (array_key_exists($keys[42], $arr)) $this->setModifiedAt($arr[$keys[42]]);
+		if (array_key_exists($keys[43], $arr)) $this->setPuserId($arr[$keys[43]]);
+		if (array_key_exists($keys[44], $arr)) $this->setAccessControlId($arr[$keys[44]]);
+		if (array_key_exists($keys[45], $arr)) $this->setConversionProfileId($arr[$keys[45]]);
+		if (array_key_exists($keys[46], $arr)) $this->setCategories($arr[$keys[46]]);
+		if (array_key_exists($keys[47], $arr)) $this->setCategoriesIds($arr[$keys[47]]);
+		if (array_key_exists($keys[48], $arr)) $this->setStartDate($arr[$keys[48]]);
+		if (array_key_exists($keys[49], $arr)) $this->setEndDate($arr[$keys[49]]);
+		if (array_key_exists($keys[50], $arr)) $this->setFlavorParamsIds($arr[$keys[50]]);
+		if (array_key_exists($keys[51], $arr)) $this->setAvailableFrom($arr[$keys[51]]);
 	}
 
 	/**
@@ -4130,7 +4034,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(entryPeer::DISPLAY_IN_SEARCH)) $criteria->add(entryPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 		if ($this->isColumnModified(entryPeer::SUBP_ID)) $criteria->add(entryPeer::SUBP_ID, $this->subp_id);
 		if ($this->isColumnModified(entryPeer::CUSTOM_DATA)) $criteria->add(entryPeer::CUSTOM_DATA, $this->custom_data);
-		if ($this->isColumnModified(entryPeer::SEARCH_TEXT)) $criteria->add(entryPeer::SEARCH_TEXT, $this->search_text);
 		if ($this->isColumnModified(entryPeer::SCREEN_NAME)) $criteria->add(entryPeer::SCREEN_NAME, $this->screen_name);
 		if ($this->isColumnModified(entryPeer::SITE_URL)) $criteria->add(entryPeer::SITE_URL, $this->site_url);
 		if ($this->isColumnModified(entryPeer::PERMISSIONS)) $criteria->add(entryPeer::PERMISSIONS, $this->permissions);
@@ -4152,7 +4055,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(entryPeer::CATEGORIES_IDS)) $criteria->add(entryPeer::CATEGORIES_IDS, $this->categories_ids);
 		if ($this->isColumnModified(entryPeer::START_DATE)) $criteria->add(entryPeer::START_DATE, $this->start_date);
 		if ($this->isColumnModified(entryPeer::END_DATE)) $criteria->add(entryPeer::END_DATE, $this->end_date);
-		if ($this->isColumnModified(entryPeer::SEARCH_TEXT_DISCRETE)) $criteria->add(entryPeer::SEARCH_TEXT_DISCRETE, $this->search_text_discrete);
 		if ($this->isColumnModified(entryPeer::FLAVOR_PARAMS_IDS)) $criteria->add(entryPeer::FLAVOR_PARAMS_IDS, $this->flavor_params_ids);
 		if ($this->isColumnModified(entryPeer::AVAILABLE_FROM)) $criteria->add(entryPeer::AVAILABLE_FROM, $this->available_from);
 
@@ -4279,8 +4181,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 
 		$copyObj->setCustomData($this->custom_data);
 
-		$copyObj->setSearchText($this->search_text);
-
 		$copyObj->setScreenName($this->screen_name);
 
 		$copyObj->setSiteUrl($this->site_url);
@@ -4320,8 +4220,6 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$copyObj->setStartDate($this->start_date);
 
 		$copyObj->setEndDate($this->end_date);
-
-		$copyObj->setSearchTextDiscrete($this->search_text_discrete);
 
 		$copyObj->setFlavorParamsIds($this->flavor_params_ids);
 

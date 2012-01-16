@@ -266,12 +266,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	protected $display_in_search;
 
 	/**
-	 * The value for the search_text field.
-	 * @var        string
-	 */
-	protected $search_text;
-
-	/**
 	 * The value for the partner_data field.
 	 * @var        string
 	 */
@@ -995,16 +989,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	public function getDisplayInSearch()
 	{
 		return $this->display_in_search;
-	}
-
-	/**
-	 * Get the [search_text] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSearchText()
-	{
-		return $this->search_text;
 	}
 
 	/**
@@ -2069,29 +2053,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 	} // setDisplayInSearch()
 
 	/**
-	 * Set the value of [search_text] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     kuser The current object (for fluent API support)
-	 */
-	public function setSearchText($v)
-	{
-		if(!isset($this->oldColumnsValues[kuserPeer::SEARCH_TEXT]))
-			$this->oldColumnsValues[kuserPeer::SEARCH_TEXT] = $this->search_text;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->search_text !== $v) {
-			$this->search_text = $v;
-			$this->modifiedColumns[] = kuserPeer::SEARCH_TEXT;
-		}
-
-		return $this;
-	} // setSearchText()
-
-	/**
 	 * Set the value of [partner_data] column.
 	 * 
 	 * @param      string $v new value
@@ -2322,13 +2283,12 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			$this->updated_at = ($row[$startcol + 37] !== null) ? (string) $row[$startcol + 37] : null;
 			$this->partner_id = ($row[$startcol + 38] !== null) ? (int) $row[$startcol + 38] : null;
 			$this->display_in_search = ($row[$startcol + 39] !== null) ? (int) $row[$startcol + 39] : null;
-			$this->search_text = ($row[$startcol + 40] !== null) ? (string) $row[$startcol + 40] : null;
-			$this->partner_data = ($row[$startcol + 41] !== null) ? (string) $row[$startcol + 41] : null;
-			$this->puser_id = ($row[$startcol + 42] !== null) ? (string) $row[$startcol + 42] : null;
-			$this->admin_tags = ($row[$startcol + 43] !== null) ? (string) $row[$startcol + 43] : null;
-			$this->indexed_partner_data_int = ($row[$startcol + 44] !== null) ? (int) $row[$startcol + 44] : null;
-			$this->indexed_partner_data_string = ($row[$startcol + 45] !== null) ? (string) $row[$startcol + 45] : null;
-			$this->custom_data = ($row[$startcol + 46] !== null) ? (string) $row[$startcol + 46] : null;
+			$this->partner_data = ($row[$startcol + 40] !== null) ? (string) $row[$startcol + 40] : null;
+			$this->puser_id = ($row[$startcol + 41] !== null) ? (string) $row[$startcol + 41] : null;
+			$this->admin_tags = ($row[$startcol + 42] !== null) ? (string) $row[$startcol + 42] : null;
+			$this->indexed_partner_data_int = ($row[$startcol + 43] !== null) ? (int) $row[$startcol + 43] : null;
+			$this->indexed_partner_data_string = ($row[$startcol + 44] !== null) ? (string) $row[$startcol + 44] : null;
+			$this->custom_data = ($row[$startcol + 45] !== null) ? (string) $row[$startcol + 45] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2338,7 +2298,7 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 47; // 47 = kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 46; // 46 = kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kuser object", $e);
@@ -3177,24 +3137,21 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 				return $this->getDisplayInSearch();
 				break;
 			case 40:
-				return $this->getSearchText();
-				break;
-			case 41:
 				return $this->getPartnerData();
 				break;
-			case 42:
+			case 41:
 				return $this->getPuserId();
 				break;
-			case 43:
+			case 42:
 				return $this->getAdminTags();
 				break;
-			case 44:
+			case 43:
 				return $this->getIndexedPartnerDataInt();
 				break;
-			case 45:
+			case 44:
 				return $this->getIndexedPartnerDataString();
 				break;
-			case 46:
+			case 45:
 				return $this->getCustomData();
 				break;
 			default:
@@ -3258,13 +3215,12 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 			$keys[37] => $this->getUpdatedAt(),
 			$keys[38] => $this->getPartnerId(),
 			$keys[39] => $this->getDisplayInSearch(),
-			$keys[40] => $this->getSearchText(),
-			$keys[41] => $this->getPartnerData(),
-			$keys[42] => $this->getPuserId(),
-			$keys[43] => $this->getAdminTags(),
-			$keys[44] => $this->getIndexedPartnerDataInt(),
-			$keys[45] => $this->getIndexedPartnerDataString(),
-			$keys[46] => $this->getCustomData(),
+			$keys[40] => $this->getPartnerData(),
+			$keys[41] => $this->getPuserId(),
+			$keys[42] => $this->getAdminTags(),
+			$keys[43] => $this->getIndexedPartnerDataInt(),
+			$keys[44] => $this->getIndexedPartnerDataString(),
+			$keys[45] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -3417,24 +3373,21 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 				$this->setDisplayInSearch($value);
 				break;
 			case 40:
-				$this->setSearchText($value);
-				break;
-			case 41:
 				$this->setPartnerData($value);
 				break;
-			case 42:
+			case 41:
 				$this->setPuserId($value);
 				break;
-			case 43:
+			case 42:
 				$this->setAdminTags($value);
 				break;
-			case 44:
+			case 43:
 				$this->setIndexedPartnerDataInt($value);
 				break;
-			case 45:
+			case 44:
 				$this->setIndexedPartnerDataString($value);
 				break;
-			case 46:
+			case 45:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -3501,13 +3454,12 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[37], $arr)) $this->setUpdatedAt($arr[$keys[37]]);
 		if (array_key_exists($keys[38], $arr)) $this->setPartnerId($arr[$keys[38]]);
 		if (array_key_exists($keys[39], $arr)) $this->setDisplayInSearch($arr[$keys[39]]);
-		if (array_key_exists($keys[40], $arr)) $this->setSearchText($arr[$keys[40]]);
-		if (array_key_exists($keys[41], $arr)) $this->setPartnerData($arr[$keys[41]]);
-		if (array_key_exists($keys[42], $arr)) $this->setPuserId($arr[$keys[42]]);
-		if (array_key_exists($keys[43], $arr)) $this->setAdminTags($arr[$keys[43]]);
-		if (array_key_exists($keys[44], $arr)) $this->setIndexedPartnerDataInt($arr[$keys[44]]);
-		if (array_key_exists($keys[45], $arr)) $this->setIndexedPartnerDataString($arr[$keys[45]]);
-		if (array_key_exists($keys[46], $arr)) $this->setCustomData($arr[$keys[46]]);
+		if (array_key_exists($keys[40], $arr)) $this->setPartnerData($arr[$keys[40]]);
+		if (array_key_exists($keys[41], $arr)) $this->setPuserId($arr[$keys[41]]);
+		if (array_key_exists($keys[42], $arr)) $this->setAdminTags($arr[$keys[42]]);
+		if (array_key_exists($keys[43], $arr)) $this->setIndexedPartnerDataInt($arr[$keys[43]]);
+		if (array_key_exists($keys[44], $arr)) $this->setIndexedPartnerDataString($arr[$keys[44]]);
+		if (array_key_exists($keys[45], $arr)) $this->setCustomData($arr[$keys[45]]);
 	}
 
 	/**
@@ -3559,7 +3511,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(kuserPeer::UPDATED_AT)) $criteria->add(kuserPeer::UPDATED_AT, $this->updated_at);
 		if ($this->isColumnModified(kuserPeer::PARTNER_ID)) $criteria->add(kuserPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(kuserPeer::DISPLAY_IN_SEARCH)) $criteria->add(kuserPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
-		if ($this->isColumnModified(kuserPeer::SEARCH_TEXT)) $criteria->add(kuserPeer::SEARCH_TEXT, $this->search_text);
 		if ($this->isColumnModified(kuserPeer::PARTNER_DATA)) $criteria->add(kuserPeer::PARTNER_DATA, $this->partner_data);
 		if ($this->isColumnModified(kuserPeer::PUSER_ID)) $criteria->add(kuserPeer::PUSER_ID, $this->puser_id);
 		if ($this->isColumnModified(kuserPeer::ADMIN_TAGS)) $criteria->add(kuserPeer::ADMIN_TAGS, $this->admin_tags);
@@ -3709,8 +3660,6 @@ abstract class Basekuser extends BaseObject  implements Persistent {
 		$copyObj->setPartnerId($this->partner_id);
 
 		$copyObj->setDisplayInSearch($this->display_in_search);
-
-		$copyObj->setSearchText($this->search_text);
 
 		$copyObj->setPartnerData($this->partner_data);
 

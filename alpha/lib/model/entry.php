@@ -261,8 +261,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 
 		if ( $this->getType() != entryType::PLAYLIST ) 
 			mySearchUtils::setDisplayInSearch( $this );
-
-		mySearchUtils::setSearchTextDiscreteForEntry($this);
 			
 		// update the admin_tags per partner
 		ktagword::updateAdminTags( $this );
@@ -2129,7 +2127,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		}
 		
 		$this->setCategoriesIds ( implode ( ",", $allIds ) );
-		mySearchUtils::setSearchTextDiscreteForEntry ( $this );
 		parent::save ();
 		$this->is_categories_modified = false;
 	}

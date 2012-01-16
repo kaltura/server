@@ -309,12 +309,6 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	protected $subp_id;
 
 	/**
-	 * The value for the search_text field.
-	 * @var        string
-	 */
-	protected $search_text;
-
-	/**
 	 * The value for the permissions field.
 	 * @var        string
 	 */
@@ -1066,16 +1060,6 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	public function getSubpId()
 	{
 		return $this->subp_id;
-	}
-
-	/**
-	 * Get the [search_text] column value.
-	 * 
-	 * @return     string
-	 */
-	public function getSearchText()
-	{
-		return $this->search_text;
 	}
 
 	/**
@@ -2298,29 +2282,6 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 	} // setSubpId()
 
 	/**
-	 * Set the value of [search_text] column.
-	 * 
-	 * @param      string $v new value
-	 * @return     kshow The current object (for fluent API support)
-	 */
-	public function setSearchText($v)
-	{
-		if(!isset($this->oldColumnsValues[kshowPeer::SEARCH_TEXT]))
-			$this->oldColumnsValues[kshowPeer::SEARCH_TEXT] = $this->search_text;
-
-		if ($v !== null) {
-			$v = (string) $v;
-		}
-
-		if ($this->search_text !== $v) {
-			$this->search_text = $v;
-			$this->modifiedColumns[] = kshowPeer::SEARCH_TEXT;
-		}
-
-		return $this;
-	} // setSearchText()
-
-	/**
 	 * Set the value of [permissions] column.
 	 * 
 	 * @param      string $v new value
@@ -2569,12 +2530,11 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 43] !== null) ? (int) $row[$startcol + 43] : null;
 			$this->display_in_search = ($row[$startcol + 44] !== null) ? (int) $row[$startcol + 44] : null;
 			$this->subp_id = ($row[$startcol + 45] !== null) ? (int) $row[$startcol + 45] : null;
-			$this->search_text = ($row[$startcol + 46] !== null) ? (string) $row[$startcol + 46] : null;
-			$this->permissions = ($row[$startcol + 47] !== null) ? (string) $row[$startcol + 47] : null;
-			$this->group_id = ($row[$startcol + 48] !== null) ? (string) $row[$startcol + 48] : null;
-			$this->plays = ($row[$startcol + 49] !== null) ? (int) $row[$startcol + 49] : null;
-			$this->partner_data = ($row[$startcol + 50] !== null) ? (string) $row[$startcol + 50] : null;
-			$this->int_id = ($row[$startcol + 51] !== null) ? (int) $row[$startcol + 51] : null;
+			$this->permissions = ($row[$startcol + 46] !== null) ? (string) $row[$startcol + 46] : null;
+			$this->group_id = ($row[$startcol + 47] !== null) ? (string) $row[$startcol + 47] : null;
+			$this->plays = ($row[$startcol + 48] !== null) ? (int) $row[$startcol + 48] : null;
+			$this->partner_data = ($row[$startcol + 49] !== null) ? (string) $row[$startcol + 49] : null;
+			$this->int_id = ($row[$startcol + 50] !== null) ? (int) $row[$startcol + 50] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -2584,7 +2544,7 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 52; // 52 = kshowPeer::NUM_COLUMNS - kshowPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 51; // 51 = kshowPeer::NUM_COLUMNS - kshowPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating kshow object", $e);
@@ -3346,21 +3306,18 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 				return $this->getSubpId();
 				break;
 			case 46:
-				return $this->getSearchText();
-				break;
-			case 47:
 				return $this->getPermissions();
 				break;
-			case 48:
+			case 47:
 				return $this->getGroupId();
 				break;
-			case 49:
+			case 48:
 				return $this->getPlays();
 				break;
-			case 50:
+			case 49:
 				return $this->getPartnerData();
 				break;
-			case 51:
+			case 50:
 				return $this->getIntId();
 				break;
 			default:
@@ -3430,12 +3387,11 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 			$keys[43] => $this->getPartnerId(),
 			$keys[44] => $this->getDisplayInSearch(),
 			$keys[45] => $this->getSubpId(),
-			$keys[46] => $this->getSearchText(),
-			$keys[47] => $this->getPermissions(),
-			$keys[48] => $this->getGroupId(),
-			$keys[49] => $this->getPlays(),
-			$keys[50] => $this->getPartnerData(),
-			$keys[51] => $this->getIntId(),
+			$keys[46] => $this->getPermissions(),
+			$keys[47] => $this->getGroupId(),
+			$keys[48] => $this->getPlays(),
+			$keys[49] => $this->getPartnerData(),
+			$keys[50] => $this->getIntId(),
 		);
 		return $result;
 	}
@@ -3606,21 +3562,18 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 				$this->setSubpId($value);
 				break;
 			case 46:
-				$this->setSearchText($value);
-				break;
-			case 47:
 				$this->setPermissions($value);
 				break;
-			case 48:
+			case 47:
 				$this->setGroupId($value);
 				break;
-			case 49:
+			case 48:
 				$this->setPlays($value);
 				break;
-			case 50:
+			case 49:
 				$this->setPartnerData($value);
 				break;
-			case 51:
+			case 50:
 				$this->setIntId($value);
 				break;
 		} // switch()
@@ -3693,12 +3646,11 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[43], $arr)) $this->setPartnerId($arr[$keys[43]]);
 		if (array_key_exists($keys[44], $arr)) $this->setDisplayInSearch($arr[$keys[44]]);
 		if (array_key_exists($keys[45], $arr)) $this->setSubpId($arr[$keys[45]]);
-		if (array_key_exists($keys[46], $arr)) $this->setSearchText($arr[$keys[46]]);
-		if (array_key_exists($keys[47], $arr)) $this->setPermissions($arr[$keys[47]]);
-		if (array_key_exists($keys[48], $arr)) $this->setGroupId($arr[$keys[48]]);
-		if (array_key_exists($keys[49], $arr)) $this->setPlays($arr[$keys[49]]);
-		if (array_key_exists($keys[50], $arr)) $this->setPartnerData($arr[$keys[50]]);
-		if (array_key_exists($keys[51], $arr)) $this->setIntId($arr[$keys[51]]);
+		if (array_key_exists($keys[46], $arr)) $this->setPermissions($arr[$keys[46]]);
+		if (array_key_exists($keys[47], $arr)) $this->setGroupId($arr[$keys[47]]);
+		if (array_key_exists($keys[48], $arr)) $this->setPlays($arr[$keys[48]]);
+		if (array_key_exists($keys[49], $arr)) $this->setPartnerData($arr[$keys[49]]);
+		if (array_key_exists($keys[50], $arr)) $this->setIntId($arr[$keys[50]]);
 	}
 
 	/**
@@ -3756,7 +3708,6 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(kshowPeer::PARTNER_ID)) $criteria->add(kshowPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(kshowPeer::DISPLAY_IN_SEARCH)) $criteria->add(kshowPeer::DISPLAY_IN_SEARCH, $this->display_in_search);
 		if ($this->isColumnModified(kshowPeer::SUBP_ID)) $criteria->add(kshowPeer::SUBP_ID, $this->subp_id);
-		if ($this->isColumnModified(kshowPeer::SEARCH_TEXT)) $criteria->add(kshowPeer::SEARCH_TEXT, $this->search_text);
 		if ($this->isColumnModified(kshowPeer::PERMISSIONS)) $criteria->add(kshowPeer::PERMISSIONS, $this->permissions);
 		if ($this->isColumnModified(kshowPeer::GROUP_ID)) $criteria->add(kshowPeer::GROUP_ID, $this->group_id);
 		if ($this->isColumnModified(kshowPeer::PLAYS)) $criteria->add(kshowPeer::PLAYS, $this->plays);
@@ -3919,8 +3870,6 @@ abstract class Basekshow extends BaseObject  implements Persistent {
 		$copyObj->setDisplayInSearch($this->display_in_search);
 
 		$copyObj->setSubpId($this->subp_id);
-
-		$copyObj->setSearchText($this->search_text);
 
 		$copyObj->setPermissions($this->permissions);
 

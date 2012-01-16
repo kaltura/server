@@ -83,7 +83,6 @@ class kshowTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, 0);
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, null);
 		$this->addColumn('SUBP_ID', 'SubpId', 'INTEGER', false, null, 0);
-		$this->addColumn('SEARCH_TEXT', 'SearchText', 'VARCHAR', false, 4096, null);
 		$this->addColumn('PERMISSIONS', 'Permissions', 'VARCHAR', false, 1024, null);
 		$this->addColumn('GROUP_ID', 'GroupId', 'VARCHAR', false, 64, null);
 		$this->addColumn('PLAYS', 'Plays', 'INTEGER', false, null, 0);

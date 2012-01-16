@@ -77,7 +77,6 @@ class kuserTableMap extends TableMap {
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, 0);
 		$this->addColumn('DISPLAY_IN_SEARCH', 'DisplayInSearch', 'TINYINT', false, null, null);
-		$this->addColumn('SEARCH_TEXT', 'SearchText', 'VARCHAR', false, 4096, null);
 		$this->addColumn('PARTNER_DATA', 'PartnerData', 'VARCHAR', false, 4096, null);
 		$this->addColumn('PUSER_ID', 'PuserId', 'VARCHAR', false, 100, null);
 		$this->addColumn('ADMIN_TAGS', 'AdminTags', 'LONGVARCHAR', false, null, null);
