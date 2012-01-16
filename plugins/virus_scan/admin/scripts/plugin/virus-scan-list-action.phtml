@@ -11,6 +11,7 @@
 					<th><?php echo $this->translate('ID'); ?></th>
 					<th><?php echo $this->translate('Name'); ?></th>
 					<th><?php echo $this->translate('Publisher ID'); ?></th>
+					<th><?php echo $this->translate('Engine'); ?></th>
 					<th><?php echo $this->translate('Cleaning Policy'); ?></th>
 					<th><?php echo $this->translate('Entry Type'); ?></th>
 					<th><?php echo $this->translate('Create date'); ?></th>
@@ -31,6 +32,7 @@
 					<td><?php echo $profile->id; ?></td>
 					<td><?php echo $profile->name; ?></td>
 					<td><?php echo $profile->partnerId; ?></td>
+					<td><?php echo $profile->engineType; ?></td>
 					<td><?php echo $this->enumTranslate('Kaltura_Client_VirusScan_Enum_VirusFoundAction', $profile->actionIfInfected);?></td>
 					<td>
 					<?php
