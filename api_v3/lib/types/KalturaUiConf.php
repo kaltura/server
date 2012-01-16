@@ -69,11 +69,6 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
-	 */
-	public $html5Url;
-	
-	/**
-	 * @var string
 	 * @readonly
 	 */
 	public $confFilePath;
@@ -137,7 +132,10 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	 */
 	public $creationMode;
 	
-
+	/**
+	 * @var string
+	 */
+	public $html5Url;
 		
 	private static $map_between_objects = array
 	(
