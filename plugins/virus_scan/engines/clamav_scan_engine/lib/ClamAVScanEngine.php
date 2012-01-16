@@ -48,7 +48,7 @@ class ClamAVScanEngine extends VirusScanEngine
 		clearstatcache();
 		$fileLastChanged = filemtime($filePath);
 		
-		$cmd = $this->binFile . ' -verbose ' . $filePath;
+		$cmd = $this->binFile . ' --verbose ' . $filePath;
 
 		$errorDescription = null;
 		$output = null;
