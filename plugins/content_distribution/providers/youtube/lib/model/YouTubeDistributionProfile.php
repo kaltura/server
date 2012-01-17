@@ -27,7 +27,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_ALLOW_POST_ROLL_ADS = 'allowPostRollAds';		
 	
 	// validations
-	const MEDIA_TITLE_MAXIMUM_LENGTH = 60;
+	const MEDIA_TITLE_MAXIMUM_LENGTH = 100;
 	const MEDIA_DESCRIPTION_MAXIMUM_LENGTH = 715;
 	const METADATA_CUSTOM_ID_MAXIMUM_LENGTH = 64;
 	const TV_METADATA_EPISODE_MAXIMUM_LENGTH = 16;
