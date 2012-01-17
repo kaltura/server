@@ -297,7 +297,7 @@ KalturaLog::log(__METHOD__."\noperators==>\n".print_r($cdlOprSets,true));
 		$kdlFlavor->_id = $cdlFlavor->getId();
 		$kdlFlavor->_type = $cdlFlavor->getType();
 		$kdlFlavor->_tags = $cdlFlavor->getTags();
-		if($cdlFlavor instanceof flavorParams)
+		if($cdlFlavor instanceof flavorParams || $cdlFlavor instanceof flavorParamsOutput)
 		{ 
 			$kdlFlavor->_clipStart = $cdlFlavor->getClipOffset();
 			$kdlFlavor->_clipDur = $cdlFlavor->getClipDuration();
