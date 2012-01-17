@@ -223,7 +223,13 @@ KalturaLog::log(__METHOD__."==>\n");
 						$plannedDur = $this->_clipDur;
 					else
 						$plannedDur = $srcVid->_duration;
-					if($prdVid->_duration<$plannedDur*KDLConstants::ProductDurationFactor) {
+					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
+					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
+						$product->_errors[KDLConstants::VideoIndex][] = // Invalid product duration
+							KDLErrors::ToString(KDLErrors::InvalidDuration, $prdVid->_duration/1000, $plannedDur/1000);
+						$rv=false;
+					}
+					else if($prdVid->_duration<$plannedDur*KDLConstants::ProductDurationFactor) {
 						$product->_warnings[KDLConstants::VideoIndex][] =
 						KDLWarnings::ToString(KDLWarnings::ProductShortDuration, $prdVid->_duration, $plannedDur);
 					}
@@ -246,9 +252,22 @@ KalturaLog::log(__METHOD__."==>\n");
 				$trgAud = $this->_audio;
 				if($source) $srcAud = $source->_audio;
 				else $srcAud = null;
-				if($srcAud && $prdAud->_duration<$srcAud->_duration*KDLConstants::ProductDurationFactor) {
-					$product->_warnings[KDLConstants::AudioIndex][] = // "Product duration too short - ".($prdAud->_duration/1000)."sec, required - ".($srcAud->_duration/1000)."sec.";
-					KDLWarnings::ToString(KDLWarnings::ProductShortDuration, $prdAud->_duration, $srcAud->_duration);
+				
+				if($srcAud){ 
+					if($this->_clipDur && $this->_clipDur>0)
+						$plannedDur = $this->_clipDur;
+					else
+						$plannedDur = $srcAud->_duration;
+					if($prdAud->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
+					|| $prdAud->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
+						$product->_errors[KDLConstants::AudioIndex][] = // Invalid product duration 
+						KDLErrors::ToString(KDLErrors::InvalidDuration, $prdAud->_duration/1000, $plannedDur/1000);
+						$rv=false;
+					}
+					else if($prdAud->_duration<$plannedDur*KDLConstants::ProductDurationFactor) {
+						$product->_warnings[KDLConstants::AudioIndex][] = // "Product duration too short - ".($prdAud->_duration/1000)."sec, required - ".($srcAud->_duration/1000)."sec.";
+						KDLWarnings::ToString(KDLWarnings::ProductShortDuration, $prdAud->_duration, $plannedDur);
+					}
 				}
 				if($prdAud->_bitRate<$trgAud->_bitRate*KDLConstants::ProductBitrateFactor) {
 					$product->_warnings[KDLConstants::AudioIndex][] = // "Product bitrate too low - ".$prdAud->_bitRate."kbps, required - ".$trgAud->_bitRate."kbps.";
@@ -729,10 +748,12 @@ $target->_video = null;
 		}
 		else {
 			if($targetAud->_sampleRate==0){
-				if($source->_sampleRate>0)
+				if($source->_sampleRate>0) {
 					$targetAud->_sampleRate=max(KDLConstants::MinAudioSampleRate,min(KDLConstants::MaxAudioSampleRate,$source->_sampleRate));
-				else
+				}
+				else {
 					$targetAud->_sampleRate=KDLConstants::DefaultAudioSampleRate;
+				}
 			}
 			else {
 				$targetAud->_sampleRate=max(KDLConstants::MinAudioSampleRate,min(KDLConstants::MaxAudioSampleRate,$targetAud->_sampleRate));
