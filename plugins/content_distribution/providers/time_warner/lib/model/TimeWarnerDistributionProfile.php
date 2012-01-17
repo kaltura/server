@@ -227,7 +227,7 @@ class TimeWarnerDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setFieldName(TimeWarnerDistributionField::CABLE_SHORT_DESCRIPTION);
 		$fieldConfig->setUserFriendlyFieldName('TwCableDescription');
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/TwCableDescription" />');
-		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 		
 		$fieldConfig = new DistributionFieldConfig();
