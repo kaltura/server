@@ -1083,10 +1083,10 @@ $audObj = $target->_audio;
 				$sr = 44100;
 			$audioBitrateElem->ConstantBitrate['Bitrate'] = (string)$br;
 			KDLUtils::AddXMLElement($audioCodec, $audioBitrateElem);
-			if(isset($audObj->_channels))
+			if(isset($audObj->_channels) && $audObj->_channels>0)
 				$audioCodec['Channels']=(string)$audObj->_channels;
-			else
-				$audioCodec['Channels']="2";
+//			else
+//				$audioCodec['Channels']="2";
             $audioCodec['BitsPerSample']="16";
             $audioCodec['SamplesPerSecond']=(string)$sr;
 		}
@@ -1184,7 +1184,8 @@ KalturaLog::log("transcoder==>\n".print_r($transcoderParams,true)."\n<--");
 					$videoCodec = $videoProfile->MainH264VideoProfile;
 					break;
 				case KDLVideoTarget::H264B:
-					$videoCodec = $videoProfile->BaselineH264VideoProfile;
+//					$videoCodec = $videoProfile->BaselineH264VideoProfile;
+					$videoCodec = $videoProfile->MainH264VideoProfile;
 					break;
 				default:
 					continue;
@@ -1223,8 +1224,10 @@ KalturaLog::log("-->xmlBR=".$br->VariableConstrainedBitrate['AverageBitrate'].",
 			$br = null;
 		}
 		
-		if($rootFlavor)
+		if($rootFlavor){
+			$rootFlavor->Job['DefaultMediaOutputFileName']=KDLCmdlinePlaceholders::OutFileName.".{DefaultExtension}";
 			return $rootFlavor->asXML();
+		}
 		else
 			return null;
 	}
