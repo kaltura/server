@@ -73,7 +73,7 @@ class UploadTokenService extends KalturaBaseService
 	 * @param file $fileData
 	 * @param bool $resume
 	 * @param bool $finalChunk
-	 * @param int $resumeAt
+	 * @param float $resumeAt
 	 * @return KalturaUploadToken
 	 */
 	function uploadAction($uploadTokenId, $fileData, $resume = false, $finalChunk = true, $resumeAt = -1)
