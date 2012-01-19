@@ -30,15 +30,26 @@ class kQueryCache
 		$memcache = new Memcache;
 
 		//$memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
-		
+
 		$connStart = microtime(true);
-		$res = @$memcache->connect($hostName, $port);
+		
+		for($i = 0; $i < 3; $i++)
+		{
+			$curConnStart = microtime(true);
+			$res = @$memcache->connect($hostName, $port);
+			if ($res || microtime(true) - $curConnStart < .5)		// retry only if there's an error and it's a timeout error
+				break;
+			KalturaLog::debug("kQueryCache: got timeout error, retrying...");
+		}
+
 		KalturaLog::debug("kQueryCache: connect took - ". (microtime(true) - $connStart). " seconds to $hostName:$port");
+
 		if (!$res)
 		{
 			KalturaLog::err("kQueryCache: failed to connect to global memcache");
 			return null;
 		}
+		
 		return $memcache;
 	}
 	
