@@ -18,7 +18,7 @@ class Report extends BaseReport
 	public function getParameters()
 	{
 		$params = array();
-		if (preg_match_all('/\:([[A-Za-z_]*)/', $this->getQuery(), $matches))
+		if (preg_match_all('/\:([[A-Za-z_0-9]*)/', $this->getQuery(), $matches))
 		{
 			foreach($matches[1] as $param)
 			{

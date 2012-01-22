@@ -185,6 +185,36 @@ class ReportService extends KalturaBaseService
 		die;
 	}
 	
+	/**
+	 * Returns report CSV file executed by string params with the following convention: param1=value1;param2=value2 
+	 * 
+	 * @action getCsvFromStringParams
+	 * @param int $id
+	 * @param string $params
+	 * @return file
+	 */
+	function getCsvFromStringParamsAction($id, $params = null)
+	{
+		$paramsArray = $this->parseParamsStr($params);
+		return $this->getCsvAction($id, $paramsArray);
+	}
+	
+	protected function parseParamsStr($paramsStr)
+	{
+		$paramsStrArray = explode(';', $paramsStr);
+		$paramsKeyValueArray = new KalturaKeyValueArray();
+		foreach($paramsStrArray as $paramStr)
+		{
+			$paramStr = trim($paramStr);
+			$paramArray = explode('=', $paramStr);
+			$paramKeyValue = new KalturaKeyValue();
+			$paramKeyValue->key = isset($paramArray[0]) ? $paramArray[0] : null;
+			$paramKeyValue->value = isset($paramArray[1]) ? $paramArray[1] : null;
+			$paramsKeyValueArray[] = $paramKeyValue;
+		}
+		return $paramsKeyValueArray;
+	}
+	
 	protected function addPartnerIdToParams($params)
 	{
 		// remove partner id parameter

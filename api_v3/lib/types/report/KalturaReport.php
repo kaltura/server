@@ -71,7 +71,6 @@ class KalturaReport extends KalturaObject implements IFilterable
 	private static $mapBetweenObjects = array
 	(
 		'id',
-		'version',
 		'partnerId',
 		'name',
 		'systemName',

@@ -350,5 +350,7 @@ class KalturaErrors extends APIErrors
 	 */
 	const REPORT_NOT_FOUND = "REPORT_NOT_FOUND,Report id \"%s\" not found";
 	
+	const REPORT_NOT_PUBLIC = "REPORT_NOT_PUBLIC,Report id \"%s\" is not public";
+	
 	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING,Parameter \"%s\" is missing";
 }
