@@ -252,6 +252,14 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		return "{$pluginName}";
 	}
 	
+	protected function formatMultiLineComment($description, $ident = 1)
+	{
+		$tabs = "";
+		for($i = 0; $i < $ident; $i++)
+			$tabs .= "\t";
+		return str_replace("\n", "\n$tabs * ", $description); // to format multiline descriptions
+	}
+	
 	function writePlugin(DOMElement $pluginNode)
 	{
 		$xpath = new DOMXPath($this->_doc);
@@ -383,6 +391,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 	function writeClass(DOMElement $classNode)
 	{
 		$kalturaType = $classNode->getAttribute('name');
+		$description = $classNode->getAttribute("description");
 		$type = $this->getTypeClassInfo($kalturaType);
 		
 		$abstract = '';
@@ -401,6 +410,8 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		if($this->generateDocs)
 		{
 			$this->appendLine('/**');
+			if ($description)
+				$this->appendLine(" * " . $this->formatMultiLineComment($description, 0));
 			$this->appendLine(" * @package $this->package");
 			$this->appendLine(" * @subpackage $this->subpackage");
 			$this->appendLine(' */');
@@ -487,13 +498,10 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 				$propType = $propertyNode->getAttribute("enumType");
 			else
 				$propType = $propertyNode->getAttribute("type");
-			$propDescription = $propertyNode->getAttribute("description");
+			$description = $propertyNode->getAttribute("description");
 			
 			$this->appendLine("	/**");
-			$description = $propDescription;
-			$description = str_replace("\n", "\n	 * ", $propDescription); // to format multiline descriptions
-			$this->appendLine("	 * " . $description);
-			$this->appendLine("	 *");
+			$this->appendLine("	 * " . $this->formatMultiLineComment($description));
 			if ($propType == "array")
 				$this->appendLine("	 * @var $propType of {$propertyNode->getAttribute("arrayType")}");
 			elseif ($this->isSimpleType($propType))
@@ -524,11 +532,9 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine("	$propertyLine;");
 			$this->appendLine("");
 		}
-		$this->appendLine();
 
 		// close class
 		$this->appendLine("}");
-		$this->appendLine();
 	}
 	
 	function writeService(DOMElement $serviceNode)
@@ -539,6 +545,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 			
 		$serviceName = $serviceNode->getAttribute("name");
 		$serviceId = $serviceNode->getAttribute("id");
+		$description = $serviceNode->getAttribute("description");
 					
 		$serviceClassName = $this->getServiceClass($serviceNode, $plugin);
 		$this->appendLine();
@@ -555,6 +562,8 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		if($this->generateDocs)
 		{
 			$this->appendLine('/**');
+			if ($description)
+				$this->appendLine(" * " . $this->formatMultiLineComment($description, 0));
 			$this->appendLine(" * @package $this->package");
 			$this->appendLine(" * @subpackage $this->subpackage");
 			$this->appendLine(' */');
@@ -583,6 +592,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$action = $actionNode->getAttribute("name");
 	    $resultNode = $actionNode->getElementsByTagName("result")->item(0);
 	    $resultType = $resultNode->getAttribute("type");
+		$description = $actionNode->getAttribute("description");
 		
 		// method signature
 		$signature = "";
@@ -594,7 +604,11 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$paramNodes = $actionNode->getElementsByTagName("param");
 		$signature .= $this->getSignature($paramNodes);
 		
-		$this->appendLine();	
+		$this->appendLine();
+		$this->appendLine("	/**");
+		if ($description)
+			$this->appendLine("	 * " . $this->formatMultiLineComment($description));
+		$this->appendLine("	 */");
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
 		
@@ -817,12 +831,9 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 				
 			$serviceName = $serviceNode->getAttribute("name");
 			$description = $serviceNode->getAttribute("description");
-			$description = str_replace("\n", "\n	 * ", $description); // to format multiline descriptions
 			$serviceClassName = "\\Kaltura\\Client\\Service\\".ucfirst($serviceName)."Service";
 			
 			$this->appendLine("	/**");
-			$this->appendLine("	 * " . $description);
-			$this->appendLine("	 *");
 			$this->appendLine("	 * @var $serviceClassName");
 			$this->appendLine("	 */");
 			$this->appendLine("	public function get".ucfirst($serviceName)."Service()");
