@@ -3,10 +3,20 @@
  * Enable entry attachment asset ingestion from XML bulk upload
  * @package plugins.attachment
  */
-class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor
+class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPending, IKalturaSchemaContributor, IKalturaBulkUploadXmlHandler, IKalturaConfigurator
 {
 	const PLUGIN_NAME = 'attachmentBulkUploadXml';
 	const BULK_UPLOAD_XML_PLUGIN_NAME = 'bulkUploadXml';
+	
+	/**
+	 * @var array
+	 */
+	protected $currentAttachmentAssets = null;
+	
+	/**
+	 * @var BulkUploadEngineXml
+	 */
+	private $xmlBulkUploadEngine = null;
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -31,10 +41,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	 * @see IKalturaSchemaContributor::contributeToSchema()
 	 */
 	public static function contributeToSchema($type)
-	{
-		// TODO add IKalturaBulkUploadXmlHandler to handle attachments
-		return null;
-		
+	{		
 		$coreType = kPluginableEnumsManager::apiToCore('SchemaType', $type);
 		if(
 			$coreType != BulkUploadXmlPlugin::getSchemaTypeCoreValue(XmlSchemaType::BULK_UPLOAD_XML)
@@ -46,6 +53,29 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		$xsd = '
 		
 	<!-- ' . self::getPluginName() . ' -->
+	
+	<xs:complexType name="T_attachments">
+		<xs:sequence>
+			<xs:element name="action" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The action to apply:<br/>
+						Update - Update existing attachment<br/>
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="update" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element ref="attachment" maxOccurs="unbounded" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>All attachment elements</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
 	
 	<xs:complexType name="T_attachment">
 		<xs:sequence>
@@ -119,12 +149,27 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	</xs:complexType>
 	
 	<xs:element name="attachment-extension" />
+		<xs:element name="attachments" type="T_attachments" substitutionGroup="item-extension">
+		<xs:annotation>
+			<xs:documentation>All attachments elements</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<attachments>
+						<action>update</action>
+						<attachment>...</attachment>
+						<attachment>...</attachment>
+						<attachment>...</attachment>
+					</attachments>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
 	<xs:element name="attachment" type="T_attachment" substitutionGroup="item-extension">
 		<xs:annotation>
 			<xs:documentation>Attachment asset element</xs:documentation>
 			<xs:appinfo>
 				<example>
-					<attachment format="1">
+					<attachment format="1" attachmentAssetId="1_hd73jd7f">
 						<tags>
 							<tag>example</tag>
 							<tag>my_tag</tag>
@@ -141,5 +186,142 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 		';
 		
 		return $xsd;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::configureBulkUploadXmlHandler()
+	 */
+	public function configureBulkUploadXmlHandler(BulkUploadEngineXml $xmlBulkUploadEngine)
+	{
+		$this->xmlBulkUploadEngine = $xmlBulkUploadEngine;
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::handleItemAdded()
+	*/
+	public function handleItemAdded(KalturaObjectBase $object, SimpleXMLElement $item)
+	{
+		if(!($object instanceof KalturaBaseEntry))
+			return;
+		
+		if(!isset($item->attachments))
+			return;
+		
+		if(empty($item->attachments->attachment))
+			return;
+		
+		$this->xmlBulkUploadEngine->impersonate();
+				
+		$pluginsErrorResults = array();
+		foreach($item->attachments->attachment as $attachment)
+		{
+			try {
+				$this->handleAttachmentAsset($object->id, $attachment);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err($this->getContainerName() . ' failed: ' . $e->getMessage());
+				$pluginsErrorResults[] = $e->getMessage();
+			}
+		}
+		
+		if(count($pluginsErrorResults))
+			throw new Exception(implode(', ', $pluginsErrorResults));
+		
+		$this->xmlBulkUploadEngine->unimpersonate();		
+	}
+
+	private function handleAttachmentAsset($entryId, SimpleXMLElement $attachment)
+	{
+		$attachmentPlugin = KalturaAttachmentClientPlugin::get($this->xmlBulkUploadEngine->getClient());
+		
+		$attachmentAsset = new KalturaAttachmentAsset();
+		$attachmentAsset->tags = $this->xmlBulkUploadEngine->implodeChildElements($attachment->tags);
+		
+		$this->xmlBulkUploadEngine->impersonate(); //needed since $this->xmlBulkUploadEngine->getAssetParamsId calles to unimpersonate
+		
+		if(isset($attachment->fileExt))
+			$attachmentAsset->fileExt = $attachment->fileExt;
+		
+		if(isset($attachment->description))
+			$attachmentAsset->partnerDescription = $attachment->description;
+		
+		if(isset($attachment->filename))
+			$attachmentAsset->filename = $attachment->filename;
+
+		if(isset($attachment->title))
+			$attachmentAsset->title = $attachment->title;
+			
+		if(isset($attachment['format']))
+			$attachmentAsset->format = $attachment['format'];
+		 
+		$attachmentAssetId = null;
+		if(isset($attachment['attachmentAssetId']))
+			$attachmentAssetId = $attachment['attachmentAssetId'];
+		
+		if($attachmentAssetId)
+		{
+			$attachmentPlugin->attachmentAsset->update($attachmentAssetId, $attachmentAsset);
+		}else
+		{
+			$attachmentAsset = $attachmentPlugin->attachmentAsset->add($entryId, $attachmentAsset);
+			$attachmentAssetId = $attachmentAsset->id;
+		}
+		
+		$attachmentAssetResource = $this->xmlBulkUploadEngine->getResource($attachment, 0);
+		if($attachmentAssetResource)
+			$attachmentPlugin->attachmentAsset->setContent($attachmentAssetId, $attachmentAssetResource);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::handleItemUpdated()
+	*/
+	public function handleItemUpdated(KalturaObjectBase $object, SimpleXMLElement $item)
+	{
+		if(!$item->attachments)
+			return;
+			
+		if(empty($item->attachments->attachment))
+			return;
+		
+		$action = KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE];
+		if(isset($item->attachments->action))
+			$action = strtolower($item->attachments->action);
+			
+		switch ($action)
+		{
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
+				$this->handleItemAdded($object, $item);
+				break;
+			default:
+				throw new KalturaBatchException("attachments->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaBulkUploadXmlHandler::handleItemDeleted()
+	*/
+	public function handleItemDeleted(KalturaObjectBase $object, SimpleXMLElement $item)
+	{
+		// No handling required
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getContainerName()
+	*/
+	public function getContainerName()
+	{
+		return 'attachments';
+	}
+	
+	/* (non-PHPdoc)
+	 * @see IKalturaConfigurator::getConfig()
+	*/
+	public static function getConfig($configName)
+	{
+		if($configName == 'generator')
+			return new Zend_Config_Ini(dirname(__FILE__) . '/config/generator.ini');
+
+		return null;
 	}
 }
