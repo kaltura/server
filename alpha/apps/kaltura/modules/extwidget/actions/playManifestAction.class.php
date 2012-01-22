@@ -897,7 +897,6 @@ class playManifestAction extends kalturaAction
 		}
 				
 		$xml = null;
-	KalturaLog::debug("hila!!!!");
 		switch($this->format)
 		{
 		    
