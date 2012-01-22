@@ -13,7 +13,7 @@ class Form_MsnProfileConfiguration extends Form_ConfigurableProfileConfiguration
 	public function init()
 	{
 		parent::init();
-		$this->setDescription('Freewheel Distribution Profile');
+		$this->setDescription('MSN Distribution Profile');
 		
 		$this->getView()->addBasePath(realpath(dirname(__FILE__)));
 		$this->addDecorator('ViewScript', array(
