@@ -38,22 +38,80 @@ namespace Kaltura\Client;
  */
 class Configuration
 {
-	private $logger;
+	/**
+	 * @var string
+	 */
+	private $serviceUrl    				= "http://www.kaltura.com/";
 
-	public $serviceUrl    				= "http://www.kaltura.com/";
-	public $partnerId    				= null;
-	public $format        				= Client::KALTURA_SERVICE_FORMAT_XML;
-	public $clientTag 	  				= "php5zend2";
-	public $curlTimeout   				= 10;
-	public $userAgent					= '';
-	public $startZendDebuggerSession 	= false;
-	public $proxyHost                   = null;
-	public $proxyPort                   = null;
-	public $proxyType                   = 'HTTP';
-	public $proxyUser                   = null;
-	public $proxyPassword               = '';
-	public $verifySSL 					= true;
-	public $requestHeaders				= array();
+	/**
+	 * @var int
+	 */
+	private $partnerId    				= null;
+	
+	/**
+	 * @var int
+	 */
+	private $format        				= Client::KALTURA_SERVICE_FORMAT_XML;
+	
+	/**
+	 * @var string
+	 */
+	private $clientTag 	  				= "php5zend2";
+	
+	/**
+	 * @var int
+	 */
+	private $curlTimeout   				= 10;
+	
+	/**
+	 * @var string
+	 */
+	private $userAgent					= '';
+	
+	/**
+	 * @var bool
+	 */
+	private $startZendDebuggerSession 	= false;
+	
+	/**
+	 * @var string
+	 */
+	private $proxyHost                   = null;
+	
+	/**
+	 * @var int
+	 */
+	private $proxyPort                   = null;
+	
+	/**
+	 * @var string
+	 */
+	private $proxyType                   = 'HTTP';
+	
+	/**
+	 * @var string
+	 */
+	private $proxyUser                   = null;
+	
+	/**
+	 * @var string
+	 */
+	private $proxyPassword               = '';
+	
+	/**
+	 * @var bool
+	 */
+	private $verifySSL 					= true;
+	
+	/**
+	 * @var array
+	 */
+	private $requestHeaders				= array();
+	
+	/**
+	 * @var \Kaltura\Client\ILogger
+	 */
+	private $logger;
 	
 	/**
 	 * Constructs new Kaltura configuration object
@@ -61,12 +119,236 @@ class Configuration
 	 */
 	public function __construct($partnerId = -1)
 	{
-	    if (!is_numeric($partnerId))
-	        throw new ClientException("Invalid partner id", ClientException::ERROR_INVALID_PARTNER_ID);
-	        
-	    $this->partnerId = $partnerId;
+	    $this->setPartnerId($partnerId);
 	}
 	
+	/**
+	 * @return the $serviceUrl
+	 */
+	public function getServiceUrl ()
+	{
+		return $this->serviceUrl;
+	}
+
+	/**
+	 * @return the $partnerId
+	 */
+	public function getPartnerId ()
+	{
+		return $this->partnerId;
+	}
+
+	/**
+	 * @return the $format
+	 */
+	public function getFormat ()
+	{
+		return $this->format;
+	}
+
+	/**
+	 * @return the $clientTag
+	 */
+	public function getClientTag ()
+	{
+		return $this->clientTag;
+	}
+
+	/**
+	 * @return the $curlTimeout
+	 */
+	public function getCurlTimeout ()
+	{
+		return $this->curlTimeout;
+	}
+
+	/**
+	 * @return the $userAgent
+	 */
+	public function getUserAgent ()
+	{
+		return $this->userAgent;
+	}
+
+	/**
+	 * @return the $startZendDebuggerSession
+	 */
+	public function getStartZendDebuggerSession ()
+	{
+		return $this->startZendDebuggerSession;
+	}
+
+	/**
+	 * @return the $proxyHost
+	 */
+	public function getProxyHost ()
+	{
+		return $this->proxyHost;
+	}
+
+	/**
+	 * @return the $proxyPort
+	 */
+	public function getProxyPort ()
+	{
+		return $this->proxyPort;
+	}
+
+	/**
+	 * @return the $proxyType
+	 */
+	public function getProxyType ()
+	{
+		return $this->proxyType;
+	}
+
+	/**
+	 * @return the $proxyUser
+	 */
+	public function getProxyUser ()
+	{
+		return $this->proxyUser;
+	}
+
+	/**
+	 * @return the $proxyPassword
+	 */
+	public function getProxyPassword ()
+	{
+		return $this->proxyPassword;
+	}
+
+	/**
+	 * @return the $verifySSL
+	 */
+	public function getVerifySSL ()
+	{
+		return $this->verifySSL;
+	}
+
+	/**
+	 * @return the $requestHeaders
+	 */
+	public function getRequestHeaders ()
+	{
+		return $this->requestHeaders;
+	}
+
+	/**
+	 * @param string $serviceUrl
+	 */
+	public function setServiceUrl ($serviceUrl)
+	{
+		$this->serviceUrl = $serviceUrl;
+	}
+
+	/**
+	 * @param int $partnerId
+	 */
+	public function setPartnerId ($partnerId)
+	{
+		if (!is_numeric($partnerId))
+	        throw new ClientException("Invalid partner id", ClientException::ERROR_INVALID_PARTNER_ID);
+	        
+		$this->partnerId = (int)$partnerId;
+	}
+
+	/**
+	 * @param int $format
+	 */
+	public function setFormat ($format)
+	{
+		$this->format = $format;
+	}
+
+	/**
+	 * @param string $clientTag
+	 */
+	public function setClientTag ($clientTag)
+	{
+		$this->clientTag = $clientTag;
+	}
+
+	/**
+	 * @param int $curlTimeout
+	 */
+	public function setCurlTimeout ($curlTimeout)
+	{
+		$this->curlTimeout = $curlTimeout;
+	}
+
+	/**
+	 * @param string $userAgent
+	 */
+	public function setUserAgent ($userAgent)
+	{
+		$this->userAgent = $userAgent;
+	}
+
+	/**
+	 * @param bool $startZendDebuggerSession
+	 */
+	public function setStartZendDebuggerSession ($startZendDebuggerSession)
+	{
+		$this->startZendDebuggerSession = $startZendDebuggerSession;
+	}
+
+	/**
+	 * @param string $proxyHost
+	 */
+	public function setProxyHost ($proxyHost)
+	{
+		$this->proxyHost = $proxyHost;
+	}
+
+	/**
+	 * @param int $proxyPort
+	 */
+	public function setProxyPort ($proxyPort)
+	{
+		$this->proxyPort = $proxyPort;
+	}
+
+	/**
+	 * @param string $proxyType
+	 */
+	public function setProxyType ($proxyType)
+	{
+		$this->proxyType = $proxyType;
+	}
+
+	/**
+	 * @param string $proxyUser
+	 */
+	public function setProxyUser ($proxyUser)
+	{
+		$this->proxyUser = $proxyUser;
+	}
+
+	/**
+	 * @param string $proxyPassword
+	 */
+	public function setProxyPassword ($proxyPassword)
+	{
+		$this->proxyPassword = $proxyPassword;
+	}
+
+	/**
+	 * @param bool $verifySSL
+	 */
+	public function setVerifySSL ($verifySSL)
+	{
+		$this->verifySSL = $verifySSL;
+	}
+
+	/**
+	 * @param array $requestHeaders
+	 */
+	public function setRequestHeaders ($requestHeaders)
+	{
+		$this->requestHeaders = $requestHeaders;
+	}
+
 	/**
 	 * Set logger to get kaltura client debug logs
 	 *

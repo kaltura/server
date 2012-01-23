@@ -30,17 +30,16 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$enumCacheName = preg_replace('/^Kaltura(.+)$/', '$1', $enumName); 
 		
 		$classInfo = new PhpZend2ClientGeneratorClassInfo();
-		$classInfo->className = $enumCacheName;
-	if($enumNode->hasAttribute('plugin'))
-	{
-		$pluginName = ucfirst($enumNode->getAttribute('plugin'));
-		$classInfo->fullyQualifiedName = "\Kaltura\Client\Plugin\\{$pluginName}\Enum\\{$enumCacheName}";
-	}
-	else
-	{
-			$classInfo->fullyQualifiedName = "\Kaltura\Client\Enum\\{$enumCacheName}";	
+		$classInfo->setClassName($enumCacheName);
+		if($enumNode->hasAttribute('plugin'))
+		{
+			$pluginName = ucfirst($enumNode->getAttribute('plugin'));
+			$classInfo->setNamespace("Kaltura\\Client\\Plugin\\{$pluginName}\\Enum");
 		}
-		
+		else
+		{
+			$classInfo->setNamespace("Kaltura\\Client\\Enum");
+		}
 		$this->cacheEnums[$enumName] = $classInfo;
 	} 
 	
@@ -50,15 +49,15 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$classCacheName = preg_replace('/^Kaltura(.+)$/', '$1', $className); 
 		
 		$classInfo = new PhpZend2ClientGeneratorClassInfo();
-		$classInfo->className = $classCacheName;
+		$classInfo->setClassName($classCacheName);
 		if($classNode->hasAttribute('plugin'))
 		{
 			$pluginName = ucfirst($classNode->getAttribute('plugin'));
-			$classInfo->fullyQualifiedName = "\Kaltura\Client\Plugin\\{$pluginName}\Type\\{$classCacheName}";
+			$classInfo->setNamespace("Kaltura\\Client\\Plugin\\{$pluginName}\\Type");
 		}
 		else
 		{
-			$classInfo->fullyQualifiedName = "\Kaltura\Client\Type\\{$classCacheName}";	
+			$classInfo->setNamespace("Kaltura\\Client\\Type");	
 		}
 		$this->cacheTypes[$className] = $classInfo;
 	} 
@@ -80,12 +79,9 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
 		
-		if($this->generateDocs)
-		{
-			$this->appendLine('/**');
-			$this->appendLine(' * @namespace');
-			$this->appendLine(' */');
-		}
+		$this->appendLine('/**');
+		$this->appendLine(' * @namespace');
+		$this->appendLine(' */');
 		$this->appendLine('namespace Kaltura\Client;');
 		$this->appendLine();
 		
@@ -106,8 +102,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		{
 			$kalturaType = $classNode->getAttribute('name');
 			$zendType = $this->getTypeClassInfo($kalturaType);
-			$fullyQualifiedNameNoPrefixSlash = substr($zendType->fullyQualifiedName, 1);
-			$this->appendLine("		'$kalturaType' => '$fullyQualifiedNameNoPrefixSlash',");
+			$this->appendLine("		'$kalturaType' => '{$zendType->getFullyQualifiedNameNoPrefixSlash()}',");
 		}
 		$this->appendLine('	);');
 		$this->appendLine('	');
@@ -270,6 +265,12 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
     	$this->startNewTextBlock();
 		$this->appendLine('<?php');
 		
+		$this->appendLine('/**');
+		$this->appendLine(' * @namespace');
+		$this->appendLine(' */');
+		$this->appendLine("namespace Kaltura\\Client\\Plugin\\{$pluginClassName};");
+		$this->appendLine();
+		
 		if($this->generateDocs)
 		{
 			$this->appendLine('/**');
@@ -353,13 +354,10 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 	{
 		$enumClassInfo = $this->getEnumClassInfo($enumNode->getAttribute('name'));
 		
-		if($this->generateDocs)
-		{
-			$this->appendLine('/**');
-			$this->appendLine(' * @namespace');
-			$this->appendLine(' */');
-		}
-		$this->appendLine('namespace Kaltura\Client\Enum;');
+		$this->appendLine('/**');
+		$this->appendLine(' * @namespace');
+		$this->appendLine(' */');
+		$this->appendLine("namespace {$enumClassInfo->getNamespace()};");
 		$this->appendLine();
 		
 		if($this->generateDocs)
@@ -370,7 +368,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 			$this->appendLine(' */');
 		}
 		
-	 	$this->appendLine("class $enumClassInfo->className");		
+	 	$this->appendLine("class {$enumClassInfo->getClassName()}");		
 		$this->appendLine("{");
 		foreach($enumNode->childNodes as $constNode)
 		{
@@ -398,13 +396,10 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		if ($classNode->hasAttribute("abstract"))
 			$abstract = 'abstract ';
 			
-		if($this->generateDocs)
-		{
-			$this->appendLine('/**');
-			$this->appendLine(' * @namespace');
-			$this->appendLine(' */');
-		}
-		$this->appendLine('namespace Kaltura\Client\Type;');
+		$this->appendLine('/**');
+		$this->appendLine(' * @namespace');
+		$this->appendLine(' */');
+		$this->appendLine("namespace {$type->getNamespace()};");
 		$this->appendLine();
 		
 		if($this->generateDocs)
@@ -422,10 +417,10 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		if ($classNode->hasAttribute('base'))
 		{
 			$baseClassInfo = $this->getTypeClassInfo($classNode->getAttribute('base'));
-			$baseClass = $baseClassInfo->className;
+			$baseClass = $baseClassInfo->getClassName();
 		}
 			
-		$this->appendLine($abstract . "class $type->className extends $baseClass");
+		$this->appendLine($abstract . "class {$type->getClassName()} extends $baseClass");
 		$this->appendLine("{");
 		$this->appendLine("	public function getKalturaObjectType()");
 		$this->appendLine("	{");
@@ -509,12 +504,12 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 			elseif ($isEnum) 
 			{
 				$propClassInfo = $this->getEnumClassInfo($propType);
-				$this->appendLine("	 * @var $propClassInfo->fullyQualifiedName");
+				$this->appendLine("	 * @var {$propClassInfo->getFullyQualifiedName()}");
 			} 
 			else
 			{
 				$propClassInfo = $this->getTypeClassInfo($propType);
-				$this->appendLine("	 * @var $propClassInfo->fullyQualifiedName");
+				$this->appendLine("	 * @var {$propClassInfo->getFullyQualifiedName()}");
 			}
 			if ($isReadyOnly )
 				$this->appendLine("	 * @readonly");
@@ -550,13 +545,13 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$serviceClassName = $this->getServiceClass($serviceNode, $plugin);
 		$this->appendLine();
 		
-		if($this->generateDocs)
-		{
-			$this->appendLine('/**');
-			$this->appendLine(' * @namespace');
-			$this->appendLine(' */');
-		}
-		$this->appendLine('namespace Kaltura\Client\Service;');
+		$this->appendLine('/**');
+		$this->appendLine(' * @namespace');
+		$this->appendLine(' */');
+		if ($plugin)
+			$this->appendLine("namespace Kaltura\\Client\\Plugin\\{$this->getPluginClass($plugin)}\\Service;");
+		else
+			$this->appendLine('namespace Kaltura\Client\Service;');
 		$this->appendLine();
 
 		if($this->generateDocs)
@@ -608,6 +603,20 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine("	/**");
 		if ($description)
 			$this->appendLine("	 * " . $this->formatMultiLineComment($description));
+		$this->appendLine("	 * ");			
+		if (!$resultType)
+		{
+			$this->appendLine("	 * @return");
+		}
+		elseif ($this->isSimpleType($resultType) || $resultType == 'array' || $resultType == 'file')
+		{
+			$this->appendLine("	 * @return $resultType");
+		}
+		else
+		{
+			$resultTypeClassInfo = $this->getTypeClassInfo($resultType);
+			$this->appendLine("	 * @return {$resultTypeClassInfo->getFullyQualifiedName()}");
+		}
 		$this->appendLine("	 */");
 		$this->appendLine("	$signature");
 		$this->appendLine("	{");
@@ -686,25 +695,25 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 			switch($resultType)
 			{
 				case 'int':
-					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"integer\");");
+					$this->appendLine("		\$resultObject = (int)\$resultObject;");
 					break;
-				
 				case 'bool':
-					$this->appendLine("		\$resultObject = (bool) \$resultObject;");
+					$this->appendLine("		\$resultObject = (bool)\$resultObject;");
 					break;
-				
 				case 'string':
+					$this->appendLine("		\$resultObject = (string)\$resultObject;");
+					break;
 				case 'array':
 					$this->appendLine("		if(!\$resultObject)");
 					$this->appendLine("			\$resultObject = array();");
 					$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultType\");");
 					break;
-				
 				default:
 					if ($resultType)
 					{
 						$resultTypeClassInfo = $this->getTypeClassInfo($resultType);
-						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"$resultTypeClassInfo->fullyQualifiedName\");");
+						$resultObjectTypeEscaped = str_replace("\\", "\\\\", $resultTypeClassInfo->getFullyQualifiedName());
+						$this->appendLine("		\$this->client->validateObjectType(\$resultObject, \"{$resultObjectTypeEscaped}\");");
 					}
 			}
 	    }
@@ -733,7 +742,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 			else
 			{
 				$typeClass = $this->getTypeClassInfo($paramType);
-				$signature .= $typeClass->fullyQualifiedName." $".$paramName;
+				$signature .= $typeClass->getFullyQualifiedName()." $".$paramName;
 			}
 			
 			
@@ -774,12 +783,9 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 	{
 		$apiVersion = $this->_doc->documentElement->getAttribute('apiVersion');
 		
-		if($this->generateDocs)
-		{
-			$this->appendLine('/**');
-			$this->appendLine(' * @namespace');
-			$this->appendLine(' */');
-		}
+		$this->appendLine('/**');
+		$this->appendLine(' * @namespace');
+		$this->appendLine(' */');
 		$this->appendLine('namespace Kaltura\Client;');
 		$this->appendLine();
 		
@@ -834,7 +840,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 			$serviceClassName = "\\Kaltura\\Client\\Service\\".ucfirst($serviceName)."Service";
 			
 			$this->appendLine("	/**");
-			$this->appendLine("	 * @var $serviceClassName");
+			$this->appendLine("	 * @return $serviceClassName");
 			$this->appendLine("	 */");
 			$this->appendLine("	public function get".ucfirst($serviceName)."Service()");
 			$this->appendLine("	{");
@@ -864,7 +870,38 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 
 class PhpZend2ClientGeneratorClassInfo
 {
-	public $className;
+	private $className;
 	
-	public $fullyQualifiedName;
+	private $namespace;
+	
+	public function getClassName()
+	{
+		return $this->className;
+	}
+
+	public function getNamespace()
+	{
+		return $this->namespace;
+	}
+
+	public function getFullyQualifiedName()
+	{
+		return '\\'.$this->getNamespace().'\\'.$this->getClassName();
+	}
+
+	public function getFullyQualifiedNameNoPrefixSlash()
+	{
+		return $this->getNamespace().'\\'.$this->getClassName();
+	}
+
+	public function setClassName($className)
+	{
+		$this->className = $className;
+	}
+
+	public function setNamespace($namespace)
+	{
+		$this->namespace = $namespace;
+	}
+
 }

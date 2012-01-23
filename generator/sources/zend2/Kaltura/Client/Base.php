@@ -111,12 +111,12 @@ class Base
 			 
 		$params = array();
 		$files = array();
-		$this->log("service url: [" . $this->config->serviceUrl . "]");
+		$this->log("service url: [" . $this->config->getServiceUrl() . "]");
 		
 		// append the basic params
 		$this->addParam($params, "apiVersion", $this->apiVersion);
-		$this->addParam($params, "format", $this->config->format);
-		$this->addParam($params, "clientTag", $this->config->clientTag);
+		$this->addParam($params, "format", $this->config->getFormat());
+		$this->addParam($params, "clientTag", $this->config->getClientTag());
 		
 		$call = $this->callsQueue[0];
 		$this->callsQueue = array();
@@ -126,7 +126,7 @@ class Base
 		$signature = $this->signature($params);
 		$this->addParam($params, "kalsig", $signature);
 		
-		$url = $this->config->serviceUrl . "/api_v3/index.php?service={$call->service}&action={$call->action}";
+		$url = $this->config->getServiceUrl() . "/api_v3/index.php?service={$call->service}&action={$call->action}";
 		$url .= '&' . http_build_query($params); 
 		$this->log("Returned url [$url]");
 		return $url;
@@ -136,7 +136,7 @@ class Base
 	{
 		// in start session partner id is optional (default -1). if partner id was not set, use the one in the config
 		if (!isset($params["partnerId"]) || $params["partnerId"] === -1)
-			$params["partnerId"] = $this->config->partnerId;
+			$params["partnerId"] = $this->config->getPartnerId();
 			
 		$this->addParam($params, "ks", $this->ks);
 		
@@ -161,15 +161,15 @@ class Base
 				
 		$params = array();
 		$files = array();
-		$this->log("service url: [" . $this->config->serviceUrl . "]");
+		$this->log("service url: [" . $this->config->getServiceUrl() . "]");
 		
 		// append the basic params
 		$this->addParam($params, "apiVersion", $this->apiVersion);
-		$this->addParam($params, "format", $this->config->format);
-		$this->addParam($params, "clientTag", $this->config->clientTag);
+		$this->addParam($params, "format", $this->config->getFormat());
+		$this->addParam($params, "clientTag", $this->config->getClientTag());
 		$this->addParam($params, "ignoreNull", true);
 		
-		$url = $this->config->serviceUrl."/api_v3/index.php?service=";
+		$url = $this->config->getServiceUrl()."/api_v3/index.php?service=";
 		if ($this->isMultiRequest)
 		{
 			$url .= "multirequest";
@@ -208,7 +208,7 @@ class Base
 		{
 			$this->log("result (serialized): " . $postResult);
 			
-			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_XML)
+			if ($this->config->getFormat() == self::KALTURA_SERVICE_FORMAT_XML)
 			{
 				$result = $this->unmarshal($postResult);
 
@@ -330,13 +330,13 @@ class Base
 		}
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, $this->config->userAgent);
+		curl_setopt($ch, CURLOPT_USERAGENT, $this->config->getUserAgent());
 		if (count($files) > 0)
 			curl_setopt($ch, CURLOPT_TIMEOUT, 0);
 		else
-			curl_setopt($ch, CURLOPT_TIMEOUT, $this->config->curlTimeout);
+			curl_setopt($ch, CURLOPT_TIMEOUT, $this->config->getCurlTimeout());
 			
-		if ($this->config->startZendDebuggerSession === true)
+		if ($this->config->getStartZendDebuggerSession() === true)
 		{
 			$zendDebuggerParams = $this->getZendDebuggerParams($url);
 			$cookies = array_merge($cookies, $zendDebuggerParams);
@@ -348,25 +348,25 @@ class Base
 			curl_setopt($ch, CURLOPT_COOKIE, $cookiesStr);
 		}
 		
-		if (isset($this->config->proxyHost)) {
+		if ($this->config->getProxyHost()) {
 			curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, true);
-			curl_setopt($ch, CURLOPT_PROXY, $this->config->proxyHost);
-			if (isset($this->config->proxyPort)) {
-				curl_setopt($ch, CURLOPT_PROXYPORT, $this->config->proxyPort);
+			curl_setopt($ch, CURLOPT_PROXY, $this->config->getProxyHost());
+			if ($this->config->getProxyPort()) {
+				curl_setopt($ch, CURLOPT_PROXYPORT, $this->config->getProxyPort());
 			}
-			if (isset($this->config->proxyUser)) {
-				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->config->proxyUser.':'.$this->config->proxyPassword);
+			if ($this->config->getProxyUser()) {
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->config->getProxyUser().':'.$this->config->getProxyPassword());
 			}
-			if (isset($this->config->proxyType) && $this->config->proxyType === 'SOCKS5') {
+			if ($this->config->getProxyType() === 'SOCKS5') {
 				curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 			}	
 		}
 		
 		// Set SSL verification
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->config->verifySSL);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->config->getVerifySSL());
 		
 		// Set custom headers
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->requestHeaders);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->config->getRequestHeaders());
 		
 		// Save response headers
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'readHeader') );
@@ -413,6 +413,22 @@ class Base
 		{
 			$this->shouldLog = true;	
 		}
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getApiVersion()
+	{
+		return $this->apiVersion;
+	}
+
+	/**
+	 * @param string $apiVersion
+	 */
+	public function setApiVersion($apiVersion)
+	{
+		$this->apiVersion = $apiVersion;
 	}
 	
 	/**
