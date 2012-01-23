@@ -15,11 +15,11 @@ class kVirusScanFlowManager implements kBatchJobStatusEventConsumer, kObjectAdde
 		foreach ($fileSyncList as $fileSync)
 		{
 			// resume file sync added event
-			kEventsManager::continueEvent(new kObjectAddedEvent($fileSync, $raisedJob), 'kVirusScanFlowManager');
+			kEventsManager::continueEvent(new kObjectAddedEvent($fileSync), 'kVirusScanFlowManager');
 		}
 
 		// resume flavor asset added event consumption
-		kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset, $raisedJob), 'kVirusScanFlowManager');
+		kEventsManager::continueEvent(new kObjectAddedEvent($flavorAsset), 'kVirusScanFlowManager');
 	}
 	
 	
