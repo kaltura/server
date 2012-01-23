@@ -260,4 +260,11 @@ class KalturaEntryDistribution extends KalturaObject implements IFilterable
 		return array(
 		);
 	}
+	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyNotNull("entryId");
+		$this->validatePropertyNotNull("distributionProfileId");
+		parent::validateForInsert($propertiesToSkip);
+	}
 }

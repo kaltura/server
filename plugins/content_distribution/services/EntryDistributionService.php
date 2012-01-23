@@ -30,8 +30,7 @@ class EntryDistributionService extends KalturaBaseService
 	 */
 	function addAction(KalturaEntryDistribution $entryDistribution)
 	{
-		$entryDistribution->validatePropertyNotNull("entryId");
-		$entryDistribution->validatePropertyNotNull("distributionProfileId");
+		$entryDistribution->validateForInsert();
 					
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->distributionProfileId);
 		if (!$dbDistributionProfile)
@@ -47,7 +46,6 @@ class EntryDistributionService extends KalturaBaseService
 		if($dbEntryDistribution)
 			throw new KalturaAPIException(ContentDistributionErrors::ENTRY_DISTRIBUTION_ALREADY_EXISTS, $entryDistribution->entryId, $entryDistribution->distributionProfileId);
 
-		$entryDistribution->validateForInsert(array());
 		$dbEntryDistribution = kContentDistributionManager::addEntryDistribution($dbEntry, $dbDistributionProfile);
 		$entryDistribution->toInsertableObject($dbEntryDistribution);
 		$dbEntryDistribution->setPartnerId($this->getPartnerId());
