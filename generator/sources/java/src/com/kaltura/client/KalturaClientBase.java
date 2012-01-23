@@ -137,6 +137,7 @@ abstract public class KalturaClientBase {
         // append the basic params
         kparams.put("apiVersion", this.getApiVersion());
         kparams.put("clientTag", this.kalturaConfiguration.getClientTag());
+        kparams.put("ignoreNull", "1");
         kparams.addIntIfNotNull("format", this.kalturaConfiguration.getServiceFormat().getHashCode());
 
         String url = this.kalturaConfiguration.getEndpoint() + "/api_v3/index.php?service=";

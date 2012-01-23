@@ -621,7 +621,7 @@ class JavaClientGenerator extends ClientGeneratorFromXml
 					$this->appendLine ( "        }" );
 					break;
 				case "file" :
-					$this->appendLine ( "        kfiles.put(\"$paramName\", " . $paramName . ");" );
+					$this->appendLine ( "        if($paramName != null) kfiles.put(\"$paramName\", " . $paramName . ");" );
 					break;
 				default : // for objects
 					$this->appendLine ( "        if ($paramName != null) kparams.add(\"$paramName\", " . $paramName . ".toParams());" );
