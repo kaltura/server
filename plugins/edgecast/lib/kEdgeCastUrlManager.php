@@ -10,10 +10,15 @@ class kEdgeCastUrlManager extends kUrlManager
 		$url = parent::getFlavorAssetUrl($flavorAsset);
 		
 		// move version param to "behind" the flavor asset id
-		$flavorIdStr = '/flavorId/'.$flavorAsset->getId();
+		$flavorAssetId = $flavorAsset->getId();
+		$flavorIdStr = '/flavorId/'.$flavorAssetId;
 		$url = str_replace($flavorIdStr, '', $url);
 		$url = str_replace('serveFlavor', 'serveFlavor'.$flavorIdStr, $url);
-        
+		
+		if ($this->extention) {
+			$url .= "/name/$flavorAssetId.$this->extention";
+		}
+			
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$url = $this->addEcSeek($url, $syncKey);			
 		return $url;
