@@ -27,14 +27,13 @@ class kQueryCache
 	
 	protected static function connectToMemcache($hostName, $port)
 	{
-		$memcache = new Memcache;
-
-		//$memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
-
 		$connStart = microtime(true);
 		
 		for($i = 0; $i < 3; $i++)
 		{
+			$memcache = new Memcache;	
+			//$memcache->setOption(Memcached::OPT_BINARY_PROTOCOL, true);			// TODO: enable when moving to memcached v1.3
+
 			$curConnStart = microtime(true);
 			$res = @$memcache->connect($hostName, $port);
 			if ($res || microtime(true) - $curConnStart < .5)		// retry only if there's an error and it's a timeout error
