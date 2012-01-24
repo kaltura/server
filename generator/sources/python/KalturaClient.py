@@ -236,6 +236,7 @@ class KalturaClient:
         try:
             f = self.openRequestUrl(url, params, files)
             data = self.readHttpResponse(f, requestTimeout)
+            self.responseHeaders = f.info().headers
         finally:
             if requestTimeout != None:
                 socket.setdefaulttimeout(origSocketTimeout)
@@ -256,7 +257,7 @@ class KalturaClient:
         if resultNode == None:
             raise KalturaClientException('Could not find result node in response xml', KalturaClientException.ERROR_RESULT_NOT_FOUND)
 
-        execTime = getChildNodeByXPath('xml/executionTime')
+        execTime = getChildNodeByXPath(resultXml, 'xml/executionTime')
         if execTime != None:
             self.executionTime = getXmlNodeFloat(execTime)
 
@@ -266,7 +267,8 @@ class KalturaClient:
         
     # Call all API services that are in queue
     def doQueue(self):
-        self.executionTime = None        
+        self.responseHeaders = None
+        self.executionTime = None
         if len(self.callsQueue) == 0:
             self.multiRequest = False
             return None
