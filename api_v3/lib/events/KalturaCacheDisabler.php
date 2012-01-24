@@ -9,9 +9,6 @@ class KalturaCacheDisabler implements kObjectSavedEventConsumer
 	
 	public function shouldConsumeSavedEvent(BaseObject $object)
 	{
-		
-		return KalturaResponseCacher::isCacheDisabled();
+		return KalturaResponseCacher::isCacheEnabled();
 	}
-	
-
 }

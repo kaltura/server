@@ -68,6 +68,7 @@ class KalturaResponseCacher
 			{
 				if ($matches[1] > time())
 				{
+					self::disableCache();
 					return;
 				}
 			}
@@ -76,6 +77,7 @@ class KalturaResponseCacher
 		$isAdminLogin = isset($params['service']) && isset($params['action']) && $params['service'] == 'adminuser' && $params['action'] == 'login';
 		if ($isAdminLogin || isset($params['nocache']))
 		{
+			self::disableCache();
 			return;
 		}
 		
@@ -84,7 +86,8 @@ class KalturaResponseCacher
 		{
 			if(preg_match('/[\d]+:ks/', $key))
 			{
-				$ks = $value;
+				if (!$ks && strpos($value, ':result') === false)
+					$ks = $value;
 				unset($params[$key]);
 			}
 		}
@@ -109,17 +112,19 @@ class KalturaResponseCacher
 		$this->_params["___cache___userId"] = $ksData["userId"];
 		$this->_params['___cache___uri'] = $_SERVER['PHP_SELF'];
 		$this->_params['___cache___protocol'] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-		
-		if (!in_array($ksData["partnerId"], kConf::get('v3cache_include_referrer_in_key')))
+
+		// take only the hostname part of the referrer parameter of baseEntry.getContextData
+		foreach ($this->_params as $key => $value)
 		{
-			foreach ($this->_params as $key => $value)
-			{
-				if (strpos($key, 'contextDataParams:referrer') !== false)
-				{
-					unset($this->_params[$key]);
-					break;
-				}
-			}
+			if (strpos($key, 'contextDataParams:referrer') === false)
+				continue;
+
+			if (in_array($ksData["partnerId"], kConf::get('v3cache_include_referrer_in_key')))
+				$this->_params[$key] = parse_url($value, PHP_URL_HOST);
+			else
+				unset($this->_params[$key]);
+				
+			break;
 		}
 		
 		ksort($this->_params);
@@ -143,7 +148,7 @@ class KalturaResponseCacher
 	/**
 	 * This function checks whether the cache is disabled and returns the result.
 	 */	
-	public static function isCacheDisabled()
+	public static function isCacheEnabled()
 	{
 		return count(self::$_useCache);
 	}
@@ -379,6 +384,7 @@ class KalturaResponseCacher
 		}
 		catch(Exception $e){
 			KalturaLog::err($e->getMessage());
+			self::disableCache();
 			return false;
 		}
 		
@@ -407,16 +413,15 @@ class KalturaResponseCacher
 		}
         
         
-		if ($ks->isAdmin())
+		if ($ks->isAdmin() ||
+			($ks->valid_until && $ks->valid_until < time()) ||	 // if ks has expired dont cache response
+			($ks->user !== "0" && $ks->user !== null)) // $uid will be null when no session
+		{
+			self::disableCache();
 			return false;
-	
-		if ($ks->valid_until && $ks->valid_until < time()) // if ks has expired dont cache response
-			return false;
-	
-		if ($ks->user === "0" || $ks->user === null) // $uid will be null when no session
-			return true;
-			
-		return false;
+		}
+		
+		return true;
 	}
 	
 	private function getKsData()
