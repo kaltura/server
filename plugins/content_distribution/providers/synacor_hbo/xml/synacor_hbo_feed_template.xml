@@ -21,7 +21,7 @@
 		</offering>
 		<rating type=""></rating> 
 		<runtime timeInSeconds=""></runtime>
-		<link type="video/mp4" href=""/>
+		<link type="VIDEO_MIME_TYPE" href=""/>
 		<go:series>
 			<go:title></go:title> 
 		</go:series>

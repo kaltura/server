@@ -170,7 +170,28 @@ class SynacorHboFeed
 			$flavorAsset = $flavorAssets[0];
     		/* @var $flavorAsset flavorAsset */
     		$flavorUrl = $this->getAssetUrl($flavorAsset);
-    		$this->setNodeValue('atom:link[@type=\'video/mp4\']/@href', $flavorUrl, $item);
+		    // we don't have a way to identify the mime type of the file
+			// as there is no guarantee that the file exists in the current data center
+			// so we will just use those hardcoded conditions
+			$mimeType = '';
+			switch($flavorAsset->getFileExt())
+			{
+				case 'flv':
+					$mimeType = 'video/x-flv';
+					break;
+				case 'mp4':
+					$mimeType = 'video/mp4';
+					break;
+				case 'mpeg':
+				case 'mpg':
+					$mimeType = 'video/mpeg';
+					break;
+				default:
+					$mimeType = 'video/x-flv'; // default requested by synacor
+			}
+
+    		$this->setNodeValue('atom:link[@type=\'VIDEO_MIME_TYPE\']/@href', $flavorUrl, $item);
+    		$this->setNodeValue('atom:link[@type=\'VIDEO_MIME_TYPE\']/@type', $mimeType, $item);
 		}
 		if (!is_null($thumbAssets) && is_array($thumbAssets) && count($thumbAssets)>0)
 		{
