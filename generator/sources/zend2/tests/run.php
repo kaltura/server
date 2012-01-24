@@ -1,6 +1,5 @@
 <?php
 define('ZEND_AUTOLOADER_PATH', '/var/www/kaltura/web/content/clientlibs/Zend/Loader/StandardAutoloader.php');
-define('KALTURA_CLIENT_LIB_PATH', '/var/www/kaltura/web/content/clientlibs/php5zend2/Kaltura');
 define('CONFIG_FILE', 'config.ini');
 
 use Kaltura\Client\Configuration as KalturaConfiguration;
@@ -13,19 +12,17 @@ use Kaltura\Client\ClientException;
 require_once ZEND_AUTOLOADER_PATH;
 $loader = new \Zend\Loader\StandardAutoloader();
 // register Kaltura namespace
-$loader->registerNamespace('Kaltura', KALTURA_CLIENT_LIB_PATH);
+$loader->registerNamespace('Kaltura', dirname(__FILE__).'/../library/Kaltura');
+$loader->registerNamespace('Test', dirname(__FILE__).'/Test');
 $loader->register();
 
 $testerConfig = new \Zend\Config\Ini(dirname(__FILE__).'/'.CONFIG_FILE);
-
-require_once('SampleLoggerImplementation.php'); // FIXME - use autoloader
-require_once('Zend2ClientTester.php'); // FIXME - use autoloader
 
 // init kaltura configuration
 $config = new KalturaConfiguration($testerConfig->partnerId);
 $config->setServiceUrl($testerConfig->serviceUrl);
 $config->setCurlTimeout(30);
-$config->setLogger(new SampleLoggerImplementation());
+$config->setLogger(new \Test\SampleLoggerImplementation());
 
 // init kaltura client
 $client = new KalturaClient($config);
@@ -52,5 +49,5 @@ catch (ClientException $ex)
 }
 
 // run the tester
-$tester = new Zend2ClientTester($client);
+$tester = new \Test\Zend2ClientTester($client);
 $tester->run();

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @namespace
+ */
+namespace Test;
+
 class SampleLoggerImplementation implements \Kaltura\Client\ILogger
 {
 	public function log($msg)

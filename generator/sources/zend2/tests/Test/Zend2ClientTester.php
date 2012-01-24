@@ -1,4 +1,9 @@
 <?php
+/**
+ * @namespace
+ */
+namespace Test;
+
 use Kaltura\Client\Type\MediaEntryFilterForPlaylist;
 use Kaltura\Client\Type\MediaEntryFilter;
 use Kaltura\Client\Type\UploadedFileTokenResource;
@@ -19,7 +24,7 @@ class Zend2ClientTester
 	 */
 	protected $_client;
 	
-	public function __construct(Kaltura\Client\Client $client)
+	public function __construct(\Kaltura\Client\Client $client)
 	{
 		$this->_client = $client;
 	}
