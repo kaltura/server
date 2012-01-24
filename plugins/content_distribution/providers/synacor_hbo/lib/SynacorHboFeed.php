@@ -165,6 +165,8 @@ class SynacorHboFeed
 		
 		$this->setNodeValue('go:series/go:title', $values[SynacorHboDistributionField::ENTRY_SERIES_TITLE], $item);
 		
+		$this->setNodeValue('atom:brand', $values[SynacorHboDistributionField::ENTRY_BRAND], $item);		
+		
 		if (!is_null($flavorAssets) && is_array($flavorAssets) && count($flavorAssets)>0)
 		{
 			$flavorAsset = $flavorAssets[0];

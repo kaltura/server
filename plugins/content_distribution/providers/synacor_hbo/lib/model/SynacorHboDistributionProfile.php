@@ -149,6 +149,13 @@ class SynacorHboDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/SynacorHboSeriesTitle" />');
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(SynacorHboDistributionField::ENTRY_BRAND);
+	    $fieldConfig->setUserFriendlyFieldName('Synacor HBO Brand');
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/SynacorHboBrand" />');
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    		
 		return $fieldConfigArray;
 	}

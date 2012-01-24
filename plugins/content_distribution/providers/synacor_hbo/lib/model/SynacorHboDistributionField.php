@@ -21,4 +21,5 @@ interface SynacorHboDistributionField extends BaseEnum
     //const ENTRY_RUNTIME = 'ENTRY_RUNTIME';
     //const ENTRY_MP4_LINK = 'ENTRY_MP4_LINK';
     const ENTRY_SERIES_TITLE = 'ENTRY_SERIES_TITLE';
+    const ENTRY_BRAND = 'ENTRY_BRAND';
 }

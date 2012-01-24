@@ -25,5 +25,6 @@
 		<go:series>
 			<go:title></go:title> 
 		</go:series>
+		<brand></brand>
 	</entry>
 </feed>
