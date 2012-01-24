@@ -230,6 +230,17 @@ class mySearchUtils
 		}
 	}
 		
+	// don't insert doubles, or small words
+	// TODO !!
+	public static function prepareSearchText ( $words )
+	{ 
+		// a  single quote should be removed with no space replacer
+		$words = preg_replace ( "/[\r\n'\"]/" , "", $words );
+		// all other starnge characters will be ragrded as spaces
+		$words = preg_replace ( '/[ \r\t]{2,}/s' , " " , $words ) ; // get rid of multiple spaces
+		return $words;
+	}
+	
 	// add to the kaltura network or only to the partner's search text
 	public static function addPartner ( $partner_id , $text , $res , $extra_invisible_data = null )
 	{
