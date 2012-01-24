@@ -131,6 +131,10 @@ class executeplaylistAction extends defPartnerservices2Action
 		$this->addMsg ( "count" , count ( $entry_list )) ;
 		$this->addMsg ( $this->getObjectPrefix() , $wrapper ) ;
 		
+		if ($_SERVER["REQUEST_METHOD"] == "GET")
+		{
+			requestUtils::sendCachingHeaders(60, true, time());
+		}
 	}
 }
 ?>
