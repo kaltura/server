@@ -19,6 +19,9 @@ $loader->register();
 
 $testerConfig = new \Zend\Config\Ini(dirname(__FILE__).'/'.CONFIG_FILE);
 
+if ($testerConfig->partnerId == 123)
+	die('Please edit the configuration file (config.ini)');
+	
 // init kaltura configuration
 $config = new KalturaConfiguration($testerConfig->partnerId);
 $config->setServiceUrl($testerConfig->serviceUrl);
