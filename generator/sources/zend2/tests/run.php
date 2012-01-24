@@ -1,5 +1,6 @@
 <?php
-define('ZEND_AUTOLOADER_PATH', '/var/www/kaltura/web/content/clientlibs/Zend/Loader/StandardAutoloader.php');
+/* set this path to the location of Zend/Loader/StandardAutoloader.php */
+define('ZEND_AUTOLOADER_PATH', '/_path_/_to_/_zend_/_framework_/Zend/Loader/StandardAutoloader.php');
 define('CONFIG_FILE', 'config.ini');
 
 use Kaltura\Client\Configuration as KalturaConfiguration;
