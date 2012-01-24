@@ -1938,8 +1938,34 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		return ( $kuser ? $kuser->getScreenName() : "" );
 	}
 		
-	// this will make sure that the extra data set in the search_text won't leak out 
-	public function getSearchText()	{	return '';	}
+	public function getSearchText()
+	{
+		$displayInSearch = $this->getDisplayInSearch();
+		
+		$words = "";
+		$fields_to_use = $this->getColumnNames();
+		foreach ( $fields_to_use  as $field )
+		{
+			$field_str = $this->getByName ( $field , BasePeer::TYPE_FIELDNAME );
+			$words .= " " . $field_str;
+		}
+			
+		$extra_invisible_data = null;
+			
+		$extra_invisible_data = "_MEDIA_TYPE_" . $this->getMediaType(); 
+		$type = $this->getType();
+		// add the SEARCH_ENTRY_TYPE_RC to the words
+		if ( $type == entryType::MIX )
+			$extra_invisible_data .= " " . mySearchUtils::SEARCH_ENTRY_TYPE_RC ;
+
+		$prepared_text = mySearchUtils::prepareSearchText ( $words );
+			
+		$partner_id = $this->getPartnerId();
+		
+		// if res == 1 - only for partner , if == 2 - also for kaltura network
+		return mySearchUtils::addPartner($partner_id, $prepared_text, $displayInSearch, $extra_invisible_data);
+	}
+	
 /*	
 	public function dumpContent() 
 	{
