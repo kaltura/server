@@ -83,7 +83,7 @@ class Zend2ClientTester
     	$this->assertTrue($entry->status === EntryStatus::IMPORT);
     	
     	// upload file using the upload token
-    	$uploadFilePath = dirname(__FILE__) . '/resources/' . self::UPLOAD_VIDEO_FILENAME;
+    	$uploadFilePath = dirname(__FILE__) . '/../resources/' . self::UPLOAD_VIDEO_FILENAME;
     	$uploadToken = $this->_client->getUploadTokenService()->upload($uploadToken->id, $uploadFilePath);
     	$this->assertTrue($uploadToken->status === UploadTokenStatus::CLOSED);
     	
@@ -169,7 +169,7 @@ class Zend2ClientTester
 		$uploadToken->fileName = self::UPLOAD_IMAGE_FILENAME;
 		$uploadToken = $this->_client->getUploadTokenService()->add($uploadToken);
 
-    	$uploadFilePath = dirname(__FILE__) . '/resources/' . self::UPLOAD_IMAGE_FILENAME;
+    	$uploadFilePath = dirname(__FILE__) . '/../resources/' . self::UPLOAD_IMAGE_FILENAME;
     	$uploadToken = $this->_client->getUploadTokenService()->upload($uploadToken->id, $uploadFilePath);
     	
 		$resource = new UploadedFileTokenResource();
