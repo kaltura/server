@@ -10,4 +10,5 @@ interface DailymotionDistributionField extends BaseEnum
     const VIDEO_TAGS = 'VIDEO_TAGS';
     const VIDEO_CHANNEL = 'VIDEO_CHANNEL';    
     const VIDEO_LANGUAGE = 'VIDEO_LANGUAGE';
+    const VIDEO_TYPE = 'VIDEO_TYPE';
 }

@@ -11,12 +11,14 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 	const METADATA_FIELD_CATEGORY = 'DailymotionCategory';
 	const METADATA_FIELD_DESCRIPTION = 'DailymotionDescription';
 	const METADATA_FIELD_TAGS = 'DailymotionKeywords';
+	const METADATA_FIELD_TYPE = 'DailymotionType';
 
 	const VIDEO_TITLE_MAXIMUM_LENGTH = 255;
 	const VIDEO_DESCRIPTION_MAXIMUM_LENGTH = 2000;
 	const VIDEO_TAGS_MINIMUM_COUNT = 2;
 	const VIDEO_TAGS_MAXIMUM_LENGTH = 250;
 	const VIDEO_TAG_MINIMUM_LENGTH = 3;
+	const VIDEO_TYPE_ALLOWED_VALUES = 'ugc,creative,official';
 	
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
@@ -46,14 +48,19 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 		    DailymotionDistributionField::VIDEO_DESCRIPTION => self::VIDEO_DESCRIPTION_MAXIMUM_LENGTH,
 		);
 		
+		$inListOrNullFields = array (
+		    DailymotionDistributionField::VIDEO_TYPE => explode(',', self::VIDEO_TYPE_ALLOWED_VALUES),
+	    );
+		
 		$allFieldValues = $this->getAllFieldValues($entryDistribution);
 		if (!$allFieldValues || !is_array($allFieldValues)) {
 		    KalturaLog::err('Error getting field values from entry distribution id ['.$entryDistribution->getId().'] profile id ['.$this->getId().']');
 		    return $validationErrors;
-		}
-		
+		}	
+				
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
-	    
+	    $validationErrors = array_merge($validationErrors, $this->validateInListOrNull($inListOrNullFields, $allFieldValues, $action));
+				
 		$videoTagsValue = isset($allFieldValues[DailymotionDistributionField::VIDEO_TAGS]) ? $allFieldValues[DailymotionDistributionField::VIDEO_TAGS] : null;
 		$validationErrors = array_merge($validationErrors, $this->validateTags($videoTagsValue, $action));
 	
@@ -173,6 +180,15 @@ class DailymotionDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setUserFriendlyFieldName('Video language');
 	    $fieldConfig->setEntryMrssXslt('<xsl:text>en</xsl:text>');
 	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+	    
+	    $fieldConfig = new DistributionFieldConfig();
+	    $fieldConfig->setFieldName(DailymotionDistributionField::VIDEO_TYPE);
+	    $fieldConfig->setUserFriendlyFieldName(self::METADATA_FIELD_TYPE);
+	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/'.self::METADATA_FIELD_TYPE.'" />');
+	    $fieldConfig->setUpdateOnChange(true);
+	    $fieldConfig->setUpdateParams(array("/*[local-name()='metadata']/*[local-name()='".self::METADATA_FIELD_TYPE."']"));
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::NOT_REQUIRED);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
 	    return $fieldConfigArray;

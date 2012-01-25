@@ -73,7 +73,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$props['description'] = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_DESCRIPTION);
 		//$props['date'] = time();
 		$props['language'] = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_LANGUAGE);
-		
+		$props['type'] = $this->getValueForField(KalturaDailymotionDistributionField::VIDEO_TYPE);
 		$props['published']= true;
 		if(!is_null($enabled))
 			$props['private']= !$enabled;
