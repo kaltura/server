@@ -130,11 +130,6 @@ class executeplaylistAction extends defPartnerservices2Action
 		$wrapper =  objectWrapperBase::getWrapperClass( $entry_list  , $level );
 		$this->addMsg ( "count" , count ( $entry_list )) ;
 		$this->addMsg ( $this->getObjectPrefix() , $wrapper ) ;
-		
-		if ($_SERVER["REQUEST_METHOD"] == "GET")
-		{
-			requestUtils::sendCachingHeaders(60, true, time());
-		}
 	}
 }
 ?>
