@@ -55,6 +55,8 @@ class kBusinessConvertDL
 		}
 		
 		$saveEntry = false;
+		$oldFlavorParamsIds = $entry->getFlavorParamsIds();
+		$oldFlavorParamsIdsArray = explode(',', $oldFlavorParamsIds);
 		foreach($oldAssets as $oldAsset)
 		{
 			/* @var $oldAsset asset */
@@ -64,6 +66,9 @@ class kBusinessConvertDL
 			if(isset($newAssets[$oldAsset->getType()]) && isset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()];
+				//if the flavorParamId is not in the entry's flavor_params_ids field(could happen if the conversion failed or the flavor param was not applicable for the original source) 
+				if($oldFlavorParamsIdsArray && !in_array($oldAsset->getFlavorParamsId(), $oldFlavorParamsIdsArray))
+					$entry->addFlavorParamsId($oldAsset->getFlavorParamsId());
 				/* @var $newAsset asset */
 				KalturaLog::debug("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
 				
@@ -117,7 +122,9 @@ class kBusinessConvertDL
 		$entry->setConversionProfileId($tempEntry->getConversionProfileId());
 		$entry->setConversionQuality($tempEntry->getConversionQuality());
 		$entry->setReplacingEntryId(null);
-		$entry->setReplacementStatus(entryReplacementStatus::NONE);		
+		$entry->setReplacementStatus(entryReplacementStatus::NONE);
+		if ($entry->getStatus() != entryStatus::DELETED)
+			$entry->setStatus($tempEntry->getStatus());	
 		$entry->save();
 			
 		myEntryUtils::deleteEntry($tempEntry);
