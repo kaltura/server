@@ -39,10 +39,21 @@ namespace Kaltura\Client;
 abstract class Plugin implements IPlugin
 {
 	/**
+	 * @var \Kaltura\Client\Client
+	 */
+	protected $_client;
+	/**
 	 * @param \Kaltura\Client\Client $client
 	 */
 	protected function __construct(Client $client)
 	{
-		
+		$this->_client = $client;
+	}
+	
+	public function __get($prop)
+	{
+		$getter = 'get'.ucfirst($prop).'Service';
+		if (method_exists($this, $getter))
+			return $this->$getter();
 	}
 }

@@ -167,10 +167,10 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$enumName = preg_replace('/^Kaltura(.+)$/', '$1', $enumName); 
 			
 		if(!$enumNode->hasAttribute('plugin'))
-			return "Kaltura/Client/Enum/{$enumName}.php";
+			return "library/Kaltura/Client/Enum/{$enumName}.php";
 
 		$pluginName = ucfirst($enumNode->getAttribute('plugin'));
-		return "Kaltura/Client/Plugin/{$pluginName}/Enum/{$enumName}.php";
+		return "library/Kaltura/Client/Plugin/{$pluginName}/Enum/{$enumName}.php";
 	}
 	
 	protected function getTypePath(DOMElement $classNode)
@@ -179,10 +179,10 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$className = preg_replace('/^Kaltura(.+)$/', '$1', $className); 
 			
 		if(!$classNode->hasAttribute('plugin'))
-			return "Kaltura/Client/Type/{$className}.php";
+			return "library/Kaltura/Client/Type/{$className}.php";
 
 		$pluginName = ucfirst($classNode->getAttribute('plugin'));
-		return "Kaltura/Client/Plugin/{$pluginName}/Type/{$className}.php";
+		return "library/Kaltura/Client/Plugin/{$pluginName}/Type/{$className}.php";
 	}
 	
 	protected function getServicePath($serviceNode)
@@ -190,26 +190,26 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$serviceName = ucfirst($serviceNode->getAttribute('name'));
 			
 		if(!$serviceNode->hasAttribute('plugin'))
-			return "Kaltura/Client/Service/{$serviceName}Service.php";
+			return "library/Kaltura/Client/Service/{$serviceName}Service.php";
 
 		$pluginName = ucfirst($serviceNode->getAttribute('plugin'));
-		return "Kaltura/Client/Plugin/{$pluginName}/Service/{$serviceName}Service.php";
+		return "library/Kaltura/Client/Plugin/{$pluginName}/Service/{$serviceName}Service.php";
 	}
 	
 	protected function getPluginPath($pluginName)
 	{
 		$pluginName = ucfirst($pluginName);
-		return "Kaltura/Client/Plugin/{$pluginName}/{$pluginName}.php";
+		return "library/Kaltura/Client/Plugin/{$pluginName}/".$this->getPluginClass($pluginName).".php";
 	}
 	
 	protected function getMainPath()
 	{
-		return 'Kaltura/Client/Client.php';
+		return 'library/Kaltura/Client/Client.php';
 	}
 	
 	protected function getMapPath()
 	{
-		return 'Kaltura/Client/TypeMap.php';
+		return 'library/Kaltura/Client/TypeMap.php';
 	}
 	
 	/**
@@ -244,7 +244,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 	protected function getPluginClass($pluginName)
 	{
 		$pluginName = ucfirst($pluginName);
-		return "{$pluginName}";
+		return "{$pluginName}Plugin";
 	}
 	
 	protected function formatMultiLineComment($description, $ident = 1)
@@ -268,7 +268,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('/**');
 		$this->appendLine(' * @namespace');
 		$this->appendLine(' */');
-		$this->appendLine("namespace Kaltura\\Client\\Plugin\\{$pluginClassName};");
+		$this->appendLine("namespace Kaltura\\Client\\Plugin\\".ucfirst($pluginName).";");
 		$this->appendLine();
 		
 		if($this->generateDocs)
@@ -288,27 +288,21 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('');
 	
 		$serviceNodes = $xpath->query("/xml/services/service[@plugin = '$pluginName']");
-//		$serviceNodes = $xpath->query("/xml/plugins/plugin[@name = '$pluginName']/pluginService");
 		foreach($serviceNodes as $serviceNode)
 		{
-			$serviceAttribute = $serviceNode->getAttribute("name");
+			$serviceName = $serviceNode->getAttribute("name");
 			$serviceClass = $this->getServiceClass($serviceNode);
+			$serviceRelativeClassName = "Service\\{$serviceClass}";
 			$this->appendLine('	/**');
-			$this->appendLine("	 * @var $serviceClass");
+			$this->appendLine("	 * @var $serviceRelativeClassName");
 			$this->appendLine('	 */');
-			$this->appendLine("	public \${$serviceAttribute} = null;");
+			$this->appendLine("	protected \${$serviceName} = null;");
 			$this->appendLine('');
 		}
 		
 		$this->appendLine('	protected function __construct(\Kaltura\Client\Client $client)');
 		$this->appendLine('	{');
 		$this->appendLine('		parent::__construct($client);');
-		foreach($serviceNodes as $serviceNode)
-		{
-			$serviceAttribute = $serviceNode->getAttribute("name");
-			$serviceClass = $this->getServiceClass($serviceNode);
-			$this->appendLine("		\$this->$serviceAttribute = new $serviceClass(\$client);");
-		}
 		$this->appendLine('	}');
 		$this->appendLine('');
 		$this->appendLine('	/**');
@@ -329,8 +323,9 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('		$services = array(');
 		foreach($serviceNodes as $serviceNode)
 		{
-			$serviceAttribute = $serviceNode->getAttribute("name");
-			$this->appendLine("			'$serviceAttribute' => \$this->$serviceAttribute,");
+			$serviceName = $serviceNode->getAttribute("name");
+			$serviceClass = $this->getServiceClass($serviceNode);
+			$this->appendLine("			'$serviceName' => \$this->get{$serviceClass}(),");
 		}
 		$this->appendLine('		);');
 		$this->appendLine('		return $services;');
@@ -343,6 +338,26 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine('	{');
 		$this->appendLine("		return '$pluginName';");
 		$this->appendLine('	}');
+		
+		foreach($serviceNodes as $serviceNode)
+		{
+			$serviceName = $serviceNode->getAttribute("name");
+			$description = $serviceNode->getAttribute("description");
+			$serviceClass = $this->getServiceClass($serviceNode);
+			$serviceRelativeClassName = "Service\\{$serviceClass}";
+			
+			$this->appendLine("	/**");
+			$this->appendLine("	 * @return \\Kaltura\\Client\\Plugin\\".ucfirst($pluginName)."\\$serviceRelativeClassName");
+			$this->appendLine("	 */");
+			$this->appendLine("	public function get{$serviceClass}()");
+			$this->appendLine("	{");
+			$this->appendLine("		if (is_null(\$this->$serviceName))");
+			$this->appendLine("			\$this->$serviceName = new $serviceRelativeClassName(\$this->_client);");
+			$this->appendLine("		return \$this->$serviceName;");
+			$this->appendLine("	}");
+			
+			
+		}
 		$this->appendLine('}');
 		$this->appendLine('');
 		
@@ -549,7 +564,7 @@ class PhpZend2ClientGenerator extends ClientGeneratorFromXml
 		$this->appendLine(' * @namespace');
 		$this->appendLine(' */');
 		if ($plugin)
-			$this->appendLine("namespace Kaltura\\Client\\Plugin\\{$this->getPluginClass($plugin)}\\Service;");
+			$this->appendLine("namespace Kaltura\\Client\\Plugin\\".ucfirst($plugin)."\\Service;");
 		else
 			$this->appendLine('namespace Kaltura\Client\Service;');
 		$this->appendLine();
