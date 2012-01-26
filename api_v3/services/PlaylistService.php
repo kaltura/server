@@ -58,7 +58,7 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function addAction( KalturaPlaylist $playlist , $updateStats = false)
 	{
-		$dbPlaylist = $playlist->toObject();
+		$dbPlaylist = $playlist->toInsertableObject();
 		
 		$this->checkAndSetValidUserInsert($playlist, $dbPlaylist);
 		$this->checkAdminOnlyInsertProperties($playlist);

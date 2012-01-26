@@ -88,6 +88,14 @@ class KalturaPlaylist extends KalturaBaseEntry
 		return $object_to_fill;
 	}
 	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		
+		$this->validatePropertyNotNull("playlistType");
+		$this->validatePropertyNotNull("totalResults");
+	}
+	
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject))
