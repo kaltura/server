@@ -11,10 +11,22 @@ class sftpMgr extends kFileTransferMgr
 	
 	private $sftp_id = false;
 	
+	private $sftp_pass = null;
+
+	private $sftp_server;
+	
+	private $sftp_port;
+	 
+	private $sftp_user;
+	
+	private $privKeyFile;
+	
+	private $useCmd;
+	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
-	protected function __construct()
+	protected function __construct($useCmd = false)
 	{
-		// do nothing
+		$this->useCmd = $useCmd;
 	}
 
 	
@@ -48,6 +60,8 @@ class sftpMgr extends kFileTransferMgr
 		if (!$sftp_port || $sftp_port == 0) {
                 	$sftp_port = 22;
 		}
+		$this->sftp_port = $sftp_port;
+		$this->sftp_server = $sftp_server;
 		return ssh2_connect($sftp_server, $sftp_port);
 	}
 	
@@ -55,6 +69,8 @@ class sftpMgr extends kFileTransferMgr
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
 	protected function doLogin($sftp_user, $sftp_pass, $ftp_passive_mode = TRUE)
 	{
+		$this->sftp_user = $sftp_user;
+		$this->sftp_pass = $sftp_pass;
 		// try to login
 		if (ssh2_auth_password($this->getSsh2Connection(), $sftp_user, $sftp_pass)) {
 			$this->sftp_id = ssh2_sftp($this->getSsh2Connection());
@@ -69,6 +85,9 @@ class sftpMgr extends kFileTransferMgr
 	// login using a public key
 	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null)
 	{
+		$this->sftp_user = $user;
+		$this->privKeyFile = $privKeyFile;
+		
 		// try to login
 		if (ssh2_auth_pubkey_file($this->getSsh2Connection(), $user, $pubKeyFile, $privKeyFile, $passphrase)) {
 			$this->sftp_id = ssh2_sftp($this->getSsh2Connection());
@@ -87,18 +106,31 @@ class sftpMgr extends kFileTransferMgr
 		$remote_file = ltrim($remote_file,'/');
 		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
 		$absolute_path = trim($absolute_path, '/');
-        $stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'w');
-        if (!$stream) {
-        	return false;
-        }
-        
-        //Writes the file in chunks (for large files bug)
-        $fileToReadHandle = fopen($local_file, "r");
-        $ret = $this->writeFileInChunks($fileToReadHandle, $stream);
-        @fclose($fileToReadHandle);
-		@fclose($stream);
-	
-        return $ret;		
+		
+		KalturaLog::debug('Put file ');
+		if ($this->privKeyFile == null || !$this->useCmd){
+			KalturaLog::debug('Put file');
+			$stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'w');
+        	if (!$stream)
+        		return false;
+
+        	//Writes the file in chunks (for large files bug)
+        	$fileToReadHandle = fopen($local_file, "r");
+        	$ret = $this->writeFileInChunks($fileToReadHandle, $stream);
+        	@fclose($fileToReadHandle);
+			@fclose($stream);
+			return $ret;
+		}
+		else
+		{
+			//else the authentication is by private key
+			$sftpPutCommand = "cd $this->start_dir \n put $local_file";
+			$cmd = "echo -e '$sftpPutCommand \n quit' | sftp -oPort=$this->sftp_port -o IdentityFile=$this->privKeyFile -o 'PasswordAuthentication yes'  $this->sftp_user@$this->sftp_server";
+			KalturaLog::debug('Put file using command: ' . $cmd);
+			system($cmd, $return_value);		
+						
+			return true;
+		}
 	}
 		
 	// download a file from the server (ftp_mode is irrelevant)
