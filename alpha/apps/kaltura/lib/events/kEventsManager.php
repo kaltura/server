@@ -105,8 +105,10 @@ class kEventsManager
 		foreach(self::$deferredEvents as $key => $event)
 		{
 			if (!$deferredEvent || $deferredEvent->getPriority() > $event->getPriority())
+			{
 				$deferredEvent = $event;
 				$deferredEventKey = $key;
+			}
 		}
 		
 		unset(self::$deferredEvents[$deferredEventKey]);

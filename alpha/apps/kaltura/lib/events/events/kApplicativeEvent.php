@@ -35,7 +35,7 @@ abstract class kApplicativeEvent extends KalturaEvent implements IKalturaContinu
 	public function getKey()
 	{
 		if(method_exists($this->object, 'getId'))
-			return get_class($this->object).$this->object->getId();
+			return get_class($this)."_".get_class($this->object)."_".$this->object->getId();
 		
 		return null;
 	}
