@@ -85,7 +85,7 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$serverUrl = $distributionProfile->sftpHost;
 		$loginName = $distributionProfile->sftpLogin;
 		$loginPass = $distributionProfile->sftpPass;
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP_CMD);
 		$sftpManager->login($serverUrl, $loginName, $loginPass);
 		return $sftpManager;
 	}
