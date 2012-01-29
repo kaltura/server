@@ -515,7 +515,7 @@ class kFlowHelper
 	 */
 	public static function handleCaptureThumbFinished(BatchJob $dbBatchJob, kCaptureThumbJobData $data, BatchJob $twinJob = null)
 	{
-		KalturaLog::debug("Captire thumbnail finished with destination file: " . $data->getThumbPath());
+		KalturaLog::debug("Capture thumbnail finished with destination file: " . $data->getThumbPath());
 
 		if($dbBatchJob->getAbort())
 			return $dbBatchJob;
@@ -810,6 +810,26 @@ class kFlowHelper
 
 		kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, $engineType, $data->getFlavorAssetId(), $data->getFlavorParamsOutputId(), $mediaInfoId);
 
+		return $dbBatchJob;
+	}
+	
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kConvertCollectionJobData $data
+	 * @return BatchJob
+	 */
+	public static function handleDeleteFileFinished(BatchJob $dbBatchJob, kDeleteFileJobData $data)
+	{
+		KalturaLog::debug("File delete finished for file path: ". $data->getLocalFileSyncPath().", data center: ".$dbBatchJob->getDc());
+		
+		//Change status of the filesync to "purged"
+		
+		$fileSyncFroDeletedFile = kFileSyncUtils::retrieveObjectForSyncKey($data->getSyncKey());
+		
+		$fileSyncFroDeletedFile->setStatus(FileSync::FILE_SYNC_STATUS_PURGED);
+		
+		$fileSyncFroDeletedFile->save();
+		
 		return $dbBatchJob;
 	}
 
@@ -1336,6 +1356,17 @@ class kFlowHelper
 
 		return $dbBatchJob;
 	}
+	
+    public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
+	{
+	    KalturaLog::debug("Remote storage file deletion finished for fileysnc ID:[ ". $data->getSrcFileSyncId() ."]");
+	    
+	    $fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
+		$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
+		$fileSync->save();
+		
+		return $dbBatchJob;
+	}
 
 	/**
 	 * @param BatchJob $dbBatchJob
@@ -1828,6 +1859,7 @@ class kFlowHelper
 		switch($entry->getReplacementStatus())
 		{
 			case entryReplacementStatus::APPROVED_BUT_NOT_READY:
+				KalturaLog::debug("status changed to ready");
 				kEventsManager::raiseEventDeferred(new kObjectReadyForReplacmentEvent($tempEntry));
 				break;
 
