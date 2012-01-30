@@ -1,6 +1,6 @@
 <?php
 
-if($argc != 3)
+if($argc < 3)
 {
 	echo "Arguments missing.\n\n";
 	echo "Usage: php exportToNetStorage.php {partner id} {storage profile id} {max number of entries}(optional)\n";
