@@ -19,7 +19,7 @@ class sftpMgr extends kFileTransferMgr
 	 
 	private $sftp_user;
 	
-	private $privKeyFile;
+	private $sftp_privKeyFile;
 	
 	private $useCmd;
 	
@@ -86,7 +86,7 @@ class sftpMgr extends kFileTransferMgr
 	protected function doLoginPubKey($user, $pubKeyFile, $privKeyFile, $passphrase = null)
 	{
 		$this->sftp_user = $user;
-		$this->privKeyFile = $privKeyFile;
+		$this->sftp_privKeyFile = $privKeyFile;
 		
 		// try to login
 		if (ssh2_auth_pubkey_file($this->getSsh2Connection(), $user, $pubKeyFile, $privKeyFile, $passphrase)) {
@@ -108,7 +108,7 @@ class sftpMgr extends kFileTransferMgr
 		$absolute_path = trim($absolute_path, '/');
 		
 		KalturaLog::debug('Put file ');
-		if ($this->privKeyFile == null || !$this->useCmd){
+		if ($this->sftp_privKeyFile == null || !$this->useCmd){
 			KalturaLog::debug('Put file');
 			$stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'w');
         	if (!$stream)
@@ -125,7 +125,7 @@ class sftpMgr extends kFileTransferMgr
 		{
 			//else the authentication is by private key
 			$sftpPutCommand = "cd $this->start_dir \n put $local_file";
-			$cmd = "echo -e '$sftpPutCommand \n quit' | sftp -oPort=$this->sftp_port -o IdentityFile=$this->privKeyFile -o 'PasswordAuthentication yes'  $this->sftp_user@$this->sftp_server";
+			$cmd = "echo -e '$sftpPutCommand \n quit' | sftp -oPort=$this->sftp_port -o IdentityFile=$this->sftp_privKeyFile -o 'PasswordAuthentication yes'  $this->sftp_user@$this->sftp_server";
 			KalturaLog::debug('Put file using command: ' . $cmd);
 			system($cmd, $return_value);		
 						
