@@ -576,16 +576,23 @@ class kContentDistributionManager
 					}
 				}
 			}
-			return self::addSubmitAddJob($entryDistribution, $distributionProfile);
+			if (!$returnNull)
+			{
+				$returnValue = self::addSubmitAddJob($entryDistribution, $distributionProfile);
+			}
 		}
 		
-		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
+		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $returnNull)
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 			$entryDistribution->save();
 		}
 		
-		if ($returnNull) return null;
+		if(!count($validationErrors))
+		{
+			if ($returnNull) return null;
+				return $returnValue;
+		}
 		
 		KalturaLog::log("Validation errors found");
 		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
