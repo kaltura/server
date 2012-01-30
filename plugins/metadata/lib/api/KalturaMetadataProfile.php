@@ -83,6 +83,12 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 	public $views;
 
 	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $xslt;
+
+	/**
 	 * @var KalturaMetadataProfileCreateMode
 	 */
 	public $createMode;
@@ -134,5 +140,8 @@ class KalturaMetadataProfile extends KalturaObject implements IFilterable
 		
 		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_VIEWS);
 		$this->views = kFileSyncUtils::file_get_contents($key, true, false);
+
+		$key = $source_object->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
+		$this->xslt = kFileSyncUtils::file_get_contents($key, true, false);
 	}
 }

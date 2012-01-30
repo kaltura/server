@@ -457,6 +457,46 @@ class MetadataProfileService extends KalturaBaseService
 	}	
 
 	/**
+	 * Update an existing metadata object xslt file
+	 * 
+	 * @action updateXsltFromFile
+	 * @param int $id 
+	 * @param file $xsltFile XSLT file, will be executed on every metadata add/update
+	 * @return KalturaMetadataProfile
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
+	 */	
+	function updateXsltFromFileAction($id, $xsltFile)
+	{
+		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
+		
+		if(!$dbMetadataProfile)
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+	
+		$filePath = null;
+		if($xsltFile)
+		{
+			$filePath = $xsltFile['tmp_name'];
+			if(!file_exists($filePath))
+				throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xsltFile['name']);
+		}
+		
+		$dbMetadataProfile->incrementXsltVersion();
+		$dbMetadataProfile->save();
+		
+		if(trim(file_get_contents($filePath)) != '')
+		{
+			$key = $dbMetadataProfile->getSyncKey(MetadataProfile::FILE_SYNC_METADATA_XSLT);
+			kFileSyncUtils::moveFromFile($filePath, $key);
+		}
+		
+		$metadataProfile = new KalturaMetadataProfile();
+		$metadataProfile->fromObject($dbMetadataProfile);
+		
+		return $metadataProfile;
+	}	
+	
+	/**
 	 * Serves metadata profile XSD file
 	 *  
 	 * @action serve

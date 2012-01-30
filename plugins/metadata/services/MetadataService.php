@@ -439,7 +439,14 @@ class MetadataService extends KalturaBaseService
         	XsltParameterName::KALTURA_CURRENT_TIMESTAMP => time(),
         );
         
-        $xmlDataTransformed = kXml::transformXmlUsingXslt($xmlData, $xsltString, $xsltParams);
+        $xsltErrors = array();
+        $xmlDataTransformed = kXml::transformXmlUsingXslt($xmlData, $xsltString, $xsltParams, $xsltErrors);
+        
+        if (!empty($xsltErrors))
+        {
+        	throw new KalturaAPIException("XSLT_VALIDATION_ERROR,XSLT validation error [%s]", implode(',', $xsltErrors));
+        }
+        
         if ($xmlDataTransformed)
             return $xmlDataTransformed;
         
