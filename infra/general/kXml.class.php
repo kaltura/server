@@ -1,4 +1,32 @@
 <?php
+
+/** 
+ * @package infra
+ * @subpackage utils
+ */
+class XSLTErrorCollector
+{
+	public $errors = array();
+	
+	public function __construct()
+	{
+		set_error_handler(array($this, "errorHandler"));
+	}
+
+	public function restoreErrorHandler()
+	{
+		restore_error_handler();
+	}
+	
+	public function errorHandler($errNo, $errStr, $errFile, $errLine)
+	{
+		$startPos = strpos($errStr, ': ');
+		if ($startPos !== false)
+			$errStr = substr($errStr, $startPos + 2);
+		$this->errors[] = $errStr;
+	}
+}
+
 /** 
  * @package infra
  * @subpackage utils
@@ -327,7 +355,7 @@ class kXml
 	 * @param array $xsltParams
 	 * @return string  
 	 */
-	public static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array())
+	public static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array(), &$xsltErrors = array())
 	{
 					
 		$xml = new DOMDocument();
@@ -352,7 +380,12 @@ class kXml
 	    $proc->registerPHPFunctions(kConf::get('xslt_enabled_php_functions'));
 		@$proc->importStyleSheet($xsl);
 		
+		$errorHandler = new XSLTErrorCollector();
+		
 		$xml = @$proc->transformToDoc($xml);
+		
+		$errorHandler->restoreErrorHandler();	
+		$xsltErrors = $errorHandler->errors;
 
 		if(!$xml)
 		{
