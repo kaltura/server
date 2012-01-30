@@ -107,9 +107,8 @@ class sftpMgr extends kFileTransferMgr
 		$absolute_path = trim($this->start_dir,'/').'/'.$remote_file;
 		$absolute_path = trim($absolute_path, '/');
 		
-		KalturaLog::debug('Put file ');
-		if ($this->sftp_privKeyFile == null || !$this->useCmd){
-			KalturaLog::debug('Put file');
+		if ($this->sftp_privKeyFile == null || !$this->useCmd)
+		{
 			$stream = @fopen("ssh2.sftp://$sftp/$absolute_path", 'w');
         	if (!$stream)
         		return false;
