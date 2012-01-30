@@ -8,7 +8,7 @@ if($argc != 3)
 } 
 $partnerId = $argv[1];
 $storageProfileId = $argv[2];
-$maxEntriesToExport = $argv[3];
+$maxEntriesToExport = isset($argv[3]) ? $argv[3] : -1;
 
 if (empty($maxEntriesToExport) || $maxEntriesToExport <= 0) {
     $maxEntriesToExport = -1;
