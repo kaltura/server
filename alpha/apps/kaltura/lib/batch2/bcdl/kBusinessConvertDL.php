@@ -80,7 +80,8 @@ class kBusinessConvertDL
 				$oldAsset->setContainerFormat($newAsset->getContainerFormat());
 				$oldAsset->setSize($newAsset->getSize());
 				$oldAsset->setFileExt($newAsset->getFileExt());
-					
+				$oldAsset->setTags($newAsset->getTags());
+				$oldAsset->setDescription($newAsset->getDescription());
 				$oldAsset->incrementVersion();
 				$oldAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 				$oldAsset->save();
@@ -90,6 +91,13 @@ class kBusinessConvertDL
 				
 				kFileSyncUtils::createSyncFileLinkForKey($oldFileSync, $newFileSync);
 				
+				$newFlavorMediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($newAsset->getId());
+				if($newFlavorMediaInfo)
+				{
+					$oldFlavorNewMediaInfo = $newFlavorMediaInfo->copy();
+					$oldFlavorNewMediaInfo->setFlavorAssetId($oldAsset->getId());
+					$oldFlavorNewMediaInfo->save();
+				}
 				unset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]);
 			}	
 			//If the old asset is not set for replacement by its paramsId and type, delete it.
@@ -123,7 +131,7 @@ class kBusinessConvertDL
 		$entry->setReplacementStatus(entryReplacementStatus::NONE);
 		$entry->setStatus($tempEntry->getStatus());	
 		$entry->save();
-			
+		
 		myEntryUtils::deleteEntry($tempEntry);
 	}
 	
