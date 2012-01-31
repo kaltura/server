@@ -15,6 +15,7 @@ class YahooDistributionEngine extends DistributionEngine implements
 	const TEMP_DIRECTORY = 'yahoo_distribution';
 	const FEED_TEMPLATE = 'feed_template.xml';
 	const DELETE_FEED_TEMPLATE = 'feed_template_delete.xml';
+	const ACCESS_URL = 'https://contentmgmt.bcst.yahoo.com/vbs_script_batchjob.asp';
 	
 	protected $tempXmlPath;
 
@@ -121,31 +122,40 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$smallThumbDestFileName = $currentTime.'_'.basename($providerData->smallThumbPath); 
 		$largeThumbDestFileName = $currentTime.'_'.basename($providerData->largeThumbPath);
 		
-		$feed->setThumbnailsPath($smallThumbDestFileName, $largeThumbDestFileName);	
-		
+		$feed->setThumbnailsPath($smallThumbDestFileName, $largeThumbDestFileName);		
 		//create unique names for flavor assets 
 		$feed->setStreams($flavorAssets, $currentTime);	
 		$remoteId = $entryDistribution->entryId;
+		$data->remoteId = $remoteId;
 		$fileName = $remoteId .'_'. $currentTime . '.xml';
 		$srcFile = $this->tempXmlPath . '/' . $fileName;
 		$path = $distributionProfile->ftpPath;
 		$destFile = "{$path}/{$fileName}";
 			
-		file_put_contents($srcFile, $feed->getXmlString());	
+		$xmlString = $feed->getXmlString();	
+		file_put_contents($srcFile, $xmlString);	
 		KalturaLog::debug("XML written to file [$srcFile]");
 		//upload file to FTP
+
 		$ftpManager = $this->getFTPManager($distributionProfile);
+		if(!$ftpManager)
+			throw new Exception("FTP manager not loaded");
+		
 		//upload flavors and thumbnails to FTP
 		$this->uploadThumbAssetsFiles($path, $providerData, $ftpManager, $smallThumbDestFileName, $largeThumbDestFileName);				
 		$this->uploadFlavorAssetsFiles($path, $feed, $providerData, $ftpManager, $flavorAssets, $currentTime);	
 		//upload feed to FTP
-		$ftpManager->putFile($destFile, $srcFile, true);		
-		if ($remoteId){
-			return true;
-		}
-		else{
-			return false;
-		}		
+		$ftpManager->putFile($destFile, $srcFile, true);
+
+		$data->sentData = $xmlString;
+		$data->results = 'none'; 
+		// the url should be accessed automatically
+		if ($distributionProfile->processFeed == KalturaYahooDistributionProcessFeedActionStatus::AUTOMATIC)
+		{
+			$accessUrlResult = $this->accessUrl($distributionProfile, $destFile);
+			$data->results = $accessUrlResult['result'];
+		}			
+		return true;			
 	}
 	
 	/**
@@ -167,7 +177,8 @@ class YahooDistributionEngine extends DistributionEngine implements
 		$feed->setFieldsForDelete();
 		$currentTime = time();
 	
-		$remoteId = $entryDistribution->entryId;			
+		$remoteId = $entryDistribution->entryId;
+		$data->remoteId = $remoteId;			
 		$fileName = $remoteId .'_'. $currentTime. '.xml';
 		$srcFile = $this->tempXmlPath . '/' . $fileName;
 		$path = $distributionProfile->ftpPath;
@@ -177,18 +188,22 @@ class YahooDistributionEngine extends DistributionEngine implements
 		if(!$ftpManager)
 			throw new Exception("FTP manager not loaded");
 	
-		file_put_contents($srcFile, $feed->getXmlString());
+		$xmlString = $feed->getXmlString();
+		file_put_contents($srcFile, $xmlString);
 		KalturaLog::debug("XML written to file [$srcFile]");
 		//upload file to FTP
 		$ftpManager = $this->getFTPManager($distributionProfile);
 		$ftpManager->putFile($destFile, $srcFile, true);
-				
-		if ($remoteId){
-			return true;
-		}
-		else{
-			return false;
-		}		
+
+		$data->sentData = $xmlString;
+		$data->results = 'none'; 
+		// the url should be accessed automatically
+		if ($distributionProfile->processFeed == KalturaYahooDistributionProcessFeedActionStatus::AUTOMATIC)
+		{
+			$accessUrlResult = $this->accessUrl($distributionProfile, $destFile);
+			$data->results = $accessUrlResult['result'];
+		}				
+		return true;		
 	}
 				
 	/**
@@ -274,5 +289,35 @@ class YahooDistributionEngine extends DistributionEngine implements
 			$ftpManager->putFile($largeThumbDestFileName, $providerData->largeThumbPath, true);
 	}
 	
+	/**
+	 * access url.
+	 * @param KalturaYahooDistributionProfile $distributionProfile
+	 */
+	private function accessUrl(KalturaYahooDistributionProfile $distributionProfile, $fileName)
+	{
+		$url = self::ACCESS_URL;
+		$params = array(
+			'UserName' => $distributionProfile->ftpUsername,
+			'Password' => $distributionProfile->ftpPassword,
+			'FileName' => $fileName,
+		);
+		$url = $url.'?'.http_build_query($params);
+		
+		$ch = curl_init();		
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		
+		$result = curl_exec($ch);		
+		$resultsArr = array(
+              'result' => $result,
+              'error' => curl_error($ch),
+              'http_code' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+        );  		
+		
+        curl_close($ch);
+		return $resultsArr;
+	}
 	
 }

@@ -35,6 +35,11 @@ class KalturaYahooDistributionProfile extends KalturaConfigurableDistributionPro
 	 * @var string
 	 */
 	public $contactEmail;	
+	
+	/** 
+	 * @var KalturaYahooDistributionProcessFeedActionStatus
+	 */
+	public $processFeed;
 
 	
 	/*
@@ -48,6 +53,7 @@ class KalturaYahooDistributionProfile extends KalturaConfigurableDistributionPro
 		'ftpHost',
 		'contactTelephone',
 		'contactEmail',
+		'processFeed' => 'processFeedActionStatus',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -309,7 +309,8 @@ class YahooDistributionFeedHelper
 	 */
 	public function flavorAssetUniqueName($flavorAsset, $currentTime)
 	{
-		$uniqueName = $currentTime.'_'.$this->entryDistribution->id.'_'.$flavorAsset->entryId.'_'.$flavorAsset->id;
+		$fileExt = $flavorAsset->fileExt;	
+		$uniqueName = $currentTime.'_'.$this->entryDistribution->id.'_'.$flavorAsset->entryId.'_'.$flavorAsset->id.'.'.$fileExt;
 		return $uniqueName;		
 	}
 	

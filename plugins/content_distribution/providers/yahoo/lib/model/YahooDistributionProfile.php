@@ -23,6 +23,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_FTP_HOST = 'ftpHost';
 	const CUSTOM_DATA_CONTACT_TELEPHONE = 'contactTelephone';
 	const CUSTOM_DATA_CONTACT_EMAIL = 'contactEmail';
+	const CUSTOM_DATA_PROCESS_FEED_ACTION_STATUS = 'processFeed';
 			
 	// validations
 	const VIDEO_DESCRIPTION_MAXIMUM_LENGTH = 255;
@@ -249,6 +250,7 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 	public function getFtpHost()			 		{return $this->getFromCustomData(self::CUSTOM_DATA_FTP_HOST);}
 	public function getContactEmail()		 		{return $this->getFromCustomData(self::CUSTOM_DATA_CONTACT_EMAIL);}
 	public function getContactTelephone()	 		{return $this->getFromCustomData(self::CUSTOM_DATA_CONTACT_TELEPHONE);}
+	public function getProcessFeedActionStatus()	{return $this->getFromCustomData(self::CUSTOM_DATA_PROCESS_FEED_ACTION_STATUS);}	
 	
 	public function setFtpPath($v)			 		{$this->putInCustomData(self::CUSTOM_DATA_FTP_PATH, $v);}
 	public function setFtpUsername($v)			 	{$this->putInCustomData(self::CUSTOM_DATA_FTP_USERNAME, $v);}
@@ -256,6 +258,8 @@ class YahooDistributionProfile extends ConfigurableDistributionProfile
 	public function setFtpHost($v)					{$this->putInCustomData(self::CUSTOM_DATA_FTP_HOST, $v);}
 	public function setContactEmail($v)				{$this->putInCustomData(self::CUSTOM_DATA_CONTACT_EMAIL, $v);}
 	public function setContactTelephone($v)			{$this->putInCustomData(self::CUSTOM_DATA_CONTACT_TELEPHONE, $v);}	   
+	public function setProcessFeedActionStatus($v)	{$this->putInCustomData(self::CUSTOM_DATA_PROCESS_FEED_ACTION_STATUS, $v);}	   
+	
 	
 	protected function getDefaultFieldConfigArray()
 	{	    

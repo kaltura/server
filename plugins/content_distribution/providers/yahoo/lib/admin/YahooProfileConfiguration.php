@@ -27,11 +27,11 @@ class Form_YahooProfileConfiguration extends Form_ConfigurableProfileConfigurati
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'ftp_path', array(
-			'label'			=> 'FTP Path:',
+		$this->addElement('text', 'ftp_host', array(
+			'label'			=> 'FTP Host:',
 			'filters'		=> array('StringTrim'),
 		));
-		
+				
 		$this->addElement('text', 'ftp_username', array(
 			'label'			=> 'FTP user name:',
 			'filters'		=> array('StringTrim'),
@@ -42,9 +42,18 @@ class Form_YahooProfileConfiguration extends Form_ConfigurableProfileConfigurati
 			'filters'		=> array('StringTrim'),
 		));
 	
-		$this->addElement('text', 'ftp_host', array(
-			'label'			=> 'FTP Host:',
+		$this->addElement('text', 'ftp_path', array(
+			'label'			=> 'FTP Path:',
 			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('select', 'process_feed', array(
+			'label'			=> 'Process Feed:',
+			'filters'		=> array('StringTrim'),
+			'multiOptions' => array(
+	            0 => 'Manual',
+	            1 => 'Automatic',
+	        ),
 		));
 	}
 }
