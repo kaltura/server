@@ -556,7 +556,7 @@ class kContentDistributionManager
 			return null;
 		} 
 		
-		$returnNull = false;
+		$returnValue = true;
 		$validationErrors = $entryDistribution->getValidationErrors();
 		if(!count($validationErrors))
 		{
@@ -572,27 +572,22 @@ class kContentDistributionManager
 						KalturaLog::log("Will be sent on exact time [$sunrise] for sunrise time [" . $entryDistribution->getSunrise() . "]");
 						$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::SUBMIT_REQUIRED);
 						$entryDistribution->save();
-						$returnNull = true;
+						$returnValue = null;
 					}
 				}
 			}
-			if (!$returnNull)
-			{
+			if ($returnValue)
 				$returnValue = self::addSubmitAddJob($entryDistribution, $distributionProfile);
-			}
 		}
 		
-		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED && $returnNull)
+		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 			$entryDistribution->save();
 		}
 		
 		if(!count($validationErrors))
-		{
-			if ($returnNull) return null;
-				return $returnValue;
-		}
+			return $returnValue;
 		
 		KalturaLog::log("Validation errors found");
 		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
