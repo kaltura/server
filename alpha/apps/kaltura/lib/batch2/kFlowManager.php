@@ -80,6 +80,19 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return $dbBatchJob;
 		}
 	}
+	
+	protected function updatedDeleteFile (BatchJob $dbBatchJob, kDeleteFileJobData $data)
+	{
+		switch ($dbBatchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+				return kFlowHelper::handleDeleteFileFinished($dbBatchJob, $data);
+			case BatchJob::BATCHJOB_STATUS_FAILED:
+			case BatchJob::BATCHJOB_STATUS_FATAL:
+			default:
+				return $dbBatchJob;
+		}	
+	}
 
 	protected function updatedConvert(BatchJob $dbBatchJob, kConvertJobData $data, BatchJob $twinJob = null)
 	{
@@ -294,6 +307,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 
 				case BatchJobType::CAPTURE_THUMB:
 					$dbBatchJob = $this->updatedCaptureThumb($dbBatchJob, $dbBatchJob->getData(), $twinJob);
+					break;
+					
+				case BatchJobType::DELETE_FILE:
+					$dbBatchJob=$this->updatedDeleteFile($dbBatchJob, $dbBatchJob->getData());
 					break;
 
 				default:
