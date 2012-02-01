@@ -169,7 +169,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 			<xs:documentation>Attachment asset element</xs:documentation>
 			<xs:appinfo>
 				<example>
-					<attachment format="1" attachmentAssetId="1_hd73jd7f">
+					<attachment format="1" attachmentAssetId="{asset id}">
 						<tags>
 							<tag>example</tag>
 							<tag>my_tag</tag>
