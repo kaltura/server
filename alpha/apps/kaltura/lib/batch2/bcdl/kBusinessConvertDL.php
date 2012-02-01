@@ -64,6 +64,8 @@ class kBusinessConvertDL
 			if(isset($newAssets[$oldAsset->getType()]) && isset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]))
 			{
 				$newAsset = $newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()];
+				//in situations were the flavor was created but failed to be converted it param id wont be added to the entry's flavor_params_ids field. so now when replacing the
+				//old entry's flavors with the temporery entry's flavors we should add their params ids to the entry's flavor_params_ids field.
 				$entry->addFlavorParamsId($oldAsset->getFlavorParamsId());
 				
 				/* @var $newAsset asset */
@@ -96,6 +98,7 @@ class kBusinessConvertDL
 				{
 					$oldFlavorNewMediaInfo = $newFlavorMediaInfo->copy();
 					$oldFlavorNewMediaInfo->setFlavorAssetId($oldAsset->getId());
+					$oldFlavorNewMediaInfo->setFlavorAssetVersion($oldAsset->getVersion());
 					$oldFlavorNewMediaInfo->save();
 				}
 				unset($newAssets[$oldAsset->getType()][$oldAsset->getFlavorParamsId()]);
