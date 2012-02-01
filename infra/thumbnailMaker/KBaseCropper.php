@@ -30,7 +30,7 @@ abstract class KBaseCropper
 		$this->targetPath = str_replace($search, $replace ,$targetPath);
 	}
 	
-	public function crop($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0)
+	public function crop($quality, $cropType, $width = 0, $height = 0, $cropX = 0, $cropY = 0, $cropWidth = 0, $cropHeight = 0, $scaleWidth = 1, $scaleHeight = 1, $bgcolor = 0xffffff, $density = 0, $forceRotation = null)
 	{
 		if(is_null($quality))
 			$quality = 100;
@@ -55,7 +55,7 @@ abstract class KBaseCropper
 		if(is_null($bgcolor))
 			$bgcolor = 0;
 		
-		$cmd = $this->getCommand($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density);
+		$cmd = $this->getCommand($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $forceRotation = null);
 		if($cmd)
 		{
 			KalturaLog::info("Executing: $cmd");
