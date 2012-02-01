@@ -21,7 +21,7 @@ if (!PartnerPeer::retrieveByPK($partnerId))
 $c = new Criteria();
 $c->add(entryPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 $c->add(entryPeer::STATUS, entryStatus::DELETED, Criteria::EQUAL);
-BaseentryPeer::setDefaultCriteriaFilter();
+BaseentryPeer::setUseCriteriaFilter(false);
 $entries = entryPeer::doSelect($c);
 
 foreach ($entries as $deletedEntry)
@@ -54,6 +54,7 @@ foreach ($entries as $deletedEntry)
 		$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
 		$deletedAsset->save();
 		assetPeer::clearInstancePool();
+		
 		$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$assetfileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($assetSyncKey);
 		foreach ( $assetfileSyncs as $assetfileSync ) 
@@ -64,5 +65,19 @@ foreach ($entries as $deletedEntry)
 			}
 			$assetfileSync->save ();
 		}
+		
+		//restore asset's convert-log's file syncs.
+		$assetConvertLogSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
+		$assetConvertLogfileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($assetConvertLogSyncKey);
+		foreach ( $assetConvertLogfileSyncs as $assetConvertLogfileSync ) 
+		{
+			if ($assetConvertLogfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED) 
+			{
+				$assetConvertLogfileSync->setStatus ( FileSync::FILE_SYNC_STATUS_READY );
+			}
+			$assetConvertLogfileSync->save ();
+		}
+		
+		
 	}
 }
