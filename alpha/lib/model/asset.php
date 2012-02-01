@@ -91,7 +91,8 @@ class asset extends Baseasset implements ISyncableFile
 	public function copyToEntry($entryId = null, $partnerId = null)
 	{
 		$newFlavorAsset = $this->copy();
-		
+		//this is the first version of the new asset.
+		$newFlavorAsset->setVersion(1);
 		if($partnerId)
 			$newFlavorAsset->setPartnerId($partnerId);
 		if($entryId)
@@ -113,6 +114,7 @@ class asset extends Baseasset implements ISyncableFile
 		{
 			$newMediaInfo = $mediaInfo->copy();
 			$newMediaInfo->setFlavorAssetId($newFlavorAsset->getId());
+			$newMediaInfo->setFlavorAssetVersion($newFlavorAsset->getVersion());
 			$newMediaInfo->save();
 		}
 		
