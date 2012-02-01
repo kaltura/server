@@ -123,7 +123,7 @@ class sftpMgr extends kFileTransferMgr
 		else
 		{
 			//else the authentication is by private key
-			$sftpPutCommand = "cd $this->start_dir \n put $local_file";
+			$sftpPutCommand = "put $local_file $remote_file";
 			$cmd = "echo -e '$sftpPutCommand \n quit' | sftp -oPort=$this->sftp_port -o IdentityFile=$this->sftp_privKeyFile -o 'PasswordAuthentication yes'  $this->sftp_user@$this->sftp_server";
 			KalturaLog::debug('Put file using command: ' . $cmd);
 			system($cmd, $return_value);		
