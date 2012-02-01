@@ -459,14 +459,14 @@ class MetadataProfileService extends KalturaBaseService
 	/**
 	 * Update an existing metadata object xslt file
 	 * 
-	 * @action updateXsltFromFile
+	 * @action updateTransformationFromFile
 	 * @param int $id 
 	 * @param file $xsltFile XSLT file, will be executed on every metadata add/update
 	 * @return KalturaMetadataProfile
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 * @throws MetadataErrors::METADATA_FILE_NOT_FOUND
 	 */	
-	function updateXsltFromFileAction($id, $xsltFile)
+	function updateTransformationFromFileAction($id, $xsltFile)
 	{
 		$dbMetadataProfile = MetadataProfilePeer::retrieveByPK($id);
 		
