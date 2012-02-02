@@ -92,7 +92,7 @@ class kDataCenterMgr
 	
 	public static function getRemoteDcExternalUrl ( FileSync $file_sync )
 	{
-		KalturaLog::log("File Sync [{$file_sync->getId()}]]");
+		KalturaLog::log("File Sync [{$file_sync->getId()}]");
 		$dc_id = $file_sync->getDc();		
 		$dc = self::getDcById ( $dc_id );
 		$external_url = $dc["external_url"];
@@ -101,7 +101,7 @@ class kDataCenterMgr
 
 	public static function getRemoteDcExternalUrlByDcId ( $dc_id )
 	{
-		KalturaLog::log("DC id [{$dc_id}]]");
+		KalturaLog::log("DC id [{$dc_id}]");
 		$dc = self::getDcById ( $dc_id );
 		$external_url = $dc["external_url"];
 		return $external_url;
