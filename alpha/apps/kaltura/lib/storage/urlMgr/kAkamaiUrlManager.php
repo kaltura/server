@@ -226,7 +226,19 @@ class kAkamaiUrlManager extends kUrlManager
 					$url .= "/name/$flavorAssetId.$this->extention";
 						
 				if($this->seekFromTime > 0)
-					$url .= '?aktimeoffset=' . floor($this->seekFromTime / 1000);
+				{
+					$fromTime = floor($this->seekFromTime / 1000);
+					
+					/*
+					 * Akamai servers fail to return subset of the last second of the video.
+					 * The URL will return the two last seconds of the video in such cases. 
+					 **/
+					$entry = $flavorAsset->getentry();
+					if($entry && $fromTime > ($entry->getDurationInt() - 1))
+						$fromTime -= 1;
+						
+					$url .= "?aktimeoffset=$fromTime";
+				}
 			}
 		}
 		
