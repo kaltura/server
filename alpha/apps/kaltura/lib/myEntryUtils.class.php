@@ -8,8 +8,8 @@ class myEntryUtils
 		$dbEntry->setCreateThumb(false);
 		$dbEntry->save();
 		
+		$dbEntry->reload();
 		$fileSyncKey = $dbEntry->getSyncKey($fileSyncType);
-		$fileSync = FileSync::createForFileSyncKey($fileSyncKey);
 		kFileSyncUtils::file_put_contents($fileSyncKey, file_get_contents($filePath));
 		
 		$wrapper = objectWrapperBase::getWrapperClass($dbEntry);
