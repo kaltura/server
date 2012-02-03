@@ -119,12 +119,10 @@ class kFileSyncUtils
 		$res = FileSyncPeer::doSelectOne( $c );
 		if($res)
 		{
-			KalturaLog::log("File Sync already exists");
 			if($strict)
-			{
-				KalturaLog::log(__METHOD__." - file already exists");
-				throw new Exception ( "key [" . $key . "] already exists");
-			}
+				throw new kFileSyncException("key $key already exists", kFileSyncException::FILE_SYNC_ALREADY_EXISTS);
+				
+			KalturaLog::err("File Sync key $key already exists");
 		}
 		else
 		{
