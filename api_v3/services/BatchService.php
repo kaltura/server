@@ -115,7 +115,16 @@ class BatchService extends KalturaBaseService
 		)
 			return;
 			
-		myEntryUtils::updateThumbnailFromFile($bulkUploadResult->getEntry(), $bulkUploadResult->getThumbnailUrl());
+		try 
+		{
+			myEntryUtils::updateThumbnailFromFile($bulkUploadResult->getEntry(), $bulkUploadResult->getThumbnailUrl());
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return;
+		}
+		
 		$bulkUploadResult->setThumbnailSaved(true);
 		$bulkUploadResult->save();
 	}
