@@ -1,9 +1,18 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ajax
+ */ 
 require_once( 'mySearchUtils.class.php');
 require_once( 'mySmartPager.class.php');
 require_once( 'baseObjectUtils.class.php');
 
-// TODO - don't extend sfAction & clean up the old code !!
+// TODO - Clean up the old code !!
+/**
+ * @package Core
+ * @subpackage ajax
+ * @abstract
+ */ 
 abstract class AJAX_getObjectsAction //extends sfAction
 {
 	const SEARCH_MODE_FULLTEXT = true;

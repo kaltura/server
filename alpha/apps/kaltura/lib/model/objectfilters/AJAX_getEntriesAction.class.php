@@ -1,6 +1,14 @@
 <?php
+/**
+ * @package Core
+ * @subpackage ajax
+ */ 
 require_once( 'AJAX_getObjectsAction.class.php');
 
+/**
+ * @package Core
+ * @subpackage ajax
+ */ 
 class AJAX_getEntriesAction extends AJAX_getObjectsAction
 {
 	private $kuser_id = null;
