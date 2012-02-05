@@ -1422,7 +1422,7 @@ class myPartnerUtils
 		}
 	}
 	
-	public function getPartnersArray($partnerIds)
+	public static function getPartnersArray($partnerIds)
 	{
 		$partners = array();
 		$c = new Criteria();
