@@ -237,7 +237,8 @@ class KAsyncConvert extends KJobHandlerWorker
 			$fileSize = filesize($data->destFileSyncLocalPath);
 			kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
 			
-			if(!file_exists($sharedFile) || filesize($sharedFile) != $fileSize)
+			// directory sizes may differ on different devices
+			if(!file_exists($sharedFile) || (is_file($sharedFile) && filesize($sharedFile) != $fileSize))
 			{
 				KalturaLog::err("Error: moving file failed");
 				die();
