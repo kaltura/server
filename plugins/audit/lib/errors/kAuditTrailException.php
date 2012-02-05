@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.audit
+ * @subpackage errors
+ */
 class kAuditTrailException extends kCoreException
 {
 	const UNIQUE_ID_NOT_GENERATED = "UNIQUE_ID_NOT_GENERATED";
