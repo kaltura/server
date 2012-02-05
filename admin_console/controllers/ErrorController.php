@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Errors
+ */
 class ErrorController extends Zend_Controller_Action
 {
 	const ACL_RESOURCE_NOT_EXCEPTION_PATTERN = '/Resource \'\\w*\' not found/';

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Monitoring
+ */
 class MonitoringController extends Zend_Controller_Action
 {
 	private $xymonUrl;

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class PartnerController extends Zend_Controller_Action
 {
 	const PARTNER_PACKAGE_FREE = 1;

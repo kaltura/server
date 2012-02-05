@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class PartnerUsageController extends Zend_Controller_Action
 {
 	public function indexAction()

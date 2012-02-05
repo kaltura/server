@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Admin
+ */
 class PluginController extends Zend_Controller_Action
 {
 	public function indexAction()

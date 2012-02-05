@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Reports
+ */
 class ReportController extends Zend_Controller_Action
 {
 	public function listAction()

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Widgets
+ */
 class WidgetController extends Zend_Controller_Action
 {
 	public function listAction()

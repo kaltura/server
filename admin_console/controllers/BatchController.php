@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Jobs
+ */
 class BatchController extends Zend_Controller_Action
 {
 
