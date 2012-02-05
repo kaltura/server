@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage storage
+ */
 class kPathManager
 {
     const PATH_FORMAT_PARAM = 'path_format';

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage storage
+ */
 class kExternalPathManager extends kPathManager
 {
 	/**

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage storage.Level3
+ */
 class kLevel3UrlManager extends kUrlManager
 {
 	static private function hmac($hashfunc, $key, $data)

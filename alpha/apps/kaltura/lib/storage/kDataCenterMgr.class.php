@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage storage
+ */
 class kDataCenterMgr
 {
 	private static $s_current_dc;

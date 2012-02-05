@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage storage.Akamai
+ */
 class kAkamaiUrlManager extends kUrlManager
 {
 
@@ -366,87 +370,86 @@ class kAkamaiUrlManager extends kUrlManager
 
 }
 
-/*
- ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
- ' Akamai On-Demand ARL Generation
- '
- ' PURPOSE/NOTES:
- ' --------------
- '
- ' A URL to ARL function call for streaming on-demand files.
- '
- ' USAGE:
- ' ------
- '
- ' Akamai code can be placed in an ASP page or in the global.asa page.
- ' Invocation is:
- '
- '	GenerateARL(<url>, <cpcode>, <objectdata>, <ad>, <munge>)
- '
- ' Where the url is the original url to the .asf or .wma media file,
- ' the cpcode is the value given to the customer by Akamai,
- ' deterministic is whether you want the same input to always
- ' generate the same ARL output (0 for false or 1 for true), and
- ' objectdata is the type of fingerprint for the object data field.
- ' Values for objectdata are:
- '     1 - Creation Time - Current Timestamp
- '     1 - File Last modified time(note, file must exist on local web server)
- '     2 - Version number(see OBJECTDATA_VERSION define below).
- '
- ' <ad> Invokes Real Ad Plug-in on Real Server. This should only be used on Real SMIL files
- ' that are invoking an ad server. (0 for off or 1 for on)
- '
- ' <munge>  Encode original URL. Obscures the original URL, but is not cryptographically secure.
- ' (0 for off and 1 for on)
- '
- ' The url must be fully formed and not relative. For example:
- '
- '	http://www.foo.com/movie.asf
- '
- ' is fine, but:
- '
- '	../movie.asf                                or
- '       /movie.asf
- '
- ' is not OK. This function does not attempt to validate the URL other than
- ' ensuring the file extension is .asf or .wma, however (aliases are not
- ' currently supported). So if the URL you input is not something that could
- ' be resolved by a browser, the generated ARL will also be invalid.
- '
- ' An example invocation would be:
- '
- '	ARL = GenerateARL("http://www.foo.com/movie.asf", 801, 0, 0, 0)
- '
- ' After which ARL would contain a value like:
- '
- '	mms://a712.v8010.c801.g.vm.akamaistream.net/7/712/801/7d029a36/www.foo.com/movie.asf
- '
- ' After a movie/sound file is changed its ARL must be regenerated. The timestamp
- ' (in this example 7d029a36) indicates to the Akamai cache whether it needs to
- ' fetch a new copy of the movie. Ideally the object data should never change unless
- ' the source movie or sound file has changed. Object data must be alphanumeric
- ' ranging from 3 to 14 characters.
- '
- ' ERROR CODES:
- ' ------------
- ' The following error codes may be returned instead of an ARL if the input
- ' is incorrect:
- '
- ' INVALID_URL            = -1
- ' INVALID_CPCODE         = -2
- ' INVALID_FILE_NAME      = -3
- '
- ' If you do not wish to have error codes returned, you can invoke:
- '
- '	GenerateSafeARL(<url>, <cpcode>, <objectdata>, <ad>, <munge>)
- '
- ' This function performs exactly as GenerateARL with the exception that
- ' any INVALID argument will cause the output to be the original URL.
- ' This function is suggested for runtime, customer-focused environments.
- '
- ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+/**
+ * Akamai On-Demand ARL Generation
+ *
+ * PURPOSE/NOTES:
+ * --------------
+ *
+ * A URL to ARL function call for streaming on-demand files.
+ *
+ * USAGE:
+ * ------
+ *
+ * Akamai code can be placed in an ASP page or in the global.asa page.
+ * Invocation is:
+ *
+ *	GenerateARL(<url>, <cpcode>, <objectdata>, <ad>, <munge>)
+ *
+ * Where the url is the original url to the .asf or .wma media file,
+ * the cpcode is the value given to the customer by Akamai,
+ * deterministic is whether you want the same input to always
+ * generate the same ARL output (0 for false or 1 for true), and
+ * objectdata is the type of fingerprint for the object data field.
+ * Values for objectdata are:
+ *     1 - Creation Time - Current Timestamp
+ *     1 - File Last modified time(note, file must exist on local web server)
+ *     2 - Version number(see OBJECTDATA_VERSION define below).
+ *
+ * <ad> Invokes Real Ad Plug-in on Real Server. This should only be used on Real SMIL files
+ * that are invoking an ad server. (0 for off or 1 for on)
+ *
+ * <munge>  Encode original URL. Obscures the original URL, but is not cryptographically secure.
+ * (0 for off and 1 for on)
+ *
+ * The url must be fully formed and not relative. For example:
+ *
+ *	http://www.foo.com/movie.asf
+ *
+ * is fine, but:
+ *
+ *	../movie.asf                                or
+ *       /movie.asf
+ *
+ * is not OK. This function does not attempt to validate the URL other than
+ * ensuring the file extension is .asf or .wma, however (aliases are not
+ * currently supported). So if the URL you input is not something that could
+ * be resolved by a browser, the generated ARL will also be invalid.
+ *
+ * An example invocation would be:
+ *
+ *	ARL = GenerateARL("http://www.foo.com/movie.asf", 801, 0, 0, 0)
+ *
+ * After which ARL would contain a value like:
+ *
+ *	mms://a712.v8010.c801.g.vm.akamaistream.net/7/712/801/7d029a36/www.foo.com/movie.asf
+ *
+ * After a movie/sound file is changed its ARL must be regenerated. The timestamp
+ * (in this example 7d029a36) indicates to the Akamai cache whether it needs to
+ * fetch a new copy of the movie. Ideally the object data should never change unless
+ * the source movie or sound file has changed. Object data must be alphanumeric
+ * ranging from 3 to 14 characters.
+ *
+ * ERROR CODES:
+ * ------------
+ * The following error codes may be returned instead of an ARL if the input
+ * is incorrect:
+ *
+ * INVALID_URL            = -1
+ * INVALID_CPCODE         = -2
+ * INVALID_FILE_NAME      = -3
+ *
+ * If you do not wish to have error codes returned, you can invoke:
+ *
+ *	GenerateSafeARL(<url>, <cpcode>, <objectdata>, <ad>, <munge>)
+ *
+ * This function performs exactly as GenerateARL with the exception that
+ * any INVALID argument will cause the output to be the original URL.
+ * This function is suggested for runtime, customer-focused environments.
+ *
+ * @package Core
+ * @subpackage storage.Akamai
  */
-
 class Akamaizer
 {
 	// For deterministic = 1 (true) only, use a static object data version number:

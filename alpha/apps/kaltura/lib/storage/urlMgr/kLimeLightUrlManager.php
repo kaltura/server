@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage storage.LimeLight
+ */
 class kLimeLightUrlManager extends kUrlManager
 {
 	/**

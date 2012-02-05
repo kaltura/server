@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage storage
+ */
 class kLocalPathUrlManager extends kUrlManager
 {
 	/**
