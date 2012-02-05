@@ -52,6 +52,7 @@ class kmc4Action extends kalturaAction
 	/** load partner from DB, and set templatePartnerId **/
 		$this->partner = $partner = null;
 		$this->templatePartnerId = self::SYSTEM_DEFAULT_PARTNER;
+		$this->ignoreSeoLinks = $this->partner->getIgnoreSeoLinks();
 		if ($this->partner_id !== NULL)
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);

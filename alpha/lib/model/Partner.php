@@ -430,6 +430,9 @@ class Partner extends BasePartner
 	public function getTemplatePartnerId() { return $this->getFromCustomData("templatePartnerId", null, 0); }
 	public function setTemplatePartnerId( $v ) { $this->putInCustomData("templatePartnerId", (int)$v); } 
 	
+	public function getIgnoreSeoLinks() { return $this->getFromCustomData("ignoreSeoLinks", null, 0); }
+	public function setIgnoreSeoLinks( $v ) { $this->putInCustomData("ignoreSeoLinks", (int)$v); } 
+	
 	public function getLicensedJWPlayer() { return $this->getFromCustomData("licensedJWPlayer", null, 0); }
 	public function setLicensedJWPlayer( $v ) { $this->putInCustomData("licensedJWPlayer", (int)$v); } 
 
