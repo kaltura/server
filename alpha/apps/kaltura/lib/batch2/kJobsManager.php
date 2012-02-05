@@ -1053,7 +1053,7 @@ class kJobsManager
 	 * 
 	 * @return BatchJob
 	 */
-	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false)
+	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, $srcFileSyncLocalPath, $force = false, $dc = null)
 	{
 		KalturaLog::log(__METHOD__ . " entryId[$entryId], partnerId[$partnerId], externalStorage id[" . $externalStorage->getId() . "], fileSync id[" . $fileSync->getId() . "], srcFileSyncLocalPath[$srcFileSyncLocalPath]");
 		
@@ -1077,6 +1077,10 @@ class kJobsManager
 			$batchJob = new BatchJob();
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
+		}
+		if($dc)
+		{
+			$batchJob->setDc($dc);
 		}
 		
 		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
