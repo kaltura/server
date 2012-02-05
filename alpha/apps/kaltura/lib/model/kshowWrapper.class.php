@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.wrappers
+ */
 class kshowWrapper extends objectWrapperBase
 {
 	protected $basic_fields = array ( "id" , "name" , "partnerId" , "subpId" );

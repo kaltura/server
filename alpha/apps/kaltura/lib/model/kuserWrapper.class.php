@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.wrappers
+ */
 class kuserWrapper extends objectWrapperBase
 {
 	protected $basic_fields = array ( "id" , "screenName" , "partnerId"  );

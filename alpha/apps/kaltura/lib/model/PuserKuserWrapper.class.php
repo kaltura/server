@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.wrappers
+ */
 class PuserKuserWrapper extends objectWrapperBase
 {
 	// the PuserKuser id make more harm than good - 

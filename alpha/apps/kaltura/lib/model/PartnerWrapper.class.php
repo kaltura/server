@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Core
+ * @subpackage model.wrappers
+ */
 class PartnerWrapper extends objectWrapperBase
 {
 	// TODO - make sure is never called from an object - secret and admin secret will leak out!
