@@ -1078,7 +1078,7 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-		if($dc)
+		if(!is_null($dc))
 		{
 			$batchJob->setDc($dc);
 		}
