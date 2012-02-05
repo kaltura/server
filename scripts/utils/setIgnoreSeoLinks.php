@@ -20,6 +20,7 @@ $dbConf = kConf::getDB ();
 DbManager::setConfig ( $dbConf );
 DbManager::initialize ();
 
+$partnerId = null;
 if ( $argc == 3)
 {	
 	$partnerId = (int) $argv[1];
