@@ -56,6 +56,9 @@ class BatchService extends KalturaBaseService
 			if(!$entry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $bulkUploadResult->entryId);
 				
+			if($bulkUploadResult->thumbnailUrl)
+				$entry->setCreateThumb(false);
+				
 			$entry->setBulkUploadId($bulkUploadResult->bulkUploadJobId);
 			$entry->save();
 			
