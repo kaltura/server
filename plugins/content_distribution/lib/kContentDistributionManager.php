@@ -279,6 +279,7 @@ class kContentDistributionManager
  		$jobData->setMediaFiles($entryDistribution->getMediaFiles());
  		
 		$batchJob = new BatchJob();
+		$batchJob->setDc($dc);
 		$batchJob->setEntryId($entryDistribution->getEntryId());
 		$batchJob->setPartnerId($entryDistribution->getPartnerId());
 		
