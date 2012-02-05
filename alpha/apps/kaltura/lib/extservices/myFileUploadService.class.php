@@ -26,7 +26,7 @@ class myFileUploadService extends myBaseMediaSource implements IMediaSource
 		return array("maxFiles" => self::MAX_FILES );
 	}
 	
-	static $video_file_ext = array("flv","asf","qt","mov","mpg","mpeg","avi","wmv","mp4","m4v","3gp","vob","f4v","mkv","mxf");
+	static $video_file_ext = array("flv","asf","qt","mov","mpg","mpeg","avi","wmv","mp4","m4v","3gp","vob","f4v","mkv","mxf","mts");
 	static $image_file_ext = array("jpg","jpeg","bmp","png","gif","tif","tiff");
 	static $audio_file_ext = array("flv","asf","wmv","qt","mov","mpg","avi","mp3","wav","mp4","wma","3gp","vob","amr");
 		
