@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.audit
+ * @subpackage model.filters
+ */
 class AuditTrailFilter extends baseObjectFilter
 {
 	public function init ()
