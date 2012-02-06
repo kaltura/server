@@ -119,9 +119,9 @@ class KAsyncMailer extends KJobHandlerWorker
  				$data->mailType,
  				explode ( "|" , $data->subjectParams ) ,
  				explode ( "|" , $data->bodyParams ),
- 				$data->culture!= ''? $data->culture : 'en',
  				$data->fromEmail ,
  				$data->fromName,
+ 				$data->culture,
  				$data->isHtml);
 			
 	 		if ( $result )
@@ -147,7 +147,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 
-	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $culture, $fromemail , $fromname, $isHtml = false  )
+	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $culture = 'en', $isHtml = false  )
 	{
 		KalturaLog::debug(__METHOD__ . "($recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $culture, $fromemail , $fromname)");
 		
