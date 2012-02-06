@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.cuePoint
+ * @subpackage model.filters
+ */
 class CuePointFilter extends baseObjectFilter
 {
 	public function init ()
