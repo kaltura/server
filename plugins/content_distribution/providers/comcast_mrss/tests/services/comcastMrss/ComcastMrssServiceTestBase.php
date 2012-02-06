@@ -2,6 +2,9 @@
 
 /**
  * comcastMrss service base test case.
+ * @package plugins.comcastMrssDistribution
+ * @subpackage tests
+ * @abstract
  */
 abstract class ComcastMrssServiceTestBase extends KalturaApiTestCase
 {
