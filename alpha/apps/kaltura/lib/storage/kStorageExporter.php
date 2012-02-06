@@ -124,13 +124,17 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	{
 		if(!$this->shouldExport($key, $externalStorage))
 		{
-			KalturaLog::log(__METHOD__ . " no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
+			KalturaLog::log("no need to export key [$key] to externalStorage id[" . $externalStorage->getId() . "]");
 			return;
 		}
 			
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage);
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true);
+		if(!$fileSync){
+			KalturaLog::err("no ready fileSync was found for key [$key]");
+			return;
+		}
 		$parent_file_sync = kFileSyncUtils::resolve($fileSync);
 		$srcFileSyncPath = $parent_file_sync->getFileRoot() . $parent_file_sync->getFilePath();
 		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSyncPath, $force, $fileSync->getDc());
