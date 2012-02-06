@@ -1,6 +1,12 @@
 <?php
+/**
+ * @package Admin
+ */
 require_once(dirname(__FILE__) . '/../infra/kConf.php');
 
+/**
+ * @package Admin
+ */
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
 	protected $startTime;
