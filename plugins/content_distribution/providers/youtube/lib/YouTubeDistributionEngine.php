@@ -325,12 +325,14 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		if (!file_exists($fileLocation))
 		{
 			file_put_contents($fileLocation, $keyContent);
+			chmod($fileLocation, 0600);
 		}
 		else
 		{
 			if (file_get_contents($fileLocation) !== $keyContent) // if key was updated
 			{
 				file_put_contents($fileLocation, $keyContent);
+				chmod($fileLocation, 0600);
 			}
 		}
 		
