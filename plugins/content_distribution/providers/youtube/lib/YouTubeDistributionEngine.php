@@ -310,7 +310,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 		$loginName = $distributionProfile->sftpLogin;
 		$publicKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPublicKey, 'publickey');
 		$privateKeyFile = $this->getFileLocationForSFTPKey($distributionProfile->id, $distributionProfile->sftpPrivateKey, 'privatekey');
-		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP);
+		$sftpManager = kFileTransferMgr::getInstance(kFileTransferMgrType::SFTP_CMD);
 		$sftpManager->loginPubKey($serverUrl, $loginName, $publicKeyFile, $privateKeyFile);
 		return $sftpManager;
 	}
