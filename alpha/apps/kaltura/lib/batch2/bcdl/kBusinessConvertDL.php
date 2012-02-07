@@ -136,6 +136,13 @@ class kBusinessConvertDL
 		$entry->save();
 		
 		myEntryUtils::deleteEntry($tempEntry);
+		
+		$te = new TrackEntry();
+		$te->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_REPLACED_ENTRY);
+		$te->setEntryId($entry->getId());
+		$te->setParam1Str($tempEntry->getId());
+		$te->setDescription(__CLASS__ . ":" . __METHOD__ . "[" . __LINE__ . "]");
+		TrackEntry::addTrackEntry($te);
 	}
 	
 	public static function parseFlavorDescription(flavorParamsOutputWrap $flavor)

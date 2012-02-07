@@ -16,6 +16,7 @@ class TrackEntry extends BaseTrackEntry
 	const TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY = 4;
 	const TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY = 5;
 	const TRACK_ENTRY_EVENT_TYPE_DELETED_ENTRY = 6;
+	const TRACK_ENTRY_EVENT_TYPE_REPLACED_ENTRY = 7;
 	
 	public static function addTrackEntry ( TrackEntry $te )
 	{
