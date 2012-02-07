@@ -130,8 +130,6 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		switch($dbBatchJob->getStatus())
 		{
-			case BatchJob::BATCHJOB_STATUS_ABORTED: 
-				return kFlowHelper::handleBulkUploadAborted($dbBatchJob, $data, $twinJob);
 			case BatchJob::BATCHJOB_STATUS_FAILED: 
 			case BatchJob::BATCHJOB_STATUS_FATAL: 
 				return kFlowHelper::handleBulkUploadFailed($dbBatchJob, $data, $twinJob);
@@ -463,6 +461,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 			return true;
 			
+		if(
+			$object instanceof BatchJob
+			&&	$object->getType() == BatchJobType::BULKUPLOAD
+			&&	$object->getStatus() == BatchJob::BATCHJOB_STATUS_ABORTED
+			&&	in_array(BatchJobPeer::STATUS, $modifiedColumns)
+			&&	in_array($object->getColumnsOldValue(BatchJobPeer::STATUS), BatchJobPeer::getClosedStatusList())
+		)
+			return true;
+			
 		return false;
 	}
 
@@ -492,6 +499,21 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			return true;
 		}
 
+		if(
+			$object instanceof BatchJob
+			&&	$object->getType() == BatchJobType::BULKUPLOAD
+			&&	$object->getStatus() == BatchJob::BATCHJOB_STATUS_ABORTED
+			&&	in_array(BatchJobPeer::STATUS, $modifiedColumns)
+			&&	in_array($object->getColumnsOldValue(BatchJobPeer::STATUS), BatchJobPeer::getClosedStatusList())
+		)
+		{
+			$partner = $object->getPartner();
+			if($partner->getEnableBulkUploadNotificationsEmails())
+				kFlowHelper::sendBulkUploadNotificationEmail($object, MailType::MAIL_TYPE_BULKUPLOAD_ABORTED, array($partner->getAdminName(), $object->getId(), kFlowHelper::createBulkUploadLogUrl($object)));
+				
+			return true;
+		}
+			
 		if(
 			!($object instanceof flavorAsset)
 			||	!in_array(assetPeer::STATUS, $modifiedColumns)

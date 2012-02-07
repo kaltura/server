@@ -1286,20 +1286,7 @@ class kFlowHelper
 	public static function handleBulkUploadFinished(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
 	{
 		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 64, array($dbBatchJob->getPartner()->getAdminName(), $dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
-		return $dbBatchJob;
-	}
-
-	/**
-	 * @param BatchJob $dbBatchJob
-	 * @param kBulkUploadJobData $data
-	 * @param BatchJob $twinJob
-	 * @return BatchJob
-	 */
-	public static function handleBulkUploadAborted(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
-	{
-		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 66, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
+			self::sendBulkUploadNotificationEmail($dbBatchJob, MailType::MAIL_TYPE_BULKUPLOAD_FINISHED, array($dbBatchJob->getPartner()->getAdminName(), $dbBatchJob->getId(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
@@ -1311,8 +1298,8 @@ class kFlowHelper
 	 */
 	public static function handleBulkUploadFailed(BatchJob $dbBatchJob, kBulkUploadJobData $data, BatchJob $twinJob = null)
 	{
-	if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
-			self::sendBulkUploadNotificationEmail($dbBatchJob, 65, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
+		if ($dbBatchJob->getPartner()->getEnableBulkUploadNotificationsEmails())
+				self::sendBulkUploadNotificationEmail($dbBatchJob, MailType::MAIL_TYPE_BULKUPLOAD_FAILED, array($dbBatchJob->getPartner()->getAdminName(),$dbBatchJob->getId(), $dbBatchJob->getErrType(), $dbBatchJob->getErrNumber(), $dbBatchJob->getMessage(), self::createBulkUploadLogUrl($dbBatchJob)));
 		return $dbBatchJob;
 	}
 
