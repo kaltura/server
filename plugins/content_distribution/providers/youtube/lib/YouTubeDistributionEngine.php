@@ -322,12 +322,7 @@ class YouTubeDistributionEngine extends DistributionEngine implements
 	{
 		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
 		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation))
-		{
-			file_put_contents($fileLocation, $keyContent);
-			chmod($fileLocation, 0600);
-		}
-		elseif (file_get_contents($fileLocation) !== $keyContent) // if key was updated
+		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $keyContent))
 		{
 			file_put_contents($fileLocation, $keyContent);
 			chmod($fileLocation, 0600);
