@@ -123,6 +123,8 @@ class kBusinessPostConvertDL
 				
 		$currentReadyBehavior = self::getReadyBehavior($currentFlavorAsset, $profile);
 		KalturaLog::debug("Current ready behavior [$currentReadyBehavior]");
+		if($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE)
+			return;
 		
 		$rootBatchJob = null;
 		if($dbBatchJob)
