@@ -192,7 +192,26 @@ class myFileConverter
 		$return_value = "";
 
 		set_time_limit(120);
-		exec ( $exec_cmd , $output , $return_value );
+		$rv=exec ( $exec_cmd , $output , $return_value );
+		if($position<30 && isset($position_str)){
+			foreach($output as $outLine) {
+				if(strpos($outLine,"first frame not a keyframe")===false 
+				&& strpos($outLine,"first frame is no keyframe")===false)
+					continue;
+
+				KalturaLog::log("FFMpeg response - \n".print_r(implode($output),1));
+				KalturaLog::log("The ffmpeg responded with 'first-frame-not-a-keyframe'. The fast-seek mode failed to properly get the right frame. Switching to the 'slow-mode' that is limited to th3 first 30sec only ".print_r(implode($output),1));
+				$exec_cmd = kConversionEngineFfmpeg::getCmd() . " -i \"$source_file\"". $position_str  . " -an -y -r 1 " . $dimensions .
+					" " . " -vframes $frame_count -f \"" . $target_type . "\" " . "\"$target_file\"" . " 2>&1";
+				KalturaLog::log("fmpeg cmd [$exec_cmd]");
+				$output = array ();
+				$return_value = "";
+
+				set_time_limit(120);
+				$rv=exec ( $exec_cmd , $output , $return_value );
+				break;
+			}
+		}
 
 		$conversion_info = new conversionInfo();
 		$conversion_info->fillFromMetadata( $source_file );
