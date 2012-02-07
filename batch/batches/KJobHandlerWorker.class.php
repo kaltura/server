@@ -36,7 +36,17 @@ abstract class KJobHandlerWorker extends KBatchBase
 			return $this->init();
 		
 		if(is_null($jobs))
-			$jobs = $this->getJobs();
+		{
+			try
+			{
+				$jobs = $this->getJobs();
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err($e->getMessage());
+				return null;
+			}
+		}
 		
 		KalturaLog::info(count($jobs) . " jobs to handle");
 		
