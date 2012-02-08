@@ -193,7 +193,7 @@ class KalturaBaseEntry extends KalturaObject implements IFilterable
 	 * 
 	 * @var KalturaLicenseType
 	 */
-	public $licenseType = KalturaLicenseType::UNKNOWN;
+	public $licenseType;
 	
 	/**
 	 * Version of the entry data
