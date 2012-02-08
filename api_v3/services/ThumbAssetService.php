@@ -566,6 +566,21 @@ class ThumbAssetService extends KalturaAssetService
 		$destThumbParams = new thumbParams();
 		$thumbParams->toUpdatableObject($destThumbParams);
 
+		$srcAsset = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entryId);		
+		if (is_null($srcAsset))
+			throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY);
+		
+		$sourceFileSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET); 
+		list($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($sourceFileSyncKey,true);
+		if(is_null($fileSync))
+		{
+			throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY);
+		}
+		else if(!$local)
+		{
+			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
+		}
+		
 		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId, true);
 		if(!$dbThumbAsset)
 			return null;
