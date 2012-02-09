@@ -581,7 +581,7 @@ class ThumbAssetService extends KalturaAssetService
 			kFile::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
 		}
 		
-		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId, true);
+		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId, true , $srcAsset);
 		if(!$dbThumbAsset)
 			return null;
 			
