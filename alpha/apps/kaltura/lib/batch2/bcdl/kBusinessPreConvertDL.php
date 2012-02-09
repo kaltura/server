@@ -83,11 +83,11 @@ class kBusinessPreConvertDL
 	 */
 	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false , $srcAsset = null)
 	{
-		if (is_null($srcAsset))
+		if (is_null($srcAsset)){
 			$srcAsset = self::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entry->getId());
-		
-		if (is_null($srcAsset))
-			throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY);
+			if (is_null($srcAsset))
+				throw new APIException(APIErrors::FLAVOR_ASSET_IS_NOT_READY);
+		}
 			
 		$errDescription = null;
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
