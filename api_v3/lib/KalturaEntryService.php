@@ -588,6 +588,9 @@ class KalturaEntryService extends KalturaBaseService
 		// create a default name if none was given
 		if (!$entry->name)
 			$entry->name = $this->getPartnerId().'_'.time();
+			
+		if ($entry->licenseType === null)
+			$entry->licenseType = KalturaLicenseType::UNKNOWN;
 		
 		// first copy all the properties to the db entry, then we'll check for security stuff
 		if(!$dbEntry)
