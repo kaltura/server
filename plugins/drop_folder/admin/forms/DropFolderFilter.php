@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ */
 class Form_DropFolderFilter extends Form_PartnerIdFilter
 {
 	public function init()

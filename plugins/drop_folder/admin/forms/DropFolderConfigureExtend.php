@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ */
 class Form_DropFolderConfigureExtend_SubForm extends Zend_Form_SubForm
 {
 	public function init()

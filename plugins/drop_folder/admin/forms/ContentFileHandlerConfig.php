@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ */
 class Form_ContentFileHandlerConfig extends Infra_Form
 {
 	public function init()

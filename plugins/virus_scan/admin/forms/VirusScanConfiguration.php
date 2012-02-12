@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.virusScan
+ * @subpackage Admin
+ */
 class Form_Partner_VirusScanConfiguration extends Infra_Form
 {
 	public function init()

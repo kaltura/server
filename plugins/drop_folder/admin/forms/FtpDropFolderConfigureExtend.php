@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ */
 class Form_FtpDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureExtend_SubForm
 {
 	public function getTitle()

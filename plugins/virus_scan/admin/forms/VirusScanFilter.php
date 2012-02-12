@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.virusScan
+ * @subpackage Admin
+ */
 class Form_VirusScanFilter extends Form_PartnerIdFilter
 {
 	public function init()

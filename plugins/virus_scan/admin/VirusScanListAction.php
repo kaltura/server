@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.virusScan
+ * @subpackage Admin
+ */
 class VirusScanListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
 {
 	

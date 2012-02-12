@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ * @abstract
+ */
 abstract class Form_SshDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureExtend_SubForm
 {
 	public function init()

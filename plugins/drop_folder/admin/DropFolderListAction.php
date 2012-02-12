@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ */
 class DropFolderListAction extends KalturaAdminConsolePlugin implements IKalturaAdminConsolePublisherAction
 {
 	public function __construct()

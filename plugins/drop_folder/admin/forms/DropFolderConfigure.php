@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ */
 class Form_DropFolderConfigure extends Infra_Form
 {
 	protected $newPartnerId;

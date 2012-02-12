@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package plugins.dropFolder
+ * @subpackage Scheduler
+ */
 class DropFolderBatchUtils
 {
     

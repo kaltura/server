@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.dropFolder
+ * @subpackage Admin
+ */
 class DropFolderSetStatusAction extends KalturaAdminConsolePlugin
 {
 	

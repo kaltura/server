@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @package plugins.partnerAggregation
+ * @subpackage model.filters
+ */
 class DwhHourlyPartnerFilter extends baseObjectFilter
 {
 	public function init ()

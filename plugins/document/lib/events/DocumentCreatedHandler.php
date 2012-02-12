@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.document
+ * @subpackage lib
+ */
 class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAddedEventConsumer
 {
 	protected static $fileExtensions = array(

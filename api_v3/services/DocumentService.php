@@ -4,7 +4,9 @@
  * Document service
  *
  * @service document
- * @deprecated
+ * @package api
+ * @subpackage services
+ * @deprecated Use Documents instead
  */
 class DocumentService extends DocumentsService
 {

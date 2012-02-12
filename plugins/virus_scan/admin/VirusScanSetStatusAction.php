@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.virusScan
+ * @subpackage Admin
+ */
 class VirusScanSetStatusAction extends KalturaAdminConsolePlugin
 {
 	public function __construct()
