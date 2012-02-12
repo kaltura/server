@@ -43,33 +43,35 @@ class kBusinessPreConvertDL
 	 * @param string $entryId
 	 * @return flavorAsset
 	 */
-	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId){
-		$srcAsset = null;
+	private static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId)
+	{
 		if($sourceAssetId)
 		{
 			$srcAsset = assetPeer::retrieveById($sourceAssetId);
+			if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+				return $srcAsset;
 		}
-		else 
+		
+		if($sourceParamsId)
 		{
-			if($sourceParamsId)
-			{
-				KalturaLog::debug("Look for flavor params [" . $sourceParamsId . "]");
-				$srcAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $sourceParamsId);
-			}
-					
-			if(is_null($srcAsset))
-			{
-				KalturaLog::debug("Look for original flavor");
-				$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
-			}
-					
-			if (is_null($srcAsset) || $srcAsset->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-			{
-				KalturaLog::debug("Look for highest bitrate flavor");
-				$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
-			}
+			KalturaLog::debug("Look for flavor params [$sourceParamsId]");
+			$srcAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $sourceParamsId);
+			if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+				return $srcAsset;
 		}
-		return $srcAsset;
+					
+		KalturaLog::debug("Look for original flavor of entry [$entryId]");
+		$srcAsset = assetPeer::retrieveOriginalByEntryId($entryId);
+		if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			return $srcAsset;
+					
+			
+		KalturaLog::debug("Look for highest bitrate flavor of entry [$entryId]");
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
+		if($srcAsset && $srcAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
+			return $srcAsset;
+			
+		return null;
 	}
 	
 	
