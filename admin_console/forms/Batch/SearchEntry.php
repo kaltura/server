@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Jobs
+ */
 class Form_Batch_SearchEntry extends Form_Base
 {
     public function init()

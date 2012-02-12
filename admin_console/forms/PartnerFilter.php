@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_PartnerFilter extends Form_PartnerBaseFilter
 {
 	public function init()

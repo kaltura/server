@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 {
 	protected $limitType;

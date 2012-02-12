@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_PartnerCreate extends Infra_Form
 {	
 	public function init()

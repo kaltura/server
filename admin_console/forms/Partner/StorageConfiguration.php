@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_Partner_StorageConfiguration extends Infra_Form
 {
 	public function init()

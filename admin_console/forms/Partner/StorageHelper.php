@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_Partner_StorageHelper
 {
 	public static function addProtocolsToForm(Zend_Form $form)

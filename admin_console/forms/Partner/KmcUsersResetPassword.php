@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Users
+ */
 class Form_Partner_KmcUsersResetPassword extends Infra_Form
 {
 	public function init()

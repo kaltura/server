@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Widgets
+ */
 class Form_NewUIConf extends Zend_Form
 {
 	public function init()

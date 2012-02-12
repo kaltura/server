@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Reports
+ */
 class Form_Report extends Infra_Form
 {
 	public function init()

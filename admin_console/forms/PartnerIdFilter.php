@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_PartnerIdFilter extends Zend_Form
 {
 	public function init()

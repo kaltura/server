@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Admin
+ */
 class Form_Base extends Infra_Form
 {
 	protected $templatePath = null;

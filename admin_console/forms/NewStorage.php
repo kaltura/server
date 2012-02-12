@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_NewStorage extends Zend_Form
 {
 	public function init()

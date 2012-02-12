@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Widgets
+ */
 class Form_Widget extends Infra_Form
 {
 	public function init()

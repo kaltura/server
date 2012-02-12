@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Auth
+ */
 class Form_ResetPassword extends Zend_Form
 {
 	public function init()

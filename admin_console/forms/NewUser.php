@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Users
+ */
 class Form_NewUser extends Zend_Form
 {
 	public function init()

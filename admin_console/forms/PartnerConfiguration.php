@@ -1,5 +1,8 @@
 <?php 
-
+/**
+ * @package Admin
+ * @subpackage Partners
+ */
 class Form_PartnerConfiguration extends Infra_Form
 {    
 	const GROUP_ENABLE_DISABLE_FEATURES = 'GROUP_ENABLE_DISABLE_FEATURES';

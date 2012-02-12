@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @package Admin
+ * @subpackage Widgets
+ */
 class Form_WidgetFilter extends Form_PartnerIdFilter
 {
 	public function init()
