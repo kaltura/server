@@ -737,8 +737,7 @@ return array($genericWidget, $myspaceWidget);
 			// TODO - some good error -
 			// TODO - let's make a list of all errors we encounter and see how we use the I18N and built-in configuration mechanism to maintain the list
 			// and later on translate the errors.
-			ERROR::fatal ( 12345 ,
-			"Kshow with id [" .  $kshow_id . "] does not exist in the system. This is either an innocent mistake or you are a wicked bastard" );
+			// ERROR::fatal ( 12345 , "Kshow with id [" .  $kshow_id . "] does not exist in the system. This is either an innocent mistake or you are a wicked bastard" );
 			// TODO - think of our policy - what do we do if we notice what looks like an attemp to harm the system ?
 			// because the system is not stable, mistakes like this one might very possibly be innocent, but later on - what should happen in XSS / SQL injection /
 			// attemp to insert malformed data ?
@@ -750,9 +749,7 @@ return array($genericWidget, $myspaceWidget);
 		// 1. - it is produced by him or a template
 		if ( $existing_kshow->getProducerId() != $likuser_id )
 		{
-			ERROR::fatal ( 10101 ,
-			"User (with id [" . $likuser_id . "] is attempting to modify a kshow with id [$kshow_id] that does not belong to him (producer_id [" .
-			$existing_kshow->getProducerId() . "] !!" );
+			//ERROR::fatal ( 10101 , "User (with id [" . $likuser_id . "] is attempting to modify a kshow with id [$kshow_id] that does not belong to him (producer_id [" . $existing_kshow->getProducerId() . "] !!" );
 
 			return false;
 		}

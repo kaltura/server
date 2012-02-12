@@ -5,8 +5,3 @@ include_once( 'debugUtils.class.php');
 include_once( 'dateUtils.class.php');
 require_once( 'requestUtils.class.php');
 include_once( 'baseObjectUtils.class.php');
-include_once( 'ERROR.class.php');
-
-
-
-?>
