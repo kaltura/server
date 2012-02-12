@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
+ */
 class DailyMotionImpl
 {	
 	/**

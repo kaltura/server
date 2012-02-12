@@ -4,6 +4,9 @@
  * Provides access to the Dailymotion API.
  *
  * @author Olivier Poitrey <rs@dailymotion.com>
+ *
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
  */
 class Dailymotion
 {
@@ -704,8 +707,32 @@ class Dailymotion
     }
 }
 
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
+ */
 class DailymotionApiException extends Exception {}
+
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
+ */
 class DailymotionTransportException extends DailymotionApiException {}
+
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
+ */
 class DailymotionAuthException extends DailymotionApiException {public $error = null;}
+
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
+ */
 class DailymotionAuthRequiredException extends DailymotionAuthException {}
+
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
+ */
 class DailymotionAuthRefusedException extends DailymotionAuthException {}

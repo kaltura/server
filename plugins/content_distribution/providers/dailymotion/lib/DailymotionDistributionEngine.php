@@ -1,5 +1,10 @@
 <?php
+/**
+ * @package plugins.dailymotionDistribution
+ * @subpackage lib
+ */
 require_once 'DailymotionImpl.php';
+
 /**
  * @package plugins.dailymotionDistribution
  * @subpackage lib

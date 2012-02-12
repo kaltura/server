@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.contentDistribution 
+ * @subpackage Scheduler.Distribute
+ */
 interface IDistributionEngineCloseSubmit extends IDistributionEngine
 {
 	/**
