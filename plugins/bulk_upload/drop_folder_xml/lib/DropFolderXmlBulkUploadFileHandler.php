@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package dropFolder 
+ * @package plugins.dropFolderXmlBulkUpload
  * @subpackage Scheduler.fileHandlers
  */
 class DropFolderXmlBulkUploadFileHandler extends DropFolderFileHandler
