@@ -205,7 +205,7 @@ class HuluFeedHelper
 			if ($node->childNodes->length > 0 && $node->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE)
 				$node->childNodes->item(0)->nodeValue = $value;
 			else
-				$node->nodeValue = $value;
+				$node->nodeValue = htmlspecialchars($value);
 		}
 	}
 	
