@@ -220,7 +220,7 @@ class kMetadataManager
 		foreach($metadatas as $metadata)
 			$searchValues = self::getDataSearchValues($metadata, $searchValues);
 		
-		if(count($searchValues) && count($searchValues[$dataFieldName]))
+		if (isset($searchValues[$dataFieldName]))
 			$searchValues[$dataFieldName] = implode(' ', $searchValues[$dataFieldName]);
 		
 		return $searchValues;
