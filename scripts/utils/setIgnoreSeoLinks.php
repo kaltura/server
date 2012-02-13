@@ -16,6 +16,8 @@ KAutoloader::register();
 
 error_reporting ( E_ALL );
 
+KalturaLog::setLogger(new KalturaStdoutLogger());
+
 $dbConf = kConf::getDB ();
 DbManager::setConfig ( $dbConf );
 DbManager::initialize ();
