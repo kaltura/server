@@ -7,6 +7,7 @@ class ktagword {
 	const TOP_TAGS_TTL_SECONDS = 600; // top tags will be cached for 10 minutes
 	const ADMIN_TAGS_TTL_SECONDS = 600; // admin tags will be cached for 10 minutes
 	const TAG_SEPARATOR = ",";
+	const MAXIMUM_TAG_LENGTH = 100;
 
 	static protected $cache;
 
@@ -37,7 +38,7 @@ class ktagword {
 			$tagword = strtolower  ( trim ( $tagword ) );
 			if (strlen($tagword) >= 2)  // check only words with 2 chars or more
 			{
-				$fixed_tag = substr ( $tagword , 0 , 30 ); // make sure not to let strings longer than the size in the DB
+				$fixed_tag = substr ( $tagword , 0 , self::MAXIMUM_TAG_LENGTH ); // make sure not to let strings longer than the size in the DB
 
 				// remove duplicates
 				if ( ! in_array ( $fixed_tag , $validTagwords ))
