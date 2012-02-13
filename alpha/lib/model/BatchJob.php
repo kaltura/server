@@ -160,13 +160,14 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 				
                 if ($this->getEntryId())
                 {
-                	$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($this->getEntryId());
-                    if ($flavorAsset)
+               		$srcflavorAsset = assetPeer::retrieveOriginalReadyByEntryId($this->getEntryId());
+                    if ($srcflavorAsset)
                     {
-                    	$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-                    	$flavorFileSync = kFileSyncUtils::getOriginFileSyncForKey($flavorSyncKey, false);
-                    	if ($flavorFileSync && in_array($flavorFileSync->getDc(), kDataCenterMgr::getDcIds()))
-                    		$dc = $flavorFileSync->getDc();
+                    	$srcFlavorSyncKey = $srcflavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+						// if the file sync is ready in the local datacenter, use it
+						list($srcflavorFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcFlavorSyncKey, true, false);
+						if (!$local && $srcflavorFileSync)
+							$dc = $srcflavorFileSync->getDc();                  	
                     }
                     else
                     {
