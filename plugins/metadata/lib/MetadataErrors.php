@@ -22,4 +22,6 @@ class MetadataErrors extends KalturaErrors
 	const METADATA_ALREADY_EXISTS = "METADATA_ALREADY_EXISTS,Metadata already exists id [%s]";
 	
 	const EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT = "EXCEEDED_ADDITIONAL_SEARCHABLE_FIELDS_LIMIT,exceeded number of account searchable int/date fields, allowed number is [%d]";
+	
+	const XSLT_VALIDATION_ERROR = "XSLT_VALIDATION_ERROR,XSLT validation error [%s]";
 }

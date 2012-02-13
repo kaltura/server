@@ -444,7 +444,7 @@ class MetadataService extends KalturaBaseService
         
         if (!empty($xsltErrors))
         {
-        	throw new KalturaAPIException("XSLT_VALIDATION_ERROR,XSLT validation error [%s]", implode(',', $xsltErrors));
+        	throw new KalturaAPIException(MetadataErrors::XSLT_VALIDATION_ERROR, implode(',', $xsltErrors));
         }
         
         if ($xmlDataTransformed)
