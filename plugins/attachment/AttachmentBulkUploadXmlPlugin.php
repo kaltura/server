@@ -79,7 +79,7 @@ class AttachmentBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPen
 	
 	<xs:complexType name="T_attachment">
 		<xs:sequence>
-			<xs:element name="tags" minOccurs="1" maxOccurs="1" type="T_tags">
+			<xs:element name="tags" minOccurs="0" maxOccurs="1" type="T_tags">
 				<xs:annotation>
 					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
 				</xs:annotation>
