@@ -463,7 +463,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			
 		if(
 			$object instanceof BatchJob
-			&&	$object->getType() == BatchJobType::BULKUPLOAD
+			&&	$object->getJobType() == BatchJobType::BULKUPLOAD
 			&&	$object->getStatus() == BatchJob::BATCHJOB_STATUS_ABORTED
 			&&	in_array(BatchJobPeer::STATUS, $modifiedColumns)
 			&&	in_array($object->getColumnsOldValue(BatchJobPeer::STATUS), BatchJobPeer::getClosedStatusList())
