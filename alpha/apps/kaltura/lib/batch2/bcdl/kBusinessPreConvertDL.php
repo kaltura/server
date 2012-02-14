@@ -888,6 +888,17 @@ class kBusinessPreConvertDL
 				
 			$conversionProfileFlavorParamsItem = $conversionProfileFlavorParams[$flavor->getId()];
 			
+			// if flavor is not source, apply dynamic attributes defined for id -2 (all flavors)
+			if(!$flavor->hasTag(flavorParams::TAG_SOURCE))
+			{
+    			if(isset($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX]))
+    			{
+    				foreach($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX] as $attributeName => $attributeValue)
+    					$flavor->setDynamicAttribute($attributeName, $attributeValue);
+    			}
+			}
+
+			// overwrite dynamic attributes if defined for this specific flavor
 			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
 			{
 				foreach($dynamicFlavorAttributes[$flavor->getId()] as $attributeName => $attributeValue)
@@ -1113,7 +1124,15 @@ class kBusinessPreConvertDL
 				unset($flavors[$index]);
 				continue;
 			}
-				
+
+			// if flavor is not source (checked above), apply dynamic attributes defined for id -2 (all flavors)
+			if(isset($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX]))
+			{
+				foreach($dynamicFlavorAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX] as $attributeName => $attributeValue)
+					$flavor->setDynamicAttribute($attributeName, $attributeValue);
+			}
+    			
+			// overwrite dynamic attributes if defined for this specific flavor
 			if(isset($dynamicFlavorAttributes[$flavor->getId()]))
 			{
 				foreach($dynamicFlavorAttributes[$flavor->getId()] as $attributeName => $attributeValue)

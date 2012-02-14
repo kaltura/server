@@ -23,6 +23,7 @@ class flavorParams extends assetParams
 	}
 	
 	const SOURCE_FLAVOR_ID = 0;
+	const DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX = -2; // "flavor params id" that will identify dynamic attributes that should apply for all flavors except for source
 	
 	const VIDEO_CODEC_NONE = "";
 	const VIDEO_CODEC_VP6 = "vp6";
