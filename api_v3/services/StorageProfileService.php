@@ -124,4 +124,29 @@ class StorageProfileService extends KalturaBaseService
 		$response->objects = KalturaStorageProfileArray::fromStorageProfileArray($list);
 		return $response;
 	}
+	
+	/**
+	 * Action for manually exporting an entry
+	 * @param $entryId - entry ID string
+	 * @param $storageProfileId - storage profile ID to export to
+	 */
+	public function exportEntryAction ( $entryId , $storageProfileId)
+	{
+	    $baseEntryService = new BaseEntryService();
+	    
+	    return $baseEntryService->exportAction ($entryId , $storageProfileId);
+	    
+	}
+	
+	/**
+	 * Action for manually exporting an asset
+	 * @param $assetId - asset ID string
+	 * @param $storageProfileId - storage profile ID to export to
+	 */
+	public function exportAssetAction ( $assetId , $storageProfileId)
+	{
+        $assetService = new KalturaAssetService();
+        
+        return $assetService->exportAction($assetId, $storageProfileId);
+	}
 }

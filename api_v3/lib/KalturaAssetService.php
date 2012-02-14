@@ -79,4 +79,40 @@ class KalturaAssetService extends KalturaBaseService
 		
 		return $this->serveFile($asset, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileName, $forceProxy);
 	}
+	
+	/**
+	 * Action for manually exporting an asset
+	 * @param $assetId - asset ID string
+	 * @param $storageProfileId - storage profile ID to export to
+	 */
+	public function exportAction ( $assetId , $storageProfileId )
+	{
+	    if (!$assetId || $assetId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
+	    }
+	    
+	    if (!$storageProfileId || $storageProfileId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
+	    }
+	    
+	    $asset = entryPeer::retrieveByPK($assetId);
+	    
+	    $storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    
+	    if (!$asset)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $assetId);
+	    }
+	    
+	    if (!$storageProfile)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
+	    }
+	    
+	    kStorageExporter::exportEntry($asset, $storageProfile);
+	    
+	    return $asset;
+	}
 }

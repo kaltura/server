@@ -808,4 +808,40 @@ class BaseEntryService extends KalturaEntryService
 		return $result;
 	}
 	
+	/**
+	 * Action for manually exporting an entry
+	 * @param $entryId - entry ID string
+	 * @param $storageProfileId - storage profile ID to export to
+	 */
+	public function exportAction ( $entryId , $storageProfileId )
+	{
+	    if (!$entryId || $entryId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
+	    }
+	    
+	    if (!$storageProfileId || $storageProfileId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, -1);
+	    }
+	    
+	    $entry = entryPeer::retrieveByPK($entryId);
+	    
+	    $storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    
+	    if (!$entry)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+	    }
+	    
+	    if (!$storageProfile)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
+	    }
+	    
+	    kStorageExporter::exportEntry($entry, $storageProfile);
+	    
+	    return $entry;
+	    
+	}
 }
