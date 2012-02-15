@@ -209,21 +209,21 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(AttUverseDistributionField::ITEM_METADATA_SHORT_TITLE);
 	    $fieldConfig->setUserFriendlyFieldName('metadata short title');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/AttUverseShortTitle" />');
-	 //   $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(AttUverseDistributionField::ITEM_METADATA_TUNEIN);
 	    $fieldConfig->setUserFriendlyFieldName('metadata tunein');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/AttUverseTunein" />');
-	  //  $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
 	    $fieldConfig->setFieldName(AttUverseDistributionField::ITEM_METADATA_CONTENT_RATING);
 	    $fieldConfig->setUserFriendlyFieldName('metadata content rating');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/AttUverseContentRating" />');
-	  //  $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    $fieldConfig = new DistributionFieldConfig();
@@ -237,7 +237,7 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 	    $fieldConfig->setFieldName(AttUverseDistributionField::ITEM_METADATA_GENRE);
 	    $fieldConfig->setUserFriendlyFieldName('metadata genre');
 	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="customData/metadata/AttUverseGenre" />');
-	   // $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    return $fieldConfigArray;
