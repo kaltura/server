@@ -611,18 +611,27 @@ class kContentDistributionManager
 					KalturaLog::log($errDescription);
 			}
 		
-			if($validationError->getErrorType() == DistributionErrorType::MISSING_THUMBNAIL && in_array($validationError->getData(), $autoCreateThumbs))
+		    if($validationError->getErrorType() == DistributionErrorType::MISSING_THUMBNAIL && count($autoCreateThumbs))
 			{
-				$destThumbParams = assetParamsPeer::retrieveByPK($validationError->getData());
-				if($destThumbParams)
-				{
-					KalturaLog::log("Adding thumbnail [" . $validationError->getData() . "] to entry [" . $entryDistribution->getEntryId() . "]");
-					kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams);
-				}
-				else 
-				{
-					KalturaLog::err("Required thumbnail params not found [" . $validationError->getData() . "]");
-				}	
+			    $requiredDimensions = explode('x', $validationError->getData());
+			    $foundThumbParams = false;
+			    foreach ($autoCreateThumbs as $autoCreateThumb)
+			    {
+			        $thumbParams = assetParamsPeer::retrieveByPK($autoCreateThumb);
+			        
+			        if ($thumbParams->getWidth() == (int)$requiredDimensions[0] && $thumbParams->getHeight() == (int)$requiredDimensions[1])
+			        {
+			            $foundThumbParams = true;
+			            KalturaLog::log("Adding thumbnail [" . $autoCreateThumb . "] to entry [" . $entryDistribution->getEntryId() . "]");
+					    kBusinessPreConvertDL::decideThumbGenerate($entry, $thumbParams); 
+					    break;
+			        }
+			    }
+			    
+			    if (!$foundThumbParams)
+			    {
+			        KalturaLog::err("Required thumbnail params not found [" . $validationError->getData() . "]");
+			    }
 			}
 		}
 		
