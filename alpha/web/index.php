@@ -4,6 +4,8 @@ require_once(dirname(__FILE__).'/../../infra/kConf.php');
  
 function checkCache()
 {
+	$baseDir = "/tmp/cache_v2";
+
 	$start_time = microtime(true);
 
 	$uri = $_SERVER["REQUEST_URI"];
@@ -36,7 +38,7 @@ function checkCache()
 		$keys = array_keys($params);
 		$key = md5(implode("|", $params).implode("|", $keys));
 
-		$cache_filename = "/tmp/cache-$key";
+		$cache_filename = "$baseDir/cache-$key";
 
 		if (file_exists($cache_filename))
 		{
@@ -48,11 +50,11 @@ function checkCache()
 			}
             else
             {
-            	$content_type = @file_get_contents("/tmp/cache-$key.headers");
+            	$content_type = @file_get_contents("$baseDir/cache-$key.headers");
 				if ($content_type)
 					header("Content-Type: $content_type");
 					
-            	$response = @file_get_contents("/tmp/cache-$key");
+            	$response = @file_get_contents("$baseDir/cache-$key");
                 if ($response)
                 {
                 	header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
