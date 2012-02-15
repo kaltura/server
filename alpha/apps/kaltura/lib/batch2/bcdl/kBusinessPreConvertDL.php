@@ -43,7 +43,7 @@ class kBusinessPreConvertDL
 	 * @param string $entryId
 	 * @return flavorAsset
 	 */
-	private static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId)
+	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId)
 	{
 		if($sourceAssetId)
 		{
