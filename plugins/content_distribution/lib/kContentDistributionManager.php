@@ -581,7 +581,7 @@ class kContentDistributionManager
 				$returnValue = self::addSubmitAddJob($entryDistribution, $distributionProfile);
 		}
 		
-		if($submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
+		if(!$returnValue && $submitWhenReady && $entryDistribution->getStatus() != EntryDistributionStatus::QUEUED)
 		{
 			$entryDistribution->setStatus(EntryDistributionStatus::QUEUED);
 			$entryDistribution->save();
