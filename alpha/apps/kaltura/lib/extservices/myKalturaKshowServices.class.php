@@ -152,6 +152,7 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 				//$entry = $obj->getEntry();
 				$entry = $obj;
 			}
+			/* @var $entry entry */
 			
 			// use the id as the url - it will help using this entry id in addentry
 			$object = array ( "id" => $entry->getId() ,
@@ -159,6 +160,7 @@ class myKalturaKshowServices extends myBaseMediaSource implements IMediaSource
 				"tags" => $entry->getTags() ,
 				"title" => $entry->getName() , 
 				"description" => $entry->getTags() ,
+				"flash_playback_type" => $entry->getMediaTypeName() ,
 //				"partnerId" => $entry->getPartnerId() 
 			);
 				

@@ -96,12 +96,15 @@ class myKalturaUserClipsServices extends myBaseMediaSource implements IMediaSour
 			$should_add_thumbs = $media_type != entry::ENTRY_MEDIA_TYPE_AUDIO;
 			foreach ( $entry_results as $entry )
 			{
+				/* @var $entry entry */
 				// send the id as the url
 				$object = array ( "id" => $entry->getId() ,
 					"url" => $entry->getDataUrl() , 
 					"tags" => $entry->getTags() ,
 					"title" => $entry->getName() , 
-					"description" => $entry->getDescription() );
+					"description" => $entry->getDescription() ,
+					"flash_playback_type" => $entry->getMediaTypeName() , 
+				);
 					
 				if ( $should_add_thumbs )
 				{

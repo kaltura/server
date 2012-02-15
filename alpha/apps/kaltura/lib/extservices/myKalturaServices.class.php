@@ -142,6 +142,7 @@ class myKalturaServices extends myBaseMediaSource implements IMediaSource
 		$should_add_thumbs = $media_type != entry::ENTRY_MEDIA_TYPE_AUDIO;
 		foreach ( $entry_results as $entry )
 		{
+			/* @var $entry entry */
 			// use the id as the url - it will help using this entry id in addentry
 			$object = array ( "id" => $entry->getId() ,
 				"url" => $entry->getDataUrl() , 
