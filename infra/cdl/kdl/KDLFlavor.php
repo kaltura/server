@@ -208,6 +208,37 @@ KalturaLog::log(__METHOD__."==>\n");
 		KalturaLog::log( ".TRG-->".$this->ToString());
 		$rv = $product->ValidateFlavor();
 
+		if($source){
+			$srcVid = $source->_video;
+			$srcAud = $source->_audio;
+			$srcCont = $source->_container;
+		}
+		else {
+			$srcVid = null;
+			$srcAud = null;
+			$srcCont =null;
+		}
+		
+		/*
+		 * Evaluate source duration, to be used to check the product duration validity 
+		 */
+$plannedDur = 0;
+		{
+			if($this->_clipDur && $this->_clipDur>0){
+				$plannedDur = $this->_clipDur;
+				$vDur = $plannedDur;
+				$aDur = $plannedDur;
+				$cDur = $plannedDur;
+
+			}
+			else {
+				$vDur = isset($srcVid)? $srcVid->_duration: 0;
+				$aDur = isset($srcAud)? $srcAud->_duration: 0;
+				$cDur = isset($srcCont)? $srcCont->_duration: 0;
+				$plannedDur = max(max($aDur, $vDur),$cDur);
+			}
+		}
+
 		if($this->_video!==null) {
 			if($product->_video===null){
 				$product->_errors[KDLConstants::VideoIndex][] = KDLErrors::ToString(KDLErrors::MissingMediaStream);
@@ -216,13 +247,8 @@ KalturaLog::log(__METHOD__."==>\n");
 			else {
 				$prdVid = $product->_video;
 				$trgVid = $this->_video;
-				if($source) $srcVid = $source->_video;
-				else $srcVid = null;
-				if($srcVid){
-					if($this->_clipDur && $this->_clipDur>0)
-						$plannedDur = $this->_clipDur;
-					else
-						$plannedDur = $srcVid->_duration;
+
+				if($plannedDur>0){
 					if($prdVid->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdVid->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
 						$product->_errors[KDLConstants::VideoIndex][] = // Invalid product duration
@@ -235,7 +261,7 @@ KalturaLog::log(__METHOD__."==>\n");
 					}
 				}
 				
-				if($prdVid->_bitRate<$trgVid->_bitRate*KDLConstants::ProductBitrateFactor) {
+				if(isset($srcVid) && $prdVid->_bitRate<$trgVid->_bitRate*KDLConstants::ProductBitrateFactor) {
 					$product->_warnings[KDLConstants::VideoIndex][] = // "Product bitrate too low - ".$prdVid->_bitRate."kbps, required - ".$trgVid->_bitRate."kbps.";
 					KDLWarnings::ToString(KDLWarnings::ProductLowBitrate, $prdVid->_bitRate, $srcVid->_bitRate);
 				}
@@ -250,14 +276,8 @@ KalturaLog::log(__METHOD__."==>\n");
 			else {
 				$prdAud = $product->_audio;
 				$trgAud = $this->_audio;
-				if($source) $srcAud = $source->_audio;
-				else $srcAud = null;
 				
-				if($srcAud){ 
-					if($this->_clipDur && $this->_clipDur>0)
-						$plannedDur = $this->_clipDur;
-					else
-						$plannedDur = $srcAud->_duration;
+				if($plannedDur){ 
 					if($prdAud->_duration<$plannedDur*KDLSanityLimits::MinDurationFactor 
 					|| $prdAud->_duration>$plannedDur*KDLSanityLimits::MaxDurationFactor) {
 						$product->_errors[KDLConstants::AudioIndex][] = // Invalid product duration 
@@ -269,7 +289,7 @@ KalturaLog::log(__METHOD__."==>\n");
 						KDLWarnings::ToString(KDLWarnings::ProductShortDuration, $prdAud->_duration, $plannedDur);
 					}
 				}
-				if($prdAud->_bitRate<$trgAud->_bitRate*KDLConstants::ProductBitrateFactor) {
+				if(isset($srcAud) && $prdAud->_bitRate<$trgAud->_bitRate*KDLConstants::ProductBitrateFactor) {
 					$product->_warnings[KDLConstants::AudioIndex][] = // "Product bitrate too low - ".$prdAud->_bitRate."kbps, required - ".$trgAud->_bitRate."kbps.";
 					KDLWarnings::ToString(KDLWarnings::ProductLowBitrate, $prdAud->_bitRate, $srcAud->_bitRate);
 				}
