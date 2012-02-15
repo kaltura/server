@@ -613,16 +613,16 @@ class kContentDistributionManager
 		
 		    if($validationError->getErrorType() == DistributionErrorType::MISSING_THUMBNAIL && count($autoCreateThumbs))
 			{
-			    $requiredDimensions = explode('x', $validationError->getData());
+			    list($requiredWidth, $requiredHeight) = explode('x', $validationError->getData());
 			    $foundThumbParams = false;
-			    foreach ($autoCreateThumbs as $autoCreateThumb)
+			    $thumbParamsObjects = assetParamsPeer::retrieveByPKs($autoCreateThumbs);
+			    foreach ($thumbParamsObjects as $thumbParams)
 			    {
-			        $thumbParams = assetParamsPeer::retrieveByPK($autoCreateThumb);
-			        
-			        if ($thumbParams->getWidth() == (int)$requiredDimensions[0] && $thumbParams->getHeight() == (int)$requiredDimensions[1])
+			    	/* @var $thumbParams thumbParams */
+			        if ($thumbParams->getWidth() == intval($requiredWidth) && $thumbParams->getHeight() == intval($requiredHeight))
 			        {
 			            $foundThumbParams = true;
-			            KalturaLog::log("Adding thumbnail [" . $autoCreateThumb . "] to entry [" . $entryDistribution->getEntryId() . "]");
+			            KalturaLog::log("Adding thumbnail [" . $thumbParams->getId() . "] to entry [" . $entryDistribution->getEntryId() . "]");
 					    kBusinessPreConvertDL::decideThumbGenerate($entry, $thumbParams); 
 					    break;
 			        }
