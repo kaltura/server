@@ -663,7 +663,7 @@ class kContentDistributionManager
 		}	
 		
 		$requiredFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
-		$optionalFlavorParamsIds = $distributionProfile->getRequiredFlavorParamsIdsArray();
+		$optionalFlavorParamsIds = $distributionProfile->getOptionalFlavorParamsIdsArray();
 		$flavorParamsIds = array_merge($requiredFlavorParamsIds, $optionalFlavorParamsIds);
 		$flavorAssetIds = array();
 		if(!is_array($flavorParamsIds))

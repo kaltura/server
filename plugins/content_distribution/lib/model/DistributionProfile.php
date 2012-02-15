@@ -237,6 +237,18 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	}
 	
 	/**
+	 * @see content_distribution/lib/model/om/BaseDistributionProfile#getOptionalFlavorParamsIds()
+	 * @return array
+	 */
+	public function getOptionalFlavorParamsIdsArray()
+	{
+		if(is_null($this->getOptionalFlavorParamsIds()) || !strlen($this->getOptionalFlavorParamsIds()))
+			return array();
+			
+		return explode(',', $this->getOptionalFlavorParamsIds());
+	}
+	
+	/**
 	 * @see content_distribution/lib/model/om/BaseDistributionProfile#setRequiredFlavorParamsIdsArray()
 	 */
 	public function setRequiredFlavorParamsIdsArray(array $v)
