@@ -154,6 +154,17 @@ abstract class BasePartnerStats extends BaseObject  implements Persistent {
 	{
 		return $this->oldColumnsValues;
 	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
+	}
 
 	/**
 	 * Get the [partner_id] column value.

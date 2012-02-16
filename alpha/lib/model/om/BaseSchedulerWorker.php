@@ -133,6 +133,17 @@ abstract class BaseSchedulerWorker extends BaseObject  implements Persistent {
 	{
 		return $this->oldColumnsValues;
 	}
+	
+	/**
+	 * @return mixed field value or null
+	 */
+	public function getColumnsOldValue($name)
+	{
+		if(isset($this->oldColumnsValues[$name]))
+			return $this->oldColumnsValues[$name];
+			
+		return null;
+	}
 
 	/**
 	 * Applies default values to this object.
