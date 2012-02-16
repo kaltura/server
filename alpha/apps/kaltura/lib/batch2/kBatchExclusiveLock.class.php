@@ -371,7 +371,7 @@ class kBatchExclusiveLock
 		if(!$db_object)
 			throw new APIException(APIErrors::FREE_EXCLUSIVE_JOB_FAILED, $id, $lockKey->getSchedulerId(), $lockKey->getWorkerId(), $lockKey->getBatchIndex());
 		
-		if($resetExecutionAttempts)
+		if($resetExecutionAttempts || in_array($db_object->getStatus(), BatchJobPeer::getClosedStatusList()))
 			$db_object->setExecutionAttempts(0);
 			
 		$db_object->setSchedulerId( null );
