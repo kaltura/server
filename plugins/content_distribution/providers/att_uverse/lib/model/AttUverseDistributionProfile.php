@@ -38,7 +38,7 @@ class AttUverseDistributionProfile extends ConfigurableDistributionProfile
 		}
 		
 		$validationErrors = array_merge($validationErrors, $this->validateMaxLength($maxLengthFields, $allFieldValues, $action));
-		$validationErrors = array_merge($validationErrors, $this->validateThumbnailExist($entryDistribution, $action));
+		//$validationErrors = array_merge($validationErrors, $this->validateThumbnailExist($entryDistribution, $action));
 									
 		return $validationErrors;
 	}

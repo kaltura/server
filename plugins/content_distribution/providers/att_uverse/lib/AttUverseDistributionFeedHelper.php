@@ -179,16 +179,17 @@ class AttUverseDistributionFeedHelper
 		$this->addCategories($item, $values[AttUverseDistributionField::ITEM_CATEGORIES]);
 
 		//content
-		if (!is_null($flavorAssets) && is_array($flavorAssets) && count($flavorAssets)>0)
+		if (!is_null($flavorAssets) && is_array($flavorAssets))
 		{
 			$this->setFlavorAsset($item, $flavorAssets, $remoteAssetFileUrls);
 		}
 		
 		//thumbnail
-		if (!is_null($thumbAssets) && is_array($thumbAssets) && count($thumbAssets)>0)
+		if (!is_null($thumbAssets) && is_array($thumbAssets))
 		{
 			$this->setThumbAsset($item, $thumbAssets, $remoteThumbailFileUrls);			
-		}	
+		}
+	
 		
 		//metadata fields
 		$this->setNodeValue('customData/metadata/ShortTitle', $values[AttUverseDistributionField::ITEM_METADATA_SHORT_TITLE], $item);
@@ -251,10 +252,10 @@ class AttUverseDistributionFeedHelper
 	 * @param array $remoteAssetFileUrls
 	 */
 	public function setFlavorAsset($item, array $flavorAssets, $remoteAssetFileUrls)
-	{			
+	{	
+		$node = $this->xpath->query('content', $item)->item(0);		
 		if(count($flavorAssets))
-		{
-			$node = $this->xpath->query('content', $item)->item(0);
+		{			
 			foreach ($flavorAssets as $flavorAsset)
 			{				
 				/* @var $flavorAsset flavorAsset */
@@ -270,10 +271,9 @@ class AttUverseDistributionFeedHelper
 				$this->setNodeValue('@url', $url, $contentNode);
 				$this->setNodeValue('@height', $flavorAsset->getHeight(), $contentNode);
 				$this->setNodeValue('@width',$flavorAsset->getWidth() ,$contentNode);
-				$this->setNodeValue('@url', $url, $contentNode);
-			}
-			$node->parentNode->removeChild($node);
+			}			
 		}
+		$node->parentNode->removeChild($node);
 	}
 	
 	/**
@@ -283,9 +283,9 @@ class AttUverseDistributionFeedHelper
 	 */
 	public function setThumbAsset($item, array $thumbAssets, $remoteThumbailFileUrls)
 	{
+		$node = $this->xpath->query('thumbnail', $item)->item(0);
 		if(count($thumbAssets))
-		{				
-			$node = $this->xpath->query('thumbnail', $item)->item(0);						
+		{										
 			foreach ($thumbAssets as $thumbAsset)
 			{
 				/* @var $thumbAsset thumbAsset */ 			
@@ -300,9 +300,9 @@ class AttUverseDistributionFeedHelper
 				$this->setNodeValue('@url', $url, $thumbnailNode);
 				$this->setNodeValue('@height', $thumbAsset->getHeight(), $thumbnailNode);
 				$this->setNodeValue('@width',$thumbAsset->getWidth() ,$thumbnailNode);
-			}
-			$node->parentNode->removeChild($node);	
-		}	
+			}			
+		}
+		$node->parentNode->removeChild($node);		
 	}
 	
 	public function getXml()

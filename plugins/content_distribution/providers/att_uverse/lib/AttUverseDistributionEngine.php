@@ -70,11 +70,14 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 		//upload video to FTP
 		$remoteAssetFileUrls = array();
 		$assetLocalPathsArray = unserialize($providerData->assetLocalPaths);
-		foreach ($assetLocalPathsArray as $assetId => $assetLocalPath)
+		if ($assetLocalPathsArray)
 		{
-			$videoDestFilePath = $this->getRemoteFilePath($assetLocalPath, $distributionProfile->ftpPath);			
-			$this->uploadAssetsFiles($ftpManager, $videoDestFilePath, $assetLocalPath);			
-			$remoteAssetFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$videoDestFilePath;			
+			foreach ($assetLocalPathsArray as $assetId => $assetLocalPath)
+			{
+				$videoDestFilePath = $this->getRemoteFilePath($assetLocalPath, $distributionProfile->ftpPath);			
+				$this->uploadAssetsFiles($ftpManager, $videoDestFilePath, $assetLocalPath);			
+				$remoteAssetFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$videoDestFilePath;			
+			}
 		}
 		//save flavor assets on provider data to use in the service				
 		$providerData->remoteAssetFileUrls = serialize($remoteAssetFileUrls);
@@ -82,11 +85,14 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 		//upload thumbnail to FTP
 		$remoteThumbnailFileUrls = array();
 		$thumbLocalPathsArray = unserialize($providerData->thumbLocalPaths);
-		foreach ($thumbLocalPathsArray as $assetId => $thumbLocalPath)
+		if ($thumbLocalPathsArray)
 		{
-			$thumbnailDestFilePath = $this->getRemoteFilePath($thumbLocalPath, $distributionProfile->ftpPath);
-			$this->uploadAssetsFiles($ftpManager, $thumbnailDestFilePath, $thumbLocalPath);				
-			$remoteThumbnailFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$videoDestFilePath;			
+			foreach ($thumbLocalPathsArray as $assetId => $thumbLocalPath)
+			{
+				$thumbnailDestFilePath = $this->getRemoteFilePath($thumbLocalPath, $distributionProfile->ftpPath);
+				$this->uploadAssetsFiles($ftpManager, $thumbnailDestFilePath, $thumbLocalPath);				
+				$remoteThumbnailFileUrls[$assetId] = 'ftp://'.$distributionProfile->ftpHost.'/'.$thumbnailDestFilePath;			
+			}
 		}
 		//save thumnail assets on provider data to use in the service
 		$providerData->remoteThumbnailFileUrls = serialize($remoteThumbnailFileUrls);
