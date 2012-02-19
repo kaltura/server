@@ -109,7 +109,7 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		$data->flavorParamsOutput = $this->kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
-		if($this->taskConfig->params->isRemote)
+		if($this->taskConfig->params->isRemoteOutput)
 			$job->lastWorkerRemote = true;
 			
 		$data->actualSrcFileSyncLocalPath = $this->translateSharedPath2Local($data->srcFileSyncLocalPath);
@@ -162,7 +162,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			}
 		}
 		
-		if($this->taskConfig->params->isRemote || !strlen(trim($data->actualSrcFileSyncLocalPath))) // for distributed conversion
+		if($this->taskConfig->params->isRemoteInput || !strlen(trim($data->actualSrcFileSyncLocalPath))) // for distributed conversion
 		{
 			if(!strlen(trim($data->actualSrcFileSyncLocalPath)))
 				$data->actualSrcFileSyncLocalPath = $this->taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($data->srcFileSyncRemoteUrl);
@@ -247,7 +247,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			@chmod($sharedFile, 0777);
 			$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
 			
-			if($this->taskConfig->params->isRemote) // for remote conversion
+			if($this->taskConfig->params->isRemoteOutput) // for remote conversion
 			{
 				$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
 				$job->status = KalturaBatchJobStatus::ALMOST_DONE;
@@ -276,7 +276,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			@chmod("$sharedFile.log", 0777);
 			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
 		
-			if($this->taskConfig->params->isRemote) // for remote conversion
+			if($this->taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
 		}
 		else 
