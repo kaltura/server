@@ -423,7 +423,7 @@ class playManifestAction extends kalturaAction
 					case entry::ENTRY_MEDIA_TYPE_AUDIO:	
 						$duration = $this->entry->getDurationInt();
 						$flavors = $this->buildFlavorsArray($duration, true);
-						
+						KalturaLog::debug("retrieved entry duration: [$duration]");
 						return $this->buildXml(self::PLAY_STREAM_TYPE_RECORDED, $flavors, $duration);
 				}
 				
@@ -568,12 +568,14 @@ class playManifestAction extends kalturaAction
 						$urlManager = kUrlManager::getUrlManagerByStorageProfile($fileSync->getDc());
 						$urlManager->setClipTo($this->clipTo);
 						
+						$urlManager->setContainerFormat($flavorAsset->getContainerFormat());
 						if($flavorAsset->getFileExt() === null) // if the extension is missig use the one from the actual path
         					$urlManager->setFileExtension(pathinfo($fileSync->getFilePath(), PATHINFO_EXTENSION));
         				else
 							$urlManager->setFileExtension($flavorAsset->getFileExt());
         					
 						$urlManager->setProtocol(StorageProfile::PLAY_FORMAT_RTMP);
+						
 						$url = $urlManager->getFileSyncUrl($fileSync);
 						$url = preg_replace('/^\//', '', $url);
 						
