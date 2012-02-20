@@ -998,7 +998,10 @@ class kJobsManager
 					if($sourceIncludedInProfile)
 						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_READY);
 					else
+					{
 						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_DELETED);
+						$flavorAsset->setDeletedAt(time());
+					}
 						
 					$flavorAsset->save();
 					
