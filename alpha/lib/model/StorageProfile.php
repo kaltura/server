@@ -89,6 +89,16 @@ class StorageProfile extends BaseStorageProfile
 		$this->putInCustomData("allow_auto_delete", (bool)$v); 
 	}
 	
+    public function setRTMPPrefix ($v)
+	{
+	    $this->putInCustomData("rtmp_prefix", $v);
+	}
+	
+	public function getRTMPPrefix ()
+	{
+	    return $this->getFromCustomData("rtmp_prefix");
+	}
+	
 	/* ---------------------------------- TODO - temp solution -----------------------------------------*/
 	
 	/* URL Manager Params */
