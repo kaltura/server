@@ -2602,4 +2602,27 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable
 		$copyObj->setCopiedFrom($this);
 		return $copyObj;
 	}
+	
+	
+	public function getDynamicFlavorAttributesForAssetParams($assetParamsId)
+	{
+	    // set dynamic flavor attributes
+		$dynamicFlavorAttributes = array();
+		$dynamicEntryAttributes = $this->getDynamicFlavorAttributes(); // dynamic attributes for all entry flavors
+	    // if dynamic attributes are set for this specific flavor - use them
+		if (isset($dynamicEntryAttributes[$assetParamsId]))
+	    {
+	        $dynamicFlavorAttributes = $dynamicEntryAttributes[$assetParamsId];
+	    }
+	    // if not, and the flavor is not source - use attributes defined for flavor id -2
+	    else if (isset($dynamicEntryAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX]))
+	    {
+	        $assetParamsDb = assetParamsPeer::retrieveByPK($assetParamsId);
+	        if (!$assetParamsDb->hasTag(flavorParams::TAG_SOURCE)) // not the source flavor
+	        {
+		        $dynamicFlavorAttributes = $dynamicEntryAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX];
+	        }
+		}
+		return $dynamicFlavorAttributes;
+	}
 }

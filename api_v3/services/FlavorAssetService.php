@@ -569,19 +569,7 @@ class FlavorAssetService extends KalturaAssetService
 		}
 		$err = "";
 		
-		// set dynamic flavor attributes
-		$dynamicFlavorAttributes = array();
-		$dynamicEntryAttributes = $dbEntry->getDynamicFlavorAttributes(); // dynamic attributes for all entry flavors
-	    // if dynamic attributes are set for this specific flavor - use them
-		if (isset($dynamicEntryAttributes[$flavorParamsDb->getId()]))
-	    {
-	        $dynamicFlavorAttributes = $dynamicEntryAttributes[$flavorParamsDb->getId()];
-	    }
-	    // if not, and the flavor is not source - use attributes defined for flavor id -2
-	    else if (!$flavorParamsDb->hasTag(flavorParams::TAG_SOURCE) && isset($dynamicEntryAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX]))
-	    {
-		    $dynamicFlavorAttributes = $dynamicEntryAttributes[flavorParams::DYNAMIC_ATTRIBUTES_ALL_FLAVORS_INDEX];
-		}
+		$dynamicFlavorAttributes = $dbEntry->getDynamicFlavorAttributesForAssetParams($flavorParamsDb->getId());
 		
 		kBusinessPreConvertDL::decideAddEntryFlavor(null, $dbEntry->getId(), $flavorParamsId, $err, null, $dynamicFlavorAttributes);
 	}
