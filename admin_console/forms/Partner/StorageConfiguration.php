@@ -98,6 +98,11 @@ class Form_Partner_StorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			
 		));
+		
+		$this->addElement('text', 'rtmpPrefix', array(
+		    'label'        =>  'RTMP stream URL prefix:',
+		    'filters'      =>   array('StringTrim'),
+		));
 		 
 		$this->addElement('text', 'deliveryIisBaseUrl', array(
 			'label'			=> 'IIS Delivery Base URL:',
