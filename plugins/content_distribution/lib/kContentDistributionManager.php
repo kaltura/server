@@ -122,7 +122,7 @@ class kContentDistributionManager
 			return true;
 		
 		// check if all files exist on any of the remote dcs
-		$otherDcs = kDataCenterMgr::getAllDcs();
+		$otherDcs = kDataCenterMgr::getAllDcs(true);
 		foreach($otherDcs as $remoteDc)
 		{
 			$remoteDcId = $remoteDc['id'];
@@ -170,7 +170,10 @@ class kContentDistributionManager
 		if($entryDistribution->getStatus() == EntryDistributionStatus::SUBMITTING)
 			return null;
 		
-		$dc = kDataCenterMgr::getCurrentDcId();
+		$dc = $distributionProfile->getRecommendedDcForExecute();
+		if(is_null($dc))
+			$dc = kDataCenterMgr::getCurrentDcId();
+			
 		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 		if($distributionProfile->getProvider()->isLocalFileRequired($jobType))
 		{
@@ -257,7 +260,11 @@ class kContentDistributionManager
 		if($entryDistribution->getStatus() == EntryDistributionStatus::UPDATING)
 			return null;
 		
-		$dc = kDataCenterMgr::getCurrentDcId();
+		
+		$dc = $distributionProfile->getRecommendedDcForExecute();
+		if(is_null($dc))
+			$dc = kDataCenterMgr::getCurrentDcId();
+		
 		$jobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_UPDATE);
 		if($distributionProfile->getProvider()->isLocalFileRequired($jobType))
 		{

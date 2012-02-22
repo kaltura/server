@@ -136,6 +136,12 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 	 */
 	public $recommendedDcForDownload;
 	
+	/**
+	 * The best Kaltura data center to be used to execute the distribution job
+	 * @var int
+	 */
+	public $recommendedDcForExecute;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
 	 */
@@ -160,6 +166,7 @@ class KalturaDistributionProfile extends KalturaObject implements IFilterable
 		'sunsetDefaultOffset',
 		'recommendedStorageProfileForDownload',
 		'recommendedDcForDownload',
+		'recommendedDcForExecute',
 	 );
 		 
 	public function getMapBetweenObjects()
