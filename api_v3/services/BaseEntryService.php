@@ -809,9 +809,10 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
+	 * @action export
 	 * Action for manually exporting an entry
-	 * @param $entryId - entry ID string
-	 * @param $storageProfileId - storage profile ID to export to
+	 * @param string $entryId
+	 * @param int $storageProfileId
 	 */
 	public function exportAction ( $entryId , $storageProfileId )
 	{
