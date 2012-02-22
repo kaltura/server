@@ -48,7 +48,7 @@ class KalturaQuickPlayDistributionJobProviderData extends KalturaConfigurableDis
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 			{
 				$str = new KalturaString();
-				$str->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+				$str->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			    $this->videoFilePaths[] = $str;
 			}
 		}
@@ -59,7 +59,7 @@ class KalturaQuickPlayDistributionJobProviderData extends KalturaConfigurableDis
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 			{
 				$str = new KalturaString();
-				$str->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+				$str->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			    $this->thumbnailFilePaths[] = $str;
 			}
 		}

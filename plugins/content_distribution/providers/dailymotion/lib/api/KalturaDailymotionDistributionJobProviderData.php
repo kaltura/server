@@ -30,7 +30,7 @@ class KalturaDailymotionDistributionJobProviderData extends KalturaConfigurableD
 		if($flavorAsset) 
 		{
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
 	}

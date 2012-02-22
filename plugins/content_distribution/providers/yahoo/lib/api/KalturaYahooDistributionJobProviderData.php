@@ -41,8 +41,8 @@ class KalturaYahooDistributionJobProviderData extends KalturaConfigurableDistrib
 					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 					if(kFileSyncUtils::fileSync_exists($syncKey)){
 						$id = $flavorAsset->getId();
-					    //$this->videoAssetFilePath[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
-						$videoAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+					    //$this->videoAssetFilePath[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+						$videoAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 					}
 				}
 			}
@@ -68,11 +68,11 @@ class KalturaYahooDistributionJobProviderData extends KalturaConfigurableDistrib
 			}
 			$syncKey = $smallThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey)){
-			    $this->smallThumbPath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			    $this->smallThumbPath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			}
 			$syncKey = $largeThumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey)){
-			     $this->largeThumbPath= kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			     $this->largeThumbPath= kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			}
 		}	
 	}

@@ -48,7 +48,7 @@ class KalturaFreewheelGenericDistributionJobProviderData extends KalturaConfigur
 		{
 			$videoAssetFilePath = new KalturaString();
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$videoAssetFilePath->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$videoAssetFilePath->value = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			$this->videoAssetFilePaths[] = $videoAssetFilePath;
 		}
 		
@@ -57,7 +57,7 @@ class KalturaFreewheelGenericDistributionJobProviderData extends KalturaConfigur
 		{
 			$thumbAsset = reset($thumbAssets);
 			$syncKey = $thumbAssets->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
 		// entry cue points

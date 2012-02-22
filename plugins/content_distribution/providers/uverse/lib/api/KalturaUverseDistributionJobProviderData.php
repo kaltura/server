@@ -46,7 +46,7 @@ class KalturaUverseDistributionJobProviderData extends KalturaConfigurableDistri
 		{
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey))
-				$this->localAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+				$this->localAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
 		$entryDistributionDb = EntryDistributionPeer::retrieveByPK($distributionJobData->entryDistributionId);

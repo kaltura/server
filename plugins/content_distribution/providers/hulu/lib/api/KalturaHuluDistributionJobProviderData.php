@@ -49,7 +49,7 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 		{
 			$flavorAsset = reset($flavorAssets);
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
@@ -57,7 +57,7 @@ class KalturaHuluDistributionJobProviderData extends KalturaConfigurableDistribu
 		{
 			$thumbAsset = reset($thumbAssets);
 			$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
 		$tempFieldValues = unserialize($this->fieldValues);

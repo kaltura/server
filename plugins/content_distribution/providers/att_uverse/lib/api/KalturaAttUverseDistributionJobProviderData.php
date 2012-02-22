@@ -57,7 +57,7 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 					$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 					if(kFileSyncUtils::fileSync_exists($syncKey)){
 						$id = $flavorAsset->getId();
-						$videoAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+						$videoAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 					}
 				}
 			}
@@ -77,7 +77,7 @@ class KalturaAttUverseDistributionJobProviderData extends KalturaConfigurableDis
 				$syncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				if(kFileSyncUtils::fileSync_exists($syncKey)){
 					$id = $thumbAsset->getId();
-					$thumbAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);				    
+					$thumbAssetFilePathArray[$id] = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);				    
 				}
 			}
 			$thumbLocalIds = array_keys($thumbAssetFilePathArray);

@@ -41,7 +41,7 @@ class KalturaFreewheelDistributionJobProviderData extends KalturaDistributionJob
 		{
 			$videoAssetFilePath = new KalturaFreewheelDistributionAssetPath();
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$videoAssetFilePath->path = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$videoAssetFilePath->path = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			$this->videoAssetFilePaths[] = $videoAssetFilePath;
 		}
 		
@@ -50,7 +50,7 @@ class KalturaFreewheelDistributionJobProviderData extends KalturaDistributionJob
 		{
 			$thumbAsset = reset($thumbAssets);
 			$syncKey = $thumbAssets->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 	}
 		

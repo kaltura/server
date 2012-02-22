@@ -235,7 +235,7 @@ class NdnFeed
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		if(kFileSyncUtils::fileSync_exists($syncKey))
 		{
-			$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+			$filePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			$mimeType = kFile::mimeType($filePath);
 		}				
 		$this->setNodeValue('media:content/@type', $mimeType, $item);

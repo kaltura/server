@@ -36,7 +36,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 		{
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey))
-				$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+				$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
 		$thumbAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->thumbAssetIds));
@@ -44,7 +44,7 @@ class KalturaYoutubeApiDistributionJobProviderData extends KalturaConfigurableDi
 		{
 			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey))
-				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, true);
+				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 		}
 		
 	}
