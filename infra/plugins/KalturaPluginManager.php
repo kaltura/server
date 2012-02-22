@@ -305,7 +305,7 @@ class KalturaPluginManager
 		{
 			if(!class_exists($pluginClass))
 			{
-				KalturaLog::err("Plugin [$pluginClass] could - class not found.");
+				KalturaLog::err("Plugin [$pluginClass] class not found.");
 				continue;
 			}
 				
