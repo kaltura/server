@@ -285,7 +285,10 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 					unset($freeTextsArr[$valIndex]);
 					
 			foreach($freeTextsArr as $freeText)
+			{
+				$freeText = SphinxUtils::escapeString($freeText);
 				$additionalConditions[] = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << ( $freeText ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
+			}
 			
 			return $additionalConditions;
 		}
@@ -297,6 +300,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 				
 		$freeTextsArr = array_unique($freeTextsArr);
 		$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
+		$freeTextExpr = SphinxUtils::escapeString($freeTextExpr);
 		$additionalConditions[] = '@'. MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ' . MetadataPlugin::PLUGIN_NAME . "_text << ( $freeTextExpr ) << " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_text';
 		return $additionalConditions;
 	}
