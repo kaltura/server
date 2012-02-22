@@ -58,7 +58,7 @@ class AttUverseDistributionEngine extends DistributionEngine implements
 	{
 		KalturaLog::debug("AttUverse: submit");
 		/* @var $entryDistribution EntryDistribution */
-		$entryDistribution = $data->entryDistribution;		
+		$entryDistribution = $data->entryDistribution;	
 
 		$remoteId = $entryDistribution->entryId;
 		$data->remoteId = $remoteId;

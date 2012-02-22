@@ -1,5 +1,6 @@
 <?php
 /**
+ * @package plugins.attUverseDistribution
  * @subpackage lib
  */
 class AttUverseDistributionFeedHelper
