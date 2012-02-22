@@ -90,9 +90,11 @@ abstract class KalturaAssetService extends KalturaBaseService
 	}
 	
 	/**
+	 * @action export
+	 * 
 	 * Action for manually exporting an asset
-	 * @param $assetId - asset ID string
-	 * @param $storageProfileId - storage profile ID to export to
+	 * @param string $assetId
+	 * @param int $storageProfileId
 	 */
 	public function exportAction ( $assetId , $storageProfileId )
 	{
