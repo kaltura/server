@@ -126,9 +126,11 @@ class StorageProfileService extends KalturaBaseService
 	}
 	
 	/**
-	 * Action for manually exporting an entry
-	 * @param $storageProfileId - storage profile ID to export to
-	 * @param $entryId - entry ID string
+	 * @action exportEntry
+	 * 
+	 * Action for manually exporting an entry 
+	 * @param string $entryId
+	 * @param int $storageProfileId
 	 */
 	public function exportEntryAction($storageProfileId, $entryId)
 	{
@@ -164,9 +166,11 @@ class StorageProfileService extends KalturaBaseService
 	}
 	
 	/**
+	 * @action exportAsset
+	 * 
 	 * Action for manually exporting an asset
-	 * @param $storageProfileId - storage profile ID to export to
-	 * @param $assetId - asset ID string
+	 * @param string $assetId
+	 * @param int $storageProfileId - storage profile ID to export to
 	 */
 	public function exportAssetAction($storageProfileId, $assetId)
 	{
