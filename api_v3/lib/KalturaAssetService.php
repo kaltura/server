@@ -7,7 +7,7 @@
  * @package api
  * @subpackage services
  */
-class KalturaAssetService extends KalturaBaseService
+abstract class KalturaAssetService extends KalturaBaseService
 {
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -18,6 +18,15 @@ class KalturaAssetService extends KalturaBaseService
 		parent::applyPartnerFilterForClass(new assetPeer());
 		parent::applyPartnerFilterForClass(new assetParamsPeer());
 	}
+	
+	/**
+	 * Get asset by ID
+	 * 
+	 * @action get
+	 * @param string $id
+	 * @return KalturaAsset
+	 */
+	abstract public function getAction($id);
 	
 	/**
 	* @param asset $asset
@@ -97,22 +106,22 @@ class KalturaAssetService extends KalturaBaseService
 	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
 	    }
 	    
-	    $asset = entryPeer::retrieveByPK($assetId);
+	    $dbAsset = entryPeer::retrieveByPK($assetId);
 	    
-	    $storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 	    
-	    if (!$asset)
+	    if (!$dbAsset)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $assetId);
 	    }
 	    
-	    if (!$storageProfile)
+	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
 	    }
 	    
-	    kStorageExporter::exportEntry($asset, $storageProfile);
+	    kStorageExporter::exportEntry($dbAsset, $dbStorageProfile);
 	    
-	    return $asset;
+	    return $this->getAction($assetId);
 	}
 }

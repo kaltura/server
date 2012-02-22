@@ -127,23 +127,48 @@ class StorageProfileService extends KalturaBaseService
 	
 	/**
 	 * Action for manually exporting an entry
-	 * @param $entryId - entry ID string
 	 * @param $storageProfileId - storage profile ID to export to
+	 * @param $entryId - entry ID string
 	 */
-	public function exportEntryAction ( $entryId , $storageProfileId)
+	public function exportEntryAction($storageProfileId, $entryId)
 	{
-	    $baseEntryService = new BaseEntryService();
+	    if (!$entryId || $entryId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, -1);
+	    }
 	    
-	    return $baseEntryService->exportAction ($entryId , $storageProfileId);
+	    if (!$storageProfileId || $storageProfileId == "")
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, -1);
+	    }
 	    
+	    $entry = entryPeer::retrieveByPK($entryId);
+	    
+	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    
+	    if (!$entry)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
+	    }
+	    
+	    if (!$dbStorageProfile)
+	    {
+	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
+	    }
+	    
+	    kStorageExporter::exportEntry($entry, $dbStorageProfile);
+	    
+		$storageProfile = new KalturaStorageProfile();
+		$storageProfile->fromObject($dbStorageProfile);
+		return $storageProfile;
 	}
 	
 	/**
 	 * Action for manually exporting an asset
-	 * @param $assetId - asset ID string
 	 * @param $storageProfileId - storage profile ID to export to
+	 * @param $assetId - asset ID string
 	 */
-	public function exportAssetAction ( $assetId , $storageProfileId)
+	public function exportAssetAction($storageProfileId, $assetId)
 	{
         $assetService = new KalturaAssetService();
         

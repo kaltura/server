@@ -825,22 +825,24 @@ class BaseEntryService extends KalturaEntryService
 	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, -1);
 	    }
 	    
-	    $entry = entryPeer::retrieveByPK($entryId);
+	    $dbEntry = entryPeer::retrieveByPK($entryId);
 	    
-	    $storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+	    $dbStorageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 	    
-	    if (!$entry)
+	    if (!$dbEntry)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
 	    }
 	    
-	    if (!$storageProfile)
+	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $storageProfileId);
 	    }
 	    
-	    kStorageExporter::exportEntry($entry, $storageProfile);
+	    kStorageExporter::exportEntry($dbEntry, $dbStorageProfile);
 	    
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry);
 	    return $entry;
 	    
 	}
