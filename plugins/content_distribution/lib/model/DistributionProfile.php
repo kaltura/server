@@ -249,11 +249,17 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return explode(',', $this->getOptionalFlavorParamsIds());
 	}
 	
+	private function filterEmptyString($value)
+	{
+		return strlen(strval($value));
+	}
+	
 	/**
 	 * @see content_distribution/lib/model/om/BaseDistributionProfile#setRequiredFlavorParamsIdsArray()
 	 */
 	public function setRequiredFlavorParamsIdsArray(array $v)
 	{
+		$v = array_filter($v, array($this, filterEmptyString));
 		return $this->setRequiredFlavorParamsIds(implode(',', array_unique($v)));
 	}
 
