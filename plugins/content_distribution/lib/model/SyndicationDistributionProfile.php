@@ -40,6 +40,7 @@ class SyndicationDistributionProfile extends DistributionProfile
 		$syndicationFeed->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$syndicationFeed->setAllowEmbed(false);
 		$syndicationFeed->setType(syndicationFeedType::KALTURA);
+		$syndicationFeed->setFlavorParamId($this->required_flavor_params_ids);
 		$syndicationFeed->save();
 		
 		$this->setFeedId($syndicationFeed->getId());

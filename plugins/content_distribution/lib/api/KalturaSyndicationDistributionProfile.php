@@ -65,6 +65,12 @@ class KalturaSyndicationDistributionProfile extends KalturaDistributionProfile
 		if(is_null($object))
 			$object = new SyndicationDistributionProfile();
 		
+		if ( count(explode(",", $this->requiredFlavorParamsIds)) > 1 )
+		{
+		    throw new KalturaAPIException( KalturaErrors::INVALID_FIELD_VALUE, "requiredFlavorParamsIds");
+		}
+		
+			
 		return parent::toObject($object, $skip);
 	}
 }
