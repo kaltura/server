@@ -148,8 +148,11 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 */
 	protected function executeSphinx($index, $wheres, $orderBy, $limit, $maxMatches, $setLimit, $conditions = '')
 	{
+		$pdo = DbManager::getSphinxConnection();
+		
+		$comment = $pdo->getComment();
 		$sphinxIdField = $this->getSphinxIdField();
-		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker=none, max_matches=$maxMatches";
+		$sql = "SELECT $sphinxIdField $conditions FROM $index $wheres $orderBy LIMIT $limit OPTION ranker=none, max_matches=$maxMatches, comment='$comment'";
 
 		$badSphinxQueries = kConf::hasParam("sphinx_bad_queries") ? kConf::get("sphinx_bad_queries") : array();
 
@@ -164,8 +167,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 
 		
 		//debug query
-		//echo $sql."\n"; die;
-		$pdo = DbManager::getSphinxConnection();
+
 		$stmt = $pdo->query($sql);
 		if(!$stmt)
 		{

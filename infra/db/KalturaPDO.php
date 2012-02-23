@@ -39,11 +39,8 @@ class KalturaPDO extends PropelPDO
 		$this->enableComments = $enabled;
 	}
 
-	protected function getComment() 
+	public function getComment() 
 	{
-		if(!$this->enableComments)
-			return '';
-			
 		if(!self::$comment)
 		{
 			$uniqueId = new UniqueId();
@@ -51,7 +48,16 @@ class KalturaPDO extends PropelPDO
 			self::$comment .= "[$uniqueId]";
 		}
 		
-		return '/* ' . self::$comment . "[$this->connectionName] */ ";
+		return self::$comment . "[$this->connectionName]";
+	}
+	
+	protected function getCommentWrapped() 
+	{
+		if(!$this->enableComments)
+			return '';
+			
+		$commentBody = $this->getComment();
+		return "/* $commentBody */ ";
 	}
 	
 	/* (non-PHPdoc)
@@ -59,7 +65,7 @@ class KalturaPDO extends PropelPDO
 	 */
 	public function prepare($sql, $driver_options = array())
 	{
-		$comment = $this->getComment();
+		$comment = $this->getCommentWrapped();
 		$sql = $comment . $sql;
 		
 		return parent::prepare($sql, $driver_options);
@@ -72,7 +78,7 @@ class KalturaPDO extends PropelPDO
 	{
 		KalturaLog::debug($sql);
 		
-		$comment = $this->getComment();
+		$comment = $this->getCommentWrapped();
 		$sql = $comment . $sql;
 		
 		try
@@ -96,7 +102,7 @@ class KalturaPDO extends PropelPDO
 		$sql = $args[0];
 		KalturaLog::debug($sql);
 		
-		$comment = $this->getComment();
+		$comment = $this->getCommentWrapped();
 		$sql = $comment . $sql;
 		
 		try
