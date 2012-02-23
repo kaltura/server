@@ -36,7 +36,9 @@ class YahooDistributionFeedHelper
 	
 	protected $flavorAssets;
 	
-	const VIDEO_TIME_ZONE = 'EST';	
+	const VIDEO_TIME_ZONE = 'America/New_York';
+	const VIDEO_TIME_ZONE_CODE = 'ET';
+	const VIDEO_TIME_FORMAT = 'm/d/Y H:i:s';
 		
 	/**
 	 * @param $templateName
@@ -66,16 +68,20 @@ class YahooDistributionFeedHelper
 		if (is_null($startTime)) {
 		    $startTime = time() - 24*60*60;  // yesterday, to make the video public by default
 		}
-		$this->setVideoValidTime(date('c', intval($startTime)));
+		$this->setVideoValidTime($startTime);
 		
 		$endTime = $this->getValueForField(KalturaYahooDistributionField::VIDEO_EXPIRATION_TIME);
 		if ($endTime && intval($endTime)) {
-            $this->setVideoExpirationTime(date('c', $endTime));
+			$this->setVideoExpirationTime($endTime);        
+		}
+		//remove video exportaion time tag if empty
+		else{
+			$this->deleteVideoExpirtaionTimeTag();
 		}		
+		
 		$this->setContactTelephone($this->getValueForField(KalturaYahooDistributionField::CONTACT_TELEPHONE));
-		$this->setContactEmail($this->getValueForField(KalturaYahooDistributionField::CONTACT_EMAIL));
-		$this->setVideoTimeZone();
-		$this->setVideoModifiedDate($this->getValueForField(KalturaYahooDistributionField::VIDEO_MODIFIED_DATE));
+		$this->setContactEmail($this->getValueForField(KalturaYahooDistributionField::CONTACT_EMAIL));					
+		$this->setVideoModifiedDate($this->getValueForField(KalturaYahooDistributionField::VIDEO_MODIFIED_DATE));		
 		$this->setVideoFeedItemId($this->getValueForField(KalturaYahooDistributionField::VIDEO_FEEDITEM_ID));
 		$this->setVideoTitle($this->getValueForField(KalturaYahooDistributionField::VIDEO_TITLE));
 		$this->setVideoDescription($this->getValueForField(KalturaYahooDistributionField::VIDEO_DESCRIPTION));
@@ -95,13 +101,13 @@ class YahooDistributionFeedHelper
 		if (is_null($startTime)) {
 		    $startTime = time() - 24*60*60;  // yesterday, to make the video public by default
 		}
-		$this->setVideoValidTime(date('c', intval($startTime)));
+		$this->setVideoValidTime($startTime);
+		
 		//expiration time
-		$newEndTime = time() - 24*60*60;  //// yesterday, to make the video expired by default
+		$newEndTime = time() - 24*60*60;  // yesterday, to make the video expired by default
 		if ($newEndTime && intval($newEndTime)) {
-           	$this->setVideoExpirationTime(date('c', $newEndTime));
+			$this->setVideoExpirationTime($newEndTime);
 		}		
-		$this->setVideoTimeZone();
 	}
 	
 	private function getValueForField($fieldName)
@@ -156,14 +162,7 @@ class YahooDistributionFeedHelper
 	{
 		$this->setNodeValue('/CMSFEED/CONTACT/@EMAIL', $value);
 	}
-	
-	public function setVideoTimeZone()
-	{		
-		$this->setNodeValue('/CMSFEED/FEEDITEM/MODIFIEDDATE/@TZ', self::VIDEO_TIME_ZONE);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/VALIDTIME/@TZ', self::VIDEO_TIME_ZONE);
-		$this->setNodeValue('/CMSFEED/FEEDITEM/EXPIRATIONTIME/@TZ', self::VIDEO_TIME_ZONE);
-	}
-	
+		
 	public function setVideoType($value)
 	{
 		$this->setNodeValue('/CMSFEED/VIDEO/@TYPE', $value);
@@ -171,8 +170,11 @@ class YahooDistributionFeedHelper
 	
 	public function setVideoModifiedDate($value)
 	{
-		$value = date('c', intval($value));
-		$this->setNodeValue('/CMSFEED/FEEDITEM/MODIFIEDDATE', $value);
+		$dateTime = new DateTime('@'.$value);
+		$dateTime->setTimezone(new DateTimeZone(self::VIDEO_TIME_ZONE));
+		$date = $dateTime->format(self::VIDEO_TIME_FORMAT);
+		$this->setNodeValue('/CMSFEED/FEEDITEM/MODIFIEDDATE', $date);
+		$this->setNodeValue('/CMSFEED/FEEDITEM/MODIFIEDDATE/@TZ', self::VIDEO_TIME_ZONE_CODE);	
 	}
 		
 	public function setVideoFeedItemId($value)
@@ -249,16 +251,29 @@ class YahooDistributionFeedHelper
 			$parentNode->removeChild($node);
 		}	
 	}
-	
-	
+		
 	public function setVideoValidTime($value)
 	{
-		$this->setNodeValue('/CMSFEED/FEEDITEM/VALIDTIME', $value);
+		$dateTime = new DateTime('@'.$value);
+		$dateTime->setTimezone(new DateTimeZone(self::VIDEO_TIME_ZONE));
+		$date = $dateTime->format(self::VIDEO_TIME_FORMAT);
+		$this->setNodeValue('/CMSFEED/FEEDITEM/VALIDTIME', $date);
+		$this->setNodeValue('/CMSFEED/FEEDITEM/VALIDTIME/@TZ', self::VIDEO_TIME_ZONE_CODE);	
 	}
 	
 	public function setVideoExpirationTime($value)
+	{		
+		$dateTime = new DateTime('@'.$value);
+		$dateTime->setTimezone(new DateTimeZone(self::VIDEO_TIME_ZONE));
+		$date = $dateTime->format(self::VIDEO_TIME_FORMAT);
+		$this->setNodeValue('/CMSFEED/FEEDITEM/EXPIRATIONTIME', $date);
+		$this->setNodeValue('/CMSFEED/FEEDITEM/EXPIRATIONTIME/@TZ', self::VIDEO_TIME_ZONE_CODE);	
+	}
+		
+	public function deleteVideoExpirtaionTimeTag()
 	{
-		$this->setNodeValue('/CMSFEED/FEEDITEM/EXPIRATIONTIME', $value);
+		$node = $this->xpath->query('/CMSFEED/FEEDITEM/EXPIRATIONTIME')->item(0);
+		$node->parentNode->removeChild($node);		
 	}
 	
 	public function setVideoDuration($value)
