@@ -79,25 +79,23 @@ class SphinxCriterion extends KalturaCriterion
 	
 	protected function generateAggregatedCondition($sphinxField, $value,$queryHasOr, $aggregatedStr, $singleStr)
 	{
+		$values = implode(',', $value);
+		
 		if ($queryHasOr)
 		{
-			$values = implode(',', $value);
-			$thisClause = "$aggregatedStr ($sphinxField , $values)";
+			return "$aggregatedStr ($sphinxField , $values)";
 		}
 		else
 		{
 			if(count($value) > 1)
 			{
-				$values = implode(',', $value);
-				$thisClause = "$sphinxField $aggregatedStr($values)";
+				return "$sphinxField $aggregatedStr($values)";
 			}
 			else
 			{
-				$singleValue = reset($value);
-				$thisClause = "$sphinxField $singleStr $singleValue";
+				return "$sphinxField $singleStr $values";
 			}
 		}
-		return $thisClause;
 	}
 	
 	protected function getNonStringClause($sphinxField, $type, $comparison, $value, $queryHasOr)

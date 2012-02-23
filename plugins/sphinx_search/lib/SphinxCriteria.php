@@ -221,9 +221,9 @@ abstract class SphinxCriteria extends KalturaCriteria
 	 * This function is responsible to sort the fields by their priority.
 	 * Fields that cut more results, should be first so the query will be faster. 
 	 */
-	protected static function sortFieldsByPriority($a,$b) 
+	protected static function sortFieldsByPriority($fieldA,$fieldB) 
 	{
-		if($a == $b)
+		if($fieldA == $fieldB)
 			return 0;
 		
 		$fieldsWithPriorities = kConf::get("fields_with_priorities_in_sphinx");
@@ -231,8 +231,8 @@ abstract class SphinxCriteria extends KalturaCriteria
 		$priorityA = 0;
 		$priorityB = 0;
 		
-		$aFieldName = substr($a,strpos($a,".") + 1);
-		$bFieldName = substr($b,strpos($b,".") + 1);
+		$aFieldName = substr($fieldA,strpos($fieldA,".") + 1);
+		$bFieldName = substr($fieldB,strpos($fieldB,".") + 1);
 		
 		if(array_key_exists($aFieldName, $fieldsWithPriorities)) 
 			$priorityA = $fieldsWithPriorities[$aFieldName];
@@ -240,13 +240,7 @@ abstract class SphinxCriteria extends KalturaCriteria
 		if(array_key_exists($bFieldName, $fieldsWithPriorities))
 			$priorityB = $fieldsWithPriorities[$bFieldName];
 		
-		if($priorityA > $priorityB) 
-			return -1;
-		
-		if($priorityA < $priorityB)
-			return 1;
-		
-		return ($a < $b) ? -1 : 1;
+		return ($priorityB - $priorityA);
 	}
 	
 	/* (non-PHPdoc)
