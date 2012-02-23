@@ -20,8 +20,6 @@ class ContentDistributionBatchService extends BatchService
 		$criteria = KalturaCriteria::create(EntryDistributionPeer::OM_CLASS);
 		$criteria->add(EntryDistributionPeer::SUN_STATUS, EntryDistributionSunStatus::AFTER_SUNSET , Criteria::NOT_EQUAL);
 		$crit1 = $criteria->getNewCriterion(EntryDistributionPeer::SUNSET, time(), Criteria::LESS_THAN);
-		$crit2 = $criteria->getNewCriterion(EntryDistributionPeer::SUNSET, 0, Criteria::GREATER_THAN);
-		$crit1->addAnd($crit2);
 		$criteria->add($crit1);
 		$entryDistributions = EntryDistributionPeer::doSelect($criteria);
 		foreach($entryDistributions as $entryDistribution) // raise the updated events to trigger index in search engine (sphinx)
