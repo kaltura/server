@@ -304,8 +304,6 @@ class PartnerService extends KalturaBaseService
 	 * @param KalturaPartnerFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaPartnerListResponse
-	 * 
-	 * @throws KalturaErrors::NON_GROUP_PARTNER
 	 */
 	function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
