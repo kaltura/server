@@ -13,8 +13,9 @@
 <script type="text/javascript" src="js/jquery.json.min.js"></script>
 <script type="text/javascript" src="js/code.example.js"></script>
 <script type="text/javascript" src="js/main.js?r35598"></script>
-</head>
+</head> 
 	<?php 
+	    ini_set("memory_limit","256M");
 		require_once("../../bootstrap.php");
 		ActKeyUtils::checkCurrent();
 		KalturaLog::setContext("TESTME");
@@ -37,7 +38,7 @@
 		{
 			$services = unserialize(file_get_contents($cacheFileName));
 		}
-		else
+		else 
 		{
 			$clientGenerator = new DummyForDocsClientGenerator();
 			$clientGenerator->setIncludeOrExcludeList($include, $exclude, $excludePaths);
